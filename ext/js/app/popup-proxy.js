@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, log} from '../core.js';
-import {yomitan} from '../yomitan.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {log} from '../core/logger.js';
 
 /**
  * This class is a proxy for a Popup that is hosted in a different frame.
  * It effectively forwards all API calls to the underlying Popup.
- * @augments EventDispatcher<import('popup').PopupAnyEventType>
+ * @augments EventDispatcher<import('popup').Events>
  */
 export class PopupProxy extends EventDispatcher {
     /**
@@ -30,12 +30,15 @@ export class PopupProxy extends EventDispatcher {
      * @param {import('popup').PopupProxyConstructorDetails} details Details about how to set up the instance.
      */
     constructor({
+        application,
         id,
         depth,
         frameId,
         frameOffsetForwarder
     }) {
         super();
+        /** @type {import('../application.js').Application} */
+        this._application = application;
         /** @type {string} */
         this._id = id;
         /** @type {number} */
@@ -140,7 +143,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async setOptionsContext(optionsContext) {
-        await this._invokeSafe('PopupFactory.setOptionsContext', {id: this._id, optionsContext}, void 0);
+        await this._invokeSafe('popupFactorySetOptionsContext', {id: this._id, optionsContext}, void 0);
     }
 
     /**
@@ -149,7 +152,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async hide(changeFocus) {
-        await this._invokeSafe('PopupFactory.hide', {id: this._id, changeFocus}, void 0);
+        await this._invokeSafe('popupFactoryHide', {id: this._id, changeFocus}, void 0);
     }
 
     /**
@@ -157,7 +160,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<boolean>} `true` if the popup is visible, `false` otherwise.
      */
     isVisible() {
-        return this._invokeSafe('PopupFactory.isVisible', {id: this._id}, false);
+        return this._invokeSafe('popupFactoryIsVisible', {id: this._id}, false);
     }
 
     /**
@@ -168,7 +171,7 @@ export class PopupProxy extends EventDispatcher {
      *   or null if the override wasn't assigned.
      */
     setVisibleOverride(value, priority) {
-        return this._invokeSafe('PopupFactory.setVisibleOverride', {id: this._id, value, priority}, null);
+        return this._invokeSafe('popupFactorySetVisibleOverride', {id: this._id, value, priority}, null);
     }
 
     /**
@@ -177,7 +180,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<boolean>} `true` if the override existed and was removed, `false` otherwise.
      */
     clearVisibleOverride(token) {
-        return this._invokeSafe('PopupFactory.clearVisibleOverride', {id: this._id, token}, false);
+        return this._invokeSafe('popupFactoryClearVisibleOverride', {id: this._id, token}, false);
     }
 
     /**
@@ -192,7 +195,7 @@ export class PopupProxy extends EventDispatcher {
             x += this._frameOffsetX;
             y += this._frameOffsetY;
         }
-        return await this._invokeSafe('PopupFactory.containsPoint', {id: this._id, x, y}, false);
+        return await this._invokeSafe('popupFactoryContainsPoint', {id: this._id, x, y}, false);
     }
 
     /**
@@ -212,7 +215,7 @@ export class PopupProxy extends EventDispatcher {
                 sourceRect.bottom += this._frameOffsetY;
             }
         }
-        await this._invokeSafe('PopupFactory.showContent', {id: this._id, details, displayDetails}, void 0);
+        await this._invokeSafe('popupFactoryShowContent', {id: this._id, details, displayDetails}, void 0);
     }
 
     /**
@@ -221,7 +224,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async setCustomCss(css) {
-        await this._invokeSafe('PopupFactory.setCustomCss', {id: this._id, css}, void 0);
+        await this._invokeSafe('popupFactorySetCustomCss', {id: this._id, css}, void 0);
     }
 
     /**
@@ -229,7 +232,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async clearAutoPlayTimer() {
-        await this._invokeSafe('PopupFactory.clearAutoPlayTimer', {id: this._id}, void 0);
+        await this._invokeSafe('popupFactoryClearAutoPlayTimer', {id: this._id}, void 0);
     }
 
     /**
@@ -238,7 +241,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async setContentScale(scale) {
-        await this._invokeSafe('PopupFactory.setContentScale', {id: this._id, scale}, void 0);
+        await this._invokeSafe('popupFactorySetContentScale', {id: this._id, scale}, void 0);
     }
 
     /**
@@ -254,7 +257,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async updateTheme() {
-        await this._invokeSafe('PopupFactory.updateTheme', {id: this._id}, void 0);
+        await this._invokeSafe('popupFactoryUpdateTheme', {id: this._id}, void 0);
     }
 
     /**
@@ -265,7 +268,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async setCustomOuterCss(css, useWebExtensionApi) {
-        await this._invokeSafe('PopupFactory.setCustomOuterCss', {id: this._id, css, useWebExtensionApi}, void 0);
+        await this._invokeSafe('popupFactorySetCustomOuterCss', {id: this._id, css, useWebExtensionApi}, void 0);
     }
 
     /**
@@ -282,7 +285,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<import('popup').ValidSize>} The size and whether or not it is valid.
      */
     getFrameSize() {
-        return this._invokeSafe('PopupFactory.getFrameSize', {id: this._id}, {width: 0, height: 0, valid: false});
+        return this._invokeSafe('popupFactoryGetFrameSize', {id: this._id}, {width: 0, height: 0, valid: false});
     }
 
     /**
@@ -292,36 +295,34 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<boolean>} `true` if the size assignment was successful, `false` otherwise.
      */
     setFrameSize(width, height) {
-        return this._invokeSafe('PopupFactory.setFrameSize', {id: this._id, width, height}, false);
+        return this._invokeSafe('popupFactorySetFrameSize', {id: this._id, width, height}, false);
     }
 
     // Private
 
     /**
-     * @template {import('core').SerializableObject} TParams
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {TParams} params
-     * @returns {Promise<TReturn>}
+     * @template {import('cross-frame-api').ApiNames} TName
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     _invoke(action, params) {
-        return yomitan.crossFrame.invoke(this._frameId, action, params);
+        return this._application.crossFrame.invoke(this._frameId, action, params);
     }
 
     /**
-     * @template {import('core').SerializableObject} TParams
-     * @template [TReturn=unknown]
+     * @template {import('cross-frame-api').ApiNames} TName
      * @template [TReturnDefault=unknown]
-     * @param {string} action
-     * @param {TParams} params
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
      * @param {TReturnDefault} defaultReturnValue
-     * @returns {Promise<TReturn|TReturnDefault>}
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>|TReturnDefault>}
      */
     async _invokeSafe(action, params, defaultReturnValue) {
         try {
             return await this._invoke(action, params);
         } catch (e) {
-            if (!yomitan.isExtensionUnloaded) { throw e; }
+            if (!this._application.webExtension.unloaded) { throw e; }
             return defaultReturnValue;
         }
     }
@@ -361,7 +362,7 @@ export class PopupProxy extends EventDispatcher {
             } else {
                 this._frameOffsetX = 0;
                 this._frameOffsetY = 0;
-                this.trigger('offsetNotFound');
+                this.trigger('offsetNotFound', {});
                 return;
             }
             this._frameOffsetUpdatedAt = now;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
  */
 
 import type * as Dictionary from './dictionary';
+import type {SearchResolution} from 'settings';
 
 // Kanji
 
@@ -116,6 +117,10 @@ export type FindTermsOptions = {
      * A set of dictionary names which should have definitions removed.
      */
     excludeDictionaryDefinitions: Set<string> | null;
+    /**
+     * Whether every substring should be searched for, or only whole words.
+     */
+    searchResolution: SearchResolution;
 };
 
 /**
@@ -168,6 +173,14 @@ export type FindTermDictionary = {
      * Whether or not secondary term searches are allowed for this dictionary.
      */
     allowSecondarySearches: boolean;
+    /**
+     * Whether this dictionary's part of speech rules should be used to filter results.
+     */
+    partsOfSpeechFilter: boolean;
+    /**
+     * Whether to use the deinflections from this dictionary.
+     */
+    useDeinflections: boolean;
 };
 
 export type TermEnabledDictionaryMap = Map<string, FindTermDictionary>;

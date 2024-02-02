@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,12 @@
  */
 
 export type RequestFrameInfoResponseParams = {
+    uniqueId: string;
     frameId: number;
     nonce: string;
     more: boolean;
 };
 
-export type RequestFrameInfoResponseReturn = {
-    nonce: string;
-};
+export type RequestFrameInfoResponseReturn = {nonce: string} | null;
+
+export type ResponseHandler = (params: RequestFrameInfoResponseParams) => RequestFrameInfoResponseReturn;

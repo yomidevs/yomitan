@@ -151,6 +151,7 @@
         "uniqueReadings": [],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -313,6 +314,7 @@
         "uniqueReadings": [],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -339,7 +341,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 1,
@@ -595,6 +602,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -626,6 +634,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -643,7 +652,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 2,
@@ -908,6 +922,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -939,6 +954,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -961,7 +977,12 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 3,
@@ -1213,6 +1234,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -1248,6 +1270,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -1265,7 +1288,12 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 3,
@@ -1517,6 +1545,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -1552,6 +1581,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -1569,7 +1599,12 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 3,
@@ -1821,6 +1856,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -1856,6 +1892,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -1873,7 +1910,12 @@
           "source": "打つ",
           "rawSource": "打つ",
           "sourceTerm": "打つ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 3,
@@ -2125,6 +2167,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -2160,6 +2203,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -2177,7 +2221,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 1,
@@ -2433,6 +2482,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -2464,6 +2514,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -2481,7 +2532,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 2,
@@ -2746,6 +2802,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -2777,6 +2834,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -2799,7 +2857,12 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 4,
@@ -3103,6 +3166,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -3176,6 +3253,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -3193,7 +3276,12 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 4,
@@ -3497,6 +3585,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -3570,6 +3672,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -3587,7 +3695,12 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 4,
@@ -3891,6 +4004,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -3964,6 +4091,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -3981,7 +4114,12 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 4,
@@ -4285,6 +4423,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -4358,6 +4510,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -4375,8 +4533,13 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -4629,6 +4792,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -4664,6 +4828,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -4681,8 +4846,13 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -4935,6 +5105,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -4970,6 +5141,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -4987,8 +5159,13 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -5241,6 +5418,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -5276,6 +5454,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -5293,8 +5472,13 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -5547,6 +5731,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -5582,6 +5767,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -5599,7 +5785,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 1,
@@ -5855,6 +6046,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -5886,6 +6078,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -5903,7 +6096,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 2,
@@ -6168,6 +6366,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -6199,6 +6398,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -6221,7 +6421,12 @@
           "source": "画像",
           "rawSource": "画像",
           "sourceTerm": "画像",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 5,
@@ -6320,6 +6525,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -6351,6 +6557,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -6373,7 +6580,12 @@
           "source": "だ",
           "rawSource": "だ",
           "sourceTerm": "だ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 1,
@@ -6629,6 +6841,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -6660,6 +6873,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -6682,7 +6896,12 @@
           "source": "ダース",
           "rawSource": "ダース",
           "sourceTerm": "ダース",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 2,
@@ -6947,6 +7166,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -6978,6 +7198,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -7000,7 +7221,12 @@
           "source": "うつ",
           "rawSource": "うつ",
           "sourceTerm": "うつ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 3,
@@ -7252,6 +7478,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -7287,6 +7514,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -7304,7 +7532,12 @@
           "source": "うつ",
           "rawSource": "うつ",
           "sourceTerm": "うつ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 3,
@@ -7556,6 +7789,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -7591,6 +7825,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -7613,7 +7848,12 @@
           "source": "ぶつ",
           "rawSource": "ぶつ",
           "sourceTerm": "ぶつ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 3,
@@ -7865,6 +8105,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -7900,6 +8141,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -7917,7 +8159,12 @@
           "source": "ぶつ",
           "rawSource": "ぶつ",
           "sourceTerm": "ぶつ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 3,
@@ -8169,6 +8416,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -8204,6 +8452,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -8226,7 +8475,12 @@
           "source": "うちこむ",
           "rawSource": "うちこむ",
           "sourceTerm": "うちこむ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 4,
@@ -8530,6 +8784,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -8603,6 +8871,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -8620,7 +8894,12 @@
           "source": "うちこむ",
           "rawSource": "うちこむ",
           "sourceTerm": "うちこむ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 4,
@@ -8924,6 +9203,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -8997,6 +9290,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -9014,8 +9313,13 @@
           "source": "うち",
           "rawSource": "うち",
           "sourceTerm": "うつ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -9268,6 +9572,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -9303,6 +9608,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -9320,8 +9626,13 @@
           "source": "うち",
           "rawSource": "うち",
           "sourceTerm": "うつ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -9574,6 +9885,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -9609,6 +9921,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -9631,7 +9944,12 @@
           "source": "ぶちこむ",
           "rawSource": "ぶちこむ",
           "sourceTerm": "ぶちこむ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 4,
@@ -9935,6 +10253,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -10008,6 +10340,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -10025,7 +10363,12 @@
           "source": "ぶちこむ",
           "rawSource": "ぶちこむ",
           "sourceTerm": "ぶちこむ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 4,
@@ -10329,6 +10672,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -10402,6 +10759,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -10419,8 +10782,13 @@
           "source": "ぶち",
           "rawSource": "ぶち",
           "sourceTerm": "ぶつ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -10673,6 +11041,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -10708,6 +11077,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -10725,8 +11095,13 @@
           "source": "ぶち",
           "rawSource": "ぶち",
           "sourceTerm": "ぶつ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -10979,6 +11354,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -11014,6 +11390,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -11036,7 +11413,12 @@
           "source": "がぞう",
           "rawSource": "がぞう",
           "sourceTerm": "がぞう",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 5,
@@ -11135,6 +11517,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -11166,6 +11549,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -11199,7 +11583,12 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "sequence": 4,
           "dictionary": "Test Dictionary 2",
@@ -11545,6 +11934,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -11600,6 +12003,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -11616,7 +12025,12 @@
           "source": "打ち込む",
           "rawSource": "打ち込む",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "sequence": 4,
           "dictionary": "Test Dictionary 2",
@@ -11962,6 +12376,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -12017,6 +12445,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -12033,8 +12467,13 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "sequence": 3,
@@ -12329,6 +12768,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -12354,6 +12794,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -12370,8 +12811,13 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "sequence": 3,
@@ -12666,6 +13112,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -12691,6 +13138,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -12707,7 +13155,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "sequence": 1,
           "dictionary": "Test Dictionary 2",
@@ -12968,6 +13421,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -12993,6 +13447,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -13009,7 +13464,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "sequence": 2,
           "dictionary": "Test Dictionary 2",
@@ -13279,6 +13739,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -13304,6 +13765,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -13324,7 +13786,12 @@
           "type": "termMerged",
           "source": "打ち込む",
           "rawSource": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "sequence": 4,
           "dictionary": "Test Dictionary 2",
@@ -13954,6 +14421,32 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
+              "expressionIndex": 1,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 2,
           "url": "url:",
           "cloze": {
@@ -14042,6 +14535,12 @@
           }
         ],
         "pitchCount": 4,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -14057,8 +14556,13 @@
           "type": "termMerged",
           "source": "打ち",
           "rawSource": "打ち",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "sequence": 3,
@@ -14586,6 +15090,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 2,
           "url": "url:",
           "cloze": {
@@ -14612,6 +15117,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -14627,7 +15133,12 @@
           "type": "termMerged",
           "source": "打",
           "rawSource": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "sequence": 1,
           "dictionary": "Test Dictionary 2",
@@ -14882,6 +15393,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -14907,6 +15419,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -14922,7 +15435,12 @@
           "type": "termMerged",
           "source": "打",
           "rawSource": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "sequence": 2,
           "dictionary": "Test Dictionary 2",
@@ -15186,6 +15704,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -15211,6 +15730,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -15233,10 +15753,15 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "reasons": [
-            "-te",
-            "progressive or perfect",
-            "polite past negative"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "-te",
+                "progressive or perfect",
+                "polite past negative"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -15541,6 +16066,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -15614,6 +16153,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -15631,10 +16176,15 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "reasons": [
-            "-te",
-            "progressive or perfect",
-            "polite past negative"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "-te",
+                "progressive or perfect",
+                "polite past negative"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -15939,6 +16489,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -16012,6 +16576,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -16029,10 +16599,15 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "reasons": [
-            "-te",
-            "progressive or perfect",
-            "polite past negative"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "-te",
+                "progressive or perfect",
+                "polite past negative"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -16337,6 +16912,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -16410,6 +16999,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -16427,10 +17022,15 @@
           "source": "打ち込んでいませんでした",
           "rawSource": "打ち込んでいませんでした",
           "sourceTerm": "打ち込む",
-          "reasons": [
-            "-te",
-            "progressive or perfect",
-            "polite past negative"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "-te",
+                "progressive or perfect",
+                "polite past negative"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -16735,6 +17335,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -16808,6 +17422,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -16825,8 +17445,13 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -17079,6 +17704,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -17114,6 +17740,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -17131,8 +17758,13 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -17385,6 +18017,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -17420,6 +18053,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -17437,8 +18071,13 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -17691,6 +18330,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -17726,6 +18366,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -17743,8 +18384,13 @@
           "source": "打ち",
           "rawSource": "打ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -17997,6 +18643,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -18032,6 +18679,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -18049,7 +18697,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 1,
@@ -18305,6 +18958,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -18336,6 +18990,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -18353,7 +19008,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 2,
@@ -18618,6 +19278,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -18649,6 +19310,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -18671,7 +19333,12 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 4,
@@ -18975,6 +19642,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -19048,6 +19729,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -19065,7 +19752,12 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 4,
@@ -19369,6 +20061,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -19442,6 +20148,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -19459,7 +20171,12 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 4,
@@ -19763,6 +20480,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -19836,6 +20567,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -19853,7 +20590,12 @@
           "source": "打ち込む",
           "rawSource": "打(う)ち込(こ)む",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 4,
@@ -20157,6 +20899,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -20230,6 +20986,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -20247,8 +21009,13 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -20501,6 +21268,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -20536,6 +21304,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -20553,8 +21322,13 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -20807,6 +21581,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -20842,6 +21617,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -20859,8 +21635,13 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -21113,6 +21894,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -21148,6 +21930,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -21165,8 +21948,13 @@
           "source": "打ち",
           "rawSource": "打(う)ち",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -21419,6 +22207,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -21454,6 +22243,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -21471,7 +22261,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 1,
@@ -21727,6 +22522,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -21758,6 +22554,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -21775,7 +22572,12 @@
           "source": "打",
           "rawSource": "打",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 2,
@@ -22040,6 +22842,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -22071,6 +22874,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -22093,7 +22897,12 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 4,
@@ -22397,6 +23206,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -22470,6 +23293,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -22487,7 +23316,12 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "isPrimary": true,
           "sequence": 4,
@@ -22791,6 +23625,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -22864,6 +23712,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -22881,7 +23735,12 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 4,
@@ -23185,6 +24044,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -23258,6 +24131,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -23275,7 +24154,12 @@
           "source": "打ち込む",
           "rawSource": "(打)(ち)(込)(む)",
           "sourceTerm": "打ち込む",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 4,
@@ -23579,6 +24463,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -23652,6 +24550,12 @@
           }
         ],
         "pitchCount": 2,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -23669,8 +24573,13 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -23923,6 +24832,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -23958,6 +24868,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -23975,8 +24886,13 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "isPrimary": true,
@@ -24229,6 +25145,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -24264,6 +25181,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -24281,8 +25199,13 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -24535,6 +25458,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -24570,6 +25494,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -24587,8 +25512,13 @@
           "source": "打ち",
           "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 1,
           "isPrimary": true,
@@ -24841,6 +25771,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -24876,6 +25807,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -24893,7 +25825,12 @@
           "source": "打",
           "rawSource": "(打)",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 1,
@@ -25149,6 +26086,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -25180,6 +26118,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -25197,7 +26136,12 @@
           "source": "打",
           "rawSource": "(打)",
           "sourceTerm": "打",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 2,
@@ -25462,6 +26406,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -25493,6 +26438,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -25515,8 +26461,13 @@
           "source": "よみ",
           "rawSource": "test",
           "sourceTerm": "よむ",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 100,
           "isPrimary": true,
@@ -25610,6 +26561,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -25645,6 +26597,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -25667,7 +26620,12 @@
           "source": "つよみ",
           "rawSource": "つtest",
           "sourceTerm": "つよみ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 90,
           "isPrimary": true,
           "sequence": 7,
@@ -25760,6 +26718,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -25795,6 +26754,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -25817,8 +26777,13 @@
           "source": "よみました",
           "rawSource": "testました",
           "sourceTerm": "よむ",
-          "reasons": [
-            "polite past"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "polite past"
+              ]
+            }
           ],
           "score": 100,
           "isPrimary": true,
@@ -25912,6 +26877,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -25947,6 +26913,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -25967,7 +26934,12 @@
           "type": "termMerged",
           "source": "うちこむ",
           "rawSource": "うちこむ",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 10,
           "sequence": 4,
           "dictionary": "Test Dictionary 2",
@@ -26597,6 +27569,32 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "うちこむ",
+              "phoneticTranscriptions": []
+            },
+            {
+              "index": 1,
+              "expressionIndex": 1,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打ち込む",
+              "reading": "ぶちこむ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -26685,6 +27683,12 @@
           }
         ],
         "pitchCount": 4,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -26700,8 +27704,13 @@
           "type": "termMerged",
           "source": "うち",
           "rawSource": "うち",
-          "reasons": [
-            "masu stem"
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "masu stem"
+              ]
+            }
           ],
           "score": 10,
           "sequence": 3,
@@ -27229,6 +28238,7 @@
             }
           ],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 0,
           "url": "url:",
           "cloze": {
@@ -27255,6 +28265,7 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -27277,7 +28288,12 @@
           "source": "お手前",
           "rawSource": "お手前",
           "sourceTerm": "お手前",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 9,
@@ -27444,6 +28460,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "お手前",
+              "reading": "おてまえ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -27563,6 +28593,12 @@
           }
         ],
         "pitchCount": 3,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -27585,7 +28621,12 @@
           "source": "番号",
           "rawSource": "番号",
           "sourceTerm": "番号",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 10,
@@ -27672,6 +28713,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "番号",
+              "reading": "ばんごう",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -27723,6 +28778,12 @@
           }
         ],
         "pitchCount": 1,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -27745,7 +28806,12 @@
           "source": "中腰",
           "rawSource": "中腰",
           "sourceTerm": "中腰",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 11,
@@ -27832,6 +28898,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "中腰",
+              "reading": "ちゅうごし",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -27883,6 +28963,12 @@
           }
         ],
         "pitchCount": 1,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -27905,7 +28991,12 @@
           "source": "所業",
           "rawSource": "所業",
           "sourceTerm": "所業",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 12,
@@ -27992,6 +29083,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "所業",
+              "reading": "しょぎょう",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -28043,6 +29148,12 @@
           }
         ],
         "pitchCount": 1,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -28065,7 +29176,12 @@
           "source": "土木工事",
           "rawSource": "土木工事",
           "sourceTerm": "土木工事",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 1,
           "isPrimary": true,
           "sequence": 13,
@@ -28152,6 +29268,20 @@
               ]
             }
           ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "土木工事",
+              "reading": "どぼくこうじ",
+              "phoneticTranscriptions": []
+            }
+          ],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -28203,6 +29333,225 @@
           }
         ],
         "pitchCount": 1,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": []
+          }
+        ],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test pronunciations 6 - phonetic transcriptions",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 20,
+          "source": "好き",
+          "rawSource": "好き",
+          "sourceTerm": "好き",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 14,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "好き",
+          "reading": "すき",
+          "expressions": [
+            {
+              "sourceTerm": "好き",
+              "expression": "好き",
+              "reading": "すき",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "好き",
+                  "reading": "すき",
+                  "pitches": []
+                }
+              ],
+              "furiganaSegments": [
+                {
+                  "text": "好",
+                  "furigana": "す"
+                },
+                {
+                  "text": "き",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": []
+            }
+          ],
+          "glossary": [
+            "suki definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "adj-na",
+              "category": "default",
+              "notes": "",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            },
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "好き",
+              "reading": "すき",
+              "pitches": []
+            }
+          ],
+          "phoneticTranscriptions": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "好き",
+              "reading": "すき",
+              "phoneticTranscriptions": [
+                {
+                  "ipa": "[sɨᵝkʲi]",
+                  "tags": [
+                    {
+                      "name": "東京",
+                      "category": "default",
+                      "notes": "",
+                      "order": 0,
+                      "score": 0,
+                      "dictionary": "Test Dictionary 2",
+                      "redundant": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "好",
+              "furigana": "す"
+            },
+            {
+              "text": "き",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "好き"
+        ],
+        "uniqueReadings": [
+          "すき"
+        ],
+        "pitches": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "pitches": []
+          }
+        ],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [
+          {
+            "dictionary": "Test Dictionary 2",
+            "phoneticTranscriptions": [
+              {
+                "expressions": [
+                  "好き"
+                ],
+                "reading": "すき",
+                "ipa": "[sɨᵝkʲi]",
+                "tags": [
+                  {
+                    "name": "東京",
+                    "category": "default",
+                    "order": 0,
+                    "score": 0,
+                    "content": [],
+                    "dictionaries": [
+                      "Test Dictionary 2"
+                    ],
+                    "redundant": false
+                  }
+                ],
+                "exclusiveExpressions": [],
+                "exclusiveReadings": []
+              }
+            ]
+          }
+        ],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",
@@ -28221,11 +29570,16 @@
         "marker": "{marker}",
         "definition": {
           "type": "term",
-          "id": 21,
+          "id": 22,
           "source": "構造",
           "rawSource": "構造",
           "sourceTerm": "構造",
-          "reasons": [],
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
           "score": 35,
           "isPrimary": true,
           "sequence": 101,
@@ -28322,6 +29676,7 @@
           ],
           "frequencies": [],
           "pitches": [],
+          "phoneticTranscriptions": [],
           "sourceTermExactMatchCount": 1,
           "url": "url:",
           "cloze": {
@@ -28353,6 +29708,2369 @@
         ],
         "pitches": [],
         "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test dictionary deinflection",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 23,
+          "source": "のたもうた",
+          "rawSource": "のたもうた",
+          "sourceTerm": "のたまう",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "both",
+              "inflectionRules": [
+                "past"
+              ]
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 15,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "のたまう",
+          "reading": "のたまう",
+          "expressions": [
+            {
+              "sourceTerm": "のたまう",
+              "expression": "のたまう",
+              "reading": "のたまう",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "のたまう",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
+            }
+          ],
+          "glossary": [
+            "notamau definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "v5",
+              "category": "default",
+              "notes": "",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "のたまう",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "のたまう"
+        ],
+        "uniqueReadings": [
+          "のたまう"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text transformations - convertNumericCharacters",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 25,
+          "source": "３９",
+          "rawSource": "39",
+          "sourceTerm": "３９",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 17,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "３９",
+          "reading": "さんきゅう",
+          "expressions": [
+            {
+              "sourceTerm": "３９",
+              "expression": "３９",
+              "reading": "さんきゅう",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "３９",
+                  "furigana": "さんきゅう"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": []
+            }
+          ],
+          "glossary": [
+            "sankyuu definition"
+          ],
+          "definitionTags": [],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "３９",
+              "furigana": "さんきゅう"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "３９"
+        ],
+        "uniqueReadings": [
+          "さんきゅう"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text transformations - convertAlphabeticCharacters",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 3,
+          "source": "うつ",
+          "rawSource": "utsu",
+          "sourceTerm": "うつ",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 10,
+          "isPrimary": true,
+          "sequence": 3,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "打つ",
+          "reading": "うつ",
+          "expressions": [
+            {
+              "sourceTerm": "うつ",
+              "expression": "打つ",
+              "reading": "うつ",
+              "termTags": [
+                {
+                  "name": "E1",
+                  "category": "default",
+                  "notes": "example tag 1",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                },
+                {
+                  "name": "P",
+                  "category": "popular",
+                  "notes": "popular term",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                }
+              ],
+              "frequencies": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 2
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 6
+                },
+                {
+                  "index": 2,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 10
+                },
+                {
+                  "index": 3,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "sixteen"
+                },
+                {
+                  "index": 4,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "twenty-two (22)"
+                },
+                {
+                  "index": 5,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 28
+                }
+              ],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "打",
+                  "furigana": "う"
+                },
+                {
+                  "text": "つ",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
+            }
+          ],
+          "glossary": [
+            "utsu definition 1",
+            "utsu definition 2"
+          ],
+          "definitionTags": [
+            {
+              "name": "vt",
+              "category": "partOfSpeech",
+              "notes": "transitive verb",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [
+            {
+              "name": "E1",
+              "category": "default",
+              "notes": "example tag 1",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            },
+            {
+              "name": "P",
+              "category": "popular",
+              "notes": "popular term",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "frequencies": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 2
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 6
+            },
+            {
+              "index": 2,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 10
+            },
+            {
+              "index": 3,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "sixteen"
+            },
+            {
+              "index": 4,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "twenty-two (22)"
+            },
+            {
+              "index": 5,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 28
+            }
+          ],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 0,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "打",
+              "furigana": "う"
+            },
+            {
+              "text": "つ",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "打つ"
+        ],
+        "uniqueReadings": [
+          "うつ"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      },
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 4,
+          "source": "うつ",
+          "rawSource": "utsu",
+          "sourceTerm": "うつ",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 3,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "打つ",
+          "reading": "うつ",
+          "expressions": [
+            {
+              "sourceTerm": "うつ",
+              "expression": "打つ",
+              "reading": "うつ",
+              "termTags": [
+                {
+                  "name": "E2",
+                  "category": "default",
+                  "notes": "example tag 2",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                },
+                {
+                  "name": "P",
+                  "category": "popular",
+                  "notes": "popular term",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                }
+              ],
+              "frequencies": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 2
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 6
+                },
+                {
+                  "index": 2,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 10
+                },
+                {
+                  "index": 3,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "sixteen"
+                },
+                {
+                  "index": 4,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "twenty-two (22)"
+                },
+                {
+                  "index": 5,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 28
+                }
+              ],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "打",
+                  "furigana": "う"
+                },
+                {
+                  "text": "つ",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
+            }
+          ],
+          "glossary": [
+            "utsu definition 3",
+            "utsu definition 4"
+          ],
+          "definitionTags": [
+            {
+              "name": "vt",
+              "category": "partOfSpeech",
+              "notes": "transitive verb",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [
+            {
+              "name": "E2",
+              "category": "default",
+              "notes": "example tag 2",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            },
+            {
+              "name": "P",
+              "category": "popular",
+              "notes": "popular term",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "frequencies": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 2
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 6
+            },
+            {
+              "index": 2,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 10
+            },
+            {
+              "index": 3,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "sixteen"
+            },
+            {
+              "index": 4,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "twenty-two (22)"
+            },
+            {
+              "index": 5,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 28
+            }
+          ],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 0,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "打",
+              "furigana": "う"
+            },
+            {
+              "text": "つ",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "打つ"
+        ],
+        "uniqueReadings": [
+          "うつ"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text transformations - convertKatakanaToHiragana",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 3,
+          "source": "うつ",
+          "rawSource": "ウツ",
+          "sourceTerm": "うつ",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 10,
+          "isPrimary": true,
+          "sequence": 3,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "打つ",
+          "reading": "うつ",
+          "expressions": [
+            {
+              "sourceTerm": "うつ",
+              "expression": "打つ",
+              "reading": "うつ",
+              "termTags": [
+                {
+                  "name": "E1",
+                  "category": "default",
+                  "notes": "example tag 1",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                },
+                {
+                  "name": "P",
+                  "category": "popular",
+                  "notes": "popular term",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                }
+              ],
+              "frequencies": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 2
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 6
+                },
+                {
+                  "index": 2,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 10
+                },
+                {
+                  "index": 3,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "sixteen"
+                },
+                {
+                  "index": 4,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "twenty-two (22)"
+                },
+                {
+                  "index": 5,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 28
+                }
+              ],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "打",
+                  "furigana": "う"
+                },
+                {
+                  "text": "つ",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
+            }
+          ],
+          "glossary": [
+            "utsu definition 1",
+            "utsu definition 2"
+          ],
+          "definitionTags": [
+            {
+              "name": "vt",
+              "category": "partOfSpeech",
+              "notes": "transitive verb",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [
+            {
+              "name": "E1",
+              "category": "default",
+              "notes": "example tag 1",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            },
+            {
+              "name": "P",
+              "category": "popular",
+              "notes": "popular term",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "frequencies": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 2
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 6
+            },
+            {
+              "index": 2,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 10
+            },
+            {
+              "index": 3,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "sixteen"
+            },
+            {
+              "index": 4,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "twenty-two (22)"
+            },
+            {
+              "index": 5,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 28
+            }
+          ],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 0,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "打",
+              "furigana": "う"
+            },
+            {
+              "text": "つ",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "打つ"
+        ],
+        "uniqueReadings": [
+          "うつ"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      },
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 4,
+          "source": "うつ",
+          "rawSource": "ウツ",
+          "sourceTerm": "うつ",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 3,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "打つ",
+          "reading": "うつ",
+          "expressions": [
+            {
+              "sourceTerm": "うつ",
+              "expression": "打つ",
+              "reading": "うつ",
+              "termTags": [
+                {
+                  "name": "E2",
+                  "category": "default",
+                  "notes": "example tag 2",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                },
+                {
+                  "name": "P",
+                  "category": "popular",
+                  "notes": "popular term",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                }
+              ],
+              "frequencies": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 2
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 6
+                },
+                {
+                  "index": 2,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 10
+                },
+                {
+                  "index": 3,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "sixteen"
+                },
+                {
+                  "index": 4,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "twenty-two (22)"
+                },
+                {
+                  "index": 5,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 28
+                }
+              ],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "打",
+                  "furigana": "う"
+                },
+                {
+                  "text": "つ",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
+            }
+          ],
+          "glossary": [
+            "utsu definition 3",
+            "utsu definition 4"
+          ],
+          "definitionTags": [
+            {
+              "name": "vt",
+              "category": "partOfSpeech",
+              "notes": "transitive verb",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [
+            {
+              "name": "E2",
+              "category": "default",
+              "notes": "example tag 2",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            },
+            {
+              "name": "P",
+              "category": "popular",
+              "notes": "popular term",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "frequencies": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 2
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 6
+            },
+            {
+              "index": 2,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 10
+            },
+            {
+              "index": 3,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "sixteen"
+            },
+            {
+              "index": 4,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "twenty-two (22)"
+            },
+            {
+              "index": 5,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 28
+            }
+          ],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 0,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "打",
+              "furigana": "う"
+            },
+            {
+              "text": "つ",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "打つ"
+        ],
+        "uniqueReadings": [
+          "うつ"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text transformations - convertHiraganaToKatakana",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 14,
+          "source": "テキスト",
+          "rawSource": "てきすと",
+          "sourceTerm": "テキスト",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 8,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "テキスト",
+          "reading": "テキスト",
+          "expressions": [
+            {
+              "sourceTerm": "テキスト",
+              "expression": "テキスト",
+              "reading": "テキスト",
+              "termTags": [
+                {
+                  "name": "E1",
+                  "category": "default",
+                  "notes": "example tag 1",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                },
+                {
+                  "name": "P",
+                  "category": "popular",
+                  "notes": "popular term",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                }
+              ],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "テキスト",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "text definition 1",
+            "text definition 2"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [
+            {
+              "name": "E1",
+              "category": "default",
+              "notes": "example tag 1",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            },
+            {
+              "name": "P",
+              "category": "popular",
+              "notes": "popular term",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "frequencies": [],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "テキスト",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "テキスト"
+        ],
+        "uniqueReadings": [
+          "テキスト"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text transformations - convertHalfWidthCharacters, convertKatakanaToHiragana",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 3,
+          "source": "うつ",
+          "rawSource": "ｳﾂ",
+          "sourceTerm": "うつ",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 10,
+          "isPrimary": true,
+          "sequence": 3,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "打つ",
+          "reading": "うつ",
+          "expressions": [
+            {
+              "sourceTerm": "うつ",
+              "expression": "打つ",
+              "reading": "うつ",
+              "termTags": [
+                {
+                  "name": "E1",
+                  "category": "default",
+                  "notes": "example tag 1",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                },
+                {
+                  "name": "P",
+                  "category": "popular",
+                  "notes": "popular term",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                }
+              ],
+              "frequencies": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 2
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 6
+                },
+                {
+                  "index": 2,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 10
+                },
+                {
+                  "index": 3,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "sixteen"
+                },
+                {
+                  "index": 4,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "twenty-two (22)"
+                },
+                {
+                  "index": 5,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 28
+                }
+              ],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "打",
+                  "furigana": "う"
+                },
+                {
+                  "text": "つ",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
+            }
+          ],
+          "glossary": [
+            "utsu definition 1",
+            "utsu definition 2"
+          ],
+          "definitionTags": [
+            {
+              "name": "vt",
+              "category": "partOfSpeech",
+              "notes": "transitive verb",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [
+            {
+              "name": "E1",
+              "category": "default",
+              "notes": "example tag 1",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            },
+            {
+              "name": "P",
+              "category": "popular",
+              "notes": "popular term",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "frequencies": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 2
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 6
+            },
+            {
+              "index": 2,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 10
+            },
+            {
+              "index": 3,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "sixteen"
+            },
+            {
+              "index": 4,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "twenty-two (22)"
+            },
+            {
+              "index": 5,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 28
+            }
+          ],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 0,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "打",
+              "furigana": "う"
+            },
+            {
+              "text": "つ",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "打つ"
+        ],
+        "uniqueReadings": [
+          "うつ"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      },
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 4,
+          "source": "うつ",
+          "rawSource": "ｳﾂ",
+          "sourceTerm": "うつ",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 3,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "打つ",
+          "reading": "うつ",
+          "expressions": [
+            {
+              "sourceTerm": "うつ",
+              "expression": "打つ",
+              "reading": "うつ",
+              "termTags": [
+                {
+                  "name": "E2",
+                  "category": "default",
+                  "notes": "example tag 2",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                },
+                {
+                  "name": "P",
+                  "category": "popular",
+                  "notes": "popular term",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                }
+              ],
+              "frequencies": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 2
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": false,
+                  "frequency": 6
+                },
+                {
+                  "index": 2,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 10
+                },
+                {
+                  "index": 3,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "sixteen"
+                },
+                {
+                  "index": 4,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": "twenty-two (22)"
+                },
+                {
+                  "index": 5,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打つ",
+                  "reading": "うつ",
+                  "hasReading": true,
+                  "frequency": 28
+                }
+              ],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "打",
+                  "furigana": "う"
+                },
+                {
+                  "text": "つ",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v5"
+              ]
+            }
+          ],
+          "glossary": [
+            "utsu definition 3",
+            "utsu definition 4"
+          ],
+          "definitionTags": [
+            {
+              "name": "vt",
+              "category": "partOfSpeech",
+              "notes": "transitive verb",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [
+            {
+              "name": "E2",
+              "category": "default",
+              "notes": "example tag 2",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            },
+            {
+              "name": "P",
+              "category": "popular",
+              "notes": "popular term",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "frequencies": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 2
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": false,
+              "frequency": 6
+            },
+            {
+              "index": 2,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 10
+            },
+            {
+              "index": 3,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "sixteen"
+            },
+            {
+              "index": 4,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": "twenty-two (22)"
+            },
+            {
+              "index": 5,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打つ",
+              "reading": "うつ",
+              "hasReading": true,
+              "frequency": 28
+            }
+          ],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 0,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "打",
+              "furigana": "う"
+            },
+            {
+              "text": "つ",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "打つ"
+        ],
+        "uniqueReadings": [
+          "うつ"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text transformations - collapseEmphaticSequences",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 26,
+          "source": "すごい",
+          "rawSource": "すっっごーーい",
+          "sourceTerm": "すごい",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 18,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "凄い",
+          "reading": "すごい",
+          "expressions": [
+            {
+              "sourceTerm": "すごい",
+              "expression": "凄い",
+              "reading": "すごい",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "凄",
+                  "furigana": "すご"
+                },
+                {
+                  "text": "い",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "adj-i"
+              ]
+            }
+          ],
+          "glossary": [
+            "sugoi definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "adj-i",
+              "category": "default",
+              "notes": "",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 0,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "凄",
+              "furigana": "すご"
+            },
+            {
+              "text": "い",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "凄い"
+        ],
+        "uniqueReadings": [
+          "すごい"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
         "context": {
           "query": "query",
           "fullQuery": "fullQuery",

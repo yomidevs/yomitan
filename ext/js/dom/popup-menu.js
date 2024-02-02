@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, EventListenerCollection} from '../core.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from './query-selector.js';
 
 /**
- * @augments EventDispatcher<import('popup-menu').EventType>
+ * @augments EventDispatcher<import('popup-menu').Events>
  */
 export class PopupMenu extends EventDispatcher {
     /**
@@ -247,7 +248,7 @@ export class PopupMenu extends EventDispatcher {
             {altKey: false, ctrlKey: false, metaKey: false, shiftKey: false}
         );
 
-        /** @type {import('popup-menu').MenuCloseEventDetails} */
+        /** @type {import('popup-menu').EventArgument<'close'>} */
         const detail = {
             menu: this,
             item,

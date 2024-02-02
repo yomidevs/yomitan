@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,6 @@
 
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
-import {yomitan} from '../../yomitan.js';
 import {ScanInputsController} from './scan-inputs-controller.js';
 
 export class ScanInputsSimpleController {
@@ -40,7 +39,7 @@ export class ScanInputsSimpleController {
 
     /** */
     async prepare() {
-        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
+        const {platform: {os}} = await this._settingsController.application.api.getEnvironmentInfo();
         this._hotkeyUtil.os = os;
 
         this._mainScanModifierKeyInputHasOther = false;
@@ -67,7 +66,7 @@ export class ScanInputsSimpleController {
     // Private
 
     /**
-     * @param {import('settings-controller').ScanInputsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'scanInputsChanged'>} details
      */
     _onScanInputsChanged({source}) {
         if (source === this) { return; }
@@ -75,7 +74,7 @@ export class ScanInputsSimpleController {
     }
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         const {scanning: {inputs}} = options;
@@ -236,7 +235,7 @@ export class ScanInputsSimpleController {
      */
     async _modifyProfileSettings(targets) {
         await this._settingsController.modifyProfileSettings(targets);
-        /** @type {import('settings-controller').ScanInputsChangedEvent} */
+        /** @type {import('settings-controller').EventArgument<'scanInputsChanged'>} */
         const event = {source: this};
         this._settingsController.trigger('scanInputsChanged', event);
     }

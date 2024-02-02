@@ -46,7 +46,7 @@
                 ]
             }
         ],
-        "minimum_chrome_version": "96.0.0.0",
+        "minimum_chrome_version": "102.0.0.0",
         "options_ui": {
             "page": "settings.html",
             "open_in_tab": true

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
  * @returns {T}
  */
 export function parseJson(value) {
+    // eslint-disable-next-line no-restricted-syntax
     return JSON.parse(value);
 }
 
@@ -36,5 +37,6 @@ export function parseJson(value) {
  * @returns {Promise<T>}
  */
 export async function readResponseJson(response) {
+    // eslint-disable-next-line no-restricted-syntax
     return await response.json();
 }

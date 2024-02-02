@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ export type GetImageDetailsFunction = (
     mediaType: string,
     transfer?: Transferable[]
 ) => Promise<{content: ArrayBuffer, width: number, height: number}>;
-
 
 export type GenericMediaLoader = {
     getImageDetails: GetImageDetailsFunction;

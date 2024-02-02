@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,14 @@
  */
 
 import type {TextScanner} from '../../ext/js/language/text-scanner';
+import type {TextSourceGenerator} from '../../ext/js/dom/text-source-generator';
+import type {API} from '../../ext/js/comm/api';
 import type * as Dictionary from './dictionary';
 import type * as Display from './display';
 import type * as Input from './input';
 import type * as Settings from './settings';
 import type * as TextSource from './text-source';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type SearchResultDetail = {
     documentTitle: string;
@@ -118,7 +121,16 @@ export type InputInfoDetail = {
     restoreSelection: boolean;
 };
 
-export type EventType = 'searched' | 'clear';
+export type Events = {
+    searched: SearchedEventDetails;
+    clear: {
+        reason: ClearReason;
+    };
+};
+
+export type ClearReason = 'mousedown';
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type GetSearchContextCallback = GetSearchContextCallbackSync | GetSearchContextCallbackAsync;
 
@@ -127,6 +139,7 @@ export type GetSearchContextCallbackSync = () => SearchContext;
 export type GetSearchContextCallbackAsync = () => Promise<SearchContext>;
 
 export type ConstructorDetails = {
+    api: API;
     node: HTMLElement | Window;
     getSearchContext: GetSearchContextCallback;
     ignoreElements?: (() => Element[]) | null;
@@ -135,6 +148,7 @@ export type ConstructorDetails = {
     searchKanji?: boolean;
     searchOnClick?: boolean;
     searchOnClickOnly?: boolean;
+    textSourceGenerator: TextSourceGenerator;
 };
 
 export type SearchContext = {
@@ -184,6 +198,15 @@ export type PointerEventType = (
     'click' |
     'script'
 );
+
+/**
+ * An enum representing the pen pointer state.
+ * - `0` - Not active.
+ * - `1` - Hovering.
+ * - `2` - Touching.
+ * - `3` - Hovering after touching.
+ */
+export type PenPointerState = 0 | 1 | 2 | 3;
 
 export type SentenceTerminatorMap = Map<string, [includeCharacterAtStart: boolean, includeCharacterAtEnd: boolean]>;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,419 +16,142 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core.js';
+/**
+ * Injects a stylesheet into a tab.
+ * @param {'file'|'code'} type The type of content to inject; either 'file' or 'code'.
+ * @param {string} content The content to inject.
+ *   - If type is `'file'`, this argument should be a path to a file.
+ *   - If type is `'code'`, this argument should be the CSS content.
+ * @param {number} tabId The id of the tab to inject into.
+ * @param {number|undefined} frameId The id of the frame to inject into.
+ * @param {boolean} allFrames Whether or not the stylesheet should be injected into all frames.
+ * @returns {Promise<void>}
+ */
+export function injectStylesheet(type, content, tabId, frameId, allFrames) {
+    return new Promise((resolve, reject) => {
+        /** @type {chrome.scripting.InjectionTarget} */
+        const target = {
+            tabId,
+            allFrames
+        };
+        /** @type {chrome.scripting.CSSInjection} */
+        const details = (
+            type === 'file' ?
+            {origin: 'AUTHOR', files: [content], target} :
+            {origin: 'USER', css: content, target}
+        );
+        if (!allFrames && typeof frameId === 'number') {
+            details.target.frameIds = [frameId];
+        }
+        chrome.scripting.insertCSS(details, () => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
+            } else {
+                resolve();
+            }
+        });
+    });
+}
 
 /**
- * This class is used to manage script injection into content tabs.
+ * Checks whether or not a content script is registered.
+ * @param {string} id The identifier used with a call to `registerContentScript`.
+ * @returns {Promise<boolean>} `true` if a script is registered, `false` otherwise.
  */
-export class ScriptManager {
-    /**
-     * Creates a new instance of the class.
-     */
-    constructor() {
-        /** @type {Map<string, ?browser.contentScripts.RegisteredContentScript>} */
-        this._contentScriptRegistrations = new Map();
-    }
-
-    /**
-     * Injects a stylesheet into a tab.
-     * @param {'file'|'code'} type The type of content to inject; either 'file' or 'code'.
-     * @param {string} content The content to inject.
-     *   If type is 'file', this argument should be a path to a file.
-     *   If type is 'code', this argument should be the CSS content.
-     * @param {number} tabId The id of the tab to inject into.
-     * @param {number|undefined} frameId The id of the frame to inject into.
-     * @param {boolean} allFrames Whether or not the stylesheet should be injected into all frames.
-     * @returns {Promise<void>}
-     */
-    injectStylesheet(type, content, tabId, frameId, allFrames) {
-        if (isObject(chrome.scripting) && typeof chrome.scripting.insertCSS === 'function') {
-            return this._injectStylesheetMV3(type, content, tabId, frameId, allFrames);
-        } else {
-            return Promise.reject(new Error('Stylesheet injection not supported'));
-        }
-    }
-
-    /**
-     * Injects a script into a tab.
-     * @param {string} file The path to a file to inject.
-     * @param {number} tabId The id of the tab to inject into.
-     * @param {number|undefined} frameId The id of the frame to inject into.
-     * @param {boolean} allFrames Whether or not the script should be injected into all frames.
-     * @returns {Promise<{frameId: number|undefined, result: unknown}>} The id of the frame and the result of the script injection.
-     */
-    injectScript(file, tabId, frameId, allFrames) {
-        if (isObject(chrome.scripting) && typeof chrome.scripting.executeScript === 'function') {
-            return this._injectScriptMV3(file, tabId, frameId, allFrames);
-        } else {
-            return Promise.reject(new Error('Script injection not supported'));
-        }
-    }
-
-    /**
-     * Checks whether or not a content script is registered.
-     * @param {string} id The identifier used with a call to `registerContentScript`.
-     * @returns {Promise<boolean>} `true` if a script is registered, `false` otherwise.
-     */
-    async isContentScriptRegistered(id) {
-        if (this._contentScriptRegistrations.has(id)) {
+export async function isContentScriptRegistered(id) {
+    const scripts = await new Promise((resolve, reject) => {
+        chrome.scripting.getRegisteredContentScripts({ids: [id]}, (result) => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
+            } else {
+                resolve(result);
+            }
+        });
+    });
+    for (const script of scripts) {
+        if (script.id === id) {
             return true;
         }
-        if (isObject(chrome.scripting) && typeof chrome.scripting.getRegisteredContentScripts === 'function') {
-            const scripts = await new Promise((resolve, reject) => {
-                chrome.scripting.getRegisteredContentScripts({ids: [id]}, (result) => {
-                    const e = chrome.runtime.lastError;
-                    if (e) {
-                        reject(new Error(e.message));
-                    } else {
-                        resolve(result);
-                    }
-                });
-            });
-            for (const script of scripts) {
-                if (script.id === id) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    }
+    return false;
+}
+
+/**
+ * Registers a dynamic content script.
+ * Note: if the fallback handler is used and the 'webNavigation' permission isn't granted,
+ * there is a possibility that the script can be injected more than once due to the events used.
+ * Therefore, a reentrant check may need to be performed by the content script.
+ * @param {string} id A unique identifier for the registration.
+ * @param {import('script-manager').RegistrationDetails} details The script registration details.
+ * @throws An error is thrown if the id is already in use.
+ */
+export async function registerContentScript(id, details) {
+    if (await isContentScriptRegistered(id)) {
+        throw new Error('Registration already exists');
     }
 
-    /**
-     * Registers a dynamic content script.
-     * Note: if the fallback handler is used and the 'webNavigation' permission isn't granted,
-     * there is a possibility that the script can be injected more than once due to the events used.
-     * Therefore, a reentrant check may need to be performed by the content script.
-     * @param {string} id A unique identifier for the registration.
-     * @param {import('script-manager').RegistrationDetails} details The script registration details.
-     * @throws An error is thrown if the id is already in use.
-     */
-    async registerContentScript(id, details) {
-        if (await this.isContentScriptRegistered(id)) {
-            throw new Error('Registration already exists');
-        }
-
-        if (isObject(chrome.scripting) && typeof chrome.scripting.registerContentScripts === 'function') {
-            const details2 = this._createContentScriptRegistrationOptionsChrome(details, id);
-            await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
-                chrome.scripting.registerContentScripts([details2], () => {
-                    const e = chrome.runtime.lastError;
-                    if (e) {
-                        reject(new Error(e.message));
-                    } else {
-                        resolve();
-                    }
-                });
-            }));
-            this._contentScriptRegistrations.set(id, null);
-            return;
-        }
-
-        // Fallback
-        this._registerContentScriptFallback(id, details);
-    }
-
-    /**
-     * Unregisters a previously registered content script.
-     * @param {string} id The identifier passed to a previous call to `registerContentScript`.
-     * @returns {Promise<boolean>} `true` if the content script was unregistered, `false` otherwise.
-     */
-    async unregisterContentScript(id) {
-        if (isObject(chrome.scripting) && typeof chrome.scripting.unregisterContentScripts === 'function') {
-            this._contentScriptRegistrations.delete(id);
-            try {
-                await this._unregisterContentScriptMV3(id);
-                return true;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        // Fallback
-        const registration = this._contentScriptRegistrations.get(id);
-        if (typeof registration === 'undefined') { return false; }
-        this._contentScriptRegistrations.delete(id);
-        if (registration !== null && typeof registration.unregister === 'function') {
-            await registration.unregister();
-        }
-        return true;
-    }
-
-    /**
-     * Gets the optional permissions required to register a content script.
-     * @returns {string[]} An array of the required permissions, which may be empty.
-     */
-    getRequiredContentScriptRegistrationPermissions() {
-        if (isObject(chrome.scripting) && typeof chrome.scripting.registerContentScripts === 'function') {
-            return [];
-        }
-
-        // Fallback
-        return ['webNavigation'];
-    }
-
-    // Private
-
-    /**
-     * @param {'file'|'code'} type
-     * @param {string} content
-     * @param {number} tabId
-     * @param {number|undefined} frameId
-     * @param {boolean} allFrames
-     * @returns {Promise<void>}
-     */
-    _injectStylesheetMV3(type, content, tabId, frameId, allFrames) {
-        return new Promise((resolve, reject) => {
-            /** @type {chrome.scripting.InjectionTarget} */
-            const target = {
-                tabId,
-                allFrames
-            };
-            /** @type {chrome.scripting.CSSInjection} */
-            const details = (
-                type === 'file' ?
-                {origin: 'AUTHOR', files: [content], target} :
-                {origin: 'USER', css: content, target}
-            );
-            if (!allFrames && typeof frameId === 'number') {
-                details.target.frameIds = [frameId];
-            }
-            chrome.scripting.insertCSS(details, () => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    resolve();
-                }
-            });
-        });
-    }
-
-    /**
-     * @param {string} file
-     * @param {number} tabId
-     * @param {number|undefined} frameId
-     * @param {boolean} allFrames
-     * @returns {Promise<{frameId: number|undefined, result: unknown}>} The id of the frame and the result of the script injection.
-     */
-    _injectScriptMV3(file, tabId, frameId, allFrames) {
-        return new Promise((resolve, reject) => {
-            /** @type {chrome.scripting.ScriptInjection<unknown[], unknown>} */
-            const details = {
-                injectImmediately: true,
-                files: [file],
-                target: {tabId, allFrames}
-            };
-            if (!allFrames && typeof frameId === 'number') {
-                details.target.frameIds = [frameId];
-            }
-            chrome.scripting.executeScript(details, (results) => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    const {frameId: frameId2, result} = results[0];
-                    resolve({frameId: frameId2, result});
-                }
-            });
-        });
-    }
-
-    /**
-     * @param {string} id
-     * @returns {Promise<void>}
-     */
-    _unregisterContentScriptMV3(id) {
-        return new Promise((resolve, reject) => {
-            chrome.scripting.unregisterContentScripts({ids: [id]}, () => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    resolve();
-                }
-            });
-        });
-    }
-
-    /**
-     * @param {import('script-manager').RegistrationDetails} details
-     * @returns {browser.contentScripts.RegisteredContentScriptOptions}
-     */
-    _createContentScriptRegistrationOptionsFirefox(details) {
-        const {css, js, matchAboutBlank} = details;
-        /** @type {browser.contentScripts.RegisteredContentScriptOptions} */
-        const options = {};
-        if (typeof matchAboutBlank !== 'undefined') {
-            options.matchAboutBlank = matchAboutBlank;
-        }
-        if (Array.isArray(css)) {
-            options.css = css.map((file) => ({file}));
-        }
-        if (Array.isArray(js)) {
-            options.js = js.map((file) => ({file}));
-        }
-        this._initializeContentScriptRegistrationOptionsGeneric(details, options);
-        return options;
-    }
-
-    /**
-     * @param {import('script-manager').RegistrationDetails} details
-     * @param {string} id
-     * @returns {chrome.scripting.RegisteredContentScript}
-     */
-    _createContentScriptRegistrationOptionsChrome(details, id) {
-        const {css, js} = details;
-        /** @type {chrome.scripting.RegisteredContentScript} */
-        const options = {
-            id: id,
-            persistAcrossSessions: true
-        };
-        if (Array.isArray(css)) {
-            options.css = [...css];
-        }
-        if (Array.isArray(js)) {
-            options.js = [...js];
-        }
-        this._initializeContentScriptRegistrationOptionsGeneric(details, options);
-        return options;
-    }
-
-    /**
-     * @param {import('script-manager').RegistrationDetails} details
-     * @param {chrome.scripting.RegisteredContentScript|browser.contentScripts.RegisteredContentScriptOptions} options
-     */
-    _initializeContentScriptRegistrationOptionsGeneric(details, options) {
-        const {allFrames, excludeMatches, matches, runAt} = details;
-        if (typeof allFrames !== 'undefined') {
-            options.allFrames = allFrames;
-        }
-        if (Array.isArray(excludeMatches)) {
-            options.excludeMatches = [...excludeMatches];
-        }
-        if (Array.isArray(matches)) {
-            options.matches = [...matches];
-        }
-        if (typeof runAt !== 'undefined') {
-            options.runAt = runAt;
-        }
-    }
-
-    /**
-     * @param {string[]} array
-     * @param {boolean} firefoxConvention
-     * @returns {string[]|browser.extensionTypes.ExtensionFileOrCode[]}
-     */
-    _convertFileArray(array, firefoxConvention) {
-        return firefoxConvention ? array.map((file) => ({file})) : [...array];
-    }
-
-    /**
-     * @param {string} id
-     * @param {import('script-manager').RegistrationDetails} details
-     */
-    _registerContentScriptFallback(id, details) {
-        const {allFrames, css, js, matchAboutBlank, runAt, urlMatches} = details;
-        /** @type {import('script-manager').ContentScriptInjectionDetails} */
-        const details2 = {allFrames, css, js, matchAboutBlank, runAt, urlRegex: /** @type {?RegExp} */ (null)};
-        /** @type {() => Promise<void>} */
-        let unregister;
-        const webNavigationEvent = this._getWebNavigationEvent(runAt);
-        if (typeof webNavigationEvent === 'object' && webNavigationEvent !== null) {
-            /**
-             * @param {chrome.webNavigation.WebNavigationFramedCallbackDetails} details
-             */
-            const onTabCommitted = ({url, tabId, frameId}) => {
-                this._injectContentScript(true, details2, null, url, tabId, frameId);
-            };
-            const filter = {url: [{urlMatches}]};
-            webNavigationEvent.addListener(onTabCommitted, filter);
-            unregister = async () => webNavigationEvent.removeListener(onTabCommitted);
-        } else {
-            /**
-             * @param {number} tabId
-             * @param {chrome.tabs.TabChangeInfo} changeInfo
-             * @param {chrome.tabs.Tab} tab
-             */
-            const onTabUpdated = (tabId, {status}, {url}) => {
-                if (typeof status === 'string' && typeof url === 'string') {
-                    this._injectContentScript(false, details2, status, url, tabId, void 0);
-                }
-            };
-            try {
-                // Firefox
-                /** @type {browser.tabs.UpdateFilter} */
-                const extraParameters = {urls: [urlMatches], properties: ['status']};
-                browser.tabs.onUpdated.addListener(
-                    /** @type {(tabId: number, changeInfo: browser.tabs._OnUpdatedChangeInfo, tab: browser.tabs.Tab) => void} */ (onTabUpdated),
-                    extraParameters
-                );
-            } catch (e) {
-                // Chrome
-                details2.urlRegex = new RegExp(urlMatches);
-                chrome.tabs.onUpdated.addListener(onTabUpdated);
-            }
-            unregister = async () => chrome.tabs.onUpdated.removeListener(onTabUpdated);
-        }
-        this._contentScriptRegistrations.set(id, {unregister});
-    }
-
-    /**
-     * @param {import('script-manager').RunAt} runAt
-     * @returns {?(chrome.webNavigation.WebNavigationFramedEvent|chrome.webNavigation.WebNavigationTransitionalEvent)}
-     */
-    _getWebNavigationEvent(runAt) {
-        const {webNavigation} = chrome;
-        if (!isObject(webNavigation)) { return null; }
-        switch (runAt) {
-            case 'document_start':
-                return webNavigation.onCommitted;
-            case 'document_end':
-                return webNavigation.onDOMContentLoaded;
-            default: // 'document_idle':
-                return webNavigation.onCompleted;
-        }
-    }
-
-    /**
-     * @param {boolean} isWebNavigation
-     * @param {import('script-manager').ContentScriptInjectionDetails} details
-     * @param {?string} status
-     * @param {string} url
-     * @param {number} tabId
-     * @param {number|undefined} frameId
-     */
-    async _injectContentScript(isWebNavigation, details, status, url, tabId, frameId) {
-        const {urlRegex} = details;
-        if (urlRegex !== null && !urlRegex.test(url)) { return; }
-
-        let {allFrames, css, js, runAt} = details;
-
-        if (isWebNavigation) {
-            if (allFrames) {
-                allFrames = false;
+    const details2 = createContentScriptRegistrationOptions(details, id);
+    await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
+        chrome.scripting.registerContentScripts([details2], () => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
             } else {
-                if (frameId !== 0) { return; }
+                resolve();
             }
-        } else {
-            if (runAt === 'document_start') {
-                if (status !== 'loading') { return; }
-            } else { // 'document_end', 'document_idle'
-                if (status !== 'complete') { return; }
-            }
-        }
+        });
+    }));
+}
 
-        const promises = [];
-        if (Array.isArray(css)) {
-            for (const file of css) {
-                promises.push(this.injectStylesheet('file', file, tabId, frameId, allFrames));
+/**
+ * Unregisters a previously registered content script.
+ * @param {string} id The identifier passed to a previous call to `registerContentScript`.
+ * @returns {Promise<void>}
+ */
+export async function unregisterContentScript(id) {
+    return new Promise((resolve, reject) => {
+        chrome.scripting.unregisterContentScripts({ids: [id]}, () => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
+            } else {
+                resolve();
             }
-        }
-        if (Array.isArray(js)) {
-            for (const file of js) {
-                promises.push(this.injectScript(file, tabId, frameId, allFrames));
-            }
-        }
-        await Promise.all(promises);
+        });
+    });
+}
+
+/**
+ * @param {import('script-manager').RegistrationDetails} details
+ * @param {string} id
+ * @returns {chrome.scripting.RegisteredContentScript}
+ */
+function createContentScriptRegistrationOptions(details, id) {
+    const {css, js, allFrames, matches, runAt, world} = details;
+    /** @type {chrome.scripting.RegisteredContentScript} */
+    const options = {
+        id: id,
+        persistAcrossSessions: true
+    };
+    if (Array.isArray(css)) {
+        options.css = [...css];
     }
+    if (Array.isArray(js)) {
+        options.js = [...js];
+    }
+    if (typeof allFrames !== 'undefined') {
+        options.allFrames = allFrames;
+    }
+    if (Array.isArray(matches)) {
+        options.matches = [...matches];
+    }
+    if (typeof runAt !== 'undefined') {
+        options.runAt = runAt;
+    }
+    if (typeof world !== 'undefined') {
+        options.world = world;
+    }
+    return options;
 }

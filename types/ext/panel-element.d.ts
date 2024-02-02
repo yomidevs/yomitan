@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type EventType = 'visibilityChanged' | 'closeCompleted';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
-export type VisibilityChangedEvent = {
-    visible: boolean;
+export type Events = {
+    visibilityChanged: {
+        visible: boolean;
+    };
+    closeCompleted: {
+        reopening: boolean;
+    };
 };
 
-export type CloseCompletedEvent = {
-    reopening: boolean;
-};
-
-/* eslint-disable @stylistic/ts/indent */
-export type Event<T extends EventType> = (
-    T extends 'visibilityChanged' ? VisibilityChangedEvent :
-    T extends 'closeCompleted' ? CloseCompletedEvent :
-    never
-);
-/* eslint-enable @stylistic/ts/indent */
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type ConstructorDetails = {
     node: HTMLElement;

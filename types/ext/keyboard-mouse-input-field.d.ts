@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Input from './input';
+import type {Modifier} from './input';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
-export type EventType = 'change';
-
-export type ChangeEvent = {
-    key: string | null;
-    modifiers: Input.Modifier[];
+export type Events = {
+    change: {
+        key: string | null;
+        modifiers: Modifier[];
+    };
 };
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;

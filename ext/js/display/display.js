@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2017-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,13 +18,20 @@
 
 import {ThemeController} from '../app/theme-controller.js';
 import {FrameEndpoint} from '../comm/frame-endpoint.js';
-import {DynamicProperty, EventDispatcher, EventListenerCollection, clone, deepEqual, invokeMessageHandler, log, promiseTimeout} from '../core.js';
+import {extendApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {DynamicProperty} from '../core/dynamic-property.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {ExtensionError} from '../core/extension-error.js';
+import {log} from '../core/logger.js';
+import {toError} from '../core/to-error.js';
+import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ScrollElement} from '../dom/scroll-element.js';
+import {TextSourceGenerator} from '../dom/text-source-generator.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {TextScanner} from '../language/text-scanner.js';
-import {yomitan} from '../yomitan.js';
 import {DisplayContentManager} from './display-content-manager.js';
 import {DisplayGenerator} from './display-generator.js';
 import {DisplayHistory} from './display-history.js';
@@ -34,27 +41,27 @@ import {OptionToggleHotkeyHandler} from './option-toggle-hotkey-handler.js';
 import {QueryParser} from './query-parser.js';
 
 /**
- * @augments EventDispatcher<import('display').DisplayEventType>
+ * @augments EventDispatcher<import('display').Events>
  */
 export class Display extends EventDispatcher {
     /**
+     * @param {import('../application.js').Application} application
      * @param {number|undefined} tabId
      * @param {number|undefined} frameId
      * @param {import('display').DisplayPageType} pageType
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {import('../dom/document-focus-controller.js').DocumentFocusController} documentFocusController
      * @param {import('../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
-    constructor(tabId, frameId, pageType, japaneseUtil, documentFocusController, hotkeyHandler) {
+    constructor(application, tabId, frameId, pageType, documentFocusController, hotkeyHandler) {
         super();
+        /** @type {import('../application.js').Application} */
+        this._application = application;
         /** @type {number|undefined} */
         this._tabId = tabId;
         /** @type {number|undefined} */
         this._frameId = frameId;
         /** @type {import('display').DisplayPageType} */
         this._pageType = pageType;
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
         /** @type {import('../dom/document-focus-controller.js').DocumentFocusController} */
         this._documentFocusController = documentFocusController;
         /** @type {import('../input/hotkey-handler.js').HotkeyHandler} */
@@ -83,16 +90,13 @@ export class Display extends EventDispatcher {
         this._hotkeyHelpController = new HotkeyHelpController();
         /** @type {DisplayGenerator} */
         this._displayGenerator = new DisplayGenerator({
-            japaneseUtil,
             contentManager: this._contentManager,
             hotkeyHelpController: this._hotkeyHelpController
         });
-        /** @type {import('core').MessageHandlerMap} */
-        this._messageHandlers = new Map();
-        /** @type {import('core').MessageHandlerMap} */
-        this._directMessageHandlers = new Map();
-        /** @type {import('core').MessageHandlerMap} */
-        this._windowMessageHandlers = new Map();
+        /** @type {import('display').DirectApiMap} */
+        this._directApiMap = new Map();
+        /** @type {import('api-map').ApiMap<import('display').WindowApiSurface>} */ // import('display').WindowApiMap
+        this._windowApiMap = new Map();
         /** @type {DisplayHistory} */
         this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
         /** @type {boolean} */
@@ -125,10 +129,13 @@ export class Display extends EventDispatcher {
         this._queryParserVisibleOverride = null;
         /** @type {HTMLElement} */
         this._queryParserContainer = querySelectorNotNull(document, '#query-parser-container');
+        /** @type {TextSourceGenerator} */
+        this._textSourceGenerator = new TextSourceGenerator();
         /** @type {QueryParser} */
         this._queryParser = new QueryParser({
+            api: application.api,
             getSearchContext: this._getSearchContext.bind(this),
-            japaneseUtil
+            textSourceGenerator: this._textSourceGenerator
         });
         /** @type {HTMLElement} */
         this._contentScrollElement = querySelectorNotNull(document, '#content-scroll');
@@ -159,7 +166,7 @@ export class Display extends EventDispatcher {
         /** @type {boolean} */
         this._childrenSupported = true;
         /** @type {?FrameEndpoint} */
-        this._frameEndpoint = (pageType === 'popup' ? new FrameEndpoint() : null);
+        this._frameEndpoint = (pageType === 'popup' ? new FrameEndpoint(this._application.api) : null);
         /** @type {?import('environment').Browser} */
         this._browser = null;
         /** @type {?HTMLTextAreaElement} */
@@ -207,17 +214,22 @@ export class Display extends EventDispatcher {
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
         ]);
         this.registerDirectMessageHandlers([
-            ['Display.setOptionsContext', this._onMessageSetOptionsContext.bind(this)],
-            ['Display.setContent',        this._onMessageSetContent.bind(this)],
-            ['Display.setCustomCss',      this._onMessageSetCustomCss.bind(this)],
-            ['Display.setContentScale',   this._onMessageSetContentScale.bind(this)],
-            ['Display.configure',         this._onMessageConfigure.bind(this)],
-            ['Display.visibilityChanged', this._onMessageVisibilityChanged.bind(this)]
+            ['displaySetOptionsContext', this._onMessageSetOptionsContext.bind(this)],
+            ['displaySetContent',        this._onMessageSetContent.bind(this)],
+            ['displaySetCustomCss',      this._onMessageSetCustomCss.bind(this)],
+            ['displaySetContentScale',   this._onMessageSetContentScale.bind(this)],
+            ['displayConfigure',         this._onMessageConfigure.bind(this)],
+            ['displayVisibilityChanged', this._onMessageVisibilityChanged.bind(this)]
         ]);
         this.registerWindowMessageHandlers([
-            ['Display.extensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
+            ['displayExtensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
+    }
+
+    /** @type {import('../application.js').Application} */
+    get application() {
+        return this._application;
     }
 
     /** @type {DisplayGenerator} */
@@ -233,11 +245,6 @@ export class Display extends EventDispatcher {
     set queryParserVisible(value) {
         this._queryParserVisible = value;
         this._updateQueryParser();
-    }
-
-    /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-    get japaneseUtil() {
-        return this._japaneseUtil;
     }
 
     /** @type {number} */
@@ -308,7 +315,7 @@ export class Display extends EventDispatcher {
 
         // State setup
         const {documentElement} = document;
-        const {browser} = await yomitan.api.getEnvironmentInfo();
+        const {browser} = await this._application.api.getEnvironmentInfo();
         this._browser = browser;
 
         if (documentElement !== null) {
@@ -316,8 +323,8 @@ export class Display extends EventDispatcher {
         }
 
         // Prepare
-        await this._hotkeyHelpController.prepare();
-        await this._displayGenerator.prepare();
+        await this._hotkeyHelpController.prepare(this._application.api);
+        await this._displayGenerator.prepare(this._application.api);
         this._queryParser.prepare();
         this._history.prepare();
         this._optionToggleHotkeyHandler.prepare();
@@ -326,9 +333,10 @@ export class Display extends EventDispatcher {
         this._history.on('stateChanged', this._onStateChanged.bind(this));
         this._queryParser.on('searched', this._onQueryParserSearch.bind(this));
         this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
-        yomitan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
-        yomitan.crossFrame.registerHandlers([
-            ['popupMessage', this._onDirectMessage.bind(this)]
+        this._application.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
+        this._application.crossFrame.registerHandlers([
+            ['displayPopupMessage1', this._onDisplayPopupMessage1.bind(this)],
+            ['displayPopupMessage2', this._onDisplayPopupMessage2.bind(this)]
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
 
@@ -384,7 +392,7 @@ export class Display extends EventDispatcher {
      * @param {Error} error
      */
     onError(error) {
-        if (yomitan.isExtensionUnloaded) { return; }
+        if (this._application.webExtension.unloaded) { return; }
         log.error(error);
     }
 
@@ -412,7 +420,7 @@ export class Display extends EventDispatcher {
 
     /** */
     async updateOptions() {
-        const options = await yomitan.api.optionsGet(this.getOptionsContext());
+        const options = await this._application.api.optionsGet(this.getOptionsContext());
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
 
@@ -449,9 +457,7 @@ export class Display extends EventDispatcher {
         this._updateNestedFrontend(options);
         this._updateContentTextScanner(options);
 
-        /** @type {import('display').OptionsUpdatedEvent} */
-        const event = {options};
-        this.trigger('optionsUpdated', event);
+        this.trigger('optionsUpdated', {options});
     }
 
     /**
@@ -481,7 +487,7 @@ export class Display extends EventDispatcher {
             case 'overwrite':
                 this._history.replaceState(state, content, url);
                 break;
-            default: // 'new'
+            case 'new':
                 this._updateHistoryState();
                 this._history.pushState(state, content, url);
                 break;
@@ -506,28 +512,24 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('core').MessageHandlerMapInit} handlers
+     * @param {import('display').DirectApiMapInit} handlers
      */
     registerDirectMessageHandlers(handlers) {
-        for (const [name, handlerInfo] of handlers) {
-            this._directMessageHandlers.set(name, handlerInfo);
-        }
+        extendApiMap(this._directApiMap, handlers);
     }
 
     /**
-     * @param {import('core').MessageHandlerMapInit} handlers
+     * @param {import('display').WindowApiMapInit} handlers
      */
     registerWindowMessageHandlers(handlers) {
-        for (const [name, handlerInfo] of handlers) {
-            this._windowMessageHandlers.set(name, handlerInfo);
-        }
+        extendApiMap(this._windowApiMap, handlers);
     }
 
     /** */
     close() {
         switch (this._pageType) {
             case 'popup':
-                this.invokeContentOrigin('Frontend.closePopup');
+                this.invokeContentOrigin('frontendClosePopup', void 0);
                 break;
             case 'search':
                 this._closeTab();
@@ -580,32 +582,32 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {import('core').SerializableObject} [params]
-     * @returns {Promise<TReturn>}
+     * @template {import('cross-frame-api').ApiNames} TName
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
-    async invokeContentOrigin(action, params = {}) {
+    async invokeContentOrigin(action, params) {
         if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
             throw new Error('Content origin is same page');
         }
         if (typeof this._contentOriginTabId !== 'number' || typeof this._contentOriginFrameId !== 'number') {
             throw new Error('No content origin is assigned');
         }
-        return await yomitan.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
+        return await this._application.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
     }
 
     /**
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {import('core').SerializableObject} [params]
-     * @returns {Promise<TReturn>}
+     * @template {import('cross-frame-api').ApiNames} TName
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
-    async invokeParentFrame(action, params = {}) {
+    async invokeParentFrame(action, params) {
         if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
             throw new Error('Invalid parent frame');
         }
-        return await yomitan.crossFrame.invoke(this._parentFrameId, action, params);
+        return await this._application.crossFrame.invoke(this._parentFrameId, action, params);
     }
 
     /**
@@ -636,25 +638,42 @@ export class Display extends EventDispatcher {
 
     // Message handlers
 
-    /**
-     * @param {import('frame-client').Message<import('display').MessageDetails>} data
-     * @returns {import('core').MessageHandlerResult}
-     * @throws {Error}
-     */
-    _onDirectMessage(data) {
-        const {action, params} = this._authenticateMessageData(data);
-        const handler = this._directMessageHandlers.get(action);
-        if (typeof handler === 'undefined') {
-            throw new Error(`Invalid action: ${action}`);
-        }
+    /** @type {import('cross-frame-api').ApiHandler<'displayPopupMessage1'>} */
+    async _onDisplayPopupMessage1(message) {
+        /** @type {import('display').DirectApiMessageAny} */
+        const messageInner = this._authenticateMessageData(message);
+        return await this._onDisplayPopupMessage2(messageInner);
+    }
 
-        return handler(params);
+    /** @type {import('cross-frame-api').ApiHandler<'displayPopupMessage2'>} */
+    _onDisplayPopupMessage2(message) {
+        return new Promise((resolve, reject) => {
+            const {action, params} = message;
+            invokeApiMapHandler(
+                this._directApiMap,
+                action,
+                params,
+                [],
+                (result) => {
+                    const {error} = result;
+                    if (typeof error !== 'undefined') {
+                        reject(ExtensionError.deserialize(error));
+                    } else {
+                        resolve(result.result);
+                    }
+                },
+                () => {
+                    reject(new Error(`Invalid action: ${action}`));
+                }
+            );
+        });
     }
 
     /**
-     * @param {MessageEvent<import('frame-client').Message<import('display').MessageDetails>>} details
+     * @param {MessageEvent<import('display').WindowApiFrameClientMessageAny>} details
      */
     _onWindowMessage({data}) {
+        /** @type {import('display').WindowApiMessageAny} */
         let data2;
         try {
             data2 = this._authenticateMessageData(data);
@@ -662,46 +681,37 @@ export class Display extends EventDispatcher {
             return;
         }
 
-        const {action, params} = data2;
-        const messageHandler = this._windowMessageHandlers.get(action);
-        if (typeof messageHandler === 'undefined') { return; }
-
-        const callback = () => {}; // NOP
-        invokeMessageHandler(messageHandler, params, callback);
+        try {
+            const {action, params} = data2;
+            const callback = () => {}; // NOP
+            invokeApiMapHandler(this._windowApiMap, action, params, [], callback);
+        } catch (e) {
+            // NOP
+        }
     }
 
-    /**
-     * @param {{optionsContext: import('settings').OptionsContext}} details
-     */
+    /** @type {import('display').DirectApiHandler<'displaySetOptionsContext'>} */
     async _onMessageSetOptionsContext({optionsContext}) {
         await this.setOptionsContext(optionsContext);
         this.searchLast(true);
     }
 
-    /**
-     * @param {{details: import('display').ContentDetails}} details
-     */
+    /** @type {import('display').DirectApiHandler<'displaySetContent'>} */
     _onMessageSetContent({details}) {
         this.setContent(details);
     }
 
-    /**
-     * @param {{css: string}} details
-     */
+    /** @type {import('display').DirectApiHandler<'displaySetCustomCss'>} */
     _onMessageSetCustomCss({css}) {
         this.setCustomCss(css);
     }
 
-    /**
-     * @param {{scale: number}} details
-     */
+    /** @type {import('display').DirectApiHandler<'displaySetContentScale'>} */
     _onMessageSetContentScale({scale}) {
         this._setContentScale(scale);
     }
 
-    /**
-     * @param {import('display').ConfigureMessageDetails} details
-     */
+    /** @type {import('display').DirectApiHandler<'displayConfigure'>} */
     async _onMessageConfigure({depth, parentPopupId, parentFrameId, childrenSupported, scale, optionsContext}) {
         this._depth = depth;
         this._parentPopupId = parentPopupId;
@@ -711,38 +721,30 @@ export class Display extends EventDispatcher {
         await this.setOptionsContext(optionsContext);
     }
 
-    /**
-     * @param {{value: boolean}} details
-     */
+    /** @type {import('display').DirectApiHandler<'displayVisibilityChanged'>} */
     _onMessageVisibilityChanged({value}) {
         this._frameVisible = value;
-        /** @type {import('display').FrameVisibilityChangeEvent} */
-        const event = {value};
-        this.trigger('frameVisibilityChange', event);
+        this.trigger('frameVisibilityChange', {value});
     }
 
-    /** */
+    /** @type {import('display').WindowApiHandler<'displayExtensionUnloaded'>} */
     _onMessageExtensionUnloaded() {
-        if (yomitan.isExtensionUnloaded) { return; }
-        yomitan.triggerExtensionUnloaded();
+        this._application.webExtension.triggerUnloaded();
     }
 
     // Private
 
     /**
      * @template [T=unknown]
-     * @param {T|import('frame-client').Message<T>} data
+     * @param {import('frame-client').Message<unknown>} message
      * @returns {T}
      * @throws {Error}
      */
-    _authenticateMessageData(data) {
-        if (this._frameEndpoint === null) {
-            return /** @type {T} */ (data);
-        }
-        if (!this._frameEndpoint.authenticate(data)) {
+    _authenticateMessageData(message) {
+        if (this._frameEndpoint !== null && !this._frameEndpoint.authenticate(message)) {
             throw new Error('Invalid authentication');
         }
-        return /** @type {import('frame-client').Message<T>} */ (data).data;
+        return /** @type {import('frame-client').Message<T>} */ (message).data;
     }
 
     /** */
@@ -791,12 +793,12 @@ export class Display extends EventDispatcher {
                     break;
             }
         } catch (e) {
-            this.onError(e instanceof Error ? e : new Error(`${e}`));
+            this.onError(toError(e));
         }
     }
 
     /**
-     * @param {import('display').QueryParserSearchedEvent} details
+     * @param {import('query-parser').EventArgument<'searched'>} details
      */
     _onQueryParserSearch({type, dictionaryEntries, sentence, inputInfo: {eventType}, textSource, optionsContext, sentenceOffset}) {
         const query = textSource.text();
@@ -869,7 +871,7 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('dynamic-property').ChangeEventDetails<boolean>} details
+     * @param {import('dynamic-property').EventArgument<boolean, 'change'>} details
      */
     _onProgressIndicatorVisibleChanged({value}) {
         if (this._progressIndicatorTimer !== null) {
@@ -906,7 +908,7 @@ export class Display extends EventDispatcher {
             const element = /** @type {Element} */ (e.currentTarget);
             let query = element.textContent;
             if (query === null) { query = ''; }
-            const dictionaryEntries = await yomitan.api.kanjiFind(query, optionsContext);
+            const dictionaryEntries = await this._application.api.kanjiFind(query, optionsContext);
             /** @type {import('display').ContentDetails} */
             const details = {
                 focus: false,
@@ -926,7 +928,7 @@ export class Display extends EventDispatcher {
             };
             this.setContent(details);
         } catch (error) {
-            this.onError(error instanceof Error ? error : new Error(`${error}`));
+            this.onError(toError(error));
         }
     }
 
@@ -1142,7 +1144,7 @@ export class Display extends EventDispatcher {
      */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
         if (isKanji) {
-            const dictionaryEntries = await yomitan.api.kanjiFind(source, optionsContext);
+            const dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
             return dictionaryEntries;
         } else {
             /** @type {import('api').FindTermsDetails} */
@@ -1161,7 +1163,7 @@ export class Display extends EventDispatcher {
                 }
             }
 
-            const {dictionaryEntries} = await yomitan.api.termsFind(source, findDetails, optionsContext);
+            const {dictionaryEntries} = await this._application.api.termsFind(source, findDetails, optionsContext);
             return dictionaryEntries;
         }
     }
@@ -1646,7 +1648,7 @@ export class Display extends EventDispatcher {
 
     /** */
     _closePopups() {
-        yomitan.trigger('closePopups');
+        this._application.triggerClosePopups();
     }
 
     /**
@@ -1717,11 +1719,12 @@ export class Display extends EventDispatcher {
             import('../app/frontend.js')
         ]);
 
-        const popupFactory = new PopupFactory(this._frameId);
+        const popupFactory = new PopupFactory(this._application, this._frameId);
         popupFactory.prepare();
 
         /** @type {import('frontend').ConstructorDetails} */
         const setupNestedPopupsOptions = {
+            application: this._application,
             useProxyPopup,
             parentPopupId,
             parentFrameId,
@@ -1769,7 +1772,7 @@ export class Display extends EventDispatcher {
                     /** @type {string} */
                     let text;
                     try {
-                        text = await this.invokeContentOrigin('Frontend.getSelectionText');
+                        text = await this.invokeContentOrigin('frontendGetSelectionText', void 0);
                     } catch (e) {
                         break;
                     }
@@ -1777,7 +1780,7 @@ export class Display extends EventDispatcher {
                 }
                 break;
             default:
-                await this.invokeContentOrigin('Frontend.copySelection');
+                await this.invokeContentOrigin('frontendCopySelection', void 0);
                 break;
         }
     }
@@ -1834,12 +1837,14 @@ export class Display extends EventDispatcher {
 
         if (this._contentTextScanner === null) {
             this._contentTextScanner = new TextScanner({
+                api: this._application.api,
                 node: window,
                 getSearchContext: this._getSearchContext.bind(this),
                 searchTerms: true,
                 searchKanji: false,
                 searchOnClick: true,
-                searchOnClickOnly: true
+                searchOnClickOnly: true,
+                textSourceGenerator: this._textSourceGenerator
             });
             this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
             this._contentTextScanner.excludeSelector = '.scan-disable,.scan-disable *';
@@ -1893,7 +1898,7 @@ export class Display extends EventDispatcher {
      * @param {import('text-scanner').SearchedEventDetails} details
      */
     _onContentTextScannerSearched({type, dictionaryEntries, sentence, textSource, optionsContext, error}) {
-        if (error !== null && !yomitan.isExtensionUnloaded) {
+        if (error !== null && !this._application.webExtension.unloaded) {
             log.error(error);
         }
 
@@ -2011,9 +2016,7 @@ export class Display extends EventDispatcher {
 
         /** @type {Promise<unknown>[]} */
         const promises = [];
-        /** @type {import('display').LogDictionaryEntryDataEvent} */
-        const event = {dictionaryEntry, promises};
-        this.trigger('logDictionaryEntryData', event);
+        this.trigger('logDictionaryEntryData', {dictionaryEntry, promises});
         if (promises.length > 0) {
             for (const result2 of await Promise.all(promises)) {
                 Object.assign(result, result2);
@@ -2031,9 +2034,7 @@ export class Display extends EventDispatcher {
 
     /** */
     _triggerContentUpdateStart() {
-        /** @type {import('display').ContentUpdateStartEvent} */
-        const event = {type: this._contentType, query: this._query};
-        this.trigger('contentUpdateStart', event);
+        this.trigger('contentUpdateStart', {type: this._contentType, query: this._query});
     }
 
     /**
@@ -2042,15 +2043,11 @@ export class Display extends EventDispatcher {
      * @param {number} index
      */
     _triggerContentUpdateEntry(dictionaryEntry, element, index) {
-        /** @type {import('display').ContentUpdateEntryEvent} */
-        const event = {dictionaryEntry, element, index};
-        this.trigger('contentUpdateEntry', event);
+        this.trigger('contentUpdateEntry', {dictionaryEntry, element, index});
     }
 
     /** */
     _triggerContentUpdateComplete() {
-        /** @type {import('display').ContentUpdateCompleteEvent} */
-        const event = {type: this._contentType};
-        this.trigger('contentUpdateComplete', event);
+        this.trigger('contentUpdateComplete', {type: this._contentType});
     }
 }

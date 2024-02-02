@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,4 @@ export type IntermediateOptions = Core.SafeAny;
 
 export type LegacyUpdateFunction = (options: LegacyOptions) => void;
 
-export type ModernUpdateFunction = ModernUpdateFunctionSync | ModernUpdateFunctionAsync;
-
-export type ModernUpdateFunctionSync = (options: IntermediateOptions) => IntermediateOptions;
-
-export type ModernUpdateFunctionAsync = (options: IntermediateOptions) => Promise<IntermediateOptions>;
-
-export type ModernUpdate = {
-    async: boolean;
-    update: ModernUpdateFunction;
-};
+export type UpdateFunction = (options: IntermediateOptions) => void | Promise<void>;

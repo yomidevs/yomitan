@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,13 @@ export type TextDecorationLine = 'underline' | 'overline' | 'line-through';
 
 export type TextDecorationLineOrNone = 'none' | TextDecorationLine;
 
+export type TextDecorationStyle = 'solid' | 'double' | 'dotted' | 'dashed' | 'wavy';
+
 export type FontStyle = 'normal' | 'italic';
 
 export type FontWeight = 'normal' | 'bold';
+
+export type WordBreak = 'normal' | 'break-all' | 'keep-all';
 
 export type TextAlign = 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'justify-all' | 'match-parent';
 
@@ -37,6 +41,8 @@ export type ImageAppearance = 'auto' | 'monochrome';
 
 export type Image = DictionaryData.TermImage & {
     verticalAlign: VerticalAlign;
+    border: string;
+    borderRadius: string;
     sizeUnits: SizeUnits;
 };
 
@@ -48,13 +54,34 @@ export type StructuredContentStyle = {
     fontStyle?: FontStyle;
     fontWeight?: FontWeight;
     fontSize?: string;
+    color?: string;
+    background?: string;
+    backgroundColor?: string;
     textDecorationLine?: TextDecorationLineOrNone | TextDecorationLine[];
+    textDecorationStyle?: TextDecorationStyle;
+    textDecorationColor?: string;
+    borderColor?: string;
+    borderStyle?: string;
+    borderRadius?: string;
+    borderWidth?: string;
+    clipPath?: string;
     verticalAlign?: VerticalAlign;
     textAlign?: TextAlign;
-    marginTop?: number;
-    marginLeft?: number;
-    marginRight?: number;
-    marginBottom?: number;
+    textEmphasis?: string;
+    textShadow?: string;
+    margin?: string;
+    marginTop?: number | string;
+    marginLeft?: number | string;
+    marginRight?: number | string;
+    marginBottom?: number | string;
+    padding?: string;
+    paddingTop?: string;
+    paddingLeft?: string;
+    paddingRight?: string;
+    paddingBottom?: string;
+    wordBreak?: WordBreak;
+    whiteSpace?: string;
+    cursor?: string;
     listStyleType?: string;
 };
 
@@ -100,6 +127,10 @@ export type StyledElement = {
     data?: Data;
     style?: StructuredContentStyle;
     /**
+     * Hover text for the element.
+     */
+    title?: string;
+    /**
      * Defines the language of an element in the format defined by RFC 5646.
      */
     lang?: string;
@@ -116,7 +147,7 @@ export type ImageElementBase = {
      */
     width?: number;
     /**
-     * Preferred width of the image.
+     * Preferred height of the image.
      */
     height?: number;
     /**
@@ -125,7 +156,7 @@ export type ImageElementBase = {
      */
     preferredWidth?: number;
     /**
-     * Preferred width of the image.
+     * Preferred height of the image.
      * This is only used in the internal database.
      */
     preferredHeight?: number;
@@ -177,6 +208,14 @@ export type ImageElement = ImageElementBase & {
      * The vertical alignment of the image.
      */
     verticalAlign?: VerticalAlign;
+    /**
+     * Shorthand for border width, style, and color.
+     */
+    border?: string;
+    /**
+     * Roundness of the corners of the image's outer border edge.
+     */
+    borderRadius?: string;
     /**
      * The units for the width and height.
      */

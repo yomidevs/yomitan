@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,10 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection} from '../../core.js';
+import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {DocumentUtil} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 export class ScanInputsController {
@@ -43,7 +42,7 @@ export class ScanInputsController {
 
     /** */
     async prepare() {
-        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
+        const {platform: {os}} = await this._settingsController.application.api.getEnvironmentInfo();
         this._os = os;
 
         this._scanningInputCountNodes = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.scanning-input-count'));
@@ -110,7 +109,7 @@ export class ScanInputsController {
     // Private
 
     /**
-     * @param {import('settings-controller').ScanInputsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'scanInputsChanged'>} details
      */
     _onScanInputsChanged({source}) {
         if (source === this) { return; }
@@ -118,7 +117,7 @@ export class ScanInputsController {
     }
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         const {inputs} = options.scanning;
@@ -190,7 +189,7 @@ export class ScanInputsController {
 
     /** */
     _triggerScanInputsChanged() {
-        /** @type {import('settings-controller').ScanInputsChangedEvent} */
+        /** @type {import('settings-controller').EventArgument<'scanInputsChanged'>} */
         const event = {source: this};
         this._settingsController.trigger('scanInputsChanged', event);
     }
@@ -312,7 +311,7 @@ class ScanInputField {
     // Private
 
     /**
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} details
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} details
      */
     _onIncludeValueChange({modifiers}) {
         const modifiers2 = this._joinModifiers(modifiers);
@@ -320,7 +319,7 @@ class ScanInputField {
     }
 
     /**
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} details
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} details
      */
     _onExcludeValueChange({modifiers}) {
         const modifiers2 = this._joinModifiers(modifiers);

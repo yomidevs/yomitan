@@ -14,14 +14,14 @@ jobs:
     if: github.actor == 'djahandarie'
     steps:
       - name: Download workflow artifact
-        uses: dawidd6/action-download-artifact@268677152d06ba59fcec7a7f0b5d961b6ccd7e1e # v2.28.0
+        uses: dawidd6/action-download-artifact@e7466d1a7587ed14867642c2ca74b5bcc1e19a2d # v3.0.0
         with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             workflow: auto-approve.yml
             run_id: ${{ github.event.workflow_run.id }}
       - name: Read the pr_num file
         id: pr_num_reader
-        uses: juliangruber/read-file-action@02bbba9876a8f870efd4ad64e3b9088d3fb94d4b # v1.1.6
+        uses: juliangruber/read-file-action@b549046febe0fe86f8cb4f93c24e284433f9ab58 # v1.1.7
         with:
             path: ./pr_num/pr_num.txt
       - uses: hmarr/auto-approve-action@44888193675f29a83e04faf4002fa8c0b537b1e4 # v3.2.1

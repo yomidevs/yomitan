@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,11 +20,11 @@ import {ExtensionError} from '../core/extension-error.js';
 
 export class API {
     /**
-     * @param {import('../yomitan.js').Yomitan} yomitan
+     * @param {import('../extension/web-extension.js').WebExtension} webExtension
      */
-    constructor(yomitan) {
-        /** @type {import('../yomitan.js').Yomitan} */
-        this._yomitan = yomitan;
+    constructor(webExtension) {
+        /** @type {import('../extension/web-extension.js').WebExtension} */
+        this._webExtension = webExtension;
     }
 
     /**
@@ -156,21 +156,19 @@ export class API {
 
     /**
      * @param {import('api').ApiParam<'sendMessageToFrame', 'frameId'>} frameId
-     * @param {import('api').ApiParam<'sendMessageToFrame', 'action'>} action
-     * @param {import('api').ApiParam<'sendMessageToFrame', 'params'>} [params]
+     * @param {import('api').ApiParam<'sendMessageToFrame', 'message'>} message
      * @returns {Promise<import('api').ApiReturn<'sendMessageToFrame'>>}
      */
-    sendMessageToFrame(frameId, action, params) {
-        return this._invoke('sendMessageToFrame', {frameId, action, params});
+    sendMessageToFrame(frameId, message) {
+        return this._invoke('sendMessageToFrame', {frameId, message});
     }
 
     /**
-     * @param {import('api').ApiParam<'broadcastTab', 'action'>} action
-     * @param {import('api').ApiParam<'broadcastTab', 'params'>} params
+     * @param {import('api').ApiParam<'broadcastTab', 'message'>} message
      * @returns {Promise<import('api').ApiReturn<'broadcastTab'>>}
      */
-    broadcastTab(action, params) {
-        return this._invoke('broadcastTab', {action, params});
+    broadcastTab(message) {
+        return this._invoke('broadcastTab', {message});
     }
 
     /**
@@ -355,14 +353,6 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'loadExtensionScripts', 'files'>} files
-     * @returns {Promise<import('api').ApiReturn<'loadExtensionScripts'>>}
-     */
-    loadExtensionScripts(files) {
-        return this._invoke('loadExtensionScripts', {files});
-    }
-
-    /**
      * @param {import('api').ApiParam<'openCrossFramePort', 'targetTabId'>} targetTabId
      * @param {import('api').ApiParam<'openCrossFramePort', 'targetFrameId'>} targetFrameId
      * @returns {Promise<import('api').ApiReturn<'openCrossFramePort'>>}
@@ -381,17 +371,19 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<TAction>>}
      */
     _invoke(action, params) {
-        /** @type {import('api').MessageAny} */
+        /** @type {import('api').ApiMessage<TAction>} */
         const data = {action, params};
         return new Promise((resolve, reject) => {
             try {
-                this._yomitan.sendMessage(data, (response) => {
-                    this._checkLastError(chrome.runtime.lastError);
+                this._webExtension.sendMessage(data, (response) => {
+                    this._webExtension.getLastError();
                     if (response !== null && typeof response === 'object') {
-                        if (typeof response.error !== 'undefined') {
-                            reject(ExtensionError.deserialize(response.error));
+                        const {error} = /** @type {import('core').UnknownObject} */ (response);
+                        if (typeof error !== 'undefined') {
+                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */ (error)));
                         } else {
-                            resolve(response.result);
+                            const {result} = /** @type {import('core').UnknownObject} */ (response);
+                            resolve(/** @type {import('api').ApiReturn<TAction>} */ (result));
                         }
                     } else {
                         const message = response === null ? 'Unexpected null response' : `Unexpected response of type ${typeof response}`;
@@ -402,12 +394,5 @@ export class API {
                 reject(e);
             }
         });
-    }
-
-    /**
-     * @param {chrome.runtime.LastError|undefined} _ignore
-     */
-    _checkLastError(_ignore) {
-        // NOP
     }
 }

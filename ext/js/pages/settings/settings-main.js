@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {log} from '../../core.js';
+import {Application} from '../../application.js';
+import {log} from '../../core/logger.js';
 import {DocumentFocusController} from '../../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 import {ExtensionContentController} from '../common/extension-content-controller.js';
 import {AnkiController} from './anki-controller.js';
 import {AnkiTemplatesController} from './anki-templates-controller.js';
@@ -53,7 +53,7 @@ import {TranslationTextReplacementsController} from './translation-text-replacem
 /**
  * @param {GenericSettingController} genericSettingController
  */
-async function setupGenericSettingsController(genericSettingController) {
+async function setupGenericSettingController(genericSettingController) {
     await genericSettingController.prepare();
     await genericSettingController.refresh();
 }
@@ -78,7 +78,8 @@ async function main() {
             document.documentElement.dataset.loadingStalled = 'true';
         }, 1000);
 
-        await yomitan.prepare();
+        const application = new Application();
+        await application.prepare();
 
         if (prepareTimer !== null) {
             clearTimeout(prepareTimer);
@@ -91,10 +92,10 @@ async function main() {
         const modalController = new ModalController();
         modalController.prepare();
 
-        const settingsController = new SettingsController();
+        const settingsController = new SettingsController(application);
         await settingsController.prepare();
 
-        const persistentStorageController = new PersistentStorageController();
+        const persistentStorageController = new PersistentStorageController(application);
         persistentStorageController.prepare();
 
         const storageController = new StorageController(persistentStorageController);
@@ -107,7 +108,7 @@ async function main() {
         dictionaryImportController.prepare();
 
         const genericSettingController = new GenericSettingController(settingsController);
-        preparePromises.push(setupGenericSettingsController(genericSettingController));
+        preparePromises.push(setupGenericSettingController(genericSettingController));
 
         const audioController = new AudioController(settingsController, modalController);
         audioController.prepare();
@@ -154,10 +155,10 @@ async function main() {
         const extensionKeyboardShortcutController = new ExtensionKeyboardShortcutController(settingsController);
         extensionKeyboardShortcutController.prepare();
 
-        const popupWindowController = new PopupWindowController();
+        const popupWindowController = new PopupWindowController(application.api);
         popupWindowController.prepare();
 
-        const mecabController = new MecabController();
+        const mecabController = new MecabController(application.api);
         mecabController.prepare();
 
         const collapsibleDictionaryController = new CollapsibleDictionaryController(settingsController);

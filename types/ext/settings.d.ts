@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -234,7 +234,10 @@ export type TranslationOptions = {
     convertKatakanaToHiragana: TranslationConvertType;
     collapseEmphaticSequences: TranslationCollapseEmphaticSequences;
     textReplacements: TranslationTextReplacementOptions;
+    searchResolution: SearchResolution;
 };
+
+export type SearchResolution = 'letter' | 'word';
 
 export type TranslationTextReplacementOptions = {
     searchOriginal: boolean;
@@ -255,6 +258,8 @@ export type DictionaryOptions = {
     enabled: boolean;
     allowSecondarySearches: boolean;
     definitionsCollapsible: DictionaryDefinitionsCollapsible;
+    partsOfSpeechFilter: boolean;
+    useDeinflections: boolean;
 };
 
 export type ParsingOptions = {

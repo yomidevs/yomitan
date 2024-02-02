@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,11 +18,17 @@
 
 import {API} from './comm/api.js';
 import {CrossFrameAPI} from './comm/cross-frame-api.js';
-import {EventDispatcher, deferPromise, invokeMessageHandler, log} from './core.js';
+import {createApiMap, invokeApiMapHandler} from './core/api-map.js';
+import {EventDispatcher} from './core/event-dispatcher.js';
 import {ExtensionError} from './core/extension-error.js';
+import {log} from './core/logger.js';
+import {deferPromise} from './core/utilities.js';
+import {WebExtension} from './extension/web-extension.js';
 
-// Set up chrome alias if it's not available (Edge Legacy)
-if ((() => {
+/**
+ * @returns {boolean}
+ */
+function checkChromeNotAvailable() {
     let hasChrome = false;
     let hasBrowser = false;
     try {
@@ -36,7 +42,10 @@ if ((() => {
         // NOP
     }
     return (hasBrowser && !hasChrome);
-})()) {
+}
+
+// Set up chrome alias if it's not available (Edge Legacy)
+if (checkChromeNotAvailable()) {
     // @ts-expect-error - objects should have roughly the same interface
     // eslint-disable-next-line no-global-assign
     chrome = browser;
@@ -44,14 +53,17 @@ if ((() => {
 
 /**
  * The Yomitan class is a core component through which various APIs are handled and invoked.
- * @augments EventDispatcher<import('extension').ExtensionEventType>
+ * @augments EventDispatcher<import('application').Events>
  */
-export class Yomitan extends EventDispatcher {
+export class Application extends EventDispatcher {
     /**
      * Creates a new instance. The instance should not be used until it has been fully prepare()'d.
      */
     constructor() {
         super();
+
+        /** @type {WebExtension} */
+        this._webExtension = new WebExtension();
 
         /** @type {string} */
         this._extensionName = 'Yomitan';
@@ -65,7 +77,7 @@ export class Yomitan extends EventDispatcher {
         /** @type {?string} */
         this._extensionUrlBase = null;
         try {
-            this._extensionUrlBase = chrome.runtime.getURL('/');
+            this._extensionUrlBase = this._webExtension.getUrl('/');
         } catch (e) {
             // NOP
         }
@@ -77,10 +89,6 @@ export class Yomitan extends EventDispatcher {
         /** @type {?CrossFrameAPI} */
         this._crossFrame = null;
         /** @type {boolean} */
-        this._isExtensionUnloaded = false;
-        /** @type {boolean} */
-        this._isTriggeringExtensionUnloaded = false;
-        /** @type {boolean} */
         this._isReady = false;
 
         const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
@@ -90,16 +98,21 @@ export class Yomitan extends EventDispatcher {
         this._isBackendReadyPromiseResolve = resolve;
 
         /* eslint-disable no-multi-spaces */
-        /** @type {import('core').MessageHandlerMap} */
-        this._messageHandlers = new Map(/** @type {import('core').MessageHandlerMapInit} */ ([
-            ['Yomitan.isReady',         this._onMessageIsReady.bind(this)],
-            ['Yomitan.backendReady',    this._onMessageBackendReady.bind(this)],
-            ['Yomitan.getUrl',          this._onMessageGetUrl.bind(this)],
-            ['Yomitan.optionsUpdated',  this._onMessageOptionsUpdated.bind(this)],
-            ['Yomitan.databaseUpdated', this._onMessageDatabaseUpdated.bind(this)],
-            ['Yomitan.zoomChanged',     this._onMessageZoomChanged.bind(this)]
-        ]));
+        /** @type {import('application').ApiMap} */
+        this._apiMap = createApiMap([
+            ['applicationIsReady',         this._onMessageIsReady.bind(this)],
+            ['applicationBackendReady',    this._onMessageBackendReady.bind(this)],
+            ['applicationGetUrl',          this._onMessageGetUrl.bind(this)],
+            ['applicationOptionsUpdated',  this._onMessageOptionsUpdated.bind(this)],
+            ['applicationDatabaseUpdated', this._onMessageDatabaseUpdated.bind(this)],
+            ['applicationZoomChanged',     this._onMessageZoomChanged.bind(this)]
+        ]);
         /* eslint-enable no-multi-spaces */
+    }
+
+    /** @type {WebExtension} */
+    get webExtension() {
+        return this._webExtension;
     }
 
     /**
@@ -109,14 +122,6 @@ export class Yomitan extends EventDispatcher {
     get isBackground() {
         if (this._isBackground === null) { throw new Error('Not prepared'); }
         return /** @type {boolean} */ (this._isBackground);
-    }
-
-    /**
-     * Whether or not the extension is unloaded.
-     * @type {boolean}
-     */
-    get isExtensionUnloaded() {
-        return this._isExtensionUnloaded;
     }
 
     /**
@@ -148,12 +153,12 @@ export class Yomitan extends EventDispatcher {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
 
         if (!isBackground) {
-            this._api = new API(this);
+            this._api = new API(this._webExtension);
 
-            this.sendMessage({action: 'requestBackendReadySignal'});
+            await this._webExtension.sendMessagePromise({action: 'requestBackendReadySignal'});
             await this._isBackendReadyPromise;
 
-            this._crossFrame = new CrossFrameAPI();
+            this._crossFrame = new CrossFrameAPI(this._api);
             await this._crossFrame.prepare();
 
             log.on('log', this._onForwardLog.bind(this));
@@ -166,7 +171,7 @@ export class Yomitan extends EventDispatcher {
      */
     ready() {
         this._isReady = true;
-        this.sendMessage({action: 'yomitanReady'});
+        this._webExtension.sendMessagePromise({action: 'applicationReady'});
     }
 
     /**
@@ -178,33 +183,14 @@ export class Yomitan extends EventDispatcher {
         return this._extensionUrlBase !== null && url.startsWith(this._extensionUrlBase);
     }
 
-    /**
-     * Runs `chrome.runtime.sendMessage()` with additional exception handling events.
-     * @param {import('extension').ChromeRuntimeSendMessageArgs} args The arguments to be passed to `chrome.runtime.sendMessage()`.
-     * @throws {Error} Errors thrown by `chrome.runtime.sendMessage()` are re-thrown.
-     */
-    sendMessage(...args) {
-        try {
-            // @ts-expect-error - issue with type conversion, somewhat difficult to resolve in pure JS
-            chrome.runtime.sendMessage(...args);
-        } catch (e) {
-            this.triggerExtensionUnloaded();
-            throw e;
-        }
+    /** */
+    triggerStorageChanged() {
+        this.trigger('storageChanged', {});
     }
 
-    /**
-     * Triggers the extensionUnloaded event.
-     */
-    triggerExtensionUnloaded() {
-        this._isExtensionUnloaded = true;
-        if (this._isTriggeringExtensionUnloaded) { return; }
-        try {
-            this._isTriggeringExtensionUnloaded = true;
-            this.trigger('extensionUnloaded');
-        } finally {
-            this._isTriggeringExtensionUnloaded = false;
-        }
+    /** */
+    triggerClosePopups() {
+        this.trigger('closePopups', {});
     }
 
     // Private
@@ -216,55 +202,41 @@ export class Yomitan extends EventDispatcher {
         return location.href;
     }
 
-    /** @type {import('extension').ChromeRuntimeOnMessageCallback} */
-    _onMessage({action, params}, sender, callback) {
-        const messageHandler = this._messageHandlers.get(action);
-        if (typeof messageHandler === 'undefined') { return false; }
-        return invokeMessageHandler(messageHandler, params, callback, sender);
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
+    _onMessage({action, params}, _sender, callback) {
+        return invokeApiMapHandler(this._apiMap, action, params, [], callback);
     }
 
-    /**
-     * @returns {boolean}
-     */
+    /** @type {import('application').ApiHandler<'applicationIsReady'>} */
     _onMessageIsReady() {
         return this._isReady;
     }
 
-    /**
-     * @returns {void}
-     */
+    /** @type {import('application').ApiHandler<'applicationBackendReady'>} */
     _onMessageBackendReady() {
         if (this._isBackendReadyPromiseResolve === null) { return; }
         this._isBackendReadyPromiseResolve();
         this._isBackendReadyPromiseResolve = null;
     }
 
-    /**
-     * @returns {{url: string}}
-     */
+    /** @type {import('application').ApiHandler<'applicationGetUrl'>} */
     _onMessageGetUrl() {
         return {url: this._getUrl()};
     }
 
-    /**
-     * @param {{source: string}} params
-     */
+    /** @type {import('application').ApiHandler<'applicationOptionsUpdated'>} */
     _onMessageOptionsUpdated({source}) {
         if (source !== 'background') {
             this.trigger('optionsUpdated', {source});
         }
     }
 
-    /**
-     * @param {{type: string, cause: string}} params
-     */
+    /** @type {import('application').ApiHandler<'applicationDatabaseUpdated'>} */
     _onMessageDatabaseUpdated({type, cause}) {
         this.trigger('databaseUpdated', {type, cause});
     }
 
-    /**
-     * @param {{oldZoomFactor: number, newZoomFactor: number}} params
-     */
+    /** @type {import('application').ApiHandler<'applicationZoomChanged'>} */
     _onMessageZoomChanged({oldZoomFactor, newZoomFactor}) {
         this.trigger('zoomChanged', {oldZoomFactor, newZoomFactor});
     }
@@ -281,8 +253,3 @@ export class Yomitan extends EventDispatcher {
         }
     }
 }
-
-/**
- * The default Yomitan class instance.
- */
-export const yomitan = new Yomitan();

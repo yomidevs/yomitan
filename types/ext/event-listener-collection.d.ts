@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {EventDispatcher} from '../../ext/js/core';
 import type * as Core from './core';
 
 export type EventListenerFunction = (...args: Core.SafeAny[]) => unknown;
@@ -55,7 +54,7 @@ export type ExtensionEventDetails = {
 
 export type EventDispatcherDetails = {
     type: 'off';
-    target: EventDispatcher<string>;
+    target: Core.EventDispatcherOffGeneric;
     eventName: string;
     callback: EventListenerFunction;
 };
@@ -67,10 +66,4 @@ export type AddEventListenerArgs = [
     type: string,
     listener: EventListener | EventListenerObject | EventListenerFunction,
     options?: AddEventListenerOptions | boolean,
-];
-
-export type OnArgs = [
-    target: EventDispatcher<string>,
-    eventName: string,
-    callback: (details: Core.SafeAny) => void,
 ];

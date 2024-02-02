@@ -1,0 +1,741 @@
+[
+    [
+        "発条",
+        "ばね",
+        "",
+        "",
+        0,
+        [
+            {
+                "type": "structured-content",
+                "content": {
+                    "tag": "ul",
+                    "lang": "ja",
+                    "style": {
+                        "listStyleType": "\"＊\""
+                    },
+                    "content": [
+                        {
+                            "tag": "li",
+                            "content": [
+                                {
+                                    "tag": "span",
+                                    "title": "noun (common) (futsuumeishi)",
+                                    "style": {
+                                        "fontSize": "0.7em",
+                                        "fontWeight": "bold",
+                                        "padding": "0.15em 0.3em 0.3em 0.3em",
+                                        "wordBreak": "keep-all",
+                                        "borderRadius": "0.3em",
+                                        "verticalAlign": "text-bottom",
+                                        "backgroundColor": "#565656",
+                                        "color": "white",
+                                        "cursor": "help",
+                                        "margin": "0em 0.25em 0em 0em"
+                                    },
+                                    "data": {
+                                        "code": "n"
+                                    },
+                                    "content": "noun"
+                                },
+                                {
+                                    "tag": "span",
+                                    "title": "word usually written using kana alone",
+                                    "style": {
+                                        "fontSize": "0.7em",
+                                        "fontWeight": "bold",
+                                        "paddingTop": "0.15em",
+                                        "paddingRight": "0.3em",
+                                        "paddingBottom": "0.3em",
+                                        "paddingLeft": "0.3em",
+                                        "wordBreak": "keep-all",
+                                        "borderRadius": "0.3em",
+                                        "verticalAlign": "text-bottom",
+                                        "backgroundColor": "brown",
+                                        "color": "white",
+                                        "cursor": "help",
+                                        "marginRight": "0.25em"
+                                    },
+                                    "data": {
+                                        "code": "uk"
+                                    },
+                                    "content": "kana"
+                                },
+                                {
+                                    "tag": "ol",
+                                    "content": {
+                                        "tag": "li",
+                                        "style": {
+                                            "listStyleType": "\"① \""
+                                        },
+                                        "data": {
+                                            "sense-number": "1"
+                                        },
+                                        "content": [
+                                            {
+                                                "tag": "ul",
+                                                "data": {
+                                                    "content": "glossary"
+                                                },
+                                                "content": {
+                                                    "tag": "li",
+                                                    "content": "spring"
+                                                }
+                                            },
+                                            {
+                                                "tag": "ul",
+                                                "style": {
+                                                    "marginBottom": 0.5
+                                                },
+                                                "content": [
+                                                    {
+                                                        "tag": "li",
+                                                        "lang": "ja",
+                                                        "style": {
+                                                            "listStyleType": "circle",
+                                                            "fontSize": "120%"
+                                                        },
+                                                        "data": {
+                                                            "content": "example-sentence-a"
+                                                        },
+                                                        "content": [
+                                                            "その",
+                                                            {
+                                                                "tag": "span",
+                                                                "style": {
+                                                                    "color": "#dd2121",
+                                                                    "textShadow": "0.5px 0.5px 1px gray",
+                                                                    "textEmphasis": "circle crimson",
+                                                                    "textDecorationLine": "underline",
+                                                                    "textDecorationStyle": "wavy",
+                                                                    "textDecorationColor": "red"
+                                                                },
+                                                                "content": "ばね"
+                                                            },
+                                                            {
+                                                                "tag": "ruby",
+                                                                "content": [
+                                                                    "１",
+                                                                    {
+                                                                        "tag": "rt",
+                                                                        "content": "いっ"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "tag": "ruby",
+                                                                "content": [
+                                                                    "個",
+                                                                    {
+                                                                        "tag": "rt",
+                                                                        "content": "こ"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "で",
+                                                            {
+                                                                "tag": "ruby",
+                                                                "content": [
+                                                                    "車",
+                                                                    {
+                                                                        "tag": "rt",
+                                                                        "content": "くるま"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "の",
+                                                            {
+                                                                "tag": "ruby",
+                                                                "content": [
+                                                                    "全",
+                                                                    {
+                                                                        "tag": "rt",
+                                                                        "content": "ぜん"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "tag": "ruby",
+                                                                "content": [
+                                                                    "重",
+                                                                    {
+                                                                        "tag": "rt",
+                                                                        "content": "じゅう"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "tag": "ruby",
+                                                                "content": [
+                                                                    "量",
+                                                                    {
+                                                                        "tag": "rt",
+                                                                        "content": "りょう"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "を",
+                                                            {
+                                                                "tag": "ruby",
+                                                                "content": [
+                                                                    "支",
+                                                                    {
+                                                                        "tag": "rt",
+                                                                        "content": "ささ"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "えている。"
+                                                        ]
+                                                    },
+                                                    {
+                                                        "tag": "li",
+                                                        "lang": "en",
+                                                        "style": {
+                                                            "listStyleType": "none",
+                                                            "fontSize": "70%"
+                                                        },
+                                                        "data": {
+                                                            "content": "example-sentence-b"
+                                                        },
+                                                        "content": "That one spring carries the whole weight of the car."
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "tag": "li",
+                            "content": [
+                                {
+                                    "tag": "span",
+                                    "title": "noun (common) (futsuumeishi)",
+                                    "style": {
+                                        "fontSize": "0.7em",
+                                        "fontWeight": "bold",
+                                        "padding": "0.15em 0.3em 0.3em 0.3em",
+                                        "wordBreak": "keep-all",
+                                        "borderRadius": "0.3em",
+                                        "verticalAlign": "text-bottom",
+                                        "backgroundColor": "#565656",
+                                        "color": "white",
+                                        "cursor": "help",
+                                        "marginRight": 0.25
+                                    },
+                                    "data": {
+                                        "code": "n"
+                                    },
+                                    "content": "noun"
+                                },
+                                {
+                                    "tag": "span",
+                                    "title": "word usually written using kana alone",
+                                    "style": {
+                                        "fontSize": "0.7em",
+                                        "fontWeight": "bold",
+                                        "padding": "0.15em 0.3em 0.3em 0.3em",
+                                        "wordBreak": "keep-all",
+                                        "borderRadius": "0.3em",
+                                        "verticalAlign": "text-bottom",
+                                        "backgroundColor": "brown",
+                                        "color": "white",
+                                        "cursor": "help",
+                                        "marginRight": 0.25
+                                    },
+                                    "data": {
+                                        "code": "uk"
+                                    },
+                                    "content": "kana"
+                                },
+                                {
+                                    "tag": "span",
+                                    "title": "valid only for these forms and/or readings",
+                                    "style": {
+                                        "cursor": "help"
+                                    },
+                                    "content": [
+                                        {
+                                            "tag": "span",
+                                            "style": {
+                                                "color": "red"
+                                            },
+                                            "content": "［"
+                                        },
+                                        "ばね・バネ only",
+                                        {
+                                            "tag": "span",
+                                            "style": {
+                                                "color": "red"
+                                            },
+                                            "content": "］"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tag": "ol",
+                                    "content": [
+                                        {
+                                            "tag": "li",
+                                            "style": {
+                                                "listStyleType": "\"② \""
+                                            },
+                                            "data": {
+                                                "sense-number": "2"
+                                            },
+                                            "content": {
+                                                "tag": "ul",
+                                                "data": {
+                                                    "content": "glossary"
+                                                },
+                                                "content": [
+                                                    {
+                                                        "tag": "li",
+                                                        "content": "spring (in one's legs)"
+                                                    },
+                                                    {
+                                                        "tag": "li",
+                                                        "content": "bounce"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "tag": "li",
+                                            "style": {
+                                                "listStyleType": "\"③ \""
+                                            },
+                                            "data": {
+                                                "sense-number": "3"
+                                            },
+                                            "content": {
+                                                "tag": "ul",
+                                                "data": {
+                                                    "content": "glossary"
+                                                },
+                                                "content": [
+                                                    {
+                                                        "tag": "li",
+                                                        "content": "springboard"
+                                                    },
+                                                    {
+                                                        "tag": "li",
+                                                        "content": "impetus"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "tag": "li",
+                            "data": {
+                                "content": "forms"
+                            },
+                            "content": [
+                                {
+                                    "tag": "span",
+                                    "title": "spelling and reading variants",
+                                    "style": {
+                                        "fontSize": "0.7em",
+                                        "fontWeight": "bold",
+                                        "padding": "0.15em 0.3em 0.3em 0.3em",
+                                        "wordBreak": "keep-all",
+                                        "borderRadius": "0.3em",
+                                        "verticalAlign": "text-bottom",
+                                        "backgroundColor": "#565656",
+                                        "color": "white",
+                                        "cursor": "help",
+                                        "marginRight": 0.25
+                                    },
+                                    "content": "forms"
+                                },
+                                {
+                                    "tag": "table",
+                                    "content": [
+                                        {
+                                            "tag": "tr",
+                                            "content": [
+                                                {
+                                                    "tag": "th",
+                                                    "style": {
+                                                        "textAlign": "center",
+                                                        "fontWeight": "normal"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "th",
+                                                    "style": {
+                                                        "textAlign": "center",
+                                                        "fontWeight": "normal",
+                                                        "whiteSpace": "nowrap"
+                                                    },
+                                                    "content": "発条"
+                                                },
+                                                {
+                                                    "tag": "th",
+                                                    "style": {
+                                                        "textAlign": "center",
+                                                        "fontWeight": "normal",
+                                                        "whiteSpace": "nowrap"
+                                                    },
+                                                    "content": "弾機"
+                                                },
+                                                {
+                                                    "tag": "th",
+                                                    "style": {
+                                                        "textAlign": "center",
+                                                        "fontWeight": "normal",
+                                                        "whiteSpace": "nowrap"
+                                                    },
+                                                    "content": "撥条"
+                                                },
+                                                {
+                                                    "tag": "th",
+                                                    "style": {
+                                                        "textAlign": "center",
+                                                        "fontWeight": "normal"
+                                                    },
+                                                    "content": {
+                                                        "tag": "span",
+                                                        "title": "no associated kanji forms",
+                                                        "style": {
+                                                            "color": "red",
+                                                            "cursor": "help"
+                                                        },
+                                                        "content": "∅"
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "tag": "tr",
+                                            "content": [
+                                                {
+                                                    "tag": "th",
+                                                    "style": {
+                                                        "fontWeight": "normal"
+                                                    },
+                                                    "content": {
+                                                        "tag": "span",
+                                                        "title": "gikun (meaning as reading) or jukujikun (special kanji reading)",
+                                                        "style": {
+                                                            "cursor": "help"
+                                                        },
+                                                        "content": [
+                                                            {
+                                                                "tag": "span",
+                                                                "style": {
+                                                                    "color": "red"
+                                                                },
+                                                                "content": "｛"
+                                                            },
+                                                            "ばね",
+                                                            {
+                                                                "tag": "span",
+                                                                "style": {
+                                                                    "color": "red"
+                                                                },
+                                                                "content": "｝"
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    },
+                                                    "content": {
+                                                        "tag": "span",
+                                                        "title": "high priority form",
+                                                        "style": {
+                                                            "padding": "0.15em 0.2em",
+                                                            "borderRadius": "100%",
+                                                            "cursor": "help",
+                                                            "backgroundColor": "green",
+                                                            "color": "white"
+                                                        },
+                                                        "content": "優"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    },
+                                                    "content": {
+                                                        "tag": "span",
+                                                        "title": "valid form/reading combination",
+                                                        "style": {
+                                                            "padding": "0.15em 0.2em",
+                                                            "borderRadius": "100%",
+                                                            "cursor": "help",
+                                                            "backgroundColor": "transparent",
+                                                            "borderStyle": "solid",
+                                                            "borderWidth": "0.75px"
+                                                        },
+                                                        "content": "可"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    },
+                                                    "content": {
+                                                        "tag": "span",
+                                                        "title": "rarely used form",
+                                                        "style": {
+                                                            "padding": "0.15em 0.2em",
+                                                            "borderRadius": "100%",
+                                                            "cursor": "help",
+                                                            "backgroundColor": "purple",
+                                                            "color": "white"
+                                                        },
+                                                        "content": "稀"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "tag": "tr",
+                                            "content": [
+                                                {
+                                                    "tag": "th",
+                                                    "style": {
+                                                        "fontWeight": "normal"
+                                                    },
+                                                    "content": "ぜんまい"
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    },
+                                                    "content": {
+                                                        "tag": "span",
+                                                        "title": "valid form/reading combination",
+                                                        "style": {
+                                                            "padding": "0.15em 0.2em",
+                                                            "borderRadius": "100%",
+                                                            "cursor": "help",
+                                                            "backgroundColor": "transparent",
+                                                            "borderStyle": "solid",
+                                                            "borderWidth": "0.75px"
+                                                        },
+                                                        "content": "可"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    },
+                                                    "content": {
+                                                        "tag": "span",
+                                                        "title": "rarely used form",
+                                                        "style": {
+                                                            "padding": "0.15em 0.2em",
+                                                            "borderRadius": "100%",
+                                                            "cursor": "help",
+                                                            "background": "radial-gradient(purple 55%, black 100%)",
+                                                            "color": "white"
+                                                        },
+                                                        "content": "稀"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "tag": "tr",
+                                            "content": [
+                                                {
+                                                    "tag": "th",
+                                                    "style": {
+                                                        "fontWeight": "normal"
+                                                    },
+                                                    "content": "はつじょう"
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    },
+                                                    "content": {
+                                                        "tag": "span",
+                                                        "title": "valid form/reading combination",
+                                                        "style": {
+                                                            "padding": "0.15em 0.2em",
+                                                            "borderRadius": "100%",
+                                                            "cursor": "help",
+                                                            "backgroundColor": "transparent",
+                                                            "borderStyle": "solid",
+                                                            "borderWidth": "0.75px"
+                                                        },
+                                                        "content": "可"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    },
+                                                    "content": {
+                                                        "tag": "div",
+                                                        "title": "rarely used form",
+                                                        "style": {
+                                                            "clipPath": "circle()",
+                                                            "cursor": "help",
+                                                            "backgroundColor": "purple",
+                                                            "color": "white"
+                                                        },
+                                                        "content": "稀"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "tag": "tr",
+                                            "content": [
+                                                {
+                                                    "tag": "th",
+                                                    "style": {
+                                                        "fontWeight": "normal"
+                                                    },
+                                                    "content": "だんき"
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    },
+                                                    "content": {
+                                                        "tag": "span",
+                                                        "title": "valid form/reading combination",
+                                                        "style": {
+                                                            "padding": "0.15em 0.2em",
+                                                            "borderRadius": "100%",
+                                                            "cursor": "help",
+                                                            "backgroundColor": "transparent",
+                                                            "borderStyle": "solid",
+                                                            "borderWidth": "0.75px"
+                                                        },
+                                                        "content": "可"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "tag": "tr",
+                                            "content": [
+                                                {
+                                                    "tag": "th",
+                                                    "style": {
+                                                        "fontWeight": "normal"
+                                                    },
+                                                    "content": "バネ"
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    }
+                                                },
+                                                {
+                                                    "tag": "td",
+                                                    "style": {
+                                                        "textAlign": "center"
+                                                    },
+                                                    "content": {
+                                                        "tag": "span",
+                                                        "title": "valid form/reading combination",
+                                                        "style": {
+                                                            "padding": "0.15em 0.2em",
+                                                            "borderRadius": "100%",
+                                                            "cursor": "help",
+                                                            "backgroundColor": "transparent",
+                                                            "borderStyle": "solid",
+                                                            "borderWidth": "0.75px"
+                                                        },
+                                                        "content": "可"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        1099490,
+        ""
+    ]
+]

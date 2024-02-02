@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,28 +21,16 @@ export type RunAt = 'document_start' | 'document_end' | 'document_idle';
 export type RegistrationDetails = {
     /** Same as `matches` in the `content_scripts` manifest key. */
     matches: string[];
-
-    /** Regex match pattern to use as a fallback when native content script registration isn't supported. */
-    /** Should be equivalent to `matches`. */
-    urlMatches: string;
-
     /** Same as `run_at` in the `content_scripts` manifest key. */
     runAt: RunAt;
-
-    /** Same as `exclude_matches` in the `content_scripts` manifest key. */
-    excludeMatches?: string[];
-
-    /** Same as `match_about_blank` in the `content_scripts` manifest key. */
-    matchAboutBlank: boolean;
-
     /** Same as `all_frames` in the `content_scripts` manifest key. */
     allFrames: boolean;
-
     /** List of CSS paths. */
     css?: string[];
-
     /** List of script paths. */
     js?: string[];
+    /** The execution world for the script. */
+    world?: ExecutionWorld;
 };
 
 export type ContentScriptInjectionDetails = {
@@ -54,3 +42,4 @@ export type ContentScriptInjectionDetails = {
     urlRegex: RegExp | null;
 };
 
+export type ExecutionWorld = 'MAIN' | 'ISOLATED';

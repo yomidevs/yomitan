@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,12 @@
 
 import type {PopupFactory} from '../../ext/js/app/popup-factory';
 import type {HotkeyHandler} from '../../ext/js/input/hotkey-handler';
+import type {Application} from '../../ext/js/application';
 
 /** Details about how to set up the instance. */
 export type ConstructorDetails = {
+    /** The main application instance. */
+    application: Application;
     /** The type of page, one of 'web', 'popup', or 'search'. */
     pageType: PageType;
     /** A PopupFactory instance to use for generating popups. */
@@ -47,15 +50,3 @@ export type ConstructorDetails = {
 };
 
 export type PageType = 'web' | 'popup' | 'search';
-
-export type FrontendRequestReadyBroadcastParams = {
-    frameId: number;
-};
-
-export type GetPopupInfoResult = {
-    popupId: string | null;
-};
-
-export type FrontendReadyDetails = {
-    frameId: number;
-};

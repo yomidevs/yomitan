@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import type * as Dictionary from './dictionary';
 import type * as Extension from './extension';
 import type * as Settings from './settings';
 import type * as TemplateRenderer from './template-renderer';
+import type * as Api from './api';
 
 export type CreateNoteDetails = {
     dictionaryEntry: Dictionary.DictionaryEntry;
@@ -117,4 +118,23 @@ export type BatchedRequestData = {
     resolve: (result: TemplateRenderer.RenderResult) => void;
     reject: (reason?: unknown) => void;
     marker: string;
+};
+
+export type MinimalApi = {
+    injectAnkiNoteMedia(
+        timestamp: Api.ApiParam<'injectAnkiNoteMedia', 'timestamp'>,
+        definitionDetails: Api.ApiParam<'injectAnkiNoteMedia', 'definitionDetails'>,
+        audioDetails: Api.ApiParam<'injectAnkiNoteMedia', 'audioDetails'>,
+        screenshotDetails: Api.ApiParam<'injectAnkiNoteMedia', 'screenshotDetails'>,
+        clipboardDetails: Api.ApiParam<'injectAnkiNoteMedia', 'clipboardDetails'>,
+        dictionaryMediaDetails: Api.ApiParam<'injectAnkiNoteMedia', 'dictionaryMediaDetails'>,
+    ): Promise<Api.ApiReturn<'injectAnkiNoteMedia'>>;
+
+    parseText(
+        text: Api.ApiParam<'parseText', 'text'>,
+        optionsContext: Api.ApiParam<'parseText', 'optionsContext'>,
+        scanLength: Api.ApiParam<'parseText', 'scanLength'>,
+        useInternalParser: Api.ApiParam<'parseText', 'useInternalParser'>,
+        useMecabParser: Api.ApiParam<'parseText', 'useMecabParser'>,
+    ): Promise<Api.ApiReturn<'parseText'>>;
 };

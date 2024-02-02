@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-multi-spaces */
-
-import {expect, test} from 'vitest';
+import {describe, expect, test} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {JsonSchema} from '../ext/js/data/json-schema.js';
 
@@ -61,7 +59,7 @@ function clone(value) {
 
 /** */
 function testValidate1() {
-    test('Validate1', () => {
+    describe('Validate1', () => {
         /** @type {import('ext/json-schema').Schema} */
         const schema = {
             allOf: [
@@ -112,17 +110,20 @@ function testValidate1() {
             );
         };
 
-        for (let i = -111; i <= 111; i++) {
-            const actual = schemaValidate(schema, i);
-            const expected = jsValidate(i);
-            expect(actual).toStrictEqual(expected);
-        }
+        test('works as expected', () => {
+            for (let i = -111; i <= 111; i++) {
+                const actual = schemaValidate(schema, i);
+                const expected = jsValidate(i);
+                expect(actual).toStrictEqual(expected);
+            }
+        });
     });
 }
 
 /** */
 function testValidate2() {
-    test('Validate2', () => {
+    describe('Validate2', () => {
+        /* eslint-disable no-multi-spaces */
         /** @type {{schema: import('ext/json-schema').Schema, inputs: {expected: boolean, value: unknown}[]}[]} */
         const data = [
             // String tests
@@ -516,20 +517,21 @@ function testValidate2() {
                 ]
             }
         ];
+        /* eslint-enable no-multi-spaces */
 
-        for (const {schema, inputs} of data) {
-            for (const {expected, value} of inputs) {
+        describe.each(data)('Schema %#', ({schema, inputs}) => {
+            test.each(inputs)(`schemaValidate(${schema}, $value) -> $expected`, ({expected, value}) => {
                 const actual = schemaValidate(schema, value);
                 expect(actual).toStrictEqual(expected);
-            }
-        }
+            });
+        });
     });
 }
 
 
 /** */
 function testGetValidValueOrDefault1() {
-    test('GetValidValueOrDefault1', () => {
+    describe('GetValidValueOrDefault1', () => {
         /** @type {{schema: import('ext/json-schema').Schema, inputs: [value: unknown, expected: unknown][]}[]} */
         const data = [
             // Test value defaulting on objects with additionalProperties=false
@@ -875,19 +877,20 @@ function testGetValidValueOrDefault1() {
             }
         ];
 
-        for (const {schema, inputs} of data) {
-            for (const [value, expected] of inputs) {
+        describe.each(data)('Schema %#', ({schema, inputs}) => {
+            test.each(inputs)(`getValidValueOrDefault(${schema}, %o) -> %o`, (value, expected) => {
                 const actual = getValidValueOrDefault(schema, value);
                 expect(actual).toStrictEqual(expected);
-            }
-        }
+            });
+        });
     });
 }
 
 
 /** */
 function testProxy1() {
-    test('Proxy1', () => {
+    describe('Proxy1', () => {
+        /* eslint-disable no-multi-spaces */
         /** @type {{schema: import('ext/json-schema').Schema, tests: {error: boolean, value?: import('ext/json-schema').Value, action: (value: import('core').SafeAny) => void}[]}[]} */
         const data = [
             // Object tests
@@ -1017,6 +1020,21 @@ function testProxy1() {
                 ]
             }
         ];
+        /* eslint-enable no-multi-spaces */
+
+        describe.each(data)('Schema %#', ({schema, tests}) => {
+            test.each(tests)('proxy %#', ({error, value, action}) => {
+                if (typeof value === 'undefined') { value = getValidValueOrDefault(schema, void 0); }
+                value = clone(value);
+                expect(schemaValidate(schema, value)).toBe(true);
+                const valueProxy = createProxy(schema, value);
+                if (error) {
+                    expect(() => action(valueProxy)).toThrow();
+                } else {
+                    expect(() => action(valueProxy)).not.toThrow();
+                }
+            });
+        });
 
         for (const {schema, tests} of data) {
             for (let {error, value, action} of tests) {

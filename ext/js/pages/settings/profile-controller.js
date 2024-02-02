@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {clone, EventListenerCollection} from '../../core.js';
+import {EventListenerCollection} from '../../core/event-listener-collection.js';
+import {clone} from '../../core/utilities.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 import {ProfileConditionsUI} from './profile-conditions-ui.js';
 
 export class ProfileController {
@@ -81,7 +81,7 @@ export class ProfileController {
 
     /** */
     async prepare() {
-        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
+        const {platform: {os}} = await this._settingsController.application.api.getEnvironmentInfo();
         this._profileConditionsUI.os = os;
 
         this._profileRemoveModal = this._modalController.getModal('profile-remove');
@@ -475,7 +475,7 @@ export class ProfileController {
     }
 
     /**
-     * @param {import('profile-conditions-ui').ConditionGroupCountChangedEvent} details
+     * @param {import('profile-conditions-ui').EventArgument<'conditionGroupCountChanged'>} details
      */
     _onConditionGroupCountChanged({count, profileIndex}) {
         if (profileIndex >= 0 && profileIndex < this._profileEntryList.length) {

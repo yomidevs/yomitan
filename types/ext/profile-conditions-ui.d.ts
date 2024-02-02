@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,16 @@
  */
 
 import type * as Settings from './settings';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
-export type EventType = 'conditionGroupCountChanged';
+export type Events = {
+    conditionGroupCountChanged: {
+        count: number;
+        profileIndex: number;
+    };
+};
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type DescriptorType = Settings.ProfileConditionType;
 
@@ -47,11 +55,6 @@ export type Operator = {
     resetDefaultOnChange: boolean | null;
     validate: ValidateFunction | null;
     normalize: NormalizeFunction | null;
-};
-
-export type ConditionGroupCountChangedEvent = {
-    count: number;
-    profileIndex: number;
 };
 
 export type DescriptorInfo = {

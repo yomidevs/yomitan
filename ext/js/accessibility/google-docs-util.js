@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,8 +23,10 @@ import {TextSourceRange} from '../dom/text-source-range.js';
  * This class is a helper for handling Google Docs content in content scripts.
  */
 export class GoogleDocsUtil {
-    /** @type {HTMLStyleElement|undefined} */
-    static _styleNode = void 0;
+    constructor() {
+        /** @type {?HTMLStyleElement} */
+        this._styleNode = null;
+    }
 
     /**
      * Scans the document for text or elements with text information at the given coordinate.
@@ -34,7 +36,7 @@ export class GoogleDocsUtil {
      * @param {import('document-util').GetRangeFromPointOptions} options Options to configure how element detection is performed.
      * @returns {?TextSourceRange} A range for the hovered text or element, or `null` if no applicable content was found.
      */
-    static getRangeFromPoint(x, y, {normalizeCssZoom}) {
+    getRangeFromPoint(x, y, {normalizeCssZoom}) {
         const styleNode = this._getStyleNode();
         styleNode.disabled = false;
         const element = document.elementFromPoint(x, y);
@@ -49,12 +51,14 @@ export class GoogleDocsUtil {
     }
 
     /**
+     * Gets this <style> node, or creates one if it doesn't exist.
+     *
+     * A <style> node is necessary to force the SVG <rect> elements to have a fill,
+     * which allows them to be included in document.elementsFromPoint's return value.
      * @returns {HTMLStyleElement}
      */
-    static _getStyleNode() {
-        // This <style> node is necessary to force the SVG <rect> elements to have a fill,
-        // which allows them to be included in document.elementsFromPoint's return value.
-        if (typeof this._styleNode === 'undefined') {
+    _getStyleNode() {
+        if (this._styleNode === null) {
             const style = document.createElement('style');
             style.textContent = [
                 '.kix-canvas-tile-content{pointer-events:none!important;}',
@@ -77,7 +81,7 @@ export class GoogleDocsUtil {
      * @param {boolean} normalizeCssZoom
      * @returns {TextSourceRange}
      */
-    static _createRange(element, text, x, y, normalizeCssZoom) {
+    _createRange(element, text, x, y, normalizeCssZoom) {
         // Create imposter
         const content = document.createTextNode(text);
         const svgText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -118,7 +122,7 @@ export class GoogleDocsUtil {
      * @param {boolean} normalizeCssZoom
      * @returns {Range}
      */
-    static _getRangeWithPoint(textNode, x, y, normalizeCssZoom) {
+    _getRangeWithPoint(textNode, x, y, normalizeCssZoom) {
         if (normalizeCssZoom) {
             const scale = DocumentUtil.computeZoomScale(textNode);
             x /= scale;
@@ -147,7 +151,7 @@ export class GoogleDocsUtil {
      * @param {string} propertyName
      * @param {string} value
      */
-    static _setImportantStyle(style, propertyName, value) {
+    _setImportantStyle(style, propertyName, value) {
         style.setProperty(propertyName, value, 'important');
     }
 }

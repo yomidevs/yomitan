@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,6 @@ export class CssStyleApplier {
         /** @type {RegExp} */
         this._patternClassNameCharacter = /[0-9a-zA-Z-_]/;
     }
-    /* eslint-enable jsdoc/check-line-alignment */
 
     /**
      * Loads the data file for use.

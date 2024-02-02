@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,123 +16,128 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {AnkiUtil} from './anki-util.js';
+import {getFieldMarkers} from './anki-util.js';
 
-export class PermissionsUtil {
-    constructor() {
-        /** @type {Set<string>} */
-        this._ankiFieldMarkersRequiringClipboardPermission = new Set([
-            'clipboard-image',
-            'clipboard-text'
-        ]);
+/**
+ * This function returns whether an Anki field marker might require clipboard permissions.
+ * This is speculative and may not guarantee that the field marker actually does require the permission,
+ * as the custom handlebars template is not deeply inspected.
+ * @param {string} marker
+ * @returns {boolean}
+ */
+function ankiFieldMarkerMayUseClipboard(marker) {
+    switch (marker) {
+        case 'clipboard-image':
+        case 'clipboard-text':
+            return true;
+        default:
+            return false;
     }
+}
 
-    /**
-     * @param {chrome.permissions.Permissions} permissions
-     * @returns {Promise<boolean>}
-     */
-    hasPermissions(permissions) {
-        return new Promise((resolve, reject) => chrome.permissions.contains(permissions, (result) => {
+/**
+ * @param {chrome.permissions.Permissions} permissions
+ * @returns {Promise<boolean>}
+ */
+export function hasPermissions(permissions) {
+    return new Promise((resolve, reject) => chrome.permissions.contains(permissions, (result) => {
+        const e = chrome.runtime.lastError;
+        if (e) {
+            reject(new Error(e.message));
+        } else {
+            resolve(result);
+        }
+    }));
+}
+
+/**
+ * @param {chrome.permissions.Permissions} permissions
+ * @param {boolean} shouldHave
+ * @returns {Promise<boolean>}
+ */
+export function setPermissionsGranted(permissions, shouldHave) {
+    return (
+        shouldHave ?
+        new Promise((resolve, reject) => chrome.permissions.request(permissions, (result) => {
             const e = chrome.runtime.lastError;
             if (e) {
                 reject(new Error(e.message));
             } else {
                 resolve(result);
             }
-        }));
-    }
-
-    /**
-     * @param {chrome.permissions.Permissions} permissions
-     * @param {boolean} shouldHave
-     * @returns {Promise<boolean>}
-     */
-    setPermissionsGranted(permissions, shouldHave) {
-        return (
-            shouldHave ?
-            new Promise((resolve, reject) => chrome.permissions.request(permissions, (result) => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    resolve(result);
-                }
-            })) :
-            new Promise((resolve, reject) => chrome.permissions.remove(permissions, (result) => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    resolve(!result);
-                }
-            }))
-        );
-    }
-
-    /**
-     * @returns {Promise<chrome.permissions.Permissions>}
-     */
-    getAllPermissions() {
-        return new Promise((resolve, reject) => chrome.permissions.getAll((result) => {
+        })) :
+        new Promise((resolve, reject) => chrome.permissions.remove(permissions, (result) => {
             const e = chrome.runtime.lastError;
             if (e) {
                 reject(new Error(e.message));
             } else {
-                resolve(result);
+                resolve(!result);
             }
-        }));
+        }))
+    );
+}
+
+/**
+ * @returns {Promise<chrome.permissions.Permissions>}
+ */
+export function getAllPermissions() {
+    return new Promise((resolve, reject) => chrome.permissions.getAll((result) => {
+        const e = chrome.runtime.lastError;
+        if (e) {
+            reject(new Error(e.message));
+        } else {
+            resolve(result);
+        }
+    }));
+}
+
+/**
+ * @param {string} fieldValue
+ * @returns {string[]}
+ */
+export function getRequiredPermissionsForAnkiFieldValue(fieldValue) {
+    const markers = getFieldMarkers(fieldValue);
+    for (const marker of markers) {
+        if (ankiFieldMarkerMayUseClipboard(marker)) {
+            return ['clipboardRead'];
+        }
+    }
+    return [];
+}
+
+/**
+ * @param {chrome.permissions.Permissions} permissions
+ * @param {import('settings').ProfileOptions} options
+ * @returns {boolean}
+ */
+export function hasRequiredPermissionsForOptions(permissions, options) {
+    const permissionsSet = new Set(permissions.permissions);
+
+    if (!permissionsSet.has('nativeMessaging')) {
+        if (options.parsing.enableMecabParser) {
+            return false;
+        }
     }
 
-    /**
-     * @param {string} fieldValue
-     * @returns {string[]}
-     */
-    getRequiredPermissionsForAnkiFieldValue(fieldValue) {
-        const markers = AnkiUtil.getFieldMarkers(fieldValue);
-        const markerPermissions = this._ankiFieldMarkersRequiringClipboardPermission;
-        for (const marker of markers) {
-            if (markerPermissions.has(marker)) {
-                return ['clipboardRead'];
-            }
+    if (!permissionsSet.has('clipboardRead')) {
+        if (options.clipboard.enableBackgroundMonitor || options.clipboard.enableSearchPageMonitor) {
+            return false;
         }
-        return [];
-    }
-
-    /**
-     * @param {chrome.permissions.Permissions} permissions
-     * @param {import('settings').ProfileOptions} options
-     * @returns {boolean}
-     */
-    hasRequiredPermissionsForOptions(permissions, options) {
-        const permissionsSet = new Set(permissions.permissions);
-
-        if (!permissionsSet.has('nativeMessaging')) {
-            if (options.parsing.enableMecabParser) {
-                return false;
-            }
-        }
-
-        if (!permissionsSet.has('clipboardRead')) {
-            if (options.clipboard.enableBackgroundMonitor || options.clipboard.enableSearchPageMonitor) {
-                return false;
-            }
-            const fieldMarkersRequiringClipboardPermission = this._ankiFieldMarkersRequiringClipboardPermission;
-            const fieldsList = [
-                options.anki.terms.fields,
-                options.anki.kanji.fields
-            ];
-            for (const fields of fieldsList) {
-                for (const fieldValue of Object.values(fields)) {
-                    const markers = AnkiUtil.getFieldMarkers(fieldValue);
-                    for (const marker of markers) {
-                        if (fieldMarkersRequiringClipboardPermission.has(marker)) {
-                            return false;
-                        }
+        const fieldsList = [
+            options.anki.terms.fields,
+            options.anki.kanji.fields
+        ];
+        for (const fields of fieldsList) {
+            for (const fieldValue of Object.values(fields)) {
+                const markers = getFieldMarkers(fieldValue);
+                for (const marker of markers) {
+                    if (ankiFieldMarkerMayUseClipboard(marker)) {
+                        return false;
                     }
                 }
             }
         }
-
-        return true;
     }
+
+    return true;
 }

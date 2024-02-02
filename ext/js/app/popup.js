@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,16 +17,18 @@
  */
 
 import {FrameClient} from '../comm/frame-client.js';
-import {DynamicProperty, EventDispatcher, EventListenerCollection, deepEqual} from '../core.js';
+import {DynamicProperty} from '../core/dynamic-property.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {deepEqual} from '../core/utilities.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {loadStyle} from '../dom/style-util.js';
-import {yomitan} from '../yomitan.js';
 import {ThemeController} from './theme-controller.js';
 
 /**
  * This class is the container which hosts the display of search results.
- * @augments EventDispatcher<import('popup').PopupAnyEventType>
+ * @augments EventDispatcher<import('popup').Events>
  */
 export class Popup extends EventDispatcher {
     /**
@@ -34,12 +36,15 @@ export class Popup extends EventDispatcher {
      * @param {import('popup').PopupConstructorDetails} details The details used to construct the new instance.
      */
     constructor({
+        application,
         id,
         depth,
         frameId,
         childrenSupported
     }) {
         super();
+        /** @type {import('../application.js').Application} */
+        this._application = application;
         /** @type {string} */
         this._id = id;
         /** @type {number} */
@@ -203,7 +208,7 @@ export class Popup extends EventDispatcher {
         this._frame.addEventListener('scroll', (e) => e.stopPropagation());
         this._frame.addEventListener('load', this._onFrameLoad.bind(this));
         this._visible.on('change', this._onVisibleChange.bind(this));
-        yomitan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
+        this._application.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         this._onVisibleChange({value: this.isVisibleSync()});
         this._themeController.prepare();
     }
@@ -215,7 +220,7 @@ export class Popup extends EventDispatcher {
     async setOptionsContext(optionsContext) {
         await this._setOptionsContext(optionsContext);
         if (this._frameConnected) {
-            await this._invokeSafe('Display.setOptionsContext', {optionsContext});
+            await this._invokeSafe('displaySetOptionsContext', {optionsContext});
         }
     }
 
@@ -299,7 +304,7 @@ export class Popup extends EventDispatcher {
         await this._show(sourceRects, writingMode);
 
         if (displayDetails !== null) {
-            this._invokeSafe('Display.setContent', {details: displayDetails});
+            this._invokeSafe('displaySetContent', {details: displayDetails});
         }
     }
 
@@ -308,7 +313,7 @@ export class Popup extends EventDispatcher {
      * @param {string} css The CSS rules.
      */
     async setCustomCss(css) {
-        await this._invokeSafe('Display.setCustomCss', {css});
+        await this._invokeSafe('displaySetCustomCss', {css});
     }
 
     /**
@@ -316,7 +321,7 @@ export class Popup extends EventDispatcher {
      */
     async clearAutoPlayTimer() {
         if (this._frameConnected) {
-            await this._invokeSafe('Display.clearAutoPlayTimer', {});
+            await this._invokeSafe('displayAudioClearAutoPlayTimer', void 0);
         }
     }
 
@@ -327,7 +332,7 @@ export class Popup extends EventDispatcher {
     async setContentScale(scale) {
         this._contentScale = scale;
         this._frame.style.fontSize = `${scale}px`;
-        await this._invokeSafe('Display.setContentScale', {scale});
+        await this._invokeSafe('displaySetContentScale', {scale});
     }
 
     /**
@@ -359,10 +364,8 @@ export class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        const node = await loadStyle('yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
-        /** @type {import('popup').CustomOuterCssChangedEvent} */
-        const event = {node, useWebExtensionApi, inShadow};
-        this.trigger('customOuterCssChanged', event);
+        const node = await loadStyle(this._application, 'yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
+        this.trigger('customOuterCssChanged', {node, useWebExtensionApi, inShadow});
     }
 
     /**
@@ -482,7 +485,7 @@ export class Popup extends EventDispatcher {
         this._frameConnected = true;
 
         // Configure
-        /** @type {import('display').ConfigureMessageDetails} */
+        /** @type {import('display').DirectApiParams<'displayConfigure'>} */
         const configureParams = {
             depth: this._depth,
             parentPopupId: this._id,
@@ -491,7 +494,7 @@ export class Popup extends EventDispatcher {
             scale: this._contentScale,
             optionsContext: this._optionsContext
         };
-        await this._invokeSafe('Display.configure', configureParams);
+        await this._invokeSafe('displayConfigure', configureParams);
     }
 
     /**
@@ -574,7 +577,7 @@ export class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        await loadStyle('yomitan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
+        await loadStyle(this._application, 'yomitan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
     }
 
     /**
@@ -653,13 +656,13 @@ export class Popup extends EventDispatcher {
     }
 
     /**
-     * @param {import('dynamic-property').ChangeEventDetails<boolean>} event
+     * @param {import('dynamic-property').EventArgument<boolean, 'change'>} event
      */
     _onVisibleChange({value}) {
         if (this._visibleValue === value) { return; }
         this._visibleValue = value;
         this._frame.style.setProperty('visibility', value ? 'visible' : 'hidden', 'important');
-        this._invokeSafe('Display.visibilityChanged', {value});
+        this._invokeSafe('displayVisibilityChanged', {value});
     }
 
     /**
@@ -682,11 +685,10 @@ export class Popup extends EventDispatcher {
     }
 
     /**
-     * @template {import('core').SerializableObject} TParams
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {TParams} params
-     * @returns {Promise<TReturn>}
+     * @template {import('display').DirectApiNames} TName
+     * @param {TName} action
+     * @param {import('display').DirectApiParams<TName>} params
+     * @returns {Promise<import('display').DirectApiReturn<TName>>}
      */
     async _invoke(action, params) {
         const contentWindow = this._frame.contentWindow;
@@ -694,22 +696,27 @@ export class Popup extends EventDispatcher {
             throw new Error(`Failed to invoke action ${action}: frame state invalid`);
         }
 
-        const message = this._frameClient.createMessage({action, params});
-        return await yomitan.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
+        /** @type {import('display').DirectApiMessage<TName>} */
+        const message = {action, params};
+        const wrappedMessage = this._frameClient.createMessage(message);
+        return /** @type {import('display').DirectApiReturn<TName>} */ (await this._application.crossFrame.invoke(
+            this._frameClient.frameId,
+            'displayPopupMessage1',
+            /** @type {import('display').DirectApiFrameClientMessageAny} */ (wrappedMessage)
+        ));
     }
 
     /**
-     * @template {import('core').SerializableObject} TParams
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {TParams} params
-     * @returns {Promise<TReturn|undefined>}
+     * @template {import('display').DirectApiNames} TName
+     * @param {TName} action
+     * @param {import('display').DirectApiParams<TName>} params
+     * @returns {Promise<import('display').DirectApiReturn<TName>|undefined>}
      */
     async _invokeSafe(action, params) {
         try {
             return await this._invoke(action, params);
         } catch (e) {
-            if (!yomitan.isExtensionUnloaded) { throw e; }
+            if (!this._application.webExtension.unloaded) { throw e; }
             return void 0;
         }
     }
@@ -730,7 +737,7 @@ export class Popup extends EventDispatcher {
      * @returns {void}
      */
     _onExtensionUnloaded() {
-        this._invokeWindow('Display.extensionUnloaded');
+        this._invokeWindow('displayExtensionUnloaded');
     }
 
     /**
@@ -1003,7 +1010,7 @@ export class Popup extends EventDispatcher {
      */
     async _setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
-        const options = await yomitan.api.optionsGet(optionsContext);
+        const options = await this._application.api.optionsGet(optionsContext);
         const {general} = options;
         this._themeController.theme = general.popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;

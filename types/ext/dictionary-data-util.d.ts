@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,21 +64,15 @@ export type KanjiFrequency = {
 export type TermFrequencyType = 'popular' | 'rare' | 'normal';
 
 export type GroupedPronunciationInternal = {
+    pronunciation: Dictionary.Pronunciation;
     terms: Set<string>;
     reading: string;
-    position: number;
-    nasalPositions: number[];
-    devoicePositions: number[];
-    tags: Dictionary.Tag[];
 };
 
 export type GroupedPronunciation = {
+    pronunciation: Dictionary.Pronunciation;
     terms: string[];
     reading: string;
-    position: number;
-    nasalPositions: number[];
-    devoicePositions: number[];
-    tags: Dictionary.Tag[];
     exclusiveTerms: string[];
     exclusiveReadings: string[];
 };

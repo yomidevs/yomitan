@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,17 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {isStringPartiallyJapanese} from '../../language/japanese.js';
+
 export class StructuredContentGenerator {
     /**
      * @param {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} contentManager
-     * @param {import('../../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {Document} document
      */
-    constructor(contentManager, japaneseUtil, document) {
+    constructor(contentManager, document) {
         /** @type {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} */
         this._contentManager = contentManager;
-        /** @type {import('../../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
         /** @type {Document} */
         this._document = document;
     }
@@ -73,6 +72,8 @@ export class StructuredContentGenerator {
             collapsed,
             collapsible,
             verticalAlign,
+            border,
+            borderRadius,
             sizeUnits
         } = data;
 
@@ -130,6 +131,8 @@ export class StructuredContentGenerator {
         }
 
         imageContainer.style.width = `${usedWidth}em`;
+        if (typeof border === 'string') { imageContainer.style.border = border; }
+        if (typeof borderRadius === 'string') { imageContainer.style.borderRadius = borderRadius; }
         if (typeof title === 'string') {
             imageContainer.title = title;
         }
@@ -160,7 +163,7 @@ export class StructuredContentGenerator {
         if (typeof content === 'string') {
             if (content.length > 0) {
                 container.appendChild(this._createTextNode(content));
-                if (language === null && this._japaneseUtil.isStringPartiallyJapanese(content)) {
+                if (language === null && isStringPartiallyJapanese(content)) {
                     container.lang = 'ja';
                 }
             }
@@ -321,10 +324,11 @@ export class StructuredContentGenerator {
                 break;
         }
         if (hasStyle) {
-            const {style} = /** @type {import('structured-content').StyledElement} */ (content);
+            const {style, title} = /** @type {import('structured-content').StyledElement} */ (content);
             if (typeof style === 'object' && style !== null) {
                 this._setStructuredContentElementStyle(node, style);
             }
+            if (typeof title === 'string') { node.title = title; }
         }
         if (hasChildren) {
             this._appendStructuredContent(node, content.content, dictionary, language);
@@ -342,29 +346,79 @@ export class StructuredContentGenerator {
             fontStyle,
             fontWeight,
             fontSize,
+            color,
+            background,
+            backgroundColor,
             textDecorationLine,
+            textDecorationStyle,
+            textDecorationColor,
+            borderColor,
+            borderStyle,
+            borderRadius,
+            borderWidth,
+            clipPath,
             verticalAlign,
             textAlign,
+            textEmphasis,
+            textShadow,
+            margin,
             marginTop,
             marginLeft,
             marginRight,
             marginBottom,
+            padding,
+            paddingTop,
+            paddingLeft,
+            paddingRight,
+            paddingBottom,
+            wordBreak,
+            whiteSpace,
+            cursor,
             listStyleType
         } = contentStyle;
         if (typeof fontStyle === 'string') { style.fontStyle = fontStyle; }
         if (typeof fontWeight === 'string') { style.fontWeight = fontWeight; }
         if (typeof fontSize === 'string') { style.fontSize = fontSize; }
+        if (typeof color === 'string') { style.color = color; }
+        if (typeof background === 'string') { style.background = background; }
+        if (typeof backgroundColor === 'string') { style.backgroundColor = backgroundColor; }
         if (typeof verticalAlign === 'string') { style.verticalAlign = verticalAlign; }
         if (typeof textAlign === 'string') { style.textAlign = textAlign; }
+        if (typeof textEmphasis === 'string') { style.textEmphasis = textEmphasis; }
+        if (typeof textShadow === 'string') { style.textShadow = textShadow; }
         if (typeof textDecorationLine === 'string') {
             style.textDecoration = textDecorationLine;
         } else if (Array.isArray(textDecorationLine)) {
             style.textDecoration = textDecorationLine.join(' ');
         }
+        if (typeof textDecorationStyle === 'string') {
+            style.textDecorationStyle = textDecorationStyle;
+        }
+        if (typeof textDecorationColor === 'string') {
+            style.textDecorationColor = textDecorationColor;
+        }
+        if (typeof borderColor === 'string') { style.borderColor = borderColor; }
+        if (typeof borderStyle === 'string') { style.borderStyle = borderStyle; }
+        if (typeof borderRadius === 'string') { style.borderRadius = borderRadius; }
+        if (typeof borderWidth === 'string') { style.borderWidth = borderWidth; }
+        if (typeof clipPath === 'string') { style.clipPath = clipPath; }
+        if (typeof margin === 'string') { style.margin = margin; }
         if (typeof marginTop === 'number') { style.marginTop = `${marginTop}em`; }
+        if (typeof marginTop === 'string') { style.marginTop = marginTop; }
         if (typeof marginLeft === 'number') { style.marginLeft = `${marginLeft}em`; }
+        if (typeof marginLeft === 'string') { style.marginLeft = marginLeft; }
         if (typeof marginRight === 'number') { style.marginRight = `${marginRight}em`; }
+        if (typeof marginRight === 'string') { style.marginRight = marginRight; }
         if (typeof marginBottom === 'number') { style.marginBottom = `${marginBottom}em`; }
+        if (typeof marginBottom === 'string') { style.marginBottom = marginBottom; }
+        if (typeof padding === 'string') { style.padding = padding; }
+        if (typeof paddingTop === 'string') { style.paddingTop = paddingTop; }
+        if (typeof paddingLeft === 'string') { style.paddingLeft = paddingLeft; }
+        if (typeof paddingRight === 'string') { style.paddingRight = paddingRight; }
+        if (typeof paddingBottom === 'string') { style.paddingBottom = paddingBottom; }
+        if (typeof wordBreak === 'string') { style.wordBreak = wordBreak; }
+        if (typeof whiteSpace === 'string') { style.whiteSpace = whiteSpace; }
+        if (typeof cursor === 'string') { style.cursor = cursor; }
         if (typeof listStyleType === 'string') { style.listStyleType = listStyleType; }
     }
 

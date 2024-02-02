@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,10 @@
  */
 
 import {ExtensionError} from '../../core/extension-error.js';
+import {toError} from '../../core/to-error.js';
 import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {JapaneseUtil} from '../../language/sandbox/japanese-util.js';
 import {TemplateRendererProxy} from '../../templates/template-renderer-proxy.js';
-import {yomitan} from '../../yomitan.js';
 
 export class AnkiTemplatesController {
     /**
@@ -55,12 +54,12 @@ export class AnkiTemplatesController {
         /** @type {?import('./modal.js').Modal} */
         this._fieldTemplateResetModal = null;
         /** @type {AnkiNoteBuilder} */
-        this._ankiNoteBuilder = new AnkiNoteBuilder(new JapaneseUtil(null), new TemplateRendererProxy());
+        this._ankiNoteBuilder = new AnkiNoteBuilder(settingsController.application.api, new TemplateRendererProxy());
     }
 
     /** */
     async prepare() {
-        this._defaultFieldTemplates = await yomitan.api.getDefaultAnkiFieldTemplates();
+        this._defaultFieldTemplates = await this._settingsController.application.api.getDefaultAnkiFieldTemplates();
 
         /** @type {HTMLButtonElement} */
         const menuButton = querySelectorNotNull(document, '#anki-card-templates-test-field-menu-button');
@@ -94,7 +93,7 @@ export class AnkiTemplatesController {
     // Private
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         let templates = options.anki.fieldTemplates;
@@ -205,7 +204,7 @@ export class AnkiTemplatesController {
      */
     async _getDictionaryEntry(text, optionsContext) {
         if (this._cachedDictionaryEntryText !== text) {
-            const {dictionaryEntries} = await yomitan.api.termsFind(text, {}, optionsContext);
+            const {dictionaryEntries} = await this._settingsController.application.api.termsFind(text, {}, optionsContext);
             if (dictionaryEntries.length === 0) { return null; }
 
             this._cachedDictionaryEntryValue = dictionaryEntries[0];
@@ -266,7 +265,7 @@ export class AnkiTemplatesController {
                 allErrors.push(...errors);
             }
         } catch (e) {
-            allErrors.push(e instanceof Error ? e : new Error(`${e}`));
+            allErrors.push(toError(e));
         }
 
         /**

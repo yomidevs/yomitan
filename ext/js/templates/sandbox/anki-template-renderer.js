@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,12 +17,12 @@
  */
 
 import {Handlebars} from '../../../lib/handlebars.js';
-import {AnkiNoteDataCreator} from '../../data/sandbox/anki-note-data-creator.js';
-import {PronunciationGenerator} from '../../display/sandbox/pronunciation-generator.js';
+import {createAnkiNoteData} from '../../data/sandbox/anki-note-data-creator.js';
+import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../../dictionary/dictionary-data-util.js';
+import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../../display/sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
 import {CssStyleApplier} from '../../dom/sandbox/css-style-applier.js';
-import {DictionaryDataUtil} from '../../language/sandbox/dictionary-data-util.js';
-import {JapaneseUtil} from '../../language/sandbox/japanese-util.js';
+import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../../language/japanese.js';
 import {AnkiTemplateRendererContentManager} from './anki-template-renderer-content-manager.js';
 import {TemplateRendererMediaProvider} from './template-renderer-media-provider.js';
 import {TemplateRenderer} from './template-renderer.js';
@@ -42,16 +42,10 @@ export class AnkiTemplateRenderer {
         this._pronunciationStyleApplier = new CssStyleApplier('/data/pronunciation-style.json');
         /** @type {RegExp} */
         this._structuredContentDatasetKeyIgnorePattern = /^sc([^a-z]|$)/;
-        /** @type {JapaneseUtil} */
-        this._japaneseUtil = new JapaneseUtil(null);
         /** @type {TemplateRenderer} */
         this._templateRenderer = new TemplateRenderer();
-        /** @type {AnkiNoteDataCreator} */
-        this._ankiNoteDataCreator = new AnkiNoteDataCreator(this._japaneseUtil);
         /** @type {TemplateRendererMediaProvider} */
         this._mediaProvider = new TemplateRendererMediaProvider();
-        /** @type {PronunciationGenerator} */
-        this._pronunciationGenerator = new PronunciationGenerator(this._japaneseUtil);
         /** @type {?(Map<string, unknown>[])} */
         this._stateStack = null;
         /** @type {?import('anki-note-builder').Requirement[]} */
@@ -106,7 +100,7 @@ export class AnkiTemplateRenderer {
         ]);
         /* eslint-enable no-multi-spaces */
         this._templateRenderer.registerDataType('ankiNote', {
-            modifier: ({marker, commonData}) => this._ankiNoteDataCreator.create(marker, commonData),
+            modifier: ({marker, commonData}) => createAnkiNoteData(marker, commonData),
             composeData: ({marker}, commonData) => ({marker, commonData})
         });
         this._templateRenderer.setRenderCallbacks(
@@ -171,7 +165,7 @@ export class AnkiTemplateRenderer {
     /** @type {import('template-renderer').HelperFunction<string>} */
     _furigana(args, context, options) {
         const {expression, reading} = this._getFuriganaExpressionAndReading(args, context, options);
-        const segments = this._japaneseUtil.distributeFurigana(expression, reading);
+        const segments = distributeFurigana(expression, reading);
 
         let result = '';
         for (const {text, reading: reading2} of segments) {
@@ -190,7 +184,7 @@ export class AnkiTemplateRenderer {
     /** @type {import('template-renderer').HelperFunction<string>} */
     _furiganaPlain(args, context, options) {
         const {expression, reading} = this._getFuriganaExpressionAndReading(args, context, options);
-        const segments = this._japaneseUtil.distributeFurigana(expression, reading);
+        const segments = distributeFurigana(expression, reading);
 
         let result = '';
         for (const {text, reading: reading2} of segments) {
@@ -232,21 +226,23 @@ export class AnkiTemplateRenderer {
 
     /** @type {import('template-renderer').HelperFunction<string>} */
     _multiLine(_args, context, options) {
-        return this._stringToMultiLineHtml(this._asString(options.fn(context)));
+        return this._stringToMultiLineHtml(this._computeValueString(options, context));
     }
 
-    /** @type {import('template-renderer').HelperFunction<string>} */
+    /**
+     * Usage:
+     * ```{{#regexReplace regex string [flags] [content]...}}content{{/regexReplace}}```
+     * - regex: regular expression string
+     * - string: string to replace
+     * - flags: optional flags for regular expression.
+     * e.g. "i" for case-insensitive, "g" for replace all
+     * @type {import('template-renderer').HelperFunction<string>}
+     */
     _regexReplace(args, context, options) {
-        // Usage:
-        // {{#regexReplace regex string [flags] [content]...}}content{{/regexReplace}}
-        // regex: regular expression string
-        // string: string to replace
-        // flags: optional flags for regular expression
-        //   e.g. "i" for case-insensitive, "g" for replace all
         const argCount = args.length;
-        let value = this._asString(options.fn(context));
+        let value = this._computeValueString(options, context);
         if (argCount > 3) {
-            value = `${args.slice(3, -1).join('')}${value}`;
+            value = `${args.slice(3).join('')}${value}`;
         }
         if (argCount > 1) {
             try {
@@ -262,17 +258,19 @@ export class AnkiTemplateRenderer {
         return value;
     }
 
-    /** @type {import('template-renderer').HelperFunction<string>} */
+    /**
+     * Usage:
+     * {{#regexMatch regex [flags] [content]...}}content{{/regexMatch}}
+     * - regex: regular expression string
+     * - flags: optional flags for regular expression
+     * e.g. "i" for case-insensitive, "g" for match all
+     * @type {import('template-renderer').HelperFunction<string>}
+     */
     _regexMatch(args, context, options) {
-        // Usage:
-        // {{#regexMatch regex [flags] [content]...}}content{{/regexMatch}}
-        // regex: regular expression string
-        // flags: optional flags for regular expression
-        //   e.g. "i" for case-insensitive, "g" for match all
         const argCount = args.length;
-        let value = this._asString(options.fn(context));
+        let value = this._computeValueString(options, context);
         if (argCount > 2) {
-            value = `${args.slice(2, -1).join('')}${value}`;
+            value = `${args.slice(2).join('')}${value}`;
         }
         if (argCount > 0) {
             try {
@@ -327,14 +325,14 @@ export class AnkiTemplateRenderer {
             for (const entry of iterable) {
                 any = true;
                 if (results.length >= maxCount) { break; }
-                const processedEntry = options.fn(entry);
+                const processedEntry = this._computeValue(options, entry);
                 results.push(processedEntry);
             }
             if (any) {
                 return results.join('');
             }
         }
-        return this._asString(options.inverse(context));
+        return this._computeInverseString(options, context);
     }
 
     /** @type {import('template-renderer').HelperFunction<unknown[]>} */
@@ -446,7 +444,7 @@ export class AnkiTemplateRenderer {
             case 1:
                 {
                     const [key] = /** @type {[key: string]} */ (args);
-                    const value = options.fn(context);
+                    const value = this._computeValue(options, context);
                     stateStack[stateStack.length - 1].set(key, value);
                 }
                 break;
@@ -466,7 +464,7 @@ export class AnkiTemplateRenderer {
         if (stateStack === null) { throw new Error('Invalid state'); }
         try {
             stateStack.push(new Map());
-            return options.fn(context);
+            return this._computeValue(options, context);
         } finally {
             if (stateStack.length > 1) {
                 stateStack.pop();
@@ -502,25 +500,25 @@ export class AnkiTemplateRenderer {
 
     /** @type {import('template-renderer').HelperFunction<unknown>} */
     _noop(_args, context, options) {
-        return options.fn(context);
+        return this._computeValue(options, context);
     }
 
     /** @type {import('template-renderer').HelperFunction<boolean>} */
     _isMoraPitchHigh(args) {
         const [index, position] = /** @type {[index: number, position: number]} */ (args);
-        return this._japaneseUtil.isMoraPitchHigh(index, position);
+        return isMoraPitchHigh(index, position);
     }
 
     /** @type {import('template-renderer').HelperFunction<string[]>} */
     _getKanaMorae(args) {
         const [text] = /** @type {[text: string]} */ (args);
-        return this._japaneseUtil.getKanaMorae(`${text}`);
+        return getKanaMorae(`${text}`);
     }
 
     /** @type {import('template-renderer').HelperFunction<import('core').TypeofResult>} */
     _getTypeof(args, context, options) {
         const ii = args.length;
-        const value = (ii > 0 ? args[0] : options.fn(context));
+        const value = (ii > 0 ? args[0] : this._computeValue(options, context));
         return typeof value;
     }
 
@@ -543,14 +541,15 @@ export class AnkiTemplateRenderer {
         const [data] = /** @type {[data: import('anki-templates').NoteData]} */ (args);
         const {dictionaryEntry} = data;
         if (dictionaryEntry.type !== 'term') { return []; }
-        const {pronunciations, headwords} = dictionaryEntry;
+        const {pronunciations: termPronunciations, headwords} = dictionaryEntry;
         /** @type {Set<string>} */
         const categories = new Set();
-        for (const {headwordIndex, pitches} of pronunciations) {
+        for (const {headwordIndex, pronunciations} of termPronunciations) {
             const {reading, wordClasses} = headwords[headwordIndex];
-            const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
+            const isVerbOrAdjective = isNonNounVerbOrAdjective(wordClasses);
+            const pitches = getPronunciationsOfType(pronunciations, 'pitch-accent');
             for (const {position} of pitches) {
-                const category = this._japaneseUtil.getPitchCategory(reading, position, isVerbOrAdjective);
+                const category = getPitchCategory(reading, position, isVerbOrAdjective);
                 if (category !== null) {
                     categories.add(category);
                 }
@@ -661,7 +660,7 @@ export class AnkiTemplateRenderer {
      */
     _createStructuredContentGenerator(data) {
         const contentManager = new AnkiTemplateRendererContentManager(this._mediaProvider, data);
-        const instance = new StructuredContentGenerator(contentManager, this._japaneseUtil, document);
+        const instance = new StructuredContentGenerator(contentManager, document);
         this._cleanupCallbacks.push(() => contentManager.unloadAll());
         return instance;
     }
@@ -669,8 +668,8 @@ export class AnkiTemplateRenderer {
     /**
      * @type {import('template-renderer').HelperFunction<string>}
      */
-    _formatGlossary(args, context, options) {
-        const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossary]} */ (args);
+    _formatGlossary(args, _context, options) {
+        const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossaryContent]} */ (args);
         const data = options.data.root;
         if (typeof content === 'string') { return this._stringToMultiLineHtml(this._escape(content)); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
@@ -730,15 +729,15 @@ export class AnkiTemplateRenderer {
         if (typeof downstepPosition !== 'number') { return ''; }
         if (!Array.isArray(nasalPositions)) { nasalPositions = []; }
         if (!Array.isArray(devoicePositions)) { devoicePositions = []; }
-        const morae = this._japaneseUtil.getKanaMorae(reading);
+        const morae = getKanaMorae(reading);
 
         switch (format) {
             case 'text':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
+                return this._getPronunciationHtml(createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
             case 'graph':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationGraph(morae, downstepPosition));
+                return this._getPronunciationHtml(createPronunciationGraph(morae, downstepPosition));
             case 'position':
-                return this._getPronunciationHtml(this._pronunciationGenerator.createPronunciationDownstepPosition(downstepPosition));
+                return this._getPronunciationHtml(createPronunciationDownstepPosition(downstepPosition));
             default:
                 return '';
         }
@@ -750,8 +749,8 @@ export class AnkiTemplateRenderer {
     _hiragana(args, context, options) {
         const ii = args.length;
         const {keepProlongedSoundMarks} = options.hash;
-        const value = (ii > 0 ? args[0] : options.fn(context));
-        return typeof value === 'string' ? this._japaneseUtil.convertKatakanaToHiragana(value, keepProlongedSoundMarks === true) : '';
+        const value = (ii > 0 ? args[0] : this._computeValue(options, context));
+        return typeof value === 'string' ? convertKatakanaToHiragana(value, keepProlongedSoundMarks === true) : '';
     }
 
     /**
@@ -759,8 +758,8 @@ export class AnkiTemplateRenderer {
      */
     _katakana(args, context, options) {
         const ii = args.length;
-        const value = (ii > 0 ? args[0] : options.fn(context));
-        return typeof value === 'string' ? this._japaneseUtil.convertHiraganaToKatakana(value) : '';
+        const value = (ii > 0 ? args[0] : this._computeValue(options, context));
+        return typeof value === 'string' ? convertHiraganaToKatakana(value) : '';
     }
 
     /**
@@ -769,5 +768,41 @@ export class AnkiTemplateRenderer {
      */
     _asString(value) {
         return typeof value === 'string' ? value : `${value}`;
+    }
+
+    /**
+     * @param {import('template-renderer').HelperOptions} options
+     * @param {unknown} context
+     * @returns {unknown}
+     */
+    _computeValue(options, context) {
+        return typeof options.fn === 'function' ? options.fn(context) : '';
+    }
+
+    /**
+     * @param {import('template-renderer').HelperOptions} options
+     * @param {unknown} context
+     * @returns {string}
+     */
+    _computeValueString(options, context) {
+        return this._asString(this._computeValue(options, context));
+    }
+
+    /**
+     * @param {import('template-renderer').HelperOptions} options
+     * @param {unknown} context
+     * @returns {unknown}
+     */
+    _computeInverse(options, context) {
+        return typeof options.inverse === 'function' ? options.inverse(context) : '';
+    }
+
+    /**
+     * @param {import('template-renderer').HelperOptions} options
+     * @param {unknown} context
+     * @returns {string}
+     */
+    _computeInverseString(options, context) {
+        return this._asString(this._computeInverse(options, context));
     }
 }

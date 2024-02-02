@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection, isObject} from '../../core.js';
+import {EventListenerCollection} from '../../core/event-listener-collection.js';
+import {isObject} from '../../core/utilities.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
-import {yomitan} from '../../yomitan.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
 export class ExtensionKeyboardShortcutController {
@@ -62,7 +62,7 @@ export class ExtensionKeyboardShortcutController {
             this._clearButton.addEventListener('click', this._onClearClick.bind(this));
         }
 
-        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
+        const {platform: {os}} = await this._settingsController.application.api.getEnvironmentInfo();
         this._os = os;
         this._hotkeyUtil.os = os;
 
@@ -313,7 +313,7 @@ class ExtensionKeyboardShortcutHotkeyEntry {
     // Private
 
     /**
-     * @param {import('keyboard-mouse-input-field').ChangeEvent} e
+     * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} e
      */
     _onInputFieldChange(e) {
         const {key, modifiers} = e;

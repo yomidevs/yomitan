@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-import type * as TextSource from './text-source';
 
 export type NormalizedWritingMode = 'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | 'sideways-lr';
 
@@ -33,20 +31,6 @@ export type GetRangeFromPointOptions = {
      */
     normalizeCssZoom: boolean;
 };
-
-/**
- * Scans the document for text or elements with text information at the given coordinate.
- * Coordinates are provided in [client space](https://developer.mozilla.org/en-US/docs/Web/CSS/CSSOM_View/Coordinate_systems).
- * @returns A range for the hovered text or element, or `null` if no applicable content was found.
- */
-export type GetRangeFromPointHandler = (
-    /** The x coordinate to search at. */
-    x: number,
-    /** The y coordinate to search at. */
-    y: number,
-    /** Options to configure how element detection is performed. */
-    options: GetRangeFromPointOptions,
-) => (TextSource.TextSource | null);
 
 export type ToNumberConstraints = {
     min?: string | number;

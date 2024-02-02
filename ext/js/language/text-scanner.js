@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,19 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, EventListenerCollection, clone, log} from '../core.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {log} from '../core/logger.js';
+import {clone} from '../core/utilities.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
-import {yomitan} from '../yomitan.js';
 
 /**
- * @augments EventDispatcher<import('text-scanner').EventType>
+ * @augments EventDispatcher<import('text-scanner').Events>
  */
 export class TextScanner extends EventDispatcher {
     /**
      * @param {import('text-scanner').ConstructorDetails} details
      */
     constructor({
+        api,
         node,
         getSearchContext,
         ignoreElements = null,
@@ -36,9 +39,12 @@ export class TextScanner extends EventDispatcher {
         searchTerms = false,
         searchKanji = false,
         searchOnClick = false,
-        searchOnClickOnly = false
+        searchOnClickOnly = false,
+        textSourceGenerator
     }) {
         super();
+        /** @type {import('../comm/api.js').API} */
+        this._api = api;
         /** @type {HTMLElement|Window} */
         this._node = node;
         /** @type {import('text-scanner').GetSearchContextCallback} */
@@ -55,6 +61,8 @@ export class TextScanner extends EventDispatcher {
         this._searchOnClick = searchOnClick;
         /** @type {boolean} */
         this._searchOnClickOnly = searchOnClickOnly;
+        /** @type {import('../dom/text-source-generator').TextSourceGenerator} */
+        this._textSourceGenerator = textSourceGenerator;
 
         /** @type {boolean} */
         this._isPrepared = false;
@@ -137,8 +145,8 @@ export class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
         /** @type {boolean} */
         this._preventScroll = false;
-        /** @type {0|1|2|3} */
-        this._penPointerState = 0; // 0 = not active; 1 = hovering; 2 = touching; 3 = hovering after touching
+        /** @type {import('text-scanner').PenPointerState} */
+        this._penPointerState = 0;
         /** @type {Map<number, string>} */
         this._pointerIdTypeMap = new Map();
 
@@ -1099,7 +1107,7 @@ export class TextScanner extends EventDispatcher {
     _getTouchEventListeners(capture) {
         return [
             [this._node, 'auxclick', this._onAuxClick.bind(this), capture],
-            [this._node, 'touchstart', this._onTouchStart.bind(this), capture],
+            [this._node, 'touchstart', this._onTouchStart.bind(this), {passive: true, capture}],
             [this._node, 'touchend', this._onTouchEnd.bind(this), capture],
             [this._node, 'touchcancel', this._onTouchCancel.bind(this), capture],
             [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false, capture}],
@@ -1130,7 +1138,7 @@ export class TextScanner extends EventDispatcher {
         if (documentElement !== null) {
             entries.push([documentElement, 'mousedown', this._onSearchClickMouseDown.bind(this), capture]);
             if (this._touchInputEnabled) {
-                entries.push([documentElement, 'touchstart', this._onSearchClickTouchStart.bind(this), capture]);
+                entries.push([documentElement, 'touchstart', this._onSearchClickTouchStart.bind(this), {passive: true, capture}]);
             }
         }
         return entries;
@@ -1198,7 +1206,7 @@ export class TextScanner extends EventDispatcher {
         /** @type {import('api').FindTermsDetails} */
         const details = {};
         if (this._matchTypePrefix) { details.matchType = 'prefix'; }
-        const {dictionaryEntries, originalTextLength} = await yomitan.api.termsFind(searchText, details, optionsContext);
+        const {dictionaryEntries, originalTextLength} = await this._api.termsFind(searchText, details, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(originalTextLength, false, layoutAwareScan);
@@ -1230,7 +1238,7 @@ export class TextScanner extends EventDispatcher {
         const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
-        const dictionaryEntries = await yomitan.api.kanjiFind(searchText, optionsContext);
+        const dictionaryEntries = await this._api.kanjiFind(searchText, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
         textSource.setEndOffset(1, false, layoutAwareScan);
@@ -1271,7 +1279,7 @@ export class TextScanner extends EventDispatcher {
                 return;
             }
 
-            const textSource = DocumentUtil.getRangeFromPoint(x, y, {
+            const textSource = this._textSourceGenerator.getRangeFromPoint(x, y, {
                 deepContentScan: this._deepContentScan,
                 normalizeCssZoom: this._normalizeCssZoom
             });
@@ -1382,13 +1390,13 @@ export class TextScanner extends EventDispatcher {
                 return input.scanOnPenRelease;
         }
         switch (this._penPointerState) {
-            case 1: // hovering
+            case 1:
                 return input.scanOnPenHover;
-            case 2: // touching
+            case 2:
                 return input.scanOnPenMove;
-            case 3: // hovering after touching
+            case 3:
                 return input.scanOnPenReleaseHover;
-            default: // not active
+            case 0:
                 return false;
         }
     }
@@ -1558,7 +1566,7 @@ export class TextScanner extends EventDispatcher {
      */
     async _hasJapanese(text) {
         try {
-            return await yomitan.api.textHasJapaneseCharacters(text);
+            return await this._api.textHasJapaneseCharacters(text);
         } catch (e) {
             return false;
         }
@@ -1597,7 +1605,7 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {string} reason
+     * @param {import('text-scanner').ClearReason} reason
      */
     _triggerClear(reason) {
         this.trigger('clear', {reason});

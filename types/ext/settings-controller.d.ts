@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,29 +21,30 @@ import type {ScanInputsSimpleController} from '../../ext/js/pages/settings/scan-
 import type * as Core from './core';
 import type * as Settings from './settings';
 import type * as SettingsModifications from './settings-modifications';
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type PageExitPrevention = {
     end: () => void;
 };
 
-export type EventType = 'optionsChanged' | 'optionsContextChanged' | 'permissionsChanged' | 'dictionarySettingsReordered' | 'scanInputsChanged';
-
-export type OptionsChangedEvent = {
-    options: Settings.ProfileOptions;
-    optionsContext: Settings.OptionsContext;
+export type Events = {
+    optionsChanged: {
+        options: Settings.ProfileOptions;
+        optionsContext: Settings.OptionsContext;
+    };
+    optionsContextChanged: Record<string, never>;
+    permissionsChanged: {
+        permissions: chrome.permissions.Permissions;
+    };
+    dictionarySettingsReordered: {
+        source: DictionaryController;
+    };
+    scanInputsChanged: {
+        source: ScanInputsController | ScanInputsSimpleController;
+    };
 };
 
-export type PermissionsChangedEvent = {
-    permissions: chrome.permissions.Permissions;
-};
-
-export type DictionarySettingsReorderedEvent = {
-    source: DictionaryController;
-};
-
-export type ScanInputsChangedEvent = {
-    source: ScanInputsController | ScanInputsSimpleController;
-};
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type SettingsRead<THasScope extends boolean> = THasScope extends true ? SettingsModifications.ScopedRead : SettingsModifications.Read;
 

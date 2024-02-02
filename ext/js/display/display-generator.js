@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,21 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {isObject} from '../core/utilities.js';
+import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
-import {DictionaryDataUtil} from '../language/sandbox/dictionary-data-util.js';
-import {yomitan} from '../yomitan.js';
-import {PronunciationGenerator} from './sandbox/pronunciation-generator.js';
+import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji, isStringPartiallyJapanese} from '../language/japanese.js';
+import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
 
 export class DisplayGenerator {
     /**
      * @param {import('display').DisplayGeneratorConstructorDetails} details
      */
-    constructor({japaneseUtil, contentManager, hotkeyHelpController = null}) {
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
+    constructor({contentManager, hotkeyHelpController = null}) {
         /** @type {import('./display-content-manager.js').DisplayContentManager} */
         this._contentManager = contentManager;
         /** @type {?import('../input/hotkey-help-controller.js').HotkeyHelpController} */
@@ -38,14 +36,14 @@ export class DisplayGenerator {
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
         /** @type {StructuredContentGenerator} */
-        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, japaneseUtil, document);
-        /** @type {PronunciationGenerator} */
-        this._pronunciationGenerator = new PronunciationGenerator(japaneseUtil);
+        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
     }
 
-    /** */
-    async prepare() {
-        const html = await yomitan.api.getDisplayTemplatesHtml();
+    /**
+     * @param {import('../comm/api.js').API} api
+     */
+    async prepare(api) {
+        const html = await api.getDisplayTemplatesHtml();
         this._templates.load(html);
         this.updateHotkeys();
     }
@@ -67,17 +65,17 @@ export class DisplayGenerator {
         const node = this._instantiate('term-entry');
 
         const headwordsContainer = this._querySelector(node, '.headword-list');
-        const inflectionsContainer = this._querySelector(node, '.inflection-list');
+        const inflectionRuleChainsContainer = this._querySelector(node, '.inflection-rule-chains');
         const groupedPronunciationsContainer = this._querySelector(node, '.pronunciation-group-list');
         const frequencyGroupListContainer = this._querySelector(node, '.frequency-group-list');
         const definitionsContainer = this._querySelector(node, '.definition-list');
         const headwordTagsContainer = this._querySelector(node, '.headword-list-tag-list');
 
-        const {headwords, type, inflections, definitions, frequencies, pronunciations} = dictionaryEntry;
-        const groupedPronunciations = DictionaryDataUtil.getGroupedPronunciations(dictionaryEntry);
+        const {headwords, type, inflectionRuleChainCandidates, definitions, frequencies, pronunciations} = dictionaryEntry;
+        const groupedPronunciations = getGroupedPronunciations(dictionaryEntry);
         const pronunciationCount = groupedPronunciations.reduce((i, v) => i + v.pronunciations.length, 0);
-        const groupedFrequencies = DictionaryDataUtil.groupTermFrequencies(dictionaryEntry);
-        const termTags = DictionaryDataUtil.groupTermTags(dictionaryEntry);
+        const groupedFrequencies = groupTermFrequencies(dictionaryEntry);
+        const termTags = groupTermTags(dictionaryEntry);
 
         /** @type {Set<string>} */
         const uniqueTerms = new Set();
@@ -112,7 +110,7 @@ export class DisplayGenerator {
         }
         headwordsContainer.dataset.count = `${headwords.length}`;
 
-        this._appendMultiple(inflectionsContainer, this._createTermInflection.bind(this), inflections);
+        this._appendMultiple(inflectionRuleChainsContainer, this._createInflectionRuleChain.bind(this), inflectionRuleChainCandidates);
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations);
         this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
@@ -167,7 +165,7 @@ export class DisplayGenerator {
         const dictionaryIndicesContainer = this._querySelector(node, '.kanji-dictionary-indices');
 
         this._setTextContent(glyphContainer, dictionaryEntry.character, 'ja');
-        const groupedFrequencies = DictionaryDataUtil.groupKanjiFrequencies(dictionaryEntry.frequencies);
+        const groupedFrequencies = groupKanjiFrequencies(dictionaryEntry.frequencies);
 
         const dictionaryTag = this._createDictionaryTag(dictionaryEntry.dictionary);
 
@@ -335,7 +333,7 @@ export class DisplayGenerator {
 
         node.dataset.isPrimary = `${isPrimaryAny}`;
         node.dataset.readingIsSame = `${reading === term}`;
-        node.dataset.frequency = DictionaryDataUtil.getTermFrequency(tags);
+        node.dataset.frequency = getTermFrequency(tags);
         node.dataset.matchTypes = [...matchTypes].join(' ');
         node.dataset.matchSources = [...matchSources].join(' ');
 
@@ -354,6 +352,44 @@ export class DisplayGenerator {
         this._appendFurigana(termContainer, term, reading, this._appendKanjiLinks.bind(this));
 
         return node;
+    }
+
+    /**
+     * @param {import('dictionary').InflectionRuleChainCandidate} inflectionRuleChain
+     * @returns {?HTMLElement}
+     */
+    _createInflectionRuleChain(inflectionRuleChain) {
+        const {source, inflectionRules} = inflectionRuleChain;
+        if (!Array.isArray(inflectionRules) || inflectionRules.length === 0) { return null; }
+        const fragment = this._instantiate('inflection-rule-chain');
+
+        const sourceIcon = this._getInflectionSourceIcon(source);
+
+        fragment.appendChild(sourceIcon);
+
+        this._appendMultiple(fragment, this._createTermInflection.bind(this), inflectionRules);
+        return fragment;
+    }
+
+    /**
+     * @param {import('dictionary').InflectionSource} source
+     * @returns {HTMLElement}
+     */
+    _getInflectionSourceIcon(source) {
+        const icon = document.createElement('span');
+        icon.classList.add('inflection-source-icon');
+        icon.dataset.inflectionSource = source;
+        switch (source) {
+            case 'dictionary':
+                icon.title = 'Dictionary Deinflection';
+                return icon;
+            case 'algorithm':
+                icon.title = 'Algorithm Deinflection';
+                return icon;
+            case 'both':
+                icon.title = 'Dictionary and Algorithm Deinflection';
+                return icon;
+        }
     }
 
     /**
@@ -378,7 +414,7 @@ export class DisplayGenerator {
      */
     _createTermDefinition(definition, dictionaryTag, headwords, uniqueTerms, uniqueReadings) {
         const {dictionary, tags, headwordIndices, entries} = definition;
-        const disambiguations = DictionaryDataUtil.getDisambiguations(headwords, headwordIndices, uniqueTerms, uniqueReadings);
+        const disambiguations = getDisambiguations(headwords, headwordIndices, uniqueTerms, uniqueReadings);
 
         const node = this._instantiate('definition-item');
 
@@ -396,19 +432,24 @@ export class DisplayGenerator {
     }
 
     /**
-     * @param {import('dictionary-data').TermGlossary} entry
+     * @param {import('dictionary-data').TermGlossaryContent} entry
      * @param {string} dictionary
      * @returns {?HTMLElement}
      */
     _createTermDefinitionEntry(entry, dictionary) {
-        if (typeof entry === 'string') {
-            return this._createTermDefinitionEntryText(entry);
-        } else if (typeof entry === 'object' && entry !== null) {
-            switch (entry.type) {
-                case 'image':
-                    return this._createTermDefinitionEntryImage(entry, dictionary);
-                case 'structured-content':
-                    return this._createTermDefinitionEntryStructuredContent(entry.content, dictionary);
+        switch (typeof entry) {
+            case 'string':
+                return this._createTermDefinitionEntryText(entry);
+            case 'object': {
+                switch (entry.type) {
+                    case 'image':
+                        return this._createTermDefinitionEntryImage(entry, dictionary);
+                    case 'structured-content':
+                        return this._createTermDefinitionEntryStructuredContent(entry.content, dictionary);
+                    case 'text':
+                        break;
+                }
+                break;
             }
         }
 
@@ -621,7 +662,7 @@ export class DisplayGenerator {
         n1.appendChild(tag);
 
         let hasTags = false;
-        for (const {tags} of pronunciations) {
+        for (const {pronunciation: {tags}} of pronunciations) {
             if (tags.length > 0) {
                 hasTags = true;
                 break;
@@ -640,9 +681,51 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createPronunciation(details) {
-        const jp = this._japaneseUtil;
-        const {reading, position, nasalPositions, devoicePositions, tags, exclusiveTerms, exclusiveReadings} = details;
-        const morae = jp.getKanaMorae(reading);
+        const {pronunciation} = details;
+        switch (pronunciation.type) {
+            case 'pitch-accent':
+                return this._createPronunciationPitchAccent(pronunciation, details);
+            case 'phonetic-transcription':
+                return this._createPronunciationPhoneticTranscription(pronunciation, details);
+        }
+    }
+
+
+    /**
+     * @param {import('dictionary').PhoneticTranscription} pronunciation
+     * @param {import('dictionary-data-util').GroupedPronunciation} details
+     * @returns {HTMLElement}
+     */
+    _createPronunciationPhoneticTranscription(pronunciation, details) {
+        const {ipa, tags} = pronunciation;
+        const {exclusiveTerms, exclusiveReadings} = details;
+
+        const node = this._instantiate('pronunciation');
+
+        node.dataset.tagCount = `${tags.length}`;
+
+        let n = this._querySelector(node, '.pronunciation-tag-list');
+        this._appendMultiple(n, this._createTag.bind(this), tags);
+
+        n = this._querySelector(node, '.pronunciation-disambiguation-list');
+        this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
+
+        n = this._querySelector(node, '.pronunciation-text-container');
+
+        this._setTextContent(n, ipa);
+
+        return node;
+    }
+
+    /**
+     * @param {import('dictionary').PitchAccent} pitchAccent
+     * @param {import('dictionary-data-util').GroupedPronunciation} details
+     * @returns {HTMLElement}
+     */
+    _createPronunciationPitchAccent(pitchAccent, details) {
+        const {position, nasalPositions, devoicePositions, tags} = pitchAccent;
+        const {reading, exclusiveTerms, exclusiveReadings} = details;
+        const morae = getKanaMorae(reading);
 
         const node = this._instantiate('pronunciation');
 
@@ -658,14 +741,15 @@ export class DisplayGenerator {
         this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
 
         n = this._querySelector(node, '.pronunciation-downstep-notation-container');
-        n.appendChild(this._pronunciationGenerator.createPronunciationDownstepPosition(position));
+        n.appendChild(createPronunciationDownstepPosition(position));
 
         n = this._querySelector(node, '.pronunciation-text-container');
+
         n.lang = 'ja';
-        n.appendChild(this._pronunciationGenerator.createPronunciationText(morae, position, nasalPositions, devoicePositions));
+        n.appendChild(createPronunciationText(morae, position, nasalPositions, devoicePositions));
 
         n = this._querySelector(node, '.pronunciation-graph-container');
-        n.appendChild(this._pronunciationGenerator.createPronunciationGraph(morae, position));
+        n.appendChild(createPronunciationGraph(morae, position));
 
         return node;
     }
@@ -824,10 +908,9 @@ export class DisplayGenerator {
      * @param {string} text
      */
     _appendKanjiLinks(container, text) {
-        const jp = this._japaneseUtil;
         let part = '';
         for (const c of text) {
-            if (jp.isCodePointKanji(/** @type {number} */ (c.codePointAt(0)))) {
+            if (isCodePointKanji(/** @type {number} */ (c.codePointAt(0)))) {
                 if (part.length > 0) {
                     container.appendChild(document.createTextNode(part));
                     part = '';
@@ -881,7 +964,7 @@ export class DisplayGenerator {
      */
     _appendFurigana(container, term, reading, addText) {
         container.lang = 'ja';
-        const segments = this._japaneseUtil.distributeFurigana(term, reading);
+        const segments = distributeFurigana(term, reading);
         for (const {text, reading: furigana} of segments) {
             if (furigana) {
                 const ruby = document.createElement('ruby');
@@ -912,7 +995,7 @@ export class DisplayGenerator {
     _setTextContent(node, value, language) {
         if (typeof language === 'string') {
             node.lang = language;
-        } else if (this._japaneseUtil.isStringPartiallyJapanese(value)) {
+        } else if (isStringPartiallyJapanese(value)) {
             node.lang = 'ja';
         }
 
@@ -929,7 +1012,7 @@ export class DisplayGenerator {
         // cause the text to not copy correctly.
         if (typeof language === 'string') {
             node.lang = language;
-        } else if (this._japaneseUtil.isStringPartiallyJapanese(value)) {
+        } else if (isStringPartiallyJapanese(value)) {
             node.lang = 'ja';
         }
 
@@ -949,20 +1032,21 @@ export class DisplayGenerator {
 
     /**
      * @param {string} reading
-     * @param {import('dictionary').TermPronunciation[]} pronunciations
+     * @param {import('dictionary').TermPronunciation[]} termPronunciations
      * @param {string[]} wordClasses
      * @param {number} headwordIndex
      * @returns {?string}
      */
-    _getPronunciationCategories(reading, pronunciations, wordClasses, headwordIndex) {
-        if (pronunciations.length === 0) { return null; }
-        const isVerbOrAdjective = DictionaryDataUtil.isNonNounVerbOrAdjective(wordClasses);
+    _getPronunciationCategories(reading, termPronunciations, wordClasses, headwordIndex) {
+        if (termPronunciations.length === 0) { return null; }
+        const isVerbOrAdjective = isNonNounVerbOrAdjective(wordClasses);
         /** @type {Set<import('japanese-util').PitchCategory>} */
         const categories = new Set();
-        for (const pronunciation of pronunciations) {
-            if (pronunciation.headwordIndex !== headwordIndex) { continue; }
-            for (const {position} of pronunciation.pitches) {
-                const category = this._japaneseUtil.getPitchCategory(reading, position, isVerbOrAdjective);
+        for (const termPronunciation of termPronunciations) {
+            if (termPronunciation.headwordIndex !== headwordIndex) { continue; }
+            for (const pronunciation of termPronunciation.pronunciations) {
+                if (pronunciation.type !== 'pitch-accent') { continue; }
+                const category = getPitchCategory(reading, pronunciation.position, isVerbOrAdjective);
                 if (category !== null) {
                     categories.add(category);
                 }

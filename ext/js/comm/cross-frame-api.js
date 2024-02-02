@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,22 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, EventListenerCollection, invokeMessageHandler, log} from '../core.js';
+import {extendApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
-import {yomitan} from '../yomitan.js';
+import {log} from '../core/logger.js';
 
 /**
- * @augments EventDispatcher<import('cross-frame-api').CrossFrameAPIPortEventType>
+ * @augments EventDispatcher<import('cross-frame-api').CrossFrameAPIPortEvents>
  */
-class CrossFrameAPIPort extends EventDispatcher {
+export class CrossFrameAPIPort extends EventDispatcher {
     /**
      * @param {number} otherTabId
      * @param {number} otherFrameId
      * @param {chrome.runtime.Port} port
-     * @param {import('core').MessageHandlerMap} messageHandlers
+     * @param {import('cross-frame-api').ApiMap} apiMap
      */
-    constructor(otherTabId, otherFrameId, port, messageHandlers) {
+    constructor(otherTabId, otherFrameId, port, apiMap) {
         super();
         /** @type {number} */
         this._otherTabId = otherTabId;
@@ -39,8 +41,8 @@ class CrossFrameAPIPort extends EventDispatcher {
         this._otherFrameId = otherFrameId;
         /** @type {?chrome.runtime.Port} */
         this._port = port;
-        /** @type {import('core').MessageHandlerMap} */
-        this._messageHandlers = messageHandlers;
+        /** @type {import('cross-frame-api').ApiMap} */
+        this._apiMap = apiMap;
         /** @type {Map<number, import('cross-frame-api').Invocation>} */
         this._activeInvocations = new Map();
         /** @type {number} */
@@ -69,13 +71,12 @@ class CrossFrameAPIPort extends EventDispatcher {
     }
 
     /**
-     * @template [TParams=import('core').SerializableObject]
-     * @template [TReturn=unknown]
-     * @param {string} action
-     * @param {TParams} params
+     * @template {import('cross-frame-api').ApiNames} TName
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
      * @param {number} ackTimeout
      * @param {number} responseTimeout
-     * @returns {Promise<TReturn>}
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     invoke(action, params, ackTimeout, responseTimeout) {
         return new Promise((resolve, reject) => {
@@ -186,7 +187,7 @@ class CrossFrameAPIPort extends EventDispatcher {
 
     /**
      * @param {number} id
-     * @param {import('core').Response<unknown>} data
+     * @param {import('core').Response<import('cross-frame-api').ApiReturnAny>} data
      */
     _onResult(id, data) {
         const invocation = this._activeInvocations.get(id);
@@ -217,15 +218,13 @@ class CrossFrameAPIPort extends EventDispatcher {
 
     /**
      * @param {number} id
-     * @param {unknown} error
+     * @param {unknown} errorOrMessage
      */
-    _onError(id, error) {
+    _onError(id, errorOrMessage) {
         const invocation = this._activeInvocations.get(id);
         if (typeof invocation === 'undefined') { return; }
 
-        if (!(error instanceof Error)) {
-            error = new Error(`${error} (${invocation.action})`);
-        }
+        const error = errorOrMessage instanceof Error ? errorOrMessage : new Error(`${errorOrMessage} (${invocation.action})`);
 
         this._activeInvocations.delete(id);
         if (invocation.timer !== null) {
@@ -239,23 +238,18 @@ class CrossFrameAPIPort extends EventDispatcher {
 
     /**
      * @param {number} id
-     * @param {import('cross-frame-api').InvocationData} details
-     * @returns {boolean}
+     * @param {import('cross-frame-api').ApiMessageAny} details
      */
     _onInvoke(id, {action, params}) {
-        const messageHandler = this._messageHandlers.get(action);
         this._sendAck(id);
-        if (typeof messageHandler === 'undefined') {
-            this._sendError(id, new Error(`Unknown action: ${action}`));
-            return false;
-        }
-
-        /**
-         * @param {import('core').Response<unknown>} data
-         * @returns {void}
-         */
-        const callback = (data) => this._sendResult(id, data);
-        return invokeMessageHandler(messageHandler, params, callback);
+        invokeApiMapHandler(
+            this._apiMap,
+            action,
+            params,
+            [],
+            (data) => this._sendResult(id, data),
+            () => this._sendError(id, new Error(`Unknown action: ${action}`))
+        );
     }
 
     /**
@@ -279,7 +273,7 @@ class CrossFrameAPIPort extends EventDispatcher {
 
     /**
      * @param {number} id
-     * @param {import('core').Response<unknown>} data
+     * @param {import('core').Response<import('cross-frame-api').ApiReturnAny>} data
      */
     _sendResult(id, data) {
         this._sendResponse({type: 'result', id, data});
@@ -295,15 +289,20 @@ class CrossFrameAPIPort extends EventDispatcher {
 }
 
 export class CrossFrameAPI {
-    constructor() {
+    /**
+     * @param {import('../comm/api.js').API} api
+     */
+    constructor(api) {
+        /** @type {import('../comm/api.js').API} */
+        this._api = api;
         /** @type {number} */
         this._ackTimeout = 3000; // 3 seconds
         /** @type {number} */
         this._responseTimeout = 10000; // 10 seconds
         /** @type {Map<number, Map<number, CrossFrameAPIPort>>} */
         this._commPorts = new Map();
-        /** @type {import('core').MessageHandlerMap} */
-        this._messageHandlers = new Map();
+        /** @type {import('cross-frame-api').ApiMap} */
+        this._apiMap = new Map();
         /** @type {(port: CrossFrameAPIPort) => void} */
         this._onDisconnectBind = this._onDisconnect.bind(this);
         /** @type {?number} */
@@ -315,29 +314,27 @@ export class CrossFrameAPI {
     /** */
     async prepare() {
         chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
-        ({tabId: this._tabId = null, frameId: this._frameId = null} = await yomitan.api.frameInformationGet());
+        ({tabId: this._tabId = null, frameId: this._frameId = null} = await this._api.frameInformationGet());
     }
 
     /**
-     * @template [TParams=import('core').SerializableObject]
-     * @template [TReturn=unknown]
+     * @template {import('cross-frame-api').ApiNames} TName
      * @param {number} targetFrameId
-     * @param {string} action
-     * @param {TParams} params
-     * @returns {Promise<TReturn>}
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     invoke(targetFrameId, action, params) {
         return this.invokeTab(null, targetFrameId, action, params);
     }
 
     /**
-     * @template [TParams=import('core').SerializableObject]
-     * @template [TReturn=unknown]
+     * @template {import('cross-frame-api').ApiNames} TName
      * @param {?number} targetTabId
      * @param {number} targetFrameId
-     * @param {string} action
-     * @param {TParams} params
-     * @returns {Promise<TReturn>}
+     * @param {TName} action
+     * @param {import('cross-frame-api').ApiParams<TName>} params
+     * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     async invokeTab(targetTabId, targetFrameId, action, params) {
         if (typeof targetTabId !== 'number') {
@@ -351,24 +348,10 @@ export class CrossFrameAPI {
     }
 
     /**
-     * @param {import('core').MessageHandlerMapInit} messageHandlers
-     * @throws {Error}
+     * @param {import('cross-frame-api').ApiMapInit} handlers
      */
-    registerHandlers(messageHandlers) {
-        for (const [key, value] of messageHandlers) {
-            if (this._messageHandlers.has(key)) {
-                throw new Error(`Handler ${key} is already registered`);
-            }
-            this._messageHandlers.set(key, value);
-        }
-    }
-
-    /**
-     * @param {string} key
-     * @returns {boolean}
-     */
-    unregisterHandler(key) {
-        return this._messageHandlers.delete(key);
+    registerHandlers(handlers) {
+        extendApiMap(this._apiMap, handlers);
     }
 
     // Private
@@ -432,7 +415,7 @@ export class CrossFrameAPI {
      * @returns {Promise<CrossFrameAPIPort>}
      */
     async _createCommPort(otherTabId, otherFrameId) {
-        await yomitan.api.openCrossFramePort(otherTabId, otherFrameId);
+        await this._api.openCrossFramePort(otherTabId, otherFrameId);
 
         const tabPorts = this._commPorts.get(otherTabId);
         if (typeof tabPorts !== 'undefined') {
@@ -451,7 +434,7 @@ export class CrossFrameAPI {
      * @returns {CrossFrameAPIPort}
      */
     _setupCommPort(otherTabId, otherFrameId, port) {
-        const commPort = new CrossFrameAPIPort(otherTabId, otherFrameId, port, this._messageHandlers);
+        const commPort = new CrossFrameAPIPort(otherTabId, otherFrameId, port, this._apiMap);
         let tabPorts = this._commPorts.get(otherTabId);
         if (typeof tabPorts === 'undefined') {
             tabPorts = new Map();

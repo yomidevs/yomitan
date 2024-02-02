@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,15 +17,16 @@
  */
 
 import {describe, expect, test} from 'vitest';
-import {DynamicProperty, deepEqual} from '../ext/js/core.js';
+import {DynamicProperty} from '../ext/js/core/dynamic-property.js';
+import {deepEqual} from '../ext/js/core/utilities.js';
 
 /** */
 function testDynamicProperty() {
-    test('DynamicProperty', () => {
+    describe('DynamicProperty', () => {
+        /** @type {import('test/core').DynamicPropertyTestData} */
         const data = [
             {
                 initialValue: 0,
-                /** @type {{operation: ?string, expectedDefaultValue: number, expectedValue: number, expectedOverrideCount: number, expeectedEventOccurred: boolean, args: [value: number, priority?: number]}[]} */
                 operations: [
                     {
                         operation: null,
@@ -33,7 +34,7 @@ function testDynamicProperty() {
                         expectedDefaultValue: 0,
                         expectedValue: 0,
                         expectedOverrideCount: 0,
-                        expeectedEventOccurred: false
+                        expectedEventOccurred: false
                     },
                     {
                         operation: 'set.defaultValue',
@@ -41,7 +42,7 @@ function testDynamicProperty() {
                         expectedDefaultValue: 1,
                         expectedValue: 1,
                         expectedOverrideCount: 0,
-                        expeectedEventOccurred: true
+                        expectedEventOccurred: true
                     },
                     {
                         operation: 'set.defaultValue',
@@ -49,7 +50,7 @@ function testDynamicProperty() {
                         expectedDefaultValue: 1,
                         expectedValue: 1,
                         expectedOverrideCount: 0,
-                        expeectedEventOccurred: false
+                        expectedEventOccurred: false
                     },
                     {
                         operation: 'set.defaultValue',
@@ -57,7 +58,7 @@ function testDynamicProperty() {
                         expectedDefaultValue: 0,
                         expectedValue: 0,
                         expectedOverrideCount: 0,
-                        expeectedEventOccurred: true
+                        expectedEventOccurred: true
                     },
                     {
                         operation: 'setOverride',
@@ -65,7 +66,7 @@ function testDynamicProperty() {
                         expectedDefaultValue: 0,
                         expectedValue: 8,
                         expectedOverrideCount: 1,
-                        expeectedEventOccurred: true
+                        expectedEventOccurred: true
                     },
                     {
                         operation: 'setOverride',
@@ -73,7 +74,7 @@ function testDynamicProperty() {
                         expectedDefaultValue: 0,
                         expectedValue: 8,
                         expectedOverrideCount: 2,
-                        expeectedEventOccurred: false
+                        expectedEventOccurred: false
                     },
                     {
                         operation: 'setOverride',
@@ -81,7 +82,7 @@ function testDynamicProperty() {
                         expectedDefaultValue: 0,
                         expectedValue: 32,
                         expectedOverrideCount: 3,
-                        expeectedEventOccurred: true
+                        expectedEventOccurred: true
                     },
                     {
                         operation: 'setOverride',
@@ -89,7 +90,7 @@ function testDynamicProperty() {
                         expectedDefaultValue: 0,
                         expectedValue: 32,
                         expectedOverrideCount: 4,
-                        expeectedEventOccurred: false
+                        expectedEventOccurred: false
                     },
                     {
                         operation: 'clearOverride',
@@ -97,7 +98,7 @@ function testDynamicProperty() {
                         expectedDefaultValue: 0,
                         expectedValue: 32,
                         expectedOverrideCount: 3,
-                        expeectedEventOccurred: false
+                        expectedEventOccurred: false
                     },
                     {
                         operation: 'clearOverride',
@@ -105,7 +106,7 @@ function testDynamicProperty() {
                         expectedDefaultValue: 0,
                         expectedValue: 32,
                         expectedOverrideCount: 2,
-                        expeectedEventOccurred: false
+                        expectedEventOccurred: false
                     },
                     {
                         operation: 'clearOverride',
@@ -113,7 +114,7 @@ function testDynamicProperty() {
                         expectedDefaultValue: 0,
                         expectedValue: 64,
                         expectedOverrideCount: 1,
-                        expeectedEventOccurred: true
+                        expectedEventOccurred: true
                     },
                     {
                         operation: 'clearOverride',
@@ -121,40 +122,42 @@ function testDynamicProperty() {
                         expectedDefaultValue: 0,
                         expectedValue: 0,
                         expectedOverrideCount: 0,
-                        expeectedEventOccurred: true
+                        expectedEventOccurred: true
                     }
                 ]
             }
         ];
 
-        for (const {initialValue, operations} of data) {
-            const property = new DynamicProperty(initialValue);
-            const overrideTokens = [];
-            let eventOccurred = false;
-            const onChange = () => { eventOccurred = true; };
-            property.on('change', onChange);
-            for (const {operation, args, expectedDefaultValue, expectedValue, expectedOverrideCount, expeectedEventOccurred} of operations) {
-                eventOccurred = false;
-                switch (operation) {
-                    case 'set.defaultValue': property.defaultValue = args[0]; break;
-                    case 'setOverride': overrideTokens.push(property.setOverride(...args)); break;
-                    case 'clearOverride': property.clearOverride(overrideTokens[overrideTokens.length + args[0]]); break;
+        describe.each(data)('Test DynamicProperty($initialValue)', ({initialValue, operations}) => {
+            test('works as expected', () => {
+                const property = new DynamicProperty(initialValue);
+                const overrideTokens = [];
+                let eventOccurred = false;
+                const onChange = () => { eventOccurred = true; };
+                property.on('change', onChange);
+                for (const {operation, args, expectedDefaultValue, expectedValue, expectedOverrideCount, expectedEventOccurred} of operations) {
+                    eventOccurred = false;
+                    switch (operation) {
+                        case 'set.defaultValue': property.defaultValue = args[0]; break;
+                        case 'setOverride': overrideTokens.push(property.setOverride(...args)); break;
+                        case 'clearOverride': property.clearOverride(overrideTokens[overrideTokens.length + args[0]]); break;
+                    }
+                    expect(eventOccurred).toStrictEqual(expectedEventOccurred);
+                    expect(property.defaultValue).toStrictEqual(expectedDefaultValue);
+                    expect(property.value).toStrictEqual(expectedValue);
+                    expect(property.overrideCount).toStrictEqual(expectedOverrideCount);
                 }
-                expect(eventOccurred).toStrictEqual(expeectedEventOccurred);
-                expect(property.defaultValue).toStrictEqual(expectedDefaultValue);
-                expect(property.value).toStrictEqual(expectedValue);
-                expect(property.overrideCount).toStrictEqual(expectedOverrideCount);
-            }
-            property.off('change', onChange);
-        }
+                property.off('change', onChange);
+            });
+        });
     });
 }
 
 /** */
 function testDeepEqual() {
     describe('deepEqual', () => {
-        const data = [
-        // Simple tests
+        /** @type {import('test/core').DeepEqualTestData} */
+        const simpleTestsData = [
             {
                 value1: 0,
                 value2: 0,
@@ -194,9 +197,10 @@ function testDeepEqual() {
                 value1: true,
                 value2: false,
                 expected: false
-            },
-
-            // Simple object tests
+            }
+        ];
+        /** @type {import('test/core').DeepEqualTestData} */
+        const simpleObjectTestsData = [
             {
                 value1: {},
                 value2: {},
@@ -216,9 +220,10 @@ function testDeepEqual() {
                 value1: {},
                 value2: null,
                 expected: false
-            },
-
-            // Complex object tests
+            }
+        ];
+        /** @type {import('test/core').DeepEqualTestData} */
+        const complexObjectTestsData = [
             {
                 value1: [1],
                 value2: [],
@@ -259,27 +264,55 @@ function testDeepEqual() {
                 value1: {test: {test2: [true]}},
                 value2: {test: {test2: [true]}},
                 expected: true
-            },
-
-            // Recursive
+            }
+        ];
+        /** @type {import('test/core').DeepEqualTestData} */
+        const recursiveTestsData = [
             {
                 value1: (() => { const x = {}; x.x = x; return x; })(),
                 value2: (() => { const x = {}; x.x = x; return x; })(),
                 expected: false
             }
         ];
-
-        let index = 0;
-        for (const {value1, value2, expected} of data) {
-            test(`${index}`, () => {
+        describe('simple tests', () => {
+            test.each(simpleTestsData)('deepEqual($value1, $value2) -> $expected', ({value1, value2, expected}) => {
                 const actual1 = deepEqual(value1, value2);
                 expect(actual1).toStrictEqual(expected);
 
                 const actual2 = deepEqual(value2, value1);
                 expect(actual2).toStrictEqual(expected);
             });
-            ++index;
-        }
+        });
+
+        describe('simple object tests', () => {
+            test.each(simpleObjectTestsData)('deepEqual($value1, $value2) -> $expected', ({value1, value2, expected}) => {
+                const actual1 = deepEqual(value1, value2);
+                expect(actual1).toStrictEqual(expected);
+
+                const actual2 = deepEqual(value2, value1);
+                expect(actual2).toStrictEqual(expected);
+            });
+        });
+
+        describe('complex object tests', () => {
+            test.each(complexObjectTestsData)('deepEqual($value1, $value2) -> $expected', ({value1, value2, expected}) => {
+                const actual1 = deepEqual(value1, value2);
+                expect(actual1).toStrictEqual(expected);
+
+                const actual2 = deepEqual(value2, value1);
+                expect(actual2).toStrictEqual(expected);
+            });
+        });
+
+        describe('recursive tests', () => {
+            test.each(recursiveTestsData)('deepEqual($value1, $value2) -> $expected', ({value1, value2, expected}) => {
+                const actual1 = deepEqual(value1, value2);
+                expect(actual1).toStrictEqual(expected);
+
+                const actual2 = deepEqual(value2, value1);
+                expect(actual2).toStrictEqual(expected);
+            });
+        });
     });
 }
 

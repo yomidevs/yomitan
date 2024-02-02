@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher} from '../core.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
 
 /**
- * @augments EventDispatcher<import('panel-element').EventType>
+ * @augments EventDispatcher<import('panel-element').Events>
  */
 export class PanelElement extends EventDispatcher {
     /**
@@ -84,9 +84,9 @@ export class PanelElement extends EventDispatcher {
     }
 
     /**
-     * @param {import('panel-element').EventType} eventName
-     * @param {(details: import('core').SafeAny) => void} callback
-     * @returns {void}
+     * @template {import('core').EventNames<import('panel-element').Events>} TName
+     * @param {TName} eventName
+     * @param {(details: import('core').EventArgument<import('panel-element').Events, TName>) => void} callback
      */
     on(eventName, callback) {
         if (eventName === 'visibilityChanged') {
@@ -100,12 +100,13 @@ export class PanelElement extends EventDispatcher {
                 });
             }
         }
-        return super.on(eventName, callback);
+        super.on(eventName, callback);
     }
 
     /**
-     * @param {import('panel-element').EventType} eventName
-     * @param {(details: import('core').SafeAny) => void} callback
+     * @template {import('core').EventNames<import('panel-element').Events>} TName
+     * @param {TName} eventName
+     * @param {(details: import('core').EventArgument<import('panel-element').Events, TName>) => void} callback
      * @returns {boolean}
      */
     off(eventName, callback) {

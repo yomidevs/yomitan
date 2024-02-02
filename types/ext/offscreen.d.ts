@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,16 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Deinflector from './deinflector';
 import type * as Dictionary from './dictionary';
 import type * as DictionaryDatabase from './dictionary-database';
 import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
-import type {ApiMap, ApiMapInit, ApiHandler, ApiParams, ApiReturn, ApiNames} from './api-map';
+import type {
+    ApiMap as BaseApiMap,
+    ApiMapInit as BaseApiMapInit,
+    ApiHandler as BaseApiHandler,
+    ApiParams as BaseApiParams,
+    ApiReturn as BaseApiReturn,
+    ApiNames as BaseApiNames,
+} from './api-map';
+import type {LanguageTransformDescriptor} from './language-transformer';
 
-type OffscreenApiSurface = {
+type ApiSurface = {
     databasePrepareOffscreen: {
         params: void;
         return: void;
@@ -45,7 +52,7 @@ type OffscreenApiSurface = {
     };
     translatorPrepareOffscreen: {
         params: {
-            deinflectionReasons: Deinflector.ReasonsRaw;
+            descriptor: LanguageTransformDescriptor;
         };
         return: void;
     };
@@ -93,13 +100,13 @@ type OffscreenApiSurface = {
     };
 };
 
-export type Message<TName extends MessageType> = (
-    OffscreenApiParams<TName> extends void ?
-        {action: TName} :
-        {action: TName, params: OffscreenApiParams<TName>}
+export type ApiMessage<TName extends ApiNames> = (
+    ApiParams<TName> extends void ?
+        {action: TName, params?: never} :
+        {action: TName, params: ApiParams<TName>}
 );
 
-export type MessageType = ApiNames<OffscreenApiSurface>;
+export type ApiNames = BaseApiNames<ApiSurface>;
 
 export type FindKanjiOptionsOffscreen = Omit<Translation.FindKanjiOptions, 'enabledDictionaryMap'> & {
     enabledDictionaryMap: [
@@ -107,7 +114,6 @@ export type FindKanjiOptionsOffscreen = Omit<Translation.FindKanjiOptions, 'enab
         options: Translation.FindKanjiDictionary,
     ][];
 };
-
 
 export type FindTermsOptionsOffscreen = Omit<Translation.FindTermsOptions, 'enabledDictionaryMap' | 'excludeDictionaryDefinitions' | 'textReplacements'> & {
     enabledDictionaryMap: [
@@ -122,14 +128,14 @@ export type FindTermsTextReplacementOffscreen = Omit<Translation.FindTermsTextRe
     pattern: string;
 };
 
-export type OffscreenApiMap = ApiMap<OffscreenApiSurface>;
+export type ApiMap = BaseApiMap<ApiSurface>;
 
-export type OffscreenApiMapInit = ApiMapInit<OffscreenApiSurface>;
+export type ApiMapInit = BaseApiMapInit<ApiSurface>;
 
-export type OffscreenApiHandler<TName extends MessageType> = ApiHandler<OffscreenApiSurface[TName]>;
+export type ApiHandler<TName extends ApiNames> = BaseApiHandler<ApiSurface[TName]>;
 
-export type OffscreenApiParams<TName extends MessageType> = ApiParams<OffscreenApiSurface[TName]>;
+export type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;
 
-export type OffscreenApiReturn<TName extends MessageType> = ApiReturn<OffscreenApiSurface[TName]>;
+export type ApiReturn<TName extends ApiNames> = BaseApiReturn<ApiSurface[TName]>;
 
-export type MessageAny = Message<MessageType>;
+export type ApiMessageAny = {[name in ApiNames]: ApiMessage<name>}[ApiNames];

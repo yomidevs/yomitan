@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,39 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-multi-spaces */
-
-import {expect, test} from 'vitest';
+import {describe, expect, test} from 'vitest';
 import {CacheMap} from '../ext/js/general/cache-map.js';
 
 /** */
 function testConstructor() {
-    test('constructor', () => {
-        const data = [
-            [false, () => new CacheMap(0)],
-            [false, () => new CacheMap(1)],
-            [false, () => new CacheMap(Number.MAX_VALUE)],
-            [true,  () => new CacheMap(-1)],
-            [true,  () => new CacheMap(1.5)],
-            [true,  () => new CacheMap(Number.NaN)],
-            [true,  () => new CacheMap(Number.POSITIVE_INFINITY)],
-            // @ts-expect-error - Ignore because it should throw an error
-            [true,  () => new CacheMap('a')]
-        ];
+    describe('constructor', () => {
+        const shouldThrow = [-1, 1.5, Number.NaN, Number.POSITIVE_INFINITY];
+        const shouldNotThrow = [0, 1, Number.MAX_VALUE];
 
-        for (const [throws, create] of data) {
-            if (throws) {
-                expect(create).toThrowError();
-            } else {
-                expect(create).not.toThrowError();
-            }
-        }
+        test.each(shouldNotThrow)('`() => new CacheMap(%d)` should not throw', (param) => {
+            expect(() => new CacheMap(param)).not.toThrowError();
+        });
+        test.each(shouldThrow)('`() => new CacheMap(%d)` should throw', (param) => {
+            expect(() => new CacheMap(param)).toThrowError();
+        });
     });
 }
 
 /** */
 function testApi() {
-    test('api', () => {
+    describe('api', () => {
+        /* eslint-disable no-multi-spaces */
         const data = [
             {
                 maxSize: 1,
@@ -100,8 +89,9 @@ function testApi() {
                 ]
             }
         ];
+        /* eslint-enable no-multi-spaces */
 
-        for (const {maxSize, expectedSize, calls} of data) {
+        test.each(data)('api-test-%#', ({maxSize, expectedSize, calls}) => {
             const cache = new CacheMap(maxSize);
             expect(cache.maxSize).toStrictEqual(maxSize);
             for (const call of calls) {
@@ -119,7 +109,7 @@ function testApi() {
                 }
             }
             expect(cache.size).toStrictEqual(expectedSize);
-        }
+        });
     });
 }
 

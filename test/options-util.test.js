@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-multi-spaces */
-
 import fs from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {expect, test, vi} from 'vitest';
+import {describe, expect, test, vi} from 'vitest';
 import {OptionsUtil} from '../ext/js/data/options-util.js';
 import {TemplatePatcher} from '../ext/js/templates/template-patcher.js';
 import {chrome, fetch} from './mocks/common.js';
@@ -413,6 +411,7 @@ function createProfileOptionsUpdatedTestData1() {
             convertHiraganaToKatakana: 'false',
             convertKatakanaToHiragana: 'variant',
             collapseEmphaticSequences: 'false',
+            searchResolution: 'letter',
             textReplacements: {
                 searchOriginal: true,
                 groups: []
@@ -424,7 +423,9 @@ function createProfileOptionsUpdatedTestData1() {
                 priority: 0,
                 enabled: true,
                 allowSecondarySearches: false,
-                definitionsCollapsible: 'not-collapsible'
+                definitionsCollapsible: 'not-collapsible',
+                partsOfSpeechFilter: true,
+                useDeinflections: true
             }
         ],
         parsing: {
@@ -474,6 +475,7 @@ function createProfileOptionsUpdatedTestData1() {
             ]
         },
         inputs: {
+            /* eslint-disable no-multi-spaces */
             hotkeys: [
                 {action: 'close',             argument: '',  key: 'Escape',    modifiers: [],       scopes: ['popup'], enabled: true},
                 {action: 'focusSearchBox',    argument: '',  key: 'Escape',    modifiers: [],       scopes: ['search'], enabled: true},
@@ -492,6 +494,7 @@ function createProfileOptionsUpdatedTestData1() {
                 {action: 'viewNote',          argument: '',  key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'copyHostSelection', argument: '',  key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true}
             ]
+            /* eslint-enable no-multi-spaces */
         },
         popupWindow: {
             width: 400,
@@ -601,7 +604,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 21,
+        version: 24,
         global: {
             database: {
                 prefixWildcardsSupported: false
@@ -626,7 +629,7 @@ async function testUpdate() {
 
 /** */
 async function testDefault() {
-    test('Default', async () => {
+    describe('Default', () => {
         /** @type {((options: import('options-util').IntermediateOptions) => void)[]} */
         const data = [
             (options) => options,
@@ -638,27 +641,22 @@ async function testDefault() {
             }
         ];
 
-        const optionsUtil = new OptionsUtil();
-        await optionsUtil.prepare();
+        test.each(data)('default-test-%#', async (modify) => {
+            const optionsUtil = new OptionsUtil();
+            await optionsUtil.prepare();
 
-        for (const modify of data) {
             const options = optionsUtil.getDefault();
-
             const optionsModified = structuredClone(options);
             modify(optionsModified);
-
             const optionsUpdated = await optionsUtil.update(structuredClone(optionsModified));
             expect(structuredClone(optionsUpdated)).toStrictEqual(structuredClone(options));
-        }
+        });
     });
 }
 
 /** */
 async function testFieldTemplatesUpdate() {
-    test('FieldTemplatesUpdate', async () => {
-        const optionsUtil = new OptionsUtil();
-        await optionsUtil.prepare();
-
+    describe('FieldTemplatesUpdate', () => {
         const templatePatcher = new TemplatePatcher();
         /**
          * @param {string} fileName
@@ -669,10 +667,10 @@ async function testFieldTemplatesUpdate() {
             return templatePatcher.parsePatch(content).addition;
         };
         const updates = [
-            {version: 2,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars')},
-            {version: 4,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars')},
-            {version: 6,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars')},
-            {version: 8,  changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
+            {version: 2, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars')},
+            {version: 4, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars')},
+            {version: 6, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars')},
+            {version: 8, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
             {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
             {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
             {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')},
@@ -1575,7 +1573,11 @@ async function testFieldTemplatesUpdate() {
         ];
 
         const updatesPattern = /<<<UPDATE-ADDITIONS>>>/g;
-        for (const {old, expected, oldVersion, newVersion} of data) {
+
+        test.each(data)('field-templates-update-test-%#', async ({old, expected, oldVersion, newVersion}) => {
+            const optionsUtil = new OptionsUtil();
+            await optionsUtil.prepare();
+
             const options = /** @type {import('core').SafeAny} */ (createOptionsTestData1());
             options.profiles[0].options.anki.fieldTemplates = old;
             options.version = oldVersion;
@@ -1585,7 +1587,7 @@ async function testFieldTemplatesUpdate() {
             const optionsUpdated = structuredClone(await optionsUtil.update(options, newVersion));
             const fieldTemplatesActual = optionsUpdated.profiles[0].options.anki.fieldTemplates;
             expect(fieldTemplatesActual).toStrictEqual(expected2);
-        }
+        });
     });
 }
 

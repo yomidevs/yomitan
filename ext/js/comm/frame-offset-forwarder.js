@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,18 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {yomitan} from '../yomitan.js';
 import {FrameAncestryHandler} from './frame-ancestry-handler.js';
 
 export class FrameOffsetForwarder {
     /**
+     * @param {import('../comm/cross-frame-api.js').CrossFrameAPI} crossFrameApi
      * @param {number} frameId
      */
-    constructor(frameId) {
+    constructor(crossFrameApi, frameId) {
+        /** @type {import('../comm/cross-frame-api.js').CrossFrameAPI} */
+        this._crossFrameApi = crossFrameApi;
         /** @type {number} */
         this._frameId = frameId;
         /** @type {FrameAncestryHandler} */
-        this._frameAncestryHandler = new FrameAncestryHandler(frameId);
+        this._frameAncestryHandler = new FrameAncestryHandler(crossFrameApi, frameId);
     }
 
     /**
@@ -35,8 +37,8 @@ export class FrameOffsetForwarder {
      */
     prepare() {
         this._frameAncestryHandler.prepare();
-        yomitan.crossFrame.registerHandlers([
-            ['FrameOffsetForwarder.getChildFrameRect', this._onMessageGetChildFrameRect.bind(this)]
+        this._crossFrameApi.registerHandlers([
+            ['frameOffsetForwarderGetChildFrameRect', this._onMessageGetChildFrameRect.bind(this)]
         ]);
     }
 
@@ -55,7 +57,7 @@ export class FrameOffsetForwarder {
             /** @type {Promise<?import('frame-offset-forwarder').ChildFrameRect>[]} */
             const promises = [];
             for (const frameId of ancestorFrameIds) {
-                promises.push(yomitan.crossFrame.invoke(frameId, 'FrameOffsetForwarder.getChildFrameRect', {frameId: childFrameId}));
+                promises.push(this._crossFrameApi.invoke(frameId, 'frameOffsetForwarderGetChildFrameRect', {frameId: childFrameId}));
                 childFrameId = frameId;
             }
 
@@ -76,10 +78,7 @@ export class FrameOffsetForwarder {
 
     // Private
 
-    /**
-     * @param {{frameId: number}} event
-     * @returns {?import('frame-offset-forwarder').ChildFrameRect}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'frameOffsetForwarderGetChildFrameRect'>} */
     _onMessageGetChildFrameRect({frameId}) {
         const frameElement = this._frameAncestryHandler.getChildFrameElement(frameId);
         if (frameElement === null) { return null; }

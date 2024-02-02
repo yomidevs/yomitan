@@ -140,6 +140,12 @@
                         </span>
                         <span class="storage-use-finite" hidden>
                             Yomitan is using approximately <span class="storage-usage">?</span> of <span class="storage-quota">?</span>.
+                            <div class="storage-exhaustion-alert warning-text margin-above">
+                                <div>
+                                    <strong>Your system is running low on storage space.</strong><br>
+                                    Importing dictionaries may fail.
+                                </div>
+                            </div>
                         </span>
                         <span class="storage-use-infinite" hidden>
                             Yomitan is permitted unlimited storage.
@@ -1505,6 +1511,18 @@
         </div>
     </div>
     <div class="settings-group advanced-only">
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Dictionary search resolution</div>
+                <div class="settings-item-description" lang="en"><p>"A dog"&#x3000;&rarr;&#x3000;search for "A dog","A do", "A d", "A"</p> or <p>"A dog"&#x3000;&rarr;&#x3000;"A dog", "A"</p></div>
+            </div>
+            <div class="settings-item-right">
+                <select data-setting="translation.searchResolution">
+                    <option value="letter">Letter</option>
+                    <option value="word">Word</option>
+                </select>
+            </div>
+        </div></div>
         <div class="settings-item settings-item-button" data-modal-action="show,translation-text-replacement-patterns"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure custom text replacement patterns&hellip;</div>
@@ -2134,6 +2152,10 @@
                     Enabling this option will force Google Docs webpages to expose some additional text
                     information which should allow Yomitan to still work.
                 </p>
+                <p class="warning-text">
+                    If any profile has this setting enabled, compatibility mode will be activated;
+                    profile conditions are ignored.
+                </p>
                 <p class="danger-text">
                     Google has changed this compatibility implementation several times, and the changes do not seem to be announced or documented.
                     Therefore, it is possible that this feature could stop working at any time the future without warning.
@@ -2457,7 +2479,7 @@
 
         <div class="warning-text margin-above no-dictionaries-installed-warning" hidden>
             No dictionaries have been installed yet.
-            Visit the <a href="https://github.com/themoeway/yomitan#dictionaries" target="_blank" rel="noopener noreferrer">Yomitan homepage</a>
+            Visit the <a href="https://github.com/themoeway/yomitan/blob/master/docs/dictionaries.md#dictionaries" target="_blank" rel="noopener noreferrer">Yomitan homepage</a>
             for a list of free dictionaries or click the <em>Import</em> button below to select a dictionary file to import.
         </div>
         <div id="dictionary-error" class="danger-text margin-above" hidden></div>
@@ -2657,6 +2679,42 @@
                 <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
             </div>
         </div>
+        <div class="settings-item dictionary-parts-of-speech-filter-setting" hidden>
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Part of speech filtering
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" class="dictionary-parts-of-speech-filter-toggle"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                When deinflecting words, only dictionary entries whose POS matches that expected by the deinflector will be shown.
+                <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
+            </div>
+        </div>
+        <hr>
+        <div class="settings-item dictionary-use-deinflections-setting" hidden>
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Use deinflections
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" class="dictionary-use-deinflections-toggle"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                Deinflections from this dictionary will be used.
+                <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
+            </div>
+        </div>
+        <hr>
         <div class="settings-item"><div class="settings-item-children">
             <div class="dictionary-details-table"></div>
             <div class="dictionary-counts"></div>

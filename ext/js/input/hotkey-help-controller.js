@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core.js';
 import {parseJson} from '../core/json.js';
-import {yomitan} from '../yomitan.js';
+import {isObject} from '../core/utilities.js';
 import {HotkeyUtil} from './hotkey-util.js';
 
 export class HotkeyHelpController {
@@ -34,10 +33,10 @@ export class HotkeyHelpController {
     }
 
     /**
-     * @returns {Promise<void>}
+     * @param {import('../comm/api.js').API} api
      */
-    async prepare() {
-        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
+    async prepare(api) {
+        const {platform: {os}} = await api.getEnvironmentInfo();
         this._hotkeyUtil.os = os;
         await this._setupGlobalCommands(this._globalActionHotkeys);
     }

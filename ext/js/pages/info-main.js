@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,10 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {log, promiseTimeout} from '../core.js';
+import {Application} from '../application.js';
+import {log} from '../core/logger.js';
+import {promiseTimeout} from '../core/utilities.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
-import {yomitan} from '../yomitan.js';
 import {BackupController} from './settings/backup-controller.js';
 import {SettingsController} from './settings/settings-controller.js';
 
@@ -56,11 +57,13 @@ function getOperatingSystemDisplayName(os) {
     }
 }
 
-/** */
-async function showAnkiConnectInfo() {
+/**
+ * @param {import('../comm/api.js').API} api
+ */
+async function showAnkiConnectInfo(api) {
     let ankiConnectVersion = null;
     try {
-        ankiConnectVersion = await yomitan.api.getAnkiConnectVersion();
+        ankiConnectVersion = await api.getAnkiConnectVersion();
     } catch (e) {
         // NOP
     }
@@ -77,11 +80,13 @@ async function showAnkiConnectInfo() {
     ankiVersionUnknownElement.hidden = (ankiConnectVersion !== null);
 }
 
-/** */
-async function showDictionaryInfo() {
+/**
+ * @param {import('../comm/api.js').API} api
+ */
+async function showDictionaryInfo(api) {
     let dictionaryInfos;
     try {
-        dictionaryInfos = await yomitan.api.getDictionaryInfo();
+        dictionaryInfos = await api.getDictionaryInfo();
     } catch (e) {
         return;
     }
@@ -120,11 +125,12 @@ async function main() {
         const manifest = chrome.runtime.getManifest();
         const language = chrome.i18n.getUILanguage();
 
-        await yomitan.prepare();
+        const application = new Application();
+        await application.prepare();
 
         const {userAgent} = navigator;
         const {name, version} = manifest;
-        const {browser, platform: {os}} = await yomitan.api.getEnvironmentInfo();
+        const {browser, platform: {os}} = await application.api.getEnvironmentInfo();
 
         /** @type {HTMLLinkElement} */
         const thisVersionLink = querySelectorNotNull(document, '#release-notes-this-version-link');
@@ -148,10 +154,10 @@ async function main() {
         languageElement.textContent = `${language}`;
         userAgentElement.textContent = userAgent;
 
-        showAnkiConnectInfo();
-        showDictionaryInfo();
+        showAnkiConnectInfo(application.api);
+        showDictionaryInfo(application.api);
 
-        const settingsController = new SettingsController();
+        const settingsController = new SettingsController(application);
         await settingsController.prepare();
 
         const backupController = new BackupController(settingsController, null);

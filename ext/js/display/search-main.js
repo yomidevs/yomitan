@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../lib/wanakana.js';
-import {log} from '../core.js';
+import {Application} from '../application.js';
+import {log} from '../core/logger.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
-import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
-import {yomitan} from '../yomitan.js';
 import {DisplayAnki} from './display-anki.js';
 import {DisplayAudio} from './display-audio.js';
 import {Display} from './display.js';
@@ -32,6 +30,8 @@ import {SearchPersistentStateController} from './search-persistent-state-control
 /** Entry point. */
 async function main() {
     try {
+        const application = new Application();
+
         const documentFocusController = new DocumentFocusController('#search-textbox');
         documentFocusController.prepare();
 
@@ -41,32 +41,30 @@ async function main() {
         const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
         searchActionPopupController.prepare();
 
-        await yomitan.prepare();
+        await application.prepare();
 
-        const {tabId, frameId} = await yomitan.api.frameInformationGet();
-
-        const japaneseUtil = new JapaneseUtil(wanakana);
+        const {tabId, frameId} = await application.api.frameInformationGet();
 
         const hotkeyHandler = new HotkeyHandler();
-        hotkeyHandler.prepare();
+        hotkeyHandler.prepare(application.crossFrame);
 
-        const display = new Display(tabId, frameId, 'search', japaneseUtil, documentFocusController, hotkeyHandler);
+        const display = new Display(application, tabId, frameId, 'search', documentFocusController, hotkeyHandler);
         await display.prepare();
 
         const displayAudio = new DisplayAudio(display);
         displayAudio.prepare();
 
-        const displayAnki = new DisplayAnki(display, displayAudio, japaneseUtil);
+        const displayAnki = new DisplayAnki(display, displayAudio);
         displayAnki.prepare();
 
-        const searchDisplayController = new SearchDisplayController(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController);
+        const searchDisplayController = new SearchDisplayController(tabId, frameId, display, displayAudio, searchPersistentStateController);
         await searchDisplayController.prepare();
 
         display.initializeState();
 
         document.documentElement.dataset.loaded = 'true';
 
-        yomitan.ready();
+        application.ready();
     } catch (e) {
         log.error(e);
     }

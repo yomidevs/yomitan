@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,7 @@
  */
 
 import {FrameOffsetForwarder} from '../comm/frame-offset-forwarder.js';
-import {generateId} from '../core.js';
-import {yomitan} from '../yomitan.js';
+import {generateId} from '../core/utilities.js';
 import {PopupProxy} from './popup-proxy.js';
 import {PopupWindow} from './popup-window.js';
 import {Popup} from './popup.js';
@@ -29,13 +28,16 @@ import {Popup} from './popup.js';
 export class PopupFactory {
     /**
      * Creates a new instance.
+     * @param {import('../application.js').Application} application
      * @param {number} frameId The frame ID of the host frame.
      */
-    constructor(frameId) {
+    constructor(application, frameId) {
+        /** @type {import('../application.js').Application} */
+        this._application = application;
         /** @type {number} */
         this._frameId = frameId;
         /** @type {FrameOffsetForwarder} */
-        this._frameOffsetForwarder = new FrameOffsetForwarder(frameId);
+        this._frameOffsetForwarder = new FrameOffsetForwarder(application.crossFrame, frameId);
         /** @type {Map<string, import('popup').PopupAny>} */
         this._popups = new Map();
         /** @type {Map<string, {popup: import('popup').PopupAny, token: string}[]>} */
@@ -48,22 +50,22 @@ export class PopupFactory {
     prepare() {
         this._frameOffsetForwarder.prepare();
         /* eslint-disable no-multi-spaces */
-        yomitan.crossFrame.registerHandlers([
-            ['PopupFactory.getOrCreatePopup',     this._onApiGetOrCreatePopup.bind(this)],
-            ['PopupFactory.setOptionsContext',    this._onApiSetOptionsContext.bind(this)],
-            ['PopupFactory.hide',                 this._onApiHide.bind(this)],
-            ['PopupFactory.isVisible',            this._onApiIsVisibleAsync.bind(this)],
-            ['PopupFactory.setVisibleOverride',   this._onApiSetVisibleOverride.bind(this)],
-            ['PopupFactory.clearVisibleOverride', this._onApiClearVisibleOverride.bind(this)],
-            ['PopupFactory.containsPoint',        this._onApiContainsPoint.bind(this)],
-            ['PopupFactory.showContent',          this._onApiShowContent.bind(this)],
-            ['PopupFactory.setCustomCss',         this._onApiSetCustomCss.bind(this)],
-            ['PopupFactory.clearAutoPlayTimer',   this._onApiClearAutoPlayTimer.bind(this)],
-            ['PopupFactory.setContentScale',      this._onApiSetContentScale.bind(this)],
-            ['PopupFactory.updateTheme',          this._onApiUpdateTheme.bind(this)],
-            ['PopupFactory.setCustomOuterCss',    this._onApiSetCustomOuterCss.bind(this)],
-            ['PopupFactory.getFrameSize',         this._onApiGetFrameSize.bind(this)],
-            ['PopupFactory.setFrameSize',         this._onApiSetFrameSize.bind(this)]
+        this._application.crossFrame.registerHandlers([
+            ['popupFactoryGetOrCreatePopup',     this._onApiGetOrCreatePopup.bind(this)],
+            ['popupFactorySetOptionsContext',    this._onApiSetOptionsContext.bind(this)],
+            ['popupFactoryHide',                 this._onApiHide.bind(this)],
+            ['popupFactoryIsVisible',            this._onApiIsVisibleAsync.bind(this)],
+            ['popupFactorySetVisibleOverride',   this._onApiSetVisibleOverride.bind(this)],
+            ['popupFactoryClearVisibleOverride', this._onApiClearVisibleOverride.bind(this)],
+            ['popupFactoryContainsPoint',        this._onApiContainsPoint.bind(this)],
+            ['popupFactoryShowContent',          this._onApiShowContent.bind(this)],
+            ['popupFactorySetCustomCss',         this._onApiSetCustomCss.bind(this)],
+            ['popupFactoryClearAutoPlayTimer',   this._onApiClearAutoPlayTimer.bind(this)],
+            ['popupFactorySetContentScale',      this._onApiSetContentScale.bind(this)],
+            ['popupFactoryUpdateTheme',          this._onApiUpdateTheme.bind(this)],
+            ['popupFactorySetCustomOuterCss',    this._onApiSetCustomOuterCss.bind(this)],
+            ['popupFactoryGetFrameSize',         this._onApiGetFrameSize.bind(this)],
+            ['popupFactorySetFrameSize',         this._onApiSetFrameSize.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
     }
@@ -119,6 +121,7 @@ export class PopupFactory {
                 id = generateId(16);
             }
             const popup = new PopupWindow({
+                application: this._application,
                 id,
                 depth,
                 frameId: this._frameId
@@ -131,6 +134,7 @@ export class PopupFactory {
                 id = generateId(16);
             }
             const popup = new Popup({
+                application: this._application,
                 id,
                 depth,
                 frameId: this._frameId,
@@ -152,7 +156,7 @@ export class PopupFactory {
             }
             const useFrameOffsetForwarder = (parentPopupId === null);
             /** @type {{id: string, depth: number, frameId: number}} */
-            const info = await yomitan.crossFrame.invoke(frameId, 'PopupFactory.getOrCreatePopup', /** @type {import('popup-factory').GetOrCreatePopupDetails} */ ({
+            const info = await this._application.crossFrame.invoke(frameId, 'popupFactoryGetOrCreatePopup', /** @type {import('popup-factory').GetOrCreatePopupDetails} */ ({
                 id,
                 parentPopupId,
                 frameId,
@@ -160,6 +164,7 @@ export class PopupFactory {
             }));
             id = info.id;
             const popup = new PopupProxy({
+                application: this._application,
                 id,
                 depth: info.depth,
                 frameId: info.frameId,
@@ -239,10 +244,7 @@ export class PopupFactory {
 
     // API message handlers
 
-    /**
-     * @param {import('popup-factory').GetOrCreatePopupDetails} details
-     * @returns {Promise<{id: string, depth: number, frameId: number}>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryGetOrCreatePopup'>} */
     async _onApiGetOrCreatePopup(details) {
         const popup = await this.getOrCreatePopup(details);
         return {
@@ -252,53 +254,37 @@ export class PopupFactory {
         };
     }
 
-    /**
-     * @param {{id: string, optionsContext: import('settings').OptionsContext}} params
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetOptionsContext'>} */
     async _onApiSetOptionsContext({id, optionsContext}) {
         const popup = this._getPopup(id);
         await popup.setOptionsContext(optionsContext);
     }
 
-    /**
-     * @param {{id: string, changeFocus: boolean}} params
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryHide'>} */
     async _onApiHide({id, changeFocus}) {
         const popup = this._getPopup(id);
         await popup.hide(changeFocus);
     }
 
-    /**
-     * @param {{id: string}} params
-     * @returns {Promise<boolean>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryIsVisible'>} */
     async _onApiIsVisibleAsync({id}) {
         const popup = this._getPopup(id);
         return await popup.isVisible();
     }
 
-    /**
-     * @param {{id: string, value: boolean, priority: number}} params
-     * @returns {Promise<?import('core').TokenString>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetVisibleOverride'>} */
     async _onApiSetVisibleOverride({id, value, priority}) {
         const popup = this._getPopup(id);
         return await popup.setVisibleOverride(value, priority);
     }
 
-    /**
-     * @param {{id: string, token: import('core').TokenString}} params
-     * @returns {Promise<boolean>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryClearVisibleOverride'>} */
     async _onApiClearVisibleOverride({id, token}) {
         const popup = this._getPopup(id);
         return await popup.clearVisibleOverride(token);
     }
 
-    /**
-     * @param {{id: string, x: number, y: number}} params
-     * @returns {Promise<boolean>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryContainsPoint'>} */
     async _onApiContainsPoint({id, x, y}) {
         const popup = this._getPopup(id);
         const offset = this._getPopupOffset(popup);
@@ -307,10 +293,7 @@ export class PopupFactory {
         return await popup.containsPoint(x, y);
     }
 
-    /**
-     * @param {{id: string, details: import('popup').ContentDetails, displayDetails: ?import('display').ContentDetails}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryShowContent'>} */
     async _onApiShowContent({id, details, displayDetails}) {
         const popup = this._getPopup(id);
         if (!this._popupCanShow(popup)) { return; }
@@ -327,64 +310,43 @@ export class PopupFactory {
         return await popup.showContent(details, displayDetails);
     }
 
-    /**
-     * @param {{id: string, css: string}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetCustomCss'>} */
     async _onApiSetCustomCss({id, css}) {
         const popup = this._getPopup(id);
         await popup.setCustomCss(css);
     }
 
-    /**
-     * @param {{id: string}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryClearAutoPlayTimer'>} */
     async _onApiClearAutoPlayTimer({id}) {
         const popup = this._getPopup(id);
         await popup.clearAutoPlayTimer();
     }
 
-    /**
-     * @param {{id: string, scale: number}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetContentScale'>} */
     async _onApiSetContentScale({id, scale}) {
         const popup = this._getPopup(id);
         await popup.setContentScale(scale);
     }
 
-    /**
-     * @param {{id: string}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryUpdateTheme'>} */
     async _onApiUpdateTheme({id}) {
         const popup = this._getPopup(id);
         await popup.updateTheme();
     }
 
-    /**
-     * @param {{id: string, css: string, useWebExtensionApi: boolean}} params
-     * @returns {Promise<void>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetCustomOuterCss'>} */
     async _onApiSetCustomOuterCss({id, css, useWebExtensionApi}) {
         const popup = this._getPopup(id);
         await popup.setCustomOuterCss(css, useWebExtensionApi);
     }
 
-    /**
-     * @param {{id: string}} params
-     * @returns {Promise<import('popup').ValidSize>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactoryGetFrameSize'>} */
     async _onApiGetFrameSize({id}) {
         const popup = this._getPopup(id);
         return await popup.getFrameSize();
     }
 
-    /**
-     * @param {{id: string, width: number, height: number}} params
-     * @returns {Promise<boolean>}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'popupFactorySetFrameSize'>} */
     async _onApiSetFrameSize({id, width, height}) {
         const popup = this._getPopup(id);
         return await popup.setFrameSize(width, height);

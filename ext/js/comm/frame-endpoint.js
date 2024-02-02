@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection, generateId} from '../core.js';
-import {yomitan} from '../yomitan.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {generateId} from '../core/utilities.js';
 
 export class FrameEndpoint {
-    constructor() {
+    /**
+     * @param {import('../comm/api.js').API} api
+     */
+    constructor(api) {
+        /** @type {import('../comm/api.js').API} */
+        this._api = api;
         /** @type {string} */
         this._secret = generateId(16);
         /** @type {?string} */
@@ -41,7 +46,7 @@ export class FrameEndpoint {
         }
         /** @type {import('frame-client').FrameEndpointReadyDetails} */
         const details = {secret: this._secret};
-        yomitan.api.broadcastTab('frameEndpointReady', details);
+        this._api.broadcastTab({action: 'frameEndpointReady', params: details});
     }
 
     /**
@@ -83,6 +88,6 @@ export class FrameEndpoint {
         this._eventListeners.removeAllEventListeners();
         /** @type {import('frame-client').FrameEndpointConnectedDetails} */
         const details = {secret, token};
-        yomitan.api.sendMessageToFrame(hostFrameId, 'frameEndpointConnected', details);
+        this._api.sendMessageToFrame(hostFrameId, {action: 'frameEndpointConnected', params: details});
     }
 }

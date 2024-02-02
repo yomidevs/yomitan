@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type {EventNames, EventArgument as BaseEventArgument} from './core';
 import type * as Display from './display';
 
 export type Entry = {
@@ -30,8 +31,10 @@ export type EntryState = Display.HistoryState;
 
 export type EntryContent = Display.HistoryContent;
 
-export type EventType = 'stateChanged';
-
-export type StateChangedEvent = {
-    synthetic: boolean;
+export type Events = {
+    stateChanged: {
+        synthetic: boolean;
+    };
 };
+
+export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;

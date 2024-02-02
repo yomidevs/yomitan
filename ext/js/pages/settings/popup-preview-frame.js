@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,18 @@ import * as wanakana from '../../../lib/wanakana.js';
 import {Frontend} from '../../app/frontend.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {TextSourceRange} from '../../dom/text-source-range.js';
-import {yomitan} from '../../yomitan.js';
 
 export class PopupPreviewFrame {
     /**
+     * @param {import('../../application.js').Application} application
      * @param {number} tabId
      * @param {number} frameId
      * @param {import('../../app/popup-factory.js').PopupFactory} popupFactory
      * @param {import('../../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
-    constructor(tabId, frameId, popupFactory, hotkeyHandler) {
+    constructor(application, tabId, frameId, popupFactory, hotkeyHandler) {
+        /** @type {import('../../application.js').Application} */
+        this._application = application;
         /** @type {number} */
         this._tabId = tabId;
         /** @type {number} */
@@ -86,11 +88,12 @@ export class PopupPreviewFrame {
 
         // Overwrite API functions
         /** @type {?(optionsContext: import('settings').OptionsContext) => Promise<import('settings').ProfileOptions>} */
-        this._apiOptionsGetOld = yomitan.api.optionsGet.bind(yomitan.api);
-        yomitan.api.optionsGet = this._apiOptionsGet.bind(this);
+        this._apiOptionsGetOld = this._application.api.optionsGet.bind(this._application.api);
+        this._application.api.optionsGet = this._apiOptionsGet.bind(this);
 
         // Overwrite frontend
         this._frontend = new Frontend({
+            application: this._application,
             tabId: this._tabId,
             frameId: this._frameId,
             popupFactory: this._popupFactory,
@@ -140,7 +143,7 @@ export class PopupPreviewFrame {
     }
 
     /**
-     * @param {import('popup').CustomOuterCssChangedEvent} details
+     * @param {import('popup').EventArgument<'customOuterCssChanged'>} details
      */
     _onCustomOuterCssChanged({node, inShadow}) {
         if (node === null || inShadow) { return; }

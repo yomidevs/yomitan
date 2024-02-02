@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, EventListenerCollection} from '../core.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {DocumentUtil} from '../dom/document-util.js';
-import {yomitan} from '../yomitan.js';
 
 /**
  * Class which handles hotkey events and actions.
- * @augments EventDispatcher<import('hotkey-handler').EventType>
+ * @augments EventDispatcher<import('hotkey-handler').Events>
  */
 export class HotkeyHandler extends EventDispatcher {
     /**
@@ -46,12 +46,13 @@ export class HotkeyHandler extends EventDispatcher {
 
     /**
      * Begins listening to key press events in order to detect hotkeys.
+     * @param {import('../comm/cross-frame-api.js').CrossFrameAPI} crossFrameApi
      */
-    prepare() {
+    prepare(crossFrameApi) {
         this._isPrepared = true;
         this._updateEventHandlers();
-        yomitan.crossFrame.registerHandlers([
-            ['HotkeyHandler.forwardHotkey', this._onMessageForwardHotkey.bind(this)]
+        crossFrameApi.registerHandlers([
+            ['hotkeyHandlerForwardHotkey', this._onMessageForwardHotkey.bind(this)]
         ]);
     }
 
@@ -120,25 +121,21 @@ export class HotkeyHandler extends EventDispatcher {
     }
 
     /**
-     * Adds a single event listener to a specific event.
-     * @template [TEventDetails=unknown]
-     * @param {import('hotkey-handler').EventType} eventName The string representing the event's name.
-     * @param {(details: TEventDetails) => void} callback The event listener callback to add.
-     * @returns {void}
+     * @template {import('core').EventNames<import('hotkey-handler').Events>} TName
+     * @param {TName} eventName
+     * @param {(details: import('core').EventArgument<import('hotkey-handler').Events, TName>) => void} callback
      */
     on(eventName, callback) {
-        const result = super.on(eventName, callback);
+        super.on(eventName, callback);
         this._updateHasEventListeners();
         this._updateEventHandlers();
-        return result;
     }
 
     /**
-     * Removes a single event listener from a specific event.
-     * @template [TEventDetails=unknown]
-     * @param {import('hotkey-handler').EventType} eventName The string representing the event's name.
-     * @param {(details: TEventDetails) => void} callback The event listener callback to add.
-     * @returns {boolean} `true` if the callback was removed, `false` otherwise.
+     * @template {import('core').EventNames<import('hotkey-handler').Events>} TName
+     * @param {TName} eventName
+     * @param {(details: import('core').EventArgument<import('hotkey-handler').Events, TName>) => void} callback
+     * @returns {boolean}
      */
     off(eventName, callback) {
         const result = super.off(eventName, callback);
@@ -163,10 +160,7 @@ export class HotkeyHandler extends EventDispatcher {
 
     // Message handlers
 
-    /**
-     * @param {{key: string, modifiers: import('input').ModifierKey[]}} details
-     * @returns {boolean}
-     */
+    /** @type {import('cross-frame-api').ApiHandler<'hotkeyHandlerForwardHotkey'>} */
     _onMessageForwardHotkey({key, modifiers}) {
         return this.simulate(key, modifiers);
     }

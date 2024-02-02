@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,55 +20,6 @@ import fs from 'fs';
 import JSZip from 'jszip';
 import path from 'path';
 import {parseJson} from './json.js';
-
-/**
- * @param {string[]} args
- * @param {Map<?string, (boolean|null|number|string|string[])>} argMap
- * @returns {Map<?string, (boolean|null|number|string|string[])>}
- */
-export function getArgs(args, argMap) {
-    let key = null;
-    let canKey = true;
-    let onKey = false;
-    for (const arg of args) {
-        onKey = false;
-
-        if (canKey && arg.startsWith('--')) {
-            if (arg.length === 2) {
-                canKey = false;
-                key = null;
-                onKey = false;
-            } else {
-                key = arg.substring(2);
-                onKey = true;
-            }
-        }
-
-        const target = argMap.get(key);
-        if (typeof target === 'boolean') {
-            argMap.set(key, true);
-            key = null;
-        } else if (typeof target === 'number') {
-            argMap.set(key, target + 1);
-            key = null;
-        } else if (target === null || typeof target === 'string') {
-            if (!onKey) {
-                argMap.set(key, arg);
-                key = null;
-            }
-        } else if (Array.isArray(target)) {
-            if (!onKey) {
-                target.push(arg);
-                key = null;
-            }
-        } else {
-            console.error(`Unknown argument: ${arg}`);
-            key = null;
-        }
-    }
-
-    return argMap;
-}
 
 /**
  * @param {string} baseDirectory

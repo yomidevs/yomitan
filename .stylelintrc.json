@@ -1,7 +1,7 @@
 {
     "extends": "stylelint-config-recommended",
     "plugins": [
-        "stylelint-stylistic"
+        "@stylistic/stylelint-plugin"
     ],
     "ignoreFiles": [
         "ext/lib/**/*.css"
@@ -33,30 +33,30 @@
             }
         ],
 
-        "stylistic/block-opening-brace-space-after": "always-single-line",
-        "stylistic/block-opening-brace-space-before": [
+        "@stylistic/block-opening-brace-space-after": "always-single-line",
+        "@stylistic/block-opening-brace-space-before": [
             "always",
             {
                 "ignoreSelectors": "/^\\.icon/"
             }
         ],
-        "stylistic/color-hex-case": "lower",
-        "stylistic/declaration-colon-space-after": "always-single-line",
-        "stylistic/declaration-colon-space-before": "never",
-        "stylistic/function-comma-space-after": "always",
-        "stylistic/function-comma-space-before": "never",
-        "stylistic/function-parentheses-space-inside": "never",
-        "stylistic/function-whitespace-after": "always",
-        "stylistic/indentation": 4,
-        "stylistic/max-empty-lines": 2,
-        "stylistic/no-extra-semicolons": true,
-        "stylistic/number-leading-zero": "always",
-        "stylistic/number-no-trailing-zeros": true,
-        "stylistic/property-case": "lower",
-        "stylistic/selector-combinator-space-after": "never",
-        "stylistic/selector-combinator-space-before": "never",
-        "stylistic/selector-list-comma-newline-after": "always-multi-line",
-        "stylistic/string-quotes": "single",
-        "stylistic/unit-case": "lower"
+        "@stylistic/color-hex-case": "lower",
+        "@stylistic/declaration-colon-space-after": "always-single-line",
+        "@stylistic/declaration-colon-space-before": "never",
+        "@stylistic/function-comma-space-after": "always",
+        "@stylistic/function-comma-space-before": "never",
+        "@stylistic/function-parentheses-space-inside": "never",
+        "@stylistic/function-whitespace-after": "always",
+        "@stylistic/indentation": 4,
+        "@stylistic/max-empty-lines": 2,
+        "@stylistic/no-extra-semicolons": true,
+        "@stylistic/number-leading-zero": "always",
+        "@stylistic/number-no-trailing-zeros": true,
+        "@stylistic/property-case": "lower",
+        "@stylistic/selector-combinator-space-after": "never",
+        "@stylistic/selector-combinator-space-before": "never",
+        "@stylistic/selector-list-comma-newline-after": "always-multi-line",
+        "@stylistic/string-quotes": "single",
+        "@stylistic/unit-case": "lower"
     }
 }

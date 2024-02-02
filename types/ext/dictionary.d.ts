@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -208,9 +208,9 @@ export type TermDictionaryEntry = {
      */
     isPrimary: boolean;
     /**
-     * A list of inflections that was applied to get the term.
+     * Ways that a looked-up word might be an inflected form of this term.
      */
-    inflections: string[];
+    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
     /**
      * A score for the dictionary entry.
      */
@@ -252,6 +252,15 @@ export type TermDictionaryEntry = {
      */
     frequencies: TermFrequency[];
 };
+
+export type InflectionRuleChainCandidate = {
+    source: InflectionSource;
+    inflectionRules: InflectionRuleChain;
+};
+
+export type InflectionRuleChain = string[];
+
+export type InflectionSource = 'algorithm' | 'dictionary' | 'both';
 
 /**
  * A term headword is a combination of a term, reading, and auxiliary information.
@@ -337,7 +346,7 @@ export type TermDefinition = {
     /**
      * The definition entries.
      */
-    entries: DictionaryData.TermGlossary[];
+    entries: DictionaryData.TermGlossaryContent[];
 };
 
 /**
@@ -365,15 +374,21 @@ export type TermPronunciation = {
      */
     dictionaryPriority: number;
     /**
-     * The pitch accent representations for the term.
+     * The pronunciations for the term.
      */
-    pitches: TermPitch[];
+    pronunciations: Pronunciation[];
 };
+
+export type Pronunciation = PitchAccent | PhoneticTranscription;
 
 /**
  * Pitch accent information for a term, represented as the position of the downstep.
  */
-export type TermPitch = {
+export type PitchAccent = {
+    /**
+     * Type of the pronunciation, for disambiguation between union type members.
+     */
+    type: 'pitch-accent';
     /**
      * Position of the downstep, as a number of mora.
      */
@@ -391,6 +406,25 @@ export type TermPitch = {
      */
     tags: Tag[];
 };
+
+export type PhoneticTranscription = {
+    /**
+     * Type of the pronunciation, for disambiguation between union type members.
+     */
+    type: 'phonetic-transcription';
+    /**
+     * An IPA transcription.
+     */
+    ipa: string;
+    /**
+     * Tags for the IPA transcription.
+     */
+    tags: Tag[];
+};
+
+export type PronunciationType = Pronunciation['type'];
+
+export type PronunciationGeneric<T extends PronunciationType> = Extract<Pronunciation, {type: T}>;
 
 /**
  * Frequency information corresponds to how frequently a term appears in a corpus,

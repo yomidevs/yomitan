@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,31 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../lib/wanakana.js';
 import {AccessibilityController} from '../accessibility/accessibility-controller.js';
 import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
-import {clone, deferPromise, isObject, log, promiseTimeout} from '../core.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {readResponseJson} from '../core/json.js';
-import {AnkiUtil} from '../data/anki-util.js';
+import {log} from '../core/logger.js';
+import {clone, deferPromise, isObject, promiseTimeout} from '../core/utilities.js';
+import {isNoteDataValid} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
-import {PermissionsUtil} from '../data/permissions-util.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
+import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
+import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
-import {DictionaryDatabase} from '../language/dictionary-database.js';
-import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
+import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/japanese.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
-import {MediaUtil} from '../media/media-util.js';
+import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
 import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
-import {ProfileConditionsUtil} from './profile-conditions-util.js';
+import {createSchema, normalizeContext} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
-import {ScriptManager} from './script-manager.js';
+import {injectStylesheet} from './script-manager.js';
 
 /**
  * This class controls the core logic of the extension, including API calls
@@ -48,11 +48,11 @@ import {ScriptManager} from './script-manager.js';
  */
 export class Backend {
     /**
-     * Creates a new instance.
+     * @param {import('../extension/web-extension.js').WebExtension} webExtension
      */
-    constructor() {
-        /** @type {JapaneseUtil} */
-        this._japaneseUtil = new JapaneseUtil(wanakana);
+    constructor(webExtension) {
+        /** @type {import('../extension/web-extension.js').WebExtension} */
+        this._webExtension = webExtension;
         /** @type {Environment} */
         this._environment = new Environment();
         /** @type {AnkiConnect} */
@@ -67,7 +67,6 @@ export class Backend {
             this._dictionaryDatabase = new DictionaryDatabase();
             /** @type {Translator|TranslatorProxy} */
             this._translator = new Translator({
-                japaneseUtil: this._japaneseUtil,
                 database: this._dictionaryDatabase
             });
             /** @type {ClipboardReader|ClipboardReaderProxy} */
@@ -79,7 +78,7 @@ export class Backend {
             });
         } else {
             /** @type {?OffscreenProxy} */
-            this._offscreen = new OffscreenProxy();
+            this._offscreen = new OffscreenProxy(webExtension);
             /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
             this._dictionaryDatabase = new DictionaryDatabaseProxy(this._offscreen);
             /** @type {Translator|TranslatorProxy} */
@@ -90,30 +89,24 @@ export class Backend {
 
         /** @type {ClipboardMonitor} */
         this._clipboardMonitor = new ClipboardMonitor({
-            japaneseUtil: this._japaneseUtil,
             clipboardReader: this._clipboardReader
         });
         /** @type {?import('settings').Options} */
         this._options = null;
         /** @type {import('../data/json-schema.js').JsonSchema[]} */
         this._profileConditionsSchemaCache = [];
-        /** @type {ProfileConditionsUtil} */
-        this._profileConditionsUtil = new ProfileConditionsUtil();
         /** @type {?string} */
         this._defaultAnkiFieldTemplates = null;
         /** @type {RequestBuilder} */
         this._requestBuilder = new RequestBuilder();
         /** @type {AudioDownloader} */
         this._audioDownloader = new AudioDownloader({
-            japaneseUtil: this._japaneseUtil,
             requestBuilder: this._requestBuilder
         });
         /** @type {OptionsUtil} */
         this._optionsUtil = new OptionsUtil();
-        /** @type {ScriptManager} */
-        this._scriptManager = new ScriptManager();
         /** @type {AccessibilityController} */
-        this._accessibilityController = new AccessibilityController(this._scriptManager);
+        this._accessibilityController = new AccessibilityController();
 
         /** @type {?number} */
         this._searchPopupTabId = null;
@@ -143,12 +136,13 @@ export class Backend {
         this._logErrorLevel = null;
         /** @type {?chrome.permissions.Permissions} */
         this._permissions = null;
-        /** @type {PermissionsUtil} */
-        this._permissionsUtil = new PermissionsUtil();
+        /** @type {Map<string, (() => void)[]>} */
+        this._applicationReadyHandlers = new Map();
 
         /* eslint-disable no-multi-spaces */
         /** @type {import('api').ApiMap} */
         this._apiMap = createApiMap([
+            ['applicationReady',             this._onApiApplicationReady.bind(this)],
             ['requestBackendReadySignal',    this._onApiRequestBackendReadySignal.bind(this)],
             ['optionsGet',                   this._onApiOptionsGet.bind(this)],
             ['optionsGetFull',               this._onApiOptionsGetFull.bind(this)],
@@ -189,7 +183,6 @@ export class Backend {
             ['textHasJapaneseCharacters',    this._onApiTextHasJapaneseCharacters.bind(this)],
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
-            ['loadExtensionScripts',         this._onApiLoadExtensionScripts.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
@@ -262,7 +255,7 @@ export class Backend {
         try {
             this._prepareInternalSync();
 
-            this._permissions = await this._permissionsUtil.getAllPermissions();
+            this._permissions = await getAllPermissions();
             this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
             this._badgePrepareDelayTimer = setTimeout(() => {
                 this._badgePrepareDelayTimer = null;
@@ -285,9 +278,9 @@ export class Backend {
                 log.error(e);
             }
 
-            /** @type {import('deinflector').ReasonsRaw} */
-            const deinflectionReasons = await this._fetchJson('/data/deinflect.json');
-            this._translator.prepare(deinflectionReasons);
+            /** @type {import('language-transformer').LanguageTransformDescriptor} */
+            const descriptor = await this._fetchJson('/data/language/japanese-transforms.json');
+            this._translator.prepare(descriptor);
 
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await this._fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
@@ -302,8 +295,8 @@ export class Backend {
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
 
-            this._sendMessageAllTabsIgnoreResponse('Yomitan.backendReady', {});
-            this._sendMessageIgnoreResponse({action: 'Yomitan.backendReady', params: {}});
+            this._sendMessageAllTabsIgnoreResponse({action: 'applicationBackendReady'});
+            this._sendMessageIgnoreResponse({action: 'applicationBackendReady'});
         } catch (e) {
             log.error(e);
             throw e;
@@ -318,7 +311,7 @@ export class Backend {
     // Event handlers
 
     /**
-     * @param {{text: string}} params
+     * @param {import('clipboard-monitor').EventArgument<'change'>} details
      */
     async _onClipboardTextChange({text}) {
         const {clipboard: {maximumSearchLength}} = this._getProfileOptions({current: true}, false);
@@ -342,8 +335,9 @@ export class Backend {
      * @param {{level: import('log').LogLevel}} params
      */
     _onLog({level}) {
-        const levelValue = this._getErrorLevelValue(level);
-        if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
+        const levelValue = log.getLogErrorLevelValue(level);
+        const currentLogErrorLevel = this._logErrorLevel !== null ? log.getLogErrorLevelValue(this._logErrorLevel) : 0;
+        if (levelValue <= currentLogErrorLevel) { return; }
 
         this._logErrorLevel = level;
         this._updateBadge();
@@ -370,7 +364,7 @@ export class Backend {
         });
     }
 
-    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('api').MessageAny>} */
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('api').ApiMessageAny>} */
     _onMessageWrapper(message, sender, sendResponse) {
         if (this._isPrepared) {
             return this._onMessage(message, sender, sendResponse);
@@ -393,7 +387,7 @@ export class Backend {
     }
 
     /**
-     * @param {import('api').MessageAny} message
+     * @param {import('api').ApiMessageAny} message
      * @param {chrome.runtime.MessageSender} sender
      * @param {(response?: unknown) => void} callback
      * @returns {boolean}
@@ -406,7 +400,7 @@ export class Backend {
      * @param {chrome.tabs.ZoomChangeInfo} event
      */
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
-        this._sendMessageTabIgnoreResponse(tabId, {action: 'Yomitan.zoomChanged', params: {oldZoomFactor, newZoomFactor}}, {});
+        this._sendMessageTabIgnoreResponse(tabId, {action: 'applicationZoomChanged', params: {oldZoomFactor, newZoomFactor}}, {});
     }
 
     /**
@@ -426,10 +420,26 @@ export class Backend {
 
     // Message handlers
 
+    /** @type {import('api').ApiHandler<'applicationReady'>} */
+    _onApiApplicationReady(_params, sender) {
+        const {tab, frameId} = sender;
+        if (!tab || typeof frameId !== 'number') { return; }
+        const {id} = tab;
+        if (typeof id !== 'number') { return; }
+        const key = `${id}:${frameId}`;
+        const handlers = this._applicationReadyHandlers.get(key);
+        if (typeof handlers === 'undefined') { return; }
+        for (const handler of handlers) {
+            handler();
+        }
+        this._applicationReadyHandlers.delete(key);
+    }
+
     /** @type {import('api').ApiHandler<'requestBackendReadySignal'>} */
     _onApiRequestBackendReadySignal(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
-        const data = {action: 'Yomitan.backendReady', params: {}};
+        /** @type {import('application').ApiMessage<'applicationBackendReady'>} */
+        const data = {action: 'applicationBackendReady'};
         if (typeof sender.tab === 'undefined') {
             this._sendMessageIgnoreResponse(data);
             return false;
@@ -531,7 +541,7 @@ export class Backend {
         for (let i = 0; i < notes.length; ++i) {
             const note = notes[i];
             let canAdd = canAddArray[i];
-            const valid = AnkiUtil.isNoteDataValid(note);
+            const valid = isNoteDataValid(note);
             if (!valid) { canAdd = false; }
             const info = {canAdd, valid, noteIds: null};
             results.push(info);
@@ -611,30 +621,30 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'sendMessageToFrame'>} */
-    _onApiSendMessageToFrame({frameId: targetFrameId, action, params}, sender) {
+    _onApiSendMessageToFrame({frameId: targetFrameId, message}, sender) {
         if (!sender) { return false; }
         const {tab} = sender;
         if (!tab) { return false; }
         const {id} = tab;
         if (typeof id !== 'number') { return false; }
-        const frameId = sender.frameId;
-        /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
-        const message = {action, params, frameId};
-        this._sendMessageTabIgnoreResponse(id, message, {frameId: targetFrameId});
+        const {frameId} = sender;
+        /** @type {import('application').ApiMessageAny} */
+        const message2 = {...message, frameId};
+        this._sendMessageTabIgnoreResponse(id, message2, {frameId: targetFrameId});
         return true;
     }
 
     /** @type {import('api').ApiHandler<'broadcastTab'>} */
-    _onApiBroadcastTab({action, params}, sender) {
+    _onApiBroadcastTab({message}, sender) {
         if (!sender) { return false; }
         const {tab} = sender;
         if (!tab) { return false; }
         const {id} = tab;
         if (typeof id !== 'number') { return false; }
-        const frameId = sender.frameId;
-        /** @type {import('extension').ChromeRuntimeMessageWithFrameId} */
-        const message = {action, params, frameId};
-        this._sendMessageTabIgnoreResponse(id, message, {});
+        const {frameId} = sender;
+        /** @type {import('application').ApiMessageAny} */
+        const message2 = {...message, frameId};
+        this._sendMessageTabIgnoreResponse(id, message2, {});
         return true;
     }
 
@@ -650,7 +660,7 @@ export class Backend {
     async _onApiInjectStylesheet({type, value}, sender) {
         const {frameId, tab} = sender;
         if (typeof tab !== 'object' || tab === null || typeof tab.id !== 'number') { throw new Error('Invalid tab'); }
-        return await this._scriptManager.injectStylesheet(type, value, tab.id, frameId, false);
+        return await injectStylesheet(type, value, tab.id, frameId, false);
     }
 
     /** @type {import('api').ApiHandler<'getStylesheetContent'>} */
@@ -801,7 +811,7 @@ export class Backend {
 
         let permissionsOkay = false;
         try {
-            permissionsOkay = await this._permissionsUtil.hasPermissions({permissions: ['nativeMessaging']});
+            permissionsOkay = await hasPermissions({permissions: ['nativeMessaging']});
         } catch (e) {
             // NOP
         }
@@ -832,7 +842,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'textHasJapaneseCharacters'>} */
     _onApiTextHasJapaneseCharacters({text}) {
-        return this._japaneseUtil.isStringPartiallyJapanese(text);
+        return isStringPartiallyJapanese(text);
     }
 
     /** @type {import('api').ApiHandler<'getTermFrequencies'>} */
@@ -843,17 +853,6 @@ export class Backend {
     /** @type {import('api').ApiHandler<'findAnkiNotes'>} */
     async _onApiFindAnkiNotes({query}) {
         return await this._anki.findNotes(query);
-    }
-
-    /** @type {import('api').ApiHandler<'loadExtensionScripts'>} */
-    async _onApiLoadExtensionScripts({files}, sender) {
-        if (!sender || !sender.tab) { throw new Error('Invalid sender'); }
-        const tabId = sender.tab.id;
-        if (typeof tabId !== 'number') { throw new Error('Sender has invalid tab ID'); }
-        const {frameId} = sender;
-        for (const file of files) {
-            await this._scriptManager.injectScript(file, tabId, frameId, false);
-        }
     }
 
     /** @type {import('api').ApiHandler<'openCrossFramePort'>} */
@@ -1107,7 +1106,7 @@ export class Backend {
 
         await this._sendMessageTabPromise(
             id,
-            {action: 'SearchDisplayController.setMode', params: {mode: 'popup'}},
+            {action: 'searchDisplayControllerSetMode', params: {mode: 'popup'}},
             {frameId: 0}
         );
 
@@ -1127,7 +1126,7 @@ export class Backend {
             try {
                 const mode = await this._sendMessageTabPromise(
                     id,
-                    {action: 'SearchDisplayController.getMode', params: {}},
+                    {action: 'searchDisplayControllerGetMode'},
                     {frameId: 0}
                 );
                 return mode === 'popup';
@@ -1207,7 +1206,7 @@ export class Backend {
     async _updateSearchQuery(tabId, text, animate) {
         await this._sendMessageTabPromise(
             tabId,
-            {action: 'SearchDisplayController.updateSearchQuery', params: {text, animate}},
+            {action: 'searchDisplayControllerUpdateSearchQuery', params: {text, animate}},
             {frameId: 0}
         );
     }
@@ -1238,7 +1237,7 @@ export class Backend {
 
         this._accessibilityController.update(this._getOptionsFull(false));
 
-        this._sendMessageAllTabsIgnoreResponse('Yomitan.optionsUpdated', {source});
+        this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
     }
 
     /**
@@ -1299,7 +1298,7 @@ export class Backend {
      * @returns {?import('settings').Profile}
      */
     _getProfileFromContext(options, optionsContext) {
-        const normalizedOptionsContext = this._profileConditionsUtil.normalizeContext(optionsContext);
+        const normalizedOptionsContext = normalizeContext(optionsContext);
 
         let index = 0;
         for (const profile of options.profiles) {
@@ -1309,7 +1308,7 @@ export class Backend {
             if (index < this._profileConditionsSchemaCache.length) {
                 schema = this._profileConditionsSchemaCache[index];
             } else {
-                schema = this._profileConditionsUtil.createSchema(conditionGroups);
+                schema = createSchema(conditionGroups);
                 this._profileConditionsSchemaCache.push(schema);
             }
 
@@ -1367,7 +1366,6 @@ export class Backend {
      * @returns {Promise<import('api').ParseTextLine[]>}
      */
     async _textParseScanning(text, scanLength, optionsContext) {
-        const jp = this._japaneseUtil;
         /** @type {import('translator').FindTermsMode} */
         const mode = 'simple';
         const options = this._getProfileOptions(optionsContext, false);
@@ -1389,13 +1387,13 @@ export class Backend {
             if (
                 dictionaryEntries.length > 0 &&
                 originalTextLength > 0 &&
-                (originalTextLength !== character.length || jp.isCodePointJapanese(codePoint))
+                (originalTextLength !== character.length || isCodePointJapanese(codePoint))
             ) {
                 previousUngroupedSegment = null;
                 const {headwords: [{term, reading}]} = dictionaryEntries[0];
                 const source = text.substring(i, i + originalTextLength);
                 const textSegments = [];
-                for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(term, reading, source)) {
+                for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, source)) {
                     textSegments.push({text: text2, reading: reading2});
                 }
                 results.push(textSegments);
@@ -1418,8 +1416,6 @@ export class Backend {
      * @returns {Promise<import('backend').MecabParseResults>}
      */
     async _textParseMecab(text) {
-        const jp = this._japaneseUtil;
-
         let parseTextResults;
         try {
             parseTextResults = await this._mecab.parseText(text);
@@ -1435,9 +1431,9 @@ export class Backend {
             for (const line of lines) {
                 for (const {term, reading, source} of line) {
                     const termParts = [];
-                    for (const {text: text2, reading: reading2} of jp.distributeFuriganaInflected(
+                    for (const {text: text2, reading: reading2} of distributeFuriganaInflected(
                         term.length > 0 ? term : source,
-                        jp.convertKatakanaToHiragana(reading),
+                        jpConvertKatakanaToHiragana(reading),
                         source
                     )) {
                         termParts.push({text: text2, reading: reading2});
@@ -1449,20 +1445,6 @@ export class Backend {
             results.push([name, result]);
         }
         return results;
-    }
-
-    /**
-     * @param {?import('log').LogLevel} errorLevel
-     * @returns {number}
-     */
-    _getErrorLevelValue(errorLevel) {
-        switch (errorLevel) {
-            case 'info': return 0;
-            case 'debug': return 0;
-            case 'warn': return 1;
-            case 'error': return 2;
-            default: return 0;
-        }
     }
 
     /**
@@ -1660,7 +1642,7 @@ export class Backend {
         try {
             const response = await this._sendMessageTabPromise(
                 tabId,
-                {action: 'Yomitan.getUrl', params: {}},
+                {action: 'applicationGetUrl'},
                 {frameId: 0}
             );
             const url = typeof response === 'object' && response !== null ? /** @type {import('core').SerializableObject} */ (response).url : void 0;
@@ -1690,6 +1672,7 @@ export class Backend {
     }
 
     /**
+     * This function works around the need to have the "tabs" permission to access tab.url.
      * @param {number} timeout
      * @param {boolean} multiple
      * @param {import('backend').FindTabsPredicate} predicate
@@ -1697,7 +1680,6 @@ export class Backend {
      * @returns {Promise<import('backend').TabInfo[]|(?import('backend').TabInfo)>}
      */
     async _findTabs(timeout, multiple, predicate, predicateIsAsync) {
-        // This function works around the need to have the "tabs" permission to access tab.url.
         const tabs = await this._getAllTabs();
 
         let done = false;
@@ -1831,18 +1813,8 @@ export class Backend {
         return new Promise((resolve, reject) => {
             /** @type {?import('core').Timeout} */
             let timer = null;
-            /** @type {?import('extension').ChromeRuntimeOnMessageCallback} */
-            let onMessage = (message, sender) => {
-                if (
-                    !sender.tab ||
-                    sender.tab.id !== tabId ||
-                    sender.frameId !== frameId ||
-                    !(typeof message === 'object' && message !== null) ||
-                    /** @type {import('core').SerializableObject} */ (message).action !== 'yomitanReady'
-                ) {
-                    return;
-                }
 
+            const readyHandler = () => {
                 cleanup();
                 resolve();
             };
@@ -1851,15 +1823,12 @@ export class Backend {
                     clearTimeout(timer);
                     timer = null;
                 }
-                if (onMessage !== null) {
-                    chrome.runtime.onMessage.removeListener(onMessage);
-                    onMessage = null;
-                }
+                this._removeApplicationReadyHandler(tabId, frameId, readyHandler);
             };
 
-            chrome.runtime.onMessage.addListener(onMessage);
+            this._addApplicationReadyHandler(tabId, frameId, readyHandler);
 
-            this._sendMessageTabPromise(tabId, {action: 'Yomitan.isReady'}, {frameId})
+            this._sendMessageTabPromise(tabId, {action: 'applicationIsReady'}, {frameId})
                 .then(
                     (value) => {
                         if (!value) { return; }
@@ -1918,16 +1887,16 @@ export class Backend {
     }
 
     /**
-     * @param {{action: string, params: import('core').SerializableObject}} message
+     * @template {import('application').ApiNames} TName
+     * @param {import('application').ApiMessage<TName>} message
      */
     _sendMessageIgnoreResponse(message) {
-        const callback = () => this._checkLastError(chrome.runtime.lastError);
-        chrome.runtime.sendMessage(message, callback);
+        this._webExtension.sendMessageIgnoreResponse(message);
     }
 
     /**
      * @param {number} tabId
-     * @param {{action: string, params?: import('core').SerializableObject, frameId?: number}} message
+     * @param {import('application').ApiMessageAny} message
      * @param {chrome.tabs.MessageSendOptions} options
      */
     _sendMessageTabIgnoreResponse(tabId, message, options) {
@@ -1936,25 +1905,25 @@ export class Backend {
     }
 
     /**
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
+     * @param {import('application').ApiMessageAny} message
      */
-    _sendMessageAllTabsIgnoreResponse(action, params) {
+    _sendMessageAllTabsIgnoreResponse(message) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
                 const {id} = tab;
                 if (typeof id !== 'number') { continue; }
-                chrome.tabs.sendMessage(id, {action, params}, callback);
+                chrome.tabs.sendMessage(id, message, callback);
             }
         });
     }
 
     /**
+     * @template {import('application').ApiNames} TName
      * @param {number} tabId
-     * @param {{action: string, params?: import('core').SerializableObject}} message
+     * @param {import('application').ApiMessage<TName>} message
      * @param {chrome.tabs.MessageSendOptions} options
-     * @returns {Promise<unknown>}
+     * @returns {Promise<import('application').ApiReturn<TName>>}
      */
     _sendMessageTabPromise(tabId, message, options) {
         return new Promise((resolve, reject) => {
@@ -1963,7 +1932,7 @@ export class Backend {
              */
             const callback = (response) => {
                 try {
-                    resolve(this._getMessageResponseResult(response));
+                    resolve(/** @type {import('application').ApiReturn<TName>} */ (this._getMessageResponseResult(response)));
                 } catch (error) {
                     reject(error);
                 }
@@ -1986,11 +1955,11 @@ export class Backend {
         if (typeof response !== 'object' || response === null) {
             throw new Error('Tab did not respond');
         }
-        const responseError = /** @type {import('core').SerializedError|undefined} */ (/** @type {import('core').SerializableObject} */ (response).error);
+        const responseError = /** @type {import('core').Response<unknown>} */ (response).error;
         if (typeof responseError === 'object' && responseError !== null) {
             throw ExtensionError.deserialize(responseError);
         }
-        return /** @type {import('core').SerializableObject} */ (response).result;
+        return /** @type {import('core').Response<unknown>} */ (response).result;
     }
 
     /**
@@ -2025,7 +1994,7 @@ export class Backend {
         let token = null;
         try {
             if (typeof tabId === 'number' && typeof frameId === 'number') {
-                const action = 'Frontend.setAllVisibleOverride';
+                const action = 'frontendSetAllVisibleOverride';
                 const params = {value: false, priority: 0, awaitFrame: true};
                 token = await this._sendMessageTabPromise(tabId, {action, params}, {frameId});
             }
@@ -2042,7 +2011,7 @@ export class Backend {
             });
         } finally {
             if (token !== null) {
-                const action = 'Frontend.clearAllVisibleOverride';
+                const action = 'frontendClearAllVisibleOverride';
                 const params = {token};
                 try {
                     await this._sendMessageTabPromise(tabId, {action, params}, {frameId});
@@ -2155,7 +2124,7 @@ export class Backend {
             return null;
         }
 
-        let extension = contentType !== null ? MediaUtil.getFileExtensionFromAudioMediaType(contentType) : null;
+        let extension = contentType !== null ? getFileExtensionFromAudioMediaType(contentType) : null;
         if (extension === null) { extension = '.mp3'; }
         let fileName = this._generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp, definitionDetails);
         fileName = fileName.replace(/\]/g, '');
@@ -2174,7 +2143,7 @@ export class Backend {
         const dataUrl = await this._getScreenshot(tabId, frameId, format, quality);
 
         const {mediaType, data} = this._getDataUrlInfo(dataUrl);
-        const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
+        const extension = getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for screenshot image');
         }
@@ -2196,7 +2165,7 @@ export class Backend {
         }
 
         const {mediaType, data} = this._getDataUrlInfo(dataUrl);
-        const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
+        const extension = getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for clipboard image');
         }
@@ -2242,7 +2211,7 @@ export class Backend {
             let fileName = null;
             if (media !== null) {
                 const {content, mediaType} = media;
-                const extension = MediaUtil.getFileExtensionFromImageMediaType(mediaType);
+                const extension = getFileExtensionFromImageMediaType(mediaType);
                 fileName = this._generateAnkiNoteMediaFileName(
                     `yomitan_dictionary_media_${i + 1}`,
                     extension !== null ? extension : '',
@@ -2407,7 +2376,7 @@ export class Backend {
      */
     _triggerDatabaseUpdated(type, cause) {
         this._translator.clearDatabaseCaches();
-        this._sendMessageAllTabsIgnoreResponse('Yomitan.databaseUpdated', {type, cause});
+        this._sendMessageAllTabsIgnoreResponse({action: 'applicationDatabaseUpdated', params: {type, cause}});
     }
 
     /**
@@ -2442,7 +2411,8 @@ export class Backend {
                 convertHiraganaToKatakana,
                 convertKatakanaToHiragana,
                 collapseEmphaticSequences,
-                textReplacements: textReplacementsOptions
+                textReplacements: textReplacementsOptions,
+                searchResolution
             }
         } = options;
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
@@ -2451,7 +2421,9 @@ export class Backend {
             enabledDictionaryMap.set(mainDictionary, {
                 index: enabledDictionaryMap.size,
                 priority: 0,
-                allowSecondarySearches: false
+                allowSecondarySearches: false,
+                partsOfSpeechFilter: true,
+                useDeinflections: true
             });
             excludeDictionaryDefinitions = new Set();
             excludeDictionaryDefinitions.add(mainDictionary);
@@ -2469,6 +2441,7 @@ export class Backend {
             convertHiraganaToKatakana,
             convertKatakanaToHiragana,
             collapseEmphaticSequences,
+            searchResolution,
             textReplacements,
             enabledDictionaryMap,
             excludeDictionaryDefinitions
@@ -2496,10 +2469,13 @@ export class Backend {
         const enabledDictionaryMap = new Map();
         for (const dictionary of options.dictionaries) {
             if (!dictionary.enabled) { continue; }
-            enabledDictionaryMap.set(dictionary.name, {
+            const {name, priority, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
+            enabledDictionaryMap.set(name, {
                 index: enabledDictionaryMap.size,
-                priority: dictionary.priority,
-                allowSecondarySearches: dictionary.allowSecondarySearches
+                priority,
+                allowSecondarySearches,
+                partsOfSpeechFilter,
+                useDeinflections
             });
         }
         return enabledDictionaryMap;
@@ -2631,7 +2607,7 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _checkPermissions() {
-        this._permissions = await this._permissionsUtil.getAllPermissions();
+        this._permissions = await getAllPermissions();
         this._updateBadge();
     }
 
@@ -2648,18 +2624,18 @@ export class Backend {
      */
     _hasRequiredPermissionsForSettings(options) {
         if (!this._canObservePermissionsChanges()) { return true; }
-        return this._permissions === null || this._permissionsUtil.hasRequiredPermissionsForOptions(this._permissions, options);
+        return this._permissions === null || hasRequiredPermissionsForOptions(this._permissions, options);
     }
 
     /**
+     * Only request this permission for Firefox versions >= 77.
+     * https://bugzilla.mozilla.org/show_bug.cgi?id=1630413
      * @returns {Promise<void>}
      */
     async _requestPersistentStorage() {
         try {
             if (await navigator.storage.persisted()) { return; }
 
-            // Only request this permission for Firefox versions >= 77.
-            // https://bugzilla.mozilla.org/show_bug.cgi?id=1630413
             const {vendor, version} = await browser.runtime.getBrowserInfo();
             if (vendor !== 'Mozilla') { return; }
 
@@ -2683,7 +2659,7 @@ export class Backend {
         const results = [];
         for (const item of await this._dictionaryDatabase.getMedia(targets)) {
             const {content, dictionary, height, mediaType, path, width} = item;
-            const content2 = ArrayBufferUtil.arrayBufferToBase64(content);
+            const content2 = arrayBufferToBase64(content);
             results.push({content: content2, dictionary, height, mediaType, path, width});
         }
         return results;
@@ -2702,5 +2678,39 @@ export class Backend {
             default:
                 return defaultValue;
         }
+    }
+
+    /**
+     * @param {number} tabId
+     * @param {number} frameId
+     * @param {() => void} handler
+     */
+    _addApplicationReadyHandler(tabId, frameId, handler) {
+        const key = `${tabId}:${frameId}`;
+        let handlers = this._applicationReadyHandlers.get(key);
+        if (typeof handlers === 'undefined') {
+            handlers = [];
+            this._applicationReadyHandlers.set(key, handlers);
+        }
+        handlers.push(handler);
+    }
+
+    /**
+     * @param {number} tabId
+     * @param {number} frameId
+     * @param {() => void} handler
+     * @returns {boolean}
+     */
+    _removeApplicationReadyHandler(tabId, frameId, handler) {
+        const key = `${tabId}:${frameId}`;
+        const handlers = this._applicationReadyHandlers.get(key);
+        if (typeof handlers === 'undefined') { return false; }
+        const index = handlers.indexOf(handler);
+        if (index < 0) { return false; }
+        handlers.splice(index, 1);
+        if (handlers.length === 0) {
+            this._applicationReadyHandlers.delete(key);
+        }
+        return true;
     }
 }

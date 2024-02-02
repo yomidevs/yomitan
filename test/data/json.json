@@ -30,11 +30,6 @@
             "type": "ManifestConfig"
         },
         {
-            "path": "ext/data/deinflect.json",
-            "typeFile": "types/ext/deinflector.d.ts",
-            "type": "ReasonsRaw"
-        },
-        {
             "path": "ext/data/pronunciation-style.json",
             "typeFile": "types/ext/css-style-applier.d.ts",
             "type": "RawStyleData"
@@ -95,6 +90,11 @@
             "type": "AjvSchema"
         },
         {
+            "path": "ext/data/language/japanese-transforms.json",
+            "typeFile": "types/ext/language-transformer.d.ts",
+            "type": "LanguageTransformDescriptor"
+        },
+        {
             "path": "test/data/translator-test-inputs.json",
             "typeFile": "types/test/translator.d.ts",
             "type": "TranslatorTestInputs",
@@ -116,6 +116,12 @@
             "path": "test/data/anki-note-builder-test-results.json",
             "typeFile": "types/test/translator.d.ts",
             "type": "AnkiNoteBuilderTestResults",
+            "jsconfig": "test"
+        },
+        {
+            "path": "test/data/database-test-cases.json",
+            "typeFile": "types/test/database.d.ts",
+            "type": "DatabaseTestData",
             "jsconfig": "test"
         },
         {
@@ -161,6 +167,12 @@
         },
         {
             "path": "test/data/dictionaries/valid-dictionary1/term_bank_1.json",
+            "typeFile": "types/ext/dictionary-data.d.ts",
+            "type": "TermV3Array",
+            "schema": "ext/data/schemas/dictionary-term-bank-v3-schema.json"
+        },
+        {
+            "path": "test/data/dictionaries/valid-dictionary1/term_bank_2.json",
             "typeFile": "types/ext/dictionary-data.d.ts",
             "type": "TermV3Array",
             "schema": "ext/data/schemas/dictionary-term-bank-v3-schema.json"

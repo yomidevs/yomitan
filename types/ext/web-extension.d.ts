@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
- * Copyright (C) 2021-2022  Yomichan Authors
+ * Copyright (C) 2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {log} from '../core.js';
-import {DictionaryWorkerHandler} from './dictionary-worker-handler.js';
-
-/** Entry point. */
-function main() {
-    try {
-        const dictionaryWorkerHandler = new DictionaryWorkerHandler();
-        dictionaryWorkerHandler.prepare();
-    } catch (e) {
-        log.error(e);
-    }
-}
-
-main();
+export type Events = {
+    unloaded: Record<string, never>;
+};

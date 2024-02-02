@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection} from '../core.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {AudioSystem} from '../media/audio-system.js';
-import {yomitan} from '../yomitan.js';
 
 export class DisplayAudio {
     /**
@@ -89,7 +88,7 @@ export class DisplayAudio {
             ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)]
         ]);
         this._display.registerDirectMessageHandlers([
-            ['Display.clearAutoPlayTimer', this._onMessageClearAutoPlayTimer.bind(this)]
+            ['displayAudioClearAutoPlayTimer', this._onMessageClearAutoPlayTimer.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
@@ -162,7 +161,7 @@ export class DisplayAudio {
     // Private
 
     /**
-     * @param {import('display').OptionsUpdatedEvent} details
+     * @param {import('display').EventArgument<'optionsUpdated'>} details
      */
     _onOptionsUpdated({options}) {
         const {enabled, autoPlay, volume, sources} = options.audio;
@@ -201,7 +200,7 @@ export class DisplayAudio {
     }
 
     /**
-     * @param {import('display').ContentUpdateEntryEvent} details
+     * @param {import('display').EventArgument<'contentUpdateEntry'>} details
      */
     _onContentUpdateEntry({element}) {
         const eventListeners = this._eventListeners;
@@ -237,7 +236,7 @@ export class DisplayAudio {
     }
 
     /**
-     * @param {import('display').FrameVisibilityChangeEvent} details
+     * @param {import('display').EventArgument<'frameVisibilityChange'>} details
      */
     _onFrameVisibilityChange({value}) {
         if (!value) {
@@ -260,7 +259,7 @@ export class DisplayAudio {
         this.playAudio(this._display.selectedIndex, 0, source);
     }
 
-    /** */
+    /** @type {import('display').DirectApiHandler<'displayAudioClearAutoPlayTimer'>} */
     _onMessageClearAutoPlayTimer() {
         this.clearAutoPlayTimer();
     }
@@ -676,7 +675,7 @@ export class DisplayAudio {
      */
     async _getTermAudioInfoList(source, term, reading) {
         const sourceData = this._getSourceData(source);
-        const infoList = await yomitan.api.getTermAudioInfoList(sourceData, term, reading);
+        const infoList = await this._display.application.api.getTermAudioInfoList(sourceData, term, reading);
         return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
     }
 
@@ -779,7 +778,7 @@ export class DisplayAudio {
     }
 
     /**
-     * @param {import('popup-menu').MenuCloseEventDetails} details
+     * @param {import('popup-menu').EventArgument<'close'>} details
      */
     _onPopupMenuClose({menu}) {
         this._openMenus.delete(menu);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -109,7 +109,7 @@ export type ApiFunctionOrdered<TSurface extends ApiSurface, TName extends ApiNam
 ) => Promise<ApiReturn<TSurface[TName]>>;
 
 /** Type alias for a union of all params types. */
-export type ApiParamsAny<TSurface extends ApiSurface> = ApiParams<TSurface[keyof TSurface]>;
+export type ApiParamsAny<TSurface extends ApiSurface> = {[name in ApiNames<TSurface>]: ApiParams<TSurface[name]>}[ApiNames<TSurface>];
 
 /** Type alias for a union of all return types. */
-export type ApiReturnAny<TSurface extends ApiSurface> = ApiReturn<TSurface[keyof TSurface]>;
+export type ApiReturnAny<TSurface extends ApiSurface> = {[name in ApiNames<TSurface>]: ApiReturn<TSurface[name]>}[ApiNames<TSurface>];

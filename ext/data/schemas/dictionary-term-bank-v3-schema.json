@@ -115,6 +115,10 @@
                                 "style": {
                                     "$ref": "#/definitions/structuredContentStyle"
                                 },
+                                "title": {
+                                    "type": "string",
+                                    "description": "Hover text for the element."
+                                },
                                 "lang": {
                                     "type": "string",
                                     "description": "Defines the language of an element in the format defined by RFC 5646."
@@ -148,7 +152,7 @@
                                 },
                                 "height": {
                                     "type": "number",
-                                    "description": "Preferred width of the image.",
+                                    "description": "Preferred height of the image.",
                                     "minimum": 0
                                 },
                                 "title": {
@@ -199,6 +203,14 @@
                                     "type": "string",
                                     "description": "The vertical alignment of the image.",
                                     "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"]
+                                },
+                                "border": {
+                                    "type": "string",
+                                    "description": "Shorthand for border width, style, and color."
+                                },
+                                "borderRadius": {
+                                    "type": "string",
+                                    "description": "Roundness of the corners of the image's outer border edge."
                                 },
                                 "sizeUnits": {
                                     "type": "string",
@@ -263,6 +275,15 @@
                     "type": "string",
                     "default": "medium"
                 },
+                "color": {
+                    "type": "string"
+                },
+                "background": {
+                    "type": "string"
+                },
+                "backgroundColor": {
+                    "type": "string"
+                },
                 "textDecorationLine": {
                     "oneOf": [
                         {
@@ -280,6 +301,29 @@
                         }
                     ]
                 },
+                "textDecorationStyle": {
+                    "type": "string",
+                    "enum": ["solid", "double", "dotted", "dashed", "wavy"],
+                    "default": "solid"
+                },
+                "textDecorationColor": {
+                    "type": "string"
+                },
+                "borderColor": {
+                    "type": "string"
+                },
+                "borderStyle": {
+                    "type": "string"
+                },
+                "borderRadius": {
+                    "type": "string"
+                },
+                "borderWidth": {
+                    "type": "string"
+                },
+                "clipPath": {
+                    "type": "string"
+                },
                 "verticalAlign": {
                     "type": "string",
                     "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"],
@@ -290,21 +334,58 @@
                     "enum": ["start", "end", "left", "right", "center", "justify", "justify-all", "match-parent"],
                     "default": "start"
                 },
+                "textEmphasis": {
+                    "type": "string"
+                },
+                "textShadow": {
+                    "type": "string"
+                },
+                "margin": {
+                    "type": "string"
+                },
                 "marginTop": {
-                    "type": "number",
+                    "type": ["number", "string"],
                     "default": 0
                 },
                 "marginLeft": {
-                    "type": "number",
+                    "type": ["number", "string"],
                     "default": 0
                 },
                 "marginRight": {
-                    "type": "number",
+                    "type": ["number", "string"],
                     "default": 0
                 },
                 "marginBottom": {
-                    "type": "number",
+                    "type": ["number", "string"],
                     "default": 0
+                },
+                "padding": {
+                    "type": "string"
+                },
+                "paddingTop": {
+                    "type": "string"
+                },
+                "paddingLeft": {
+                    "type": "string"
+                },
+                "paddingRight": {
+                    "type": "string"
+                },
+                "paddingBottom": {
+                    "type": "string"
+                },
+                "wordBreak": {
+                    "type": "string",
+                    "enum": ["normal", "break-all", "keep-all"],
+                    "default": "normal"
+                },
+                "whiteSpace": {
+                    "type": "string",
+                    "default": "normal"
+                },
+                "cursor": {
+                    "type": "string",
+                    "default": "auto"
                 },
                 "listStyleType": {
                     "type": "string",
@@ -336,7 +417,7 @@
             },
             {
                 "type": "string",
-                "description": "String of space-separated rule identifiers for the definition which is used to validate delinflection. Valid rule identifiers are: v1: ichidan verb; v5: godan verb; vs: suru verb; vk: kuru verb; adj-i: i-adjective. An empty string corresponds to words which aren't inflected, such as nouns."
+                "description": "String of space-separated rule identifiers for the definition which is used to validate deinflection. An empty string should be used for words which aren't inflected."
             },
             {
                 "type": "number",
@@ -421,7 +502,7 @@
                                         },
                                         "height": {
                                             "type": "integer",
-                                            "description": "Preferred width of the image.",
+                                            "description": "Preferred height of the image.",
                                             "minimum": 1
                                         },
                                         "title": {
@@ -468,6 +549,26 @@
                                             "description": "Whether or not the image can be collapsed.",
                                             "default": true
                                         }
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "type": "array",
+                            "description": "Deinflection of the term to an uninflected term.",
+                            "minItems": 2,
+                            "maxItems": 2,
+                            "items": [
+                                {
+                                    "type": "string",
+                                    "description": "The uninflected term."
+                                },
+                                {
+                                    "type": "array",
+                                    "description": "A chain of inflection rules that produced the inflected term",
+                                    "items": {
+                                        "type": "string",
+                                        "description": "A single inflection rule."
                                     }
                                 }
                             ]

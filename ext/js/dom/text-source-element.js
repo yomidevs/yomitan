@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {StringUtil} from '../data/sandbox/string-util.js';
+import {readCodePointsBackward, readCodePointsForward} from '../data/sandbox/string-util.js';
 import {DocumentUtil} from './document-util.js';
 
 /**
@@ -118,7 +118,7 @@ export class TextSourceElement {
         const offset = fromEnd ? this._endOffset : this._startOffset;
         length = Math.min(this._fullContent.length - offset, length);
         if (length > 0) {
-            length = StringUtil.readCodePointsForward(this._fullContent, offset, length).length;
+            length = readCodePointsForward(this._fullContent, offset, length).length;
         }
         this._endOffset = offset + length;
         this._content = this._fullContent.substring(this._startOffset, this._endOffset);
@@ -133,7 +133,7 @@ export class TextSourceElement {
     setStartOffset(length) {
         length = Math.min(this._startOffset, length);
         if (length > 0) {
-            length = StringUtil.readCodePointsBackward(this._fullContent, this._startOffset - 1, length).length;
+            length = readCodePointsBackward(this._fullContent, this._startOffset - 1, length).length;
         }
         this._startOffset -= length;
         this._content = this._fullContent.substring(this._startOffset, this._endOffset);

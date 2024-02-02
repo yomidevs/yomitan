@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {clone} from '../core.js';
+import {clone} from '../core/utilities.js';
 import {CacheMap} from '../general/cache-map.js';
 
 export class JsonSchemaError extends Error {
@@ -1343,12 +1343,18 @@ class JsonSchemaProxyHandler {
      * @returns {?number}
      */
     _getArrayIndex(property) {
-        if (typeof property === 'string' && this._numberPattern.test(property)) {
-            return Number.parseInt(property, 10);
-        } else if (typeof property === 'number' && Math.floor(property) === property && property >= 0) {
-            return property;
-        } else {
-            return null;
+        switch (typeof property) {
+            case 'string':
+                if (this._numberPattern.test(property)) {
+                    return Number.parseInt(property, 10);
+                }
+                break;
+            case 'number':
+                if (Math.floor(property) === property && property >= 0) {
+                    return property;
+                }
+                break;
         }
+        return null;
     }
 }

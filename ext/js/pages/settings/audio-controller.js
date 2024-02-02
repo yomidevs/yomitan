@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, EventListenerCollection} from '../../core.js';
+import {EventDispatcher} from '../../core/event-dispatcher.js';
+import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {AudioSystem} from '../../media/audio-system.js';
 
 /**
- * @augments EventDispatcher<import('audio-controller').EventType>
+ * @augments EventDispatcher<import('audio-controller').Events>
  */
 export class AudioController extends EventDispatcher {
     /**
@@ -117,7 +118,7 @@ export class AudioController extends EventDispatcher {
     // Private
 
     /**
-     * @param {import('settings-controller').OptionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
         for (const entry of this._audioSourceEntries) {
@@ -163,7 +164,7 @@ export class AudioController extends EventDispatcher {
         );
         voices.sort(this._textToSpeechVoiceCompare.bind(this));
         this._voices = voices;
-        this.trigger('voicesUpdated');
+        this.trigger('voicesUpdated', {});
     }
 
     /**

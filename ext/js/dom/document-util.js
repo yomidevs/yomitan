@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,8 +28,6 @@ export class DocumentUtil {
     static _transparentColorPattern = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
     /** @type {?boolean} */
     static _cssZoomSupported = null;
-    /** @type {import('document-util').GetRangeFromPointHandler[]} @readonly */
-    static _getRangeFromPointHandlers = [];
 
     /**
      * Scans the document for text or elements with text information at the given coordinate.
@@ -37,14 +35,9 @@ export class DocumentUtil {
      * @param {number} x The x coordinate to search at.
      * @param {number} y The y coordinate to search at.
      * @param {import('document-util').GetRangeFromPointOptions} options Options to configure how element detection is performed.
-     * @returns {?TextSourceRange|TextSourceElement} A range for the hovered text or element, or `null` if no applicable content was found.
+     * @returns {?import('text-source').TextSource} A range for the hovered text or element, or `null` if no applicable content was found.
      */
     static getRangeFromPoint(x, y, options) {
-        for (const handler of this._getRangeFromPointHandlers) {
-            const r = handler(x, y, options);
-            if (r !== null) { return r; }
-        }
-
         const {deepContentScan, normalizeCssZoom} = options;
 
         const elements = this._getElementsFromPoint(x, y, deepContentScan);
@@ -91,14 +84,6 @@ export class DocumentUtil {
             }
             return null;
         }
-    }
-
-    /**
-     * Registers a custom handler for scanning for text or elements at the input position.
-     * @param {import('document-util').GetRangeFromPointHandler} handler The handler callback which will be invoked when calling `getRangeFromPoint`.
-     */
-    static registerGetRangeFromPointHandler(handler) {
-        this._getRangeFromPointHandlers.push(handler);
     }
 
     /**
@@ -386,7 +371,7 @@ export class DocumentUtil {
     /**
      * Adds a fullscreen change event listener. This function handles all of the browser-specific variants.
      * @param {EventListener} onFullscreenChanged The event callback.
-     * @param {?import('../core.js').EventListenerCollection} eventListenerCollection An optional `EventListenerCollection` to add the registration to.
+     * @param {?import('../core/event-listener-collection.js').EventListenerCollection} eventListenerCollection An optional `EventListenerCollection` to add the registration to.
      */
     static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection = null) {
         const target = document;

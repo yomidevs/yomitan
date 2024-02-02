@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ export type Tag = {
     dictionary: string;
 };
 
-export type DatabaseTermMeta = DatabaseTermMetaFrequency | DatabaseTermMetaPitch;
+export type DatabaseTermMeta = DatabaseTermMetaFrequency | DatabaseTermMetaPitch | DatabaseTermMetaPhoneticData;
 
 export type DatabaseTermMetaFrequency = {
     expression: string;
@@ -118,12 +118,19 @@ export type DatabaseTermMetaPitch = {
     dictionary: string;
 };
 
+export type DatabaseTermMetaPhoneticData = {
+    expression: string;
+    mode: 'ipa';
+    data: DictionaryData.TermMetaPhoneticData;
+    dictionary: string;
+};
+
 export type TermMetaFrequencyDataWithReading = {
     reading: string;
     frequency: DictionaryData.GenericFrequencyData;
 };
 
-export type TermMeta = TermMetaFrequency | TermMetaPitch;
+export type TermMeta = TermMetaFrequency | TermMetaPitch | TermMetaPhoneticData;
 
 export type TermMetaType = TermMeta['mode'];
 
@@ -136,10 +143,18 @@ export type TermMetaFrequency = {
 };
 
 export type TermMetaPitch = {
+    mode: 'pitch';
     index: number;
     term: string;
-    mode: 'pitch';
     data: DictionaryData.TermMetaPitchData;
+    dictionary: string;
+};
+
+export type TermMetaPhoneticData = {
+    mode: 'ipa';
+    index: number;
+    term: string;
+    data: DictionaryData.TermMetaPhoneticData;
     dictionary: string;
 };
 

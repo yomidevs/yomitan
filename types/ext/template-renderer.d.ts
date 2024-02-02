@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,8 +55,8 @@ export type DataType = {
 export type HelperOptionsFunction<TResult = unknown> = (context: unknown) => TResult;
 
 export type HelperOptions = {
-    fn: HelperOptionsFunction;
-    inverse: HelperOptionsFunction;
+    fn?: HelperOptionsFunction;
+    inverse?: HelperOptionsFunction;
     hash: Core.SafeAny;
     data?: Core.SafeAny;
 };

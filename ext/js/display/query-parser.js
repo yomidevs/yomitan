@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,24 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, log} from '../core.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {log} from '../core/logger.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {convertHiraganaToKatakana, convertKatakanaToHiragana, isStringEntirelyKana} from '../language/japanese.js';
 import {TextScanner} from '../language/text-scanner.js';
-import {yomitan} from '../yomitan.js';
 
 /**
- * @augments EventDispatcher<import('display').QueryParserEventType>
+ * @augments EventDispatcher<import('query-parser').Events>
  */
 export class QueryParser extends EventDispatcher {
     /**
      * @param {import('display').QueryParserConstructorDetails} details
      */
-    constructor({getSearchContext, japaneseUtil}) {
+    constructor({api, getSearchContext, textSourceGenerator}) {
         super();
+        /** @type {import('../comm/api.js').API} */
+        this._api = api;
         /** @type {import('display').GetSearchContextCallback} */
         this._getSearchContext = getSearchContext;
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
         /** @type {string} */
         this._text = '';
         /** @type {?import('core').TokenObject} */
@@ -58,12 +59,18 @@ export class QueryParser extends EventDispatcher {
         this._queryParserModeSelect = querySelectorNotNull(document, '#query-parser-mode-select');
         /** @type {TextScanner} */
         this._textScanner = new TextScanner({
+            api,
             node: this._queryParser,
             getSearchContext,
             searchTerms: true,
             searchKanji: false,
-            searchOnClick: true
+            searchOnClick: true,
+            textSourceGenerator
         });
+        /** @type {?(import('../language/japanese-wanakana.js'))} */
+        this._japaneseWanakanaModule = null;
+        /** @type {?Promise<import('../language/japanese-wanakana.js')>} */
+        this._japaneseWanakanaModuleImport = null;
     }
 
     /** @type {string} */
@@ -92,7 +99,7 @@ export class QueryParser extends EventDispatcher {
             this._queryParser.dataset.termSpacing = `${termSpacing}`;
         }
         if (typeof readingMode === 'string') {
-            this._readingMode = readingMode;
+            this._setReadingMode(readingMode);
         }
         if (typeof useInternalParser === 'boolean') {
             this._useInternalParser = useInternalParser;
@@ -123,7 +130,7 @@ export class QueryParser extends EventDispatcher {
         /** @type {?import('core').TokenObject} */
         const token = {};
         this._setTextToken = token;
-        this._parseResults = await yomitan.api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
+        this._parseResults = await this._api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
         if (this._setTextToken !== token) { return; }
 
         this._refreshSelectedParser();
@@ -160,8 +167,7 @@ export class QueryParser extends EventDispatcher {
         } = e;
         if (type === null || dictionaryEntries === null || sentence === null || optionsContext === null) { return; }
 
-        /** @type {import('display').QueryParserSearchedEvent} */
-        const event2 = {
+        this.trigger('searched', {
             textScanner,
             type,
             dictionaryEntries,
@@ -170,8 +176,7 @@ export class QueryParser extends EventDispatcher {
             textSource,
             optionsContext,
             sentenceOffset: this._getSentenceOffset(e.textSource)
-        };
-        this.trigger('searched', event2);
+        });
     }
 
     /**
@@ -211,7 +216,7 @@ export class QueryParser extends EventDispatcher {
             scope: 'profile',
             optionsContext
         };
-        yomitan.api.modifySettings([modification], 'search');
+        this._api.modifySettings([modification], 'search');
     }
 
     /**
@@ -347,15 +352,15 @@ export class QueryParser extends EventDispatcher {
     _convertReading(term, reading) {
         switch (this._readingMode) {
             case 'hiragana':
-                return this._japaneseUtil.convertKatakanaToHiragana(reading);
+                return convertKatakanaToHiragana(reading);
             case 'katakana':
-                return this._japaneseUtil.convertHiraganaToKatakana(reading);
+                return convertHiraganaToKatakana(reading);
             case 'romaji':
-                if (this._japaneseUtil.convertToRomajiSupported()) {
+                if (this._japaneseWanakanaModule !== null) {
                     if (reading.length > 0) {
-                        return this._japaneseUtil.convertToRomaji(reading);
-                    } else if (this._japaneseUtil.isStringEntirelyKana(term)) {
-                        return this._japaneseUtil.convertToRomaji(term);
+                        return this._japaneseWanakanaModule.convertToRomaji(reading);
+                    } else if (isStringEntirelyKana(term)) {
+                        return this._japaneseWanakanaModule.convertToRomaji(term);
                     }
                 }
                 return reading;
@@ -398,5 +403,22 @@ export class QueryParser extends EventDispatcher {
             if (node.nodeType === ELEMENT_NODE) { return /** @type {Element} */ (node); }
             node = node.parentNode;
         }
+    }
+
+    /**
+     * @param {import('settings').ParsingReadingMode} value
+     */
+    _setReadingMode(value) {
+        this._readingMode = value;
+        if (value === 'romaji') {
+            this._loadJapaneseWanakanaModule();
+        }
+    }
+
+    /** */
+    _loadJapaneseWanakanaModule() {
+        if (this._japaneseWanakanaModuleImport !== null) { return; }
+        this._japaneseWanakanaModuleImport = import('../language/japanese-wanakana.js');
+        this._japaneseWanakanaModuleImport.then((value) => { this._japaneseWanakanaModule = value; });
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection} from '../../core.js';
+import {EventListenerCollection} from '../../core/event-listener-collection.js';
+import {toError} from '../../core/to-error.js';
+import {getAllPermissions, setPermissionsGranted} from '../../data/permissions-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class PermissionsOriginController {
@@ -60,7 +62,7 @@ export class PermissionsOriginController {
     // Private
 
     /**
-     * @param {import('settings-controller').PermissionsChangedEvent} details
+     * @param {import('settings-controller').EventArgument<'permissionsChanged'>} details
      */
     _onPermissionsChanged({permissions}) {
         this._eventListeners.removeAllEventListeners();
@@ -139,7 +141,7 @@ export class PermissionsOriginController {
 
     /** */
     async _updatePermissions() {
-        const permissions = await this._settingsController.permissionsUtil.getAllPermissions();
+        const permissions = await getAllPermissions();
         this._onPermissionsChanged({permissions});
     }
 
@@ -151,11 +153,11 @@ export class PermissionsOriginController {
     async _setOriginPermissionEnabled(origin, enabled) {
         let added = false;
         try {
-            added = await this._settingsController.permissionsUtil.setPermissionsGranted({origins: [origin]}, enabled);
+            added = await setPermissionsGranted({origins: [origin]}, enabled);
         } catch (e) {
             const errorContainer = /** @type {HTMLElement} */ (this._errorContainer);
             errorContainer.hidden = false;
-            errorContainer.textContent = e instanceof Error ? e.message : `${e}`;
+            errorContainer.textContent = toError(e).message;
         }
         if (!added) { return false; }
         await this._updatePermissions();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {isObject} from '../core/utilities.js';
+import {base64ToArrayBuffer} from '../data/sandbox/array-buffer-util.js';
 
 export class OffscreenProxy {
-    constructor() {
+    /**
+     * @param {import('../extension/web-extension.js').WebExtension} webExtension
+     */
+    constructor(webExtension) {
+        /** @type {import('../extension/web-extension.js').WebExtension} */
+        this._webExtension = webExtension;
         /** @type {?Promise<void>} */
         this._creatingOffscreen = null;
     }
@@ -72,20 +77,13 @@ export class OffscreenProxy {
     }
 
     /**
-     * @template {import('offscreen').MessageType} TMessageType
-     * @param {import('offscreen').Message<TMessageType>} message
-     * @returns {Promise<import('offscreen').OffscreenApiReturn<TMessageType>>}
+     * @template {import('offscreen').ApiNames} TMessageType
+     * @param {import('offscreen').ApiMessage<TMessageType>} message
+     * @returns {Promise<import('offscreen').ApiReturn<TMessageType>>}
      */
-    sendMessagePromise(message) {
-        return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage(message, (response) => {
-                try {
-                    resolve(this._getMessageResponseResult(response));
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        });
+    async sendMessagePromise(message) {
+        const response = await this._webExtension.sendMessagePromise(message);
+        return this._getMessageResponseResult(/** @type {import('core').Response<import('offscreen').ApiReturn<TMessageType>>} */ (response));
     }
 
     /**
@@ -146,7 +144,7 @@ export class DictionaryDatabaseProxy {
      */
     async getMedia(targets) {
         const serializedMedia = /** @type {import('dictionary-database').Media<string>[]} */ (await this._offscreen.sendMessagePromise({action: 'databaseGetMediaOffscreen', params: {targets}}));
-        const media = serializedMedia.map((m) => ({...m, content: ArrayBufferUtil.base64ToArrayBuffer(m.content)}));
+        const media = serializedMedia.map((m) => ({...m, content: base64ToArrayBuffer(m.content)}));
         return media;
     }
 }
@@ -161,10 +159,10 @@ export class TranslatorProxy {
     }
 
     /**
-     * @param {import('deinflector').ReasonsRaw} deinflectionReasons
+     * @param {import('language-transformer').LanguageTransformDescriptor} descriptor
      */
-    async prepare(deinflectionReasons) {
-        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {deinflectionReasons}});
+    async prepare(descriptor) {
+        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {descriptor}});
     }
 
     /**

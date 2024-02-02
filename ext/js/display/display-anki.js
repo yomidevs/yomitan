@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,21 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection, deferPromise} from '../core.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {toError} from '../core/to-error.js';
+import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
-import {AnkiUtil} from '../data/anki-util.js';
+import {isNoteDataValid} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
-import {yomitan} from '../yomitan.js';
 
 export class DisplayAnki {
     /**
      * @param {import('./display.js').Display} display
      * @param {import('./display-audio.js').DisplayAudio} displayAudio
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      */
-    constructor(display, displayAudio, japaneseUtil) {
+    constructor(display, displayAudio) {
         /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {import('./display-audio.js').DisplayAudio} */
@@ -40,7 +40,7 @@ export class DisplayAnki {
         /** @type {?string} */
         this._ankiFieldTemplatesDefault = null;
         /** @type {AnkiNoteBuilder} */
-        this._ankiNoteBuilder = new AnkiNoteBuilder(japaneseUtil, new TemplateRendererProxy());
+        this._ankiNoteBuilder = new AnkiNoteBuilder(display.application.api, new TemplateRendererProxy());
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._errorNotification = null;
         /** @type {?EventListenerCollection} */
@@ -159,7 +159,7 @@ export class DisplayAnki {
             try {
                 ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, mode, []));
             } catch (e) {
-                errors = [e instanceof Error ? e : new Error(`${e}`)];
+                errors = [toError(e)];
             }
             /** @type {import('display-anki').AnkiNoteLogData} */
             const entry = {mode, note};
@@ -174,7 +174,7 @@ export class DisplayAnki {
 
         return {
             ankiNoteData,
-            ankiNoteDataException: ankiNoteDataException instanceof Error ? ankiNoteDataException : new Error(`${ankiNoteDataException}`),
+            ankiNoteDataException: toError(ankiNoteDataException),
             ankiNotes
         };
     }
@@ -182,7 +182,7 @@ export class DisplayAnki {
     // Private
 
     /**
-     * @param {import('display').OptionsUpdatedEvent} details
+     * @param {import('display').EventArgument<'optionsUpdated'>} details
      */
     _onOptionsUpdated({options}) {
         const {
@@ -238,7 +238,7 @@ export class DisplayAnki {
     }
 
     /**
-     * @param {import('display').ContentUpdateEntryEvent} details
+     * @param {import('display').EventArgument<'contentUpdateEntry'>} details
      */
     _onContentUpdateEntry({element}) {
         const eventListeners = this._eventListeners;
@@ -261,7 +261,7 @@ export class DisplayAnki {
     }
 
     /**
-     * @param {import('display').LogDictionaryEntryDataEvent} details
+     * @param {import('display').EventArgument<'logDictionaryEntryData'>} details
      */
     _onLogDictionaryEntryData({dictionaryEntry, promises}) {
         promises.push(this.getLogData(dictionaryEntry));
@@ -486,11 +486,11 @@ export class DisplayAnki {
             let noteId = null;
             let addNoteOkay = false;
             try {
-                noteId = await yomitan.api.addAnkiNote(note);
+                noteId = await this._display.application.api.addAnkiNote(note);
                 addNoteOkay = true;
             } catch (e) {
                 allErrors.length = 0;
-                allErrors.push(e instanceof Error ? e : new Error(`${e}`));
+                allErrors.push(toError(e));
             }
 
             if (addNoteOkay) {
@@ -499,9 +499,9 @@ export class DisplayAnki {
                 } else {
                     if (this._suspendNewCards) {
                         try {
-                            await yomitan.api.suspendAnkiCardsForNote(noteId);
+                            await this._display.application.api.suspendAnkiCardsForNote(noteId);
                         } catch (e) {
-                            allErrors.push(e instanceof Error ? e : new Error(`${e}`));
+                            allErrors.push(toError(e));
                         }
                     }
                     button.disabled = true;
@@ -509,7 +509,7 @@ export class DisplayAnki {
                 }
             }
         } catch (e) {
-            allErrors.push(e instanceof Error ? e : new Error(`${e}`));
+            allErrors.push(toError(e));
         } finally {
             progressIndicatorVisible.clearOverride(overrideToken);
         }
@@ -604,7 +604,7 @@ export class DisplayAnki {
         templates = this._ankiFieldTemplatesDefault;
         if (typeof templates === 'string') { return templates; }
 
-        templates = await yomitan.api.getDefaultAnkiFieldTemplates();
+        templates = await this._display.application.api.getDefaultAnkiFieldTemplates();
         this._ankiFieldTemplatesDefault = templates;
         return templates;
     }
@@ -638,16 +638,16 @@ export class DisplayAnki {
         let ankiError = null;
         try {
             if (forceCanAddValue !== null) {
-                if (!await yomitan.api.isAnkiConnected()) {
+                if (!await this._display.application.api.isAnkiConnected()) {
                     throw new Error('Anki not connected');
                 }
                 infos = this._getAnkiNoteInfoForceValue(notes, forceCanAddValue);
             } else {
-                infos = await yomitan.api.getAnkiNoteInfo(notes, fetchAdditionalInfo);
+                infos = await this._display.application.api.getAnkiNoteInfo(notes, fetchAdditionalInfo);
             }
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValue(notes, false);
-            ankiError = e instanceof Error ? e : new Error(`${e}`);
+            ankiError = toError(e);
         }
 
         /** @type {import('display-anki').DictionaryEntryDetails[]} */
@@ -675,7 +675,7 @@ export class DisplayAnki {
     _getAnkiNoteInfoForceValue(notes, canAdd) {
         const results = [];
         for (const note of notes) {
-            const valid = AnkiUtil.isNoteDataValid(note);
+            const valid = isNoteDataValid(note);
             results.push({canAdd, valid, noteIds: null});
         }
         return results;
@@ -852,14 +852,14 @@ export class DisplayAnki {
         const noteIds = this._getNodeNoteIds(node);
         if (noteIds.length === 0) { return; }
         try {
-            await yomitan.api.noteView(noteIds[0], this._noteGuiMode, false);
+            await this._display.application.api.noteView(noteIds[0], this._noteGuiMode, false);
         } catch (e) {
             const displayErrors = (
-                e instanceof Error && e.message === 'Mode not supported' ?
+                toError(e).message === 'Mode not supported' ?
                 [this._display.displayGenerator.instantiateTemplateFragment('footer-notification-anki-view-note-error')] :
                 void 0
             );
-            this._showErrorNotification([e instanceof Error ? e : new Error(`${e}`)], displayErrors);
+            this._showErrorNotification([toError(e)], displayErrors);
             return;
         }
     }

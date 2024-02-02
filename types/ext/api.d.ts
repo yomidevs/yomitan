@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ import type * as Settings from './settings';
 import type * as SettingsModifications from './settings-modifications';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
+import type {ApiMessageNoFrameIdAny as ApplicationApiMessageNoFrameIdAny} from './application';
 import type {
     ApiMap as BaseApiMap,
     ApiMapInit as BaseApiMapInit,
@@ -111,6 +112,10 @@ export type GetTermFrequenciesDetailsTermReadingListItem = {
 };
 
 type ApiSurface = {
+    applicationReady: {
+        params: void;
+        return: void;
+    };
     optionsGet: {
         params: {
             optionsContext: Settings.OptionsContext;
@@ -220,15 +225,13 @@ type ApiSurface = {
     sendMessageToFrame: {
         params: {
             frameId: number;
-            action: string;
-            params?: Core.SerializableObject;
+            message: ApplicationApiMessageNoFrameIdAny;
         };
         return: boolean;
     };
     broadcastTab: {
         params: {
-            action: string;
-            params?: Core.SerializableObject;
+            message: ApplicationApiMessageNoFrameIdAny;
         };
         return: boolean;
     };
@@ -363,12 +366,6 @@ type ApiSurface = {
         };
         return: Anki.NoteId[];
     };
-    loadExtensionScripts: {
-        params: {
-            files: string[];
-        };
-        return: void;
-    };
     openCrossFramePort: {
         params: {
             targetTabId: number;
@@ -405,9 +402,9 @@ export type ApiReturn<TName extends ApiNames> = BaseApiReturn<ApiSurface[TName]>
 
 export type ApiParamsAny = BaseApiParamsAny<ApiSurface>;
 
-export type MessageAny = Message<ApiNames>;
+export type ApiMessageAny = {[name in ApiNames]: ApiMessage<name>}[ApiNames];
 
-type Message<TName extends ApiNames> = {
+type ApiMessage<TName extends ApiNames> = {
     action: TName;
     params: ApiParams<TName>;
 };

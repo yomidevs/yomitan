@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher, EventListenerCollection} from '../../core.js';
+import {EventDispatcher} from '../../core/event-dispatcher.js';
+import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {DocumentUtil} from '../../dom/document-util.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 
 /**
- * @augments EventDispatcher<import('keyboard-mouse-input-field').EventType>
+ * @augments EventDispatcher<import('keyboard-mouse-input-field').Events>
  */
 export class KeyboardMouseInputField extends EventDispatcher {
     /**
@@ -308,9 +309,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
 
         this._updateDisplayString();
         if (changed) {
-            /** @type {import('keyboard-mouse-input-field').ChangeEvent} */
-            const event = {modifiers: this._modifiers, key: this._key};
-            this.trigger('change', event);
+            this.trigger('change', {modifiers: this._modifiers, key: this._key});
         }
     }
 

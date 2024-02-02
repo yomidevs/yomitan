@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-import {yomitan} from '../yomitan.js';
 
 /** @type {Map<string, ?HTMLStyleElement|HTMLLinkElement>} */
 const injectedStylesheets = new Map();
@@ -54,6 +52,7 @@ function setInjectedStylesheet(id, parentNode, value) {
 }
 
 /**
+ * @param {import('../application.js').Application} application
  * @param {string} id
  * @param {'code'|'file'|'file-content'} type
  * @param {string} value
@@ -62,8 +61,8 @@ function setInjectedStylesheet(id, parentNode, value) {
  * @returns {Promise<?HTMLStyleElement|HTMLLinkElement>}
  * @throws {Error}
  */
-export async function loadStyle(id, type, value, useWebExtensionApi = false, parentNode = null) {
-    if (useWebExtensionApi && yomitan.isExtensionUrl(window.location.href)) {
+export async function loadStyle(application, id, type, value, useWebExtensionApi = false, parentNode = null) {
+    if (useWebExtensionApi && application.isExtensionUrl(window.location.href)) {
         // Permissions error will occur if trying to use the WebExtension API to inject into an extension page
         useWebExtensionApi = false;
     }
@@ -79,7 +78,7 @@ export async function loadStyle(id, type, value, useWebExtensionApi = false, par
     }
 
     if (type === 'file-content') {
-        value = await yomitan.api.getStylesheetContent(value);
+        value = await application.api.getStylesheetContent(value);
         type = 'code';
         useWebExtensionApi = false;
     }
@@ -91,7 +90,7 @@ export async function loadStyle(id, type, value, useWebExtensionApi = false, par
         }
 
         setInjectedStylesheet(id, parentNode, null);
-        await yomitan.api.injectStylesheet(type, value);
+        await application.api.injectStylesheet(type, value);
         return null;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-multi-spaces */
-
-import {expect, test} from 'vitest';
-import {ProfileConditionsUtil} from '../ext/js/background/profile-conditions-util.js';
+import {describe, expect, test} from 'vitest';
+import {createSchema, normalizeContext} from '../ext/js/background/profile-conditions-util.js';
 
 /** */
 function testNormalizeContext() {
-    test('NormalizeContext', () => {
+    describe('NormalizeContext', () => {
         /** @type {{context: import('settings').OptionsContext, expected: import('profile-conditions-util').NormalizedOptionsContext}[]} */
         const data = [
             // Empty
@@ -51,17 +49,17 @@ function testNormalizeContext() {
             }
         ];
 
-        for (const {context, expected} of data) {
-            const profileConditionsUtil = new ProfileConditionsUtil();
-            const actual = profileConditionsUtil.normalizeContext(context);
+        test.each(data)('normalize-context-test-%#', ({context, expected}) => {
+            const actual = normalizeContext(context);
             expect(actual).toStrictEqual(expected);
-        }
+        });
     });
 }
 
 /** */
 function testSchemas() {
-    test('Schemas', () => {
+    describe('Schemas', () => {
+        /* eslint-disable no-multi-spaces */
         /** @type {{conditionGroups: import('settings').ProfileConditionGroup[], expectedSchema?: import('ext/json-schema').Schema, inputs?: {expected: boolean, context: import('settings').OptionsContext}[]}[]} */
         const data = [
             // Empty
@@ -1099,21 +1097,21 @@ function testSchemas() {
                 ]
             }
         ];
+        /* eslint-enable no-multi-spaces */
 
-        for (const {conditionGroups, expectedSchema, inputs} of data) {
-            const profileConditionsUtil = new ProfileConditionsUtil();
-            const schema = profileConditionsUtil.createSchema(conditionGroups);
+        test.each(data)('schemas-test-%#', ({conditionGroups, expectedSchema, inputs}) => {
+            const schema = createSchema(conditionGroups);
             if (typeof expectedSchema !== 'undefined') {
                 expect(schema.schema).toStrictEqual(expectedSchema);
             }
             if (Array.isArray(inputs)) {
                 for (const {expected, context} of inputs) {
-                    const normalizedContext = profileConditionsUtil.normalizeContext(context);
+                    const normalizedContext = normalizeContext(context);
                     const actual = schema.isValid(normalizedContext);
                     expect(actual).toStrictEqual(expected);
                 }
             }
-        }
+        });
     });
 }
 

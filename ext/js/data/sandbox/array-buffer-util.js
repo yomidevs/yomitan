@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,61 +17,56 @@
  */
 
 /**
- * Class containing generic ArrayBuffer utility functions.
+ * Decodes the contents of an ArrayBuffer using UTF8.
+ * @param {ArrayBuffer} arrayBuffer The input ArrayBuffer.
+ * @returns {string} A UTF8-decoded string.
  */
-export class ArrayBufferUtil {
-    /**
-     * Decodes the contents of an ArrayBuffer using UTF8.
-     * @param {ArrayBuffer} arrayBuffer The input ArrayBuffer.
-     * @returns {string} A UTF8-decoded string.
-     */
-    static arrayBufferUtf8Decode(arrayBuffer) {
-        try {
-            return new TextDecoder('utf-8').decode(arrayBuffer);
-        } catch (e) {
-            return decodeURIComponent(escape(this.arrayBufferToBinaryString(arrayBuffer)));
-        }
+export function arrayBufferUtf8Decode(arrayBuffer) {
+    try {
+        return new TextDecoder('utf-8').decode(arrayBuffer);
+    } catch (e) {
+        return decodeURIComponent(escape(arrayBufferToBinaryString(arrayBuffer)));
     }
+}
 
-    /**
-     * Converts the contents of an ArrayBuffer to a base64 string.
-     * @param {ArrayBuffer} arrayBuffer The input ArrayBuffer.
-     * @returns {string} A base64 string representing the binary content.
-     */
-    static arrayBufferToBase64(arrayBuffer) {
-        return btoa(this.arrayBufferToBinaryString(arrayBuffer));
-    }
+/**
+ * Converts the contents of an ArrayBuffer to a base64 string.
+ * @param {ArrayBuffer} arrayBuffer The input ArrayBuffer.
+ * @returns {string} A base64 string representing the binary content.
+ */
+export function arrayBufferToBase64(arrayBuffer) {
+    return btoa(arrayBufferToBinaryString(arrayBuffer));
+}
 
-    /**
-     * Converts the contents of an ArrayBuffer to a binary string.
-     * @param {ArrayBuffer} arrayBuffer The input ArrayBuffer.
-     * @returns {string} A string representing the binary content.
-     */
-    static arrayBufferToBinaryString(arrayBuffer) {
-        const bytes = new Uint8Array(arrayBuffer);
-        try {
-            return String.fromCharCode(...bytes);
-        } catch (e) {
-            let binary = '';
-            for (let i = 0, ii = bytes.byteLength; i < ii; ++i) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            return binary;
+/**
+ * Converts the contents of an ArrayBuffer to a binary string.
+ * @param {ArrayBuffer} arrayBuffer The input ArrayBuffer.
+ * @returns {string} A string representing the binary content.
+ */
+export function arrayBufferToBinaryString(arrayBuffer) {
+    const bytes = new Uint8Array(arrayBuffer);
+    try {
+        return String.fromCharCode(...bytes);
+    } catch (e) {
+        let binary = '';
+        for (let i = 0, ii = bytes.byteLength; i < ii; ++i) {
+            binary += String.fromCharCode(bytes[i]);
         }
+        return binary;
     }
+}
 
-    /**
-     * Converts a base64 string to an ArrayBuffer.
-     * @param {string} content The binary content string encoded in base64.
-     * @returns {ArrayBuffer} A new `ArrayBuffer` object corresponding to the specified content.
-     */
-    static base64ToArrayBuffer(content) {
-        const binaryContent = atob(content);
-        const length = binaryContent.length;
-        const array = new Uint8Array(length);
-        for (let i = 0; i < length; ++i) {
-            array[i] = binaryContent.charCodeAt(i);
-        }
-        return array.buffer;
+/**
+ * Converts a base64 string to an ArrayBuffer.
+ * @param {string} content The binary content string encoded in base64.
+ * @returns {ArrayBuffer} A new `ArrayBuffer` object corresponding to the specified content.
+ */
+export function base64ToArrayBuffer(content) {
+    const binaryContent = atob(content);
+    const length = binaryContent.length;
+    const array = new Uint8Array(length);
+    for (let i = 0; i < length; ++i) {
+        array[i] = binaryContent.charCodeAt(i);
     }
+    return array.buffer;
 }
