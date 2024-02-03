@@ -15,7 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type Manifest = chrome.runtime.Manifest;
+/**
+ * These overrides provide compatibility between the default chrome types and the minor
+ * differences that other browsers such as Firefox use.
+ */
+export type ManifestOverrides = {
+    author?: chrome.runtime.Manifest['author'] | string;
+};
+
+export type Manifest = Omit<chrome.runtime.Manifest, keyof ManifestOverrides> & ManifestOverrides;
 
 export type ManifestConfig = {
     manifest: Manifest;

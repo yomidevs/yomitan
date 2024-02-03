@@ -16,67 +16,139 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+const placeholder = '${title}';
 
 /**
- * TODO : This function is not very type safe at the moment, could be improved.
- * @template {import('translation').FindTermsOptions|import('translation').FindKanjiOptions} T
- * @param {string} dictionaryName
+ * @template {import('test/translator').OptionsType} T
+ * @param {T} type
  * @param {import('test/translator').OptionsPresetObject} optionsPresets
  * @param {import('test/translator').OptionsList} optionsArray
- * @returns {T}
+ * @returns {import('test/translator').OptionsPresetGeneric<T>}
  * @throws {Error}
  */
-export function createFindOptions(dictionaryName, optionsPresets, optionsArray) {
-    /** @type {import('core').UnknownObject} */
-    const options = {};
+function getCompositePreset(type, optionsPresets, optionsArray) {
+    const preset = /** @type {import('test/translator').OptionsPresetGeneric<T>} */ ({type});
     if (!Array.isArray(optionsArray)) { optionsArray = [optionsArray]; }
     for (const entry of optionsArray) {
         switch (typeof entry) {
             case 'string':
-                if (!Object.prototype.hasOwnProperty.call(optionsPresets, entry)) {
-                    throw new Error('Invalid options preset');
+                {
+                    if (!Object.prototype.hasOwnProperty.call(optionsPresets, entry)) {
+                        throw new Error('Options preset not found');
+                    }
+                    const preset2 = optionsPresets[entry];
+                    if (preset2.type !== type) {
+                        throw new Error('Invalid options preset type');
+                    }
+                    Object.assign(preset, structuredClone(preset2));
                 }
-                Object.assign(options, structuredClone(optionsPresets[entry]));
                 break;
             case 'object':
-                Object.assign(options, structuredClone(entry));
+                if (entry.type !== type) {
+                    throw new Error('Invalid options preset type');
+                }
+                Object.assign(preset, structuredClone(entry));
                 break;
             default:
                 throw new Error('Invalid options type');
         }
     }
+    return preset;
+}
 
-    // Construct regex
-    if (Array.isArray(options.textReplacements)) {
-        options.textReplacements = options.textReplacements.map((value) => {
+
+/**
+ * @param {string} dictionaryName
+ * @param {import('test/translator').OptionsPresetObject} optionsPresets
+ * @param {import('test/translator').OptionsList} optionsArray
+ * @returns {import('translation').FindKanjiOptions}
+ */
+export function createFindKanjiOptions(dictionaryName, optionsPresets, optionsArray) {
+    const preset = getCompositePreset('kanji', optionsPresets, optionsArray);
+
+    /** @type {import('translation').KanjiEnabledDictionaryMap} */
+    const enabledDictionaryMap = new Map();
+    const presetEnabledDictionaryMap = preset.enabledDictionaryMap;
+    if (Array.isArray(presetEnabledDictionaryMap)) {
+        for (const [key, value] of presetEnabledDictionaryMap) {
+            enabledDictionaryMap.set(key === placeholder ? dictionaryName : key, value);
+        }
+    }
+
+    return {
+        enabledDictionaryMap,
+        removeNonJapaneseCharacters: !!preset.removeNonJapaneseCharacters
+    };
+}
+
+/**
+ * @param {string} dictionaryName
+ * @param {import('test/translator').OptionsPresetObject} optionsPresets
+ * @param {import('test/translator').OptionsList} optionsArray
+ * @returns {import('translation').FindTermsOptions}
+ */
+export function createFindTermsOptions(dictionaryName, optionsPresets, optionsArray) {
+    const preset = getCompositePreset('terms', optionsPresets, optionsArray);
+
+    /** @type {import('translation').TermEnabledDictionaryMap} */
+    const enabledDictionaryMap = new Map();
+    const presetEnabledDictionaryMap = preset.enabledDictionaryMap;
+    if (Array.isArray(presetEnabledDictionaryMap)) {
+        for (const [key, value] of presetEnabledDictionaryMap) {
+            enabledDictionaryMap.set(key === placeholder ? dictionaryName : key, value);
+        }
+    }
+
+    /** @type {import('translation').FindTermsTextReplacements} */
+    const textReplacements = [];
+    if (Array.isArray(preset.textReplacements)) {
+        for (const value of preset.textReplacements) {
             if (Array.isArray(value)) {
-                value = value.map(({pattern, flags, replacement}) => ({pattern: new RegExp(pattern, flags), replacement}));
-            }
-            return value;
-        });
-    }
-
-    // Update structure
-    const placeholder = '${title}';
-    if (options.mainDictionary === placeholder) {
-        options.mainDictionary = dictionaryName;
-    }
-    let {enabledDictionaryMap} = options;
-    if (Array.isArray(enabledDictionaryMap)) {
-        for (const entry of enabledDictionaryMap) {
-            if (entry[0] === placeholder) {
-                entry[0] = dictionaryName;
+                const array = [];
+                for (const {pattern, flags, replacement} of value) {
+                    array.push({pattern: new RegExp(pattern, flags), replacement});
+                }
+                textReplacements.push(array);
+            } else {
+                // Null
+                textReplacements.push(value);
             }
         }
-        enabledDictionaryMap = new Map(enabledDictionaryMap);
-        options.enabledDictionaryMap = enabledDictionaryMap;
     }
-    const {excludeDictionaryDefinitions} = options;
-    options.excludeDictionaryDefinitions = (
-        Array.isArray(excludeDictionaryDefinitions) ?
-        new Set(excludeDictionaryDefinitions) :
-        null
-    );
 
-    return /** @type {T} */ (options);
+    const {
+        matchType,
+        deinflect,
+        mainDictionary,
+        sortFrequencyDictionary,
+        sortFrequencyDictionaryOrder,
+        removeNonJapaneseCharacters,
+        convertHalfWidthCharacters,
+        convertNumericCharacters,
+        convertAlphabeticCharacters,
+        convertHiraganaToKatakana,
+        convertKatakanaToHiragana,
+        collapseEmphaticSequences,
+        excludeDictionaryDefinitions,
+        searchResolution
+    } = preset;
+
+    return {
+        matchType: typeof matchType !== 'undefined' ? matchType : 'exact',
+        deinflect: typeof deinflect !== 'undefined' ? deinflect : true,
+        mainDictionary: typeof mainDictionary !== 'undefined' && mainDictionary !== placeholder ? mainDictionary : dictionaryName,
+        sortFrequencyDictionary: typeof sortFrequencyDictionary !== 'undefined' ? sortFrequencyDictionary : null,
+        sortFrequencyDictionaryOrder: typeof sortFrequencyDictionaryOrder !== 'undefined' ? sortFrequencyDictionaryOrder : 'ascending',
+        removeNonJapaneseCharacters: typeof removeNonJapaneseCharacters !== 'undefined' ? removeNonJapaneseCharacters : false,
+        convertHalfWidthCharacters: typeof convertHalfWidthCharacters !== 'undefined' ? convertHalfWidthCharacters : 'false',
+        convertNumericCharacters: typeof convertNumericCharacters !== 'undefined' ? convertNumericCharacters : 'false',
+        convertAlphabeticCharacters: typeof convertAlphabeticCharacters !== 'undefined' ? convertAlphabeticCharacters : 'false',
+        convertHiraganaToKatakana: typeof convertHiraganaToKatakana !== 'undefined' ? convertHiraganaToKatakana : 'false',
+        convertKatakanaToHiragana: typeof convertKatakanaToHiragana !== 'undefined' ? convertKatakanaToHiragana : 'false',
+        collapseEmphaticSequences: typeof collapseEmphaticSequences !== 'undefined' ? collapseEmphaticSequences : 'false',
+        textReplacements,
+        enabledDictionaryMap,
+        excludeDictionaryDefinitions: Array.isArray(excludeDictionaryDefinitions) ? new Set(excludeDictionaryDefinitions) : null,
+        searchResolution: typeof searchResolution !== 'undefined' ? searchResolution : 'letter'
+    };
 }

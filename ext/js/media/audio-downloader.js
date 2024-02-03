@@ -20,17 +20,16 @@ import {RequestBuilder} from '../background/request-builder.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {readResponseJson} from '../core/json.js';
 import {JsonSchema} from '../data/json-schema.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
 import {SimpleDOMParser} from '../dom/simple-dom-parser.js';
+import {isStringEntirelyKana} from '../language/japanese.js';
 
 export class AudioDownloader {
     /**
-     * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil, requestBuilder: RequestBuilder}} details
+     * @param {{requestBuilder: RequestBuilder}} details
      */
-    constructor({japaneseUtil, requestBuilder}) {
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
+    constructor({requestBuilder}) {
         /** @type {RequestBuilder} */
         this._requestBuilder = requestBuilder;
         /** @type {?JsonSchema} */
@@ -111,7 +110,7 @@ export class AudioDownloader {
 
     /** @type {import('audio-downloader').GetInfoHandler} */
     async _getInfoJpod101(term, reading) {
-        if (reading === term && this._japaneseUtil.isStringEntirelyKana(term)) {
+        if (reading === term && isStringEntirelyKana(term)) {
             reading = term;
             term = '';
         }
@@ -359,7 +358,7 @@ export class AudioDownloader {
             throw new Error('Could not retrieve audio');
         }
 
-        const data = ArrayBufferUtil.arrayBufferToBase64(arrayBuffer);
+        const data = arrayBufferToBase64(arrayBuffer);
         const contentType = response.headers.get('Content-Type');
         return {data, contentType};
     }

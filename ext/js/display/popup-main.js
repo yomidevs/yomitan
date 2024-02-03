@@ -16,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {Application} from '../application.js';
 import {log} from '../core/logger.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
-import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
-import {yomitan} from '../yomitan.js';
 import {DisplayAnki} from './display-anki.js';
 import {DisplayAudio} from './display-audio.js';
 import {DisplayProfileSelection} from './display-profile-selection.js';
@@ -33,22 +32,21 @@ async function main() {
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 
-        await yomitan.prepare();
+        const application = new Application();
+        await application.prepare();
 
-        const {tabId, frameId} = await yomitan.api.frameInformationGet();
-
-        const japaneseUtil = new JapaneseUtil(null);
+        const {tabId, frameId} = await application.api.frameInformationGet();
 
         const hotkeyHandler = new HotkeyHandler();
-        hotkeyHandler.prepare();
+        hotkeyHandler.prepare(application.crossFrame);
 
-        const display = new Display(tabId, frameId, 'popup', japaneseUtil, documentFocusController, hotkeyHandler);
+        const display = new Display(application, tabId, frameId, 'popup', documentFocusController, hotkeyHandler);
         await display.prepare();
 
         const displayAudio = new DisplayAudio(display);
         displayAudio.prepare();
 
-        const displayAnki = new DisplayAnki(display, displayAudio, japaneseUtil);
+        const displayAnki = new DisplayAnki(display, displayAudio);
         displayAnki.prepare();
 
         const displayProfileSelection = new DisplayProfileSelection(display);
@@ -61,7 +59,7 @@ async function main() {
 
         document.documentElement.dataset.loaded = 'true';
 
-        yomitan.ready();
+        application.ready();
     } catch (e) {
         log.error(e);
     }

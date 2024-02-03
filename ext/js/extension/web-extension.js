@@ -91,7 +91,8 @@ export class WebExtension extends EventDispatcher {
      */
     getLastError() {
         const {lastError} = chrome.runtime;
-        if (typeof lastError !== 'undefined') {
+        if (lastError) {
+            if (lastError instanceof Error) { return lastError; }
             const {message} = lastError;
             return new Error(typeof message === 'string' ? message : 'An unknown web extension error occured');
         }

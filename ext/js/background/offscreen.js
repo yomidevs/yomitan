@@ -16,12 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
-import {JapaneseUtil} from '../language/sandbox/japanese-util.js';
 import {Translator} from '../language/translator.js';
 
 /**
@@ -33,13 +31,10 @@ export class Offscreen {
      * Creates a new instance.
      */
     constructor() {
-        /** @type {JapaneseUtil} */
-        this._japaneseUtil = new JapaneseUtil(wanakana);
         /** @type {DictionaryDatabase} */
         this._dictionaryDatabase = new DictionaryDatabase();
         /** @type {Translator} */
         this._translator = new Translator({
-            japaneseUtil: this._japaneseUtil,
             database: this._dictionaryDatabase
         });
         /** @type {ClipboardReader} */
@@ -115,13 +110,13 @@ export class Offscreen {
     /** @type {import('offscreen').ApiHandler<'databaseGetMediaOffscreen'>} */
     async _getMediaHandler({targets}) {
         const media = await this._dictionaryDatabase.getMedia(targets);
-        const serializedMedia = media.map((m) => ({...m, content: ArrayBufferUtil.arrayBufferToBase64(m.content)}));
+        const serializedMedia = media.map((m) => ({...m, content: arrayBufferToBase64(m.content)}));
         return serializedMedia;
     }
 
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */
-    _prepareTranslatorHandler({deinflectionReasons}) {
-        this._translator.prepare(deinflectionReasons);
+    _prepareTranslatorHandler({descriptor}) {
+        this._translator.prepare(descriptor);
     }
 
     /** @type {import('offscreen').ApiHandler<'findKanjiOffscreen'>} */

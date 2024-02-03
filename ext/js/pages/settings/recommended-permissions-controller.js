@@ -18,6 +18,7 @@
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {toError} from '../../core/to-error.js';
+import {getAllPermissions, setPermissionsGranted} from '../../data/permissions-util.js';
 
 export class RecommendedPermissionsController {
     /**
@@ -77,7 +78,7 @@ export class RecommendedPermissionsController {
 
     /** */
     async _updatePermissions() {
-        const permissions = await this._settingsController.permissionsUtil.getAllPermissions();
+        const permissions = await getAllPermissions();
         this._onPermissionsChanged({permissions});
     }
 
@@ -89,7 +90,7 @@ export class RecommendedPermissionsController {
     async _setOriginPermissionEnabled(origin, enabled) {
         let added = false;
         try {
-            added = await this._settingsController.permissionsUtil.setPermissionsGranted({origins: [origin]}, enabled);
+            added = await setPermissionsGranted({origins: [origin]}, enabled);
         } catch (e) {
             if (this._errorContainer !== null) {
                 this._errorContainer.hidden = false;

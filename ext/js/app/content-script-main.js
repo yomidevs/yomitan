@@ -16,29 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {Application} from '../application.js';
 import {log} from '../core/logger.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
-import {yomitan} from '../yomitan.js';
 import {Frontend} from './frontend.js';
 import {PopupFactory} from './popup-factory.js';
 
 /** Entry point. */
 async function main() {
     try {
-        await yomitan.prepare();
+        const application = new Application();
+        await application.prepare();
 
-        const {tabId, frameId} = await yomitan.api.frameInformationGet();
+        const {tabId, frameId} = await application.api.frameInformationGet();
         if (typeof frameId !== 'number') {
             throw new Error('Failed to get frameId');
         }
 
         const hotkeyHandler = new HotkeyHandler();
-        hotkeyHandler.prepare();
+        hotkeyHandler.prepare(application.crossFrame);
 
-        const popupFactory = new PopupFactory(frameId);
+        const popupFactory = new PopupFactory(application, frameId);
         popupFactory.prepare();
 
         const frontend = new Frontend({
+            application,
             tabId,
             frameId,
             popupFactory,
@@ -54,7 +56,7 @@ async function main() {
         });
         await frontend.prepare();
 
-        yomitan.ready();
+        application.ready();
     } catch (e) {
         log.error(e);
     }
