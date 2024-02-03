@@ -1068,56 +1068,56 @@ function testDeinflections() {
             category: '-ku stem of kansai-ben adjectives',
             valid: true,
             tests: [
-                {term: '宜しい', source: '宜しゅう', rule: null, reasons: ['adv', 'ksb']},
-                {term: 'よろしい', source: 'よろしゅう', rule: null, reasons: ['adv', 'ksb']},
-                {term: '良い', source: '良う', rule: null, reasons: ['adv', 'ksb']},
-                {term: 'よい', source: 'よう', rule: null, reasons: ['adv', 'ksb']}
+                {term: '宜しい', source: '宜しゅう', rule: null, reasons: ['adv', 'kansai-ben']},
+                {term: 'よろしい', source: 'よろしゅう', rule: null, reasons: ['adv', 'kansai-ben']},
+                {term: '良い', source: '良う', rule: null, reasons: ['adv', 'kansai-ben']},
+                {term: 'よい', source: 'よう', rule: null, reasons: ['adv', 'kansai-ben']}
             ]
         },
         {
             category: '-te form of kansai-ben adjectives',
             valid: true,
             tests: [
-                {term: 'よろしい', source: 'よろしゅうて', rule: null, reasons: ['-te', 'ksb']},
-                {term: '宜しい', source: '宜しゅうて', rule: null, reasons: ['-te', 'ksb']},
-                {term: 'よい', source: 'ようて', rule: null, reasons: ['-te', 'ksb']},
-                {term: '良い', source: '良うて', rule: null, reasons: ['-te', 'ksb']}
+                {term: 'よろしい', source: 'よろしゅうて', rule: null, reasons: ['-te', 'kansai-ben']},
+                {term: '宜しい', source: '宜しゅうて', rule: null, reasons: ['-te', 'kansai-ben']},
+                {term: 'よい', source: 'ようて', rule: null, reasons: ['-te', 'kansai-ben']},
+                {term: '良い', source: '良うて', rule: null, reasons: ['-te', 'kansai-ben']}
             ]
         },
         {
             category: 'Negative form of kansai-ben adjectives',
             valid: true,
             tests: [
-                {term: 'よろしい', source: 'よろしゅうない', rule: null, reasons: ['negative', 'ksb']},
-                {term: '宜しい', source: '宜しゅうない', rule: null, reasons: ['negative', 'ksb']},
-                {term: 'よい', source: 'ようない', rule: null, reasons: ['negative', 'ksb']},
-                {term: '良い', source: '良うない', rule: null, reasons: ['negative', 'ksb']}
+                {term: 'よろしい', source: 'よろしゅうない', rule: null, reasons: ['negative', 'kansai-ben']},
+                {term: '宜しい', source: '宜しゅうない', rule: null, reasons: ['negative', 'kansai-ben']},
+                {term: 'よい', source: 'ようない', rule: null, reasons: ['negative', 'kansai-ben']},
+                {term: '良い', source: '良うない', rule: null, reasons: ['negative', 'kansai-ben']}
             ]
         },
         {
             category: 'Negative form of kansai-ben verbs',
             valid: true,
             tests: [
-                {term: '食べる', source: '食べへん', rule: null, reasons: ['negative', 'ksb']},
-                {term: '食べる', source: '食べへんかった', rule: null, reasons: ['negative', 'past', 'ksb']}
+                {term: '食べる', source: '食べへん', rule: null, reasons: ['negative', 'kansai-ben']},
+                {term: '食べる', source: '食べへんかった', rule: null, reasons: ['negative', 'past', 'kansai-ben']}
             ]
         },
         {
             category: '-te form of kansai-ben verbs',
             valid: true,
             tests: [
-                {term: '買う', source: '買うて', rule: null, reasons: ['-te', 'ksb']},
-                {term: 'かう', source: 'こうて', rule: null, reasons: ['-te', 'ksb']},
-                {term: 'はう', source: 'ほうて', rule: null, reasons: ['-te', 'ksb']}
+                {term: '買う', source: '買うて', rule: null, reasons: ['-te', 'kansai-ben']},
+                {term: 'かう', source: 'こうて', rule: null, reasons: ['-te', 'kansai-ben']},
+                {term: 'はう', source: 'ほうて', rule: null, reasons: ['-te', 'kansai-ben']}
             ]
         },
         {
             category: 'past form of kansai-ben terms',
             valid: true,
             tests: [
-                {term: '買う', source: '買うた', rule: null, reasons: ['past', 'ksb']},
-                {term: 'かう', source: 'こうた', rule: null, reasons: ['past', 'ksb']},
-                {term: 'はう', source: 'ほうた', rule: null, reasons: ['past', 'ksb']}
+                {term: '買う', source: '買うた', rule: null, reasons: ['past', 'kansai-ben']},
+                {term: 'かう', source: 'こうた', rule: null, reasons: ['past', 'kansai-ben']},
+                {term: 'はう', source: 'ほうた', rule: null, reasons: ['past', 'kansai-ben']}
             ]
         }
     ];
