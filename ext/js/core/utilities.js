@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Checks whether a given value is a non-array object.
  * @param {unknown} value The value to check.
