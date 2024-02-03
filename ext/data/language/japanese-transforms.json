@@ -1047,6 +1047,27 @@
                 {"suffixIn": "ようた", "suffixOut": "やった", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ゆうた", "suffixOut": "いった", "conditionsIn": [], "conditionsOut": []}
             ]
+        },
+        {
+            "name": "kansai-ben",
+            "description": "-tara form of kansai-ben terms",
+            "rules": [
+                {"suffixIn": "うたら", "suffixOut": "ったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "おうたら", "suffixOut": "あったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "こうたら", "suffixOut": "かったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ごうたら", "suffixOut": "がったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "そうたら", "suffixOut": "さったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ぞうたら", "suffixOut": "ざったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "とうたら", "suffixOut": "たったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "どうたら", "suffixOut": "だったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "のうたら", "suffixOut": "なったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ほうたら", "suffixOut": "はったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ぼうたら", "suffixOut": "ばったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "もうたら", "suffixOut": "まったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ろうたら", "suffixOut": "らったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ようたら", "suffixOut": "やったら", "conditionsIn": [], "conditionsOut": []},
+                {"suffixIn": "ゆうたら", "suffixOut": "いったら", "conditionsIn": [], "conditionsOut": []}
+            ]
         }
     ]
 }

@@ -1119,6 +1119,15 @@ function testDeinflections() {
                 {term: 'かう', source: 'こうた', rule: null, reasons: ['past', 'kansai-ben']},
                 {term: 'はう', source: 'ほうた', rule: null, reasons: ['past', 'kansai-ben']}
             ]
+        },
+        {
+            category: '-tara form of kansai-ben terms',
+            valid: true,
+            tests: [
+                {term: '買う', source: '買うたら', rule: null, reasons: ['-tara', 'kansai-ben']},
+                {term: 'かう', source: 'こうたら', rule: null, reasons: ['-tara', 'kansai-ben']},
+                {term: 'はう', source: 'ほうたら', rule: null, reasons: ['-tara', 'kansai-ben']}
+            ]
         }
     ];
     /* eslint-enable no-multi-spaces */
