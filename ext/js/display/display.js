@@ -1850,7 +1850,8 @@ export class Display extends EventDispatcher {
             this._contentTextScanner.excludeSelector = '.scan-disable,.scan-disable *';
             this._contentTextScanner.prepare();
             this._contentTextScanner.on('clear', this._onContentTextScannerClear.bind(this));
-            this._contentTextScanner.on('searched', this._onContentTextScannerSearched.bind(this));
+            this._contentTextScanner.on('searchSuccess', this._onContentTextScannerSearchSuccess.bind(this));
+            this._contentTextScanner.on('searchError', this._onContentTextScannerSearchError.bind(this));
         }
 
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
@@ -1895,15 +1896,9 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {import('text-scanner').SearchedEventDetails} details
+     * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
-    _onContentTextScannerSearched({type, dictionaryEntries, sentence, textSource, optionsContext, error}) {
-        if (error !== null && !this._application.webExtension.unloaded) {
-            log.error(error);
-        }
-
-        if (type === null) { return; }
-
+    _onContentTextScannerSearchSuccess({type, dictionaryEntries, sentence, textSource, optionsContext}) {
         const query = textSource.text();
         const url = window.location.href;
         const documentTitle = document.title;
@@ -1933,10 +1928,24 @@ export class Display extends EventDispatcher {
     }
 
     /**
+     * @param {import('text-scanner').EventArgument<'searchError'>} details
+     */
+    _onContentTextScannerSearchError({error}) {
+        if (!this._application.webExtension.unloaded) {
+            log.error(error);
+        }
+    }
+
+    /**
      * @type {import('display').GetSearchContextCallback}
      */
     _getSearchContext() {
-        return {optionsContext: this.getOptionsContext()};
+        return {
+            optionsContext: this.getOptionsContext(),
+            detail: {
+                documentTitle: document.title
+            }
+        };
     }
 
     /**

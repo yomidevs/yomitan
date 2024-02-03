@@ -183,7 +183,9 @@ export class Frontend {
         chrome.runtime.onMessage.addListener(this._onRuntimeMessage.bind(this));
 
         this._textScanner.on('clear', this._onTextScannerClear.bind(this));
-        this._textScanner.on('searched', this._onSearched.bind(this));
+        this._textScanner.on('searchSuccess', this._onSearchSuccess.bind(this));
+        this._textScanner.on('searchEmpty', this._onSearchEmpty.bind(this));
+        this._textScanner.on('searchError', this._onSearchError.bind(this));
 
         /* eslint-disable no-multi-spaces */
         this._application.crossFrame.registerHandlers([
@@ -369,31 +371,36 @@ export class Frontend {
     }
 
     /**
-     * @param {import('text-scanner').SearchedEventDetails} details
+     * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
-    _onSearched({type, dictionaryEntries, sentence, inputInfo: {eventType, passive, detail: inputInfoDetail}, textSource, optionsContext, detail, error}) {
-        const scanningOptions = /** @type {import('settings').ProfileOptions} */ (this._options).scanning;
+    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo: {eventType, detail: inputInfoDetail}, textSource, optionsContext, detail}) {
+        this._stopClearSelectionDelayed();
+        let focus = (eventType === 'mouseMove');
+        if (typeof inputInfoDetail === 'object' && inputInfoDetail !== null) {
+            const focus2 = inputInfoDetail.focus;
+            if (typeof focus2 === 'boolean') { focus = focus2; }
+        }
+        this._showContent(textSource, focus, dictionaryEntries, type, sentence, detail !== null ? detail.documentTitle : null, optionsContext);
+    }
 
-        if (error !== null) {
-            if (this._application.webExtension.unloaded) {
-                if (textSource !== null && !passive) {
-                    this._showExtensionUnloaded(textSource);
-                }
-            } else {
-                log.error(error);
+    /** */
+    _onSearchEmpty() {
+        const scanningOptions = /** @type {import('settings').ProfileOptions} */ (this._options).scanning;
+        if (scanningOptions.autoHideResults) {
+            this._clearSelectionDelayed(scanningOptions.hideDelay, false, false);
+        }
+    }
+
+    /**
+     * @param {import('text-scanner').EventArgument<'searchError'>} details
+     */
+    _onSearchError({error, textSource, inputInfo: {passive}}) {
+        if (this._application.webExtension.unloaded) {
+            if (textSource !== null && !passive) {
+                this._showExtensionUnloaded(textSource);
             }
-        } if (type !== null && optionsContext !== null) {
-            this._stopClearSelectionDelayed();
-            let focus = (eventType === 'mouseMove');
-            if (typeof inputInfoDetail === 'object' && inputInfoDetail !== null) {
-                const focus2 = inputInfoDetail.focus;
-                if (typeof focus2 === 'boolean') { focus = focus2; }
-            }
-            this._showContent(textSource, focus, dictionaryEntries, type, sentence, detail !== null ? detail.documentTitle : null, optionsContext);
         } else {
-            if (scanningOptions.autoHideResults) {
-                this._clearSelectionDelayed(scanningOptions.hideDelay, false, false);
-            }
+            log.error(error);
         }
     }
 
@@ -888,7 +895,7 @@ export class Frontend {
     }
 
     /**
-     * @returns {Promise<{optionsContext: import('settings').OptionsContext, detail?: import('text-scanner').SearchResultDetail}>}
+     * @returns {Promise<import('text-scanner').SearchContext>}
      */
     async _getSearchContext() {
         let url = window.location.href;
