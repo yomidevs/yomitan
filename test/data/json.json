@@ -23,6 +23,7 @@
         {"path": "test/data/dictionaries/invalid-dictionary6/index.json", "ignore": true},
         {"path": "test/jsconfig.json", "ignore": true},
         {"path": "test/data/vitest.write.config.json", "ignore": true},
+        {"path": "benches/jsconfig.json", "ignore": true},
 
         {
             "path": "dev/data/manifest-variants.json",
