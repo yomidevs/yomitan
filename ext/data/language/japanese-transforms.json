@@ -944,7 +944,7 @@
             ]
         },
         {
-            "name": "ksb",
+            "name": "kansai-ben",
             "description": "Negative form of kansai-ben verbs",
             "rules": [
                 {"suffixIn": "へん", "suffixOut": "ない", "conditionsIn": [], "conditionsOut": ["adj-i"]},
@@ -956,7 +956,7 @@
             ]
         },
         {
-            "name": "ksb",
+            "name": "kansai-ben",
             "description": "-ku stem of kansai-ben adjectives",
             "rules": [
                 {"suffixIn": "う", "suffixOut": "く", "conditionsIn": [], "conditionsOut": []},
@@ -973,7 +973,7 @@
             ]
         },
         {
-            "name": "ksb",
+            "name": "kansai-ben",
             "description": "-te form of kansai-ben adjectives",
             "rules": [
                 {"suffixIn": "うて", "suffixOut": "くて", "conditionsIn": [], "conditionsOut": []},
@@ -990,7 +990,7 @@
             ]
         },
         {
-            "name": "ksb",
+            "name": "kansai-ben",
             "description": "Negative form of kansai-ben adjectives",
             "rules": [
                 {"suffixIn": "うない", "suffixOut": "くない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
@@ -1007,7 +1007,7 @@
             ]
         },
         {
-            "name": "ksb",
+            "name": "kansai-ben",
             "description": "-te form of kansai-ben verbs",
             "rules": [
                 {"suffixIn": "うて", "suffixOut": "って", "conditionsIn": [], "conditionsOut": []},
@@ -1028,7 +1028,7 @@
             ]
         },
         {
-            "name": "ksb",
+            "name": "kansai-ben",
             "description": "past form of kansai-ben terms",
             "rules": [
                 {"suffixIn": "うた", "suffixOut": "った", "conditionsIn": [], "conditionsOut": []},
