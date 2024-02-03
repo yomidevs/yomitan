@@ -112,7 +112,6 @@ function testDeinflections() {
                 {term: '食べる', source: '食べるな',         rule: 'v1', reasons: ['imperative negative']},
                 {term: '食べる', source: '食べまして',        rule: 'v1', reasons: ['polite', '-te']},
 
-
                 {term: '食べる', source: '食べれば',         rule: 'v1', reasons: ['-ba']},
                 {term: '食べる', source: '食べちゃう',       rule: 'v1', reasons: ['-chau']},
                 {term: '食べる', source: '食べちまう',       rule: 'v1', reasons: ['-chimau']},
