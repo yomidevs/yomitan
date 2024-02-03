@@ -171,6 +171,67 @@ function getPublicContext(context) {
 }
 
 /**
+ * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @returns {number[]}
+ */
+function getFrequencyNumbers(dictionaryEntry) {
+    let previousDictionary;
+    const frequencies = [];
+    for (const {dictionary, frequency, displayValue} of dictionaryEntry.frequencies) {
+        if (dictionary === previousDictionary) {
+            continue;
+        }
+        previousDictionary = dictionary;
+
+        if (displayValue !== null) {
+            const frequencyMatch = displayValue.match(/\d+/);
+            if (frequencyMatch !== null) {
+                frequencies.push(Number.parseInt(frequencyMatch[0], 10));
+                continue;
+            }
+        }
+        frequencies.push(frequency);
+    }
+    return frequencies;
+}
+
+/**
+ * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @returns {number}
+ */
+function getFrequencyHarmonic(dictionaryEntry) {
+    const frequencies = getFrequencyNumbers(dictionaryEntry);
+
+    if (frequencies.length === 0) {
+        return -1;
+    }
+
+    let total = 0;
+    for (const frequency of frequencies) {
+        total += 1 / frequency;
+    }
+    return Math.floor(frequencies.length / total);
+}
+
+/**
+ * @param {import('dictionary').TermDictionaryEntry|import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+ * @returns {number}
+ */
+function getFrequencyAverage(dictionaryEntry) {
+    const frequencies = getFrequencyNumbers(dictionaryEntry);
+
+    if (frequencies.length === 0) {
+        return -1;
+    }
+
+    let total = 0;
+    for (const frequency of frequencies) {
+        total += frequency;
+    }
+    return Math.floor(total / frequencies.length);
+}
+
+/**
  * @param {import('dictionary').DictionaryEntry} dictionaryEntry
  * @returns {import('anki-templates').PitchGroup[]}
  */
@@ -272,6 +333,8 @@ function getKanjiDefinition(dictionaryEntry, context) {
     const stats = createCachedValue(getKanjiStats.bind(null, dictionaryEntry));
     const tags = createCachedValue(convertTags.bind(null, dictionaryEntry.tags));
     const frequencies = createCachedValue(getKanjiFrequencies.bind(null, dictionaryEntry));
+    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry));
+    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry));
     const cloze = createCachedValue(getCloze.bind(null, dictionaryEntry, context));
 
     return {
@@ -284,6 +347,8 @@ function getKanjiDefinition(dictionaryEntry, context) {
         get tags() { return getCachedValue(tags); },
         get stats() { return getCachedValue(stats); },
         get frequencies() { return getCachedValue(frequencies); },
+        get frequencyHarmonic() { return getCachedValue(frequencyHarmonic); },
+        get frequencyAverage() { return getCachedValue(frequencyAverage); },
         url,
         get cloze() { return getCachedValue(cloze); }
     };
@@ -366,6 +431,8 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode) {
     const termTags = createCachedValue(getTermTags.bind(null, dictionaryEntry, type));
     const expressions = createCachedValue(getTermExpressions.bind(null, dictionaryEntry));
     const frequencies = createCachedValue(getTermFrequencies.bind(null, dictionaryEntry));
+    const frequencyHarmonic = createCachedValue(getFrequencyHarmonic.bind(null, dictionaryEntry));
+    const frequencyAverage = createCachedValue(getFrequencyAverage.bind(null, dictionaryEntry));
     const pitches = createCachedValue(getTermPitches.bind(null, dictionaryEntry));
     const phoneticTranscriptions = createCachedValue(getTermPhoneticTranscriptions.bind(null, dictionaryEntry));
     const glossary = createCachedValue(getTermGlossaryArray.bind(null, dictionaryEntry, type));
@@ -403,6 +470,8 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode) {
         get termTags() { return getCachedValue(termTags); },
         get definitions() { return getCachedValue(commonInfo).definitions; },
         get frequencies() { return getCachedValue(frequencies); },
+        get frequencyHarmonic() { return getCachedValue(frequencyHarmonic); },
+        get frequencyAverage() { return getCachedValue(frequencyAverage); },
         get pitches() { return getCachedValue(pitches); },
         get phoneticTranscriptions() { return getCachedValue(phoneticTranscriptions); },
         sourceTermExactMatchCount,

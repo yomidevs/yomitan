@@ -107,7 +107,7 @@ export type FindTermsOptions = {
     /**
      * An iterable sequence of text replacements to be applied during the term lookup process.
      */
-    textReplacements: (FindTermsTextReplacement[] | null)[];
+    textReplacements: FindTermsTextReplacements;
     /**
      * The mapping of dictionaries to search for terms in.
      * The key is the dictionary name.
@@ -158,6 +158,11 @@ export type FindTermsTextReplacement = {
      */
     replacement: string;
 };
+
+/**
+ * Multiple text replacements.
+ */
+export type FindTermsTextReplacements = (FindTermsTextReplacement[] | null)[];
 
 /**
  * Details about a dictionary.

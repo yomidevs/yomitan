@@ -19,12 +19,12 @@
 import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {afterAll, describe, expect, test} from 'vitest';
-import {DocumentUtil} from '../ext/js/dom/document-util.js';
+import {parseJson} from '../dev/json.js';
 import {DOMTextScanner} from '../ext/js/dom/dom-text-scanner.js';
 import {TextSourceElement} from '../ext/js/dom/text-source-element.js';
+import {TextSourceGenerator} from '../ext/js/dom/text-source-generator.js';
 import {TextSourceRange} from '../ext/js/dom/text-source-range.js';
 import {setupDomTest} from './fixtures/dom-test.js';
-import {parseJson} from '../dev/json.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -182,7 +182,8 @@ describe('Document utility tests', () => {
                     };
 
                     // Test docRangeFromPoint
-                    const source = DocumentUtil.getRangeFromPoint(0, 0, {
+                    const textSourceGenerator = new TextSourceGenerator();
+                    const source = textSourceGenerator.getRangeFromPoint(0, 0, {
                         deepContentScan: false,
                         normalizeCssZoom: true
                     });
@@ -217,7 +218,7 @@ describe('Document utility tests', () => {
                     }
 
                     // Test docSentenceExtract
-                    const sentenceActual = DocumentUtil.extractSentence(
+                    const sentenceActual = textSourceGenerator.extractSentence(
                         source,
                         false,
                         sentenceScanExtent,

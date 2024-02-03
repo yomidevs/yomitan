@@ -10,6 +10,7 @@
     },
     "type": "module",
     "scripts": {
+        "bench": "vitest bench",
         "build": "node ./dev/bin/build.js",
         "build-libs": "node ./dev/bin/build-libs.js",
         "test": "npm run test-lint-js && npm run test-ts && npm run test-lint-css && npm run test-lint-html && npm run test-code && npm run test-build",
@@ -24,7 +25,8 @@
         "test-code-write": "vitest run --config test/data/vitest.write.config.json",
         "test-build": "node ./dev/bin/build.js --dryRun --all",
         "license-report": "license-report --output=html --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link --html.cssFile=dev/data/legal-npm.css > ext/legal-npm.html",
-        "license-report-markdown": "license-report --output=markdown --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link"
+        "license-report-markdown": "license-report --output=markdown --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link",
+        "prepare": "husky install"
     },
     "repository": {
         "type": "git",
@@ -45,12 +47,13 @@
         "sourceDir": "ext"
     },
     "devDependencies": {
+        "@codspeed/vitest-plugin": "^3.1.0",
         "@playwright/test": "^1.39.0",
         "@stylistic/eslint-plugin-ts": "^1.5.1",
         "@stylistic/stylelint-plugin": "^2.0.0",
         "@types/assert": "^1.5.10",
         "@types/browserify": "^12.0.40",
-        "@types/chrome": "^0.0.254",
+        "@types/chrome": "^0.0.260",
         "@types/css": "^0.0.37",
         "@types/events": "^3.0.3",
         "@types/firefox-webext-browser": "^120.0.0",
@@ -60,7 +63,7 @@
         "@types/zip.js": "^2.0.32",
         "@typescript-eslint/eslint-plugin": "^6.16.0",
         "@typescript-eslint/parser": "^6.16.0",
-        "@vitest/coverage-v8": "^1.1.1",
+        "@vitest/coverage-v8": "1.2.2",
         "ajv": "^8.12.0",
         "css": "^3.0.0",
         "dotenv": "^16.3.1",
@@ -75,14 +78,17 @@
         "eslint-plugin-vitest": "^0.3.20",
         "fake-indexeddb": "^5.0.2",
         "html-validate": "^8.8.0",
+        "husky": "^9.0.10",
         "jsdom": "^24.0.0",
         "jszip": "^3.10.1",
         "license-report": "^6.5.0",
+        "lint-staged": "^15.2.1",
+        "prettier": "^3.2.4",
         "stylelint": "^16.1.0",
         "stylelint-config-recommended": "^14.0.0",
         "ts-json-schema-generator": "^1.5.0",
         "typescript": "5.3.3",
-        "vitest": "^1.1.1"
+        "vitest": "1.2.2"
     },
     "dependencies": {
         "@zip.js/zip.js": "^2.7.31",
@@ -91,5 +97,8 @@
         "handlebars": "^4.7.8",
         "parse5": "^7.1.2",
         "wanakana": "^5.3.1"
+    },
+    "lint-staged": {
+        "*.md": "prettier --write"
     }
 }
