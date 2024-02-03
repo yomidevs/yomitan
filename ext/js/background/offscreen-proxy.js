@@ -169,14 +169,14 @@ export class LanguageUtilProxy {
      * @param {string} language
      * @returns {Promise<import('language').TextTransformation[]>}
      */
-    async getTextTransformations(language) {
+    getTextTransformations(language) {
         return this._offscreen.sendMessagePromise({action: 'getTextTransformationsOffscreen', params: {language}});
     }
 
     /**
      * @returns {Promise<import('language').Language[]>}
      */
-    async getLanguages() {
+    getLanguages() {
         return this._offscreen.sendMessagePromise({action: 'getLanguagesOffscreen'});
     }
 }
