@@ -539,7 +539,7 @@ export function convertNumericToFullWidth(text) {
 
 /**
  * @param {string} text
- * @param {?import('../general/text-source-map.js').TextSourceMap} [sourceMap]
+ * @param {?import('../../general/text-source-map.js').TextSourceMap} [sourceMap]
  * @returns {string}
  */
 export function convertHalfWidthKanaToFullWidth(text, sourceMap = null) {
@@ -705,7 +705,7 @@ export function distributeFuriganaInflected(term, reading, source) {
 /**
  * @param {string} text
  * @param {boolean} fullCollapse
- * @param {?import('../general/text-source-map.js').TextSourceMap} [sourceMap]
+ * @param {?import('../../general/text-source-map.js').TextSourceMap} [sourceMap]
  * @returns {string}
  */
 export function collapseEmphaticSequences(text, fullCollapse, sourceMap = null) {
