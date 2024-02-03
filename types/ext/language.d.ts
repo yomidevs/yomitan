@@ -41,7 +41,7 @@ export type TextTransformation<T = unknown> = {
 };
 
 export type LanguageFeatures = {
-    textTransformations?: TextTransformation[];
+    textTransformations: TextTransformation[];
 };
 
 export type Language = LanguageProperties & LanguageFeatures;
