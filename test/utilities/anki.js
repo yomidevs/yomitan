@@ -21,6 +21,19 @@ import {createAnkiNoteData} from '../../ext/js/data/sandbox/anki-note-data-creat
 import {AnkiTemplateRenderer} from '../../ext/js/templates/sandbox/anki-template-renderer.js';
 
 /**
+ * @param {import('dictionary').DictionaryEntryType} type
+ * @returns {import('anki-note-builder').Field[]}
+ */
+function createTestFields(type) {
+    /** @type {import('anki-note-builder').Field[]} */
+    const fields = [];
+    for (const marker of getStandardFieldMarkers(type)) {
+        fields.push([marker, `{${marker}}`]);
+    }
+    return fields;
+}
+
+/**
  * @param {import('dictionary').DictionaryEntry} dictionaryEntry
  * @param {import('settings').ResultOutputMode} mode
  * @returns {import('anki-templates').NoteData}
@@ -49,20 +62,12 @@ export function createTestAnkiNoteData(dictionaryEntry, mode) {
 
 /**
  * @param {import('dictionary').DictionaryEntry[]} dictionaryEntries
- * @param {import('dictionary').DictionaryEntryType} type
  * @param {import('settings').ResultOutputMode} mode
  * @param {string} template
  * @param {?import('vitest').ExpectStatic} expect
  * @returns {Promise<import('anki').NoteFields[]>}
  */
-export async function getTemplateRenderResults(dictionaryEntries, type, mode, template, expect) {
-    const markers = getStandardFieldMarkers(type);
-    /** @type {import('anki-note-builder').Field[]} */
-    const fields = [];
-    for (const marker of markers) {
-        fields.push([marker, `{${marker}}`]);
-    }
-
+export async function getTemplateRenderResults(dictionaryEntries, mode, template, expect) {
     const ankiTemplateRenderer = new AnkiTemplateRenderer();
     await ankiTemplateRenderer.prepare();
     const clozePrefix = 'cloze-prefix';
@@ -100,7 +105,7 @@ export async function getTemplateRenderResults(dictionaryEntries, type, mode, te
             template,
             deckName: 'deckName',
             modelName: 'modelName',
-            fields,
+            fields: createTestFields(dictionaryEntry.type),
             tags: ['yomitan'],
             checkForDuplicates: true,
             duplicateScope: 'collection',

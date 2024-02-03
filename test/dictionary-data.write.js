@@ -64,7 +64,7 @@ test('Write dictionary data expected data', async ({window, translator, expect})
                     const {mode, text} = data;
                     const options = createFindTermsOptions(dictionaryName, optionsPresets, data.options);
                     const {dictionaryEntries, originalTextLength} = await translator.findTerms(mode, text, options);
-                    const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, 'terms', mode, template, null) : null;
+                    const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, mode, template, null) : null;
                     const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, mode)) : null;
                     actualResults1.push({name, originalTextLength, dictionaryEntries});
                     actualResults2.push({name, noteDataList});
@@ -76,7 +76,7 @@ test('Write dictionary data expected data', async ({window, translator, expect})
                     const {text} = data;
                     const options = createFindKanjiOptions(dictionaryName, optionsPresets, data.options);
                     const dictionaryEntries = await translator.findKanji(text, options);
-                    const renderResults = await getTemplateRenderResults(dictionaryEntries, 'kanji', 'split', template, null);
+                    const renderResults = await getTemplateRenderResults(dictionaryEntries, 'split', template, null);
                     const noteDataList = dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, 'split'));
                     actualResults1.push({name, dictionaryEntries});
                     actualResults2.push({name, noteDataList});
