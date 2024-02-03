@@ -560,24 +560,6 @@ export class Translator {
 
     /**
      * @param {import('translation').FindTermsOptions} options
-     * @returns {[collapseEmphatic: boolean, collapseEmphaticFull: boolean][]}
-     */
-    _getCollapseEmphaticOptions(options) {
-        /** @type {[collapseEmphatic: boolean, collapseEmphaticFull: boolean][]} */
-        const collapseEmphaticOptions = [[false, false]];
-        switch (options.collapseEmphaticSequences) {
-            case 'true':
-                collapseEmphaticOptions.push([true, false]);
-                break;
-            case 'full':
-                collapseEmphaticOptions.push([true, false], [true, true]);
-                break;
-        }
-        return collapseEmphaticOptions;
-    }
-
-    /**
-     * @param {import('translation').FindTermsOptions} options
      * @returns {(import('translation').FindTermsTextReplacement[] | null)[]}
      */
     _getTextReplacementsVariants(options) {

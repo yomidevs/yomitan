@@ -81,30 +81,6 @@ export type FindTermsOptions = {
      */
     removeNonJapaneseCharacters: boolean;
     /**
-     * Whether or not half-width characters should be converted to full-width characters.
-     */
-    convertHalfWidthCharacters: FindTermsVariantMode;
-    /**
-     * Whether or not ASCII numeric characters should be converted to full-width numeric characters.
-     */
-    convertNumericCharacters: FindTermsVariantMode;
-    /**
-     * Whether or not alphabetic characters should be converted to kana.
-     */
-    convertAlphabeticCharacters: FindTermsVariantMode;
-    /**
-     * Whether or not hiragana characters should be converted to katakana.
-     */
-    convertHiraganaToKatakana: FindTermsVariantMode;
-    /**
-     * Whether or not katakana characters should be converted to hiragana.
-     */
-    convertKatakanaToHiragana: FindTermsVariantMode;
-    /**
-     * How emphatic character sequences should be collapsed.
-     */
-    collapseEmphaticSequences: FindTermsEmphaticSequencesMode;
-    /**
      * An iterable sequence of text replacements to be applied during the term lookup process.
      */
     textReplacements: FindTermsTextReplacements;
@@ -121,7 +97,13 @@ export type FindTermsOptions = {
      * Whether every substring should be searched for, or only whole words.
      */
     searchResolution: SearchResolution;
+    /**
+     * Which variants of the search text should be looked up.
+     */
     textTransformationsOptions: TextTransformationsOptions;
+    /**
+     * ISO-639 code of the language.
+     */
     language: string;
 };
 

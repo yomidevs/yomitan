@@ -464,6 +464,7 @@
             "options": [
                 "default",
                 {
+                    "type": "terms",
                     "language": "en",
                     "removeNonJapaneseCharacters": false,
                     "textTransformationsOptions": {
@@ -480,6 +481,7 @@
             "options": [
                 "default",
                 {
+                    "type": "terms",
                     "language": "en",
                     "removeNonJapaneseCharacters": false,
                     "textTransformationsOptions": {

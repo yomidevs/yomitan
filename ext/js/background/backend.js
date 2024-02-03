@@ -2386,12 +2386,6 @@ export class Backend {
             general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language},
             scanning: {alphanumeric},
             translation: {
-                convertHalfWidthCharacters,
-                convertNumericCharacters,
-                convertAlphabeticCharacters,
-                convertHiraganaToKatakana,
-                convertKatakanaToHiragana,
-                collapseEmphaticSequences,
                 textReplacements: textReplacementsOptions,
                 searchResolution
             }
@@ -2417,12 +2411,6 @@ export class Backend {
             sortFrequencyDictionary,
             sortFrequencyDictionaryOrder,
             removeNonJapaneseCharacters: !alphanumeric,
-            convertHalfWidthCharacters,
-            convertNumericCharacters,
-            convertAlphabeticCharacters,
-            convertHiraganaToKatakana,
-            convertKatakanaToHiragana,
-            collapseEmphaticSequences,
             searchResolution,
             textReplacements,
             enabledDictionaryMap,

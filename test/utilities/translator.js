@@ -123,14 +123,10 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         sortFrequencyDictionary,
         sortFrequencyDictionaryOrder,
         removeNonJapaneseCharacters,
-        convertHalfWidthCharacters,
-        convertNumericCharacters,
-        convertAlphabeticCharacters,
-        convertHiraganaToKatakana,
-        convertKatakanaToHiragana,
-        collapseEmphaticSequences,
         excludeDictionaryDefinitions,
-        searchResolution
+        searchResolution,
+        language,
+        textTransformationsOptions
     } = preset;
 
     return {
@@ -140,15 +136,11 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         sortFrequencyDictionary: typeof sortFrequencyDictionary !== 'undefined' ? sortFrequencyDictionary : null,
         sortFrequencyDictionaryOrder: typeof sortFrequencyDictionaryOrder !== 'undefined' ? sortFrequencyDictionaryOrder : 'ascending',
         removeNonJapaneseCharacters: typeof removeNonJapaneseCharacters !== 'undefined' ? removeNonJapaneseCharacters : false,
-        convertHalfWidthCharacters: typeof convertHalfWidthCharacters !== 'undefined' ? convertHalfWidthCharacters : 'false',
-        convertNumericCharacters: typeof convertNumericCharacters !== 'undefined' ? convertNumericCharacters : 'false',
-        convertAlphabeticCharacters: typeof convertAlphabeticCharacters !== 'undefined' ? convertAlphabeticCharacters : 'false',
-        convertHiraganaToKatakana: typeof convertHiraganaToKatakana !== 'undefined' ? convertHiraganaToKatakana : 'false',
-        convertKatakanaToHiragana: typeof convertKatakanaToHiragana !== 'undefined' ? convertKatakanaToHiragana : 'false',
-        collapseEmphaticSequences: typeof collapseEmphaticSequences !== 'undefined' ? collapseEmphaticSequences : 'false',
         textReplacements,
         enabledDictionaryMap,
         excludeDictionaryDefinitions: Array.isArray(excludeDictionaryDefinitions) ? new Set(excludeDictionaryDefinitions) : null,
-        searchResolution: typeof searchResolution !== 'undefined' ? searchResolution : 'letter'
+        searchResolution: typeof searchResolution !== 'undefined' ? searchResolution : 'letter',
+        textTransformationsOptions: typeof textTransformationsOptions !== 'undefined' ? textTransformationsOptions : {},
+        language: typeof language !== 'undefined' ? language : 'ja'
     };
 }
