@@ -81,8 +81,8 @@ export function getStandardFieldMarkers(type) {
                 'screenshot',
                 'search-query',
                 'selection-text',
-                'sentence-furigana',
                 'sentence',
+                'sentence-furigana',
                 'stroke-count',
                 'tags',
                 'url'
