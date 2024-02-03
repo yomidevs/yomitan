@@ -636,7 +636,6 @@
                 {"suffixIn": "くあります", "suffixOut": "い", "conditionsIn": ["v"], "conditionsOut": ["adj-i"]}
             ]
         },
-        
         {
             "name": "potential",
             "rules": [
