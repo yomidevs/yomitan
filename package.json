@@ -60,7 +60,7 @@
         "@types/zip.js": "^2.0.32",
         "@typescript-eslint/eslint-plugin": "^6.16.0",
         "@typescript-eslint/parser": "^6.16.0",
-        "@vitest/coverage-v8": "^1.2.2",
+        "@vitest/coverage-v8": "1.2.2",
         "ajv": "^8.12.0",
         "css": "^3.0.0",
         "dotenv": "^16.3.1",
@@ -82,7 +82,7 @@
         "stylelint-config-recommended": "^14.0.0",
         "ts-json-schema-generator": "^1.5.0",
         "typescript": "5.3.3",
-        "vitest": "^1.2.2"
+        "vitest": "1.2.2"
     },
     "dependencies": {
         "@zip.js/zip.js": "^2.7.31",
