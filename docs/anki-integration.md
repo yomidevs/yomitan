@@ -36,10 +36,10 @@ Flashcard fields can be configured with the following steps:
     | `{document-title}`         | Title of the web page that the term appeared in.                                                                         |
     | `{expression}`             | Term expressed as kanji (will be displayed in kana if kanji is not available).                                           |
     | `{frequencies}`            | Frequency information for the term.                                                                                      |
-    | `{frequency-harmonic-rank}` | The harmonic mean of frequency data for the current term. Defaults to rank 9999999 when no frequency is found.          |
-    | `{frequency-harmonic-occurrence}` | The harmonic mean of frequency data for the current term. Defaults to 0 occurrences when no frequency is found.   |
-    | `{frequency-average-rank}` | The average of frequency data for the current term. Defaults to rank 9999999 when no frequency is found.                 |
-    | `{frequency-average-occurrence}` | The average of frequency data for the current term. Defaults to 0 occurrences when no frequency is found.          |
+    | `{frequency-harmonic-rank}` | The harmonic mean of frequency data for the current term. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term usage. |
+    | `{frequency-harmonic-occurrence}` | The harmonic mean of frequency data for the current term. Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term usage. |
+    | `{frequency-average-rank}` | The average of frequency data for the current term. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term usage. |
+    | `{frequency-average-occurrence}` | The average of frequency data for the current term. Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term usage. |
     | `{furigana}`               | Term expressed as kanji with furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).                    |
     | `{furigana-plain}`         | Term expressed as kanji with furigana displayed next to it in brackets (e.g. 日本語[にほんご]).                          |
     | `{glossary}`               | List of definitions for the term (output format depends on whether running in _grouped_ mode).                           |
@@ -71,10 +71,10 @@ Flashcard fields can be configured with the following steps:
     | `{dictionary}`        | Name of the dictionary from which the card is being created.                                                             |
     | `{document-title}`    | Title of the web page that the kanji appeared in.                                                                        |
     | `{frequencies}`       | Frequency information for the kanji.                                                                                     |
-    | `{frequency-harmonic-rank}` | The harmonic mean of frequency data for the current kanji. Defaults to rank 9999999 when no frequency is found.    |
-    | `{frequency-harmonic-occurrence}` | The harmonic mean of frequency data for the current kanji. Defaults to 0 occurrences when no frequency is found. |
-    | `{frequency-average-rank}` | The average of frequency data for the current kanji. Defaults to rank 9999999 when no frequency is found.           |
-    | `{frequency-average-occurrence}` | The average of frequency data for the current kanji. Defaults to 0 occurrences when no frequency is found.    |
+    | `{frequency-harmonic-rank}` | The harmonic mean of frequency data for the current kanji. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based kanji usage. |
+    | `{frequency-harmonic-occurrence}` | The harmonic mean of frequency data for the current kanji. Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based kanji usage. |
+    | `{frequency-average-rank}` | The average of frequency data for the current kanji. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based kanji usage. |
+    | `{frequency-average-occurrence}` | The average of frequency data for the current kanji. Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based kanji usage. |
     | `{glossary}`          | List of definitions for the kanji.                                                                                       |
     | `{kunyomi}`           | Kunyomi (Japanese reading) for the kanji expressed as katakana.                                                          |
     | `{onyomi}`            | Onyomi (Chinese reading) for the kanji expressed as hiragana.                                                            |
