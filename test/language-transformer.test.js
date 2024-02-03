@@ -110,6 +110,8 @@ function testDeinflections() {
                 {term: '食べる', source: '食べさせない',     rule: 'v1', reasons: ['causative', 'negative']},
                 {term: '食べる', source: '食べさせられない', rule: 'v1', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '食べる', source: '食べるな',         rule: 'v1', reasons: ['imperative negative']},
+                {term: '食べる', source: '食べまして',        rule: 'v1', reasons: ['polite', '-te']},
+
 
                 {term: '食べる', source: '食べれば',         rule: 'v1', reasons: ['-ba']},
                 {term: '食べる', source: '食べちゃう',       rule: 'v1', reasons: ['-chau']},
@@ -158,6 +160,7 @@ function testDeinflections() {
                 {term: '買う', source: '買わせない',       rule: 'v5', reasons: ['causative', 'negative']},
                 {term: '買う', source: '買わせられない',   rule: 'v5', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '買う', source: '買うな',           rule: 'v5', reasons: ['imperative negative']},
+                {term: '買う', source: '買いまして',     rule: 'v5', reasons: ['polite', '-te']},
 
                 {term: '買う', source: '買えば',           rule: 'v5', reasons: ['-ba']},
                 {term: '買う', source: '買っちゃう',       rule: 'v5', reasons: ['-chau']},
@@ -206,6 +209,7 @@ function testDeinflections() {
                 {term: '行く', source: '行かせない',       rule: 'v5', reasons: ['causative', 'negative']},
                 {term: '行く', source: '行かせられない',   rule: 'v5', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '行く', source: '行くな',           rule: 'v5', reasons: ['imperative negative']},
+                {term: '行く', source: '行きまして',     rule: 'v5', reasons: ['polite', '-te']},
 
                 {term: '行く', source: '行けば',           rule: 'v5', reasons: ['-ba']},
                 {term: '行く', source: '行っちゃう',       rule: 'v5', reasons: ['-chau']},
@@ -254,6 +258,7 @@ function testDeinflections() {
                 {term: '泳ぐ', source: '泳がせない',       rule: 'v5', reasons: ['causative', 'negative']},
                 {term: '泳ぐ', source: '泳がせられない',   rule: 'v5', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '泳ぐ', source: '泳ぐな',           rule: 'v5', reasons: ['imperative negative']},
+                {term: '泳ぐ', source: '泳ぎまして',     rule: 'v5', reasons: ['polite', '-te']},
 
                 {term: '泳ぐ', source: '泳げば',           rule: 'v5', reasons: ['-ba']},
                 {term: '泳ぐ', source: '泳いじゃう',       rule: 'v5', reasons: ['-chau']},
@@ -301,6 +306,7 @@ function testDeinflections() {
                 {term: '話す', source: '話させない',       rule: 'v5', reasons: ['causative', 'negative']},
                 {term: '話す', source: '話させられない',   rule: 'v5', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '話す', source: '話すな',           rule: 'v5', reasons: ['imperative negative']},
+                {term: '話す', source: '話しまして',     rule: 'v5', reasons: ['polite', '-te']},
 
                 {term: '話す', source: '話せば',           rule: 'v5', reasons: ['-ba']},
                 {term: '話す', source: '話しちゃう',       rule: 'v5', reasons: ['-chau']},
@@ -349,6 +355,7 @@ function testDeinflections() {
                 {term: '待つ', source: '待たせない',       rule: 'v5', reasons: ['causative', 'negative']},
                 {term: '待つ', source: '待たせられない',   rule: 'v5', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '待つ', source: '待つな',           rule: 'v5', reasons: ['imperative negative']},
+                {term: '待つ', source: '待ちまして',     rule: 'v5', reasons: ['polite', '-te']},
 
                 {term: '待つ', source: '待てば',           rule: 'v5', reasons: ['-ba']},
                 {term: '待つ', source: '待っちゃう',       rule: 'v5', reasons: ['-chau']},
@@ -397,6 +404,7 @@ function testDeinflections() {
                 {term: '死ぬ', source: '死なせない',       rule: 'v5', reasons: ['causative', 'negative']},
                 {term: '死ぬ', source: '死なせられない',   rule: 'v5', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '死ぬ', source: '死ぬな',           rule: 'v5', reasons: ['imperative negative']},
+                {term: '死ぬ', source: '死にまして',     rule: 'v5', reasons: ['polite', '-te']},
 
                 {term: '死ぬ', source: '死ねば',           rule: 'v5', reasons: ['-ba']},
                 {term: '死ぬ', source: '死んじゃう',       rule: 'v5', reasons: ['-chau']},
@@ -444,6 +452,7 @@ function testDeinflections() {
                 {term: '遊ぶ', source: '遊ばせない',       rule: 'v5', reasons: ['causative', 'negative']},
                 {term: '遊ぶ', source: '遊ばせられない',   rule: 'v5', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '遊ぶ', source: '遊ぶな',           rule: 'v5', reasons: ['imperative negative']},
+                {term: '遊ぶ', source: '遊びまして',     rule: 'v5', reasons: ['polite', '-te']},
 
                 {term: '遊ぶ', source: '遊べば',           rule: 'v5', reasons: ['-ba']},
                 {term: '遊ぶ', source: '遊んじゃう',       rule: 'v5', reasons: ['-chau']},
@@ -491,6 +500,7 @@ function testDeinflections() {
                 {term: '飲む', source: '飲ませない',       rule: 'v5', reasons: ['causative', 'negative']},
                 {term: '飲む', source: '飲ませられない',   rule: 'v5', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '飲む', source: '飲むな',           rule: 'v5', reasons: ['imperative negative']},
+                {term: '飲む', source: '飲みまして',     rule: 'v5', reasons: ['polite', '-te']},
 
                 {term: '飲む', source: '飲めば',           rule: 'v5', reasons: ['-ba']},
                 {term: '飲む', source: '飲んじゃう',       rule: 'v5', reasons: ['-chau']},
@@ -538,6 +548,7 @@ function testDeinflections() {
                 {term: '作る', source: '作らせない',       rule: 'v5', reasons: ['causative', 'negative']},
                 {term: '作る', source: '作らせられない',   rule: 'v5', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '作る', source: '作るな',           rule: 'v5', reasons: ['imperative negative']},
+                {term: '作る', source: '作りまして',     rule: 'v5', reasons: ['polite', '-te']},
 
                 {term: '作る', source: '作れば',           rule: 'v5', reasons: ['-ba']},
                 {term: '作る', source: '作っちゃう',       rule: 'v5', reasons: ['-chau']},
@@ -590,6 +601,7 @@ function testDeinflections() {
                 {term: '為る', source: '為せられない',   rule: 'vs', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '為る', source: '為させられない', rule: 'vs', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '為る', source: '為るな',         rule: 'vs', reasons: ['imperative negative']},
+                {term: '為る', source: '為まして',     rule: 'vs', reasons: ['polite', '-te']},
 
                 {term: '為る', source: '為れば',         rule: 'vs', reasons: ['-ba']},
                 {term: '為る', source: '為ちゃう',       rule: 'vs', reasons: ['-chau']},
@@ -639,6 +651,7 @@ function testDeinflections() {
                 {term: 'する', source: 'させられない',   rule: 'vs', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: 'する', source: 'せさせられない', rule: 'vs', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: 'する', source: 'するな',         rule: 'vs', reasons: ['imperative negative']},
+                {term: 'する', source: 'しまして',     rule: 'vs', reasons: ['polite', '-te']},
 
                 {term: 'する', source: 'すれば',         rule: 'vs', reasons: ['-ba']},
                 {term: 'する', source: 'しちゃう',       rule: 'vs', reasons: ['-chau']},
@@ -682,6 +695,7 @@ function testDeinflections() {
                 {term: '来る', source: '来させない',     rule: 'vk', reasons: ['causative', 'negative']},
                 {term: '来る', source: '来させられない', rule: 'vk', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '来る', source: '来るな',         rule: 'vk', reasons: ['imperative negative']},
+                {term: '来る', source: '来まして',     rule: 'vk', reasons: ['polite', '-te']},
 
                 {term: '来る', source: '来れば',         rule: 'vk', reasons: ['-ba']},
                 {term: '来る', source: '来ちゃう',       rule: 'vk', reasons: ['-chau']},
@@ -725,6 +739,7 @@ function testDeinflections() {
                 {term: '來る', source: '來させない',     rule: 'vk', reasons: ['causative', 'negative']},
                 {term: '來る', source: '來させられない', rule: 'vk', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '來る', source: '來るな',         rule: 'vk', reasons: ['imperative negative']},
+                {term: '來る', source: '來まして',     rule: 'vk', reasons: ['polite', '-te']},
 
                 {term: '來る', source: '來れば',         rule: 'vk', reasons: ['-ba']},
                 {term: '來る', source: '來ちゃう',       rule: 'vk', reasons: ['-chau']},
@@ -768,6 +783,7 @@ function testDeinflections() {
                 {term: 'くる', source: 'こさせない',     rule: 'vk', reasons: ['causative', 'negative']},
                 {term: 'くる', source: 'こさせられない', rule: 'vk', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: 'くる', source: 'くるな',         rule: 'vk', reasons: ['imperative negative']},
+                {term: 'くる', source: 'きまして',     rule: 'vk', reasons: ['polite', '-te']},
 
                 {term: 'くる', source: 'くれば',         rule: 'vk', reasons: ['-ba']},
                 {term: 'くる', source: 'きちゃう',       rule: 'vk', reasons: ['-chau']},
@@ -823,6 +839,7 @@ function testDeinflections() {
                 {term: '論ずる', source: '論じさせられない', rule: 'vz', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '論ずる', source: '論ぜさせられない', rule: 'vz', reasons: ['causative', 'potential or passive', 'negative']},
                 {term: '論ずる', source: '論ずるな',         rule: 'vz', reasons: ['imperative negative']},
+                {term: '論ずる', source: '論じまして',     rule: 'vz', reasons: ['polite', '-te']},
 
                 {term: '論ずる', source: '論ずれば',         rule: 'vz', reasons: ['-ba']},
                 {term: '論ずる', source: '論じちゃう',       rule: 'vz', reasons: ['-chau']},
