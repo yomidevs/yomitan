@@ -369,7 +369,7 @@ export class API {
     }
 
     /**
-     * @param {string} language
+     * @param {import('api').ApiParam<'getTextTransformations', 'language'>} language
      * @returns {Promise<import('api').ApiReturn<'getTextTransformations'>>}
      */
     getTextTransformations(language) {
