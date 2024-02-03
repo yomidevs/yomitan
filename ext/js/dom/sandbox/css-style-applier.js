@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {readResponseJson} from '../../core/json.js';
+import {fetchJson} from '../../core/fetch-utilities.js';
 
 /**
  * This class is used to apply CSS styles to elements using a consistent method
@@ -48,7 +48,7 @@ export class CssStyleApplier {
         /** @type {import('css-style-applier').RawStyleData} */
         let rawData = [];
         try {
-            rawData = await this._fetchJsonAsset(this._styleDataUrl);
+            rawData = await fetchJson(this._styleDataUrl);
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error(e);
@@ -97,28 +97,6 @@ export class CssStyleApplier {
     }
 
     // Private
-
-    /**
-     * Fetches and parses a JSON file.
-     * @template [T=unknown]
-     * @param {string} url The URL to the file.
-     * @returns {Promise<T>} A JSON object.
-     * @throws {Error} An error is thrown if the fetch fails.
-     */
-    async _fetchJsonAsset(url) {
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.status}`);
-        }
-        return await readResponseJson(response);
-    }
 
     /**
      * Gets an array of candidate CSS rules which might match a specific class.
