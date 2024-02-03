@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {FindTermsMatchType, FindTermsSortOrder, FindTermsVariantMode, FindTermsEmphaticSequencesMode, FindKanjiDictionary, FindTermDictionary} from '../ext/translation';
+import type {FindTermsMatchType, FindTermsSortOrder, FindKanjiDictionary, FindTermDictionary} from '../ext/translation';
 import type {SearchResolution, TextTransformationsOptions} from '../ext/settings';
 import type {FindTermsMode} from 'translator';
 import type {DictionaryEntry} from 'dictionary';
@@ -44,12 +44,6 @@ export type FindTermsOptionsPreset = {
     sortFrequencyDictionary?: string | null;
     sortFrequencyDictionaryOrder?: FindTermsSortOrder;
     removeNonJapaneseCharacters?: boolean;
-    convertHalfWidthCharacters?: FindTermsVariantMode;
-    convertNumericCharacters?: FindTermsVariantMode;
-    convertAlphabeticCharacters?: FindTermsVariantMode;
-    convertHiraganaToKatakana?: FindTermsVariantMode;
-    convertKatakanaToHiragana?: FindTermsVariantMode;
-    collapseEmphaticSequences?: FindTermsEmphaticSequencesMode;
     textReplacements?: (FindTermsTextReplacement[] | null)[];
     enabledDictionaryMap?: [key: string, value: FindTermDictionary][];
     excludeDictionaryDefinitions?: string[] | null;

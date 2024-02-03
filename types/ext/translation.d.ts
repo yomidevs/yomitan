@@ -118,16 +118,6 @@ export type FindTermsMatchType = Dictionary.TermSourceMatchType;
 export type FindTermsSortOrder = 'ascending' | 'descending';
 
 /**
- * Mode describing how to handle variations.
- */
-export type FindTermsVariantMode = 'false' | 'true' | 'variant';
-
-/**
- * Mode describing how to handle emphatic sequence variations.
- */
-export type FindTermsEmphaticSequencesMode = 'false' | 'true' | 'full';
-
-/**
  * Information about how text should be replaced when looking up terms.
  */
 export type FindTermsTextReplacement = {
