@@ -21,7 +21,7 @@ import {readResponseJson} from './json.js';
  * @param {string} url
  * @returns {Promise<Response>}
  */
-export async function fetchAsset(url) {
+async function fetchAsset(url) {
     const response = await fetch(chrome.runtime.getURL(url), {
         method: 'GET',
         mode: 'no-cors',
