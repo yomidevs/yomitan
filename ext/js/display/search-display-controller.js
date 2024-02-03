@@ -21,7 +21,6 @@ import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
-import {yomitan} from '../yomitan.js';
 
 export class SearchDisplayController {
     /**
@@ -29,10 +28,9 @@ export class SearchDisplayController {
      * @param {number|undefined} frameId
      * @param {import('./display.js').Display} display
      * @param {import('./display-audio.js').DisplayAudio} displayAudio
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {import('./search-persistent-state-controller.js').SearchPersistentStateController} searchPersistentStateController
      */
-    constructor(tabId, frameId, display, displayAudio, japaneseUtil, searchPersistentStateController) {
+    constructor(tabId, frameId, display, displayAudio, searchPersistentStateController) {
         /** @type {number|undefined} */
         this._tabId = tabId;
         /** @type {number|undefined} */
@@ -71,9 +69,8 @@ export class SearchDisplayController {
         this._clipboardMonitorEnabled = false;
         /** @type {ClipboardMonitor} */
         this._clipboardMonitor = new ClipboardMonitor({
-            japaneseUtil,
             clipboardReader: {
-                getText: yomitan.api.clipboardGet.bind(yomitan.api)
+                getText: this._display.application.api.clipboardGet.bind(this._display.application.api)
             }
         });
         /** @type {import('application').ApiMap} */
@@ -91,7 +88,7 @@ export class SearchDisplayController {
         this._searchPersistentStateController.on('modeChange', this._onModeChange.bind(this));
 
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-        yomitan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
+        this._display.application.on('optionsUpdated', this._onOptionsUpdated.bind(this));
 
         this._display.on('optionsUpdated', this._onDisplayOptionsUpdated.bind(this));
         this._display.on('contentUpdateStart', this._onContentUpdateStart.bind(this));
@@ -299,7 +296,7 @@ export class SearchDisplayController {
             scope: 'profile',
             optionsContext: this._display.getOptionsContext()
         };
-        yomitan.api.modifySettings([modification], 'search');
+        this._display.application.api.modifySettings([modification], 'search');
     }
 
     /**
@@ -432,7 +429,7 @@ export class SearchDisplayController {
             scope: 'profile',
             optionsContext: this._display.getOptionsContext()
         };
-        await yomitan.api.modifySettings([modification], 'search');
+        await this._display.application.api.modifySettings([modification], 'search');
     }
 
     /** */

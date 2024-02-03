@@ -19,7 +19,6 @@
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {clone} from '../../core/utilities.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 import {ProfileConditionsUI} from './profile-conditions-ui.js';
 
 export class ProfileController {
@@ -82,7 +81,7 @@ export class ProfileController {
 
     /** */
     async prepare() {
-        const {platform: {os}} = await yomitan.api.getEnvironmentInfo();
+        const {platform: {os}} = await this._settingsController.application.api.getEnvironmentInfo();
         this._profileConditionsUI.os = os;
 
         this._profileRemoveModal = this._modalController.getModal('profile-remove');

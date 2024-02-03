@@ -24,7 +24,6 @@ export class AnkiTemplateRendererContentManager {
      * Creates a new instance of the class.
      * @param {import('./template-renderer-media-provider.js').TemplateRendererMediaProvider} mediaProvider The media provider for the object.
      * @param {import('anki-templates').NoteData} data The data object passed to the Handlebars template renderer.
-     *   See AnkiNoteDataCreator.create's return value for structure information.
      */
     constructor(mediaProvider, data) {
         /** @type {import('./template-renderer-media-provider.js').TemplateRendererMediaProvider} */

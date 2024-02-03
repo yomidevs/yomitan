@@ -16,17 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {isStringPartiallyJapanese} from '../../language/japanese.js';
+
 export class StructuredContentGenerator {
     /**
      * @param {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} contentManager
-     * @param {import('../../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      * @param {Document} document
      */
-    constructor(contentManager, japaneseUtil, document) {
+    constructor(contentManager, document) {
         /** @type {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} */
         this._contentManager = contentManager;
-        /** @type {import('../../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
         /** @type {Document} */
         this._document = document;
     }
@@ -164,7 +163,7 @@ export class StructuredContentGenerator {
         if (typeof content === 'string') {
             if (content.length > 0) {
                 container.appendChild(this._createTextNode(content));
-                if (language === null && this._japaneseUtil.isStringPartiallyJapanese(content)) {
+                if (language === null && isStringPartiallyJapanese(content)) {
                     container.lang = 'ja';
                 }
             }
@@ -348,6 +347,7 @@ export class StructuredContentGenerator {
             fontWeight,
             fontSize,
             color,
+            background,
             backgroundColor,
             textDecorationLine,
             textDecorationStyle,
@@ -356,8 +356,10 @@ export class StructuredContentGenerator {
             borderStyle,
             borderRadius,
             borderWidth,
+            clipPath,
             verticalAlign,
             textAlign,
+            textEmphasis,
             textShadow,
             margin,
             marginTop,
@@ -378,9 +380,11 @@ export class StructuredContentGenerator {
         if (typeof fontWeight === 'string') { style.fontWeight = fontWeight; }
         if (typeof fontSize === 'string') { style.fontSize = fontSize; }
         if (typeof color === 'string') { style.color = color; }
+        if (typeof background === 'string') { style.background = background; }
         if (typeof backgroundColor === 'string') { style.backgroundColor = backgroundColor; }
         if (typeof verticalAlign === 'string') { style.verticalAlign = verticalAlign; }
         if (typeof textAlign === 'string') { style.textAlign = textAlign; }
+        if (typeof textEmphasis === 'string') { style.textEmphasis = textEmphasis; }
         if (typeof textShadow === 'string') { style.textShadow = textShadow; }
         if (typeof textDecorationLine === 'string') {
             style.textDecoration = textDecorationLine;
@@ -397,6 +401,7 @@ export class StructuredContentGenerator {
         if (typeof borderStyle === 'string') { style.borderStyle = borderStyle; }
         if (typeof borderRadius === 'string') { style.borderRadius = borderRadius; }
         if (typeof borderWidth === 'string') { style.borderWidth = borderWidth; }
+        if (typeof clipPath === 'string') { style.clipPath = clipPath; }
         if (typeof margin === 'string') { style.margin = margin; }
         if (typeof marginTop === 'number') { style.marginTop = `${marginTop}em`; }
         if (typeof marginTop === 'string') { style.marginTop = marginTop; }

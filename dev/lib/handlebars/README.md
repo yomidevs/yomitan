@@ -5,6 +5,7 @@ A custom version of the handlebars package which, to improve security, does not 
 ## Limitations
 
 - Only the following compile options are supported:
+
   - `data`
   - `knownHelpers`
   - `knownHelpersOnly`

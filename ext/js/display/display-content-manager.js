@@ -17,8 +17,7 @@
  */
 
 import {EventListenerCollection} from '../core/event-listener-collection.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
-import {yomitan} from '../yomitan.js';
+import {base64ToArrayBuffer} from '../data/sandbox/array-buffer-util.js';
 
 /**
  * The content manager which is used when generating HTML display content.
@@ -140,10 +139,10 @@ export class DisplayContentManager {
      */
     async _getMediaData(path, dictionary) {
         const token = this._token;
-        const datas = await yomitan.api.getMedia([{path, dictionary}]);
+        const datas = await this._display.application.api.getMedia([{path, dictionary}]);
         if (token === this._token && datas.length > 0) {
             const data = datas[0];
-            const buffer = ArrayBufferUtil.base64ToArrayBuffer(data.content);
+            const buffer = base64ToArrayBuffer(data.content);
             const blob = new Blob([buffer], {type: data.mediaType});
             const url = URL.createObjectURL(blob);
             return {data, url};

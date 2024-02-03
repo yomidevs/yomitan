@@ -21,7 +21,6 @@ import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 import {DictionaryController} from './dictionary-controller.js';
 
 export class DictionaryImportController {
@@ -120,7 +119,7 @@ export class DictionaryImportController {
             this._setModifying(true);
             this._hideErrors();
 
-            await yomitan.api.purgeDatabase();
+            await this._settingsController.application.api.purgeDatabase();
             const errors = await this._clearDictionarySettings();
 
             if (errors.length > 0) {
@@ -236,7 +235,7 @@ export class DictionaryImportController {
     async _importDictionary(file, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
         const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
-        yomitan.api.triggerDatabaseUpdated('dictionary', 'import');
+        this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
         const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
 
         if (errors.length > 0) {
@@ -399,6 +398,6 @@ export class DictionaryImportController {
 
     /** */
     _triggerStorageChanged() {
-        yomitan.triggerStorageChanged();
+        this._settingsController.application.triggerStorageChanged();
     }
 }

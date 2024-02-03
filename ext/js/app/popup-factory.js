@@ -18,7 +18,6 @@
 
 import {FrameOffsetForwarder} from '../comm/frame-offset-forwarder.js';
 import {generateId} from '../core/utilities.js';
-import {yomitan} from '../yomitan.js';
 import {PopupProxy} from './popup-proxy.js';
 import {PopupWindow} from './popup-window.js';
 import {Popup} from './popup.js';
@@ -29,13 +28,16 @@ import {Popup} from './popup.js';
 export class PopupFactory {
     /**
      * Creates a new instance.
+     * @param {import('../application.js').Application} application
      * @param {number} frameId The frame ID of the host frame.
      */
-    constructor(frameId) {
+    constructor(application, frameId) {
+        /** @type {import('../application.js').Application} */
+        this._application = application;
         /** @type {number} */
         this._frameId = frameId;
         /** @type {FrameOffsetForwarder} */
-        this._frameOffsetForwarder = new FrameOffsetForwarder(frameId);
+        this._frameOffsetForwarder = new FrameOffsetForwarder(application.crossFrame, frameId);
         /** @type {Map<string, import('popup').PopupAny>} */
         this._popups = new Map();
         /** @type {Map<string, {popup: import('popup').PopupAny, token: string}[]>} */
@@ -48,7 +50,7 @@ export class PopupFactory {
     prepare() {
         this._frameOffsetForwarder.prepare();
         /* eslint-disable no-multi-spaces */
-        yomitan.crossFrame.registerHandlers([
+        this._application.crossFrame.registerHandlers([
             ['popupFactoryGetOrCreatePopup',     this._onApiGetOrCreatePopup.bind(this)],
             ['popupFactorySetOptionsContext',    this._onApiSetOptionsContext.bind(this)],
             ['popupFactoryHide',                 this._onApiHide.bind(this)],
@@ -119,6 +121,7 @@ export class PopupFactory {
                 id = generateId(16);
             }
             const popup = new PopupWindow({
+                application: this._application,
                 id,
                 depth,
                 frameId: this._frameId
@@ -131,6 +134,7 @@ export class PopupFactory {
                 id = generateId(16);
             }
             const popup = new Popup({
+                application: this._application,
                 id,
                 depth,
                 frameId: this._frameId,
@@ -152,7 +156,7 @@ export class PopupFactory {
             }
             const useFrameOffsetForwarder = (parentPopupId === null);
             /** @type {{id: string, depth: number, frameId: number}} */
-            const info = await yomitan.crossFrame.invoke(frameId, 'popupFactoryGetOrCreatePopup', /** @type {import('popup-factory').GetOrCreatePopupDetails} */ ({
+            const info = await this._application.crossFrame.invoke(frameId, 'popupFactoryGetOrCreatePopup', /** @type {import('popup-factory').GetOrCreatePopupDetails} */ ({
                 id,
                 parentPopupId,
                 frameId,
@@ -160,6 +164,7 @@ export class PopupFactory {
             }));
             id = info.id;
             const popup = new PopupProxy({
+                application: this._application,
                 id,
                 depth: info.depth,
                 frameId: info.frameId,

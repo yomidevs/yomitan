@@ -288,6 +288,12 @@ a {
     color: var(--link-color);
     text-decoration: underline;
     cursor: pointer;
+    text-underline-offset: calc(4em / var(--font-size-no-units));
+    text-decoration-thickness: calc(1em / var(--font-size-no-units));
+}
+a:has(rt) {
+    text-decoration: none;
+    border-bottom: solid calc(1em / var(--font-size-no-units)) var(--link-color);
 }
 
 
