@@ -49,6 +49,7 @@ export type DatabaseDeinflection = {
     databaseEntries: DictionaryDatabase.TermEntry[];
 };
 
-export type TextTransformation = Language.TextTransformation & {
+export type TextTransformation = {
+    transformation: Language.TextTransformation;
     setting: string;
 };

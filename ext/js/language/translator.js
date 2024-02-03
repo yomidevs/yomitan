@@ -450,8 +450,8 @@ export class Translator {
                 text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
             }
 
-            for (const textTransformation of textTransformations.values()) {
-                const {id, transform} = textTransformation;
+            for (const {transformation} of textTransformations.values()) {
+                const {id, transform} = transformation;
                 const setting = arrayVariant.get(id);
                 text2 = transform(text2, setting, sourceMap);
             }
@@ -508,7 +508,7 @@ export class Translator {
             const value = textTransformationsOptions[id];
             if (value) {
                 textTransformations.set(id, {
-                    ...transformation,
+                    transformation,
                     setting: value
                 });
             }
@@ -550,8 +550,9 @@ export class Translator {
      * @returns {unknown[]}
      */
     _getTextTransformationVariants(transformation) {
-        for (const [optionValue, , optionSetting] of transformation.options) {
-            if (optionValue === transformation.setting) {
+        const {setting, transformation: {options}} = transformation;
+        for (const [optionValue, , optionSetting] of options) {
+            if (optionValue === setting) {
                 return optionSetting;
             }
         }

@@ -137,8 +137,8 @@ export class Offscreen {
     }
 
     /** @type {import('offscreen').ApiHandler<'getTextTransformationsOffscreen'>}*/
-    _getTextTransformationsHandler({iso}) {
-        return this._languageUtil.getTextTransformations(iso);
+    _getTextTransformationsHandler({language}) {
+        return this._languageUtil.getTextTransformations(language);
     }
 
     /** @type {import('offscreen').ApiHandler<'findKanjiOffscreen'>} */

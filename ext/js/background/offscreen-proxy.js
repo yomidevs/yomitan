@@ -166,11 +166,11 @@ export class LanguageUtilProxy {
     }
 
     /**
-     * @param {string} iso
+     * @param {string} language
      * @returns {Promise<import('language').TextTransformation[]>}
      */
-    async getTextTransformations(iso) {
-        return this._offscreen.sendMessagePromise({action: 'getTextTransformationsOffscreen', params: {iso}});
+    async getTextTransformations(language) {
+        return this._offscreen.sendMessagePromise({action: 'getTextTransformationsOffscreen', params: {language}});
     }
 
     /**

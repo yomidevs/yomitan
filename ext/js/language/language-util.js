@@ -35,7 +35,7 @@ export class LanguageUtil {
 
     /** @returns {import('language').Language[]}*/
     getLanguages() {
-        return Array.from(this.languages.values());
+        return [...this.languages.values()];
     }
 
     /**

@@ -62,7 +62,7 @@ type ApiSurface = {
     };
     getTextTransformationsOffscreen: {
         params: {
-            iso: string;
+            language: string;
         };
         return: Language.TextTransformation[];
     };
