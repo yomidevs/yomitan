@@ -55,7 +55,6 @@ async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
     const dictionaryDatabase = new DictionaryDatabase();
     await dictionaryDatabase.prepare();
     const languageUtil = new LanguageUtil();
-    languageUtil.prepare();
 
     const {errors} = await dictionaryImporter.importDictionary(
         dictionaryDatabase,

@@ -52,10 +52,6 @@ type ApiSurface = {
         };
         return: DictionaryDatabase.Media<string>[];
     };
-    languageUtilPrepareOffscreen: {
-        params: void;
-        return: void;
-    };
     getLanguagesOffscreen: {
         params: void;
         return: Language.Language[];

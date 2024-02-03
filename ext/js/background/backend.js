@@ -290,8 +290,6 @@ export class Backend {
             this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
             this._options = await this._optionsUtil.load();
 
-            await this._languageUtil.prepare();
-
             /** @type {import('language-transformer').LanguageTransformDescriptor} */
             const descriptor = await fetchJson('/data/language/japanese-transforms.json');
             this._translator.prepare(descriptor);

@@ -18,12 +18,20 @@
 import {textTransformations as textTransformationsEN} from './en/text-transformations.js';
 import {textTransformations as textTransformationsJA} from './ja/text-transformations.js';
 
-/** @type {Map<string, import('language').LanguageFeatures>} */
-export const languageFeatures = new Map([
+/** @type {Map<string, import('language').Language>} */
+export const languages = new Map([
     ['ja', {
+        name: 'Japanese',
+        iso: 'ja',
+        flag: '🇯🇵',
+        exampleText: '読め',
         textTransformations: textTransformationsJA
     }],
     ['en', {
+        name: 'English',
+        iso: 'en',
+        flag: '🇬🇧',
+        exampleText: 'read',
         textTransformations: textTransformationsEN
     }]
 ]);

@@ -15,28 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {fetchJson} from '../core/utilities.js';
-import {languageFeatures} from './index.js';
+import {languages} from './index.js';
 
 export class LanguageUtil {
     constructor() {
-        /** @type {import('language').LanguageMap}*/
-        this.languages = new Map();
     }
 
-    /** */
-    async prepare() {
-        /** @type {import('language').Language[]} */
-        const languages = await fetchJson('/js/language/index.json');
-        for (const {iso, name, flag, exampleText} of languages) {
-            const features = languageFeatures.get(iso) || {textTransformations: []};
-            this.languages.set(iso, {...features, iso, name, flag, exampleText});
-        }
-    }
 
     /** @returns {import('language').Language[]}*/
     getLanguages() {
-        return [...this.languages.values()];
+        return [...languages.values()];
     }
 
     /**
@@ -44,7 +32,7 @@ export class LanguageUtil {
      * @returns {import('language').TextTransformation[]}
      */
     getTextTransformations(iso) {
-        return this.languages.get(iso)?.textTransformations || [];
+        return languages.get(iso)?.textTransformations || [];
     }
 }
 

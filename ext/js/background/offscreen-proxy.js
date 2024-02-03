@@ -159,13 +159,6 @@ export class LanguageUtilProxy {
     }
 
     /**
-     * @returns {Promise<void>}
-     */
-    async prepare() {
-        await this._offscreen.sendMessagePromise({action: 'languageUtilPrepareOffscreen'});
-    }
-
-    /**
      * @param {string} language
      * @returns {Promise<import('language').TextTransformation[]>}
      */

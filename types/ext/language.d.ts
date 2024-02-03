@@ -17,15 +17,6 @@
 
 import {TextSourceMap} from '../../ext/js/general/text-source-map.js';
 
-export type LanguageProperties = {
-    name: string;
-    iso: string;
-    flag: string;
-    exampleText: string;
-};
-
-export type LanguagePropertiesArray = LanguageProperties[];
-
 export type TextTransformationOption<T = unknown> = [
     value: string,
     label: string,
@@ -40,10 +31,12 @@ export type TextTransformation<T = unknown> = {
     transform: (str: string, setting: T, sourceMap?: TextSourceMap) => string;
 };
 
-export type LanguageFeatures = {
+export type Language = {
+    name: string;
+    iso: string;
+    flag: string;
+    exampleText: string;
     textTransformations: TextTransformation[];
 };
-
-export type Language = LanguageProperties & LanguageFeatures;
 
 export type LanguageMap = Map<string, Language>;

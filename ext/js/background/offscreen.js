@@ -61,7 +61,6 @@ export class Offscreen {
             ['databasePurgeOffscreen',          this._purgeDatabaseHandler.bind(this)],
             ['databaseGetMediaOffscreen',       this._getMediaHandler.bind(this)],
             ['translatorPrepareOffscreen',      this._prepareTranslatorHandler.bind(this)],
-            ['languageUtilPrepareOffscreen',    this._prepareLanguageUtilHandler.bind(this)],
             ['getLanguagesOffscreen',           this._getLanguagesHandler.bind(this)],
             ['getTextTransformationsOffscreen', this._getTextTransformationsHandler.bind(this)],
             ['findKanjiOffscreen',              this._findKanjiHandler.bind(this)],
@@ -124,11 +123,6 @@ export class Offscreen {
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */
     _prepareTranslatorHandler({descriptor}) {
         this._translator.prepare(descriptor);
-    }
-
-    /** @type {import('offscreen').ApiHandler<'languageUtilPrepareOffscreen'>}*/
-    _prepareLanguageUtilHandler() {
-        this._languageUtil.prepare();
     }
 
     /** @type {import('offscreen').ApiHandler<'getLanguagesOffscreen'>}*/
