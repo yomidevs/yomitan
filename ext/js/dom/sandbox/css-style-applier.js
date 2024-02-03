@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {fetchJson} from '../../core/utilities.js';
+import {fetchJson} from '../../core/fetch-utilities.js';
 
 /**
  * This class is used to apply CSS styles to elements using a consistent method
