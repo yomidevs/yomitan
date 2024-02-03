@@ -26,7 +26,11 @@ export type LanguageProperties = {
 
 export type LanguagePropertiesArray = LanguageProperties[];
 
-export type TextTransformationOption<T = unknown> = [string, string, T[]];
+export type TextTransformationOption<T = unknown> = [
+    value: string,
+    label: string,
+    option: T[],
+];
 
 export type TextTransformation<T = unknown> = {
     id: string;

@@ -352,7 +352,7 @@ export type LanguageOptions = {
 };
 
 export type LanguagesOptions = {
-    [iso: string]: LanguageOptions;
+    [language: string]: LanguageOptions;
 };
 
 export type PreventMiddleMouseOptions = {

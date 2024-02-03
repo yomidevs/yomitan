@@ -785,6 +785,7 @@
                             },
                             "languages": {
                                 "type": "object",
+                                "required": ["ja"],
                                 "propertyNames": {
                                     "type": "string"
                                 },
