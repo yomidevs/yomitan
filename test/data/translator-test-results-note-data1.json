@@ -29737,6 +29737,13 @@
               "inflectionRules": [
                 "past"
               ]
+            },
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "past",
+                "ksb"
+              ]
             }
           ],
           "score": 1,
