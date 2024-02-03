@@ -20,13 +20,14 @@ import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {bench, describe} from 'vitest';
 import {parseJson} from '../dev/json.js';
-import {Deinflector} from '../ext/js/language/deinflector.js';
+import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/** @type {import('deinflector').ReasonsRaw} */
-const deinflectionReasons = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/deinflect.json'), {encoding: 'utf8'}));
-const deinflector = new Deinflector(deinflectionReasons);
+/** @type {import('language-transformer').LanguageTransformDescriptor} */
+const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/language/japanese-transforms.json'), {encoding: 'utf8'}));
+const languageTransformer = new LanguageTransformer();
+languageTransformer.addDescriptor(descriptor);
 
 describe('Deinflector basic tests', () => {
     const adjectiveInflections = [
@@ -96,8 +97,8 @@ describe('Deinflector basic tests', () => {
     ];
 
     bench('deinflection', () => {
-        for (const inflection of [...adjectiveInflections, ...verbInflections, ...inflectionCombinations]) {
-            deinflector.deinflect(inflection);
+        for (const transform of [...adjectiveInflections, ...verbInflections, ...inflectionCombinations]) {
+            languageTransformer.transform(transform);
         }
     });
 });
