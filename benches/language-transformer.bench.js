@@ -29,7 +29,7 @@ const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'da
 const languageTransformer = new LanguageTransformer();
 languageTransformer.addDescriptor(descriptor);
 
-describe('Deinflector basic tests', () => {
+describe('Language transformer basic tests', () => {
     const adjectiveInflections = [
         '愛しい',
         '愛しそう',
@@ -96,7 +96,7 @@ describe('Deinflector basic tests', () => {
         '食べさせられたくなかった'
     ];
 
-    bench('deinflection', () => {
+    bench('transformations', () => {
         for (const transform of [...adjectiveInflections, ...verbInflections, ...inflectionCombinations]) {
             languageTransformer.transform(transform);
         }
