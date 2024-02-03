@@ -19,6 +19,7 @@
  * Gets a list of field markers from the standard Handlebars template.
  * @param {import('dictionary').DictionaryEntryType} type What type of dictionary entry to get the fields for.
  * @returns {string[]} The list of field markers.
+ * @throws {Error}
  */
 export function getStandardFieldMarkers(type) {
     switch (type) {
@@ -87,6 +88,6 @@ export function getStandardFieldMarkers(type) {
                 'url'
             ];
         default:
-            return [];
+            throw new Error(`Unsupported type: ${type}`);
     }
 }
