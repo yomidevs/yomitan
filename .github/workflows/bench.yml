@@ -30,5 +30,3 @@ jobs:
         with:
           token: ${{ secrets.CODSPEED_TOKEN }}
           run: npm run bench
-          env:
-            CI: true
