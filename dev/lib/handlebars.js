@@ -15,4 +15,4 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export {Handlebars} from 'kbn-handlebars/src/handlebars.js';
+export {Handlebars} from 'yomitan-handlebars/src/handlebars.js';
