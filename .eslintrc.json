@@ -615,8 +615,8 @@
                 "ext/js/core.js",
                 "ext/js/core/extension-error.js",
                 "ext/js/**/sandbox/**/*.js",
-                "ext/js/language/languages/ja/japanese.js",
-                "ext/js/language/languages/ja/japanese-wanakana.js"
+                "ext/js/language/ja/japanese.js",
+                "ext/js/language/ja/japanese-wanakana.js"
             ],
             "env": {
                 "webextensions": false

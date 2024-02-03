@@ -22,7 +22,7 @@ import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../../dictionar
 import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../../display/sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
 import {CssStyleApplier} from '../../dom/sandbox/css-style-applier.js';
-import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../../language/languages/ja/japanese.js';
+import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../../language/ja/japanese.js';
 import {AnkiTemplateRendererContentManager} from './anki-template-renderer-content-manager.js';
 import {TemplateRendererMediaProvider} from './template-renderer-media-provider.js';
 import {TemplateRenderer} from './template-renderer.js';

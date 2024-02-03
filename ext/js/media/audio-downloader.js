@@ -23,7 +23,7 @@ import {JsonSchema} from '../data/json-schema.js';
 import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
 import {SimpleDOMParser} from '../dom/simple-dom-parser.js';
-import {isStringEntirelyKana} from '../language/languages/ja/japanese.js';
+import {isStringEntirelyKana} from '../language/ja/japanese.js';
 
 export class AudioDownloader {
     /**

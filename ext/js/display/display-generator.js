@@ -20,7 +20,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {isObject} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
-import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji, isStringPartiallyJapanese} from '../language/languages/ja/japanese.js';
+import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji, isStringPartiallyJapanese} from '../language/ja/japanese.js';
 import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
 

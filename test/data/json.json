@@ -96,7 +96,7 @@
             "type": "LanguageTransformDescriptor"
         },
         {
-            "path": "ext/js/language/languages/index.json",
+            "path": "ext/js/language/index.json",
             "typeFile": "types/ext/language.d.ts",
             "type": "LanguagePropertiesArray"
         },

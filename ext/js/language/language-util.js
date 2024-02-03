@@ -16,7 +16,7 @@
  */
 
 import {fetchJson} from '../core/utilities.js';
-import {languageFeatures} from './languages/index.js';
+import {languageFeatures} from './index.js';
 
 export class LanguageUtil {
     constructor() {
@@ -27,7 +27,7 @@ export class LanguageUtil {
     /** */
     async prepare() {
         /** @type {import('language').Language[]} */
-        const languages = await fetchJson('/js/language/languages/index.json');
+        const languages = await fetchJson('/js/language/index.json');
         for (const {iso, name, flag, exampleText} of languages) {
             const features = languageFeatures.get(iso) || {textTransformations: []};
             this.languages.set(iso, {...features, iso, name, flag, exampleText});
