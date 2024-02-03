@@ -31,11 +31,6 @@
             "type": "ManifestConfig"
         },
         {
-            "path": "ext/data/deinflect.json",
-            "typeFile": "types/ext/deinflector.d.ts",
-            "type": "ReasonsRaw"
-        },
-        {
             "path": "ext/data/pronunciation-style.json",
             "typeFile": "types/ext/css-style-applier.d.ts",
             "type": "RawStyleData"
@@ -94,6 +89,11 @@
             "path": "ext/data/schemas/options-schema.json",
             "typeFile": "types/test/json.d.ts",
             "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/language/japanese-transforms.json",
+            "typeFile": "types/ext/language-transformer.d.ts",
+            "type": "LanguageTransformDescriptor"
         },
         {
             "path": "test/data/translator-test-inputs.json",

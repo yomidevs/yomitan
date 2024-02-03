@@ -15,7 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {TextScanner} from '../../ext/js/language/text-scanner';
+import type {TextSourceGenerator} from '../../ext/js/dom/text-source-generator';
+import type {API} from '../../ext/js/comm/api';
 import type * as Dictionary from './dictionary';
 import type * as Display from './display';
 import type * as Input from './input';
@@ -92,18 +93,6 @@ export type InputConfig = {
     preventPenScrolling: boolean;
 };
 
-export type SearchedEventDetails = {
-    textScanner: TextScanner;
-    type: Display.PageType | null;
-    dictionaryEntries: Dictionary.DictionaryEntry[] | null;
-    sentence: Display.HistoryStateSentence | null;
-    inputInfo: InputInfo;
-    textSource: TextSource.TextSource;
-    optionsContext: Settings.OptionsContext | null;
-    detail: SearchResultDetail | null;
-    error: Error | null;
-};
-
 export type InputInfo = {
     input: InputConfig | null;
     pointerType: PointerType;
@@ -120,9 +109,25 @@ export type InputInfoDetail = {
 };
 
 export type Events = {
-    searched: SearchedEventDetails;
     clear: {
         reason: ClearReason;
+    };
+    searchSuccess: {
+        type: 'terms' | 'kanji';
+        dictionaryEntries: Dictionary.DictionaryEntry[];
+        sentence: Display.HistoryStateSentence;
+        inputInfo: InputInfo;
+        textSource: TextSource.TextSource;
+        optionsContext: Settings.OptionsContext;
+        detail: SearchResultDetail;
+    };
+    searchEmpty: {
+        inputInfo: InputInfo;
+    };
+    searchError: {
+        error: Error;
+        textSource: TextSource.TextSource;
+        inputInfo: InputInfo;
     };
 };
 
@@ -137,6 +142,7 @@ export type GetSearchContextCallbackSync = () => SearchContext;
 export type GetSearchContextCallbackAsync = () => Promise<SearchContext>;
 
 export type ConstructorDetails = {
+    api: API;
     node: HTMLElement | Window;
     getSearchContext: GetSearchContextCallback;
     ignoreElements?: (() => Element[]) | null;
@@ -145,11 +151,12 @@ export type ConstructorDetails = {
     searchKanji?: boolean;
     searchOnClick?: boolean;
     searchOnClickOnly?: boolean;
+    textSourceGenerator: TextSourceGenerator;
 };
 
 export type SearchContext = {
     optionsContext: Settings.OptionsContext;
-    detail?: SearchResultDetail;
+    detail: SearchResultDetail;
 };
 
 export type SelectionRestoreInfo = {

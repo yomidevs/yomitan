@@ -18,12 +18,21 @@
 
 import {isObject} from '../../core/utilities.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 
 export class PersistentStorageController {
-    constructor() {
+    /**
+     * @param {import('../../application.js').Application} application
+     */
+    constructor(application) {
+        /** @type {import('../../application.js').Application} */
+        this._application = application;
         /** @type {HTMLInputElement} */
         this._persistentStorageCheckbox = querySelectorNotNull(document, '#storage-persistent-checkbox');
+    }
+
+    /** @type {import('../../application.js').Application} */
+    get application() {
+        return this._application;
     }
 
     /** */
@@ -82,7 +91,7 @@ export class PersistentStorageController {
         const node = document.querySelector('#storage-persistent-fail-warning');
         if (node !== null) { node.hidden = isStoragePeristent; }
 
-        yomitan.triggerStorageChanged();
+        this._application.triggerStorageChanged();
     }
 
     /**

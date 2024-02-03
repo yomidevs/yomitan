@@ -23,17 +23,15 @@ import {dirname, join} from 'path';
 import {expect, vi} from 'vitest';
 import {parseJson} from '../../dev/json.js';
 import {createDictionaryArchive} from '../../dev/util.js';
-import {AnkiNoteDataCreator} from '../../ext/js/data/sandbox/anki-note-data-creator.js';
 import {DictionaryDatabase} from '../../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../../ext/js/dictionary/dictionary-importer.js';
-import {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util.js';
 import {Translator} from '../../ext/js/language/translator.js';
 import {chrome, fetch} from '../mocks/common.js';
 import {DictionaryImporterMediaLoader} from '../mocks/dictionary-importer-media-loader.js';
 import {createDomTest} from './dom-test.js';
 
 const extDir = join(dirname(fileURLToPath(import.meta.url)), '../../ext');
-const deinflectionReasonsPath = join(extDir, 'data/deinflect.json');
+const languageTransformDescriptorPath = join(extDir, 'data/language/japanese-transforms.json');
 
 vi.stubGlobal('indexedDB', indexedDB);
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
@@ -43,7 +41,7 @@ vi.stubGlobal('chrome', chrome);
 /**
  * @param {string} dictionaryDirectory
  * @param {string} dictionaryName
- * @returns {Promise<{translator: Translator, ankiNoteDataCreator: AnkiNoteDataCreator}>}
+ * @returns {Promise<Translator>}
  */
 async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
     // Dictionary
@@ -65,37 +63,28 @@ async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
     expect(errors.length).toEqual(0);
 
     // Setup translator
-    const japaneseUtil = new JapaneseUtil(null);
-    const translator = new Translator({japaneseUtil, database: dictionaryDatabase});
-    /** @type {import('deinflector').ReasonsRaw} */
-    const deinflectionReasons = parseJson(readFileSync(deinflectionReasonsPath, {encoding: 'utf8'}));
+    const translator = new Translator({database: dictionaryDatabase});
+    /** @type {import('language-transformer').LanguageTransformDescriptor} */
+    const deinflectionReasons = parseJson(readFileSync(languageTransformDescriptorPath, {encoding: 'utf8'}));
     translator.prepare(deinflectionReasons);
 
-    // Assign properties
-    const ankiNoteDataCreator = new AnkiNoteDataCreator(japaneseUtil);
-    return {translator, ankiNoteDataCreator};
+    return translator;
 }
 
 /**
  * @param {string|undefined} htmlFilePath
  * @param {string} dictionaryDirectory
  * @param {string} dictionaryName
- * @returns {Promise<import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator, ankiNoteDataCreator: AnkiNoteDataCreator}>>}
+ * @returns {Promise<import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator}>>}
  */
 export async function createTranslatorTest(htmlFilePath, dictionaryDirectory, dictionaryName) {
     const test = createDomTest(htmlFilePath);
-    const {translator, ankiNoteDataCreator} = await createTranslatorContext(dictionaryDirectory, dictionaryName);
-    /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator, ankiNoteDataCreator: AnkiNoteDataCreator}>} */
+    const translator = await createTranslatorContext(dictionaryDirectory, dictionaryName);
+    /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator}>} */
     const result = test.extend({
         window: async ({window}, use) => { await use(window); },
         // eslint-disable-next-line no-empty-pattern
-        translator: async ({}, use) => { await use(translator); },
-        ankiNoteDataCreator: async ({window}, use) => {
-            // The window property needs to be referenced for it to be initialized.
-            // It is needed for DOM access for structured content.
-            void window;
-            await use(ankiNoteDataCreator);
-        }
+        translator: async ({}, use) => { await use(translator); }
     });
     return result;
 }

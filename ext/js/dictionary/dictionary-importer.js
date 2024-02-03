@@ -24,11 +24,11 @@ import {
     ZipReader as ZipReader0,
     configure
 } from '../../lib/zip.js';
-import {stringReverse} from '../core/utilities.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {toError} from '../core/to-error.js';
-import {MediaUtil} from '../media/media-util.js';
+import {stringReverse} from '../core/utilities.js';
+import {getFileExtensionFromImageMediaType, getImageMediaTypeFromFileName} from '../media/media-util.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
 const BlobWriter = /** @type {typeof import('@zip.js/zip.js').BlobWriter} */ (/** @type {unknown} */ (BlobWriter0));
@@ -560,7 +560,7 @@ export class DictionaryImporter {
         // Check if already added
         let mediaData = media.get(path);
         if (typeof mediaData !== 'undefined') {
-            if (MediaUtil.getFileExtensionFromImageMediaType(mediaData.mediaType) === null) {
+            if (getFileExtensionFromImageMediaType(mediaData.mediaType) === null) {
                 throw createError('Media file is not a valid image');
             }
             return mediaData;
@@ -575,7 +575,7 @@ export class DictionaryImporter {
         // Load file content
         let content = await (await this._getData(file, new BlobWriter())).arrayBuffer();
 
-        const mediaType = MediaUtil.getImageMediaTypeFromFileName(path);
+        const mediaType = getImageMediaTypeFromFileName(path);
         if (mediaType === null) {
             throw createError('Could not determine media type for image');
         }

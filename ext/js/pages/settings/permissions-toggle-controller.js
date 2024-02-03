@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {getAllPermissions, hasPermissions, setPermissionsGranted} from '../../data/permissions-util.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
 
 export class PermissionsToggleController {
@@ -85,11 +86,11 @@ export class PermissionsToggleController {
             toggle.checked = valuePre;
             const permissions = this._getRequiredPermissions(toggle);
             try {
-                value = await this._settingsController.permissionsUtil.setPermissionsGranted({permissions}, value);
+                value = await setPermissionsGranted({permissions}, value);
             } catch (error) {
                 value = valuePre;
                 try {
-                    value = await this._settingsController.permissionsUtil.hasPermissions({permissions});
+                    value = await hasPermissions({permissions});
                 } catch (error2) {
                     // NOP
                 }
@@ -111,13 +112,13 @@ export class PermissionsToggleController {
         const permissionsSet = new Set(typeof permissions2 !== 'undefined' ? permissions2 : []);
         for (const toggle of /** @type {NodeListOf<HTMLInputElement>} */ (this._toggles)) {
             const {permissionsSetting} = toggle.dataset;
-            const hasPermissions = this._hasAll(permissionsSet, this._getRequiredPermissions(toggle));
+            const hasPermissions2 = this._hasAll(permissionsSet, this._getRequiredPermissions(toggle));
 
             if (typeof permissionsSetting === 'string') {
-                const valid = !toggle.checked || hasPermissions;
+                const valid = !toggle.checked || hasPermissions2;
                 this._setToggleValid(toggle, valid);
             } else {
-                toggle.checked = hasPermissions;
+                toggle.checked = hasPermissions2;
             }
         }
     }
@@ -134,7 +135,7 @@ export class PermissionsToggleController {
 
     /** */
     async _updateValidity() {
-        const permissions = await this._settingsController.permissionsUtil.getAllPermissions();
+        const permissions = await getAllPermissions();
         this._onPermissionsChanged({permissions});
     }
 

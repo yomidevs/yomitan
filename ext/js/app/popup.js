@@ -24,7 +24,6 @@ import {ExtensionError} from '../core/extension-error.js';
 import {deepEqual} from '../core/utilities.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {loadStyle} from '../dom/style-util.js';
-import {yomitan} from '../yomitan.js';
 import {ThemeController} from './theme-controller.js';
 
 /**
@@ -37,12 +36,15 @@ export class Popup extends EventDispatcher {
      * @param {import('popup').PopupConstructorDetails} details The details used to construct the new instance.
      */
     constructor({
+        application,
         id,
         depth,
         frameId,
         childrenSupported
     }) {
         super();
+        /** @type {import('../application.js').Application} */
+        this._application = application;
         /** @type {string} */
         this._id = id;
         /** @type {number} */
@@ -206,7 +208,7 @@ export class Popup extends EventDispatcher {
         this._frame.addEventListener('scroll', (e) => e.stopPropagation());
         this._frame.addEventListener('load', this._onFrameLoad.bind(this));
         this._visible.on('change', this._onVisibleChange.bind(this));
-        yomitan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
+        this._application.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         this._onVisibleChange({value: this.isVisibleSync()});
         this._themeController.prepare();
     }
@@ -362,7 +364,7 @@ export class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        const node = await loadStyle('yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
+        const node = await loadStyle(this._application, 'yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
         this.trigger('customOuterCssChanged', {node, useWebExtensionApi, inShadow});
     }
 
@@ -575,7 +577,7 @@ export class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        await loadStyle('yomitan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
+        await loadStyle(this._application, 'yomitan-popup-outer-stylesheet', fileType, '/css/popup-outer.css', useWebExtensionApi, parentNode);
     }
 
     /**
@@ -697,7 +699,7 @@ export class Popup extends EventDispatcher {
         /** @type {import('display').DirectApiMessage<TName>} */
         const message = {action, params};
         const wrappedMessage = this._frameClient.createMessage(message);
-        return /** @type {import('display').DirectApiReturn<TName>} */ (await yomitan.crossFrame.invoke(
+        return /** @type {import('display').DirectApiReturn<TName>} */ (await this._application.crossFrame.invoke(
             this._frameClient.frameId,
             'displayPopupMessage1',
             /** @type {import('display').DirectApiFrameClientMessageAny} */ (wrappedMessage)
@@ -714,7 +716,7 @@ export class Popup extends EventDispatcher {
         try {
             return await this._invoke(action, params);
         } catch (e) {
-            if (!yomitan.webExtension.unloaded) { throw e; }
+            if (!this._application.webExtension.unloaded) { throw e; }
             return void 0;
         }
     }
@@ -1008,7 +1010,7 @@ export class Popup extends EventDispatcher {
      */
     async _setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
-        const options = await yomitan.api.optionsGet(optionsContext);
+        const options = await this._application.api.optionsGet(optionsContext);
         const {general} = options;
         this._themeController.theme = general.popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;

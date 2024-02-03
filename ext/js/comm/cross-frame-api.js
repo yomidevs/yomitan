@@ -22,7 +22,6 @@ import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {log} from '../core/logger.js';
-import {yomitan} from '../yomitan.js';
 
 /**
  * @augments EventDispatcher<import('cross-frame-api').CrossFrameAPIPortEvents>
@@ -290,7 +289,12 @@ export class CrossFrameAPIPort extends EventDispatcher {
 }
 
 export class CrossFrameAPI {
-    constructor() {
+    /**
+     * @param {import('../comm/api.js').API} api
+     */
+    constructor(api) {
+        /** @type {import('../comm/api.js').API} */
+        this._api = api;
         /** @type {number} */
         this._ackTimeout = 3000; // 3 seconds
         /** @type {number} */
@@ -310,7 +314,7 @@ export class CrossFrameAPI {
     /** */
     async prepare() {
         chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
-        ({tabId: this._tabId = null, frameId: this._frameId = null} = await yomitan.api.frameInformationGet());
+        ({tabId: this._tabId = null, frameId: this._frameId = null} = await this._api.frameInformationGet());
     }
 
     /**
@@ -411,7 +415,7 @@ export class CrossFrameAPI {
      * @returns {Promise<CrossFrameAPIPort>}
      */
     async _createCommPort(otherTabId, otherFrameId) {
-        await yomitan.api.openCrossFramePort(otherTabId, otherFrameId);
+        await this._api.openCrossFramePort(otherTabId, otherFrameId);
 
         const tabPorts = this._commPorts.get(otherTabId);
         if (typeof tabPorts !== 'undefined') {

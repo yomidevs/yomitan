@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Deinflector from './deinflector';
 import type * as Dictionary from './dictionary';
 import type * as DictionaryDatabase from './dictionary-database';
 import type * as DictionaryImporter from './dictionary-importer';
@@ -30,6 +29,7 @@ import type {
     ApiReturn as BaseApiReturn,
     ApiNames as BaseApiNames,
 } from './api-map';
+import type {LanguageTransformDescriptor} from './language-transformer';
 
 type ApiSurface = {
     databasePrepareOffscreen: {
@@ -52,7 +52,7 @@ type ApiSurface = {
     };
     translatorPrepareOffscreen: {
         params: {
-            deinflectionReasons: Deinflector.ReasonsRaw;
+            descriptor: LanguageTransformDescriptor;
         };
         return: void;
     };

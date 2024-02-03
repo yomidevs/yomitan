@@ -16,9 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {RegexUtil} from '../general/regex-util.js';
+import {applyTextReplacement} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
-import {Deinflector} from './deinflector.js';
+import {convertAlphabeticToKana} from './japanese-wanakana.js';
+import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth, isCodePointJapanese} from './japanese.js';
+import {LanguageTransformer} from './language-transformer.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
@@ -28,13 +30,11 @@ export class Translator {
      * Creates a new Translator instance.
      * @param {import('translator').ConstructorDetails} details The details for the class.
      */
-    constructor({japaneseUtil, database}) {
-        /** @type {import('./sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
+    constructor({database}) {
         /** @type {import('../dictionary/dictionary-database.js').DictionaryDatabase} */
         this._database = database;
-        /** @type {?Deinflector} */
-        this._deinflector = null;
+        /** @type {LanguageTransformer} */
+        this._languageTransformer = new LanguageTransformer();
         /** @type {import('translator').DictionaryTagCache} */
         this._tagCache = new Map();
         /** @type {Intl.Collator} */
@@ -44,12 +44,11 @@ export class Translator {
     }
 
     /**
-     * Initializes the instance for use. The public API should not be used until
-     * this function has been called.
-     * @param {import('deinflector').ReasonsRaw} deinflectionReasons The raw deinflections reasons data that the Deinflector uses.
+     * Initializes the instance for use. The public API should not be used until this function has been called.
+     * @param {import('language-transformer').LanguageTransformDescriptor} descriptor
      */
-    prepare(deinflectionReasons) {
-        this._deinflector = new Deinflector(deinflectionReasons);
+    prepare(descriptor) {
+        this._languageTransformer.addDescriptor(descriptor);
     }
 
     /**
@@ -407,10 +406,9 @@ export class Translator {
             const entryDictionary = /** @type {import('translation').FindTermDictionary} */ (enabledDictionaryMap.get(databaseEntry.dictionary));
             const {partsOfSpeechFilter} = entryDictionary;
 
-            const definitionRules = Deinflector.rulesToRuleFlags(databaseEntry.rules);
+            const definitionConditions = this._languageTransformer.getConditionFlagsFromPartsOfSpeech(databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
-                const deinflectionRules = deinflection.rules;
-                if (!partsOfSpeechFilter || Deinflector.rulesMatch(deinflectionRules, definitionRules)) {
+                if (!partsOfSpeechFilter || LanguageTransformer.conditionsMatch(deinflection.conditions, definitionConditions)) {
                     deinflection.databaseEntries.push(databaseEntry);
                 }
             }
@@ -436,7 +434,6 @@ export class Translator {
             this._getCollapseEmphaticOptions(options)
         ];
 
-        const jp = this._japaneseUtil;
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const deinflections = [];
         const used = new Set();
@@ -447,22 +444,22 @@ export class Translator {
                 text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
             }
             if (halfWidth) {
-                text2 = jp.convertHalfWidthKanaToFullWidth(text2, sourceMap);
+                text2 = convertHalfWidthKanaToFullWidth(text2, sourceMap);
             }
             if (numeric) {
-                text2 = jp.convertNumericToFullWidth(text2);
+                text2 = convertNumericToFullWidth(text2);
             }
             if (alphabetic) {
-                text2 = jp.convertAlphabeticToKana(text2, sourceMap);
+                text2 = convertAlphabeticToKana(text2, sourceMap);
             }
             if (katakana) {
-                text2 = jp.convertHiraganaToKatakana(text2);
+                text2 = convertHiraganaToKatakana(text2);
             }
             if (hiragana) {
-                text2 = jp.convertKatakanaToHiragana(text2);
+                text2 = convertKatakanaToHiragana(text2);
             }
             if (collapseEmphatic) {
-                text2 = jp.collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
+                text2 = collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
             }
 
             for (
@@ -474,13 +471,13 @@ export class Translator {
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                for (const {term, rules, reasons} of /** @type {Deinflector} */ (this._deinflector).deinflect(source)) {
+                for (const {text: transformedText, conditions, trace} of this._languageTransformer.transform(source)) {
                     /** @type {import('dictionary').InflectionRuleChainCandidate} */
                     const inflectionRuleChainCandidate = {
                         source: 'algorithm',
-                        inflectionRules: reasons
+                        inflectionRules: trace.map((frame) => frame.transform)
                     };
-                    deinflections.push(this._createDeinflection(rawSource, source, term, rules, [inflectionRuleChainCandidate]));
+                    deinflections.push(this._createDeinflection(rawSource, source, transformedText, conditions, [inflectionRuleChainCandidate]));
                 }
             }
         }
@@ -509,7 +506,7 @@ export class Translator {
      */
     _applyTextReplacements(text, sourceMap, replacements) {
         for (const {pattern, replacement} of replacements) {
-            text = RegexUtil.applyTextReplacement(text, sourceMap, pattern, replacement);
+            text = applyTextReplacement(text, sourceMap, pattern, replacement);
         }
         return text;
     }
@@ -519,10 +516,9 @@ export class Translator {
      * @returns {string}
      */
     _getJapaneseOnlyText(text) {
-        const jp = this._japaneseUtil;
         let length = 0;
         for (const c of text) {
-            if (!jp.isCodePointJapanese(/** @type {number} */ (c.codePointAt(0)))) {
+            if (!isCodePointJapanese(/** @type {number} */ (c.codePointAt(0)))) {
                 return text.substring(0, length);
             }
             length += c.length;
@@ -572,12 +568,12 @@ export class Translator {
      * @param {string} originalText
      * @param {string} transformedText
      * @param {string} deinflectedText
-     * @param {import('translation-internal').DeinflectionRuleFlags} rules
+     * @param {number} conditions
      * @param {import('dictionary').InflectionRuleChainCandidate[]} inflectionRuleChainCandidates
      * @returns {import('translation-internal').DatabaseDeinflection}
      */
-    _createDeinflection(originalText, transformedText, deinflectedText, rules, inflectionRuleChainCandidates) {
-        return {originalText, transformedText, deinflectedText, rules, inflectionRuleChainCandidates, databaseEntries: []};
+    _createDeinflection(originalText, transformedText, deinflectedText, conditions, inflectionRuleChainCandidates) {
+        return {originalText, transformedText, deinflectedText, conditions, inflectionRuleChainCandidates, databaseEntries: []};
     }
 
     // Term dictionary entry grouping

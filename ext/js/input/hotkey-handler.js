@@ -19,7 +19,6 @@
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {DocumentUtil} from '../dom/document-util.js';
-import {yomitan} from '../yomitan.js';
 
 /**
  * Class which handles hotkey events and actions.
@@ -47,11 +46,12 @@ export class HotkeyHandler extends EventDispatcher {
 
     /**
      * Begins listening to key press events in order to detect hotkeys.
+     * @param {import('../comm/cross-frame-api.js').CrossFrameAPI} crossFrameApi
      */
-    prepare() {
+    prepare(crossFrameApi) {
         this._isPrepared = true;
         this._updateEventHandlers();
-        yomitan.crossFrame.registerHandlers([
+        crossFrameApi.registerHandlers([
             ['hotkeyHandlerForwardHotkey', this._onMessageForwardHotkey.bind(this)]
         ]);
     }

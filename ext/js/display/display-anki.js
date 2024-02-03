@@ -20,19 +20,17 @@ import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {toError} from '../core/to-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
-import {AnkiUtil} from '../data/anki-util.js';
+import {isNoteDataValid} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
-import {yomitan} from '../yomitan.js';
 
 export class DisplayAnki {
     /**
      * @param {import('./display.js').Display} display
      * @param {import('./display-audio.js').DisplayAudio} displayAudio
-     * @param {import('../language/sandbox/japanese-util.js').JapaneseUtil} japaneseUtil
      */
-    constructor(display, displayAudio, japaneseUtil) {
+    constructor(display, displayAudio) {
         /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {import('./display-audio.js').DisplayAudio} */
@@ -42,7 +40,7 @@ export class DisplayAnki {
         /** @type {?string} */
         this._ankiFieldTemplatesDefault = null;
         /** @type {AnkiNoteBuilder} */
-        this._ankiNoteBuilder = new AnkiNoteBuilder(japaneseUtil, new TemplateRendererProxy());
+        this._ankiNoteBuilder = new AnkiNoteBuilder(display.application.api, new TemplateRendererProxy());
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._errorNotification = null;
         /** @type {?EventListenerCollection} */
@@ -488,7 +486,7 @@ export class DisplayAnki {
             let noteId = null;
             let addNoteOkay = false;
             try {
-                noteId = await yomitan.api.addAnkiNote(note);
+                noteId = await this._display.application.api.addAnkiNote(note);
                 addNoteOkay = true;
             } catch (e) {
                 allErrors.length = 0;
@@ -501,7 +499,7 @@ export class DisplayAnki {
                 } else {
                     if (this._suspendNewCards) {
                         try {
-                            await yomitan.api.suspendAnkiCardsForNote(noteId);
+                            await this._display.application.api.suspendAnkiCardsForNote(noteId);
                         } catch (e) {
                             allErrors.push(toError(e));
                         }
@@ -606,7 +604,7 @@ export class DisplayAnki {
         templates = this._ankiFieldTemplatesDefault;
         if (typeof templates === 'string') { return templates; }
 
-        templates = await yomitan.api.getDefaultAnkiFieldTemplates();
+        templates = await this._display.application.api.getDefaultAnkiFieldTemplates();
         this._ankiFieldTemplatesDefault = templates;
         return templates;
     }
@@ -640,12 +638,12 @@ export class DisplayAnki {
         let ankiError = null;
         try {
             if (forceCanAddValue !== null) {
-                if (!await yomitan.api.isAnkiConnected()) {
+                if (!await this._display.application.api.isAnkiConnected()) {
                     throw new Error('Anki not connected');
                 }
                 infos = this._getAnkiNoteInfoForceValue(notes, forceCanAddValue);
             } else {
-                infos = await yomitan.api.getAnkiNoteInfo(notes, fetchAdditionalInfo);
+                infos = await this._display.application.api.getAnkiNoteInfo(notes, fetchAdditionalInfo);
             }
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValue(notes, false);
@@ -677,7 +675,7 @@ export class DisplayAnki {
     _getAnkiNoteInfoForceValue(notes, canAdd) {
         const results = [];
         for (const note of notes) {
-            const valid = AnkiUtil.isNoteDataValid(note);
+            const valid = isNoteDataValid(note);
             results.push({canAdd, valid, noteIds: null});
         }
         return results;
@@ -854,7 +852,7 @@ export class DisplayAnki {
         const noteIds = this._getNodeNoteIds(node);
         if (noteIds.length === 0) { return; }
         try {
-            await yomitan.api.noteView(noteIds[0], this._noteGuiMode, false);
+            await this._display.application.api.noteView(noteIds[0], this._noteGuiMode, false);
         } catch (e) {
             const displayErrors = (
                 toError(e).message === 'Mode not supported' ?

@@ -18,7 +18,6 @@
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-import {yomitan} from '../../yomitan.js';
 
 export class SecondarySearchDictionaryController {
     /**
@@ -41,7 +40,7 @@ export class SecondarySearchDictionaryController {
     async prepare() {
         await this._onDatabaseUpdated();
 
-        yomitan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+        this._settingsController.application.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._settingsController.on('dictionarySettingsReordered', this._onDictionarySettingsReordered.bind(this));
     }

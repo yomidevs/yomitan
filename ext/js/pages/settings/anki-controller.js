@@ -21,11 +21,11 @@ import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {ExtensionError} from '../../core/extension-error.js';
 import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
-import {AnkiUtil} from '../../data/anki-util.js';
+import {stringContainsAnyFieldMarker} from '../../data/anki-util.js';
+import {getRequiredPermissionsForAnkiFieldValue, hasPermissions, setPermissionsGranted} from '../../data/permissions-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
-import {yomitan} from '../../yomitan.js';
 
 export class AnkiController {
     /**
@@ -138,6 +138,10 @@ export class AnkiController {
                     'document-title',
                     'expression',
                     'frequencies',
+                    'frequency-harmonic-rank',
+                    'frequency-harmonic-occurrence',
+                    'frequency-average-rank',
+                    'frequency-average-occurrence',
                     'furigana',
                     'furigana-plain',
                     'glossary',
@@ -168,6 +172,11 @@ export class AnkiController {
                     'cloze-suffix',
                     'dictionary',
                     'document-title',
+                    'frequencies',
+                    'frequency-harmonic-rank',
+                    'frequency-harmonic-occurrence',
+                    'frequency-average-rank',
+                    'frequency-average-occurrence',
                     'glossary',
                     'kunyomi',
                     'onyomi',
@@ -211,7 +220,7 @@ export class AnkiController {
      * @returns {string[]}
      */
     getRequiredPermissions(fieldValue) {
-        return this._settingsController.permissionsUtil.getRequiredPermissionsForAnkiFieldValue(fieldValue);
+        return getRequiredPermissionsForAnkiFieldValue(fieldValue);
     }
 
     // Private
@@ -509,7 +518,7 @@ export class AnkiController {
 
         let noteId = null;
         for (const query of queries) {
-            const notes = await yomitan.api.findAnkiNotes(query);
+            const notes = await this._settingsController.application.api.findAnkiNotes(query);
             if (notes.length > 0) {
                 noteId = notes[0];
                 break;
@@ -520,7 +529,7 @@ export class AnkiController {
             throw new Error('Could not find a note to test with');
         }
 
-        await yomitan.api.noteView(noteId, mode, false);
+        await this._settingsController.application.api.noteView(noteId, mode, false);
     }
 
     /**
@@ -738,7 +747,7 @@ class AnkiCardController {
      */
     _validateField(node, index) {
         let valid = (node.dataset.hasPermissions !== 'false');
-        if (valid && index === 0 && !AnkiUtil.stringContainsAnyFieldMarker(node.value)) {
+        if (valid && index === 0 && !stringContainsAnyFieldMarker(node.value)) {
             valid = false;
         }
         node.dataset.invalid = `${!valid}`;
@@ -936,7 +945,7 @@ class AnkiCardController {
      */
     async _requestPermissions(permissions) {
         try {
-            await this._settingsController.permissionsUtil.setPermissionsGranted({permissions}, true);
+            await setPermissionsGranted({permissions}, true);
         } catch (e) {
             log.error(e);
         }
@@ -952,12 +961,12 @@ class AnkiCardController {
         const permissions = this._ankiController.getRequiredPermissions(fieldValue);
         if (permissions.length > 0) {
             node.dataset.requiredPermission = permissions.join(' ');
-            const hasPermissions = await (
+            const hasPermissions2 = await (
                 request ?
-                this._settingsController.permissionsUtil.setPermissionsGranted({permissions}, true) :
-                this._settingsController.permissionsUtil.hasPermissions({permissions})
+                setPermissionsGranted({permissions}, true) :
+                hasPermissions({permissions})
             );
-            node.dataset.hasPermissions = `${hasPermissions}`;
+            node.dataset.hasPermissions = `${hasPermissions2}`;
         } else {
             delete node.dataset.requiredPermission;
             delete node.dataset.hasPermissions;
@@ -977,15 +986,15 @@ class AnkiCardController {
             if (typeof requiredPermission !== 'string') { continue; }
             const requiredPermissionArray = (requiredPermission.length === 0 ? [] : requiredPermission.split(' '));
 
-            let hasPermissions = true;
+            let hasPermissions2 = true;
             for (const permission of requiredPermissionArray) {
                 if (!permissionsSet.has(permission)) {
-                    hasPermissions = false;
+                    hasPermissions2 = false;
                     break;
                 }
             }
 
-            inputField.dataset.hasPermissions = `${hasPermissions}`;
+            inputField.dataset.hasPermissions = `${hasPermissions2}`;
             this._validateField(inputField, i);
         }
     }

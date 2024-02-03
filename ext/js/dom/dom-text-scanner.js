@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {StringUtil} from '../data/sandbox/string-util.js';
+import {readCodePointsBackward, readCodePointsForward} from '../data/sandbox/string-util.js';
 
 /**
  * A class used to scan text in a document.
@@ -172,7 +172,7 @@ export class DOMTextScanner {
         if (resetOffset) { this._offset = 0; }
 
         while (this._offset < nodeValueLength) {
-            const char = StringUtil.readCodePointsForward(nodeValue, this._offset, 1);
+            const char = readCodePointsForward(nodeValue, this._offset, 1);
             this._offset += char.length;
             const charAttributes = DOMTextScanner.getCharacterAttributes(char, preserveNewlines, preserveWhitespace);
             if (this._checkCharacterForward(char, charAttributes)) { break; }
@@ -201,7 +201,7 @@ export class DOMTextScanner {
         if (resetOffset) { this._offset = nodeValueLength; }
 
         while (this._offset > 0) {
-            const char = StringUtil.readCodePointsBackward(nodeValue, this._offset - 1, 1);
+            const char = readCodePointsBackward(nodeValue, this._offset - 1, 1);
             this._offset -= char.length;
             const charAttributes = DOMTextScanner.getCharacterAttributes(char, preserveNewlines, preserveWhitespace);
             if (this._checkCharacterBackward(char, charAttributes)) { break; }
