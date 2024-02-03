@@ -29,7 +29,7 @@ export class LanguageUtil {
         /** @type {import('language').Language[]} */
         const languages = await fetchJson('/js/language/languages/index.json');
         for (const {iso, name, flag, exampleText} of languages) {
-            const features = /** @type {import('language').LanguageFeatures}*/ (languageFeatures.get(iso));
+            const features = languageFeatures.get(iso) || {textTransformations: []};
             this.languages.set(iso, {...features, iso, name, flag, exampleText});
         }
     }
