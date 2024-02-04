@@ -19,7 +19,7 @@ import {basicTextPreprocessorOptions} from '../text-preprocessors.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth} from './japanese.js';
 
-/** @type {import('language').TextPreprocessor<boolean[]>}*/
+/** @type {import('language').TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>}*/
 const collapseEmphaticSequencesTransform = {
     id: 'collapseEmphaticSequences',
     name: 'Collapse emphatic character sequences',
