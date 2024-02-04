@@ -56,16 +56,16 @@ export class LanguagesController {
     async _updateOptions() {
         const options = await this._settingsController.getOptions();
         const {general: {language}} = options;
+
         if (!options.languages[language]) {
+            /** @type {import('settings').LanguageOptions} */
+            const defaultOptions = {
+                textPreprocessors: {}
+            };
             await this._settingsController.modifyProfileSettings([{
                 action: 'set',
-                path: 'languages',
-                value: {
-                    ...options.languages,
-                    [language]: {
-                        textPreprocessors: {}
-                    }
-                }
+                path: `languages[${JSON.stringify(language)}]`,
+                value: defaultOptions
             }]);
         }
     }

@@ -348,7 +348,7 @@ export type TextPreprocessorsOptions = {
 };
 
 export type LanguageOptions = {
-    textPreprocessors?: TextPreprocessorsOptions;
+    textPreprocessors: TextPreprocessorsOptions;
 };
 
 export type LanguageOptionsObjectMap = {
