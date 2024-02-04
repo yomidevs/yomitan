@@ -346,74 +346,6 @@
         },
         {
             "files": [
-                "ext/js/core/extension-error.js",
-                "ext/js/application.js",
-                "ext/js/accessibility/accessibility-controller.js",
-                "ext/js/background/backend.js",
-                "ext/js/background/offscreen.js",
-                "ext/js/background/offscreen-proxy.js",
-                "ext/js/background/profile-conditions-util.js",
-                "ext/js/background/request-builder.js",
-                "ext/js/background/script-manager.js",
-                "ext/js/comm/anki-connect.js",
-                "ext/js/comm/clipboard-monitor.js",
-                "ext/js/comm/clipboard-reader.js",
-                "ext/js/comm/mecab.js",
-                "ext/js/data/anki-util.js",
-                "ext/js/data/database.js",
-                "ext/js/data/json-schema.js",
-                "ext/js/data/options-util.js",
-                "ext/js/data/permissions-util.js",
-                "ext/js/data/sandbox/array-buffer-util.js",
-                "ext/js/dom/simple-dom-parser.js",
-                "ext/js/extension/environment.js",
-                "ext/js/general/cache-map.js",
-                "ext/js/general/object-property-accessor.js",
-                "ext/js/general/regex-util.js",
-                "ext/js/general/text-source-map.js",
-                "ext/js/language/language-transformer.js",
-                "ext/js/dictionary/dictionary-database.js",
-                "ext/js/dictionary/dictionary-data-util.js",
-                "ext/js/language/sandbox/japanese-util.js",
-                "ext/js/language/translator.js",
-                "ext/js/media/audio-downloader.js",
-                "ext/js/media/media-util.js",
-                "ext/js/templates/template-patcher.js",
-                "ext/js/background/background-main.js"
-            ],
-            "env": {
-                "browser": false,
-                "serviceworker": true,
-                "webextensions": true
-            },
-            "globals": {
-                "FileReader": "readonly",
-                "Intl": "readonly",
-                "crypto": "readonly",
-                "AbortController": "readonly"
-            }
-        },
-        {
-            "files": [
-                "ext/js/core.js",
-                "ext/js/core/extension-error.js",
-                "ext/js/data/database.js",
-                "ext/js/data/json-schema.js",
-                "ext/js/general/cache-map.js",
-                "ext/js/dictionary/dictionary-database.js",
-                "ext/js/dictionary/dictionary-importer.js",
-                "ext/js/dictionary/dictionary-worker-handler.js",
-                "ext/js/dictionary/dictionary-worker-media-loader.js",
-                "ext/js/media/media-util.js"
-            ],
-            "env": {
-                "browser": false,
-                "worker": true,
-                "webextensions": true
-            }
-        },
-        {
-            "files": [
                 "test/**/*.test.js"
             ],
             "plugins": [
@@ -433,6 +365,108 @@
             "extends": [
                 "plugin:@typescript-eslint/disable-type-checked"
             ]
+        },
+        {
+            "files": [
+                "ext/js/core/api-map.js",
+                "ext/js/core/extension-error.js",
+                "ext/js/core/json.js",
+                "ext/js/data/sandbox/anki-note-data-creator.js",
+                "ext/js/dictionary/dictionary-data-util.js",
+                "ext/js/display/sandbox/pronunciation-generator.js",
+                "ext/js/display/sandbox/structured-content-generator.js",
+                "ext/js/dom/sandbox/css-style-applier.js",
+                "ext/js/language/ja/japanese.js",
+                "ext/js/templates/sandbox/anki-template-renderer-content-manager.js",
+                "ext/js/templates/sandbox/anki-template-renderer.js",
+                "ext/js/templates/sandbox/template-renderer-frame-api.js",
+                "ext/js/templates/sandbox/template-renderer-frame-main.js",
+                "ext/js/templates/sandbox/template-renderer-media-provider.js",
+                "ext/js/templates/sandbox/template-renderer.js"
+            ],
+            "env": {
+                "webextensions": false
+            }
+        },
+        {
+            "files": [
+                "ext/js/core/event-dispatcher.js",
+                "ext/js/core/extension-error.js",
+                "ext/js/core/json.js",
+                "ext/js/core/logger.js",
+                "ext/js/core/to-error.js",
+                "ext/js/core/utilities.js",
+                "ext/js/data/database.js",
+                "ext/js/dictionary/dictionary-database.js",
+                "ext/js/dictionary/dictionary-importer.js",
+                "ext/js/dictionary/dictionary-worker-handler.js",
+                "ext/js/dictionary/dictionary-worker-main.js",
+                "ext/js/dictionary/dictionary-worker-media-loader.js",
+                "ext/js/media/media-util.js"
+            ],
+            "env": {
+                "browser": false,
+                "worker": true
+            }
+        },
+        {
+            "files": [
+                "ext/js/accessibility/accessibility-controller.js",
+                "ext/js/application.js",
+                "ext/js/background/backend.js",
+                "ext/js/background/background-main.js",
+                "ext/js/background/offscreen-proxy.js",
+                "ext/js/background/profile-conditions-util.js",
+                "ext/js/background/request-builder.js",
+                "ext/js/background/script-manager.js",
+                "ext/js/comm/anki-connect.js",
+                "ext/js/comm/api.js",
+                "ext/js/comm/clipboard-monitor.js",
+                "ext/js/comm/clipboard-reader.js",
+                "ext/js/comm/cross-frame-api.js",
+                "ext/js/comm/mecab.js",
+                "ext/js/core/api-map.js",
+                "ext/js/core/event-dispatcher.js",
+                "ext/js/core/event-listener-collection.js",
+                "ext/js/core/extension-error.js",
+                "ext/js/core/fetch-utilities.js",
+                "ext/js/core/json.js",
+                "ext/js/core/logger.js",
+                "ext/js/core/to-error.js",
+                "ext/js/core/utilities.js",
+                "ext/js/data/anki-util.js",
+                "ext/js/data/database.js",
+                "ext/js/data/json-schema.js",
+                "ext/js/data/options-util.js",
+                "ext/js/data/permissions-util.js",
+                "ext/js/data/sandbox/array-buffer-util.js",
+                "ext/js/dictionary/dictionary-database.js",
+                "ext/js/dom/native-simple-dom-parser.js",
+                "ext/js/dom/simple-dom-parser.js",
+                "ext/js/extension/environment.js",
+                "ext/js/extension/web-extension.js",
+                "ext/js/general/cache-map.js",
+                "ext/js/general/object-property-accessor.js",
+                "ext/js/general/regex-util.js",
+                "ext/js/general/text-source-map.js",
+                "ext/js/language/ja/japanese-wanakana.js",
+                "ext/js/language/ja/japanese.js",
+                "ext/js/language/language-transformer.js",
+                "ext/js/language/translator.js",
+                "ext/js/media/audio-downloader.js",
+                "ext/js/media/media-util.js",
+                "ext/js/templates/template-patcher.js"
+            ],
+            "env": {
+                "browser": false,
+                "serviceworker": true
+            },
+            "globals": {
+                "FileReader": "readonly",
+                "Intl": "readonly",
+                "crypto": "readonly",
+                "AbortController": "readonly"
+            }
         }
     ]
 }
