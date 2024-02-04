@@ -1134,8 +1134,8 @@ export class OptionsUtil {
     }
 
     /**
-     * - Added general.language
-     * - Modularized text transformations
+     * - Added general.language.
+     * - Modularized text transformations.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion25(options) {
