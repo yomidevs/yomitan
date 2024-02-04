@@ -36,7 +36,7 @@ export class LanguagesController {
     async prepare() {
         await this._updateOptions();
         this._languages = await this._settingsController.application.api.getLanguages();
-        this._languages.sort((a, b) => a.iso.localeCompare(b.iso));
+        this._languages.sort((a, b) => a.iso.localeCompare(b.iso, 'en'));
         this._fillSelect();
     }
 
