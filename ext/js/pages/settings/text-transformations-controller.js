@@ -51,13 +51,15 @@ export class TextTransformationsController {
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     async _onOptionsChanged({options}) {
-        if (options.general.language !== this._language) {
-            this._language = options.general.language;
-
-            this._clearSettingsItems();
-            this._transformations = await this._settingsController.application.api.getTextTransformations(this._language);
-            this._renderSettingsItems();
+        if (options.general.language === this._language) {
+            return;
         }
+
+        this._language = options.general.language;
+
+        this._clearSettingsItems();
+        this._transformations = await this._settingsController.application.api.getTextTransformations(this._language);
+        this._renderSettingsItems();
     }
 
     /** */
