@@ -49,18 +49,18 @@ export class Offscreen {
         /* eslint-disable no-multi-spaces */
         /** @type {import('offscreen').ApiMap} */
         this._apiMap = createApiMap([
-            ['clipboardGetTextOffscreen',       this._getTextHandler.bind(this)],
-            ['clipboardGetImageOffscreen',      this._getImageHandler.bind(this)],
-            ['clipboardSetBrowserOffscreen',    this._setClipboardBrowser.bind(this)],
-            ['databasePrepareOffscreen',        this._prepareDatabaseHandler.bind(this)],
-            ['getDictionaryInfoOffscreen',      this._getDictionaryInfoHandler.bind(this)],
-            ['databasePurgeOffscreen',          this._purgeDatabaseHandler.bind(this)],
-            ['databaseGetMediaOffscreen',       this._getMediaHandler.bind(this)],
-            ['translatorPrepareOffscreen',      this._prepareTranslatorHandler.bind(this)],
-            ['findKanjiOffscreen',              this._findKanjiHandler.bind(this)],
-            ['findTermsOffscreen',              this._findTermsHandler.bind(this)],
-            ['getTermFrequenciesOffscreen',     this._getTermFrequenciesHandler.bind(this)],
-            ['clearDatabaseCachesOffscreen',    this._clearDatabaseCachesHandler.bind(this)]
+            ['clipboardGetTextOffscreen',    this._getTextHandler.bind(this)],
+            ['clipboardGetImageOffscreen',   this._getImageHandler.bind(this)],
+            ['clipboardSetBrowserOffscreen', this._setClipboardBrowser.bind(this)],
+            ['databasePrepareOffscreen',     this._prepareDatabaseHandler.bind(this)],
+            ['getDictionaryInfoOffscreen',   this._getDictionaryInfoHandler.bind(this)],
+            ['databasePurgeOffscreen',       this._purgeDatabaseHandler.bind(this)],
+            ['databaseGetMediaOffscreen',    this._getMediaHandler.bind(this)],
+            ['translatorPrepareOffscreen',   this._prepareTranslatorHandler.bind(this)],
+            ['findKanjiOffscreen',           this._findKanjiHandler.bind(this)],
+            ['findTermsOffscreen',           this._findTermsHandler.bind(this)],
+            ['getTermFrequenciesOffscreen',  this._getTermFrequenciesHandler.bind(this)],
+            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
 

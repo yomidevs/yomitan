@@ -21,7 +21,6 @@ import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
 import type * as Translation from './translation';
 import type * as Translator from './translator';
-
 import type {
     ApiMap as BaseApiMap,
     ApiMapInit as BaseApiMapInit,
