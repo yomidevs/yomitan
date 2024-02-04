@@ -39,7 +39,6 @@ export class Offscreen {
         });
         /** @type {ClipboardReader} */
         this._clipboardReader = new ClipboardReader({
-            // eslint-disable-next-line no-undef
             document: (typeof document === 'object' && document !== null ? document : null),
             pasteTargetSelector: '#clipboard-paste-target',
             richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
