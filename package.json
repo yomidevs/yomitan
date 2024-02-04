@@ -15,6 +15,7 @@
         "build-libs": "node ./dev/bin/build-libs.js",
         "test": "npm run test-lint-js && npm run test-ts && npm run test-lint-css && npm run test-lint-html && npm run test-code && npm run test-build",
         "test-lint-js": "npx eslint .",
+        "test-lint-json": "npx eslint **/*.json",
         "test-lint-css": "npx stylelint \"ext/**/*.css\" \"test/**/*.css\" \"dev/**/*.css\"",
         "test-lint-html": "npx html-validate \"ext/**/*.html\" \"test/**/*.html\" \"dev/**/*.html\"",
         "test-ts": "npm run test-ts-main && npm run test-ts-dev && npm run test-ts-test",
