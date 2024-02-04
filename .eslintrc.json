@@ -261,7 +261,12 @@
             "files": [
                 "*.json"
             ],
-            "parser": "jsonc-eslint-parser",
+            "parser": "jsonc-eslint-parser"
+        },
+        {
+            "files": [
+                "ext/data/schemas/options-schema.json"
+            ],
             "rules": {
                 "no-multi-spaces": "off"
             }
