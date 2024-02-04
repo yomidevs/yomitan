@@ -58,8 +58,10 @@ if (checkChromeNotAvailable()) {
 export class Application extends EventDispatcher {
     /**
      * Creates a new instance. The instance should not be used until it has been fully prepare()'d.
+     * @param {API} api
+     * @param {CrossFrameAPI} crossFrameApi
      */
-    constructor() {
+    constructor(api, crossFrameApi) {
         super();
 
         /** @type {WebExtension} */
@@ -84,24 +86,17 @@ export class Application extends EventDispatcher {
 
         /** @type {?boolean} */
         this._isBackground = null;
-        /** @type {?API} */
-        this._api = null;
-        /** @type {?CrossFrameAPI} */
-        this._crossFrame = null;
+        /** @type {API} */
+        this._api = api;
+        /** @type {CrossFrameAPI} */
+        this._crossFrame = crossFrameApi;
         /** @type {boolean} */
         this._isReady = false;
-
-        const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
-        /** @type {Promise<void>} */
-        this._isBackendReadyPromise = promise;
-        /** @type {?(() => void)} */
-        this._isBackendReadyPromiseResolve = resolve;
 
         /* eslint-disable no-multi-spaces */
         /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
             ['applicationIsReady',         this._onMessageIsReady.bind(this)],
-            ['applicationBackendReady',    this._onMessageBackendReady.bind(this)],
             ['applicationGetUrl',          this._onMessageGetUrl.bind(this)],
             ['applicationOptionsUpdated',  this._onMessageOptionsUpdated.bind(this)],
             ['applicationDatabaseUpdated', this._onMessageDatabaseUpdated.bind(this)],
@@ -113,15 +108,6 @@ export class Application extends EventDispatcher {
     /** @type {WebExtension} */
     get webExtension() {
         return this._webExtension;
-    }
-
-    /**
-     * Whether the current frame is the background page/service worker or not.
-     * @type {boolean}
-     */
-    get isBackground() {
-        if (this._isBackground === null) { throw new Error('Not prepared'); }
-        return /** @type {boolean} */ (this._isBackground);
     }
 
     /**
@@ -146,23 +132,10 @@ export class Application extends EventDispatcher {
 
     /**
      * Prepares the instance for use.
-     * @param {boolean} [isBackground=false] Assigns whether this instance is being used from the background page/service worker.
      */
-    async prepare(isBackground = false) {
-        this._isBackground = isBackground;
+    prepare() {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-
-        if (!isBackground) {
-            this._api = new API(this._webExtension);
-
-            await this._webExtension.sendMessagePromise({action: 'requestBackendReadySignal'});
-            await this._isBackendReadyPromise;
-
-            this._crossFrame = new CrossFrameAPI(this._api);
-            await this._crossFrame.prepare();
-
-            log.on('log', this._onForwardLog.bind(this));
-        }
+        log.on('log', this._onForwardLog.bind(this));
     }
 
     /**
@@ -170,6 +143,7 @@ export class Application extends EventDispatcher {
      * setup has completed.
      */
     ready() {
+        if (this._isReady) { return; }
         this._isReady = true;
         this._webExtension.sendMessagePromise({action: 'applicationReady'});
     }
@@ -193,6 +167,45 @@ export class Application extends EventDispatcher {
         this.trigger('closePopups', {});
     }
 
+    /**
+     * @param {(application: Application) => (Promise<void>)} mainFunction
+     */
+    static async main(mainFunction) {
+        const webExtension = new WebExtension();
+        const api = new API(webExtension);
+        await this.waitForBackendReady(webExtension);
+        const {tabId = null, frameId = null} = await api.frameInformationGet();
+        const crossFrameApi = new CrossFrameAPI(api, tabId, frameId);
+        crossFrameApi.prepare();
+        const application = new Application(api, crossFrameApi);
+        application.prepare();
+        try {
+            await mainFunction(application);
+        } catch (error) {
+            log.error(error);
+        } finally {
+            application.ready();
+        }
+    }
+
+    /**
+     * @param {WebExtension} webExtension
+     */
+    static async waitForBackendReady(webExtension) {
+        const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
+        /** @type {import('application').ApiMap} */
+        const apiMap = createApiMap([['applicationBackendReady', () => { resolve(); }]]);
+        /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
+        const onMessage = ({action, params}, _sender, callback) => invokeApiMapHandler(apiMap, action, params, [], callback);
+        chrome.runtime.onMessage.addListener(onMessage);
+        try {
+            await webExtension.sendMessagePromise({action: 'requestBackendReadySignal'});
+            await promise;
+        } finally {
+            chrome.runtime.onMessage.removeListener(onMessage);
+        }
+    }
+
     // Private
 
     /**
@@ -210,13 +223,6 @@ export class Application extends EventDispatcher {
     /** @type {import('application').ApiHandler<'applicationIsReady'>} */
     _onMessageIsReady() {
         return this._isReady;
-    }
-
-    /** @type {import('application').ApiHandler<'applicationBackendReady'>} */
-    _onMessageBackendReady() {
-        if (this._isBackendReadyPromiseResolve === null) { return; }
-        this._isBackendReadyPromiseResolve();
-        this._isBackendReadyPromiseResolve = null;
     }
 
     /** @type {import('application').ApiHandler<'applicationGetUrl'>} */

@@ -17,49 +17,36 @@
  */
 
 import {Application} from '../application.js';
-import {log} from '../core/logger.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {Frontend} from './frontend.js';
 import {PopupFactory} from './popup-factory.js';
 
-/** Entry point. */
-async function main() {
-    try {
-        const application = new Application();
-        await application.prepare();
-
-        const {tabId, frameId} = await application.api.frameInformationGet();
-        if (typeof frameId !== 'number') {
-            throw new Error('Failed to get frameId');
-        }
-
-        const hotkeyHandler = new HotkeyHandler();
-        hotkeyHandler.prepare(application.crossFrame);
-
-        const popupFactory = new PopupFactory(application, frameId);
-        popupFactory.prepare();
-
-        const frontend = new Frontend({
-            application,
-            tabId,
-            frameId,
-            popupFactory,
-            depth: 0,
-            parentPopupId: null,
-            parentFrameId: null,
-            useProxyPopup: false,
-            pageType: 'web',
-            canUseWindowPopup: true,
-            allowRootFramePopupProxy: true,
-            childrenSupported: true,
-            hotkeyHandler
-        });
-        await frontend.prepare();
-
-        application.ready();
-    } catch (e) {
-        log.error(e);
+await Application.main(async (application) => {
+    const {tabId, frameId} = await application.api.frameInformationGet();
+    if (typeof frameId !== 'number') {
+        throw new Error('Failed to get frameId');
     }
-}
 
-await main();
+    const hotkeyHandler = new HotkeyHandler();
+    hotkeyHandler.prepare(application.crossFrame);
+
+    const popupFactory = new PopupFactory(application, frameId);
+    popupFactory.prepare();
+
+    const frontend = new Frontend({
+        application,
+        tabId,
+        frameId,
+        popupFactory,
+        depth: 0,
+        parentPopupId: null,
+        parentFrameId: null,
+        useProxyPopup: false,
+        pageType: 'web',
+        canUseWindowPopup: true,
+        allowRootFramePopupProxy: true,
+        childrenSupported: true,
+        hotkeyHandler
+    });
+    await frontend.prepare();
+});

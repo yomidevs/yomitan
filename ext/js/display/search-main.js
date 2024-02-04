@@ -17,7 +17,6 @@
  */
 
 import {Application} from '../application.js';
-import {log} from '../core/logger.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {DisplayAnki} from './display-anki.js';
@@ -27,47 +26,34 @@ import {SearchActionPopupController} from './search-action-popup-controller.js';
 import {SearchDisplayController} from './search-display-controller.js';
 import {SearchPersistentStateController} from './search-persistent-state-controller.js';
 
-/** Entry point. */
-async function main() {
-    try {
-        const application = new Application();
+await Application.main(async (application) => {
+    const documentFocusController = new DocumentFocusController('#search-textbox');
+    documentFocusController.prepare();
 
-        const documentFocusController = new DocumentFocusController('#search-textbox');
-        documentFocusController.prepare();
+    const searchPersistentStateController = new SearchPersistentStateController();
+    searchPersistentStateController.prepare();
 
-        const searchPersistentStateController = new SearchPersistentStateController();
-        searchPersistentStateController.prepare();
+    const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
+    searchActionPopupController.prepare();
 
-        const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
-        searchActionPopupController.prepare();
+    const {tabId, frameId} = await application.api.frameInformationGet();
 
-        await application.prepare();
+    const hotkeyHandler = new HotkeyHandler();
+    hotkeyHandler.prepare(application.crossFrame);
 
-        const {tabId, frameId} = await application.api.frameInformationGet();
+    const display = new Display(application, tabId, frameId, 'search', documentFocusController, hotkeyHandler);
+    await display.prepare();
 
-        const hotkeyHandler = new HotkeyHandler();
-        hotkeyHandler.prepare(application.crossFrame);
+    const displayAudio = new DisplayAudio(display);
+    displayAudio.prepare();
 
-        const display = new Display(application, tabId, frameId, 'search', documentFocusController, hotkeyHandler);
-        await display.prepare();
+    const displayAnki = new DisplayAnki(display, displayAudio);
+    displayAnki.prepare();
 
-        const displayAudio = new DisplayAudio(display);
-        displayAudio.prepare();
+    const searchDisplayController = new SearchDisplayController(tabId, frameId, display, displayAudio, searchPersistentStateController);
+    await searchDisplayController.prepare();
 
-        const displayAnki = new DisplayAnki(display, displayAudio);
-        displayAnki.prepare();
+    display.initializeState();
 
-        const searchDisplayController = new SearchDisplayController(tabId, frameId, display, displayAudio, searchPersistentStateController);
-        await searchDisplayController.prepare();
-
-        display.initializeState();
-
-        document.documentElement.dataset.loaded = 'true';
-
-        application.ready();
-    } catch (e) {
-        log.error(e);
-    }
-}
-
-await main();
+    document.documentElement.dataset.loaded = 'true';
+});
