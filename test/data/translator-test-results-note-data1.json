@@ -29913,6 +29913,13 @@
               "inflectionRules": [
                 "past"
               ]
+            },
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "past",
+                "kansai-ben"
+              ]
             }
           ],
           "score": 1,
