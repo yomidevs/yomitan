@@ -785,12 +785,12 @@
                             },
                             "languages": {
                                 "type": "object",
-                                "required": ["ja"],
                                 "propertyNames": {
                                     "type": "string"
                                 },
                                 "additionalProperties": {
                                     "type": "object",
+                                    "required": ["textTransformations"],
                                     "properties": {
                                         "textTransformations": {
                                             "type": "object",
