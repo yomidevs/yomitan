@@ -152,7 +152,7 @@ export class TextPreprocessorsController {
      */
     _createSelect(preprocessor) {
         const select = document.createElement('select');
-        select.setAttribute('data-setting', `languages.${this._language}.textPreprocessors.${preprocessor.id}`);
+        select.setAttribute('data-setting', `languages[${JSON.stringify(this._language)}].textPreprocessors.${preprocessor.id}`);
 
         for (const [optionValue, optionLabel] of preprocessor.options) {
             const optionElement = document.createElement('option');
