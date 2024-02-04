@@ -19,7 +19,7 @@
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {log} from '../core/logger.js';
-import {promiseAnimationFrame} from '../core/utilities.js';
+import {promiseAnimationFrame} from '../core/promise-animation-frame.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceGenerator} from '../dom/text-source-generator.js';
