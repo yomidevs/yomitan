@@ -19,7 +19,7 @@ import {textPreprocessors as textPreprocessorsEN} from './en/text-preprocessors.
 import {textPreprocessors as textPreprocessorsJA} from './ja/text-preprocessors.js';
 
 /** @type {Map<string, import('language').Language>} */
-export const languages = new Map([
+const languages = new Map([
     ['ja', {
         name: 'Japanese',
         iso: 'ja',
@@ -37,3 +37,15 @@ export const languages = new Map([
 ]);
 
 
+/** @returns {import('language').Language[]}*/
+export function getAllLanguages() {
+    return [...languages.values()];
+}
+
+/**
+ * @param {string} iso
+ * @returns {import('language').Language | undefined}
+ */
+export function getLanguage(iso) {
+    return languages.get(iso);
+}

@@ -15,19 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {languages} from './languages.js';
-
-/** @returns {import('language').Language[]}*/
-export function getLanguages() {
-    return [...languages.values()];
-}
+import {getLanguage} from './languages.js';
 
 /**
  * @param {string} iso
  * @returns {import('language').TextPreprocessor[]}
  */
 export function getTextPreprocessors(iso) {
-    return languages.get(iso)?.textPreprocessors || [];
+    return getLanguage(iso)?.textPreprocessors || [];
 }
 
 
