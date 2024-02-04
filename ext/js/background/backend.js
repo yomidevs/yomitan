@@ -34,11 +34,11 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {LanguageUtil} from '../language/language-util.js';
+import {getLanguages, getTextTransformations} from '../language/language-util.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
-import {ClipboardReaderProxy, DictionaryDatabaseProxy, LanguageUtilProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
+import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
 import {createSchema, normalizeContext} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
@@ -66,11 +66,8 @@ export class Backend {
             this._offscreen = null;
             /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
             this._dictionaryDatabase = new DictionaryDatabase();
-            /** @type {LanguageUtil|LanguageUtilProxy} */
-            this._languageUtil = new LanguageUtil();
             /** @type {Translator|TranslatorProxy} */
             this._translator = new Translator({
-                languageUtil: this._languageUtil,
                 database: this._dictionaryDatabase
             });
             /** @type {ClipboardReader|ClipboardReaderProxy} */
@@ -85,8 +82,6 @@ export class Backend {
             this._offscreen = new OffscreenProxy(webExtension);
             /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
             this._dictionaryDatabase = new DictionaryDatabaseProxy(this._offscreen);
-            /** @type {LanguageUtil|LanguageUtilProxy} */
-            this._languageUtil = new LanguageUtilProxy(this._offscreen);
             /** @type {Translator|TranslatorProxy} */
             this._translator = new TranslatorProxy(this._offscreen);
             /** @type {ClipboardReader|ClipboardReaderProxy} */
@@ -917,12 +912,12 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'getLanguages'>} */
     _onApiGetLanguages() {
-        return this._languageUtil.getLanguages();
+        return getLanguages();
     }
 
     /** @type {import('api').ApiHandler<'getTextTransformations'>} */
     _onApiGetTextTransformations({language}) {
-        return this._languageUtil.getTextTransformations(language);
+        return getTextTransformations(language);
     }
 
     // Command handlers

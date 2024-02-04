@@ -20,7 +20,7 @@ import {applyTextReplacement} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
-import {LanguageUtil} from './language-util.js';
+import {getTextTransformations} from './language-util.js';
 /**
  * Class which finds term and kanji dictionary entries for text.
  */
@@ -29,9 +29,7 @@ export class Translator {
      * Creates a new Translator instance.
      * @param {import('translator').ConstructorDetails} details The details for the class.
      */
-    constructor({languageUtil, database}) {
-        /** @type {LanguageUtil} */
-        this._languageUtil = languageUtil;
+    constructor({database}) {
         /** @type {import('../dictionary/dictionary-database.js').DictionaryDatabase} */
         this._database = database;
         /** @type {LanguageTransformer} */
@@ -498,7 +496,7 @@ export class Translator {
      */
     _getTextTransformations(options) {
         const {textTransformationsOptions, language} = options;
-        const textTransformationsData = this._languageUtil.getTextTransformations(language);
+        const textTransformationsData = getTextTransformations(language);
 
         /** @type {Map<string, import('translation-internal').TextTransformation>} */
         const textTransformations = new Map();

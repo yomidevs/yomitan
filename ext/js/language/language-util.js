@@ -15,24 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {languages} from './index.js';
+import {languages} from './languages.js';
 
-export class LanguageUtil {
-    constructor() {
-    }
-
-
-    /** @returns {import('language').Language[]}*/
-    getLanguages() {
-        return [...languages.values()];
-    }
-
-    /**
-     * @param {string} iso
-     * @returns {import('language').TextTransformation[]}
-     */
-    getTextTransformations(iso) {
-        return languages.get(iso)?.textTransformations || [];
-    }
+/** @returns {import('language').Language[]}*/
+export function getLanguages() {
+    return [...languages.values()];
 }
+
+/**
+ * @param {string} iso
+ * @returns {import('language').TextTransformation[]}
+ */
+export function getTextTransformations(iso) {
+    return languages.get(iso)?.textTransformations || [];
+}
+
 

@@ -20,7 +20,6 @@ import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
-import {LanguageUtil} from '../language/language-util.js';
 import {Translator} from '../language/translator.js';
 
 /**
@@ -34,12 +33,9 @@ export class Offscreen {
     constructor() {
         /** @type {DictionaryDatabase} */
         this._dictionaryDatabase = new DictionaryDatabase();
-        /** @type {LanguageUtil} */
-        this._languageUtil = new LanguageUtil();
         /** @type {Translator} */
         this._translator = new Translator({
-            database: this._dictionaryDatabase,
-            languageUtil: this._languageUtil
+            database: this._dictionaryDatabase
         });
         /** @type {ClipboardReader} */
         this._clipboardReader = new ClipboardReader({
@@ -61,8 +57,6 @@ export class Offscreen {
             ['databasePurgeOffscreen',          this._purgeDatabaseHandler.bind(this)],
             ['databaseGetMediaOffscreen',       this._getMediaHandler.bind(this)],
             ['translatorPrepareOffscreen',      this._prepareTranslatorHandler.bind(this)],
-            ['getLanguagesOffscreen',           this._getLanguagesHandler.bind(this)],
-            ['getTextTransformationsOffscreen', this._getTextTransformationsHandler.bind(this)],
             ['findKanjiOffscreen',              this._findKanjiHandler.bind(this)],
             ['findTermsOffscreen',              this._findTermsHandler.bind(this)],
             ['getTermFrequenciesOffscreen',     this._getTermFrequenciesHandler.bind(this)],
@@ -123,16 +117,6 @@ export class Offscreen {
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */
     _prepareTranslatorHandler({descriptor}) {
         this._translator.prepare(descriptor);
-    }
-
-    /** @type {import('offscreen').ApiHandler<'getLanguagesOffscreen'>}*/
-    _getLanguagesHandler() {
-        return this._languageUtil.getLanguages();
-    }
-
-    /** @type {import('offscreen').ApiHandler<'getTextTransformationsOffscreen'>}*/
-    _getTextTransformationsHandler({language}) {
-        return this._languageUtil.getTextTransformations(language);
     }
 
     /** @type {import('offscreen').ApiHandler<'findKanjiOffscreen'>} */
