@@ -200,7 +200,7 @@ export class Display extends EventDispatcher {
         /** @type {ThemeController} */
         this._themeController = new ThemeController(document.documentElement);
 
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         this._hotkeyHandler.registerActions([
             ['close',             () => { this._onHotkeyClose(); }],
             ['nextEntry',         this._onHotkeyActionMoveRelative.bind(this, 1)],
@@ -224,7 +224,7 @@ export class Display extends EventDispatcher {
         this.registerWindowMessageHandlers([
             ['displayExtensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
         ]);
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
     }
 
     /** @type {import('../application.js').Application} */

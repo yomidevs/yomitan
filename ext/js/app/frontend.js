@@ -115,7 +115,7 @@ export class Frontend {
         /** @type {?import('settings').OptionsContext} */
         this._optionsContextOverride = null;
 
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('application').ApiMap} */
         this._runtimeApiMap = createApiMap([
             ['frontendRequestReadyBroadcast',   this._onMessageRequestFrontendReadyBroadcast.bind(this)],
@@ -127,7 +127,7 @@ export class Frontend {
             ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
             ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)]
         ]);
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
     }
 
     /**
@@ -187,7 +187,7 @@ export class Frontend {
         this._textScanner.on('searchEmpty', this._onSearchEmpty.bind(this));
         this._textScanner.on('searchError', this._onSearchError.bind(this));
 
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         this._application.crossFrame.registerHandlers([
             ['frontendClosePopup',       this._onApiClosePopup.bind(this)],
             ['frontendCopySelection',    this._onApiCopySelection.bind(this)],
@@ -195,7 +195,7 @@ export class Frontend {
             ['frontendGetPopupInfo',     this._onApiGetPopupInfo.bind(this)],
             ['frontendGetPageInfo',      this._onApiGetPageInfo.bind(this)]
         ]);
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
 
         this._prepareSiteSpecific();
         this._updateContentScale();

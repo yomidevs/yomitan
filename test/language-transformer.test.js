@@ -64,7 +64,7 @@ function hasTermReasons(languageTransformer, source, expectedTerm, expectedCondi
 
 /** */
 function testDeinflections() {
-    /* eslint-disable no-multi-spaces */
+    /* eslint-disable @stylistic/no-multi-spaces */
     const data = [
         {
             category: 'adjectives',
@@ -1146,7 +1146,7 @@ function testDeinflections() {
             ]
         }
     ];
-    /* eslint-enable no-multi-spaces */
+    /* eslint-enable @stylistic/no-multi-spaces */
 
     /** @type {import('language-transformer').LanguageTransformDescriptor} */
     const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/language/japanese-transforms.json'), {encoding: 'utf8'}));

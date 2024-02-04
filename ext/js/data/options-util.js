@@ -687,7 +687,7 @@ export class OptionsUtil {
         const rawPattern1 = '{{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}';
         const pattern1 = new RegExp(`((\r?\n)?[ \t]*)${escapeRegExp(rawPattern1)}`, 'g');
         const replacement1 = (
-        // eslint-disable-next-line indent
+        // eslint-disable-next-line @stylistic/indent
 `{{~#scope~}}
     {{~#set "any" false}}{{/set~}}
     {{~#if definitionTags~}}{{#each definitionTags~}}
@@ -771,7 +771,7 @@ export class OptionsUtil {
             };
             delete profile.options.anki.sentenceExt;
             profile.options.general.popupActionBarLocation = 'top';
-            /* eslint-disable no-multi-spaces */
+            /* eslint-disable @stylistic/no-multi-spaces */
             profile.options.inputs = {
                 hotkeys: [
                     {action: 'close',             key: 'Escape',    modifiers: [],       scopes: ['popup'], enabled: true},
@@ -792,7 +792,7 @@ export class OptionsUtil {
                     {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true}
                 ]
             };
-            /* eslint-enable no-multi-spaces */
+            /* eslint-enable @stylistic/no-multi-spaces */
             profile.options.anki.suspendNewCards = false;
             profile.options.popupWindow = {
                 width: profile.options.general.popupWidth,
