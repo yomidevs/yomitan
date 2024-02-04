@@ -182,6 +182,8 @@
 
         "eslint-comments/no-unused-disable": "error",
 
+        "unused-imports/no-unused-imports": "error",
+
         "@typescript-eslint/ban-ts-comment": ["error", {"ts-expect-error": {"descriptionFormat": "^ - .+$"}}],
         "@typescript-eslint/ban-types": ["error", {"types": {"object": true}, "extendDefaults": true}],
         "@typescript-eslint/consistent-type-exports": "off",
@@ -197,24 +199,12 @@
                 "*.ts"
             ],
             "rules": {
+                "comma-dangle": "off",
                 "no-multiple-empty-lines": ["error", {"max": 1, "maxEOF": 0}],
                 "no-undef": "off",
-                "unused-imports/no-unused-imports": "error",
+
                 "@typescript-eslint/no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
-                "comma-dangle": "off",
-                "@typescript-eslint/comma-dangle": [
-                    "error",
-                    {
-                        "arrays": "always-multiline",
-                        "objects": "always-multiline",
-                        "imports": "always-multiline",
-                        "exports": "always-multiline",
-                        "functions": "always-multiline",
-                        "enums": "always-multiline",
-                        "generics": "always-multiline",
-                        "tuples": "always-multiline"
-                    }
-                ],
+
                 "@stylistic/ts/block-spacing": "off",
                 "@stylistic/ts/brace-style": ["error", "1tbs", {"allowSingleLine": true}],
                 "@stylistic/ts/comma-dangle": [
