@@ -307,20 +307,12 @@
         },
         {
             "files": [
-                "ext/js/core.js",
-                "ext/js/core/extension-error.js",
-                "ext/js/**/sandbox/**/*.js",
-                "ext/js/language/ja/japanese.js",
-                "ext/js/language/ja/japanese-wanakana.js"
-            ],
-            "env": {
-                "webextensions": false
-            }
-        },
-        {
-            "files": [
                 "test/**/*.js",
-                "dev/**/*.js"
+                "dev/**/*.js",
+                "integration.spec.js",
+                "playwright.config.js",
+                "playwright-util.js",
+                "visual.spec.js"
             ],
             "env": {
                 "browser": false,
@@ -422,35 +414,6 @@
         },
         {
             "files": [
-                "playwright.config.js"
-            ],
-            "env": {
-                "browser": false,
-                "node": true,
-                "webextensions": false
-            },
-            "rules": {
-                "no-undefined": "off"
-            }
-        },
-        {
-            "files": [
-                "integration.spec.js",
-                "playwright-util.js",
-                "visual.spec.js"
-            ],
-            "env": {
-                "browser": false,
-                "node": true,
-                "webextensions": false
-            },
-            "rules": {
-                "no-undefined": "off",
-                "no-empty-pattern": "off"
-            }
-        },
-        {
-            "files": [
                 "test/**/*.test.js"
             ],
             "plugins": [
@@ -461,8 +424,7 @@
             ],
             "rules": {
                 "vitest/prefer-to-be": "off"
-            },
-            "env": {}
+            }
         },
         {
             "files": [
