@@ -25,6 +25,7 @@
         "typescript"
     ],
     "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
     "html-validate.validate": [
         "html"
     ]
