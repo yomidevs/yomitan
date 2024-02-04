@@ -97,7 +97,7 @@ export type ProfileOptions = {
     inputs: InputsOptions;
     clipboard: ClipboardOptions;
     accessibility: AccessibilityOptions;
-    languages: LanguagesOptions;
+    languages: LanguageOptionsObjectMap;
 };
 
 export type GeneralOptions = {
@@ -351,7 +351,7 @@ export type LanguageOptions = {
     textTransformations?: TextTransformationsOptions;
 };
 
-export type LanguagesOptions = {
+export type LanguageOptionsObjectMap = {
     [language: string]: LanguageOptions;
 };
 
