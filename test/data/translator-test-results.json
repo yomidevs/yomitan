@@ -16978,7 +16978,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertNumericCharacters",
+    "name": "Test text preprocessors - convertNumericCharacters",
     "originalTextLength": 2,
     "dictionaryEntries": [
       {
@@ -17043,7 +17043,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertAlphabeticCharacters",
+    "name": "Test text preprocessors - convertAlphabeticCharacters",
     "originalTextLength": 4,
     "dictionaryEntries": [
       {
@@ -17389,7 +17389,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertKatakanaToHiragana",
+    "name": "Test text preprocessors - convertKatakanaToHiragana",
     "originalTextLength": 2,
     "dictionaryEntries": [
       {
@@ -17735,7 +17735,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertHiraganaToKatakana",
+    "name": "Test text preprocessors - convertHiraganaToKatakana",
     "originalTextLength": 4,
     "dictionaryEntries": [
       {
@@ -17844,7 +17844,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertHalfWidthCharacters, convertKatakanaToHiragana",
+    "name": "Test text preprocessors - convertHalfWidthCharacters, convertKatakanaToHiragana",
     "originalTextLength": 2,
     "dictionaryEntries": [
       {
@@ -18190,7 +18190,7 @@
     ]
   },
   {
-    "name": "Test text transformations - collapseEmphaticSequences",
+    "name": "Test text preprocessors - collapseEmphaticSequences",
     "originalTextLength": 7,
     "dictionaryEntries": [
       {
@@ -18269,7 +18269,7 @@
     ]
   },
   {
-    "name": "Test text transformations - capitalizeFirstLetter",
+    "name": "Test text preprocessors - capitalizeFirstLetter",
     "originalTextLength": 7,
     "dictionaryEntries": [
       {
@@ -18350,7 +18350,7 @@
     ]
   },
   {
-    "name": "Test text transformations - decapitalize",
+    "name": "Test text preprocessors - decapitalize",
     "originalTextLength": 8,
     "dictionaryEntries": [
       {

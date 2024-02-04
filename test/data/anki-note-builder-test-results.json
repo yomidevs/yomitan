@@ -3263,7 +3263,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertNumericCharacters",
+    "name": "Test text preprocessors - convertNumericCharacters",
     "results": [
       {
         "audio": "",
@@ -3303,7 +3303,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertAlphabeticCharacters",
+    "name": "Test text preprocessors - convertAlphabeticCharacters",
     "results": [
       {
         "audio": "",
@@ -3378,7 +3378,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertKatakanaToHiragana",
+    "name": "Test text preprocessors - convertKatakanaToHiragana",
     "results": [
       {
         "audio": "",
@@ -3453,7 +3453,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertHiraganaToKatakana",
+    "name": "Test text preprocessors - convertHiraganaToKatakana",
     "results": [
       {
         "audio": "",
@@ -3493,7 +3493,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertHalfWidthCharacters, convertKatakanaToHiragana",
+    "name": "Test text preprocessors - convertHalfWidthCharacters, convertKatakanaToHiragana",
     "results": [
       {
         "audio": "",
@@ -3568,7 +3568,7 @@
     ]
   },
   {
-    "name": "Test text transformations - collapseEmphaticSequences",
+    "name": "Test text preprocessors - collapseEmphaticSequences",
     "results": [
       {
         "audio": "",
@@ -3608,7 +3608,7 @@
     ]
   },
   {
-    "name": "Test text transformations - capitalizeFirstLetter",
+    "name": "Test text preprocessors - capitalizeFirstLetter",
     "results": [
       {
         "audio": "",
@@ -3648,7 +3648,7 @@
     ]
   },
   {
-    "name": "Test text transformations - decapitalize",
+    "name": "Test text preprocessors - decapitalize",
     "results": [
       {
         "audio": "",

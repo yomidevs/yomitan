@@ -18,7 +18,7 @@
 
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
-export class TextTransformationsController {
+export class TextPreprocessorsController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
      */
@@ -26,9 +26,9 @@ export class TextTransformationsController {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {HTMLSelectElement} */
-        this._container = querySelectorNotNull(document, '#text-transformations');
-        /** @type {import('language').TextTransformation[]}*/
-        this._transformations = [];
+        this._container = querySelectorNotNull(document, '#text-preprocessors');
+        /** @type {import('language').TextPreprocessor[]}*/
+        this._preprocessors = [];
         /** @type {string} */
         this._language = '';
     }
@@ -58,39 +58,39 @@ export class TextTransformationsController {
         this._language = options.general.language;
 
         this._clearSettingsItems();
-        this._transformations = await this._settingsController.application.api.getTextTransformations(this._language);
+        this._preprocessors = await this._settingsController.application.api.getTextPreprocessors(this._language);
         this._renderSettingsItems();
     }
 
     /** */
     _clearSettingsItems() {
-        const settingsItems = document.querySelectorAll('.text-transformation');
-        for (const transformation of settingsItems) {
-            transformation.remove();
+        const settingsItems = document.querySelectorAll('.text-preprocessor');
+        for (const preprocessor of settingsItems) {
+            preprocessor.remove();
         }
     }
 
     /** */
     _renderSettingsItems() {
-        for (const transformation of this._transformations) {
-            const settingsItem = this._createSettingsItem(transformation);
+        for (const preprocessor of this._preprocessors) {
+            const settingsItem = this._createSettingsItem(preprocessor);
             this._container.appendChild(settingsItem);
         }
     }
 
     /**
-     * @param {import('language').TextTransformation} transformation
+     * @param {import('language').TextPreprocessor} preprocessor
      * @returns {HTMLElement}
      */
-    _createSettingsItem(transformation) {
+    _createSettingsItem(preprocessor) {
         const settingsItem = document.createElement('div');
-        settingsItem.classList.add('settings-item', 'text-transformation');
+        settingsItem.classList.add('settings-item', 'text-preprocessor');
 
         const innerWrappableDiv = document.createElement('div');
         innerWrappableDiv.classList.add('settings-item-inner', 'settings-item-inner-wrappable');
 
-        innerWrappableDiv.appendChild(this._createLeftSide(transformation));
-        innerWrappableDiv.appendChild(this._createRightSide(transformation));
+        innerWrappableDiv.appendChild(this._createLeftSide(preprocessor));
+        innerWrappableDiv.appendChild(this._createRightSide(preprocessor));
 
         settingsItem.appendChild(innerWrappableDiv);
 
@@ -98,63 +98,63 @@ export class TextTransformationsController {
     }
 
     /**
-     * @param {import('language').TextTransformation} transformation
+     * @param {import('language').TextPreprocessor} preprocessor
      * @returns {HTMLElement}
      */
-    _createLeftSide(transformation) {
+    _createLeftSide(preprocessor) {
         const leftSide = document.createElement('div');
         leftSide.classList.add('settings-item-left');
 
-        leftSide.appendChild(this._createLabel(transformation));
-        leftSide.appendChild(this._createDescription(transformation));
+        leftSide.appendChild(this._createLabel(preprocessor));
+        leftSide.appendChild(this._createDescription(preprocessor));
 
         return leftSide;
     }
 
     /**
-     * @param {import('language').TextTransformation} transformation
+     * @param {import('language').TextPreprocessor} preprocessor
      * @returns {HTMLElement}
      */
-    _createLabel(transformation) {
+    _createLabel(preprocessor) {
         const label = document.createElement('div');
         label.classList.add('settings-item-label');
-        label.textContent = transformation.name;
+        label.textContent = preprocessor.name;
         return label;
     }
 
     /**
-     * @param {import('language').TextTransformation} transformation
+     * @param {import('language').TextPreprocessor} preprocessor
      * @returns {HTMLElement}
      */
-    _createDescription(transformation) {
+    _createDescription(preprocessor) {
         const description = document.createElement('div');
         description.classList.add('settings-item-description');
-        description.textContent = transformation.description;
+        description.textContent = preprocessor.description;
         return description;
     }
 
     /**
-     * @param {import('language').TextTransformation} transformation
+     * @param {import('language').TextPreprocessor} preprocessor
      * @returns {HTMLElement}
      */
-    _createRightSide(transformation) {
+    _createRightSide(preprocessor) {
         const rightSide = document.createElement('div');
         rightSide.classList.add('settings-item-right');
 
-        rightSide.appendChild(this._createSelect(transformation));
+        rightSide.appendChild(this._createSelect(preprocessor));
 
         return rightSide;
     }
 
     /**
-     * @param {import('language').TextTransformation} transformation
+     * @param {import('language').TextPreprocessor} preprocessor
      * @returns {HTMLSelectElement}
      */
-    _createSelect(transformation) {
+    _createSelect(preprocessor) {
         const select = document.createElement('select');
-        select.setAttribute('data-setting', `languages.${this._language}.textTransformations.${transformation.id}`);
+        select.setAttribute('data-setting', `languages.${this._language}.textPreprocessors.${preprocessor.id}`);
 
-        for (const [optionValue, optionLabel] of transformation.options) {
+        for (const [optionValue, optionLabel] of preprocessor.options) {
             const optionElement = document.createElement('option');
             optionElement.value = optionValue;
             optionElement.textContent = optionLabel;

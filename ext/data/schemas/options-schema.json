@@ -790,9 +790,9 @@
                                 },
                                 "additionalProperties": {
                                     "type": "object",
-                                    "required": ["textTransformations"],
+                                    "required": ["textPreprocessors"],
                                     "properties": {
-                                        "textTransformations": {
+                                        "textPreprocessors": {
                                             "type": "object",
                                             "propertyNames": {
                                                 "type": "string"
@@ -806,7 +806,7 @@
                                 },
                                 "default": {
                                     "ja": {
-                                        "textTransformations": {
+                                        "textPreprocessors": {
                                             "convertHalfWidthCharacters": "false",
                                             "convertNumericCharacters": "false",
                                             "convertAlphabeticCharacters": "false",

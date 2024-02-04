@@ -1135,11 +1135,11 @@ export class OptionsUtil {
 
     /**
      * - Added general.language.
-     * - Modularized text transformations.
+     * - Modularized text preprocessors.
      * @type {import('options-util').UpdateFunction}
      */
     _updateVersion25(options) {
-        const textTransformations = [
+        const textPreprocessors = [
             'convertHalfWidthCharacters',
             'convertNumericCharacters',
             'convertAlphabeticCharacters',
@@ -1153,13 +1153,13 @@ export class OptionsUtil {
 
             profileOptions.languages = {
                 ja: {
-                    textTransformations: {}
+                    textPreprocessors: {}
                 }
             };
 
-            for (const transformation of textTransformations) {
-                profileOptions.languages.ja.textTransformations[transformation] = profileOptions.translation[transformation];
-                delete profileOptions.translation[transformation];
+            for (const preprocessor of textPreprocessors) {
+                profileOptions.languages.ja.textPreprocessors[preprocessor] = profileOptions.translation[preprocessor];
+                delete profileOptions.translation[preprocessor];
             }
         }
     }

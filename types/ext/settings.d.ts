@@ -343,12 +343,12 @@ export type AccessibilityOptions = {
     forceGoogleDocsHtmlRendering: boolean;
 };
 
-export type TextTransformationsOptions = {
+export type TextPreprocessorsOptions = {
     [id: string]: string;
 };
 
 export type LanguageOptions = {
-    textTransformations?: TextTransformationsOptions;
+    textPreprocessors?: TextPreprocessorsOptions;
 };
 
 export type LanguageOptionsObjectMap = {

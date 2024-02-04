@@ -16,7 +16,7 @@
  */
 
 import type {FindTermsMatchType, FindTermsSortOrder, FindKanjiDictionary, FindTermDictionary} from '../ext/translation';
-import type {SearchResolution, TextTransformationsOptions} from '../ext/settings';
+import type {SearchResolution, TextPreprocessorsOptions} from '../ext/settings';
 import type {FindTermsMode} from 'translator';
 import type {DictionaryEntry} from 'dictionary';
 import type {NoteData} from 'anki-templates';
@@ -49,7 +49,7 @@ export type FindTermsOptionsPreset = {
     excludeDictionaryDefinitions?: string[] | null;
     searchResolution?: SearchResolution;
     language?: string;
-    textTransformationsOptions?: TextTransformationsOptions;
+    textPreprocessorsOptions?: TextPreprocessorsOptions;
 };
 
 export type OptionsType = OptionsPreset['type'];

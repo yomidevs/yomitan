@@ -414,7 +414,7 @@ function createProfileOptionsUpdatedTestData1() {
         },
         languages: {
             ja: {
-                textTransformations: {
+                textPreprocessors: {
                     convertHalfWidthCharacters: 'false',
                     convertNumericCharacters: 'false',
                     convertAlphabeticCharacters: 'false',

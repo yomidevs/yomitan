@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {textTransformations as textTransformationsEN} from './en/text-transformations.js';
-import {textTransformations as textTransformationsJA} from './ja/text-transformations.js';
+import {textPreprocessors as textPreprocessorsEN} from './en/text-preprocessors.js';
+import {textPreprocessors as textPreprocessorsJA} from './ja/text-preprocessors.js';
 
 /** @type {Map<string, import('language').Language>} */
 export const languages = new Map([
@@ -25,14 +25,14 @@ export const languages = new Map([
         iso: 'ja',
         flag: '🇯🇵',
         exampleText: '読め',
-        textTransformations: textTransformationsJA
+        textPreprocessors: textPreprocessorsJA
     }],
     ['en', {
         name: 'English',
         iso: 'en',
         flag: '🇬🇧',
         exampleText: 'read',
-        textTransformations: textTransformationsEN
+        textPreprocessors: textPreprocessorsEN
     }]
 ]);
 

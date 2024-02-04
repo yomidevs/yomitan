@@ -49,7 +49,7 @@ import {SettingsDisplayController} from './settings-display-controller.js';
 import {SortFrequencyDictionaryController} from './sort-frequency-dictionary-controller.js';
 import {StatusFooter} from './status-footer.js';
 import {StorageController} from './storage-controller.js';
-import {TextTransformationsController} from './text-transformations-controller.js';
+import {TextPreprocessorsController} from './text-preprocessors-controller.js';
 import {TranslationTextReplacementsController} from './translation-text-replacements-controller.js';
 
 /**
@@ -148,8 +148,8 @@ async function main() {
         const languagesController = new LanguagesController(settingsController);
         languagesController.prepare();
 
-        const textTransformationsController = new TextTransformationsController(settingsController);
-        textTransformationsController.prepare();
+        const textPreprocessorsController = new TextPreprocessorsController(settingsController);
+        textPreprocessorsController.prepare();
 
         const translationTextReplacementsController = new TranslationTextReplacementsController(settingsController);
         translationTextReplacementsController.prepare();

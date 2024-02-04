@@ -20,7 +20,7 @@ import {applyTextReplacement} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
-import {getTextTransformations} from './language-util.js';
+import {getTextPreprocessors} from './language-util.js';
 /**
  * Class which finds term and kanji dictionary entries for text.
  */
@@ -414,7 +414,7 @@ export class Translator {
         }
     }
 
-    // Deinflections and text transformations
+    // Deinflections and text preprocessing
 
     /**
      * @param {string} text
@@ -422,16 +422,16 @@ export class Translator {
      * @returns {import('translation-internal').DatabaseDeinflection[]}
      */
     _getAlgorithmDeinflections(text, options) {
-        const textTransformations = this._getTextTransformations(options);
+        const textPreprocessors = this._getTextPreprocessors(options);
 
-        const textTransformationsVectorSpace = new Map();
-        for (const [id, transformation] of textTransformations) {
-            textTransformationsVectorSpace.set(id, this._getTextTransformationVariants(transformation));
+        const textPreprocessorsVectorSpace = new Map();
+        for (const [id, preprocessors] of textPreprocessors) {
+            textPreprocessorsVectorSpace.set(id, this._getTextPreprocessorVariants(preprocessors));
         }
 
         const variantVectorSpace = new Map([
             ['textReplacements', this._getTextReplacementsVariants(options)],
-            ...textTransformationsVectorSpace
+            ...textPreprocessorsVectorSpace
         ]);
 
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
@@ -448,8 +448,8 @@ export class Translator {
                 text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
             }
 
-            for (const {transformation} of textTransformations.values()) {
-                const {id, transform} = transformation;
+            for (const {preprocessor} of textPreprocessors.values()) {
+                const {id, transform} = preprocessor;
                 const setting = arrayVariant.get(id);
                 text2 = transform(text2, setting, sourceMap);
             }
@@ -492,27 +492,27 @@ export class Translator {
 
     /**
      * @param {import('translation').FindTermsOptions} options
-     * @returns {Map<string, import('translation-internal').TextTransformation>}
+     * @returns {Map<string, import('translation-internal').TextPreprocessor>}
      */
-    _getTextTransformations(options) {
-        const {textTransformationsOptions, language} = options;
-        const textTransformationsData = getTextTransformations(language);
+    _getTextPreprocessors(options) {
+        const {textPreprocessorsOptions, language} = options;
+        const textPreprocessorsData = getTextPreprocessors(language);
 
-        /** @type {Map<string, import('translation-internal').TextTransformation>} */
-        const textTransformations = new Map();
+        /** @type {Map<string, import('translation-internal').TextPreprocessor>} */
+        const textPreprocessors = new Map();
 
-        for (const transformation of textTransformationsData) {
-            const {id} = transformation;
-            const value = textTransformationsOptions[id];
+        for (const preprocessor of textPreprocessorsData) {
+            const {id} = preprocessor;
+            const value = textPreprocessorsOptions[id];
             if (value) {
-                textTransformations.set(id, {
-                    transformation,
+                textPreprocessors.set(id, {
+                    preprocessor,
                     setting: value
                 });
             }
         }
 
-        return textTransformations;
+        return textPreprocessors;
     }
 
     /**
@@ -544,11 +544,11 @@ export class Translator {
     }
 
     /**
-     * @param {import('translation-internal').TextTransformation} transformation
+     * @param {import('translation-internal').TextPreprocessor} preprocessor
      * @returns {unknown[]}
      */
-    _getTextTransformationVariants(transformation) {
-        const {setting, transformation: {options}} = transformation;
+    _getTextPreprocessorVariants(preprocessor) {
+        const {setting, preprocessor: {options}} = preprocessor;
         for (const [optionValue, , optionSetting] of options) {
             if (optionValue === setting) {
                 return optionSetting;

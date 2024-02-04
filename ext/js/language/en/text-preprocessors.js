@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {capitalizeFirstLetter, decapitalize} from '../text-transformations.js';
+import {capitalizeFirstLetter, decapitalize} from '../text-preprocessors.js';
 
-export const textTransformations = [
+export const textPreprocessors = [
     decapitalize,
     capitalizeFirstLetter
 ];

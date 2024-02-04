@@ -34,7 +34,7 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {getLanguages, getTextTransformations} from '../language/language-util.js';
+import {getLanguages, getTextPreprocessors} from '../language/language-util.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -186,7 +186,7 @@ export class Backend {
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
             ['getLanguages',                 this._onApiGetLanguages.bind(this)],
-            ['getTextTransformations',       this._onApiGetTextTransformations.bind(this)]
+            ['getTextPreprocessors',         this._onApiGetTextPreprocessors.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
 
@@ -915,9 +915,9 @@ export class Backend {
         return getLanguages();
     }
 
-    /** @type {import('api').ApiHandler<'getTextTransformations'>} */
-    _onApiGetTextTransformations({language}) {
-        return getTextTransformations(language);
+    /** @type {import('api').ApiHandler<'getTextPreprocessors'>} */
+    _onApiGetTextPreprocessors({language}) {
+        return getTextPreprocessors(language);
     }
 
     // Command handlers
@@ -2384,7 +2384,7 @@ export class Backend {
                 searchResolution
             }
         } = options;
-        const textTransformationsOptions = options.languages[language].textTransformations || {};
+        const textPreprocessorsOptions = options.languages[language].textPreprocessors || {};
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
         let excludeDictionaryDefinitions = null;
         if (mode === 'merge' && !enabledDictionaryMap.has(mainDictionary)) {
@@ -2410,7 +2410,7 @@ export class Backend {
             enabledDictionaryMap,
             excludeDictionaryDefinitions,
             language,
-            textTransformationsOptions
+            textPreprocessorsOptions
         };
     }
 

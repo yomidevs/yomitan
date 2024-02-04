@@ -126,7 +126,7 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         excludeDictionaryDefinitions,
         searchResolution,
         language,
-        textTransformationsOptions
+        textPreprocessorsOptions
     } = preset;
 
     return {
@@ -140,7 +140,7 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         enabledDictionaryMap,
         excludeDictionaryDefinitions: Array.isArray(excludeDictionaryDefinitions) ? new Set(excludeDictionaryDefinitions) : null,
         searchResolution: typeof searchResolution !== 'undefined' ? searchResolution : 'letter',
-        textTransformationsOptions: typeof textTransformationsOptions !== 'undefined' ? textTransformationsOptions : {},
+        textPreprocessorsOptions: typeof textPreprocessorsOptions !== 'undefined' ? textPreprocessorsOptions : {},
         language: typeof language !== 'undefined' ? language : 'ja'
     };
 }

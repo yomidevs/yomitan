@@ -24,10 +24,10 @@ export function getLanguages() {
 
 /**
  * @param {string} iso
- * @returns {import('language').TextTransformation[]}
+ * @returns {import('language').TextPreprocessor[]}
  */
-export function getTextTransformations(iso) {
-    return languages.get(iso)?.textTransformations || [];
+export function getTextPreprocessors(iso) {
+    return languages.get(iso)?.textPreprocessors || [];
 }
 
 

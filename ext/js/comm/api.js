@@ -369,11 +369,11 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'getTextTransformations', 'language'>} language
-     * @returns {Promise<import('api').ApiReturn<'getTextTransformations'>>}
+     * @param {import('api').ApiParam<'getTextPreprocessors', 'language'>} language
+     * @returns {Promise<import('api').ApiReturn<'getTextPreprocessors'>>}
      */
-    getTextTransformations(language) {
-        return this._invoke('getTextTransformations', {language});
+    getTextPreprocessors(language) {
+        return this._invoke('getTextPreprocessors', {language});
     }
 
     // Utilities

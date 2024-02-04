@@ -30028,7 +30028,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertNumericCharacters",
+    "name": "Test text preprocessors - convertNumericCharacters",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -30129,7 +30129,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertAlphabeticCharacters",
+    "name": "Test text preprocessors - convertAlphabeticCharacters",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -30760,7 +30760,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertKatakanaToHiragana",
+    "name": "Test text preprocessors - convertKatakanaToHiragana",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -31391,7 +31391,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertHiraganaToKatakana",
+    "name": "Test text preprocessors - convertHiraganaToKatakana",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -31543,7 +31543,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertHalfWidthCharacters, convertKatakanaToHiragana",
+    "name": "Test text preprocessors - convertHalfWidthCharacters, convertKatakanaToHiragana",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -32174,7 +32174,7 @@
     ]
   },
   {
-    "name": "Test text transformations - collapseEmphaticSequences",
+    "name": "Test text preprocessors - collapseEmphaticSequences",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -32295,7 +32295,7 @@
     ]
   },
   {
-    "name": "Test text transformations - capitalizeFirstLetter",
+    "name": "Test text preprocessors - capitalizeFirstLetter",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -32408,7 +32408,7 @@
     ]
   },
   {
-    "name": "Test text transformations - decapitalize",
+    "name": "Test text preprocessors - decapitalize",
     "noteDataList": [
       {
         "marker": "{marker}",

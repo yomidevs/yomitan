@@ -17,7 +17,7 @@
  */
 
 import type * as Dictionary from './dictionary';
-import type {SearchResolution, TextTransformationsOptions} from 'settings';
+import type {SearchResolution, TextPreprocessorsOptions} from 'settings';
 
 // Kanji
 
@@ -100,7 +100,7 @@ export type FindTermsOptions = {
     /**
      * Which variants of the search text should be looked up.
      */
-    textTransformationsOptions: TextTransformationsOptions;
+    textPreprocessorsOptions: TextPreprocessorsOptions;
     /**
      * ISO-639 code of the language.
      */

@@ -22,7 +22,7 @@
             "sortFrequencyDictionaryOrder": "descending",
             "removeNonJapaneseCharacters": true,
             "language": "ja",
-            "textTransformationsOptions": {
+            "textPreprocessorsOptions": {
                 "convertHalfWidthCharacters": "false",
                 "convertNumericCharacters": "false",
                 "convertAlphabeticCharacters": "false",
@@ -364,7 +364,7 @@
             "options": "default"
         },
         {
-            "name": "Test text transformations - convertNumericCharacters",
+            "name": "Test text preprocessors - convertNumericCharacters",
             "func": "findTerms",
             "mode": "split",
             "text": "39",
@@ -372,7 +372,7 @@
                 "default",
                 {
                     "type": "terms",
-                    "textTransformationsOptions": {
+                    "textPreprocessorsOptions": {
                         "convertNumericCharacters": "true"
                     },
                     "removeNonJapaneseCharacters": false
@@ -380,7 +380,7 @@
             ]
         },
         {
-            "name": "Test text transformations - convertAlphabeticCharacters",
+            "name": "Test text preprocessors - convertAlphabeticCharacters",
             "func": "findTerms",
             "mode": "split",
             "text": "utsu",
@@ -389,14 +389,14 @@
                 {
                     "type": "terms",
                     "removeNonJapaneseCharacters": false,
-                    "textTransformationsOptions": {
+                    "textPreprocessorsOptions": {
                         "convertAlphabeticCharacters": "true"
                     }
                 }
             ]
         },
         {
-            "name": "Test text transformations - convertKatakanaToHiragana",
+            "name": "Test text preprocessors - convertKatakanaToHiragana",
             "func": "findTerms",
             "mode": "split",
             "text": "ウツ",
@@ -404,14 +404,14 @@
                 "default",
                 {
                     "type": "terms",
-                    "textTransformationsOptions": {
+                    "textPreprocessorsOptions": {
                         "convertKatakanaToHiragana": "true"
                     }
                 }
             ]
         },
         {
-            "name": "Test text transformations - convertHiraganaToKatakana",
+            "name": "Test text preprocessors - convertHiraganaToKatakana",
             "func": "findTerms",
             "mode": "split",
             "text": "てきすと",
@@ -419,14 +419,14 @@
                 "default",
                 {
                     "type": "terms",
-                    "textTransformationsOptions": {
+                    "textPreprocessorsOptions": {
                         "convertHiraganaToKatakana": "true"
                     }
                 }
             ]
         },
         {
-            "name": "Test text transformations - convertHalfWidthCharacters, convertKatakanaToHiragana",
+            "name": "Test text preprocessors - convertHalfWidthCharacters, convertKatakanaToHiragana",
             "func": "findTerms",
             "mode": "split",
             "text": "ｳﾂ",
@@ -434,7 +434,7 @@
                 "default",
                 {
                     "type": "terms",
-                    "textTransformationsOptions": {
+                    "textPreprocessorsOptions": {
                         "convertHalfWidthCharacters": "true",
                         "convertKatakanaToHiragana": "true"
                     }
@@ -442,7 +442,7 @@
             ]
         },
         {
-            "name": "Test text transformations - collapseEmphaticSequences",
+            "name": "Test text preprocessors - collapseEmphaticSequences",
             "func": "findTerms",
             "mode": "split",
             "text": "すっっごーーい",
@@ -450,14 +450,14 @@
                 "default",
                 {
                     "type": "terms",
-                    "textTransformationsOptions": {
+                    "textPreprocessorsOptions": {
                         "collapseEmphaticSequences": "full"
                     }
                 }
             ]
         },
         {
-            "name": "Test text transformations - capitalizeFirstLetter",
+            "name": "Test text preprocessors - capitalizeFirstLetter",
             "func": "findTerms",
             "mode": "split",
             "text": "english",
@@ -467,14 +467,14 @@
                     "type": "terms",
                     "language": "en",
                     "removeNonJapaneseCharacters": false,
-                    "textTransformationsOptions": {
+                    "textPreprocessorsOptions": {
                         "capitalizeFirstLetter": "true"
                     }
                 }
             ]
         },
         {
-            "name": "Test text transformations - decapitalize",
+            "name": "Test text preprocessors - decapitalize",
             "func": "findTerms",
             "mode": "split",
             "text": "LANGUAGE",
@@ -484,7 +484,7 @@
                     "type": "terms",
                     "language": "en",
                     "removeNonJapaneseCharacters": false,
-                    "textTransformationsOptions": {
+                    "textPreprocessorsOptions": {
                         "decapitalize": "true"
                     }
                 }

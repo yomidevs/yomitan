@@ -63,7 +63,7 @@ export class LanguagesController {
                 value: {
                     ...options.languages,
                     [language]: {
-                        textTransformations: {}
+                        textPreprocessors: {}
                     }
                 }
             }]);

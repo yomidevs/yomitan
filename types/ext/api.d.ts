@@ -385,11 +385,11 @@ type ApiSurface = {
         params: void;
         return: Language.Language[];
     };
-    getTextTransformations: {
+    getTextPreprocessors: {
         params: {
             language: string;
         };
-        return: Language.TextTransformation[];
+        return: Language.TextPreprocessor[];
     };
 };
 
