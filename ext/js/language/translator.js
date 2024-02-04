@@ -20,7 +20,7 @@ import {applyTextReplacement} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
-import {getTextPreprocessors} from './language-util.js';
+import {getTextPreprocessors} from './languages.js';
 /**
  * Class which finds term and kanji dictionary entries for text.
  */

@@ -38,14 +38,14 @@ const languages = new Map([
 
 
 /** @returns {import('language').Language[]}*/
-export function getAllLanguages() {
+export function getLanguages() {
     return [...languages.values()];
 }
 
 /**
  * @param {string} iso
- * @returns {import('language').Language | undefined}
+ * @returns {import('language').TextPreprocessor[]}
  */
-export function getLanguage(iso) {
-    return languages.get(iso);
+export function getTextPreprocessors(iso) {
+    return languages.get(iso)?.textPreprocessors || [];
 }

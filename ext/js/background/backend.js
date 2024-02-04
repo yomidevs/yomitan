@@ -34,8 +34,7 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {getTextPreprocessors} from '../language/language-util.js';
-import {getAllLanguages} from '../language/languages.js';
+import {getLanguages, getTextPreprocessors} from '../language/languages.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -913,7 +912,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'getLanguages'>} */
     _onApiGetLanguages() {
-        return getAllLanguages();
+        return getLanguages();
     }
 
     /** @type {import('api').ApiHandler<'getTextPreprocessors'>} */
