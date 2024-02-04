@@ -201,6 +201,14 @@ type ApiSurface = {
         };
         return: Settings.AnkiNoteGuiMode;
     };
+    notesView: {
+        params: {
+            noteIds: Anki.NoteId[];
+            mode: Settings.AnkiNoteGuiMode;
+            allowFallback: boolean;
+        };
+        return: Settings.AnkiNoteGuiMode;
+    };
     suspendAnkiCardsForNote: {
         params: {
             noteId: Anki.NoteId;

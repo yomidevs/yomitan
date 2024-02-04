@@ -201,6 +201,14 @@ export class AnkiConnect {
     }
 
     /**
+     * @param {import('anki').NoteId[]} noteIds
+     * @returns {Promise<import('anki').CardId[]>}
+     */
+    async guiBrowseNotes(noteIds) {
+        return await this.guiBrowse(`nid:${noteIds.join(',')}`);
+    }
+
+    /**
      * Opens the note editor GUI.
      * @param {import('anki').NoteId} noteId The ID of the note.
      * @returns {Promise<void>} Nothing is returned.

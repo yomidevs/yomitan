@@ -783,7 +783,7 @@ export class DisplayAnki {
         if (e.shiftKey) {
             this._showViewNoteMenu(element);
         } else {
-            this._viewNote(element);
+            this._viewNotes(element);
         }
     }
 
@@ -853,6 +853,25 @@ export class DisplayAnki {
         if (noteIds.length === 0) { return; }
         try {
             await this._display.application.api.noteView(noteIds[0], this._noteGuiMode, false);
+        } catch (e) {
+            const displayErrors = (
+                toError(e).message === 'Mode not supported' ?
+                [this._display.displayGenerator.instantiateTemplateFragment('footer-notification-anki-view-note-error')] :
+                void 0
+            );
+            this._showErrorNotification([toError(e)], displayErrors);
+            return;
+        }
+    }
+
+    /**
+     * @param {HTMLElement} node
+     */
+    async _viewNotes(node) {
+        const noteIds = this._getNodeNoteIds(node);
+        if (noteIds.length === 0) { return; }
+        try {
+            await this._display.application.api.notesView(noteIds, this._noteGuiMode, false);
         } catch (e) {
             const displayErrors = (
                 toError(e).message === 'Mode not supported' ?

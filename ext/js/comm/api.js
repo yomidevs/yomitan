@@ -128,6 +128,16 @@ export class API {
     }
 
     /**
+     * @param {import('api').ApiParam<'notesView', 'noteIds'>} noteIds
+     * @param {import('api').ApiParam<'noteView', 'mode'>} mode
+     * @param {import('api').ApiParam<'noteView', 'allowFallback'>} allowFallback
+     * @returns {Promise<import('api').ApiReturn<'noteView'>>}
+     */
+    notesView(noteIds, mode, allowFallback) {
+        return this._invoke('notesView', {noteIds, mode, allowFallback});
+    }
+
+    /**
      * @param {import('api').ApiParam<'suspendAnkiCardsForNote', 'noteId'>} noteId
      * @returns {Promise<import('api').ApiReturn<'suspendAnkiCardsForNote'>>}
      */

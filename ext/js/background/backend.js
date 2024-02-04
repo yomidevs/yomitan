@@ -155,6 +155,7 @@ export class Backend {
             ['getAnkiNoteInfo',              this._onApiGetAnkiNoteInfo.bind(this)],
             ['injectAnkiNoteMedia',          this._onApiInjectAnkiNoteMedia.bind(this)],
             ['noteView',                     this._onApiNoteView.bind(this)],
+            ['notesView',                    this._onApiNotesView.bind(this)],
             ['suspendAnkiCardsForNote',      this._onApiSuspendAnkiCardsForNote.bind(this)],
             ['commandExec',                  this._onApiCommandExec.bind(this)],
             ['getTermAudioInfoList',         this._onApiGetTermAudioInfoList.bind(this)],
@@ -596,6 +597,24 @@ export class Backend {
         }
         // Fallback
         await this._anki.guiBrowseNote(noteId);
+        return 'browse';
+    }
+
+    /** @type {import('api').ApiHandler<'notesView'>} */
+    async _onApiNotesView({noteIds, mode, allowFallback}) {
+        if (noteIds.length === 1 && mode === 'edit') {
+            try {
+                await this._anki.guiEditNote(noteIds[0]);
+                return 'edit';
+            } catch (e) {
+                if (!(e instanceof Error && this._anki.isErrorUnsupportedAction(e))) {
+                    throw e;
+                } else if (!allowFallback) {
+                    throw new Error('Mode not supported');
+                }
+            }
+        }
+        await this._anki.guiBrowseNotes(noteIds);
         return 'browse';
     }
 
