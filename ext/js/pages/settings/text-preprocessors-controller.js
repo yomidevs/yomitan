@@ -29,8 +29,8 @@ export class TextPreprocessorsController {
         this._container = querySelectorNotNull(document, '#text-preprocessors');
         /** @type {import('language').TextPreprocessor[]}*/
         this._preprocessors = [];
-        /** @type {string} */
-        this._language = '';
+        /** @type {string|null} */
+        this._language = null;
     }
 
     /**
