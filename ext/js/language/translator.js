@@ -18,8 +18,8 @@
 
 import {applyTextReplacement} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
-import {convertAlphabeticToKana} from './japanese-wanakana.js';
-import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth, isCodePointJapanese} from './japanese.js';
+import {convertAlphabeticToKana} from './ja/japanese-wanakana.js';
+import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth, isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
 
 /**
