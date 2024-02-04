@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {readResponseJson} from './json.js';
 
 /**
  * Checks whether a given value is a non-array object.
@@ -316,44 +315,4 @@ export function promiseAnimationFrame(timeout) {
             timer = setTimeout(onTimeout, timeout);
         }
     });
-}
-
-
-/**
- * @param {string} url
- * @returns {Promise<Response>}
- */
-export async function fetchAsset(url) {
-    const response = await fetch(chrome.runtime.getURL(url), {
-        method: 'GET',
-        mode: 'no-cors',
-        cache: 'default',
-        credentials: 'omit',
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer'
-    });
-    if (!response.ok) {
-        throw new Error(`Failed to fetch ${url}: ${response.status}`);
-    }
-    return response;
-}
-
-
-/**
- * @param {string} url
- * @returns {Promise<string>}
- */
-export async function fetchText(url) {
-    const response = await fetchAsset(url);
-    return await response.text();
-}
-
-/**
- * @template [T=unknown]
- * @param {string} url
- * @returns {Promise<T>}
- */
-export async function fetchJson(url) {
-    const response = await fetchAsset(url);
-    return await readResponseJson(response);
 }
