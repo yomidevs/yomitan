@@ -115,11 +115,13 @@ Required licensing notices for this project follow below:
 
 Yomitan uses several third-party libraries to function.
 
-| Name                | Installed version | License type | Link                                                     |
-| :------------------ | :---------------- | :----------- | :------------------------------------------------------- |
-| @zip.js/zip.js      | 2.7.31            | BSD-3-Clause | git+https://github.com/gildas-lormeau/zip.js.git         |
-| dexie               | 3.2.4             | Apache-2.0   | git+https://github.com/dfahlander/Dexie.js.git           |
-| dexie-export-import | 4.0.7             | Apache-2.0   | git+https://github.com/dexie/Dexie.js.git                |
-| kbn-handlebars      | 81ccdc2           | MIT          | git+https://github.com/themoeway/yomitan-handlebars.git  |
-| parse5              | 7.1.2             | MIT          | git://github.com/inikulin/parse5.git                     |
-| wanakana            | 5.3.1             | MIT          | git+ssh://git@github.com/WaniKani/WanaKana.git           |
+<!-- The following table is generated using the command `npm run license-report-markdown`. -->
+
+| Name                | Installed version | License type | Link                                             |
+| :------------------ | :---------------- | :----------- | :----------------------------------------------- |
+| @zip.js/zip.js      | 2.7.32            | BSD-3-Clause | git+https://github.com/gildas-lormeau/zip.js.git |
+| dexie               | 3.2.4             | Apache-2.0   | git+https://github.com/dfahlander/Dexie.js.git   |
+| dexie-export-import | 4.0.7             | Apache-2.0   | git+https://github.com/dexie/Dexie.js.git        |
+| yomitan-handlebars  | 1.0.0             | MIT          | n/a                                              |
+| parse5              | 7.1.2             | MIT          | git://github.com/inikulin/parse5.git             |
+| wanakana            | 5.3.1             | MIT          | git+ssh://git@github.com/WaniKani/WanaKana.git   |
