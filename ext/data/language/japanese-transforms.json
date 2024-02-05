@@ -896,57 +896,6 @@
         },
         {
             "name": "kansai-ben",
-            "description": "-ku stem of kansai-ben adjectives",
-            "rules": [
-                {"suffixIn": "う", "suffixOut": "く", "conditionsIn": [], "conditionsOut": ["adv"]},
-                {"suffixIn": "こう", "suffixOut": "かく", "conditionsIn": [], "conditionsOut": ["adv"]},
-                {"suffixIn": "ごう", "suffixOut": "がく", "conditionsIn": [], "conditionsOut": ["adv"]},
-                {"suffixIn": "そう", "suffixOut": "さく", "conditionsIn": [], "conditionsOut": ["adv"]},
-                {"suffixIn": "とう", "suffixOut": "たく", "conditionsIn": [], "conditionsOut": ["adv"]},
-                {"suffixIn": "のう", "suffixOut": "なく", "conditionsIn": [], "conditionsOut": ["adv"]},
-                {"suffixIn": "ぼう", "suffixOut": "ばく", "conditionsIn": [], "conditionsOut": ["adv"]},
-                {"suffixIn": "もう", "suffixOut": "まく", "conditionsIn": [], "conditionsOut": ["adv"]},
-                {"suffixIn": "ろう", "suffixOut": "らく", "conditionsIn": [], "conditionsOut": ["adv"]},
-                {"suffixIn": "よう", "suffixOut": "よく", "conditionsIn": [], "conditionsOut": ["adv"]},
-                {"suffixIn": "しゅう", "suffixOut": "しく", "conditionsIn": [], "conditionsOut": ["adv"]}
-            ]
-        },
-        {
-            "name": "kansai-ben",
-            "description": "-te form of kansai-ben adjectives",
-            "rules": [
-                {"suffixIn": "うて", "suffixOut": "くて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
-                {"suffixIn": "ごうて", "suffixOut": "がくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
-                {"suffixIn": "こうて", "suffixOut": "かくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
-                {"suffixIn": "そうて", "suffixOut": "さくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
-                {"suffixIn": "とうて", "suffixOut": "たくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
-                {"suffixIn": "のうて", "suffixOut": "なくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
-                {"suffixIn": "ぼうて", "suffixOut": "ばくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
-                {"suffixIn": "もうて", "suffixOut": "まくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
-                {"suffixIn": "ろうて", "suffixOut": "らくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
-                {"suffixIn": "ようて", "suffixOut": "よくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
-                {"suffixIn": "しゅうて", "suffixOut": "しくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]}
-            ]
-        },
-        {
-            "name": "kansai-ben",
-            "description": "Negative form of kansai-ben adjectives",
-            "rules": [
-                {"suffixIn": "うない", "suffixOut": "くない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
-                {"suffixIn": "こうない", "suffixOut": "かくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
-                {"suffixIn": "ごうない", "suffixOut": "がくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
-                {"suffixIn": "そうない", "suffixOut": "さくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
-                {"suffixIn": "とうない", "suffixOut": "たくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
-                {"suffixIn": "のうない", "suffixOut": "なくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
-                {"suffixIn": "ぼうない", "suffixOut": "ばくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
-                {"suffixIn": "もうない", "suffixOut": "まくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
-                {"suffixIn": "ろうない", "suffixOut": "らくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
-                {"suffixIn": "ようない", "suffixOut": "よくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
-                {"suffixIn": "しゅうない", "suffixOut": "しくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]}
-            ]
-        },
-        {
-            "name": "kansai-ben",
             "description": "-te form of kansai-ben verbs",
             "rules": [
                 {"suffixIn": "うて", "suffixOut": "って", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
@@ -1006,6 +955,57 @@
                 {"suffixIn": "ろうたら", "suffixOut": "らったら", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ようたら", "suffixOut": "やったら", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ゆうたら", "suffixOut": "いったら", "conditionsIn": [], "conditionsOut": []}
+            ]
+        },
+        {
+            "name": "kansai-ben",
+            "description": "-ku stem of kansai-ben adjectives",
+            "rules": [
+                {"suffixIn": "う", "suffixOut": "く", "conditionsIn": [], "conditionsOut": ["adv"]},
+                {"suffixIn": "こう", "suffixOut": "かく", "conditionsIn": [], "conditionsOut": ["adv"]},
+                {"suffixIn": "ごう", "suffixOut": "がく", "conditionsIn": [], "conditionsOut": ["adv"]},
+                {"suffixIn": "そう", "suffixOut": "さく", "conditionsIn": [], "conditionsOut": ["adv"]},
+                {"suffixIn": "とう", "suffixOut": "たく", "conditionsIn": [], "conditionsOut": ["adv"]},
+                {"suffixIn": "のう", "suffixOut": "なく", "conditionsIn": [], "conditionsOut": ["adv"]},
+                {"suffixIn": "ぼう", "suffixOut": "ばく", "conditionsIn": [], "conditionsOut": ["adv"]},
+                {"suffixIn": "もう", "suffixOut": "まく", "conditionsIn": [], "conditionsOut": ["adv"]},
+                {"suffixIn": "ろう", "suffixOut": "らく", "conditionsIn": [], "conditionsOut": ["adv"]},
+                {"suffixIn": "よう", "suffixOut": "よく", "conditionsIn": [], "conditionsOut": ["adv"]},
+                {"suffixIn": "しゅう", "suffixOut": "しく", "conditionsIn": [], "conditionsOut": ["adv"]}
+            ]
+        },
+        {
+            "name": "kansai-ben",
+            "description": "-te form of kansai-ben adjectives",
+            "rules": [
+                {"suffixIn": "うて", "suffixOut": "くて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
+                {"suffixIn": "こうて", "suffixOut": "かくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
+                {"suffixIn": "ごうて", "suffixOut": "がくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
+                {"suffixIn": "そうて", "suffixOut": "さくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
+                {"suffixIn": "とうて", "suffixOut": "たくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
+                {"suffixIn": "のうて", "suffixOut": "なくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
+                {"suffixIn": "ぼうて", "suffixOut": "ばくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
+                {"suffixIn": "もうて", "suffixOut": "まくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
+                {"suffixIn": "ろうて", "suffixOut": "らくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
+                {"suffixIn": "ようて", "suffixOut": "よくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
+                {"suffixIn": "しゅうて", "suffixOut": "しくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]}
+            ]
+            },
+        {
+            "name": "kansai-ben",
+            "description": "Negative form of kansai-ben adjectives",
+            "rules": [
+                {"suffixIn": "うない", "suffixOut": "くない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "こうない", "suffixOut": "かくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "ごうない", "suffixOut": "がくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "そうない", "suffixOut": "さくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "とうない", "suffixOut": "たくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "のうない", "suffixOut": "なくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "ぼうない", "suffixOut": "ばくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "もうない", "suffixOut": "まくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "ろうない", "suffixOut": "らくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "ようない", "suffixOut": "よくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
+                {"suffixIn": "しゅうない", "suffixOut": "しくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]}
             ]
         }
     ]
