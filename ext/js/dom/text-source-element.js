@@ -246,8 +246,8 @@ export class TextSourceElement {
                 break;
         }
 
-        // Remove zero-width space and zero-width non-joiner
-        content = content.replace(/[\u200b\u200c]/g, '');
+        // Remove zero-width space, zero-width non-joiner, soft hyphen
+        content = content.replace(/[\u200b\u200c\u00ad]/g, '');
 
         return content;
     }
