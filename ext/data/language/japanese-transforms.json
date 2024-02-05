@@ -990,7 +990,7 @@
                 {"suffixIn": "ようて", "suffixOut": "よくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]},
                 {"suffixIn": "しゅうて", "suffixOut": "しくて", "conditionsIn": ["iru"], "conditionsOut": ["iru"]}
             ]
-            },
+        },
         {
             "name": "kansai-ben",
             "description": "Negative form of kansai-ben adjectives",
