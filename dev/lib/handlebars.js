@@ -14,5 +14,5 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-export {Handlebars} from './handlebars/src/handlebars.js';
 
+export {Handlebars} from 'yomitan-handlebars/src/handlebars.js';
