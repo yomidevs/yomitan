@@ -134,8 +134,7 @@ export class LanguageTransformer {
         for (let i = 0; i < results.length; ++i) {
             const {text, conditions, trace} = results[i];
             for (const {name, rules, matchConditions} of this._transforms) {
-                if (!matchConditions) { continue; }
-                if (!this._checkMatchConditions(text, matchConditions)) { continue; }
+                if (typeof matchConditions !== 'undefined' && !this._checkMatchConditions(text, matchConditions)) { continue; }
 
                 for (let j = 0, jj = rules.length; j < jj; ++j) {
                     const rule = rules[j];
