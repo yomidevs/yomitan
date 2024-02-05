@@ -16,8 +16,22 @@
  */
 
 import {AnkiNoteBuilder} from '../../ext/js/data/anki-note-builder.js';
+import {getStandardFieldMarkers} from '../../ext/js/data/anki-template-util.js';
 import {createAnkiNoteData} from '../../ext/js/data/sandbox/anki-note-data-creator.js';
 import {AnkiTemplateRenderer} from '../../ext/js/templates/sandbox/anki-template-renderer.js';
+
+/**
+ * @param {import('dictionary').DictionaryEntryType} type
+ * @returns {import('anki-note-builder').Field[]}
+ */
+function createTestFields(type) {
+    /** @type {import('anki-note-builder').Field[]} */
+    const fields = [];
+    for (const marker of getStandardFieldMarkers(type)) {
+        fields.push([marker, `{${marker}}`]);
+    }
+    return fields;
+}
 
 /**
  * @param {import('dictionary').DictionaryEntry} dictionaryEntry
@@ -47,95 +61,13 @@ export function createTestAnkiNoteData(dictionaryEntry, mode) {
 }
 
 /**
- * @param {'terms'|'kanji'} type
- * @returns {string[]}
- */
-function getFieldMarkers(type) {
-    switch (type) {
-        case 'terms':
-            return [
-                'audio',
-                'clipboard-image',
-                'clipboard-text',
-                'cloze-body',
-                'cloze-prefix',
-                'cloze-suffix',
-                'conjugation',
-                'dictionary',
-                'document-title',
-                'expression',
-                'frequencies',
-                'frequency-harmonic-rank',
-                'frequency-harmonic-occurrence',
-                'frequency-average-rank',
-                'frequency-average-occurrence',
-                'furigana',
-                'furigana-plain',
-                'glossary',
-                'glossary-brief',
-                'glossary-no-dictionary',
-                'part-of-speech',
-                'pitch-accents',
-                'pitch-accent-graphs',
-                'pitch-accent-positions',
-                'phonetic-transcriptions',
-                'reading',
-                'screenshot',
-                'search-query',
-                'selection-text',
-                'sentence',
-                'sentence-furigana',
-                'tags',
-                'url'
-            ];
-        case 'kanji':
-            return [
-                'character',
-                'clipboard-image',
-                'clipboard-text',
-                'cloze-body',
-                'cloze-prefix',
-                'cloze-suffix',
-                'dictionary',
-                'document-title',
-                'frequencies',
-                'frequency-harmonic-rank',
-                'frequency-harmonic-occurrence',
-                'frequency-average-rank',
-                'frequency-average-occurrence',
-                'glossary',
-                'kunyomi',
-                'onyomi',
-                'screenshot',
-                'search-query',
-                'selection-text',
-                'sentence',
-                'sentence-furigana',
-                'stroke-count',
-                'tags',
-                'url'
-            ];
-        default:
-            return [];
-    }
-}
-
-/**
  * @param {import('dictionary').DictionaryEntry[]} dictionaryEntries
- * @param {'terms'|'kanji'} type
  * @param {import('settings').ResultOutputMode} mode
  * @param {string} template
  * @param {?import('vitest').ExpectStatic} expect
  * @returns {Promise<import('anki').NoteFields[]>}
  */
-export async function getTemplateRenderResults(dictionaryEntries, type, mode, template, expect) {
-    const markers = getFieldMarkers(type);
-    /** @type {import('anki-note-builder').Field[]} */
-    const fields = [];
-    for (const marker of markers) {
-        fields.push([marker, `{${marker}}`]);
-    }
-
+export async function getTemplateRenderResults(dictionaryEntries, mode, template, expect) {
     const ankiTemplateRenderer = new AnkiTemplateRenderer();
     await ankiTemplateRenderer.prepare();
     const clozePrefix = 'cloze-prefix';
@@ -173,7 +105,7 @@ export async function getTemplateRenderResults(dictionaryEntries, type, mode, te
             template,
             deckName: 'deckName',
             modelName: 'modelName',
-            fields,
+            fields: createTestFields(dictionaryEntry.type),
             tags: ['yomitan'],
             checkForDuplicates: true,
             duplicateScope: 'collection',
