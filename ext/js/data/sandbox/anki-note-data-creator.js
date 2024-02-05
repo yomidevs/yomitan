@@ -17,7 +17,7 @@
  */
 
 import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../../dictionary/dictionary-data-util.js';
-import {distributeFurigana} from '../../language/japanese.js';
+import {distributeFurigana} from '../../language/ja/japanese.js';
 
 /**
  * Creates a compatibility representation of the specified data.

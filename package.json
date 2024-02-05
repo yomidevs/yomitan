@@ -10,6 +10,7 @@
     },
     "type": "module",
     "scripts": {
+        "bench": "vitest bench",
         "build": "node ./dev/bin/build.js",
         "build-libs": "node ./dev/bin/build-libs.js",
         "test": "npm run test-lint-js && npm run test-ts && npm run test-lint-css && npm run test-lint-html && npm run test-code && npm run test-build",
@@ -24,7 +25,8 @@
         "test-code-write": "vitest run --config test/data/vitest.write.config.json",
         "test-build": "node ./dev/bin/build.js --dryRun --all",
         "license-report": "license-report --output=html --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link --html.cssFile=dev/data/legal-npm.css > ext/legal-npm.html",
-        "license-report-markdown": "license-report --output=markdown --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link"
+        "license-report-markdown": "license-report --output=markdown --only=prod --fields=name --fields=installedVersion --fields=licenseType --fields=link",
+        "prepare": "husky install"
     },
     "repository": {
         "type": "git",
@@ -45,6 +47,7 @@
         "sourceDir": "ext"
     },
     "devDependencies": {
+        "@codspeed/vitest-plugin": "^3.1.0",
         "@playwright/test": "^1.39.0",
         "@stylistic/eslint-plugin-ts": "^1.5.1",
         "@stylistic/stylelint-plugin": "^2.0.0",
@@ -55,7 +58,7 @@
         "@types/events": "^3.0.3",
         "@types/firefox-webext-browser": "^120.0.0",
         "@types/jsdom": "^21.1.6",
-        "@types/node": "^20.10.6",
+        "@types/node": "20.11.5",
         "@types/wanakana": "^4.0.6",
         "@types/zip.js": "^2.0.32",
         "@typescript-eslint/eslint-plugin": "^6.16.0",
@@ -74,10 +77,14 @@
         "eslint-plugin-unused-imports": "^3.0.0",
         "eslint-plugin-vitest": "^0.3.20",
         "fake-indexeddb": "^5.0.2",
+        "handlebars": "^4.7.8",
         "html-validate": "^8.8.0",
+        "husky": "^9.0.10",
         "jsdom": "^24.0.0",
         "jszip": "^3.10.1",
         "license-report": "^6.5.0",
+        "lint-staged": "^15.2.1",
+        "prettier": "^3.2.4",
         "stylelint": "^16.1.0",
         "stylelint-config-recommended": "^14.0.0",
         "ts-json-schema-generator": "^1.5.0",
@@ -88,8 +95,11 @@
         "@zip.js/zip.js": "^2.7.31",
         "dexie": "^3.2.4",
         "dexie-export-import": "^4.0.7",
-        "handlebars": "^4.7.8",
+        "yomitan-handlebars": "git+https://github.com/themoeway/yomitan-handlebars.git#12aff5e3550954d7d3a98a5917ff7d579f3cce25",
         "parse5": "^7.1.2",
         "wanakana": "^5.3.1"
+    },
+    "lint-staged": {
+        "*.md": "prettier --write"
     }
 }

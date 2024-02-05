@@ -23,7 +23,7 @@ import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {readResponseJson} from '../core/json.js';
+import {fetchJson, fetchText} from '../core/fetch-utilities.js';
 import {log} from '../core/logger.js';
 import {clone, deferPromise, isObject, promiseTimeout} from '../core/utilities.js';
 import {isNoteDataValid} from '../data/anki-util.js';
@@ -33,7 +33,7 @@ import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
-import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/japanese.js';
+import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -279,11 +279,11 @@ export class Backend {
             }
 
             /** @type {import('language-transformer').LanguageTransformDescriptor} */
-            const descriptor = await this._fetchJson('/data/language/japanese-transforms.json');
+            const descriptor = await fetchJson('/data/language/japanese-transforms.json');
             this._translator.prepare(descriptor);
 
             await this._optionsUtil.prepare();
-            this._defaultAnkiFieldTemplates = (await this._fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
+            this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
             this._options = await this._optionsUtil.load();
 
             this._applyOptions('background');
@@ -668,7 +668,7 @@ export class Backend {
         if (!url.startsWith('/') || url.startsWith('//') || !url.endsWith('.css')) {
             throw new Error('Invalid URL');
         }
-        return await this._fetchText(url);
+        return await fetchText(url);
     }
 
     /** @type {import('api').ApiHandler<'getEnvironmentInfo'>} */
@@ -683,7 +683,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'getDisplayTemplatesHtml'>} */
     async _onApiGetDisplayTemplatesHtml() {
-        return await this._fetchText('/display-templates.html');
+        return await fetchText('/display-templates.html');
     }
 
     /** @type {import('api').ApiHandler<'getZoom'>} */
@@ -1846,44 +1846,6 @@ export class Backend {
                 }, timeout);
             }
         });
-    }
-
-    /**
-     * @param {string} url
-     * @returns {Promise<Response>}
-     */
-    async _fetchAsset(url) {
-        const response = await fetch(chrome.runtime.getURL(url), {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.status}`);
-        }
-        return response;
-    }
-
-    /**
-     * @param {string} url
-     * @returns {Promise<string>}
-     */
-    async _fetchText(url) {
-        const response = await this._fetchAsset(url);
-        return await response.text();
-    }
-
-    /**
-     * @template [T=unknown]
-     * @param {string} url
-     * @returns {Promise<T>}
-     */
-    async _fetchJson(url) {
-        const response = await this._fetchAsset(url);
-        return await readResponseJson(response);
     }
 
     /**

@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../lib/wanakana.js';
+import * as wanakana from '../../../lib/wanakana.js';
 
 /**
  * @param {string} text
- * @param {?import('../general/text-source-map.js').TextSourceMap} sourceMap
+ * @param {?import('../../general/text-source-map.js').TextSourceMap} sourceMap
  * @param {number} sourceMapStart
  * @returns {string}
  */
@@ -84,7 +84,7 @@ export function convertToRomaji(text) {
 
 /**
  * @param {string} text
- * @param {?import('../general/text-source-map.js').TextSourceMap} sourceMap
+ * @param {?import('../../general/text-source-map.js').TextSourceMap} sourceMap
  * @returns {string}
  */
 export function convertAlphabeticToKana(text, sourceMap = null) {

@@ -1,8 +1,9 @@
-# Yomitan <!-- omit from toc --> 
+# Yomitan <!-- omit from toc -->
+
 [![Chrome Release](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&logoColor=lightblue&color=lightblue&label=chrome%20release%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn)
 [![Firefox Release](<https://img.shields.io/amo/v/yomitan?logo=Firefox&color=orange&label=firefox%20release%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
-[![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC) 
+[![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)
 
 :wave: **This project is a community fork of Yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023). We have made a number of foundational changes to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**:
 
@@ -57,6 +58,7 @@ Yomitan provides advanced features not available in other browser-based dictiona
 Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially introduced into the _testing_ version, and after some time spent ensuring that they are relatively bug free, they will be promoted to the _stable_ version. If you are technically savvy and don't mind submitting issues on GitHub, try the _testing_ version; otherwise, the _stable_ version will be your best bet.
 
 - **Google Chrome**
+
   - [stable](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn)
   - [testing](https://chrome.google.com/webstore/detail/yomitan-development-build/glnaenfapkkecknnmginabpmgkenenml)
 
@@ -113,11 +115,13 @@ Required licensing notices for this project follow below:
 
 Yomitan uses several third-party libraries to function.
 
-| Name                | Installed version | License type | Link                                                     |
-| :------------------ | :---------------- | :----------- | :------------------------------------------------------- |
-| @zip.js/zip.js      | 2.7.31            | BSD-3-Clause | git+https://github.com/gildas-lormeau/zip.js.git         |
-| dexie               | 3.2.4             | Apache-2.0   | git+https://github.com/dfahlander/Dexie.js.git           |
-| dexie-export-import | 4.0.7             | Apache-2.0   | git+https://github.com/dexie/Dexie.js.git                |
-| handlebars          | 4.7.8             | MIT          | git+https://github.com/handlebars-lang/handlebars.js.git |
-| parse5              | 7.1.2             | MIT          | git://github.com/inikulin/parse5.git                     |
-| wanakana            | 5.3.1             | MIT          | git+ssh://git@github.com/WaniKani/WanaKana.git           |
+<!-- The following table is generated using the command `npm run license-report-markdown`. -->
+
+| Name                | Installed version | License type | Link                                             |
+| :------------------ | :---------------- | :----------- | :----------------------------------------------- |
+| @zip.js/zip.js      | 2.7.32            | BSD-3-Clause | git+https://github.com/gildas-lormeau/zip.js.git |
+| dexie               | 3.2.4             | Apache-2.0   | git+https://github.com/dfahlander/Dexie.js.git   |
+| dexie-export-import | 4.0.7             | Apache-2.0   | git+https://github.com/dexie/Dexie.js.git        |
+| yomitan-handlebars  | 1.0.0             | MIT          | n/a                                              |
+| parse5              | 7.1.2             | MIT          | git://github.com/inikulin/parse5.git             |
+| wanakana            | 5.3.1             | MIT          | git+ssh://git@github.com/WaniKani/WanaKana.git   |
