@@ -201,7 +201,7 @@ type ApiSurface = {
         };
         return: Settings.AnkiNoteGuiMode;
     };
-    notesView: {
+    viewNotes: {
         params: {
             noteIds: Anki.NoteId[];
             mode: Settings.AnkiNoteGuiMode;

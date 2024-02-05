@@ -807,6 +807,11 @@ export class DisplayAnki {
                     this._viewNote(item);
                 }
                 break;
+            case 'viewNotes':
+                if (item !== null) {
+                    this._viewNotes(item);
+                }
+                break;
         }
     }
 
@@ -871,7 +876,7 @@ export class DisplayAnki {
         const noteIds = this._getNodeNoteIds(node);
         if (noteIds.length === 0) { return; }
         try {
-            await this._display.application.api.notesView(noteIds, this._noteGuiMode, false);
+            await this._display.application.api.viewNotes(noteIds, this._noteGuiMode, false);
         } catch (e) {
             const displayErrors = (
                 toError(e).message === 'Mode not supported' ?

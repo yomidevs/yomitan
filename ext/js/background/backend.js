@@ -155,7 +155,7 @@ export class Backend {
             ['getAnkiNoteInfo',              this._onApiGetAnkiNoteInfo.bind(this)],
             ['injectAnkiNoteMedia',          this._onApiInjectAnkiNoteMedia.bind(this)],
             ['noteView',                     this._onApiNoteView.bind(this)],
-            ['notesView',                    this._onApiNotesView.bind(this)],
+            ['viewNotes',                    this._onApiViewNotes.bind(this)],
             ['suspendAnkiCardsForNote',      this._onApiSuspendAnkiCardsForNote.bind(this)],
             ['commandExec',                  this._onApiCommandExec.bind(this)],
             ['getTermAudioInfoList',         this._onApiGetTermAudioInfoList.bind(this)],
@@ -600,8 +600,8 @@ export class Backend {
         return 'browse';
     }
 
-    /** @type {import('api').ApiHandler<'notesView'>} */
-    async _onApiNotesView({noteIds, mode, allowFallback}) {
+    /** @type {import('api').ApiHandler<'viewNotes'>} */
+    async _onApiViewNotes({noteIds, mode, allowFallback}) {
         if (noteIds.length === 1 && mode === 'edit') {
             try {
                 await this._anki.guiEditNote(noteIds[0]);
