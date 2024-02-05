@@ -28,7 +28,7 @@ export type TextPreprocessor<T = unknown> = {
     name: string;
     description: string;
     options: TextPreprocessorOption<T>[];
-    transform: (str: string, setting: T, sourceMap?: TextSourceMap) => string;
+    process: (str: string, setting: T, sourceMap?: TextSourceMap) => string;
 };
 
 export type Language = {

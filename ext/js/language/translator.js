@@ -449,9 +449,9 @@ export class Translator {
             }
 
             for (const {preprocessor} of textPreprocessors.values()) {
-                const {id, transform} = preprocessor;
+                const {id, process} = preprocessor;
                 const setting = arrayVariant.get(id);
-                text2 = transform(text2, setting, sourceMap);
+                text2 = process(text2, setting, sourceMap);
             }
 
             for (

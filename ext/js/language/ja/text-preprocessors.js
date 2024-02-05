@@ -20,7 +20,7 @@ import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth} from './japanese.js';
 
 /** @type {import('language').TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>}*/
-const collapseEmphaticSequencesTransform = {
+const collapseEmphaticSequencesPrerocessor = {
     id: 'collapseEmphaticSequences',
     name: 'Collapse emphatic character sequences',
     description: 'すっっごーーい → すっごーい / すごい',
@@ -29,7 +29,7 @@ const collapseEmphaticSequencesTransform = {
         ['true', 'Collapse into single character', [[false, false], [true, false]]],
         ['full', 'Remove all characters', [[false, false], [true, false], [true, true]]]
     ],
-    transform: (str, setting, sourceMap) => {
+    process: (str, setting, sourceMap) => {
         const [collapseEmphatic, collapseEmphaticFull] = setting;
         if (collapseEmphatic) {
             str = collapseEmphaticSequences(str, collapseEmphaticFull, sourceMap);
@@ -45,35 +45,35 @@ export const textPreprocessors = [
         name: 'Convert half width characters to full width',
         description: 'ﾖﾐﾁｬﾝ → ヨミチャン',
         options: basicTextPreprocessorOptions,
-        transform: (str, setting, sourceMap) => setting ? convertHalfWidthKanaToFullWidth(str, sourceMap) : str
+        process: (str, setting, sourceMap) => setting ? convertHalfWidthKanaToFullWidth(str, sourceMap) : str
     },
     {
         id: 'convertNumericCharacters',
         name: 'Convert numeric characters to full width',
         description: '1234 → １２３４',
         options: basicTextPreprocessorOptions,
-        transform: (str, setting) => setting ? convertNumericToFullWidth(str) : str
+        process: (str, setting) => setting ? convertNumericToFullWidth(str) : str
     },
     {
         id: 'convertAlphabeticCharacters',
         name: 'Convert alphabetic characters to hiragana',
         description: 'yomichan → よみちゃん',
         options: basicTextPreprocessorOptions,
-        transform: (str, setting, sourceMap) => setting ? convertAlphabeticToKana(str, sourceMap) : str
+        process: (str, setting, sourceMap) => setting ? convertAlphabeticToKana(str, sourceMap) : str
     },
     {
         id: 'convertHiraganaToKatakana',
         name: 'Convert hiragana to katakana',
         description: 'よみちゃん → ヨミチャン',
         options: basicTextPreprocessorOptions,
-        transform: (str, setting) => setting ? convertHiraganaToKatakana(str) : str
+        process: (str, setting) => setting ? convertHiraganaToKatakana(str) : str
     },
     {
         id: 'convertKatakanaToHiragana',
         name: 'Convert katakana to hiragana',
         description: 'ヨミチャン → よみちゃん',
         options: basicTextPreprocessorOptions,
-        transform: (str, setting) => setting ? convertKatakanaToHiragana(str) : str
+        process: (str, setting) => setting ? convertKatakanaToHiragana(str) : str
     },
-    collapseEmphaticSequencesTransform
+    collapseEmphaticSequencesPrerocessor
 ];
