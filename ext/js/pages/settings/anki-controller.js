@@ -21,6 +21,7 @@ import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {ExtensionError} from '../../core/extension-error.js';
 import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
+import {getStandardFieldMarkers} from '../../data/anki-template-util.js';
 import {stringContainsAnyFieldMarker} from '../../data/anki-util.js';
 import {getRequiredPermissionsForAnkiFieldValue, hasPermissions, setPermissionsGranted} from '../../data/permissions-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -117,81 +118,6 @@ export class AnkiController {
 
         await this._updateOptions();
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
-    }
-
-    /**
-     * @param {string} type
-     * @returns {string[]}
-     */
-    getFieldMarkers(type) {
-        switch (type) {
-            case 'terms':
-                return [
-                    'audio',
-                    'clipboard-image',
-                    'clipboard-text',
-                    'cloze-body',
-                    'cloze-prefix',
-                    'cloze-suffix',
-                    'conjugation',
-                    'dictionary',
-                    'document-title',
-                    'expression',
-                    'frequencies',
-                    'frequency-harmonic-rank',
-                    'frequency-harmonic-occurrence',
-                    'frequency-average-rank',
-                    'frequency-average-occurrence',
-                    'furigana',
-                    'furigana-plain',
-                    'glossary',
-                    'glossary-brief',
-                    'glossary-no-dictionary',
-                    'part-of-speech',
-                    'pitch-accents',
-                    'pitch-accent-graphs',
-                    'pitch-accent-positions',
-                    'pitch-accent-categories',
-                    'phonetic-transcriptions',
-                    'reading',
-                    'screenshot',
-                    'search-query',
-                    'selection-text',
-                    'sentence',
-                    'sentence-furigana',
-                    'tags',
-                    'url'
-                ];
-            case 'kanji':
-                return [
-                    'character',
-                    'clipboard-image',
-                    'clipboard-text',
-                    'cloze-body',
-                    'cloze-prefix',
-                    'cloze-suffix',
-                    'dictionary',
-                    'document-title',
-                    'frequencies',
-                    'frequency-harmonic-rank',
-                    'frequency-harmonic-occurrence',
-                    'frequency-average-rank',
-                    'frequency-average-occurrence',
-                    'glossary',
-                    'kunyomi',
-                    'onyomi',
-                    'screenshot',
-                    'search-query',
-                    'selection-text',
-                    'sentence-furigana',
-                    'sentence',
-                    'stroke-count',
-                    'tags',
-                    'url'
-                ];
-            default:
-                return [];
-        }
     }
 
     /**
@@ -356,11 +282,11 @@ export class AnkiController {
 
     /** */
     _setupFieldMenus() {
-        /** @type {[types: string[], selector: string][]} */
+        /** @type {[types: import('dictionary').DictionaryEntryType[], selector: string][]} */
         const fieldMenuTargets = [
-            [['terms'], '#anki-card-terms-field-menu-template'],
+            [['term'], '#anki-card-terms-field-menu-template'],
             [['kanji'], '#anki-card-kanji-field-menu-template'],
-            [['terms', 'kanji'], '#anki-card-all-field-menu-template']
+            [['term', 'kanji'], '#anki-card-all-field-menu-template']
         ];
         for (const [types, selector] of fieldMenuTargets) {
             const element = /** @type {HTMLTemplateElement} */ (document.querySelector(selector));
@@ -368,7 +294,7 @@ export class AnkiController {
 
             let markers = [];
             for (const type of types) {
-                markers.push(...this.getFieldMarkers(type));
+                markers.push(...getStandardFieldMarkers(type));
             }
             markers = [...new Set(markers)];
 
@@ -580,7 +506,9 @@ class AnkiCardController {
         this._node = node;
         const {ankiCardType} = node.dataset;
         /** @type {string} */
-        this._cardType = typeof ankiCardType === 'string' ? ankiCardType : 'terms';
+        this._optionsType = typeof ankiCardType === 'string' ? ankiCardType : 'terms';
+        /** @type {import('dictionary').DictionaryEntryType} */
+        this._dictionaryEntryType = ankiCardType === 'kanji' ? 'kanji' : 'term';
         /** @type {string|undefined} */
         this._cardMenu = node.dataset.ankiCardMenu;
         /** @type {EventListenerCollection} */
@@ -609,7 +537,7 @@ class AnkiCardController {
         const ankiOptions = options.anki;
         if (this._cleaned) { return; }
 
-        const cardOptions = this._getCardOptions(ankiOptions, this._cardType);
+        const cardOptions = this._getCardOptions(ankiOptions, this._optionsType);
         if (cardOptions === null) { return; }
         const {deck, model, fields} = cardOptions;
         /** @type {HTMLSelectElement} */
@@ -651,7 +579,7 @@ class AnkiCardController {
      * @returns {boolean}
      */
     isStale() {
-        return (this._cardType !== this._node.dataset.ankiCardType);
+        return (this._optionsType !== this._node.dataset.ankiCardType);
     }
 
     // Private
@@ -710,7 +638,7 @@ class AnkiCardController {
         const indexNumber = typeof index === 'string' ? Number.parseInt(index, 10) : 0;
         if (typeof fieldName !== 'string') { return; }
 
-        const defaultValue = this._getDefaultFieldValue(fieldName, indexNumber, this._cardType, null);
+        const defaultValue = this._getDefaultFieldValue(fieldName, indexNumber, this._dictionaryEntryType, null);
         if (defaultValue === '') { return; }
 
         const match = /^\{([\w\W]+)\}$/.exec(defaultValue);
@@ -768,11 +696,11 @@ class AnkiCardController {
 
     /**
      * @param {import('settings').AnkiOptions} ankiOptions
-     * @param {string} cardType
+     * @param {string} optionsType
      * @returns {?import('settings').AnkiNoteOptions}
      */
-    _getCardOptions(ankiOptions, cardType) {
-        switch (cardType) {
+    _getCardOptions(ankiOptions, optionsType) {
+        switch (optionsType) {
             case 'terms': return ankiOptions.terms;
             case 'kanji': return ankiOptions.kanji;
             default: return null;
@@ -803,7 +731,7 @@ class AnkiCardController {
             /** @type {HTMLInputElement} */
             const inputField = querySelectorNotNull(content, '.anki-card-field-value');
             inputField.value = fieldValue;
-            inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._cardType, 'fields', fieldName]);
+            inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName]);
             this._validateFieldPermissions(inputField, index, false);
 
             this._fieldEventListeners.addEventListener(inputField, 'change', this._onFieldChange.bind(this, index), false);
@@ -876,7 +804,7 @@ class AnkiCardController {
 
         await this._settingsController.modifyProfileSettings([{
             action: 'set',
-            path: ObjectPropertyAccessor.getPathString(['anki', this._cardType, 'deck']),
+            path: ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'deck']),
             value
         }]);
     }
@@ -907,27 +835,26 @@ class AnkiCardController {
             this._modelChangingTo = null;
         }
 
-        const cardType = this._cardType;
-        const cardOptions = this._getCardOptions(options.anki, cardType);
+        const cardOptions = this._getCardOptions(options.anki, this._optionsType);
         const oldFields = cardOptions !== null ? cardOptions.fields : null;
 
         /** @type {import('settings').AnkiNoteFields} */
         const fields = {};
         for (let i = 0, ii = fieldNames.length; i < ii; ++i) {
             const fieldName = fieldNames[i];
-            fields[fieldName] = this._getDefaultFieldValue(fieldName, i, cardType, oldFields);
+            fields[fieldName] = this._getDefaultFieldValue(fieldName, i, this._dictionaryEntryType, oldFields);
         }
 
         /** @type {import('settings-modifications').Modification[]} */
         const targets = [
             {
                 action: 'set',
-                path: ObjectPropertyAccessor.getPathString(['anki', this._cardType, 'model']),
+                path: ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'model']),
                 value
             },
             {
                 action: 'set',
-                path: ObjectPropertyAccessor.getPathString(['anki', this._cardType, 'fields']),
+                path: ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields']),
                 value: fields
             }
         ];
@@ -1002,11 +929,11 @@ class AnkiCardController {
     /**
      * @param {string} fieldName
      * @param {number} index
-     * @param {string} cardType
+     * @param {import('dictionary').DictionaryEntryType} dictionaryEntryType
      * @param {?import('settings').AnkiNoteFields} oldFields
      * @returns {string}
      */
-    _getDefaultFieldValue(fieldName, index, cardType, oldFields) {
+    _getDefaultFieldValue(fieldName, index, dictionaryEntryType, oldFields) {
         if (
             typeof oldFields === 'object' &&
             oldFields !== null &&
@@ -1016,10 +943,10 @@ class AnkiCardController {
         }
 
         if (index === 0) {
-            return (cardType === 'kanji' ? '{character}' : '{expression}');
+            return (dictionaryEntryType === 'kanji' ? '{character}' : '{expression}');
         }
 
-        const markers = this._ankiController.getFieldMarkers(cardType);
+        const markers = getStandardFieldMarkers(dictionaryEntryType);
         const markerAliases = new Map([
             ['expression', ['phrase', 'term', 'word']],
             ['glossary', ['definition', 'meaning']],
