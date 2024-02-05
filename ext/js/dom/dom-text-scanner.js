@@ -472,6 +472,7 @@ export class DOMTextScanner {
                 return preserveNewlines ? 3 : 1;
             case 0x200b: // Zero-width space
             case 0x200c: // Zero-width non-joiner
+            case 0x00ad: // Soft hyphen
                 return 0;
             default: // Other
                 return 2;
