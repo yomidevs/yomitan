@@ -58,7 +58,7 @@
         "@types/events": "^3.0.3",
         "@types/firefox-webext-browser": "^120.0.0",
         "@types/jsdom": "^21.1.6",
-        "@types/node": "^20.10.6",
+        "@types/node": "20.11.5",
         "@types/wanakana": "^4.0.6",
         "@types/zip.js": "^2.0.32",
         "@typescript-eslint/eslint-plugin": "^6.16.0",
