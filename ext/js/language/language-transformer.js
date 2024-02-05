@@ -49,7 +49,7 @@ export class LanguageTransformer {
         /** @type {import('language-transformer-internal').Transform[]} */
         const transforms2 = [];
         for (let i = 0, ii = transforms.length; i < ii; ++i) {
-            const {name, rules} = transforms[i];
+            const {name, rules, matchConditions} = transforms[i];
             /** @type {import('language-transformer-internal').Rule[]} */
             const rules2 = [];
             for (let j = 0, jj = rules.length; j < jj; ++j) {
@@ -65,7 +65,7 @@ export class LanguageTransformer {
                     conditionsOut: conditionFlagsOut
                 });
             }
-            transforms2.push({name, rules: rules2});
+            transforms2.push({name, rules: rules2, matchConditions});
         }
 
         this._nextFlagIndex = nextFlagIndex;
@@ -133,7 +133,13 @@ export class LanguageTransformer {
         const results = [this._createTransformedText(sourceText, 0, [])];
         for (let i = 0; i < results.length; ++i) {
             const {text, conditions, trace} = results[i];
-            for (const {name, rules} of this._transforms) {
+            for (const {name, rules, matchConditions} of this._transforms) {
+                if (matchConditions) {
+                    for (const endsWithCondition of matchConditions.endsWith) {
+                        if (!text.endsWith(endsWithCondition)) { continue; }
+                    }
+                }
+
                 for (let j = 0, jj = rules.length; j < jj; ++j) {
                     const rule = rules[j];
                     if (!LanguageTransformer.conditionsMatch(conditions, rule.conditionsIn)) { continue; }
