@@ -134,11 +134,8 @@ export class LanguageTransformer {
         for (let i = 0; i < results.length; ++i) {
             const {text, conditions, trace} = results[i];
             for (const {name, rules, matchConditions} of this._transforms) {
-                if (matchConditions) {
-                    for (const endsWithCondition of matchConditions.endsWith) {
-                        if (!text.endsWith(endsWithCondition)) { continue; }
-                    }
-                }
+                if (!matchConditions) { continue; }
+                if (!this._checkMatchConditions(text, matchConditions)) { continue; }
 
                 for (let j = 0, jj = rules.length; j < jj; ++j) {
                     const rule = rules[j];
@@ -154,6 +151,20 @@ export class LanguageTransformer {
             }
         }
         return results;
+    }
+
+    /**
+     * Returns true if _text_ matches one of the conditions, false otherwise.
+     * @param {string} text
+     * @param {import('language-transformer').MatchConditions} matchConditions
+     * @returns {boolean}
+     */
+    _checkMatchConditions(text, matchConditions) {
+        for (const endsWithCondition of matchConditions.endsWith) {
+            if (text.endsWith(endsWithCondition)) { return true; }
+        }
+
+        return false;
     }
 
     /**
