@@ -49,7 +49,7 @@ export class LanguageTransformer {
         /** @type {import('language-transformer-internal').Transform[]} */
         const transforms2 = [];
         for (let i = 0, ii = transforms.length; i < ii; ++i) {
-            const {name, rules, matchConditions} = transforms[i];
+            const {name, rules} = transforms[i];
             /** @type {import('language-transformer-internal').Rule[]} */
             const rules2 = [];
             for (let j = 0, jj = rules.length; j < jj; ++j) {
@@ -65,7 +65,9 @@ export class LanguageTransformer {
                     conditionsOut: conditionFlagsOut
                 });
             }
-            transforms2.push({name, rules: rules2, matchConditions});
+            const suffixes = rules.map((rule) => rule.suffixIn);
+            const precondition = new RegExp(`(${suffixes.join('|')})$`);
+            transforms2.push({name, rules: rules2, precondition});
         }
 
         this._nextFlagIndex = nextFlagIndex;
@@ -133,8 +135,8 @@ export class LanguageTransformer {
         const results = [this._createTransformedText(sourceText, 0, [])];
         for (let i = 0; i < results.length; ++i) {
             const {text, conditions, trace} = results[i];
-            for (const {name, rules, matchConditions} of this._transforms) {
-                if (typeof matchConditions !== 'undefined' && !this._checkMatchConditions(text, matchConditions)) { continue; }
+            for (const {name, rules, precondition} of this._transforms) {
+                if (typeof precondition !== 'undefined' && !precondition.test(text)) { continue; }
 
                 for (let j = 0, jj = rules.length; j < jj; ++j) {
                     const rule = rules[j];
@@ -150,20 +152,6 @@ export class LanguageTransformer {
             }
         }
         return results;
-    }
-
-    /**
-     * Returns true if _text_ matches one of the conditions, false otherwise.
-     * @param {string} text
-     * @param {import('language-transformer').MatchConditions} matchConditions
-     * @returns {boolean}
-     */
-    _checkMatchConditions(text, matchConditions) {
-        for (const endsWithCondition of matchConditions.endsWith) {
-            if (text.endsWith(endsWithCondition)) { return true; }
-        }
-
-        return false;
     }
 
     /**

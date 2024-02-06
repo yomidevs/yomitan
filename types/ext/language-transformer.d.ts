@@ -46,7 +46,6 @@ export type Transform = {
     description?: string;
     i18n?: TransformI18n[];
     rules: Rule[];
-    matchConditions?: MatchConditions;
 };
 
 export type TransformI18n = {
@@ -60,8 +59,4 @@ export type Rule = {
     suffixOut: string;
     conditionsIn: string[];
     conditionsOut: string[];
-};
-
-export type MatchConditions = {
-    endsWith: string[];
 };

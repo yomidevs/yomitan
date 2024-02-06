@@ -120,10 +120,7 @@
                 {"suffixIn": "べば", "suffixOut": "ぶ", "conditionsIn": [], "conditionsOut": ["v5"]},
                 {"suffixIn": "めば", "suffixOut": "む", "conditionsIn": [], "conditionsOut": ["v5"]},
                 {"suffixIn": "れば", "suffixOut": "る", "conditionsIn": [], "conditionsOut": ["v1", "v5", "vk", "vs", "vz"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["ば"]
-            }
+            ]
         },
         {
             "name": "-chau",
@@ -145,10 +142,7 @@
                 {"suffixIn": "きちゃう", "suffixOut": "くる", "conditionsIn": ["v5"], "conditionsOut": ["vk"]},
                 {"suffixIn": "来ちゃう", "suffixOut": "来る", "conditionsIn": ["v5"], "conditionsOut": ["vk"]},
                 {"suffixIn": "來ちゃう", "suffixOut": "來る", "conditionsIn": ["v5"], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["ちゃう", "じゃう"]
-            }
+            ]
         },
         {
             "name": "-chimau",
@@ -170,10 +164,7 @@
                 {"suffixIn": "きちまう", "suffixOut": "くる", "conditionsIn": ["v5"], "conditionsOut": ["vk"]},
                 {"suffixIn": "来ちまう", "suffixOut": "来る", "conditionsIn": ["v5"], "conditionsOut": ["vk"]},
                 {"suffixIn": "來ちまう", "suffixOut": "來る", "conditionsIn": ["v5"], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["ちまう", "じまう"]
-            }
+            ]
         },
         {
             "name": "-shimau",
@@ -201,10 +192,7 @@
                 {"suffixIn": "きなさい", "suffixOut": "くる", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "来なさい", "suffixOut": "来る", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "來なさい", "suffixOut": "來る", "conditionsIn": [], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["なさい"]
-            }
+            ]
         },
         {
             "name": "-sou",
@@ -226,10 +214,7 @@
                 {"suffixIn": "きそう", "suffixOut": "くる", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "来そう", "suffixOut": "来る", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "來そう", "suffixOut": "來る", "conditionsIn": [], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["そう"]
-            }
+            ]
         },
         {
             "name": "-sugiru",
@@ -251,10 +236,7 @@
                 {"suffixIn": "きすぎる", "suffixOut": "くる", "conditionsIn": ["v1"], "conditionsOut": ["vk"]},
                 {"suffixIn": "来すぎる", "suffixOut": "来る", "conditionsIn": ["v1"], "conditionsOut": ["vk"]},
                 {"suffixIn": "來すぎる", "suffixOut": "來る", "conditionsIn": ["v1"], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["すぎる"]
-            }
+            ]
         },
         {
             "name": "-tai",
@@ -275,10 +257,7 @@
                 {"suffixIn": "きたい", "suffixOut": "くる", "conditionsIn": ["adj-i"], "conditionsOut": ["vk"]},
                 {"suffixIn": "来たい", "suffixOut": "来る", "conditionsIn": ["adj-i"], "conditionsOut": ["vk"]},
                 {"suffixIn": "來たい", "suffixOut": "來る", "conditionsIn": ["adj-i"], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["たい"]
-            }
+            ]
         },
         {
             "name": "-tara",
@@ -318,10 +297,7 @@
                 {"suffixIn": "副うたら", "suffixOut": "副う", "conditionsIn": [], "conditionsOut": ["v5"]},
                 {"suffixIn": "厭うたら", "suffixOut": "厭う", "conditionsIn": [], "conditionsOut": ["v5"]},
                 {"suffixIn": "のたもうたら", "suffixOut": "のたまう", "conditionsIn": [], "conditionsOut": ["v5"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["たら", "だら"]
-            }
+            ]
         },
         {
             "name": "-tari",
@@ -361,10 +337,7 @@
                 {"suffixIn": "副うたり", "suffixOut": "副う", "conditionsIn": [], "conditionsOut": ["v5"]},
                 {"suffixIn": "厭うたり", "suffixOut": "厭う", "conditionsIn": [], "conditionsOut": ["v5"]},
                 {"suffixIn": "のたもうたり", "suffixOut": "のたまう", "conditionsIn": [], "conditionsOut": ["v5"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["たり", "だり"]
-            }
+            ]
         },
         {
             "name": "-te",
@@ -405,10 +378,7 @@
                 {"suffixIn": "厭うて", "suffixOut": "厭う", "conditionsIn": ["iru"], "conditionsOut": ["v5"]},
                 {"suffixIn": "のたもうて", "suffixOut": "のたまう", "conditionsIn": ["iru"], "conditionsOut": ["v5"]},
                 {"suffixIn": "まして", "suffixOut": "ます", "conditionsIn": [], "conditionsOut": ["v"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["て", "で"]
-            }
+            ]
         },
         {
             "name": "-zu",
@@ -429,10 +399,7 @@
                 {"suffixIn": "こず", "suffixOut": "くる", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "来ず", "suffixOut": "来る", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "來ず", "suffixOut": "來る", "conditionsIn": [], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["ず"]
-            }
+            ]
         },
         {
             "name": "-nu",
@@ -453,10 +420,7 @@
                 {"suffixIn": "こぬ", "suffixOut": "くる", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "来ぬ", "suffixOut": "来る", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "來ぬ", "suffixOut": "來る", "conditionsIn": [], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["ぬ"]
-            }
+            ]
         },
         {
             "name": "-mu",
@@ -477,10 +441,7 @@
                 {"suffixIn": "こむ", "suffixOut": "くる", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "来む", "suffixOut": "来る", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "來む", "suffixOut": "來る", "conditionsIn": [], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["む"]
-            }
+            ]
         },
         {
             "name": "-zaru",
@@ -501,10 +462,7 @@
                 {"suffixIn": "こざる", "suffixOut": "くる", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "来ざる", "suffixOut": "来る", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "來ざる", "suffixOut": "來る", "conditionsIn": [], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["ざる"]
-            }
+            ]
         },
         {
             "name": "-neba",
@@ -525,10 +483,7 @@
                 {"suffixIn": "こねば", "suffixOut": "くる", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "来ねば", "suffixOut": "来る", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "來ねば", "suffixOut": "來る", "conditionsIn": [], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["ねば"]
-            }
+            ]
         },
         {
             "name": "adv",
@@ -558,10 +513,7 @@
                 {"suffixIn": "こさせる", "suffixOut": "くる", "conditionsIn": ["v1"], "conditionsOut": ["vk"]},
                 {"suffixIn": "来させる", "suffixOut": "来る", "conditionsIn": ["v1"], "conditionsOut": ["vk"]},
                 {"suffixIn": "來させる", "suffixOut": "來る", "conditionsIn": ["v1"], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["せる"]
-            }
+            ]
         },
         {
             "name": "imperative",
@@ -654,10 +606,7 @@
                 {"suffixIn": "来ない", "suffixOut": "来る", "conditionsIn": ["adj-i"], "conditionsOut": ["vk"]},
                 {"suffixIn": "來ない", "suffixOut": "來る", "conditionsIn": ["adj-i"], "conditionsOut": ["vk"]},
                 {"suffixIn": "ません", "suffixOut": "ます", "conditionsIn": ["v"], "conditionsOut": ["v"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["ない", "ません"]
-            }
+            ]
         },
         {
             "name": "noun",
@@ -684,10 +633,7 @@
                 {"suffixIn": "こられる", "suffixOut": "くる", "conditionsIn": ["v1"], "conditionsOut": ["vk"]},
                 {"suffixIn": "来られる", "suffixOut": "来る", "conditionsIn": ["v1"], "conditionsOut": ["vk"]},
                 {"suffixIn": "來られる", "suffixOut": "來る", "conditionsIn": ["v1"], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["れる"]
-            }
+            ]
         },
         {
             "name": "past",
@@ -729,10 +675,7 @@
                 {"suffixIn": "のたもうた", "suffixOut": "のたまう", "conditionsIn": [], "conditionsOut": ["v5"]},
                 {"suffixIn": "ました", "suffixOut": "ます", "conditionsIn": [], "conditionsOut": ["v"]},
                 {"suffixIn": "ませんでした", "suffixOut": "ません", "conditionsIn": [], "conditionsOut": ["v"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["た", "だ"]
-            }
+            ]
         },
         {
             "name": "polite",
@@ -754,10 +697,7 @@
                 {"suffixIn": "来ます", "suffixOut": "来る", "conditionsIn": ["vk"], "conditionsOut": ["vk"]},
                 {"suffixIn": "來ます", "suffixOut": "來る", "conditionsIn": ["vk"], "conditionsOut": ["vk"]},
                 {"suffixIn": "くあります", "suffixOut": "い", "conditionsIn": ["v"], "conditionsOut": ["adj-i"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["ます"]
-            }
+            ]
         },
         {
             "name": "potential",
@@ -776,10 +716,7 @@
                 {"suffixIn": "これる", "suffixOut": "くる", "conditionsIn": ["v1"], "conditionsOut": ["vk"]},
                 {"suffixIn": "来れる", "suffixOut": "来る", "conditionsIn": ["v1"], "conditionsOut": ["vk"]},
                 {"suffixIn": "來れる", "suffixOut": "來る", "conditionsIn": ["v1"], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["る"]
-            }
+            ]
         },
         {
             "name": "potential or passive",
@@ -792,10 +729,7 @@
                 {"suffixIn": "こられる", "suffixOut": "くる", "conditionsIn": ["v1"], "conditionsOut": ["vk"]},
                 {"suffixIn": "来られる", "suffixOut": "来る", "conditionsIn": ["v1"], "conditionsOut": ["vk"]},
                 {"suffixIn": "來られる", "suffixOut": "來る", "conditionsIn": ["v1"], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["れる"]
-            }
+            ]
         },
         {
             "name": "volitional",
@@ -817,10 +751,7 @@
                 {"suffixIn": "来よう", "suffixOut": "来る", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "來よう", "suffixOut": "來る", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "ましょう", "suffixOut": "ます", "conditionsIn": [], "conditionsOut": ["v"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["う"]
-            }
+            ]
         },
         {
             "name": "causative passive",
@@ -833,10 +764,7 @@
                 {"suffixIn": "まされる", "suffixOut": "む", "conditionsIn": ["v1"], "conditionsOut": ["v5"]},
                 {"suffixIn": "らされる", "suffixOut": "る", "conditionsIn": ["v1"], "conditionsOut": ["v5"]},
                 {"suffixIn": "わされる", "suffixOut": "う", "conditionsIn": ["v1"], "conditionsOut": ["v5"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["される"]
-            }
+            ]
         },
         {
             "name": "-toku",
@@ -857,10 +785,7 @@
                 {"suffixIn": "きとく", "suffixOut": "くる", "conditionsIn": ["v5"], "conditionsOut": ["vk"]},
                 {"suffixIn": "来とく", "suffixOut": "来る", "conditionsIn": ["v5"], "conditionsOut": ["vk"]},
                 {"suffixIn": "來とく", "suffixOut": "來る", "conditionsIn": ["v5"], "conditionsOut": ["vk"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["とく", "どく"]
-            }
+            ]
         },
         {
             "name": "progressive or perfect",
@@ -873,10 +798,7 @@
                 {"suffixIn": "でる", "suffixOut": "で", "conditionsIn": ["v1p"], "conditionsOut": ["iru"]},
                 {"suffixIn": "とる", "suffixOut": "て", "conditionsIn": ["v5"], "conditionsOut": ["iru"]},
                 {"suffixIn": "ないでいる", "suffixOut": "ない", "conditionsIn": ["v1"], "conditionsOut": ["adj-i"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["る"]
-            }
+            ]
         },
         {
             "name": "-ki",
@@ -935,10 +857,7 @@
                 {"suffixIn": "れぇ", "suffixOut": "れい", "conditionsIn": [], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "べぇ", "suffixOut": "ばい", "conditionsIn": [], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "てぇ", "suffixOut": "たい", "conditionsIn": [], "conditionsOut": ["adj-i"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["え", "ぇ", "い", "ぃ"]
-            }
+            ]
         },
         {
             "name": "slang",
@@ -982,10 +901,7 @@
                 {"suffixIn": "ろう", "suffixOut": "らく", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "よう", "suffixOut": "よく", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "しゅう", "suffixOut": "しく", "conditionsIn": [], "conditionsOut": []}
-            ],
-            "matchConditions": {
-                "endsWith": ["う"]
-            }
+            ]
         },
         {
             "name": "kansai-ben",
@@ -1002,10 +918,7 @@
                 {"suffixIn": "ろうて", "suffixOut": "らくて", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ようて", "suffixOut": "よくて", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "しゅうて", "suffixOut": "しくて", "conditionsIn": [], "conditionsOut": []}
-            ],
-            "matchConditions": {
-                "endsWith": ["うて"]
-            }
+            ]
         },
         {
             "name": "kansai-ben",
@@ -1022,10 +935,7 @@
                 {"suffixIn": "ろうない", "suffixOut": "らくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "ようない", "suffixOut": "よくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]},
                 {"suffixIn": "しゅうない", "suffixOut": "しくない", "conditionsIn": ["adj-i"], "conditionsOut": ["adj-i"]}
-            ],
-            "matchConditions": {
-                "endsWith": ["うない"]
-            }
+            ]
         },
         {
             "name": "kansai-ben",
@@ -1046,10 +956,7 @@
                 {"suffixIn": "ろうて", "suffixOut": "らって", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ようて", "suffixOut": "やって", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ゆうて", "suffixOut": "いって", "conditionsIn": [], "conditionsOut": []}
-            ],
-            "matchConditions": {
-                "endsWith": ["うて"]
-            }
+            ]
         },
         {
             "name": "kansai-ben",
@@ -1070,10 +977,7 @@
                 {"suffixIn": "ろうた", "suffixOut": "らった", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ようた", "suffixOut": "やった", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ゆうた", "suffixOut": "いった", "conditionsIn": [], "conditionsOut": []}
-            ],
-            "matchConditions": {
-                "endsWith": ["うた"]
-            }
+            ]
         },
         {
             "name": "kansai-ben",
@@ -1094,10 +998,7 @@
                 {"suffixIn": "ろうたら", "suffixOut": "らったら", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ようたら", "suffixOut": "やったら", "conditionsIn": [], "conditionsOut": []},
                 {"suffixIn": "ゆうたら", "suffixOut": "いったら", "conditionsIn": [], "conditionsOut": []}
-            ],
-            "matchConditions": {
-                "endsWith": ["うたら"]
-            }
+            ]
         }
     ]
 }

@@ -15,12 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {MatchConditions} from 'language-transformer';
-
 export type Transform = {
     name: string;
     rules: Rule[];
-    matchConditions?: MatchConditions;
+    precondition?: RegExp;
 };
 
 export type Rule = {
