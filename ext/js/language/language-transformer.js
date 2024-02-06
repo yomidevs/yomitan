@@ -66,8 +66,8 @@ export class LanguageTransformer {
                 });
             }
             const suffixes = rules.map((rule) => rule.suffixIn);
-            const precondition = new RegExp(`(${suffixes.join('|')})$`);
-            transforms2.push({name, rules: rules2, precondition});
+            const suffixHeuristic = new RegExp(`(${suffixes.join('|')})$`);
+            transforms2.push({name, rules: rules2, suffixHeuristic});
         }
 
         this._nextFlagIndex = nextFlagIndex;
@@ -135,8 +135,8 @@ export class LanguageTransformer {
         const results = [this._createTransformedText(sourceText, 0, [])];
         for (let i = 0; i < results.length; ++i) {
             const {text, conditions, trace} = results[i];
-            for (const {name, rules, precondition} of this._transforms) {
-                if (typeof precondition !== 'undefined' && !precondition.test(text)) { continue; }
+            for (const {name, rules, suffixHeuristic} of this._transforms) {
+                if (!suffixHeuristic.test(text)) { continue; }
 
                 for (let j = 0, jj = rules.length; j < jj; ++j) {
                     const rule = rules[j];
