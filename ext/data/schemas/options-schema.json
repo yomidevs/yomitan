@@ -74,8 +74,7 @@
                             "sentenceParsing",
                             "inputs",
                             "clipboard",
-                            "accessibility",
-                            "languages"
+                            "accessibility"
                         ],
                         "properties": {
                             "general": {
@@ -779,40 +778,6 @@
                                                     }
                                                 }
                                             }
-                                        }
-                                    }
-                                }
-                            },
-                            "languages": {
-                                "type": "object",
-                                "propertyNames": {
-                                    "type": "string"
-                                },
-                                "additionalProperties": {
-                                    "type": "object",
-                                    "required": ["textPreprocessors"],
-                                    "properties": {
-                                        "textPreprocessors": {
-                                            "type": "object",
-                                            "propertyNames": {
-                                                "type": "string"
-                                            },
-                                            "additionalProperties": {
-                                                "type": "string",
-                                                "default": "false"
-                                            }
-                                        }
-                                    }
-                                },
-                                "default": {
-                                    "ja": {
-                                        "textPreprocessors": {
-                                            "convertHalfWidthCharacters": "false",
-                                            "convertNumericCharacters": "false",
-                                            "convertAlphabeticCharacters": "false",
-                                            "convertHiraganaToKatakana": "false",
-                                            "convertKatakanaToHiragana": "variant",
-                                            "collapseEmphaticSequences": "false"
                                         }
                                     }
                                 }

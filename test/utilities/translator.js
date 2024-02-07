@@ -125,8 +125,7 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         removeNonJapaneseCharacters,
         excludeDictionaryDefinitions,
         searchResolution,
-        language,
-        textPreprocessorsOptions
+        language
     } = preset;
 
     return {
@@ -140,7 +139,6 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         enabledDictionaryMap,
         excludeDictionaryDefinitions: Array.isArray(excludeDictionaryDefinitions) ? new Set(excludeDictionaryDefinitions) : null,
         searchResolution: typeof searchResolution !== 'undefined' ? searchResolution : 'letter',
-        textPreprocessorsOptions: typeof textPreprocessorsOptions !== 'undefined' ? textPreprocessorsOptions : {},
         language: typeof language !== 'undefined' ? language : 'ja'
     };
 }

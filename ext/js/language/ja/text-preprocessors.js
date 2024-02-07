@@ -24,11 +24,7 @@ const collapseEmphaticSequencesPrerocessor = {
     id: 'collapseEmphaticSequences',
     name: 'Collapse emphatic character sequences',
     description: 'すっっごーーい → すっごーい / すごい',
-    options: [
-        ['false', 'Disabled', [[false, false]]],
-        ['true', 'Collapse into single character', [[false, false], [true, false]]],
-        ['full', 'Remove all characters', [[false, false], [true, false], [true, true]]]
-    ],
+    options: [[false, false], [true, false], [true, true]],
     process: (str, setting, sourceMap) => {
         const [collapseEmphatic, collapseEmphaticFull] = setting;
         if (collapseEmphatic) {

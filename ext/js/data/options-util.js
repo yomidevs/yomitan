@@ -1151,14 +1151,7 @@ export class OptionsUtil {
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.general.language = 'ja';
 
-            profileOptions.languages = {
-                ja: {
-                    textPreprocessors: {}
-                }
-            };
-
             for (const preprocessor of textPreprocessors) {
-                profileOptions.languages.ja.textPreprocessors[preprocessor] = profileOptions.translation[preprocessor];
                 delete profileOptions.translation[preprocessor];
             }
         }

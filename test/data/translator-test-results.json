@@ -3969,6 +3969,174 @@
             "displayValueParsed": false
           }
         ]
+      },
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 1,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 0,
+        "maxTransformedTextLength": 1,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "打",
+            "reading": "だ",
+            "sources": [
+              {
+                "originalText": "ダ",
+                "transformedText": "だ",
+                "deinflectedText": "だ",
+                "matchType": "exact",
+                "matchSource": "reading",
+                "isPrimary": true
+              }
+            ],
+            "tags": [
+              {
+                "name": "E1",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "example tag 1"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 1,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              1
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "da definition 1",
+              "da definition 2"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": [
+          {
+            "index": 0,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 1,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 1,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 0,
+            "displayValue": "four",
+            "displayValueParsed": true
+          },
+          {
+            "index": 2,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": false,
+            "frequency": 5,
+            "displayValue": "five (5)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 3,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 8,
+            "displayValue": null,
+            "displayValueParsed": false
+          },
+          {
+            "index": 4,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 0,
+            "displayValue": "fourteen",
+            "displayValueParsed": true
+          },
+          {
+            "index": 5,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 20,
+            "displayValue": "twenty (20)",
+            "displayValueParsed": true
+          },
+          {
+            "index": 6,
+            "headwordIndex": 0,
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "hasReading": true,
+            "frequency": 26,
+            "displayValue": null,
+            "displayValueParsed": false
+          }
+        ]
       }
     ]
   },
@@ -18200,6 +18368,13 @@
           {
             "source": "algorithm",
             "inflectionRules": []
+          },
+          {
+            "source": "algorithm",
+            "inflectionRules": [
+              "adv",
+              "kansai-ben"
+            ]
           }
         ],
         "score": 1,

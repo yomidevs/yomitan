@@ -17,7 +17,7 @@
  */
 
 import type * as Dictionary from './dictionary';
-import type {SearchResolution, TextPreprocessorsOptions} from 'settings';
+import type {SearchResolution} from 'settings';
 
 // Kanji
 
@@ -97,10 +97,6 @@ export type FindTermsOptions = {
      * Whether every substring should be searched for, or only whole words.
      */
     searchResolution: SearchResolution;
-    /**
-     * Which variants of the search text should be looked up.
-     */
-    textPreprocessorsOptions: TextPreprocessorsOptions;
     /**
      * ISO-639 code of the language.
      */

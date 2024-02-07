@@ -424,14 +424,14 @@ export class Translator {
     _getAlgorithmDeinflections(text, options) {
         const textPreprocessors = this._getTextPreprocessors(options);
 
-        const textPreprocessorsVectorSpace = new Map();
-        for (const [id, preprocessors] of textPreprocessors) {
-            textPreprocessorsVectorSpace.set(id, this._getTextPreprocessorVariants(preprocessors));
+        const preprocessorOptionsVectorSpace = new Map();
+        for (const [id, preprocessor] of textPreprocessors) {
+            preprocessorOptionsVectorSpace.set(id, preprocessor.options);
         }
 
         const variantVectorSpace = new Map([
             ['textReplacements', this._getTextReplacementsVariants(options)],
-            ...textPreprocessorsVectorSpace
+            ...preprocessorOptionsVectorSpace
         ]);
 
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
@@ -448,7 +448,7 @@ export class Translator {
                 text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
             }
 
-            for (const {preprocessor} of textPreprocessors.values()) {
+            for (const preprocessor of textPreprocessors.values()) {
                 const {id, process} = preprocessor;
                 const setting = arrayVariant.get(id);
                 text2 = process(text2, setting, sourceMap);
@@ -492,25 +492,17 @@ export class Translator {
 
     /**
      * @param {import('translation').FindTermsOptions} options
-     * @returns {Map<string, import('translation-internal').TextPreprocessor>}
+     * @returns {Map<string, import('language').TextPreprocessor>}
      */
     _getTextPreprocessors(options) {
-        const {textPreprocessorsOptions, language} = options;
+        const {language} = options;
         const textPreprocessorsData = getTextPreprocessors(language);
 
-        /** @type {Map<string, import('translation-internal').TextPreprocessor>} */
-        const textPreprocessors = new Map();
-
-        for (const preprocessor of textPreprocessorsData) {
-            const {id} = preprocessor;
-            const value = textPreprocessorsOptions[id];
-            if (value) {
-                textPreprocessors.set(id, {
-                    preprocessor,
-                    setting: value
-                });
-            }
-        }
+        /** @type {Map<string, import('language').TextPreprocessor>} */
+        const textPreprocessors = textPreprocessorsData.reduce((map, preprocessor) => {
+            map.set(preprocessor.id, preprocessor);
+            return map;
+        }, new Map());
 
         return textPreprocessors;
     }
@@ -541,20 +533,6 @@ export class Translator {
             length += c.length;
         }
         return text;
-    }
-
-    /**
-     * @param {import('translation-internal').TextPreprocessor} preprocessor
-     * @returns {unknown[]}
-     */
-    _getTextPreprocessorVariants(preprocessor) {
-        const {setting, preprocessor: {options}} = preprocessor;
-        for (const [optionValue, , optionSetting] of options) {
-            if (optionValue === setting) {
-                return optionSetting;
-            }
-        }
-        return [false];
     }
 
     /**

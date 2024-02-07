@@ -22,14 +22,6 @@
             "sortFrequencyDictionaryOrder": "descending",
             "removeNonJapaneseCharacters": true,
             "language": "ja",
-            "textPreprocessorsOptions": {
-                "convertHalfWidthCharacters": "false",
-                "convertNumericCharacters": "false",
-                "convertAlphabeticCharacters": "false",
-                "convertHiraganaToKatakana": "false",
-                "convertKatakanaToHiragana": "false",
-                "collapseEmphaticSequences": "false"
-            },
             "textReplacements": [
                 null
             ],
@@ -372,9 +364,6 @@
                 "default",
                 {
                     "type": "terms",
-                    "textPreprocessorsOptions": {
-                        "convertNumericCharacters": "true"
-                    },
                     "removeNonJapaneseCharacters": false
                 }
             ]
@@ -388,10 +377,7 @@
                 "default",
                 {
                     "type": "terms",
-                    "removeNonJapaneseCharacters": false,
-                    "textPreprocessorsOptions": {
-                        "convertAlphabeticCharacters": "true"
-                    }
+                    "removeNonJapaneseCharacters": false
                 }
             ]
         },
@@ -403,10 +389,7 @@
             "options": [
                 "default",
                 {
-                    "type": "terms",
-                    "textPreprocessorsOptions": {
-                        "convertKatakanaToHiragana": "true"
-                    }
+                    "type": "terms"
                 }
             ]
         },
@@ -418,10 +401,7 @@
             "options": [
                 "default",
                 {
-                    "type": "terms",
-                    "textPreprocessorsOptions": {
-                        "convertHiraganaToKatakana": "true"
-                    }
+                    "type": "terms"
                 }
             ]
         },
@@ -433,11 +413,7 @@
             "options": [
                 "default",
                 {
-                    "type": "terms",
-                    "textPreprocessorsOptions": {
-                        "convertHalfWidthCharacters": "true",
-                        "convertKatakanaToHiragana": "true"
-                    }
+                    "type": "terms"
                 }
             ]
         },
@@ -449,10 +425,7 @@
             "options": [
                 "default",
                 {
-                    "type": "terms",
-                    "textPreprocessorsOptions": {
-                        "collapseEmphaticSequences": "full"
-                    }
+                    "type": "terms"
                 }
             ]
         },
@@ -466,10 +439,7 @@
                 {
                     "type": "terms",
                     "language": "en",
-                    "removeNonJapaneseCharacters": false,
-                    "textPreprocessorsOptions": {
-                        "capitalizeFirstLetter": "true"
-                    }
+                    "removeNonJapaneseCharacters": false
                 }
             ]
         },
@@ -483,10 +453,7 @@
                 {
                     "type": "terms",
                     "language": "en",
-                    "removeNonJapaneseCharacters": false,
-                    "textPreprocessorsOptions": {
-                        "decapitalize": "true"
-                    }
+                    "removeNonJapaneseCharacters": false
                 }
             ]
         }

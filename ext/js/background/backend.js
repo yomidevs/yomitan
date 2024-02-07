@@ -2384,7 +2384,6 @@ export class Backend {
                 searchResolution
             }
         } = options;
-        const textPreprocessorsOptions = options.languages[language]?.textPreprocessors || {};
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
         let excludeDictionaryDefinitions = null;
         if (mode === 'merge' && !enabledDictionaryMap.has(mainDictionary)) {
@@ -2409,8 +2408,8 @@ export class Backend {
             textReplacements,
             enabledDictionaryMap,
             excludeDictionaryDefinitions,
-            language,
-            textPreprocessorsOptions
+            language
+
         };
     }
 

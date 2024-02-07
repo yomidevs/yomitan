@@ -15,12 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @type {import('language').TextPreprocessorOption<boolean>[]} */
-export const basicTextPreprocessorOptions = [
-    ['false', 'Disabled', [false]],
-    ['true', 'Enabled', [true]],
-    ['variant', 'Use both variants', [false, true]]
-];
+/** @type {import('language').TextPreprocessorOptions<boolean>} */
+export const basicTextPreprocessorOptions = [false, true];
 
 /** @type {import('language').TextPreprocessor} */
 export const decapitalize = {

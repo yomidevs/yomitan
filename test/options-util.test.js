@@ -412,18 +412,6 @@ function createProfileOptionsUpdatedTestData1() {
                 groups: []
             }
         },
-        languages: {
-            ja: {
-                textPreprocessors: {
-                    convertHalfWidthCharacters: 'false',
-                    convertNumericCharacters: 'false',
-                    convertAlphabeticCharacters: 'false',
-                    convertHiraganaToKatakana: 'false',
-                    convertKatakanaToHiragana: 'variant',
-                    collapseEmphaticSequences: 'false'
-                }
-            }
-        },
         dictionaries: [
             {
                 name: 'Test Dictionary',

@@ -34,7 +34,6 @@ export class LanguagesController {
 
     /** */
     async prepare() {
-        await this._updateOptions();
         this._languages = await this._settingsController.application.api.getLanguages();
         this._languages.sort((a, b) => a.iso.localeCompare(b.iso, 'en'));
         this._fillSelect();
@@ -48,25 +47,6 @@ export class LanguagesController {
             option.value = iso;
             option.text = `(${iso}) ${name} ${flag}`;
             selectElement.appendChild(option);
-        }
-        selectElement.addEventListener('settingChanged', this._updateOptions.bind(this), false);
-    }
-
-    /** */
-    async _updateOptions() {
-        const options = await this._settingsController.getOptions();
-        const {general: {language}} = options;
-
-        if (!options.languages[language]) {
-            /** @type {import('settings').LanguageOptions} */
-            const defaultOptions = {
-                textPreprocessors: {}
-            };
-            await this._settingsController.modifyProfileSettings([{
-                action: 'set',
-                path: `languages[${JSON.stringify(language)}]`,
-                value: defaultOptions
-            }]);
         }
     }
 }

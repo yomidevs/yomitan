@@ -17,17 +17,13 @@
 
 import {TextSourceMap} from '../../ext/js/general/text-source-map.js';
 
-export type TextPreprocessorOption<T = unknown> = [
-    value: string,
-    label: string,
-    option: T[],
-];
+export type TextPreprocessorOptions<T = unknown> = T[];
 
 export type TextPreprocessor<T = unknown> = {
     id: string;
     name: string;
     description: string;
-    options: TextPreprocessorOption<T>[];
+    options: TextPreprocessorOptions<T>;
     process: (str: string, setting: T, sourceMap?: TextSourceMap) => string;
 };
 
