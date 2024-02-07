@@ -34,7 +34,7 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {getLanguages, getTextPreprocessors} from '../language/languages.js';
+import {getLanguages} from '../language/languages.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -185,8 +185,7 @@ export class Backend {
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
-            ['getLanguages',                 this._onApiGetLanguages.bind(this)],
-            ['getTextPreprocessors',         this._onApiGetTextPreprocessors.bind(this)]
+            ['getLanguages',                 this._onApiGetLanguages.bind(this)]
         ]);
         /* eslint-enable no-multi-spaces */
 
@@ -913,11 +912,6 @@ export class Backend {
     /** @type {import('api').ApiHandler<'getLanguages'>} */
     _onApiGetLanguages() {
         return getLanguages();
-    }
-
-    /** @type {import('api').ApiHandler<'getTextPreprocessors'>} */
-    _onApiGetTextPreprocessors({language}) {
-        return getTextPreprocessors(language);
     }
 
     // Command handlers

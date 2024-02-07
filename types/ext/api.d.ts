@@ -385,12 +385,6 @@ type ApiSurface = {
         params: void;
         return: Language.Language[];
     };
-    getTextPreprocessors: {
-        params: {
-            language: string;
-        };
-        return: Language.TextPreprocessor[];
-    };
 };
 
 type ApiExtraArgs = [sender: chrome.runtime.MessageSender];

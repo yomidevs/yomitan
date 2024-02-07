@@ -368,14 +368,6 @@ export class API {
         return this._invoke('getLanguages', void 0);
     }
 
-    /**
-     * @param {import('api').ApiParam<'getTextPreprocessors', 'language'>} language
-     * @returns {Promise<import('api').ApiReturn<'getTextPreprocessors'>>}
-     */
-    getTextPreprocessors(language) {
-        return this._invoke('getTextPreprocessors', {language});
-    }
-
     // Utilities
 
     /**
