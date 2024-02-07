@@ -17,7 +17,6 @@
  */
 
 import {Application} from '../application.js';
-import {log} from '../core/logger.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
@@ -50,64 +49,54 @@ async function setupGenericSettingsController(genericSettingController) {
     await genericSettingController.refresh();
 }
 
-/** Entry point. */
-async function main() {
-    try {
-        const documentFocusController = new DocumentFocusController();
-        documentFocusController.prepare();
+await Application.main(async (application) => {
+    const documentFocusController = new DocumentFocusController();
+    documentFocusController.prepare();
 
-        const extensionContentController = new ExtensionContentController();
-        extensionContentController.prepare();
+    const extensionContentController = new ExtensionContentController();
+    extensionContentController.prepare();
 
-        /** @type {HTMLElement} */
-        const statusFooterElement = querySelectorNotNull(document, '.status-footer-container');
-        const statusFooter = new StatusFooter(statusFooterElement);
-        statusFooter.prepare();
+    /** @type {HTMLElement} */
+    const statusFooterElement = querySelectorNotNull(document, '.status-footer-container');
+    const statusFooter = new StatusFooter(statusFooterElement);
+    statusFooter.prepare();
 
-        const application = new Application();
-        await application.prepare();
+    setupEnvironmentInfo(application.api);
 
-        setupEnvironmentInfo(application.api);
+    chrome.storage.session.get({'needsCustomTemplatesWarning': false}).then((result) => {
+        if (result.needsCustomTemplatesWarning) {
+            document.documentElement.dataset.warnCustomTemplates = 'true';
+            chrome.storage.session.remove(['needsCustomTemplatesWarning']);
+        }
+    });
 
-        chrome.storage.session.get({'needsCustomTemplatesWarning': false}).then((result) => {
-            if (result.needsCustomTemplatesWarning) {
-                document.documentElement.dataset.warnCustomTemplates = 'true';
-                chrome.storage.session.remove(['needsCustomTemplatesWarning']);
-            }
-        });
+    const preparePromises = [];
 
-        const preparePromises = [];
+    const modalController = new ModalController();
+    modalController.prepare();
 
-        const modalController = new ModalController();
-        modalController.prepare();
+    const settingsController = new SettingsController(application);
+    await settingsController.prepare();
 
-        const settingsController = new SettingsController(application);
-        await settingsController.prepare();
+    const dictionaryController = new DictionaryController(settingsController, modalController, statusFooter);
+    dictionaryController.prepare();
 
-        const dictionaryController = new DictionaryController(settingsController, modalController, statusFooter);
-        dictionaryController.prepare();
+    const dictionaryImportController = new DictionaryImportController(settingsController, modalController, statusFooter);
+    dictionaryImportController.prepare();
 
-        const dictionaryImportController = new DictionaryImportController(settingsController, modalController, statusFooter);
-        dictionaryImportController.prepare();
+    const genericSettingController = new GenericSettingController(settingsController);
+    preparePromises.push(setupGenericSettingsController(genericSettingController));
 
-        const genericSettingController = new GenericSettingController(settingsController);
-        preparePromises.push(setupGenericSettingsController(genericSettingController));
+    const simpleScanningInputController = new ScanInputsSimpleController(settingsController);
+    simpleScanningInputController.prepare();
 
-        const simpleScanningInputController = new ScanInputsSimpleController(settingsController);
-        simpleScanningInputController.prepare();
+    const recommendedPermissionsController = new RecommendedPermissionsController(settingsController);
+    recommendedPermissionsController.prepare();
 
-        const recommendedPermissionsController = new RecommendedPermissionsController(settingsController);
-        recommendedPermissionsController.prepare();
+    await Promise.all(preparePromises);
 
-        await Promise.all(preparePromises);
+    document.documentElement.dataset.loaded = 'true';
 
-        document.documentElement.dataset.loaded = 'true';
-
-        const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-        settingsDisplayController.prepare();
-    } catch (e) {
-        log.error(e);
-    }
-}
-
-await main();
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    settingsDisplayController.prepare();
+});

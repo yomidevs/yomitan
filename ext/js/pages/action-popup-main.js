@@ -305,17 +305,9 @@ class DisplayController {
     }
 }
 
-/** Entry point. */
-async function main() {
-    const application = new Application();
-    await application.prepare();
-
+await Application.main(async (application) => {
     application.api.logIndicatorClear();
 
     const displayController = new DisplayController(application.api);
     displayController.prepare();
-
-    application.ready();
-}
-
-await main();
+});

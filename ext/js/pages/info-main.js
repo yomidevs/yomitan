@@ -17,7 +17,6 @@
  */
 
 import {Application} from '../application.js';
-import {log} from '../core/logger.js';
 import {promiseTimeout} from '../core/utilities.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
@@ -116,59 +115,49 @@ async function showDictionaryInfo(api) {
     container.appendChild(fragment);
 }
 
-/** Entry point. */
-async function main() {
-    try {
-        const documentFocusController = new DocumentFocusController();
-        documentFocusController.prepare();
+await Application.main(async (application) => {
+    const documentFocusController = new DocumentFocusController();
+    documentFocusController.prepare();
 
-        const manifest = chrome.runtime.getManifest();
-        const language = chrome.i18n.getUILanguage();
+    const manifest = chrome.runtime.getManifest();
+    const language = chrome.i18n.getUILanguage();
 
-        const application = new Application();
-        await application.prepare();
+    const {userAgent} = navigator;
+    const {name, version} = manifest;
+    const {browser, platform: {os}} = await application.api.getEnvironmentInfo();
 
-        const {userAgent} = navigator;
-        const {name, version} = manifest;
-        const {browser, platform: {os}} = await application.api.getEnvironmentInfo();
+    /** @type {HTMLLinkElement} */
+    const thisVersionLink = querySelectorNotNull(document, '#release-notes-this-version-link');
+    const {hrefFormat} = thisVersionLink.dataset;
+    thisVersionLink.href = typeof hrefFormat === 'string' ? hrefFormat.replace(/\{version\}/g, version) : '';
 
-        /** @type {HTMLLinkElement} */
-        const thisVersionLink = querySelectorNotNull(document, '#release-notes-this-version-link');
-        const {hrefFormat} = thisVersionLink.dataset;
-        thisVersionLink.href = typeof hrefFormat === 'string' ? hrefFormat.replace(/\{version\}/g, version) : '';
+    /** @type {HTMLElement} */
+    const versionElement = querySelectorNotNull(document, '#version');
+    /** @type {HTMLElement} */
+    const browserElement = querySelectorNotNull(document, '#browser');
+    /** @type {HTMLElement} */
+    const platformElement = querySelectorNotNull(document, '#platform');
+    /** @type {HTMLElement} */
+    const languageElement = querySelectorNotNull(document, '#language');
+    /** @type {HTMLElement} */
+    const userAgentElement = querySelectorNotNull(document, '#user-agent');
 
-        /** @type {HTMLElement} */
-        const versionElement = querySelectorNotNull(document, '#version');
-        /** @type {HTMLElement} */
-        const browserElement = querySelectorNotNull(document, '#browser');
-        /** @type {HTMLElement} */
-        const platformElement = querySelectorNotNull(document, '#platform');
-        /** @type {HTMLElement} */
-        const languageElement = querySelectorNotNull(document, '#language');
-        /** @type {HTMLElement} */
-        const userAgentElement = querySelectorNotNull(document, '#user-agent');
+    versionElement.textContent = `${name} ${version}`;
+    browserElement.textContent = getBrowserDisplayName(browser);
+    platformElement.textContent = getOperatingSystemDisplayName(os);
+    languageElement.textContent = `${language}`;
+    userAgentElement.textContent = userAgent;
 
-        versionElement.textContent = `${name} ${version}`;
-        browserElement.textContent = getBrowserDisplayName(browser);
-        platformElement.textContent = getOperatingSystemDisplayName(os);
-        languageElement.textContent = `${language}`;
-        userAgentElement.textContent = userAgent;
+    showAnkiConnectInfo(application.api);
+    showDictionaryInfo(application.api);
 
-        showAnkiConnectInfo(application.api);
-        showDictionaryInfo(application.api);
+    const settingsController = new SettingsController(application);
+    await settingsController.prepare();
 
-        const settingsController = new SettingsController(application);
-        await settingsController.prepare();
+    const backupController = new BackupController(settingsController, null);
+    await backupController.prepare();
 
-        const backupController = new BackupController(settingsController, null);
-        await backupController.prepare();
+    await promiseTimeout(100);
 
-        await promiseTimeout(100);
-
-        document.documentElement.dataset.loaded = 'true';
-    } catch (e) {
-        log.error(e);
-    }
-}
-
-await main();
+    document.documentElement.dataset.loaded = 'true';
+});
