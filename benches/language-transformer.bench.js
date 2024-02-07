@@ -97,6 +97,114 @@ describe('language transformer', () => {
             '食べさせられたくなかった'
         ];
 
+        const kuruInflections = [
+            'くる',
+            'きます',
+            'きた',
+            'きました',
+            'きて',
+            'こられる',
+            'こられる',
+            'こさせる',
+            'こさせられる',
+            'こい',
+            'こない',
+            'きません',
+            'こなかった',
+            'きませんでした',
+            'こなくて',
+            'こられない',
+            'こられない',
+            'こさせない',
+            'こさせられない',
+            'くるな',
+            'きまして',
+            'くれば',
+            'きちゃう',
+            'きちまう',
+            'きなさい',
+            'きそう',
+            'きすぎる',
+            'きたい',
+            'きたら',
+            'きたり',
+            'こず',
+            'こぬ',
+            'こざる',
+            'こねば',
+            'き',
+            'きましょう',
+            'こよう',
+            'きとく',
+            'きている',
+            'きておる',
+            'きてる',
+            'きとる',
+            'きてしまう'
+        ];
+
+        const suruInflections = [
+            'する',
+            'します',
+            'した',
+            'しました',
+            'して',
+            'できる',
+            '出来る',
+            'せられる',
+            'される',
+            'させる',
+            'せさせる',
+            'させられる',
+            'せさせられる',
+            'しろ',
+            'しない',
+            'しません',
+            'しなかった',
+            'しませんでした',
+            'しなくて',
+            'せられない',
+            'されない',
+            'させない',
+            'せさせない',
+            'させられない',
+            'せさせられない',
+            'するな',
+            'しまして',
+            'すれば',
+            'しちゃう',
+            'しちまう',
+            'しなさい',
+            'しそう',
+            'しすぎる',
+            'したい',
+            'したら',
+            'したり',
+            'せず',
+            'せぬ',
+            'せざる',
+            'せねば',
+            'しましょう',
+            'しよう',
+            'しとく',
+            'している',
+            'しておる',
+            'してる',
+            'しとる',
+            'してしまう'
+        ];
+
+        const kansaibenInflections = [
+            'よろしゅう',
+            'よろしゅうて',
+            'よろしゅうない',
+            '買わへん',
+            '買わへんかった',
+            '買うて',
+            '買うた',
+            '買うたら'
+        ];
+
         const basicTransformations = [...adjectiveInflections, ...verbInflections, ...inflectionCombinations];
         bench(`transformations (n=${basicTransformations.length})`, () => {
             for (const transform of basicTransformations) {
@@ -104,9 +212,11 @@ describe('language transformer', () => {
             }
         });
 
-        const transformationCombination = '抱き抱えていなければ';
-        bench('single transformation combination', () => {
-            languageTransformer.transform(transformationCombination);
+        const transformationsFull = [...basicTransformations, ...kuruInflections, ...suruInflections, ...kansaibenInflections];
+        bench(`transformations-full (n=${transformationsFull.length})`, () => {
+            for (const transform of transformationsFull) {
+                languageTransformer.transform(transform);
+            }
         });
     });
 });
