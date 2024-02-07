@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {escapeRegExp} from '../core/utilities.js';
+
 export class LanguageTransformer {
     constructor() {
         /** @type {number} */
@@ -65,7 +67,9 @@ export class LanguageTransformer {
                     conditionsOut: conditionFlagsOut
                 });
             }
-            transforms2.push({name, rules: rules2});
+            const suffixes = rules.map((rule) => rule.suffixIn);
+            const suffixHeuristic = new RegExp(`(${suffixes.map((suffix) => escapeRegExp(suffix)).join('|')})$`);
+            transforms2.push({name, rules: rules2, suffixHeuristic});
         }
 
         this._nextFlagIndex = nextFlagIndex;
@@ -133,7 +137,10 @@ export class LanguageTransformer {
         const results = [this._createTransformedText(sourceText, 0, [])];
         for (let i = 0; i < results.length; ++i) {
             const {text, conditions, trace} = results[i];
-            for (const {name, rules} of this._transforms) {
+            for (const transform of this._transforms) {
+                if (!transform.suffixHeuristic.test(text)) { continue; }
+
+                const {name, rules} = transform;
                 for (let j = 0, jj = rules.length; j < jj; ++j) {
                     const rule = rules[j];
                     if (!LanguageTransformer.conditionsMatch(conditions, rule.conditionsIn)) { continue; }
