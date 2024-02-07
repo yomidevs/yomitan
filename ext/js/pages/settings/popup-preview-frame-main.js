@@ -18,37 +18,26 @@
 
 import {PopupFactory} from '../../app/popup-factory.js';
 import {Application} from '../../application.js';
-import {log} from '../../core/logger.js';
 import {HotkeyHandler} from '../../input/hotkey-handler.js';
 import {PopupPreviewFrame} from './popup-preview-frame.js';
 
-/** Entry point. */
-async function main() {
-    try {
-        const application = new Application();
-        await application.prepare();
-
-        const {tabId, frameId} = await application.api.frameInformationGet();
-        if (typeof tabId === 'undefined') {
-            throw new Error('Failed to get tabId');
-        }
-        if (typeof frameId === 'undefined') {
-            throw new Error('Failed to get frameId');
-        }
-
-        const hotkeyHandler = new HotkeyHandler();
-        hotkeyHandler.prepare(application.crossFrame);
-
-        const popupFactory = new PopupFactory(application, frameId);
-        popupFactory.prepare();
-
-        const preview = new PopupPreviewFrame(application, tabId, frameId, popupFactory, hotkeyHandler);
-        await preview.prepare();
-
-        document.documentElement.dataset.loaded = 'true';
-    } catch (e) {
-        log.error(e);
+await Application.main(async (application) => {
+    const {tabId, frameId} = await application.api.frameInformationGet();
+    if (typeof tabId === 'undefined') {
+        throw new Error('Failed to get tabId');
     }
-}
+    if (typeof frameId === 'undefined') {
+        throw new Error('Failed to get frameId');
+    }
 
-await main();
+    const hotkeyHandler = new HotkeyHandler();
+    hotkeyHandler.prepare(application.crossFrame);
+
+    const popupFactory = new PopupFactory(application, frameId);
+    popupFactory.prepare();
+
+    const preview = new PopupPreviewFrame(application, tabId, frameId, popupFactory, hotkeyHandler);
+    await preview.prepare();
+
+    document.documentElement.dataset.loaded = 'true';
+});

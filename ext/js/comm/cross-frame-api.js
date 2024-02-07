@@ -291,8 +291,10 @@ export class CrossFrameAPIPort extends EventDispatcher {
 export class CrossFrameAPI {
     /**
      * @param {import('../comm/api.js').API} api
+     * @param {?number} tabId
+     * @param {?number} frameId
      */
-    constructor(api) {
+    constructor(api, tabId, frameId) {
         /** @type {import('../comm/api.js').API} */
         this._api = api;
         /** @type {number} */
@@ -306,15 +308,14 @@ export class CrossFrameAPI {
         /** @type {(port: CrossFrameAPIPort) => void} */
         this._onDisconnectBind = this._onDisconnect.bind(this);
         /** @type {?number} */
-        this._tabId = null;
+        this._tabId = tabId;
         /** @type {?number} */
-        this._frameId = null;
+        this._frameId = frameId;
     }
 
     /** */
-    async prepare() {
+    prepare() {
         chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
-        ({tabId: this._tabId = null, frameId: this._frameId = null} = await this._api.frameInformationGet());
     }
 
     /**

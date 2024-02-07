@@ -17,7 +17,6 @@
  */
 
 import {Application} from '../application.js';
-import {log} from '../core/logger.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {DisplayAnki} from './display-anki.js';
@@ -26,43 +25,31 @@ import {DisplayProfileSelection} from './display-profile-selection.js';
 import {DisplayResizer} from './display-resizer.js';
 import {Display} from './display.js';
 
-/** Entry point. */
-async function main() {
-    try {
-        const documentFocusController = new DocumentFocusController();
-        documentFocusController.prepare();
+await Application.main(async (application) => {
+    const documentFocusController = new DocumentFocusController();
+    documentFocusController.prepare();
 
-        const application = new Application();
-        await application.prepare();
+    const {tabId, frameId} = await application.api.frameInformationGet();
 
-        const {tabId, frameId} = await application.api.frameInformationGet();
+    const hotkeyHandler = new HotkeyHandler();
+    hotkeyHandler.prepare(application.crossFrame);
 
-        const hotkeyHandler = new HotkeyHandler();
-        hotkeyHandler.prepare(application.crossFrame);
+    const display = new Display(application, tabId, frameId, 'popup', documentFocusController, hotkeyHandler);
+    await display.prepare();
 
-        const display = new Display(application, tabId, frameId, 'popup', documentFocusController, hotkeyHandler);
-        await display.prepare();
+    const displayAudio = new DisplayAudio(display);
+    displayAudio.prepare();
 
-        const displayAudio = new DisplayAudio(display);
-        displayAudio.prepare();
+    const displayAnki = new DisplayAnki(display, displayAudio);
+    displayAnki.prepare();
 
-        const displayAnki = new DisplayAnki(display, displayAudio);
-        displayAnki.prepare();
+    const displayProfileSelection = new DisplayProfileSelection(display);
+    displayProfileSelection.prepare();
 
-        const displayProfileSelection = new DisplayProfileSelection(display);
-        displayProfileSelection.prepare();
+    const displayResizer = new DisplayResizer(display);
+    displayResizer.prepare();
 
-        const displayResizer = new DisplayResizer(display);
-        displayResizer.prepare();
+    display.initializeState();
 
-        display.initializeState();
-
-        document.documentElement.dataset.loaded = 'true';
-
-        application.ready();
-    } catch (e) {
-        log.error(e);
-    }
-}
-
-await main();
+    document.documentElement.dataset.loaded = 'true';
+});
