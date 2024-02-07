@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {escapeRegExp} from '../core/utilities.js';
+
 export class LanguageTransformer {
     constructor() {
         /** @type {number} */
@@ -66,7 +68,7 @@ export class LanguageTransformer {
                 });
             }
             const suffixes = rules.map((rule) => rule.suffixIn);
-            const suffixHeuristic = new RegExp(`(${suffixes.join('|')})$`);
+            const suffixHeuristic = new RegExp(escapeRegExp(`(${suffixes.join('|')})$`));
             transforms2.push({name, rules: rules2, suffixHeuristic});
         }
 
