@@ -29,6 +29,7 @@ export function getStandardFieldMarkers(type) {
                 'clipboard-image',
                 'clipboard-text',
                 'cloze-body',
+                'cloze-body-kana',
                 'cloze-prefix',
                 'cloze-suffix',
                 'conjugation',
