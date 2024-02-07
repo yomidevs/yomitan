@@ -116,7 +116,7 @@ export class SearchDisplayController {
             this._onDisplayOptionsUpdated({options: displayOptions});
         }
 
-        const optionsFull = await yomitan.api.optionsGetFull();
+        const optionsFull = await this._display.application.api.optionsGetFull();
         this._optionsFull = optionsFull;
         const {profiles, profileCurrent} = optionsFull;
 
@@ -342,7 +342,7 @@ export class SearchDisplayController {
             scope: 'global',
             optionsContext: null
         };
-        await yomitan.api.modifySettings([modification], 'action-popup');
+        await this._display.application.api.modifySettings([modification], 'search');
     }
 
     /**
