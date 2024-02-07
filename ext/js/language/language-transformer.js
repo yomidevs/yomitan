@@ -68,7 +68,7 @@ export class LanguageTransformer {
                 });
             }
             const suffixes = rules.map((rule) => rule.suffixIn);
-            const suffixHeuristic = new RegExp(escapeRegExp(`(${suffixes.join('|')})$`));
+            const suffixHeuristic = new RegExp(`(${suffixes.map((suffix) => escapeRegExp(suffix)).join('|')})$`);
             transforms2.push({name, rules: rules2, suffixHeuristic});
         }
 
