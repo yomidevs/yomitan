@@ -29,76 +29,84 @@ const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'da
 const languageTransformer = new LanguageTransformer();
 languageTransformer.addDescriptor(descriptor);
 
-describe('Language transformer basic tests', () => {
-    const adjectiveInflections = [
-        '愛しい',
-        '愛しそう',
-        '愛しすぎる',
-        '愛しかったら',
-        '愛しかったり',
-        '愛しくて',
-        '愛しく',
-        '愛しくない',
-        '愛しさ',
-        '愛しかった',
-        '愛しくありません',
-        '愛しくありませんでした',
-        '愛しき'
-    ];
+describe('language transformer', () => {
+    describe('basic tests', () => {
+        const adjectiveInflections = [
+            '愛しい',
+            '愛しそう',
+            '愛しすぎる',
+            '愛しかったら',
+            '愛しかったり',
+            '愛しくて',
+            '愛しく',
+            '愛しくない',
+            '愛しさ',
+            '愛しかった',
+            '愛しくありません',
+            '愛しくありませんでした',
+            '愛しき'
+        ];
 
-    const verbInflections = [
-        '食べる',
-        '食べます',
-        '食べた',
-        '食べました',
-        '食べて',
-        '食べられる',
-        '食べられる',
-        '食べさせる',
-        '食べさせられる',
-        '食べろ',
-        '食べない',
-        '食べません',
-        '食べなかった',
-        '食べませんでした',
-        '食べなくて',
-        '食べられない',
-        '食べられない',
-        '食べさせない',
-        '食べさせられない',
-        '食べ',
-        '食べれば',
-        '食べちゃう',
-        '食べちまう',
-        '食べなさい',
-        '食べそう',
-        '食べすぎる',
-        '食べたい',
-        '食べたら',
-        '食べたり',
-        '食べず',
-        '食べぬ',
-        '食べ',
-        '食べましょう',
-        '食べよう',
-        '食べとく',
-        '食べている',
-        '食べておる',
-        '食べてる',
-        '食べとる',
-        '食べてしまう'
-    ];
+        const verbInflections = [
+            '食べる',
+            '食べます',
+            '食べた',
+            '食べました',
+            '食べて',
+            '食べられる',
+            '食べられる',
+            '食べさせる',
+            '食べさせられる',
+            '食べろ',
+            '食べない',
+            '食べません',
+            '食べなかった',
+            '食べませんでした',
+            '食べなくて',
+            '食べられない',
+            '食べられない',
+            '食べさせない',
+            '食べさせられない',
+            '食べ',
+            '食べれば',
+            '食べちゃう',
+            '食べちまう',
+            '食べなさい',
+            '食べそう',
+            '食べすぎる',
+            '食べたい',
+            '食べたら',
+            '食べたり',
+            '食べず',
+            '食べぬ',
+            '食べ',
+            '食べましょう',
+            '食べよう',
+            '食べとく',
+            '食べている',
+            '食べておる',
+            '食べてる',
+            '食べとる',
+            '食べてしまう'
+        ];
 
-    const inflectionCombinations = [
-        '抱き抱えていなければ',
-        '抱きかかえていなければ',
-        '打ち込んでいませんでした',
-        '食べさせられたくなかった'
-    ];
+        const inflectionCombinations = [
+            '抱き抱えていなければ',
+            '抱きかかえていなければ',
+            '打ち込んでいませんでした',
+            '食べさせられたくなかった'
+        ];
 
-    bench('transformations', () => {
-        for (const transform of [...adjectiveInflections, ...verbInflections, ...inflectionCombinations]) {
-            languageTransformer.transform(transform);
-        }
+        const basicTransformations = [...adjectiveInflections, ...verbInflections, ...inflectionCombinations];
+        bench(`transformations (n=${basicTransformations.length})`, () => {
+            for (const transform of basicTransformations) {
+                languageTransformer.transform(transform);
+            }
+        });
+
+        const transformationCombination = '抱き抱えていなければ';
+        bench('single transformation combination', () => {
+            languageTransformer.transform(transformationCombination);
+        });
     });
 });
