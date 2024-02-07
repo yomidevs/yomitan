@@ -20,7 +20,6 @@ import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {AudioSystem} from '../media/audio-system.js';
-import {yomitan} from '../yomitan.js';
 
 export class DisplayAudio {
     /**
@@ -676,7 +675,7 @@ export class DisplayAudio {
      */
     async _getTermAudioInfoList(source, term, reading) {
         const sourceData = this._getSourceData(source);
-        const infoList = await yomitan.api.getTermAudioInfoList(sourceData, term, reading);
+        const infoList = await this._display.application.api.getTermAudioInfoList(sourceData, term, reading);
         return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
     }
 

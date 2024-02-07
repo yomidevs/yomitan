@@ -303,14 +303,12 @@ export function promiseAnimationFrame(timeout) {
         const onTimeout = () => {
             timer = null;
             if (frameRequest !== null) {
-                // eslint-disable-next-line no-undef
                 cancelAnimationFrame(frameRequest);
                 frameRequest = null;
             }
             resolve({time: performance.now(), timeout: true});
         };
 
-        // eslint-disable-next-line no-undef
         frameRequest = requestAnimationFrame(onFrame);
         if (typeof timeout === 'number') {
             timer = setTimeout(onTimeout, timeout);

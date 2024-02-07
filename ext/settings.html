@@ -140,6 +140,12 @@
                         </span>
                         <span class="storage-use-finite" hidden>
                             Yomitan is using approximately <span class="storage-usage">?</span> of <span class="storage-quota">?</span>.
+                            <div class="storage-exhaustion-alert warning-text margin-above">
+                                <div>
+                                    <strong>Your system is running low on storage space.</strong><br>
+                                    Importing dictionaries may fail.
+                                </div>
+                            </div>
                         </span>
                         <span class="storage-use-infinite" hidden>
                             Yomitan is permitted unlimited storage.
@@ -2473,7 +2479,7 @@
 
         <div class="warning-text margin-above no-dictionaries-installed-warning" hidden>
             No dictionaries have been installed yet.
-            Visit the <a href="https://github.com/themoeway/yomitan#dictionaries" target="_blank" rel="noopener noreferrer">Yomitan homepage</a>
+            Visit the <a href="https://github.com/themoeway/yomitan/blob/master/docs/dictionaries.md#dictionaries" target="_blank" rel="noopener noreferrer">Yomitan homepage</a>
             for a list of free dictionaries or click the <em>Import</em> button below to select a dictionary file to import.
         </div>
         <div id="dictionary-error" class="danger-text margin-above" hidden></div>
@@ -3387,6 +3393,40 @@
                 <tr>
                     <td><code class="anki-field-marker">{document-title}</code></td>
                     <td>Title of the web page that the term or kanji appeared in.</td>
+                </tr>
+                <tr>
+                    <td><code class="anki-field-marker">{frequencies}</code></td>
+                    <td>
+                        Frequency information for the term or kanji.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code class="anki-field-marker">{frequency-harmonic-rank}</code></td>
+                    <td>
+                        The harmonic mean of frequency data for the current term or kanji.<br>
+                        Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term or kanji usage.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code class="anki-field-marker">{frequency-harmonic-occurrence}</code></td>
+                    <td>
+                        The harmonic mean of frequency data for the current term or kanji.<br>
+                        Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term or kanji usage.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code class="anki-field-marker">{frequency-average-rank}</code></td>
+                    <td>
+                        The average of frequency data for the current term or kanji.<br>
+                        Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term or kanji usage.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code class="anki-field-marker">{frequency-average-occurrence}</code></td>
+                    <td>
+                        The average of frequency data for the current term or kanji.<br>
+                        Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term or kanji usage.
+                    </td>
                 </tr>
                 <tr>
                     <td><code class="anki-field-marker">{screenshot}</code></td>

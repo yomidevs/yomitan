@@ -18,10 +18,8 @@
 
 import {describe, expect, test} from 'vitest';
 import {TextSourceMap} from '../ext/js/general/text-source-map.js';
-import {JapaneseUtil} from '../ext/js/language/sandbox/japanese-util.js';
-import * as wanakana from '../ext/lib/wanakana.js';
-
-const jp = new JapaneseUtil(wanakana);
+import * as jpw from '../ext/js/language/ja/japanese-wanakana.js';
+import * as jp from '../ext/js/language/ja/japanese.js';
 
 /** */
 function testIsCodePointKanji() {
@@ -199,7 +197,7 @@ function testConvertToRomaji() {
         ];
 
         test.each(data)('%s -> %o', (string, expected) => {
-            expect(jp.convertToRomaji(string)).toStrictEqual(expected);
+            expect(jpw.convertToRomaji(string)).toStrictEqual(expected);
         });
     });
 }
@@ -268,8 +266,8 @@ function testConvertAlphabeticToKana() {
         for (const [string, expected, expectedSourceMapping] of data) {
             test(`${string} -> ${string}${typeof expectedSourceMapping !== 'undefined' ? ', ' + JSON.stringify(expectedSourceMapping) : ''}`, () => {
                 const sourceMap = new TextSourceMap(string);
-                const actual1 = jp.convertAlphabeticToKana(string, null);
-                const actual2 = jp.convertAlphabeticToKana(string, sourceMap);
+                const actual1 = jpw.convertAlphabeticToKana(string, null);
+                const actual2 = jpw.convertAlphabeticToKana(string, sourceMap);
                 expect(actual1).toStrictEqual(expected);
                 expect(actual2).toStrictEqual(expected);
                 if (typeof expectedSourceMapping !== 'undefined') {

@@ -16,8 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {fetchJson, fetchText} from '../core/fetch-utilities.js';
+import {parseJson} from '../core/json.js';
 import {escapeRegExp, isObject} from '../core/utilities.js';
-import {parseJson, readResponseJson} from '../core/json.js';
 import {TemplatePatcher} from '../templates/template-patcher.js';
 import {JsonSchema} from './json-schema.js';
 
@@ -32,7 +33,7 @@ export class OptionsUtil {
     /** */
     async prepare() {
         /** @type {import('ext/json-schema').Schema} */
-        const schema = await this._fetchJson('/data/schemas/options-schema.json');
+        const schema = await fetchJson('/data/schemas/options-schema.json');
         this._optionsSchema = new JsonSchema(schema);
     }
 
@@ -438,7 +439,7 @@ export class OptionsUtil {
             if (fieldTemplates === null) { continue; }
 
             if (patch === null) {
-                const content = await this._fetchText(modificationsUrl);
+                const content = await fetchText(modificationsUrl);
                 if (this._templatePatcher === null) {
                     this._templatePatcher = new TemplatePatcher();
                 }
@@ -447,45 +448,6 @@ export class OptionsUtil {
 
             profileOptions.anki.fieldTemplates = /** @type {TemplatePatcher} */ (this._templatePatcher).applyPatch(fieldTemplates, patch);
         }
-    }
-
-    /**
-     * @param {string} url
-     * @returns {Promise<Response>}
-     */
-    async _fetchGeneric(url) {
-        url = chrome.runtime.getURL(url);
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.status}`);
-        }
-        return response;
-    }
-
-    /**
-     * @param {string} url
-     * @returns {Promise<string>}
-     */
-    async _fetchText(url) {
-        const response = await this._fetchGeneric(url);
-        return await response.text();
-    }
-
-    /**
-     * @template [T=unknown]
-     * @param {string} url
-     * @returns {Promise<T>}
-     */
-    async _fetchJson(url) {
-        const response = await this._fetchGeneric(url);
-        return await readResponseJson(response);
     }
 
     /**

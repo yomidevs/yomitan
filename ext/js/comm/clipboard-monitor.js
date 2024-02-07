@@ -17,18 +17,17 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
+import {isStringPartiallyJapanese} from '../language/ja/japanese.js';
 
 /**
  * @augments EventDispatcher<import('clipboard-monitor').Events>
  */
 export class ClipboardMonitor extends EventDispatcher {
     /**
-     * @param {{japaneseUtil: import('../language/sandbox/japanese-util.js').JapaneseUtil, clipboardReader: import('clipboard-monitor').ClipboardReaderLike}} details
+     * @param {{clipboardReader: import('clipboard-monitor').ClipboardReaderLike}} details
      */
-    constructor({japaneseUtil, clipboardReader}) {
+    constructor({clipboardReader}) {
         super();
-        /** @type {import('../language/sandbox/japanese-util.js').JapaneseUtil} */
-        this._japaneseUtil = japaneseUtil;
         /** @type {import('clipboard-monitor').ClipboardReaderLike} */
         this._clipboardReader = clipboardReader;
         /** @type {?import('core').Timeout} */
@@ -72,7 +71,7 @@ export class ClipboardMonitor extends EventDispatcher {
                 text !== this._previousText
             ) {
                 this._previousText = text;
-                if (canChange && this._japaneseUtil.isStringPartiallyJapanese(text)) {
+                if (canChange && isStringPartiallyJapanese(text)) {
                     this.trigger('change', {text});
                 }
             }

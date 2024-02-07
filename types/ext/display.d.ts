@@ -17,7 +17,8 @@
 
 import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
 import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
-import type {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util';
+import type {TextSourceGenerator} from '../../ext/js/dom/text-source-generator';
+import type {API} from '../../ext/js/comm/api';
 import type * as Dictionary from './dictionary';
 import type * as Extension from './extension';
 import type * as Settings from './settings';
@@ -127,8 +128,9 @@ export type SearchMode = null | 'popup' | 'action-popup';
 export type GetSearchContextCallback = TextScannerTypes.GetSearchContextCallbackSync;
 
 export type QueryParserConstructorDetails = {
+    api: API;
     getSearchContext: GetSearchContextCallback;
-    japaneseUtil: JapaneseUtil;
+    textSourceGenerator: TextSourceGenerator;
 };
 
 export type QueryParserOptions = {
@@ -169,7 +171,6 @@ export type Events = {
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type DisplayGeneratorConstructorDetails = {
-    japaneseUtil: JapaneseUtil;
     contentManager: DisplayContentManager;
     hotkeyHelpController?: HotkeyHelpController | null;
 };

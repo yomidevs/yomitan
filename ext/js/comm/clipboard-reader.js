@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {MediaUtil} from '../media/media-util.js';
+import {getFileExtensionFromImageMediaType} from '../media/media-util.js';
 
 /**
  * Class which can read text and images from the clipboard.
@@ -130,7 +130,7 @@ export class ClipboardReader {
 
             for (const item of items) {
                 for (const type of item.types) {
-                    if (!MediaUtil.getFileExtensionFromImageMediaType(type)) { continue; }
+                    if (!getFileExtensionFromImageMediaType(type)) { continue; }
                     try {
                         const blob = await item.getType(type);
                         return await this._readFileAsDataURL(blob);

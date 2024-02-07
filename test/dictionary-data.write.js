@@ -21,7 +21,7 @@ import path from 'path';
 import {parseJson} from '../dev/json.js';
 import {createTranslatorTest} from './fixtures/translator-test.js';
 import {createTestAnkiNoteData, getTemplateRenderResults} from './utilities/anki.js';
-import {createFindOptions} from './utilities/translator.js';
+import {createFindKanjiOptions, createFindTermsOptions} from './utilities/translator.js';
 
 /**
  * @param {string} fileName
@@ -35,7 +35,10 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
-test('Write dictionary data expected data', async ({translator, ankiNoteDataCreator, expect}) => {
+test('Write dictionary data expected data', async ({window, translator, expect}) => {
+    // The window property needs to be referenced for it to be initialized.
+    // It is needed for DOM access for structured content.
+    void window;
     const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
     /** @type {import('test/translator').TranslatorTestInputs} */
     const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
@@ -59,11 +62,10 @@ test('Write dictionary data expected data', async ({translator, ankiNoteDataCrea
             case 'findTerms':
                 {
                     const {mode, text} = data;
-                    /** @type {import('translation').FindTermsOptions} */
-                    const options = createFindOptions(dictionaryName, optionsPresets, data.options);
+                    const options = createFindTermsOptions(dictionaryName, optionsPresets, data.options);
                     const {dictionaryEntries, originalTextLength} = await translator.findTerms(mode, text, options);
-                    const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, 'terms', mode, template, null) : null;
-                    const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, mode)) : null;
+                    const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, mode, template, null) : null;
+                    const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, mode)) : null;
                     actualResults1.push({name, originalTextLength, dictionaryEntries});
                     actualResults2.push({name, noteDataList});
                     actualResults3.push({name, results: renderResults});
@@ -72,11 +74,10 @@ test('Write dictionary data expected data', async ({translator, ankiNoteDataCrea
             case 'findKanji':
                 {
                     const {text} = data;
-                    /** @type {import('translation').FindKanjiOptions} */
-                    const options = createFindOptions(dictionaryName, optionsPresets, data.options);
+                    const options = createFindKanjiOptions(dictionaryName, optionsPresets, data.options);
                     const dictionaryEntries = await translator.findKanji(text, options);
-                    const renderResults = await getTemplateRenderResults(dictionaryEntries, 'kanji', 'split', template, null);
-                    const noteDataList = dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, 'split'));
+                    const renderResults = await getTemplateRenderResults(dictionaryEntries, 'split', template, null);
+                    const noteDataList = dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, 'split'));
                     actualResults1.push({name, dictionaryEntries});
                     actualResults2.push({name, noteDataList});
                     actualResults3.push({name, results: renderResults});

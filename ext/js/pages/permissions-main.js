@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {Application} from '../application.js';
 import {log} from '../core/logger.js';
 import {promiseTimeout} from '../core/utilities.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
-import {yomitan} from '../yomitan.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
 import {ModalController} from './settings/modal-controller.js';
 import {PermissionsOriginController} from './settings/permissions-origin-controller.js';
@@ -30,11 +30,11 @@ import {SettingsController} from './settings/settings-controller.js';
 import {SettingsDisplayController} from './settings/settings-display-controller.js';
 
 /**
- * @returns {Promise<void>}
+ * @param {import('../comm/api.js').API} api
  */
-async function setupEnvironmentInfo() {
+async function setupEnvironmentInfo(api) {
     const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
-    const {browser, platform} = await yomitan.api.getEnvironmentInfo();
+    const {browser, platform} = await api.getEnvironmentInfo();
     document.documentElement.dataset.browser = browser;
     document.documentElement.dataset.os = platform.os;
     document.documentElement.dataset.manifestVersion = `${manifestVersion}`;
@@ -90,6 +90,8 @@ function setupPermissionsToggles() {
 /** Entry point. */
 async function main() {
     try {
+        const application = new Application();
+
         const documentFocusController = new DocumentFocusController();
         documentFocusController.prepare();
 
@@ -98,9 +100,9 @@ async function main() {
 
         setupPermissionsToggles();
 
-        await yomitan.prepare();
+        await application.prepare();
 
-        setupEnvironmentInfo();
+        setupEnvironmentInfo(application.api);
 
         /** @type {HTMLInputElement} */
         const permissionCheckbox1 = querySelectorNotNull(document, '#permission-checkbox-allow-in-private-windows');
@@ -121,7 +123,7 @@ async function main() {
         const modalController = new ModalController();
         modalController.prepare();
 
-        const settingsController = new SettingsController();
+        const settingsController = new SettingsController(application);
         await settingsController.prepare();
 
         const permissionsToggleController = new PermissionsToggleController(settingsController);
@@ -130,7 +132,7 @@ async function main() {
         const permissionsOriginController = new PermissionsOriginController(settingsController);
         permissionsOriginController.prepare();
 
-        const persistentStorageController = new PersistentStorageController();
+        const persistentStorageController = new PersistentStorageController(application);
         persistentStorageController.prepare();
 
         await promiseTimeout(100);

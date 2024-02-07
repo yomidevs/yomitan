@@ -227,6 +227,10 @@
 {{#*inline "pitch-accent-positions"}}
     {{~> pitch-accent-list format='position'~}}
 {{/inline}}
+
+{{~#*inline "pitch-accent-categories"~}}
+    {{~#each (pitchCategories @root)~}}{{~.~}}{{~#unless @last~}},{{~/unless~}}{{~/each~}}
+{{~/inline~}}
 {{! End Pitch Accents }}
 
 {{#*inline "phonetic-transcriptions"}}
@@ -235,7 +239,7 @@
             {{~#each definition.phoneticTranscriptions~}}
                 {{~#each phoneticTranscriptions~}}
                     <li>
-                        {{~set "any" false~}}   
+                        {{~set "any" false~}}
                         {{~#each tags~}}
                             {{~#if (get "any")}}, {{else}}<i>({{/if~}}
                             {{name}}
@@ -295,6 +299,38 @@
             </li>
         {{~/each~}}
         </ul>
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-harmonic-rank"}}
+    {{~#if (op "===" definition.frequencyHarmonic -1) ~}}
+        9999999
+    {{~else ~}}
+        {{definition.frequencyHarmonic}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-harmonic-occurrence"}}
+    {{~#if (op "===" definition.frequencyHarmonic -1) ~}}
+        0
+    {{~else ~}}
+        {{definition.frequencyHarmonic}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-average-rank"}}
+    {{~#if (op "===" definition.frequencyAverage -1) ~}}
+        9999999
+    {{~else ~}}
+        {{definition.frequencyAverage}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-average-occurrence"}}
+    {{~#if (op "===" definition.frequencyAverage -1) ~}}
+        0
+    {{~else ~}}
+        {{definition.frequencyAverage}}
     {{~/if~}}
 {{/inline}}
 

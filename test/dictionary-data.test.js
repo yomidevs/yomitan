@@ -22,7 +22,7 @@ import {describe} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {createTranslatorTest} from './fixtures/translator-test.js';
 import {createTestAnkiNoteData, getTemplateRenderResults} from './utilities/anki.js';
-import {createFindOptions} from './utilities/translator.js';
+import {createFindKanjiOptions, createFindTermsOptions} from './utilities/translator.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';
@@ -53,16 +53,18 @@ describe('Dictionary data', () => {
         expected3: expectedResults3[i]
     }));
     describe.each(testCases)('Test %#: $data.name', ({data, expected1, expected2, expected3}) => {
-        test('Test', async ({translator, ankiNoteDataCreator, expect}) => {
+        test('Test', async ({window, translator, expect}) => {
+            // The window property needs to be referenced for it to be initialized.
+            // It is needed for DOM access for structured content.
+            void window;
             switch (data.func) {
                 case 'findTerms':
                     {
                         const {mode, text} = data;
-                        /** @type {import('translation').FindTermsOptions} */
-                        const options = createFindOptions(dictionaryName, optionsPresets, data.options);
+                        const options = createFindTermsOptions(dictionaryName, optionsPresets, data.options);
                         const {dictionaryEntries, originalTextLength} = await translator.findTerms(mode, text, options);
-                        const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, 'terms', mode, template, expect) : null;
-                        const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, mode)) : null;
+                        const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, mode, template, expect) : null;
+                        const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, mode)) : null;
                         expect.soft(originalTextLength).toStrictEqual(expected1.originalTextLength);
                         expect.soft(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);
                         expect.soft(noteDataList).toEqual(expected2.noteDataList);
@@ -72,11 +74,10 @@ describe('Dictionary data', () => {
                 case 'findKanji':
                     {
                         const {text} = data;
-                        /** @type {import('translation').FindKanjiOptions} */
-                        const options = createFindOptions(dictionaryName, optionsPresets, data.options);
+                        const options = createFindKanjiOptions(dictionaryName, optionsPresets, data.options);
                         const dictionaryEntries = await translator.findKanji(text, options);
-                        const renderResults = await getTemplateRenderResults(dictionaryEntries, 'kanji', 'split', template, expect);
-                        const noteDataList = dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, 'split'));
+                        const renderResults = await getTemplateRenderResults(dictionaryEntries, 'split', template, expect);
+                        const noteDataList = dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, 'split'));
                         expect.soft(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);
                         expect.soft(noteDataList).toEqual(expected2.noteDataList);
                         expect.soft(renderResults).toStrictEqual(expected3.results);

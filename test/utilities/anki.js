@@ -16,17 +16,30 @@
  */
 
 import {AnkiNoteBuilder} from '../../ext/js/data/anki-note-builder.js';
-import {JapaneseUtil} from '../../ext/js/language/sandbox/japanese-util.js';
+import {getStandardFieldMarkers} from '../../ext/js/data/anki-template-util.js';
+import {createAnkiNoteData} from '../../ext/js/data/sandbox/anki-note-data-creator.js';
 import {AnkiTemplateRenderer} from '../../ext/js/templates/sandbox/anki-template-renderer.js';
 
 /**
- * @param {import('../../ext/js/data/sandbox/anki-note-data-creator.js').AnkiNoteDataCreator} ankiNoteDataCreator
+ * @param {import('dictionary').DictionaryEntryType} type
+ * @returns {import('anki-note-builder').Field[]}
+ */
+function createTestFields(type) {
+    /** @type {import('anki-note-builder').Field[]} */
+    const fields = [];
+    for (const marker of getStandardFieldMarkers(type)) {
+        fields.push([marker, `{${marker}}`]);
+    }
+    return fields;
+}
+
+/**
  * @param {import('dictionary').DictionaryEntry} dictionaryEntry
  * @param {import('settings').ResultOutputMode} mode
  * @returns {import('anki-templates').NoteData}
  * @throws {Error}
  */
-export function createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, mode) {
+export function createTestAnkiNoteData(dictionaryEntry, mode) {
     const marker = '{marker}';
     /** @type {import('anki-templates-internal').CreateDetails} */
     const data = {
@@ -44,93 +57,19 @@ export function createTestAnkiNoteData(ankiNoteDataCreator, dictionaryEntry, mod
         },
         media: {}
     };
-    return ankiNoteDataCreator.create(marker, data);
-}
-
-/**
- * @param {'terms'|'kanji'} type
- * @returns {string[]}
- */
-function getFieldMarkers(type) {
-    switch (type) {
-        case 'terms':
-            return [
-                'audio',
-                'clipboard-image',
-                'clipboard-text',
-                'cloze-body',
-                'cloze-prefix',
-                'cloze-suffix',
-                'conjugation',
-                'dictionary',
-                'document-title',
-                'expression',
-                'frequencies',
-                'furigana',
-                'furigana-plain',
-                'glossary',
-                'glossary-brief',
-                'glossary-no-dictionary',
-                'part-of-speech',
-                'pitch-accents',
-                'pitch-accent-graphs',
-                'pitch-accent-positions',
-                'phonetic-transcriptions',
-                'reading',
-                'screenshot',
-                'search-query',
-                'selection-text',
-                'sentence',
-                'sentence-furigana',
-                'tags',
-                'url'
-            ];
-        case 'kanji':
-            return [
-                'character',
-                'clipboard-image',
-                'clipboard-text',
-                'cloze-body',
-                'cloze-prefix',
-                'cloze-suffix',
-                'dictionary',
-                'document-title',
-                'glossary',
-                'kunyomi',
-                'onyomi',
-                'screenshot',
-                'search-query',
-                'selection-text',
-                'sentence',
-                'sentence-furigana',
-                'stroke-count',
-                'tags',
-                'url'
-            ];
-        default:
-            return [];
-    }
+    return createAnkiNoteData(marker, data);
 }
 
 /**
  * @param {import('dictionary').DictionaryEntry[]} dictionaryEntries
- * @param {'terms'|'kanji'} type
  * @param {import('settings').ResultOutputMode} mode
  * @param {string} template
  * @param {?import('vitest').ExpectStatic} expect
  * @returns {Promise<import('anki').NoteFields[]>}
  */
-export async function getTemplateRenderResults(dictionaryEntries, type, mode, template, expect) {
-    const markers = getFieldMarkers(type);
-    /** @type {import('anki-note-builder').Field[]} */
-    const fields = [];
-    for (const marker of markers) {
-        fields.push([marker, `{${marker}}`]);
-    }
-
+export async function getTemplateRenderResults(dictionaryEntries, mode, template, expect) {
     const ankiTemplateRenderer = new AnkiTemplateRenderer();
     await ankiTemplateRenderer.prepare();
-    const japaneseUtil = new JapaneseUtil(null);
     const clozePrefix = 'cloze-prefix';
     const clozeSuffix = 'cloze-suffix';
     const results = [];
@@ -146,7 +85,8 @@ export async function getTemplateRenderResults(dictionaryEntries, type, mode, te
                 }
                 break;
         }
-        const ankiNoteBuilder = new AnkiNoteBuilder(japaneseUtil, ankiTemplateRenderer.templateRenderer);
+        const api = new MinimalApi();
+        const ankiNoteBuilder = new AnkiNoteBuilder(api, ankiTemplateRenderer.templateRenderer);
         const context = {
             url: 'url:',
             sentence: {
@@ -165,7 +105,7 @@ export async function getTemplateRenderResults(dictionaryEntries, type, mode, te
             template,
             deckName: 'deckName',
             modelName: 'modelName',
-            fields,
+            fields: createTestFields(dictionaryEntry.type),
             tags: ['yomitan'],
             checkForDuplicates: true,
             duplicateScope: 'collection',
@@ -187,4 +127,20 @@ export async function getTemplateRenderResults(dictionaryEntries, type, mode, te
     }
 
     return results;
+}
+
+class MinimalApi {
+    /**
+     * @type {import('anki-note-builder.js').MinimalApi['injectAnkiNoteMedia']}
+     */
+    async injectAnkiNoteMedia() {
+        throw new Error('Not supported');
+    }
+
+    /**
+     * @type {import('anki-note-builder.js').MinimalApi['parseText']}
+     */
+    async parseText() {
+        throw new Error('Not supported');
+    }
 }

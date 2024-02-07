@@ -41,6 +41,8 @@ export type ImageAppearance = 'auto' | 'monochrome';
 
 export type Image = DictionaryData.TermImage & {
     verticalAlign: VerticalAlign;
+    border: string;
+    borderRadius: string;
     sizeUnits: SizeUnits;
 };
 
@@ -53,6 +55,7 @@ export type StructuredContentStyle = {
     fontWeight?: FontWeight;
     fontSize?: string;
     color?: string;
+    background?: string;
     backgroundColor?: string;
     textDecorationLine?: TextDecorationLineOrNone | TextDecorationLine[];
     textDecorationStyle?: TextDecorationStyle;
@@ -61,8 +64,10 @@ export type StructuredContentStyle = {
     borderStyle?: string;
     borderRadius?: string;
     borderWidth?: string;
+    clipPath?: string;
     verticalAlign?: VerticalAlign;
     textAlign?: TextAlign;
+    textEmphasis?: string;
     textShadow?: string;
     margin?: string;
     marginTop?: number | string;
@@ -142,7 +147,7 @@ export type ImageElementBase = {
      */
     width?: number;
     /**
-     * Preferred width of the image.
+     * Preferred height of the image.
      */
     height?: number;
     /**
@@ -151,7 +156,7 @@ export type ImageElementBase = {
      */
     preferredWidth?: number;
     /**
-     * Preferred width of the image.
+     * Preferred height of the image.
      * This is only used in the internal database.
      */
     preferredHeight?: number;
@@ -203,6 +208,14 @@ export type ImageElement = ImageElementBase & {
      * The vertical alignment of the image.
      */
     verticalAlign?: VerticalAlign;
+    /**
+     * Shorthand for border width, style, and color.
+     */
+    border?: string;
+    /**
+     * Roundness of the corners of the image's outer border edge.
+     */
+    borderRadius?: string;
     /**
      * The units for the width and height.
      */

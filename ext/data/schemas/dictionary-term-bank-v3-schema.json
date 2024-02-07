@@ -152,7 +152,7 @@
                                 },
                                 "height": {
                                     "type": "number",
-                                    "description": "Preferred width of the image.",
+                                    "description": "Preferred height of the image.",
                                     "minimum": 0
                                 },
                                 "title": {
@@ -203,6 +203,14 @@
                                     "type": "string",
                                     "description": "The vertical alignment of the image.",
                                     "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"]
+                                },
+                                "border": {
+                                    "type": "string",
+                                    "description": "Shorthand for border width, style, and color."
+                                },
+                                "borderRadius": {
+                                    "type": "string",
+                                    "description": "Roundness of the corners of the image's outer border edge."
                                 },
                                 "sizeUnits": {
                                     "type": "string",
@@ -270,6 +278,9 @@
                 "color": {
                     "type": "string"
                 },
+                "background": {
+                    "type": "string"
+                },
                 "backgroundColor": {
                     "type": "string"
                 },
@@ -310,6 +321,9 @@
                 "borderWidth": {
                     "type": "string"
                 },
+                "clipPath": {
+                    "type": "string"
+                },
                 "verticalAlign": {
                     "type": "string",
                     "enum": ["baseline", "sub", "super", "text-top", "text-bottom", "middle", "top", "bottom"],
@@ -319,6 +333,9 @@
                     "type": "string",
                     "enum": ["start", "end", "left", "right", "center", "justify", "justify-all", "match-parent"],
                     "default": "start"
+                },
+                "textEmphasis": {
+                    "type": "string"
                 },
                 "textShadow": {
                     "type": "string"
@@ -485,7 +502,7 @@
                                         },
                                         "height": {
                                             "type": "integer",
-                                            "description": "Preferred width of the image.",
+                                            "description": "Preferred height of the image.",
                                             "minimum": 1
                                         },
                                         "title": {
@@ -539,6 +556,8 @@
                         {
                             "type": "array",
                             "description": "Deinflection of the term to an uninflected term.",
+                            "minItems": 2,
+                            "maxItems": 2,
                             "items": [
                                 {
                                     "type": "string",

@@ -16,12 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core/utilities.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {ArrayBufferUtil} from '../data/sandbox/array-buffer-util.js';
+import {isObject} from '../core/utilities.js';
+import {base64ToArrayBuffer} from '../data/sandbox/array-buffer-util.js';
 
 export class OffscreenProxy {
-    constructor() {
+    /**
+     * @param {import('../extension/web-extension.js').WebExtension} webExtension
+     */
+    constructor(webExtension) {
+        /** @type {import('../extension/web-extension.js').WebExtension} */
+        this._webExtension = webExtension;
         /** @type {?Promise<void>} */
         this._creatingOffscreen = null;
     }
@@ -54,7 +59,6 @@ export class OffscreenProxy {
      */
     async _hasOffscreenDocument() {
         const offscreenUrl = chrome.runtime.getURL('offscreen.html');
-        // @ts-expect-error - API not defined yet
         if (!chrome.runtime.getContexts) { // chrome version below 116
             // Clients: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/clients
             // @ts-expect-error - Types not set up for service workers yet
@@ -63,12 +67,13 @@ export class OffscreenProxy {
             return await matchedClients.some((client) => client.url === offscreenUrl);
         }
 
-        // @ts-expect-error - API not defined yet
         const contexts = await chrome.runtime.getContexts({
-            contextTypes: ['OFFSCREEN_DOCUMENT'],
+            contextTypes: [
+                /** @type {chrome.runtime.ContextType} */ ('OFFSCREEN_DOCUMENT')
+            ],
             documentUrls: [offscreenUrl]
         });
-        return !!contexts.length;
+        return contexts.length > 0;
     }
 
     /**
@@ -76,16 +81,9 @@ export class OffscreenProxy {
      * @param {import('offscreen').ApiMessage<TMessageType>} message
      * @returns {Promise<import('offscreen').ApiReturn<TMessageType>>}
      */
-    sendMessagePromise(message) {
-        return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage(message, (response) => {
-                try {
-                    resolve(this._getMessageResponseResult(response));
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        });
+    async sendMessagePromise(message) {
+        const response = await this._webExtension.sendMessagePromise(message);
+        return this._getMessageResponseResult(/** @type {import('core').Response<import('offscreen').ApiReturn<TMessageType>>} */ (response));
     }
 
     /**
@@ -146,7 +144,7 @@ export class DictionaryDatabaseProxy {
      */
     async getMedia(targets) {
         const serializedMedia = /** @type {import('dictionary-database').Media<string>[]} */ (await this._offscreen.sendMessagePromise({action: 'databaseGetMediaOffscreen', params: {targets}}));
-        const media = serializedMedia.map((m) => ({...m, content: ArrayBufferUtil.base64ToArrayBuffer(m.content)}));
+        const media = serializedMedia.map((m) => ({...m, content: base64ToArrayBuffer(m.content)}));
         return media;
     }
 }
@@ -161,10 +159,10 @@ export class TranslatorProxy {
     }
 
     /**
-     * @param {import('deinflector').ReasonsRaw} deinflectionReasons
+     * @param {import('language-transformer').LanguageTransformDescriptor} descriptor
      */
-    async prepare(deinflectionReasons) {
-        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {deinflectionReasons}});
+    async prepare(descriptor) {
+        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {descriptor}});
     }
 
     /**
