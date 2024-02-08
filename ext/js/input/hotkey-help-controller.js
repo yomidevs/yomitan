@@ -151,7 +151,7 @@ export class HotkeyHelpController {
         if (typeof hotkey !== 'string') { return null; }
         const data = /** @type {unknown} */ (parseJson(hotkey));
         if (!Array.isArray(data)) { return null; }
-        const [action, attributes, values] = data;
+        const [action, attributes, values] = /** @type {unknown[]} */ (data);
         if (typeof action !== 'string') { return null; }
         /** @type {string[]} */
         const attributesArray = [];
@@ -169,7 +169,7 @@ export class HotkeyHelpController {
         return {
             action: global ? action.substring(globalPrexix.length) : action,
             global,
-            attributes,
+            attributes: attributesArray,
             values,
             defaultAttributeValues
         };
