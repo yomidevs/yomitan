@@ -873,11 +873,7 @@ function getCloze(dictionaryEntry, context) {
 
     const textSegments = [];
     for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, text.substring(offset, offset + originalText.length))) {
-        if (reading2 !== '') {
-            textSegments.push(reading2);
-        } else {
-            textSegments.push(text2);
-        }
+        textSegments.push(reading2.length > 0 ? reading2 : text2);
     }
 
     return {
