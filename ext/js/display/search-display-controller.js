@@ -116,9 +116,7 @@ export class SearchDisplayController {
             this._onDisplayOptionsUpdated({options: displayOptions});
         }
 
-        const optionsFull = await this._display.application.api.optionsGetFull();
-        this._optionsFull = optionsFull;
-        const {profiles, profileCurrent} = optionsFull;
+        const {profiles, profileCurrent} = await this._display.application.api.optionsGetFull();
 
         this._updateProfileSelect(profiles, profileCurrent);
     }
@@ -322,10 +320,11 @@ export class SearchDisplayController {
     /**
      * @param {Event} event
      */
-    _onProfileSelectChange(event) {
+    async _onProfileSelectChange(event) {
         const node = /** @type {HTMLInputElement} */ (event.currentTarget);
         const value = parseInt(node.value, 10);
-        if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= /** @type {import('settings').Options} */ (this._optionsFull).profiles.length) {
+        const optionsFull = await this._display.application.api.optionsGetFull();
+        if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= optionsFull.profiles.length) {
             this._setPrimaryProfileIndex(value);
         }
     }
