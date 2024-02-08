@@ -304,5 +304,6 @@ export type Cloze = {
     sentence: string;
     prefix: string;
     body: string;
+    bodyKana: string;
     suffix: string;
 };
