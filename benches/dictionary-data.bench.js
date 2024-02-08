@@ -52,7 +52,7 @@ describe('Dictionary data', () => {
         }
     });
 
-    bench(`Translator.prototype.findTerms - text transformations  (n=${findTermTests.length})`, async () => {
+    bench(`Translator.prototype.findTerms - text transformations  (n=${findTermWithTextTransformationsTests.length})`, async () => {
         // The window property needs to be referenced for it to be initialized.
         // It is needed for DOM access for structured content.
         void window;
