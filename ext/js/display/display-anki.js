@@ -857,7 +857,7 @@ export class DisplayAnki {
         const noteIds = this._getNodeNoteIds(node);
         if (noteIds.length === 0) { return; }
         try {
-            await this._display.application.api.noteView(noteIds[0], this._noteGuiMode, false);
+            await this._display.application.api.viewNotes([noteIds[0]], this._noteGuiMode, false);
         } catch (e) {
             const displayErrors = (
                 toError(e).message === 'Mode not supported' ?

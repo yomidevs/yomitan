@@ -118,20 +118,10 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'noteView', 'noteId'>} noteId
-     * @param {import('api').ApiParam<'noteView', 'mode'>} mode
-     * @param {import('api').ApiParam<'noteView', 'allowFallback'>} allowFallback
-     * @returns {Promise<import('api').ApiReturn<'noteView'>>}
-     */
-    noteView(noteId, mode, allowFallback) {
-        return this._invoke('noteView', {noteId, mode, allowFallback});
-    }
-
-    /**
      * @param {import('api').ApiParam<'viewNotes', 'noteIds'>} noteIds
      * @param {import('api').ApiParam<'viewNotes', 'mode'>} mode
      * @param {import('api').ApiParam<'viewNotes', 'allowFallback'>} allowFallback
-     * @returns {Promise<import('api').ApiReturn<'noteView'>>}
+     * @returns {Promise<import('api').ApiReturn<'viewNotes'>>}
      */
     viewNotes(noteIds, mode, allowFallback) {
         return this._invoke('viewNotes', {noteIds, mode, allowFallback});

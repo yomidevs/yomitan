@@ -455,7 +455,7 @@ export class AnkiController {
             throw new Error('Could not find a note to test with');
         }
 
-        await this._settingsController.application.api.noteView(noteId, mode, false);
+        await this._settingsController.application.api.viewNotes([noteId], mode, false);
     }
 
     /**
