@@ -23,14 +23,12 @@ const languages = new Map([
     ['ja', {
         name: 'Japanese',
         iso: 'ja',
-        flag: '🇯🇵',
         exampleText: '読め',
         textPreprocessors: textPreprocessorsJA
     }],
     ['en', {
         name: 'English',
         iso: 'en',
-        flag: '🇬🇧',
         exampleText: 'read',
         textPreprocessors: textPreprocessorsEN
     }]

@@ -33,7 +33,6 @@ export type TextPreprocessor<T = unknown> = {
 export type Language = {
     name: string;
     iso: string;
-    flag: string;
     exampleText: string;
     textPreprocessors: TextPreprocessor<Core.SafeAny>[];
 };

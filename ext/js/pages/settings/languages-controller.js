@@ -42,10 +42,10 @@ export class LanguagesController {
     /** */
     _fillSelect() {
         const selectElement = querySelectorNotNull(document, '#language-select');
-        for (const {iso, name, flag} of this._languages) {
+        for (const {iso, name} of this._languages) {
             const option = document.createElement('option');
             option.value = iso;
-            option.text = `(${iso}) ${name} ${flag}`;
+            option.text = `(${iso}) ${name}`;
             selectElement.appendChild(option);
         }
     }
