@@ -21,6 +21,7 @@ import {TextSourceMap} from '../general/text-source-map.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
 import {getTextPreprocessors} from './languages.js';
+
 /**
  * Class which finds term and kanji dictionary entries for text.
  */
@@ -499,10 +500,10 @@ export class Translator {
         const textPreprocessorsData = getTextPreprocessors(language);
 
         /** @type {Map<string, import('language').TextPreprocessor>} */
-        const textPreprocessors = textPreprocessorsData.reduce((map, preprocessor) => {
-            map.set(preprocessor.id, preprocessor);
-            return map;
-        }, new Map());
+        const textPreprocessors = new Map();
+        for (const preprocessor of textPreprocessorsData) {
+            textPreprocessors.set(preprocessor.id, preprocessor);
+        }
 
         return textPreprocessors;
     }
