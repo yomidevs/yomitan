@@ -29,6 +29,7 @@ Flashcard fields can be configured with the following steps:
     | `{clipboard-image}`        | An image which is stored in the system clipboard, if present.                                                            |
     | `{clipboard-text}`         | Text which is stored in the system clipboard, if present.                                                                |
     | `{cloze-body}`             | Raw, inflected term as it appeared before being reduced to dictionary form by Yomitan.                                   |
+    | `{cloze-body-kana}`        | Kana reading for `{cloze-body}`.                                                                                         |
     | `{cloze-prefix}`           | Fragment of the containing `{sentence}` starting at the beginning of `{sentence}` until the beginning of `{cloze-body}`. |
     | `{cloze-suffix}`           | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.             |
     | `{conjugation}`            | Conjugation path from the raw inflected term to the source term.                                                         |
