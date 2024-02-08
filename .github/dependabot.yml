@@ -27,3 +27,13 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    ignore:
+      # These dependencies should be updated manually:
+      - dependency-name: "vitest"
+        # Benchmarking is an experimental feature in vitest:
+        # https://github.com/themoeway/yomitan/pull/583#issuecomment-1925047371
+      - dependency-name: "@vitest/coverage-v8"
+        # Pinned to stay on the same version as vitest
+      - dependency-name: "@types/node"
+        # Version 20.11.6 introduces an incompatibility with vite:
+        # https://github.com/vitejs/vite/issues/15714

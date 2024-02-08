@@ -89,16 +89,16 @@
         "stylelint": "^16.1.0",
         "stylelint-config-recommended": "^14.0.0",
         "ts-json-schema-generator": "^1.5.0",
-        "typescript": "5.3.3",
+        "typescript": "^5.3.3",
         "vitest": "1.2.2"
     },
     "dependencies": {
         "@zip.js/zip.js": "^2.7.31",
         "dexie": "^3.2.4",
         "dexie-export-import": "^4.0.7",
-        "yomitan-handlebars": "git+https://github.com/themoeway/yomitan-handlebars.git#12aff5e3550954d7d3a98a5917ff7d579f3cce25",
         "parse5": "^7.1.2",
-        "wanakana": "^5.3.1"
+        "wanakana": "^5.3.1",
+        "yomitan-handlebars": "git+https://github.com/themoeway/yomitan-handlebars.git#12aff5e3550954d7d3a98a5917ff7d579f3cce25"
     },
     "lint-staged": {
         "*.md": "prettier --write"
