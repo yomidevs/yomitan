@@ -16,15 +16,18 @@
  */
 
 import {TextSourceMap} from '../../ext/js/general/text-source-map.js';
+import type * as Core from './core';
 
 export type TextPreprocessorOptions<T = unknown> = T[];
+
+export type TextPreprocessorFunction<T = unknown> = (str: string, setting: T, sourceMap?: TextSourceMap) => string;
 
 export type TextPreprocessor<T = unknown> = {
     id: string;
     name: string;
     description: string;
     options: TextPreprocessorOptions<T>;
-    process: (str: string, setting: T, sourceMap?: TextSourceMap) => string;
+    process: TextPreprocessorFunction<T>;
 };
 
 export type Language = {
@@ -32,7 +35,5 @@ export type Language = {
     iso: string;
     flag: string;
     exampleText: string;
-    textPreprocessors: TextPreprocessor[];
+    textPreprocessors: TextPreprocessor<Core.SafeAny>[];
 };
-
-export type LanguageMap = Map<string, Language>;

@@ -34,42 +34,52 @@ const collapseEmphaticSequencesPrerocessor = {
     }
 };
 
-/** @type {import('language').TextPreprocessor<any>[]} */
+/**
+ * @typedef JapaneseTextProcessor
+ * @type {import('language').TextPreprocessor<boolean> | import('language').TextPreprocessor<[boolean, boolean]>}
+ */
+
+/** @type {JapaneseTextProcessor[]} */
 export const textPreprocessors = [
     {
         id: 'convertHalfWidthCharacters',
         name: 'Convert half width characters to full width',
         description: 'ﾖﾐﾁｬﾝ → ヨミチャン',
         options: basicTextPreprocessorOptions,
-        process: (str, setting, sourceMap) => setting ? convertHalfWidthKanaToFullWidth(str, sourceMap) : str
+        process: /** @type {import('language').TextPreprocessorFunction} */
+            (str, setting, sourceMap) => setting ? convertHalfWidthKanaToFullWidth(str, sourceMap) : str
     },
     {
         id: 'convertNumericCharacters',
         name: 'Convert numeric characters to full width',
         description: '1234 → １２３４',
         options: basicTextPreprocessorOptions,
-        process: (str, setting) => setting ? convertNumericToFullWidth(str) : str
+        process: /** @type {import('language').TextPreprocessorFunction} */
+            (str, setting) => setting ? convertNumericToFullWidth(str) : str
     },
     {
         id: 'convertAlphabeticCharacters',
         name: 'Convert alphabetic characters to hiragana',
         description: 'yomichan → よみちゃん',
         options: basicTextPreprocessorOptions,
-        process: (str, setting, sourceMap) => setting ? convertAlphabeticToKana(str, sourceMap) : str
+        process: /** @type {import('language').TextPreprocessorFunction} */
+            (str, setting, sourceMap) => setting ? convertAlphabeticToKana(str, sourceMap) : str
     },
     {
         id: 'convertHiraganaToKatakana',
         name: 'Convert hiragana to katakana',
         description: 'よみちゃん → ヨミチャン',
         options: basicTextPreprocessorOptions,
-        process: (str, setting) => setting ? convertHiraganaToKatakana(str) : str
+        process: /** @type {import('language').TextPreprocessorFunction} */
+            (str, setting) => setting ? convertHiraganaToKatakana(str) : str
     },
     {
         id: 'convertKatakanaToHiragana',
         name: 'Convert katakana to hiragana',
         description: 'ヨミチャン → よみちゃん',
         options: basicTextPreprocessorOptions,
-        process: (str, setting) => setting ? convertKatakanaToHiragana(str) : str
+        process: /** @type {import('language').TextPreprocessorFunction} */
+            (str, setting) => setting ? convertKatakanaToHiragana(str) : str
     },
     collapseEmphaticSequencesPrerocessor
 ];
