@@ -35,11 +35,11 @@ const collapseEmphaticSequencesPrerocessor = {
 };
 
 /**
- * @typedef JapaneseTextProcessor
+ * @typedef JapaneseTextPreprocessor
  * @type {import('language').TextPreprocessor<boolean> | import('language').TextPreprocessor<[boolean, boolean]>}
  */
 
-/** @type {JapaneseTextProcessor[]} */
+/** @type {JapaneseTextPreprocessor[]} */
 export const textPreprocessors = [
     {
         id: 'convertHalfWidthCharacters',

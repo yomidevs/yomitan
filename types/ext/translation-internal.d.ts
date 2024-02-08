@@ -18,6 +18,7 @@
 import type * as DictionaryDatabase from './dictionary-database';
 import type * as Dictionary from './dictionary';
 import type * as Translation from './translation';
+import type * as Language from './language';
 
 export type TextDeinflectionOptions = [
     textReplacements: Translation.FindTermsTextReplacement[] | null,
@@ -47,3 +48,5 @@ export type DatabaseDeinflection = {
     inflectionRuleChainCandidates: Dictionary.InflectionRuleChainCandidate[];
     databaseEntries: DictionaryDatabase.TermEntry[];
 };
+
+export type PreprocessorOptionsSpace = Map<string, Language.TextPreprocessorOptions>;

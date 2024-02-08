@@ -43,7 +43,12 @@ export function getLanguages() {
 /**
  * @param {string} iso
  * @returns {import('language').TextPreprocessor[]}
+ * @throws {Error}
  */
 export function getTextPreprocessors(iso) {
-    return languages.get(iso)?.textPreprocessors || [];
+    const language = languages.get(iso);
+    if (!language) {
+        throw new Error(`Language not found: ${iso}`);
+    }
+    return language.textPreprocessors;
 }
