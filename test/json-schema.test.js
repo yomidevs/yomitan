@@ -123,7 +123,7 @@ function testValidate1() {
 /** */
 function testValidate2() {
     describe('Validate2', () => {
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{schema: import('ext/json-schema').Schema, inputs: {expected: boolean, value: unknown}[]}[]} */
         const data = [
             // String tests
@@ -517,7 +517,7 @@ function testValidate2() {
                 ]
             }
         ];
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
 
         describe.each(data)('Schema %#', ({schema, inputs}) => {
             test.each(inputs)(`schemaValidate(${schema}, $value) -> $expected`, ({expected, value}) => {
@@ -890,7 +890,7 @@ function testGetValidValueOrDefault1() {
 /** */
 function testProxy1() {
     describe('Proxy1', () => {
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{schema: import('ext/json-schema').Schema, tests: {error: boolean, value?: import('ext/json-schema').Value, action: (value: import('core').SafeAny) => void}[]}[]} */
         const data = [
             // Object tests
@@ -1020,7 +1020,7 @@ function testProxy1() {
                 ]
             }
         ];
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
 
         describe.each(data)('Schema %#', ({schema, tests}) => {
             test.each(tests)('proxy %#', ({error, value, action}) => {

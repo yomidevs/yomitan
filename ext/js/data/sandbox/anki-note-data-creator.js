@@ -17,7 +17,7 @@
  */
 
 import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../../dictionary/dictionary-data-util.js';
-import {distributeFurigana} from '../../language/ja/japanese.js';
+import {distributeFurigana, distributeFuriganaInflected} from '../../language/ja/japanese.js';
 
 /**
  * Creates a compatibility representation of the specified data.
@@ -846,9 +846,13 @@ function convertPitchTag({name, category, content, order, score, dictionaries, r
  */
 function getCloze(dictionaryEntry, context) {
     let originalText = '';
+    let term = '';
+    let reading = '';
     switch (dictionaryEntry.type) {
         case 'term':
             {
+                term = dictionaryEntry.headwords[0].term;
+                reading = dictionaryEntry.headwords[0].reading;
                 const primarySource = getPrimarySource(dictionaryEntry);
                 if (primarySource !== null) { originalText = primarySource.originalText; }
             }
@@ -867,10 +871,16 @@ function getCloze(dictionaryEntry, context) {
     if (typeof text !== 'string') { text = ''; }
     if (typeof offset !== 'number') { offset = 0; }
 
+    const textSegments = [];
+    for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, text.substring(offset, offset + originalText.length))) {
+        textSegments.push(reading2.length > 0 ? reading2 : text2);
+    }
+
     return {
         sentence: text,
         prefix: text.substring(0, offset),
         body: text.substring(offset, offset + originalText.length),
+        bodyKana: textSegments.join(''),
         suffix: text.substring(offset + originalText.length)
     };
 }
