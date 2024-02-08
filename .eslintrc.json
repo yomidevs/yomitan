@@ -412,7 +412,6 @@
         {
             "files": [
                 "ext/js/accessibility/accessibility-controller.js",
-                "ext/js/application.js",
                 "ext/js/background/backend.js",
                 "ext/js/background/background-main.js",
                 "ext/js/background/offscreen-proxy.js",
@@ -420,10 +419,8 @@
                 "ext/js/background/request-builder.js",
                 "ext/js/background/script-manager.js",
                 "ext/js/comm/anki-connect.js",
-                "ext/js/comm/api.js",
                 "ext/js/comm/clipboard-monitor.js",
                 "ext/js/comm/clipboard-reader.js",
-                "ext/js/comm/cross-frame-api.js",
                 "ext/js/comm/mecab.js",
                 "ext/js/core/api-map.js",
                 "ext/js/core/event-dispatcher.js",
