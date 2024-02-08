@@ -33,7 +33,7 @@ describe('Dictionary data', () => {
     const {window, teardown} = domTestEnv;
     afterAll(() => teardown(globalThis));
 
-    const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
+    const testInputsFilePath = path.join(dirname, '..', 'test', 'data/translator-test-inputs.json');
     /** @type {import('test/translator').TranslatorTestInputs} */
     const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
 
