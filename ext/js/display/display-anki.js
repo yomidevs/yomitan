@@ -109,14 +109,14 @@ export class DisplayAnki {
     /** */
     prepare() {
         this._noteContext = this._getNoteContext();
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         this._display.hotkeyHandler.registerActions([
             ['addNoteKanji',      () => { this._tryAddAnkiNoteForSelectedEntry('kanji'); }],
             ['addNoteTermKanji',  () => { this._tryAddAnkiNoteForSelectedEntry('term-kanji'); }],
             ['addNoteTermKana',   () => { this._tryAddAnkiNoteForSelectedEntry('term-kana'); }],
             ['viewNote',          this._viewNoteForSelectedEntry.bind(this)]
         ]);
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         this._display.on('contentClear', this._onContentClear.bind(this));
         this._display.on('contentUpdateStart', this._onContentUpdateStart.bind(this));

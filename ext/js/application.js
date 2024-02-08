@@ -93,7 +93,7 @@ export class Application extends EventDispatcher {
         /** @type {boolean} */
         this._isReady = false;
 
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
             ['applicationIsReady',         this._onMessageIsReady.bind(this)],
@@ -102,7 +102,7 @@ export class Application extends EventDispatcher {
             ['applicationDatabaseUpdated', this._onMessageDatabaseUpdated.bind(this)],
             ['applicationZoomChanged',     this._onMessageZoomChanged.bind(this)]
         ]);
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
     }
 
     /** @type {WebExtension} */
