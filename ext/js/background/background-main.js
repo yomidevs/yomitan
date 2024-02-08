@@ -16,15 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Application} from '../application.js';
+import {WebExtension} from '../extension/web-extension.js';
 import {Backend} from './backend.js';
 
 /** Entry point. */
 async function main() {
-    const application = new Application();
-    application.prepare(true);
+    const webExtension = new WebExtension();
 
-    const backend = new Backend(application.webExtension);
+    const backend = new Backend(webExtension);
     await backend.prepare();
 }
 
