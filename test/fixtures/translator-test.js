@@ -43,7 +43,7 @@ vi.stubGlobal('chrome', chrome);
  * @param {string} dictionaryName
  * @returns {Promise<Translator>}
  */
-async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
+export async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
     // Dictionary
     const testDictionary = createDictionaryArchive(dictionaryDirectory, dictionaryName);
     const testDictionaryContent = await testDictionary.generateAsync({type: 'arraybuffer'});
