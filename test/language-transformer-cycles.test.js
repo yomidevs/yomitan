@@ -154,8 +154,8 @@ describe('Deinflection data', () => {
                     for (const item of newDeinflectionNode.getHistory()) {
                         stack.push(
                             item.ruleNode === null ?
-                            `${item.text} (start)` :
-                            `${item.text} (${item.ruleNode.groupName}, ${item.ruleNode.rule.conditionsIn.join(',')}=>${item.ruleNode.rule.conditionsOut.join(',')}, ${item.ruleNode.rule.suffixIn}=>${item.ruleNode.rule.suffixOut})`
+                                `${item.text} (start)` :
+                                `${item.text} (${item.ruleNode.groupName}, ${item.ruleNode.rule.conditionsIn.join(',')}=>${item.ruleNode.rule.conditionsOut.join(',')}, ${item.ruleNode.rule.suffixIn}=>${item.ruleNode.rule.suffixOut})`
                         );
                     }
                     const message = `Cycle detected:\n  ${stack.join('\n  ')}`;
