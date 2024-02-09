@@ -119,6 +119,7 @@ export function formatRulesJson(rules) {
     }
     if (ruleIndex > 0) { result += '\n'; }
     result += ']';
+    result += '\n';
     return result;
 }
 
