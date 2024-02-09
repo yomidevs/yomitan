@@ -49,7 +49,7 @@ export class PopupFactory {
      */
     prepare() {
         this._frameOffsetForwarder.prepare();
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         this._application.crossFrame.registerHandlers([
             ['popupFactoryGetOrCreatePopup',     this._onApiGetOrCreatePopup.bind(this)],
             ['popupFactorySetOptionsContext',    this._onApiSetOptionsContext.bind(this)],
@@ -67,7 +67,7 @@ export class PopupFactory {
             ['popupFactoryGetFrameSize',         this._onApiGetFrameSize.bind(this)],
             ['popupFactorySetFrameSize',         this._onApiSetFrameSize.bind(this)]
         ]);
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
     }
 
     /**

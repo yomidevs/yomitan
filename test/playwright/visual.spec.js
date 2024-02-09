@@ -60,11 +60,11 @@ test('visual', async ({page, extensionId}) => {
 
         // Otherwise prepare for it to be attached
         let frame_attached;
-        if (popup_frame === undefined) {
+        if (typeof popup_frame === 'undefined') {
             frame_attached = page.waitForEvent('frameattached');
         }
         await page.mouse.move(box.x + offset.x, box.y + offset.y, {steps: 10}); // hover over the test
-        if (popup_frame === undefined) {
+        if (typeof popup_frame === 'undefined') {
             popup_frame = await frame_attached; // wait for popup to be attached
         }
         try {

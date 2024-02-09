@@ -475,7 +475,7 @@ function createProfileOptionsUpdatedTestData1() {
             ]
         },
         inputs: {
-            /* eslint-disable no-multi-spaces */
+            /* eslint-disable @stylistic/no-multi-spaces */
             hotkeys: [
                 {action: 'close',             argument: '',  key: 'Escape',    modifiers: [],       scopes: ['popup'], enabled: true},
                 {action: 'focusSearchBox',    argument: '',  key: 'Escape',    modifiers: [],       scopes: ['search'], enabled: true},
@@ -494,7 +494,7 @@ function createProfileOptionsUpdatedTestData1() {
                 {action: 'viewNote',          argument: '',  key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'copyHostSelection', argument: '',  key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true}
             ]
-            /* eslint-enable no-multi-spaces */
+            /* eslint-enable @stylistic/no-multi-spaces */
         },
         popupWindow: {
             width: 400,

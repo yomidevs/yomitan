@@ -17,7 +17,6 @@
  */
 
 import {Application} from '../application.js';
-import {log} from '../core/logger.js';
 import {promiseTimeout} from '../core/utilities.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
@@ -87,63 +86,52 @@ function setupPermissionsToggles() {
     }
 }
 
-/** Entry point. */
-async function main() {
-    try {
-        const application = new Application();
+await Application.main(async (application) => {
+    const documentFocusController = new DocumentFocusController();
+    documentFocusController.prepare();
 
-        const documentFocusController = new DocumentFocusController();
-        documentFocusController.prepare();
+    const extensionContentController = new ExtensionContentController();
+    extensionContentController.prepare();
 
-        const extensionContentController = new ExtensionContentController();
-        extensionContentController.prepare();
+    setupPermissionsToggles();
 
-        setupPermissionsToggles();
+    setupEnvironmentInfo(application.api);
 
-        await application.prepare();
+    /** @type {HTMLInputElement} */
+    const permissionCheckbox1 = querySelectorNotNull(document, '#permission-checkbox-allow-in-private-windows');
+    /** @type {HTMLInputElement} */
+    const permissionCheckbox2 = querySelectorNotNull(document, '#permission-checkbox-allow-file-url-access');
+    /** @type {HTMLInputElement[]} */
+    const permissionsCheckboxes = [permissionCheckbox1, permissionCheckbox2];
 
-        setupEnvironmentInfo(application.api);
+    const permissions = await Promise.all([
+        isAllowedIncognitoAccess(),
+        isAllowedFileSchemeAccess()
+    ]);
 
-        /** @type {HTMLInputElement} */
-        const permissionCheckbox1 = querySelectorNotNull(document, '#permission-checkbox-allow-in-private-windows');
-        /** @type {HTMLInputElement} */
-        const permissionCheckbox2 = querySelectorNotNull(document, '#permission-checkbox-allow-file-url-access');
-        /** @type {HTMLInputElement[]} */
-        const permissionsCheckboxes = [permissionCheckbox1, permissionCheckbox2];
-
-        const permissions = await Promise.all([
-            isAllowedIncognitoAccess(),
-            isAllowedFileSchemeAccess()
-        ]);
-
-        for (let i = 0, ii = permissions.length; i < ii; ++i) {
-            permissionsCheckboxes[i].checked = permissions[i];
-        }
-
-        const modalController = new ModalController();
-        modalController.prepare();
-
-        const settingsController = new SettingsController(application);
-        await settingsController.prepare();
-
-        const permissionsToggleController = new PermissionsToggleController(settingsController);
-        permissionsToggleController.prepare();
-
-        const permissionsOriginController = new PermissionsOriginController(settingsController);
-        permissionsOriginController.prepare();
-
-        const persistentStorageController = new PersistentStorageController(application);
-        persistentStorageController.prepare();
-
-        await promiseTimeout(100);
-
-        document.documentElement.dataset.loaded = 'true';
-
-        const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-        settingsDisplayController.prepare();
-    } catch (e) {
-        log.error(e);
+    for (let i = 0, ii = permissions.length; i < ii; ++i) {
+        permissionsCheckboxes[i].checked = permissions[i];
     }
-}
 
-await main();
+    const modalController = new ModalController();
+    modalController.prepare();
+
+    const settingsController = new SettingsController(application);
+    await settingsController.prepare();
+
+    const permissionsToggleController = new PermissionsToggleController(settingsController);
+    permissionsToggleController.prepare();
+
+    const permissionsOriginController = new PermissionsOriginController(settingsController);
+    permissionsOriginController.prepare();
+
+    const persistentStorageController = new PersistentStorageController(application);
+    persistentStorageController.prepare();
+
+    await promiseTimeout(100);
+
+    document.documentElement.dataset.loaded = 'true';
+
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    settingsDisplayController.prepare();
+});

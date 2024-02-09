@@ -59,7 +59,7 @@ function testNormalizeContext() {
 /** */
 function testSchemas() {
     describe('Schemas', () => {
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{conditionGroups: import('settings').ProfileConditionGroup[], expectedSchema?: import('ext/json-schema').Schema, inputs?: {expected: boolean, context: import('settings').OptionsContext}[]}[]} */
         const data = [
             // Empty
@@ -1097,7 +1097,7 @@ function testSchemas() {
                 ]
             }
         ];
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
 
         test.each(data)('schemas-test-%#', ({conditionGroups, expectedSchema, inputs}) => {
             const schema = createSchema(conditionGroups);

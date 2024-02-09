@@ -139,7 +139,7 @@ export class Backend {
         /** @type {Map<string, (() => void)[]>} */
         this._applicationReadyHandlers = new Map();
 
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('api').ApiMap} */
         this._apiMap = createApiMap([
             ['applicationReady',             this._onApiApplicationReady.bind(this)],
@@ -185,7 +185,7 @@ export class Backend {
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)]
         ]);
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
 
         /** @type {Map<string, (params?: import('core').SerializableObject) => void>} */
         this._commandHandlers = new Map(/** @type {[name: string, handler: (params?: import('core').SerializableObject) => void][]} */ ([

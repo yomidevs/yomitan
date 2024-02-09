@@ -39,14 +39,13 @@ export class Offscreen {
         });
         /** @type {ClipboardReader} */
         this._clipboardReader = new ClipboardReader({
-            // eslint-disable-next-line no-undef
             document: (typeof document === 'object' && document !== null ? document : null),
             pasteTargetSelector: '#clipboard-paste-target',
             richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
         });
 
 
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('offscreen').ApiMap} */
         this._apiMap = createApiMap([
             ['clipboardGetTextOffscreen',    this._getTextHandler.bind(this)],
@@ -62,7 +61,7 @@ export class Offscreen {
             ['getTermFrequenciesOffscreen',  this._getTermFrequenciesHandler.bind(this)],
             ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)]
         ]);
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
 
         /** @type {?Promise<void>} */
         this._prepareDatabasePromise = null;

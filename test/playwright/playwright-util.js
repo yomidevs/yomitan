@@ -23,7 +23,8 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 export const root = path.join(dirname, '..', '..');
 
 export const test = base.extend({
-    context: async ({ }, use) => {
+    // eslint-disable-next-line no-empty-pattern
+    context: async ({}, use) => {
         const pathToExtension = path.join(root, 'ext');
         const context = await chromium.launchPersistentContext('', {
             // headless: false,

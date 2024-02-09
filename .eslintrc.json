@@ -33,175 +33,26 @@
         "jsonc",
         "unused-imports",
         "@typescript-eslint",
-        "@stylistic/ts"
+        "@stylistic"
     ],
     "ignorePatterns": [
         "/ext/lib/",
         "/dev/lib/handlebars/"
     ],
     "rules": {
-        "arrow-parens": [
-            "error",
-            "always"
-        ],
-        "comma-dangle": [
-            "error",
-            "never"
-        ],
-        "curly": [
-            "error",
-            "all"
-        ],
+        "curly": ["error", "all"],
         "dot-notation": "error",
         "eqeqeq": "error",
-        "func-names": [
-            "error",
-            "always"
-        ],
+        "func-names": ["error", "always"],
         "guard-for-in": "error",
-        "new-parens": "error",
         "no-case-declarations": "error",
         "no-const-assign": "error",
         "no-constant-condition": "off",
-        "no-multiple-empty-lines": [
-            "error",
-            {
-                "max": 2
-            }
-        ],
         "no-global-assign": "error",
+        "no-implicit-globals": "error",
         "no-new": "error",
         "no-param-reassign": "off",
         "no-prototype-builtins": "error",
-        "no-shadow": [
-            "off",
-            {
-                "builtinGlobals": false
-            }
-        ],
-        "no-undef": "error",
-        "no-undefined": "error",
-        "no-underscore-dangle": [
-            "error",
-            {
-                "allowAfterThis": true,
-                "allowAfterSuper": false,
-                "allowAfterThisConstructor": false
-            }
-        ],
-        "no-unexpected-multiline": "error",
-        "no-unneeded-ternary": "error",
-        "no-unused-vars": [
-            "error",
-            {
-                "vars": "local",
-                "args": "after-used",
-                "argsIgnorePattern": "^_",
-                "caughtErrors": "none"
-            }
-        ],
-        "no-unused-expressions": "error",
-        "no-var": "error",
-        "prefer-const": [
-            "error",
-            {
-                "destructuring": "all"
-            }
-        ],
-        "quote-props": [
-            "error",
-            "consistent"
-        ],
-        "quotes": [
-            "error",
-            "single",
-            "avoid-escape"
-        ],
-        "require-atomic-updates": "off",
-        "semi": "error",
-        "wrap-iife": [
-            "error",
-            "inside"
-        ],
-        "brace-style": [
-            "error",
-            "1tbs",
-            {
-                "allowSingleLine": true
-            }
-        ],
-        "indent": [
-            "error",
-            4,
-            {
-                "SwitchCase": 1,
-                "MemberExpression": 1,
-                "flatTernaryExpressions": true,
-                "ignoredNodes": [
-                    "ConditionalExpression"
-                ]
-            }
-        ],
-        "object-curly-newline": "error",
-        "padded-blocks": [
-            "error",
-            "never"
-        ],
-        "array-bracket-spacing": [
-            "error",
-            "never"
-        ],
-        "arrow-spacing": [
-            "error",
-            {
-                "before": true,
-                "after": true
-            }
-        ],
-        "block-spacing": [
-            "error",
-            "always"
-        ],
-        "comma-spacing": [
-            "error",
-            {
-                "before": false,
-                "after": true
-            }
-        ],
-        "computed-property-spacing": [
-            "error",
-            "never"
-        ],
-        "func-call-spacing": [
-            "error",
-            "never"
-        ],
-        "function-paren-newline": [
-            "error",
-            "multiline-arguments"
-        ],
-        "generator-star-spacing": [
-            "error",
-            "before"
-        ],
-        "key-spacing": [
-            "error",
-            {
-                "beforeColon": false,
-                "afterColon": true,
-                "mode": "strict"
-            }
-        ],
-        "keyword-spacing": [
-            "error",
-            {
-                "before": true,
-                "after": true
-            }
-        ],
-        "no-implicit-globals": "error",
-        "no-multi-spaces": "error",
         "no-restricted-syntax": [
             "error",
             {
@@ -213,92 +64,76 @@
                 "selector": "MemberExpression[property.name=json]"
             }
         ],
-        "no-trailing-spaces": "error",
-        "no-whitespace-before-property": "error",
-        "object-curly-spacing": [
-            "error",
-            "never"
-        ],
-        "rest-spread-spacing": [
-            "error",
-            "never"
-        ],
-        "semi-spacing": [
-            "error",
-            {
-                "before": false,
-                "after": true
-            }
-        ],
-        "space-before-blocks": [
-            "error",
-            "always"
-        ],
-        "space-before-function-paren": [
-            "error",
-            {
-                "anonymous": "never",
-                "named": "never",
-                "asyncArrow": "always"
-            }
-        ],
-        "space-in-parens": [
-            "error",
-            "never"
-        ],
-        "space-infix-ops": [
-            "error",
-            {
-                "int32Hint": false
-            }
-        ],
-        "space-unary-ops": "error",
-        "spaced-comment": [
-            "error",
-            "always"
-        ],
-        "switch-colon-spacing": [
-            "error",
-            {
-                "after": true,
-                "before": false
-            }
-        ],
-        "template-curly-spacing": [
-            "error",
-            "never"
-        ],
-        "template-tag-spacing": [
-            "error",
-            "never"
-        ],
+        "no-shadow": ["off", {"builtinGlobals": false}],
+        "no-undef": "error",
+        "no-undefined": "error",
+        "no-underscore-dangle": ["error", {"allowAfterThis": true, "allowAfterSuper": false, "allowAfterThisConstructor": false}],
+        "no-unexpected-multiline": "error",
+        "no-unneeded-ternary": "error",
+        "no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
+        "no-unused-expressions": "error",
+        "no-var": "error",
+        "prefer-const": ["error", {"destructuring": "all"}],
+        "require-atomic-updates": "off",
+
+        "@stylistic/array-bracket-spacing": ["error", "never"],
+        "@stylistic/arrow-parens": ["error", "always"],
+        "@stylistic/arrow-spacing": ["error", {"before": true, "after": true}],
+        "@stylistic/block-spacing": ["error", "always"],
+        "@stylistic/brace-style": ["error", "1tbs", {"allowSingleLine": true}],
+        "@stylistic/comma-dangle": ["error", "never"],
+        "@stylistic/comma-spacing": ["error", {"before": false, "after": true}],
+        "@stylistic/computed-property-spacing": ["error", "never"],
+        "@stylistic/func-call-spacing": ["error", "never"],
+        "@stylistic/function-paren-newline": ["error", "multiline-arguments"],
+        "@stylistic/generator-star-spacing": ["error", "before"],
+        "@stylistic/indent": ["error", 4, {"SwitchCase": 1, "MemberExpression": 1, "flatTernaryExpressions": true, "ignoredNodes": ["ConditionalExpression"]}],
+        "@stylistic/key-spacing": ["error", {"beforeColon": false, "afterColon": true, "mode": "strict"}],
+        "@stylistic/keyword-spacing": ["error", {"before": true, "after": true}],
+        "@stylistic/new-parens": "error",
+        "@stylistic/no-multi-spaces": "error",
+        "@stylistic/no-multiple-empty-lines": ["error", {"max": 2}],
+        "@stylistic/no-trailing-spaces": "error",
+        "@stylistic/no-whitespace-before-property": "error",
+        "@stylistic/object-curly-newline": "error",
+        "@stylistic/object-curly-spacing": ["error", "never"],
+        "@stylistic/padded-blocks": ["error", "never"],
+        "@stylistic/quote-props": ["error", "consistent"],
+        "@stylistic/quotes": ["error", "single", "avoid-escape"],
+        "@stylistic/rest-spread-spacing": ["error", "never"],
+        "@stylistic/semi": "error",
+        "@stylistic/semi-spacing": ["error", {"before": false, "after": true}],
+        "@stylistic/space-before-blocks": ["error", "always"],
+        "@stylistic/space-before-function-paren": ["error", {"anonymous": "never", "named": "never", "asyncArrow": "always"}],
+        "@stylistic/space-in-parens": ["error", "never"],
+        "@stylistic/space-infix-ops": ["error", {"int32Hint": false}],
+        "@stylistic/space-unary-ops": "error",
+        "@stylistic/spaced-comment": ["error", "always"],
+        "@stylistic/switch-colon-spacing": ["error", {"after": true, "before": false}],
+        "@stylistic/template-curly-spacing": ["error", "never"],
+        "@stylistic/template-tag-spacing": ["error", "never"],
+        "@stylistic/wrap-iife": ["error", "inside"],
+
         "no-unsanitized/method": "error",
         "no-unsanitized/property": "error",
+
         "jsdoc/check-access": "error",
         "jsdoc/check-alignment": "error",
-        "jsdoc/check-line-alignment": [
-            "error",
-            "never",
-            {
-                "wrapIndent": "  "
-            }
-        ],
+        "jsdoc/check-line-alignment": ["error", "never", {"wrapIndent": "  "}],
         "jsdoc/check-param-names": "error",
         "jsdoc/check-property-names": "error",
         "jsdoc/check-tag-names": "error",
+        "jsdoc/empty-tags": "error",
         "jsdoc/check-types": "error",
         "jsdoc/check-values": "error",
-        "jsdoc/empty-tags": "error",
         "jsdoc/implements-on-classes": "error",
         "jsdoc/multiline-blocks": "error",
         "jsdoc/no-bad-blocks": "error",
         "jsdoc/no-multi-asterisks": "error",
         "jsdoc/no-undefined-types": "error",
         "jsdoc/require-asterisk-prefix": "error",
-        "jsdoc/require-hyphen-before-param-description": [
-            "error",
-            "never"
-        ],
+        "jsdoc/require-description": "off",
+        "jsdoc/require-hyphen-before-param-description": ["error", "never"],
         "jsdoc/require-jsdoc": [
             "error",
             {
@@ -317,7 +152,6 @@
                 "checkSetters": "no-getter"
             }
         ],
-        "jsdoc/require-description": "off",
         "jsdoc/require-param": "error",
         "jsdoc/require-param-description": "off",
         "jsdoc/require-param-name": "error",
@@ -335,77 +169,27 @@
         "jsdoc/require-yields-check": "error",
         "jsdoc/tag-lines": ["error", "never", {"startLines": 0}],
         "jsdoc/valid-types": "error",
-        "jsonc/indent": [
-            "error",
-            4
-        ],
-        "jsonc/array-bracket-newline": [
-            "error",
-            "consistent"
-        ],
-        "jsonc/array-bracket-spacing": [
-            "error",
-            "never"
-        ],
-        "jsonc/array-element-newline": [
-            "error",
-            "consistent"
-        ],
-        "jsonc/comma-style": [
-            "error",
-            "last"
-        ],
-        "jsonc/key-spacing": [
-            "error",
-            {
-                "beforeColon": false,
-                "afterColon": true,
-                "mode": "strict"
-            }
-        ],
+
+        "jsonc/indent": ["error", 4],
+        "jsonc/array-bracket-newline": ["error", "consistent"],
+        "jsonc/array-bracket-spacing": ["error", "never"],
+        "jsonc/array-element-newline": ["error", "consistent"],
+        "jsonc/comma-style": ["error", "last"],
+        "jsonc/key-spacing": ["error", {"beforeColon": false, "afterColon": true, "mode": "strict"}],
         "jsonc/no-octal-escape": "error",
-        "jsonc/object-curly-newline": [
-            "error",
-            {
-                "consistent": true
-            }
-        ],
-        "jsonc/object-curly-spacing": [
-            "error",
-            "never"
-        ],
-        "jsonc/object-property-newline": [
-            "error",
-            {
-                "allowAllPropertiesOnSameLine": true
-            }
-        ],
+        "jsonc/object-curly-newline": ["error", {"consistent": true}],
+        "jsonc/object-curly-spacing": ["error", "never"],
+        "jsonc/object-property-newline": ["error", {"allowAllPropertiesOnSameLine": true}],
+
         "eslint-comments/no-unused-disable": "error",
-        "@typescript-eslint/ban-ts-comment": [
-            "error",
-            {
-                "ts-expect-error": {
-                    "descriptionFormat": "^ - .+$"
-                }
-            }
-        ],
-        "@typescript-eslint/ban-types": [
-            "error",
-            {
-                "types": {
-                    "object": true
-                },
-                "extendDefaults": true
-            }
-        ],
+
+        "unused-imports/no-unused-imports": "error",
+
+        "@typescript-eslint/ban-ts-comment": ["error", {"ts-expect-error": {"descriptionFormat": "^ - .+$"}}],
+        "@typescript-eslint/ban-types": ["error", {"types": {"object": true}, "extendDefaults": true}],
         "@typescript-eslint/consistent-type-exports": "off",
         "@typescript-eslint/no-explicit-any": "error",
-        "@typescript-eslint/no-shadow": [
-            "error",
-            {
-                "builtinGlobals": false
-            }
-        ],
+        "@typescript-eslint/no-shadow": ["error", {"builtinGlobals": false}],
         "@typescript-eslint/no-this-alias": "error",
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/no-var-requires": "off"
@@ -416,26 +200,13 @@
                 "*.ts"
             ],
             "rules": {
-                "no-multiple-empty-lines": [
-                    "error",
-                    {
-                        "max": 1,
-                        "maxEOF": 0
-                    }
-                ],
                 "no-undef": "off",
-                "unused-imports/no-unused-imports": "error",
-                "@typescript-eslint/no-unused-vars": [
-                    "error",
-                    {
-                        "vars": "local",
-                        "args": "after-used",
-                        "argsIgnorePattern": "^_",
-                        "caughtErrors": "none"
-                    }
-                ],
-                "comma-dangle": "off",
-                "@typescript-eslint/comma-dangle": [
+
+                "@typescript-eslint/no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
+
+                "@stylistic/block-spacing": "off",
+                "@stylistic/brace-style": ["error", "1tbs", {"allowSingleLine": true}],
+                "@stylistic/comma-dangle": [
                     "error",
                     {
                         "arrays": "always-multiline",
@@ -448,115 +219,46 @@
                         "tuples": "always-multiline"
                     }
                 ],
-                "@stylistic/ts/block-spacing": "off",
-                "@stylistic/ts/brace-style": [
-                    "error",
-                    "1tbs",
-                    {
-                        "allowSingleLine": true
-                    }
-                ],
-                "@stylistic/ts/comma-dangle": [
-                    "error",
-                    {
-                        "arrays": "always-multiline",
-                        "objects": "always-multiline",
-                        "imports": "always-multiline",
-                        "exports": "always-multiline",
-                        "functions": "always-multiline",
-                        "enums": "always-multiline",
-                        "generics": "always-multiline",
-                        "tuples": "always-multiline"
-                    }
-                ],
-                "@stylistic/ts/comma-spacing": [
+                "@stylistic/comma-spacing": ["error", {"before": false, "after": true}],
+                "@stylistic/function-call-spacing": ["error", "never"],
+                "@stylistic/indent": ["error", 4],
+                "@stylistic/key-spacing": ["error", {"beforeColon": false, "afterColon": true, "mode": "strict"}],
+                "@stylistic/keyword-spacing": ["error", {"before": true, "after": true}],
+                "@stylistic/lines-around-comment": "off",
+                "@stylistic/lines-between-class-members": ["error", "always"],
+                "@stylistic/member-delimiter-style": [
                     "error",
                     {
-                        "before": false,
-                        "after": true
-                    }
-                ],
-                "@stylistic/ts/function-call-spacing": [
-                    "error",
-                    "never"
-                ],
-                "@stylistic/ts/indent": [
-                    "error",
-                    4
-                ],
-                "@stylistic/ts/key-spacing": [
-                    "error",
-                    {
-                        "beforeColon": false,
-                        "afterColon": true,
-                        "mode": "strict"
-                    }
-                ],
-                "@stylistic/ts/keyword-spacing": [
-                    "error",
-                    {
-                        "before": true,
-                        "after": true
-                    }
-                ],
-                "@stylistic/ts/lines-around-comment": "off",
-                "@stylistic/ts/lines-between-class-members": [
-                    "error",
-                    "always"
-                ],
-                "@stylistic/ts/member-delimiter-style": [
-                    "error",
-                    {
-                        "multiline": {
-                            "delimiter": "semi",
-                            "requireLast": true
-                        },
-                        "singleline": {
-                            "delimiter": "comma",
-                            "requireLast": false
-                        },
+                        "multiline": {"delimiter": "semi", "requireLast": true},
+                        "singleline": {"delimiter": "comma", "requireLast": false},
                         "multilineDetection": "brackets"
                     }
                 ],
-                "@stylistic/ts/no-extra-parens": [
-                    "error",
-                    "all"
-                ],
-                "@stylistic/ts/no-extra-semi": "error",
-                "@stylistic/ts/object-curly-spacing": [
-                    "error",
-                    "never"
-                ],
-                "@stylistic/ts/padding-line-between-statements": "off",
-                "@stylistic/ts/quotes": [
-                    "error",
-                    "single",
-                    "avoid-escape"
-                ],
-                "@stylistic/ts/semi": "error",
-                "@stylistic/ts/space-before-blocks": [
-                    "error",
-                    "always"
-                ],
-                "@stylistic/ts/space-before-function-paren": [
-                    "error",
-                    {
-                        "anonymous": "never",
-                        "named": "never",
-                        "asyncArrow": "always"
-                    }
-                ],
-                "@stylistic/ts/space-infix-ops": "error",
-                "@stylistic/ts/type-annotation-spacing": "error"
+                "@stylistic/no-multiple-empty-lines": ["error", {"max": 1, "maxEOF": 0}],
+                "@stylistic/no-extra-parens": ["error", "all"],
+                "@stylistic/no-extra-semi": "error",
+                "@stylistic/object-curly-spacing": ["error", "never"],
+                "@stylistic/padding-line-between-statements": "off",
+                "@stylistic/quotes": ["error", "single", "avoid-escape"],
+                "@stylistic/semi": "error",
+                "@stylistic/space-before-blocks": ["error", "always"],
+                "@stylistic/space-before-function-paren": ["error", {"anonymous": "never", "named": "never", "asyncArrow": "always"}],
+                "@stylistic/space-infix-ops": "error",
+                "@stylistic/type-annotation-spacing": "error"
             }
         },
         {
             "files": [
                 "*.json"
             ],
-            "parser": "jsonc-eslint-parser",
+            "parser": "jsonc-eslint-parser"
+        },
+        {
+            "files": [
+                "ext/data/schemas/options-schema.json"
+            ],
             "rules": {
-                "no-multi-spaces": "off"
+                "@stylistic/no-multi-spaces": "off"
             }
         },
         {
@@ -567,10 +269,7 @@
                 "test/data/translator-test-results.json"
             ],
             "rules": {
-                "jsonc/indent": [
-                    "error",
-                    2
-                ]
+                "jsonc/indent": ["error", 2]
             }
         },
         {
@@ -579,12 +278,8 @@
                 "test/data/dictionaries/valid-dictionary1/term_bank_2.json"
             ],
             "rules": {
-                "jsonc/array-element-newline": [
-                    "off"
-                ],
-                "jsonc/object-property-newline": [
-                    "off"
-                ]
+                "jsonc/array-element-newline": "off",
+                "jsonc/object-property-newline": "off"
             }
         },
         {
@@ -612,20 +307,12 @@
         },
         {
             "files": [
-                "ext/js/core.js",
-                "ext/js/core/extension-error.js",
-                "ext/js/**/sandbox/**/*.js",
-                "ext/js/language/ja/japanese.js",
-                "ext/js/language/ja/japanese-wanakana.js"
-            ],
-            "env": {
-                "webextensions": false
-            }
-        },
-        {
-            "files": [
                 "test/**/*.js",
-                "dev/**/*.js"
+                "dev/**/*.js",
+                "integration.spec.js",
+                "playwright.config.js",
+                "playwright-util.js",
+                "visual.spec.js"
             ],
             "env": {
                 "browser": false,
@@ -659,103 +346,6 @@
         },
         {
             "files": [
-                "ext/js/core/extension-error.js",
-                "ext/js/application.js",
-                "ext/js/accessibility/accessibility-controller.js",
-                "ext/js/background/backend.js",
-                "ext/js/background/offscreen.js",
-                "ext/js/background/offscreen-proxy.js",
-                "ext/js/background/profile-conditions-util.js",
-                "ext/js/background/request-builder.js",
-                "ext/js/background/script-manager.js",
-                "ext/js/comm/anki-connect.js",
-                "ext/js/comm/clipboard-monitor.js",
-                "ext/js/comm/clipboard-reader.js",
-                "ext/js/comm/mecab.js",
-                "ext/js/data/anki-util.js",
-                "ext/js/data/database.js",
-                "ext/js/data/json-schema.js",
-                "ext/js/data/options-util.js",
-                "ext/js/data/permissions-util.js",
-                "ext/js/data/sandbox/array-buffer-util.js",
-                "ext/js/dom/simple-dom-parser.js",
-                "ext/js/extension/environment.js",
-                "ext/js/general/cache-map.js",
-                "ext/js/general/object-property-accessor.js",
-                "ext/js/general/regex-util.js",
-                "ext/js/general/text-source-map.js",
-                "ext/js/language/language-transformer.js",
-                "ext/js/dictionary/dictionary-database.js",
-                "ext/js/dictionary/dictionary-data-util.js",
-                "ext/js/language/sandbox/japanese-util.js",
-                "ext/js/language/translator.js",
-                "ext/js/media/audio-downloader.js",
-                "ext/js/media/media-util.js",
-                "ext/js/templates/template-patcher.js",
-                "ext/js/background/background-main.js"
-            ],
-            "env": {
-                "browser": false,
-                "serviceworker": true,
-                "webextensions": true
-            },
-            "globals": {
-                "FileReader": "readonly",
-                "Intl": "readonly",
-                "crypto": "readonly",
-                "AbortController": "readonly"
-            }
-        },
-        {
-            "files": [
-                "ext/js/core.js",
-                "ext/js/core/extension-error.js",
-                "ext/js/data/database.js",
-                "ext/js/data/json-schema.js",
-                "ext/js/general/cache-map.js",
-                "ext/js/dictionary/dictionary-database.js",
-                "ext/js/dictionary/dictionary-importer.js",
-                "ext/js/dictionary/dictionary-worker-handler.js",
-                "ext/js/dictionary/dictionary-worker-media-loader.js",
-                "ext/js/media/media-util.js"
-            ],
-            "env": {
-                "browser": false,
-                "worker": true,
-                "webextensions": true
-            }
-        },
-        {
-            "files": [
-                "playwright.config.js"
-            ],
-            "env": {
-                "browser": false,
-                "node": true,
-                "webextensions": false
-            },
-            "rules": {
-                "no-undefined": "off"
-            }
-        },
-        {
-            "files": [
-                "integration.spec.js",
-                "playwright-util.js",
-                "visual.spec.js"
-            ],
-            "env": {
-                "browser": false,
-                "node": true,
-                "webextensions": false
-            },
-            "rules": {
-                "no-undefined": "off",
-                "no-empty-pattern": "off"
-            }
-        },
-        {
-            "files": [
                 "test/**/*.test.js"
             ],
             "plugins": [
@@ -766,8 +356,7 @@
             ],
             "rules": {
                 "vitest/prefer-to-be": "off"
-            },
-            "env": {}
+            }
         },
         {
             "files": [
@@ -776,6 +365,105 @@
             "extends": [
                 "plugin:@typescript-eslint/disable-type-checked"
             ]
+        },
+        {
+            "files": [
+                "ext/js/core/api-map.js",
+                "ext/js/core/extension-error.js",
+                "ext/js/core/json.js",
+                "ext/js/data/sandbox/anki-note-data-creator.js",
+                "ext/js/dictionary/dictionary-data-util.js",
+                "ext/js/display/sandbox/pronunciation-generator.js",
+                "ext/js/display/sandbox/structured-content-generator.js",
+                "ext/js/dom/sandbox/css-style-applier.js",
+                "ext/js/language/ja/japanese.js",
+                "ext/js/templates/sandbox/anki-template-renderer-content-manager.js",
+                "ext/js/templates/sandbox/anki-template-renderer.js",
+                "ext/js/templates/sandbox/template-renderer-frame-api.js",
+                "ext/js/templates/sandbox/template-renderer-frame-main.js",
+                "ext/js/templates/sandbox/template-renderer-media-provider.js",
+                "ext/js/templates/sandbox/template-renderer.js"
+            ],
+            "env": {
+                "webextensions": false
+            }
+        },
+        {
+            "files": [
+                "ext/js/core/event-dispatcher.js",
+                "ext/js/core/extension-error.js",
+                "ext/js/core/json.js",
+                "ext/js/core/logger.js",
+                "ext/js/core/to-error.js",
+                "ext/js/core/utilities.js",
+                "ext/js/data/database.js",
+                "ext/js/dictionary/dictionary-database.js",
+                "ext/js/dictionary/dictionary-importer.js",
+                "ext/js/dictionary/dictionary-worker-handler.js",
+                "ext/js/dictionary/dictionary-worker-main.js",
+                "ext/js/dictionary/dictionary-worker-media-loader.js",
+                "ext/js/media/media-util.js"
+            ],
+            "env": {
+                "browser": false,
+                "worker": true
+            }
+        },
+        {
+            "files": [
+                "ext/js/accessibility/accessibility-controller.js",
+                "ext/js/background/backend.js",
+                "ext/js/background/background-main.js",
+                "ext/js/background/offscreen-proxy.js",
+                "ext/js/background/profile-conditions-util.js",
+                "ext/js/background/request-builder.js",
+                "ext/js/background/script-manager.js",
+                "ext/js/comm/anki-connect.js",
+                "ext/js/comm/clipboard-monitor.js",
+                "ext/js/comm/clipboard-reader.js",
+                "ext/js/comm/mecab.js",
+                "ext/js/core/api-map.js",
+                "ext/js/core/event-dispatcher.js",
+                "ext/js/core/event-listener-collection.js",
+                "ext/js/core/extension-error.js",
+                "ext/js/core/fetch-utilities.js",
+                "ext/js/core/json.js",
+                "ext/js/core/logger.js",
+                "ext/js/core/to-error.js",
+                "ext/js/core/utilities.js",
+                "ext/js/data/anki-util.js",
+                "ext/js/data/database.js",
+                "ext/js/data/json-schema.js",
+                "ext/js/data/options-util.js",
+                "ext/js/data/permissions-util.js",
+                "ext/js/data/sandbox/array-buffer-util.js",
+                "ext/js/dictionary/dictionary-database.js",
+                "ext/js/dom/native-simple-dom-parser.js",
+                "ext/js/dom/simple-dom-parser.js",
+                "ext/js/extension/environment.js",
+                "ext/js/extension/web-extension.js",
+                "ext/js/general/cache-map.js",
+                "ext/js/general/object-property-accessor.js",
+                "ext/js/general/regex-util.js",
+                "ext/js/general/text-source-map.js",
+                "ext/js/language/ja/japanese-wanakana.js",
+                "ext/js/language/ja/japanese.js",
+                "ext/js/language/language-transformer.js",
+                "ext/js/language/translator.js",
+                "ext/js/media/audio-downloader.js",
+                "ext/js/media/media-util.js",
+                "ext/js/templates/template-patcher.js"
+            ],
+            "env": {
+                "browser": false,
+                "serviceworker": true
+            },
+            "globals": {
+                "FileReader": "readonly",
+                "Intl": "readonly",
+                "crypto": "readonly",
+                "AbortController": "readonly"
+            }
         }
     ]
 }

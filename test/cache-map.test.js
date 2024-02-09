@@ -37,7 +37,7 @@ function testConstructor() {
 /** */
 function testApi() {
     describe('api', () => {
-        /* eslint-disable no-multi-spaces */
+        /* eslint-disable @stylistic/no-multi-spaces */
         const data = [
             {
                 maxSize: 1,
@@ -89,7 +89,7 @@ function testApi() {
                 ]
             }
         ];
-        /* eslint-enable no-multi-spaces */
+        /* eslint-enable @stylistic/no-multi-spaces */
 
         test.each(data)('api-test-%#', ({maxSize, expectedSize, calls}) => {
             const cache = new CacheMap(maxSize);
