@@ -18,21 +18,16 @@
 import {readFileSync} from 'fs';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
-import {afterAll, bench, describe} from 'vitest';
+import {bench, describe} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {createFindKanjiOptions, createFindTermsOptions} from '../test/utilities/translator.js';
-import {setupDomTest} from '../test/fixtures/dom-test.js';
 import {createTranslatorContext} from '../test/fixtures/translator-test.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';
-const domTestEnv = await setupDomTest();
 const translator = await createTranslatorContext(path.join(dirname, '..', 'test', 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
-describe('Dictionary data', () => {
-    const {window, teardown} = domTestEnv;
-    afterAll(() => teardown(globalThis));
-
+describe('Translator', () => {
     const testInputsFilePath = path.join(dirname, '..', 'test', 'data/translator-test-inputs.json');
     /** @type {import('test/translator').TranslatorTestInputs} */
     const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
@@ -42,9 +37,6 @@ describe('Dictionary data', () => {
     const findTermWithTextTransformationsTests = tests.filter((data) => data.options !== 'kanji' && data.options !== 'default');
 
     bench(`Translator.prototype.findTerms - no text transformations  (n=${findTermTests.length})`, async () => {
-        // The window property needs to be referenced for it to be initialized.
-        // It is needed for DOM access for structured content.
-        void window;
         for (const data of /** @type {import('test/translator').TestInputFindTerm[]} */ (findTermTests)) {
             const {mode, text} = data;
             const options = createFindTermsOptions(dictionaryName, optionsPresets, data.options);
@@ -53,9 +45,6 @@ describe('Dictionary data', () => {
     });
 
     bench(`Translator.prototype.findTerms - text transformations  (n=${findTermWithTextTransformationsTests.length})`, async () => {
-        // The window property needs to be referenced for it to be initialized.
-        // It is needed for DOM access for structured content.
-        void window;
         for (const data of /** @type {import('test/translator').TestInputFindTerm[]} */ (findTermWithTextTransformationsTests)) {
             const {mode, text} = data;
             const options = createFindTermsOptions(dictionaryName, optionsPresets, data.options);
@@ -64,9 +53,6 @@ describe('Dictionary data', () => {
     });
 
     bench(`Translator.prototype.findKanji - (n=${findKanjiTests.length})`, async () => {
-        // The window property needs to be referenced for it to be initialized.
-        // It is needed for DOM access for structured content.
-        void window;
         for (const data of /** @type {import('test/translator').TestInputFindKanji[]} */ (findKanjiTests)) {
             const {text} = data;
             const options = createFindKanjiOptions(dictionaryName, optionsPresets, data.options);
