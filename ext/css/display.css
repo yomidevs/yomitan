@@ -146,6 +146,7 @@
     --tag-part-of-speech-background-color: #565656;
     --tag-search-background-color: #8a8a91;
     --tag-pronunciation-dictionary-background-color: #6640be;
+    --tag-inflection-color: rgba(0, 0, 0, 0.05);
 
     --sidebar-background-color: #f8f9fa;
 
@@ -214,6 +215,7 @@
     --tag-part-of-speech-background-color: #565656;
     --tag-search-background-color: #69696e;
     --tag-pronunciation-dictionary-background-color: #6640be;
+    --tag-inflection-color: rgba(255, 255, 255, 0.05);
 
     --sidebar-background-color: #282828;
 
@@ -260,14 +262,6 @@
     background-color: transparent;
 }
 body {
-    overflow: hidden;
-    overflow-y: scroll;
-    padding: 1em 1em 200px 1em;
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
-}
-body::-webkit-scrollbar {
-    display: none;  /* Safari and Chrome */
 }
 ol, ul {
     margin-top: 0;
@@ -378,6 +372,11 @@ a:has(rt) {
 .content {
     flex: 1 1 auto;
     position: relative;
+    background-color: color-mix(in oklab, var(--background-color), transparent 2%);
+    border-radius: 8px;
+    border: 1px solid color-mix(in oklab, var(--background-color), transparent 40%);
+    box-shadow: 0 0 3px color-mix(in oklab, var(--text-color), transparent 60%);
+    margin: 3px;
 }
 .content-scroll {
     position: absolute;
@@ -389,6 +388,8 @@ a:has(rt) {
     flex-flow: column nowrap;
     align-items: stretch;
     justify-content: flex-start;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .content-body {
     flex: 1 1 auto;
@@ -605,10 +606,10 @@ button.sidebar-button.sidebar-button-highlight {
 .actions {
     display: flex;
     flex-flow: row nowrap;
-    float: right;
-    margin: -0.25em;
     position: relative;
     z-index: 1;
+    margin-left: auto;
+    float: right;
 }
 .actions::after {
     clear: both;
@@ -715,9 +716,10 @@ button.action-button:active {
     border-right: none;
     font-size: 1em;
     min-height: var(--tag-height);
-    margin: calc(1em / var(--font-size-no-units)) 0.375em calc(1em / var(--font-size-no-units)) 0;
 }
 .tag-label {
+    flex-grow: 1;
+
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
@@ -726,7 +728,6 @@ button.action-button:active {
     padding: calc(2.5em / var(--font-size-no-units)) 0.375em calc(2.5em / var(--font-size-no-units)) 0.375em;
     color: var(--tag-text-color);
     cursor: pointer;
-    width: 100%;
 }
 .tag-label-content {
     display: block;
@@ -787,6 +788,7 @@ button.action-button:active {
 .tag[data-category=dictionary] {
     --tag-color: var(--tag-dictionary-background-color);
     flex-grow: 1;
+    width: 100%;
 }
 .tag[data-category=frequency] {
     --tag-color: var(--tag-frequency-background-color);
@@ -806,14 +808,12 @@ button.action-button:active {
 .entry {
     padding: 0;
     position: relative;
-    background-color: color-mix(in oklab, var(--background-color), transparent 2%);
-    border-radius: 10px;
-    border: 1px solid color-mix(in oklab, var(--text-color), transparent 60%);
-    box-shadow: 0.1em 0.1em 1em color-mix(in oklab, var(--text-color), transparent 60%);
     overflow: hidden;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
 }
 .entry+.entry {
-    margin-top: 1em;
+    border-top: 4px solid var(--light-border-color);
 }
 .entry-body {
     clear: both;
@@ -821,22 +821,28 @@ button.action-button:active {
 .entry-body-section {
     padding: 0 10px;
 }
-.entry[data-definition-count='0'] .entry-body-section[data-section-type=definitions],
-.entry[data-frequency-count='0'] .entry-body-section[data-section-type=frequencies],
-.entry[data-pronunciation-count='0'] .entry-body-section[data-section-type=pronunciations] {
+.entry[data-definition-count='0'] .entry-body-section[data-section-type=definitions] {
     display: none;
 }
 .entry-header {
-    padding: 0.75em 1em 0.25em 10px;
 }
 
 /* Inflections */
 .inflection-rule-chains {
+    display: contents;
     padding-inline-start: 0;
     list-style-type: none;
 }
 .inflection-rule-chain {
-    color: var(--reason-text-color);
+    display: inline-block;
+    color: var(--text-color-light1);
+    text-decoration: underline dotted;
+    border: 1px solid var(--dark-border-color);
+    padding: 0 calc(3em / var(--font-size-no-units));
+    margin: calc(1em / var(--font-size-no-units));
+    background: var(--tag-inflection-color);
+    border-radius: 3px;
+    vertical-align: -2px;
 }
 .inflection-rule-chain:empty {
     display: none;
@@ -845,31 +851,18 @@ button.action-button:active {
     content: var(--inflection-separator);
     padding: 0 0.25em;
 }
-.inflection-source-icon {
-    display: inline-block;
-    white-space: nowrap;
-    text-align: center;
-    width: 1.4em;
-    margin-right: 0.2em;
-}
-.inflection-source-icon[data-inflection-source='dictionary']::after {
-    content: '📖';
-}
-.inflection-source-icon[data-inflection-source='algorithm']::after {
-    content: '🧩';
-}
-.inflection-source-icon[data-inflection-source='both'] {
-    width: 2.8em;
-}
-.inflection-source-icon[data-inflection-source='both']::after {
-    content: '🧩📖';
-}
+
+
 
 
 /* Headwords */
 .headword-list {
-    display: inline;
+    display: block;
+    float: left;
     margin-right: var(--headword-list-end-space);
+}
+.headword-list-tag-list {
+    display: inline-block;
 }
 .headword {
     --headword-current-text-color: var(--headword-text-color);
@@ -897,12 +890,6 @@ button.action-button:active {
 .headword-details {
     display: inline;
 }
-.headword-list-details {
-    display: inline;
-}
-.headword-list-tag-list {
-    display: inline;
-}
 .headword-text-container {
     display: inline-block;
     margin-left: calc(-1 * var(--headword-reading-space));
@@ -920,6 +907,7 @@ button.action-button:active {
 .headword-term {
     color: var(--headword-current-text-color);
     font-size: var(--headword-font-size);
+    line-height: 1.15;
 }
 .headword-reading {
     color: var(--headword-current-reading-text-color);
@@ -941,9 +929,6 @@ button.action-button:active {
     color: var(--headword-current-kanji-text-color);
     text-decoration: none;
     cursor: pointer;
-}
-:root[data-result-output-mode=merge] .headword-list-details {
-    display: block;
 }
 :root[data-term-display-mode=ruby-and-reading] .headword-term-outer::after,
 :root[data-term-display-mode=term-and-reading] .headword-term-outer::after {
@@ -1120,8 +1105,9 @@ button.action-button:active {
 .definition-list {
     margin: 0 -10px;
     padding: 0;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 2px;
 }
 .definition-list[data-count='0'],
 .definition-list[data-count='1'] {
@@ -1181,8 +1167,6 @@ button.action-button:active {
 .definition-item {
     display: block;
     position: relative;
-    flex-basis: calc(100% / 4 - 2px);
-    margin: 1px;
 }
 .definition-list[data-count='1'] .definition-item, .definition-list[data-count='2'] .definition-item{
     flex-grow: 1;
@@ -1198,7 +1182,7 @@ button.action-button:active {
 .definition-item-inner {
     display: flex;
     flex-flow: row nowrap;
-    padding: 0 10px;
+    padding: 5px 10px;
 }
 .definition-item-content {
     width: 100%;
@@ -1255,14 +1239,26 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 }
 .definition-tag-list {
     display: flex;
+    margin-bottom: 2px;
+}
+
+.headword-extras {
+    display: contents;
+}
+.frequency-group-item, .pronunciation-group-tag-list, .inflection-rule-chain {
+    margin-right: calc(1em / var(--font-size-no-units));
 }
 
 /* Frequencies */
+.frequency-group-list {
+    display: contents;
+}
 .frequency-group-item {
-    display: inline;
+    display: inline-block;
 }
 .frequency-item {
-    display: inline;
+    display: inline-block;
+    padding: calc(1em / var(--font-size-no-units)) 0;
 }
 .frequency-disambiguation {
     color: var(--text-color-light3);
@@ -1285,6 +1281,9 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     white-space: pre-wrap;
     display: inline;
     color: var(--text-color-light3);
+}
+.frequency-value {
+    white-space: nowrap;
 }
 .entry[data-unique-term-count='1'] .frequency-item[data-has-reading=false] .frequency-disambiguation,
 .entry[data-unique-reading-count='1'][data-unique-term-count='1'] .frequency-disambiguation,
@@ -1405,120 +1404,31 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     font-weight: normal;
     opacity: 0.75;
 }
-:root[data-frequency-display-mode=list] .frequency-group-list {
-    list-style-type: decimal;
-    padding: 0 0 0 var(--list-padding1);
-}
-:root[data-frequency-display-mode=list] .frequency-group-item {
-    display: list-item;
-}
-:root[data-frequency-display-mode=list] .frequency-group-item::marker {
-    color: var(--text-color-light3);
-}
-:root[data-frequency-display-mode=list] .frequency-group-tag {
-    display: block;
-    min-height: auto;
-}
-:root[data-frequency-display-mode=list] .frequency-group-tag>.tag-label {
-    display: inline-flex;
-}
-:root[data-frequency-display-mode=list] .frequency-list {
-    list-style-type: circle;
-    padding: 0 0 0 var(--list-padding2);
-}
-:root[data-frequency-display-mode=list] .frequency-item {
-    display: list-item;
-}
-:root[data-frequency-display-mode=list] .frequency-item::marker {
-    color: var(--text-color-light3);
-}
-:root[data-frequency-display-mode=list] .frequency-group-list[data-count='1'] {
-    list-style-type: none;
-    padding-left: 0;
-}
-:root[data-frequency-display-mode=list] .frequency-group-list[data-count='1']>.frequency-group-item {
-    display: inline;
-}
-:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1']>.frequency-group-tag>.tag-body {
-    display: inline-flex;
-}
-:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1']>.frequency-group-tag>.tag-body>.frequency-body {
-    display: inline;
-}
-:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1'] .frequency-list {
-    list-style-type: none;
-    padding-left: 0;
-}
-:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1'] .frequency-item {
-    display: inline;
-}
 
 
 /* Pitch accent styles */
 .pronunciation-group-list {
+    display: contents;
     margin: 0;
-    padding: 0 0 0 var(--list-padding1);
-    list-style-type: decimal;
+    padding: 0;
+    list-style: none;
 }
-.pronunciation-group-list[data-count='0'],
-.pronunciation-group-list[data-count='1'] {
-    padding-left: 0;
-    list-style-type: none;
+.pronunciation-group {
+    display: inline-flex;
 }
 .pronunciation-list {
-    margin: 0;
-    padding: 0 0 0 var(--list-padding2);
-    list-style-type: circle;
+    padding: 0;
     display: block;
-}
-.pronunciation-list[data-count='0'],
-.pronunciation-list[data-count='1'] {
-    padding-left: 0;
-    list-style-type: none;
-    display: inline;
-}
-.pronunciation-group::marker,
-.pronunciation::marker {
-    color: var(--text-color-light3);
+    list-style: none;
+    display: flex;
 }
 .pronunciation {
-    display: list-item;
-    line-height: 1.5;
+    margin: calc(1em / var(--font-size-no-units)) calc(3em / var(--font-size-no-units)) calc(1em / var(--font-size-no-units)) 0;
 }
-.pronunciation-list[data-count='0'] .pronunciation,
-.pronunciation-list[data-count='1'] .pronunciation {
-    display: inline;
+.pronunciation + .pronunciation {
+    border-left: calc(1em / var(--font-size-no-units)) solid var(--tag-color);
+    padding-left: calc(3em / var(--font-size-no-units));
 }
-.pronunciation-group-tag-list {
-    margin-right: 0.375em;
-}
-.pronunciation-disambiguation-list {
-    color: var(--text-color-light3);
-    padding-right: var(--disambiguation-space);
-}
-.pronunciation-disambiguation-list::before {
-    content: var(--disambiguation-prefix);
-}
-.pronunciation-disambiguation-list::after {
-    content: var(--disambiguation-suffix);
-}
-.pronunciation-disambiguation+.pronunciation-disambiguation::before {
-    content: var(--disambiguation-separator);
-}
-.pronunciation-disambiguation-list[data-count='0'] {
-    display: none;
-}
-.pronunciation-tag-list:not([data-count='0']) {
-    margin-right: 0.375em;
-}
-.pronunciation-downstep-notation-container {
-    margin-left: 0.25em;
-}
-.pronunciation-graph-container {
-    margin-left: 0.25em;
-}
-
-
 /* Kanji */
 .kanji-glyph-container {
     display: block;
@@ -1580,9 +1490,6 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     white-space: pre-line;
 }
 .kanji-tag-list {
-    position: relative;
-}
-.entry[data-type=kanji] .entry-body-section[data-section-type=frequencies] {
     position: relative;
 }
 

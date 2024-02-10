@@ -363,42 +363,30 @@ export class DisplayGenerator {
         if (!Array.isArray(inflectionRules) || inflectionRules.length === 0) { return null; }
         const fragment = this._instantiate('inflection-rule-chain');
 
-        const sourceIcon = this._getInflectionSourceIcon(source);
-
-        fragment.appendChild(sourceIcon);
-
-        this._appendMultiple(fragment, this._createTermInflection.bind(this), inflectionRules);
+        this._appendMultiple(fragment, this._createTermInflection.bind(this), inflectionRules, source);
         return fragment;
     }
 
-    /**
-     * @param {import('dictionary').InflectionSource} source
-     * @returns {HTMLElement}
-     */
-    _getInflectionSourceIcon(source) {
-        const icon = document.createElement('span');
-        icon.classList.add('inflection-source-icon');
-        icon.dataset.inflectionSource = source;
-        switch (source) {
-            case 'dictionary':
-                icon.title = 'Dictionary Deinflection';
-                return icon;
-            case 'algorithm':
-                icon.title = 'Algorithm Deinflection';
-                return icon;
-            case 'both':
-                icon.title = 'Dictionary and Algorithm Deinflection';
-                return icon;
-        }
-    }
 
     /**
      * @param {string} inflection
+     * @param {import('dictionary').InflectionSource} source
      * @returns {DocumentFragment}
      */
-    _createTermInflection(inflection) {
+    _createTermInflection(inflection, source) {
         const fragment = this._templates.instantiateFragment('inflection');
         const node = this._querySelector(fragment, '.inflection');
+        switch (source) {
+            case 'dictionary':
+                node.title = 'Dictionary Deinflection';
+                break;
+            case 'algorithm':
+                node.title = 'Algorithm Deinflection';
+                break;
+            case 'both':
+                node.title = 'Dictionary and Algorithm Deinflection';
+                break;
+        }
         this._setTextContent(node, inflection);
         node.dataset.reason = inflection;
         return fragment;
@@ -657,9 +645,11 @@ export class DisplayGenerator {
         node.dataset.pronunciationsMulti = 'true';
         node.dataset.pronunciationsCount = `${pronunciations.length}`;
 
-        const n1 = this._querySelector(node, '.pronunciation-group-tag-list');
-        const tag = this._createTag(this._createTagData(dictionary, 'pronunciation-dictionary'));
-        n1.appendChild(tag);
+        const tag = this._querySelector(node, '.tag');
+        tag.dataset.details = dictionary;
+
+        const tagLabel = this._querySelector(node, '.tag-label-content');
+        this._setTextContent(tagLabel, dictionary);
 
         let hasTags = false;
         for (const {pronunciation: {tags}} of pronunciations) {

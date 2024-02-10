@@ -24,8 +24,6 @@ iframe.yomitan-popup {
     visibility: hidden;
     z-index: 2147483647;
     box-sizing: border-box;
-    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 50px), transparent 100%);
-    mask-image: linear-gradient(to bottom, black calc(100% - 50px), transparent 100%);
 }
 iframe.yomitan-popup[data-popup-display-mode=full-width] {
     border-left: none;

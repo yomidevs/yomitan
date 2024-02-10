@@ -30,18 +30,14 @@
             </button>
         </div>
         <div class="headword-list"></div>
-        <div class="headword-list-details">
-            <div class="headword-list-tag-list tag-list"></div>
+        <div class="headword-list-tag-list tag-list"></div>
+        <div class="headword-extras">
+            <div class="frequency-group-list"></div>
+            <ol class="pronunciation-group-list"></ol>
             <ul class="inflection-rule-chains"></ul>
         </div>
     </div>
     <div class="entry-body">
-        <div class="entry-body-section" data-section-type="frequencies">
-            <div class="entry-body-section-content frequency-group-list"></div>
-        </div>
-        <div class="entry-body-section" data-section-type="pronunciations">
-            <ol class="entry-body-section-content pronunciation-group-list"></ol>
-        </div>
         <div class="entry-body-section" data-section-type="definitions">
             <ol class="entry-body-section-content definition-list"></ol>
         </div>
@@ -102,9 +98,36 @@
 </span></span></template>
 
 <!-- Pitch accent templates -->
-<template id="pronunciation-group-template"><li class="pronunciation-group"><span class="pronunciation-group-tag-list tag-list"></span><ul class="pronunciation-list"></ul></li></template>
-<template id="pronunciation-disambiguation-template"><span class="pronunciation-disambiguation"></span></template>
-<template id="pronunciation-template"><li class="pronunciation"><span class="pronunciation-tag-list tag-list"></span><span class="pronunciation-disambiguation-list"></span><span class="pronunciation-representation-list"><span class="pronunciation-text-container"></span><span class="pronunciation-downstep-notation-container"></span><span class="pronunciation-graph-container"></span></span></li></template>
+<template id="pronunciation-group-template">
+    <li class="pronunciation-group">
+        <span class="pronunciation-group-tag-list tag-list">
+            <span class="tag tag-has-body" data-category="pronunciation-dictionary">
+                <span class="tag-label">
+                    <span class="tag-label-content"></span>
+                </span>
+                <span class="tag-body">
+                    <span class="tag-body-content">
+                        <ul class="pronunciation-list"></ul>
+                    </span>
+                </span>
+            </span>
+        </span>
+    </li>
+</template>
+<template id="pronunciation-disambiguation-template">
+    <span class="pronunciation-disambiguation"></span>
+</template>
+<template id="pronunciation-template">
+    <li class="pronunciation">
+        <span class="pronunciation-tag-list tag-list"></span>
+        <span class="pronunciation-disambiguation-list"></span>
+        <span class="pronunciation-representation-list">
+            <span class="pronunciation-text-container"></span>
+            <span class="pronunciation-downstep-notation-container"></span>
+            <span class="pronunciation-graph-container"></span>
+        </span>
+    </li>
+</template>
 
 <!-- Kanji entry templates -->
 <template id="kanji-entry-template" data-remove-whitespace-text="true"><div class="entry" data-type="kanji">
