@@ -14,7 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import ucs2length from 'ajv/dist/runtime/ucs2length.js';
-const ucs2length2 = ucs2length.default;
-export {ucs2length2 as ucs2length};
 
+import ucs2length from 'ajv/dist/runtime/ucs2length.js';
+
+const ucs2length2 = ucs2length.default;
+
+export {ucs2length2 as ucs2length};

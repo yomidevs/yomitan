@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 // @ts-check
 import {defineConfig, devices} from '@playwright/test';
-
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -116,4 +116,3 @@ export default defineConfig({
     //   port: 3000,
     // },
 });
-

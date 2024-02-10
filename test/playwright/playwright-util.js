@@ -20,6 +20,7 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export const root = path.join(dirname, '..', '..');
 
 export const test = base.extend({
@@ -47,6 +48,7 @@ export const test = base.extend({
         await use(extensionId);
     }
 });
+
 export const expect = test.expect;
 
 export const mockModelFieldNames = [
