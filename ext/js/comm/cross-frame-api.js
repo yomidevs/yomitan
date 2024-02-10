@@ -410,6 +410,7 @@ export class CrossFrameAPI {
         }
         return await this._createCommPort(otherTabId, otherFrameId);
     }
+
     /**
      * @param {number} otherTabId
      * @param {number} otherFrameId

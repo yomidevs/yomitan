@@ -279,7 +279,10 @@ export class AnkiTemplateRenderer {
                 const regex = new RegExp(pattern, typeof flags === 'string' ? flags : '');
                 /** @type {string[]} */
                 const parts = [];
-                value.replace(regex, (g0) => { parts.push(g0); return g0; });
+                value.replace(regex, (g0) => {
+                    parts.push(g0);
+                    return g0;
+                });
                 value = parts.join('');
             } catch (e) {
                 return `${e}`;

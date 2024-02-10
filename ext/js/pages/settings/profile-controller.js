@@ -549,7 +549,8 @@ export class ProfileController {
             Number.isFinite(intValue) &&
             intValue >= 0 &&
             intValue < this.profileCount ?
-            intValue : null
+            intValue :
+            null
         );
     }
 

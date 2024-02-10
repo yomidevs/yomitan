@@ -806,8 +806,10 @@ export class Display extends EventDispatcher {
         const historyMode = (
             eventType === 'click' ||
             !(typeof historyState === 'object' && historyState !== null) ||
-            historyState.cause !== 'queryParser'
-        ) ? 'new' : 'overwrite';
+            historyState.cause !== 'queryParser' ?
+            'new' :
+            'overwrite'
+        );
         /** @type {import('display').ContentDetails} */
         const details = {
             focus: false,

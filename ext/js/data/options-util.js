@@ -46,7 +46,8 @@ export class OptionsUtil {
         // Invalid options
         let options = /** @type {{[key: string]: unknown}} */ (
             typeof optionsInput === 'object' && optionsInput !== null && !Array.isArray(optionsInput) ?
-            optionsInput : {}
+            optionsInput :
+            {}
         );
 
         // Check for legacy options
