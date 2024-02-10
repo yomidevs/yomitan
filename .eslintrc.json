@@ -159,7 +159,21 @@
         "@stylistic/switch-colon-spacing": ["error", {"after": true, "before": false}],
         "@stylistic/template-curly-spacing": ["error", "never"],
         "@stylistic/template-tag-spacing": ["error", "never"],
+        "@stylistic/type-annotation-spacing": [
+            "error",
+            {
+                "before": false,
+                "after": true,
+                "overrides": {
+                    "arrow": {"before": true, "after": true}
+                }
+            }
+        ],
+        "@stylistic/type-generic-spacing": "error",
+        "@stylistic/type-named-tuple-spacing": "error",
         "@stylistic/wrap-iife": ["error", "inside"],
+        "@stylistic/wrap-regex": "off",
+        "@stylistic/yield-star-spacing": ["error", {"before": true, "after": false}],
 
         "no-unsanitized/method": "error",
         "no-unsanitized/property": "error",
