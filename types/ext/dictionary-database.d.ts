@@ -200,7 +200,6 @@ export type ObjectStoreName = (
     'media'
 );
 
-/* eslint-disable @stylistic/indent */
 export type ObjectStoreData<T extends ObjectStoreName> = (
     T extends 'dictionaries' ? DictionaryImporter.Summary :
     T extends 'terms' ? DatabaseTermEntry :
@@ -211,7 +210,6 @@ export type ObjectStoreData<T extends ObjectStoreName> = (
     T extends 'media' ? MediaDataArrayBufferContent :
     never
 );
-/* eslint-enable @stylistic/indent */
 
 export type DeleteDictionaryProgressData = {
     count: number;

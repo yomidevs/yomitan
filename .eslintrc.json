@@ -140,9 +140,11 @@
             {"blankLine": "always", "prev": "*", "next": "export"},
             {"blankLine": "always", "prev": "import", "next": "let"},
             {"blankLine": "always", "prev": "import", "next": "const"},
-            {"blankLine": "never", "prev": "import", "next": "import"},
             {"blankLine": "always", "prev": "export", "next": "let"},
-            {"blankLine": "always", "prev": "export", "next": "const"}
+            {"blankLine": "always", "prev": "export", "next": "const"},
+            {"blankLine": "never", "prev": "import", "next": "import"},
+            {"blankLine": "any", "prev": "export", "next": "export"},
+            {"blankLine": "any", "prev": "type", "next": "type"}
         ],
         "@stylistic/quote-props": ["error", "consistent-as-needed", {"numbers": true}],
         "@stylistic/quotes": ["error", "single", "avoid-escape"],
@@ -266,7 +268,6 @@
                 "@typescript-eslint/no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
 
                 "@stylistic/block-spacing": "off",
-                "@stylistic/brace-style": ["error", "1tbs", {"allowSingleLine": true}],
                 "@stylistic/comma-dangle": [
                     "error",
                     {
@@ -280,33 +281,9 @@
                         "tuples": "always-multiline"
                     }
                 ],
-                "@stylistic/comma-spacing": ["error", {"before": false, "after": true}],
-                "@stylistic/function-call-spacing": ["error", "never"],
-                "@stylistic/indent": ["error", 4],
                 "@stylistic/indent-binary-ops": "off",
-                "@stylistic/key-spacing": ["error", {"beforeColon": false, "afterColon": true, "mode": "strict"}],
-                "@stylistic/keyword-spacing": ["error", {"before": true, "after": true}],
-                "@stylistic/lines-around-comment": "off",
-                "@stylistic/lines-between-class-members": ["error", "always"],
-                "@stylistic/member-delimiter-style": [
-                    "error",
-                    {
-                        "multiline": {"delimiter": "semi", "requireLast": true},
-                        "singleline": {"delimiter": "comma", "requireLast": false},
-                        "multilineDetection": "brackets"
-                    }
-                ],
-                "@stylistic/no-multiple-empty-lines": ["error", {"max": 1, "maxEOF": 0}],
-                "@stylistic/no-extra-parens": ["error", "all"],
-                "@stylistic/no-extra-semi": "error",
-                "@stylistic/object-curly-spacing": ["error", "never"],
-                "@stylistic/padding-line-between-statements": "off",
-                "@stylistic/quotes": ["error", "single", "avoid-escape"],
-                "@stylistic/semi": "error",
-                "@stylistic/space-before-blocks": ["error", "always"],
-                "@stylistic/space-before-function-paren": ["error", {"anonymous": "never", "named": "never", "asyncArrow": "always"}],
-                "@stylistic/space-infix-ops": "error",
-                "@stylistic/type-annotation-spacing": "error"
+                "@stylistic/no-multiple-empty-lines": ["error", {"max": 1, "maxEOF": 0, "maxBOF": 0}],
+                "@stylistic/no-extra-parens": ["error", "all"]
             }
         },
         {
