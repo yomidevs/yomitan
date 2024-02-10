@@ -1091,9 +1091,9 @@ export class OptionsUtil {
         }
 
         if (customTemplates && isObject(chrome.storage)) {
-            chrome.storage.session.set({'needsCustomTemplatesWarning': true});
+            chrome.storage.session.set({needsCustomTemplatesWarning: true});
             await this._createTab(chrome.runtime.getURL('/welcome.html'));
-            chrome.storage.session.set({'openedWelcomePage': true});
+            chrome.storage.session.set({openedWelcomePage: true});
         }
     }
 

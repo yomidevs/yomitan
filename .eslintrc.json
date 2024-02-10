@@ -144,7 +144,7 @@
             {"blankLine": "always", "prev": "export", "next": "let"},
             {"blankLine": "always", "prev": "export", "next": "const"}
         ],
-        "@stylistic/quote-props": ["error", "consistent"],
+        "@stylistic/quote-props": ["error", "consistent-as-needed", {"numbers": true}],
         "@stylistic/quotes": ["error", "single", "avoid-escape"],
         "@stylistic/rest-spread-spacing": ["error", "never"],
         "@stylistic/semi": "error",
