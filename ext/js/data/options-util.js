@@ -521,7 +521,8 @@ export class OptionsUtil {
             this._updateVersion21,
             this._updateVersion22,
             this._updateVersion23,
-            this._updateVersion24
+            this._updateVersion24,
+            this._updateVersion25
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1134,6 +1135,20 @@ export class OptionsUtil {
             if (Array.isArray(profileOptions.dictionaries)) {
                 for (const dictionary of profileOptions.dictionaries) {
                     dictionary.useDeinflections = true;
+                }
+            }
+        }
+    }
+
+    /**
+     * - Change 'viewNote' action to 'viewNotes'.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion25(options) {
+        for (const profile of options.profiles) {
+            for (const hotkey of profile.options.inputs.hotkeys) {
+                if (hotkey.action === 'viewNote') {
+                    hotkey.action = 'viewNotes';
                 }
             }
         }
