@@ -142,9 +142,11 @@
             {"blankLine": "always", "prev": "import", "next": "const"},
             {"blankLine": "always", "prev": "export", "next": "let"},
             {"blankLine": "always", "prev": "export", "next": "const"},
-            {"blankLine": "never", "prev": "import", "next": "import"},
-            {"blankLine": "any", "prev": "export", "next": "export"},
-            {"blankLine": "any", "prev": "type", "next": "type"}
+            {"blankLine": "always", "prev": "export", "next": "export"},
+            {"blankLine": "always", "prev": "export", "next": "type"},
+            {"blankLine": "always", "prev": "type", "next": "export"},
+            {"blankLine": "always", "prev": "type", "next": "type"},
+            {"blankLine": "never", "prev": "import", "next": "import"}
         ],
         "@stylistic/quote-props": ["error", "consistent-as-needed", {"numbers": true}],
         "@stylistic/quotes": ["error", "single", "avoid-escape"],
