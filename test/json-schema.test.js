@@ -985,11 +985,15 @@ function testProxy1() {
                     {error: true,  value: ['default'], action: (value) => { value[0] = null; }},
                     {error: false, value: ['default'], action: (value) => { delete value[0]; }},
                     {error: false, value: ['default'], action: (value) => { value[1] = 'string'; }},
-                    {error: false, value: ['default'], action: (value) => {
-                        value[1] = 'string';
-                        if (value.length !== 2) { throw new Error(`Invalid length; expected=2; actual=${value.length}`); }
-                        if (typeof value.push !== 'function') { throw new Error(`Invalid push; expected=function; actual=${typeof value.push}`); }
-                    }}
+                    {
+                        error: false,
+                        value: ['default'],
+                        action: (value) => {
+                            value[1] = 'string';
+                            if (value.length !== 2) { throw new Error(`Invalid length; expected=2; actual=${value.length}`); }
+                            if (typeof value.push !== 'function') { throw new Error(`Invalid push; expected=function; actual=${typeof value.push}`); }
+                        }
+                    }
                 ]
             },
 

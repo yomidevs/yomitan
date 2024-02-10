@@ -100,12 +100,17 @@ export const expectedAddNoteBody = {
             'deckName': 'Mock Deck',
             'modelName': 'Mock Model',
             'options': {
-                'allowDuplicate': false, 'duplicateScope': 'collection', 'duplicateScopeOptions': {
-                    'deckName': null, 'checkChildren': false, 'checkAllModels': false
+                'allowDuplicate': false,
+                'duplicateScope': 'collection',
+                'duplicateScopeOptions': {
+                    'deckName': null,
+                    'checkChildren': false,
+                    'checkAllModels': false
                 }
             }
         }
-    }, 'version': 2
+    },
+    'version': 2
 };
 
 const baseAnkiResp = {

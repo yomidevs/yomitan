@@ -129,6 +129,9 @@
         "@stylistic/nonblock-statement-body-position": ["error", "beside"],
         "@stylistic/object-curly-newline": "error",
         "@stylistic/object-curly-spacing": ["error", "never"],
+        "@stylistic/object-property-newline": ["error", {"allowAllPropertiesOnSameLine": true}],
+        "@stylistic/one-var-declaration-per-line": ["error", "initializations"],
+        "@stylistic/operator-linebreak": ["error", "after"],
         "@stylistic/padded-blocks": ["error", "never"],
         "@stylistic/padding-line-between-statements": [
             "error",
@@ -146,6 +149,7 @@
         "@stylistic/rest-spread-spacing": ["error", "never"],
         "@stylistic/semi": "error",
         "@stylistic/semi-spacing": ["error", {"before": false, "after": true}],
+        "@stylistic/semi-style": ["error", "last"],
         "@stylistic/space-before-blocks": ["error", "always"],
         "@stylistic/space-before-function-paren": ["error", {"anonymous": "never", "named": "never", "asyncArrow": "always"}],
         "@stylistic/space-in-parens": ["error", "never"],
