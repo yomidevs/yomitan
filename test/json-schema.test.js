@@ -520,7 +520,7 @@ function testValidate2() {
         /* eslint-enable @stylistic/no-multi-spaces */
 
         describe.each(data)('Schema %#', ({schema, inputs}) => {
-            test.each(inputs)(`schemaValidate(${schema}, $value) -> $expected`, ({expected, value}) => {
+            test.each(inputs)(`schemaValidate(${JSON.stringify(schema)}, $value) -> $expected`, ({expected, value}) => {
                 const actual = schemaValidate(schema, value);
                 expect(actual).toStrictEqual(expected);
             });
@@ -878,7 +878,7 @@ function testGetValidValueOrDefault1() {
         ];
 
         describe.each(data)('Schema %#', ({schema, inputs}) => {
-            test.each(inputs)(`getValidValueOrDefault(${schema}, %o) -> %o`, (value, expected) => {
+            test.each(inputs)(`getValidValueOrDefault(${JSON.stringify(schema)}, %o) -> %o`, (value, expected) => {
                 const actual = getValidValueOrDefault(schema, value);
                 expect(actual).toStrictEqual(expected);
             });

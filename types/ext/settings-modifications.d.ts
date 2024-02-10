@@ -100,6 +100,7 @@ export type ModificationPushResult = number;
 export type ModificationResult = (
     ModificationSetResult |
     ModificationDeleteResult |
+    // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
     ModificationSwapResult |
     ModificationSpliceResult |
     ModificationPushResult

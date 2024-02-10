@@ -3,8 +3,7 @@
     "extends": [
         "eslint:recommended",
         "plugin:jsonc/recommended-with-json",
-        "plugin:eslint-comments/recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:eslint-comments/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -248,27 +247,43 @@
 
         "eslint-comments/no-unused-disable": "error",
 
-        "unused-imports/no-unused-imports": "error",
-
-        "@typescript-eslint/ban-ts-comment": ["error", {"ts-expect-error": {"descriptionFormat": "^ - .+$"}}],
-        "@typescript-eslint/ban-types": ["error", {"types": {"object": true}, "extendDefaults": true}],
-        "@typescript-eslint/consistent-type-exports": "off",
-        "@typescript-eslint/no-explicit-any": "error",
-        "@typescript-eslint/no-shadow": ["error", {"builtinGlobals": false}],
-        "@typescript-eslint/no-this-alias": "error",
-        "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-var-requires": "off"
+        "unused-imports/no-unused-imports": "error"
     },
     "overrides": [
+        {
+            "files": [
+                "*.js",
+                "*.ts"
+            ],
+            "extends": [
+                "plugin:@typescript-eslint/recommended-type-checked"
+            ],
+            "rules": {
+                "@typescript-eslint/no-floating-promises": "off",
+                "@typescript-eslint/no-misused-promises": "off",
+                "@typescript-eslint/no-redundant-type-constituents": "off",
+                "@typescript-eslint/no-unsafe-argument": "off",
+                "@typescript-eslint/no-unsafe-assignment": "off",
+                "@typescript-eslint/no-unsafe-call": "off",
+                "@typescript-eslint/no-unsafe-enum-comparison": "off",
+                "@typescript-eslint/no-unsafe-member-access": "off",
+                "@typescript-eslint/no-unsafe-return": "off",
+                "@typescript-eslint/require-await": "off",
+                "@typescript-eslint/restrict-template-expressions": "off",
+
+                "@typescript-eslint/ban-ts-comment": ["error", {"ts-expect-error": {"descriptionFormat": "^ - .+$"}}],
+                "@typescript-eslint/ban-types": ["error", {"types": {"object": true}, "extendDefaults": true}],
+                "@typescript-eslint/no-explicit-any": "error",
+                "@typescript-eslint/no-shadow": ["error", {"builtinGlobals": false}],
+                "@typescript-eslint/no-this-alias": "error",
+                "@typescript-eslint/no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}]
+            }
+        },
         {
             "files": [
                 "*.ts"
             ],
             "rules": {
-                "no-undef": "off",
-
-                "@typescript-eslint/no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
-
                 "@stylistic/block-spacing": "off",
                 "@stylistic/comma-dangle": [
                     "error",

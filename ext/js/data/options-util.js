@@ -496,6 +496,7 @@ export class OptionsUtil {
      * @returns {import('options-util').UpdateFunction[]}
      */
     _getVersionUpdates(targetVersion) {
+        /* eslint-disable @typescript-eslint/unbound-method */
         const result = [
             this._updateVersion1,
             this._updateVersion2,
@@ -522,6 +523,7 @@ export class OptionsUtil {
             this._updateVersion23,
             this._updateVersion24
         ];
+        /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
         }
