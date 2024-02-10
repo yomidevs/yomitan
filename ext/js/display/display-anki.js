@@ -114,7 +114,7 @@ export class DisplayAnki {
             ['addNoteKanji',      () => { this._tryAddAnkiNoteForSelectedEntry('kanji'); }],
             ['addNoteTermKanji',  () => { this._tryAddAnkiNoteForSelectedEntry('term-kanji'); }],
             ['addNoteTermKana',   () => { this._tryAddAnkiNoteForSelectedEntry('term-kana'); }],
-            ['viewNote',          this._viewNoteForSelectedEntry.bind(this)]
+            ['viewNotes',         this._viewNoteForSelectedEntry.bind(this)]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
@@ -907,7 +907,7 @@ export class DisplayAnki {
             /** @type {Element} */
             const label = querySelectorNotNull(item, '.popup-menu-item-label');
             label.textContent = `Note ${i + 1}: ${noteId}`;
-            item.dataset.menuAction = 'viewNote';
+            item.dataset.menuAction = 'viewNotes';
             item.dataset.noteIds = `${noteId}`;
             menuBodyNode.appendChild(item);
         }
