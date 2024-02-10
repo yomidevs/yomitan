@@ -802,11 +802,6 @@ export class DisplayAnki {
     _onViewNoteButtonMenuClose(e) {
         const {detail: {action, item}} = e;
         switch (action) {
-            case 'viewNote':
-                if (item !== null) {
-                    this._viewNote(item);
-                }
-                break;
             case 'viewNotes':
                 if (item !== null) {
                     this._viewNotes(item);
@@ -847,25 +842,6 @@ export class DisplayAnki {
                 delete badgeData.icon;
                 badge.hidden = true;
             }
-        }
-    }
-
-    /**
-     * @param {HTMLElement} node
-     */
-    async _viewNote(node) {
-        const noteIds = this._getNodeNoteIds(node);
-        if (noteIds.length === 0) { return; }
-        try {
-            await this._display.application.api.viewNotes([noteIds[0]], this._noteGuiMode, false);
-        } catch (e) {
-            const displayErrors = (
-                toError(e).message === 'Mode not supported' ?
-                [this._display.displayGenerator.instantiateTemplateFragment('footer-notification-anki-view-note-error')] :
-                void 0
-            );
-            this._showErrorNotification([toError(e)], displayErrors);
-            return;
         }
     }
 
@@ -949,7 +925,7 @@ export class DisplayAnki {
         const index = this._display.selectedIndex;
         const button = this._getViewNoteButton(index);
         if (button !== null) {
-            this._viewNote(button);
+            this._viewNotes(button);
         }
     }
 
