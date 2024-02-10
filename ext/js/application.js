@@ -76,14 +76,6 @@ export class Application extends EventDispatcher {
             // NOP
         }
 
-        /** @type {?string} */
-        this._extensionUrlBase = null;
-        try {
-            this._extensionUrlBase = this._webExtension.getUrl('/');
-        } catch (e) {
-            // NOP
-        }
-
         /** @type {?boolean} */
         this._isBackground = null;
         /** @type {API} */
@@ -146,15 +138,6 @@ export class Application extends EventDispatcher {
         if (this._isReady) { return; }
         this._isReady = true;
         this._webExtension.sendMessagePromise({action: 'applicationReady'});
-    }
-
-    /**
-     * Checks whether or not a URL is an extension URL.
-     * @param {string} url The URL to check.
-     * @returns {boolean} `true` if the URL is an extension URL, `false` otherwise.
-     */
-    isExtensionUrl(url) {
-        return this._extensionUrlBase !== null && url.startsWith(this._extensionUrlBase);
     }
 
     /** */
