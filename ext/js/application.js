@@ -58,7 +58,7 @@ if (checkChromeNotAvailable()) {
 export class Application extends EventDispatcher {
     /**
      * Creates a new instance. The instance should not be used until it has been fully prepare()'d.
-     * @param {Logger} logger
+     * @param {import('./core/logger.js').Logger} logger
      * @param {API} api
      * @param {CrossFrameAPI} crossFrameApi
      */
@@ -93,7 +93,7 @@ export class Application extends EventDispatcher {
         this._crossFrame = crossFrameApi;
         /** @type {boolean} */
         this._isReady = false;
-        /** @type {Logger} */
+        /** @type {import('./core/logger.js').Logger} */
         this._logger = logger;
 
         /* eslint-disable @stylistic/no-multi-spaces */
@@ -131,7 +131,7 @@ export class Application extends EventDispatcher {
         return this._crossFrame;
     }
 
-    /** @type {Logger} */
+    /** @type {import('./core/logger.js').Logger} */
     get logger() {
         return this._logger;
     }
