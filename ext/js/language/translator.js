@@ -20,7 +20,7 @@ import {applyTextReplacement} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
-import {getLanguages, getTextPreprocessors} from './languages.js';
+import {getAllLanguageTextPreprocessors} from './languages.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
@@ -41,8 +41,8 @@ export class Translator {
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
         /** @type {RegExp} */
         this._numberRegex = /[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/;
-        /** @type {Map<string, import('translation-internal').PreprocessorOptionsSpace>} */
-        this._preprocessorOptionsSpaces = new Map();
+        /** @type {Map<string, {textPreprocessors: import('language').TextPreprocessorWithId<unknown>[], optionSpace: import('translation-internal').PreprocessorOptionsSpace}>} */
+        this._textPreprocessors = new Map();
     }
 
     /**
@@ -51,14 +51,13 @@ export class Translator {
      */
     prepare(descriptor) {
         this._languageTransformer.addDescriptor(descriptor);
-        const languages = getLanguages();
-        for (const {iso, textPreprocessors} of languages) {
-            /** @type {Map<string, import('language').TextPreprocessorOptions>} */
-            const preprocessorOptionsSpace = new Map();
-            for (const {id, options} of textPreprocessors) {
-                preprocessorOptionsSpace.set(id, options);
+        for (const {iso, textPreprocessors} of getAllLanguageTextPreprocessors()) {
+            /** @type {Map<string, import('language').TextPreprocessorOptions<unknown>>} */
+            const optionSpace = new Map();
+            for (const {id, textPreprocessor} of textPreprocessors) {
+                optionSpace.set(id, textPreprocessor.options);
             }
-            this._preprocessorOptionsSpaces.set(iso, preprocessorOptionsSpace);
+            this._textPreprocessors.set(iso, {textPreprocessors, optionSpace});
         }
     }
 
@@ -432,16 +431,20 @@ export class Translator {
      * @param {string} text
      * @param {import('translation').FindTermsOptions} options
      * @returns {import('translation-internal').DatabaseDeinflection[]}
+     * @throws {Error}
      */
     _getAlgorithmDeinflections(text, options) {
         const {language} = options;
-        const textPreprocessors = getTextPreprocessors(language);
-        const preprocessorOptionsSpace = /** @type {import('translation-internal').PreprocessorOptionsSpace} */ (this._preprocessorOptionsSpaces.get(language));
+        const info = this._textPreprocessors.get(language);
+        if (typeof info === 'undefined') { throw new Error(`Unsupported language: ${language}`); }
+        const {textPreprocessors, optionSpace: textPreprocessorOptionsSpace} = info;
 
-        const variantSpace = new Map([
-            ['textReplacements', this._getTextReplacementsVariants(options)],
-            ...preprocessorOptionsSpace
-        ]);
+        /** @type {Map<string, import('language').TextPreprocessorOptions<unknown>>} */
+        const variantSpace = new Map();
+        variantSpace.set('textReplacements', this._getTextReplacementsVariants(options));
+        for (const [key, value] of textPreprocessorOptionsSpace) {
+            variantSpace.set(key, value);
+        }
 
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const deinflections = [];
@@ -458,9 +461,9 @@ export class Translator {
             }
 
             for (const preprocessor of textPreprocessors.values()) {
-                const {id, process} = preprocessor;
+                const {id, textPreprocessor} = preprocessor;
                 const setting = arrayVariant.get(id);
-                text2 = process(text2, setting, sourceMap);
+                text2 = textPreprocessor.process(text2, setting, sourceMap);
             }
 
             for (

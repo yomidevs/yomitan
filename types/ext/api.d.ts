@@ -381,9 +381,9 @@ type ApiSurface = {
         params: void;
         return: boolean;
     };
-    getLanguages: {
+    getLanguageSummaries: {
         params: void;
-        return: Language.Language[];
+        return: Language.LanguageSummary[];
     };
 };
 

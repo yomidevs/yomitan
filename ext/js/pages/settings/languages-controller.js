@@ -26,7 +26,7 @@ export class LanguagesController {
     constructor(settingsController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {import('language').Language[]} */
+        /** @type {import('language').LanguageSummary[]} */
         this._languages = [];
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
@@ -34,7 +34,7 @@ export class LanguagesController {
 
     /** */
     async prepare() {
-        this._languages = await this._settingsController.application.api.getLanguages();
+        this._languages = await this._settingsController.application.api.getLanguageSummaries();
         this._languages.sort((a, b) => a.iso.localeCompare(b.iso, 'en'));
         this._fillSelect();
     }
