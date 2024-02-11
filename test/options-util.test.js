@@ -1582,8 +1582,7 @@ async function testFieldTemplatesUpdate() {
             {{.}}
         {{~/each~}}
     {{~/if~}}
-{{/inline}}
-`.trimStart(),
+{{/inline}}`.trimStart(),
 
                 expected: `
 {{#*inline "conjugation"}}
@@ -1606,6 +1605,9 @@ async function testFieldTemplatesUpdate() {
         {{~#if (get "multiple")~}}</ul>{{/if~}}
     {{~/if~}}
 {{/inline}}
+{{#*inline "cloze-body-kana"}}
+    {{~#if definition.cloze}}{{definition.cloze.bodyKana}}{{/if~}}
+{{/inline}}
 
 {{#*inline "phonetic-transcriptions"}}
     {{~#if (op ">" definition.phoneticTranscriptions.length 0)~}}
@@ -1627,7 +1629,37 @@ async function testFieldTemplatesUpdate() {
         </ul>
     {{~/if~}}
 {{/inline}}
-`.trimStart()
+{{#*inline "frequency-harmonic-rank"}}
+    {{~#if (op "===" definition.frequencyHarmonic -1) ~}}
+        9999999
+    {{~else ~}}
+        {{definition.frequencyHarmonic}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-harmonic-occurrence"}}
+    {{~#if (op "===" definition.frequencyHarmonic -1) ~}}
+        0
+    {{~else ~}}
+        {{definition.frequencyHarmonic}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-average-rank"}}
+    {{~#if (op "===" definition.frequencyAverage -1) ~}}
+        9999999
+    {{~else ~}}
+        {{definition.frequencyAverage}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-average-occurrence"}}
+    {{~#if (op "===" definition.frequencyAverage -1) ~}}
+        0
+    {{~else ~}}
+        {{definition.frequencyAverage}}
+    {{~/if~}}
+{{/inline}}`.trimStart()
             }
         ];
 
