@@ -86,3 +86,7 @@
         {{definition.frequencyAverage}}
     {{~/if~}}
 {{/inline}}
+
+{{~#*inline "pitch-accent-categories"~}}
+    {{~#each (pitchCategories @root)~}}{{~.~}}{{~#unless @last~}},{{~/unless~}}{{~/each~}}
+{{~/inline~}}

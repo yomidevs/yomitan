@@ -1659,7 +1659,11 @@ async function testFieldTemplatesUpdate() {
     {{~else ~}}
         {{definition.frequencyAverage}}
     {{~/if~}}
-{{/inline}}`.trimStart()
+{{/inline}}
+
+{{~#*inline "pitch-accent-categories"~}}
+    {{~#each (pitchCategories @root)~}}{{~.~}}{{~#unless @last~}},{{~/unless~}}{{~/each~}}
+{{~/inline~}}`.trimStart()
             }
         ];
 
