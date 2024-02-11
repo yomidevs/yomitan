@@ -19,7 +19,6 @@
 import {AccessibilityController} from '../accessibility/accessibility-controller.js';
 import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
-import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
@@ -30,14 +29,11 @@ import {isNoteDataValid} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
 import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
-import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
-import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
 import {createSchema, normalizeContext} from './profile-conditions-util.js';
 import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
@@ -49,8 +45,11 @@ import {injectStylesheet} from './script-manager.js';
 export class Backend {
     /**
      * @param {import('../extension/web-extension.js').WebExtension} webExtension
+     * @param {import('../dictionary/dictionary-database.js').DictionaryDatabase|import('./offscreen-proxy.js').DictionaryDatabaseProxy} dictionaryDatabase
+     * @param {import('../language/translator.js').Translator|import('./offscreen-proxy.js').TranslatorProxy} translator
+     * @param {import('../comm/clipboard-reader.js').ClipboardReader|import('./offscreen-proxy.js').ClipboardReaderProxy} clipboardReader
      */
-    constructor(webExtension) {
+    constructor(webExtension, dictionaryDatabase, translator, clipboardReader) {
         /** @type {import('../extension/web-extension.js').WebExtension} */
         this._webExtension = webExtension;
         /** @type {Environment} */
@@ -59,34 +58,12 @@ export class Backend {
         this._anki = new AnkiConnect();
         /** @type {Mecab} */
         this._mecab = new Mecab();
-
-        if (!chrome.offscreen) {
-            /** @type {?OffscreenProxy} */
-            this._offscreen = null;
-            /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
-            this._dictionaryDatabase = new DictionaryDatabase();
-            /** @type {Translator|TranslatorProxy} */
-            this._translator = new Translator({
-                database: this._dictionaryDatabase
-            });
-            /** @type {ClipboardReader|ClipboardReaderProxy} */
-            this._clipboardReader = new ClipboardReader({
-                // eslint-disable-next-line no-undef
-                document: (typeof document === 'object' && document !== null ? document : null),
-                pasteTargetSelector: '#clipboard-paste-target',
-                richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
-            });
-        } else {
-            /** @type {?OffscreenProxy} */
-            this._offscreen = new OffscreenProxy(webExtension);
-            /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
-            this._dictionaryDatabase = new DictionaryDatabaseProxy(this._offscreen);
-            /** @type {Translator|TranslatorProxy} */
-            this._translator = new TranslatorProxy(this._offscreen);
-            /** @type {ClipboardReader|ClipboardReaderProxy} */
-            this._clipboardReader = new ClipboardReaderProxy(this._offscreen);
-        }
-
+        /** @type {import('../dictionary/dictionary-database.js').DictionaryDatabase|import('./offscreen-proxy.js').DictionaryDatabaseProxy} */
+        this._dictionaryDatabase = dictionaryDatabase;
+        /** @type {import('../language/translator.js').Translator|import('./offscreen-proxy.js').TranslatorProxy} */
+        this._translator = translator;
+        /** @type {import('../comm/clipboard-reader.js').ClipboardReader|import('./offscreen-proxy.js').ClipboardReaderProxy} */
+        this._clipboardReader = clipboardReader;
         /** @type {ClipboardMonitor} */
         this._clipboardMonitor = new ClipboardMonitor({
             clipboardReader: this._clipboardReader
@@ -267,9 +244,6 @@ export class Backend {
 
             await this._requestBuilder.prepare();
             await this._environment.prepare();
-            if (this._offscreen !== null) {
-                await this._offscreen.prepare();
-            }
             this._clipboardReader.browser = this._environment.getInfo().browser;
 
             try {
