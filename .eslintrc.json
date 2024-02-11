@@ -33,7 +33,8 @@
         "unused-imports",
         "@typescript-eslint",
         "@stylistic",
-        "unicorn"
+        "unicorn",
+        "sonarjs"
     ],
     "ignorePatterns": [
         "/ext/lib/",
@@ -319,7 +320,34 @@
         "unicorn/require-array-join-separator": "error",
         "unicorn/require-number-to-fixed-digits-argument": "error",
         "unicorn/template-indent": "error",
-        "unicorn/throw-new-error": "error"
+        "unicorn/throw-new-error": "error",
+
+        "sonarjs/max-switch-cases": "error",
+        "sonarjs/no-all-duplicated-branches": "error",
+        "sonarjs/no-collapsible-if": "error",
+        "sonarjs/no-collection-size-mischeck": "error",
+        "sonarjs/no-duplicated-branches": "error",
+        "sonarjs/no-element-overwrite": "error",
+        "sonarjs/no-empty-collection": "error",
+        "sonarjs/no-extra-arguments": "error",
+        "sonarjs/no-gratuitous-expressions": "error",
+        "sonarjs/no-identical-conditions": "error",
+        "sonarjs/no-identical-expressions": "error",
+        "sonarjs/no-identical-functions": "error",
+        "sonarjs/no-ignored-return": "error",
+        "sonarjs/no-inverted-boolean-check": "error",
+        "sonarjs/no-one-iteration-loop": "error",
+        "sonarjs/no-redundant-boolean": "error",
+        "sonarjs/no-redundant-jump": "error",
+        "sonarjs/no-same-line-conditional": "error",
+        "sonarjs/no-unused-collection": "error",
+        "sonarjs/no-use-of-empty-return-value": "error",
+        "sonarjs/no-useless-catch": "error",
+        "sonarjs/non-existent-operator": "error",
+        "sonarjs/prefer-immediate-return": "error",
+        "sonarjs/prefer-object-literal": "error",
+        "sonarjs/prefer-single-boolean-return": "error",
+        "sonarjs/prefer-while": "error"
     },
     "overrides": [
         {
