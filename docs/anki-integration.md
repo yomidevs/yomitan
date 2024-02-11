@@ -29,7 +29,6 @@ Flashcard fields can be configured with the following steps:
     | `{clipboard-image}`               | An image which is stored in the system clipboard, if present.                                                                                                          |
     | `{clipboard-text}`                | Text which is stored in the system clipboard, if present.                                                                                                              |
     | `{cloze-body}`                    | Raw, inflected term as it appeared before being reduced to dictionary form by Yomitan.                                                                                 |
-    | `{cloze-body-kana}`               | Kana reading for `{cloze-body}`.                                                                                                                                       |
     | `{cloze-prefix}`                  | Fragment of the containing `{sentence}` starting at the beginning of `{sentence}` until the beginning of `{cloze-body}`.                                               |
     | `{cloze-suffix}`                  | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.                                                           |
     | `{conjugation}`                   | Conjugation path from the raw inflected term to the source term.                                                                                                       |
@@ -50,7 +49,6 @@ Flashcard fields can be configured with the following steps:
     | `{pitch-accents}`                 | List of pitch accent downstep notations for the term.                                                                                                                  |
     | `{pitch-accent-graphs}`           | List of pitch accent graphs for the term.                                                                                                                              |
     | `{pitch-accent-positions}`        | List of accent downstep positions for the term as a number.                                                                                                            |
-    | `{pitch-accent-categories}`       | List of pitch accent categories for the term (e.g. heiban, kifuku, atamadaka, odaka, nakadaka).                                                                        |
     | `{reading}`                       | Kana reading for the term (empty for terms where the expression is the reading).                                                                                       |
     | `{screenshot}`                    | Screenshot of the web page taken at the time the term was added.                                                                                                       |
     | `{search-query}`                  | The full search query shown on the search page.                                                                                                                        |
