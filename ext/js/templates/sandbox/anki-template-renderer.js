@@ -279,7 +279,10 @@ export class AnkiTemplateRenderer {
                 const regex = new RegExp(pattern, typeof flags === 'string' ? flags : '');
                 /** @type {string[]} */
                 const parts = [];
-                value.replace(regex, (g0) => { parts.push(g0); return g0; });
+                value.replace(regex, (g0) => {
+                    parts.push(g0);
+                    return g0;
+                });
                 value = parts.join('');
             } catch (e) {
                 return `${e}`;
@@ -531,6 +534,7 @@ export class AnkiTemplateRenderer {
     _concat(args) {
         let result = '';
         for (let i = 0, ii = args.length; i < ii; ++i) {
+            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
             result += args[i];
         }
         return result;

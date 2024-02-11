@@ -342,4 +342,3 @@ export class ManifestUtil {
         return modifiedManifest;
     }
 }
-

@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {generateId} from '../core/utilities.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {generateId} from '../core/utilities.js';
 
 export class TemplateRendererProxy {
     constructor() {
@@ -220,10 +220,14 @@ export class TemplateRendererProxy {
                 }
             };
 
-            let timer = (typeof timeout === 'number' ? setTimeout(() => {
-                cleanup();
-                reject(new Error('Timeout'));
-            }, timeout) : null);
+            let timer = (
+                typeof timeout === 'number' ?
+                setTimeout(() => {
+                    cleanup();
+                    reject(new Error('Timeout'));
+                }, timeout) :
+                null
+            );
 
             this._invocations.add(invocation);
 

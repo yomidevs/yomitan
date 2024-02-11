@@ -269,8 +269,16 @@ function testDeepEqual() {
         /** @type {import('test/core').DeepEqualTestData} */
         const recursiveTestsData = [
             {
-                value1: (() => { const x = {}; x.x = x; return x; })(),
-                value2: (() => { const x = {}; x.x = x; return x; })(),
+                value1: (() => {
+                    const x = {};
+                    x.x = x;
+                    return x;
+                })(),
+                value2: (() => {
+                    const x = {};
+                    x.x = x;
+                    return x;
+                })(),
                 expected: false
             }
         ];

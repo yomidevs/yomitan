@@ -43,10 +43,13 @@ function prepareWindow(window) {
 export async function setupDomTest(htmlFilePath) {
     const html = typeof htmlFilePath === 'string' ? fs.readFileSync(htmlFilePath, {encoding: 'utf8'}) : '<!DOCTYPE html>';
     const env = builtinEnvironments.jsdom;
-    const {teardown} = await env.setup(global, {jsdom: {html}});
+    const environment = await env.setup(global, {jsdom: {html}});
     const window = /** @type {import('jsdom').DOMWindow} */ (/** @type {unknown} */ (global.window));
     prepareWindow(window);
-    return {window, teardown};
+    return {
+        window,
+        teardown: (global) => environment.teardown(global)
+    };
 }
 
 /**
@@ -59,13 +62,13 @@ export function createDomTest(htmlFilePath) {
         // eslint-disable-next-line no-empty-pattern
         window: async ({}, use) => {
             const env = builtinEnvironments.jsdom;
-            const {teardown} = await env.setup(global, {jsdom: {html}});
+            const environment = await env.setup(global, {jsdom: {html}});
             const window = /** @type {import('jsdom').DOMWindow} */ (/** @type {unknown} */ (global.window));
             prepareWindow(window);
             try {
                 await use(window);
             } finally {
-                teardown(global);
+                environment.teardown(global);
             }
         }
     });

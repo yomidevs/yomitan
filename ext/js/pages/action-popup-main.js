@@ -50,7 +50,8 @@ class DisplayController {
             typeof manifest.options_ui === 'object' &&
             manifest.options_ui !== null &&
             typeof manifest.options_ui.page === 'string' ?
-            manifest.options_ui.page : ''
+            manifest.options_ui.page :
+            ''
         );
         this._setupButtonEvents('.action-open-settings', 'openSettingsPage', chrome.runtime.getURL(optionsPageUrl));
         this._setupButtonEvents('.action-open-permissions', null, chrome.runtime.getURL('/permissions.html'));

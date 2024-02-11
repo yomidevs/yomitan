@@ -16,6 +16,9 @@
  */
 
 export type ModifierKey = 'alt' | 'ctrl' | 'meta' | 'shift';
+
 export type ModifierMouseButton = 'mouse0' | 'mouse1' | 'mouse2' | 'mouse3' | 'mouse4' | 'mouse5';
+
 export type Modifier = ModifierKey | ModifierMouseButton;
+
 export type ModifierType = 'key' | 'mouse';

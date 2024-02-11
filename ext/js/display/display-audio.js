@@ -514,8 +514,10 @@ export class DisplayAudio {
             !canToggleOff ||
             primaryCardAudio === null ||
             primaryCardAudio.index !== index ||
-            primaryCardAudio.subIndex !== subIndex
-        ) ? {index: index, subIndex} : null;
+            primaryCardAudio.subIndex !== subIndex ?
+            {index: index, subIndex} :
+            null
+        );
         cacheEntry.primaryCardAudio = primaryCardAudio;
 
         if (menu !== null) {

@@ -20,6 +20,7 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export const root = path.join(dirname, '..', '..');
 
 export const test = base.extend({
@@ -47,6 +48,7 @@ export const test = base.extend({
         await use(extensionId);
     }
 });
+
 export const expect = test.expect;
 
 export const mockModelFieldNames = [
@@ -58,10 +60,10 @@ export const mockModelFieldNames = [
 
 /** @type {{[key: string]: string|undefined}} */
 export const mockModelFieldsToAnkiValues = {
-    'Word': '{expression}',
-    'Reading': '{furigana-plain}',
-    'Sentence': '{clipboard-text}',
-    'Audio': '{audio}'
+    Word: '{expression}',
+    Reading: '{furigana-plain}',
+    Sentence: '{clipboard-text}',
+    Audio: '{audio}'
 };
 
 /**
@@ -87,23 +89,30 @@ export const writeToClipboardFromPage = async (page, text) => {
 };
 
 export const expectedAddNoteBody = {
-    'action': 'addNote',
-    'params':
-    {
-        'note': {
-            'fields': {
-                'Word': '読む', 'Reading': '読[よ]む', 'Audio': '[sound:mock_audio.mp3]', 'Sentence': '読むの例文'
+    version: 2,
+    action: 'addNote',
+    params: {
+        note: {
+            fields: {
+                Word: '読む',
+                Reading: '読[よ]む',
+                Audio: '[sound:mock_audio.mp3]',
+                Sentence: '読むの例文'
             },
-            'tags': ['yomitan'],
-            'deckName': 'Mock Deck',
-            'modelName': 'Mock Model',
-            'options': {
-                'allowDuplicate': false, 'duplicateScope': 'collection', 'duplicateScopeOptions': {
-                    'deckName': null, 'checkChildren': false, 'checkAllModels': false
+            tags: ['yomitan'],
+            deckName: 'Mock Deck',
+            modelName: 'Mock Model',
+            options: {
+                allowDuplicate: false,
+                duplicateScope: 'collection',
+                duplicateScopeOptions: {
+                    deckName: null,
+                    checkChildren: false,
+                    checkAllModels: false
                 }
             }
         }
-    }, 'version': 2
+    }
 };
 
 const baseAnkiResp = {
@@ -113,11 +122,11 @@ const baseAnkiResp = {
 
 /** @type {{[key: string]: import('core').SerializableObject}} */
 const ankiRouteResponses = {
-    'version': Object.assign({body: JSON.stringify(6)}, baseAnkiResp),
-    'deckNames': Object.assign({body: JSON.stringify(['Mock Deck'])}, baseAnkiResp),
-    'modelNames': Object.assign({body: JSON.stringify(['Mock Model'])}, baseAnkiResp),
-    'modelFieldNames': Object.assign({body: JSON.stringify(mockModelFieldNames)}, baseAnkiResp),
-    'canAddNotes': Object.assign({body: JSON.stringify([true, true])}, baseAnkiResp),
-    'storeMediaFile': Object.assign({body: JSON.stringify('mock_audio.mp3')}, baseAnkiResp),
-    'addNote': Object.assign({body: JSON.stringify(102312488912)}, baseAnkiResp)
+    version: Object.assign({body: JSON.stringify(6)}, baseAnkiResp),
+    deckNames: Object.assign({body: JSON.stringify(['Mock Deck'])}, baseAnkiResp),
+    modelNames: Object.assign({body: JSON.stringify(['Mock Model'])}, baseAnkiResp),
+    modelFieldNames: Object.assign({body: JSON.stringify(mockModelFieldNames)}, baseAnkiResp),
+    canAddNotes: Object.assign({body: JSON.stringify([true, true])}, baseAnkiResp),
+    storeMediaFile: Object.assign({body: JSON.stringify('mock_audio.mp3')}, baseAnkiResp),
+    addNote: Object.assign({body: JSON.stringify(102312488912)}, baseAnkiResp)
 };

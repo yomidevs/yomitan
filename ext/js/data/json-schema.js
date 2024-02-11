@@ -805,7 +805,7 @@ export class JsonSchema {
         const {type: schemaType, const: schemaConst, enum: schemaEnum} = schema;
         const type = this._getValueType(value);
         if (!this._isValueTypeAny(value, type, schemaType)) {
-            throw this._createError(`Value type ${type} does not match schema type ${schemaType}`);
+            throw this._createError(`Value type ${type} does not match schema type ${Array.isArray(schemaType) ? schemaType.join(',') : schemaType}`);
         }
 
         if (typeof schemaConst !== 'undefined' && !this._valuesAreEqual(value, schemaConst)) {
