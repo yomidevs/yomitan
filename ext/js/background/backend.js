@@ -66,7 +66,7 @@ export class Backend {
             /** @type {?OffscreenProxy} */
             this._offscreen = null;
             /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
-            this._dictionaryDatabase = new DictionaryDatabase(this._logger);
+            this._dictionaryDatabase = new DictionaryDatabase(logger);
             /** @type {Translator|TranslatorProxy} */
             this._translator = new Translator({
                 database: this._dictionaryDatabase
