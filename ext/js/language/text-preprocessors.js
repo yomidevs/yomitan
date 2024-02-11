@@ -24,7 +24,7 @@ export const decapitalize = {
     name: 'Decapitalize text',
     description: 'CAPITALIZED TEXT → capitalized text',
     options: basicTextPreprocessorOptions,
-    process: (str, setting) => setting ? str.toLowerCase() : str
+    process: (str, setting) => (setting ? str.toLowerCase() : str)
 };
 
 /** @type {import('language').TextPreprocessor} */
@@ -33,6 +33,5 @@ export const capitalizeFirstLetter = {
     name: 'Capitalize first letter',
     description: 'lowercase text → Lowercase text',
     options: basicTextPreprocessorOptions,
-    process: (str, setting) => setting ? str.charAt(0).toUpperCase() + str.slice(1) : str
+    process: (str, setting) => (setting ? str.charAt(0).toUpperCase() + str.slice(1) : str)
 };
-

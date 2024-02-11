@@ -47,7 +47,7 @@ export const textPreprocessors = [
         description: 'ﾖﾐﾁｬﾝ → ヨミチャン',
         options: basicTextPreprocessorOptions,
         process: /** @type {import('language').TextPreprocessorFunction} */
-            (str, setting, sourceMap) => setting ? convertHalfWidthKanaToFullWidth(str, sourceMap) : str
+            (str, setting, sourceMap) => (setting ? convertHalfWidthKanaToFullWidth(str, sourceMap) : str)
     },
     {
         id: 'convertNumericCharacters',
@@ -55,7 +55,7 @@ export const textPreprocessors = [
         description: '1234 → １２３４',
         options: basicTextPreprocessorOptions,
         process: /** @type {import('language').TextPreprocessorFunction} */
-            (str, setting) => setting ? convertNumericToFullWidth(str) : str
+            (str, setting) => (setting ? convertNumericToFullWidth(str) : str)
     },
     {
         id: 'convertAlphabeticCharacters',
@@ -63,7 +63,7 @@ export const textPreprocessors = [
         description: 'yomichan → よみちゃん',
         options: basicTextPreprocessorOptions,
         process: /** @type {import('language').TextPreprocessorFunction} */
-            (str, setting, sourceMap) => setting ? convertAlphabeticToKana(str, sourceMap) : str
+            (str, setting, sourceMap) => (setting ? convertAlphabeticToKana(str, sourceMap) : str)
     },
     {
         id: 'convertHiraganaToKatakana',
@@ -71,7 +71,7 @@ export const textPreprocessors = [
         description: 'よみちゃん → ヨミチャン',
         options: basicTextPreprocessorOptions,
         process: /** @type {import('language').TextPreprocessorFunction} */
-            (str, setting) => setting ? convertHiraganaToKatakana(str) : str
+            (str, setting) => (setting ? convertHiraganaToKatakana(str) : str)
     },
     {
         id: 'convertKatakanaToHiragana',
@@ -79,7 +79,7 @@ export const textPreprocessors = [
         description: 'ヨミチャン → よみちゃん',
         options: basicTextPreprocessorOptions,
         process: /** @type {import('language').TextPreprocessorFunction} */
-            (str, setting) => setting ? convertKatakanaToHiragana(str) : str
+            (str, setting) => (setting ? convertKatakanaToHiragana(str) : str)
     },
     collapseEmphaticSequencesPrerocessor
 ];
