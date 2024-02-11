@@ -199,8 +199,8 @@ export class DictionaryImportController {
 
                 await this._importDictionary(files[i], importDetails, onProgress);
             }
-        } catch (err) {
-            this._showErrors([toError(err)]);
+        } catch (error) {
+            this._showErrors([toError(error)]);
         } finally {
             prevention.end();
             for (const progress of progressContainers) { progress.hidden = true; }

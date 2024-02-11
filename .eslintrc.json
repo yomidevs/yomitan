@@ -254,7 +254,7 @@
 
         "import/extensions": ["error", "ignorePackages"],
 
-        "unicorn/catch-error-name": ["error", {"ignore": ["^(e|err|error2?)$"]}],
+        "unicorn/catch-error-name": ["error", {"ignore": ["^(e|error2?)$"]}],
         "unicorn/custom-error-definition": "error",
         "unicorn/empty-brace-spaces": "error",
         "unicorn/error-message": "error",
