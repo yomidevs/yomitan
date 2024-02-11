@@ -21,6 +21,15 @@
 
 {{<<<<<<<}}
 {{#*inline "conjugation"}}
+    {{~#if definition.reasons~}}
+        {{~#each definition.reasons~}}
+            {{~#if (op ">" @index 0)}} « {{/if~}}
+            {{.}}
+        {{~/each~}}
+    {{~/if~}}
+{{/inline}}
+{{=======}}
+{{#*inline "conjugation"}}
     {{~#if (op ">" definition.inflectionRuleChainCandidates.length 0)~}}
         {{~set "multiple" false~}}
         {{~#if (op ">" definition.inflectionRuleChainCandidates.length 1)~}}
@@ -38,15 +47,6 @@
                 {{~/if~}}
             {{~/each~}}
         {{~#if (get "multiple")~}}</ul>{{/if~}}
-    {{~/if~}}
-{{/inline}}
-{{=======}}
-{{#*inline "conjugation"}}
-    {{~#if definition.reasons~}}
-        {{~#each definition.reasons~}}
-            {{~#if (op ">" @index 0)}} « {{/if~}}
-            {{.}}
-        {{~/each~}}
     {{~/if~}}
 {{/inline}}
 {{>>>>>>>}}

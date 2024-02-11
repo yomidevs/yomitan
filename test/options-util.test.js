@@ -1576,6 +1576,17 @@ async function testFieldTemplatesUpdate() {
                 newVersion: 24,
                 old: `
 {{#*inline "conjugation"}}
+    {{~#if definition.reasons~}}
+        {{~#each definition.reasons~}}
+            {{~#if (op ">" @index 0)}} « {{/if~}}
+            {{.}}
+        {{~/each~}}
+    {{~/if~}}
+{{/inline}}
+`.trimStart(),
+
+                expected: `
+{{#*inline "conjugation"}}
     {{~#if (op ">" definition.inflectionRuleChainCandidates.length 0)~}}
         {{~set "multiple" false~}}
         {{~#if (op ">" definition.inflectionRuleChainCandidates.length 1)~}}
@@ -1593,17 +1604,6 @@ async function testFieldTemplatesUpdate() {
                 {{~/if~}}
             {{~/each~}}
         {{~#if (get "multiple")~}}</ul>{{/if~}}
-    {{~/if~}}
-{{/inline}}
-`.trimStart(),
-
-                expected: `
-{{#*inline "conjugation"}}
-    {{~#if definition.reasons~}}
-        {{~#each definition.reasons~}}
-            {{~#if (op ">" @index 0)}} « {{/if~}}
-            {{.}}
-        {{~/each~}}
     {{~/if~}}
 {{/inline}}
 
