@@ -649,7 +649,7 @@ async function testCumulativeFieldTemplatesUpdates() {
 
         const options = /** @type {import('core').SafeAny} */ (createOptionsTestData1());
 
-        const oldAnkiFieldTemplates = fs.readFileSync(path.join(dirname, 'data', 'old-default-anki-field-templates.handlebars'), {encoding: 'utf8'});
+        const oldAnkiFieldTemplates = fs.readFileSync(path.join(dirname, 'data', 'templates', 'old-default-anki-field-templates.handlebars'), {encoding: 'utf8'});
         const defaultAnkiFieldTemplates = fs.readFileSync(path.join(dirname, '..', 'ext', 'data', 'templates', 'default-anki-field-templates.handlebars'), {encoding: 'utf8'});
 
         options.profiles[0].options.anki.fieldTemplates = oldAnkiFieldTemplates;
