@@ -18,7 +18,6 @@
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
-import {log} from '../core/logger.js';
 import {clone} from '../core/utilities.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
@@ -31,6 +30,7 @@ export class TextScanner extends EventDispatcher {
      * @param {import('text-scanner').ConstructorDetails} details
      */
     constructor({
+        logger,
         api,
         node,
         getSearchContext,
@@ -43,6 +43,8 @@ export class TextScanner extends EventDispatcher {
         textSourceGenerator
     }) {
         super();
+        /** @type {import('../core/logger.js').Logger} */
+        this._logger = logger;
         /** @type {import('../comm/api.js').API} */
         this._api = api;
         /** @type {HTMLElement|Window} */
@@ -1280,7 +1282,7 @@ export class TextScanner extends EventDispatcher {
                 this._triggerSearchEmpty(inputInfo);
             }
         } catch (e) {
-            log.error(e);
+            this._logger.error(e);
         } finally {
             this._pendingLookup = false;
         }

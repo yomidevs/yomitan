@@ -23,6 +23,7 @@ import {dirname, join} from 'path';
 import {expect, vi} from 'vitest';
 import {parseJson} from '../../dev/json.js';
 import {createDictionaryArchive} from '../../dev/util.js';
+import {Logger} from '../../ext/js/core/logger.js';
 import {DictionaryDatabase} from '../../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../../ext/js/dictionary/dictionary-importer.js';
 import {Translator} from '../../ext/js/language/translator.js';
@@ -49,9 +50,10 @@ export async function createTranslatorContext(dictionaryDirectory, dictionaryNam
     const testDictionaryContent = await testDictionary.generateAsync({type: 'arraybuffer'});
 
     // Setup database
+    const logger = new Logger();
     const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
     const dictionaryImporter = new DictionaryImporter(dictionaryImporterMediaLoader);
-    const dictionaryDatabase = new DictionaryDatabase();
+    const dictionaryDatabase = new DictionaryDatabase(logger);
     await dictionaryDatabase.prepare();
 
     const {errors} = await dictionaryImporter.importDictionary(

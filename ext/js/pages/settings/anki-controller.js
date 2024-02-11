@@ -19,7 +19,6 @@
 import {AnkiConnect} from '../../comm/anki-connect.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {ExtensionError} from '../../core/extension-error.js';
-import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
 import {getStandardFieldMarkers} from '../../data/anki-template-util.js';
 import {stringContainsAnyFieldMarker} from '../../data/anki-util.js';
@@ -874,7 +873,7 @@ class AnkiCardController {
         try {
             await setPermissionsGranted({permissions}, true);
         } catch (e) {
-            log.error(e);
+            this._settingsController.application.logger.error(e);
         }
     }
 

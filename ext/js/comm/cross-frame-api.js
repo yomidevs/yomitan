@@ -21,20 +21,22 @@ import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
-import {log} from '../core/logger.js';
 
 /**
  * @augments EventDispatcher<import('cross-frame-api').CrossFrameAPIPortEvents>
  */
 export class CrossFrameAPIPort extends EventDispatcher {
     /**
+     * @param {import('../core/logger.js').Logger} logger
      * @param {number} otherTabId
      * @param {number} otherFrameId
      * @param {chrome.runtime.Port} port
      * @param {import('cross-frame-api').ApiMap} apiMap
      */
-    constructor(otherTabId, otherFrameId, port, apiMap) {
+    constructor(logger, otherTabId, otherFrameId, port, apiMap) {
         super();
+        /** @type {import('../core/logger.js').Logger} */
+        this._logger = logger;
         /** @type {number} */
         this._otherTabId = otherTabId;
         /** @type {number} */
@@ -159,7 +161,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
     _onAck(id) {
         const invocation = this._activeInvocations.get(id);
         if (typeof invocation === 'undefined') {
-            log.warn(new Error(`Request ${id} not found for acknowledgement`));
+            this._logger.warn(new Error(`Request ${id} not found for acknowledgement`));
             return;
         }
 
@@ -192,7 +194,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
     _onResult(id, data) {
         const invocation = this._activeInvocations.get(id);
         if (typeof invocation === 'undefined') {
-            log.warn(new Error(`Request ${id} not found`));
+            this._logger.warn(new Error(`Request ${id} not found`));
             return;
         }
 
@@ -290,11 +292,14 @@ export class CrossFrameAPIPort extends EventDispatcher {
 
 export class CrossFrameAPI {
     /**
+     * @param {import('../core/logger.js').Logger} logger
      * @param {import('../comm/api.js').API} api
      * @param {?number} tabId
      * @param {?number} frameId
      */
-    constructor(api, tabId, frameId) {
+    constructor(logger, api, tabId, frameId) {
+        /** @type {import('../core/logger.js').Logger} */
+        this._logger = logger;
         /** @type {import('../comm/api.js').API} */
         this._api = api;
         /** @type {number} */
@@ -376,7 +381,7 @@ export class CrossFrameAPI {
             this._setupCommPort(otherTabId, otherFrameId, port);
         } catch (e) {
             port.disconnect();
-            log.error(e);
+            this._logger.error(e);
         }
     }
 
@@ -435,7 +440,7 @@ export class CrossFrameAPI {
      * @returns {CrossFrameAPIPort}
      */
     _setupCommPort(otherTabId, otherFrameId, port) {
-        const commPort = new CrossFrameAPIPort(otherTabId, otherFrameId, port, this._apiMap);
+        const commPort = new CrossFrameAPIPort(this._logger, otherTabId, otherFrameId, port, this._apiMap);
         let tabPorts = this._commPorts.get(otherTabId);
         if (typeof tabPorts === 'undefined') {
             tabPorts = new Map();

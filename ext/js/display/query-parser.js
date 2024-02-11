@@ -17,7 +17,6 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
-import {log} from '../core/logger.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, isStringEntirelyKana} from '../language/ja/japanese.js';
 import {TextScanner} from '../language/text-scanner.js';
@@ -29,8 +28,10 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('display').QueryParserConstructorDetails} details
      */
-    constructor({api, getSearchContext, textSourceGenerator}) {
+    constructor({logger, api, getSearchContext, textSourceGenerator}) {
         super();
+        /** @type {import('../core/logger.js').Logger} */
+        this._logger = logger;
         /** @type {import('../comm/api.js').API} */
         this._api = api;
         /** @type {import('display').GetSearchContextCallback} */
@@ -59,6 +60,7 @@ export class QueryParser extends EventDispatcher {
         this._queryParserModeSelect = querySelectorNotNull(document, '#query-parser-mode-select');
         /** @type {TextScanner} */
         this._textScanner = new TextScanner({
+            logger,
             api,
             node: this._queryParser,
             getSearchContext,
@@ -167,7 +169,7 @@ export class QueryParser extends EventDispatcher {
      * @param {import('text-scanner').EventArgument<'searchError'>} details
      */
     _onSearchError({error}) {
-        log.error(error);
+        this._logger.error(error);
     }
 
     /**

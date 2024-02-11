@@ -17,7 +17,6 @@
  */
 
 import {ExtensionError} from '../../core/extension-error.js';
-import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -299,7 +298,7 @@ export class DictionaryImportController {
     _showErrors(errors) {
         const uniqueErrors = new Map();
         for (const error of errors) {
-            log.error(error);
+            this._settingsController.application.logger.error(error);
             const errorString = this._errorToString(error);
             let count = uniqueErrors.get(errorString);
             if (typeof count === 'undefined') {

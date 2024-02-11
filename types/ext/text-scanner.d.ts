@@ -17,6 +17,7 @@
 
 import type {TextSourceGenerator} from '../../ext/js/dom/text-source-generator';
 import type {API} from '../../ext/js/comm/api';
+import type {Logger} from '../../ext/js/core/logger';
 import type * as Dictionary from './dictionary';
 import type * as Display from './display';
 import type * as Input from './input';
@@ -142,6 +143,7 @@ export type GetSearchContextCallbackSync = () => SearchContext;
 export type GetSearchContextCallbackAsync = () => Promise<SearchContext>;
 
 export type ConstructorDetails = {
+    logger: Logger;
     api: API;
     node: HTMLElement | Window;
     getSearchContext: GetSearchContextCallback;

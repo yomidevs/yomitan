@@ -16,12 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {log} from '../core/logger.js';
 import {stringReverse} from '../core/utilities.js';
 import {Database} from '../data/database.js';
 
 export class DictionaryDatabase {
-    constructor() {
+    /**
+     * @param {import('../core/logger.js').Logger} logger
+     */
+    constructor(logger) {
+        /** @type {import('../core/logger.js').Logger} */
+        this._logger = logger;
         /** @type {Database<import('dictionary-database').ObjectStoreName>} */
         this._db = new Database();
         /** @type {string} */
@@ -156,7 +160,7 @@ export class DictionaryDatabase {
             await Database.deleteDatabase(this._dbName);
             result = true;
         } catch (e) {
-            log.error(e);
+            this._logger.error(e);
         }
         await this.prepare();
         return result;

@@ -32,6 +32,7 @@ export class GenericSettingController {
         this._defaultScope = 'profile';
         /** @type {DOMDataBinder<import('generic-setting-controller').ElementMetadata>} */
         this._dataBinder = new DOMDataBinder({
+            logger: this._settingsController.application.logger,
             selector: '[data-setting]',
             createElementMetadata: this._createElementMetadata.bind(this),
             compareElementMetadata: this._compareElementMetadata.bind(this),

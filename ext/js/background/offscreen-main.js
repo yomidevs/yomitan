@@ -16,11 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {Logger} from '../core/logger.js';
 import {Offscreen} from './offscreen.js';
 
 /** Entry point. */
 function main() {
-    const offscreen = new Offscreen();
+    const logger = new Logger();
+    const offscreen = new Offscreen(logger);
     offscreen.prepare();
 }
 

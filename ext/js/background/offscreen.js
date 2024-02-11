@@ -29,10 +29,11 @@ import {Translator} from '../language/translator.js';
 export class Offscreen {
     /**
      * Creates a new instance.
+     * @param {import('../core/logger.js').Logger} logger
      */
-    constructor() {
+    constructor(logger) {
         /** @type {DictionaryDatabase} */
-        this._dictionaryDatabase = new DictionaryDatabase();
+        this._dictionaryDatabase = new DictionaryDatabase(logger);
         /** @type {Translator} */
         this._translator = new Translator({
             database: this._dictionaryDatabase

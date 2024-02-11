@@ -18,7 +18,6 @@
 
 import {Dexie} from '../../../lib/dexie.js';
 import {parseJson} from '../../core/json.js';
-import {log} from '../../core/logger.js';
 import {toError} from '../../core/to-error.js';
 import {isObject} from '../../core/utilities.js';
 import {OptionsUtil} from '../../data/options-util.js';
@@ -242,7 +241,7 @@ export class BackupController {
      * @param {Error} error
      */
     _showSettingsImportError(error) {
-        log.error(error);
+        this._settingsController.application.logger.error(error);
         /** @type {HTMLElement} */
         const element = querySelectorNotNull(document, '#settings-import-error-message');
         element.textContent = `${error}`;
@@ -530,7 +529,7 @@ export class BackupController {
         try {
             await this._settingsImportSetOptionsFull(optionsFull);
         } catch (e) {
-            log.error(e);
+            this._settingsController.application.logger.error(e);
         }
     }
 

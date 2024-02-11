@@ -150,8 +150,3 @@ export class Logger extends EventDispatcher {
         }
     }
 }
-
-/**
- * This object is the default logger used by the runtime.
- */
-export const log = new Logger();

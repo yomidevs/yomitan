@@ -24,7 +24,6 @@ import {Mecab} from '../comm/mecab.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {fetchJson, fetchText} from '../core/fetch-utilities.js';
-import {log} from '../core/logger.js';
 import {clone, deferPromise, isObject, promiseTimeout} from '../core/utilities.js';
 import {isNoteDataValid} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
@@ -48,9 +47,12 @@ import {injectStylesheet} from './script-manager.js';
  */
 export class Backend {
     /**
+     * @param {import('../core/logger.js').Logger} logger
      * @param {import('../extension/web-extension.js').WebExtension} webExtension
      */
-    constructor(webExtension) {
+    constructor(logger, webExtension) {
+        /** @type {import('../core/logger.js').Logger} */
+        this._logger = logger;
         /** @type {import('../extension/web-extension.js').WebExtension} */
         this._webExtension = webExtension;
         /** @type {Environment} */
@@ -64,7 +66,7 @@ export class Backend {
             /** @type {?OffscreenProxy} */
             this._offscreen = null;
             /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
-            this._dictionaryDatabase = new DictionaryDatabase();
+            this._dictionaryDatabase = new DictionaryDatabase(this._logger);
             /** @type {Translator|TranslatorProxy} */
             this._translator = new Translator({
                 database: this._dictionaryDatabase
@@ -106,7 +108,7 @@ export class Backend {
         /** @type {OptionsUtil} */
         this._optionsUtil = new OptionsUtil();
         /** @type {AccessibilityController} */
-        this._accessibilityController = new AccessibilityController();
+        this._accessibilityController = new AccessibilityController(logger);
 
         /** @type {?number} */
         this._searchPopupTabId = null;
@@ -263,7 +265,7 @@ export class Backend {
             }, 1000);
             this._updateBadge();
 
-            log.on('log', this._onLog.bind(this));
+            this._logger.on('log', this._onLog.bind(this));
 
             await this._requestBuilder.prepare();
             await this._environment.prepare();
@@ -275,7 +277,7 @@ export class Backend {
             try {
                 await this._dictionaryDatabase.prepare();
             } catch (e) {
-                log.error(e);
+                this._logger.error(e);
             }
 
             /** @type {import('language-transformer').LanguageTransformDescriptor} */
@@ -298,7 +300,7 @@ export class Backend {
             this._sendMessageAllTabsIgnoreResponse({action: 'applicationBackendReady'});
             this._sendMessageIgnoreResponse({action: 'applicationBackendReady'});
         } catch (e) {
-            log.error(e);
+            this._logger.error(e);
             throw e;
         } finally {
             if (this._badgePrepareDelayTimer !== null) {
@@ -335,8 +337,8 @@ export class Backend {
      * @param {{level: import('log').LogLevel}} params
      */
     _onLog({level}) {
-        const levelValue = log.getLogErrorLevelValue(level);
-        const currentLogErrorLevel = this._logErrorLevel !== null ? log.getLogErrorLevelValue(this._logErrorLevel) : 0;
+        const levelValue = this._logger.getLogErrorLevelValue(level);
+        const currentLogErrorLevel = this._logErrorLevel !== null ? this._logger.getLogErrorLevelValue(this._logErrorLevel) : 0;
         if (levelValue <= currentLogErrorLevel) { return; }
 
         this._logErrorLevel = level;
@@ -739,7 +741,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'log'>} */
     _onApiLog({error, level, context}) {
-        log.log(ExtensionError.deserialize(error), level, context);
+        this._logger.log(ExtensionError.deserialize(error), level, context);
     }
 
     /** @type {import('api').ApiHandler<'logIndicatorClear'>} */

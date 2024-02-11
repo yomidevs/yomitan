@@ -21,7 +21,7 @@ import {CrossFrameAPI} from './comm/cross-frame-api.js';
 import {createApiMap, invokeApiMapHandler} from './core/api-map.js';
 import {EventDispatcher} from './core/event-dispatcher.js';
 import {ExtensionError} from './core/extension-error.js';
-import {log} from './core/logger.js';
+import {Logger} from './core/logger.js';
 import {deferPromise} from './core/utilities.js';
 import {WebExtension} from './extension/web-extension.js';
 
@@ -58,10 +58,11 @@ if (checkChromeNotAvailable()) {
 export class Application extends EventDispatcher {
     /**
      * Creates a new instance. The instance should not be used until it has been fully prepare()'d.
+     * @param {Logger} logger
      * @param {API} api
      * @param {CrossFrameAPI} crossFrameApi
      */
-    constructor(api, crossFrameApi) {
+    constructor(logger, api, crossFrameApi) {
         super();
 
         /** @type {WebExtension} */
@@ -92,6 +93,8 @@ export class Application extends EventDispatcher {
         this._crossFrame = crossFrameApi;
         /** @type {boolean} */
         this._isReady = false;
+        /** @type {Logger} */
+        this._logger = logger;
 
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('application').ApiMap} */
@@ -116,7 +119,6 @@ export class Application extends EventDispatcher {
      * @type {API}
      */
     get api() {
-        if (this._api === null) { throw new Error('Not prepared'); }
         return this._api;
     }
 
@@ -126,8 +128,12 @@ export class Application extends EventDispatcher {
      * @type {CrossFrameAPI}
      */
     get crossFrame() {
-        if (this._crossFrame === null) { throw new Error('Not prepared'); }
         return this._crossFrame;
+    }
+
+    /** @type {Logger} */
+    get logger() {
+        return this._logger;
     }
 
     /**
@@ -135,7 +141,7 @@ export class Application extends EventDispatcher {
      */
     prepare() {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-        log.on('log', this._onForwardLog.bind(this));
+        this._logger.on('log', this._onForwardLog.bind(this));
     }
 
     /**
@@ -171,18 +177,19 @@ export class Application extends EventDispatcher {
      * @param {(application: Application) => (Promise<void>)} mainFunction
      */
     static async main(mainFunction) {
+        const logger = new Logger();
         const webExtension = new WebExtension();
         const api = new API(webExtension);
         await this.waitForBackendReady(webExtension);
         const {tabId = null, frameId = null} = await api.frameInformationGet();
-        const crossFrameApi = new CrossFrameAPI(api, tabId, frameId);
+        const crossFrameApi = new CrossFrameAPI(logger, api, tabId, frameId);
         crossFrameApi.prepare();
-        const application = new Application(api, crossFrameApi);
+        const application = new Application(logger, api, crossFrameApi);
         application.prepare();
         try {
             await mainFunction(application);
         } catch (error) {
-            log.error(error);
+            logger.error(error);
         } finally {
             application.ready();
         }

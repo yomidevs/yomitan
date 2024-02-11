@@ -22,7 +22,12 @@ import {DictionaryImporter} from './dictionary-importer.js';
 import {DictionaryWorkerMediaLoader} from './dictionary-worker-media-loader.js';
 
 export class DictionaryWorkerHandler {
-    constructor() {
+    /**
+     * @param {import('../core/logger.js').Logger} logger
+     */
+    constructor(logger) {
+        /** @type {import('../core/logger.js').Logger} */
+        this._logger = logger;
         /** @type {DictionaryWorkerMediaLoader} */
         this._mediaLoader = new DictionaryWorkerMediaLoader();
     }
@@ -130,7 +135,7 @@ export class DictionaryWorkerHandler {
      * @returns {Promise<DictionaryDatabase>}
      */
     async _getPreparedDictionaryDatabase() {
-        const dictionaryDatabase = new DictionaryDatabase();
+        const dictionaryDatabase = new DictionaryDatabase(this._logger);
         await dictionaryDatabase.prepare();
         return dictionaryDatabase;
     }

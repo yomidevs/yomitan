@@ -16,16 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {log} from '../core/logger.js';
+import {Logger} from '../core/logger.js';
 import {DictionaryWorkerHandler} from './dictionary-worker-handler.js';
 
 /** Entry point. */
 function main() {
+    const logger = new Logger();
     try {
-        const dictionaryWorkerHandler = new DictionaryWorkerHandler();
+        const dictionaryWorkerHandler = new DictionaryWorkerHandler(logger);
         dictionaryWorkerHandler.prepare();
     } catch (e) {
-        log.error(e);
+        logger.error(e);
     }
 }
 

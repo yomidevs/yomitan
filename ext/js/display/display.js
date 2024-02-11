@@ -23,7 +23,6 @@ import {DynamicProperty} from '../core/dynamic-property.js';
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {log} from '../core/logger.js';
 import {toError} from '../core/to-error.js';
 import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
 import {PopupMenu} from '../dom/popup-menu.js';
@@ -133,6 +132,7 @@ export class Display extends EventDispatcher {
         this._textSourceGenerator = new TextSourceGenerator();
         /** @type {QueryParser} */
         this._queryParser = new QueryParser({
+            logger: application.logger,
             api: application.api,
             getSearchContext: this._getSearchContext.bind(this),
             textSourceGenerator: this._textSourceGenerator
@@ -393,7 +393,7 @@ export class Display extends EventDispatcher {
      */
     onError(error) {
         if (this._application.webExtension.unloaded) { return; }
-        log.error(error);
+        this._application.logger.error(error);
     }
 
     /**
@@ -1694,7 +1694,7 @@ export class Display extends EventDispatcher {
                 }
                 await this._frontendSetupPromise;
             } catch (e) {
-                log.error(e);
+                this._application.logger.error(e);
                 return;
             } finally {
                 this._frontendSetupPromise = null;
@@ -1837,6 +1837,7 @@ export class Display extends EventDispatcher {
 
         if (this._contentTextScanner === null) {
             this._contentTextScanner = new TextScanner({
+                logger: this._application.logger,
                 api: this._application.api,
                 node: window,
                 getSearchContext: this._getSearchContext.bind(this),
@@ -1932,7 +1933,7 @@ export class Display extends EventDispatcher {
      */
     _onContentTextScannerSearchError({error}) {
         if (!this._application.webExtension.unloaded) {
-            log.error(error);
+            this._application.logger.error(error);
         }
     }
 

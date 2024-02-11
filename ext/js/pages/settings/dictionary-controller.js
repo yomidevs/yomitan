@@ -17,7 +17,6 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {log} from '../../core/logger.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
@@ -889,7 +888,7 @@ export class DictionaryController {
             await this._deleteDictionaryInternal(dictionaryTitle, onProgress);
             await this._deleteDictionarySettings(dictionaryTitle);
         } catch (e) {
-            log.error(e);
+            this._settingsController.application.logger.error(e);
         } finally {
             prevention.end();
             for (const progress of progressContainers) { progress.hidden = true; }

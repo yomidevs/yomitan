@@ -16,17 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {log} from '../core/logger.js';
-
 /**
  * @template [K=unknown]
  * @template [V=unknown]
  */
 export class TaskAccumulator {
     /**
+     * @param {import('../core/logger.js').Logger} logger
      * @param {(tasks: [key: ?K, task: import('task-accumulator').Task<V>][]) => Promise<void>} runTasks
      */
-    constructor(runTasks) {
+    constructor(logger, runTasks) {
+        /** @type {import('../core/logger.js').Logger} */
+        this._logger = logger;
         /** @type {?Promise<void>} */
         this._deferPromise = null;
         /** @type {?Promise<void>} */
@@ -104,7 +105,7 @@ export class TaskAccumulator {
             }
             await this._runTasksCallback(allTasks);
         } catch (e) {
-            log.error(e);
+            this._logger.error(e);
         }
     }
 

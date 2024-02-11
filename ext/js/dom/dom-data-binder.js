@@ -27,7 +27,9 @@ export class DOMDataBinder {
     /**
      * @param {import('dom-data-binder').ConstructorDetails<T>} details
      */
-    constructor({selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null}) {
+    constructor({logger, selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null}) {
+        /** @type {import('../core/logger.js').Logger} */
+        this._logger = logger;
         /** @type {string} */
         this._selector = selector;
         /** @type {import('dom-data-binder').CreateElementMetadataCallback<T>} */
@@ -41,9 +43,9 @@ export class DOMDataBinder {
         /** @type {?import('dom-data-binder').OnErrorCallback<T>} */
         this._onError = onError;
         /** @type {TaskAccumulator<import('dom-data-binder').ElementObserver<T>, import('dom-data-binder').UpdateTaskValue>} */
-        this._updateTasks = new TaskAccumulator(this._onBulkUpdate.bind(this));
+        this._updateTasks = new TaskAccumulator(this._logger, this._onBulkUpdate.bind(this));
         /** @type {TaskAccumulator<import('dom-data-binder').ElementObserver<T>, import('dom-data-binder').AssignTaskValue>} */
-        this._assignTasks = new TaskAccumulator(this._onBulkAssign.bind(this));
+        this._assignTasks = new TaskAccumulator(this._logger, this._onBulkAssign.bind(this));
         /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */
         this._selectorObserver = /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */ (new SelectorObserver({
             selector,

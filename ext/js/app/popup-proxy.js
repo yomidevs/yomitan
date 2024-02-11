@@ -17,7 +17,6 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
-import {log} from '../core/logger.js';
 
 /**
  * This class is a proxy for a Popup that is hosted in a different frame.
@@ -367,7 +366,7 @@ export class PopupProxy extends EventDispatcher {
             }
             this._frameOffsetUpdatedAt = now;
         } catch (e) {
-            log.error(e);
+            this._application.logger.error(e);
         } finally {
             this._frameOffsetPromise = null;
         }

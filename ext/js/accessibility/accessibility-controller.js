@@ -17,13 +17,17 @@
  */
 
 import {isContentScriptRegistered, registerContentScript, unregisterContentScript} from '../background/script-manager.js';
-import {log} from '../core/logger.js';
 
 /**
  * This class controls the registration of accessibility handlers.
  */
 export class AccessibilityController {
-    constructor() {
+    /**
+     * @param {import('../core/logger.js').Logger} logger
+     */
+    constructor(logger) {
+        /** @type {import('../core/logger.js').Logger} */
+        this._logger = logger;
         /** @type {?import('core').TokenObject} */
         this._updateGoogleDocsAccessibilityToken = null;
         /** @type {?Promise<void>} */
@@ -97,7 +101,7 @@ export class AccessibilityController {
                 await unregisterContentScript(id);
             }
         } catch (e) {
-            log.error(e);
+            this._logger.error(e);
         }
     }
 

@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type {Logger} from '../../ext/js/core/logger.js';
 import type * as TaskAccumulator from './task-accumulator';
 
 export type CreateElementMetadataCallback<T = unknown> = (element: Element) => T | undefined;
@@ -39,6 +40,7 @@ export type SetValuesDetails<T = unknown> = {
 export type OnErrorCallback<T = unknown> = (error: Error, stale: boolean, element: Element, metadata: T) => void;
 
 export type ConstructorDetails<T = unknown> = {
+    logger: Logger;
     selector: string;
     createElementMetadata: CreateElementMetadataCallback<T>;
     compareElementMetadata: CompareElementMetadataCallback<T>;

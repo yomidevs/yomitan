@@ -18,7 +18,6 @@
 
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
-import {log} from '../core/logger.js';
 import {promiseAnimationFrame} from '../core/promise-animation-frame.js';
 import {DocumentUtil} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
@@ -91,6 +90,7 @@ export class Frontend {
         this._textSourceGenerator = new TextSourceGenerator();
         /** @type {TextScanner} */
         this._textScanner = new TextScanner({
+            logger: application.logger,
             api: application.api,
             node: window,
             ignoreElements: this._ignoreElements.bind(this),
@@ -400,7 +400,7 @@ export class Frontend {
                 this._showExtensionUnloaded(textSource);
             }
         } else {
-            log.error(error);
+            this._application.logger.error(error);
         }
     }
 
@@ -757,7 +757,7 @@ export class Frontend {
         );
         this._lastShowPromise.catch((error) => {
             if (this._application.webExtension.unloaded) { return; }
-            log.error(error);
+            this._application.logger.error(error);
         });
         return this._lastShowPromise;
     }

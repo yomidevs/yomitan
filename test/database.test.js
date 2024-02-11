@@ -23,6 +23,7 @@ import {join, dirname as pathDirname} from 'path';
 import {beforeEach, describe, test, vi} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {createDictionaryArchive} from '../dev/util.js';
+import {Logger} from '../ext/js/core/logger.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
@@ -121,7 +122,8 @@ describe('Database', () => {
         ]);
 
         // Setup database
-        const dictionaryDatabase = new DictionaryDatabase();
+        const logger = new Logger();
+        const dictionaryDatabase = new DictionaryDatabase(logger);
         /** @type {import('dictionary-importer').ImportDetails} */
         const detaultImportDetails = {prefixWildcardsSupported: false};
 
@@ -162,7 +164,8 @@ describe('Database', () => {
         ];
         describe.each(invalidDictionaries)('Invalid dictionary: $name', ({name}) => {
             test('Has invalid data', async ({expect}) => {
-                const dictionaryDatabase = new DictionaryDatabase();
+                const logger = new Logger();
+                const dictionaryDatabase = new DictionaryDatabase(logger);
                 await dictionaryDatabase.prepare();
 
                 const testDictionary = createTestDictionaryArchive(name);
@@ -194,7 +197,8 @@ describe('Database', () => {
             ]);
 
             // Setup database
-            const dictionaryDatabase = new DictionaryDatabase();
+            const logger = new Logger();
+            const dictionaryDatabase = new DictionaryDatabase(logger);
             await dictionaryDatabase.prepare();
 
             // Import data
@@ -321,7 +325,8 @@ describe('Database', () => {
                 const testDictionaryIndex = parseJson(await testDictionary.files['index.json'].async('string'));
 
                 // Setup database
-                const dictionaryDatabase = new DictionaryDatabase();
+                const logger = new Logger();
+                const dictionaryDatabase = new DictionaryDatabase(logger);
                 await dictionaryDatabase.prepare();
 
                 // Import data
