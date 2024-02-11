@@ -165,6 +165,7 @@ describe('Document utility tests', () => {
                         // Override getClientRects to return a rect guaranteed to contain (x, y)
                         range.getClientRects = () => {
                             /** @type {import('test/document-types').PseudoDOMRectList} */
+                            // eslint-disable-next-line sonarjs/prefer-immediate-return
                             const domRectList = Object.assign(
                                 [new DOMRect(x - 1, y - 1, 2, 2)],
                                 {

@@ -1146,8 +1146,7 @@ export class Display extends EventDispatcher {
      */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
         if (isKanji) {
-            const dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
-            return dictionaryEntries;
+            return await this._application.api.kanjiFind(source, optionsContext);
         } else {
             /** @type {import('api').FindTermsDetails} */
             const findDetails = {};

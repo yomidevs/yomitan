@@ -67,13 +67,11 @@ function getComputedFontSizeInPixels(window, getComputedStyle, element) {
         if (element.nodeType === window.Node.ELEMENT_NODE) {
             const fontSize = getComputedStyle(/** @type {Element} */ (element)).fontSize;
             if (fontSize.endsWith('px')) {
-                const value = Number.parseFloat(fontSize.substring(0, fontSize.length - 2));
-                return value;
+                return Number.parseFloat(fontSize.substring(0, fontSize.length - 2));
             }
         }
     }
-    const defaultFontSize = 14;
-    return defaultFontSize;
+    return 14; // Default font size
 }
 
 /**

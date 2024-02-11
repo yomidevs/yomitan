@@ -81,6 +81,7 @@ export async function createTranslatorTest(htmlFilePath, dictionaryDirectory, di
     const test = createDomTest(htmlFilePath);
     const translator = await createTranslatorContext(dictionaryDirectory, dictionaryName);
     /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator}>} */
+    // eslint-disable-next-line sonarjs/prefer-immediate-return
     const result = test.extend({
         window: async ({window}, use) => { await use(window); },
         // eslint-disable-next-line no-empty-pattern

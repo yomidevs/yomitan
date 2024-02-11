@@ -574,8 +574,7 @@ export class SearchDisplayController {
             case 'select':
                 return true;
         }
-        if (element instanceof HTMLElement && element.isContentEditable) { return true; }
-        return false;
+        return element instanceof HTMLElement && !!element.isContentEditable;
     }
 
     /**
