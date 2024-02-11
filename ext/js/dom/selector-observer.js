@@ -170,7 +170,7 @@ export class SelectorObserver {
 
         if (
             this._onChildrenUpdated !== null &&
-            (addedNodes.length !== 0 || addedNodes.length !== 0)
+            (addedNodes.length > 0 || addedNodes.length > 0)
         ) {
             for (let node = /** @type {?Node} */ (target); node !== null; node = node.parentNode) {
                 const observer = this._elementMap.get(node);

@@ -183,7 +183,7 @@ export class KeyboardShortcutController {
         const listContainer = /** @type {HTMLElement} */ (this._listContainer);
         listContainer.appendChild(fragment);
         listContainer.hidden = (hotkeys.length === 0);
-        /** @type {HTMLElement} */ (this._emptyIndicator).hidden = (hotkeys.length !== 0);
+        /** @type {HTMLElement} */ (this._emptyIndicator).hidden = (hotkeys.length > 0);
     }
 
     /**

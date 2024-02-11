@@ -401,11 +401,11 @@ export class AnkiController {
         if (typeof data !== 'undefined') {
             details += `${JSON.stringify(data, null, 4)}\n\n`;
         }
-        details += `${error.stack}`.trimRight();
+        details += `${error.stack}`.trimEnd();
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsNode).textContent = details;
 
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsContainer).hidden = true;
-        /** @type {HTMLElement} */ (this._ankiErrorInvalidResponseInfo).hidden = (errorString.indexOf('Invalid response') < 0);
+        /** @type {HTMLElement} */ (this._ankiErrorInvalidResponseInfo).hidden = !errorString.includes('Invalid response');
         /** @type {HTMLElement} */ (this._ankiErrorMessageDetailsToggle).hidden = false;
     }
 
@@ -762,7 +762,8 @@ class AnkiCardController {
         const ELEMENT_NODE = Node.ELEMENT_NODE;
         const container = this._ankiCardFieldsContainer;
         if (container !== null) {
-            for (const node of [...container.childNodes]) {
+            const childNodesFrozen = [...container.childNodes];
+            for (const node of childNodesFrozen) {
                 if (node.nodeType === ELEMENT_NODE && node instanceof HTMLElement && node.dataset.persistent === 'true') { continue; }
                 container.removeChild(node);
             }

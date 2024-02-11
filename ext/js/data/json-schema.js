@@ -27,6 +27,8 @@ export class JsonSchemaError extends Error {
      */
     constructor(message, valueStack, schemaStack) {
         super(message);
+        /** @type {string} */
+        this.name = 'JsonSchemaError';
         /** @type {import('ext/json-schema').ValueStackItem[]} */
         this._valueStack = valueStack;
         /** @type {import('ext/json-schema').SchemaStackItem[]} */
@@ -371,18 +373,16 @@ export class JsonSchema {
             return {schema, stack: [{schema, path: null}]};
         }
         const {prefixItems} = schema;
-        if (typeof prefixItems !== 'undefined') {
-            if (index >= 0 && index < prefixItems.length) {
-                const itemSchema = prefixItems[index];
-                if (typeof itemSchema !== 'undefined') {
-                    return {
-                        schema: itemSchema,
-                        stack: [
-                            {schema: prefixItems, path: 'prefixItems'},
-                            {schema: itemSchema, path: index}
-                        ]
-                    };
-                }
+        if (typeof prefixItems !== 'undefined' && index >= 0 && index < prefixItems.length) {
+            const itemSchema = prefixItems[index];
+            if (typeof itemSchema !== 'undefined') {
+                return {
+                    schema: itemSchema,
+                    stack: [
+                        {schema: prefixItems, path: 'prefixItems'},
+                        {schema: itemSchema, path: index}
+                    ]
+                };
             }
         }
         const {items} = schema;

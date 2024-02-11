@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import Dexie from 'dexie';
-import 'dexie-export-import';
+export {default as Dexie} from 'dexie';
 
-export {Dexie};
+import 'dexie-export-import';

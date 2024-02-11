@@ -172,7 +172,7 @@ export class DictionaryImportController {
                     for (const label of infoLabels) { label.textContent = labelText; }
                 }
 
-                const percent = count > 0 ? (index / count * 100.0) : 0.0;
+                const percent = count > 0 ? (index / count * 100) : 0;
                 const cssString = `${percent}%`;
                 const statusString = `${Math.floor(percent).toFixed(0)}%`;
                 for (const progressBar of progressBars) { progressBar.style.width = cssString; }

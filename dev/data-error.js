@@ -18,12 +18,14 @@
 /**
  * Schema validation error type.
  */
-class DataError extends Error {
+export class DataError extends Error {
     /**
      * @param {string} message
      */
     constructor(message) {
         super(message);
+        /** @type {string} */
+        this.name = 'DataError';
         /** @type {unknown} */
         this._data = void 0;
     }
@@ -32,7 +34,3 @@ class DataError extends Error {
     get data() { return this._data; }
     set data(value) { this._data = value; }
 }
-
-module.exports = {
-    DataError
-};

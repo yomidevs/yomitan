@@ -322,7 +322,7 @@ export class SearchDisplayController {
      */
     async _onProfileSelectChange(event) {
         const node = /** @type {HTMLInputElement} */ (event.currentTarget);
-        const value = parseInt(node.value, 10);
+        const value = Number.parseInt(node.value, 10);
         const optionsFull = await this._display.application.api.optionsGetFull();
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= optionsFull.profiles.length) {
             this._setPrimaryProfileIndex(value);

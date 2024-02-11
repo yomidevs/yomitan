@@ -171,11 +171,11 @@ export class AnkiTemplateRenderer {
         for (const {text, reading: reading2} of segments) {
             const safeText = this._escape(text);
             const safeReading = this._escape(reading2);
-            if (safeReading.length > 0) {
-                result += `<ruby>${safeText}<rt>${safeReading}</rt></ruby>`;
-            } else {
-                result += safeText;
-            }
+            result += (
+                safeReading.length > 0 ?
+                `<ruby>${safeText}<rt>${safeReading}</rt></ruby>` :
+                safeText
+            );
         }
 
         return this._safeString(result);

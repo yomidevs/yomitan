@@ -34,7 +34,7 @@ function querySelectorTextNode(element, selector) {
     let textIndex = -1;
     const match = /::text$|::nth-text\((\d+)\)$/.exec(selector);
     if (match !== null) {
-        textIndex = (match[1] ? parseInt(match[1], 10) - 1 : 0);
+        textIndex = (match[1] ? Number.parseInt(match[1], 10) - 1 : 0);
         selector = selector.substring(0, selector.length - match[0].length);
     }
     const result = element.querySelector(selector);
@@ -67,7 +67,7 @@ function getComputedFontSizeInPixels(window, getComputedStyle, element) {
         if (element.nodeType === window.Node.ELEMENT_NODE) {
             const fontSize = getComputedStyle(/** @type {Element} */ (element)).fontSize;
             if (fontSize.endsWith('px')) {
-                const value = parseFloat(fontSize.substring(0, fontSize.length - 2));
+                const value = Number.parseFloat(fontSize.substring(0, fontSize.length - 2));
                 return value;
             }
         }
@@ -92,7 +92,7 @@ function createAbsoluteGetComputedStyle(window) {
                 if (typeof result === 'string') {
                     result = result.replace(/([-+]?\d(?:\.\d)?(?:[eE][-+]?\d+)?)em/g, (g0, g1) => {
                         const fontSize = getComputedFontSizeInPixels(window, getComputedStyleOld, element);
-                        return `${parseFloat(g1) * fontSize}px`;
+                        return `${Number.parseFloat(g1) * fontSize}px`;
                     });
                 }
                 return result;

@@ -144,7 +144,7 @@ export class AudioController extends EventDispatcher {
             const text = input.value || '';
             const voiceUri = input.dataset.voice;
             const audio = this._audioSystem.createTextToSpeechAudio(text, typeof voiceUri === 'string' ? voiceUri : '');
-            audio.volume = 1.0;
+            audio.volume = 1;
             audio.play();
         } catch (e) {
             // NOP

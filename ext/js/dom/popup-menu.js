@@ -219,8 +219,8 @@ export class PopupMenu extends EventDispatcher {
             (bottom - top) * ((-vertical + 1) * -0.5)
         );
 
-        x = Math.max(0.0, Math.min(containerNodeRect.width - menuRect.width, x));
-        y = Math.max(0.0, Math.min(containerNodeRect.height - menuRect.height, y));
+        x = Math.max(0, Math.min(containerNodeRect.width - menuRect.width, x));
+        y = Math.max(0, Math.min(containerNodeRect.height - menuRect.height, y));
 
         menu.style.left = `${x}px`;
         menu.style.top = `${y}px`;
