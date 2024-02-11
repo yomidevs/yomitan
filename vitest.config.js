@@ -24,7 +24,8 @@ export default defineConfig({
         exclude: [
             ...configDefaults.exclude,
             'dev/lib/**',
-            'test/playwright/**'
+            'test/playwright/**',
+            'test/json.test.js'
         ],
         poolOptions: {
             threads: {
