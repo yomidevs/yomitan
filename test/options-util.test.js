@@ -674,7 +674,8 @@ async function testFieldTemplatesUpdate() {
             {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
             {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
             {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')},
-            {version: 21, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v21.handlebars')}
+            {version: 21, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v21.handlebars')},
+            {version: 24, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v24.handlebars')}
         ];
         /**
          * @param {number} startVersion
@@ -1569,7 +1570,65 @@ async function testFieldTemplatesUpdate() {
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart()
-            }
+            },
+            {
+                oldVersion: 21,
+                newVersion: 24,
+                old: `
+{{#*inline "conjugation"}}
+    {{~#if (op ">" definition.inflectionRuleChainCandidates.length 0)~}}
+        {{~set "multiple" false~}}
+        {{~#if (op ">" definition.inflectionRuleChainCandidates.length 1)~}}
+            {{~set "multiple" true~}}
+        {{~/if~}}
+        {{~#if (get "multiple")~}}<ul>{{/if~}}
+            {{~#each definition.inflectionRuleChainCandidates~}}
+                {{~#if (op ">" inflectionRules.length 0)~}}
+                    {{~#if (get "multiple")~}}<li>{{/if~}}
+                    {{~#each inflectionRules~}}
+                        {{~#if (op ">" @index 0)}} « {{/if~}}
+                        {{.}}
+                    {{~/each~}}
+                    {{~#if (get "multiple")~}}</li>{{/if~}}
+                {{~/if~}}
+            {{~/each~}}
+        {{~#if (get "multiple")~}}</ul>{{/if~}}
+    {{~/if~}}
+{{/inline}}
+`.trimStart(),
+
+                expected: `
+{{#*inline "conjugation"}}
+    {{~#if definition.reasons~}}
+        {{~#each definition.reasons~}}
+            {{~#if (op ">" @index 0)}} « {{/if~}}
+            {{.}}
+        {{~/each~}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "phonetic-transcriptions"}}
+    {{~#if (op ">" definition.phoneticTranscriptions.length 0)~}}
+        <ul>
+            {{~#each definition.phoneticTranscriptions~}}
+                {{~#each phoneticTranscriptions~}}
+                    <li>
+                        {{~set "any" false~}}
+                        {{~#each tags~}}
+                            {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                            {{name}}
+                            {{~set "any" true~}}
+                        {{~/each~}}
+                        {{~#if (get "any")}})</i> {{/if~}}
+                        {{ipa~}}
+                    </li>
+                {{~/each~}}
+            {{~/each~}}
+        </ul>
+    {{~/if~}}
+{{/inline}}
+`.trimStart()
+            },
         ];
 
         const updatesPattern = /<<<UPDATE-ADDITIONS>>>/g;
