@@ -15,24 +15,43 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {TextSourceMap} from '../../ext/js/general/text-source-map.js';
-import type * as Core from './core';
+import type {TextSourceMap} from '../../ext/js/general/text-source-map.js';
+import type {SafeAny} from './core';
 
 export type TextPreprocessorOptions<T = unknown> = T[];
 
-export type TextPreprocessorFunction<T = unknown> = (str: string, setting: T, sourceMap?: TextSourceMap) => string;
+export type TextPreprocessorFunction<T = unknown> = (str: string, setting: T, sourceMap: TextSourceMap) => string;
 
 export type TextPreprocessor<T = unknown> = {
-    id: string;
     name: string;
     description: string;
     options: TextPreprocessorOptions<T>;
     process: TextPreprocessorFunction<T>;
 };
 
-export type Language = {
+export type LanguageAndPreprocessors = {
+    iso: string;
+    textPreprocessors: TextPreprocessorWithId<unknown>[];
+};
+
+export type TextPreprocessorWithId<T = unknown> = {
+    id: string;
+    textPreprocessor: TextPreprocessor<T>;
+};
+
+export type LanguageSummary = {
     name: string;
     iso: string;
     exampleText: string;
-    textPreprocessors: TextPreprocessor<Core.SafeAny>[];
+};
+
+export type LanguageDescriptor<TTextPreprocessorDescriptor extends TextPreprocessorDescriptor> = {
+    name: string;
+    iso: string;
+    exampleText: string;
+    textPreprocessors: TTextPreprocessorDescriptor;
+};
+
+export type TextPreprocessorDescriptor = {
+    [key: string]: TextPreprocessor<SafeAny>;
 };

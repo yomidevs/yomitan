@@ -29,6 +29,8 @@
             "event-listener-collection": ["../types/ext/event-listener-collection"],
             "japanese-util": ["../types/ext/japanese-util"],
             "language": ["../types/ext/language"],
+            "language-english": ["../types/ext/language-english"],
+            "language-japanese": ["../types/ext/language-japanese"],
             "ext/json-schema": ["../types/ext/json-schema"],
             "language-transformer": ["../types/ext/language-transformer"],
             "language-transformer-internal": ["../types/ext/language-transformer-internal"],

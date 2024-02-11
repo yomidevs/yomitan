@@ -362,10 +362,10 @@ export class API {
     }
 
     /**
-     * @returns {Promise<import('api').ApiReturn<'getLanguages'>>}
+     * @returns {Promise<import('api').ApiReturn<'getLanguageSummaries'>>}
      */
-    getLanguages() {
-        return this._invoke('getLanguages', void 0);
+    getLanguageSummaries() {
+        return this._invoke('getLanguageSummaries', void 0);
     }
 
     // Utilities

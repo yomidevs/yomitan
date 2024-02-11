@@ -18,18 +18,16 @@
 /** @type {import('language').TextPreprocessorOptions<boolean>} */
 export const basicTextPreprocessorOptions = [false, true];
 
-/** @type {import('language').TextPreprocessor} */
+/** @type {import('language').TextPreprocessor<boolean>} */
 export const decapitalize = {
-    id: 'decapitalize',
     name: 'Decapitalize text',
     description: 'CAPITALIZED TEXT → capitalized text',
     options: basicTextPreprocessorOptions,
     process: (str, setting) => setting ? str.toLowerCase() : str
 };
 
-/** @type {import('language').TextPreprocessor} */
+/** @type {import('language').TextPreprocessor<boolean>} */
 export const capitalizeFirstLetter = {
-    id: 'capitalizeFirstLetter',
     name: 'Capitalize first letter',
     description: 'lowercase text → Lowercase text',
     options: basicTextPreprocessorOptions,

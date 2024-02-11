@@ -15,40 +15,47 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {textPreprocessors as textPreprocessorsEN} from './en/text-preprocessors.js';
-import {textPreprocessors as textPreprocessorsJA} from './ja/text-preprocessors.js';
+import {descriptor as descriptorEnglish} from './en/language-english.js';
+import {descriptor as descriptorJapanese} from './ja/language-japanese.js';
 
-/** @type {Map<string, import('language').Language>} */
-const languages = new Map([
-    ['ja', {
-        name: 'Japanese',
-        iso: 'ja',
-        exampleText: '読め',
-        textPreprocessors: textPreprocessorsJA
-    }],
-    ['en', {
-        name: 'English',
-        iso: 'en',
-        exampleText: 'read',
-        textPreprocessors: textPreprocessorsEN
-    }]
-]);
+const languageDescriptors = [
+    descriptorEnglish,
+    descriptorJapanese
+];
 
-
-/** @returns {import('language').Language[]}*/
-export function getLanguages() {
-    return [...languages.values()];
+/** @type {Map<string, typeof languageDescriptors[0]>} */
+const languageDescriptorMap = new Map();
+for (const languageDescriptor of languageDescriptors) {
+    languageDescriptorMap.set(languageDescriptor.iso, languageDescriptor);
 }
 
 /**
- * @param {string} iso
- * @returns {import('language').TextPreprocessor[]}
+ * @returns {import('language').LanguageSummary[]}
+ */
+export function getLanguageSummaries() {
+    const results = [];
+    for (const {name, iso, exampleText} of languageDescriptorMap.values()) {
+        results.push({name, iso, exampleText});
+    }
+    return results;
+}
+
+/**
+ * @returns {import('language').LanguageAndPreprocessors[]}
  * @throws {Error}
  */
-export function getTextPreprocessors(iso) {
-    const language = languages.get(iso);
-    if (!language) {
-        throw new Error(`Language not found: ${iso}`);
+export function getAllLanguageTextPreprocessors() {
+    const results = [];
+    for (const {iso, textPreprocessors} of languageDescriptorMap.values()) {
+        /** @type {import('language').TextPreprocessorWithId<unknown>[]} */
+        const textPreprocessorsArray = [];
+        for (const [id, textPreprocessor] of Object.entries(textPreprocessors)) {
+            textPreprocessorsArray.push({
+                id,
+                textPreprocessor: /** @type {import('language').TextPreprocessor<unknown>} */ (textPreprocessor)
+            });
+        }
+        results.push({iso, textPreprocessors: textPreprocessorsArray});
     }
-    return language.textPreprocessors;
+    return results;
 }

@@ -34,7 +34,7 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {getLanguages} from '../language/languages.js';
+import {getLanguageSummaries} from '../language/languages.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -185,7 +185,7 @@ export class Backend {
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
-            ['getLanguages',                 this._onApiGetLanguages.bind(this)]
+            ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -909,9 +909,9 @@ export class Backend {
         return {targetTabId, targetFrameId};
     }
 
-    /** @type {import('api').ApiHandler<'getLanguages'>} */
-    _onApiGetLanguages() {
-        return getLanguages();
+    /** @type {import('api').ApiHandler<'getLanguageSummaries'>} */
+    _onApiGetLanguageSummaries() {
+        return getLanguageSummaries();
     }
 
     // Command handlers
