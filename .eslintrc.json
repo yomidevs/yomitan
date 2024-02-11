@@ -34,7 +34,8 @@
         "@typescript-eslint",
         "@stylistic",
         "unicorn",
-        "sonarjs"
+        "sonarjs",
+        "import"
     ],
     "ignorePatterns": [
         "/ext/lib/",
@@ -250,6 +251,8 @@
         "eslint-comments/no-unused-disable": "error",
 
         "unused-imports/no-unused-imports": "error",
+
+        "import/extensions": ["error", "ignorePackages"],
 
         "unicorn/catch-error-name": ["error", {"ignore": ["^(e|err|error2?)$"]}],
         "unicorn/custom-error-definition": "error",

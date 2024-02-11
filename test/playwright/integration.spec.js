@@ -16,7 +16,7 @@
  */
 
 import path from 'path';
-import {createDictionaryArchive} from '../../dev/util';
+import {createDictionaryArchive} from '../../dev/util.js';
 import {
     expect,
     expectedAddNoteBody,
@@ -26,7 +26,7 @@ import {
     root,
     test,
     writeToClipboardFromPage
-} from './playwright-util';
+} from './playwright-util.js';
 
 test.beforeEach(async ({context}) => {
     // Wait for the on-install welcome.html tab to load, which becomes the foreground tab

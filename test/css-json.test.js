@@ -18,7 +18,7 @@
 
 import fs from 'fs';
 import {describe, expect, test} from 'vitest';
-import {formatRulesJson, generateRules, getTargets} from '../dev/generate-css-json';
+import {formatRulesJson, generateRules, getTargets} from '../dev/generate-css-json.js';
 
 /** */
 function main() {
