@@ -350,25 +350,39 @@ export type PreventMiddleMouseOptions = {
 };
 
 export type ResultOutputMode = 'group' | 'merge' | 'split';
+
 export type PopupDisplayMode = 'default' | 'full-width';
+
 export type PopupHorizontalTextPosition = 'below' | 'above';
+
 export type PopupVerticalTextPosition = 'default' | 'before' | 'after' | 'left' | 'right';
+
 export type GlossaryLayoutMode = 'default' | 'compact';
+
 export type PopupTheme = 'light' | 'dark' | 'browser';
+
 export type PopupOuterTheme = 'light' | 'dark' | 'browser' | 'site';
+
 export type PopupCurrentIndicatorMode = 'none' | 'asterisk' | 'triangle' | 'bar-left' | 'bar-right' | 'dot-left' | 'dot-right';
+
 export type PopupActionBarVisibility = 'auto' | 'always';
+
 export type PopupActionBarLocation = 'left' | 'right' | 'top' | 'bottom';
+
 export type FrequencyDisplayMode = 'tags' | 'tags-grouped' | 'split-tags' | 'split-tags-grouped' | 'inline-list' | 'list';
+
 export type TermDisplayMode = 'ruby' | 'ruby-and-reading' | 'term-and-reading';
+
 export type SortFrequencyDictionaryOrder = 'ascending' | 'descending';
 
 export type PopupWindowType = 'normal' | 'popup';
+
 export type PopupWindowState = 'normal' | 'maximized' | 'fullscreen';
 
 export type AudioSourceType = 'jpod101' | 'jpod101-alternate' | 'jisho' | 'text-to-speech' | 'text-to-speech-reading' | 'custom' | 'custom-json';
 
 export type TranslationConvertType = 'false' | 'true' | 'variant';
+
 export type TranslationCollapseEmphaticSequences = 'false' | 'true' | 'full';
 
 export type DictionaryDefinitionsCollapsible = 'not-collapsible' | 'expanded' | 'collapsed' | 'force-collapsed' | 'force-expanded';
@@ -376,11 +390,15 @@ export type DictionaryDefinitionsCollapsible = 'not-collapsible' | 'expanded' | 
 export type ParsingReadingMode = 'hiragana' | 'katakana' | 'romaji' | 'dictionary-reading' | 'none';
 
 export type AnkiScreenshotFormat = 'png' | 'jpeg';
+
 export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
+
 export type AnkiDisplayTags = 'never' | 'always' | 'non-standard';
+
 export type AnkiNoteGuiMode = 'browse' | 'edit';
 
 export type SentenceTerminationCharacterMode = 'custom' | 'custom-no-newlines' | 'newlines' | 'none';
 
 export type InputsHotkeyModifier = 'alt' | 'ctrl' | 'shift' | 'meta';
+
 export type InputsHotkeyScope = 'popup' | 'search' | 'web';

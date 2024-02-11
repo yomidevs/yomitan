@@ -59,6 +59,7 @@ export class Logger extends EventDispatcher {
             } else {
                 errorString = (
                     typeof error === 'object' && error !== null ?
+                    // eslint-disable-next-line @typescript-eslint/no-base-to-string
                     error.toString() :
                     `${error}`
                 );

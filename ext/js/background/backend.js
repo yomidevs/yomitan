@@ -2476,7 +2476,7 @@ export class Backend {
         chrome.storage.session.get(['openedWelcomePage']).then((result) => {
             if (!result.openedWelcomePage) {
                 this._openWelcomeGuidePage();
-                chrome.storage.session.set({'openedWelcomePage': true});
+                chrome.storage.session.set({openedWelcomePage: true});
             }
         });
     }

@@ -23,10 +23,10 @@ import JSZip from 'jszip';
 import {fileURLToPath} from 'node:url';
 import path from 'path';
 import readline from 'readline';
+import {parseArgs} from 'util';
 import {buildLibs} from '../build-libs.js';
 import {ManifestUtil} from '../manifest-util.js';
 import {getAllFiles, testMain} from '../util.js';
-import {parseArgs} from 'util';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -267,7 +267,8 @@ export async function main(argv) {
         await buildLibs();
         const variantNames = /** @type {string[]} */ ((
             argv.length === 0 || args.all ?
-            manifestUtil.getVariants().filter(({buildable}) => buildable !== false).map(({name}) => name) : []
+            manifestUtil.getVariants().filter(({buildable}) => buildable !== false).map(({name}) => name) :
+            []
         ));
         await build(buildDir, extDir, manifestUtil, variantNames, manifestPath, dryRun, dryRunBuildZip, yomitanVersion);
     } finally {

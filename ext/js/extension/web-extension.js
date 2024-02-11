@@ -26,6 +26,13 @@ export class WebExtension extends EventDispatcher {
         super();
         /** @type {boolean} */
         this._unloaded = false;
+        /** @type {?string} */
+        this._extensionBaseUrl = null;
+        try {
+            this._extensionBaseUrl = this.getUrl('/');
+        } catch (e) {
+            // NOP
+        }
     }
 
     /** @type {boolean} */
@@ -104,5 +111,14 @@ export class WebExtension extends EventDispatcher {
         if (this._unloaded) { return; }
         this._unloaded = true;
         this.trigger('unloaded', {});
+    }
+
+    /**
+     * Checks whether or not a URL is an extension URL.
+     * @param {string} url The URL to check.
+     * @returns {boolean} `true` if the URL is an extension URL, `false` otherwise.
+     */
+    isExtensionUrl(url) {
+        return this._extensionBaseUrl !== null && url.startsWith(this._extensionBaseUrl);
     }
 }

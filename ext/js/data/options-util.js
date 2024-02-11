@@ -46,7 +46,8 @@ export class OptionsUtil {
         // Invalid options
         let options = /** @type {{[key: string]: unknown}} */ (
             typeof optionsInput === 'object' && optionsInput !== null && !Array.isArray(optionsInput) ?
-            optionsInput : {}
+            optionsInput :
+            {}
         );
 
         // Check for legacy options
@@ -495,6 +496,7 @@ export class OptionsUtil {
      * @returns {import('options-util').UpdateFunction[]}
      */
     _getVersionUpdates(targetVersion) {
+        /* eslint-disable @typescript-eslint/unbound-method */
         const result = [
             this._updateVersion1,
             this._updateVersion2,
@@ -522,6 +524,7 @@ export class OptionsUtil {
             this._updateVersion24,
             this._updateVersion25
         ];
+        /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
             result.splice(targetVersion);
         }
@@ -1091,9 +1094,9 @@ export class OptionsUtil {
         }
 
         if (customTemplates && isObject(chrome.storage)) {
-            chrome.storage.session.set({'needsCustomTemplatesWarning': true});
+            chrome.storage.session.set({needsCustomTemplatesWarning: true});
             await this._createTab(chrome.runtime.getURL('/welcome.html'));
-            chrome.storage.session.set({'openedWelcomePage': true});
+            chrome.storage.session.set({openedWelcomePage: true});
         }
     }
 

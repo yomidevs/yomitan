@@ -62,7 +62,7 @@ function setInjectedStylesheet(id, parentNode, value) {
  * @throws {Error}
  */
 export async function loadStyle(application, id, type, value, useWebExtensionApi = false, parentNode = null) {
-    if (useWebExtensionApi && application.isExtensionUrl(window.location.href)) {
+    if (useWebExtensionApi && application.webExtension.isExtensionUrl(window.location.href)) {
         // Permissions error will occur if trying to use the WebExtension API to inject into an extension page
         useWebExtensionApi = false;
     }
