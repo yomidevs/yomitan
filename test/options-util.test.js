@@ -1628,7 +1628,7 @@ async function testFieldTemplatesUpdate() {
     {{~/if~}}
 {{/inline}}
 `.trimStart()
-            },
+            }
         ];
 
         const updatesPattern = /<<<UPDATE-ADDITIONS>>>/g;
