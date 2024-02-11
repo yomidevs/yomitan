@@ -32,7 +32,8 @@
         "jsonc",
         "unused-imports",
         "@typescript-eslint",
-        "@stylistic"
+        "@stylistic",
+        "unicorn"
     ],
     "ignorePatterns": [
         "/ext/lib/",
