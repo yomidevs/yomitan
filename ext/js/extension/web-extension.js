@@ -105,4 +105,12 @@ export class WebExtension extends EventDispatcher {
         this._unloaded = true;
         this.trigger('unloaded', {});
     }
+
+    /**
+     * @returns {boolean}
+     */
+    isOffscreenSupported() {
+        const {offscreen} = chrome;
+        return typeof offscreen === 'object' && offscreen !== null;
+    }
 }

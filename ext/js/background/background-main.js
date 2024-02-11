@@ -16,14 +16,41 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ClipboardReader} from '../comm/clipboard-reader.js';
+import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {WebExtension} from '../extension/web-extension.js';
+import {Translator} from '../language/translator.js';
 import {Backend} from './backend.js';
+import {ClipboardReaderProxy, DictionaryDatabaseProxy, OffscreenProxy, TranslatorProxy} from './offscreen-proxy.js';
 
 /** Entry point. */
 async function main() {
     const webExtension = new WebExtension();
 
-    const backend = new Backend(webExtension);
+    /** @type {?import('../dictionary/dictionary-database.js').DictionaryDatabase|import('./offscreen-proxy.js').DictionaryDatabaseProxy} */
+    let dictionaryDatabase = null;
+    /** @type {?import('../language/translator.js').Translator|import('./offscreen-proxy.js').TranslatorProxy} */
+    let translator = null;
+    /** @type {?import('../comm/clipboard-reader.js').ClipboardReader|import('./offscreen-proxy.js').ClipboardReaderProxy} */
+    let clipboardReader = null;
+    if (webExtension.isOffscreenSupported()) {
+        const offscreen = new OffscreenProxy(webExtension);
+        offscreen.prepare();
+        dictionaryDatabase = new DictionaryDatabaseProxy(offscreen);
+        translator = new TranslatorProxy(offscreen);
+        clipboardReader = new ClipboardReaderProxy(offscreen);
+    } else {
+        dictionaryDatabase = new DictionaryDatabase();
+        translator = new Translator({database: dictionaryDatabase});
+        clipboardReader = new ClipboardReader({
+            // eslint-disable-next-line no-undef
+            document: (typeof document === 'object' && document !== null ? document : null),
+            pasteTargetSelector: '#clipboard-paste-target',
+            richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
+        });
+    }
+
+    const backend = new Backend(webExtension, dictionaryDatabase, translator, clipboardReader);
     await backend.prepare();
 }
 
