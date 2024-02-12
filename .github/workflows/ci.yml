@@ -53,6 +53,11 @@ jobs:
         env:
           CI: true
 
+      - name: Test JSON
+        run: npm run test-json
+        env:
+          CI: true
+
       - name: Build Legal
         run: npm run license-report
 
