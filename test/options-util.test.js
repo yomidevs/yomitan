@@ -628,6 +628,42 @@ async function testUpdate() {
 }
 
 /** */
+async function testCumulativeFieldTemplatesUpdates() {
+    /**
+     * @param {string} templates
+     * @returns {Map<string, string>}
+     */
+    const getHandlebarsPartials = (templates) => {
+        const inlinePartialRegex = /{{~?#\*inline .*?"([^"]*)"~?}}.*?{{~?\/inline~?}}/gs;
+        const matches = templates.matchAll(inlinePartialRegex);
+        const partials = new Map();
+        for (const match of matches) {
+            const [template, name] = match;
+            partials.set(name, template);
+        }
+        return partials;
+    };
+    test('CumulativeFieldTemplatesUpdates', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        const options = /** @type {import('core').SafeAny} */ (createOptionsTestData1());
+
+        const oldAnkiFieldTemplates = fs.readFileSync(path.join(dirname, 'data', 'templates', 'old-default-anki-field-templates.handlebars'), {encoding: 'utf8'});
+        const defaultAnkiFieldTemplates = fs.readFileSync(path.join(dirname, '..', 'ext', 'data', 'templates', 'default-anki-field-templates.handlebars'), {encoding: 'utf8'});
+
+        options.profiles[0].options.anki.fieldTemplates = oldAnkiFieldTemplates;
+        const optionsUpdated = structuredClone(await optionsUtil.update(options));
+        const fieldTemplatesUpdated = optionsUpdated.profiles[0].options.anki.fieldTemplates || '';
+
+        const partialsUpdated = getHandlebarsPartials(fieldTemplatesUpdated);
+        const partialsExpected = getHandlebarsPartials(defaultAnkiFieldTemplates);
+
+        expect(partialsUpdated).toStrictEqual(partialsExpected);
+    });
+}
+
+/** */
 async function testDefault() {
     describe('Default', () => {
         /** @type {((options: import('options-util').IntermediateOptions) => void)[]} */
@@ -1697,6 +1733,7 @@ async function main() {
     await testUpdate();
     await testDefault();
     await testFieldTemplatesUpdate();
+    await testCumulativeFieldTemplatesUpdates();
 }
 
 await main();
