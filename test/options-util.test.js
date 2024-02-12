@@ -667,7 +667,7 @@ async function testFieldTemplatesUpdate() {
             return templatePatcher.parsePatch(content).addition;
         };
 
-        /** @type {{version: number, changes: string}[]} */
+        /** @type {import('options-util').TemplateFieldUpdate[]} */
         const updates = [];
         const fileNameRegex = /^anki-field-templates-upgrade-v(\d+)\.handlebars$/;
         const templatesDirPath = path.join(dirname, '..', 'ext', 'data', 'templates');
