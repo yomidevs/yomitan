@@ -663,20 +663,25 @@ async function testFieldTemplatesUpdate() {
          * @returns {string}
          */
         const loadDataFile = (fileName) => {
-            const content = fs.readFileSync(path.join(dirname, '..', 'ext', fileName), {encoding: 'utf8'});
+            const content = fs.readFileSync(fileName, {encoding: 'utf8'});
             return templatePatcher.parsePatch(content).addition;
         };
-        const updates = [
-            {version: 2, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars')},
-            {version: 4, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars')},
-            {version: 6, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars')},
-            {version: 8, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
-            {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
-            {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
-            {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')},
-            {version: 21, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v21.handlebars')},
-            {version: 24, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v24.handlebars')}
-        ];
+
+        /** @type {{version: number, changes: string}[]} */
+        const updates = [];
+        const fileNameRegex = /^anki-field-templates-upgrade-v(\d+)\.handlebars$/;
+        const templatesDirPath = path.join(dirname, '..', 'ext', 'data', 'templates');
+        const templatesDir = fs.readdirSync(templatesDirPath, {encoding: 'utf8'});
+        for (const fileName of templatesDir) {
+            const match = fileNameRegex.exec(fileName);
+            if (match !== null) {
+                updates.push({
+                    version: Number.parseInt(match[1]),
+                    changes: loadDataFile(path.join(templatesDirPath, match[0]))
+                });
+            }
+        }
+        updates.sort((a, b) => a.version - b.version);
         /**
          * @param {number} startVersion
          * @param {number} targetVersion
