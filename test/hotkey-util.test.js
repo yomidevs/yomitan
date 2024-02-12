@@ -160,7 +160,7 @@ function testSortModifiers() {
 
         const hotkeyUtil = new HotkeyUtil();
         for (const {modifiers, expected} of data) {
-            test(`[${modifiers}] -> [${expected}]`, () => {
+            test(`[${modifiers.join(',')}] -> [${expected.join(',')}]`, () => {
                 const modifiers2 = hotkeyUtil.sortModifiers(modifiers);
                 expect(modifiers2).toStrictEqual(modifiers);
                 expect(modifiers2).toStrictEqual(expected);

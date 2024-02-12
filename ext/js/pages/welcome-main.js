@@ -63,7 +63,7 @@ await Application.main(async (application) => {
 
     setupEnvironmentInfo(application.api);
 
-    chrome.storage.session.get({'needsCustomTemplatesWarning': false}).then((result) => {
+    chrome.storage.session.get({needsCustomTemplatesWarning: false}).then((result) => {
         if (result.needsCustomTemplatesWarning) {
             document.documentElement.dataset.warnCustomTemplates = 'true';
             chrome.storage.session.remove(['needsCustomTemplatesWarning']);

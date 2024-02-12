@@ -102,9 +102,13 @@ export type TermGlossaryContent = (
 );
 
 export type TermGlossaryString = string;
+
 export type TermGlossaryText = {type: 'text', text: string};
+
 export type TermGlossaryImage = {type: 'image'} & TermImage;
+
 export type TermGlossaryStructuredContent = {type: 'structured-content', content: StructuredContent.Content};
+
 export type TermGlossaryDeinflection = [
     uninflected: string,
     inflectionRuleChain: string[],

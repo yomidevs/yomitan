@@ -579,7 +579,9 @@ export class BackupController {
      */
     async _exportDatabase(databaseName) {
         const db = await new Dexie(databaseName).open();
-        const blob = await db.export({progressCallback: this._databaseExportProgressCallback});
+        const blob = await db.export({
+            progressCallback: this._databaseExportProgressCallback.bind(this)
+        });
         await db.close();
         return blob;
     }
@@ -639,12 +641,14 @@ export class BackupController {
     }
 
     /**
-     * @param {string} databaseName
+     * @param {string} _databaseName
      * @param {File} file
      */
-    async _importDatabase(databaseName, file) {
+    async _importDatabase(_databaseName, file) {
         await this._settingsController.application.api.purgeDatabase();
-        await Dexie.import(file, {progressCallback: this._databaseImportProgressCallback});
+        await Dexie.import(file, {
+            progressCallback: this._databaseImportProgressCallback.bind(this)
+        });
         this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
         this._settingsController.application.triggerStorageChanged();
     }

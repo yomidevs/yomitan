@@ -33,6 +33,6 @@ export type NormalizedOptionsContext1 = Settings.OptionsContext1 & {
 
 export type NormalizedOptionsContext2 = Settings.OptionsContext2;
 
-export type NormalizedOptionsContext3 = Settings.OptionsContext2;
+export type NormalizedOptionsContext3 = Settings.OptionsContext3;
 
 export type NormalizedOptionsContext = NormalizedOptionsContext1 | NormalizedOptionsContext2 | NormalizedOptionsContext3;
