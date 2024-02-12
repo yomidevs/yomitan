@@ -24,3 +24,8 @@ export type IntermediateOptions = Core.SafeAny;
 export type LegacyUpdateFunction = (options: LegacyOptions) => void;
 
 export type UpdateFunction = (options: IntermediateOptions) => void | Promise<void>;
+
+export type TemplateFieldUpdate = {
+    version: number;
+    changes: string;
+};

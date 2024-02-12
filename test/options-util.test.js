@@ -699,19 +699,25 @@ async function testFieldTemplatesUpdate() {
          * @returns {string}
          */
         const loadDataFile = (fileName) => {
-            const content = fs.readFileSync(path.join(dirname, '..', 'ext', fileName), {encoding: 'utf8'});
+            const content = fs.readFileSync(fileName, {encoding: 'utf8'});
             return templatePatcher.parsePatch(content).addition;
         };
-        const updates = [
-            {version: 2, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars')},
-            {version: 4, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars')},
-            {version: 6, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars')},
-            {version: 8, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
-            {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
-            {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
-            {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')},
-            {version: 21, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v21.handlebars')}
-        ];
+
+        /** @type {import('options-util').TemplateFieldUpdate[]} */
+        const updates = [];
+        const fileNameRegex = /^anki-field-templates-upgrade-v(\d+)\.handlebars$/;
+        const templatesDirPath = path.join(dirname, '..', 'ext', 'data', 'templates');
+        const templatesDir = fs.readdirSync(templatesDirPath, {encoding: 'utf8'});
+        for (const fileName of templatesDir) {
+            const match = fileNameRegex.exec(fileName);
+            if (match !== null) {
+                updates.push({
+                    version: Number.parseInt(match[1]),
+                    changes: loadDataFile(path.join(templatesDirPath, match[0]))
+                });
+            }
+        }
+        updates.sort((a, b) => a.version - b.version);
         /**
          * @param {number} startVersion
          * @param {number} targetVersion
@@ -1605,6 +1611,100 @@ async function testFieldTemplatesUpdate() {
 {{/inline}}
 
 {{~> (lookup . "marker") ~}}`.trimStart()
+            },
+            {
+                oldVersion: 21,
+                newVersion: 24,
+                old: `
+{{#*inline "conjugation"}}
+    {{~#if definition.reasons~}}
+        {{~#each definition.reasons~}}
+            {{~#if (op ">" @index 0)}} « {{/if~}}
+            {{.}}
+        {{~/each~}}
+    {{~/if~}}
+{{/inline}}`.trimStart(),
+
+                expected: `
+{{#*inline "conjugation"}}
+    {{~#if (op ">" definition.inflectionRuleChainCandidates.length 0)~}}
+        {{~set "multiple" false~}}
+        {{~#if (op ">" definition.inflectionRuleChainCandidates.length 1)~}}
+            {{~set "multiple" true~}}
+        {{~/if~}}
+        {{~#if (get "multiple")~}}<ul>{{/if~}}
+            {{~#each definition.inflectionRuleChainCandidates~}}
+                {{~#if (op ">" inflectionRules.length 0)~}}
+                    {{~#if (get "multiple")~}}<li>{{/if~}}
+                    {{~#each inflectionRules~}}
+                        {{~#if (op ">" @index 0)}} « {{/if~}}
+                        {{.}}
+                    {{~/each~}}
+                    {{~#if (get "multiple")~}}</li>{{/if~}}
+                {{~/if~}}
+            {{~/each~}}
+        {{~#if (get "multiple")~}}</ul>{{/if~}}
+    {{~/if~}}
+{{/inline}}
+{{#*inline "cloze-body-kana"}}
+    {{~#if definition.cloze}}{{definition.cloze.bodyKana}}{{/if~}}
+{{/inline}}
+
+{{#*inline "phonetic-transcriptions"}}
+    {{~#if (op ">" definition.phoneticTranscriptions.length 0)~}}
+        <ul>
+            {{~#each definition.phoneticTranscriptions~}}
+                {{~#each phoneticTranscriptions~}}
+                    <li>
+                        {{~set "any" false~}}
+                        {{~#each tags~}}
+                            {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                            {{name}}
+                            {{~set "any" true~}}
+                        {{~/each~}}
+                        {{~#if (get "any")}})</i> {{/if~}}
+                        {{ipa~}}
+                    </li>
+                {{~/each~}}
+            {{~/each~}}
+        </ul>
+    {{~/if~}}
+{{/inline}}
+{{#*inline "frequency-harmonic-rank"}}
+    {{~#if (op "===" definition.frequencyHarmonic -1) ~}}
+        9999999
+    {{~else ~}}
+        {{definition.frequencyHarmonic}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-harmonic-occurrence"}}
+    {{~#if (op "===" definition.frequencyHarmonic -1) ~}}
+        0
+    {{~else ~}}
+        {{definition.frequencyHarmonic}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-average-rank"}}
+    {{~#if (op "===" definition.frequencyAverage -1) ~}}
+        9999999
+    {{~else ~}}
+        {{definition.frequencyAverage}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-average-occurrence"}}
+    {{~#if (op "===" definition.frequencyAverage -1) ~}}
+        0
+    {{~else ~}}
+        {{definition.frequencyAverage}}
+    {{~/if~}}
+{{/inline}}
+
+{{~#*inline "pitch-accent-categories"~}}
+    {{~#each (pitchCategories @root)~}}{{~.~}}{{~#unless @last~}},{{~/unless~}}{{~/each~}}
+{{~/inline~}}`.trimStart()
             }
         ];
 
