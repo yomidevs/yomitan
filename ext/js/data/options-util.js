@@ -1116,8 +1116,10 @@ export class OptionsUtil {
      */
     _updateVersion23(options) {
         for (const {options: profileOptions} of options.profiles) {
-            for (const dictionary of profileOptions.dictionaries) {
-                dictionary.partsOfSpeechFilter = true;
+            if (Array.isArray(profileOptions.dictionaries)) {
+                for (const dictionary of profileOptions.dictionaries) {
+                    dictionary.partsOfSpeechFilter = true;
+                }
             }
         }
     }
@@ -1130,8 +1132,10 @@ export class OptionsUtil {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v24.handlebars');
 
         for (const {options: profileOptions} of options.profiles) {
-            for (const dictionary of profileOptions.dictionaries) {
-                dictionary.useDeinflections = true;
+            if (Array.isArray(profileOptions.dictionaries)) {
+                for (const dictionary of profileOptions.dictionaries) {
+                    dictionary.useDeinflections = true;
+                }
             }
         }
     }
