@@ -19,9 +19,9 @@ import {capitalizeFirstLetter, decapitalize} from '../text-preprocessors.js';
 
 /** @type {import('language').LanguageWithCapitalization} */
 export const descriptor = {
-    name: 'English',
-    iso: 'en',
-    exampleText: 'read',
+    name: 'Albanian',
+    iso: 'sq',
+    exampleText: 'ndihmojme',
     textPreprocessors: {
         capitalizeFirstLetter,
         decapitalize

@@ -15,15 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {capitalizeFirstLetter, decapitalize} from '../text-preprocessors.js';
+import type {LanguageDescriptor, CapitalizationPreprocessors, RemoveDiacriticsPreprocessors} from '../ext/language';
 
-/** @type {import('language').LanguageWithCapitalization} */
-export const descriptor = {
-    name: 'English',
-    iso: 'en',
-    exampleText: 'read',
-    textPreprocessors: {
-        capitalizeFirstLetter,
-        decapitalize
-    }
-};
+export type LatinTextPreprocessorDescriptor = CapitalizationPreprocessors & RemoveDiacriticsPreprocessors;
+
+export type LatinLanguageDescriptor = LanguageDescriptor<LatinTextPreprocessorDescriptor>;

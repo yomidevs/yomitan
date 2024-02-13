@@ -15,15 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {capitalizeFirstLetter, decapitalize} from '../text-preprocessors.js';
-
-/** @type {import('language').LanguageWithCapitalization} */
 export const descriptor = {
-    name: 'English',
-    iso: 'en',
-    exampleText: 'read',
-    textPreprocessors: {
-        capitalizeFirstLetter,
-        decapitalize
-    }
+    name: 'Khmer',
+    iso: 'km',
+    exampleText: 'អាន',
+    textPreprocessors: {}
 };

@@ -17,13 +17,28 @@
 
 import {capitalizeFirstLetter, decapitalize} from '../text-preprocessors.js';
 
-/** @type {import('language').LanguageWithCapitalization} */
+/** @type {import('language/language-german').GermanLanguageDescriptor} */
 export const descriptor = {
-    name: 'English',
-    iso: 'en',
-    exampleText: 'read',
+    name: 'German',
+    iso: 'de',
+    exampleText: 'gelesen',
     textPreprocessors: {
         capitalizeFirstLetter,
-        decapitalize
+        decapitalize,
+        eszettConversion: {
+            name: 'Convert "ß" to "ss"',
+            description: 'ß → ss, ẞ → SS and vice versa',
+            options: ['off', 'direct', 'inverse'],
+            process: (str, setting) => {
+                switch (setting) {
+                    case 'off':
+                        return str;
+                    case 'direct':
+                        return str.replace(/ẞ/g, 'SS').replace(/ß/g, 'ss');
+                    case 'inverse':
+                        return str.replace(/SS/g, 'ẞ').replace(/ss/g, 'ß');
+                }
+            }
+        }
     }
 };

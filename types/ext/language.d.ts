@@ -55,3 +55,20 @@ export type LanguageDescriptor<TTextPreprocessorDescriptor extends TextPreproces
 export type TextPreprocessorDescriptor = {
     [key: string]: TextPreprocessor<SafeAny>;
 };
+
+export type BidirectionalPreprocessorOptions = 'off' | 'direct' | 'inverse';
+
+export type BidirectionalConversionPreprocessor = TextPreprocessor<BidirectionalPreprocessorOptions>;
+
+export type RemoveDiacriticsPreprocessors = {
+    removeDiacritics: TextPreprocessor<boolean>;
+};
+
+export type CapitalizationPreprocessors = {
+    capitalizeFirstLetter: TextPreprocessor<boolean>;
+    decapitalize: TextPreprocessor<boolean>;
+};
+
+export type LanguageWithCapitalization = LanguageDescriptor<CapitalizationPreprocessors>;
+
+export type LanguageWithoutPreprocessors = LanguageDescriptor<Record<string, never>>;

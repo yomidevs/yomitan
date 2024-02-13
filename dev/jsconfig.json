@@ -29,8 +29,6 @@
             "event-listener-collection": ["../types/ext/event-listener-collection"],
             "japanese-util": ["../types/ext/japanese-util"],
             "language": ["../types/ext/language"],
-            "language-english": ["../types/ext/language-english"],
-            "language-japanese": ["../types/ext/language-japanese"],
             "ext/json-schema": ["../types/ext/json-schema"],
             "language-transformer": ["../types/ext/language-transformer"],
             "language-transformer-internal": ["../types/ext/language-transformer-internal"],
@@ -41,6 +39,7 @@
             "translation": ["../types/ext/translation"],
             "translation-internal": ["../types/ext/translation-internal"],
             "dev/*": ["../types/dev/*"],
+            "language/*": ["../types/language/*"],
             "rollup/parseAst": ["../types/other/rollup-parse-ast"],
             "chai": ["../node_modules/@vitest/expect/dist/chai.d.cts"]
         },

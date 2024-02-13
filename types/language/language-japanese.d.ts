@@ -15,15 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {capitalizeFirstLetter, decapitalize} from '../text-preprocessors.js';
+import type {LanguageDescriptor, TextPreprocessor, BidirectionalConversionPreprocessor} from '../ext/language';
 
-/** @type {import('language').LanguageWithCapitalization} */
-export const descriptor = {
-    name: 'English',
-    iso: 'en',
-    exampleText: 'read',
-    textPreprocessors: {
-        capitalizeFirstLetter,
-        decapitalize
-    }
+export type JapaneseTextPreprocessorDescriptor = {
+    convertHalfWidthCharacters: TextPreprocessor<boolean>;
+    convertNumericCharacters: TextPreprocessor<boolean>;
+    convertAlphabeticCharacters: TextPreprocessor<boolean>;
+    convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
+    collapseEmphaticSequences: TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
 };
+
+export type JapaneseLanguageDescriptor = LanguageDescriptor<JapaneseTextPreprocessorDescriptor>;

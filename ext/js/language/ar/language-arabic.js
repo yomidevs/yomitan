@@ -15,15 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {capitalizeFirstLetter, decapitalize} from '../text-preprocessors.js';
+import {basicTextPreprocessorOptions} from '../text-preprocessors.js';
 
-/** @type {import('language').LanguageWithCapitalization} */
+/** @type {import('language/language-arabic').ArabicLanguageDescriptor} */
 export const descriptor = {
-    name: 'English',
-    iso: 'en',
-    exampleText: 'read',
+    name: 'Arabic',
+    iso: 'ar',
+    exampleText: 'قَرَأَ',
     textPreprocessors: {
-        capitalizeFirstLetter,
-        decapitalize
+        removeDiacritics: {
+            name: 'Remove diacritics',
+            description: 'وَلَدَ ⬅️ ولد',
+            options: basicTextPreprocessorOptions,
+            process: (text, setting) => {
+                return setting ? text.replace(/[\u064E-\u0650]/g, '') : text;
+            }
+        }
     }
 };
