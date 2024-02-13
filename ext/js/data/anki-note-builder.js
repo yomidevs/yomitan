@@ -54,7 +54,6 @@ export class AnkiNoteBuilder {
         fields,
         tags = [],
         requirements = [],
-        checkForDuplicates = true,
         duplicateScope = 'collection',
         duplicateScopeCheckAllModels = false,
         resultOutputMode = 'split',
@@ -111,7 +110,7 @@ export class AnkiNoteBuilder {
             deckName,
             modelName,
             options: {
-                allowDuplicate: !checkForDuplicates,
+                allowDuplicate: true,
                 duplicateScope,
                 duplicateScopeOptions: {
                     deckName: duplicateScopeDeckName,

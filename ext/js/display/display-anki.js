@@ -394,6 +394,7 @@ export class DisplayAnki {
                     this._setupTagsIndicator(i, noteInfos);
                 }
             }
+
             this._updateViewNoteButton(i, allNoteIds !== null ? [...allNoteIds] : [], false);
         }
     }
@@ -506,7 +507,6 @@ export class DisplayAnki {
                             allErrors.push(toError(e));
                         }
                     }
-                    button.disabled = true;
                     this._updateViewNoteButton(dictionaryEntryIndex, [noteId], true);
                 }
             }
@@ -615,7 +615,6 @@ export class DisplayAnki {
      * @returns {Promise<import('display-anki').DictionaryEntryDetails[]>}
      */
     async _getDictionaryEntryDetails(dictionaryEntries) {
-        const forceCanAddValue = (this._checkForDuplicates ? null : true);
         const fetchAdditionalInfo = (this._displayTags !== 'never');
 
         const notePromises = [];
@@ -638,14 +637,13 @@ export class DisplayAnki {
         let infos;
         let ankiError = null;
         try {
-            if (forceCanAddValue !== null) {
-                if (!await this._display.application.api.isAnkiConnected()) {
-                    throw new Error('Anki not connected');
-                }
-                infos = this._getAnkiNoteInfoForceValue(notes, forceCanAddValue);
-            } else {
-                infos = await this._display.application.api.getAnkiNoteInfo(notes, fetchAdditionalInfo);
+            if (!await this._display.application.api.isAnkiConnected()) {
+                throw new Error('Anki not connected');
             }
+
+            infos = this._checkForDuplicates ?
+                await this._display.application.api.getAnkiNoteInfo(notes, fetchAdditionalInfo) :
+                this._getAnkiNoteInfoForceValue(notes, true);
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValue(notes, false);
             ankiError = toError(e);
@@ -711,7 +709,6 @@ export class DisplayAnki {
             modelName,
             fields,
             tags: this._noteTags,
-            checkForDuplicates: this._checkForDuplicates,
             duplicateScope: this._duplicateScope,
             duplicateScopeCheckAllModels: this._duplicateScopeCheckAllModels,
             resultOutputMode: this._resultOutputMode,
