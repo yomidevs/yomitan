@@ -3,7 +3,6 @@
     "conditions": {
         "v": {
             "name": "Verb",
-            "partsOfSpeech": ["v1", "v5", "vk", "vs", "vz"],
             "i18n": [
                 {
                     "language": "ja",
@@ -14,7 +13,6 @@
         },
         "v1": {
             "name": "Ichidan verb",
-            "partsOfSpeech": ["v1"],
             "i18n": [
                 {
                     "language": "ja",
@@ -25,7 +23,6 @@
         },
         "v1d": {
             "name": "Ichidan verb, dictionary form",
-            "partsOfSpeech": ["v1"],
             "i18n": [
                 {
                     "language": "ja",
@@ -35,7 +32,6 @@
         },
         "v1p": {
             "name": "Ichidan verb, progressive or perfect form",
-            "partsOfSpeech": ["v1"],
             "i18n": [
                 {
                     "language": "ja",
@@ -45,7 +41,6 @@
         },
         "v5": {
             "name": "Godan verb",
-            "partsOfSpeech": ["v5"],
             "i18n": [
                 {
                     "language": "ja",
@@ -55,7 +50,6 @@
         },
         "vk": {
             "name": "Kuru verb",
-            "partsOfSpeech": ["vk"],
             "i18n": [
                 {
                     "language": "ja",
@@ -65,7 +59,6 @@
         },
         "vs": {
             "name": "Suru verb",
-            "partsOfSpeech": ["vs"],
             "i18n": [
                 {
                     "language": "ja",
@@ -75,7 +68,6 @@
         },
         "vz": {
             "name": "Zuru verb",
-            "partsOfSpeech": ["vz"],
             "i18n": [
                 {
                     "language": "ja",
@@ -85,7 +77,6 @@
         },
         "adj-i": {
             "name": "Adjective with i ending",
-            "partsOfSpeech": ["adj-i"],
             "i18n": [
                 {
                     "language": "ja",
@@ -94,16 +85,13 @@
             ]
         },
         "-te": {
-            "name": "Intermediate -te endings for progressive or perfect tense",
-            "partsOfSpeech": []
+            "name": "Intermediate -te endings for progressive or perfect tense"
         },
         "adv": {
-            "name": "Intermediate -ku endings for adverbs",
-            "partsOfSpeech": []
+            "name": "Intermediate -ku endings for adverbs"
         },
         "past": {
-            "name": "-ta past form ending",
-            "partsOfSpeech": []
+            "name": "-ta past form ending"
         }
     },
     "transforms": [

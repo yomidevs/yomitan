@@ -31,7 +31,6 @@ export type ConditionMapEntries = ConditionMapEntry[];
 
 export type Condition = {
     name: string;
-    partsOfSpeech: string[];
     i18n?: RuleI18n[];
     subConditions?: string[];
 };
