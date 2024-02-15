@@ -33,7 +33,7 @@ export class DisplayAudio {
         /** @type {AudioSystem} */
         this._audioSystem = new AudioSystem();
         /** @type {number} */
-        this._playbackVolume = 1.0;
+        this._playbackVolume = 1;
         /** @type {boolean} */
         this._autoPlay = false;
         /** @type {?import('core').Timeout} */
@@ -166,7 +166,7 @@ export class DisplayAudio {
     _onOptionsUpdated({options}) {
         const {enabled, autoPlay, volume, sources} = options.audio;
         this._autoPlay = enabled && autoPlay;
-        this._playbackVolume = Number.isFinite(volume) ? Math.max(0.0, Math.min(1.0, volume / 100.0)) : 1.0;
+        this._playbackVolume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume / 100)) : 1;
 
         /** @type {Set<import('settings').AudioSourceType>} */
         const requiredAudioSources = new Set([
@@ -534,7 +534,7 @@ export class DisplayAudio {
         if (headwordNode !== null) {
             const {index} = headwordNode.dataset;
             if (typeof index === 'string') {
-                const headwordIndex = parseInt(index, 10);
+                const headwordIndex = Number.parseInt(index, 10);
                 if (Number.isFinite(headwordIndex)) { return headwordIndex; }
             }
         }

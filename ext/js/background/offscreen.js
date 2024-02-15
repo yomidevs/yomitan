@@ -109,8 +109,7 @@ export class Offscreen {
     /** @type {import('offscreen').ApiHandler<'databaseGetMediaOffscreen'>} */
     async _getMediaHandler({targets}) {
         const media = await this._dictionaryDatabase.getMedia(targets);
-        const serializedMedia = media.map((m) => ({...m, content: arrayBufferToBase64(m.content)}));
-        return serializedMedia;
+        return media.map((m) => ({...m, content: arrayBufferToBase64(m.content)}));
     }
 
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */

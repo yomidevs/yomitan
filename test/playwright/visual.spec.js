@@ -17,7 +17,7 @@
 
 import path from 'path';
 import {pathToFileURL} from 'url';
-import {expect, root, test} from './playwright-util';
+import {expect, root, test} from './playwright-util.js';
 
 test.beforeEach(async ({context}) => {
     // Wait for the on-install welcome.html tab to load, which becomes the foreground tab

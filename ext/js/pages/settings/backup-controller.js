@@ -144,7 +144,7 @@ export class BackupController {
             }
         }
 
-        const data = {
+        return {
             version: this._currentVersion,
             date: this._getSettingsExportDateString(date, '-', ' ', ':', 6),
             url: chrome.runtime.getURL('/'),
@@ -154,8 +154,6 @@ export class BackupController {
             permissions,
             options: optionsFull
         };
-
-        return data;
     }
 
     /**

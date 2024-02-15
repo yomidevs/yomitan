@@ -1294,11 +1294,9 @@ export class TextScanner extends EventDispatcher {
     async _searchAtFromMouseMove(x, y, inputInfo) {
         if (this._pendingLookup) { return; }
 
-        if (inputInfo.passive) {
-            if (!await this._scanTimerWait()) {
-                // Aborted
-                return;
-            }
+        if (inputInfo.passive && !await this._scanTimerWait()) {
+            // Aborted
+            return;
         }
 
         await this._searchAt(x, y, inputInfo);

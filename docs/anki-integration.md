@@ -47,6 +47,7 @@ Flashcard fields can be configured with the following steps:
     | `{glossary-brief}`         | List of definitions for the term in a more compact format.                                                               |
     | `{glossary-no-dictionary}` | List of definitions for the term, except the dictionary tag is omitted.                                                  |
     | `{part-of-speech}`         | Part of speech information for the term.                                                                                 |
+    | `{phonetic-transcriptions}`| List of phonetic transcriptions for the term.                                                                            |
     | `{pitch-accents}`          | List of pitch accent downstep notations for the term.                                                                    |
     | `{pitch-accent-graphs}`    | List of pitch accent graphs for the term.                                                                                |
     | `{pitch-accent-positions}` | List of accent downstep positions for the term as a number.                                                              |

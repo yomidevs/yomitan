@@ -18,7 +18,7 @@
 import {test as teardown} from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import {root} from './playwright-util';
+import {root} from './playwright-util.js';
 
 const manifestPath = path.join(root, 'ext/manifest.json');
 const copyManifestPath = path.join(root, 'ext/manifest-old.json');

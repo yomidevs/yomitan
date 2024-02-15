@@ -18,7 +18,9 @@
 
 /**
  * This class contains utility functions related to the HTML document.
+ * TODO : This class should be made non-static
  */
+// eslint-disable-next-line unicorn/no-static-only-class
 export class DocumentUtil {
     /** @type {?boolean} */
     static _cssZoomSupported = null;
@@ -460,7 +462,7 @@ export class DocumentUtil {
             if (typeof value !== 'string' || value.length === 0) {
                 return null;
             }
-            value = parseFloat(value);
+            value = Number.parseFloat(value);
         }
         return !Number.isNaN(value) ? value : null;
     }

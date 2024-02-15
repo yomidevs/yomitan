@@ -68,7 +68,7 @@ export class Popup extends EventDispatcher {
         /** @type {?import('settings').OptionsContext} */
         this._optionsContext = null;
         /** @type {number} */
-        this._contentScale = 1.0;
+        this._contentScale = 1;
         /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
@@ -777,7 +777,7 @@ export class Popup extends EventDispatcher {
     _getPosition(sourceRects, writingMode, viewport) {
         sourceRects = this._convertSourceRectsCoordinateSpace(sourceRects);
         const contentScale = this._contentScale;
-        const scaleRatio = this._frameSizeContentScale === null ? 1.0 : contentScale / this._frameSizeContentScale;
+        const scaleRatio = this._frameSizeContentScale === null ? 1 : contentScale / this._frameSizeContentScale;
         this._frameSizeContentScale = contentScale;
         const frameRect = this._frame.getBoundingClientRect();
         const frameWidth = Math.max(frameRect.width * scaleRatio, this._initialWidth * contentScale);
@@ -1133,6 +1133,8 @@ class PopupError extends ExtensionError {
      */
     constructor(message, source) {
         super(message);
+        /** @type {string} */
+        this.name = 'PopupError';
         /** @type {Popup} */
         this._source = source;
     }

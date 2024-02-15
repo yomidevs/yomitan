@@ -30,6 +30,7 @@ export async function createAnkiTemplateRendererTest() {
     const ankiTemplateRenderer = new AnkiTemplateRenderer();
     await ankiTemplateRenderer.prepare();
     /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, ankiTemplateRenderer: AnkiTemplateRenderer}>} */
+    // eslint-disable-next-line sonarjs/prefer-immediate-return
     const result = test.extend({
         window: async ({window}, use) => { await use(window); },
         ankiTemplateRenderer: async ({window}, use) => {

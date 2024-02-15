@@ -353,7 +353,7 @@ class ExtensionKeyboardShortcutHotkeyEntry {
      * @param {boolean} updateInput
      */
     async _tryUpdateInput(key, modifiers, updateInput) {
-        let okay = (key === null ? (modifiers.length === 0) : (modifiers.length !== 0));
+        let okay = (key === null ? (modifiers.length === 0) : (modifiers.length > 0));
         if (okay) {
             try {
                 await this._parent.updateCommand(this._name, key, modifiers);

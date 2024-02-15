@@ -92,7 +92,7 @@ const JAPANESE_RANGES = [
     [0xffe0, 0xffee] // Currency markers
 ];
 
-const SMALL_KANA_SET = new Set(Array.from('ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ'));
+const SMALL_KANA_SET = new Set('ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ');
 
 const HALFWIDTH_KATAKANA_MAPPING = new Map([
     ['ｦ', 'ヲヺ-'],

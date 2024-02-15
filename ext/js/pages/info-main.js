@@ -108,7 +108,7 @@ async function showDictionaryInfo(api) {
     /** @type {HTMLElement} */
     const noneElement = querySelectorNotNull(document, '#installed-dictionaries-none');
 
-    noneElement.hidden = (dictionaryInfos.length !== 0);
+    noneElement.hidden = (dictionaryInfos.length > 0);
     /** @type {HTMLElement} */
     const container = querySelectorNotNull(document, '#installed-dictionaries');
     container.textContent = '';

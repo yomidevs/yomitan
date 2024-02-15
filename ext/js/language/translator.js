@@ -491,11 +491,11 @@ export class Translator {
      * @returns {number}
      */
     _getNextSubstringLength(searchResolution, currentLength, source) {
-        if (searchResolution === 'word') {
-            return source.search(/[^\p{Letter}][\p{Letter}\p{Number}]*$/u);
-        } else {
-            return currentLength - 1;
-        }
+        return (
+            searchResolution === 'word' ?
+            source.search(/[^\p{Letter}][\p{Letter}\p{Number}]*$/u) :
+            currentLength - 1
+        );
     }
 
     /**
@@ -620,7 +620,7 @@ export class Translator {
             for (const group of groupedDictionaryEntries) {
                 this._sortTermDictionaryEntriesById(group.dictionaryEntries);
             }
-            if (ungroupedDictionaryEntriesMap.size !== 0 || secondarySearchDictionaryMap.size !== 0) {
+            if (ungroupedDictionaryEntriesMap.size > 0 || secondarySearchDictionaryMap.size > 0) {
                 await this._addSecondaryRelatedDictionaryEntries(groupedDictionaryEntries, ungroupedDictionaryEntriesMap, enabledDictionaryMap, secondarySearchDictionaryMap, tagAggregator);
             }
         }
