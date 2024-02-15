@@ -99,11 +99,11 @@ export class DisplayAnki {
         /** @type {(event: MouseEvent) => void} */
         this._onNoteAddBind = this._onNoteAdd.bind(this);
         /** @type {(event: MouseEvent) => void} */
-        this._onViewNoteButtonClickBind = this._onViewNoteButtonClick.bind(this);
+        this._onViewNotesButtonClickBind = this._onViewNotesButtonClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
-        this._onViewNoteButtonContextMenuBind = this._onViewNoteButtonContextMenu.bind(this);
+        this._onViewNotesButtonContextMenuBind = this._onViewNotesButtonContextMenu.bind(this);
         /** @type {(event: import('popup-menu').MenuCloseEvent) => void} */
-        this._onViewNoteButtonMenuCloseBind = this._onViewNoteButtonMenuClose.bind(this);
+        this._onViewNotesButtonMenuCloseBind = this._onViewNotesButtonMenuClose.bind(this);
     }
 
     /** */
@@ -114,7 +114,7 @@ export class DisplayAnki {
             ['addNoteKanji',      () => { this._tryAddAnkiNoteForSelectedEntry('kanji'); }],
             ['addNoteTermKanji',  () => { this._tryAddAnkiNoteForSelectedEntry('term-kanji'); }],
             ['addNoteTermKana',   () => { this._tryAddAnkiNoteForSelectedEntry('term-kana'); }],
-            ['viewNote',          this._viewNoteForSelectedEntry.bind(this)]
+            ['viewNotes',         this._viewNotesForSelectedEntry.bind(this)]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
@@ -249,9 +249,9 @@ export class DisplayAnki {
             eventListeners.addEventListener(node, 'click', this._onNoteAddBind);
         }
         for (const node of element.querySelectorAll('.action-button[data-action=view-note]')) {
-            eventListeners.addEventListener(node, 'click', this._onViewNoteButtonClickBind);
-            eventListeners.addEventListener(node, 'contextmenu', this._onViewNoteButtonContextMenuBind);
-            eventListeners.addEventListener(node, 'menuClose', this._onViewNoteButtonMenuCloseBind);
+            eventListeners.addEventListener(node, 'click', this._onViewNotesButtonClickBind);
+            eventListeners.addEventListener(node, 'contextmenu', this._onViewNotesButtonContextMenuBind);
+            eventListeners.addEventListener(node, 'menuClose', this._onViewNotesButtonMenuCloseBind);
         }
     }
 
@@ -777,34 +777,34 @@ export class DisplayAnki {
     /**
      * @param {MouseEvent} e
      */
-    _onViewNoteButtonClick(e) {
+    _onViewNotesButtonClick(e) {
         const element = /** @type {HTMLElement} */ (e.currentTarget);
         e.preventDefault();
         if (e.shiftKey) {
-            this._showViewNoteMenu(element);
+            this._showViewNotesMenu(element);
         } else {
-            this._viewNote(element);
+            this._viewNotes(element);
         }
     }
 
     /**
      * @param {MouseEvent} e
      */
-    _onViewNoteButtonContextMenu(e) {
+    _onViewNotesButtonContextMenu(e) {
         const element = /** @type {HTMLElement} */ (e.currentTarget);
         e.preventDefault();
-        this._showViewNoteMenu(element);
+        this._showViewNotesMenu(element);
     }
 
     /**
      * @param {import('popup-menu').MenuCloseEvent} e
      */
-    _onViewNoteButtonMenuClose(e) {
+    _onViewNotesButtonMenuClose(e) {
         const {detail: {action, item}} = e;
         switch (action) {
-            case 'viewNote':
+            case 'viewNotes':
                 if (item !== null) {
-                    this._viewNote(item);
+                    this._viewNotes(item);
                 }
                 break;
         }
@@ -848,11 +848,11 @@ export class DisplayAnki {
     /**
      * @param {HTMLElement} node
      */
-    async _viewNote(node) {
+    async _viewNotes(node) {
         const noteIds = this._getNodeNoteIds(node);
         if (noteIds.length === 0) { return; }
         try {
-            await this._display.application.api.noteView(noteIds[0], this._noteGuiMode, false);
+            await this._display.application.api.viewNotes(noteIds, this._noteGuiMode, false);
         } catch (e) {
             const displayErrors = (
                 toError(e).message === 'Mode not supported' ?
@@ -867,7 +867,7 @@ export class DisplayAnki {
     /**
      * @param {HTMLElement} node
      */
-    _showViewNoteMenu(node) {
+    _showViewNotesMenu(node) {
         const noteIds = this._getNodeNoteIds(node);
         if (noteIds.length === 0) { return; }
 
@@ -883,7 +883,7 @@ export class DisplayAnki {
             /** @type {Element} */
             const label = querySelectorNotNull(item, '.popup-menu-item-label');
             label.textContent = `Note ${i + 1}: ${noteId}`;
-            item.dataset.menuAction = 'viewNote';
+            item.dataset.menuAction = 'viewNotes';
             item.dataset.noteIds = `${noteId}`;
             menuBodyNode.appendChild(item);
         }
@@ -920,12 +920,14 @@ export class DisplayAnki {
         return entry !== null ? entry.querySelector('.action-button[data-action=view-note]') : null;
     }
 
-    /** */
-    _viewNoteForSelectedEntry() {
+    /**
+     * Shows notes for selected pop-up entry when "View Notes" hotkey is used.
+     */
+    _viewNotesForSelectedEntry() {
         const index = this._display.selectedIndex;
         const button = this._getViewNoteButton(index);
         if (button !== null) {
-            this._viewNote(button);
+            this._viewNotes(button);
         }
     }
 

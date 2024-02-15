@@ -62,7 +62,7 @@ export class KeyboardShortcutController {
             ['addNoteKanji',                     {scopes: new Set(['popup', 'search'])}],
             ['addNoteTermKanji',                 {scopes: new Set(['popup', 'search'])}],
             ['addNoteTermKana',                  {scopes: new Set(['popup', 'search'])}],
-            ['viewNote',                         {scopes: new Set(['popup', 'search'])}],
+            ['viewNotes',                        {scopes: new Set(['popup', 'search'])}],
             ['playAudio',                        {scopes: new Set(['popup', 'search'])}],
             ['playAudioFromSource',              {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-audio-source', default: 'jpod101'}}],
             ['copyHostSelection',                {scopes: new Set(['popup'])}],
