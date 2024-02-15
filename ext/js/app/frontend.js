@@ -82,9 +82,9 @@ export class Frontend {
         /** @type {?import('settings').ProfileOptions} */
         this._options = null;
         /** @type {number} */
-        this._pageZoomFactor = 1.0;
+        this._pageZoomFactor = 1;
         /** @type {number} */
-        this._contentScale = 1.0;
+        this._contentScale = 1;
         /** @type {Promise<void>} */
         this._lastShowPromise = Promise.resolve();
         /** @type {TextSourceGenerator} */
@@ -788,7 +788,7 @@ export class Frontend {
         }
         if (popupScaleRelativeToVisualViewport) {
             const {visualViewport} = window;
-            const visualViewportScale = (typeof visualViewport !== 'undefined' && visualViewport !== null ? visualViewport.scale : 1.0);
+            const visualViewportScale = (typeof visualViewport !== 'undefined' && visualViewport !== null ? visualViewport.scale : 1);
             contentScale /= visualViewportScale;
         }
         if (contentScale === this._contentScale) { return; }

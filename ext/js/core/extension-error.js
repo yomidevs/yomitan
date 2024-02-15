@@ -26,6 +26,8 @@ export class ExtensionError extends Error {
      */
     constructor(message) {
         super(message);
+        /** @type {string} */
+        this.name = 'ExtensionError';
         /** @type {unknown} */
         this._data = void 0;
     }

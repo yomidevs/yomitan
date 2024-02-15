@@ -86,6 +86,8 @@ export class GoogleDocsUtil {
         const content = document.createTextNode(text);
         const svgText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         const transform = element.getAttribute('transform') || '';
+        // Using getAttribute instead of dataset because element is an SVG element
+        // eslint-disable-next-line unicorn/prefer-dom-node-dataset
         const font = element.getAttribute('data-font-css') || '';
         const elementX = element.getAttribute('x');
         const elementY = element.getAttribute('y');

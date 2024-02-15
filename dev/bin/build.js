@@ -195,12 +195,10 @@ async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath,
                 await createZip(extDir, excludeFiles, fullFileName, sevenZipExes, onUpdate, dryRun);
             }
 
-            if (!dryRun) {
-                if (Array.isArray(fileCopies)) {
-                    for (const fileName2 of fileCopies) {
-                        const fileName2Safe = path.basename(fileName2);
-                        fs.copyFileSync(fullFileName, path.join(buildDir, fileName2Safe));
-                    }
+            if (!dryRun && Array.isArray(fileCopies)) {
+                for (const fileName2 of fileCopies) {
+                    const fileName2Safe = path.basename(fileName2);
+                    fs.copyFileSync(fullFileName, path.join(buildDir, fileName2Safe));
                 }
             }
         }

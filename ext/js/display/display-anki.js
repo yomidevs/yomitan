@@ -953,6 +953,8 @@ class DisplayAnkiError extends Error {
      */
     constructor(message) {
         super(message);
+        /** @type {string} */
+        this.name = 'DisplayAnkiError';
         /** @type {?import('anki-note-builder').Requirement[]} */
         this._requirements = null;
         /** @type {?import('anki-note-builder').Requirement[]} */

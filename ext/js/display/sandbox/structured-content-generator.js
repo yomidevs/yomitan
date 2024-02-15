@@ -137,7 +137,7 @@ export class StructuredContentGenerator {
             imageContainer.title = title;
         }
 
-        aspectRatioSizer.style.paddingTop = `${invAspectRatio * 100.0}%`;
+        aspectRatioSizer.style.paddingTop = `${invAspectRatio * 100}%`;
 
         if (this._contentManager !== null) {
             this._contentManager.loadMedia(

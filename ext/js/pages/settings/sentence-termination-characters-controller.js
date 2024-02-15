@@ -125,8 +125,9 @@ export class SentenceTerminationCharactersController {
             entry.prepare();
         }
 
-        /** @type {HTMLElement} */ (this._listTable).hidden = (terminationCharacters.length === 0);
-        /** @type {HTMLElement} */ (this._emptyIndicator).hidden = (terminationCharacters.length !== 0);
+        const empty = terminationCharacters.length === 0;
+        /** @type {HTMLElement} */ (this._listTable).hidden = empty;
+        /** @type {HTMLElement} */ (this._emptyIndicator).hidden = !empty;
     }
 
     /**

@@ -701,7 +701,7 @@ export class Backend {
                 typeof chrome.tabs.getZoom === 'function'
             )) {
                 // Not supported
-                resolve({zoomFactor: 1.0});
+                resolve({zoomFactor: 1});
                 return;
             }
             chrome.tabs.getZoom(tabId, (zoomFactor) => {
@@ -1701,10 +1701,8 @@ export class Backend {
                 // NOP
             }
 
-            if (okay && !done) {
-                if (add(item)) {
-                    done = true;
-                }
+            if (okay && !done && add(item)) {
+                done = true;
             }
         };
 
@@ -2294,7 +2292,7 @@ export class Backend {
      */
     _replaceInvalidFileNameCharacters(fileName) {
         // eslint-disable-next-line no-control-regex
-        return fileName.replace(/[<>:"/\\|?*\x00-\x1F]/g, '-');
+        return fileName.replace(/[<>:"/\\|?*\u0000-\u001F]/g, '-');
     }
 
     /**

@@ -16,6 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * This is a static class because this file is not imported as a module.
+ */
+// eslint-disable-next-line unicorn/no-static-only-class
 class HtmlTestUtilities {
     /**
      * @param {Element} element

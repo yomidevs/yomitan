@@ -48,11 +48,11 @@ describe('Dictionary validation', () => {
     describe.each(testCases)('Test dictionary $name', ({name, valid}) => {
         it(`should be ${valid ? 'valid' : 'invalid'}`, async ({expect}) => {
             const archive = createTestDictionaryArchive(name);
-            if (valid) {
-                await expect(dictionaryValidate.validateDictionary(null, archive, schemas)).resolves.not.toThrow();
-            } else {
-                await expect(dictionaryValidate.validateDictionary(null, archive, schemas)).rejects.toThrow();
-            }
+            await (
+                valid ?
+                expect(dictionaryValidate.validateDictionary(null, archive, schemas)).resolves.not.toThrow() :
+                expect(dictionaryValidate.validateDictionary(null, archive, schemas)).rejects.toThrow()
+            );
         });
     });
 });
