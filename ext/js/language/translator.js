@@ -1322,7 +1322,7 @@ export class Translator {
      * @returns {Generator<Map<string, unknown>, void, void>}
      */
     *_generateArrayVariants(arrayVariants) {
-        const variantKeys = Array.from(arrayVariants.keys());
+        const variantKeys = [...arrayVariants.keys()];
         const entryVariantLengths = [];
         for (const key of variantKeys) {
             const entryVariants = /** @type {unknown[]} */ (arrayVariants.get(key));
