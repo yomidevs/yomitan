@@ -20,6 +20,32 @@ import {ExtensionError} from '../core/extension-error.js';
 import {isObject} from '../core/utilities.js';
 import {base64ToArrayBuffer} from '../data/sandbox/array-buffer-util.js';
 
+/**
+ * This class is responsible for creating and communicating with an offscreen document.
+ * This offscreen document is used to solve two issues:
+ *
+ * - Provide clipboard access for the `ClipboardReader` class in the context of a MV3 extension.
+ *   The background service workers doesn't have access a webpage to read the clipboard from,
+ *   so it must be done in the offscreen page.
+ *
+ * - Provide a longer lifetime for the dictionary database. The background service worker can be
+ *   terminated by the web browser, which means that when it restarts, it has to go through its
+ *   initialization process again. This initialization process can take a non-trivial amount of
+ *   time, which is primarily caused by the startup of the IndexedDB database, especially when a
+ *   large amount of dictionary data is installed.
+ *
+ *   The offscreen document stays alive longer, potentially forever, which may be an artifact of
+ *   the clipboard access it requests in the `reasons` parameter. Therefore, this initialization
+ *   process should only take place once, or at the very least, less frequently than the service
+ *   worker.
+ *
+ *   The long lifetime of the offscreen document is not guaranteed by the spec, which could
+ *   result in this code functioning poorly in the future if a web browser vendor changes the
+ *   APIs or the implementation substantially, and this is even referenced on the Chrome
+ *   developer website.
+ * @see https://developer.chrome.com/blog/Offscreen-Documents-in-Manifest-v3
+ * @see https://developer.chrome.com/docs/extensions/reference/api/offscreen
+ */
 export class OffscreenProxy {
     /**
      * @param {import('../extension/web-extension.js').WebExtension} webExtension
@@ -144,8 +170,7 @@ export class DictionaryDatabaseProxy {
      */
     async getMedia(targets) {
         const serializedMedia = /** @type {import('dictionary-database').Media<string>[]} */ (await this._offscreen.sendMessagePromise({action: 'databaseGetMediaOffscreen', params: {targets}}));
-        const media = serializedMedia.map((m) => ({...m, content: base64ToArrayBuffer(m.content)}));
-        return media;
+        return serializedMedia.map((m) => ({...m, content: base64ToArrayBuffer(m.content)}));
     }
 }
 

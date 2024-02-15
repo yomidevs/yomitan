@@ -290,7 +290,7 @@ export class SettingsDisplayController {
      */
     _getMoreContainer(link) {
         const v = link.dataset.parentDistance;
-        const distance = v ? parseInt(v, 10) : 1;
+        const distance = v ? Number.parseInt(v, 10) : 1;
         if (Number.isNaN(distance)) { return null; }
 
         /** @type {?Element} */
@@ -338,7 +338,7 @@ export class SettingsDisplayController {
 
         let indent = '\t';
         if (args.length > 1) {
-            const count = parseInt(args[1], 10);
+            const count = Number.parseInt(args[1], 10);
             indent = (Number.isFinite(count) && count >= 0 ? ' '.repeat(count) : args[1]);
         }
 

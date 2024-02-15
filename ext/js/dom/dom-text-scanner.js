@@ -488,8 +488,8 @@ export class DOMTextScanner {
     static isStyleVisible(style) {
         return !(
             style.visibility === 'hidden' ||
-            parseFloat(style.opacity) <= 0 ||
-            parseFloat(style.fontSize) <= 0 ||
+            Number.parseFloat(style.opacity) <= 0 ||
+            Number.parseFloat(style.fontSize) <= 0 ||
             (
                 !DOMTextScanner.isStyleSelectable(style) &&
                 (

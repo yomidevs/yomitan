@@ -157,11 +157,11 @@ export class ElementOverflowController {
      * @returns {number|import('core').Timeout}
      */
     _requestIdleCallback(callback, timeout) {
-        if (typeof requestIdleCallback === 'function') {
-            return requestIdleCallback(callback, {timeout});
-        } else {
-            return setTimeout(callback, timeout);
-        }
+        return (
+            typeof requestIdleCallback === 'function' ?
+            requestIdleCallback(callback, {timeout}) :
+            setTimeout(callback, timeout)
+        );
     }
 
     /**

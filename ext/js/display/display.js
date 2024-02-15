@@ -619,7 +619,7 @@ export class Display extends EventDispatcher {
         if (node === null) { return -1; }
         const {index} = node.dataset;
         if (typeof index !== 'string') { return -1; }
-        const indexNumber = parseInt(index, 10);
+        const indexNumber = Number.parseInt(index, 10);
         return Number.isFinite(indexNumber) ? indexNumber : -1;
     }
 
@@ -1020,7 +1020,7 @@ export class Display extends EventDispatcher {
         const node = /** @type {HTMLElement} */ (e.currentTarget);
         const {index} = node.dataset;
         if (typeof index !== 'string') { return; }
-        const indexNumber = parseInt(index, 10);
+        const indexNumber = Number.parseInt(index, 10);
         if (!Number.isFinite(indexNumber)) { return; }
         this._entrySetCurrent(indexNumber);
     }
@@ -1146,8 +1146,7 @@ export class Display extends EventDispatcher {
      */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
         if (isKanji) {
-            const dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
-            return dictionaryEntries;
+            return await this._application.api.kanjiFind(source, optionsContext);
         } else {
             /** @type {import('api').FindTermsDetails} */
             const findDetails = {};
@@ -1555,11 +1554,11 @@ export class Display extends EventDispatcher {
      * @returns {boolean}
      */
     _relativeTermView(next) {
-        if (next) {
-            return this._history.hasNext() && this._history.forward();
-        } else {
-            return this._history.hasPrevious() && this._history.back();
-        }
+        return (
+            next ?
+            this._history.hasNext() && this._history.forward() :
+            this._history.hasPrevious() && this._history.back()
+        );
     }
 
     /**

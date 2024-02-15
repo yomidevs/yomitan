@@ -110,11 +110,11 @@ describe.concurrent('JSON validation', () => {
 
     const existingJsonFiles = getAllFiles(rootDir, (path, isDirectory) => {
         const fileNameNormalized = normalizePathDirectorySeparators(path);
-        if (isDirectory) {
-            return !ignoreDirectories.has(fileNameNormalized);
-        } else {
-            return /\.json$/i.test(fileNameNormalized);
-        }
+        return (
+            isDirectory ?
+            !ignoreDirectories.has(fileNameNormalized) :
+            /\.json$/i.test(fileNameNormalized)
+        );
     });
     /** @type {Set<string>} */
     const existingJsonFileSet = new Set();

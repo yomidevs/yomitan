@@ -195,6 +195,7 @@ export class SettingsController extends EventDispatcher {
      */
     preventPageExit() {
         /** @type {import('settings-controller').PageExitPrevention} */
+        // eslint-disable-next-line sonarjs/prefer-object-literal
         const obj = {};
         obj.end = this._endPreventPageExit.bind(this, obj);
         if (this._pageExitPreventionEventListeners.size === 0) {
@@ -226,8 +227,7 @@ export class SettingsController extends EventDispatcher {
     async getDefaultOptions() {
         const optionsUtil = new OptionsUtil();
         await optionsUtil.prepare();
-        const optionsFull = optionsUtil.getDefault();
-        return optionsFull;
+        return optionsUtil.getDefault();
     }
 
     // Private

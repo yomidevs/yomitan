@@ -522,7 +522,8 @@ export class OptionsUtil {
             this._updateVersion22,
             this._updateVersion23,
             this._updateVersion24,
-            this._updateVersion25
+            this._updateVersion25,
+            this._updateVersion26
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1141,11 +1142,25 @@ export class OptionsUtil {
     }
 
     /**
+     * - Change 'viewNote' action to 'viewNotes'.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion25(options) {
+        for (const profile of options.profiles) {
+            for (const hotkey of profile.options.inputs.hotkeys) {
+                if (hotkey.action === 'viewNote') {
+                    hotkey.action = 'viewNotes';
+                }
+            }
+        }
+    }
+
+    /**
      * - Added general.language.
      * - Modularized text preprocessors.
      * @type {import('options-util').UpdateFunction}
      */
-    _updateVersion25(options) {
+    _updateVersion26(options) {
         const textPreprocessors = [
             'convertHalfWidthCharacters',
             'convertNumericCharacters',

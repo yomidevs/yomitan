@@ -544,7 +544,7 @@ export class ProfileController {
      */
     _tryGetValidProfileIndex(stringValue) {
         if (typeof stringValue !== 'string') { return null; }
-        const intValue = parseInt(stringValue, 10);
+        const intValue = Number.parseInt(stringValue, 10);
         return (
             Number.isFinite(intValue) &&
             intValue >= 0 &&
@@ -573,7 +573,7 @@ export class ProfileController {
             suffix = match[5];
             if (typeof match[2] === 'string') {
                 space = match[3];
-                index = parseInt(match[4], 10) + 1;
+                index = Number.parseInt(match[4], 10) + 1;
             } else {
                 space = ' ';
                 index = 2;

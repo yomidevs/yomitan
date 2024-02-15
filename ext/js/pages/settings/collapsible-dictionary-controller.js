@@ -156,9 +156,7 @@ export class CollapsibleDictionaryController {
         const versionNode = querySelectorNotNull(node, '.dictionary-version');
         versionNode.textContent = version;
 
-        /** @type {HTMLSelectElement} */
-        const select = querySelectorNotNull(node, '.definitions-collapsible');
-        return select;
+        return querySelectorNotNull(node, '.definitions-collapsible');
     }
 
     /** */

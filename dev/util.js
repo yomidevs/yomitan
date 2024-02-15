@@ -40,10 +40,8 @@ export function getAllFiles(baseDirectory, predicate = null) {
                 if (typeof predicate !== 'function' || predicate(relativeFileName, false)) {
                     results.push(relativeFileName);
                 }
-            } else if (stats.isDirectory()) {
-                if (typeof predicate !== 'function' || predicate(relativeFileName, true)) {
-                    directories.push(fullFileName);
-                }
+            } else if (stats.isDirectory() && (typeof predicate !== 'function' || predicate(relativeFileName, true))) {
+                directories.push(fullFileName);
             }
         }
     }

@@ -101,11 +101,11 @@ export function formatRulesJson(rules) {
     for (const {selectors, styles} of rules) {
         if (ruleIndex > 0) { result += ','; }
         result += `\n${indent1}{\n${indent2}"selectors": `;
-        if (selectors.length === 1) {
-            result += `[${JSON.stringify(selectors[0], null, 4)}]`;
-        } else {
-            result += JSON.stringify(selectors, null, 4).replace(/\n/g, '\n' + indent2);
-        }
+        result += (
+            selectors.length === 1 ?
+            `[${JSON.stringify(selectors[0], null, 4)}]` :
+            JSON.stringify(selectors, null, 4).replace(/\n/g, '\n' + indent2)
+        );
         result += `,\n${indent2}"styles": [`;
         let styleIndex = 0;
         for (const [key, value] of styles) {

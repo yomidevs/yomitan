@@ -194,9 +194,9 @@ type ApiSurface = {
             errors: Core.SerializedError[];
         };
     };
-    noteView: {
+    viewNotes: {
         params: {
-            noteId: Anki.NoteId;
+            noteIds: Anki.NoteId[];
             mode: Settings.AnkiNoteGuiMode;
             allowFallback: boolean;
         };

@@ -558,7 +558,7 @@ export class DictionaryController {
         const {profiles} = optionsFull;
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
             let modified = false;
-            const missingDictionaries = new Set([...installedDictionaries]);
+            const missingDictionaries = new Set(installedDictionaries);
             const dictionaryOptionsArray = profiles[i].options.dictionaries;
             for (let j = dictionaryOptionsArray.length - 1; j >= 0; --j) {
                 const {name} = dictionaryOptionsArray[j];
@@ -871,8 +871,8 @@ export class DictionaryController {
             const onProgress = ({processed, count, storeCount, storesProcesed}) => {
                 const percent = (
                     (count > 0 && storesProcesed > 0) ?
-                    (processed / count) * (storesProcesed / storeCount) * 100.0 :
-                    0.0
+                    (processed / count) * (storesProcesed / storeCount) * 100 :
+                    0
                 );
                 const cssString = `${percent}%`;
                 const statusString = `${percent.toFixed(0)}%`;

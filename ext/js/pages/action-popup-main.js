@@ -238,7 +238,7 @@ class DisplayController {
      */
     _onProfileSelectChange(event) {
         const node = /** @type {HTMLInputElement} */ (event.currentTarget);
-        const value = parseInt(node.value, 10);
+        const value = Number.parseInt(node.value, 10);
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= /** @type {import('settings').Options} */ (this._optionsFull).profiles.length) {
             this._setPrimaryProfileIndex(value);
         }

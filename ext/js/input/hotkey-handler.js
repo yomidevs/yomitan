@@ -254,7 +254,7 @@ export class HotkeyHandler extends EventDispatcher {
      */
     _updateEventHandlers() {
         if (this._isPrepared && (this._hotkeys.size > 0 || this._hasEventListeners)) {
-            if (this._eventListeners.size !== 0) { return; }
+            if (this._eventListeners.size > 0) { return; }
             this._eventListeners.addEventListener(document, 'keydown', this._onKeyDown.bind(this), false);
         } else {
             this._eventListeners.removeAllEventListeners();

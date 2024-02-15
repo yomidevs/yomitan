@@ -307,8 +307,8 @@ export class TextSourceGenerator {
         // Adjust size
         const imposterRect = imposter.getBoundingClientRect();
         if (imposterRect.width !== elementRect.width || imposterRect.height !== elementRect.height) {
-            const width = parseFloat(elementStyle.width) + (elementRect.width - imposterRect.width);
-            const height = parseFloat(elementStyle.height) + (elementRect.height - imposterRect.height);
+            const width = Number.parseFloat(elementStyle.width) + (elementRect.width - imposterRect.width);
+            const height = Number.parseFloat(elementStyle.height) + (elementRect.height - imposterRect.height);
             this._setImposterStyle(imposterStyle, 'width', `${width}px`);
             this._setImposterStyle(imposterStyle, 'height', `${height}px`);
         }
@@ -614,7 +614,7 @@ export class TextSourceGenerator {
         }
         const style = window.getComputedStyle(element);
         return (
-            parseFloat(style.opacity) <= 0 ||
+            Number.parseFloat(style.opacity) <= 0 ||
             style.visibility === 'hidden' ||
             (style.backgroundImage === 'none' && this._isColorTransparent(style.backgroundColor))
         );
