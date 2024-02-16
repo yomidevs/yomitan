@@ -254,7 +254,7 @@ function testSchemas() {
                 ]
             },
 
-            // url tests
+            // Url tests
             {
                 conditionGroups: [
                     {
@@ -610,7 +610,7 @@ function testSchemas() {
                 ]
             },
 
-            // flags tests
+            // Flags tests
             {
                 conditionGroups: [
                     {

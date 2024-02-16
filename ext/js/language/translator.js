@@ -1609,7 +1609,7 @@ export class Translator {
             sequence: rawSequence,
             rules
         } = databaseEntry;
-        // cast is safe because getDeinflections filters out deinflection definitions
+        // Cast is safe because getDeinflections filters out deinflection definitions
         const contentDefinitions = /** @type {import('dictionary-data').TermGlossaryContent[]} */ (definitions);
         const reading = (rawReading.length > 0 ? rawReading : term);
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);

@@ -229,7 +229,7 @@ function createSchemaPopupLevelGreaterThanOrEqual(value) {
     };
 }
 
-// url schema creation functions
+// URL schema creation functions
 
 /**
  * @param {string} value

@@ -57,7 +57,7 @@ export function getAllFiles(baseDirectory, predicate = null) {
 export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
     const fileNames = fs.readdirSync(dictionaryDirectory);
 
-    // const zipFileWriter = new BlobWriter();
+    // Const zipFileWriter = new BlobWriter();
     // const zipWriter = new ZipWriter(zipFileWriter);
     const archive = new JSZip();
 
@@ -70,7 +70,7 @@ export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
             }
             archive.file(fileName, JSON.stringify(json, null, 0));
 
-            // await zipWriter.add(fileName, new TextReader(JSON.stringify(json, null, 0)));
+            // Await zipWriter.add(fileName, new TextReader(JSON.stringify(json, null, 0)));
         } else {
             const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: null});
             archive.file(fileName, content);
@@ -83,14 +83,14 @@ export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
             // console.log('??');
         }
     }
-    // await zipWriter.close();
+    // Await zipWriter.close();
 
     // Retrieves the Blob object containing the zip content into `zipFileBlob`. It
     // is also returned by zipWriter.close() for more convenience.
     // const zipFileBlob = await zipFileWriter.getData();
     return archive;
 
-    // return zipFileBlob;
+    // Return zipFileBlob;
 }
 
 /**

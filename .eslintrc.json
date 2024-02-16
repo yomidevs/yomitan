@@ -42,6 +42,15 @@
         "/dev/lib/handlebars/"
     ],
     "rules": {
+        "capitalized-comments": [
+            "error",
+            "always",
+            {
+                "ignorePattern": "case|[a-z]+[A-Z0-9]|[a-z]+\\.\\w",
+                "ignoreInlineComments": true,
+                "ignoreConsecutiveComments": true
+            }
+        ],
         "curly": ["error", "all"],
         "dot-notation": "error",
         "eqeqeq": "error",

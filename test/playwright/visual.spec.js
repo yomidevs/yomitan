@@ -22,7 +22,7 @@ import {expect, root, test} from './playwright-util.js';
 test.beforeEach(async ({context}) => {
     // Wait for the on-install welcome.html tab to load, which becomes the foreground tab
     const welcome = await context.waitForEvent('page');
-    welcome.close(); // close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
+    welcome.close(); // Close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
 });
 
 test('visual', async ({page, extensionId}) => {
@@ -63,9 +63,9 @@ test('visual', async ({page, extensionId}) => {
         if (typeof popup_frame === 'undefined') {
             frame_attached = page.waitForEvent('frameattached');
         }
-        await page.mouse.move(box.x + offset.x, box.y + offset.y, {steps: 10}); // hover over the test
+        await page.mouse.move(box.x + offset.x, box.y + offset.y, {steps: 10}); // Hover over the test
         if (typeof popup_frame === 'undefined') {
-            popup_frame = await frame_attached; // wait for popup to be attached
+            popup_frame = await frame_attached; // Wait for popup to be attached
         }
         try {
             // Some tests don't have a popup, so don't fail if it's not there
@@ -75,11 +75,11 @@ test('visual', async ({page, extensionId}) => {
             console.log(test_name + ' has no popup');
         }
 
-        await page.bringToFront(); // bring the page to the foreground so the screenshot doesn't hang; for some reason the frames result in page being in the background
+        await page.bringToFront(); // Bring the page to the foreground so the screenshot doesn't hang; for some reason the frames result in page being in the background
         await expect.soft(page).toHaveScreenshot(test_name + '.png');
 
-        await page.mouse.click(0, 0); // click away so popup disappears
-        await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement()).waitForElementState('hidden'); // wait for popup to disappear
+        await page.mouse.click(0, 0); // Click away so popup disappears
+        await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement()).waitForElementState('hidden'); // Wait for popup to disappear
     };
 
     // Test document 1
