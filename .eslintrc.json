@@ -58,7 +58,7 @@
         "guard-for-in": "error",
         "no-case-declarations": "error",
         "no-const-assign": "error",
-        "no-constant-condition": "off",
+        "no-constant-condition": ["error", {"checkLoops": false}],
         "no-global-assign": "error",
         "no-implicit-globals": "error",
         "no-new": "error",
@@ -75,7 +75,7 @@
                 "selector": "MemberExpression[property.name=json]"
             }
         ],
-        "no-shadow": ["off", {"builtinGlobals": false}],
+        "no-shadow": ["error", {"builtinGlobals": false}],
         "no-undef": "error",
         "no-undefined": "error",
         "no-underscore-dangle": ["error", {"allowAfterThis": true, "allowAfterSuper": false, "allowAfterThisConstructor": false}],
