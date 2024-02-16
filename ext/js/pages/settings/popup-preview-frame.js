@@ -58,24 +58,26 @@ export class PopupPreviewFrame {
         this._exampleTextInput = querySelectorNotNull(document, '#example-text-input');
         /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+        /** @type {import('language').LanguageSummary[]} */
+        this._languages = [];
+        /** @type {boolean} */
+        this._wanakanaBound = false;
 
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {Map<string, (params: import('core').SerializableObjectAny) => void>} */
         this._windowMessageHandlers = new Map(/** @type {[key: string, handler: (params: import('core').SerializableObjectAny) => void][]} */ ([
-            ['PopupPreviewFrame.setText',              this._onSetText.bind(this)],
-            ['PopupPreviewFrame.setCustomCss',         this._setCustomCss.bind(this)],
-            ['PopupPreviewFrame.setCustomOuterCss',    this._setCustomOuterCss.bind(this)],
-            ['PopupPreviewFrame.updateOptionsContext', this._updateOptionsContext.bind(this)]
+            ['PopupPreviewFrame.setText',                 this._onSetText.bind(this)],
+            ['PopupPreviewFrame.setCustomCss',            this._setCustomCss.bind(this)],
+            ['PopupPreviewFrame.setCustomOuterCss',       this._setCustomOuterCss.bind(this)],
+            ['PopupPreviewFrame.updateOptionsContext',    this._updateOptionsContext.bind(this)],
+            ['PopupPreviewFrame._onOptionsChanged',       this._onOptionsChanged.bind(this)],
+            ['PopupPreviewFrame._setLanguageExampleText', this._setLanguageExampleText.bind(this)]
         ]));
         /* eslint-enable @stylistic/no-multi-spaces */
     }
 
     /** */
     async prepare() {
-        if (this._exampleTextInput !== null && typeof wanakana !== 'undefined') {
-            wanakana.bind(this._exampleTextInput);
-        }
-
         window.addEventListener('message', this._onMessage.bind(this), false);
 
         // Setup events
@@ -90,6 +92,10 @@ export class PopupPreviewFrame {
         /** @type {?(optionsContext: import('settings').OptionsContext) => Promise<import('settings').ProfileOptions>} */
         this._apiOptionsGetOld = this._application.api.optionsGet.bind(this._application.api);
         this._application.api.optionsGet = this._apiOptionsGet.bind(this);
+
+        this._languages = await this._application.api.getLanguageSummaries();
+        const options = await this._application.api.optionsGet({current: true});
+        this._onOptionsChanged({options, optionsContext: {current: true}});
 
         // Overwrite frontend
         this._frontend = new Frontend({
@@ -274,6 +280,34 @@ export class PopupPreviewFrame {
         this._frontend.setOptionsContextOverride(optionsContext);
         await this._frontend.updateOptions();
         await this._updateSearch();
+    }
+
+    /**
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
+     */
+    async _onOptionsChanged({options: {general: {language}}}) {
+        this._setLanguageExampleText({language});
+    }
+
+    /**
+     * @param {{language: string}} details
+     */
+    _setLanguageExampleText({language}) {
+        const activeLanguage = /** @type {import('language').LanguageSummary} */ (this._languages.find(({iso}) => iso === language));
+
+        if (this._exampleTextInput !== null && typeof wanakana !== 'undefined') {
+            if (language === 'ja') {
+                wanakana.bind(this._exampleTextInput);
+                this._wanakanaBound = true;
+            } else if (this._wanakanaBound) {
+                wanakana.unbind(this._exampleTextInput);
+                this._wanakanaBound = false;
+            }
+        }
+
+        this._exampleTextInput.lang = language;
+        this._exampleTextInput.value = activeLanguage.exampleText;
+        this._exampleTextInput.dispatchEvent(new Event('input'));
     }
 
     /** */
