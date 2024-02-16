@@ -712,7 +712,7 @@ async function testFieldTemplatesUpdate() {
             const match = fileNameRegex.exec(fileName);
             if (match !== null) {
                 updates.push({
-                    version: Number.parseInt(match[1]),
+                    version: Number.parseInt(match[1], 10),
                     changes: loadDataFile(path.join(templatesDirPath, match[0]))
                 });
             }

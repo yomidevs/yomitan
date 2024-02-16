@@ -2601,7 +2601,7 @@ export class Backend {
             const match = /^\d+/.exec(version);
             if (match === null) { return; }
 
-            const versionNumber = Number.parseInt(match[0]);
+            const versionNumber = Number.parseInt(match[0], 10);
             if (!(Number.isFinite(versionNumber) && versionNumber >= 77)) { return; }
 
             await navigator.storage.persist();
