@@ -59,10 +59,14 @@
         "no-case-declarations": "error",
         "no-const-assign": "error",
         "no-constant-condition": ["error", {"checkLoops": false}],
+        "no-constructor-return": "error",
+        "no-duplicate-imports": "error",
         "no-global-assign": "error",
         "no-implicit-globals": "error",
         "no-new": "error",
+        "no-new-native-nonconstructor": "error",
         "no-param-reassign": "off",
+        "no-promise-executor-return": "error",
         "no-prototype-builtins": "error",
         "no-restricted-syntax": [
             "error",
@@ -75,7 +79,10 @@
                 "selector": "MemberExpression[property.name=json]"
             }
         ],
+        "no-self-compare": "error",
         "no-shadow": ["error", {"builtinGlobals": false}],
+        "no-shadow-restricted-names": "error",
+        "no-template-curly-in-string": "error",
         "no-undef": "error",
         "no-undefined": "error",
         "no-underscore-dangle": ["error", {"allowAfterThis": true, "allowAfterSuper": false, "allowAfterThisConstructor": false}],
