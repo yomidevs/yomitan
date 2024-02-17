@@ -193,9 +193,9 @@ export class SearchDisplayController {
         this._updateClipboardMonitorEnabled();
 
         const {language, enableWanakana} = options.general;
-        const wanakanaEnabled = (language === 'ja' && enableWanakana);
+        const wanakanaEnabled = language === 'ja' && enableWanakana;
         this._wanakanaEnableCheckbox.checked = wanakanaEnabled;
-        this._wanakanaSearchOption.style.display = (language === 'ja' ? '' : 'none');
+        this._wanakanaSearchOption.style.display = language === 'ja' ? '' : 'none';
         this._setWanakanaEnabled(wanakanaEnabled);
     }
 
