@@ -741,7 +741,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'log'>} */
     _onApiLog({error, level, context}) {
-        log.log(ExtensionError.deserialize(error), level, context);
+        log.logGenericError(ExtensionError.deserialize(error), level, context);
     }
 
     /** @type {import('api').ApiHandler<'logIndicatorClear'>} */

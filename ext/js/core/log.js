@@ -40,13 +40,29 @@ class Logger extends EventDispatcher {
     }
 
     /**
+     * Logs a warning. This function invokes `log` internally.
+     * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
+     */
+    warn(error) {
+        this.logGenericError(error, 'warn');
+    }
+
+    /**
+     * Logs an error. This function invokes `log` internally.
+     * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
+     */
+    error(error) {
+        this.logGenericError(error, 'error');
+    }
+
+    /**
      * Logs a generic error. This will trigger the 'log' event with the same arguments as the function invocation.
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
      * @param {import('log').LogLevel} level The level to log at. Values include `'info'`, `'debug'`, `'warn'`, and `'error'`.
      *   Other values will be logged at a non-error level.
      * @param {import('log').LogContext} [context] An optional context object for the error which should typically include a `url` field.
      */
-    log(error, level, context) {
+    logGenericError(error, level, context) {
         if (typeof context === 'undefined') {
             context = {url: location.href};
         }
@@ -117,22 +133,6 @@ class Logger extends EventDispatcher {
         /* eslint-enable no-console */
 
         this.trigger('log', {error, level, context});
-    }
-
-    /**
-     * Logs a warning. This function invokes `log` internally.
-     * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
-     */
-    warn(error) {
-        this.log(error, 'warn');
-    }
-
-    /**
-     * Logs an error. This function invokes `log` internally.
-     * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
-     */
-    error(error) {
-        this.log(error, 'error');
     }
 }
 
