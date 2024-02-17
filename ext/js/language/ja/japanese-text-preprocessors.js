@@ -25,8 +25,6 @@ import {
     convertNumericToFullWidth
 } from './japanese.js';
 
-/** @type {import('language-japanese').JapaneseLanguageDescriptor} */
-
 /** @type {import('language').TextPreprocessor<boolean>} */
 export const convertHalfWidthCharacters = {
     name: 'Convert half width characters to full width',

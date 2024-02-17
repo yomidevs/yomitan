@@ -18,7 +18,7 @@
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
 import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
 
-/** @type {import('language-japanese').JapaneseLanguageDescriptor} */
+/** @type {import('language-descriptors').JapaneseLanguageDescriptor} */
 export const descriptorJapanese = {
     name: 'Japanese',
     iso: 'ja',
@@ -33,7 +33,7 @@ export const descriptorJapanese = {
     }
 };
 
-/** @type {import('language-english').EnglishLanguageDescriptor} */
+/** @type {import('language-descriptors').EnglishLanguageDescriptor} */
 export const descriptorEnglish = {
     name: 'English',
     iso: 'en',

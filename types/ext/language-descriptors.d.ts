@@ -17,6 +17,13 @@
 
 import type {LanguageDescriptor, TextPreprocessor} from './language';
 
+export type EnglishTextPreprocessorDescriptor = {
+    capitalizeFirstLetter: TextPreprocessor<boolean>;
+    decapitalize: TextPreprocessor<boolean>;
+};
+
+export type EnglishLanguageDescriptor = LanguageDescriptor<EnglishTextPreprocessorDescriptor>;
+
 export type JapaneseTextPreprocessorDescriptor = {
     convertHalfWidthCharacters: TextPreprocessor<boolean>;
     convertNumericCharacters: TextPreprocessor<boolean>;
