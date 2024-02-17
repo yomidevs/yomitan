@@ -705,10 +705,7 @@ export class Frontend {
         const {tabId, frameId} = this._application;
         /** @type {import('display').HistoryContent} */
         const detailsContent = {
-            contentOrigin: {
-                tabId: tabId !== null ? tabId : void 0,
-                frameId: frameId !== null ? frameId : void 0
-            }
+            contentOrigin: {tabId, frameId}
         };
         if (dictionaryEntries !== null) {
             detailsContent.dictionaryEntries = dictionaryEntries;

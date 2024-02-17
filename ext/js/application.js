@@ -169,7 +169,7 @@ export class Application extends EventDispatcher {
         const webExtension = new WebExtension();
         const api = new API(webExtension);
         await this.waitForBackendReady(webExtension);
-        const {tabId = null, frameId = null} = await api.frameInformationGet();
+        const {tabId, frameId} = await api.frameInformationGet();
         const crossFrameApi = new CrossFrameAPI(api, tabId, frameId);
         crossFrameApi.prepare();
         const application = new Application(api, crossFrameApi);

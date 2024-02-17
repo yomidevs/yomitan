@@ -654,7 +654,10 @@ export class Backend {
         const tab = sender.tab;
         const tabId = tab ? tab.id : void 0;
         const frameId = sender.frameId;
-        return Promise.resolve({tabId, frameId});
+        return {
+            tabId: typeof tabId === 'number' ? tabId : null,
+            frameId: typeof frameId === 'number' ? frameId : null
+        };
     }
 
     /** @type {import('api').ApiHandler<'injectStylesheet'>} */

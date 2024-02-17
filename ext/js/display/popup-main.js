@@ -32,7 +32,7 @@ await Application.main(async (application) => {
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 
-    const display = new Display(application, tabId, frameId, 'popup', documentFocusController, hotkeyHandler);
+    const display = new Display(application, 'popup', documentFocusController, hotkeyHandler);
     await display.prepare();
 
     const displayAudio = new DisplayAudio(display);
