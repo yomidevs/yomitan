@@ -24,7 +24,7 @@ import {ExtensionError} from './extension-error.js';
  * an event for log calls.
  * @augments EventDispatcher<import('log').Events>
  */
-export class Logger extends EventDispatcher {
+class Logger extends EventDispatcher {
     /**
      * Creates a new instance.
      */
