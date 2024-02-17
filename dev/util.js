@@ -17,9 +17,7 @@
  */
 
 import fs from 'fs';
-import JSZip from 'jszip';
 import path from 'path';
-import {parseJson} from './json.js';
 
 /**
  * @param {string} baseDirectory
@@ -46,49 +44,4 @@ export function getAllFiles(baseDirectory, predicate = null) {
         }
     }
     return results;
-}
-
-/**
- * Creates a zip archive from the given dictionary directory.
- * @param {string} dictionaryDirectory
- * @param {string} [dictionaryName]
- * @returns {import('jszip')}
- */
-export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
-    const fileNames = fs.readdirSync(dictionaryDirectory);
-
-    // Const zipFileWriter = new BlobWriter();
-    // const zipWriter = new ZipWriter(zipFileWriter);
-    const archive = new JSZip();
-
-    for (const fileName of fileNames) {
-        if (/\.json$/.test(fileName)) {
-            const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: 'utf8'});
-            const json = parseJson(content);
-            if (fileName === 'index.json' && typeof dictionaryName === 'string') {
-                /** @type {import('dictionary-data').Index} */ (json).title = dictionaryName;
-            }
-            archive.file(fileName, JSON.stringify(json, null, 0));
-
-            // Await zipWriter.add(fileName, new TextReader(JSON.stringify(json, null, 0)));
-        } else {
-            const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: null});
-            archive.file(fileName, content);
-
-            // console.log('adding');
-            // const r = new TextReader(content);
-            // console.log(r.readUint8Array(0, 10));
-            // console.log('reader done');
-            // await zipWriter.add(fileName, r);
-            // console.log('??');
-        }
-    }
-    // Await zipWriter.close();
-
-    // Retrieves the Blob object containing the zip content into `zipFileBlob`. It
-    // is also returned by zipWriter.close() for more convenience.
-    // const zipFileBlob = await zipFileWriter.getData();
-    return archive;
-
-    // Return zipFileBlob;
 }

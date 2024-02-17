@@ -21,8 +21,8 @@ import {readFileSync} from 'fs';
 import {fileURLToPath} from 'node:url';
 import {dirname, join} from 'path';
 import {expect, vi} from 'vitest';
+import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
 import {parseJson} from '../../dev/json.js';
-import {createDictionaryArchive} from '../../dev/util.js';
 import {DictionaryDatabase} from '../../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../../ext/js/dictionary/dictionary-importer.js';
 import {Translator} from '../../ext/js/language/translator.js';
@@ -45,8 +45,7 @@ vi.stubGlobal('chrome', chrome);
  */
 export async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
     // Dictionary
-    const testDictionary = createDictionaryArchive(dictionaryDirectory, dictionaryName);
-    const testDictionaryContent = await testDictionary.generateAsync({type: 'arraybuffer'});
+    const testDictionaryData = await createDictionaryArchiveData(dictionaryDirectory, dictionaryName);
 
     // Setup database
     const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
@@ -56,7 +55,7 @@ export async function createTranslatorContext(dictionaryDirectory, dictionaryNam
 
     const {errors} = await dictionaryImporter.importDictionary(
         dictionaryDatabase,
-        testDictionaryContent,
+        testDictionaryData,
         {prefixWildcardsSupported: true}
     );
 

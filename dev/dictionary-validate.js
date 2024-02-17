@@ -17,10 +17,10 @@
  */
 
 import fs from 'fs';
-import JSZip from 'jszip';
 import path from 'path';
 import {performance} from 'perf_hooks';
 import {fileURLToPath} from 'url';
+import {getDictionaryArchiveEntries, getDictionaryArchiveJson, getIndexFileName, readArchiveEntryDataJson} from './dictionary-archive-util.js';
 import {parseJson} from './json.js';
 import {createJsonSchema} from './schema-validate.js';
 import {toError} from './to-error.js';
@@ -39,30 +39,31 @@ function readSchema(relativeFileName) {
 
 /**
  * @param {import('dev/schema-validate').ValidateMode} mode
- * @param {import('jszip')} zip
+ * @param {import('@zip.js/zip.js').Entry[]} entries
  * @param {import('dev/dictionary-validate').SchemasDetails} schemasDetails
  */
-async function validateDictionaryBanks(mode, zip, schemasDetails) {
-    for (const [fileName, file] of Object.entries(zip.files)) {
+async function validateDictionaryBanks(mode, entries, schemasDetails) {
+    for (const entry of entries) {
+        const {filename} = entry;
         for (const [fileNameFormat, schema] of schemasDetails) {
-            if (!fileNameFormat.test(fileName)) { continue; }
+            if (!fileNameFormat.test(filename)) { continue; }
 
             let jsonSchema;
             try {
                 jsonSchema = createJsonSchema(mode, schema);
             } catch (e) {
                 const e2 = toError(e);
-                e2.message += `\n(in file ${fileName})}`;
+                e2.message += `\n(in file ${filename})`;
                 throw e2;
             }
 
-            const data = parseJson(await file.async('string'));
+            const data = await readArchiveEntryDataJson(entry);
 
             try {
                 jsonSchema.validate(data);
             } catch (e) {
                 const e2 = toError(e);
-                e2.message += `\n(in file ${fileName})}`;
+                e2.message += `\n(in file ${filename})`;
                 throw e2;
             }
             break;
@@ -73,18 +74,13 @@ async function validateDictionaryBanks(mode, zip, schemasDetails) {
 /**
  * Validates a dictionary from its zip archive.
  * @param {import('dev/schema-validate').ValidateMode} mode
- * @param {import('jszip')} archive
+ * @param {ArrayBuffer} archiveData
  * @param {import('dev/dictionary-validate').Schemas} schemas
  */
-export async function validateDictionary(mode, archive, schemas) {
-    const indexFileName = 'index.json';
-    const indexFile = archive.files[indexFileName];
-    if (!indexFile) {
-        throw new Error('No dictionary index found in archive');
-    }
-
-    /** @type {import('dictionary-data').Index} */
-    const index = parseJson(await indexFile.async('string'));
+export async function validateDictionary(mode, archiveData, schemas) {
+    const entries = await getDictionaryArchiveEntries(archiveData);
+    const indexFileName = getIndexFileName();
+    const index = await getDictionaryArchiveJson(entries, indexFileName);
     const version = index.format || index.version;
 
     try {
@@ -92,7 +88,7 @@ export async function validateDictionary(mode, archive, schemas) {
         jsonSchema.validate(index);
     } catch (e) {
         const e2 = toError(e);
-        e2.message += `\n(in file ${indexFileName})}`;
+        e2.message += `\n(in file ${indexFileName})`;
         throw e2;
     }
 
@@ -105,7 +101,7 @@ export async function validateDictionary(mode, archive, schemas) {
         [/^tag_bank_(\d+)\.json$/, schemas.tagBankV3]
     ];
 
-    await validateDictionaryBanks(mode, archive, schemasDetails);
+    await validateDictionaryBanks(mode, entries, schemasDetails);
 }
 
 /**
@@ -138,8 +134,7 @@ export async function testDictionaryFiles(mode, dictionaryFileNames) {
         try {
             console.log(`Validating ${dictionaryFileName}...`);
             const source = fs.readFileSync(dictionaryFileName);
-            const archive = await JSZip.loadAsync(source);
-            await validateDictionary(mode, archive, schemas);
+            await validateDictionary(mode, source.buffer, schemas);
             const end = performance.now();
             console.log(`No issues detected (${((end - start) / 1000).toFixed(2)}s)`);
         } catch (e) {
