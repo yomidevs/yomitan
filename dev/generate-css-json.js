@@ -91,6 +91,7 @@ function removeProperty(styles, property, removedProperties) {
  * @returns {string}
  */
 export function formatRulesJson(rules) {
+    // This is similar to the following code, but formatted a but more succinctly:
     // return JSON.stringify(rules, null, 4);
     const indent1 = '    ';
     const indent2 = indent1.repeat(2);

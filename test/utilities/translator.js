@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// eslint-disable-next-line no-template-curly-in-string
 const placeholder = '${title}';
 
 /**

@@ -31,13 +31,13 @@ import {
 test.beforeEach(async ({context}) => {
     // Wait for the on-install welcome.html tab to load, which becomes the foreground tab
     const welcome = await context.waitForEvent('page');
-    await welcome.close(); // close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
+    await welcome.close(); // Close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
 });
 
 test('search clipboard', async ({page, extensionId}) => {
     await page.goto(`chrome-extension://${extensionId}/search.html`);
     await page.locator('#search-option-clipboard-monitor-container > label').click();
-    await page.waitForTimeout(200); // race
+    await page.waitForTimeout(200); // Race
 
     await writeToClipboardFromPage(page, 'あ');
     await expect(page.locator('#search-textbox')).toHaveValue('あ');

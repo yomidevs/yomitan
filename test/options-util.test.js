@@ -702,7 +702,7 @@ describe('OptionsUtil', () => {
             const match = fileNameRegex.exec(fileName);
             if (match !== null) {
                 updates.push({
-                    version: Number.parseInt(match[1]),
+                    version: Number.parseInt(match[1], 10),
                     changes: loadDataFile(path.join(templatesDirPath, match[0]))
                 });
             }
@@ -846,7 +846,7 @@ describe('OptionsUtil', () => {
 {{~> (lookup . "marker") ~}}
 `.trimStart()
             },
-            // glossary and glossary-brief update
+            // Glossary and glossary-brief update
             {
                 oldVersion: 7,
                 newVersion: 12,
@@ -1238,7 +1238,7 @@ describe('OptionsUtil', () => {
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
             },
-            // block helper update: furigana and furiganaPlain
+            // Block helper update: furigana and furiganaPlain
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1326,7 +1326,7 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart()
             },
-            // block helper update: formatGlossary
+            // Block helper update: formatGlossary
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1400,7 +1400,7 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart()
             },
-            // block helper update: set and get
+            // Block helper update: set and get
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1502,7 +1502,7 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart()
             },
-            // block helper update: hasMedia and getMedia
+            // Block helper update: hasMedia and getMedia
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1584,7 +1584,7 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart()
             },
-            // block helper update: pronunciation
+            // Block helper update: pronunciation
             {
                 oldVersion: 20,
                 newVersion: 21,

@@ -250,7 +250,7 @@ describe('Profile conditions utilities', () => {
                 ]
             },
 
-            // url tests
+            // Url tests
             {
                 conditionGroups: [
                     {
@@ -606,7 +606,7 @@ describe('Profile conditions utilities', () => {
                 ]
             },
 
-            // flags tests
+            // Flags tests
             {
                 conditionGroups: [
                     {

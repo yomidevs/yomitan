@@ -923,7 +923,7 @@ describe('LanguageTransformer', () => {
                 {term: 'あかい',     source: 'あけえ',     rule: 'adj-i', reasons: ['-e']},
                 {term: 'こわい',     source: 'こええ',     rule: 'adj-i', reasons: ['-e']},
                 {term: 'つよい',     source: 'つええ',     rule: 'adj-i', reasons: ['-e']},
-                // small -e
+                // Small -e
                 {term: 'すごい',     source: 'すげぇ',     rule: 'adj-i', reasons: ['-e']},
                 {term: 'やばい',     source: 'やべぇ',     rule: 'adj-i', reasons: ['-e']},
                 {term: 'うるさい',   source: 'うるせぇ',   rule: 'adj-i', reasons: ['-e']},
@@ -1152,7 +1152,6 @@ describe('LanguageTransformer', () => {
     languageTransformer.addDescriptor(descriptor);
 
     describe('deinflections', () => {
-        // for (const {valid, tests} of data) {
         describe.each(data)('$category', ({valid, tests}) => {
             for (const {source, term, rule, reasons} of tests) {
                 const {has} = hasTermReasons(languageTransformer, source, term, rule, reasons);

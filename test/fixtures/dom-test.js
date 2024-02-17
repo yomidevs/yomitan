@@ -28,6 +28,7 @@ function prepareWindow(window) {
 
     // Define innerText setter as an alias for textContent setter
     Object.defineProperty(window.HTMLDivElement.prototype, 'innerText', {
+        get() { return this.textContent; },
         set(value) { this.textContent = value; }
     });
 
