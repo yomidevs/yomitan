@@ -36,8 +36,6 @@ await Application.main(async (application) => {
     const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
     searchActionPopupController.prepare();
 
-    const {tabId, frameId} = await application.api.frameInformationGet();
-
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 

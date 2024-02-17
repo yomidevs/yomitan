@@ -29,8 +29,6 @@ await Application.main(async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
-    const {tabId, frameId} = await application.api.frameInformationGet();
-
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 
