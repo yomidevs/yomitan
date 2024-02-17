@@ -21,13 +21,10 @@ import {FrameAncestryHandler} from './frame-ancestry-handler.js';
 export class FrameOffsetForwarder {
     /**
      * @param {import('../comm/cross-frame-api.js').CrossFrameAPI} crossFrameApi
-     * @param {number} frameId
      */
-    constructor(crossFrameApi, frameId) {
+    constructor(crossFrameApi) {
         /** @type {import('../comm/cross-frame-api.js').CrossFrameAPI} */
         this._crossFrameApi = crossFrameApi;
-        /** @type {number} */
-        this._frameId = frameId;
         /** @type {FrameAncestryHandler} */
         this._frameAncestryHandler = new FrameAncestryHandler(crossFrameApi);
     }
@@ -50,15 +47,18 @@ export class FrameOffsetForwarder {
             return [0, 0];
         }
 
+        const {frameId} = this._crossFrameApi;
+        if (frameId === null) { return null; }
+
         try {
             const ancestorFrameIds = await this._frameAncestryHandler.getFrameAncestryInfo();
 
-            let childFrameId = this._frameId;
+            let childFrameId = frameId;
             /** @type {Promise<?import('frame-offset-forwarder').ChildFrameRect>[]} */
             const promises = [];
-            for (const frameId of ancestorFrameIds) {
-                promises.push(this._crossFrameApi.invoke(frameId, 'frameOffsetForwarderGetChildFrameRect', {frameId: childFrameId}));
-                childFrameId = frameId;
+            for (const ancestorFrameId of ancestorFrameIds) {
+                promises.push(this._crossFrameApi.invoke(ancestorFrameId, 'frameOffsetForwarderGetChildFrameRect', {frameId: childFrameId}));
+                childFrameId = ancestorFrameId;
             }
 
             const results = await Promise.all(promises);

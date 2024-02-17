@@ -37,7 +37,7 @@ export class PopupFactory {
         /** @type {number} */
         this._frameId = frameId;
         /** @type {FrameOffsetForwarder} */
-        this._frameOffsetForwarder = new FrameOffsetForwarder(application.crossFrame, frameId);
+        this._frameOffsetForwarder = new FrameOffsetForwarder(application.crossFrame);
         /** @type {Map<string, import('popup').PopupAny>} */
         this._popups = new Map();
         /** @type {Map<string, {popup: import('popup').PopupAny, token: string}[]>} */
