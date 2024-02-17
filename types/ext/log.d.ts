@@ -17,7 +17,7 @@
 
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
-export type LogLevel = 'log' | 'info' | 'debug' | 'warn' | 'error';
+export type LogLevel = 'log' | 'warn' | 'error';
 
 export type LogContext = {
     url: string;
