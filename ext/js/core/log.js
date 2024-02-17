@@ -31,13 +31,14 @@ class Logger extends EventDispatcher {
     constructor() {
         super();
         /** @type {string} */
-        this._extensionName = 'Yomitan';
-        try {
-            const {name, version} = chrome.runtime.getManifest();
-            this._extensionName = `${name} ${version}`;
-        } catch (e) {
-            // NOP
-        }
+        this._extensionName = 'Extension';
+    }
+
+    /**
+     * @param {string} extensionName
+     */
+    configure(extensionName) {
+        this._extensionName = extensionName;
     }
 
     /**

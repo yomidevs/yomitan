@@ -33,11 +33,24 @@ export class WebExtension extends EventDispatcher {
         } catch (e) {
             // NOP
         }
+        /** @type {string} */
+        this._extensionName = 'Extension';
+        try {
+            const {name, version} = chrome.runtime.getManifest();
+            this._extensionName = `${name} ${version}`;
+        } catch (e) {
+            // NOP
+        }
     }
 
     /** @type {boolean} */
     get unloaded() {
         return this._unloaded;
+    }
+
+    /** @type {string} */
+    get extensionName() {
+        return this._extensionName;
     }
 
     /**

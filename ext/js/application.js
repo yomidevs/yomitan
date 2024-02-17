@@ -63,19 +63,8 @@ export class Application extends EventDispatcher {
      */
     constructor(api, crossFrameApi) {
         super();
-
         /** @type {WebExtension} */
         this._webExtension = new WebExtension();
-
-        /** @type {string} */
-        this._extensionName = 'Yomitan';
-        try {
-            const manifest = chrome.runtime.getManifest();
-            this._extensionName = `${manifest.name} v${manifest.version}`;
-        } catch (e) {
-            // NOP
-        }
-
         /** @type {?boolean} */
         this._isBackground = null;
         /** @type {API} */
@@ -84,7 +73,6 @@ export class Application extends EventDispatcher {
         this._crossFrame = crossFrameApi;
         /** @type {boolean} */
         this._isReady = false;
-
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
@@ -155,6 +143,7 @@ export class Application extends EventDispatcher {
      */
     static async main(mainFunction) {
         const webExtension = new WebExtension();
+        log.configure(webExtension.extensionName);
         const api = new API(webExtension);
         await this.waitForBackendReady(webExtension);
         const {tabId = null, frameId = null} = await api.frameInformationGet();
