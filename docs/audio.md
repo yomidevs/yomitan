@@ -1,6 +1,6 @@
 ### Audio Configuration
 
-Audio can be configured in the `Audio` section of the _Settings_ page.
+Audio playback of terms' pronunciation can be configured in the `Audio` section of the _Settings_ page.
 
 For Japanese terms, Yomitan provides a preconfigured audio source. More audio sources can be added in `Audio` > `Configure audio playback sources`. They will be checked for pronunciations in the order they are listed.
 
