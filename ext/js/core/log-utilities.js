@@ -17,7 +17,7 @@
 
 /**
  * @param {import('log').LogLevel} errorLevel
- * @returns {import('log').LogErrorLevelValue}
+ * @returns {number}
  */
 export function logErrorLevelToNumber(errorLevel) {
     switch (errorLevel) {
