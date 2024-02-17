@@ -155,13 +155,12 @@ export class PopupFactory {
                 throw new Error('Invalid frameId');
             }
             const useFrameOffsetForwarder = (parentPopupId === null);
-            /** @type {{id: string, depth: number, frameId: number}} */
-            const info = await this._application.crossFrame.invoke(frameId, 'popupFactoryGetOrCreatePopup', /** @type {import('popup-factory').GetOrCreatePopupDetails} */ ({
+            const info = await this._application.crossFrame.invoke(frameId, 'popupFactoryGetOrCreatePopup', {
                 id,
                 parentPopupId,
                 frameId,
                 childrenSupported
-            }));
+            });
             id = info.id;
             const popup = new PopupProxy({
                 application: this._application,
