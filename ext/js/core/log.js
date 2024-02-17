@@ -20,14 +20,10 @@ import {EventDispatcher} from './event-dispatcher.js';
 import {ExtensionError} from './extension-error.js';
 
 /**
- * This class handles logging of messages to the console and triggering
- * an event for log calls.
+ * This class handles logging of messages to the console and triggering an event for log calls.
  * @augments EventDispatcher<import('log').Events>
  */
 class Logger extends EventDispatcher {
-    /**
-     * Creates a new instance.
-     */
     constructor() {
         super();
         /** @type {string} */
