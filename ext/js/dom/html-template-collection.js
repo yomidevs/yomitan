@@ -16,10 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {fetchText} from '../core/fetch-utilities.js';
+
 export class HtmlTemplateCollection {
     constructor() {
         /** @type {Map<string, HTMLTemplateElement>} */
         this._templates = new Map();
+    }
+
+    /**
+     * @param {string[]} urls
+     */
+    async loadFromFiles(urls) {
+        const htmlRawArray = await Promise.all(urls.map((url) => fetchText(url)));
+        const domParser = new DOMParser();
+        for (const htmlRaw of htmlRawArray) {
+            const templatesDocument = domParser.parseFromString(htmlRaw, 'text/html');
+            this.load(templatesDocument);
+        }
     }
 
     /**

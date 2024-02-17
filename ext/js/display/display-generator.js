@@ -17,7 +17,6 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {fetchText} from '../core/fetch-utilities.js';
 import {isObject} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
@@ -42,9 +41,7 @@ export class DisplayGenerator {
 
     /** */
     async prepare() {
-        const templatesDocumentRaw = await fetchText('/display-templates.html');
-        const templatesDocument = new DOMParser().parseFromString(templatesDocumentRaw, 'text/html');
-        this._templates.load(templatesDocument);
+        await this._templates.loadFromFiles(['/display-templates.html']);
         this.updateHotkeys();
     }
 
