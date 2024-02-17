@@ -41,7 +41,7 @@ export class DisplayGenerator {
 
     /** */
     async prepare() {
-        await this._templates.loadFromFiles(['/display-templates.html']);
+        await this._templates.loadFromFiles(['/templates-display.html']);
         this.updateHotkeys();
     }
 
