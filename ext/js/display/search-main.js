@@ -48,7 +48,7 @@ await Application.main(async (application) => {
     const displayAnki = new DisplayAnki(display, displayAudio);
     displayAnki.prepare();
 
-    const searchDisplayController = new SearchDisplayController(tabId, frameId, display, displayAudio, searchPersistentStateController);
+    const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
     await searchDisplayController.prepare();
 
     display.initializeState();

@@ -24,17 +24,11 @@ import {querySelectorNotNull} from '../dom/query-selector.js';
 
 export class SearchDisplayController {
     /**
-     * @param {number|undefined} tabId
-     * @param {number|undefined} frameId
      * @param {import('./display.js').Display} display
      * @param {import('./display-audio.js').DisplayAudio} displayAudio
      * @param {import('./search-persistent-state-controller.js').SearchPersistentStateController} searchPersistentStateController
      */
-    constructor(tabId, frameId, display, displayAudio, searchPersistentStateController) {
-        /** @type {number|undefined} */
-        this._tabId = tabId;
-        /** @type {number|undefined} */
-        this._frameId = frameId;
+    constructor(display, displayAudio, searchPersistentStateController) {
         /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {import('./display-audio.js').DisplayAudio} */
@@ -519,6 +513,7 @@ export class SearchDisplayController {
         if (flags !== null) {
             optionsContext.flags = flags;
         }
+        const {tabId, frameId} = this._display.application;
         /** @type {import('display').ContentDetails} */
         const details = {
             focus: false,
@@ -536,10 +531,7 @@ export class SearchDisplayController {
             content: {
                 dictionaryEntries: void 0,
                 animate,
-                contentOrigin: {
-                    tabId: this._tabId,
-                    frameId: this._frameId
-                }
+                contentOrigin: {tabId, frameId}
             }
         };
         if (!lookup) { details.params.lookup = 'false'; }
