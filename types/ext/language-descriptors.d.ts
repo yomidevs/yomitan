@@ -15,7 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {LanguageDescriptor, TextPreprocessor} from './language';
+import type {TextPreprocessor} from './language';
+import type {SafeAny} from './core';
+
+type LanguageDescriptor<TIso extends string, TTextPreprocessorDescriptor extends TextPreprocessorDescriptor> = {
+    iso: TIso;
+    name: string;
+    exampleText: string;
+    textPreprocessors: TTextPreprocessorDescriptor;
+};
+
+type TextPreprocessorDescriptor = {
+    [key: string]: TextPreprocessor<SafeAny>;
+};
+
+export type LanguageDescriptors = LanguageDescriptorObjectMap[keyof LanguageDescriptorObjectMap];
 
 export type EnglishTextPreprocessors = {
     capitalizeFirstLetter: TextPreprocessor<boolean>;
@@ -31,9 +45,7 @@ export type JapaneseTextPreprocessors = {
     collapseEmphaticSequences: TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
 };
 
-export type LanguageDescriptorObjectMap = {
+type LanguageDescriptorObjectMap = {
     en: LanguageDescriptor<'en', EnglishTextPreprocessors>;
     ja: LanguageDescriptor<'ja', JapaneseTextPreprocessors>;
 };
-
-export type LanguageDescriptors = LanguageDescriptorObjectMap[keyof LanguageDescriptorObjectMap];
