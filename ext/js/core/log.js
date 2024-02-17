@@ -40,7 +40,7 @@ class Logger extends EventDispatcher {
     }
 
     /**
-     * Logs a warning. This function invokes `log` internally.
+     * Logs a warning.
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
      */
     warn(error) {
@@ -48,7 +48,7 @@ class Logger extends EventDispatcher {
     }
 
     /**
-     * Logs an error. This function invokes `log` internally.
+     * Logs an error.
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
      */
     error(error) {
@@ -58,9 +58,8 @@ class Logger extends EventDispatcher {
     /**
      * Logs a generic error. This will trigger the 'log' event with the same arguments as the function invocation.
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
-     * @param {import('log').LogLevel} level The level to log at. Values include `'info'`, `'debug'`, `'warn'`, and `'error'`.
-     *   Other values will be logged at a non-error level.
-     * @param {import('log').LogContext} [context] An optional context object for the error which should typically include a `url` field.
+     * @param {import('log').LogLevel} level
+     * @param {import('log').LogContext} [context]
      */
     logGenericError(error, level, context) {
         if (typeof context === 'undefined') {
