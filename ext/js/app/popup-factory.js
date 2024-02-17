@@ -29,13 +29,10 @@ export class PopupFactory {
     /**
      * Creates a new instance.
      * @param {import('../application.js').Application} application
-     * @param {number} frameId The frame ID of the host frame.
      */
-    constructor(application, frameId) {
+    constructor(application) {
         /** @type {import('../application.js').Application} */
         this._application = application;
-        /** @type {number} */
-        this._frameId = frameId;
         /** @type {FrameOffsetForwarder} */
         this._frameOffsetForwarder = new FrameOffsetForwarder(application.crossFrame);
         /** @type {Map<string, import('popup').PopupAny>} */
@@ -115,6 +112,9 @@ export class PopupFactory {
             depth = 0;
         }
 
+        const currentFrameId = this._application.frameId;
+        if (currentFrameId === null) { throw new Error('Cannot create popup: no frameId'); }
+
         if (popupWindow) {
             // New unique id
             if (id === null) {
@@ -124,11 +124,11 @@ export class PopupFactory {
                 application: this._application,
                 id,
                 depth,
-                frameId: this._frameId
+                frameId: currentFrameId
             });
             this._popups.set(id, popup);
             return popup;
-        } else if (frameId === this._frameId) {
+        } else if (frameId === currentFrameId) {
             // New unique id
             if (id === null) {
                 id = generateId(16);
@@ -137,7 +137,7 @@ export class PopupFactory {
                 application: this._application,
                 id,
                 depth,
-                frameId: this._frameId,
+                frameId: currentFrameId,
                 childrenSupported
             });
             if (parent !== null) {

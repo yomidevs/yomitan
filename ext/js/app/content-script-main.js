@@ -25,7 +25,7 @@ await Application.main(async (application) => {
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 
-    const popupFactory = new PopupFactory(application, frameId);
+    const popupFactory = new PopupFactory(application);
     popupFactory.prepare();
 
     const frontend = new Frontend({
