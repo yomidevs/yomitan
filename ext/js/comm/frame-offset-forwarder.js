@@ -29,7 +29,7 @@ export class FrameOffsetForwarder {
         /** @type {number} */
         this._frameId = frameId;
         /** @type {FrameAncestryHandler} */
-        this._frameAncestryHandler = new FrameAncestryHandler(crossFrameApi, frameId);
+        this._frameAncestryHandler = new FrameAncestryHandler(crossFrameApi);
     }
 
     /**
