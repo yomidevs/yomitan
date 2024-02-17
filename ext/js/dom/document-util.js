@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 /**
  * This variable is stateful, but it is only used to do feature detection,
  * and its value should be constant for the lifetime of the extension.
@@ -472,6 +471,10 @@ function convertToNumberOrNull(value) {
 function computeCssZoomSupported() {
     // 'style' can be undefined in certain contexts, such as when document is an SVG document.
     const {style} = document.createElement('div');
-    // @ts-expect-error - zoom is a non-standard property.
-    return (typeof style === 'object' && style !== null && typeof style.zoom === 'string');
+    return (
+        typeof style === 'object' &&
+        style !== null &&
+        // @ts-expect-error - zoom is a non-standard property.
+        typeof style.zoom === 'string'
+    );
 }
