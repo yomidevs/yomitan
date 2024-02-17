@@ -557,17 +557,17 @@ export function convertHalfWidthKanaToFullWidth(text, sourceMap = null) {
 
         let index = 0;
         switch (text.charCodeAt(i + 1)) {
-            case 0xff9e: // dakuten
+            case 0xff9e: // Dakuten
                 index = 1;
                 break;
-            case 0xff9f: // handakuten
+            case 0xff9f: // Handakuten
                 index = 2;
                 break;
         }
 
         let c2 = mapping[index];
         if (index > 0) {
-            if (c2 === '-') { // invalid
+            if (c2 === '-') { // Invalid
                 index = 0;
                 c2 = mapping[0];
             } else {

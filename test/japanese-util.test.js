@@ -21,8 +21,7 @@ import {TextSourceMap} from '../ext/js/general/text-source-map.js';
 import * as jpw from '../ext/js/language/ja/japanese-wanakana.js';
 import * as jp from '../ext/js/language/ja/japanese.js';
 
-/** */
-function testIsCodePointKanji() {
+describe('Japanese utility functions', () => {
     describe('isCodePointKanji', () => {
         /** @type {[characters: string, expected: boolean][]} */
         const data = [
@@ -40,10 +39,7 @@ function testIsCodePointKanji() {
             }
         });
     });
-}
 
-/** */
-function testIsCodePointKana() {
     describe('isCodePointKana', () => {
         /** @type {[characters: string, expected: boolean][]} */
         const data = [
@@ -60,10 +56,7 @@ function testIsCodePointKana() {
             }
         });
     });
-}
 
-/** */
-function testIsCodePointJapanese() {
     describe('isCodePointJapanese', () => {
         /** @type {[characters: string, expected: boolean][]} */
         const data = [
@@ -81,10 +74,7 @@ function testIsCodePointJapanese() {
             }
         });
     });
-}
 
-/** */
-function testIsStringEntirelyKana() {
     describe('isStringEntirelyKana', () => {
         /** @type {[string: string, expected: boolean][]} */
         const data = [
@@ -105,10 +95,7 @@ function testIsStringEntirelyKana() {
             expect(jp.isStringEntirelyKana(string)).toStrictEqual(expected);
         });
     });
-}
 
-/** */
-function testIsStringPartiallyJapanese() {
     describe('isStringPartiallyJapanese', () => {
         /** @type {[string: string, expected: boolean][]} */
         const data = [
@@ -130,10 +117,7 @@ function testIsStringPartiallyJapanese() {
             expect(jp.isStringPartiallyJapanese(string)).toStrictEqual(expected);
         });
     });
-}
 
-/** */
-function testConvertKatakanaToHiragana() {
     describe('convertKatakanaToHiragana', () => {
         /** @type {[string: string, expected: string, keepProlongedSoundMarks?: boolean][]} */
         const data = [
@@ -156,11 +140,8 @@ function testConvertKatakanaToHiragana() {
             });
         }
     });
-}
 
-/** */
-function testConvertHiraganaToKatakana() {
-    describe('ConvertHiraganaToKatakana', () => {
+    describe('convertHiraganaToKatakana', () => {
         /** @type {[string: string, expected: string][]} */
         const data = [
             ['かたかな', 'カタカナ'],
@@ -178,11 +159,8 @@ function testConvertHiraganaToKatakana() {
             expect(jp.convertHiraganaToKatakana(string)).toStrictEqual(expected);
         });
     });
-}
 
-/** */
-function testConvertToRomaji() {
-    describe('ConvertToRomaji', () => {
+    describe('convertToRomaji', () => {
         /** @type {[string: string, expected: string][]} */
         const data = [
             ['かたかな', 'katakana'],
@@ -200,11 +178,8 @@ function testConvertToRomaji() {
             expect(jpw.convertToRomaji(string)).toStrictEqual(expected);
         });
     });
-}
 
-/** */
-function testConvertNumericToFullWidth() {
-    describe('ConvertNumericToFullWidth', () => {
+    describe('convertNumericToFullWidth', () => {
         /** @type {[string: string, expected: string][]} */
         const data = [
             ['0123456789', '０１２３４５６７８９'],
@@ -217,11 +192,8 @@ function testConvertNumericToFullWidth() {
             expect(jp.convertNumericToFullWidth(string)).toStrictEqual(expected);
         });
     });
-}
 
-/** */
-function testConvertHalfWidthKanaToFullWidth() {
-    describe('ConvertHalfWidthKanaToFullWidth', () => {
+    describe('convertHalfWidthKanaToFullWidth', () => {
         /** @type {[string: string, expected: string, expectedSourceMapping?: number[]][]} */
         const data = [
             ['0123456789', '0123456789'],
@@ -247,11 +219,8 @@ function testConvertHalfWidthKanaToFullWidth() {
             });
         }
     });
-}
 
-/** */
-function testConvertAlphabeticToKana() {
-    describe('ConvertAlphabeticToKana', () => {
+    describe('convertAlphabeticToKana', () => {
         /** @type {[string: string, expected: string, expectedSourceMapping?: number[]][]} */
         const data = [
             ['0123456789', '0123456789'],
@@ -276,11 +245,8 @@ function testConvertAlphabeticToKana() {
             });
         }
     });
-}
 
-/** */
-function testDistributeFurigana() {
-    describe('DistributeFurigana', () => {
+    describe('distributeFurigana', () => {
         /** @type {[input: [term: string, reading: string], expected: {text: string, reading: string}[]][]} */
         const data = [
             [
@@ -746,11 +712,8 @@ function testDistributeFurigana() {
             expect(actual).toStrictEqual(expected);
         });
     });
-}
 
-/** */
-function testDistributeFuriganaInflected() {
-    describe('DistributeFuriganaInflected', () => {
+    describe('distributeFuriganaInflected', () => {
         /** @type {[input: [term: string, reading: string, source: string], expected: {text: string, reading: string}[]][]} */
         const data = [
             [
@@ -800,11 +763,8 @@ function testDistributeFuriganaInflected() {
             expect(actual).toStrictEqual(expected);
         });
     });
-}
 
-/** */
-function testCollapseEmphaticSequences() {
-    describe('CollapseEmphaticSequences', () => {
+    describe('collapseEmphaticSequences', () => {
         /** @type {[input: [text: string, fullCollapse: boolean], output: [expected: string, expectedSourceMapping: number[]]][]} */
         const data = [
             [['かこい', false], ['かこい', [1, 1, 1]]],
@@ -860,11 +820,8 @@ function testCollapseEmphaticSequences() {
             }
         });
     });
-}
 
-/** */
-function testIsMoraPitchHigh() {
-    describe('IsMoraPitchHigh', () => {
+    describe('isMoraPitchHigh', () => {
         /** @type {[input: [moraIndex: number, pitchAccentDownstepPosition: number], expected: boolean][]} */
         const data = [
             [[0, 0], false],
@@ -899,11 +856,8 @@ function testIsMoraPitchHigh() {
             expect(actual).toStrictEqual(expected);
         });
     });
-}
 
-/** */
-function testGetKanaMorae() {
-    describe('GetKanaMorae', () => {
+    describe('getKanaMorae', () => {
         /** @type {[text: string, expected: string[]][]} */
         const data = [
             ['かこ', ['か', 'こ']],
@@ -922,27 +876,4 @@ function testGetKanaMorae() {
             expect(actual).toStrictEqual(expected);
         });
     });
-}
-
-
-/** */
-function main() {
-    testIsCodePointKanji();
-    testIsCodePointKana();
-    testIsCodePointJapanese();
-    testIsStringEntirelyKana();
-    testIsStringPartiallyJapanese();
-    testConvertKatakanaToHiragana();
-    testConvertHiraganaToKatakana();
-    testConvertToRomaji();
-    testConvertNumericToFullWidth();
-    testConvertHalfWidthKanaToFullWidth();
-    testConvertAlphabeticToKana();
-    testDistributeFurigana();
-    testDistributeFuriganaInflected();
-    testCollapseEmphaticSequences();
-    testIsMoraPitchHigh();
-    testGetKanaMorae();
-}
-
-main();
+});

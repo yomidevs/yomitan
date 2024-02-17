@@ -551,10 +551,10 @@ export class DOMTextScanner {
             case 'block':
             case 'flex':
             case 'grid':
-            case 'list': // list-item
-            case 'table': // table, table-*
+            case 'list': // Also includes: list-item
+            case 'table': // Also includes: table, table-*
                 return true;
-            case 'ruby': // ruby-*
+            case 'ruby': // Also includes: ruby-*
                 return (pos >= 0);
             default:
                 return false;

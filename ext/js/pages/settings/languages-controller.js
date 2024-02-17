@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class LanguagesController {
@@ -26,23 +25,21 @@ export class LanguagesController {
     constructor(settingsController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {import('language').LanguageSummary[]} */
-        this._languages = [];
-        /** @type {EventListenerCollection} */
-        this._eventListeners = new EventListenerCollection();
     }
 
     /** */
     async prepare() {
-        this._languages = await this._settingsController.application.api.getLanguageSummaries();
-        this._languages.sort((a, b) => a.iso.localeCompare(b.iso, 'en'));
-        this._fillSelect();
+        const languages = await this._settingsController.application.api.getLanguageSummaries();
+        languages.sort((a, b) => a.iso.localeCompare(b.iso, 'en'));
+        this._fillSelect(languages);
     }
 
-    /** */
-    _fillSelect() {
+    /**
+     * @param {import('language').LanguageSummary[]} languages
+     */
+    _fillSelect(languages) {
         const selectElement = querySelectorNotNull(document, '#language-select');
-        for (const {iso, name} of this._languages) {
+        for (const {iso, name} of languages) {
             const option = document.createElement('option');
             option.value = iso;
             option.text = `(${iso}) ${name}`;

@@ -19,8 +19,7 @@
 import {describe, expect, test} from 'vitest';
 import {createSchema, normalizeContext} from '../ext/js/background/profile-conditions-util.js';
 
-/** */
-function testNormalizeContext() {
+describe('Profile conditions utilities', () => {
     describe('NormalizeContext', () => {
         /** @type {{context: import('settings').OptionsContext, expected: import('profile-conditions-util').NormalizedOptionsContext}[]} */
         const data = [
@@ -54,10 +53,7 @@ function testNormalizeContext() {
             expect(actual).toStrictEqual(expected);
         });
     });
-}
 
-/** */
-function testSchemas() {
     describe('Schemas', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{conditionGroups: import('settings').ProfileConditionGroup[], expectedSchema?: import('ext/json-schema').Schema, inputs?: {expected: boolean, context: import('settings').OptionsContext}[]}[]} */
@@ -254,7 +250,7 @@ function testSchemas() {
                 ]
             },
 
-            // url tests
+            // Url tests
             {
                 conditionGroups: [
                     {
@@ -610,7 +606,7 @@ function testSchemas() {
                 ]
             },
 
-            // flags tests
+            // Flags tests
             {
                 conditionGroups: [
                     {
@@ -1113,13 +1109,4 @@ function testSchemas() {
             }
         });
     });
-}
-
-
-/** */
-function main() {
-    testNormalizeContext();
-    testSchemas();
-}
-
-main();
+});
