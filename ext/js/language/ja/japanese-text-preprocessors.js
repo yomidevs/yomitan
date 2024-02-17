@@ -18,10 +18,10 @@
 import {basicTextPreprocessorOptions} from '../text-preprocessors.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {
-    collapseEmphaticSequences as collapseEmphaticSequences2,
+    collapseEmphaticSequences as collapseEmphaticSequencesFunction,
     convertHalfWidthKanaToFullWidth,
-    convertHiraganaToKatakana as convertHiraganaToKatakana2,
-    convertKatakanaToHiragana as convertKatakanaToHiragana2,
+    convertHiraganaToKatakana as convertHiraganaToKatakanaFunction,
+    convertKatakanaToHiragana as convertKatakanaToHiraganaFunction,
     convertNumericToFullWidth
 } from './japanese.js';
 
@@ -58,7 +58,7 @@ export const convertHiraganaToKatakana = {
     description: 'よみちゃん → ヨミチャン',
     options: basicTextPreprocessorOptions,
     /** @type {import('language').TextPreprocessorFunction<boolean>} */
-    process: (str, setting) => (setting ? convertHiraganaToKatakana2(str) : str)
+    process: (str, setting) => (setting ? convertHiraganaToKatakanaFunction(str) : str)
 };
 
 /** @type {import('language').TextPreprocessor<boolean>} */
@@ -67,7 +67,7 @@ export const convertKatakanaToHiragana = {
     description: 'ヨミチャン → よみちゃん',
     options: basicTextPreprocessorOptions,
     /** @type {import('language').TextPreprocessorFunction<boolean>} */
-    process: (str, setting) => (setting ? convertKatakanaToHiragana2(str) : str)
+    process: (str, setting) => (setting ? convertKatakanaToHiraganaFunction(str) : str)
 };
 
 /** @type {import('language').TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>} */
@@ -79,7 +79,7 @@ export const collapseEmphaticSequences = {
     process: (str, setting, sourceMap) => {
         const [collapseEmphatic, collapseEmphaticFull] = setting;
         if (collapseEmphatic) {
-            str = collapseEmphaticSequences2(str, collapseEmphaticFull, sourceMap);
+            str = collapseEmphaticSequencesFunction(str, collapseEmphaticFull, sourceMap);
         }
         return str;
     }
