@@ -30,8 +30,6 @@ await Application.main(async (application) => {
 
     const frontend = new Frontend({
         application,
-        tabId,
-        frameId,
         popupFactory,
         depth: 0,
         parentPopupId: null,

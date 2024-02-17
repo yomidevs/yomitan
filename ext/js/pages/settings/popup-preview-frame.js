@@ -94,8 +94,6 @@ export class PopupPreviewFrame {
         // Overwrite frontend
         this._frontend = new Frontend({
             application: this._application,
-            tabId: this._tabId,
-            frameId: this._frameId,
             popupFactory: this._popupFactory,
             depth: 0,
             parentPopupId: null,

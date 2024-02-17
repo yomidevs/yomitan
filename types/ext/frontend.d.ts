@@ -29,10 +29,6 @@ export type ConstructorDetails = {
     popupFactory: PopupFactory;
     /** The nesting depth value of the popup. */
     depth: number;
-    /** The tab ID of the host tab. */
-    tabId: number | undefined;
-    /** The frame ID of the host frame. */
-    frameId: number;
     /** The popup ID of the parent popup if one exists, otherwise null. */
     parentPopupId: string | null;
     /** The frame ID of the parent popup if one exists, otherwise null. */
