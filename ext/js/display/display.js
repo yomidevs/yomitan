@@ -1720,7 +1720,7 @@ export class Display extends EventDispatcher {
             import('../app/frontend.js')
         ]);
 
-        const popupFactory = new PopupFactory(this._application, this._frameId);
+        const popupFactory = new PopupFactory(this._application);
         popupFactory.prepare();
 
         /** @type {import('frontend').ConstructorDetails} */
@@ -1730,8 +1730,6 @@ export class Display extends EventDispatcher {
             parentPopupId,
             parentFrameId,
             depth: this._depth + 1,
-            tabId: this._tabId,
-            frameId: this._frameId,
             popupFactory,
             pageType: this._pageType,
             allowRootFramePopupProxy: true,
