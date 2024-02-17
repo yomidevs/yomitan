@@ -205,8 +205,7 @@ export class AnkiController {
     /** */
     _onAnkiErrorLogLinkClick() {
         if (this._ankiError === null) { return; }
-        // eslint-disable-next-line no-console
-        console.log({error: this._ankiError});
+        log.log({error: this._ankiError});
     }
 
     /**
