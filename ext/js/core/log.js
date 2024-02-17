@@ -122,19 +122,17 @@ class Logger extends EventDispatcher {
     /**
      * Logs a warning. This function invokes `log` internally.
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
-     * @param {import('log').LogContext} [context] An optional context object for the error which should typically include a `url` field.
      */
-    warn(error, context) {
-        this.log(error, 'warn', context);
+    warn(error) {
+        this.log(error, 'warn');
     }
 
     /**
      * Logs an error. This function invokes `log` internally.
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
-     * @param {import('log').LogContext} [context] An optional context object for the error which should typically include a `url` field.
      */
-    error(error, context) {
-        this.log(error, 'error', context);
+    error(error) {
+        this.log(error, 'error');
     }
 }
 
