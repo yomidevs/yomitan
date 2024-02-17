@@ -1215,9 +1215,11 @@ export class Display extends EventDispatcher {
         const {contentOrigin} = content;
         if (typeof contentOrigin === 'object' && contentOrigin !== null) {
             const {tabId, frameId} = contentOrigin;
-            this._contentOriginTabId = tabId;
-            this._contentOriginFrameId = frameId;
-            contentOriginValid = true;
+            if (tabId !== null && frameId !== null) {
+                this._contentOriginTabId = tabId;
+                this._contentOriginFrameId = frameId;
+                contentOriginValid = true;
+            }
         }
         if (!contentOriginValid) {
             content.contentOrigin = this.getContentOrigin();
