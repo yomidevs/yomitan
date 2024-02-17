@@ -173,7 +173,7 @@ export class Backend {
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
             ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
             ['getMedia',                     this._onApiGetMedia.bind(this)],
-            ['log',                          this._onApiLog.bind(this)],
+            ['logGenericErrorBackend',       this._onApiLogGenericErrorBackend.bind(this)],
             ['logIndicatorClear',            this._onApiLogIndicatorClear.bind(this)],
             ['modifySettings',               this._onApiModifySettings.bind(this)],
             ['getSettings',                  this._onApiGetSettings.bind(this)],
@@ -266,7 +266,7 @@ export class Backend {
             }, 1000);
             this._updateBadge();
 
-            log.on('log', this._onLog.bind(this));
+            log.on('logGenericError', this._onLogGenericError.bind(this));
 
             await this._requestBuilder.prepare();
             await this._environment.prepare();
@@ -335,9 +335,9 @@ export class Backend {
     }
 
     /**
-     * @param {{level: import('log').LogLevel}} params
+     * @param {import('log').Events['logGenericError']} params
      */
-    _onLog({level}) {
+    _onLogGenericError({level}) {
         const levelValue = logErrorLevelToNumber(level);
         const currentLogErrorLevel = this._logErrorLevel !== null ? logErrorLevelToNumber(this._logErrorLevel) : 0;
         if (levelValue <= currentLogErrorLevel) { return; }
@@ -739,8 +739,8 @@ export class Backend {
         return await this._getNormalizedDictionaryDatabaseMedia(targets);
     }
 
-    /** @type {import('api').ApiHandler<'log'>} */
-    _onApiLog({error, level, context}) {
+    /** @type {import('api').ApiHandler<'logGenericErrorBackend'>} */
+    _onApiLogGenericErrorBackend({error, level, context}) {
         log.logGenericError(ExtensionError.deserialize(error), level, context);
     }
 

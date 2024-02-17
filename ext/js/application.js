@@ -115,7 +115,7 @@ export class Application extends EventDispatcher {
      */
     prepare() {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-        log.on('log', this._onForwardLog.bind(this));
+        log.on('logGenericError', this._onLogGenericError.bind(this));
     }
 
     /**
@@ -220,11 +220,11 @@ export class Application extends EventDispatcher {
     }
 
     /**
-     * @param {{error: unknown, level: import('log').LogLevel, context?: import('log').LogContext}} params
+     * @param {import('log').Events['logGenericError']} params
      */
-    async _onForwardLog({error, level, context}) {
+    async _onLogGenericError({error, level, context}) {
         try {
-            await this._api.log(ExtensionError.serialize(error), level, context);
+            await this._api.logGenericErrorBackend(ExtensionError.serialize(error), level, context);
         } catch (e) {
             // NOP
         }

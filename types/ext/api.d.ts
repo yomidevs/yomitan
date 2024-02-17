@@ -289,7 +289,7 @@ type ApiSurface = {
         };
         return: DictionaryDatabase.MediaDataStringContent[];
     };
-    log: {
+    logGenericErrorBackend: {
         params: {
             error: Core.SerializedError;
             level: Log.LogLevel;

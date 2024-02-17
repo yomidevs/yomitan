@@ -66,7 +66,7 @@ class Logger extends EventDispatcher {
     }
 
     /**
-     * Logs a generic error. This will trigger the 'log' event with the same arguments as the function invocation.
+     * Logs a generic error.
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
      * @param {import('log').LogLevel} level
      * @param {import('log').LogContext} [context]
@@ -139,7 +139,7 @@ class Logger extends EventDispatcher {
         }
         /* eslint-enable no-console */
 
-        this.trigger('log', {error, level, context});
+        this.trigger('logGenericError', {error, level, context});
     }
 }
 

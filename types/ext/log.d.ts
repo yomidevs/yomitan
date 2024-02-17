@@ -24,7 +24,7 @@ export type LogContext = {
 };
 
 export type Events = {
-    log: {
+    logGenericError: {
         error: unknown;
         level: LogLevel;
         context: LogContext;
