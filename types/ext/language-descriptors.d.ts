@@ -17,14 +17,12 @@
 
 import type {LanguageDescriptor, TextPreprocessor} from './language';
 
-export type EnglishTextPreprocessorDescriptor = {
+export type EnglishTextPreprocessors = {
     capitalizeFirstLetter: TextPreprocessor<boolean>;
     decapitalize: TextPreprocessor<boolean>;
 };
 
-export type EnglishLanguageDescriptor = LanguageDescriptor<EnglishTextPreprocessorDescriptor>;
-
-export type JapaneseTextPreprocessorDescriptor = {
+export type JapaneseTextPreprocessors = {
     convertHalfWidthCharacters: TextPreprocessor<boolean>;
     convertNumericCharacters: TextPreprocessor<boolean>;
     convertAlphabeticCharacters: TextPreprocessor<boolean>;
@@ -33,4 +31,9 @@ export type JapaneseTextPreprocessorDescriptor = {
     collapseEmphaticSequences: TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
 };
 
-export type JapaneseLanguageDescriptor = LanguageDescriptor<JapaneseTextPreprocessorDescriptor>;
+export type LanguageDescriptorObjectMap = {
+    en: LanguageDescriptor<'en', EnglishTextPreprocessors>;
+    ja: LanguageDescriptor<'ja', JapaneseTextPreprocessors>;
+};
+
+export type LanguageDescriptors = LanguageDescriptorObjectMap[keyof LanguageDescriptorObjectMap];

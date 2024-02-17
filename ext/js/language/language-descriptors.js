@@ -18,37 +18,29 @@
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
 import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
 
-/** @type {import('language-descriptors').JapaneseLanguageDescriptor} */
-export const descriptorJapanese = {
-    name: 'Japanese',
-    iso: 'ja',
-    exampleText: '読め',
-    textPreprocessors: {
-        convertHalfWidthCharacters,
-        convertNumericCharacters,
-        convertAlphabeticCharacters,
-        convertHiraganaToKatakana,
-        convertKatakanaToHiragana,
-        collapseEmphaticSequences
-    }
-};
-
-/** @type {import('language-descriptors').EnglishLanguageDescriptor} */
-export const descriptorEnglish = {
-    name: 'English',
-    iso: 'en',
-    exampleText: 'read',
-    textPreprocessors: {
-        capitalizeFirstLetter,
-        decapitalize
-    }
-};
-
-// All descriptors
-
 const languageDescriptors = [
-    descriptorEnglish,
-    descriptorJapanese
+    {
+        iso: 'en',
+        name: 'English',
+        exampleText: 'read',
+        textPreprocessors: {
+            capitalizeFirstLetter,
+            decapitalize
+        }
+    },
+    {
+        iso: 'ja',
+        name: 'Japanese',
+        exampleText: '読め',
+        textPreprocessors: {
+            convertHalfWidthCharacters,
+            convertNumericCharacters,
+            convertAlphabeticCharacters,
+            convertHiraganaToKatakana,
+            convertKatakanaToHiragana,
+            collapseEmphaticSequences
+        }
+    }
 ];
 
 /** @type {Map<string, typeof languageDescriptors[0]>} */

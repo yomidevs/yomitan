@@ -45,9 +45,9 @@ export type LanguageSummary = {
     exampleText: string;
 };
 
-export type LanguageDescriptor<TTextPreprocessorDescriptor extends TextPreprocessorDescriptor> = {
+export type LanguageDescriptor<TIso extends string, TTextPreprocessorDescriptor extends TextPreprocessorDescriptor> = {
+    iso: TIso;
     name: string;
-    iso: string;
     exampleText: string;
     textPreprocessors: TTextPreprocessorDescriptor;
 };
