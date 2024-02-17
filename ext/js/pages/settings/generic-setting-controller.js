@@ -18,7 +18,7 @@
 
 import {ExtensionError} from '../../core/extension-error.js';
 import {parseJson} from '../../core/json.js';
-import {DocumentUtil} from '../../dom/document-util.js';
+import {convertElementValueToNumber} from '../../dom/document-util.js';
 import {DOMDataBinder} from '../../dom/dom-data-binder.js';
 
 export class GenericSettingController {
@@ -328,7 +328,7 @@ export class GenericSettingController {
     _toNumber(value, data) {
         /** @type {import('document-util').ToNumberConstraints} */
         const constraints = typeof data.constraints === 'object' && data.constraints !== null ? data.constraints : {};
-        return typeof value === 'string' ? DocumentUtil.convertElementValueToNumber(value, constraints) : 0;
+        return typeof value === 'string' ? convertElementValueToNumber(value, constraints) : 0;
     }
 
     /**

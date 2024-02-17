@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {DocumentUtil} from '../../dom/document-util.js';
+import {normalizeModifier} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
@@ -417,7 +417,7 @@ class ScanInputField {
         /** @type {import('input').Modifier[]} */
         const results = [];
         for (const modifier of modifiersString.split(/[,;\s]+/)) {
-            const modifier2 = DocumentUtil.normalizeModifier(modifier.trim().toLowerCase());
+            const modifier2 = normalizeModifier(modifier.trim().toLowerCase());
             if (modifier2 === null) { continue; }
             results.push(modifier2);
         }

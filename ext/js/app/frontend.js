@@ -20,7 +20,7 @@ import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {log} from '../core/logger.js';
 import {promiseAnimationFrame} from '../core/promise-animation-frame.js';
-import {DocumentUtil} from '../dom/document-util.js';
+import {addFullscreenChangeEventListener, getFullscreenElement} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceGenerator} from '../dom/text-source-generator.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
@@ -169,7 +169,7 @@ export class Frontend {
         this._textScanner.prepare();
 
         window.addEventListener('resize', this._onResize.bind(this), false);
-        DocumentUtil.addFullscreenChangeEventListener(this._updatePopup.bind(this));
+        addFullscreenChangeEventListener(this._updatePopup.bind(this));
 
         const {visualViewport} = window;
         if (typeof visualViewport !== 'undefined' && visualViewport !== null) {
@@ -529,7 +529,7 @@ export class Frontend {
         } else if (
             isIframe &&
             showIframePopupsInRootFrame &&
-            DocumentUtil.getFullscreenElement() === null &&
+            getFullscreenElement() === null &&
             this._allowRootFramePopupProxy
         ) {
             popupPromise = this._popupCache.get('iframe');

@@ -18,7 +18,7 @@
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
-import {DocumentUtil} from '../dom/document-util.js';
+import {getActiveModifiers, isInputElementFocused} from '../dom/document-util.js';
 
 /**
  * Class which handles hotkey events and actions.
@@ -173,7 +173,7 @@ export class HotkeyHandler extends EventDispatcher {
     _onKeyDown(event) {
         const hotkeyInfo = this._hotkeys.get(event.code);
         if (typeof hotkeyInfo !== 'undefined') {
-            const eventModifiers = DocumentUtil.getActiveModifiers(event);
+            const eventModifiers = getActiveModifiers(event);
             if (this._invokeHandlers(eventModifiers, hotkeyInfo, event.key)) {
                 event.preventDefault();
                 return;
@@ -269,7 +269,7 @@ export class HotkeyHandler extends EventDispatcher {
     _isHotkeyPermitted(modifiers, key) {
         return !(
             (modifiers.length === 0 || (modifiers.length === 1 && modifiers[0] === 'shift')) &&
-            DocumentUtil.isInputElementFocused() &&
+            isInputElementFocused() &&
             this._isKeyCharacterInput(key)
         );
     }
