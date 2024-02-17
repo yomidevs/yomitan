@@ -40,6 +40,16 @@ class Logger extends EventDispatcher {
     }
 
     /**
+     * @param {unknown} message
+     * @param {...unknown} optionalParams
+     */
+    log(message, ...optionalParams) {
+        /* eslint-disable no-console */
+        console.log(message, ...optionalParams);
+        /* eslint-enable no-console */
+    }
+
+    /**
      * Logs a warning.
      * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
      */
