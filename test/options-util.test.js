@@ -608,9 +608,22 @@ function createOptionsUpdatedTestData1() {
     };
 }
 
+/**
+ * @param {string} templates
+ * @returns {Map<string, string>}
+ */
+function getHandlebarsPartials(templates) {
+    const inlinePartialRegex = /{{~?#\*inline .*?"([^"]*)"~?}}.*?{{~?\/inline~?}}/gs;
+    const matches = templates.matchAll(inlinePartialRegex);
+    const partials = new Map();
+    for (const match of matches) {
+        const [template, name] = match;
+        partials.set(name, template);
+    }
+    return partials;
+}
 
-/** */
-async function testUpdate() {
+describe('OptionsUtil', () => {
     test('Update', async () => {
         const optionsUtil = new OptionsUtil();
         await optionsUtil.prepare();
@@ -620,24 +633,7 @@ async function testUpdate() {
         const optionsExpected = createOptionsUpdatedTestData1();
         expect(optionsUpdated).toStrictEqual(optionsExpected);
     });
-}
 
-/** */
-async function testCumulativeFieldTemplatesUpdates() {
-    /**
-     * @param {string} templates
-     * @returns {Map<string, string>}
-     */
-    const getHandlebarsPartials = (templates) => {
-        const inlinePartialRegex = /{{~?#\*inline .*?"([^"]*)"~?}}.*?{{~?\/inline~?}}/gs;
-        const matches = templates.matchAll(inlinePartialRegex);
-        const partials = new Map();
-        for (const match of matches) {
-            const [template, name] = match;
-            partials.set(name, template);
-        }
-        return partials;
-    };
     test('CumulativeFieldTemplatesUpdates', async () => {
         const optionsUtil = new OptionsUtil();
         await optionsUtil.prepare();
@@ -656,10 +652,7 @@ async function testCumulativeFieldTemplatesUpdates() {
 
         expect(partialsUpdated).toStrictEqual(partialsExpected);
     });
-}
 
-/** */
-async function testDefault() {
     describe('Default', () => {
         /** @type {((options: import('options-util').IntermediateOptions) => void)[]} */
         const data = [
@@ -683,10 +676,7 @@ async function testDefault() {
             expect(structuredClone(optionsUpdated)).toStrictEqual(structuredClone(options));
         });
     });
-}
 
-/** */
-async function testFieldTemplatesUpdate() {
     describe('FieldTemplatesUpdate', () => {
         const templatePatcher = new TemplatePatcher();
         /**
@@ -707,7 +697,7 @@ async function testFieldTemplatesUpdate() {
             const match = fileNameRegex.exec(fileName);
             if (match !== null) {
                 updates.push({
-                    version: Number.parseInt(match[1]),
+                    version: Number.parseInt(match[1], 10),
                     changes: loadDataFile(path.join(templatesDirPath, match[0]))
                 });
             }
@@ -851,7 +841,7 @@ async function testFieldTemplatesUpdate() {
 {{~> (lookup . "marker") ~}}
 `.trimStart()
             },
-            // glossary and glossary-brief update
+            // Glossary and glossary-brief update
             {
                 oldVersion: 7,
                 newVersion: 12,
@@ -1243,7 +1233,7 @@ async function testFieldTemplatesUpdate() {
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart()
             },
-            // block helper update: furigana and furiganaPlain
+            // Block helper update: furigana and furiganaPlain
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1331,7 +1321,7 @@ async function testFieldTemplatesUpdate() {
 
 {{~> (lookup . "marker") ~}}`.trimStart()
             },
-            // block helper update: formatGlossary
+            // Block helper update: formatGlossary
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1405,7 +1395,7 @@ async function testFieldTemplatesUpdate() {
 
 {{~> (lookup . "marker") ~}}`.trimStart()
             },
-            // block helper update: set and get
+            // Block helper update: set and get
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1507,7 +1497,7 @@ async function testFieldTemplatesUpdate() {
 
 {{~> (lookup . "marker") ~}}`.trimStart()
             },
-            // block helper update: hasMedia and getMedia
+            // Block helper update: hasMedia and getMedia
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1589,7 +1579,7 @@ async function testFieldTemplatesUpdate() {
 
 {{~> (lookup . "marker") ~}}`.trimStart()
             },
-            // block helper update: pronunciation
+            // Block helper update: pronunciation
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1720,15 +1710,4 @@ async function testFieldTemplatesUpdate() {
             expect(fieldTemplatesActual).toStrictEqual(expected2);
         });
     });
-}
-
-
-/** */
-async function main() {
-    await testUpdate();
-    await testDefault();
-    await testFieldTemplatesUpdate();
-    await testCumulativeFieldTemplatesUpdates();
-}
-
-await main();
+});

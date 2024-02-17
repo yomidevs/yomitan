@@ -85,7 +85,7 @@ export class OffscreenProxy {
      */
     async _hasOffscreenDocument() {
         const offscreenUrl = chrome.runtime.getURL('offscreen.html');
-        if (!chrome.runtime.getContexts) { // chrome version below 116
+        if (!chrome.runtime.getContexts) { // Chrome version below 116
             // Clients: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/clients
             // @ts-expect-error - Types not set up for service workers yet
             const matchedClients = await clients.matchAll();

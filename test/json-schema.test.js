@@ -17,7 +17,6 @@
  */
 
 import {describe, expect, test} from 'vitest';
-import {parseJson} from '../dev/json.js';
 import {JsonSchema} from '../ext/js/data/json-schema.js';
 
 /**
@@ -47,18 +46,8 @@ function createProxy(schema, value) {
     return new JsonSchema(schema).createProxy(value);
 }
 
-/**
- * @template [T=unknown]
- * @param {T} value
- * @returns {T}
- */
-function clone(value) {
-    return parseJson(JSON.stringify(value));
-}
 
-
-/** */
-function testValidate1() {
+describe('JsonSchema', () => {
     describe('Validate1', () => {
         /** @type {import('ext/json-schema').Schema} */
         const schema = {
@@ -118,10 +107,7 @@ function testValidate1() {
             }
         });
     });
-}
 
-/** */
-function testValidate2() {
     describe('Validate2', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{schema: import('ext/json-schema').Schema, inputs: {expected: boolean, value: unknown}[]}[]} */
@@ -526,11 +512,7 @@ function testValidate2() {
             });
         });
     });
-}
 
-
-/** */
-function testGetValidValueOrDefault1() {
     describe('GetValidValueOrDefault1', () => {
         /** @type {{schema: import('ext/json-schema').Schema, inputs: [value: unknown, expected: unknown][]}[]} */
         const data = [
@@ -884,11 +866,7 @@ function testGetValidValueOrDefault1() {
             });
         });
     });
-}
 
-
-/** */
-function testProxy1() {
     describe('Proxy1', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{schema: import('ext/json-schema').Schema, tests: {error: boolean, value?: import('ext/json-schema').Value, action: (value: import('core').SafeAny) => void}[]}[]} */
@@ -1029,7 +1007,7 @@ function testProxy1() {
         describe.each(data)('Schema %#', ({schema, tests}) => {
             test.each(tests)('proxy %#', ({error, value, action}) => {
                 if (typeof value === 'undefined') { value = getValidValueOrDefault(schema, void 0); }
-                value = clone(value);
+                value = structuredClone(value);
                 expect(schemaValidate(schema, value)).toBe(true);
                 const valueProxy = createProxy(schema, value);
                 if (error) {
@@ -1043,7 +1021,7 @@ function testProxy1() {
         for (const {schema, tests} of data) {
             for (let {error, value, action} of tests) {
                 if (typeof value === 'undefined') { value = getValidValueOrDefault(schema, void 0); }
-                value = clone(value);
+                value = structuredClone(value);
                 expect(schemaValidate(schema, value)).toBe(true);
                 const valueProxy = createProxy(schema, value);
                 if (error) {
@@ -1054,16 +1032,4 @@ function testProxy1() {
             }
         }
     });
-}
-
-
-/** */
-function main() {
-    testValidate1();
-    testValidate2();
-    testGetValidValueOrDefault1();
-    testProxy1();
-}
-
-
-main();
+});

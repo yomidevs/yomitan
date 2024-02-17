@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {expect, test} from 'vitest';
+import {describe, expect, test} from 'vitest';
 import {ObjectPropertyAccessor} from '../ext/js/general/object-property-accessor.js';
 
 /**
@@ -38,9 +38,7 @@ function createTestObject() {
     };
 }
 
-
-/** */
-function testGet1() {
+describe('ObjectPropertyAccessor', () => {
     test('Get1', () => {
         /** @type {[pathArray: (string|number)[], getExpected: (object: import('core').SafeAny) => unknown][]} */
         const data = [
@@ -64,10 +62,7 @@ function testGet1() {
             expect(accessor.get(pathArray)).toStrictEqual(expected);
         }
     });
-}
 
-/** */
-function testGet2() {
     test('Get2', () => {
         const object = createTestObject();
         const accessor = new ObjectPropertyAccessor(object);
@@ -99,11 +94,7 @@ function testGet2() {
             expect(() => accessor.get(pathArray)).toThrow(message);
         }
     });
-}
 
-
-/** */
-function testSet1() {
     test('Set1', () => {
         const testValue = {};
         /** @type {(string|number)[][]} */
@@ -127,10 +118,7 @@ function testSet1() {
             expect(accessor.get(pathArray)).toStrictEqual(testValue);
         }
     });
-}
 
-/** */
-function testSet2() {
     test('Set2', () => {
         const object = createTestObject();
         const accessor = new ObjectPropertyAccessor(object);
@@ -156,11 +144,7 @@ function testSet2() {
             expect(() => accessor.set(pathArray, testValue)).toThrow(message);
         }
     });
-}
 
-
-/** */
-function testDelete1() {
     test('Delete1', () => {
         /**
          * @param {unknown} object
@@ -187,10 +171,7 @@ function testDelete1() {
             expect(validate(object)).toBe(true);
         }
     });
-}
 
-/** */
-function testDelete2() {
     test('Delete2', () => {
         /** @type {[pathArray: (string|number)[], message: string][]} */
         const data = [
@@ -218,11 +199,7 @@ function testDelete2() {
             expect(() => accessor.delete(pathArray)).toThrow(message);
         }
     });
-}
 
-
-/** */
-function testSwap1() {
     test('Swap1', () => {
         /** @type {[pathArray: (string|number)[], compareValues: boolean][]} */
         const data = [
@@ -257,10 +234,7 @@ function testSwap1() {
             }
         }
     });
-}
 
-/** */
-function testSwap2() {
     test('Swap2', () => {
         /** @type {[pathArray1: (string|number)[], pathArray2: (string|number)[], checkRevert: boolean, message: string][]} */
         const data = [
@@ -297,11 +271,7 @@ function testSwap2() {
             expect(value2a).toStrictEqual(value2b);
         }
     });
-}
 
-
-/** */
-function testGetPathString1() {
     test('GetPathString1', () => {
         /** @type {[pathArray: (string|number)[], expected: string][]} */
         const data = [
@@ -322,10 +292,7 @@ function testGetPathString1() {
             expect(ObjectPropertyAccessor.getPathString(pathArray)).toStrictEqual(expected);
         }
     });
-}
 
-/** */
-function testGetPathString2() {
     test('GetPathString2', () => {
         /** @type {[pathArray: unknown[], message: string][]} */
         const data = [
@@ -338,11 +305,7 @@ function testGetPathString2() {
             expect(() => ObjectPropertyAccessor.getPathString(pathArray)).toThrow(message);
         }
     });
-}
 
-
-/** */
-function testGetPathArray1() {
     test('GetPathArray1', () => {
         /** @type {[pathString: string, pathArray: (string|number)[]][]} */
         const data = [
@@ -367,10 +330,7 @@ function testGetPathArray1() {
             expect(ObjectPropertyAccessor.getPathArray(pathString)).toStrictEqual(expected);
         }
     });
-}
 
-/** */
-function testGetPathArray2() {
     test('GetPathArray2', () => {
         /** @type {[pathString: string, message: string][]} */
         const data = [
@@ -402,11 +362,7 @@ function testGetPathArray2() {
             expect(() => ObjectPropertyAccessor.getPathArray(pathString)).toThrow(message);
         }
     });
-}
 
-
-/** */
-function testHasProperty() {
     test('HasProperty', () => {
         /** @type {[object: unknown, property: unknown, expected: boolean][]} */
         const data = [
@@ -428,10 +384,7 @@ function testHasProperty() {
             expect(ObjectPropertyAccessor.hasProperty(object, property)).toStrictEqual(expected);
         }
     });
-}
 
-/** */
-function testIsValidPropertyType() {
     test('IsValidPropertyType', () => {
         /** @type {[object: unknown, property: unknown, expected: boolean][]} */
         const data = [
@@ -453,26 +406,4 @@ function testIsValidPropertyType() {
             expect(ObjectPropertyAccessor.isValidPropertyType(object, property)).toStrictEqual(expected);
         }
     });
-}
-
-
-/** */
-function main() {
-    testGet1();
-    testGet2();
-    testSet1();
-    testSet2();
-    testDelete1();
-    testDelete2();
-    testSwap1();
-    testSwap2();
-    testGetPathString1();
-    testGetPathString2();
-    testGetPathArray1();
-    testGetPathArray2();
-    testHasProperty();
-    testIsValidPropertyType();
-}
-
-
-main();
+});

@@ -439,7 +439,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'requestBackendReadySignal'>} */
     _onApiRequestBackendReadySignal(_params, sender) {
-        // tab ID isn't set in background (e.g. browser_action)
+        // Tab ID isn't set in background (e.g. browser_action)
         /** @type {import('application').ApiMessage<'applicationBackendReady'>} */
         const data = {action: 'applicationBackendReady'};
         if (typeof sender.tab === 'undefined') {
@@ -1554,7 +1554,7 @@ export class Backend {
         return (
             isObject(chrome.action) &&
             typeof chrome.action.getTitle === 'function' ?
-                new Promise((resolve) => chrome.action.getTitle({}, resolve)) :
+                new Promise((resolve) => { chrome.action.getTitle({}, resolve); }) :
                 Promise.resolve('')
         );
     }
@@ -2597,7 +2597,7 @@ export class Backend {
             const match = /^\d+/.exec(version);
             if (match === null) { return; }
 
-            const versionNumber = Number.parseInt(match[0]);
+            const versionNumber = Number.parseInt(match[0], 10);
             if (!(Number.isFinite(versionNumber) && versionNumber >= 77)) { return; }
 
             await navigator.storage.persist();
