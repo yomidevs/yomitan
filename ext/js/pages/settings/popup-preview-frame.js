@@ -59,7 +59,7 @@ export class PopupPreviewFrame {
         /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
         /** @type {import('language').LanguageSummary[]} */
-        this._languages = [];
+        this._languageSummaries = [];
         /** @type {boolean} */
         this._wanakanaBound = false;
 
@@ -93,7 +93,7 @@ export class PopupPreviewFrame {
         this._apiOptionsGetOld = this._application.api.optionsGet.bind(this._application.api);
         this._application.api.optionsGet = this._apiOptionsGet.bind(this);
 
-        this._languages = await this._application.api.getLanguageSummaries();
+        this._languageSummaries = await this._application.api.getLanguageSummaries();
         const options = await this._application.api.optionsGet({current: true});
         this._onOptionsChanged({options, optionsContext: {current: true}});
 
@@ -293,9 +293,9 @@ export class PopupPreviewFrame {
      * @param {{language: string}} details
      */
     _setLanguageExampleText({language}) {
-        const activeLanguage = /** @type {import('language').LanguageSummary} */ (this._languages.find(({iso}) => iso === language));
+        const activeLanguage = /** @type {import('language').LanguageSummary} */ (this._languageSummaries.find(({iso}) => iso === language));
 
-        if (this._exampleTextInput !== null && typeof wanakana !== 'undefined') {
+        if (this._exampleTextInput !== null) {
             if (language === 'ja') {
                 wanakana.bind(this._exampleTextInput);
                 this._wanakanaBound = true;
