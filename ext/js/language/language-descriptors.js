@@ -18,6 +18,7 @@
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
 import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
 
+/** @type {import('language-descriptors').LanguageDescriptorAny[]} */
 const languageDescriptors = [
     {
         iso: 'en',
@@ -43,7 +44,7 @@ const languageDescriptors = [
     }
 ];
 
-/** @type {Map<string, typeof languageDescriptors[0]>} */
+/** @type {Map<string, import('language-descriptors').LanguageDescriptorAny>} */
 export const languageDescriptorMap = new Map();
 for (const languageDescriptor of languageDescriptors) {
     languageDescriptorMap.set(languageDescriptor.iso, languageDescriptor);

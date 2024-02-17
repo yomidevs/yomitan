@@ -29,23 +29,27 @@ type TextPreprocessorDescriptor = {
     [key: string]: TextPreprocessor<SafeAny>;
 };
 
-export type LanguageDescriptors = LanguageDescriptorObjectMap[keyof LanguageDescriptorObjectMap];
-
-export type EnglishTextPreprocessors = {
-    capitalizeFirstLetter: TextPreprocessor<boolean>;
-    decapitalize: TextPreprocessor<boolean>;
-};
-
-export type JapaneseTextPreprocessors = {
-    convertHalfWidthCharacters: TextPreprocessor<boolean>;
-    convertNumericCharacters: TextPreprocessor<boolean>;
-    convertAlphabeticCharacters: TextPreprocessor<boolean>;
-    convertHiraganaToKatakana: TextPreprocessor<boolean>;
-    convertKatakanaToHiragana: TextPreprocessor<boolean>;
-    collapseEmphaticSequences: TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
-};
-
 type LanguageDescriptorObjectMap = {
-    en: LanguageDescriptor<'en', EnglishTextPreprocessors>;
-    ja: LanguageDescriptor<'ja', JapaneseTextPreprocessors>;
+    [key in keyof AllTextPreprocessors]: LanguageDescriptor<key, AllTextPreprocessors[key]>;
+};
+
+export type LanguageDescriptorAny = LanguageDescriptorObjectMap[keyof LanguageDescriptorObjectMap];
+
+/**
+ * This is a mapping of the iso tag to all of the preprocessors for that language.
+ * Any new language should be added to this object.
+ */
+type AllTextPreprocessors = {
+    en: {
+        capitalizeFirstLetter: TextPreprocessor<boolean>;
+        decapitalize: TextPreprocessor<boolean>;
+    };
+    ja: {
+        convertHalfWidthCharacters: TextPreprocessor<boolean>;
+        convertNumericCharacters: TextPreprocessor<boolean>;
+        convertAlphabeticCharacters: TextPreprocessor<boolean>;
+        convertHiraganaToKatakana: TextPreprocessor<boolean>;
+        convertKatakanaToHiragana: TextPreprocessor<boolean>;
+        collapseEmphaticSequences: TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
+    };
 };
