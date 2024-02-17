@@ -19,8 +19,7 @@
 import {describe, expect, test} from 'vitest';
 import {HotkeyUtil} from '../ext/js/input/hotkey-util.js';
 
-/** */
-function testCommandConversions() {
+describe('HotkeyUtil', () => {
     describe('CommandConversions', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{os: import('environment').OperatingSystem, command: string, expectedCommand: string, expectedInput: {key: string, modifiers: import('input').Modifier[]}}[]} */
@@ -53,10 +52,7 @@ function testCommandConversions() {
             });
         }
     });
-}
 
-/** */
-function testDisplayNames() {
     describe('DisplayNames', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{os: import('environment').OperatingSystem, key: ?string, modifiers: import('input').Modifier[], expected: string}[]} */
@@ -147,10 +143,7 @@ function testDisplayNames() {
             expect(displayName).toStrictEqual(expected);
         });
     });
-}
 
-/** */
-function testSortModifiers() {
     describe('SortModifiers', () => {
         /** @type {{modifiers: import('input').Modifier[], expected: import('input').Modifier[]}[]} */
         const data = [
@@ -167,14 +160,4 @@ function testSortModifiers() {
             });
         }
     });
-}
-
-
-/** */
-function main() {
-    testCommandConversions();
-    testDisplayNames();
-    testSortModifiers();
-}
-
-main();
+});

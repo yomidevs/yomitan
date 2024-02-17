@@ -61,9 +61,7 @@ function hasTermReasons(languageTransformer, source, expectedTerm, expectedCondi
     return {has: false, reasons: null, rules: null};
 }
 
-
-/** */
-function testDeinflections() {
+describe('LanguageTransformer', () => {
     /* eslint-disable @stylistic/no-multi-spaces */
     const data = [
         {
@@ -1172,12 +1170,4 @@ function testDeinflections() {
             }
         });
     });
-}
-
-
-/** */
-function main() {
-    testDeinflections();
-}
-
-main();
+});

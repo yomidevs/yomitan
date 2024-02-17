@@ -19,8 +19,7 @@
 import {describe, expect, test} from 'vitest';
 import {CacheMap} from '../ext/js/general/cache-map.js';
 
-/** */
-function testConstructor() {
+describe('CacheMap', () => {
     describe('constructor', () => {
         const shouldThrow = [-1, 1.5, Number.NaN, Number.POSITIVE_INFINITY];
         const shouldNotThrow = [0, 1, Number.MAX_VALUE];
@@ -32,10 +31,7 @@ function testConstructor() {
             expect(() => new CacheMap(param)).toThrowError();
         });
     });
-}
 
-/** */
-function testApi() {
     describe('api', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         const data = [
@@ -111,14 +107,4 @@ function testApi() {
             expect(cache.size).toStrictEqual(expectedSize);
         });
     });
-}
-
-
-/** */
-function main() {
-    testConstructor();
-    testApi();
-}
-
-
-main();
+});
