@@ -261,10 +261,6 @@ type ApiSurface = {
         params: void;
         return: string;
     };
-    getDisplayTemplatesHtml: {
-        params: void;
-        return: string;
-    };
     getZoom: {
         params: void;
         return: {

@@ -166,7 +166,6 @@ export class Backend {
             ['getStylesheetContent',         this._onApiGetStylesheetContent.bind(this)],
             ['getEnvironmentInfo',           this._onApiGetEnvironmentInfo.bind(this)],
             ['clipboardGet',                 this._onApiClipboardGet.bind(this)],
-            ['getDisplayTemplatesHtml',      this._onApiGetDisplayTemplatesHtml.bind(this)],
             ['getZoom',                      this._onApiGetZoom.bind(this)],
             ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)],
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
@@ -680,11 +679,6 @@ export class Backend {
     /** @type {import('api').ApiHandler<'clipboardGet'>} */
     async _onApiClipboardGet() {
         return this._clipboardReader.getText(false);
-    }
-
-    /** @type {import('api').ApiHandler<'getDisplayTemplatesHtml'>} */
-    async _onApiGetDisplayTemplatesHtml() {
-        return await fetchText('/display-templates.html');
     }
 
     /** @type {import('api').ApiHandler<'getZoom'>} */

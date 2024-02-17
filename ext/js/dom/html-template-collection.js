@@ -23,17 +23,11 @@ export class HtmlTemplateCollection {
     }
 
     /**
-     * @param {string|Document} source
+     * @param {Document} source
      */
     load(source) {
-        const sourceNode = (
-            typeof source === 'string' ?
-            new DOMParser().parseFromString(source, 'text/html') :
-            source
-        );
-
         const pattern = /^([\w\W]+)-template$/;
-        for (const template of sourceNode.querySelectorAll('template')) {
+        for (const template of source.querySelectorAll('template')) {
             const match = pattern.exec(template.id);
             if (match === null) { continue; }
             this._prepareTemplate(template);
