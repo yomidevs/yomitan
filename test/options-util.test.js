@@ -241,6 +241,7 @@ function createProfileOptionsUpdatedTestData1() {
     return {
         general: {
             enable: true,
+            language: 'ja',
             resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,
@@ -405,12 +406,6 @@ function createProfileOptionsUpdatedTestData1() {
             ]
         },
         translation: {
-            convertHalfWidthCharacters: 'false',
-            convertNumericCharacters: 'false',
-            convertAlphabeticCharacters: 'false',
-            convertHiraganaToKatakana: 'false',
-            convertKatakanaToHiragana: 'variant',
-            collapseEmphaticSequences: 'false',
             searchResolution: 'letter',
             textReplacements: {
                 searchOriginal: true,
@@ -604,7 +599,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 25,
+        version: 26,
         global: {
             database: {
                 prefixWildcardsSupported: false

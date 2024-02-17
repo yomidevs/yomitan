@@ -361,6 +361,13 @@ export class API {
         return this._invoke('openCrossFramePort', {targetTabId, targetFrameId});
     }
 
+    /**
+     * @returns {Promise<import('api').ApiReturn<'getLanguageSummaries'>>}
+     */
+    getLanguageSummaries() {
+        return this._invoke('getLanguageSummaries', void 0);
+    }
+
     // Utilities
 
     /**

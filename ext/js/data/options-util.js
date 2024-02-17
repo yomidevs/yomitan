@@ -522,7 +522,8 @@ export class OptionsUtil {
             this._updateVersion22,
             this._updateVersion23,
             this._updateVersion24,
-            this._updateVersion25
+            this._updateVersion25,
+            this._updateVersion26
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1153,6 +1154,31 @@ export class OptionsUtil {
             }
         }
     }
+
+    /**
+     * - Added general.language.
+     * - Modularized text preprocessors.
+     * @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion26(options) {
+        const textPreprocessors = [
+            'convertHalfWidthCharacters',
+            'convertNumericCharacters',
+            'convertAlphabeticCharacters',
+            'convertHiraganaToKatakana',
+            'convertKatakanaToHiragana',
+            'collapseEmphaticSequences'
+        ];
+
+        for (const {options: profileOptions} of options.profiles) {
+            profileOptions.general.language = 'ja';
+
+            for (const preprocessor of textPreprocessors) {
+                delete profileOptions.translation[preprocessor];
+            }
+        }
+    }
+
 
     /**
      * @param {string} url

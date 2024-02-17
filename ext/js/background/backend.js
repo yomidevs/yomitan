@@ -34,6 +34,7 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
+import {getLanguageSummaries} from '../language/languages.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -183,7 +184,8 @@ export class Backend {
             ['textHasJapaneseCharacters',    this._onApiTextHasJapaneseCharacters.bind(this)],
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
-            ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)]
+            ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
+            ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -904,6 +906,11 @@ export class Backend {
         targetPort.onDisconnect.addListener(cleanup);
 
         return {targetTabId, targetFrameId};
+    }
+
+    /** @type {import('api').ApiHandler<'getLanguageSummaries'>} */
+    _onApiGetLanguageSummaries() {
+        return getLanguageSummaries();
     }
 
     // Command handlers
@@ -2361,15 +2368,9 @@ export class Backend {
         if (typeof deinflect !== 'boolean') { deinflect = true; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
-            general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder},
+            general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language},
             scanning: {alphanumeric},
             translation: {
-                convertHalfWidthCharacters,
-                convertNumericCharacters,
-                convertAlphabeticCharacters,
-                convertHiraganaToKatakana,
-                convertKatakanaToHiragana,
-                collapseEmphaticSequences,
                 textReplacements: textReplacementsOptions,
                 searchResolution
             }
@@ -2394,16 +2395,11 @@ export class Backend {
             sortFrequencyDictionary,
             sortFrequencyDictionaryOrder,
             removeNonJapaneseCharacters: !alphanumeric,
-            convertHalfWidthCharacters,
-            convertNumericCharacters,
-            convertAlphabeticCharacters,
-            convertHiraganaToKatakana,
-            convertKatakanaToHiragana,
-            collapseEmphaticSequences,
             searchResolution,
             textReplacements,
             enabledDictionaryMap,
-            excludeDictionaryDefinitions
+            excludeDictionaryDefinitions,
+            language
         };
     }
 

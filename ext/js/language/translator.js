@@ -18,9 +18,9 @@
 
 import {applyTextReplacement} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
-import {convertAlphabeticToKana} from './ja/japanese-wanakana.js';
-import {collapseEmphaticSequences, convertHalfWidthKanaToFullWidth, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericToFullWidth, isCodePointJapanese} from './ja/japanese.js';
+import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
+import {getAllLanguageTextPreprocessors} from './languages.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
@@ -41,6 +41,8 @@ export class Translator {
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
         /** @type {RegExp} */
         this._numberRegex = /[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/;
+        /** @type {Map<string, {textPreprocessors: import('language').TextPreprocessorWithId<unknown>[], optionSpace: import('translation-internal').PreprocessorOptionsSpace}>} */
+        this._textPreprocessors = new Map();
     }
 
     /**
@@ -49,6 +51,14 @@ export class Translator {
      */
     prepare(descriptor) {
         this._languageTransformer.addDescriptor(descriptor);
+        for (const {iso, textPreprocessors} of getAllLanguageTextPreprocessors()) {
+            /** @type {Map<string, import('language').TextPreprocessorOptions<unknown>>} */
+            const optionSpace = new Map();
+            for (const {id, textPreprocessor} of textPreprocessors) {
+                optionSpace.set(id, textPreprocessor.options);
+            }
+            this._textPreprocessors.set(iso, {textPreprocessors, optionSpace});
+        }
     }
 
     /**
@@ -415,51 +425,45 @@ export class Translator {
         }
     }
 
-    // Deinflections and text transformations
+    // Deinflections and text preprocessing
 
     /**
      * @param {string} text
      * @param {import('translation').FindTermsOptions} options
      * @returns {import('translation-internal').DatabaseDeinflection[]}
+     * @throws {Error}
      */
     _getAlgorithmDeinflections(text, options) {
-        /** @type {import('translation-internal').TextDeinflectionOptionsArrays} */
-        const textOptionVariantArray = [
-            this._getTextReplacementsVariants(options),
-            this._getTextOptionEntryVariants(options.convertHalfWidthCharacters),
-            this._getTextOptionEntryVariants(options.convertNumericCharacters),
-            this._getTextOptionEntryVariants(options.convertAlphabeticCharacters),
-            this._getTextOptionEntryVariants(options.convertHiraganaToKatakana),
-            this._getTextOptionEntryVariants(options.convertKatakanaToHiragana),
-            this._getCollapseEmphaticOptions(options)
-        ];
+        const {language} = options;
+        const info = this._textPreprocessors.get(language);
+        if (typeof info === 'undefined') { throw new Error(`Unsupported language: ${language}`); }
+        const {textPreprocessors, optionSpace: textPreprocessorOptionsSpace} = info;
+
+        /** @type {Map<string, import('language').TextPreprocessorOptions<unknown>>} */
+        const variantSpace = new Map();
+        variantSpace.set('textReplacements', this._getTextReplacementsVariants(options));
+        for (const [key, value] of textPreprocessorOptionsSpace) {
+            variantSpace.set(key, value);
+        }
 
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const deinflections = [];
         const used = new Set();
-        for (const [textReplacements, halfWidth, numeric, alphabetic, katakana, hiragana, [collapseEmphatic, collapseEmphaticFull]] of /** @type {Generator<import('translation-internal').TextDeinflectionOptions, void, unknown>} */ (this._getArrayVariants(textOptionVariantArray))) {
+
+        for (const arrayVariant of this._generateArrayVariants(variantSpace)) {
+            const textReplacements = /** @type {import('translation').FindTermsTextReplacement[] | null} */ (arrayVariant.get('textReplacements'));
+
             let text2 = text;
             const sourceMap = new TextSourceMap(text2);
+
             if (textReplacements !== null) {
                 text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
             }
-            if (halfWidth) {
-                text2 = convertHalfWidthKanaToFullWidth(text2, sourceMap);
-            }
-            if (numeric) {
-                text2 = convertNumericToFullWidth(text2);
-            }
-            if (alphabetic) {
-                text2 = convertAlphabeticToKana(text2, sourceMap);
-            }
-            if (katakana) {
-                text2 = convertHiraganaToKatakana(text2);
-            }
-            if (hiragana) {
-                text2 = convertKatakanaToHiragana(text2);
-            }
-            if (collapseEmphatic) {
-                text2 = collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
+
+            for (const preprocessor of textPreprocessors.values()) {
+                const {id, textPreprocessor} = preprocessor;
+                const setting = arrayVariant.get(id);
+                text2 = textPreprocessor.process(text2, setting, sourceMap);
             }
 
             for (
@@ -524,36 +528,6 @@ export class Translator {
             length += c.length;
         }
         return text;
-    }
-
-    /**
-     * @param {import('translation').FindTermsVariantMode} value
-     * @returns {boolean[]}
-     */
-    _getTextOptionEntryVariants(value) {
-        switch (value) {
-            case 'true': return [true];
-            case 'variant': return [false, true];
-            default: return [false];
-        }
-    }
-
-    /**
-     * @param {import('translation').FindTermsOptions} options
-     * @returns {[collapseEmphatic: boolean, collapseEmphaticFull: boolean][]}
-     */
-    _getCollapseEmphaticOptions(options) {
-        /** @type {[collapseEmphatic: boolean, collapseEmphaticFull: boolean][]} */
-        const collapseEmphaticOptions = [[false, false]];
-        switch (options.collapseEmphaticSequences) {
-            case 'true':
-                collapseEmphaticOptions.push([true, false]);
-                break;
-            case 'full':
-                collapseEmphaticOptions.push([true, false], [true, true]);
-                break;
-        }
-        return collapseEmphaticOptions;
     }
 
     /**
@@ -1343,26 +1317,32 @@ export class Translator {
     }
 
     /**
-     * @param {[...args: unknown[][]]} arrayVariants
-     * @yields {[...args: unknown[]]}
-     * @returns {Generator<unknown[], void, unknown>}
+     * @param {Map<string, unknown[]>} arrayVariants
+     * @yields {Map<string, unknown>}
+     * @returns {Generator<Map<string, unknown>, void, void>}
      */
-    *_getArrayVariants(arrayVariants) {
-        const ii = arrayVariants.length;
-
-        let total = 1;
-        for (let i = 0; i < ii; ++i) {
-            total *= arrayVariants[i].length;
+    *_generateArrayVariants(arrayVariants) {
+        const variantKeys = [...arrayVariants.keys()];
+        const entryVariantLengths = [];
+        for (const key of variantKeys) {
+            const entryVariants = /** @type {unknown[]} */ (arrayVariants.get(key));
+            entryVariantLengths.push(entryVariants.length);
         }
+        const totalVariants = entryVariantLengths.reduce((acc, length) => acc * length, 1);
 
-        for (let a = 0; a < total; ++a) {
-            const variant = [];
-            let index = a;
-            for (let i = 0; i < ii; ++i) {
-                const entryVariants = arrayVariants[i];
-                variant.push(entryVariants[index % entryVariants.length]);
-                index = Math.floor(index / entryVariants.length);
+        for (let variantIndex = 0; variantIndex < totalVariants; ++variantIndex) {
+            /** @type {Map<string, unknown>} */
+            const variant = new Map();
+            let remainingIndex = variantIndex;
+
+            for (let keyIndex = 0; keyIndex < variantKeys.length; ++keyIndex) {
+                const key = variantKeys[keyIndex];
+                const entryVariants = /** @type {unknown[]} */ (arrayVariants.get(key));
+                const entryIndex = remainingIndex % entryVariants.length;
+                variant.set(key, entryVariants[entryIndex]);
+                remainingIndex = Math.floor(remainingIndex / entryVariants.length);
             }
+
             yield variant;
         }
     }
