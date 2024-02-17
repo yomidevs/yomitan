@@ -60,10 +60,8 @@ export class Application extends EventDispatcher {
      * Creates a new instance. The instance should not be used until it has been fully prepare()'d.
      * @param {API} api
      * @param {CrossFrameAPI} crossFrameApi
-     * @param {?number} tabId
-     * @param {?number} frameId
      */
-    constructor(api, crossFrameApi, tabId, frameId) {
+    constructor(api, crossFrameApi) {
         super();
 
         /** @type {WebExtension} */
@@ -86,10 +84,6 @@ export class Application extends EventDispatcher {
         this._crossFrame = crossFrameApi;
         /** @type {boolean} */
         this._isReady = false;
-        /** @type {?number} */
-        this._tabId = tabId;
-        /** @type {?number} */
-        this._frameId = frameId;
 
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('application').ApiMap} */
@@ -130,14 +124,14 @@ export class Application extends EventDispatcher {
      * @type {?number}
      */
     get tabId() {
-        return this._tabId;
+        return this._crossFrame.tabId;
     }
 
     /**
      * @type {?number}
      */
     get frameId() {
-        return this._frameId;
+        return this._crossFrame.frameId;
     }
 
     /**
@@ -178,7 +172,7 @@ export class Application extends EventDispatcher {
         const {tabId = null, frameId = null} = await api.frameInformationGet();
         const crossFrameApi = new CrossFrameAPI(api, tabId, frameId);
         crossFrameApi.prepare();
-        const application = new Application(api, crossFrameApi, tabId, frameId);
+        const application = new Application(api, crossFrameApi);
         application.prepare();
         try {
             await mainFunction(application);
