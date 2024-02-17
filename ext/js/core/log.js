@@ -28,6 +28,8 @@ class Logger extends EventDispatcher {
         super();
         /** @type {string} */
         this._extensionName = 'Extension';
+        /** @type {?string} */
+        this._issueUrl = 'https://github.com/themoeway/yomitan/issues';
     }
 
     /**
@@ -100,7 +102,9 @@ class Logger extends EventDispatcher {
         if (typeof errorData !== 'undefined') {
             message += `\nData: ${JSON.stringify(errorData, null, 4)}`;
         }
-        message += '\n\nIssues can be reported at https://github.com/themoeway/yomitan/issues';
+        if (this._issueUrl !== null) {
+            message += `\n\nIssues can be reported at ${this._issueUrl}`;
+        }
 
         /* eslint-disable no-console */
         switch (level) {
