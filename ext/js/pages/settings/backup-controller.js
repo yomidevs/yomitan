@@ -18,7 +18,7 @@
 
 import {Dexie} from '../../../lib/dexie.js';
 import {parseJson} from '../../core/json.js';
-import {log} from '../../core/logger.js';
+import {log} from '../../core/log.js';
 import {toError} from '../../core/to-error.js';
 import {isObject} from '../../core/utilities.js';
 import {OptionsUtil} from '../../data/options-util.js';
