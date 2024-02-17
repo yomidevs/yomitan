@@ -224,8 +224,7 @@ export class Application extends EventDispatcher {
      */
     async _onForwardLog({error, level, context}) {
         try {
-            const api = /** @type {API} */ (this._api);
-            await api.log(ExtensionError.serialize(error), level, context);
+            await this._api.log(ExtensionError.serialize(error), level, context);
         } catch (e) {
             // NOP
         }
