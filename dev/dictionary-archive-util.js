@@ -29,7 +29,10 @@ import {parseJson} from './json.js';
 export async function createDictionaryArchiveData(dictionaryDirectory, dictionaryName) {
     const fileNames = readdirSync(dictionaryDirectory);
     const zipFileWriter = new BlobWriter();
-    const zipWriter = new ZipWriter(zipFileWriter);
+    // Curiously, any level other than 0 here will cause DictionaryImporter.importDictionary to fail.
+    const zipWriter = new ZipWriter(zipFileWriter, {
+        level: 0
+    });
     for (const fileName of fileNames) {
         if (/\.json$/.test(fileName)) {
             const content = readFileSync(join(dictionaryDirectory, fileName), {encoding: 'utf8'});
