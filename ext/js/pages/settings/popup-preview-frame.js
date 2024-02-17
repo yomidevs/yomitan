@@ -66,12 +66,12 @@ export class PopupPreviewFrame {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {Map<string, (params: import('core').SerializableObjectAny) => void>} */
         this._windowMessageHandlers = new Map(/** @type {[key: string, handler: (params: import('core').SerializableObjectAny) => void][]} */ ([
-            ['PopupPreviewFrame.setText',                 this._onSetText.bind(this)],
-            ['PopupPreviewFrame.setCustomCss',            this._setCustomCss.bind(this)],
-            ['PopupPreviewFrame.setCustomOuterCss',       this._setCustomOuterCss.bind(this)],
-            ['PopupPreviewFrame.updateOptionsContext',    this._updateOptionsContext.bind(this)],
-            ['PopupPreviewFrame._onOptionsChanged',       this._onOptionsChanged.bind(this)],
-            ['PopupPreviewFrame._setLanguageExampleText', this._setLanguageExampleText.bind(this)]
+            ['PopupPreviewFrame.setText',                this._onSetText.bind(this)],
+            ['PopupPreviewFrame.setCustomCss',           this._setCustomCss.bind(this)],
+            ['PopupPreviewFrame.setCustomOuterCss',      this._setCustomOuterCss.bind(this)],
+            ['PopupPreviewFrame.updateOptionsContext',   this._updateOptionsContext.bind(this)],
+            ['PopupPreviewFrame.optionsChanged',         this._onOptionsChanged.bind(this)],
+            ['PopupPreviewFrame.setLanguageExampleText', this._setLanguageExampleText.bind(this)]
         ]));
         /* eslint-enable @stylistic/no-multi-spaces */
     }

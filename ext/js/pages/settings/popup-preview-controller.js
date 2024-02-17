@@ -90,14 +90,14 @@ export class PopupPreviewController {
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
-        this._invoke('PopupPreviewFrame._onOptionsChanged', {options});
+        this._invoke('PopupPreviewFrame.optionsChanged', {options});
     }
 
     /**
      * @param {import('dom-data-binder').SettingChangedEvent} settingChangedEvent
      */
     _onLanguageSelectChanged(settingChangedEvent) {
-        this._invoke('PopupPreviewFrame._setLanguageExampleText', {language: settingChangedEvent.detail.value});
+        this._invoke('PopupPreviewFrame.setLanguageExampleText', {language: settingChangedEvent.detail.value});
     }
 
     /**
