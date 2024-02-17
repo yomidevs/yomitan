@@ -24,18 +24,12 @@ import {TextSourceRange} from '../../dom/text-source-range.js';
 export class PopupPreviewFrame {
     /**
      * @param {import('../../application.js').Application} application
-     * @param {number} tabId
-     * @param {number} frameId
      * @param {import('../../app/popup-factory.js').PopupFactory} popupFactory
      * @param {import('../../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
-    constructor(application, tabId, frameId, popupFactory, hotkeyHandler) {
+    constructor(application, popupFactory, hotkeyHandler) {
         /** @type {import('../../application.js').Application} */
         this._application = application;
-        /** @type {number} */
-        this._tabId = tabId;
-        /** @type {number} */
-        this._frameId = frameId;
         /** @type {import('../../app/popup-factory.js').PopupFactory} */
         this._popupFactory = popupFactory;
         /** @type {import('../../input/hotkey-handler.js').HotkeyHandler} */

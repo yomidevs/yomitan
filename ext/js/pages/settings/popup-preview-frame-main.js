@@ -28,7 +28,7 @@ await Application.main(async (application) => {
     const popupFactory = new PopupFactory(application);
     popupFactory.prepare();
 
-    const preview = new PopupPreviewFrame(application, tabId, frameId, popupFactory, hotkeyHandler);
+    const preview = new PopupPreviewFrame(application, popupFactory, hotkeyHandler);
     await preview.prepare();
 
     document.documentElement.dataset.loaded = 'true';
