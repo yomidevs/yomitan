@@ -15,8 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {descriptor as descriptorEnglish} from './en/language-english.js';
-import {descriptor as descriptorJapanese} from './ja/language-japanese.js';
+import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
+import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
+
+/** @type {import('language-japanese').JapaneseLanguageDescriptor} */
+export const descriptorJapanese = {
+    name: 'Japanese',
+    iso: 'ja',
+    exampleText: '読め',
+    textPreprocessors: {
+        convertHalfWidthCharacters,
+        convertNumericCharacters,
+        convertAlphabeticCharacters,
+        convertHiraganaToKatakana,
+        convertKatakanaToHiragana,
+        collapseEmphaticSequences
+    }
+};
+
+/** @type {import('language-english').EnglishLanguageDescriptor} */
+export const descriptorEnglish = {
+    name: 'English',
+    iso: 'en',
+    exampleText: 'read',
+    textPreprocessors: {
+        capitalizeFirstLetter,
+        decapitalize
+    }
+};
+
+// All descriptors
 
 const languageDescriptors = [
     descriptorEnglish,
