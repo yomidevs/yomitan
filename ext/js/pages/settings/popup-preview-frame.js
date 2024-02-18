@@ -18,6 +18,7 @@
 
 import * as wanakana from '../../../lib/wanakana.js';
 import {Frontend} from '../../app/frontend.js';
+import {createApiMap, invokeApiMapHandler} from '../../core/api-map.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {TextSourceRange} from '../../dom/text-source-range.js';
 
@@ -58,15 +59,14 @@ export class PopupPreviewFrame {
         this._wanakanaBound = false;
 
         /* eslint-disable @stylistic/no-multi-spaces */
-        /** @type {Map<string, (params: import('core').SerializableObjectAny) => void>} */
-        this._windowMessageHandlers = new Map(/** @type {[key: string, handler: (params: import('core').SerializableObjectAny) => void][]} */ ([
+        /** @type {import('popup-preview-frame').ApiMap} */
+        this._windowMessageHandlers = createApiMap([
             ['PopupPreviewFrame.setText',                this._onSetText.bind(this)],
             ['PopupPreviewFrame.setCustomCss',           this._setCustomCss.bind(this)],
             ['PopupPreviewFrame.setCustomOuterCss',      this._setCustomOuterCss.bind(this)],
             ['PopupPreviewFrame.updateOptionsContext',   this._updateOptionsContext.bind(this)],
-            ['PopupPreviewFrame.optionsChanged',         this._onOptionsChanged.bind(this)],
             ['PopupPreviewFrame.setLanguageExampleText', this._setLanguageExampleText.bind(this)]
-        ]));
+        ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
 
@@ -89,7 +89,7 @@ export class PopupPreviewFrame {
 
         this._languageSummaries = await this._application.api.getLanguageSummaries();
         const options = await this._application.api.optionsGet({current: true});
-        void this._onOptionsChanged({options, optionsContext: {current: true}});
+        void this._setLanguageExampleText({language: options.general.language});
 
         // Overwrite frontend
         this._frontend = new Frontend({
@@ -156,16 +156,13 @@ export class PopupPreviewFrame {
     }
 
     /**
-     * @param {MessageEvent<{action: string, params: import('core').SerializableObject}>} e
+     * @param {MessageEvent<import('popup-preview-frame.js').ApiMessageAny>} event
      */
-    _onMessage(e) {
-        if (e.origin !== this._targetOrigin) { return; }
-
-        const {action, params} = e.data;
-        const handler = this._windowMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return; }
-
-        handler(params);
+    _onMessage(event) {
+        if (event.origin !== this._targetOrigin) { return; }
+        const {action, params} = event.data;
+        const callback = () => {}; // NOP
+        invokeApiMapHandler(this._windowMessageHandlers, action, params, [], callback);
     }
 
     /**
@@ -209,9 +206,7 @@ export class PopupPreviewFrame {
         this._setText(element.value, false);
     }
 
-    /**
-     * @param {{text: string}} details
-     */
+    /** @type {import('popup-preview-frame').ApiHandler<'PopupPreviewFrame.setText'>} */
     _onSetText({text}) {
         this._setText(text, true);
     }
@@ -242,9 +237,7 @@ export class PopupPreviewFrame {
         node.classList.toggle('placeholder-info-visible', visible);
     }
 
-    /**
-     * @param {{css: string}} details
-     */
+    /** @type {import('popup-preview-frame').ApiHandler<'PopupPreviewFrame.setCustomCss'>} */
     _setCustomCss({css}) {
         if (this._frontend === null) { return; }
         const popup = this._frontend.popup;
@@ -252,9 +245,7 @@ export class PopupPreviewFrame {
         void popup.setCustomCss(css);
     }
 
-    /**
-     * @param {{css: string}} details
-     */
+    /** @type {import('popup-preview-frame').ApiHandler<'PopupPreviewFrame.setCustomOuterCss'>} */
     _setCustomOuterCss({css}) {
         if (this._frontend === null) { return; }
         const popup = this._frontend.popup;
@@ -262,9 +253,7 @@ export class PopupPreviewFrame {
         void popup.setCustomOuterCss(css, false);
     }
 
-    /**
-     * @param {{optionsContext: import('settings').OptionsContext}} details
-     */
+    /** @type {import('popup-preview-frame').ApiHandler<'PopupPreviewFrame.updateOptionsContext'>} */
     async _updateOptionsContext(details) {
         const {optionsContext} = details;
         this._optionsContext = optionsContext;
@@ -274,16 +263,7 @@ export class PopupPreviewFrame {
         await this._updateSearch();
     }
 
-    /**
-     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
-     */
-    async _onOptionsChanged({options: {general: {language}}}) {
-        this._setLanguageExampleText({language});
-    }
-
-    /**
-     * @param {{language: string}} details
-     */
+    /** @type {import('popup-preview-frame').ApiHandler<'PopupPreviewFrame.setLanguageExampleText'>} */
     _setLanguageExampleText({language}) {
         const activeLanguage = /** @type {import('language').LanguageSummary} */ (this._languageSummaries.find(({iso}) => iso === language));
 
