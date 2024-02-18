@@ -187,7 +187,7 @@ export class DictionaryImporter {
             media: {total: media.length}
         };
         const summary = this._createSummary(dictionaryTitle, version, index, {prefixWildcardsSupported, counts});
-        dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
+        await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
 
         // Add data
         /** @type {Error[]} */

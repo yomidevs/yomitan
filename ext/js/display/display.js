@@ -364,7 +364,7 @@ export class Display extends EventDispatcher {
 
     /** */
     initializeState() {
-        this._onStateChanged();
+        void this._onStateChanged();
         if (this._frameEndpoint !== null) {
             this._frameEndpoint.signal();
         }
@@ -448,7 +448,7 @@ export class Display extends EventDispatcher {
             }
         });
 
-        this._updateNestedFrontend(options);
+        void this._updateNestedFrontend(options);
         this._updateContentTextScanner(options);
 
         this.trigger('optionsUpdated', {options});
@@ -523,10 +523,10 @@ export class Display extends EventDispatcher {
     close() {
         switch (this._pageType) {
             case 'popup':
-                this.invokeContentOrigin('frontendClosePopup', void 0);
+                void this.invokeContentOrigin('frontendClosePopup', void 0);
                 break;
             case 'search':
-                this._closeTab();
+                void this._closeTab();
                 break;
         }
     }
@@ -964,7 +964,7 @@ export class Display extends EventDispatcher {
     _onDebugLogClick(e) {
         const link = /** @type {HTMLElement} */ (e.currentTarget);
         const index = this.getElementDictionaryEntryIndex(link);
-        this._logDictionaryEntryData(index);
+        void this._logDictionaryEntryData(index);
     }
 
     /**
@@ -1064,7 +1064,7 @@ export class Display extends EventDispatcher {
         const {action} = e.detail;
         switch (action) {
             case 'log-debug-info':
-                this._logDictionaryEntryData(this.getElementDictionaryEntryIndex(node));
+                void this._logDictionaryEntryData(this.getElementDictionaryEntryIndex(node));
                 break;
         }
     }
@@ -1345,7 +1345,7 @@ export class Display extends EventDispatcher {
         const visible = this._isQueryParserVisible();
         this._queryParserContainer.hidden = !visible || text.length === 0;
         if (visible && this._queryParser.text !== text) {
-            this._setQueryParserText(text);
+            void this._setQueryParserText(text);
         }
     }
 
@@ -1738,7 +1738,7 @@ export class Display extends EventDispatcher {
         if (typeof this._contentOriginFrameId !== 'number') { return false; }
         const selection = window.getSelection();
         if (selection !== null && selection.toString().length > 0) { return false; }
-        this._copyHostSelectionSafe();
+        void this._copyHostSelectionSafe();
         return true;
     }
 

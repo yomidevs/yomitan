@@ -42,7 +42,7 @@ await Application.main(true, async (application) => {
     displayAnki.prepare();
 
     const displayProfileSelection = new DisplayProfileSelection(display);
-    displayProfileSelection.prepare();
+    void displayProfileSelection.prepare();
 
     const displayResizer = new DisplayResizer(display);
     displayResizer.prepare();

@@ -63,7 +63,7 @@ export class DisplayProfileSelection {
         if (source === this._source) { return; }
         this._profileListNeedsUpdate = true;
         if (this._profilePanel.isVisible()) {
-            this._updateProfileList();
+            void this._updateProfileList();
         }
     }
 
@@ -84,7 +84,7 @@ export class DisplayProfileSelection {
         this._profileButton.classList.toggle('sidebar-button-highlight', visible);
         document.documentElement.dataset.profilePanelVisible = `${visible}`;
         if (visible && this._profileListNeedsUpdate) {
-            this._updateProfileList();
+            void this._updateProfileList();
         }
     }
 
@@ -121,7 +121,7 @@ export class DisplayProfileSelection {
     _onProfileRadioChange(index, e) {
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
         if (element.checked) {
-            this._setProfileCurrent(index);
+            void this._setProfileCurrent(index);
         }
     }
 

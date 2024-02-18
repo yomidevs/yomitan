@@ -89,7 +89,7 @@ export class PopupPreviewFrame {
 
         this._languageSummaries = await this._application.api.getLanguageSummaries();
         const options = await this._application.api.optionsGet({current: true});
-        this._onOptionsChanged({options, optionsContext: {current: true}});
+        void this._onOptionsChanged({options, optionsContext: {current: true}});
 
         // Overwrite frontend
         this._frontend = new Frontend({
@@ -115,7 +115,7 @@ export class PopupPreviewFrame {
         }
 
         // Update search
-        this._updateSearch();
+        void this._updateSearch();
     }
 
     // Private
@@ -181,7 +181,7 @@ export class PopupPreviewFrame {
             this._themeChangeTimeout = null;
             const popup = /** @type {Frontend} */ (this._frontend).popup;
             if (popup === null) { return; }
-            popup.updateTheme();
+            void popup.updateTheme();
         }, 300);
     }
 
@@ -229,7 +229,7 @@ export class PopupPreviewFrame {
 
         this._exampleText.textContent = text;
         if (this._frontend === null) { return; }
-        this._updateSearch();
+        void this._updateSearch();
     }
 
     /**
@@ -249,7 +249,7 @@ export class PopupPreviewFrame {
         if (this._frontend === null) { return; }
         const popup = this._frontend.popup;
         if (popup === null) { return; }
-        popup.setCustomCss(css);
+        void popup.setCustomCss(css);
     }
 
     /**
@@ -259,7 +259,7 @@ export class PopupPreviewFrame {
         if (this._frontend === null) { return; }
         const popup = this._frontend.popup;
         if (popup === null) { return; }
-        popup.setCustomOuterCss(css, false);
+        void popup.setCustomOuterCss(css, false);
     }
 
     /**

@@ -256,14 +256,14 @@ export class Frontend {
      * @returns {void}
      */
     _onActionScanSelectedText() {
-        this._scanSelectedText(false);
+        void this._scanSelectedText(false);
     }
 
     /**
      * @returns {void}
      */
     _onActionScanTextAtCaret() {
-        this._scanSelectedText(true);
+        void this._scanSelectedText(true);
     }
 
     // API message handlers
@@ -320,7 +320,7 @@ export class Frontend {
      * @returns {void}
      */
     _onResize() {
-        this._updatePopupPosition();
+        void this._updatePopupPosition();
     }
 
     /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
@@ -347,7 +347,7 @@ export class Frontend {
      * @returns {void}
      */
     _onVisualViewportScroll() {
-        this._updatePopupPosition();
+        void this._updatePopupPosition();
     }
 
     /**
@@ -423,8 +423,8 @@ export class Frontend {
     _clearSelection(passive) {
         this._stopClearSelectionDelayed();
         if (this._popup !== null) {
-            this._popup.clearAutoPlayTimer();
-            this._popup.hide(!passive);
+            void this._popup.clearAutoPlayTimer();
+            void this._popup.hide(!passive);
             this._isPointerOverPopup = false;
         }
         this._textScanner.clearSelection();
@@ -630,7 +630,7 @@ export class Frontend {
         });
         popup.on('offsetNotFound', () => {
             this._allowRootFramePopupProxy = false;
-            this._updatePopup();
+            void this._updatePopup();
         });
         return popup;
     }
@@ -679,7 +679,7 @@ export class Frontend {
      * @param {import('text-source').TextSource} textSource
      */
     _showExtensionUnloaded(textSource) {
-        this._showPopupContent(textSource, null, null);
+        void this._showPopupContent(textSource, null, null);
     }
 
     /**
@@ -726,7 +726,7 @@ export class Frontend {
             details.params.full = textSource.fullContent;
             details.params['full-visible'] = 'true';
         }
-        this._showPopupContent(textSource, optionsContext, details);
+        void this._showPopupContent(textSource, optionsContext, details);
     }
 
     /**
@@ -792,9 +792,9 @@ export class Frontend {
 
         this._contentScale = contentScale;
         if (this._popup !== null) {
-            this._popup.setContentScale(this._contentScale);
+            void this._popup.setContentScale(this._contentScale);
         }
-        this._updatePopupPosition();
+        void this._updatePopupPosition();
     }
 
     /**
@@ -807,7 +807,7 @@ export class Frontend {
             this._popup !== null &&
             await this._popup.isVisible()
         ) {
-            this._showPopupContent(textSource, null, null);
+            void this._showPopupContent(textSource, null, null);
         }
     }
 
@@ -818,9 +818,9 @@ export class Frontend {
         /** @type {import('application').ApiMessageNoFrameId<'frontendReady'>} */
         const message = {action: 'frontendReady', params: {frameId: this._application.frameId}};
         if (targetFrameId === null) {
-            this._application.api.broadcastTab(message);
+            void this._application.api.broadcastTab(message);
         } else {
-            this._application.api.sendMessageToFrame(targetFrameId, message);
+            void this._application.api.sendMessageToFrame(targetFrameId, message);
         }
     }
 
@@ -864,7 +864,7 @@ export class Frontend {
             }
 
             chrome.runtime.onMessage.addListener(onMessage);
-            this._application.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._application.frameId}});
+            void this._application.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._application.frameId}});
         });
     }
 
@@ -950,7 +950,7 @@ export class Frontend {
     _prepareSiteSpecific() {
         switch (location.hostname.toLowerCase()) {
             case 'docs.google.com':
-                this._prepareGoogleDocs();
+                void this._prepareGoogleDocs();
                 break;
         }
     }

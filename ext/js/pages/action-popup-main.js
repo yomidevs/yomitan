@@ -37,14 +37,14 @@ class DisplayController {
         const manifest = chrome.runtime.getManifest();
 
         this._showExtensionInfo(manifest);
-        this._setupEnvironment();
+        void this._setupEnvironment();
         this._setupButtonEvents('.action-open-search', 'openSearchPage', chrome.runtime.getURL('/search.html'), this._onSearchClick.bind(this));
         this._setupButtonEvents('.action-open-info', 'openInfoPage', chrome.runtime.getURL('/info.html'));
 
         const optionsFull = await this._api.optionsGetFull();
         this._optionsFull = optionsFull;
 
-        this._setupHotkeys();
+        void this._setupHotkeys();
 
         const optionsPageUrl = (
             typeof manifest.options_ui === 'object' &&
@@ -114,7 +114,7 @@ class DisplayController {
                         const result = customHandler(e);
                         if (typeof result !== 'undefined') { return; }
                     }
-                    this._api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
+                    void this._api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
                     e.preventDefault();
                 };
                 /**
@@ -122,7 +122,7 @@ class DisplayController {
                  */
                 const onAuxClick = (e) => {
                     if (e.button !== 1) { return; }
-                    this._api.commandExec(command, {mode: 'newTab'});
+                    void this._api.commandExec(command, {mode: 'newTab'});
                     e.preventDefault();
                 };
                 node.addEventListener('click', onClick, false);
@@ -191,8 +191,8 @@ class DisplayController {
             toggle.checked = extensionEnabled;
             toggle.addEventListener('change', onToggleChanged, false);
         }
-        this._updateDictionariesEnabledWarnings(options);
-        this._updatePermissionsWarnings(options);
+        void this._updateDictionariesEnabledWarnings(options);
+        void this._updatePermissionsWarnings(options);
     }
 
     /** */
@@ -240,7 +240,7 @@ class DisplayController {
         const node = /** @type {HTMLInputElement} */ (event.currentTarget);
         const value = Number.parseInt(node.value, 10);
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= /** @type {import('settings').Options} */ (this._optionsFull).profiles.length) {
-            this._setPrimaryProfileIndex(value);
+            void this._setPrimaryProfileIndex(value);
         }
     }
 
@@ -307,8 +307,8 @@ class DisplayController {
 }
 
 await Application.main(true, async (application) => {
-    application.api.logIndicatorClear();
+    void application.api.logIndicatorClear();
 
     const displayController = new DisplayController(application.api);
-    displayController.prepare();
+    await displayController.prepare();
 });

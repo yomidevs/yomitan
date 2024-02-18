@@ -110,7 +110,7 @@ export class AnkiController {
         ankiApiKeyInput.addEventListener('focus', this._onApiKeyInputFocus.bind(this));
         ankiApiKeyInput.addEventListener('blur', this._onApiKeyInputBlur.bind(this));
 
-        const onAnkiSettingChanged = () => { this._updateOptions(); };
+        const onAnkiSettingChanged = () => { void this._updateOptions(); };
         const nodes = [ankiApiKeyInput, ...document.querySelectorAll('[data-setting="anki.enable"]')];
         for (const node of nodes) {
             node.addEventListener('settingChanged', onAnkiSettingChanged);
@@ -128,7 +128,7 @@ export class AnkiController {
         if (promise === null) {
             promise = this._getAnkiData();
             this._getAnkiDataPromise = promise;
-            promise.finally(() => { this._getAnkiDataPromise = null; });
+            void promise.finally(() => { this._getAnkiDataPromise = null; });
         }
         return promise;
     }
@@ -161,7 +161,7 @@ export class AnkiController {
     /**
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
-    async _onOptionsChanged({options: {anki}}) {
+    _onOptionsChanged({options: {anki}}) {
         /** @type {?string} */
         let apiKey = anki.apiKey;
         if (apiKey === '') { apiKey = null; }
@@ -187,7 +187,7 @@ export class AnkiController {
         this._ankiConnect.enabled = typeof value === 'boolean' && value;
 
         for (const cardController of this._selectorObserver.datas()) {
-            cardController.updateAnkiState();
+            void cardController.updateAnkiState();
         }
     }
 
@@ -219,7 +219,7 @@ export class AnkiController {
 
         const normalizedMode = this._normalizeAnkiNoteGuiMode(mode);
         if (normalizedMode === null) { return; }
-        this._testAnkiNoteViewerSafe(normalizedMode);
+        void this._testAnkiNoteViewerSafe(normalizedMode);
     }
 
     /**
@@ -258,7 +258,7 @@ export class AnkiController {
      */
     _createCardController(node) {
         const cardController = new AnkiCardController(this._settingsController, this, /** @type {HTMLElement} */ (node));
-        cardController.prepare();
+        void cardController.prepare();
         return cardController;
     }
 
@@ -588,7 +588,7 @@ class AnkiCardController {
      */
     _onCardDeckChange(e) {
         const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
-        this._setDeck(node.value);
+        void this._setDeck(node.value);
     }
 
     /**
@@ -596,7 +596,7 @@ class AnkiCardController {
      */
     _onCardModelChange(e) {
         const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
-        this._setModel(node.value);
+        void this._setModel(node.value);
     }
 
     /**
@@ -605,7 +605,7 @@ class AnkiCardController {
      */
     _onFieldChange(index, e) {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
-        this._validateFieldPermissions(node, index, true);
+        void this._validateFieldPermissions(node, index, true);
         this._validateField(node, index);
     }
 
@@ -624,7 +624,7 @@ class AnkiCardController {
      */
     _onFieldSettingChanged(index, e) {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
-        this._validateFieldPermissions(node, index, false);
+        void this._validateFieldPermissions(node, index, false);
     }
 
     /**
@@ -731,7 +731,7 @@ class AnkiCardController {
             const inputField = querySelectorNotNull(content, '.anki-card-field-value');
             inputField.value = fieldValue;
             inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName]);
-            this._validateFieldPermissions(inputField, index, false);
+            void this._validateFieldPermissions(inputField, index, false);
 
             this._fieldEventListeners.addEventListener(inputField, 'change', this._onFieldChange.bind(this, index), false);
             this._fieldEventListeners.addEventListener(inputField, 'input', this._onFieldInput.bind(this, index), false);
@@ -769,7 +769,7 @@ class AnkiCardController {
             container.appendChild(totalFragment);
         }
 
-        this._validateFields();
+        void this._validateFields();
     }
 
     /** */

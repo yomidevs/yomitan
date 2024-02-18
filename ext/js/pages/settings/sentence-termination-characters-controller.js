@@ -135,7 +135,7 @@ export class SentenceTerminationCharactersController {
      */
     _onAddClick(e) {
         e.preventDefault();
-        this._addNewEntry();
+        void this._addNewEntry();
     }
 
     /**
@@ -143,7 +143,7 @@ export class SentenceTerminationCharactersController {
      */
     _onResetClick(e) {
         e.preventDefault();
-        this._reset();
+        void this._reset();
     }
 
     /** */
@@ -258,7 +258,7 @@ class SentenceTerminationCharacterEntry {
      */
     _onTypeSelectChange(e) {
         const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
-        this._setHasCharacter2(element.value === 'quote');
+        void this._setHasCharacter2(element.value === 'quote');
     }
 
     /**
@@ -272,7 +272,7 @@ class SentenceTerminationCharacterEntry {
         }
 
         const value = node.value.substring(0, 1);
-        this._setCharacterValue(node, characterNumber, value);
+        void this._setCharacterValue(node, characterNumber, value);
     }
 
     /**
@@ -281,14 +281,14 @@ class SentenceTerminationCharacterEntry {
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'delete':
-                this._delete();
+                void this._delete();
                 break;
         }
     }
 
     /** */
     async _delete() {
-        this._parent.deleteEntry(this._index);
+        void this._parent.deleteEntry(this._index);
     }
 
     /**

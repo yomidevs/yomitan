@@ -223,7 +223,7 @@ export class DisplayAnki {
         this._modeOptions.set('term-kanji', terms);
         this._modeOptions.set('term-kana', terms);
 
-        this._updateAnkiFieldTemplates(options);
+        void this._updateAnkiFieldTemplates(options);
     }
 
     /** */
@@ -258,7 +258,7 @@ export class DisplayAnki {
 
     /** */
     _onContentUpdateComplete() {
-        this._updateDictionaryEntryDetails();
+        void this._updateDictionaryEntryDetails();
     }
 
     /**
@@ -277,7 +277,7 @@ export class DisplayAnki {
         const mode = this._getValidCreateMode(element.dataset.mode);
         if (mode === null) { return; }
         const index = this._display.getElementDictionaryEntryIndex(element);
-        this._addAnkiNote(index, mode);
+        void this._addAnkiNote(index, mode);
     }
 
     /**
@@ -444,7 +444,7 @@ export class DisplayAnki {
      */
     _tryAddAnkiNoteForSelectedEntry(mode) {
         const index = this._display.selectedIndex;
-        this._addAnkiNote(index, mode);
+        void this._addAnkiNote(index, mode);
     }
 
     /**
@@ -783,7 +783,7 @@ export class DisplayAnki {
         if (e.shiftKey) {
             this._showViewNotesMenu(element);
         } else {
-            this._viewNotes(element);
+            void this._viewNotes(element);
         }
     }
 
@@ -804,7 +804,7 @@ export class DisplayAnki {
         switch (action) {
             case 'viewNotes':
                 if (item !== null) {
-                    this._viewNotes(item);
+                    void this._viewNotes(item);
                 }
                 break;
         }
@@ -927,7 +927,7 @@ export class DisplayAnki {
         const index = this._display.selectedIndex;
         const button = this._getViewNoteButton(index);
         if (button !== null) {
-            this._viewNotes(button);
+            void this._viewNotes(button);
         }
     }
 

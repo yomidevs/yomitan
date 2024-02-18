@@ -73,7 +73,7 @@ export class RecommendedPermissionsController {
 
         const {origin} = node.dataset;
         if (typeof origin !== 'string') { return; }
-        this._setOriginPermissionEnabled(origin, value);
+        void this._setOriginPermissionEnabled(origin, value);
     }
 
     /** */
