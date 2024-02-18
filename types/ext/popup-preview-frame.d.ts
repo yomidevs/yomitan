@@ -25,31 +25,31 @@ import type {
 import type {OptionsContext} from './settings';
 
 export type ApiSurface = {
-    'PopupPreviewFrame.setText': {
+    setText: {
         params: {
             text: string;
         };
         return: void;
     };
-    'PopupPreviewFrame.setCustomCss': {
+    setCustomCss: {
         params: {
             css: string;
         };
         return: void;
     };
-    'PopupPreviewFrame.setCustomOuterCss': {
+    setCustomOuterCss: {
         params: {
             css: string;
         };
         return: void;
     };
-    'PopupPreviewFrame.updateOptionsContext': {
+    updateOptionsContext: {
         params: {
             optionsContext: OptionsContext;
         };
         return: void;
     };
-    'PopupPreviewFrame.setLanguageExampleText': {
+    setLanguageExampleText: {
         params: {
             language: string;
         };

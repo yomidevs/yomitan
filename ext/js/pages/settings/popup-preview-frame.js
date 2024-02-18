@@ -61,11 +61,11 @@ export class PopupPreviewFrame {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('popup-preview-frame').ApiMap} */
         this._windowMessageHandlers = createApiMap([
-            ['PopupPreviewFrame.setText',                this._onSetText.bind(this)],
-            ['PopupPreviewFrame.setCustomCss',           this._setCustomCss.bind(this)],
-            ['PopupPreviewFrame.setCustomOuterCss',      this._setCustomOuterCss.bind(this)],
-            ['PopupPreviewFrame.updateOptionsContext',   this._updateOptionsContext.bind(this)],
-            ['PopupPreviewFrame.setLanguageExampleText', this._setLanguageExampleText.bind(this)]
+            ['setText',                this._onSetText.bind(this)],
+            ['setCustomCss',           this._setCustomCss.bind(this)],
+            ['setCustomOuterCss',      this._setCustomOuterCss.bind(this)],
+            ['updateOptionsContext',   this._updateOptionsContext.bind(this)],
+            ['setLanguageExampleText', this._setLanguageExampleText.bind(this)]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -206,7 +206,7 @@ export class PopupPreviewFrame {
         this._setText(element.value, false);
     }
 
-    /** @type {import('popup-preview-frame').ApiHandler<'PopupPreviewFrame.setText'>} */
+    /** @type {import('popup-preview-frame').ApiHandler<'setText'>} */
     _onSetText({text}) {
         this._setText(text, true);
     }
@@ -237,7 +237,7 @@ export class PopupPreviewFrame {
         node.classList.toggle('placeholder-info-visible', visible);
     }
 
-    /** @type {import('popup-preview-frame').ApiHandler<'PopupPreviewFrame.setCustomCss'>} */
+    /** @type {import('popup-preview-frame').ApiHandler<'setCustomCss'>} */
     _setCustomCss({css}) {
         if (this._frontend === null) { return; }
         const popup = this._frontend.popup;
@@ -245,7 +245,7 @@ export class PopupPreviewFrame {
         void popup.setCustomCss(css);
     }
 
-    /** @type {import('popup-preview-frame').ApiHandler<'PopupPreviewFrame.setCustomOuterCss'>} */
+    /** @type {import('popup-preview-frame').ApiHandler<'setCustomOuterCss'>} */
     _setCustomOuterCss({css}) {
         if (this._frontend === null) { return; }
         const popup = this._frontend.popup;
@@ -253,7 +253,7 @@ export class PopupPreviewFrame {
         void popup.setCustomOuterCss(css, false);
     }
 
-    /** @type {import('popup-preview-frame').ApiHandler<'PopupPreviewFrame.updateOptionsContext'>} */
+    /** @type {import('popup-preview-frame').ApiHandler<'updateOptionsContext'>} */
     async _updateOptionsContext(details) {
         const {optionsContext} = details;
         this._optionsContext = optionsContext;
@@ -263,7 +263,7 @@ export class PopupPreviewFrame {
         await this._updateSearch();
     }
 
-    /** @type {import('popup-preview-frame').ApiHandler<'PopupPreviewFrame.setLanguageExampleText'>} */
+    /** @type {import('popup-preview-frame').ApiHandler<'setLanguageExampleText'>} */
     _setLanguageExampleText({language}) {
         const activeLanguage = /** @type {import('language').LanguageSummary} */ (this._languageSummaries.find(({iso}) => iso === language));
 
