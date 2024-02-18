@@ -86,7 +86,7 @@ function setupPermissionsToggles() {
     }
 }
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 

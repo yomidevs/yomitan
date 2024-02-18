@@ -25,7 +25,7 @@ import {DisplayProfileSelection} from './display-profile-selection.js';
 import {DisplayResizer} from './display-resizer.js';
 import {Display} from './display.js';
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 

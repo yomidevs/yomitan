@@ -26,7 +26,7 @@ import {SearchActionPopupController} from './search-action-popup-controller.js';
 import {SearchDisplayController} from './search-display-controller.js';
 import {SearchPersistentStateController} from './search-persistent-state-controller.js';
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController('#search-textbox');
     documentFocusController.prepare();
 
