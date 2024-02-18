@@ -52,6 +52,24 @@ if (checkChromeNotAvailable()) {
 }
 
 /**
+ * @param {WebExtension} webExtension
+ */
+async function waitForBackendReady(webExtension) {
+    const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
+    /** @type {import('application').ApiMap} */
+    const apiMap = createApiMap([['applicationBackendReady', () => { resolve(); }]]);
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
+    const onMessage = ({action, params}, _sender, callback) => invokeApiMapHandler(apiMap, action, params, [], callback);
+    chrome.runtime.onMessage.addListener(onMessage);
+    try {
+        await webExtension.sendMessagePromise({action: 'requestBackendReadySignal'});
+        await promise;
+    } finally {
+        chrome.runtime.onMessage.removeListener(onMessage);
+    }
+}
+
+/**
  * The Yomitan class is a core component through which various APIs are handled and invoked.
  * @augments EventDispatcher<import('application').Events>
  */
@@ -157,7 +175,7 @@ export class Application extends EventDispatcher {
         const webExtension = new WebExtension();
         log.configure(webExtension.extensionName);
         const api = new API(webExtension);
-        await this.waitForBackendReady(webExtension);
+        await waitForBackendReady(webExtension);
         const {tabId, frameId} = await api.frameInformationGet();
         const crossFrameApi = new CrossFrameAPI(api, tabId, frameId);
         crossFrameApi.prepare();
@@ -169,24 +187,6 @@ export class Application extends EventDispatcher {
             log.error(error);
         } finally {
             application.ready();
-        }
-    }
-
-    /**
-     * @param {WebExtension} webExtension
-     */
-    static async waitForBackendReady(webExtension) {
-        const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
-        /** @type {import('application').ApiMap} */
-        const apiMap = createApiMap([['applicationBackendReady', () => { resolve(); }]]);
-        /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
-        const onMessage = ({action, params}, _sender, callback) => invokeApiMapHandler(apiMap, action, params, [], callback);
-        chrome.runtime.onMessage.addListener(onMessage);
-        try {
-            await webExtension.sendMessagePromise({action: 'requestBackendReadySignal'});
-            await promise;
-        } finally {
-            chrome.runtime.onMessage.removeListener(onMessage);
         }
     }
 
