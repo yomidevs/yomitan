@@ -47,6 +47,14 @@ export class PopupPreviewController {
         this._customOuterCss.addEventListener('settingChanged', this._onCustomOuterCssChange.bind(this), false);
         this._frame.addEventListener('load', this._onFrameLoad.bind(this), false);
         this._settingsController.on('optionsContextChanged', this._onOptionsContextChange.bind(this));
+        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+        const languageSelect = querySelectorNotNull(document, '#language-select');
+        languageSelect.addEventListener(
+            /** @type {string} */ ('settingChanged'),
+            /** @type {EventListener} */ (this._onLanguageSelectChanged.bind(this)),
+            false
+        );
+
 
         this._frame.src = '/popup-preview.html';
     }
@@ -76,6 +84,20 @@ export class PopupPreviewController {
     _onOptionsContextChange() {
         const optionsContext = this._settingsController.getOptionsContext();
         this._invoke('PopupPreviewFrame.updateOptionsContext', {optionsContext});
+    }
+
+    /**
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
+     */
+    _onOptionsChanged({options}) {
+        this._invoke('PopupPreviewFrame.optionsChanged', {options});
+    }
+
+    /**
+     * @param {import('dom-data-binder').SettingChangedEvent} settingChangedEvent
+     */
+    _onLanguageSelectChanged(settingChangedEvent) {
+        this._invoke('PopupPreviewFrame.setLanguageExampleText', {language: settingChangedEvent.detail.value});
     }
 
     /**

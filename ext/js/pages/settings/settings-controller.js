@@ -44,7 +44,6 @@ export class SettingsController extends EventDispatcher {
         this._pageExitPreventionEventListeners = new EventListenerCollection();
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
-        this._templates.load(document);
     }
 
     /** @type {import('../../application.js').Application} */
@@ -69,6 +68,7 @@ export class SettingsController extends EventDispatcher {
 
     /** */
     async prepare() {
+        await this._templates.loadFromFiles(['/templates-settings.html']);
         this._application.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         if (this._canObservePermissionsChanges()) {
             chrome.permissions.onAdded.addListener(this._onPermissionsChanged.bind(this));

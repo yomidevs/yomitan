@@ -21,7 +21,7 @@ import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
 
 /**
  * @augments EventDispatcher<import('cross-frame-api').CrossFrameAPIPortEvents>
@@ -311,6 +311,20 @@ export class CrossFrameAPI {
         this._tabId = tabId;
         /** @type {?number} */
         this._frameId = frameId;
+    }
+
+    /**
+     * @type {?number}
+     */
+    get tabId() {
+        return this._tabId;
+    }
+
+    /**
+     * @type {?number}
+     */
+    get frameId() {
+        return this._frameId;
     }
 
     /** */

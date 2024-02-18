@@ -15,15 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {LanguageDescriptor, TextPreprocessor} from './language';
-
-export type JapaneseTextPreprocessorDescriptor = {
-    convertHalfWidthCharacters: TextPreprocessor<boolean>;
-    convertNumericCharacters: TextPreprocessor<boolean>;
-    convertAlphabeticCharacters: TextPreprocessor<boolean>;
-    convertHiraganaToKatakana: TextPreprocessor<boolean>;
-    convertKatakanaToHiragana: TextPreprocessor<boolean>;
-    collapseEmphaticSequences: TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
-};
-
-export type JapaneseLanguageDescriptor = LanguageDescriptor<JapaneseTextPreprocessorDescriptor>;
+/**
+ * @param {import('log').LogLevel} errorLevel
+ * @returns {number}
+ */
+export function logErrorLevelToNumber(errorLevel) {
+    switch (errorLevel) {
+        case 'warn': return 1;
+        case 'error': return 2;
+        default: return 0;
+    }
+}

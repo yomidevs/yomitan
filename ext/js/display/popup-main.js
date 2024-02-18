@@ -25,16 +25,14 @@ import {DisplayProfileSelection} from './display-profile-selection.js';
 import {DisplayResizer} from './display-resizer.js';
 import {Display} from './display.js';
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
-
-    const {tabId, frameId} = await application.api.frameInformationGet();
 
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 
-    const display = new Display(application, tabId, frameId, 'popup', documentFocusController, hotkeyHandler);
+    const display = new Display(application, 'popup', documentFocusController, hotkeyHandler);
     await display.prepare();
 
     const displayAudio = new DisplayAudio(display);

@@ -15,63 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {descriptor as descriptorArabic} from './ar/language-arabic.js';
-import {descriptor as descriptorGerman} from './de/language-german.js';
-import {descriptor as descriptorGreek} from './el/language-greek.js';
-import {descriptor as descriptorEnglish} from './en/language-english.js';
-import {descriptor as descriptorSpanish} from './es/language-spanish.js';
-import {descriptor as descriptorPersian} from './fa/language-persian.js';
-import {descriptor as descriptorFrench} from './fr/language-french.js';
-import {descriptor as descriptorAncientGreek} from './grc/language-ancient-greek.js';
-import {descriptor as descriptorHungarian} from './hu/language-hungarian.js';
-import {descriptor as descriptorIndonesian} from './id/language-indonesian.js';
-import {descriptor as descriptorItalian} from './it/language-italian.js';
-import {descriptor as descriptorJapanese} from './ja/language-japanese.js';
-import {descriptor as descriptorKhmer} from './km/language-khmer.js';
-import {descriptor as descriptorLatin} from './la/language-latin.js';
-import {descriptor as descriptorPolish} from './pl/language-polish.js';
-import {descriptor as descriptorPortuguese} from './pt/language-portuguese.js';
-import {descriptor as descriptorRomanian} from './ro/language-romanian.js';
-import {descriptor as descriptorRussian} from './ru/language-russian.js';
-import {descriptor as descriptorSerboCroatian} from './sh/language-serbo-croatian.js';
-import {descriptor as descriptorAlbanian} from './sq/language-albanian.js';
-import {descriptor as descriptorSwedish} from './sv/language-swedish.js';
-import {descriptor as descriptorThai} from './th/language-thai.js';
-import {descriptor as descriptorVietnamese} from './vi/language-vietnamese.js';
-import {descriptor as descriptorChinese} from './zh/language-chinese.js';
-
-const languageDescriptors = [
-    descriptorAlbanian,
-    descriptorArabic,
-    descriptorAncientGreek,
-    descriptorChinese,
-    descriptorEnglish,
-    descriptorFrench,
-    descriptorGerman,
-    descriptorGreek,
-    descriptorHungarian,
-    descriptorIndonesian,
-    descriptorItalian,
-    descriptorJapanese,
-    descriptorKhmer,
-    descriptorLatin,
-    descriptorPersian,
-    descriptorPolish,
-    descriptorPortuguese,
-    descriptorRomanian,
-    descriptorRussian,
-    descriptorSerboCroatian,
-    descriptorSwedish,
-    descriptorSpanish,
-    descriptorThai,
-    descriptorVietnamese
-];
-
-/** @type {Map<string, typeof languageDescriptors[0]>} */
-const languageDescriptorMap = new Map();
-for (const languageDescriptor of languageDescriptors) {
-    languageDescriptorMap.set(languageDescriptor.iso, languageDescriptor);
-}
+import {languageDescriptorMap} from './language-descriptors.js';
 
 /**
  * @returns {import('language').LanguageSummary[]}

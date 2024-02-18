@@ -17,7 +17,7 @@
  */
 
 import {TaskAccumulator} from '../general/task-accumulator.js';
-import {DocumentUtil} from './document-util.js';
+import {convertElementValueToNumber} from './document-util.js';
 import {SelectorObserver} from './selector-observer.js';
 
 /**
@@ -264,7 +264,7 @@ export class DOMDataBinder {
             case 'text':
                 return `${/** @type {HTMLInputElement} */ (element).value}`;
             case 'number':
-                return DocumentUtil.convertElementValueToNumber(/** @type {HTMLInputElement} */ (element).value, /** @type {HTMLInputElement} */ (element));
+                return convertElementValueToNumber(/** @type {HTMLInputElement} */ (element).value, /** @type {HTMLInputElement} */ (element));
             case 'textarea':
                 return /** @type {HTMLTextAreaElement} */ (element).value;
             case 'select':

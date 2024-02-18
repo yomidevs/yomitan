@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DocumentUtil} from './document-util.js';
+import {computeZoomScale, isPointInAnyRect} from './document-util.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
 import {TextSourceElement} from './text-source-element.js';
 import {TextSourceRange} from './text-source-range.js';
@@ -358,7 +358,7 @@ export class TextSourceGenerator {
 
         // Convert CSS zoom coordinates
         if (normalizeCssZoom) {
-            const scale = DocumentUtil.computeZoomScale(startContainer);
+            const scale = computeZoomScale(startContainer);
             x /= scale;
             y /= scale;
         }
@@ -370,7 +370,7 @@ export class TextSourceGenerator {
             const {node, offset, content} = new DOMTextScanner(nodePre, offsetPre, true, false).seek(1);
             range.setEnd(node, offset);
 
-            if (!this._isWhitespace(content) && DocumentUtil.isPointInAnyRect(x, y, range.getClientRects())) {
+            if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects())) {
                 return true;
             }
         } finally {
@@ -381,7 +381,7 @@ export class TextSourceGenerator {
         const {node, offset, content} = new DOMTextScanner(startContainer, range.startOffset, true, false).seek(-1);
         range.setStart(node, offset);
 
-        if (!this._isWhitespace(content) && DocumentUtil.isPointInAnyRect(x, y, range.getClientRects())) {
+        if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects())) {
             // This purposefully leaves the starting offset as modified and sets the range length to 0.
             range.setEnd(node, offset);
             return true;

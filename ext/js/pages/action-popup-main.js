@@ -306,7 +306,7 @@ class DisplayController {
     }
 }
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     application.api.logIndicatorClear();
 
     const displayController = new DisplayController(application.api);

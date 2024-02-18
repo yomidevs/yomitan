@@ -24,18 +24,12 @@ import {TextSourceRange} from '../../dom/text-source-range.js';
 export class PopupPreviewFrame {
     /**
      * @param {import('../../application.js').Application} application
-     * @param {number} tabId
-     * @param {number} frameId
      * @param {import('../../app/popup-factory.js').PopupFactory} popupFactory
      * @param {import('../../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
-    constructor(application, tabId, frameId, popupFactory, hotkeyHandler) {
+    constructor(application, popupFactory, hotkeyHandler) {
         /** @type {import('../../application.js').Application} */
         this._application = application;
-        /** @type {number} */
-        this._tabId = tabId;
-        /** @type {number} */
-        this._frameId = frameId;
         /** @type {import('../../app/popup-factory.js').PopupFactory} */
         this._popupFactory = popupFactory;
         /** @type {import('../../input/hotkey-handler.js').HotkeyHandler} */
@@ -58,24 +52,26 @@ export class PopupPreviewFrame {
         this._exampleTextInput = querySelectorNotNull(document, '#example-text-input');
         /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+        /** @type {import('language').LanguageSummary[]} */
+        this._languageSummaries = [];
+        /** @type {boolean} */
+        this._wanakanaBound = false;
 
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {Map<string, (params: import('core').SerializableObjectAny) => void>} */
         this._windowMessageHandlers = new Map(/** @type {[key: string, handler: (params: import('core').SerializableObjectAny) => void][]} */ ([
-            ['PopupPreviewFrame.setText',              this._onSetText.bind(this)],
-            ['PopupPreviewFrame.setCustomCss',         this._setCustomCss.bind(this)],
-            ['PopupPreviewFrame.setCustomOuterCss',    this._setCustomOuterCss.bind(this)],
-            ['PopupPreviewFrame.updateOptionsContext', this._updateOptionsContext.bind(this)]
+            ['PopupPreviewFrame.setText',                this._onSetText.bind(this)],
+            ['PopupPreviewFrame.setCustomCss',           this._setCustomCss.bind(this)],
+            ['PopupPreviewFrame.setCustomOuterCss',      this._setCustomOuterCss.bind(this)],
+            ['PopupPreviewFrame.updateOptionsContext',   this._updateOptionsContext.bind(this)],
+            ['PopupPreviewFrame.optionsChanged',         this._onOptionsChanged.bind(this)],
+            ['PopupPreviewFrame.setLanguageExampleText', this._setLanguageExampleText.bind(this)]
         ]));
         /* eslint-enable @stylistic/no-multi-spaces */
     }
 
     /** */
     async prepare() {
-        if (this._exampleTextInput !== null && typeof wanakana !== 'undefined') {
-            wanakana.bind(this._exampleTextInput);
-        }
-
         window.addEventListener('message', this._onMessage.bind(this), false);
 
         // Setup events
@@ -91,11 +87,13 @@ export class PopupPreviewFrame {
         this._apiOptionsGetOld = this._application.api.optionsGet.bind(this._application.api);
         this._application.api.optionsGet = this._apiOptionsGet.bind(this);
 
+        this._languageSummaries = await this._application.api.getLanguageSummaries();
+        const options = await this._application.api.optionsGet({current: true});
+        this._onOptionsChanged({options, optionsContext: {current: true}});
+
         // Overwrite frontend
         this._frontend = new Frontend({
             application: this._application,
-            tabId: this._tabId,
-            frameId: this._frameId,
             popupFactory: this._popupFactory,
             depth: 0,
             parentPopupId: null,
@@ -274,6 +272,34 @@ export class PopupPreviewFrame {
         this._frontend.setOptionsContextOverride(optionsContext);
         await this._frontend.updateOptions();
         await this._updateSearch();
+    }
+
+    /**
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
+     */
+    async _onOptionsChanged({options: {general: {language}}}) {
+        this._setLanguageExampleText({language});
+    }
+
+    /**
+     * @param {{language: string}} details
+     */
+    _setLanguageExampleText({language}) {
+        const activeLanguage = /** @type {import('language').LanguageSummary} */ (this._languageSummaries.find(({iso}) => iso === language));
+
+        if (this._exampleTextInput !== null) {
+            if (language === 'ja') {
+                wanakana.bind(this._exampleTextInput);
+                this._wanakanaBound = true;
+            } else if (this._wanakanaBound) {
+                wanakana.unbind(this._exampleTextInput);
+                this._wanakanaBound = false;
+            }
+        }
+
+        this._exampleTextInput.lang = language;
+        this._exampleTextInput.value = activeLanguage.exampleText;
+        this._exampleTextInput.dispatchEvent(new Event('input'));
     }
 
     /** */

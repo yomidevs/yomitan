@@ -18,7 +18,6 @@
 
 /* Variables */
 :root {
-    --main-content-horizontal-padding: 0.72em;
     --entry-horizontal-padding: 0;
 
     --padding: calc(10em / var(--font-size-no-units));
@@ -132,12 +131,12 @@ h1 {
 .search-options {
     display: flex;
     flex-flow: row wrap;
-    margin: 0.5em calc(-1 * var(--main-content-horizontal-padding));
+    margin: 0.5em 0;
     align-items: center;
 }
 .search-option {
     flex: 0 1 auto;
-    margin: 0.5em 1em;
+    margin: 0.5em 2em 0.5em 0;
     align-items: center;
     cursor: pointer;
 }

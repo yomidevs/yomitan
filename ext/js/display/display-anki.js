@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
@@ -568,8 +569,7 @@ export class DisplayAnki {
         const content = this._display.displayGenerator.createAnkiNoteErrorsNotificationContent(displayErrors);
         for (const node of content.querySelectorAll('.anki-note-error-log-link')) {
             /** @type {EventListenerCollection} */ (this._errorNotificationEventListeners).addEventListener(node, 'click', () => {
-                // eslint-disable-next-line no-console
-                console.log({ankiNoteErrors: errors});
+                log.log({ankiNoteErrors: errors});
             }, false);
         }
 
