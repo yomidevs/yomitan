@@ -324,7 +324,7 @@ export class Display extends EventDispatcher {
 
         // Prepare
         await this._hotkeyHelpController.prepare(this._application.api);
-        await this._displayGenerator.prepare(this._application.api);
+        await this._displayGenerator.prepare();
         this._queryParser.prepare();
         this._history.prepare();
         this._optionToggleHotkeyHandler.prepare();
