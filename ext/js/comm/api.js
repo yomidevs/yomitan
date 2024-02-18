@@ -210,13 +210,6 @@ export class API {
     }
 
     /**
-     * @returns {Promise<import('api').ApiReturn<'getDisplayTemplatesHtml'>>}
-     */
-    getDisplayTemplatesHtml() {
-        return this._invoke('getDisplayTemplatesHtml', void 0);
-    }
-
-    /**
      * @returns {Promise<import('api').ApiReturn<'getZoom'>>}
      */
     getZoom() {
