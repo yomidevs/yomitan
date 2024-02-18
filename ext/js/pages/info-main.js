@@ -115,7 +115,7 @@ async function showDictionaryInfo(api) {
     container.appendChild(fragment);
 }
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 

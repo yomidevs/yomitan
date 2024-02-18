@@ -21,7 +21,7 @@ import {Application} from '../../application.js';
 import {HotkeyHandler} from '../../input/hotkey-handler.js';
 import {PopupPreviewFrame} from './popup-preview-frame.js';
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 

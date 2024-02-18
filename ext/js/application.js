@@ -70,6 +70,23 @@ async function waitForBackendReady(webExtension) {
 }
 
 /**
+ * @returns {Promise<void>}
+ */
+function waitForDomContentLoaded() {
+    return new Promise((resolve) => {
+        if (document.readyState !== 'loading') {
+            resolve();
+            return;
+        }
+        const onDomContentLoaded = () => {
+            document.removeEventListener('DOMContentLoaded', onDomContentLoaded);
+            resolve();
+        };
+        document.addEventListener('DOMContentLoaded', onDomContentLoaded);
+    });
+}
+
+/**
  * The Yomitan class is a core component through which various APIs are handled and invoked.
  * @augments EventDispatcher<import('application').Events>
  */
@@ -169,9 +186,10 @@ export class Application extends EventDispatcher {
     }
 
     /**
+     * @param {boolean} waitForDom
      * @param {(application: Application) => (Promise<void>)} mainFunction
      */
-    static async main(mainFunction) {
+    static async main(waitForDom, mainFunction) {
         const webExtension = new WebExtension();
         log.configure(webExtension.extensionName);
         const api = new API(webExtension);
@@ -181,6 +199,7 @@ export class Application extends EventDispatcher {
         crossFrameApi.prepare();
         const application = new Application(api, crossFrameApi);
         application.prepare();
+        if (waitForDom) { await waitForDomContentLoaded(); }
         try {
             await mainFunction(application);
         } catch (error) {
