@@ -722,22 +722,25 @@ export class Popup extends EventDispatcher {
     }
 
     /**
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
+     * @template {import('display').WindowApiNames} TName
+     * @param {TName} action
+     * @param {import('display').WindowApiParams<TName>} params
      */
-    _invokeWindow(action, params = {}) {
+    _invokeWindow(action, params) {
         const contentWindow = this._frame.contentWindow;
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
 
-        const message = this._frameClient.createMessage({action, params});
-        contentWindow.postMessage(message, this._targetOrigin);
+        /** @type {import('display').WindowApiMessage<TName>} */
+        const message = {action, params};
+        const messageWrapper = this._frameClient.createMessage(message);
+        contentWindow.postMessage(messageWrapper, this._targetOrigin);
     }
 
     /**
      * @returns {void}
      */
     _onExtensionUnloaded() {
-        this._invokeWindow('displayExtensionUnloaded');
+        this._invokeWindow('displayExtensionUnloaded', void 0);
     }
 
     /**
