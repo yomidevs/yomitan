@@ -313,6 +313,20 @@ export class CrossFrameAPI {
         this._frameId = frameId;
     }
 
+    /**
+     * @type {?number}
+     */
+    get tabId() {
+        return this._tabId;
+    }
+
+    /**
+     * @type {?number}
+     */
+    get frameId() {
+        return this._frameId;
+    }
+
     /** */
     prepare() {
         chrome.runtime.onConnect.addListener(this._onConnect.bind(this));

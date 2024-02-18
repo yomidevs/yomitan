@@ -39,8 +39,6 @@ export class Frontend {
         pageType,
         popupFactory,
         depth,
-        tabId,
-        frameId,
         parentPopupId,
         parentFrameId,
         useProxyPopup,
@@ -57,10 +55,6 @@ export class Frontend {
         this._popupFactory = popupFactory;
         /** @type {number} */
         this._depth = depth;
-        /** @type {number|undefined} */
-        this._tabId = tabId;
-        /** @type {number} */
-        this._frameId = frameId;
         /** @type {?string} */
         this._parentPopupId = parentPopupId;
         /** @type {?number} */
@@ -588,8 +582,13 @@ export class Frontend {
             return null;
         }
 
+        const {frameId} = this._application;
+        if (frameId === null) {
+            return null;
+        }
+
         return await this._popupFactory.getOrCreatePopup({
-            frameId: this._frameId,
+            frameId,
             depth: this._depth,
             childrenSupported: this._childrenSupported
         });
@@ -703,12 +702,10 @@ export class Frontend {
         };
         if (sentence !== null) { detailsState.sentence = sentence; }
         if (documentTitle !== null) { detailsState.documentTitle = documentTitle; }
+        const {tabId, frameId} = this._application;
         /** @type {import('display').HistoryContent} */
         const detailsContent = {
-            contentOrigin: {
-                tabId: this._tabId,
-                frameId: this._frameId
-            }
+            contentOrigin: {tabId, frameId}
         };
         if (dictionaryEntries !== null) {
             detailsContent.dictionaryEntries = dictionaryEntries;
@@ -819,7 +816,7 @@ export class Frontend {
      */
     _signalFrontendReady(targetFrameId) {
         /** @type {import('application').ApiMessageNoFrameId<'frontendReady'>} */
-        const message = {action: 'frontendReady', params: {frameId: this._frameId}};
+        const message = {action: 'frontendReady', params: {frameId: this._application.frameId}};
         if (targetFrameId === null) {
             this._application.api.broadcastTab(message);
         } else {
@@ -867,7 +864,7 @@ export class Frontend {
             }
 
             chrome.runtime.onMessage.addListener(onMessage);
-            this._application.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._frameId}});
+            this._application.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._application.frameId}});
         });
     }
 

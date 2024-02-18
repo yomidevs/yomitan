@@ -108,7 +108,6 @@ export class Application extends EventDispatcher {
      * @type {API}
      */
     get api() {
-        if (this._api === null) { throw new Error('Not prepared'); }
         return this._api;
     }
 
@@ -118,8 +117,21 @@ export class Application extends EventDispatcher {
      * @type {CrossFrameAPI}
      */
     get crossFrame() {
-        if (this._crossFrame === null) { throw new Error('Not prepared'); }
         return this._crossFrame;
+    }
+
+    /**
+     * @type {?number}
+     */
+    get tabId() {
+        return this._crossFrame.tabId;
+    }
+
+    /**
+     * @type {?number}
+     */
+    get frameId() {
+        return this._crossFrame.frameId;
     }
 
     /**
@@ -157,7 +169,7 @@ export class Application extends EventDispatcher {
         const webExtension = new WebExtension();
         const api = new API(webExtension);
         await this.waitForBackendReady(webExtension);
-        const {tabId = null, frameId = null} = await api.frameInformationGet();
+        const {tabId, frameId} = await api.frameInformationGet();
         const crossFrameApi = new CrossFrameAPI(api, tabId, frameId);
         crossFrameApi.prepare();
         const application = new Application(api, crossFrameApi);

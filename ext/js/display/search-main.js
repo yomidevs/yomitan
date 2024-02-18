@@ -36,12 +36,10 @@ await Application.main(async (application) => {
     const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
     searchActionPopupController.prepare();
 
-    const {tabId, frameId} = await application.api.frameInformationGet();
-
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 
-    const display = new Display(application, tabId, frameId, 'search', documentFocusController, hotkeyHandler);
+    const display = new Display(application, 'search', documentFocusController, hotkeyHandler);
     await display.prepare();
 
     const displayAudio = new DisplayAudio(display);
@@ -50,7 +48,7 @@ await Application.main(async (application) => {
     const displayAnki = new DisplayAnki(display, displayAudio);
     displayAnki.prepare();
 
-    const searchDisplayController = new SearchDisplayController(tabId, frameId, display, displayAudio, searchPersistentStateController);
+    const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
     await searchDisplayController.prepare();
 
     display.initializeState();
