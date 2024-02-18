@@ -16,7 +16,6 @@
  */
 
 import type {TextSourceMap} from '../../ext/js/general/text-source-map.js';
-import type {SafeAny} from './core';
 
 export type TextPreprocessorOptions<T = unknown> = T[];
 
@@ -43,15 +42,4 @@ export type LanguageSummary = {
     name: string;
     iso: string;
     exampleText: string;
-};
-
-export type LanguageDescriptor<TTextPreprocessorDescriptor extends TextPreprocessorDescriptor> = {
-    name: string;
-    iso: string;
-    exampleText: string;
-    textPreprocessors: TTextPreprocessorDescriptor;
-};
-
-export type TextPreprocessorDescriptor = {
-    [key: string]: TextPreprocessor<SafeAny>;
 };
