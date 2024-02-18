@@ -23,7 +23,7 @@ import {DynamicProperty} from '../core/dynamic-property.js';
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
 import {PopupMenu} from '../dom/popup-menu.js';
@@ -2020,8 +2020,7 @@ export class Display extends EventDispatcher {
             }
         }
 
-        // eslint-disable-next-line no-console
-        console.log(result);
+        log.log(result);
     }
 
     /** */

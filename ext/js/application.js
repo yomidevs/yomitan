@@ -21,7 +21,7 @@ import {CrossFrameAPI} from './comm/cross-frame-api.js';
 import {createApiMap, invokeApiMapHandler} from './core/api-map.js';
 import {EventDispatcher} from './core/event-dispatcher.js';
 import {ExtensionError} from './core/extension-error.js';
-import {log} from './core/logger.js';
+import {log} from './core/log.js';
 import {deferPromise} from './core/utilities.js';
 import {WebExtension} from './extension/web-extension.js';
 
@@ -63,19 +63,8 @@ export class Application extends EventDispatcher {
      */
     constructor(api, crossFrameApi) {
         super();
-
         /** @type {WebExtension} */
         this._webExtension = new WebExtension();
-
-        /** @type {string} */
-        this._extensionName = 'Yomitan';
-        try {
-            const manifest = chrome.runtime.getManifest();
-            this._extensionName = `${manifest.name} v${manifest.version}`;
-        } catch (e) {
-            // NOP
-        }
-
         /** @type {?boolean} */
         this._isBackground = null;
         /** @type {API} */
@@ -84,7 +73,6 @@ export class Application extends EventDispatcher {
         this._crossFrame = crossFrameApi;
         /** @type {boolean} */
         this._isReady = false;
-
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
@@ -139,7 +127,7 @@ export class Application extends EventDispatcher {
      */
     prepare() {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-        log.on('log', this._onForwardLog.bind(this));
+        log.on('logGenericError', this._onLogGenericError.bind(this));
     }
 
     /**
@@ -167,6 +155,7 @@ export class Application extends EventDispatcher {
      */
     static async main(mainFunction) {
         const webExtension = new WebExtension();
+        log.configure(webExtension.extensionName);
         const api = new API(webExtension);
         await this.waitForBackendReady(webExtension);
         const {tabId, frameId} = await api.frameInformationGet();
@@ -243,12 +232,11 @@ export class Application extends EventDispatcher {
     }
 
     /**
-     * @param {{error: unknown, level: import('log').LogLevel, context?: import('log').LogContext}} params
+     * @param {import('log').Events['logGenericError']} params
      */
-    async _onForwardLog({error, level, context}) {
+    async _onLogGenericError({error, level, context}) {
         try {
-            const api = /** @type {API} */ (this._api);
-            await api.log(ExtensionError.serialize(error), level, context);
+            await this._api.logGenericErrorBackend(ExtensionError.serialize(error), level, context);
         } catch (e) {
             // NOP
         }

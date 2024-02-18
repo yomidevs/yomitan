@@ -17,7 +17,7 @@
  */
 
 import {isContentScriptRegistered, registerContentScript, unregisterContentScript} from '../background/script-manager.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
 
 /**
  * This class controls the registration of accessibility handlers.

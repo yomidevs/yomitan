@@ -19,7 +19,7 @@
 import {AnkiConnect} from '../../comm/anki-connect.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {ExtensionError} from '../../core/extension-error.js';
-import {log} from '../../core/logger.js';
+import {log} from '../../core/log.js';
 import {toError} from '../../core/to-error.js';
 import {getStandardFieldMarkers} from '../../data/anki-template-util.js';
 import {stringContainsAnyFieldMarker} from '../../data/anki-util.js';
@@ -205,8 +205,7 @@ export class AnkiController {
     /** */
     _onAnkiErrorLogLinkClick() {
         if (this._ankiError === null) { return; }
-        // eslint-disable-next-line no-console
-        console.log({error: this._ankiError});
+        log.log({error: this._ankiError});
     }
 
     /**
