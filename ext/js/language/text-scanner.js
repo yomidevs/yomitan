@@ -20,7 +20,7 @@ import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {log} from '../core/log.js';
 import {clone} from '../core/utilities.js';
-import {DocumentUtil} from '../dom/document-util.js';
+import {anyNodeMatchesSelector, everyNodeMatchesSelector, getActiveModifiers, getActiveModifiersAndButtons, isPointInSelection} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 
 /**
@@ -609,8 +609,8 @@ export class TextScanner extends EventDispatcher {
 
         if (preventNextClickScan) { return; }
 
-        const modifiers = DocumentUtil.getActiveModifiersAndButtons(e);
-        const modifierKeys = DocumentUtil.getActiveModifiers(e);
+        const modifiers = getActiveModifiersAndButtons(e);
+        const modifierKeys = getActiveModifiers(e);
         const inputInfo = this._createInputInfo(null, 'mouse', 'click', false, modifiers, modifierKeys);
         this._searchAt(e.clientX, e.clientY, inputInfo);
     }
@@ -658,7 +658,7 @@ export class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
 
         const selection = window.getSelection();
-        if (selection !== null && DocumentUtil.isPointInSelection(x, y, selection)) {
+        if (selection !== null && isPointInSelection(x, y, selection)) {
             return;
         }
 
@@ -1393,8 +1393,8 @@ export class TextScanner extends EventDispatcher {
      * @returns {?import('text-scanner').InputInfo}
      */
     _getMatchingInputGroupFromEvent(pointerType, eventType, event) {
-        const modifiers = DocumentUtil.getActiveModifiersAndButtons(event);
-        const modifierKeys = DocumentUtil.getActiveModifiers(event);
+        const modifiers = getActiveModifiersAndButtons(event);
+        const modifierKeys = getActiveModifiers(event);
         return this._getMatchingInputGroup(pointerType, eventType, modifiers, modifierKeys);
     }
 
@@ -1534,8 +1534,8 @@ export class TextScanner extends EventDispatcher {
         while (length > 0) {
             const nodes = textSource.getNodesInRange();
             if (
-                (includeSelector !== null && !DocumentUtil.everyNodeMatchesSelector(nodes, includeSelector)) ||
-                (excludeSelector !== null && DocumentUtil.anyNodeMatchesSelector(nodes, excludeSelector))
+                (includeSelector !== null && !everyNodeMatchesSelector(nodes, includeSelector)) ||
+                (excludeSelector !== null && anyNodeMatchesSelector(nodes, excludeSelector))
             ) {
                 --length;
                 textSource.setEndOffset(length, false, layoutAwareScan);

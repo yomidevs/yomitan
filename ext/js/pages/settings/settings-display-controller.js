@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DocumentUtil} from '../../dom/document-util.js';
+import {isInputElementFocused} from '../../dom/document-util.js';
 import {PopupMenu} from '../../dom/popup-menu.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
@@ -184,7 +184,7 @@ export class SettingsDisplayController {
     _onKeyDown(e) {
         switch (e.code) {
             case 'Escape':
-                if (!DocumentUtil.isInputElementFocused()) {
+                if (!isInputElementFocused()) {
                     this._closeTopMenuOrModal();
                     e.preventDefault();
                 }

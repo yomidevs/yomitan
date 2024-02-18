@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DocumentUtil} from '../../dom/document-util.js';
+import {convertElementValueToNumber} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class NestedPopupsController {
@@ -71,7 +71,7 @@ export class NestedPopupsController {
      */
     _onNestedPopupsCountChange(e) {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
-        const value = Math.max(1, DocumentUtil.convertElementValueToNumber(node.value, node));
+        const value = Math.max(1, convertElementValueToNumber(node.value, node));
         this._setPopupNestingMaxDepth(value);
     }
 

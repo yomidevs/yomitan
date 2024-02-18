@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {DocumentUtil} from '../../dom/document-util.js';
+import {convertElementValueToNumber, normalizeModifierKey} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
@@ -400,7 +400,7 @@ class KeyboardShortcutHotkeyEntry {
         /** @type {import('input').ModifierKey[]} */
         const modifiers2 = [];
         for (const modifier of modifiers) {
-            const modifier2 = DocumentUtil.normalizeModifierKey(modifier);
+            const modifier2 = normalizeModifierKey(modifier);
             if (modifier2 === null) { continue; }
             modifiers2.push(modifier2);
         }
@@ -435,7 +435,7 @@ class KeyboardShortcutHotkeyEntry {
         let value = this._getArgumentInputValue(node);
         switch (template) {
             case 'hotkey-argument-move-offset':
-                value = `${DocumentUtil.convertElementValueToNumber(value, node)}`;
+                value = `${convertElementValueToNumber(value, node)}`;
                 break;
         }
         this._setArgument(value);

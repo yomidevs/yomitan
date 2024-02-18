@@ -18,7 +18,7 @@
 
 import {EventDispatcher} from '../../core/event-dispatcher.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {DocumentUtil} from '../../dom/document-util.js';
+import {normalizeModifier} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
@@ -941,7 +941,7 @@ class ProfileConditionUI {
         /** @type {import('input').Modifier[]} */
         const results = [];
         for (const item of modifiersString.split(/[,;\s]+/)) {
-            const modifier = DocumentUtil.normalizeModifier(item.trim().toLowerCase());
+            const modifier = normalizeModifier(item.trim().toLowerCase());
             if (modifier !== null) { results.push(modifier); }
         }
         return results;
