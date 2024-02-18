@@ -47,6 +47,8 @@ export class SearchDisplayController {
         this._clipboardMonitorEnableCheckbox = querySelectorNotNull(document, '#clipboard-monitor-enable');
         /** @type {HTMLInputElement} */
         this._wanakanaEnableCheckbox = querySelectorNotNull(document, '#wanakana-enable');
+        /** @type {HTMLElement} */
+        this._wanakanaSearchOption = querySelectorNotNull(document, '#search-option-wanakana');
         /** @type {EventListenerCollection} */
         this._queryInputEvents = new EventListenerCollection();
         /** @type {boolean} */
@@ -184,9 +186,11 @@ export class SearchDisplayController {
         this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
         this._updateClipboardMonitorEnabled();
 
-        const enableWanakana = !!options.general.enableWanakana;
-        this._wanakanaEnableCheckbox.checked = enableWanakana;
-        this._setWanakanaEnabled(enableWanakana);
+        const {language, enableWanakana} = options.general;
+        const wanakanaEnabled = language === 'ja' && enableWanakana;
+        this._wanakanaEnableCheckbox.checked = wanakanaEnabled;
+        this._wanakanaSearchOption.style.display = language === 'ja' ? '' : 'none';
+        this._setWanakanaEnabled(wanakanaEnabled);
     }
 
     /**
