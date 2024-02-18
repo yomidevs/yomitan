@@ -26,7 +26,7 @@ import readline from 'readline';
 import {parseArgs} from 'util';
 import {buildLibs} from '../build-libs.js';
 import {ManifestUtil} from '../manifest-util.js';
-import {getAllFiles, testMain} from '../util.js';
+import {getAllFiles} from '../util.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -217,10 +217,8 @@ function ensureFilesExist(directory, files) {
     }
 }
 
-/**
- * @param {string[]} argv
- */
-export async function main(argv) {
+/** */
+export async function main() {
     /** @type {import('util').ParseArgsConfig['options']} */
     const parseArgsConfigOptions = {
         all: {
@@ -248,6 +246,7 @@ export async function main(argv) {
         }
     };
 
+    const argv = process.argv.slice(2);
     const {values: args} = parseArgs({args: argv, options: parseArgsConfigOptions});
 
     const dryRun = /** @type {boolean} */ (args.dryRun);
@@ -280,4 +279,4 @@ export async function main(argv) {
     }
 }
 
-await testMain(main, process.argv.slice(2));
+await main();
