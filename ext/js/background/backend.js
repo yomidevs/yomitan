@@ -70,12 +70,12 @@ export class Backend {
             /** @type {Translator|TranslatorProxy} */
             this._translator = new Translator(this._dictionaryDatabase);
             /** @type {ClipboardReader|ClipboardReaderProxy} */
-            this._clipboardReader = new ClipboardReader({
+            this._clipboardReader = new ClipboardReader(
                 // eslint-disable-next-line no-undef
-                document: (typeof document === 'object' && document !== null ? document : null),
-                pasteTargetSelector: '#clipboard-paste-target',
-                richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
-            });
+                (typeof document === 'object' && document !== null ? document : null),
+                '#clipboard-paste-target',
+                '#clipboard-rich-content-paste-target'
+            );
         } else {
             /** @type {?OffscreenProxy} */
             this._offscreen = new OffscreenProxy(webExtension);

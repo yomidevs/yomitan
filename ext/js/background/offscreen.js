@@ -36,11 +36,11 @@ export class Offscreen {
         /** @type {Translator} */
         this._translator = new Translator(this._dictionaryDatabase);
         /** @type {ClipboardReader} */
-        this._clipboardReader = new ClipboardReader({
-            document: (typeof document === 'object' && document !== null ? document : null),
-            pasteTargetSelector: '#clipboard-paste-target',
-            richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
-        });
+        this._clipboardReader = new ClipboardReader(
+            (typeof document === 'object' && document !== null ? document : null),
+            '#clipboard-paste-target',
+            '#clipboard-rich-content-paste-target'
+        );
 
 
         /* eslint-disable @stylistic/no-multi-spaces */
