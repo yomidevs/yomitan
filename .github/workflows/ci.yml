@@ -10,9 +10,9 @@ on:
   merge_group:
 
 jobs:
-  test:
+  static-analysis:
+    name: Static Analysis
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,51 +25,53 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Libs
+      - name: Build third-party libraries
         run: npm run build:libs
 
-      - name: Lint JS
-        run: npm run test:js
-        env:
-          CI: true
+      - name: Run static analysis tests
+        run: npm run test:static-analysis
 
-      - name: Validate JS Types
-        run: npm run test:ts
-        env:
-          CI: true
+  static-analysis-json:
+    name: Static Analysis (JSON)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Lint CSS
-        run: npm run test:css
-        env:
-          CI: true
-
-      - name: Lint HTML
-        run: npm run test:html
-        env:
-          CI: true
-
-      - name: Tests
-        run: npm run test:unit
-        env:
-          CI: true
-
-      - name: Test JSON
-        run: npm run test:json
-        env:
-          CI: true
-
-      - name: Build Legal
-        run: npm run license-report:html
-
-      - name: Build
-        run: npm run build
-
-      - name: Validate manifest.json of the extension
-        uses: cardinalby/schema-validator-action@76c68bfc941bd2dc82859f2528984999d1df36a4 # v3.1.0
+      - name: Setup node
+        uses: actions/setup-node@v4
         with:
-          file: ext/manifest.json
-          schema: "https://json.schemastore.org/chrome-manifest.json"
-          fixSchemas: true
+          node-version-file: "package.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build third-party libraries
+        run: npm run build:libs
+
+      - name: Run static analysis tests
+        run: npm run test:json
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build third-party libraries
+        run: npm run build:libs
+
+      - name: Run unit tests
+        run: npm run test:unit
 
   test-build:
     name: Test Build
