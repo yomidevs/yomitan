@@ -225,7 +225,7 @@ export class DisplayAudio {
 
         const callback = () => {
             this._autoPlayAudioTimer = null;
-            this.playAudio(0, 0);
+            void this.playAudio(0, 0);
         };
 
         if (this._autoPlayAudioDelay > 0) {
@@ -248,7 +248,7 @@ export class DisplayAudio {
 
     /** */
     _onHotkeyActionPlayAudio() {
-        this.playAudio(this._display.selectedIndex, 0);
+        void this.playAudio(this._display.selectedIndex, 0);
     }
 
     /**
@@ -256,7 +256,7 @@ export class DisplayAudio {
      */
     _onHotkeyActionPlayAudioFromSource(source) {
         if (!(typeof source === 'string' || typeof source === 'undefined' || source === null)) { return; }
-        this.playAudio(this._display.selectedIndex, 0, source);
+        void this.playAudio(this._display.selectedIndex, 0, source);
     }
 
     /** @type {import('display').DirectApiHandler<'displayAudioClearAutoPlayTimer'>} */
@@ -317,7 +317,7 @@ export class DisplayAudio {
         if (e.shiftKey) {
             this._showAudioMenu(button, dictionaryEntryIndex, headwordIndex);
         } else {
-            this.playAudio(dictionaryEntryIndex, headwordIndex);
+            void this.playAudio(dictionaryEntryIndex, headwordIndex);
         }
     }
 
@@ -348,7 +348,7 @@ export class DisplayAudio {
                 if (shiftKey) {
                     e.preventDefault();
                 }
-                this._playAudioFromSource(dictionaryEntryIndex, headwordIndex, item);
+                void this._playAudioFromSource(dictionaryEntryIndex, headwordIndex, item);
                 break;
             case 'setPrimaryAudio':
                 e.preventDefault();

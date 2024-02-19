@@ -239,7 +239,7 @@ export class SettingsController extends EventDispatcher {
     _setProfileIndex(value, canUpdateProfileIndex) {
         this._profileIndex = value;
         this.trigger('optionsContextChanged', {});
-        this._onOptionsUpdatedInternal(canUpdateProfileIndex);
+        void this._onOptionsUpdatedInternal(canUpdateProfileIndex);
     }
 
     /**
@@ -247,7 +247,7 @@ export class SettingsController extends EventDispatcher {
      */
     _onOptionsUpdated({source}) {
         if (source === this._source) { return; }
-        this._onOptionsUpdatedInternal(true);
+        void this._onOptionsUpdatedInternal(true);
     }
 
     /**
@@ -332,7 +332,7 @@ export class SettingsController extends EventDispatcher {
 
     /** */
     _onPermissionsChanged() {
-        this._triggerPermissionsChanged();
+        void this._triggerPermissionsChanged();
     }
 
     /** */

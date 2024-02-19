@@ -133,7 +133,7 @@ export class TranslationTextReplacementsController {
 
     /** */
     _onAdd() {
-        this.addGroup();
+        void this.addGroup();
     }
 
     /** */
@@ -242,7 +242,7 @@ class TranslationTextReplacementsEntry {
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'remove':
-                this._parent.deleteGroup(this._index);
+                void this._parent.deleteGroup(this._index);
                 break;
             case 'showTest':
                 this._setTestVisible(true);

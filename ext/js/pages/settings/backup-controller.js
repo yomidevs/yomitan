@@ -642,7 +642,7 @@ export class BackupController {
         await Dexie.import(file, {
             progressCallback: this._databaseImportProgressCallback.bind(this)
         });
-        this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
+        void this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
         this._settingsController.application.triggerStorageChanged();
     }
 

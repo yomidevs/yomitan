@@ -41,13 +41,13 @@ export class DictionaryWorkerHandler {
         const {action, params} = event.data;
         switch (action) {
             case 'importDictionary':
-                this._onMessageWithProgress(params, this._importDictionary.bind(this));
+                void this._onMessageWithProgress(params, this._importDictionary.bind(this));
                 break;
             case 'deleteDictionary':
-                this._onMessageWithProgress(params, this._deleteDictionary.bind(this));
+                void this._onMessageWithProgress(params, this._deleteDictionary.bind(this));
                 break;
             case 'getDictionaryCounts':
-                this._onMessageWithProgress(params, this._getDictionaryCounts.bind(this));
+                void this._onMessageWithProgress(params, this._getDictionaryCounts.bind(this));
                 break;
             case 'getImageDetails.response':
                 this._mediaLoader.handleMessage(params);
@@ -95,7 +95,7 @@ export class DictionaryWorkerHandler {
                 errors: errors.map((error) => ExtensionError.serialize(error))
             };
         } finally {
-            dictionaryDatabase.close();
+            void dictionaryDatabase.close();
         }
     }
 
@@ -109,7 +109,7 @@ export class DictionaryWorkerHandler {
         try {
             return await dictionaryDatabase.deleteDictionary(dictionaryTitle, 1000, onProgress);
         } finally {
-            dictionaryDatabase.close();
+            void dictionaryDatabase.close();
         }
     }
 
@@ -122,7 +122,7 @@ export class DictionaryWorkerHandler {
         try {
             return await dictionaryDatabase.getDictionaryCounts(dictionaryNames, getTotal);
         } finally {
-            dictionaryDatabase.close();
+            void dictionaryDatabase.close();
         }
     }
 

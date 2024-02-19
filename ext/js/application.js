@@ -172,7 +172,7 @@ export class Application extends EventDispatcher {
     ready() {
         if (this._isReady) { return; }
         this._isReady = true;
-        this._webExtension.sendMessagePromise({action: 'applicationReady'});
+        void this._webExtension.sendMessagePromise({action: 'applicationReady'});
     }
 
     /** */

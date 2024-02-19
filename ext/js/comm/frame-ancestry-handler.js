@@ -176,7 +176,7 @@ export class FrameAncestryHandler {
         const {params} = /** @type {import('core').SerializableObject} */ (data);
         if (typeof params !== 'object' || params === null) { return; }
 
-        this._onRequestFrameInfo(/** @type {import('core').SerializableObject} */ (params), source);
+        void this._onRequestFrameInfo(/** @type {import('core').SerializableObject} */ (params), source);
     }
 
     /**

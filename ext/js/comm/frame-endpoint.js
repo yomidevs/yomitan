@@ -46,7 +46,7 @@ export class FrameEndpoint {
         }
         /** @type {import('frame-client').FrameEndpointReadyDetails} */
         const details = {secret: this._secret};
-        this._api.broadcastTab({action: 'frameEndpointReady', params: details});
+        void this._api.broadcastTab({action: 'frameEndpointReady', params: details});
     }
 
     /**
@@ -88,6 +88,6 @@ export class FrameEndpoint {
         this._eventListeners.removeAllEventListeners();
         /** @type {import('frame-client').FrameEndpointConnectedDetails} */
         const details = {secret, token};
-        this._api.sendMessageToFrame(hostFrameId, {action: 'frameEndpointConnected', params: details});
+        void this._api.sendMessageToFrame(hostFrameId, {action: 'frameEndpointConnected', params: details});
     }
 }

@@ -70,7 +70,7 @@ export class PersistentStorageController {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         if (node.checked) {
             node.checked = false;
-            this._attemptPersistStorage();
+            void this._attemptPersistStorage();
         } else {
             node.checked = true;
         }

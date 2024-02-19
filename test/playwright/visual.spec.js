@@ -22,7 +22,7 @@ import {expect, root, test} from './playwright-util.js';
 test.beforeEach(async ({context}) => {
     // Wait for the on-install welcome.html tab to load, which becomes the foreground tab
     const welcome = await context.waitForEvent('page');
-    welcome.close(); // Close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
+    await welcome.close(); // Close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
 });
 
 test('visual', async ({page, extensionId}) => {

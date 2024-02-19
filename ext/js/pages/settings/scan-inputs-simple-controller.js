@@ -70,7 +70,7 @@ export class ScanInputsSimpleController {
      */
     _onScanInputsChanged({source}) {
         if (source === this) { return; }
-        this.refresh();
+        void this.refresh();
     }
 
     /**
@@ -112,7 +112,7 @@ export class ScanInputsSimpleController {
     onMiddleMouseButtonScanChange(e) {
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
         const middleMouseSupported = element.checked;
-        this._setMiddleMouseSuppported(middleMouseSupported);
+        void this._setMiddleMouseSuppported(middleMouseSupported);
     }
 
     /**
@@ -123,7 +123,7 @@ export class ScanInputsSimpleController {
         const mainScanKey = element.value;
         if (mainScanKey === 'other') { return; }
         const mainScanInputs = (mainScanKey === 'none' ? [] : [mainScanKey]);
-        this._setMainScanInputs(mainScanInputs);
+        void this._setMainScanInputs(mainScanInputs);
     }
 
     /**

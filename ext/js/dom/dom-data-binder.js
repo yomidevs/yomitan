@@ -133,7 +133,7 @@ export class DOMDataBinder {
         const value = this._getElementValue(observer.element);
         observer.value = value;
         observer.hasValue = true;
-        this._assignTasks.enqueue(observer, {value});
+        void this._assignTasks.enqueue(observer, {value});
     }
 
     /**
@@ -182,7 +182,7 @@ export class DOMDataBinder {
 
         element.addEventListener('change', observer.onChange, false);
 
-        this._updateTasks.enqueue(observer, {all: false});
+        void this._updateTasks.enqueue(observer, {all: false});
 
         return observer;
     }

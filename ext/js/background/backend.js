@@ -216,7 +216,7 @@ export class Backend {
                     this._prepareCompleteReject(error);
                 }
             );
-            promise.finally(() => this._updateBadge());
+            void promise.finally(() => this._updateBadge());
             this._preparePromise = promise;
         }
         return this._prepareCompletePromise;
@@ -282,7 +282,7 @@ export class Backend {
 
             /** @type {import('language-transformer').LanguageTransformDescriptor} */
             const descriptor = await fetchJson('/data/language/japanese-transforms.json');
-            this._translator.prepare(descriptor);
+            void this._translator.prepare(descriptor);
 
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
@@ -292,7 +292,7 @@ export class Backend {
 
             const options = this._getProfileOptions({current: true}, false);
             if (options.general.showGuide) {
-                this._openWelcomeGuidePageOnce();
+                void this._openWelcomeGuidePageOnce();
             }
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
@@ -409,7 +409,7 @@ export class Backend {
      * @returns {void}
      */
     _onPermissionsChanged() {
-        this._checkPermissions();
+        void this._checkPermissions();
     }
 
     /**
@@ -417,7 +417,7 @@ export class Backend {
      */
     _onInstalled({reason}) {
         if (reason !== 'install') { return; }
-        this._requestPersistentStorage();
+        void this._requestPersistentStorage();
     }
 
     // Message handlers
@@ -1047,7 +1047,7 @@ export class Backend {
         if (this._searchPopupTabCreatePromise === null) {
             const promise = this._getOrCreateSearchPopup();
             this._searchPopupTabCreatePromise = promise;
-            promise.then(() => { this._searchPopupTabCreatePromise = null; });
+            void promise.then(() => { this._searchPopupTabCreatePromise = null; });
         }
         return this._searchPopupTabCreatePromise;
     }
@@ -1239,7 +1239,7 @@ export class Backend {
             this._clipboardMonitor.stop();
         }
 
-        this._accessibilityController.update(this._getOptionsFull(false));
+        void this._accessibilityController.update(this._getOptionsFull(false));
 
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
     }
@@ -1612,16 +1612,16 @@ export class Backend {
         }
 
         if (color !== null && typeof chrome.action.setBadgeBackgroundColor === 'function') {
-            chrome.action.setBadgeBackgroundColor({color});
+            void chrome.action.setBadgeBackgroundColor({color});
         }
         if (text !== null && typeof chrome.action.setBadgeText === 'function') {
-            chrome.action.setBadgeText({text});
+            void chrome.action.setBadgeText({text});
         }
         if (typeof chrome.action.setTitle === 'function') {
             if (status !== null) {
                 title = `${title} - ${status}`;
             }
-            chrome.action.setTitle({title});
+            void chrome.action.setTitle({title});
         }
     }
 
@@ -2339,7 +2339,7 @@ export class Backend {
      * @param {import('backend').DatabaseUpdateCause} cause
      */
     _triggerDatabaseUpdated(type, cause) {
-        this._translator.clearDatabaseCaches();
+        void this._translator.clearDatabaseCaches();
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationDatabaseUpdated', params: {type, cause}});
     }
 
@@ -2468,12 +2468,13 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _openWelcomeGuidePageOnce() {
-        chrome.storage.session.get(['openedWelcomePage']).then((result) => {
-            if (!result.openedWelcomePage) {
-                this._openWelcomeGuidePage();
-                chrome.storage.session.set({openedWelcomePage: true});
-            }
-        });
+        const result = await chrome.storage.session.get(['openedWelcomePage']);
+        if (!result.openedWelcomePage) {
+            await Promise.all([
+                this._openWelcomeGuidePage(),
+                chrome.storage.session.set({openedWelcomePage: true})
+            ]);
+        }
     }
 
     /**
