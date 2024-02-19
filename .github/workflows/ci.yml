@@ -49,7 +49,7 @@ jobs:
           CI: true
 
       - name: Tests
-        run: npm run test-code
+        run: npm run test:code
         env:
           CI: true
 
