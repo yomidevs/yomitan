@@ -89,7 +89,7 @@ export class Display extends EventDispatcher {
         /** @type {import('api-map').ApiMap<import('display').WindowApiSurface>} */ // import('display').WindowApiMap
         this._windowApiMap = new Map();
         /** @type {DisplayHistory} */
-        this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
+        this._history = new DisplayHistory(true, false);
         /** @type {boolean} */
         this._historyChangeIgnore = false;
         /** @type {boolean} */

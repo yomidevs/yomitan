@@ -24,9 +24,10 @@ import {generateId, isObject} from '../core/utilities.js';
  */
 export class DisplayHistory extends EventDispatcher {
     /**
-     * @param {{clearable?: boolean, useBrowserHistory?: boolean}} details
+     * @param {boolean} clearable
+     * @param {boolean} useBrowserHistory
      */
-    constructor({clearable = true, useBrowserHistory = false}) {
+    constructor(clearable, useBrowserHistory) {
         super();
         /** @type {boolean} */
         this._clearable = clearable;
