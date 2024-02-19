@@ -32,16 +32,13 @@ import {ThemeController} from './theme-controller.js';
  */
 export class Popup extends EventDispatcher {
     /**
-     * Creates a new instance.
-     * @param {import('popup').PopupConstructorDetails} details The details used to construct the new instance.
+     * @param {import('../application.js').Application} application The main application instance.
+     * @param {string} id The identifier of the popup.
+     * @param {number} depth The depth of the popup.
+     * @param {number} frameId The frameId of the host frame.
+     * @param {boolean} childrenSupported Whether or not the popup is able to show child popups.
      */
-    constructor({
-        application,
-        id,
-        depth,
-        frameId,
-        childrenSupported
-    }) {
+    constructor(application, id, depth, frameId, childrenSupported) {
         super();
         /** @type {import('../application.js').Application} */
         this._application = application;

@@ -24,15 +24,12 @@ import {EventDispatcher} from '../core/event-dispatcher.js';
  */
 export class PopupWindow extends EventDispatcher {
     /**
-     * Creates a new instance.
-     * @param {import('popup').PopupWindowConstructorDetails} details Details about how to set up the instance.
+     * @param {import('../application.js').Application} application The main application instance.
+     * @param {string} id The identifier of the popup.
+     * @param {number} depth The depth of the popup.
+     * @param {number} frameId The frameId of the host frame.
      */
-    constructor({
-        application,
-        id,
-        depth,
-        frameId
-    }) {
+    constructor(application, id, depth, frameId) {
         super();
         /** @type {import('../application.js').Application} */
         this._application = application;
