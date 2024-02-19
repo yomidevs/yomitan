@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
-import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
 import type * as Dictionary from './dictionary';
 import type * as Extension from './extension';
 import type * as Settings from './settings';
@@ -161,11 +159,6 @@ export type Events = {
 };
 
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
-
-export type DisplayGeneratorConstructorDetails = {
-    contentManager: DisplayContentManager;
-    hotkeyHelpController?: HotkeyHelpController | null;
-};
 
 // Direct API
 

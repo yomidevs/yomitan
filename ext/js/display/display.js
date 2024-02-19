@@ -83,10 +83,7 @@ export class Display extends EventDispatcher {
         /** @type {HotkeyHelpController} */
         this._hotkeyHelpController = new HotkeyHelpController();
         /** @type {DisplayGenerator} */
-        this._displayGenerator = new DisplayGenerator({
-            contentManager: this._contentManager,
-            hotkeyHelpController: this._hotkeyHelpController
-        });
+        this._displayGenerator = new DisplayGenerator(this._contentManager, this._hotkeyHelpController);
         /** @type {import('display').DirectApiMap} */
         this._directApiMap = new Map();
         /** @type {import('api-map').ApiMap<import('display').WindowApiSurface>} */ // import('display').WindowApiMap
