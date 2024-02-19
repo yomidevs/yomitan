@@ -1705,8 +1705,7 @@ export class Display extends EventDispatcher {
         const popupFactory = new PopupFactory(this._application);
         popupFactory.prepare();
 
-        /** @type {import('frontend').ConstructorDetails} */
-        const setupNestedPopupsOptions = {
+        const frontend = new Frontend({
             application: this._application,
             useProxyPopup,
             parentPopupId,
@@ -1716,10 +1715,9 @@ export class Display extends EventDispatcher {
             pageType: this._pageType,
             allowRootFramePopupProxy: true,
             childrenSupported: this._childrenSupported,
-            hotkeyHandler: this._hotkeyHandler
-        };
-
-        const frontend = new Frontend(setupNestedPopupsOptions);
+            hotkeyHandler: this._hotkeyHandler,
+            canUseWindowPopup: true
+        });
         this._frontend = frontend;
         await frontend.prepare();
     }
