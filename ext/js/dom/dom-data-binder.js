@@ -50,14 +50,14 @@ export class DOMDataBinder {
         /** @type {TaskAccumulator<import('dom-data-binder').ElementObserver<T>, import('dom-data-binder').AssignTaskValue>} */
         this._assignTasks = new TaskAccumulator(this._onBulkAssign.bind(this));
         /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */
-        this._selectorObserver = /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */ (new SelectorObserver({
+        this._selectorObserver = new SelectorObserver({
             selector,
             ignoreSelector: null,
             onAdded: this._createObserver.bind(this),
             onRemoved: this._removeObserver.bind(this),
             onChildrenUpdated: this._onObserverChildrenUpdated.bind(this),
             isStale: this._isObserverStale.bind(this)
-        }));
+        });
     }
 
     /**
