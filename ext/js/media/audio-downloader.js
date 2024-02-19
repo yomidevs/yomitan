@@ -27,9 +27,9 @@ import {isStringEntirelyKana} from '../language/ja/japanese.js';
 
 export class AudioDownloader {
     /**
-     * @param {{requestBuilder: RequestBuilder}} details
+     * @param {RequestBuilder} requestBuilder
      */
-    constructor({requestBuilder}) {
+    constructor(requestBuilder) {
         /** @type {RequestBuilder} */
         this._requestBuilder = requestBuilder;
         /** @type {?JsonSchema} */

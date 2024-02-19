@@ -102,9 +102,7 @@ export class Backend {
         /** @type {RequestBuilder} */
         this._requestBuilder = new RequestBuilder();
         /** @type {AudioDownloader} */
-        this._audioDownloader = new AudioDownloader({
-            requestBuilder: this._requestBuilder
-        });
+        this._audioDownloader = new AudioDownloader(this._requestBuilder);
         /** @type {OptionsUtil} */
         this._optionsUtil = new OptionsUtil();
         /** @type {AccessibilityController} */
