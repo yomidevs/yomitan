@@ -28,6 +28,10 @@ export type TextPreprocessor<T = unknown> = {
     process: TextPreprocessorFunction<T>;
 };
 
+export type BidirectionalPreprocessorOptions = 'off' | 'direct' | 'inverse';
+
+export type BidirectionalConversionPreprocessor = TextPreprocessor<BidirectionalPreprocessorOptions>;
+
 export type LanguageAndPreprocessors = {
     iso: string;
     textPreprocessors: TextPreprocessorWithId<unknown>[];
