@@ -70,3 +70,34 @@ jobs:
           file: ext/manifest.json
           schema: "https://json.schemastore.org/chrome-manifest.json"
           fixSchemas: true
+
+  test-build:
+    name: Test Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Libs
+        run: npm run build:libs
+
+      - name: Build Legal
+        run: npm run license-report:html
+
+      - name: Build
+        run: npm run build
+
+      - name: Validate manifest.json of the extension
+        uses: cardinalby/schema-validator-action@76c68bfc941bd2dc82859f2528984999d1df36a4 # v3.1.0
+        with:
+          file: ext/manifest.json
+          schema: "https://json.schemastore.org/chrome-manifest.json"
+          fixSchemas: true
