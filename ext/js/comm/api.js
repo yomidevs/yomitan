@@ -255,6 +255,15 @@ export class API {
     }
 
     /**
+     * @param {import('api').ApiParam<'getMediaObjects', 'targets'>} targets
+     * @returns {Promise<import('api').ApiReturn<'getMediaObjects'>>}
+     */
+    getMediaObjects(targets) {
+        console.log('getMediaObjects', targets);
+        return this._invoke('getMediaObjects', {targets});
+    }
+
+    /**
      * @param {import('api').ApiParam<'logGenericErrorBackend', 'error'>} error
      * @param {import('api').ApiParam<'logGenericErrorBackend', 'level'>} level
      * @param {import('api').ApiParam<'logGenericErrorBackend', 'context'>} context

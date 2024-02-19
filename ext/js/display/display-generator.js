@@ -42,6 +42,13 @@ export class DisplayGenerator {
         this._language = 'ja';
     }
 
+    /** @type {import('./display-content-manager.js').DisplayContentManager} */
+    get contentManager() { return this._contentManager; }
+
+    set contentManager(contentManager) {
+        this._contentManager = contentManager;
+    }
+
     /** */
     async prepare() {
         await this._templates.loadFromFiles(['/templates-display.html']);
@@ -66,9 +73,9 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    createTermEntry(dictionaryEntry) {
+    async createTermEntry(dictionaryEntry) {
         const node = this._instantiate('term-entry');
 
         const headwordsContainer = this._querySelector(node, '.headword-list');
@@ -117,17 +124,19 @@ export class DisplayGenerator {
         }
         headwordsContainer.dataset.count = `${headwords.length}`;
 
-        this._appendMultiple(inflectionRuleChainsContainer, this._createInflectionRuleChain.bind(this), inflectionRuleChainCandidates);
-        this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
-        this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations);
-        this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
+        await Promise.all([
+            this._appendMultiple(inflectionRuleChainsContainer, this._createInflectionRuleChain.bind(this), inflectionRuleChainCandidates),
+            this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false),
+            this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations),
+            this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length)
+        ]);
 
         for (const term of uniqueTerms) {
-            headwordTagsContainer.appendChild(this._createSearchTag(term));
+            headwordTagsContainer.appendChild(await this._createSearchTag(term));
         }
         for (const reading of uniqueReadings) {
             if (uniqueTerms.has(reading)) { continue; }
-            headwordTagsContainer.appendChild(this._createSearchTag(reading));
+            headwordTagsContainer.appendChild(await this._createSearchTag(reading));
         }
 
         // Add definitions
@@ -145,7 +154,7 @@ export class DisplayGenerator {
                 dictionaryTag.content = [dictionary];
             }
 
-            const node2 = this._createTermDefinition(definition, dictionaryTag, headwords, uniqueTerms, uniqueReadings);
+            const node2 = await this._createTermDefinition(definition, dictionaryTag, headwords, uniqueTerms, uniqueReadings);
             node2.dataset.index = `${i}`;
             definitionsContainer.appendChild(node2);
         }
@@ -156,9 +165,9 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').KanjiDictionaryEntry} dictionaryEntry
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    createKanjiEntry(dictionaryEntry) {
+    async createKanjiEntry(dictionaryEntry) {
         const node = this._instantiate('kanji-entry');
 
         const glyphContainer = this._querySelector(node, '.kanji-glyph');
@@ -180,16 +189,18 @@ export class DisplayGenerator {
         dictionaryTag.name = dictionaryEntry.dictionaryAlias;
         dictionaryTag.content = [dictionaryEntry.dictionary];
 
-        this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, true);
-        this._appendMultiple(tagContainer, this._createTag.bind(this), [...dictionaryEntry.tags, dictionaryTag]);
-        this._appendMultiple(definitionsContainer, this._createKanjiDefinition.bind(this), dictionaryEntry.definitions);
-        this._appendMultiple(chineseReadingsContainer, this._createKanjiReading.bind(this), dictionaryEntry.onyomi);
-        this._appendMultiple(japaneseReadingsContainer, this._createKanjiReading.bind(this), dictionaryEntry.kunyomi);
+        await Promise.all([
+            this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, true),
+            this._appendMultiple(tagContainer, this._createTag.bind(this), [...dictionaryEntry.tags, dictionaryTag]),
+            this._appendMultiple(definitionsContainer, this._createKanjiDefinition.bind(this), dictionaryEntry.definitions),
+            this._appendMultiple(chineseReadingsContainer, this._createKanjiReading.bind(this), dictionaryEntry.onyomi),
+            this._appendMultiple(japaneseReadingsContainer, this._createKanjiReading.bind(this), dictionaryEntry.kunyomi)
+        ]);
 
-        statisticsContainer.appendChild(this._createKanjiInfoTable(dictionaryEntry.stats.misc));
-        classificationsContainer.appendChild(this._createKanjiInfoTable(dictionaryEntry.stats.class));
-        codepointsContainer.appendChild(this._createKanjiInfoTable(dictionaryEntry.stats.code));
-        dictionaryIndicesContainer.appendChild(this._createKanjiInfoTable(dictionaryEntry.stats.index));
+        statisticsContainer.appendChild(await this._createKanjiInfoTable(dictionaryEntry.stats.misc));
+        classificationsContainer.appendChild(await this._createKanjiInfoTable(dictionaryEntry.stats.class));
+        codepointsContainer.appendChild(await this._createKanjiInfoTable(dictionaryEntry.stats.code));
+        dictionaryIndicesContainer.appendChild(await this._createKanjiInfoTable(dictionaryEntry.stats.index));
 
         return node;
     }
@@ -367,9 +378,9 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').InflectionRuleChainCandidate} inflectionRuleChain
-     * @returns {?HTMLElement}
+     * @returns {Promise<?HTMLElement>}
      */
-    _createInflectionRuleChain(inflectionRuleChain) {
+    async _createInflectionRuleChain(inflectionRuleChain) {
         const {source, inflectionRules} = inflectionRuleChain;
         if (!Array.isArray(inflectionRules) || inflectionRules.length === 0) { return null; }
         const fragment = this._instantiate('inflection-rule-chain');
@@ -378,7 +389,7 @@ export class DisplayGenerator {
 
         fragment.appendChild(sourceIcon);
 
-        this._appendMultiple(fragment, this._createTermInflection.bind(this), inflectionRules);
+        await this._appendMultiple(fragment, this._createTermInflection.bind(this), inflectionRules);
         return fragment;
     }
 
@@ -405,9 +416,9 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').InflectionRule} inflection
-     * @returns {DocumentFragment}
+     * @returns {Promise<DocumentFragment>}
      */
-    _createTermInflection(inflection) {
+    async _createTermInflection(inflection) {
         const {name, description} = inflection;
         const fragment = this._templates.instantiateFragment('inflection');
         const node = this._querySelector(fragment, '.inflection');
@@ -423,9 +434,9 @@ export class DisplayGenerator {
      * @param {import('dictionary').TermHeadword[]} headwords
      * @param {Set<string>} uniqueTerms
      * @param {Set<string>} uniqueReadings
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createTermDefinition(definition, dictionaryTag, headwords, uniqueTerms, uniqueReadings) {
+    async _createTermDefinition(definition, dictionaryTag, headwords, uniqueTerms, uniqueReadings) {
         const {dictionary, tags, headwordIndices, entries} = definition;
         const disambiguations = getDisambiguations(headwords, headwordIndices, uniqueTerms, uniqueReadings);
 
@@ -437,19 +448,20 @@ export class DisplayGenerator {
 
         node.dataset.dictionary = dictionary;
 
-        this._appendMultiple(tagListContainer, this._createTag.bind(this), [...tags, dictionaryTag]);
-        this._appendMultiple(onlyListContainer, this._createTermDisambiguation.bind(this), disambiguations);
-        this._appendMultiple(entriesContainer, this._createTermDefinitionEntry.bind(this), entries, dictionary);
-
+        await Promise.all([
+            this._appendMultiple(tagListContainer, this._createTag.bind(this), [...tags, dictionaryTag]),
+            this._appendMultiple(onlyListContainer, this._createTermDisambiguation.bind(this), disambiguations),
+            this._appendMultiple(entriesContainer, this._createTermDefinitionEntry.bind(this), entries, dictionary)
+        ]);
         return node;
     }
 
     /**
      * @param {import('dictionary-data').TermGlossaryContent} entry
      * @param {string} dictionary
-     * @returns {?HTMLElement}
+     * @returns {Promise<?HTMLElement>}
      */
-    _createTermDefinitionEntry(entry, dictionary) {
+    async _createTermDefinitionEntry(entry, dictionary) {
         switch (typeof entry) {
             case 'string':
                 return this._createTermDefinitionEntryText(entry);
@@ -483,15 +495,15 @@ export class DisplayGenerator {
     /**
      * @param {import('dictionary-data').TermGlossaryImage} data
      * @param {string} dictionary
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createTermDefinitionEntryImage(data, dictionary) {
+    async _createTermDefinitionEntryImage(data, dictionary) {
         const {description} = data;
 
         const node = this._instantiate('gloss-item');
 
         const contentContainer = this._querySelector(node, '.gloss-content');
-        const image = this._structuredContentGenerator.createDefinitionImage(data, dictionary);
+        const image = await this._structuredContentGenerator.createDefinitionImage(data, dictionary);
         contentContainer.appendChild(image);
 
         if (typeof description === 'string') {
@@ -507,20 +519,20 @@ export class DisplayGenerator {
     /**
      * @param {import('structured-content').Content} content
      * @param {string} dictionary
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createTermDefinitionEntryStructuredContent(content, dictionary) {
+    async _createTermDefinitionEntryStructuredContent(content, dictionary) {
         const node = this._instantiate('gloss-item');
         const contentContainer = this._querySelector(node, '.gloss-content');
-        this._structuredContentGenerator.appendStructuredContent(contentContainer, content, dictionary);
+        await this._structuredContentGenerator.appendStructuredContent(contentContainer, content, dictionary);
         return node;
     }
 
     /**
      * @param {string} disambiguation
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createTermDisambiguation(disambiguation) {
+    async _createTermDisambiguation(disambiguation) {
         const node = this._instantiate('definition-disambiguation');
         node.dataset.term = disambiguation;
         this._setTextContent(node, disambiguation, this._language);
@@ -540,9 +552,9 @@ export class DisplayGenerator {
 
     /**
      * @param {string} text
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createKanjiDefinition(text) {
+    async _createKanjiDefinition(text) {
         const node = this._instantiate('kanji-gloss-item');
         const container = this._querySelector(node, '.kanji-gloss-content');
         this._setMultilineTextContent(container, text);
@@ -551,9 +563,9 @@ export class DisplayGenerator {
 
     /**
      * @param {string} reading
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createKanjiReading(reading) {
+    async _createKanjiReading(reading) {
         const node = this._instantiate('kanji-reading');
         this._setTextContent(node, reading, this._language);
         return node;
@@ -561,13 +573,13 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').KanjiStat[]} details
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createKanjiInfoTable(details) {
+    async _createKanjiInfoTable(details) {
         const node = this._instantiate('kanji-info-table');
         const container = this._querySelector(node, '.kanji-info-table-body');
 
-        const count = this._appendMultiple(container, this._createKanjiInfoTableItem.bind(this), details);
+        const count = await this._appendMultiple(container, this._createKanjiInfoTableItem.bind(this), details);
         if (count === 0) {
             const n = this._createKanjiInfoTableItemEmpty();
             container.appendChild(n);
@@ -578,9 +590,9 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').KanjiStat} details
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createKanjiInfoTableItem(details) {
+    async _createKanjiInfoTableItem(details) {
         const {content, name, value} = details;
         const node = this._instantiate('kanji-info-table-item');
         const nameNode = this._querySelector(node, '.kanji-info-table-item-header');
@@ -599,9 +611,9 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').Tag} tag
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createTag(tag) {
+    async _createTag(tag) {
         const {content, name, category, redundant} = tag;
         const node = this._instantiate('tag');
 
@@ -621,11 +633,11 @@ export class DisplayGenerator {
     /**
      * @param {import('dictionary-data-util').TagGroup} tagInfo
      * @param {number} totalHeadwordCount
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createTermTag(tagInfo, totalHeadwordCount) {
+    async _createTermTag(tagInfo, totalHeadwordCount) {
         const {tag, headwordIndices} = tagInfo;
-        const node = this._createTag(tag);
+        const node = await this._createTag(tag);
         node.dataset.headwords = headwordIndices.join(' ');
         node.dataset.totalHeadwordCount = `${totalHeadwordCount}`;
         node.dataset.matchedHeadwordCount = `${headwordIndices.length}`;
@@ -652,17 +664,17 @@ export class DisplayGenerator {
 
     /**
      * @param {string} text
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createSearchTag(text) {
+    async _createSearchTag(text) {
         return this._createTag(this._createTagData(text, 'search'));
     }
 
     /**
      * @param {import('dictionary-data-util').DictionaryGroupedPronunciations} details
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createGroupedPronunciation(details) {
+    async _createGroupedPronunciation(details) {
         const {dictionary, dictionaryAlias, pronunciations} = details;
 
         const node = this._instantiate('pronunciation-group');
@@ -671,7 +683,7 @@ export class DisplayGenerator {
         node.dataset.pronunciationsCount = `${pronunciations.length}`;
 
         const n1 = this._querySelector(node, '.pronunciation-group-tag-list');
-        const tag = this._createTag(this._createTagData(dictionaryAlias, 'pronunciation-dictionary'));
+        const tag = await this._createTag(this._createTagData(dictionaryAlias, 'pronunciation-dictionary'));
         tag.dataset.details = dictionary;
         n1.appendChild(tag);
 
@@ -685,16 +697,16 @@ export class DisplayGenerator {
 
         const n = this._querySelector(node, '.pronunciation-list');
         n.dataset.hasTags = `${hasTags}`;
-        this._appendMultiple(n, this._createPronunciation.bind(this), pronunciations);
+        await this._appendMultiple(n, this._createPronunciation.bind(this), pronunciations);
 
         return node;
     }
 
     /**
      * @param {import('dictionary-data-util').GroupedPronunciation} details
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createPronunciation(details) {
+    async _createPronunciation(details) {
         const {pronunciation} = details;
         switch (pronunciation.type) {
             case 'pitch-accent':
@@ -708,9 +720,9 @@ export class DisplayGenerator {
     /**
      * @param {import('dictionary').PhoneticTranscription} pronunciation
      * @param {import('dictionary-data-util').GroupedPronunciation} details
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createPronunciationPhoneticTranscription(pronunciation, details) {
+    async _createPronunciationPhoneticTranscription(pronunciation, details) {
         const {ipa, tags} = pronunciation;
         const {exclusiveTerms, exclusiveReadings} = details;
 
@@ -720,7 +732,7 @@ export class DisplayGenerator {
         node.dataset.tagCount = `${tags.length}`;
 
         let n = this._querySelector(node, '.pronunciation-tag-list');
-        this._appendMultiple(n, this._createTag.bind(this), tags);
+        await this._appendMultiple(n, this._createTag.bind(this), tags);
 
         n = this._querySelector(node, '.pronunciation-disambiguation-list');
         this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
@@ -735,9 +747,9 @@ export class DisplayGenerator {
     /**
      * @param {import('dictionary').PitchAccent} pitchAccent
      * @param {import('dictionary-data-util').GroupedPronunciation} details
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createPronunciationPitchAccent(pitchAccent, details) {
+    async _createPronunciationPitchAccent(pitchAccent, details) {
         const {position, nasalPositions, devoicePositions, tags} = pitchAccent;
         const {reading, exclusiveTerms, exclusiveReadings} = details;
         const morae = getKanaMorae(reading);
@@ -751,7 +763,7 @@ export class DisplayGenerator {
         node.dataset.tagCount = `${tags.length}`;
 
         let n = this._querySelector(node, '.pronunciation-tag-list');
-        this._appendMultiple(n, this._createTag.bind(this), tags);
+        await this._appendMultiple(n, this._createTag.bind(this), tags);
 
         n = this._querySelector(node, '.pronunciation-disambiguation-list');
         this._createPronunciationDisambiguations(n, exclusiveTerms, exclusiveReadings);
@@ -799,9 +811,9 @@ export class DisplayGenerator {
     /**
      * @param {import('dictionary-data-util').DictionaryFrequency<import('dictionary-data-util').TermFrequency>|import('dictionary-data-util').DictionaryFrequency<import('dictionary-data-util').KanjiFrequency>} details
      * @param {boolean} kanji
-     * @returns {HTMLElement}
+     * @returns {Promise<HTMLElement>}
      */
-    _createFrequencyGroup(details, kanji) {
+    async _createFrequencyGroup(details, kanji) {
         const {dictionary, dictionaryAlias, frequencies} = details;
 
         const node = this._instantiate('frequency-group-item');
@@ -932,7 +944,7 @@ export class DisplayGenerator {
     _appendKanjiLinks(container, text) {
         let part = '';
         for (const c of text) {
-            if (isCodePointKanji(/** @type {number} */ (c.codePointAt(0)))) {
+            if (isCodePointKanji(/** @type {number} */(c.codePointAt(0)))) {
                 if (part.length > 0) {
                     container.appendChild(document.createTextNode(part));
                     part = '';
@@ -953,17 +965,17 @@ export class DisplayGenerator {
      * @template [TItem=unknown]
      * @template [TExtraArg=void]
      * @param {HTMLElement} container
-     * @param {(item: TItem, arg: TExtraArg) => ?Node} createItem
+     * @param {(item: TItem, arg: TExtraArg) => Promise<?Node>} createItem
      * @param {TItem[]} detailsArray
      * @param {TExtraArg} [arg]
-     * @returns {number}
+     * @returns {Promise<number>}
      */
-    _appendMultiple(container, createItem, detailsArray, arg) {
+    async _appendMultiple(container, createItem, detailsArray, arg) {
         let count = 0;
         const {ELEMENT_NODE} = Node;
         if (Array.isArray(detailsArray)) {
             for (const details of detailsArray) {
-                const item = createItem(details, /** @type {TExtraArg} */ (arg));
+                const item = await createItem(details, /** @type {TExtraArg} */(arg));
                 if (item === null) { continue; }
                 container.appendChild(item);
                 if (item.nodeType === ELEMENT_NODE) {

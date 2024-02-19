@@ -172,6 +172,7 @@ export class Backend {
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
             ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
             ['getMedia',                     this._onApiGetMedia.bind(this)],
+            ['getMediaObjects',              this._onApiGetMediaObjects.bind(this)],
             ['logGenericErrorBackend',       this._onApiLogGenericErrorBackend.bind(this)],
             ['logIndicatorClear',            this._onApiLogIndicatorClear.bind(this)],
             ['modifySettings',               this._onApiModifySettings.bind(this)],
@@ -793,6 +794,11 @@ export class Backend {
     /** @type {import('api').ApiHandler<'getMedia'>} */
     async _onApiGetMedia({targets}) {
         return await this._getNormalizedDictionaryDatabaseMedia(targets);
+    }
+
+    /** @type {import('api').ApiHandler<'getMediaObjects'>} */
+    async _onApiGetMediaObjects({targets}) {
+        return await this._dictionaryDatabase.getMediaObjects(targets);
     }
 
     /** @type {import('api').ApiHandler<'logGenericErrorBackend'>} */

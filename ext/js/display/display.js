@@ -795,7 +795,6 @@ export class Display extends EventDispatcher {
             this._closePopups();
             this._closeAllPopupMenus();
             this._eventListeners.removeAllEventListeners();
-            this._contentManager.unloadAll();
             this._hideTagNotification(false);
             this._hideInflectionNotification(false);
             this._triggerContentClear();
@@ -1358,7 +1357,10 @@ export class Display extends EventDispatcher {
 
         let {dictionaryEntries} = content;
         if (!Array.isArray(dictionaryEntries)) {
+            performance.mark('display:findDictionaryEntries:start');
             dictionaryEntries = hasEnabledDictionaries && lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, wildcardsEnabled, optionsContext) : [];
+            performance.mark('display:findDictionaryEntries:end');
+            performance.measure('display:findDictionaryEntries', 'display:findDictionaryEntries:start', 'display:findDictionaryEntries:end');
             if (this._setContentToken !== token) { return; }
             content.dictionaryEntries = dictionaryEntries;
             changeHistory = true;
@@ -1393,7 +1395,11 @@ export class Display extends EventDispatcher {
 
         this._dictionaryEntries = dictionaryEntries;
 
+        performance.mark('display:updateNavigationAuto:start');
         this._updateNavigationAuto();
+        performance.mark('display:updateNavigationAuto:end');
+        performance.measure('display:updateNavigationAuto', 'display:updateNavigationAuto:start', 'display:updateNavigationAuto:end');
+
         this._setNoContentVisible(hasEnabledDictionaries && dictionaryEntries.length === 0 && lookup);
         this._setNoDictionariesVisible(!hasEnabledDictionaries);
 
@@ -1403,7 +1409,8 @@ export class Display extends EventDispatcher {
         performance.mark('display:contentUpdate:start');
         this._triggerContentUpdateStart();
 
-        for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
+        let i = 0;
+        for (const dictionaryEntry of dictionaryEntries) {
             performance.mark('display:createEntry:start');
 
             if (i > 0) {
@@ -1411,17 +1418,21 @@ export class Display extends EventDispatcher {
                 if (this._setContentToken !== token) { return; }
             }
 
-            const dictionaryEntry = dictionaryEntries[i];
             const entry = (
                 dictionaryEntry.type === 'term' ?
-                this._displayGenerator.createTermEntry(dictionaryEntry) :
-                this._displayGenerator.createKanjiEntry(dictionaryEntry)
+                await this._displayGenerator.createTermEntry(dictionaryEntry) :
+                await this._displayGenerator.createKanjiEntry(dictionaryEntry)
             );
             entry.dataset.index = `${i}`;
             this._dictionaryEntryNodes.push(entry);
             this._addEntryEventListeners(entry);
             this._triggerContentUpdateEntry(dictionaryEntry, entry, i);
+            performance.mark('display:waitMedia:start');
+            await this._contentManager.executeMediaRequests();
+            performance.mark('display:waitMedia:end');
+            performance.measure('display:waitMedia', 'display:waitMedia:start', 'display:waitMedia:end');
             container.appendChild(entry);
+
             if (focusEntry === i) {
                 this._focusEntry(i, 0, false);
             }
@@ -1430,6 +1441,8 @@ export class Display extends EventDispatcher {
 
             performance.mark('display:createEntry:end');
             performance.measure('display:createEntry', 'display:createEntry:start', 'display:createEntry:end');
+
+            ++i;
         }
 
         if (typeof scrollX === 'number' || typeof scrollY === 'number') {
