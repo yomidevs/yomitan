@@ -44,7 +44,7 @@ jobs:
           CI: true
 
       - name: Lint HTML
-        run: npm run test-lint-html
+        run: npm run test:html
         env:
           CI: true
 
