@@ -59,7 +59,7 @@ jobs:
           CI: true
 
       - name: Build Legal
-        run: npm run license-report
+        run: npm run license-report:html
 
       - name: Build
         run: npm run build

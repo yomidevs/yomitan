@@ -26,7 +26,7 @@ jobs:
         run: npm ci
 
       - name: Build Legal
-        run: npm run license-report
+        run: npm run license-report:html
 
       - name: Build
         run: npm run-script build -- --all --version ${{ github.ref_name }}
