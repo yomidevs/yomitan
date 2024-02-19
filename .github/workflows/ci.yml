@@ -26,7 +26,7 @@ jobs:
         run: npm ci
 
       - name: Build Libs
-        run: npm run build-libs
+        run: npm run build:libs
 
       - name: Lint JS
         run: npm run test-lint-js
