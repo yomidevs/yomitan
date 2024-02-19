@@ -54,7 +54,7 @@ jobs:
           CI: true
 
       - name: Test JSON
-        run: npm run test-json
+        run: npm run test:unit:json
         env:
           CI: true
 
