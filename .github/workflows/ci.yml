@@ -54,7 +54,7 @@ jobs:
           CI: true
 
       - name: Test JSON
-        run: npm run test:json:types
+        run: npm run test:json
         env:
           CI: true
 
