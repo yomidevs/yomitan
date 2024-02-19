@@ -18,7 +18,7 @@
 
 import {EventDispatcher} from '../../core/event-dispatcher.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {DocumentUtil} from '../../dom/document-util.js';
+import {normalizeModifier} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
@@ -266,7 +266,7 @@ export class ProfileConditionsUI extends EventDispatcher {
             this._children[i].index = i;
         }
 
-        this.settingsController.modifyGlobalSettings([{
+        void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
             path: this.getPath('conditionGroups'),
             start: index,
@@ -333,7 +333,7 @@ export class ProfileConditionsUI extends EventDispatcher {
 
         this._addConditionGroup(conditionGroup, index);
 
-        this.settingsController.modifyGlobalSettings([{
+        void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
             path: this.getPath('conditionGroups'),
             start: index,
@@ -543,7 +543,7 @@ class ProfileConditionGroupUI {
             this._children[i].index = i;
         }
 
-        this.settingsController.modifyGlobalSettings([{
+        void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
             path: this.getPath('conditions'),
             start: index,
@@ -581,7 +581,7 @@ class ProfileConditionGroupUI {
 
         this._addCondition(condition, index);
 
-        this.settingsController.modifyGlobalSettings([{
+        void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
             path: this.getPath('conditions'),
             start: index,
@@ -714,7 +714,7 @@ class ProfileConditionUI {
         const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
         const type = ProfileConditionsUI.normalizeProfileConditionType(element.value);
         if (type === null) { return; }
-        this._setType(type);
+        void this._setType(type);
     }
 
     /**
@@ -725,7 +725,7 @@ class ProfileConditionUI {
         const type = ProfileConditionsUI.normalizeProfileConditionType(this._typeInput.value);
         if (type === null) { return; }
         const operator = element.value;
-        this._setOperator(type, operator);
+        void this._setOperator(type, operator);
     }
 
     /**
@@ -740,7 +740,7 @@ class ProfileConditionUI {
         if (okay) {
             const normalizedValue = this._normalizeValue(value, normalize);
             node.value = normalizedValue;
-            this.settingsController.setGlobalSetting(this.getPath('value'), normalizedValue);
+            void this.settingsController.setGlobalSetting(this.getPath('value'), normalizedValue);
         }
     }
 
@@ -754,7 +754,7 @@ class ProfileConditionUI {
         this._value = modifiers;
         if (okay) {
             const normalizedValue = this._normalizeValue(modifiers, normalize);
-            this.settingsController.setGlobalSetting(this.getPath('value'), normalizedValue);
+            void this.settingsController.setGlobalSetting(this.getPath('value'), normalizedValue);
         }
     }
 
@@ -782,7 +782,7 @@ class ProfileConditionUI {
                 this._parent.removeSelf();
                 break;
             case 'resetValue':
-                this._resetValue();
+                void this._resetValue();
                 break;
         }
     }
@@ -941,7 +941,7 @@ class ProfileConditionUI {
         /** @type {import('input').Modifier[]} */
         const results = [];
         for (const item of modifiersString.split(/[,;\s]+/)) {
-            const modifier = DocumentUtil.normalizeModifier(item.trim().toLowerCase());
+            const modifier = normalizeModifier(item.trim().toLowerCase());
             if (modifier !== null) { results.push(modifier); }
         }
         return results;

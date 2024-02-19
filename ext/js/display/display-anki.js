@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
@@ -222,7 +223,7 @@ export class DisplayAnki {
         this._modeOptions.set('term-kanji', terms);
         this._modeOptions.set('term-kana', terms);
 
-        this._updateAnkiFieldTemplates(options);
+        void this._updateAnkiFieldTemplates(options);
     }
 
     /** */
@@ -257,7 +258,7 @@ export class DisplayAnki {
 
     /** */
     _onContentUpdateComplete() {
-        this._updateDictionaryEntryDetails();
+        void this._updateDictionaryEntryDetails();
     }
 
     /**
@@ -276,7 +277,7 @@ export class DisplayAnki {
         const mode = this._getValidCreateMode(element.dataset.mode);
         if (mode === null) { return; }
         const index = this._display.getElementDictionaryEntryIndex(element);
-        this._addAnkiNote(index, mode);
+        void this._addAnkiNote(index, mode);
     }
 
     /**
@@ -443,7 +444,7 @@ export class DisplayAnki {
      */
     _tryAddAnkiNoteForSelectedEntry(mode) {
         const index = this._display.selectedIndex;
-        this._addAnkiNote(index, mode);
+        void this._addAnkiNote(index, mode);
     }
 
     /**
@@ -568,8 +569,7 @@ export class DisplayAnki {
         const content = this._display.displayGenerator.createAnkiNoteErrorsNotificationContent(displayErrors);
         for (const node of content.querySelectorAll('.anki-note-error-log-link')) {
             /** @type {EventListenerCollection} */ (this._errorNotificationEventListeners).addEventListener(node, 'click', () => {
-                // eslint-disable-next-line no-console
-                console.log({ankiNoteErrors: errors});
+                log.log({ankiNoteErrors: errors});
             }, false);
         }
 
@@ -783,7 +783,7 @@ export class DisplayAnki {
         if (e.shiftKey) {
             this._showViewNotesMenu(element);
         } else {
-            this._viewNotes(element);
+            void this._viewNotes(element);
         }
     }
 
@@ -804,7 +804,7 @@ export class DisplayAnki {
         switch (action) {
             case 'viewNotes':
                 if (item !== null) {
-                    this._viewNotes(item);
+                    void this._viewNotes(item);
                 }
                 break;
         }
@@ -927,7 +927,7 @@ export class DisplayAnki {
         const index = this._display.selectedIndex;
         const button = this._getViewNoteButton(index);
         if (button !== null) {
-            this._viewNotes(button);
+            void this._viewNotes(button);
         }
     }
 

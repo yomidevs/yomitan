@@ -58,7 +58,7 @@ async function setupGenericSettingController(genericSettingController) {
     await genericSettingController.refresh();
 }
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -91,13 +91,13 @@ await Application.main(async (application) => {
     await settingsController.prepare();
 
     const persistentStorageController = new PersistentStorageController(application);
-    persistentStorageController.prepare();
+    preparePromises.push(persistentStorageController.prepare());
 
     const storageController = new StorageController(persistentStorageController);
     storageController.prepare();
 
     const dictionaryController = new DictionaryController(settingsController, modalController, statusFooter);
-    dictionaryController.prepare();
+    preparePromises.push(dictionaryController.prepare());
 
     const dictionaryImportController = new DictionaryImportController(settingsController, modalController, statusFooter);
     dictionaryImportController.prepare();
@@ -106,52 +106,52 @@ await Application.main(async (application) => {
     preparePromises.push(setupGenericSettingController(genericSettingController));
 
     const audioController = new AudioController(settingsController, modalController);
-    audioController.prepare();
+    preparePromises.push(audioController.prepare());
 
     const profileController = new ProfileController(settingsController, modalController);
-    profileController.prepare();
+    preparePromises.push(profileController.prepare());
 
     const settingsBackup = new BackupController(settingsController, modalController);
-    settingsBackup.prepare();
+    preparePromises.push(settingsBackup.prepare());
 
     const ankiController = new AnkiController(settingsController);
-    ankiController.prepare();
+    preparePromises.push(ankiController.prepare());
 
     const ankiTemplatesController = new AnkiTemplatesController(settingsController, modalController, ankiController);
-    ankiTemplatesController.prepare();
+    preparePromises.push(ankiTemplatesController.prepare());
 
     const popupPreviewController = new PopupPreviewController(settingsController);
     popupPreviewController.prepare();
 
     const scanInputsController = new ScanInputsController(settingsController);
-    scanInputsController.prepare();
+    preparePromises.push(scanInputsController.prepare());
 
     const simpleScanningInputController = new ScanInputsSimpleController(settingsController);
-    simpleScanningInputController.prepare();
+    preparePromises.push(simpleScanningInputController.prepare());
 
     const nestedPopupsController = new NestedPopupsController(settingsController);
-    nestedPopupsController.prepare();
+    preparePromises.push(nestedPopupsController.prepare());
 
     const permissionsToggleController = new PermissionsToggleController(settingsController);
-    permissionsToggleController.prepare();
+    preparePromises.push(permissionsToggleController.prepare());
 
     const secondarySearchDictionaryController = new SecondarySearchDictionaryController(settingsController);
-    secondarySearchDictionaryController.prepare();
+    preparePromises.push(secondarySearchDictionaryController.prepare());
 
     const languagesController = new LanguagesController(settingsController);
-    languagesController.prepare();
+    preparePromises.push(languagesController.prepare());
 
     const translationTextReplacementsController = new TranslationTextReplacementsController(settingsController);
-    translationTextReplacementsController.prepare();
+    preparePromises.push(translationTextReplacementsController.prepare());
 
     const sentenceTerminationCharactersController = new SentenceTerminationCharactersController(settingsController);
-    sentenceTerminationCharactersController.prepare();
+    preparePromises.push(sentenceTerminationCharactersController.prepare());
 
     const keyboardShortcutController = new KeyboardShortcutController(settingsController);
-    keyboardShortcutController.prepare();
+    preparePromises.push(keyboardShortcutController.prepare());
 
     const extensionKeyboardShortcutController = new ExtensionKeyboardShortcutController(settingsController);
-    extensionKeyboardShortcutController.prepare();
+    preparePromises.push(extensionKeyboardShortcutController.prepare());
 
     const popupWindowController = new PopupWindowController(application.api);
     popupWindowController.prepare();
@@ -160,10 +160,10 @@ await Application.main(async (application) => {
     mecabController.prepare();
 
     const collapsibleDictionaryController = new CollapsibleDictionaryController(settingsController);
-    collapsibleDictionaryController.prepare();
+    preparePromises.push(collapsibleDictionaryController.prepare());
 
     const sortFrequencyDictionaryController = new SortFrequencyDictionaryController(settingsController);
-    sortFrequencyDictionaryController.prepare();
+    preparePromises.push(sortFrequencyDictionaryController.prepare());
 
     await Promise.all(preparePromises);
 

@@ -24,7 +24,8 @@ import {Mecab} from '../comm/mecab.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {fetchJson, fetchText} from '../core/fetch-utilities.js';
-import {log} from '../core/logger.js';
+import {logErrorLevelToNumber} from '../core/log-utilities.js';
+import {log} from '../core/log.js';
 import {clone, deferPromise, isObject, promiseTimeout} from '../core/utilities.js';
 import {isNoteDataValid} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
@@ -166,13 +167,12 @@ export class Backend {
             ['getStylesheetContent',         this._onApiGetStylesheetContent.bind(this)],
             ['getEnvironmentInfo',           this._onApiGetEnvironmentInfo.bind(this)],
             ['clipboardGet',                 this._onApiClipboardGet.bind(this)],
-            ['getDisplayTemplatesHtml',      this._onApiGetDisplayTemplatesHtml.bind(this)],
             ['getZoom',                      this._onApiGetZoom.bind(this)],
             ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)],
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
             ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
             ['getMedia',                     this._onApiGetMedia.bind(this)],
-            ['log',                          this._onApiLog.bind(this)],
+            ['logGenericErrorBackend',       this._onApiLogGenericErrorBackend.bind(this)],
             ['logIndicatorClear',            this._onApiLogIndicatorClear.bind(this)],
             ['modifySettings',               this._onApiModifySettings.bind(this)],
             ['getSettings',                  this._onApiGetSettings.bind(this)],
@@ -216,7 +216,7 @@ export class Backend {
                     this._prepareCompleteReject(error);
                 }
             );
-            promise.finally(() => this._updateBadge());
+            void promise.finally(() => this._updateBadge());
             this._preparePromise = promise;
         }
         return this._prepareCompletePromise;
@@ -265,7 +265,7 @@ export class Backend {
             }, 1000);
             this._updateBadge();
 
-            log.on('log', this._onLog.bind(this));
+            log.on('logGenericError', this._onLogGenericError.bind(this));
 
             await this._requestBuilder.prepare();
             await this._environment.prepare();
@@ -282,7 +282,7 @@ export class Backend {
 
             /** @type {import('language-transformer').LanguageTransformDescriptor} */
             const descriptor = await fetchJson('/data/language/japanese-transforms.json');
-            this._translator.prepare(descriptor);
+            void this._translator.prepare(descriptor);
 
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
@@ -292,7 +292,7 @@ export class Backend {
 
             const options = this._getProfileOptions({current: true}, false);
             if (options.general.showGuide) {
-                this._openWelcomeGuidePageOnce();
+                void this._openWelcomeGuidePageOnce();
             }
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
@@ -334,11 +334,11 @@ export class Backend {
     }
 
     /**
-     * @param {{level: import('log').LogLevel}} params
+     * @param {import('log').Events['logGenericError']} params
      */
-    _onLog({level}) {
-        const levelValue = log.getLogErrorLevelValue(level);
-        const currentLogErrorLevel = this._logErrorLevel !== null ? log.getLogErrorLevelValue(this._logErrorLevel) : 0;
+    _onLogGenericError({level}) {
+        const levelValue = logErrorLevelToNumber(level);
+        const currentLogErrorLevel = this._logErrorLevel !== null ? logErrorLevelToNumber(this._logErrorLevel) : 0;
         if (levelValue <= currentLogErrorLevel) { return; }
 
         this._logErrorLevel = level;
@@ -409,7 +409,7 @@ export class Backend {
      * @returns {void}
      */
     _onPermissionsChanged() {
-        this._checkPermissions();
+        void this._checkPermissions();
     }
 
     /**
@@ -417,7 +417,7 @@ export class Backend {
      */
     _onInstalled({reason}) {
         if (reason !== 'install') { return; }
-        this._requestPersistentStorage();
+        void this._requestPersistentStorage();
     }
 
     // Message handlers
@@ -654,7 +654,10 @@ export class Backend {
         const tab = sender.tab;
         const tabId = tab ? tab.id : void 0;
         const frameId = sender.frameId;
-        return Promise.resolve({tabId, frameId});
+        return {
+            tabId: typeof tabId === 'number' ? tabId : null,
+            frameId: typeof frameId === 'number' ? frameId : null
+        };
     }
 
     /** @type {import('api').ApiHandler<'injectStylesheet'>} */
@@ -680,11 +683,6 @@ export class Backend {
     /** @type {import('api').ApiHandler<'clipboardGet'>} */
     async _onApiClipboardGet() {
         return this._clipboardReader.getText(false);
-    }
-
-    /** @type {import('api').ApiHandler<'getDisplayTemplatesHtml'>} */
-    async _onApiGetDisplayTemplatesHtml() {
-        return await fetchText('/display-templates.html');
     }
 
     /** @type {import('api').ApiHandler<'getZoom'>} */
@@ -738,9 +736,9 @@ export class Backend {
         return await this._getNormalizedDictionaryDatabaseMedia(targets);
     }
 
-    /** @type {import('api').ApiHandler<'log'>} */
-    _onApiLog({error, level, context}) {
-        log.log(ExtensionError.deserialize(error), level, context);
+    /** @type {import('api').ApiHandler<'logGenericErrorBackend'>} */
+    _onApiLogGenericErrorBackend({error, level, context}) {
+        log.logGenericError(ExtensionError.deserialize(error), level, context);
     }
 
     /** @type {import('api').ApiHandler<'logIndicatorClear'>} */
@@ -1049,7 +1047,7 @@ export class Backend {
         if (this._searchPopupTabCreatePromise === null) {
             const promise = this._getOrCreateSearchPopup();
             this._searchPopupTabCreatePromise = promise;
-            promise.then(() => { this._searchPopupTabCreatePromise = null; });
+            void promise.then(() => { this._searchPopupTabCreatePromise = null; });
         }
         return this._searchPopupTabCreatePromise;
     }
@@ -1241,7 +1239,7 @@ export class Backend {
             this._clipboardMonitor.stop();
         }
 
-        this._accessibilityController.update(this._getOptionsFull(false));
+        void this._accessibilityController.update(this._getOptionsFull(false));
 
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
     }
@@ -1614,16 +1612,16 @@ export class Backend {
         }
 
         if (color !== null && typeof chrome.action.setBadgeBackgroundColor === 'function') {
-            chrome.action.setBadgeBackgroundColor({color});
+            void chrome.action.setBadgeBackgroundColor({color});
         }
         if (text !== null && typeof chrome.action.setBadgeText === 'function') {
-            chrome.action.setBadgeText({text});
+            void chrome.action.setBadgeText({text});
         }
         if (typeof chrome.action.setTitle === 'function') {
             if (status !== null) {
                 title = `${title} - ${status}`;
             }
-            chrome.action.setTitle({title});
+            void chrome.action.setTitle({title});
         }
     }
 
@@ -2341,7 +2339,7 @@ export class Backend {
      * @param {import('backend').DatabaseUpdateCause} cause
      */
     _triggerDatabaseUpdated(type, cause) {
-        this._translator.clearDatabaseCaches();
+        void this._translator.clearDatabaseCaches();
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationDatabaseUpdated', params: {type, cause}});
     }
 
@@ -2470,12 +2468,13 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _openWelcomeGuidePageOnce() {
-        chrome.storage.session.get(['openedWelcomePage']).then((result) => {
-            if (!result.openedWelcomePage) {
-                this._openWelcomeGuidePage();
-                chrome.storage.session.set({openedWelcomePage: true});
-            }
-        });
+        const result = await chrome.storage.session.get(['openedWelcomePage']);
+        if (!result.openedWelcomePage) {
+            await Promise.all([
+                this._openWelcomeGuidePage(),
+                chrome.storage.session.set({openedWelcomePage: true})
+            ]);
+        }
     }
 
     /**

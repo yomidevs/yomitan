@@ -115,7 +115,7 @@ async function showDictionaryInfo(api) {
     container.appendChild(fragment);
 }
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -148,8 +148,8 @@ await Application.main(async (application) => {
     languageElement.textContent = `${language}`;
     userAgentElement.textContent = userAgent;
 
-    showAnkiConnectInfo(application.api);
-    showDictionaryInfo(application.api);
+    void showAnkiConnectInfo(application.api);
+    void showDictionaryInfo(application.api);
 
     const settingsController = new SettingsController(application);
     await settingsController.prepare();

@@ -21,22 +21,15 @@ import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {Frontend} from './frontend.js';
 import {PopupFactory} from './popup-factory.js';
 
-await Application.main(async (application) => {
-    const {tabId, frameId} = await application.api.frameInformationGet();
-    if (typeof frameId !== 'number') {
-        throw new Error('Failed to get frameId');
-    }
-
+await Application.main(false, async (application) => {
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 
-    const popupFactory = new PopupFactory(application, frameId);
+    const popupFactory = new PopupFactory(application);
     popupFactory.prepare();
 
     const frontend = new Frontend({
         application,
-        tabId,
-        frameId,
         popupFactory,
         depth: 0,
         parentPopupId: null,

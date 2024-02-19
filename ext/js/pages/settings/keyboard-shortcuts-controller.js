@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {DocumentUtil} from '../../dom/document-util.js';
+import {convertElementValueToNumber, normalizeModifierKey} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
@@ -191,7 +191,7 @@ export class KeyboardShortcutController {
      */
     _onAddClick(e) {
         e.preventDefault();
-        this._addNewEntry();
+        void this._addNewEntry();
     }
 
     /**
@@ -199,7 +199,7 @@ export class KeyboardShortcutController {
      */
     _onResetClick(e) {
         e.preventDefault();
-        this._reset();
+        void this._reset();
     }
 
     /** */
@@ -350,16 +350,16 @@ class KeyboardShortcutHotkeyEntry {
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'delete':
-                this._delete();
+                void this._delete();
                 break;
             case 'clearInputs':
                 /** @type {KeyboardMouseInputField} */ (this._inputField).clearInputs();
                 break;
             case 'resetInput':
-                this._resetInput();
+                void this._resetInput();
                 break;
             case 'resetArgument':
-                this._resetArgument();
+                void this._resetArgument();
                 break;
         }
     }
@@ -400,11 +400,11 @@ class KeyboardShortcutHotkeyEntry {
         /** @type {import('input').ModifierKey[]} */
         const modifiers2 = [];
         for (const modifier of modifiers) {
-            const modifier2 = DocumentUtil.normalizeModifierKey(modifier);
+            const modifier2 = normalizeModifierKey(modifier);
             if (modifier2 === null) { continue; }
             modifiers2.push(modifier2);
         }
-        this._setKeyAndModifiers(key, modifiers2);
+        void this._setKeyAndModifiers(key, modifiers2);
     }
 
     /**
@@ -414,7 +414,7 @@ class KeyboardShortcutHotkeyEntry {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const scope = this._normalizeScope(node.dataset.scope);
         if (scope === null) { return; }
-        this._setScopeEnabled(scope, node.checked);
+        void this._setScopeEnabled(scope, node.checked);
     }
 
     /**
@@ -423,7 +423,7 @@ class KeyboardShortcutHotkeyEntry {
     _onActionSelectChange(e) {
         const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
         const value = node.value;
-        this._setAction(value);
+        void this._setAction(value);
     }
 
     /**
@@ -435,15 +435,15 @@ class KeyboardShortcutHotkeyEntry {
         let value = this._getArgumentInputValue(node);
         switch (template) {
             case 'hotkey-argument-move-offset':
-                value = `${DocumentUtil.convertElementValueToNumber(value, node)}`;
+                value = `${convertElementValueToNumber(value, node)}`;
                 break;
         }
-        this._setArgument(value);
+        void this._setArgument(value);
     }
 
     /** */
     async _delete() {
-        this._parent.deleteEntry(this._index);
+        void this._parent.deleteEntry(this._index);
     }
 
     /**
@@ -607,7 +607,7 @@ class KeyboardShortcutHotkeyEntry {
             this._setArgumentInputValue(node, value);
         }
 
-        this._updateArgumentInputValidity();
+        void this._updateArgumentInputValidity();
 
         await this._modifyProfileSettings([{
             action: 'set',
@@ -702,7 +702,7 @@ class KeyboardShortcutHotkeyEntry {
             if (inputNode !== null) {
                 this._setArgumentInputValue(inputNode, argument);
                 this._argumentInput = inputNode;
-                this._updateArgumentInputValidity();
+                void this._updateArgumentInputValidity();
                 this._argumentEventListeners.addEventListener(inputNode, 'change', this._onArgumentValueChange.bind(this, template), false);
             }
             if (this._argumentContainer !== null) {

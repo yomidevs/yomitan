@@ -49,7 +49,16 @@ async function setupGenericSettingsController(genericSettingController) {
     await genericSettingController.refresh();
 }
 
-await Application.main(async (application) => {
+/** */
+async function checkNeedsCustomTemplatesWarning() {
+    const key = 'needsCustomTemplatesWarning';
+    const result = await chrome.storage.session.get({[key]: false});
+    if (!result[key]) { return; }
+    document.documentElement.dataset.warnCustomTemplates = 'true';
+    await chrome.storage.session.remove([key]);
+}
+
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -61,14 +70,8 @@ await Application.main(async (application) => {
     const statusFooter = new StatusFooter(statusFooterElement);
     statusFooter.prepare();
 
-    setupEnvironmentInfo(application.api);
-
-    chrome.storage.session.get({needsCustomTemplatesWarning: false}).then((result) => {
-        if (result.needsCustomTemplatesWarning) {
-            document.documentElement.dataset.warnCustomTemplates = 'true';
-            chrome.storage.session.remove(['needsCustomTemplatesWarning']);
-        }
-    });
+    void setupEnvironmentInfo(application.api);
+    void checkNeedsCustomTemplatesWarning();
 
     const preparePromises = [];
 
@@ -79,19 +82,19 @@ await Application.main(async (application) => {
     await settingsController.prepare();
 
     const dictionaryController = new DictionaryController(settingsController, modalController, statusFooter);
-    dictionaryController.prepare();
+    preparePromises.push(dictionaryController.prepare());
 
     const dictionaryImportController = new DictionaryImportController(settingsController, modalController, statusFooter);
-    dictionaryImportController.prepare();
+    preparePromises.push(dictionaryImportController.prepare());
 
     const genericSettingController = new GenericSettingController(settingsController);
     preparePromises.push(setupGenericSettingsController(genericSettingController));
 
     const simpleScanningInputController = new ScanInputsSimpleController(settingsController);
-    simpleScanningInputController.prepare();
+    preparePromises.push(simpleScanningInputController.prepare());
 
     const recommendedPermissionsController = new RecommendedPermissionsController(settingsController);
-    recommendedPermissionsController.prepare();
+    preparePromises.push(recommendedPermissionsController.prepare());
 
     await Promise.all(preparePromises);
 

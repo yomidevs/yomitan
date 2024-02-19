@@ -24,17 +24,11 @@ import {querySelectorNotNull} from '../dom/query-selector.js';
 
 export class SearchDisplayController {
     /**
-     * @param {number|undefined} tabId
-     * @param {number|undefined} frameId
      * @param {import('./display.js').Display} display
      * @param {import('./display-audio.js').DisplayAudio} displayAudio
      * @param {import('./search-persistent-state-controller.js').SearchPersistentStateController} searchPersistentStateController
      */
-    constructor(tabId, frameId, display, displayAudio, searchPersistentStateController) {
-        /** @type {number|undefined} */
-        this._tabId = tabId;
-        /** @type {number|undefined} */
-        this._frameId = frameId;
+    constructor(display, displayAudio, searchPersistentStateController) {
         /** @type {import('./display.js').Display} */
         this._display = display;
         /** @type {import('./display-audio.js').DisplayAudio} */
@@ -53,6 +47,8 @@ export class SearchDisplayController {
         this._clipboardMonitorEnableCheckbox = querySelectorNotNull(document, '#clipboard-monitor-enable');
         /** @type {HTMLInputElement} */
         this._wanakanaEnableCheckbox = querySelectorNotNull(document, '#wanakana-enable');
+        /** @type {HTMLElement} */
+        this._wanakanaSearchOption = querySelectorNotNull(document, '#search-option-wanakana');
         /** @type {EventListenerCollection} */
         this._queryInputEvents = new EventListenerCollection();
         /** @type {boolean} */
@@ -190,9 +186,11 @@ export class SearchDisplayController {
         this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
         this._updateClipboardMonitorEnabled();
 
-        const enableWanakana = !!options.general.enableWanakana;
-        this._wanakanaEnableCheckbox.checked = enableWanakana;
-        this._setWanakanaEnabled(enableWanakana);
+        const {language, enableWanakana} = options.general;
+        const wanakanaEnabled = language === 'ja' && enableWanakana;
+        this._wanakanaEnableCheckbox.checked = wanakanaEnabled;
+        this._wanakanaSearchOption.style.display = language === 'ja' ? '' : 'none';
+        this._setWanakanaEnabled(wanakanaEnabled);
     }
 
     /**
@@ -300,7 +298,7 @@ export class SearchDisplayController {
             scope: 'profile',
             optionsContext: this._display.getOptionsContext()
         };
-        this._display.application.api.modifySettings([modification], 'search');
+        void this._display.application.api.modifySettings([modification], 'search');
     }
 
     /**
@@ -309,7 +307,7 @@ export class SearchDisplayController {
     _onClipboardMonitorEnableChange(e) {
         const element = /** @type {HTMLInputElement} */ (e.target);
         const enabled = element.checked;
-        this._setClipboardMonitorEnabled(enabled);
+        void this._setClipboardMonitorEnabled(enabled);
     }
 
     /** */
@@ -325,7 +323,7 @@ export class SearchDisplayController {
         const value = Number.parseInt(node.value, 10);
         const optionsFull = await this._display.application.api.optionsGetFull();
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= optionsFull.profiles.length) {
-            this._setPrimaryProfileIndex(value);
+            await this._setPrimaryProfileIndex(value);
         }
     }
 
@@ -519,6 +517,7 @@ export class SearchDisplayController {
         if (flags !== null) {
             optionsContext.flags = flags;
         }
+        const {tabId, frameId} = this._display.application;
         /** @type {import('display').ContentDetails} */
         const details = {
             focus: false,
@@ -536,10 +535,7 @@ export class SearchDisplayController {
             content: {
                 dictionaryEntries: void 0,
                 animate,
-                contentOrigin: {
-                    tabId: this._tabId,
-                    frameId: this._frameId
-                }
+                contentOrigin: {tabId, frameId}
             }
         };
         if (!lookup) { details.params.lookup = 'false'; }

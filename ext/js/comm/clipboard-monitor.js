@@ -82,7 +82,7 @@ export class ClipboardMonitor extends EventDispatcher {
 
         this._timerToken = token;
 
-        intervalCallback();
+        void intervalCallback();
     }
 
     /**

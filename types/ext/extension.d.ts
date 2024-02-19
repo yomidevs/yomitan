@@ -18,8 +18,8 @@
 export type HtmlElementWithContentWindow = HTMLIFrameElement | HTMLFrameElement | HTMLObjectElement;
 
 export type ContentOrigin = {
-    tabId?: number;
-    frameId?: number;
+    tabId: number | null;
+    frameId: number | null;
 };
 
 export type ChromeRuntimeOnMessageCallback<TMessage = unknown> = (

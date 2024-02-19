@@ -20,35 +20,59 @@ import {EventDispatcher} from './event-dispatcher.js';
 import {ExtensionError} from './extension-error.js';
 
 /**
- * This class handles logging of messages to the console and triggering
- * an event for log calls.
+ * This class handles logging of messages to the console and triggering an event for log calls.
  * @augments EventDispatcher<import('log').Events>
  */
-export class Logger extends EventDispatcher {
-    /**
-     * Creates a new instance.
-     */
+class Logger extends EventDispatcher {
     constructor() {
         super();
         /** @type {string} */
-        this._extensionName = 'Yomitan';
-        try {
-            const {name, version} = chrome.runtime.getManifest();
-            this._extensionName = `${name} ${version}`;
-        } catch (e) {
-            // NOP
-        }
+        this._extensionName = 'Extension';
+        /** @type {?string} */
+        this._issueUrl = 'https://github.com/themoeway/yomitan/issues';
     }
 
     /**
-     * Logs a generic error. This will trigger the 'log' event with the same arguments as the function invocation.
-     * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
-     * @param {import('log').LogLevel} level The level to log at. Values include `'info'`, `'debug'`, `'warn'`, and `'error'`.
-     *   Other values will be logged at a non-error level.
-     * @param {?import('log').LogContext} [context] An optional context object for the error which should typically include a `url` field.
+     * @param {string} extensionName
      */
-    log(error, level, context = null) {
-        if (typeof context !== 'object' || context === null) {
+    configure(extensionName) {
+        this._extensionName = extensionName;
+    }
+
+    /**
+     * @param {unknown} message
+     * @param {...unknown} optionalParams
+     */
+    log(message, ...optionalParams) {
+        /* eslint-disable no-console */
+        console.log(message, ...optionalParams);
+        /* eslint-enable no-console */
+    }
+
+    /**
+     * Logs a warning.
+     * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
+     */
+    warn(error) {
+        this.logGenericError(error, 'warn');
+    }
+
+    /**
+     * Logs an error.
+     * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
+     */
+    error(error) {
+        this.logGenericError(error, 'error');
+    }
+
+    /**
+     * Logs a generic error.
+     * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
+     * @param {import('log').LogLevel} level
+     * @param {import('log').LogContext} [context]
+     */
+    logGenericError(error, level, context) {
+        if (typeof context === 'undefined') {
             context = {url: location.href};
         }
 
@@ -103,52 +127,19 @@ export class Logger extends EventDispatcher {
         if (typeof errorData !== 'undefined') {
             message += `\nData: ${JSON.stringify(errorData, null, 4)}`;
         }
-        message += '\n\nIssues can be reported at https://github.com/themoeway/yomitan/issues';
+        if (this._issueUrl !== null) {
+            message += `\n\nIssues can be reported at ${this._issueUrl}`;
+        }
 
         /* eslint-disable no-console */
         switch (level) {
             case 'log': console.log(message); break;
-            case 'info': console.info(message); break;
-            case 'debug': console.debug(message); break;
             case 'warn': console.warn(message); break;
             case 'error': console.error(message); break;
         }
         /* eslint-enable no-console */
 
-        this.trigger('log', {error, level, context});
-    }
-
-    /**
-     * Logs a warning. This function invokes `log` internally.
-     * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
-     * @param {?import('log').LogContext} context An optional context object for the error which should typically include a `url` field.
-     */
-    warn(error, context = null) {
-        this.log(error, 'warn', context);
-    }
-
-    /**
-     * Logs an error. This function invokes `log` internally.
-     * @param {unknown} error The error to log. This is typically an `Error` or `Error`-like object.
-     * @param {?import('log').LogContext} context An optional context object for the error which should typically include a `url` field.
-     */
-    error(error, context = null) {
-        this.log(error, 'error', context);
-    }
-
-    /**
-     * @param {import('log').LogLevel} errorLevel
-     * @returns {import('log').LogErrorLevelValue}
-     */
-    getLogErrorLevelValue(errorLevel) {
-        switch (errorLevel) {
-            case 'log':
-            case 'info':
-            case 'debug':
-                return 0;
-            case 'warn': return 1;
-            case 'error': return 2;
-        }
+        this.trigger('logGenericError', {error, level, context});
     }
 }
 

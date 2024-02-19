@@ -44,7 +44,6 @@ export class SettingsController extends EventDispatcher {
         this._pageExitPreventionEventListeners = new EventListenerCollection();
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
-        this._templates.load(document);
     }
 
     /** @type {import('../../application.js').Application} */
@@ -69,6 +68,7 @@ export class SettingsController extends EventDispatcher {
 
     /** */
     async prepare() {
+        await this._templates.loadFromFiles(['/templates-settings.html']);
         this._application.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         if (this._canObservePermissionsChanges()) {
             chrome.permissions.onAdded.addListener(this._onPermissionsChanged.bind(this));
@@ -239,7 +239,7 @@ export class SettingsController extends EventDispatcher {
     _setProfileIndex(value, canUpdateProfileIndex) {
         this._profileIndex = value;
         this.trigger('optionsContextChanged', {});
-        this._onOptionsUpdatedInternal(canUpdateProfileIndex);
+        void this._onOptionsUpdatedInternal(canUpdateProfileIndex);
     }
 
     /**
@@ -247,7 +247,7 @@ export class SettingsController extends EventDispatcher {
      */
     _onOptionsUpdated({source}) {
         if (source === this._source) { return; }
-        this._onOptionsUpdatedInternal(true);
+        void this._onOptionsUpdatedInternal(true);
     }
 
     /**
@@ -332,7 +332,7 @@ export class SettingsController extends EventDispatcher {
 
     /** */
     _onPermissionsChanged() {
-        this._triggerPermissionsChanged();
+        void this._triggerPermissionsChanged();
     }
 
     /** */

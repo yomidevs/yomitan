@@ -1,0 +1,441 @@
+<!DOCTYPE html><html><head><title>Templates</title></head><body>
+
+<!-- Profile -->
+<template id="profile-entry-template"><div class="profile-entry generic-list-entry">
+    <div class="profile-entry-cell generic-list-index-prefix"></div>
+    <div class="profile-entry-cell"><label class="radio"><input type="radio" class="profile-entry-is-default-radio" name="profile-entry-default-radio"><span class="radio-body"><span class="radio-border"></span><span class="radio-dot"></span></span></label></div>
+    <div class="profile-entry-cell"><input class="profile-entry-name-input" type="text" autocomplete="off" placeholder="Profile name"></div>
+    <div class="profile-entry-cell"><a tabindex="0" class="profile-entry-condition-count-link"><span class="profile-entry-condition-count">0</span></a></div>
+    <div class="profile-entry-cell input-height-icon-button-container"><button type="button" class="icon-button profile-entry-menu-button" data-menu="profile-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button></div>
+</div></template>
+<template id="profile-condition-group-template"><div class="profile-condition-group">
+    <div class="profile-condition-list"></div>
+    <div class="profile-condition-list-info">
+        <div class="profile-condition-group-separator-label">or</div>
+        <div class="profile-condition-list-info-space"></div>
+        <button type="button" class="profile-condition-add-button low-emphasis">Add</button>
+    </div>
+</div></template>
+<template id="profile-condition-template"><div class="profile-condition">
+    <div class="profile-condition-prefix"></div>
+    <div class="profile-condition-inner">
+        <select class="profile-condition-type"><optgroup label="Type"></optgroup></select>
+        <select class="profile-condition-operator"><optgroup label="Operator"></optgroup></select>
+        <div class="profile-condition-input-container">
+            <input type="text" class="profile-condition-input" autocomplete="off" spellcheck="false">
+            <div class="input-height-icon-button-container mouse-button-container" hidden>
+                <button type="button" class="icon-button profile-condition-mouse-button mouse-button"><span class="icon-button-inner"><span class="icon" data-icon="mouse"></span></span></button>
+            </div>
+        </div>
+    </div>
+    <div class="profile-condition-menu-button-container input-height-icon-button-container">
+        <button type="button" class="icon-button profile-condition-menu-button" data-menu="profile-condition-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+    </div>
+</div></template>
+<template id="profile-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button type="button" class="popup-menu-item" data-menu-action="moveUp">Move up</button>
+    <button type="button" class="popup-menu-item" data-menu-action="moveDown">Move down</button>
+    <button type="button" class="popup-menu-item" data-menu-action="copyFrom">Copy from&hellip;</button>
+    <button type="button" class="popup-menu-item" data-menu-action="editConditions">Edit conditions&hellip;</button>
+    <button type="button" class="popup-menu-item" data-menu-action="duplicate">Duplicate</button>
+    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
+</div></div></div></template>
+<template id="profile-condition-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button type="button" class="popup-menu-item" data-menu-action="resetValue">Reset value</button>
+    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
+    <button type="button" class="popup-menu-item" data-menu-action="deleteGroup">Delete group</button>
+</div></div></div></template>
+
+<!-- Dictionary -->
+<template id="dictionary-template">
+    <div class="dictionary-list-index generic-list-index-prefix"></div>
+    <label class="toggle dictionary-item-enabled-toggle-container"><input type="checkbox" class="dictionary-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+    <div class="dictionary-item-title-container">
+        <span>
+            <strong class="dictionary-title"></strong> <span class="light dictionary-version"></span>
+        </span>
+        <button type="button" class="dictionary-outdated-button" hidden>
+            <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
+        </button>
+        <button type="button" class="dictionary-integrity-button" hidden>
+            <div class="badge info-badge badge-small-icon"><span class="icon" data-icon="checkmark"></span></div>
+        </button>
+    </div>
+    <input type="number" step="1" class="short-height dictionary-priority">
+    <button type="button" class="icon-button dictionary-menu-button" data-menu="dictionary-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+</template>
+<template id="dictionary-details-entry-template"><div class="dictionary-details-entry">
+    <span class="dictionary-details-entry-label"></span>
+    <span class="dictionary-details-entry-info"></span>
+</div></template>
+<template id="dictionary-extra-template">
+    <div class="dictionary-item-bottom"></div>
+    <div class="dictionary-item-bottom"></div>
+    <div class="dictionary-item-bottom dictionary-item-title-container">
+        <span>
+            <strong class="dictionary-title">Unassociated Data</strong> <span class="light dictionary-total-count"></span>
+        </span>
+        <button type="button" class="dictionary-integrity-button">
+            <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
+        </button>
+    </div>
+    <div class="dictionary-item-bottom"></div>
+    <div class="dictionary-item-bottom dictionary-item-button-height"></div>
+</template>
+<template id="dictionary-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button type="button" class="popup-menu-item" data-menu-action="showDetails">Details&hellip;</button>
+    <button type="button" class="popup-menu-item" data-menu-action="moveUp">Move up</button>
+    <button type="button" class="popup-menu-item" data-menu-action="moveDown">Move down</button>
+    <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to&hellip;</button>
+    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
+</div></div></div></template>
+<template id="secondary-search-dictionary-template"><div class="secondary-search-dictionary-item horizontal-flex">
+    <label class="toggle"><input type="checkbox" class="dictionary-allow-secondary-searches"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+    <span class="horizontal-flex-fill"><strong class="dictionary-title"></strong> <span class="light dictionary-version"></span></span>
+</div></template>
+<template id="collapsible-dictionary-item-template"><div class="collapsible-dictionary-item">
+    <div class="collapsible-dictionary-cell">
+        <span class="dictionary-info-label"><strong class="dictionary-title"></strong> <span class="light dictionary-version"></span></span>
+    </div>
+    <div class="collapsible-dictionary-cell">
+        <select class="definitions-collapsible medium-width">
+            <option value="not-collapsible">Not collapsible</option>
+            <option value="collapsed">Collapsed</option>
+            <option value="expanded">Expanded</option>
+            <option value="force-collapsed">Force collapsed</option>
+            <option value="force-expanded">Force expanded</option>
+        </select>
+    </div>
+</div></template>
+
+<!-- Audio -->
+<template id="audio-source-template"><div class="audio-source">
+    <div class="audio-source-index generic-list-index-prefix"></div>
+    <div class="audio-source-inner">
+        <select class="audio-source-type-select">
+            <option value="jpod101">JapanesePod101</option>
+            <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
+            <option value="jisho">Jisho.org</option>
+            <option value="text-to-speech">Text-to-speech</option>
+            <option value="text-to-speech-reading">Text-to-speech (Kana reading)</option>
+            <option value="custom">Custom URL</option>
+            <option value="custom-json">Custom URL (JSON)</option>
+        </select>
+        <div class="audio-source-parameter-container" data-field="url" hidden>
+            <span class="audio-source-parameter-label">URL:</span>
+            <input type="text" class="audio-source-parameter">
+        </div>
+        <div class="audio-source-parameter-container" data-field="voice" hidden>
+            <span class="audio-source-parameter-label">Voice:</span>
+            <select class="audio-source-parameter"></select>
+        </div>
+    </div>
+    <button type="button" class="icon-button audio-source-menu-button" data-menu="audio-source-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+</div></template>
+<template id="audio-source-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button type="button" class="popup-menu-item" data-menu-action="help">Help</button>
+    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
+</div></div></div></template>
+
+<!-- Scanning inputs -->
+<template id="scan-input-template"><div class="scan-input" data-show-advanced="false">
+    <div class="scan-input-grid">
+        <div class="scan-input-index-cell generic-list-index-prefix"></div>
+        <div class="scan-input-menu-button-cell">
+            <div class="input-height-icon-button-container">
+                <button type="button" class="icon-button scanning-input-menu-button" data-menu="scanning-inputs-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+            </div>
+        </div>
+
+        <div class="scan-input-prefix-cell" data-property="include"><span>Required inputs:</span></div>
+        <div class="scan-input-content-cell input-group" data-property="include">
+            <input type="text" class="scan-input-field" autocomplete="off" spellcheck="false" placeholder="No inputs" data-property="include">
+            <button type="button" class="input-suffix input-suffix-icon-button light-icon mouse-button" data-property="include"><span class="icon" data-icon="mouse"></span></button>
+        </div>
+
+        <div class="scan-input-prefix-cell" data-property="exclude"><span>Excluded inputs:</span></div>
+        <div class="scan-input-content-cell input-group" data-property="exclude">
+            <input type="text" class="scan-input-field" autocomplete="off" spellcheck="false" placeholder="No inputs" data-property="exclude">
+            <button type="button" class="input-suffix input-suffix-icon-button light-icon mouse-button" data-property="exclude"><span class="icon" data-icon="mouse"></span></button>
+        </div>
+
+        <div class="scan-input-prefix-cell scan-input-options-cell" data-property="types"><span>Input types:</span></div>
+        <div class="scan-input-content-cell scan-input-options-cell" data-property="types">
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.mouse"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Mouse</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.touch"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Touch</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.pen"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Pen</span>
+            </label>
+        </div>
+
+        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="search-options"><span>Search types:</span></div>
+        <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="search-options">
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.searchTerms"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Search for terms</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.searchKanji"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Search for kanji</span>
+            </label>
+        </div>
+
+        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-options"><span>Touch options:</span></div>
+        <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-options">
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchPress"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on touch press</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchRelease"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on touch release</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchMove"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on touch move</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.preventTouchScrolling"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Prevent touch scrolling</span>
+            </label>
+        </div>
+
+        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="pen-options"><span>Pen options:</span></div>
+        <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="pen-options">
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenPress"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on pen press</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenRelease"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on pen release</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenMove"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on pen move (while touched)</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on pen hover (before touched)</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenReleaseHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on pen hover (after touched)</span>
+            </label>
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.preventPenScrolling"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Prevent pen scrolling</span>
+            </label>
+        </div>
+    </div>
+</div></template>
+<template id="scanning-inputs-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button type="button" class="popup-menu-item" data-menu-action="showAdvanced">Show advanced options</button>
+    <button type="button" class="popup-menu-item" data-menu-action="hideAdvanced">Hide advanced options</button>
+    <button type="button" class="popup-menu-item" data-menu-action="clearInputs">Clear inputs</button>
+    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
+</div></div></div></template>
+
+<!-- Anki card -->
+<template id="anki-card-field-template"><div class="anki-card-field-name-container"><span class="anki-card-field-name"></span></div>
+<div class="anki-card-field-value-container input-group">
+    <input type="text" class="anki-card-field-value" autocomplete="off">
+    <button type="button" class="anki-card-field-value-menu-button input-suffix input-suffix-icon-button light-icon" data-menu-position="v-center left"><span class="icon" data-icon="material-down-arrow"></span></button>
+</div></template>
+<template id="anki-card-terms-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
+<template id="anki-card-kanji-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
+<template id="anki-card-all-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
+
+<!-- Translation -->
+<template id="translation-text-replacement-entry-template"><div class="translation-text-replacement-entry">
+    <div class="translation-text-replacement-index generic-list-index-prefix"></div>
+    <div class="translation-text-replacement-pattern-label">Pattern:</div>
+    <div class="translation-text-replacement-replacement-label">Replacement:</div>
+    <div class="translation-text-replacement-pattern-container">
+        <input type="text" class="translation-text-replacement-pattern code">
+        <label class="translation-text-replacement-checkbox-container">
+            <label class="checkbox"><input type="checkbox" class="translation-text-replacement-checkbox translation-text-replacement-pattern-ignore-case"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+            <span class="translation-text-replacement-checkbox-label">Ignore case</span>
+        </label>
+    </div>
+    <div class="translation-text-replacement-replacement-container">
+        <input type="text" class="translation-text-replacement-replacement code">
+    </div>
+    <button type="button" class="icon-button translation-text-replacement-button" data-menu="translation-text-replacement-entry-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+
+    <div class="translation-text-replacement-test-label translation-text-replacement-test-node">Test Input:</div>
+    <div class="translation-text-replacement-test-container translation-text-replacement-test-node">
+        <input type="text" class="translation-text-replacement-test-input" lang="ja">
+        <div class="translation-text-replacement-test-label-inner">Output:</div>
+        <input type="text" class="translation-text-replacement-test-output" lang="ja" readonly>
+    </div>
+</div></template>
+<template id="translation-text-replacement-entry-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button type="button" class="popup-menu-item" data-menu-action="showTest">Test</button>
+    <button type="button" class="popup-menu-item" data-menu-action="hideTest">Hide test</button>
+    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
+</div></div></div></template>
+
+<!-- Sentence parsing -->
+<template id="sentence-termination-character-entry-template"><tr class="sentence-termination-character-entry">
+    <td class="generic-list-index-prefix"></td>
+    <td>
+        <label class="toggle"><input type="checkbox" class="sentence-termination-character-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+    </td>
+    <td>
+        <select class="sentence-termination-character-type">
+            <option value="terminator">Terminator</option>
+            <option value="quote">Quote</option>
+        </select>
+    </td>
+    <td>
+        <input type="text" class="sentence-termination-character-input1" maxlength="1" lang="ja">
+    </td>
+    <td>
+        <input type="text" class="sentence-termination-character-input2" maxlength="1" lang="ja">
+        <div class="sentence-termination-character-input2-alt">&mdash;</div>
+    </td>
+    <td>
+        <div class="sentence-termination-character-include-list">
+            <label class="sentence-termination-character-include">
+                <label class="checkbox"><input type="checkbox" class="sentence-termination-character-include-at-start"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>At start</span>
+            </label>
+            <label class="sentence-termination-character-include">
+                <label class="checkbox"><input type="checkbox" class="sentence-termination-character-include-at-end"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>At end</span>
+            </label>
+        </div>
+    </td>
+    <td>
+        <button type="button" class="icon-button sentence-termination-character-entry-button" data-menu="sentence-termination-character-entry-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+    </td>
+</tr></template>
+<template id="sentence-termination-character-entry-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
+</div></div></div></template>
+
+<!-- Keyboard shortcuts -->
+<template id="hotkey-list-item-template"><div class="hotkey-list-item"><div class="hotkey-list-item-grid">
+    <div class="hotkey-list-item-index-cell generic-list-index-prefix"></div>
+    <div class="hotkey-list-item-button-cell">
+        <div class="input-height-icon-button-container">
+            <button type="button" class="icon-button hotkey-list-item-button" data-menu="hotkey-list-item-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+        </div>
+    </div>
+
+    <div class="hotkey-list-item-input-label-cell">Input:</div>
+    <div class="hotkey-list-item-input-cell">
+        <input type="text" class="hotkey-list-item-input" autocomplete="off" spellcheck="false" placeholder="No input" data-property="include">
+        <div class="hotkey-list-item-enabled-button-container input-group">
+            <button type="button" class="hotkey-list-item-enabled-button input-button">
+                <label class="hotkey-list-item-enabled-button-label button-inner-label">
+                    <span class="checkbox"><input type="checkbox" class="hotkey-list-item-enabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></span>
+                    <span>Enabled</span>
+                </label>
+            </button>
+            <button type="button" class="hotkey-list-item-scopes-button input-suffix input-suffix-icon-button light-icon" data-menu="hotkey-list-item-scopes-menu" data-menu-position="below left"><span class="icon" data-icon="material-down-arrow"></span></button>
+        </div>
+    </div>
+
+    <div class="hotkey-list-item-action-label-cell">Action:</div>
+    <div class="hotkey-list-item-action-cell">
+        <select class="hotkey-list-item-action">
+            <option value="">None</option>
+            <option value="close">Close</option>
+            <option value="focusSearchBox">Focus search box</option>
+            <option value="nextEntry">Go to next entry</option>
+            <option value="previousEntry">Go to previous entry</option>
+            <option value="lastEntry">Go to last entry</option>
+            <option value="firstEntry">Go to first entry</option>
+            <option value="nextEntryDifferentDictionary">Go to next dictionary</option>
+            <option value="previousEntryDifferentDictionary">Go to previous dictionary</option>
+            <option value="historyBackward">Navigate backward in history</option>
+            <option value="historyForward">Navigate forward in history</option>
+            <option value="addNoteKanji">Add kanji note</option>
+            <option value="addNoteTermKanji">Add term note</option>
+            <option value="addNoteTermKana">Add term note (reading)</option>
+            <option value="viewNotes">View notes</option>
+            <option value="playAudio">Play audio</option>
+            <option value="playAudioFromSource">Play audio from source</option>
+            <option value="copyHostSelection">Copy host window selection</option>
+            <option value="scanSelectedText">Scan selected text</option>
+            <option value="scanTextAtCaret">Scan text at caret</option>
+            <option value="toggleOption">Toggle option</option>
+        </select>
+        <div class="hotkey-list-item-action-argument-container"></div>
+    </div>
+</div></div></template>
+<template id="extension-hotkey-list-item-template"><div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+    <div class="settings-item-left">
+        <div class="settings-item-label"></div>
+    </div>
+    <div class="settings-item-right">
+        <div class="flex-row-nowrap">
+            <input type="text">
+            <button type="button" class="icon-button extension-hotkey-list-item-button" data-menu="extension-hotkey-list-item-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+        </div>
+    </div>
+</div></div></template>
+<template id="hotkey-list-item-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button type="button" class="popup-menu-item" data-menu-action="clearInputs">Clear input</button>
+    <button type="button" class="popup-menu-item" data-menu-action="resetInput">Reset input</button>
+    <button type="button" class="popup-menu-item" data-menu-action="resetArgument">Reset argument</button>
+    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
+</div></div></div></template>
+<template id="hotkey-list-item-scopes-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button type="button" class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="web"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
+        <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="web"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+        <span>Web</span>
+    </label></button>
+    <button type="button" class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="popup"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
+        <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="popup"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+        <span>Popup</span>
+    </label></button>
+    <button type="button" class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="search"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
+        <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="search"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+        <span>Search</span>
+    </label></button>
+</div></div></div></template>
+<template id="extension-hotkey-list-item-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button type="button" class="popup-menu-item" data-menu-action="clearInput">Clear input</button>
+    <button type="button" class="popup-menu-item" data-menu-action="resetInput">Reset input</button>
+</div></div></div></template>
+<template id="hotkey-argument-move-offset-template"><div class="flex-row-nowrap">
+    <span class="hotkey-argument-label">Count:</span>
+    <input type="number" step="1" min="1" class="hotkey-argument-input">
+</div></template>
+<template id="hotkey-argument-setting-path-template"><div class="flex-row-nowrap">
+    <span class="hotkey-argument-label">Path:</span>
+    <input type="text" class="hotkey-argument-input horizontal-flex-fill" spellcheck="false" autocomplete="off">
+</div></template>
+<template id="hotkey-argument-audio-source-template"><div class="flex-row-nowrap">
+    <span class="hotkey-argument-label">Source:</span>
+    <select class="audio-source-select hotkey-argument-input horizontal-flex-fill">
+        <option value="jpod101">JapanesePod101</option>
+        <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
+        <option value="jisho">Jisho.org</option>
+        <option value="text-to-speech">Text-to-speech</option>
+        <option value="text-to-speech-reading">Text-to-speech (Kana reading)</option>
+        <option value="custom">Custom</option>
+    </select>
+</div></template>
+
+<!-- Permissions -->
+<template id="permissions-origin-template">
+    <div class="permissions-origin-index generic-list-index-prefix"></div>
+    <input type="text" class="permissions-origin-input horizontal-flex-fill" autocomplete="off" spellcheck="false" readonly>
+    <button type="button" class="icon-button permissions-origin-menu-button permissions-origin-button" data-menu="permissions-origin-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+</template>
+<template id="permissions-origin-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
+    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
+</div></div></div></template>
+
+</body></html>

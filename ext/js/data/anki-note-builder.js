@@ -286,7 +286,7 @@ export class AnkiNoteBuilder {
     _runBatchedRequestsDelayed() {
         if (this._batchedRequestsQueued) { return; }
         this._batchedRequestsQueued = true;
-        Promise.resolve().then(() => {
+        void Promise.resolve().then(() => {
             this._batchedRequestsQueued = false;
             this._runBatchedRequests();
         });
@@ -322,7 +322,7 @@ export class AnkiNoteBuilder {
 
         this._batchedRequests.length = 0;
 
-        this._resolveBatchedRequests(items, allRequests);
+        void this._resolveBatchedRequests(items, allRequests);
     }
 
     /**

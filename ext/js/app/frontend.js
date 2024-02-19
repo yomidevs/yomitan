@@ -18,9 +18,9 @@
 
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
 import {promiseAnimationFrame} from '../core/promise-animation-frame.js';
-import {DocumentUtil} from '../dom/document-util.js';
+import {addFullscreenChangeEventListener, getFullscreenElement} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceGenerator} from '../dom/text-source-generator.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
@@ -39,8 +39,6 @@ export class Frontend {
         pageType,
         popupFactory,
         depth,
-        tabId,
-        frameId,
         parentPopupId,
         parentFrameId,
         useProxyPopup,
@@ -57,10 +55,6 @@ export class Frontend {
         this._popupFactory = popupFactory;
         /** @type {number} */
         this._depth = depth;
-        /** @type {number|undefined} */
-        this._tabId = tabId;
-        /** @type {number} */
-        this._frameId = frameId;
         /** @type {?string} */
         this._parentPopupId = parentPopupId;
         /** @type {?number} */
@@ -169,7 +163,7 @@ export class Frontend {
         this._textScanner.prepare();
 
         window.addEventListener('resize', this._onResize.bind(this), false);
-        DocumentUtil.addFullscreenChangeEventListener(this._updatePopup.bind(this));
+        addFullscreenChangeEventListener(this._updatePopup.bind(this));
 
         const {visualViewport} = window;
         if (typeof visualViewport !== 'undefined' && visualViewport !== null) {
@@ -262,14 +256,14 @@ export class Frontend {
      * @returns {void}
      */
     _onActionScanSelectedText() {
-        this._scanSelectedText(false);
+        void this._scanSelectedText(false);
     }
 
     /**
      * @returns {void}
      */
     _onActionScanTextAtCaret() {
-        this._scanSelectedText(true);
+        void this._scanSelectedText(true);
     }
 
     // API message handlers
@@ -326,7 +320,7 @@ export class Frontend {
      * @returns {void}
      */
     _onResize() {
-        this._updatePopupPosition();
+        void this._updatePopupPosition();
     }
 
     /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
@@ -353,7 +347,7 @@ export class Frontend {
      * @returns {void}
      */
     _onVisualViewportScroll() {
-        this._updatePopupPosition();
+        void this._updatePopupPosition();
     }
 
     /**
@@ -429,8 +423,8 @@ export class Frontend {
     _clearSelection(passive) {
         this._stopClearSelectionDelayed();
         if (this._popup !== null) {
-            this._popup.clearAutoPlayTimer();
-            this._popup.hide(!passive);
+            void this._popup.clearAutoPlayTimer();
+            void this._popup.hide(!passive);
             this._isPointerOverPopup = false;
         }
         this._textScanner.clearSelection();
@@ -529,7 +523,7 @@ export class Frontend {
         } else if (
             isIframe &&
             showIframePopupsInRootFrame &&
-            DocumentUtil.getFullscreenElement() === null &&
+            getFullscreenElement() === null &&
             this._allowRootFramePopupProxy
         ) {
             popupPromise = this._popupCache.get('iframe');
@@ -588,8 +582,13 @@ export class Frontend {
             return null;
         }
 
+        const {frameId} = this._application;
+        if (frameId === null) {
+            return null;
+        }
+
         return await this._popupFactory.getOrCreatePopup({
-            frameId: this._frameId,
+            frameId,
             depth: this._depth,
             childrenSupported: this._childrenSupported
         });
@@ -631,7 +630,7 @@ export class Frontend {
         });
         popup.on('offsetNotFound', () => {
             this._allowRootFramePopupProxy = false;
-            this._updatePopup();
+            void this._updatePopup();
         });
         return popup;
     }
@@ -680,7 +679,7 @@ export class Frontend {
      * @param {import('text-source').TextSource} textSource
      */
     _showExtensionUnloaded(textSource) {
-        this._showPopupContent(textSource, null, null);
+        void this._showPopupContent(textSource, null, null);
     }
 
     /**
@@ -703,12 +702,10 @@ export class Frontend {
         };
         if (sentence !== null) { detailsState.sentence = sentence; }
         if (documentTitle !== null) { detailsState.documentTitle = documentTitle; }
+        const {tabId, frameId} = this._application;
         /** @type {import('display').HistoryContent} */
         const detailsContent = {
-            contentOrigin: {
-                tabId: this._tabId,
-                frameId: this._frameId
-            }
+            contentOrigin: {tabId, frameId}
         };
         if (dictionaryEntries !== null) {
             detailsContent.dictionaryEntries = dictionaryEntries;
@@ -729,7 +726,7 @@ export class Frontend {
             details.params.full = textSource.fullContent;
             details.params['full-visible'] = 'true';
         }
-        this._showPopupContent(textSource, optionsContext, details);
+        void this._showPopupContent(textSource, optionsContext, details);
     }
 
     /**
@@ -795,9 +792,9 @@ export class Frontend {
 
         this._contentScale = contentScale;
         if (this._popup !== null) {
-            this._popup.setContentScale(this._contentScale);
+            void this._popup.setContentScale(this._contentScale);
         }
-        this._updatePopupPosition();
+        void this._updatePopupPosition();
     }
 
     /**
@@ -810,7 +807,7 @@ export class Frontend {
             this._popup !== null &&
             await this._popup.isVisible()
         ) {
-            this._showPopupContent(textSource, null, null);
+            void this._showPopupContent(textSource, null, null);
         }
     }
 
@@ -819,11 +816,11 @@ export class Frontend {
      */
     _signalFrontendReady(targetFrameId) {
         /** @type {import('application').ApiMessageNoFrameId<'frontendReady'>} */
-        const message = {action: 'frontendReady', params: {frameId: this._frameId}};
+        const message = {action: 'frontendReady', params: {frameId: this._application.frameId}};
         if (targetFrameId === null) {
-            this._application.api.broadcastTab(message);
+            void this._application.api.broadcastTab(message);
         } else {
-            this._application.api.sendMessageToFrame(targetFrameId, message);
+            void this._application.api.sendMessageToFrame(targetFrameId, message);
         }
     }
 
@@ -867,7 +864,7 @@ export class Frontend {
             }
 
             chrome.runtime.onMessage.addListener(onMessage);
-            this._application.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._frameId}});
+            void this._application.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._application.frameId}});
         });
     }
 
@@ -953,7 +950,7 @@ export class Frontend {
     _prepareSiteSpecific() {
         switch (location.hostname.toLowerCase()) {
             case 'docs.google.com':
-                this._prepareGoogleDocs();
+                void this._prepareGoogleDocs();
                 break;
         }
     }

@@ -17,7 +17,7 @@
  */
 
 import {ExtensionError} from '../../core/extension-error.js';
-import {log} from '../../core/logger.js';
+import {log} from '../../core/log.js';
 import {toError} from '../../core/to-error.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -64,7 +64,7 @@ export class DictionaryImportController {
     }
 
     /** */
-    async prepare() {
+    prepare() {
         this._purgeConfirmModal = this._modalController.getModal('dictionary-confirm-delete-all');
 
         this._purgeButton.addEventListener('click', this._onPurgeButtonClick.bind(this), false);
@@ -94,7 +94,7 @@ export class DictionaryImportController {
     _onPurgeConfirmButtonClick(e) {
         e.preventDefault();
         /** @type {import('./modal.js').Modal} */ (this._purgeConfirmModal).setVisible(false);
-        this._purgeDatabase();
+        void this._purgeDatabase();
     }
 
     /**
@@ -106,7 +106,7 @@ export class DictionaryImportController {
         if (files === null) { return; }
         const files2 = [...files];
         node.value = '';
-        this._importDictionaries(files2);
+        void this._importDictionaries(files2);
     }
 
     /** */
@@ -235,7 +235,7 @@ export class DictionaryImportController {
     async _importDictionary(file, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
         const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
-        this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
+        void this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
         const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
 
         if (errors.length > 0) {

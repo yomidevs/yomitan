@@ -23,7 +23,7 @@ import {DynamicProperty} from '../core/dynamic-property.js';
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
 import {PopupMenu} from '../dom/popup-menu.js';
@@ -46,20 +46,14 @@ import {QueryParser} from './query-parser.js';
 export class Display extends EventDispatcher {
     /**
      * @param {import('../application.js').Application} application
-     * @param {number|undefined} tabId
-     * @param {number|undefined} frameId
      * @param {import('display').DisplayPageType} pageType
      * @param {import('../dom/document-focus-controller.js').DocumentFocusController} documentFocusController
      * @param {import('../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
-    constructor(application, tabId, frameId, pageType, documentFocusController, hotkeyHandler) {
+    constructor(application, pageType, documentFocusController, hotkeyHandler) {
         super();
         /** @type {import('../application.js').Application} */
         this._application = application;
-        /** @type {number|undefined} */
-        this._tabId = tabId;
-        /** @type {number|undefined} */
-        this._frameId = frameId;
         /** @type {import('display').DisplayPageType} */
         this._pageType = pageType;
         /** @type {import('../dom/document-focus-controller.js').DocumentFocusController} */
@@ -159,10 +153,10 @@ export class Display extends EventDispatcher {
         this._parentPopupId = null;
         /** @type {?number} */
         this._parentFrameId = null;
-        /** @type {number|undefined} */
-        this._contentOriginTabId = tabId;
-        /** @type {number|undefined} */
-        this._contentOriginFrameId = frameId;
+        /** @type {?number} */
+        this._contentOriginTabId = application.tabId;
+        /** @type {?number} */
+        this._contentOriginFrameId = application.frameId;
         /** @type {boolean} */
         this._childrenSupported = true;
         /** @type {?FrameEndpoint} */
@@ -324,7 +318,7 @@ export class Display extends EventDispatcher {
 
         // Prepare
         await this._hotkeyHelpController.prepare(this._application.api);
-        await this._displayGenerator.prepare(this._application.api);
+        await this._displayGenerator.prepare();
         this._queryParser.prepare();
         this._history.prepare();
         this._optionToggleHotkeyHandler.prepare();
@@ -370,7 +364,7 @@ export class Display extends EventDispatcher {
 
     /** */
     initializeState() {
-        this._onStateChanged();
+        void this._onStateChanged();
         if (this._frameEndpoint !== null) {
             this._frameEndpoint.signal();
         }
@@ -454,7 +448,7 @@ export class Display extends EventDispatcher {
             }
         });
 
-        this._updateNestedFrontend(options);
+        void this._updateNestedFrontend(options);
         this._updateContentTextScanner(options);
 
         this.trigger('optionsUpdated', {options});
@@ -529,10 +523,10 @@ export class Display extends EventDispatcher {
     close() {
         switch (this._pageType) {
             case 'popup':
-                this.invokeContentOrigin('frontendClosePopup', void 0);
+                void this.invokeContentOrigin('frontendClosePopup', void 0);
                 break;
             case 'search':
-                this._closeTab();
+                void this._closeTab();
                 break;
         }
     }
@@ -588,10 +582,10 @@ export class Display extends EventDispatcher {
      * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     async invokeContentOrigin(action, params) {
-        if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
+        if (this._contentOriginTabId === this._application.tabId && this._contentOriginFrameId === this._application.frameId) {
             throw new Error('Content origin is same page');
         }
-        if (typeof this._contentOriginTabId !== 'number' || typeof this._contentOriginFrameId !== 'number') {
+        if (this._contentOriginTabId === null || this._contentOriginFrameId === null) {
             throw new Error('No content origin is assigned');
         }
         return await this._application.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
@@ -604,7 +598,8 @@ export class Display extends EventDispatcher {
      * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     async invokeParentFrame(action, params) {
-        if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
+        const {frameId} = this._application;
+        if (frameId === null || this._parentFrameId === null || this._parentFrameId === frameId) {
             throw new Error('Invalid parent frame');
         }
         return await this._application.crossFrame.invoke(this._parentFrameId, action, params);
@@ -832,6 +827,7 @@ export class Display extends EventDispatcher {
     _onExtensionUnloaded() {
         const type = 'unloaded';
         if (this._contentType === type) { return; }
+        const {tabId, frameId} = this._application;
         /** @type {import('display').ContentDetails} */
         const details = {
             focus: false,
@@ -839,10 +835,7 @@ export class Display extends EventDispatcher {
             params: {type},
             state: {},
             content: {
-                contentOrigin: {
-                    tabId: this._tabId,
-                    frameId: this._frameId
-                }
+                contentOrigin: {tabId, frameId}
             }
         };
         this.setContent(details);
@@ -971,7 +964,7 @@ export class Display extends EventDispatcher {
     _onDebugLogClick(e) {
         const link = /** @type {HTMLElement} */ (e.currentTarget);
         const index = this.getElementDictionaryEntryIndex(link);
-        this._logDictionaryEntryData(index);
+        void this._logDictionaryEntryData(index);
     }
 
     /**
@@ -1071,7 +1064,7 @@ export class Display extends EventDispatcher {
         const {action} = e.detail;
         switch (action) {
             case 'log-debug-info':
-                this._logDictionaryEntryData(this.getElementDictionaryEntryIndex(node));
+                void this._logDictionaryEntryData(this.getElementDictionaryEntryIndex(node));
                 break;
         }
     }
@@ -1222,7 +1215,7 @@ export class Display extends EventDispatcher {
         const {contentOrigin} = content;
         if (typeof contentOrigin === 'object' && contentOrigin !== null) {
             const {tabId, frameId} = contentOrigin;
-            if (typeof tabId === 'number' && typeof frameId === 'number') {
+            if (tabId !== null && frameId !== null) {
                 this._contentOriginTabId = tabId;
                 this._contentOriginFrameId = frameId;
                 contentOriginValid = true;
@@ -1352,7 +1345,7 @@ export class Display extends EventDispatcher {
         const visible = this._isQueryParserVisible();
         this._queryParserContainer.hidden = !visible || text.length === 0;
         if (visible && this._queryParser.text !== text) {
-            this._setQueryParserText(text);
+            void this._setQueryParserText(text);
         }
     }
 
@@ -1673,12 +1666,12 @@ export class Display extends EventDispatcher {
      * @param {import('settings').ProfileOptions} options
      */
     async _updateNestedFrontend(options) {
-        if (typeof this._frameId !== 'number') { return; }
+        const {tabId, frameId} = this._application;
+        if (tabId === null || frameId === null) { return; }
 
         const isSearchPage = (this._pageType === 'search');
         const isEnabled = (
             this._childrenSupported &&
-            typeof this._tabId === 'number' &&
             (
                 (isSearchPage) ?
                 (options.scanning.enableOnSearchPage) :
@@ -1707,10 +1700,6 @@ export class Display extends EventDispatcher {
 
     /** */
     async _setupNestedFrontend() {
-        if (typeof this._frameId !== 'number') {
-            throw new Error('No frameId assigned');
-        }
-
         const useProxyPopup = this._parentFrameId !== null;
         const parentPopupId = this._parentPopupId;
         const parentFrameId = this._parentFrameId;
@@ -1720,7 +1709,7 @@ export class Display extends EventDispatcher {
             import('../app/frontend.js')
         ]);
 
-        const popupFactory = new PopupFactory(this._application, this._frameId);
+        const popupFactory = new PopupFactory(this._application);
         popupFactory.prepare();
 
         /** @type {import('frontend').ConstructorDetails} */
@@ -1730,8 +1719,6 @@ export class Display extends EventDispatcher {
             parentPopupId,
             parentFrameId,
             depth: this._depth + 1,
-            tabId: this._tabId,
-            frameId: this._frameId,
             popupFactory,
             pageType: this._pageType,
             allowRootFramePopupProxy: true,
@@ -1751,7 +1738,7 @@ export class Display extends EventDispatcher {
         if (typeof this._contentOriginFrameId !== 'number') { return false; }
         const selection = window.getSelection();
         if (selection !== null && selection.toString().length > 0) { return false; }
-        this._copyHostSelectionSafe();
+        void this._copyHostSelectionSafe();
         return true;
     }
 
@@ -2033,8 +2020,7 @@ export class Display extends EventDispatcher {
             }
         }
 
-        // eslint-disable-next-line no-console
-        console.log(result);
+        log.log(result);
     }
 
     /** */

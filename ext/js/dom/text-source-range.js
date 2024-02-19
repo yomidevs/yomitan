@@ -17,7 +17,7 @@
  */
 
 import {toError} from '../core/to-error.js';
-import {DocumentUtil} from './document-util.js';
+import {convertMultipleRectZoomCoordinates, convertRectZoomCoordinates, getElementWritingMode, getNodesInRange, offsetDOMRects} from './document-util.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
 
 /**
@@ -170,7 +170,7 @@ export class TextSourceRange {
      */
     getRects() {
         if (this._isImposterDisconnected()) { return this._getCachedRects(); }
-        return DocumentUtil.convertMultipleRectZoomCoordinates(this._range.getClientRects(), this._range.startContainer);
+        return convertMultipleRectZoomCoordinates(this._range.getClientRects(), this._range.startContainer);
     }
 
     /**
@@ -181,7 +181,7 @@ export class TextSourceRange {
     getWritingMode() {
         let node = this._isImposterDisconnected() ? this._imposterSourceElement : this._range.startContainer;
         if (node !== null && node.nodeType !== Node.ELEMENT_NODE) { node = node.parentElement; }
-        return DocumentUtil.getElementWritingMode(/** @type {?Element} */ (node));
+        return getElementWritingMode(/** @type {?Element} */ (node));
     }
 
     /**
@@ -243,7 +243,7 @@ export class TextSourceRange {
      * @returns {Node[]} The nodes in the range.
      */
     getNodesInRange() {
-        return DocumentUtil.getNodesInRange(this._range);
+        return getNodesInRange(this._range);
     }
 
     /**
@@ -263,8 +263,8 @@ export class TextSourceRange {
      * @returns {TextSourceRange} A new instance of the class corresponding to the range.
      */
     static createFromImposter(range, imposterElement, imposterSourceElement) {
-        const cachedRects = DocumentUtil.convertMultipleRectZoomCoordinates(range.getClientRects(), range.startContainer);
-        const cachedSourceRect = DocumentUtil.convertRectZoomCoordinates(imposterSourceElement.getBoundingClientRect(), imposterSourceElement);
+        const cachedRects = convertMultipleRectZoomCoordinates(range.getClientRects(), range.startContainer);
+        const cachedSourceRect = convertRectZoomCoordinates(imposterSourceElement.getBoundingClientRect(), imposterSourceElement);
         return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect);
     }
 
@@ -289,8 +289,8 @@ export class TextSourceRange {
         ) {
             throw new Error('Cached rects not valid for this instance');
         }
-        const sourceRect = DocumentUtil.convertRectZoomCoordinates(this._imposterSourceElement.getBoundingClientRect(), this._imposterSourceElement);
-        return DocumentUtil.offsetDOMRects(
+        const sourceRect = convertRectZoomCoordinates(this._imposterSourceElement.getBoundingClientRect(), this._imposterSourceElement);
+        return offsetDOMRects(
             this._cachedRects,
             sourceRect.left - this._cachedSourceRect.left,
             sourceRect.top - this._cachedSourceRect.top

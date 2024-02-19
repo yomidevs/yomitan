@@ -81,7 +81,7 @@ export type ApiSurface = {
     };
     frontendRequestReadyBroadcast: {
         params: {
-            frameId: number;
+            frameId: number | null;
         };
         return: void;
     };
@@ -101,7 +101,7 @@ export type ApiSurface = {
     };
     frontendReady: {
         params: {
-            frameId: number;
+            frameId: number | null;
         };
         return: void;
     };

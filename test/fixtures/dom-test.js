@@ -69,7 +69,7 @@ export function createDomTest(htmlFilePath) {
             try {
                 await use(window);
             } finally {
-                environment.teardown(global);
+                await environment.teardown(global);
             }
         }
     });

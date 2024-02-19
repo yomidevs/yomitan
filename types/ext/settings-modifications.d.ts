@@ -97,7 +97,10 @@ export type ModificationSpliceResult = unknown[];
 
 export type ModificationPushResult = number;
 
+// There is some redundancy with this type currently due to the `unknown`s used in it.
+// For now, this is fine, but the types could be improved in the future.
 export type ModificationResult = (
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     ModificationSetResult |
     ModificationDeleteResult |
     // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents

@@ -261,10 +261,6 @@ type ApiSurface = {
         params: void;
         return: string;
     };
-    getDisplayTemplatesHtml: {
-        params: void;
-        return: string;
-    };
     getZoom: {
         params: void;
         return: {
@@ -289,7 +285,7 @@ type ApiSurface = {
         };
         return: DictionaryDatabase.MediaDataStringContent[];
     };
-    log: {
+    logGenericErrorBackend: {
         params: {
             error: Core.SerializedError;
             level: Log.LogLevel;

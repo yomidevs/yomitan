@@ -18,9 +18,9 @@
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
 import {clone} from '../core/utilities.js';
-import {DocumentUtil} from '../dom/document-util.js';
+import {anyNodeMatchesSelector, everyNodeMatchesSelector, getActiveModifiers, getActiveModifiersAndButtons, isPointInSelection} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 
 /**
@@ -542,7 +542,7 @@ export class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent('mouse', 'mouseMove', e);
         if (inputInfo === null) { return; }
 
-        this._searchAtFromMouseMove(e.clientX, e.clientY, inputInfo);
+        void this._searchAtFromMouseMove(e.clientX, e.clientY, inputInfo);
     }
 
     /**
@@ -609,10 +609,10 @@ export class TextScanner extends EventDispatcher {
 
         if (preventNextClickScan) { return; }
 
-        const modifiers = DocumentUtil.getActiveModifiersAndButtons(e);
-        const modifierKeys = DocumentUtil.getActiveModifiers(e);
+        const modifiers = getActiveModifiersAndButtons(e);
+        const modifierKeys = getActiveModifiers(e);
         const inputInfo = this._createInputInfo(null, 'mouse', 'click', false, modifiers, modifierKeys);
-        this._searchAt(e.clientX, e.clientY, inputInfo);
+        void this._searchAt(e.clientX, e.clientY, inputInfo);
     }
 
     /** */
@@ -658,7 +658,7 @@ export class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
 
         const selection = window.getSelection();
-        if (selection !== null && DocumentUtil.isPointInSelection(x, y, selection)) {
+        if (selection !== null && isPointInSelection(x, y, selection)) {
             return;
         }
 
@@ -669,7 +669,7 @@ export class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchStart', e);
         if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchPress)) { return; }
 
-        this._searchAtFromTouchStart(x, y, inputInfo);
+        void this._searchAtFromTouchStart(x, y, inputInfo);
     }
 
     /**
@@ -703,7 +703,7 @@ export class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchEnd', e);
         if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchRelease)) { return; }
 
-        this._searchAtFromTouchEnd(x, y, inputInfo);
+        void this._searchAtFromTouchEnd(x, y, inputInfo);
     }
 
     /**
@@ -739,7 +739,7 @@ export class TextScanner extends EventDispatcher {
 
         const {input} = inputInfo;
         if (input !== null && input.scanOnTouchMove) {
-            this._searchAt(primaryTouch.clientX, primaryTouch.clientY, inputInfo);
+            void this._searchAt(primaryTouch.clientX, primaryTouch.clientY, inputInfo);
         }
 
         e.preventDefault(); // Disable scroll
@@ -899,7 +899,7 @@ export class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchMove', e);
         if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchMove)) { return; }
 
-        this._searchAt(e.clientX, e.clientY, inputInfo);
+        void this._searchAt(e.clientX, e.clientY, inputInfo);
     }
 
     /**
@@ -942,7 +942,7 @@ export class TextScanner extends EventDispatcher {
      */
     _onPenPointerOver(e) {
         this._penPointerState = 1;
-        this._searchAtFromPen(e, 'pointerOver', false);
+        void this._searchAtFromPen(e, 'pointerOver', false);
     }
 
     /**
@@ -950,7 +950,7 @@ export class TextScanner extends EventDispatcher {
      */
     _onPenPointerDown(e) {
         this._penPointerState = 2;
-        this._searchAtFromPen(e, 'pointerDown', true);
+        void this._searchAtFromPen(e, 'pointerDown', true);
     }
 
     /**
@@ -958,7 +958,7 @@ export class TextScanner extends EventDispatcher {
      */
     _onPenPointerMove(e) {
         if (this._penPointerState === 2 && (!this._preventScroll || !e.cancelable)) { return; }
-        this._searchAtFromPen(e, 'pointerMove', true);
+        void this._searchAtFromPen(e, 'pointerMove', true);
     }
 
     /**
@@ -967,7 +967,7 @@ export class TextScanner extends EventDispatcher {
     _onPenPointerUp(e) {
         this._penPointerState = 3;
         this._preventScroll = false;
-        this._searchAtFromPen(e, 'pointerUp', false);
+        void this._searchAtFromPen(e, 'pointerUp', false);
     }
 
     /** */
@@ -1393,8 +1393,8 @@ export class TextScanner extends EventDispatcher {
      * @returns {?import('text-scanner').InputInfo}
      */
     _getMatchingInputGroupFromEvent(pointerType, eventType, event) {
-        const modifiers = DocumentUtil.getActiveModifiersAndButtons(event);
-        const modifierKeys = DocumentUtil.getActiveModifiers(event);
+        const modifiers = getActiveModifiersAndButtons(event);
+        const modifierKeys = getActiveModifiers(event);
         return this._getMatchingInputGroup(pointerType, eventType, modifiers, modifierKeys);
     }
 
@@ -1534,8 +1534,8 @@ export class TextScanner extends EventDispatcher {
         while (length > 0) {
             const nodes = textSource.getNodesInRange();
             if (
-                (includeSelector !== null && !DocumentUtil.everyNodeMatchesSelector(nodes, includeSelector)) ||
-                (excludeSelector !== null && DocumentUtil.anyNodeMatchesSelector(nodes, excludeSelector))
+                (includeSelector !== null && !everyNodeMatchesSelector(nodes, includeSelector)) ||
+                (excludeSelector !== null && anyNodeMatchesSelector(nodes, excludeSelector))
             ) {
                 --length;
                 textSource.setEndOffset(length, false, layoutAwareScan);

@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {log} from '../../core/logger.js';
+import {log} from '../../core/log.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
@@ -149,7 +149,7 @@ class DictionaryEntry {
     _onEnabledChanged(e) {
         const {detail: {value}} = e;
         this._titleContainer.dataset.enabled = `${value}`;
-        this._dictionaryController.updateDictionariesEnabled();
+        void this._dictionaryController.updateDictionariesEnabled();
     }
 
     /** */
@@ -255,7 +255,7 @@ class DictionaryEntry {
      * @param {number} offset
      */
     _move(offset) {
-        this._dictionaryController.moveDictionaryOptions(this._index, this._index + offset);
+        void this._dictionaryController.moveDictionaryOptions(this._index, this._index + offset);
     }
 
     /**
@@ -598,7 +598,7 @@ export class DictionaryController {
     _onOptionsChanged({options}) {
         this._updateDictionariesEnabledWarnings(options);
         if (this._dictionaries !== null) {
-            this._updateEntries();
+            void this._updateEntries();
         }
     }
 
@@ -620,7 +620,7 @@ export class DictionaryController {
         const allCheckbox = /** @type {HTMLInputElement} */ (this._allCheckbox);
         const value = allCheckbox.checked;
         allCheckbox.checked = !value;
-        this._setAllDictionariesEnabled(value);
+        void this._setAllDictionariesEnabled(value);
     }
 
     /** */
@@ -718,7 +718,7 @@ export class DictionaryController {
         if (typeof title !== 'string') { return; }
         delete modal.node.dataset.dictionaryTitle;
 
-        this._deleteDictionary(title);
+        void this._deleteDictionary(title);
     }
 
     /**
@@ -726,7 +726,7 @@ export class DictionaryController {
      */
     _onCheckIntegrityButtonClick(e) {
         e.preventDefault();
-        this._checkIntegrity();
+        void this._checkIntegrity();
     }
 
     /** */
@@ -743,7 +743,7 @@ export class DictionaryController {
 
         if (!Number.isFinite(target) || !Number.isFinite(indexNumber) || indexNumber === target) { return; }
 
-        this.moveDictionaryOptions(indexNumber, target);
+        void this.moveDictionaryOptions(indexNumber, target);
     }
 
     /**
@@ -916,7 +916,7 @@ export class DictionaryController {
      */
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
         await new DictionaryWorker().deleteDictionary(dictionaryTitle, onProgress);
-        this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'delete');
+        void this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'delete');
     }
 
     /**

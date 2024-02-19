@@ -15,19 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {descriptor as descriptorEnglish} from './en/language-english.js';
-import {descriptor as descriptorJapanese} from './ja/language-japanese.js';
-
-const languageDescriptors = [
-    descriptorEnglish,
-    descriptorJapanese
-];
-
-/** @type {Map<string, typeof languageDescriptors[0]>} */
-const languageDescriptorMap = new Map();
-for (const languageDescriptor of languageDescriptors) {
-    languageDescriptorMap.set(languageDescriptor.iso, languageDescriptor);
-}
+import {languageDescriptorMap} from './language-descriptors.js';
 
 /**
  * @returns {import('language').LanguageSummary[]}

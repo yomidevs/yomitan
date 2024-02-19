@@ -22,7 +22,7 @@ import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {deepEqual} from '../core/utilities.js';
-import {DocumentUtil} from '../dom/document-util.js';
+import {addFullscreenChangeEventListener, computeZoomScale, convertRectZoomCoordinates, getFullscreenElement} from '../dom/document-util.js';
 import {loadStyle} from '../dom/style-util.js';
 import {ThemeController} from './theme-controller.js';
 
@@ -304,7 +304,7 @@ export class Popup extends EventDispatcher {
         await this._show(sourceRects, writingMode);
 
         if (displayDetails !== null) {
-            this._invokeSafe('displaySetContent', {details: displayDetails});
+            void this._invokeSafe('displaySetContent', {details: displayDetails});
         }
     }
 
@@ -594,7 +594,7 @@ export class Popup extends EventDispatcher {
             return;
         }
 
-        DocumentUtil.addFullscreenChangeEventListener(this._onFullscreenChanged.bind(this), this._fullscreenEventListeners);
+        addFullscreenChangeEventListener(this._onFullscreenChanged.bind(this), this._fullscreenEventListeners);
     }
 
     /**
@@ -662,7 +662,7 @@ export class Popup extends EventDispatcher {
         if (this._visibleValue === value) { return; }
         this._visibleValue = value;
         this._frame.style.setProperty('visibility', value ? 'visible' : 'hidden', 'important');
-        this._invokeSafe('displayVisibilityChanged', {value});
+        void this._invokeSafe('displayVisibilityChanged', {value});
     }
 
     /**
@@ -748,7 +748,7 @@ export class Popup extends EventDispatcher {
         if (defaultParent !== null && defaultParent.tagName.toLowerCase() === 'frameset') {
             defaultParent = document.documentElement;
         }
-        const fullscreenElement = DocumentUtil.getFullscreenElement();
+        const fullscreenElement = getFullscreenElement();
         if (
             fullscreenElement === null ||
             fullscreenElement.shadowRoot ||
@@ -1028,7 +1028,7 @@ export class Popup extends EventDispatcher {
         this._useSecureFrameUrl = general.useSecurePopupFrameUrl;
         this._useShadowDom = general.usePopupShadowDom;
         this._customOuterCss = general.customPopupOuterCss;
-        this.updateTheme();
+        void this.updateTheme();
     }
 
     /**
@@ -1091,7 +1091,7 @@ export class Popup extends EventDispatcher {
      * @returns {DOMRect} The rectangle of the frame.
      */
     _getFrameBoundingClientRect() {
-        return DocumentUtil.convertRectZoomCoordinates(this._frame.getBoundingClientRect(), this._container);
+        return convertRectZoomCoordinates(this._frame.getBoundingClientRect(), this._container);
     }
 
     /**
@@ -1100,7 +1100,7 @@ export class Popup extends EventDispatcher {
      * @returns {import('popup').Rect[]} Either an updated list of rectangles, or `sourceRects` if no change is required.
      */
     _convertSourceRectsCoordinateSpace(sourceRects) {
-        let scale = DocumentUtil.computeZoomScale(this._container);
+        let scale = computeZoomScale(this._container);
         if (scale === 1) { return sourceRects; }
         scale = 1 / scale;
         const sourceRects2 = [];

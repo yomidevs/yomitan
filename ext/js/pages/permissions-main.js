@@ -86,7 +86,7 @@ function setupPermissionsToggles() {
     }
 }
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -95,7 +95,7 @@ await Application.main(async (application) => {
 
     setupPermissionsToggles();
 
-    setupEnvironmentInfo(application.api);
+    void setupEnvironmentInfo(application.api);
 
     /** @type {HTMLInputElement} */
     const permissionCheckbox1 = querySelectorNotNull(document, '#permission-checkbox-allow-in-private-windows');
@@ -122,13 +122,13 @@ await Application.main(async (application) => {
     await settingsController.prepare();
 
     const permissionsToggleController = new PermissionsToggleController(settingsController);
-    permissionsToggleController.prepare();
+    void permissionsToggleController.prepare();
 
     const permissionsOriginController = new PermissionsOriginController(settingsController);
-    permissionsOriginController.prepare();
+    void permissionsOriginController.prepare();
 
     const persistentStorageController = new PersistentStorageController(application);
-    persistentStorageController.prepare();
+    void persistentStorageController.prepare();
 
     await promiseTimeout(100);
 
