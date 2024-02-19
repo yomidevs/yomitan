@@ -39,7 +39,7 @@ jobs:
           CI: true
 
       - name: Lint CSS
-        run: npm run test-lint-css
+        run: npm run test:css
         env:
           CI: true
 
