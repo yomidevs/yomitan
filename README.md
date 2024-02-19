@@ -27,7 +27,7 @@ Since this is a distributed effort, we **highly welcome new contributors**! Feel
 ## What's Yomitan?<!-- omit from toc -->
 
 Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
-which would be otherwise too difficult tackle. This extension is similar to [10ten Japanese Reader (formerly Rikaichamp)](https://addons.mozilla.org/en-US/firefox/addon/10ten-ja-reader/) for Firefox and [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp?hl=en) for Chrome, but it stands apart in its goal of being an all-encompassing learning tool as opposed to a mere browser-based dictionary.
+which would be otherwise too difficult tackle. This extension is similar to [10ten Japanese Reader (formerly Rikaichamp)](https://addons.mozilla.org/en-US/firefox/addon/10ten-ja-reader/) for Firefox and [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp) for Chrome, but it stands apart in its goal of being an all-encompassing learning tool as opposed to a mere browser-based dictionary.
 
 Yomitan provides advanced features not available in other browser-based dictionaries:
 
