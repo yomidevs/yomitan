@@ -88,9 +88,7 @@ export class Backend {
         }
 
         /** @type {ClipboardMonitor} */
-        this._clipboardMonitor = new ClipboardMonitor({
-            clipboardReader: this._clipboardReader
-        });
+        this._clipboardMonitor = new ClipboardMonitor(this._clipboardReader);
         /** @type {?import('settings').Options} */
         this._options = null;
         /** @type {import('../data/json-schema.js').JsonSchema[]} */
