@@ -29,4 +29,4 @@ async function main() {
     await backend.prepare();
 }
 
-main();
+void main();

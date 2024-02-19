@@ -26,38 +26,38 @@ class HtmlTestUtilities {
      */
     static requestFullscreen(element) {
         if (element.requestFullscreen) {
-            element.requestFullscreen();
+            void element.requestFullscreen();
             // @ts-expect-error - Browser compatibility
         } else if (element.mozRequestFullScreen) {
             // @ts-expect-error - Browser compatibility
-            element.mozRequestFullScreen();
+            void element.mozRequestFullScreen();
             // @ts-expect-error - Browser compatibility
         } else if (element.webkitRequestFullscreen) {
             // @ts-expect-error - Browser compatibility
-            element.webkitRequestFullscreen();
+            void element.webkitRequestFullscreen();
             // @ts-expect-error - Browser compatibility
         } else if (element.msRequestFullscreen) {
             // @ts-expect-error - Browser compatibility
-            element.msRequestFullscreen();
+            void element.msRequestFullscreen();
         }
     }
 
     /** */
     static exitFullscreen() {
         if (document.exitFullscreen) {
-            document.exitFullscreen();
+            void document.exitFullscreen();
             // @ts-expect-error - Browser compatibility
         } else if (document.mozCancelFullScreen) {
             // @ts-expect-error - Browser compatibility
-            document.mozCancelFullScreen();
+            void document.mozCancelFullScreen();
             // @ts-expect-error - Browser compatibility
         } else if (document.webkitExitFullscreen) {
             // @ts-expect-error - Browser compatibility
-            document.webkitExitFullscreen();
+            void document.webkitExitFullscreen();
             // @ts-expect-error - Browser compatibility
         } else if (document.msExitFullscreen) {
             // @ts-expect-error - Browser compatibility
-            document.msExitFullscreen();
+            void document.msExitFullscreen();
         }
     }
 

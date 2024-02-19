@@ -280,4 +280,4 @@ export async function main(argv) {
     }
 }
 
-testMain(main, process.argv.slice(2));
+await testMain(main, process.argv.slice(2));

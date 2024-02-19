@@ -304,7 +304,7 @@ export class Popup extends EventDispatcher {
         await this._show(sourceRects, writingMode);
 
         if (displayDetails !== null) {
-            this._invokeSafe('displaySetContent', {details: displayDetails});
+            void this._invokeSafe('displaySetContent', {details: displayDetails});
         }
     }
 
@@ -662,7 +662,7 @@ export class Popup extends EventDispatcher {
         if (this._visibleValue === value) { return; }
         this._visibleValue = value;
         this._frame.style.setProperty('visibility', value ? 'visible' : 'hidden', 'important');
-        this._invokeSafe('displayVisibilityChanged', {value});
+        void this._invokeSafe('displayVisibilityChanged', {value});
     }
 
     /**
@@ -1028,7 +1028,7 @@ export class Popup extends EventDispatcher {
         this._useSecureFrameUrl = general.useSecurePopupFrameUrl;
         this._useShadowDom = general.usePopupShadowDom;
         this._customOuterCss = general.customPopupOuterCss;
-        this.updateTheme();
+        void this.updateTheme();
     }
 
     /**

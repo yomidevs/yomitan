@@ -63,7 +63,7 @@ export class NestedPopupsController {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const value = node.checked;
         if (value && this._popupNestingMaxDepth > 0) { return; }
-        this._setPopupNestingMaxDepth(value ? 1 : 0);
+        void this._setPopupNestingMaxDepth(value ? 1 : 0);
     }
 
     /**
@@ -72,7 +72,7 @@ export class NestedPopupsController {
     _onNestedPopupsCountChange(e) {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const value = Math.max(1, convertElementValueToNumber(node.value, node));
-        this._setPopupNestingMaxDepth(value);
+        void this._setPopupNestingMaxDepth(value);
     }
 
     /**

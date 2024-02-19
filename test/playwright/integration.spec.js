@@ -51,7 +51,7 @@ test('anki add', async ({context, page, extensionId}) => {
         resolve = res;
     });
     await context.route(/127.0.0.1:8765\/*/, (route) => {
-        mockAnkiRouteHandler(route);
+        void mockAnkiRouteHandler(route);
         const req = route.request();
         if (req.url().includes('127.0.0.1:8765') && req.postDataJSON().action === 'addNote') {
             /** @type {(value: unknown) => void} */ (resolve)(req.postDataJSON());

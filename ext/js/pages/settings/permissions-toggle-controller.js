@@ -69,7 +69,7 @@ export class PermissionsToggleController {
             }
             toggle.checked = !!value;
         }
-        this._updateValidity();
+        void this._updateValidity();
     }
 
     /**

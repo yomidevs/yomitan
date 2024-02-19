@@ -126,7 +126,7 @@ export class DictionaryWorker {
                 {
                     const {worker} = details;
                     if (worker === null) { return; }
-                    this._onMessageGetImageDetails(params, worker);
+                    void this._onMessageGetImageDetails(params, worker);
                 }
                 break;
         }

@@ -66,7 +66,7 @@ export class GenericSettingController {
 
     /** */
     _onOptionsChanged() {
-        this._dataBinder.refresh();
+        void this._dataBinder.refresh();
     }
 
     /**

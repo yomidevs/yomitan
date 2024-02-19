@@ -134,7 +134,7 @@ export class AudioController extends EventDispatcher {
 
     /** */
     _onAddAudioSource() {
-        this._addAudioSource();
+        void this._addAudioSource();
     }
 
     /** */
@@ -145,7 +145,7 @@ export class AudioController extends EventDispatcher {
             const voiceUri = input.dataset.voice;
             const audio = this._audioSystem.createTextToSpeechAudio(text, typeof voiceUri === 'string' ? voiceUri : '');
             audio.volume = 1;
-            audio.play();
+            void audio.play();
         } catch (e) {
             // NOP
         }
@@ -352,7 +352,7 @@ class AudioSourceEntry {
         const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
         const value = this._normalizeAudioSourceType(element.value);
         if (value === null) { return; }
-        this._setType(value);
+        void this._setType(value);
     }
 
     /**
@@ -360,7 +360,7 @@ class AudioSourceEntry {
      */
     _onUrlInputChange(e) {
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
-        this._setUrl(element.value);
+        void this._setUrl(element.value);
     }
 
     /**
@@ -368,7 +368,7 @@ class AudioSourceEntry {
      */
     _onVoiceSelectChange(e) {
         const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
-        this._setVoice(element.value);
+        void this._setVoice(element.value);
     }
 
     /**
@@ -403,7 +403,7 @@ class AudioSourceEntry {
                 this._showHelp(this._type);
                 break;
             case 'remove':
-                this._parent.removeSource(this);
+                void this._parent.removeSource(this);
                 break;
         }
     }
