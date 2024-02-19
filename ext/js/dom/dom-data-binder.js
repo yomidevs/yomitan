@@ -25,9 +25,14 @@ import {SelectorObserver} from './selector-observer.js';
  */
 export class DOMDataBinder {
     /**
-     * @param {import('dom-data-binder').ConstructorDetails<T>} details
+     * @param {string} selector
+     * @param {import('dom-data-binder').CreateElementMetadataCallback<T>} createElementMetadata
+     * @param {import('dom-data-binder').CompareElementMetadataCallback<T>} compareElementMetadata
+     * @param {import('dom-data-binder').GetValuesCallback<T>} getValues
+     * @param {import('dom-data-binder').SetValuesCallback<T>} setValues
+     * @param {import('dom-data-binder').OnErrorCallback<T>|null} [onError]
      */
-    constructor({selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null}) {
+    constructor(selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null) {
         /** @type {string} */
         this._selector = selector;
         /** @type {import('dom-data-binder').CreateElementMetadataCallback<T>} */

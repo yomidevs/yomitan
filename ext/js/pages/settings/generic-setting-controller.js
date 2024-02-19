@@ -31,13 +31,13 @@ export class GenericSettingController {
         /** @type {import('settings-modifications').OptionsScopeType} */
         this._defaultScope = 'profile';
         /** @type {DOMDataBinder<import('generic-setting-controller').ElementMetadata>} */
-        this._dataBinder = new DOMDataBinder({
-            selector: '[data-setting]',
-            createElementMetadata: this._createElementMetadata.bind(this),
-            compareElementMetadata: this._compareElementMetadata.bind(this),
-            getValues: this._getValues.bind(this),
-            setValues: this._setValues.bind(this)
-        });
+        this._dataBinder = new DOMDataBinder(
+            '[data-setting]',
+            this._createElementMetadata.bind(this),
+            this._compareElementMetadata.bind(this),
+            this._getValues.bind(this),
+            this._setValues.bind(this)
+        );
         /** @type {Map<import('generic-setting-controller').TransformType, import('generic-setting-controller').TransformFunction>} */
         this._transforms = new Map(/** @type {[key: import('generic-setting-controller').TransformType, value: import('generic-setting-controller').TransformFunction][]} */ ([
             ['setAttribute', this._setAttribute.bind(this)],
