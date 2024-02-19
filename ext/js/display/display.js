@@ -126,11 +126,7 @@ export class Display extends EventDispatcher {
         /** @type {TextSourceGenerator} */
         this._textSourceGenerator = new TextSourceGenerator();
         /** @type {QueryParser} */
-        this._queryParser = new QueryParser({
-            api: application.api,
-            getSearchContext: this._getSearchContext.bind(this),
-            textSourceGenerator: this._textSourceGenerator
-        });
+        this._queryParser = new QueryParser(application.api, this._textSourceGenerator, this._getSearchContext.bind(this));
         /** @type {HTMLElement} */
         this._contentScrollElement = querySelectorNotNull(document, '#content-scroll');
         /** @type {HTMLElement} */

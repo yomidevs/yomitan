@@ -17,8 +17,6 @@
 
 import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
 import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
-import type {TextSourceGenerator} from '../../ext/js/dom/text-source-generator';
-import type {API} from '../../ext/js/comm/api';
 import type * as Dictionary from './dictionary';
 import type * as Extension from './extension';
 import type * as Settings from './settings';
@@ -126,12 +124,6 @@ export type HistoryContent = {
 export type SearchMode = null | 'popup' | 'action-popup';
 
 export type GetSearchContextCallback = TextScannerTypes.GetSearchContextCallbackSync;
-
-export type QueryParserConstructorDetails = {
-    api: API;
-    getSearchContext: GetSearchContextCallback;
-    textSourceGenerator: TextSourceGenerator;
-};
 
 export type QueryParserOptions = {
     selectedParser: string | null;
