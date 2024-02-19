@@ -15,14 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {DictionaryDatabase} from '../../ext/js/dictionary/dictionary-database';
 import type * as Dictionary from './dictionary';
 import type * as DictionaryDatabaseTypes from './dictionary-database';
-
-export type ConstructorDetails = {
-    /** An instance of DictionaryDatabase. */
-    database: DictionaryDatabase;
-};
 
 /**
  * Information about how popup content should be shown, specifically related to the outer popup frame.

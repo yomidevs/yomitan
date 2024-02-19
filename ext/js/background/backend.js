@@ -68,9 +68,7 @@ export class Backend {
             /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
             this._dictionaryDatabase = new DictionaryDatabase();
             /** @type {Translator|TranslatorProxy} */
-            this._translator = new Translator({
-                database: this._dictionaryDatabase
-            });
+            this._translator = new Translator(this._dictionaryDatabase);
             /** @type {ClipboardReader|ClipboardReaderProxy} */
             this._clipboardReader = new ClipboardReader({
                 // eslint-disable-next-line no-undef
