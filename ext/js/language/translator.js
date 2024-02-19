@@ -121,9 +121,9 @@ export class Translator {
             if (frequencies.length > 1) {this._sortTermDictionaryEntrySimpleData(frequencies);}
             if (pronunciations.length > 1) {this._sortTermDictionaryEntrySimpleData(pronunciations);}
         }
+        const withUserFacingInflections = this._addUserFacingInflections(language, dictionaryEntries);
         performance.mark('translator:findTerms:end');
         performance.measure('translator:findTerms', 'translator:findTerms:start', 'translator:findTerms:end');
-        const withUserFacingInflections = this._addUserFacingInflections(language, dictionaryEntries);
 
         return {dictionaryEntries: withUserFacingInflections, originalTextLength};
     }
