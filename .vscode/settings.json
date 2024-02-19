@@ -17,6 +17,8 @@
     "eslint.format.enable": true,
     "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
     "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+    "javascript.format.enable": false,
+    "typescript.format.enable": false,
     "javascript.preferences.importModuleSpecifierEnding": "js",
     "editor.tabSize": 4,
     "editor.insertSpaces": true,

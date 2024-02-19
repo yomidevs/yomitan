@@ -58,6 +58,9 @@ export class OffscreenProxy {
         this._webExtension = webExtension;
         /** @type {?Promise<void>} */
         this._creatingOffscreen = null;
+
+        /** @type {?MessagePort} */
+        this._currentOffscreenPort = null;
     }
 
     /**
@@ -136,6 +139,24 @@ export class OffscreenProxy {
         }
         return response.result;
     }
+
+    /**
+     * @param {MessagePort} port
+     */
+    async registerOffscreenPort(port) {
+        if (this._currentOffscreenPort) {
+            this._currentOffscreenPort.close();
+        }
+        this._currentOffscreenPort = port;
+    }
+
+    /**
+     * @param {any} message
+     * @param {Transferable[]} transfers
+     */
+    sendMessageViaPort(message, transfers) {
+        this._currentOffscreenPort?.postMessage(message, transfers);
+    }
 }
 
 export class DictionaryDatabaseProxy {
@@ -178,12 +199,11 @@ export class DictionaryDatabaseProxy {
     }
 
     /**
-     * @param {import('dictionary-database').MediaRequest[]} targets
-     * @returns {Promise<import('dictionary-database').MediaObject[]>}
+     * @param {import('dictionary-database').DrawMediaRequest[]} targets
+     * @returns {Promise<void>}
      */
-    async getMediaObjects(targets) {
-        console.log('offscreen getMediaObjects', targets);
-        return await this._offscreen.sendMessagePromise({action: 'databaseGetMediaObjectsOffscreen', params: {targets}});
+    async drawMedia(targets) {
+        this._offscreen.sendMessageViaPort({action: 'drawMedia', params: targets}, targets.map((t) => t.canvas));
     }
 }
 

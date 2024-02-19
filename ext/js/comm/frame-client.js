@@ -85,6 +85,8 @@ export class FrameClient {
         return new Promise((resolve, reject) => {
             /** @type {Map<string, string>} */
             const tokenMap = new Map();
+            /** @type {MessagePort | null} */
+            let messagePort = null;
             /** @type {?import('core').Timeout} */
             let timer = null;
             const deferPromiseDetails = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
@@ -95,9 +97,10 @@ export class FrameClient {
             /**
              * @param {string} action
              * @param {import('core').SerializableObject} params
+             * @param {Transferable[]} transfers
              * @throws {Error}
              */
-            const postMessage = (action, params) => {
+            const postMessage = (action, params, transfers) => {
                 const contentWindow = frame.contentWindow;
                 if (contentWindow === null) { throw new Error('Frame missing content window'); }
 
@@ -109,7 +112,7 @@ export class FrameClient {
                 }
                 if (!validOrigin) { throw new Error('Unexpected frame origin'); }
 
-                contentWindow.postMessage({action, params}, targetOrigin);
+                contentWindow.postMessage({action, params}, targetOrigin, transfers);
             };
 
             /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
@@ -132,10 +135,12 @@ export class FrameClient {
                     switch (action) {
                         case 'frameEndpointReady':
                             {
+                                const mc = new MessageChannel();
                                 const {secret} = params;
                                 const token = generateId(16);
                                 tokenMap.set(secret, token);
-                                postMessage('frameEndpointConnect', {secret, token, hostFrameId});
+                                messagePort = mc.port1;
+                                postMessage('frameEndpointConnect', {secret, token, hostFrameId}, [mc.port2]);
                             }
                             break;
                         case 'frameEndpointConnected':
@@ -176,6 +181,9 @@ export class FrameClient {
                 if (timer === null) { return; } // Done
                 clearTimeout(timer);
                 timer = null;
+                if (messagePort !== null) {
+                    messagePort.close();
+                }
 
                 frameLoadedResolve = null;
                 if (frameLoadedReject !== null) {

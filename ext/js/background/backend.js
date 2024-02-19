@@ -72,7 +72,6 @@ export class Backend {
             this._translator = new Translator(this._dictionaryDatabase);
             /** @type {ClipboardReader|ClipboardReaderProxy} */
             this._clipboardReader = new ClipboardReader(
-                // eslint-disable-next-line no-undef
                 (typeof document === 'object' && document !== null ? document : null),
                 '#clipboard-paste-target',
                 '#clipboard-rich-content-paste-target',
@@ -172,7 +171,7 @@ export class Backend {
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
             ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
             ['getMedia',                     this._onApiGetMedia.bind(this)],
-            ['getMediaObjects',              this._onApiGetMediaObjects.bind(this)],
+            ['drawMedia',                    this._onApiDrawMedia.bind(this)],
             ['logGenericErrorBackend',       this._onApiLogGenericErrorBackend.bind(this)],
             ['logIndicatorClear',            this._onApiLogIndicatorClear.bind(this)],
             ['modifySettings',               this._onApiModifySettings.bind(this)],
@@ -241,6 +240,15 @@ export class Backend {
 
         const onMessage = this._onMessageWrapper.bind(this);
         chrome.runtime.onMessage.addListener(onMessage);
+
+        // This is for receiving messages sent with navigator.serviceWorker, which has the benefit of being able to transfer objects, but doesn't accept callbacks
+        addEventListener('message', (event) => {
+            if (event.data.action === 'drawMedia') {
+                this._dictionaryDatabase.drawMedia(event.data.params);
+            } else if (event.data.action === 'registerOffscreenPort' && this._offscreen !== null) {
+                this._offscreen.registerOffscreenPort(event.ports[0]);
+            }
+        });
 
         if (this._canObservePermissionsChanges()) {
             const onPermissionsChanged = this._onWebExtensionEventWrapper(this._onPermissionsChanged.bind(this));
@@ -817,9 +825,10 @@ export class Backend {
         return await this._getNormalizedDictionaryDatabaseMedia(targets);
     }
 
-    /** @type {import('api').ApiHandler<'getMediaObjects'>} */
-    async _onApiGetMediaObjects({targets}) {
-        return await this._dictionaryDatabase.getMediaObjects(targets);
+    /** @type {import('api').ApiHandler<'drawMedia'>} */
+    async _onApiDrawMedia({targets}) {
+        console.log('_onApiDrawMedia', targets);
+        await this._dictionaryDatabase.drawMedia(targets);
     }
 
     /** @type {import('api').ApiHandler<'logGenericErrorBackend'>} */

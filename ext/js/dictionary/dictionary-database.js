@@ -34,6 +34,8 @@ export class DictionaryDatabase {
         this._createOnlyQuery3 = (item) => IDBKeyRange.only(item.term);
         /** @type {import('dictionary-database').CreateQuery<import('dictionary-database').MediaRequest>} */
         this._createOnlyQuery4 = (item) => IDBKeyRange.only(item.path);
+        /** @type {import('dictionary-database').CreateQuery<import('dictionary-database').DrawMediaGroupedRequest>} */
+        this._createOnlyQuery5 = (item) => IDBKeyRange.only(item.path);
         /** @type {import('dictionary-database').CreateQuery<string>} */
         this._createBoundQuery1 = (item) => IDBKeyRange.bound(item, `${item}\uffff`, false, false);
         /** @type {import('dictionary-database').CreateQuery<string>} */
@@ -53,6 +55,8 @@ export class DictionaryDatabase {
         this._createKanjiMetaBind = this._createKanjiMeta.bind(this);
         /** @type {import('dictionary-database').CreateResult<import('dictionary-database').MediaRequest, import('dictionary-database').MediaDataArrayBufferContent, import('dictionary-database').Media>} */
         this._createMediaBind = this._createMedia.bind(this);
+        /** @type {import('dictionary-database').CreateResult<import('dictionary-database').DrawMediaGroupedRequest, import('dictionary-database').MediaDataArrayBufferContent, import('dictionary-database').DrawMedia>} */
+        this._createDrawMediaBind = this._createDrawMedia.bind(this);
     }
 
     /** */
@@ -347,18 +351,65 @@ export class DictionaryDatabase {
     }
 
     /**
-     * This requires the ability to call URL.createObjectURL, which is not available in a service worker. Therefore Chrome must go through the Offscreen API as opposed to directly calling this.
-     * @param {import('dictionary-database').MediaRequest[]} items
-     * @returns {Promise<import('dictionary-database').MediaObject[]>}
+     * @param {import('dictionary-database').DrawMediaRequest[]} items
      */
-    async getMediaObjects(items) {
+    async drawMedia(items) {
+        performance.mark('drawMedia:start');
+
+        // merge items with the same path to reduce the number of database queries. collects the canvases into a single array for each path.
+        /** @type {Map<string, import('dictionary-database').DrawMediaGroupedRequest>} */
+        const groupedItems = new Map();
+        for (const item of items) {
+            const {path, dictionary, canvas} = item;
+            const key = `${path}:::${dictionary}`;
+            if (!groupedItems.has(key)) {
+                groupedItems.set(key, {path, dictionary, canvases: []});
+            }
+            groupedItems.get(key)?.canvases.push(canvas);
+        }
+        const groupedItemsArray = [...groupedItems.values()];
+        console.log(groupedItemsArray);
+
         /** @type {import('dictionary-database').FindPredicate<import('dictionary-database').MediaRequest, import('dictionary-database').MediaDataArrayBufferContent>} */
         const predicate = (row, item) => (row.dictionary === item.dictionary);
-        return (await this._findMultiBulk('media', ['path'], items, this._createOnlyQuery4, predicate, this._createMediaBind)).map((m) => {
-            const blob = new Blob([m.content], {type: m.mediaType});
-            const url = URL.createObjectURL(blob);
-            return {...m, content: null, url};
-        });
+        const drawPromises = [];
+        // performance.mark('drawMedia:findMultiBulk:start');
+        const results = await this._findMultiBulk('media', ['path'], groupedItemsArray, this._createOnlyQuery5, predicate, this._createDrawMediaBind);
+        // performance.mark('drawMedia:findMultiBulk:end');
+        // performance.measure('drawMedia:findMultiBulk', 'drawMedia:findMultiBulk:start', 'drawMedia:findMultiBulk:end');
+
+        performance.mark('drawMedia:decode:start');
+        for (const m of results) {
+            if (m.mediaType === 'image/svg+xml') {
+                const blob = new Blob([m.content], {type: m.mediaType});
+                const url = URL.createObjectURL(blob);
+                const image = new Image(m.width, m.height);
+                image.src = url;
+                drawPromises.push(image.decode().then(() => {
+                    URL.revokeObjectURL(url);
+                    return {canvases: m.canvases, image};
+                }));
+            } else {
+                const imageDecoder = new ImageDecoder({type: m.mediaType, data: m.content});
+                drawPromises.push(imageDecoder.decode().then((decodedImage) => {
+                    return {canvases: m.canvases, image: decodedImage.image};
+                }));
+            }
+        }
+        performance.mark('drawMedia:decode:end');
+        performance.measure('drawMedia:decode', 'drawMedia:decode:start', 'drawMedia:decode:end');
+
+        performance.mark('drawMedia:draw:start');
+        for (const {canvases, image} of await Promise.all(drawPromises)) {
+            for (const c of canvases) {
+                c.getContext('2d')?.drawImage(image, 0, 0, c.width, c.height);
+            }
+        }
+        performance.mark('drawMedia:draw:end');
+        performance.measure('drawMedia:draw', 'drawMedia:draw:start', 'drawMedia:draw:end');
+
+        performance.mark('drawMedia:end');
+        // performance.measure('drawMedia', 'drawMedia:start', 'drawMedia:end');
     }
 
     /**
@@ -491,8 +542,13 @@ export class DictionaryDatabase {
             /**
              * @param {TRow[]} rows
              * @param {import('dictionary-database').FindMultiBulkData<TItem>} data
+             * @param item
              */
-            const onGetAll = (rows, data) => {
+            const onGetAll = (item) => (rows, data) => {
+                if (typeof item === 'object' && 'path' in item) {
+                    performance.mark(`findMultiBulk:onGetAll:${item.path}:end`);
+                    performance.measure(`findMultiBulk:onGetAll:${item.path}`, `findMultiBulk:onGetAll:${item.path}:start`, `findMultiBulk:onGetAll:${item.path}:end`);
+                }
                 for (const row of rows) {
                     if (predicate(row, data.item)) {
                         results.push(createResult(row, data));
@@ -502,15 +558,22 @@ export class DictionaryDatabase {
                     resolve(results);
                 }
             };
+            performance.mark('findMultiBulk:getAll:start');
+            // console.log('?');
             for (let i = 0; i < itemCount; ++i) {
                 const item = items[i];
                 const query = createQuery(item);
                 for (let j = 0; j < indexCount; ++j) {
                     /** @type {import('dictionary-database').FindMultiBulkData<TItem>} */
                     const data = {item, itemIndex: i, indexIndex: j};
-                    this._db.getAll(indexList[j], query, onGetAll, reject, data);
+                    if (typeof item === 'object' && 'path' in item) {
+                        performance.mark(`findMultiBulk:onGetAll:${item.path}:start`);
+                    }
+                    this._db.getAll(indexList[j], query, onGetAll(item), reject, data);
                 }
             }
+            performance.mark('findMultiBulk:getAll:end');
+            performance.measure('findMultiBulk:getAll', 'findMultiBulk:getAll:start', 'findMultiBulk:getAll:end');
         });
     }
 
@@ -670,6 +733,16 @@ export class DictionaryDatabase {
     _createMedia(row, {itemIndex: index}) {
         const {dictionary, path, mediaType, width, height, content} = row;
         return {index, dictionary, path, mediaType, width, height, content};
+    }
+
+    /**
+     * @param {import('dictionary-database').MediaDataArrayBufferContent} row
+     * @param {import('dictionary-database').FindMultiBulkData<import('dictionary-database').DrawMediaGroupedRequest>} data
+     * @returns {import('dictionary-database').DrawMedia}
+     */
+    _createDrawMedia(row, {itemIndex: index, item: {canvases}}) {
+        const {dictionary, path, mediaType, width, height, content} = row;
+        return {index, dictionary, path, mediaType, width, height, content, canvases: canvases};
     }
 
     /**

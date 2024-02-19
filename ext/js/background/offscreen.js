@@ -46,19 +46,19 @@ export class Offscreen {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('offscreen').ApiMap} */
         this._apiMap = createApiMap([
-            ['clipboardGetTextOffscreen',    this._getTextHandler.bind(this)],
-            ['clipboardGetImageOffscreen',   this._getImageHandler.bind(this)],
+            ['clipboardGetTextOffscreen', this._getTextHandler.bind(this)],
+            ['clipboardGetImageOffscreen', this._getImageHandler.bind(this)],
             ['clipboardSetBrowserOffscreen', this._setClipboardBrowser.bind(this)],
-            ['databasePrepareOffscreen',     this._prepareDatabaseHandler.bind(this)],
-            ['getDictionaryInfoOffscreen',   this._getDictionaryInfoHandler.bind(this)],
-            ['databasePurgeOffscreen',       this._purgeDatabaseHandler.bind(this)],
-            ['databaseGetMediaOffscreen',    this._getMediaHandler.bind(this)],
-            ['databaseGetMediaObjectsOffscreen', this._getMediaObjectsHandler.bind(this)],
-            ['translatorPrepareOffscreen',   this._prepareTranslatorHandler.bind(this)],
-            ['findKanjiOffscreen',           this._findKanjiHandler.bind(this)],
-            ['findTermsOffscreen',           this._findTermsHandler.bind(this)],
-            ['getTermFrequenciesOffscreen',  this._getTermFrequenciesHandler.bind(this)],
-            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)],
+            ['databasePrepareOffscreen', this._prepareDatabaseHandler.bind(this)],
+            ['getDictionaryInfoOffscreen', this._getDictionaryInfoHandler.bind(this)],
+            ['databasePurgeOffscreen', this._purgeDatabaseHandler.bind(this)],
+            ['databaseGetMediaOffscreen', this._getMediaHandler.bind(this)],
+            ['databaseDrawMediaOffscreen', this._drawMediaHandler.bind(this)],
+            ['translatorPrepareOffscreen', this._prepareTranslatorHandler.bind(this)],
+            ['findKanjiOffscreen', this._findKanjiHandler.bind(this)],
+            ['findTermsOffscreen', this._findTermsHandler.bind(this)],
+            ['getTermFrequenciesOffscreen', this._getTermFrequenciesHandler.bind(this)],
+            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -69,6 +69,18 @@ export class Offscreen {
     /** */
     prepare() {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
+
+        const registerPort = () => {
+            const mc = new MessageChannel();
+            mc.port1.onmessage = (e) => {
+                this._onSWMessage(e.data);
+            };
+            void navigator.serviceWorker.ready.then((swr) => {
+                swr.active?.postMessage({action: 'registerOffscreenPort'}, [mc.port2]);
+            });
+        };
+        navigator.serviceWorker.addEventListener("controllerchange", registerPort);
+        registerPort();
     }
 
     /** @type {import('offscreen').ApiHandler<'clipboardGetTextOffscreen'>} */
@@ -111,9 +123,9 @@ export class Offscreen {
         return media.map((m) => ({...m, content: arrayBufferToBase64(m.content)}));
     }
 
-    /** @type {import('offscreen').ApiHandler<'databaseGetMediaObjectsOffscreen'>} */
-    async _getMediaObjectsHandler({targets}) {
-        return await this._dictionaryDatabase.getMediaObjects(targets);
+    /** @type {import('offscreen').ApiHandler<'databaseDrawMediaOffscreen'>} */
+    async _drawMediaHandler({targets}) {
+        await this._dictionaryDatabase.drawMedia(targets);
     }
 
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */
@@ -136,11 +148,11 @@ export class Offscreen {
         const enabledDictionaryMap = new Map(options.enabledDictionaryMap);
         const excludeDictionaryDefinitions = (
             options.excludeDictionaryDefinitions !== null ?
-            new Set(options.excludeDictionaryDefinitions) :
-            null
+                new Set(options.excludeDictionaryDefinitions) :
+                null
         );
         const textReplacements = options.textReplacements.map((group) => {
-            if (group === null) { return null; }
+            if (group === null) {return null;}
             return group.map((opt) => {
                 // https://stackoverflow.com/a/33642463
                 const match = opt.pattern.match(/\/(.*?)\/([a-z]*)?$/i);
@@ -171,5 +183,12 @@ export class Offscreen {
     /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('offscreen').ApiMessageAny>} */
     _onMessage({action, params}, _sender, callback) {
         return invokeApiMapHandler(this._apiMap, action, params, [], callback);
+    }
+
+    /** @param {{action: string, params: any}} obj */
+    _onSWMessage({action, params}) {
+        if (action === 'drawMedia') {
+            this._dictionaryDatabase.drawMedia(params);
+        }
     }
 }

@@ -117,19 +117,25 @@ export class DisplayGenerator {
         node.dataset.groupedFrequencyCount = `${groupedFrequencies.length}`;
         node.dataset.primaryMatchTypes = [...primaryMatchTypes].join(' ');
 
+        performance.mark('displayGenerator:createTermEntry:createTermHeadword:start');
         for (let i = 0, ii = headwords.length; i < ii; ++i) {
             const node2 = this._createTermHeadword(headwords[i], i, pronunciations);
             node2.dataset.index = `${i}`;
             headwordsContainer.appendChild(node2);
         }
         headwordsContainer.dataset.count = `${headwords.length}`;
+        performance.mark('displayGenerator:createTermEntry:createTermHeadword:end');
+        performance.measure('displayGenerator:createTermEntry:createTermHeadword', 'displayGenerator:createTermEntry:createTermHeadword:start', 'displayGenerator:createTermEntry:createTermHeadword:end');
 
+        performance.mark('displayGenerator:createTermEntry:promises:start');
         await Promise.all([
             this._appendMultiple(inflectionRuleChainsContainer, this._createInflectionRuleChain.bind(this), inflectionRuleChainCandidates),
             this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false),
             this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations),
             this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length)
         ]);
+        performance.mark('displayGenerator:createTermEntry:promises:end');
+        performance.measure('displayGenerator:createTermEntry:promises', 'displayGenerator:createTermEntry:promises:start', 'displayGenerator:createTermEntry:promises:end');
 
         for (const term of uniqueTerms) {
             headwordTagsContainer.appendChild(await this._createSearchTag(term));

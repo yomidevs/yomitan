@@ -17,6 +17,7 @@
         },
         "types": [
             "chrome",
+            "dom-webcodecs",
             "firefox-webext-browser",
             "handlebars",
             "jszip",

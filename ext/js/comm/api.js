@@ -255,12 +255,12 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'getMediaObjects', 'targets'>} targets
-     * @returns {Promise<import('api').ApiReturn<'getMediaObjects'>>}
+     * @param {import('api').ApiParam<'drawMedia', 'targets'>} targets
+     * @returns {Promise<import('api').ApiReturn<'drawMedia'>>}
      */
-    getMediaObjects(targets) {
-        console.log('getMediaObjects', targets);
-        return this._invoke('getMediaObjects', {targets});
+    drawMedia(targets) {
+        console.log('drawMedia', targets);
+        return this._invoke('drawMedia', {targets});
     }
 
     /**
@@ -399,10 +399,10 @@ export class API {
                     if (response !== null && typeof response === 'object') {
                         const {error} = /** @type {import('core').UnknownObject} */ (response);
                         if (typeof error !== 'undefined') {
-                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */ (error)));
+                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */(error)));
                         } else {
                             const {result} = /** @type {import('core').UnknownObject} */ (response);
-                            resolve(/** @type {import('api').ApiReturn<TAction>} */ (result));
+                            resolve(/** @type {import('api').ApiReturn<TAction>} */(result));
                         }
                     } else {
                         const message = response === null ? 'Unexpected null response. You may need to refresh the page.' : `Unexpected response of type ${typeof response}. You may need to refresh the page.`;

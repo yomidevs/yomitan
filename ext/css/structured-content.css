@@ -75,9 +75,6 @@
     outline: none;
     width: 100%;
 }
-.gloss-image:not([src]) {
-    display: none;
-}
 .gloss-image-link[data-image-rendering=pixelated] .gloss-image {
     image-rendering: auto;
     image-rendering: -moz-crisp-edges;
