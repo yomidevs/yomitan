@@ -24,7 +24,8 @@ import {Mecab} from '../comm/mecab.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {fetchJson, fetchText} from '../core/fetch-utilities.js';
-import {log} from '../core/logger.js';
+import {logErrorLevelToNumber} from '../core/log-utilities.js';
+import {log} from '../core/log.js';
 import {clone, deferPromise, isObject, promiseTimeout} from '../core/utilities.js';
 import {isNoteDataValid} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
@@ -34,6 +35,7 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
+import {getLanguageSummaries} from '../language/languages.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -165,13 +167,12 @@ export class Backend {
             ['getStylesheetContent',         this._onApiGetStylesheetContent.bind(this)],
             ['getEnvironmentInfo',           this._onApiGetEnvironmentInfo.bind(this)],
             ['clipboardGet',                 this._onApiClipboardGet.bind(this)],
-            ['getDisplayTemplatesHtml',      this._onApiGetDisplayTemplatesHtml.bind(this)],
             ['getZoom',                      this._onApiGetZoom.bind(this)],
             ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)],
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
             ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
             ['getMedia',                     this._onApiGetMedia.bind(this)],
-            ['log',                          this._onApiLog.bind(this)],
+            ['logGenericErrorBackend',       this._onApiLogGenericErrorBackend.bind(this)],
             ['logIndicatorClear',            this._onApiLogIndicatorClear.bind(this)],
             ['modifySettings',               this._onApiModifySettings.bind(this)],
             ['getSettings',                  this._onApiGetSettings.bind(this)],
@@ -183,7 +184,8 @@ export class Backend {
             ['textHasJapaneseCharacters',    this._onApiTextHasJapaneseCharacters.bind(this)],
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
-            ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)]
+            ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
+            ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -263,7 +265,7 @@ export class Backend {
             }, 1000);
             this._updateBadge();
 
-            log.on('log', this._onLog.bind(this));
+            log.on('logGenericError', this._onLogGenericError.bind(this));
 
             await this._requestBuilder.prepare();
             await this._environment.prepare();
@@ -332,11 +334,11 @@ export class Backend {
     }
 
     /**
-     * @param {{level: import('log').LogLevel}} params
+     * @param {import('log').Events['logGenericError']} params
      */
-    _onLog({level}) {
-        const levelValue = log.getLogErrorLevelValue(level);
-        const currentLogErrorLevel = this._logErrorLevel !== null ? log.getLogErrorLevelValue(this._logErrorLevel) : 0;
+    _onLogGenericError({level}) {
+        const levelValue = logErrorLevelToNumber(level);
+        const currentLogErrorLevel = this._logErrorLevel !== null ? logErrorLevelToNumber(this._logErrorLevel) : 0;
         if (levelValue <= currentLogErrorLevel) { return; }
 
         this._logErrorLevel = level;
@@ -437,7 +439,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'requestBackendReadySignal'>} */
     _onApiRequestBackendReadySignal(_params, sender) {
-        // tab ID isn't set in background (e.g. browser_action)
+        // Tab ID isn't set in background (e.g. browser_action)
         /** @type {import('application').ApiMessage<'applicationBackendReady'>} */
         const data = {action: 'applicationBackendReady'};
         if (typeof sender.tab === 'undefined') {
@@ -652,7 +654,10 @@ export class Backend {
         const tab = sender.tab;
         const tabId = tab ? tab.id : void 0;
         const frameId = sender.frameId;
-        return Promise.resolve({tabId, frameId});
+        return {
+            tabId: typeof tabId === 'number' ? tabId : null,
+            frameId: typeof frameId === 'number' ? frameId : null
+        };
     }
 
     /** @type {import('api').ApiHandler<'injectStylesheet'>} */
@@ -678,11 +683,6 @@ export class Backend {
     /** @type {import('api').ApiHandler<'clipboardGet'>} */
     async _onApiClipboardGet() {
         return this._clipboardReader.getText(false);
-    }
-
-    /** @type {import('api').ApiHandler<'getDisplayTemplatesHtml'>} */
-    async _onApiGetDisplayTemplatesHtml() {
-        return await fetchText('/display-templates.html');
     }
 
     /** @type {import('api').ApiHandler<'getZoom'>} */
@@ -736,9 +736,9 @@ export class Backend {
         return await this._getNormalizedDictionaryDatabaseMedia(targets);
     }
 
-    /** @type {import('api').ApiHandler<'log'>} */
-    _onApiLog({error, level, context}) {
-        log.log(ExtensionError.deserialize(error), level, context);
+    /** @type {import('api').ApiHandler<'logGenericErrorBackend'>} */
+    _onApiLogGenericErrorBackend({error, level, context}) {
+        log.logGenericError(ExtensionError.deserialize(error), level, context);
     }
 
     /** @type {import('api').ApiHandler<'logIndicatorClear'>} */
@@ -904,6 +904,11 @@ export class Backend {
         targetPort.onDisconnect.addListener(cleanup);
 
         return {targetTabId, targetFrameId};
+    }
+
+    /** @type {import('api').ApiHandler<'getLanguageSummaries'>} */
+    _onApiGetLanguageSummaries() {
+        return getLanguageSummaries();
     }
 
     // Command handlers
@@ -1547,7 +1552,7 @@ export class Backend {
         return (
             isObject(chrome.action) &&
             typeof chrome.action.getTitle === 'function' ?
-                new Promise((resolve) => chrome.action.getTitle({}, resolve)) :
+                new Promise((resolve) => { chrome.action.getTitle({}, resolve); }) :
                 Promise.resolve('')
         );
     }
@@ -2361,15 +2366,9 @@ export class Backend {
         if (typeof deinflect !== 'boolean') { deinflect = true; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
-            general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder},
+            general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language},
             scanning: {alphanumeric},
             translation: {
-                convertHalfWidthCharacters,
-                convertNumericCharacters,
-                convertAlphabeticCharacters,
-                convertHiraganaToKatakana,
-                convertKatakanaToHiragana,
-                collapseEmphaticSequences,
                 textReplacements: textReplacementsOptions,
                 searchResolution
             }
@@ -2394,16 +2393,11 @@ export class Backend {
             sortFrequencyDictionary,
             sortFrequencyDictionaryOrder,
             removeNonJapaneseCharacters: !alphanumeric,
-            convertHalfWidthCharacters,
-            convertNumericCharacters,
-            convertAlphabeticCharacters,
-            convertHiraganaToKatakana,
-            convertKatakanaToHiragana,
-            collapseEmphaticSequences,
             searchResolution,
             textReplacements,
             enabledDictionaryMap,
-            excludeDictionaryDefinitions
+            excludeDictionaryDefinitions,
+            language
         };
     }
 
@@ -2601,7 +2595,7 @@ export class Backend {
             const match = /^\d+/.exec(version);
             if (match === null) { return; }
 
-            const versionNumber = Number.parseInt(match[0]);
+            const versionNumber = Number.parseInt(match[0], 10);
             if (!(Number.isFinite(versionNumber) && versionNumber >= 77)) { return; }
 
             await navigator.storage.persist();

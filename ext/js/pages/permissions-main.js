@@ -43,14 +43,14 @@ async function setupEnvironmentInfo(api) {
  * @returns {Promise<boolean>}
  */
 async function isAllowedIncognitoAccess() {
-    return await new Promise((resolve) => chrome.extension.isAllowedIncognitoAccess(resolve));
+    return await new Promise((resolve) => { chrome.extension.isAllowedIncognitoAccess(resolve); });
 }
 
 /**
  * @returns {Promise<boolean>}
  */
 async function isAllowedFileSchemeAccess() {
-    return await new Promise((resolve) => chrome.extension.isAllowedFileSchemeAccess(resolve));
+    return await new Promise((resolve) => { chrome.extension.isAllowedFileSchemeAccess(resolve); });
 }
 
 /**
@@ -86,7 +86,7 @@ function setupPermissionsToggles() {
     }
 }
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 

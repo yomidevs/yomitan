@@ -17,7 +17,7 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
 
 /**
  * This class is a proxy for a Popup that is hosted in a different frame.

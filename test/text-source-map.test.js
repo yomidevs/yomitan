@@ -19,8 +19,7 @@
 import {describe, expect, test} from 'vitest';
 import {TextSourceMap} from '../ext/js/general/text-source-map.js';
 
-/** */
-function testSource() {
+describe('TextSourceMap', () => {
     describe('Source', () => {
         const data = [
             ['source1'],
@@ -33,10 +32,7 @@ function testSource() {
             expect(source).toStrictEqual(sourceMap.source);
         });
     });
-}
 
-/** */
-function testEquals() {
     describe('Equals', () => {
         /** @type {[args1: [source1: string, mapping1: ?(number[])], args2: [source2: string, mapping2: ?(number[])], expectedEquals: boolean][]} */
         const data = [
@@ -77,10 +73,7 @@ function testEquals() {
             expect(sourceMap1.equals(sourceMap2)).toStrictEqual(expectedEquals);
         });
     });
-}
 
-/** */
-function testGetSourceLength() {
     describe('GetSourceLength', () => {
         /** @type {[args: [source: string, mapping: number[]], finalLength: number, expectedValue: number][]} */
         const data = [
@@ -106,10 +99,7 @@ function testGetSourceLength() {
             expect(sourceMap.getSourceLength(finalLength)).toStrictEqual(expectedValue);
         });
     });
-}
 
-/** */
-function testCombineInsert() {
     describe('CombineInsert', () => {
         /** @type {[args: [source: string, mapping: ?(number[])], expectedArgs: [expectedSource: string, expectedMapping: ?(number[])], operations: [operation: string, arg1: number, arg2: number][]][]} */
         const data = [
@@ -230,16 +220,4 @@ function testCombineInsert() {
             expect(sourceMap.equals(expectedSourceMap)).toBe(true);
         });
     });
-}
-
-
-/** */
-function main() {
-    testSource();
-    testEquals();
-    testGetSourceLength();
-    testCombineInsert();
-}
-
-
-main();
+});

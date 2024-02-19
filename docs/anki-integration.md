@@ -23,71 +23,71 @@ Flashcard fields can be configured with the following steps:
 
     #### Markers for Term Cards
 
-    | Marker                     | Description                                                                                                              |
-    | -------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-    | `{audio}`                  | Audio sample of a native speaker's pronunciation in MP3 format (if available).                                           |
-    | `{clipboard-image}`        | An image which is stored in the system clipboard, if present.                                                            |
-    | `{clipboard-text}`         | Text which is stored in the system clipboard, if present.                                                                |
-    | `{cloze-body}`             | Raw, inflected term as it appeared before being reduced to dictionary form by Yomitan.                                   |
-    | `{cloze-body-kana}`        | Kana reading for `{cloze-body}`.                                                                                         |
-    | `{cloze-prefix}`           | Fragment of the containing `{sentence}` starting at the beginning of `{sentence}` until the beginning of `{cloze-body}`. |
-    | `{cloze-suffix}`           | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.             |
-    | `{conjugation}`            | Conjugation path from the raw inflected term to the source term.                                                         |
-    | `{dictionary}`             | Name of the dictionary from which the card is being created (unavailable in _grouped_ mode).                             |
-    | `{document-title}`         | Title of the web page that the term appeared in.                                                                         |
-    | `{expression}`             | Term expressed as kanji (will be displayed in kana if kanji is not available).                                           |
-    | `{frequencies}`            | Frequency information for the term.                                                                                      |
-    | `{frequency-harmonic-rank}` | The harmonic mean of frequency data for the current term. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term usage. |
+    | Marker                            | Description                                                                                                                                                            |
+    | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+    | `{audio}`                         | Audio sample of a native speaker's pronunciation in MP3 format (if available).                                                                                         |
+    | `{clipboard-image}`               | An image which is stored in the system clipboard, if present.                                                                                                          |
+    | `{clipboard-text}`                | Text which is stored in the system clipboard, if present.                                                                                                              |
+    | `{cloze-body}`                    | Raw, inflected term as it appeared before being reduced to dictionary form by Yomitan.                                                                                 |
+    | `{cloze-body-kana}`               | Kana reading for `{cloze-body}`.                                                                                                                                       |
+    | `{cloze-prefix}`                  | Fragment of the containing `{sentence}` starting at the beginning of `{sentence}` until the beginning of `{cloze-body}`.                                               |
+    | `{cloze-suffix}`                  | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.                                                           |
+    | `{conjugation}`                   | Conjugation path from the raw inflected term to the source term.                                                                                                       |
+    | `{dictionary}`                    | Name of the dictionary from which the card is being created (unavailable in _grouped_ mode).                                                                           |
+    | `{document-title}`                | Title of the web page that the term appeared in.                                                                                                                       |
+    | `{expression}`                    | Term expressed as kanji (will be displayed in kana if kanji is not available).                                                                                         |
+    | `{frequencies}`                   | Frequency information for the term.                                                                                                                                    |
+    | `{frequency-harmonic-rank}`       | The harmonic mean of frequency data for the current term. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term usage.   |
     | `{frequency-harmonic-occurrence}` | The harmonic mean of frequency data for the current term. Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term usage. |
-    | `{frequency-average-rank}` | The average of frequency data for the current term. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term usage. |
-    | `{frequency-average-occurrence}` | The average of frequency data for the current term. Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term usage. |
-    | `{furigana}`               | Term expressed as kanji with furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).                    |
-    | `{furigana-plain}`         | Term expressed as kanji with furigana displayed next to it in brackets (e.g. 日本語[にほんご]).                          |
-    | `{glossary}`               | List of definitions for the term (output format depends on whether running in _grouped_ mode).                           |
-    | `{glossary-brief}`         | List of definitions for the term in a more compact format.                                                               |
-    | `{glossary-no-dictionary}` | List of definitions for the term, except the dictionary tag is omitted.                                                  |
-    | `{part-of-speech}`         | Part of speech information for the term.                                                                                 |
-    | `{phonetic-transcriptions}`| List of phonetic transcriptions for the term.                                                                            |
-    | `{pitch-accents}`          | List of pitch accent downstep notations for the term.                                                                    |
-    | `{pitch-accent-graphs}`    | List of pitch accent graphs for the term.                                                                                |
-    | `{pitch-accent-positions}` | List of accent downstep positions for the term as a number.                                                              |
-    | `{pitch-accent-categories}`| List of pitch accent categories for the term (e.g. heiban, kifuku, atamadaka, odaka, nakadaka).                          |
-    | `{reading}`                | Kana reading for the term (empty for terms where the expression is the reading).                                         |
-    | `{screenshot}`             | Screenshot of the web page taken at the time the term was added.                                                         |
-    | `{search-query}`           | The full search query shown on the search page.                                                                          |
-    | `{selection-text}`         | The selected text on the search page or popup.                                                                           |
-    | `{sentence}`               | Sentence, quote, or phrase that the term appears in from the source content.                                             |
-    | `{sentence-furigana}`      | Sentence, quote, or phrase that the term appears in from the source content, with furigana added.                        |
-    | `{tags}`                   | Grammar and usage tags providing information about the term (unavailable in _grouped_ mode).                             |
-    | `{url}`                    | Address of the web page in which the term appeared in.                                                                   |
+    | `{frequency-average-rank}`        | The average of frequency data for the current term. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term usage.         |
+    | `{frequency-average-occurrence}`  | The average of frequency data for the current term. Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term usage.       |
+    | `{furigana}`                      | Term expressed as kanji with furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).                                                                  |
+    | `{furigana-plain}`                | Term expressed as kanji with furigana displayed next to it in brackets (e.g. 日本語[にほんご]).                                                                        |
+    | `{glossary}`                      | List of definitions for the term (output format depends on whether running in _grouped_ mode).                                                                         |
+    | `{glossary-brief}`                | List of definitions for the term in a more compact format.                                                                                                             |
+    | `{glossary-no-dictionary}`        | List of definitions for the term, except the dictionary tag is omitted.                                                                                                |
+    | `{part-of-speech}`                | Part of speech information for the term.                                                                                                                               |
+    | `{phonetic-transcriptions}`       | List of phonetic transcriptions for the term.                                                                                                                          |
+    | `{pitch-accents}`                 | List of pitch accent downstep notations for the term.                                                                                                                  |
+    | `{pitch-accent-graphs}`           | List of pitch accent graphs for the term.                                                                                                                              |
+    | `{pitch-accent-positions}`        | List of accent downstep positions for the term as a number.                                                                                                            |
+    | `{pitch-accent-categories}`       | List of pitch accent categories for the term (e.g. heiban, kifuku, atamadaka, odaka, nakadaka).                                                                        |
+    | `{reading}`                       | Kana reading for the term (empty for terms where the expression is the reading).                                                                                       |
+    | `{screenshot}`                    | Screenshot of the web page taken at the time the term was added.                                                                                                       |
+    | `{search-query}`                  | The full search query shown on the search page.                                                                                                                        |
+    | `{selection-text}`                | The selected text on the search page or popup.                                                                                                                         |
+    | `{sentence}`                      | Sentence, quote, or phrase that the term appears in from the source content.                                                                                           |
+    | `{sentence-furigana}`             | Sentence, quote, or phrase that the term appears in from the source content, with furigana added.                                                                      |
+    | `{tags}`                          | Grammar and usage tags providing information about the term (unavailable in _grouped_ mode).                                                                           |
+    | `{url}`                           | Address of the web page in which the term appeared in.                                                                                                                 |
 
     #### Markers for Kanji Cards
 
-    | Marker                | Description                                                                                                              |
-    | --------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-    | `{character}`         | Unicode glyph representing the current kanji.                                                                            |
-    | `{clipboard-image}`   | An image which is stored in the system clipboard, if present.                                                            |
-    | `{clipboard-text}`    | Text which is stored in the system clipboard, if present.                                                                |
-    | `{cloze-body}`        | Raw, inflected parent term as it appeared before being reduced to dictionary form by Yomitan.                            |
-    | `{cloze-prefix}`      | Fragment of the containing `{sentence}` starting at the beginning of `{sentence}` until the beginning of `{cloze-body}`. |
-    | `{cloze-suffix}`      | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.             |
-    | `{dictionary}`        | Name of the dictionary from which the card is being created.                                                             |
-    | `{document-title}`    | Title of the web page that the kanji appeared in.                                                                        |
-    | `{frequencies}`       | Frequency information for the kanji.                                                                                     |
-    | `{frequency-harmonic-rank}` | The harmonic mean of frequency data for the current kanji. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based kanji usage. |
+    | Marker                            | Description                                                                                                                                                              |
+    | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+    | `{character}`                     | Unicode glyph representing the current kanji.                                                                                                                            |
+    | `{clipboard-image}`               | An image which is stored in the system clipboard, if present.                                                                                                            |
+    | `{clipboard-text}`                | Text which is stored in the system clipboard, if present.                                                                                                                |
+    | `{cloze-body}`                    | Raw, inflected parent term as it appeared before being reduced to dictionary form by Yomitan.                                                                            |
+    | `{cloze-prefix}`                  | Fragment of the containing `{sentence}` starting at the beginning of `{sentence}` until the beginning of `{cloze-body}`.                                                 |
+    | `{cloze-suffix}`                  | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.                                                             |
+    | `{dictionary}`                    | Name of the dictionary from which the card is being created.                                                                                                             |
+    | `{document-title}`                | Title of the web page that the kanji appeared in.                                                                                                                        |
+    | `{frequencies}`                   | Frequency information for the kanji.                                                                                                                                     |
+    | `{frequency-harmonic-rank}`       | The harmonic mean of frequency data for the current kanji. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based kanji usage.   |
     | `{frequency-harmonic-occurrence}` | The harmonic mean of frequency data for the current kanji. Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based kanji usage. |
-    | `{frequency-average-rank}` | The average of frequency data for the current kanji. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based kanji usage. |
-    | `{frequency-average-occurrence}` | The average of frequency data for the current kanji. Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based kanji usage. |
-    | `{glossary}`          | List of definitions for the kanji.                                                                                       |
-    | `{kunyomi}`           | Kunyomi (Japanese reading) for the kanji expressed as katakana.                                                          |
-    | `{onyomi}`            | Onyomi (Chinese reading) for the kanji expressed as hiragana.                                                            |
-    | `{screenshot}`        | Screenshot of the web page taken at the time the kanji was added.                                                        |
-    | `{search-query}`      | The full search query shown on the search page.                                                                          |
-    | `{selection-text}`    | The selected text on the search page or popup.                                                                           |
-    | `{sentence}`          | Sentence, quote, or phrase that the character appears in from the source content.                                        |
-    | `{sentence-furigana}` | Sentence, quote, or phrase that the character appears in from the source content, with furigana added.                   |
-    | `{stroke-count}`      | Number of strokes that the kanji character has.                                                                          |
-    | `{url}`               | Address of the web page in which the kanji appeared in.                                                                  |
+    | `{frequency-average-rank}`        | The average of frequency data for the current kanji. Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based kanji usage.         |
+    | `{frequency-average-occurrence}`  | The average of frequency data for the current kanji. Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based kanji usage.       |
+    | `{glossary}`                      | List of definitions for the kanji.                                                                                                                                       |
+    | `{kunyomi}`                       | Kunyomi (Japanese reading) for the kanji expressed as katakana.                                                                                                          |
+    | `{onyomi}`                        | Onyomi (Chinese reading) for the kanji expressed as hiragana.                                                                                                            |
+    | `{screenshot}`                    | Screenshot of the web page taken at the time the kanji was added.                                                                                                        |
+    | `{search-query}`                  | The full search query shown on the search page.                                                                                                                          |
+    | `{selection-text}`                | The selected text on the search page or popup.                                                                                                                           |
+    | `{sentence}`                      | Sentence, quote, or phrase that the character appears in from the source content.                                                                                        |
+    | `{sentence-furigana}`             | Sentence, quote, or phrase that the character appears in from the source content, with furigana added.                                                                   |
+    | `{stroke-count}`                  | Number of strokes that the kanji character has.                                                                                                                          |
+    | `{url}`                           | Address of the web page in which the kanji appeared in.                                                                                                                  |
 
 When creating your model for Yomitan, _make sure that you pick a unique field to be first_; fields that will
 contain `{expression}` or `{character}` are ideal candidates for this. Anki does not allow duplicate flashcards to be

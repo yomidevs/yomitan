@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {fetchText} from '../core/fetch-utilities.js';
+
 export class HtmlTemplateCollection {
     constructor() {
         /** @type {Map<string, HTMLTemplateElement>} */
@@ -23,17 +25,23 @@ export class HtmlTemplateCollection {
     }
 
     /**
-     * @param {string|Document} source
+     * @param {string[]} urls
+     */
+    async loadFromFiles(urls) {
+        const htmlRawArray = await Promise.all(urls.map((url) => fetchText(url)));
+        const domParser = new DOMParser();
+        for (const htmlRaw of htmlRawArray) {
+            const templatesDocument = domParser.parseFromString(htmlRaw, 'text/html');
+            this.load(templatesDocument);
+        }
+    }
+
+    /**
+     * @param {Document} source
      */
     load(source) {
-        const sourceNode = (
-            typeof source === 'string' ?
-            new DOMParser().parseFromString(source, 'text/html') :
-            source
-        );
-
         const pattern = /^([\w\W]+)-template$/;
-        for (const template of sourceNode.querySelectorAll('template')) {
+        for (const template of source.querySelectorAll('template')) {
             const match = pattern.exec(template.id);
             if (match === null) { continue; }
             this._prepareTemplate(template);

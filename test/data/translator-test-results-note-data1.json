@@ -7276,6 +7276,320 @@
           }
         },
         "media": {}
+      },
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 1,
+          "source": "だ",
+          "rawSource": "ダ",
+          "sourceTerm": "だ",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 1,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "打",
+          "reading": "だ",
+          "expressions": [
+            {
+              "sourceTerm": "だ",
+              "expression": "打",
+              "reading": "だ",
+              "termTags": [
+                {
+                  "name": "E1",
+                  "category": "default",
+                  "notes": "example tag 1",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": false
+                }
+              ],
+              "frequencies": [
+                {
+                  "index": 0,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打",
+                  "reading": "だ",
+                  "hasReading": false,
+                  "frequency": 1
+                },
+                {
+                  "index": 1,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打",
+                  "reading": "だ",
+                  "hasReading": false,
+                  "frequency": "four"
+                },
+                {
+                  "index": 2,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打",
+                  "reading": "だ",
+                  "hasReading": false,
+                  "frequency": "five (5)"
+                },
+                {
+                  "index": 3,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打",
+                  "reading": "だ",
+                  "hasReading": true,
+                  "frequency": 8
+                },
+                {
+                  "index": 4,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打",
+                  "reading": "だ",
+                  "hasReading": true,
+                  "frequency": "fourteen"
+                },
+                {
+                  "index": 5,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打",
+                  "reading": "だ",
+                  "hasReading": true,
+                  "frequency": "twenty (20)"
+                },
+                {
+                  "index": 6,
+                  "expressionIndex": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "dictionaryOrder": {
+                    "index": 0,
+                    "priority": 0
+                  },
+                  "expression": "打",
+                  "reading": "だ",
+                  "hasReading": true,
+                  "frequency": 26
+                }
+              ],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "打",
+                  "furigana": "だ"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "da definition 1",
+            "da definition 2"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [
+            {
+              "name": "E1",
+              "category": "default",
+              "notes": "example tag 1",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "frequencies": [
+            {
+              "index": 0,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打",
+              "reading": "だ",
+              "hasReading": false,
+              "frequency": 1
+            },
+            {
+              "index": 1,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打",
+              "reading": "だ",
+              "hasReading": false,
+              "frequency": "four"
+            },
+            {
+              "index": 2,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打",
+              "reading": "だ",
+              "hasReading": false,
+              "frequency": "five (5)"
+            },
+            {
+              "index": 3,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打",
+              "reading": "だ",
+              "hasReading": true,
+              "frequency": 8
+            },
+            {
+              "index": 4,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打",
+              "reading": "だ",
+              "hasReading": true,
+              "frequency": "fourteen"
+            },
+            {
+              "index": 5,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打",
+              "reading": "だ",
+              "hasReading": true,
+              "frequency": "twenty (20)"
+            },
+            {
+              "index": 6,
+              "expressionIndex": 0,
+              "dictionary": "Test Dictionary 2",
+              "dictionaryOrder": {
+                "index": 0,
+                "priority": 0
+              },
+              "expression": "打",
+              "reading": "だ",
+              "hasReading": true,
+              "frequency": 26
+            }
+          ],
+          "frequencyHarmonic": 1,
+          "frequencyAverage": 1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 0,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "打",
+              "furigana": "だ"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "打"
+        ],
+        "uniqueReadings": [
+          "だ"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
       }
     ]
   },
@@ -30117,7 +30431,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertNumericCharacters",
+    "name": "Test text preprocessors - convertNumericCharacters",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -30219,7 +30533,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertAlphabeticCharacters",
+    "name": "Test text preprocessors - convertAlphabeticCharacters",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -30852,7 +31166,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertKatakanaToHiragana",
+    "name": "Test text preprocessors - convertKatakanaToHiragana",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -31485,7 +31799,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertHiraganaToKatakana",
+    "name": "Test text preprocessors - convertHiraganaToKatakana",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -31638,7 +31952,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertHalfWidthCharacters, convertKatakanaToHiragana",
+    "name": "Test text preprocessors - convertHalfWidthCharacters, convertKatakanaToHiragana",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -32271,7 +32585,7 @@
     ]
   },
   {
-    "name": "Test text transformations - collapseEmphaticSequences",
+    "name": "Test text preprocessors - collapseEmphaticSequences",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -32285,6 +32599,13 @@
             {
               "source": "algorithm",
               "inflectionRules": []
+            },
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "adv",
+                "kansai-ben"
+              ]
             }
           ],
           "score": 1,
@@ -32377,6 +32698,234 @@
         ],
         "uniqueReadings": [
           "すごい"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text preprocessors - capitalizeFirstLetter",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 27,
+          "source": "English",
+          "rawSource": "english",
+          "sourceTerm": "English",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 19,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "English",
+          "reading": "English",
+          "expressions": [
+            {
+              "sourceTerm": "English",
+              "expression": "English",
+              "reading": "English",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "English",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "English definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "English",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "English"
+        ],
+        "uniqueReadings": [
+          "English"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text preprocessors - decapitalize",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 28,
+          "source": "language",
+          "rawSource": "LANGUAGE",
+          "sourceTerm": "language",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 20,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "language",
+          "reading": "language",
+          "expressions": [
+            {
+              "sourceTerm": "language",
+              "expression": "language",
+              "reading": "language",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "language",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "language definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "language",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "language"
+        ],
+        "uniqueReadings": [
+          "language"
         ],
         "pitches": [],
         "pitchCount": 0,

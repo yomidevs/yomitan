@@ -210,13 +210,6 @@ export class API {
     }
 
     /**
-     * @returns {Promise<import('api').ApiReturn<'getDisplayTemplatesHtml'>>}
-     */
-    getDisplayTemplatesHtml() {
-        return this._invoke('getDisplayTemplatesHtml', void 0);
-    }
-
-    /**
      * @returns {Promise<import('api').ApiReturn<'getZoom'>>}
      */
     getZoom() {
@@ -253,13 +246,13 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'log', 'error'>} error
-     * @param {import('api').ApiParam<'log', 'level'>} level
-     * @param {import('api').ApiParam<'log', 'context'>} context
-     * @returns {Promise<import('api').ApiReturn<'log'>>}
+     * @param {import('api').ApiParam<'logGenericErrorBackend', 'error'>} error
+     * @param {import('api').ApiParam<'logGenericErrorBackend', 'level'>} level
+     * @param {import('api').ApiParam<'logGenericErrorBackend', 'context'>} context
+     * @returns {Promise<import('api').ApiReturn<'logGenericErrorBackend'>>}
      */
-    log(error, level, context) {
-        return this._invoke('log', {error, level, context});
+    logGenericErrorBackend(error, level, context) {
+        return this._invoke('logGenericErrorBackend', {error, level, context});
     }
 
     /**
@@ -359,6 +352,13 @@ export class API {
      */
     openCrossFramePort(targetTabId, targetFrameId) {
         return this._invoke('openCrossFramePort', {targetTabId, targetFrameId});
+    }
+
+    /**
+     * @returns {Promise<import('api').ApiReturn<'getLanguageSummaries'>>}
+     */
+    getLanguageSummaries() {
+        return this._invoke('getLanguageSummaries', void 0);
     }
 
     // Utilities

@@ -869,6 +869,43 @@
         "sentence-furigana": "cloze-prefixダースcloze-suffix",
         "tags": "abbr, n",
         "url": "<a href=\"url:\">url:</a>"
+      },
+      {
+        "audio": "",
+        "clipboard-image": "",
+        "clipboard-text": "",
+        "cloze-body": "ダ",
+        "cloze-body-kana": "ダ",
+        "cloze-prefix": "cloze-prefix",
+        "cloze-suffix": "cloze-suffix",
+        "conjugation": "",
+        "dictionary": "Test Dictionary 2",
+        "document-title": "title",
+        "expression": "打",
+        "frequencies": "<ul style=\"text-align: left;\"><li>Test Dictionary 2: 1</li><li>Test Dictionary 2: four</li><li>Test Dictionary 2: five (5)</li><li>Test Dictionary 2: 8</li><li>Test Dictionary 2: fourteen</li><li>Test Dictionary 2: twenty (20)</li><li>Test Dictionary 2: 26</li></ul>",
+        "frequency-harmonic-rank": "1",
+        "frequency-harmonic-occurrence": "1",
+        "frequency-average-rank": "1",
+        "frequency-average-occurrence": "1",
+        "furigana": "<ruby>打<rt>だ</rt></ruby>",
+        "furigana-plain": "打[だ]",
+        "glossary": "<div style=\"text-align: left;\"><i>(n, Test Dictionary 2)</i> <ul><li>da definition 1</li><li>da definition 2</li></ul></div>",
+        "glossary-brief": "<div style=\"text-align: left;\"><ul><li>da definition 1</li><li>da definition 2</li></ul></div>",
+        "glossary-no-dictionary": "<div style=\"text-align: left;\"><i>(n)</i> <ul><li>da definition 1</li><li>da definition 2</li></ul></div>",
+        "part-of-speech": "Noun",
+        "pitch-accents": "No pitch accent data",
+        "pitch-accent-graphs": "No pitch accent data",
+        "pitch-accent-positions": "No pitch accent data",
+        "pitch-accent-categories": "",
+        "phonetic-transcriptions": "",
+        "reading": "だ",
+        "screenshot": "",
+        "search-query": "fullQuery",
+        "selection-text": "",
+        "sentence": "cloze-prefixダcloze-suffix",
+        "sentence-furigana": "cloze-prefixダcloze-suffix",
+        "tags": "n",
+        "url": "<a href=\"url:\">url:</a>"
       }
     ]
   },
@@ -3437,7 +3474,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertNumericCharacters",
+    "name": "Test text preprocessors - convertNumericCharacters",
     "results": [
       {
         "audio": "",
@@ -3479,7 +3516,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertAlphabeticCharacters",
+    "name": "Test text preprocessors - convertAlphabeticCharacters",
     "results": [
       {
         "audio": "",
@@ -3558,7 +3595,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertKatakanaToHiragana",
+    "name": "Test text preprocessors - convertKatakanaToHiragana",
     "results": [
       {
         "audio": "",
@@ -3637,7 +3674,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertHiraganaToKatakana",
+    "name": "Test text preprocessors - convertHiraganaToKatakana",
     "results": [
       {
         "audio": "",
@@ -3679,7 +3716,7 @@
     ]
   },
   {
-    "name": "Test text transformations - convertHalfWidthCharacters, convertKatakanaToHiragana",
+    "name": "Test text preprocessors - convertHalfWidthCharacters, convertKatakanaToHiragana",
     "results": [
       {
         "audio": "",
@@ -3758,7 +3795,7 @@
     ]
   },
   {
-    "name": "Test text transformations - collapseEmphaticSequences",
+    "name": "Test text preprocessors - collapseEmphaticSequences",
     "results": [
       {
         "audio": "",
@@ -3768,7 +3805,7 @@
         "cloze-body-kana": "すっっごーーい",
         "cloze-prefix": "cloze-prefix",
         "cloze-suffix": "cloze-suffix",
-        "conjugation": "",
+        "conjugation": "<ul><li>adv « kansai-ben</li></ul>",
         "dictionary": "Test Dictionary 2",
         "document-title": "title",
         "expression": "凄い",
@@ -3795,6 +3832,90 @@
         "sentence": "cloze-prefixすっっごーーいcloze-suffix",
         "sentence-furigana": "cloze-prefixすっっごーーいcloze-suffix",
         "tags": "adj-i",
+        "url": "<a href=\"url:\">url:</a>"
+      }
+    ]
+  },
+  {
+    "name": "Test text preprocessors - capitalizeFirstLetter",
+    "results": [
+      {
+        "audio": "",
+        "clipboard-image": "",
+        "clipboard-text": "",
+        "cloze-body": "english",
+        "cloze-body-kana": "english",
+        "cloze-prefix": "cloze-prefix",
+        "cloze-suffix": "cloze-suffix",
+        "conjugation": "",
+        "dictionary": "Test Dictionary 2",
+        "document-title": "title",
+        "expression": "English",
+        "frequencies": "",
+        "frequency-harmonic-rank": "9999999",
+        "frequency-harmonic-occurrence": "0",
+        "frequency-average-rank": "9999999",
+        "frequency-average-occurrence": "0",
+        "furigana": "English",
+        "furigana-plain": "English",
+        "glossary": "<div style=\"text-align: left;\"><i>(n, Test Dictionary 2)</i> English definition</div>",
+        "glossary-brief": "<div style=\"text-align: left;\">English definition</div>",
+        "glossary-no-dictionary": "<div style=\"text-align: left;\"><i>(n)</i> English definition</div>",
+        "part-of-speech": "Noun",
+        "pitch-accents": "No pitch accent data",
+        "pitch-accent-graphs": "No pitch accent data",
+        "pitch-accent-positions": "No pitch accent data",
+        "pitch-accent-categories": "",
+        "phonetic-transcriptions": "",
+        "reading": "English",
+        "screenshot": "",
+        "search-query": "fullQuery",
+        "selection-text": "",
+        "sentence": "cloze-prefixenglishcloze-suffix",
+        "sentence-furigana": "cloze-prefixenglishcloze-suffix",
+        "tags": "n",
+        "url": "<a href=\"url:\">url:</a>"
+      }
+    ]
+  },
+  {
+    "name": "Test text preprocessors - decapitalize",
+    "results": [
+      {
+        "audio": "",
+        "clipboard-image": "",
+        "clipboard-text": "",
+        "cloze-body": "LANGUAGE",
+        "cloze-body-kana": "LANGUAGE",
+        "cloze-prefix": "cloze-prefix",
+        "cloze-suffix": "cloze-suffix",
+        "conjugation": "",
+        "dictionary": "Test Dictionary 2",
+        "document-title": "title",
+        "expression": "language",
+        "frequencies": "",
+        "frequency-harmonic-rank": "9999999",
+        "frequency-harmonic-occurrence": "0",
+        "frequency-average-rank": "9999999",
+        "frequency-average-occurrence": "0",
+        "furigana": "language",
+        "furigana-plain": "language",
+        "glossary": "<div style=\"text-align: left;\"><i>(n, Test Dictionary 2)</i> language definition</div>",
+        "glossary-brief": "<div style=\"text-align: left;\">language definition</div>",
+        "glossary-no-dictionary": "<div style=\"text-align: left;\"><i>(n)</i> language definition</div>",
+        "part-of-speech": "Noun",
+        "pitch-accents": "No pitch accent data",
+        "pitch-accent-graphs": "No pitch accent data",
+        "pitch-accent-positions": "No pitch accent data",
+        "pitch-accent-categories": "",
+        "phonetic-transcriptions": "",
+        "reading": "language",
+        "screenshot": "",
+        "search-query": "fullQuery",
+        "selection-text": "",
+        "sentence": "cloze-prefixLANGUAGEcloze-suffix",
+        "sentence-furigana": "cloze-prefixLANGUAGEcloze-suffix",
+        "tags": "n",
         "url": "<a href=\"url:\">url:</a>"
       }
     ]

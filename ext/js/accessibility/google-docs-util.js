@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DocumentUtil} from '../dom/document-util.js';
+import {computeZoomScale, isPointInAnyRect} from '../dom/document-util.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
 
 /**
@@ -126,7 +126,7 @@ export class GoogleDocsUtil {
      */
     _getRangeWithPoint(textNode, x, y, normalizeCssZoom) {
         if (normalizeCssZoom) {
-            const scale = DocumentUtil.computeZoomScale(textNode);
+            const scale = computeZoomScale(textNode);
             x /= scale;
             y /= scale;
         }
@@ -137,7 +137,7 @@ export class GoogleDocsUtil {
             const mid = Math.floor((start + end) / 2);
             range.setStart(textNode, mid);
             range.setEnd(textNode, end);
-            if (DocumentUtil.isPointInAnyRect(x, y, range.getClientRects())) {
+            if (isPointInAnyRect(x, y, range.getClientRects())) {
                 start = mid;
             } else {
                 end = mid;

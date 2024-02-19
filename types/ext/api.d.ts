@@ -26,6 +26,7 @@ import type * as DictionaryDatabase from './dictionary-database';
 import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
 import type * as Extension from './extension';
+import type * as Language from './language';
 import type * as Log from './log';
 import type * as Settings from './settings';
 import type * as SettingsModifications from './settings-modifications';
@@ -260,10 +261,6 @@ type ApiSurface = {
         params: void;
         return: string;
     };
-    getDisplayTemplatesHtml: {
-        params: void;
-        return: string;
-    };
     getZoom: {
         params: void;
         return: {
@@ -288,7 +285,7 @@ type ApiSurface = {
         };
         return: DictionaryDatabase.MediaDataStringContent[];
     };
-    log: {
+    logGenericErrorBackend: {
         params: {
             error: Core.SerializedError;
             level: Log.LogLevel;
@@ -379,6 +376,10 @@ type ApiSurface = {
     requestBackendReadySignal: {
         params: void;
         return: boolean;
+    };
+    getLanguageSummaries: {
+        params: void;
+        return: Language.LanguageSummary[];
     };
 };
 

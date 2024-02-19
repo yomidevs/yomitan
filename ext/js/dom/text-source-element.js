@@ -17,7 +17,7 @@
  */
 
 import {readCodePointsBackward, readCodePointsForward} from '../data/sandbox/string-util.js';
-import {DocumentUtil} from './document-util.js';
+import {convertMultipleRectZoomCoordinates} from './document-util.js';
 
 /**
  * This class represents a text source that is attached to a HTML element, such as an <img>
@@ -145,7 +145,7 @@ export class TextSourceElement {
      * @returns {DOMRect[]} The rects.
      */
     getRects() {
-        return DocumentUtil.convertMultipleRectZoomCoordinates(this._element.getClientRects(), this._element);
+        return convertMultipleRectZoomCoordinates(this._element.getClientRects(), this._element);
     }
 
     /**

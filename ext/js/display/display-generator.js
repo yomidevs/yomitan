@@ -39,12 +39,9 @@ export class DisplayGenerator {
         this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
     }
 
-    /**
-     * @param {import('../comm/api.js').API} api
-     */
-    async prepare(api) {
-        const html = await api.getDisplayTemplatesHtml();
-        this._templates.load(html);
+    /** */
+    async prepare() {
+        await this._templates.loadFromFiles(['/templates-display.html']);
         this.updateHotkeys();
     }
 
