@@ -27,8 +27,3 @@ export type Events = {
 };
 
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
-
-export type ConstructorDetails = {
-    node: HTMLElement;
-    closingAnimationDuration: number;
-};

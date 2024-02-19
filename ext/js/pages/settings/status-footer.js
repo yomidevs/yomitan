@@ -24,10 +24,7 @@ export class StatusFooter extends PanelElement {
      * @param {HTMLElement} node
      */
     constructor(node) {
-        super({
-            node,
-            closingAnimationDuration: 375 // Milliseconds; includes buffer
-        });
+        super(node, 375); // Milliseconds; includes buffer
         /** @type {HTMLElement} */
         this._body = querySelectorNotNull(node, '.status-footer');
     }
