@@ -9,6 +9,7 @@
                     "name": "動詞"
                 }
             ],
+            "isPartOfSpeech": false,
             "subConditions": ["v1", "v5", "vk", "vs", "vz"]
         },
         "v1": {
@@ -19,6 +20,7 @@
                     "name": "一段動詞"
                 }
             ],
+            "isPartOfSpeech": true,
             "subConditions": ["v1d", "v1p"]
         },
         "v1d": {
@@ -28,7 +30,8 @@
                     "language": "ja",
                     "name": "一段動詞、辞書形"
                 }
-            ]
+            ],
+            "isPartOfSpeech": false
         },
         "v1p": {
             "name": "Ichidan verb, progressive or perfect form",
@@ -37,7 +40,8 @@
                     "language": "ja",
                     "name": "一段動詞、進行形または完了形"
                 }
-            ]
+            ],
+            "isPartOfSpeech": false
         },
         "v5": {
             "name": "Godan verb",
@@ -46,7 +50,8 @@
                     "language": "ja",
                     "name": "五段動詞"
                 }
-            ]
+            ],
+            "isPartOfSpeech": true
         },
         "vk": {
             "name": "Kuru verb",
@@ -55,7 +60,8 @@
                     "language": "ja",
                     "name": "来る動詞"
                 }
-            ]
+            ],
+            "isPartOfSpeech": true
         },
         "vs": {
             "name": "Suru verb",
@@ -64,7 +70,8 @@
                     "language": "ja",
                     "name": "する動詞"
                 }
-            ]
+            ],
+            "isPartOfSpeech": true
         },
         "vz": {
             "name": "Zuru verb",
@@ -73,7 +80,8 @@
                     "language": "ja",
                     "name": "ずる動詞"
                 }
-            ]
+            ],
+            "isPartOfSpeech": true
         },
         "adj-i": {
             "name": "Adjective with i ending",
@@ -82,16 +90,20 @@
                     "language": "ja",
                     "name": "形容詞"
                 }
-            ]
+            ],
+            "isPartOfSpeech": true
         },
         "-te": {
-            "name": "Intermediate -te endings for progressive or perfect tense"
+            "name": "Intermediate -te endings for progressive or perfect tense",
+            "isPartOfSpeech": false
         },
         "adv": {
-            "name": "Intermediate -ku endings for adverbs"
+            "name": "Intermediate -ku endings for adverbs",
+            "isPartOfSpeech": false
         },
         "past": {
-            "name": "-ta past form ending"
+            "name": "-ta past form ending",
+            "isPartOfSpeech": false
         }
     },
     "transforms": [
