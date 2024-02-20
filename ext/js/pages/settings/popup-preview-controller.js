@@ -71,38 +71,41 @@ export class PopupPreviewController {
     /** */
     _onCustomCssChange() {
         const css = /** @type {HTMLTextAreaElement} */ (this._customCss).value;
-        this._invoke('PopupPreviewFrame.setCustomCss', {css});
+        this._invoke('setCustomCss', {css});
     }
 
     /** */
     _onCustomOuterCssChange() {
         const css = /** @type {HTMLTextAreaElement} */ (this._customOuterCss).value;
-        this._invoke('PopupPreviewFrame.setCustomOuterCss', {css});
+        this._invoke('setCustomOuterCss', {css});
     }
 
     /** */
     _onOptionsContextChange() {
         const optionsContext = this._settingsController.getOptionsContext();
-        this._invoke('PopupPreviewFrame.updateOptionsContext', {optionsContext});
+        this._invoke('updateOptionsContext', {optionsContext});
     }
 
     /**
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
-        this._invoke('PopupPreviewFrame.optionsChanged', {options});
+        this._invoke('setLanguageExampleText', {language: options.general.language});
     }
 
     /**
      * @param {import('dom-data-binder').SettingChangedEvent} settingChangedEvent
      */
     _onLanguageSelectChanged(settingChangedEvent) {
-        this._invoke('PopupPreviewFrame.setLanguageExampleText', {language: settingChangedEvent.detail.value});
+        const {value} = settingChangedEvent.detail;
+        if (typeof value !== 'string') { return; }
+        this._invoke('setLanguageExampleText', {language: value});
     }
 
     /**
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
+     * @template {import('popup-preview-frame').ApiNames} TName
+     * @param {TName} action
+     * @param {import('popup-preview-frame').ApiParams<TName>} params
      */
     _invoke(action, params) {
         if (this._frame === null || this._frame.contentWindow === null) { return; }
