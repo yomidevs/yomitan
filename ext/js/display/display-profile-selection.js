@@ -35,10 +35,7 @@ export class DisplayProfileSelection {
         /** @type {HTMLElement} */
         const profilePanelElement = querySelectorNotNull(document, '#profile-panel');
         /** @type {PanelElement} */
-        this._profilePanel = new PanelElement({
-            node: profilePanelElement,
-            closingAnimationDuration: 375 // Milliseconds; includes buffer
-        });
+        this._profilePanel = new PanelElement(profilePanelElement, 375); // Milliseconds; includes buffer
         /** @type {boolean} */
         this._profileListNeedsUpdate = false;
         /** @type {EventListenerCollection} */

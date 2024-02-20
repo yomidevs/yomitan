@@ -27,9 +27,11 @@ import {TextScanner} from '../language/text-scanner.js';
  */
 export class QueryParser extends EventDispatcher {
     /**
-     * @param {import('display').QueryParserConstructorDetails} details
+     * @param {import('../comm/api.js').API} api
+     * @param {import('../dom/text-source-generator').TextSourceGenerator} textSourceGenerator
+     * @param {import('display').GetSearchContextCallback} getSearchContext
      */
-    constructor({api, getSearchContext, textSourceGenerator}) {
+    constructor(api, textSourceGenerator, getSearchContext) {
         super();
         /** @type {import('../comm/api.js').API} */
         this._api = api;

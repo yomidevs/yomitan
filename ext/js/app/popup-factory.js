@@ -120,12 +120,12 @@ export class PopupFactory {
             if (id === null) {
                 id = generateId(16);
             }
-            const popup = new PopupWindow({
-                application: this._application,
+            const popup = new PopupWindow(
+                this._application,
                 id,
                 depth,
-                frameId: currentFrameId
-            });
+                currentFrameId
+            );
             this._popups.set(id, popup);
             return popup;
         } else if (frameId === currentFrameId) {
@@ -133,13 +133,13 @@ export class PopupFactory {
             if (id === null) {
                 id = generateId(16);
             }
-            const popup = new Popup({
-                application: this._application,
+            const popup = new Popup(
+                this._application,
                 id,
                 depth,
-                frameId: currentFrameId,
+                currentFrameId,
                 childrenSupported
-            });
+            );
             if (parent !== null) {
                 if (parent.child !== null) {
                     throw new Error('Parent popup already has a child');
@@ -162,13 +162,13 @@ export class PopupFactory {
                 childrenSupported
             });
             id = info.id;
-            const popup = new PopupProxy({
-                application: this._application,
+            const popup = new PopupProxy(
+                this._application,
                 id,
-                depth: info.depth,
-                frameId: info.frameId,
-                frameOffsetForwarder: useFrameOffsetForwarder ? this._frameOffsetForwarder : null
-            });
+                info.depth,
+                info.frameId,
+                useFrameOffsetForwarder ? this._frameOffsetForwarder : null
+            );
             this._popups.set(id, popup);
             return popup;
         }

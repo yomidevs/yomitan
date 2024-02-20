@@ -68,16 +68,14 @@ export class Backend {
             /** @type {DictionaryDatabase|DictionaryDatabaseProxy} */
             this._dictionaryDatabase = new DictionaryDatabase();
             /** @type {Translator|TranslatorProxy} */
-            this._translator = new Translator({
-                database: this._dictionaryDatabase
-            });
+            this._translator = new Translator(this._dictionaryDatabase);
             /** @type {ClipboardReader|ClipboardReaderProxy} */
-            this._clipboardReader = new ClipboardReader({
+            this._clipboardReader = new ClipboardReader(
                 // eslint-disable-next-line no-undef
-                document: (typeof document === 'object' && document !== null ? document : null),
-                pasteTargetSelector: '#clipboard-paste-target',
-                richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
-            });
+                (typeof document === 'object' && document !== null ? document : null),
+                '#clipboard-paste-target',
+                '#clipboard-rich-content-paste-target'
+            );
         } else {
             /** @type {?OffscreenProxy} */
             this._offscreen = new OffscreenProxy(webExtension);
@@ -90,9 +88,7 @@ export class Backend {
         }
 
         /** @type {ClipboardMonitor} */
-        this._clipboardMonitor = new ClipboardMonitor({
-            clipboardReader: this._clipboardReader
-        });
+        this._clipboardMonitor = new ClipboardMonitor(this._clipboardReader);
         /** @type {?import('settings').Options} */
         this._options = null;
         /** @type {import('../data/json-schema.js').JsonSchema[]} */
@@ -102,9 +98,7 @@ export class Backend {
         /** @type {RequestBuilder} */
         this._requestBuilder = new RequestBuilder();
         /** @type {AudioDownloader} */
-        this._audioDownloader = new AudioDownloader({
-            requestBuilder: this._requestBuilder
-        });
+        this._audioDownloader = new AudioDownloader(this._requestBuilder);
         /** @type {OptionsUtil} */
         this._optionsUtil = new OptionsUtil();
         /** @type {AccessibilityController} */

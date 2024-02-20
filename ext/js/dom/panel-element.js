@@ -23,9 +23,10 @@ import {EventDispatcher} from '../core/event-dispatcher.js';
  */
 export class PanelElement extends EventDispatcher {
     /**
-     * @param {import('panel-element').ConstructorDetails} details
+     * @param {HTMLElement} node
+     * @param {number} closingAnimationDuration
      */
-    constructor({node, closingAnimationDuration}) {
+    constructor(node, closingAnimationDuration) {
         super();
         /** @type {HTMLElement} */
         this._node = node;

@@ -26,9 +26,10 @@ import {StructuredContentGenerator} from './sandbox/structured-content-generator
 
 export class DisplayGenerator {
     /**
-     * @param {import('display').DisplayGeneratorConstructorDetails} details
+     * @param {import('./display-content-manager.js').DisplayContentManager} contentManager
+     * @param {?import('../input/hotkey-help-controller.js').HotkeyHelpController} hotkeyHelpController
      */
-    constructor({contentManager, hotkeyHelpController = null}) {
+    constructor(contentManager, hotkeyHelpController) {
         /** @type {import('./display-content-manager.js').DisplayContentManager} */
         this._contentManager = contentManager;
         /** @type {?import('../input/hotkey-help-controller.js').HotkeyHelpController} */
