@@ -15,7 +15,6 @@
             "*": ["../types/ext/*"],
             "dev/*": ["../types/dev/*"],
             "test/*": ["../types/test/*"],
-            "language/*": ["../types/language/*"],
             "rollup/parseAst": ["../types/other/rollup-parse-ast"],
             "ext/json-schema": ["../types/ext/json-schema"],
             "json-schema": ["json-schema"],
