@@ -26,16 +26,13 @@ import {log} from '../core/log.js';
  */
 export class PopupProxy extends EventDispatcher {
     /**
-     * Creates a new instance.
-     * @param {import('popup').PopupProxyConstructorDetails} details Details about how to set up the instance.
+     * @param {import('../application.js').Application} application The main application instance.
+     * @param {string} id The identifier of the popup.
+     * @param {number} depth The depth of the popup.
+     * @param {number} frameId The frameId of the host frame.
+     * @param {?import('../comm/frame-offset-forwarder.js').FrameOffsetForwarder} frameOffsetForwarder A `FrameOffsetForwarder` instance which is used to determine frame positioning.
      */
-    constructor({
-        application,
-        id,
-        depth,
-        frameId,
-        frameOffsetForwarder
-    }) {
+    constructor(application, id, depth, frameId, frameOffsetForwarder) {
         super();
         /** @type {import('../application.js').Application} */
         this._application = application;

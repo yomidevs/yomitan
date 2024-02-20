@@ -32,9 +32,6 @@ export type RejectionReason = SafeAny;
 export type SerializableObject = {[key: string]: unknown};
 
 /** This type is used as an explicit way of permitting the `object` type. */
-export type SerializableObjectAny = {[key: string]: SafeAny};
-
-/** This type is used as an explicit way of permitting the `object` type. */
 export type UnknownObject = {[key: string | symbol]: unknown};
 
 export type TokenString = string;

@@ -25,7 +25,7 @@ Flashcard fields can be configured with the following steps:
 
     | Marker                            | Description                                                                                                                                                            |
     | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-    | `{audio}`                         | Audio sample of a native speaker's pronunciation in MP3 format (if available).                                                                                         |
+    | `{audio}`                         | Audio of the term's pronunciation from one of the audio sources (if available).                                                                                        |
     | `{clipboard-image}`               | An image which is stored in the system clipboard, if present.                                                                                                          |
     | `{clipboard-text}`                | Text which is stored in the system clipboard, if present.                                                                                                              |
     | `{cloze-body}`                    | Raw, inflected term as it appeared before being reduced to dictionary form by Yomitan.                                                                                 |

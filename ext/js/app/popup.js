@@ -32,16 +32,13 @@ import {ThemeController} from './theme-controller.js';
  */
 export class Popup extends EventDispatcher {
     /**
-     * Creates a new instance.
-     * @param {import('popup').PopupConstructorDetails} details The details used to construct the new instance.
+     * @param {import('../application.js').Application} application The main application instance.
+     * @param {string} id The identifier of the popup.
+     * @param {number} depth The depth of the popup.
+     * @param {number} frameId The frameId of the host frame.
+     * @param {boolean} childrenSupported Whether or not the popup is able to show child popups.
      */
-    constructor({
-        application,
-        id,
-        depth,
-        frameId,
-        childrenSupported
-    }) {
+    constructor(application, id, depth, frameId, childrenSupported) {
         super();
         /** @type {import('../application.js').Application} */
         this._application = application;
@@ -722,22 +719,25 @@ export class Popup extends EventDispatcher {
     }
 
     /**
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
+     * @template {import('display').WindowApiNames} TName
+     * @param {TName} action
+     * @param {import('display').WindowApiParams<TName>} params
      */
-    _invokeWindow(action, params = {}) {
+    _invokeWindow(action, params) {
         const contentWindow = this._frame.contentWindow;
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
 
-        const message = this._frameClient.createMessage({action, params});
-        contentWindow.postMessage(message, this._targetOrigin);
+        /** @type {import('display').WindowApiMessage<TName>} */
+        const message = {action, params};
+        const messageWrapper = this._frameClient.createMessage(message);
+        contentWindow.postMessage(messageWrapper, this._targetOrigin);
     }
 
     /**
      * @returns {void}
      */
     _onExtensionUnloaded() {
-        this._invokeWindow('displayExtensionUnloaded');
+        this._invokeWindow('displayExtensionUnloaded', void 0);
     }
 
     /**

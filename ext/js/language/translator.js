@@ -27,10 +27,9 @@ import {getAllLanguageTextPreprocessors} from './languages.js';
  */
 export class Translator {
     /**
-     * Creates a new Translator instance.
-     * @param {import('translator').ConstructorDetails} details The details for the class.
+     * @param {import('../dictionary/dictionary-database.js').DictionaryDatabase} database
      */
-    constructor({database}) {
+    constructor(database) {
         /** @type {import('../dictionary/dictionary-database.js').DictionaryDatabase} */
         this._database = database;
         /** @type {LanguageTransformer} */

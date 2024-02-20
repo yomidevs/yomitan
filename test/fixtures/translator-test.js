@@ -63,7 +63,7 @@ export async function createTranslatorContext(dictionaryDirectory, dictionaryNam
     expect(errors.length).toEqual(0);
 
     // Setup translator
-    const translator = new Translator({database: dictionaryDatabase});
+    const translator = new Translator(dictionaryDatabase);
     /** @type {import('language-transformer').LanguageTransformDescriptor} */
     const deinflectionReasons = parseJson(readFileSync(languageTransformDescriptorPath, {encoding: 'utf8'}));
     translator.prepare(deinflectionReasons);

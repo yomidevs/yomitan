@@ -83,16 +83,13 @@ export class Display extends EventDispatcher {
         /** @type {HotkeyHelpController} */
         this._hotkeyHelpController = new HotkeyHelpController();
         /** @type {DisplayGenerator} */
-        this._displayGenerator = new DisplayGenerator({
-            contentManager: this._contentManager,
-            hotkeyHelpController: this._hotkeyHelpController
-        });
+        this._displayGenerator = new DisplayGenerator(this._contentManager, this._hotkeyHelpController);
         /** @type {import('display').DirectApiMap} */
         this._directApiMap = new Map();
         /** @type {import('api-map').ApiMap<import('display').WindowApiSurface>} */ // import('display').WindowApiMap
         this._windowApiMap = new Map();
         /** @type {DisplayHistory} */
-        this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
+        this._history = new DisplayHistory(true, false);
         /** @type {boolean} */
         this._historyChangeIgnore = false;
         /** @type {boolean} */
@@ -126,11 +123,7 @@ export class Display extends EventDispatcher {
         /** @type {TextSourceGenerator} */
         this._textSourceGenerator = new TextSourceGenerator();
         /** @type {QueryParser} */
-        this._queryParser = new QueryParser({
-            api: application.api,
-            getSearchContext: this._getSearchContext.bind(this),
-            textSourceGenerator: this._textSourceGenerator
-        });
+        this._queryParser = new QueryParser(application.api, this._textSourceGenerator, this._getSearchContext.bind(this));
         /** @type {HTMLElement} */
         this._contentScrollElement = querySelectorNotNull(document, '#content-scroll');
         /** @type {HTMLElement} */
@@ -1712,8 +1705,7 @@ export class Display extends EventDispatcher {
         const popupFactory = new PopupFactory(this._application);
         popupFactory.prepare();
 
-        /** @type {import('frontend').ConstructorDetails} */
-        const setupNestedPopupsOptions = {
+        const frontend = new Frontend({
             application: this._application,
             useProxyPopup,
             parentPopupId,
@@ -1723,10 +1715,9 @@ export class Display extends EventDispatcher {
             pageType: this._pageType,
             allowRootFramePopupProxy: true,
             childrenSupported: this._childrenSupported,
-            hotkeyHandler: this._hotkeyHandler
-        };
-
-        const frontend = new Frontend(setupNestedPopupsOptions);
+            hotkeyHandler: this._hotkeyHandler,
+            canUseWindowPopup: true
+        });
         this._frontend = frontend;
         await frontend.prepare();
     }
