@@ -156,7 +156,7 @@ export class AnkiTemplatesController {
     /** */
     _onValidateCompile() {
         if (this._compileResultInfo === null) { return; }
-        this._validate(this._compileResultInfo, '{expression}', 'term-kanji', false, true);
+        void this._validate(this._compileResultInfo, '{expression}', 'term-kanji', false, true);
     }
 
     /**
@@ -169,7 +169,7 @@ export class AnkiTemplatesController {
         const infoNode = /** @type {HTMLElement} */ (this._renderResult);
         infoNode.hidden = true;
         this._cachedDictionaryEntryText = null;
-        this._validate(infoNode, field, 'term-kanji', true, false);
+        void this._validate(infoNode, field, 'term-kanji', true, false);
     }
 
     /**

@@ -41,7 +41,7 @@ export class PopupWindowController {
      */
     _onTestWindowOpenLinkClick(e) {
         e.preventDefault();
-        this._testWindowOpen();
+        void this._testWindowOpen();
     }
 
     /** */

@@ -60,7 +60,7 @@ export class OptionToggleHotkeyHandler {
      */
     _onHotkeyActionToggleOption(argument) {
         if (typeof argument !== 'string') { return; }
-        this._toggleOption(argument);
+        void this._toggleOption(argument);
     }
 
     /**

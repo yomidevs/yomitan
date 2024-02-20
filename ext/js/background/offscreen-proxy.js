@@ -259,7 +259,7 @@ export class ClipboardReaderProxy {
     set browser(value) {
         if (this._browser === value) { return; }
         this._browser = value;
-        this._offscreen.sendMessagePromise({action: 'clipboardSetBrowserOffscreen', params: {value}});
+        void this._offscreen.sendMessagePromise({action: 'clipboardSetBrowserOffscreen', params: {value}});
     }
 
     /**

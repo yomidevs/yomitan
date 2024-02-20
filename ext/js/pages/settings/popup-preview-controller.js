@@ -38,7 +38,7 @@ export class PopupPreviewController {
     }
 
     /** */
-    async prepare() {
+    prepare() {
         if (new URLSearchParams(location.search).get('popup-preview') === 'false') { return; }
 
         this._customCss.addEventListener('input', this._onCustomCssChange.bind(this), false);

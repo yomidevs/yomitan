@@ -79,7 +79,7 @@ export class SortFrequencyDictionaryController {
     /** */
     _onSortFrequencyDictionarySelectChange() {
         const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
-        this._setSortFrequencyDictionaryValue(value !== '' ? value : null);
+        void this._setSortFrequencyDictionaryValue(value !== '' ? value : null);
     }
 
     /** */
@@ -87,14 +87,14 @@ export class SortFrequencyDictionaryController {
         const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionaryOrderSelect);
         const value2 = this._normalizeSortFrequencyDictionaryOrder(value);
         if (value2 === null) { return; }
-        this._setSortFrequencyDictionaryOrderValue(value2);
+        void this._setSortFrequencyDictionaryOrderValue(value2);
     }
 
     /** */
     _onSortFrequencyDictionaryOrderAutoButtonClick() {
         const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
         if (value === '') { return; }
-        this._autoUpdateOrder(value);
+        void this._autoUpdateOrder(value);
     }
 
     /**

@@ -51,7 +51,7 @@ export class ScanInputsController {
         this._settingsController.on('scanInputsChanged', this._onScanInputsChanged.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
-        this.refresh();
+        await this.refresh();
     }
 
     /**
@@ -67,7 +67,7 @@ export class ScanInputsController {
             this._entries[i].index = i;
         }
         this._updateCounts();
-        this._modifyProfileSettings([{
+        void this._modifyProfileSettings([{
             action: 'splice',
             path: 'scanning.inputs',
             start: index,
@@ -113,7 +113,7 @@ export class ScanInputsController {
      */
     _onScanInputsChanged({source}) {
         if (source === this) { return; }
-        this.refresh();
+        void this.refresh();
     }
 
     /**
@@ -144,7 +144,7 @@ export class ScanInputsController {
         const scanningInput = ScanInputsController.createDefaultMouseInput('', '');
         this._addOption(index, scanningInput);
         this._updateCounts();
-        this._modifyProfileSettings([{
+        void this._modifyProfileSettings([{
             action: 'splice',
             path: 'scanning.inputs',
             start: index,
@@ -315,7 +315,7 @@ class ScanInputField {
      */
     _onIncludeValueChange({modifiers}) {
         const modifiers2 = this._joinModifiers(modifiers);
-        this._parent.setProperty(this._index, 'include', modifiers2, true);
+        void this._parent.setProperty(this._index, 'include', modifiers2, true);
     }
 
     /**
@@ -323,7 +323,7 @@ class ScanInputField {
      */
     _onExcludeValueChange({modifiers}) {
         const modifiers2 = this._joinModifiers(modifiers);
-        this._parent.setProperty(this._index, 'exclude', modifiers2, true);
+        void this._parent.setProperty(this._index, 'exclude', modifiers2, true);
     }
 
     /**
@@ -406,7 +406,7 @@ class ScanInputField {
         if (this._node !== null) {
             this._node.dataset.showAdvanced = `${showAdvanced}`;
         }
-        this._parent.setProperty(this._index, 'options.showAdvanced', showAdvanced, false);
+        void this._parent.setProperty(this._index, 'options.showAdvanced', showAdvanced, false);
     }
 
     /**

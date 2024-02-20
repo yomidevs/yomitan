@@ -133,7 +133,7 @@ export class ExtensionKeyboardShortcutController {
      */
     _onResetClick(e) {
         e.preventDefault();
-        this._resetAllCommands();
+        void this._resetAllCommands();
     }
 
     /**
@@ -141,7 +141,7 @@ export class ExtensionKeyboardShortcutController {
      */
     _onClearClick(e) {
         e.preventDefault();
-        this._clearAllCommands();
+        void this._clearAllCommands();
     }
 
     /**
@@ -317,7 +317,7 @@ class ExtensionKeyboardShortcutHotkeyEntry {
      */
     _onInputFieldChange(e) {
         const {key, modifiers} = e;
-        this._tryUpdateInput(key, modifiers, false);
+        void this._tryUpdateInput(key, modifiers, false);
     }
 
     /** */
@@ -331,10 +331,10 @@ class ExtensionKeyboardShortcutHotkeyEntry {
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'clearInput':
-                this._tryUpdateInput(null, [], true);
+                void this._tryUpdateInput(null, [], true);
                 break;
             case 'resetInput':
-                this._resetInput();
+                void this._resetInput();
                 break;
         }
     }

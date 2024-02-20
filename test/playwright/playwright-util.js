@@ -68,16 +68,16 @@ export const mockModelFieldsToAnkiValues = {
 
 /**
  * @param {import('playwright').Route} route
- * @returns {Promise<void>|undefined}
+ * @returns {Promise<void>}
  */
-export const mockAnkiRouteHandler = (route) => {
+export async function mockAnkiRouteHandler(route) {
     const reqBody = route.request().postDataJSON();
     const respBody = ankiRouteResponses[reqBody.action];
     if (!respBody) {
         return route.abort();
     }
-    route.fulfill(respBody);
-};
+    await route.fulfill(respBody);
+}
 
 /**
  * @param {import('playwright').Page} page

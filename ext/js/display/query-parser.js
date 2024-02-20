@@ -207,7 +207,7 @@ export class QueryParser extends EventDispatcher {
             scope: 'profile',
             optionsContext
         };
-        this._api.modifySettings([modification], 'search');
+        void this._api.modifySettings([modification], 'search');
     }
 
     /**
@@ -410,6 +410,6 @@ export class QueryParser extends EventDispatcher {
     _loadJapaneseWanakanaModule() {
         if (this._japaneseWanakanaModuleImport !== null) { return; }
         this._japaneseWanakanaModuleImport = import('../language/ja/japanese-wanakana.js');
-        this._japaneseWanakanaModuleImport.then((value) => { this._japaneseWanakanaModule = value; });
+        void this._japaneseWanakanaModuleImport.then((value) => { this._japaneseWanakanaModule = value; });
     }
 }

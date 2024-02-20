@@ -298,7 +298,7 @@ export class SearchDisplayController {
             scope: 'profile',
             optionsContext: this._display.getOptionsContext()
         };
-        this._display.application.api.modifySettings([modification], 'search');
+        void this._display.application.api.modifySettings([modification], 'search');
     }
 
     /**
@@ -307,7 +307,7 @@ export class SearchDisplayController {
     _onClipboardMonitorEnableChange(e) {
         const element = /** @type {HTMLInputElement} */ (e.target);
         const enabled = element.checked;
-        this._setClipboardMonitorEnabled(enabled);
+        void this._setClipboardMonitorEnabled(enabled);
     }
 
     /** */
@@ -323,7 +323,7 @@ export class SearchDisplayController {
         const value = Number.parseInt(node.value, 10);
         const optionsFull = await this._display.application.api.optionsGetFull();
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= optionsFull.profiles.length) {
-            this._setPrimaryProfileIndex(value);
+            await this._setPrimaryProfileIndex(value);
         }
     }
 

@@ -112,7 +112,7 @@ export class FrameClient {
 
             /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
             const onMessage = (message) => {
-                onMessageInner(message);
+                void onMessageInner(message);
                 return false;
             };
 

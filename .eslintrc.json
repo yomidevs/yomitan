@@ -74,8 +74,8 @@
         "no-implied-eval": "error",
         "no-new": "error",
         "no-new-native-nonconstructor": "error",
-        "no-octal": "off",
-        "no-octal-escape": "off",
+        "no-octal": "error",
+        "no-octal-escape": "error",
         "no-param-reassign": "off",
         "no-promise-executor-return": "error",
         "no-prototype-builtins": "error",
@@ -394,9 +394,9 @@
                 "plugin:@typescript-eslint/recommended-type-checked"
             ],
             "rules": {
-                "@typescript-eslint/no-floating-promises": "off",
+                "@typescript-eslint/no-floating-promises": ["error", {"ignoreIIFE": true}],
                 "@typescript-eslint/no-misused-promises": "off",
-                "@typescript-eslint/no-redundant-type-constituents": "off",
+                "@typescript-eslint/no-redundant-type-constituents": "error",
                 "@typescript-eslint/no-unsafe-argument": "off",
                 "@typescript-eslint/no-unsafe-assignment": "off",
                 "@typescript-eslint/no-unsafe-call": "off",

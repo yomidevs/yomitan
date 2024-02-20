@@ -39,4 +39,4 @@ async function main() {
     await testDictionaryFiles(mode, dictionaryFileNames);
 }
 
-main();
+await main();
