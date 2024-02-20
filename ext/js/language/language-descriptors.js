@@ -82,10 +82,7 @@ const languageDescriptors = [
         iso: 'grc',
         name: 'Ancient Greek',
         exampleText: 'γράφω',
-        textPreprocessors: {
-            capitalizeFirstLetter,
-            decapitalize
-        }
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'hu',
@@ -135,28 +132,19 @@ const languageDescriptors = [
         iso: 'pl',
         name: 'Polish',
         exampleText: 'czytacie',
-        textPreprocessors: {
-            capitalizeFirstLetter,
-            decapitalize
-        }
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'pt',
         name: 'Portuguese',
         exampleText: 'ler',
-        textPreprocessors: {
-            capitalizeFirstLetter,
-            decapitalize
-        }
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'ro',
         name: 'Romanian',
         exampleText: 'citit',
-        textPreprocessors: {
-            capitalizeFirstLetter,
-            decapitalize
-        }
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'ru',
@@ -172,28 +160,19 @@ const languageDescriptors = [
         iso: 'sh',
         name: 'Serbo-Croatian',
         exampleText: 'čitaše',
-        textPreprocessors: {
-            capitalizeFirstLetter,
-            decapitalize
-        }
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'sq',
         name: 'Albanian',
         exampleText: 'ndihmojme',
-        textPreprocessors: {
-            capitalizeFirstLetter,
-            decapitalize
-        }
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'sv',
         name: 'Swedish',
         exampleText: 'läsa',
-        textPreprocessors: {
-            capitalizeFirstLetter,
-            decapitalize
-        }
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'th',
@@ -205,10 +184,7 @@ const languageDescriptors = [
         iso: 'vi',
         name: 'Vietnamese',
         exampleText: 'đọc',
-        textPreprocessors: {
-            capitalizeFirstLetter,
-            decapitalize
-        }
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'zh',

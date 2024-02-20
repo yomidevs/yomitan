@@ -13,7 +13,6 @@
         "baseUrl": ".",
         "paths": {
             "*": ["./types/ext/*"],
-            "language/*": ["./types/language/*"],
             "ext/json-schema": ["./types/ext/json-schema"]
         },
         "types": [

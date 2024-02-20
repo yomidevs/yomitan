@@ -40,7 +40,6 @@
             "translation": ["../types/ext/translation"],
             "translation-internal": ["../types/ext/translation-internal"],
             "dev/*": ["../types/dev/*"],
-            "language/*": ["../types/language/*"],
             "rollup/parseAst": ["../types/other/rollup-parse-ast"],
             "chai": ["../node_modules/@vitest/expect/dist/chai.d.cts"]
         },
