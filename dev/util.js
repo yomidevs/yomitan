@@ -92,16 +92,3 @@ export function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
 
     // Return zipFileBlob;
 }
-
-/**
- * @param {(...args: import('core').SafeAny[]) => (unknown|Promise<unknown>)} func
- * @param {...import('core').SafeAny} args
- */
-export async function testMain(func, ...args) {
-    try {
-        await func(...args);
-    } catch (e) {
-        console.log(e);
-        process.exit(-1);
-    }
-}
