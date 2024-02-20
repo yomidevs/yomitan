@@ -1,19 +1,21 @@
 ## Dictionaries
 
-### Recommended Japanese Dictionaries
+You must download and import the dictionaries you wish to use in order to enable Yomitan definition lookups. There are several free dictionaries available for Yomitan, some of them with glossaries available in different languages.
 
-You must download and import the dictionaries you wish to use in order to enable Yomitan definition lookups. There are several free Japanese dictionaries available for Yomitan, some of them with glossaries available in different languages.
+Be aware that non-English dictionaries generally contain fewer entries than their English counterparts. Even if your primary language is not English, you may consider also importing the English version for better coverage.
 
-Be aware that non-English dictionaries contain fewer entries than their English counterparts. Even if your primary language is not English, you may consider also importing the English version for better coverage.
+### Recommended Dictionaries
 
-- [Jitendex](https://github.com/stephenmk/Jitendex) - Jitendex is an improved version of JMdict for Yomitan. It features better formatting and some other improvements, and is actively being improved by its author.
+#### Japanese
+
+- [Jitendex](https://github.com/stephenmk/Jitendex) - An improved version of JMdict for Yomitan. It features better formatting and some other improvements, and is actively being improved by its author.
 - [JMdict](https://github.com/themoeway/jmdict-yomitan#jmdict-for-yomitan-1) - There are daily automatically updated builds of JMdict for Yomitan available in this repository. It is available in multiple languages and formats, but we recommend installing the more modern Jitendex for English users.
-- [JMnedict](https://github.com/themoeway/jmdict-yomitan#jmnedict-for-yomitan) - JMnedict is a dictionary that lists readings of person/place/organization names and other proper nouns.
-- [KANJIDIC](https://github.com/themoeway/jmdict-yomitan#kanjidic-for-yomitan) - KANJIDIC is an English dictionary listing readings, meanings, and other info about kanji characters.
+- [JMnedict](https://github.com/themoeway/jmdict-yomitan#jmnedict-for-yomitan) - Lists readings of person/place/organization names and other proper nouns.
+- [KANJIDIC](https://github.com/themoeway/jmdict-yomitan#kanjidic-for-yomitan) - An English dictionary listing readings, meanings, and other info about kanji characters.
 
-### More Dictionaries
+#### Other Languages
 
-There are many more dictionaries available in the Yomitan format. Some of them are listed in [Yomitan Dictionaries](https://github.com/MarvNC/yomichan-dictionaries). For guidelines on converting dictionaries, see [How Do I Make A Yomichan Dictionary](https://github.com/MarvNC/yomichan-dictionaries/blob/master/how-to-make-yomichan-dictionaries.md).
+- [KTY](https://github.com/themoeway/kaikki-to-yomitan) - Wiktionaries in various languages converted to Yomitan format.
 
 #### EPWING Dictionaries
 
