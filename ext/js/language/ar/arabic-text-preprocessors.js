@@ -15,11 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {basicTextPreprocessorOptions} from '../text-preprocessors.js';
 
-/** @type {import('language').LanguageWithoutPreprocessors} */
-export const descriptor = {
-    name: 'Persian',
-    iso: 'fa',
-    exampleText: 'خواندن',
-    textPreprocessors: {}
+/** @type {import('language').TextPreprocessor<boolean>} */
+export const removeArabicScriptDiacritics = {
+    name: 'Remove diacritics',
+    description: 'وَلَدَ ⬅️ ولد',
+    options: basicTextPreprocessorOptions,
+    process: (text, setting) => {
+        return setting ? text.replace(/[\u064E-\u0650]/g, '') : text;
+    }
 };

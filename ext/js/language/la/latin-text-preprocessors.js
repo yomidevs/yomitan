@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextPreprocessorOptions, capitalizeFirstLetter, decapitalize} from '../text-preprocessors.js';
+import {basicTextPreprocessorOptions} from '../text-preprocessors.js';
 
 /** @type {Record<string, string>} */
 const diacriticMap = {
@@ -45,21 +45,12 @@ const diacriticMap = {
     Ý: 'Y'
 };
 
-/** @type {import('language/language-latin').LatinLanguageDescriptor} */
-export const descriptor = {
-    name: 'Latin',
-    iso: 'la',
-    exampleText: 'legere',
-    textPreprocessors: {
-        capitalizeFirstLetter,
-        decapitalize,
-        removeDiacritics: {
-            name: 'Remove diacritics',
-            description: 'āēīōūȳ → aeiouy, áéíóúý → aeiouy',
-            options: basicTextPreprocessorOptions,
-            process: (str, setting) => {
-                return setting ? str.replace(/[āēīōūȳáéíóúýĀĒĪŌŪȲÁÉÍÓÚÝ]/g, (match) => diacriticMap[match] || match) : str;
-            }
-        }
+/** @type {import('language').TextPreprocessor<boolean>} */
+export const removeLatinDiacritics = {
+    name: 'Remove diacritics',
+    description: 'āēīōūȳ → aeiouy, áéíóúý → aeiouy',
+    options: basicTextPreprocessorOptions,
+    process: (str, setting) => {
+        return setting ? str.replace(/[āēīōūȳáéíóúýĀĒĪŌŪȲÁÉÍÓÚÝ]/g, (match) => diacriticMap[match] || match) : str;
     }
 };

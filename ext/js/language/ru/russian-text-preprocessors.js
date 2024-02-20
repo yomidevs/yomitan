@@ -15,10 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {LanguageDescriptor, CapitalizationPreprocessors, BidirectionalConversionPreprocessor} from '../ext/language';
+import {basicTextPreprocessorOptions} from '../text-preprocessors.js';
 
-export type GermanTextPreprocessorDescriptor = CapitalizationPreprocessors & {
-    eszettConversion: BidirectionalConversionPreprocessor;
+/** @type {import('language').TextPreprocessor<boolean>} */
+export const removeRussianDiacritics = {
+    name: 'Remove diacritics',
+    description: 'A\u0301 → A, a\u0301 → a',
+    options: basicTextPreprocessorOptions,
+    process: (str, setting) => {
+        return setting ? str.replace(/\u0301/g, '') : str;
+    }
 };
 
-export type GermanLanguageDescriptor = LanguageDescriptor<GermanTextPreprocessorDescriptor>;
+/** @type {import('language').TextPreprocessor<boolean>} */
+export const yoToE = {
+    name: 'Yo to E',
+    description: 'ё → е, Ё → Е',
+    options: basicTextPreprocessorOptions,
+    process: (str, setting) => {
+        return setting ? str.replace(/ё/g, 'е').replace(/Ё/g, 'Е') : str;
+    }
+};

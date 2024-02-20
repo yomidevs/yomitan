@@ -30,7 +30,6 @@ export const convertHalfWidthCharacters = {
     name: 'Convert half width characters to full width',
     description: 'ﾖﾐﾁｬﾝ → ヨミチャン',
     options: basicTextPreprocessorOptions,
-    /** @type {import('language').TextPreprocessorFunction<boolean>} */
     process: (str, setting, sourceMap) => (setting ? convertHalfWidthKanaToFullWidth(str, sourceMap) : str)
 };
 
@@ -39,7 +38,6 @@ export const convertNumericCharacters = {
     name: 'Convert numeric characters to full width',
     description: '1234 → １２３４',
     options: basicTextPreprocessorOptions,
-    /** @type {import('language').TextPreprocessorFunction<boolean>} */
     process: (str, setting) => (setting ? convertNumericToFullWidth(str) : str)
 };
 
@@ -48,7 +46,6 @@ export const convertAlphabeticCharacters = {
     name: 'Convert alphabetic characters to hiragana',
     description: 'yomichan → よみちゃん',
     options: basicTextPreprocessorOptions,
-    /** @type {import('language').TextPreprocessorFunction<boolean>} */
     process: (str, setting, sourceMap) => (setting ? convertAlphabeticToKana(str, sourceMap) : str)
 };
 
@@ -74,7 +71,6 @@ export const collapseEmphaticSequences = {
     name: 'Collapse emphatic character sequences',
     description: 'すっっごーーい → すっごーい / すごい',
     options: [[false, false], [true, false], [true, true]],
-    /** @type {import('language').TextPreprocessorFunction<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>} */
     process: (str, setting, sourceMap) => {
         const [collapseEmphatic, collapseEmphaticFull] = setting;
         if (collapseEmphatic) {
