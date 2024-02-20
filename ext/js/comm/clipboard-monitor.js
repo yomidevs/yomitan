@@ -24,9 +24,9 @@ import {isStringPartiallyJapanese} from '../language/ja/japanese.js';
  */
 export class ClipboardMonitor extends EventDispatcher {
     /**
-     * @param {{clipboardReader: import('clipboard-monitor').ClipboardReaderLike}} details
+     * @param {import('clipboard-monitor').ClipboardReaderLike} clipboardReader
      */
-    constructor({clipboardReader}) {
+    constructor(clipboardReader) {
         super();
         /** @type {import('clipboard-monitor').ClipboardReaderLike} */
         this._clipboardReader = clipboardReader;

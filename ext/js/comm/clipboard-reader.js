@@ -23,10 +23,11 @@ import {getFileExtensionFromImageMediaType} from '../media/media-util.js';
  */
 export class ClipboardReader {
     /**
-     * Creates a new instances of a clipboard reader.
-     * @param {{document: ?Document, pasteTargetSelector: ?string, richContentPasteTargetSelector: ?string}} details Details about how to set up the instance.
+     * @param {?Document} document
+     * @param {?string} pasteTargetSelector
+     * @param {?string} richContentPasteTargetSelector
      */
-    constructor({document = null, pasteTargetSelector = null, richContentPasteTargetSelector = null}) {
+    constructor(document, pasteTargetSelector, richContentPasteTargetSelector) {
         /** @type {?Document} */
         this._document = document;
         /** @type {?import('environment').Browser} */

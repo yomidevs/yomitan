@@ -25,7 +25,14 @@ export class SelectorObserver {
      * Creates a new instance.
      * @param {import('selector-observer').ConstructorDetails<T>} details The configuration for the object.
      */
-    constructor({selector, ignoreSelector = null, onAdded = null, onRemoved = null, onChildrenUpdated = null, isStale = null}) {
+    constructor({
+        selector,
+        ignoreSelector = null,
+        onAdded = null,
+        onRemoved = null,
+        onChildrenUpdated = null,
+        isStale = null
+    }) {
         /** @type {string} */
         this._selector = selector;
         /** @type {?string} */

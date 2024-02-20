@@ -25,9 +25,14 @@ import {SelectorObserver} from './selector-observer.js';
  */
 export class DOMDataBinder {
     /**
-     * @param {import('dom-data-binder').ConstructorDetails<T>} details
+     * @param {string} selector
+     * @param {import('dom-data-binder').CreateElementMetadataCallback<T>} createElementMetadata
+     * @param {import('dom-data-binder').CompareElementMetadataCallback<T>} compareElementMetadata
+     * @param {import('dom-data-binder').GetValuesCallback<T>} getValues
+     * @param {import('dom-data-binder').SetValuesCallback<T>} setValues
+     * @param {import('dom-data-binder').OnErrorCallback<T>|null} [onError]
      */
-    constructor({selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null}) {
+    constructor(selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null) {
         /** @type {string} */
         this._selector = selector;
         /** @type {import('dom-data-binder').CreateElementMetadataCallback<T>} */
@@ -45,14 +50,14 @@ export class DOMDataBinder {
         /** @type {TaskAccumulator<import('dom-data-binder').ElementObserver<T>, import('dom-data-binder').AssignTaskValue>} */
         this._assignTasks = new TaskAccumulator(this._onBulkAssign.bind(this));
         /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */
-        this._selectorObserver = /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */ (new SelectorObserver({
+        this._selectorObserver = new SelectorObserver({
             selector,
             ignoreSelector: null,
             onAdded: this._createObserver.bind(this),
             onRemoved: this._removeObserver.bind(this),
             onChildrenUpdated: this._onObserverChildrenUpdated.bind(this),
             isStale: this._isObserverStale.bind(this)
-        }));
+        });
     }
 
     /**

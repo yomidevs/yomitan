@@ -23,10 +23,7 @@ export class Modal extends PanelElement {
      * @param {HTMLElement} node
      */
     constructor(node) {
-        super({
-            node,
-            closingAnimationDuration: 375 // Milliseconds; includes buffer
-        });
+        super(node, 375); // Milliseconds; includes buffer
         /** @type {?Element} */
         this._contentNode = null;
         /** @type {boolean} */

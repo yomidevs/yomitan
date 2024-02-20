@@ -63,12 +63,12 @@ export class SearchDisplayController {
         this._introAnimationTimer = null;
         /** @type {boolean} */
         this._clipboardMonitorEnabled = false;
+        /** @type {import('clipboard-monitor').ClipboardReaderLike} */
+        const clipboardReader = {
+            getText: this._display.application.api.clipboardGet.bind(this._display.application.api)
+        };
         /** @type {ClipboardMonitor} */
-        this._clipboardMonitor = new ClipboardMonitor({
-            clipboardReader: {
-                getText: this._display.application.api.clipboardGet.bind(this._display.application.api)
-            }
-        });
+        this._clipboardMonitor = new ClipboardMonitor(clipboardReader);
         /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
             ['searchDisplayControllerGetMode', this._onMessageGetMode.bind(this)],

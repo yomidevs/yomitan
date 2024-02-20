@@ -18,8 +18,6 @@
 import type {Popup} from '../../ext/js/app/popup';
 import type {PopupProxy} from '../../ext/js/app/popup-proxy';
 import type {PopupWindow} from '../../ext/js/app/popup-window';
-import type {FrameOffsetForwarder} from '../../ext/js/comm/frame-offset-forwarder';
-import type {Application} from '../../ext/js/application';
 import type * as DocumentUtil from './document-util';
 import type * as Settings from './settings';
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
@@ -90,43 +88,6 @@ export type ValidSize = {
     width: number;
     height: number;
     valid: boolean;
-};
-
-export type PopupConstructorDetails = {
-    /** The main application instance. */
-    application: Application;
-    /** The ID of the popup. */
-    id: string;
-    /** The depth of the popup. */
-    depth: number;
-    /** The ID of the host frame. */
-    frameId: number;
-    /** Whether or not the popup is able to show child popups. */
-    childrenSupported: boolean;
-};
-
-export type PopupWindowConstructorDetails = {
-    /** The main application instance. */
-    application: Application;
-    /** The ID of the popup. */
-    id: string;
-    /** The depth of the popup. */
-    depth: number;
-    /** The ID of the host frame. */
-    frameId: number;
-};
-
-export type PopupProxyConstructorDetails = {
-    /** The main application instance. */
-    application: Application;
-    /** The ID of the popup. */
-    id: string;
-    /** The depth of the popup. */
-    depth: number;
-    /** The ID of the host frame. */
-    frameId: number;
-    /** A `FrameOffsetForwarder` instance which is used to determine frame positioning. */
-    frameOffsetForwarder: FrameOffsetForwarder | null;
 };
 
 export type Events = {
