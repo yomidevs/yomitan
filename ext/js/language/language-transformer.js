@@ -81,7 +81,7 @@ export class LanguageTransformer {
             const flags = conditionFlagsMap.get(type);
             if (typeof flags === 'undefined') { continue; } // This case should never happen
             this._conditionTypeToConditionFlagsMap.set(type, flags);
-            if (condition.isPartOfSpeech) {
+            if (condition.isDictionaryForm) {
                 this._partOfSpeechToConditionFlagsMap.set(type, flags);
             }
         }

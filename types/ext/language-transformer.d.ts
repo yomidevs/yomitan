@@ -32,7 +32,7 @@ export type ConditionMapEntries = ConditionMapEntry[];
 export type Condition = {
     name: string;
     i18n?: RuleI18n[];
-    isPartOfSpeech: boolean;
+    isDictionaryForm: boolean;
     subConditions?: string[];
 };
 
