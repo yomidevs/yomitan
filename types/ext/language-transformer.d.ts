@@ -31,8 +31,8 @@ export type ConditionMapEntries = ConditionMapEntry[];
 
 export type Condition = {
     name: string;
-    i18n?: RuleI18n[];
     isDictionaryForm: boolean;
+    i18n?: RuleI18n[];
     subConditions?: string[];
 };
 
