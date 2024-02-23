@@ -19,44 +19,34 @@ import {escapeRegExp} from '../core/utilities.js';
 
 export class LanguageTransformer {
     constructor() {
-        /** @type {number} */
-        this._nextFlagIndex = 0;
-        /** @type {import('language-transformer-internal').Transform[]} */
-        this._transforms = [];
-        /** @type {Map<string, number>} */
-        this._conditionTypeToConditionFlagsMap = new Map();
-        /** @type {Map<string, number>} */
-        this._partOfSpeechToConditionFlagsMap = new Map();
-    }
-
-    /** */
-    clear() {
-        this._nextFlagIndex = 0;
-        this._transforms = [];
-        this._conditionTypeToConditionFlagsMap.clear();
-        this._partOfSpeechToConditionFlagsMap.clear();
+        /** @type {Map<string, import('language-transformer-internal').LanguageTransformDescriptorInternal>} */
+        this._languageTransformDescriptors = new Map();
     }
 
     /**
-     * Note: this function does not currently combine properly with previous descriptors,
-     * they are treated as completely separate collections. This should eventually be changed.
      * @param {import('language-transformer').LanguageTransformDescriptor} descriptor
      * @throws {Error}
+     * @returns {import('language-transformer-internal').LanguageTransformDescriptorInternal}
      */
     addDescriptor(descriptor) {
-        const {conditions, transforms} = descriptor;
-        const conditionEntries = Object.entries(conditions);
-        const {conditionFlagsMap, nextFlagIndex} = this._getConditionFlagsMap(conditionEntries, this._nextFlagIndex);
-
+        /** @type {import('language-transformer-internal').ConditionTypeToConditionFlagsMap} */
+        const conditionTypeToConditionFlagsMap = new Map();
+        /** @type {import('language-transformer-internal').ConditionTypeToConditionFlagsMap} */
+        const partOfSpeechToConditionFlagsMap = new Map();
         /** @type {import('language-transformer-internal').Transform[]} */
-        const transforms2 = [];
-        for (let i = 0, ii = transforms.length; i < ii; ++i) {
-            const {name, rules} = transforms[i];
+        const transforms = [];
+
+        const {language, conditions, transforms: rawTransforms} = descriptor;
+        const conditionEntries = Object.entries(conditions);
+        const {conditionFlagsMap} = this._getConditionFlagsMap(conditionEntries);
+
+        for (let i = 0, ii = rawTransforms.length; i < ii; ++i) {
+            const {name, rules} = rawTransforms[i];
             /** @type {import('language-transformer-internal').Rule[]} */
             const rules2 = [];
             for (let j = 0, jj = rules.length; j < jj; ++j) {
                 const {suffixIn, suffixOut, conditionsIn, conditionsOut} = rules[j];
-                const conditionFlagsIn = this._getConditionFlagsStrict(conditionFlagsMap, conditionsIn);
+                const conditionFlagsIn = this._getConditionFlags(conditionFlagsMap, conditionsIn);
                 if (conditionFlagsIn === null) { throw new Error(`Invalid conditionsIn for transform[${i}].rules[${j}]`); }
                 const conditionFlagsOut = this._getConditionFlagsStrict(conditionFlagsMap, conditionsOut);
                 if (conditionFlagsOut === null) { throw new Error(`Invalid conditionsOut for transform[${i}].rules[${j}]`); }
@@ -69,57 +59,78 @@ export class LanguageTransformer {
             }
             const suffixes = rules.map((rule) => rule.suffixIn);
             const suffixHeuristic = new RegExp(`(${suffixes.map((suffix) => escapeRegExp(suffix)).join('|')})$`);
-            transforms2.push({name, rules: rules2, suffixHeuristic});
+            transforms.push({name, rules: rules2, suffixHeuristic});
         }
 
-        this._nextFlagIndex = nextFlagIndex;
-        for (const transform of transforms2) {
-            this._transforms.push(transform);
-        }
-
-        for (const [type, condition] of conditionEntries) {
+        for (const [type, {isDictionaryForm, aliases}] of conditionEntries) {
             const flags = conditionFlagsMap.get(type);
             if (typeof flags === 'undefined') { continue; } // This case should never happen
-            this._conditionTypeToConditionFlagsMap.set(type, flags);
-            if (condition.isDictionaryForm) {
-                this._partOfSpeechToConditionFlagsMap.set(type, flags);
+            conditionTypeToConditionFlagsMap.set(type, flags);
+            if (aliases) {
+                for (const alias of aliases) {
+                    conditionTypeToConditionFlagsMap.set(alias, flags);
+                }
+            }
+            if (isDictionaryForm) {
+                partOfSpeechToConditionFlagsMap.set(type, flags);
+                if (aliases) {
+                    for (const alias of aliases) {
+                        partOfSpeechToConditionFlagsMap.set(alias, flags);
+                    }
+                }
             }
         }
+
+        const languageTransformDescriptor = {partOfSpeechToConditionFlagsMap, conditionTypeToConditionFlagsMap, transforms};
+        this._languageTransformDescriptors.set(language, languageTransformDescriptor);
+        return languageTransformDescriptor;
     }
 
     /**
+     * @param {string} language
      * @param {string[]} partsOfSpeech
      * @returns {number}
      */
-    getConditionFlagsFromPartsOfSpeech(partsOfSpeech) {
-        return this._getConditionFlags(this._partOfSpeechToConditionFlagsMap, partsOfSpeech);
+    getConditionFlagsFromPartsOfSpeech(language, partsOfSpeech) {
+        const descriptor = this._languageTransformDescriptors.get(language);
+        if (typeof descriptor === 'undefined') { return 0; }
+        return this._getConditionFlags(descriptor.partOfSpeechToConditionFlagsMap, partsOfSpeech);
     }
 
     /**
+     * @param {string} language
      * @param {string[]} conditionTypes
      * @returns {number}
      */
-    getConditionFlagsFromConditionTypes(conditionTypes) {
-        return this._getConditionFlags(this._conditionTypeToConditionFlagsMap, conditionTypes);
+    getConditionFlagsFromConditionTypes(language, conditionTypes) {
+        const descriptor = this._languageTransformDescriptors.get(language);
+        if (typeof descriptor === 'undefined') { return 0; }
+        return this._getConditionFlags(descriptor.conditionTypeToConditionFlagsMap, conditionTypes);
     }
 
     /**
+     * @param {string} language
      * @param {string} conditionType
      * @returns {number}
      */
-    getConditionFlagsFromConditionType(conditionType) {
-        return this._getConditionFlags(this._conditionTypeToConditionFlagsMap, [conditionType]);
+    getConditionFlagsFromConditionType(language, conditionType) {
+        const descriptor = this._languageTransformDescriptors.get(language);
+        if (typeof descriptor === 'undefined') { return 0; }
+        return this._getConditionFlags(descriptor.conditionTypeToConditionFlagsMap, [conditionType]);
     }
 
     /**
+     * @param {string} language
      * @param {string} sourceText
      * @returns {import('language-transformer-internal').TransformedText[]}
      */
-    transform(sourceText) {
+    transform(language, sourceText) {
+        const descriptor = /** @type {import('language-transformer-internal').LanguageTransformDescriptorInternal} */ (this._languageTransformDescriptors.get(language));
+        const transforms = descriptor?.transforms ?? [];
         const results = [this._createTransformedText(sourceText, 0, [])];
         for (let i = 0; i < results.length; ++i) {
             const {text, conditions, trace} = results[i];
-            for (const transform of this._transforms) {
+            for (const transform of transforms) {
                 if (!transform.suffixHeuristic.test(text)) { continue; }
 
                 const {name, rules} = transform;
@@ -141,11 +152,11 @@ export class LanguageTransformer {
 
     /**
      * @param {import('language-transformer').ConditionMapEntries} conditions
-     * @param {number} nextFlagIndex
      * @returns {{conditionFlagsMap: Map<string, number>, nextFlagIndex: number}}
      * @throws {Error}
      */
-    _getConditionFlagsMap(conditions, nextFlagIndex) {
+    _getConditionFlagsMap(conditions) {
+        let nextFlagIndex = 0;
         /** @type {Map<string, number>} */
         const conditionFlagsMap = new Map();
         /** @type {import('language-transformer').ConditionMapEntries} */

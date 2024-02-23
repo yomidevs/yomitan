@@ -31,6 +31,7 @@ export type ConditionMapEntries = ConditionMapEntry[];
 
 export type Condition = {
     name: string;
+    aliases?: string[];
     isDictionaryForm: boolean;
     i18n?: RuleI18n[];
     subConditions?: string[];

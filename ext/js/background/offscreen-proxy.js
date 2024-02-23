@@ -184,10 +184,10 @@ export class TranslatorProxy {
     }
 
     /**
-     * @param {import('language-transformer').LanguageTransformDescriptor} descriptor
+     * @param {import('language-transformer').LanguageTransformDescriptor[]} descriptors
      */
-    async prepare(descriptor) {
-        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {descriptor}});
+    async prepare(descriptors) {
+        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {descriptors}});
     }
 
     /**

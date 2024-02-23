@@ -23,6 +23,7 @@ type LanguageDescriptor<TIso extends string, TTextPreprocessorDescriptor extends
     name: string;
     exampleText: string;
     textPreprocessors: TTextPreprocessorDescriptor;
+    hasLanguageTransforms?: boolean;
 };
 
 type TextPreprocessorDescriptor = {

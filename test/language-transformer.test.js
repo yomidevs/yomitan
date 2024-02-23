@@ -34,10 +34,10 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
  * @returns {{has: false, reasons: null, rules: null}|{has: true, reasons: string[], rules: number}}
  */
 function hasTermReasons(languageTransformer, source, expectedTerm, expectedConditionName, expectedReasons) {
-    for (const {text, conditions, trace} of languageTransformer.transform(source)) {
+    for (const {text, conditions, trace} of languageTransformer.transform('ja', source)) {
         if (text !== expectedTerm) { continue; }
         if (expectedConditionName !== null) {
-            const expectedConditions = languageTransformer.getConditionFlagsFromConditionType(expectedConditionName);
+            const expectedConditions = languageTransformer.getConditionFlagsFromConditionType('ja', expectedConditionName);
             if (!LanguageTransformer.conditionsMatch(conditions, expectedConditions)) { continue; }
         }
         let okay = true;
@@ -1147,14 +1147,13 @@ describe('LanguageTransformer', () => {
     /* eslint-enable @stylistic/no-multi-spaces */
 
     /** @type {import('language-transformer').LanguageTransformDescriptor} */
-    const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/language/japanese-transforms.json'), {encoding: 'utf8'}));
+    const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'js/language/ja/language-transforms.json'), {encoding: 'utf8'}));
     const languageTransformer = new LanguageTransformer();
     languageTransformer.addDescriptor(descriptor);
 
     describe('deinflections', () => {
         describe.each(data)('$category', ({valid, tests}) => {
             for (const {source, term, rule, reasons} of tests) {
-                const {has} = hasTermReasons(languageTransformer, source, term, rule, reasons);
                 let message = `${source} ${valid ? 'has' : 'does not have'} term candidate ${JSON.stringify(term)}`;
                 if (rule !== null) {
                     message += ` with rule ${JSON.stringify(rule)}`;
@@ -1163,7 +1162,8 @@ describe('LanguageTransformer', () => {
                     message += (typeof rule !== 'undefined' ? ' and' : ' with');
                     message += ` reasons ${JSON.stringify(reasons)}`;
                 }
-                test(`${message}`, () => {
+                test(`${message}`, async () => {
+                    const {has} = hasTermReasons(languageTransformer, source, term, rule, reasons);
                     expect(has).toStrictEqual(valid);
                 });
             }

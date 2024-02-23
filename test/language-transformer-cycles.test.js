@@ -108,7 +108,7 @@ describe('Deinflection data', () => {
         const dirname = pathDirname(fileURLToPath(import.meta.url));
 
         /** @type {import('language-transformer').LanguageTransformDescriptor} */
-        const descriptor = parseJson(readFileSync(join(dirname, '../ext/data/language/japanese-transforms.json'), {encoding: 'utf8'}));
+        const descriptor = parseJson(readFileSync(join(dirname, '../ext/js/language/ja/language-transforms.json'), {encoding: 'utf8'}));
         const languageTransformer = new LanguageTransformer();
         languageTransformer.addDescriptor(descriptor);
 
@@ -132,8 +132,8 @@ describe('Deinflection data', () => {
                 const {suffixIn, suffixOut, conditionsIn, conditionsOut} = ruleNode.rule;
                 if (
                     !LanguageTransformer.conditionsMatch(
-                        languageTransformer.getConditionFlagsFromConditionTypes(ruleNames),
-                        languageTransformer.getConditionFlagsFromConditionTypes(conditionsIn)
+                        languageTransformer.getConditionFlagsFromConditionTypes('ja', ruleNames),
+                        languageTransformer.getConditionFlagsFromConditionTypes('ja', conditionsIn)
                     ) ||
                     !text.endsWith(suffixIn) ||
                     (text.length - suffixIn.length + suffixOut.length) <= 0

@@ -51,4 +51,5 @@ export type LanguageSummary = {
     name: string;
     iso: string;
     exampleText: string;
+    hasLanguageTransforms?: boolean;
 };
