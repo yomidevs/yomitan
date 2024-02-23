@@ -33,3 +33,11 @@ export const capitalizeFirstLetter = {
     options: basicTextPreprocessorOptions,
     process: (str, setting) => (setting ? str.charAt(0).toUpperCase() + str.slice(1) : str)
 };
+
+/** @type {import('language').TextPreprocessor<boolean>} */
+export const removeDiacritics = {
+	name: 'Remove Diacritics',
+	description: 'ἄήé -> αηe',
+	options: basicTextPreprocessorOptions,
+	process: (str, setting) => (setting ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : str)
+}
