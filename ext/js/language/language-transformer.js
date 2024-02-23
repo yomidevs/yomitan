@@ -56,9 +56,9 @@ export class LanguageTransformer {
             const rules2 = [];
             for (let j = 0, jj = rules.length; j < jj; ++j) {
                 const {suffixIn, suffixOut, conditionsIn, conditionsOut} = rules[j];
-                const conditionFlagsIn = this._getConditionFlags(conditionFlagsMap, conditionsIn);
+                const conditionFlagsIn = this._getConditionFlagsStrict(conditionFlagsMap, conditionsIn);
                 if (conditionFlagsIn === null) { throw new Error(`Invalid conditionsIn for transform[${i}].rules[${j}]`); }
-                const conditionFlagsOut = this._getConditionFlags(conditionFlagsMap, conditionsOut);
+                const conditionFlagsOut = this._getConditionFlagsStrict(conditionFlagsMap, conditionsOut);
                 if (conditionFlagsOut === null) { throw new Error(`Invalid conditionsOut for transform[${i}].rules[${j}]`); }
                 rules2.push({
                     suffixIn,
@@ -81,19 +81,10 @@ export class LanguageTransformer {
             const flags = conditionFlagsMap.get(type);
             if (typeof flags === 'undefined') { continue; } // This case should never happen
             this._conditionTypeToConditionFlagsMap.set(type, flags);
-            for (const partOfSpeech of condition.partsOfSpeech) {
-                this._partOfSpeechToConditionFlagsMap.set(partOfSpeech, this.getConditionFlagsFromPartOfSpeech(partOfSpeech) | flags);
+            if (condition.isDictionaryForm) {
+                this._partOfSpeechToConditionFlagsMap.set(type, flags);
             }
         }
-    }
-
-    /**
-     * @param {string} partOfSpeech
-     * @returns {number}
-     */
-    getConditionFlagsFromPartOfSpeech(partOfSpeech) {
-        const conditionFlags = this._partOfSpeechToConditionFlagsMap.get(partOfSpeech);
-        return typeof conditionFlags !== 'undefined' ? conditionFlags : 0;
     }
 
     /**
@@ -101,20 +92,7 @@ export class LanguageTransformer {
      * @returns {number}
      */
     getConditionFlagsFromPartsOfSpeech(partsOfSpeech) {
-        let result = 0;
-        for (const partOfSpeech of partsOfSpeech) {
-            result |= this.getConditionFlagsFromPartOfSpeech(partOfSpeech);
-        }
-        return result;
-    }
-
-    /**
-     * @param {string} conditionType
-     * @returns {number}
-     */
-    getConditionFlagsFromConditionType(conditionType) {
-        const conditionFlags = this._conditionTypeToConditionFlagsMap.get(conditionType);
-        return typeof conditionFlags !== 'undefined' ? conditionFlags : 0;
+        return this._getConditionFlags(this._partOfSpeechToConditionFlagsMap, partsOfSpeech);
     }
 
     /**
@@ -122,11 +100,15 @@ export class LanguageTransformer {
      * @returns {number}
      */
     getConditionFlagsFromConditionTypes(conditionTypes) {
-        let result = 0;
-        for (const conditionType of conditionTypes) {
-            result |= this.getConditionFlagsFromConditionType(conditionType);
-        }
-        return result;
+        return this._getConditionFlags(this._conditionTypeToConditionFlagsMap, conditionTypes);
+    }
+
+    /**
+     * @param {string} conditionType
+     * @returns {number}
+     */
+    getConditionFlagsFromConditionType(conditionType) {
+        return this._getConditionFlags(this._conditionTypeToConditionFlagsMap, [conditionType]);
     }
 
     /**
@@ -182,7 +164,7 @@ export class LanguageTransformer {
                     flags = 1 << nextFlagIndex;
                     ++nextFlagIndex;
                 } else {
-                    const multiFlags = this._getConditionFlags(conditionFlagsMap, subConditions);
+                    const multiFlags = this._getConditionFlagsStrict(conditionFlagsMap, subConditions);
                     if (multiFlags === null) {
                         nextTargets.push(target);
                         continue;
@@ -206,11 +188,30 @@ export class LanguageTransformer {
      * @param {string[]} conditionTypes
      * @returns {?number}
      */
-    _getConditionFlags(conditionFlagsMap, conditionTypes) {
+    _getConditionFlagsStrict(conditionFlagsMap, conditionTypes) {
         let flags = 0;
         for (const conditionType of conditionTypes) {
             const flags2 = conditionFlagsMap.get(conditionType);
-            if (typeof flags2 === 'undefined') { return null; }
+            if (typeof flags2 === 'undefined') {
+                return null;
+            }
+            flags |= flags2;
+        }
+        return flags;
+    }
+
+    /**
+     * @param {Map<string, number>} conditionFlagsMap
+     * @param {string[]} conditionTypes
+     * @returns {number}
+     */
+    _getConditionFlags(conditionFlagsMap, conditionTypes) {
+        let flags = 0;
+        for (const conditionType of conditionTypes) {
+            let flags2 = conditionFlagsMap.get(conditionType);
+            if (typeof flags2 === 'undefined') {
+                flags2 = 0;
+            }
             flags |= flags2;
         }
         return flags;
