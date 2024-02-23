@@ -1431,6 +1431,7 @@ export class Display extends EventDispatcher {
             await this._contentManager.executeMediaRequests();
             performance.mark('display:waitMedia:end');
             performance.measure('display:waitMedia', 'display:waitMedia:start', 'display:waitMedia:end');
+            if (this._setContentToken !== token) { return; }
             container.appendChild(entry);
 
             if (focusEntry === i) {
