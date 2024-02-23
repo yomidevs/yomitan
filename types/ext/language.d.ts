@@ -21,12 +21,21 @@ export type TextPreprocessorOptions<T = unknown> = T[];
 
 export type TextPreprocessorFunction<T = unknown> = (str: string, setting: T, sourceMap: TextSourceMap) => string;
 
+/**
+ * Text preprocessors are used during the translation process to create alternate versions of the input text to search for.
+ * This is helpful when the input text doesn't exactly match the term or expression found in the database.
+ * When a language has multiple preprocessors, the translator will generate variants of the text by applying all combinations of the preprocessors.
+ */
 export type TextPreprocessor<T = unknown> = {
     name: string;
     description: string;
     options: TextPreprocessorOptions<T>;
     process: TextPreprocessorFunction<T>;
 };
+
+export type BidirectionalPreprocessorOptions = 'off' | 'direct' | 'inverse';
+
+export type BidirectionalConversionPreprocessor = TextPreprocessor<BidirectionalPreprocessorOptions>;
 
 export type LanguageAndPreprocessors = {
     iso: string;
