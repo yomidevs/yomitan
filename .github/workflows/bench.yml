@@ -22,7 +22,7 @@ jobs:
         run: npm ci
 
       - name: Build Libs
-        run: npm run build-libs
+        run: npm run build:libs
 
       - name: Run Benchmarks
         uses: CodSpeedHQ/action@v2

@@ -115,7 +115,7 @@ Required licensing notices for this project follow below:
 
 Yomitan uses several third-party libraries to function.
 
-<!-- The following table is generated using the command `npm run license-report-markdown`. -->
+<!-- The following table is generated using the command `npm run license-report:markdown`. -->
 
 | Name                | Installed version | License type | Link                                             |
 | :------------------ | :---------------- | :----------- | :----------------------------------------------- |
