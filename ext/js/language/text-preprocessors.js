@@ -36,8 +36,8 @@ export const capitalizeFirstLetter = {
 
 /** @type {import('language').TextPreprocessor<boolean>} */
 export const removeDiacritics = {
-	name: 'Remove Diacritics',
-	description: 'ἄήé -> αηe',
-	options: basicTextPreprocessorOptions,
-	process: (str, setting) => (setting ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : str)
-}
+    name: 'Remove Diacritics',
+    description: 'ἄήé -> αηe',
+    options: basicTextPreprocessorOptions,
+    process: (str, setting) => (setting ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : str)
+};
