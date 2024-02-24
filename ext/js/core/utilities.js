@@ -21,7 +21,7 @@
  * @param {unknown} value The value to check.
  * @returns {boolean} `true` if the value is an object and not an array, `false` otherwise.
  */
-export function isObject(value) {
+export function isObject2(value) {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 

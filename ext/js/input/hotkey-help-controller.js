@@ -17,7 +17,7 @@
  */
 
 import {parseJson} from '../core/json.js';
-import {isObject} from '../core/utilities.js';
+import {isObject2} from '../core/utilities.js';
 import {HotkeyUtil} from './hotkey-util.js';
 
 export class HotkeyHelpController {
@@ -93,7 +93,7 @@ export class HotkeyHelpController {
      */
     _getAllCommands() {
         return new Promise((resolve, reject) => {
-            if (!(isObject(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
+            if (!(isObject2(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
                 resolve([]);
                 return;
             }

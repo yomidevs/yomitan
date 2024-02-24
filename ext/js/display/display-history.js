@@ -17,7 +17,7 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
-import {generateId, isObject} from '../core/utilities.js';
+import {generateId, isObject2} from '../core/utilities.js';
 
 /**
  * @augments EventDispatcher<import('display-history').Events>
@@ -189,7 +189,7 @@ export class DisplayHistory extends EventDispatcher {
     _updateStateFromHistory() {
         let state = history.state;
         let id = null;
-        if (isObject(state)) {
+        if (isObject2(state)) {
             id = state.id;
             if (typeof id === 'string') {
                 const entry = this._historyMap.get(id);

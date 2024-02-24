@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deferPromise, generateId, isObject} from '../core/utilities.js';
+import {deferPromise, generateId, isObject2} from '../core/utilities.js';
 
 export class FrameClient {
     constructor() {
@@ -121,9 +121,9 @@ export class FrameClient {
              */
             const onMessageInner = async (message) => {
                 try {
-                    if (!isObject(message)) { return; }
+                    if (!isObject2(message)) { return; }
                     const {action, params} = message;
-                    if (!isObject(params)) { return; }
+                    if (!isObject2(params)) { return; }
                     await frameLoadedPromise;
                     if (timer === null) { return; } // Done
 
