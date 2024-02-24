@@ -17,7 +17,6 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {isObject2} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji} from '../language/ja/japanese.js';
@@ -257,7 +256,7 @@ export class DisplayGenerator {
             if (error instanceof DocumentFragment || error instanceof Node) {
                 div.appendChild(error);
             } else {
-                let message = isObject2(error) && typeof error.message === 'string' ? error.message : `${error}`;
+                let message = error.message;
                 let link = null;
                 if (error instanceof ExtensionError && error.data !== null && typeof error.data === 'object') {
                     const {referenceUrl} = /** @type {import('core').UnknownObject} */ (error.data);

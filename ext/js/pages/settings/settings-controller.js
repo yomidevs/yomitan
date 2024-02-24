@@ -18,7 +18,8 @@
 
 import {EventDispatcher} from '../../core/event-dispatcher.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {generateId, isObject2} from '../../core/utilities.js';
+import {isObject} from '../../core/object-utilities.js';
+import {generateId} from '../../core/utilities.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {getAllPermissions} from '../../data/permissions-util.js';
 import {HtmlTemplateCollection} from '../../dom/html-template-collection.js';
@@ -353,6 +354,6 @@ export class SettingsController extends EventDispatcher {
      * @returns {boolean}
      */
     _canObservePermissionsChanges() {
-        return isObject2(chrome.permissions) && isObject2(chrome.permissions.onAdded) && isObject2(chrome.permissions.onRemoved);
+        return isObject(chrome.permissions) && isObject(chrome.permissions.onAdded) && isObject(chrome.permissions.onRemoved);
     }
 }

@@ -26,7 +26,8 @@ import {ExtensionError} from '../core/extension-error.js';
 import {fetchJson, fetchText} from '../core/fetch-utilities.js';
 import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
-import {clone, deferPromise, isObject2, promiseTimeout} from '../core/utilities.js';
+import {isObject} from '../core/object-utilities.js';
+import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
 import {isNoteDataValid} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
@@ -222,12 +223,12 @@ export class Backend {
      * @returns {void}
      */
     _prepareInternalSync() {
-        if (isObject2(chrome.commands) && isObject2(chrome.commands.onCommand)) {
+        if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
             const onCommand = this._onWebExtensionEventWrapper(this._onCommand.bind(this));
             chrome.commands.onCommand.addListener(onCommand);
         }
 
-        if (isObject2(chrome.tabs) && isObject2(chrome.tabs.onZoomChange)) {
+        if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
             const onZoomChange = this._onWebExtensionEventWrapper(this._onZoomChange.bind(this));
             chrome.tabs.onZoomChange.addListener(onZoomChange);
         }
@@ -1087,7 +1088,7 @@ export class Backend {
         }
 
         // chrome.windows not supported (e.g. on Firefox mobile)
-        if (!isObject2(chrome.windows)) {
+        if (!isObject(chrome.windows)) {
             throw new Error('Window creation not supported');
         }
 
@@ -1554,7 +1555,7 @@ export class Backend {
      */
     _getBrowserIconTitle() {
         return (
-            isObject2(chrome.action) &&
+            isObject(chrome.action) &&
             typeof chrome.action.getTitle === 'function' ?
                 new Promise((resolve) => { chrome.action.getTitle({}, resolve); }) :
                 Promise.resolve('')
@@ -1566,7 +1567,7 @@ export class Backend {
      */
     _updateBadge() {
         let title = this._defaultBrowserActionTitle;
-        if (title === null || !isObject2(chrome.action)) {
+        if (title === null || !isObject(chrome.action)) {
             // Not ready or invalid
             return;
         }
@@ -2573,7 +2574,7 @@ export class Backend {
      * @returns {boolean}
      */
     _canObservePermissionsChanges() {
-        return isObject2(chrome.permissions) && isObject2(chrome.permissions.onAdded) && isObject2(chrome.permissions.onRemoved);
+        return isObject(chrome.permissions) && isObject(chrome.permissions.onAdded) && isObject(chrome.permissions.onRemoved);
     }
 
     /**

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject2} from '../../core/utilities.js';
+import {isObject} from '../../core/object-utilities.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class PersistentStorageController {
@@ -98,7 +98,7 @@ export class PersistentStorageController {
      * @returns {boolean}
      */
     _isPersistentStorageSupported() {
-        return isObject2(navigator.storage) && typeof navigator.storage.persist === 'function';
+        return isObject(navigator.storage) && typeof navigator.storage.persist === 'function';
     }
 
     /**

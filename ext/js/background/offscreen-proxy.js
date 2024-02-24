@@ -17,7 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {isObject2} from '../core/utilities.js';
+import {isObject} from '../core/object-utilities.js';
 import {base64ToArrayBuffer} from '../data/sandbox/array-buffer-util.js';
 
 /**
@@ -123,7 +123,7 @@ export class OffscreenProxy {
         if (typeof runtimeError !== 'undefined') {
             throw new Error(runtimeError.message);
         }
-        if (!isObject2(response)) {
+        if (!isObject(response)) {
             throw new Error('Offscreen document did not respond');
         }
         const responseError = response.error;
