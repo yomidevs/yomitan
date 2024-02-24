@@ -290,16 +290,22 @@ export class AnkiController {
         const {templates} = this._settingsController;
         for (const [types, templateName] of fieldMenuTargets) {
             const templateContent = templates.getTemplateContent(templateName);
-            if (templateContent === null) { continue; }
+            if (templateContent === null) {
+                log.warn(new Error(`Failed to set up menu "${templateName}": element not found`));
+                continue;
+            }
+
+            const container = templateContent.querySelector('.popup-menu-body');
+            if (container === null) {
+                log.warn(new Error(`Failed to set up menu "${templateName}": body not found`));
+                return;
+            }
 
             let markers = [];
             for (const type of types) {
                 markers.push(...getStandardFieldMarkers(type));
             }
             markers = [...new Set(markers)];
-
-            const container = templateContent.querySelector('.popup-menu-body');
-            if (container === null) { return; }
 
             const fragment = document.createDocumentFragment();
             for (const marker of markers) {
