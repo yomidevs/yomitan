@@ -56,9 +56,7 @@ export class HtmlTemplateCollection {
      * @throws {Error}
      */
     instantiate(name) {
-        const template = this._templates.get(name);
-        if (typeof template === 'undefined') { throw new Error(`Failed to find template: ${name}`); }
-        const {firstElementChild} = template.content;
+        const {firstElementChild} = this.getTemplateContent(name);
         if (firstElementChild === null) { throw new Error(`Failed to find template content element: ${name}`); }
         return /** @type {T} */ (document.importNode(firstElementChild, true));
     }
@@ -66,13 +64,20 @@ export class HtmlTemplateCollection {
     /**
      * @param {string} name
      * @returns {DocumentFragment}
-     * @throws {Error}
      */
     instantiateFragment(name) {
+        return document.importNode(this.getTemplateContent(name), true);
+    }
+
+    /**
+     * @param {string} name
+     * @returns {DocumentFragment}
+     * @throws {Error}
+     */
+    getTemplateContent(name) {
         const template = this._templates.get(name);
         if (typeof template === 'undefined') { throw new Error(`Failed to find template: ${name}`); }
-        const {content} = template;
-        return document.importNode(content, true);
+        return template.content;
     }
 
     /**
