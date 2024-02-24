@@ -17,15 +17,6 @@
  */
 
 /**
- * Checks whether a given value is a non-array object.
- * @param {unknown} value The value to check.
- * @returns {boolean} `true` if the value is an object and not an array, `false` otherwise.
- */
-export function isObject2(value) {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-/**
  * Converts any string into a form that can be passed into the RegExp constructor.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
  * @param {string} string The string to convert to a valid regular expression.
