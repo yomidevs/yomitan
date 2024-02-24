@@ -43,6 +43,14 @@ export function isObject(value) {
 
 /**
  * @param {unknown} value
+ * @returns {value is Record<string, unknown>}
+ */
+export function isObjectOrArray(value) {
+    return typeof value === 'object' && value !== null;
+}
+
+/**
+ * @param {unknown} value
  * @returns {string}
  */
 function getType(value) {
