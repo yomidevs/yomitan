@@ -46,7 +46,9 @@ export function applyTextReplacement(text, sourceMap, pattern, replacement) {
         pattern.lastIndex += delta;
 
         if (actualReplacementLength > 0) {
-            sourceMap.insert(index, ...(new Array(actualReplacementLength).fill(0)));
+            /** @type {number[]} */
+            const zeroes = new Array(actualReplacementLength).fill(0);
+            sourceMap.insert(index, ...zeroes);
             sourceMap.combine(index - 1 + actualReplacementLength, matchText.length);
         } else {
             sourceMap.combine(index, matchText.length);
@@ -65,7 +67,13 @@ export function applyTextReplacement(text, sourceMap, pattern, replacement) {
 export function applyMatchReplacement(replacement, match) {
     const pattern = matchReplacementPattern;
     pattern.lastIndex = 0;
-    return replacement.replace(pattern, (g0, g1, g2) => {
+    /**
+     * @param {string} g0
+     * @param {string} g1
+     * @param {string} g2
+     * @returns {string}
+     */
+    const replacer = (g0, g1, g2) => {
         if (typeof g1 !== 'undefined') {
             const matchIndex = Number.parseInt(g1, 10);
             if (matchIndex >= 1 && matchIndex <= match.length) {
@@ -87,5 +95,6 @@ export function applyMatchReplacement(replacement, match) {
             }
         }
         return g0;
-    });
+    };
+    return replacement.replace(pattern, replacer);
 }

@@ -88,10 +88,16 @@ function createAbsoluteGetComputedStyle(window) {
             get: (target, property) => {
                 let result = /** @type {import('core').SafeAny} */ (target)[property];
                 if (typeof result === 'string') {
-                    result = result.replace(/([-+]?\d(?:\.\d)?(?:[eE][-+]?\d+)?)em/g, (g0, g1) => {
+                    /**
+                     * @param {string} g0
+                     * @param {string} g1
+                     * @returns {string}
+                     */
+                    const replacer = (g0, g1) => {
                         const fontSize = getComputedFontSizeInPixels(window, getComputedStyleOld, element);
                         return `${Number.parseFloat(g1) * fontSize}px`;
-                    });
+                    };
+                    result = result.replace(/([-+]?\d(?:\.\d)?(?:[eE][-+]?\d+)?)em/g, replacer);
                 }
                 return result;
             }

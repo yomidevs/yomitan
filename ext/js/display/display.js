@@ -1934,20 +1934,28 @@ export class Display extends EventDispatcher {
         this._hotkeyHandler.setHotkeys(this._pageType, options.inputs.hotkeys);
     }
 
-    /** */
-    async _closeTab() {
-        const tab = await new Promise((resolve, reject) => {
+    /**
+     * @returns {Promise<?chrome.tabs.Tab>}
+     */
+    _getCurrentTab() {
+        return new Promise((resolve, reject) => {
             chrome.tabs.getCurrent((result) => {
                 const e = chrome.runtime.lastError;
                 if (e) {
                     reject(new Error(e.message));
                 } else {
-                    resolve(result);
+                    resolve(typeof result !== 'undefined' ? result : null);
                 }
             });
         });
-        const tabId = tab.id;
-        await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
+    }
+
+    /**
+     * @param {number} tabId
+     * @returns {Promise<void>}
+     */
+    _removeTab(tabId) {
+        return new Promise((resolve, reject) => {
             chrome.tabs.remove(tabId, () => {
                 const e = chrome.runtime.lastError;
                 if (e) {
@@ -1956,7 +1964,16 @@ export class Display extends EventDispatcher {
                     resolve();
                 }
             });
-        }));
+        });
+    }
+
+    /** */
+    async _closeTab() {
+        const tab = await this._getCurrentTab();
+        if (tab === null) { return; }
+        const tabId = tab.id;
+        if (typeof tabId === 'undefined') { return; }
+        await this._removeTab(tabId);
     }
 
     /** */

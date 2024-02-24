@@ -89,10 +89,10 @@ export class HotkeyHelpController {
     // Private
 
     /**
-     * @param {Map<string, string>} commandMap
+     * @returns {Promise<chrome.commands.Command[]>}
      */
-    async _setupGlobalCommands(commandMap) {
-        const commands = await new Promise((resolve, reject) => {
+    _getAllCommands() {
+        return new Promise((resolve, reject) => {
             if (!(isObject(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
                 resolve([]);
                 return;
@@ -107,10 +107,17 @@ export class HotkeyHelpController {
                 }
             });
         });
+    }
+
+    /**
+     * @param {Map<string, string>} commandMap
+     */
+    async _setupGlobalCommands(commandMap) {
+        const commands = await this._getAllCommands();
 
         commandMap.clear();
         for (const {name, shortcut} of commands) {
-            if (shortcut.length === 0) { continue; }
+            if (typeof name !== 'string' || typeof shortcut !== 'string' || shortcut.length === 0) { continue; }
             const {key, modifiers} = this._hotkeyUtil.convertCommandToInput(shortcut);
             commandMap.set(name, this._hotkeyUtil.getInputDisplayValue(key, modifiers));
         }
