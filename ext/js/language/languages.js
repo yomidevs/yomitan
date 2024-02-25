@@ -49,11 +49,11 @@ export function getAllLanguageTextPreprocessors() {
 }
 
 /**
- * @param {string} language
  * @param {string} text
+ * @param {string} language
  * @returns {boolean}
  */
-export function textMayBeTranslatable(language, text) {
+export function textMayBeTranslatable(text, language) {
     const descriptor = languageDescriptorMap.get(language);
     if (typeof descriptor === 'undefined') { return false; }
     return typeof descriptor.textMayBeTranslatable === 'undefined' || descriptor.textMayBeTranslatable(text);

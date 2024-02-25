@@ -274,7 +274,7 @@ export class SearchDisplayController {
     async _onExternalSearchUpdate({text, animate = true}) {
         const options = this._display.getOptions();
         if (options === null) { return; }
-        if (!await this._display.application.api.textMayBeTranslatable(text)) { return; }
+        if (!await this._display.application.api.textMayBeTranslatable(text, options.general.language)) { return; }
         const {clipboard: {autoSearchContent, maximumSearchLength}} = options;
         if (text.length > maximumSearchLength) {
             text = text.substring(0, maximumSearchLength);

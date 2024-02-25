@@ -347,6 +347,7 @@ type ApiSurface = {
     textMayBeTranslatable: {
         params: {
             text: string;
+            language: string;
         };
         return: boolean;
     };

@@ -1557,7 +1557,7 @@ export class TextScanner extends EventDispatcher {
      */
     async _textMayBeTranslatable(text) {
         try {
-            return await this._api.textMayBeTranslatable(text);
+            return this._language !== null && await this._api.textMayBeTranslatable(text, this._language);
         } catch (e) {
             return false;
         }

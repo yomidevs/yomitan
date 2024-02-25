@@ -322,10 +322,11 @@ export class API {
 
     /**
      * @param {import('api').ApiParam<'textMayBeTranslatable', 'text'>} text
+     * @param {import('api').ApiParam<'textMayBeTranslatable', 'language'>} language
      * @returns {Promise<import('api').ApiReturn<'textMayBeTranslatable'>>}
      */
-    textMayBeTranslatable(text) {
-        return this._invoke('textMayBeTranslatable', {text});
+    textMayBeTranslatable(text, language) {
+        return this._invoke('textMayBeTranslatable', {text, language});
     }
 
     /**
