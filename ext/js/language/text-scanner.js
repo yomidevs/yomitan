@@ -70,6 +70,8 @@ export class TextScanner extends EventDispatcher {
         this._includeSelector = null;
         /** @type {?string} */
         this._excludeSelector = null;
+        /** @type {?string} */
+        this._language = null;
 
         /** @type {?import('text-scanner').InputInfo} */
         this._inputInfoCurrent = null;
@@ -187,6 +189,10 @@ export class TextScanner extends EventDispatcher {
     set excludeSelector(value) {
         this._excludeSelector = value;
     }
+
+    /** @type {?string} */
+    get language() { return this._language; }
+    set language(value) { this._language = value; }
 
     /** */
     prepare() {
@@ -449,7 +455,7 @@ export class TextScanner extends EventDispatcher {
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
-            } else if (textSource !== null && textSource instanceof TextSourceElement && await this._hasJapanese(textSource.fullContent)) {
+            } else if (textSource !== null && textSource instanceof TextSourceElement && await this._isTextLookupWorthy(textSource.fullContent)) {
                 dictionaryEntries = [];
                 sentence = {text: '', offset: 0};
             }
@@ -1549,9 +1555,9 @@ export class TextScanner extends EventDispatcher {
      * @param {string} text
      * @returns {Promise<boolean>}
      */
-    async _hasJapanese(text) {
+    async _isTextLookupWorthy(text) {
         try {
-            return await this._api.textHasJapaneseCharacters(text);
+            return this._language !== null && await this._api.isTextLookupWorthy(text, this._language);
         } catch (e) {
             return false;
         }
