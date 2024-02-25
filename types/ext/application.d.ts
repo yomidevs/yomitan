@@ -41,7 +41,7 @@ export type ApiSurface = {
     searchDisplayControllerUpdateSearchQuery: {
         params: {
             text: string;
-            animate?: boolean;
+            animate: boolean;
         };
         return: void;
     };

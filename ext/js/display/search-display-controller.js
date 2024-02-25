@@ -103,7 +103,7 @@ export class SearchDisplayController {
         this._searchBackButton.addEventListener('click', this._onSearchBackButtonClick.bind(this), false);
         this._wanakanaEnableCheckbox.addEventListener('change', this._onWanakanaEnableChange.bind(this));
         window.addEventListener('copy', this._onCopy.bind(this));
-        this._clipboardMonitor.on('change', this._onExternalSearchUpdate.bind(this));
+        this._clipboardMonitor.on('change', this._onClipboardMonitorChange.bind(this));
         this._clipboardMonitorEnableCheckbox.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
         this._display.hotkeyHandler.on('keydownNonHotkey', this._onKeyDown.bind(this));
 
@@ -271,10 +271,26 @@ export class SearchDisplayController {
     }
 
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
-    async _onExternalSearchUpdate({text, animate = true}) {
+    _onExternalSearchUpdate({text, animate}) {
+        void this._updateSearchFromClipboard(text, animate, false);
+    }
+
+    /**
+     * @param {import('clipboard-monitor').Events['change']} event
+     */
+    _onClipboardMonitorChange({text}) {
+        void this._updateSearchFromClipboard(text, true, true);
+    }
+
+    /**
+     * @param {string} text
+     * @param {boolean} animate
+     * @param {boolean} checkText
+     */
+    async _updateSearchFromClipboard(text, animate, checkText) {
         const options = this._display.getOptions();
         if (options === null) { return; }
-        if (!await this._display.application.api.textMayBeTranslatable(text, options.general.language)) { return; }
+        if (checkText && !await this._display.application.api.textMayBeTranslatable(text, options.general.language)) { return; }
         const {clipboard: {autoSearchContent, maximumSearchLength}} = options;
         if (text.length > maximumSearchLength) {
             text = text.substring(0, maximumSearchLength);
