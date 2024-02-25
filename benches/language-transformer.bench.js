@@ -25,7 +25,7 @@ import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('language-transformer').LanguageTransformDescriptor} */
-const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'js/language/ja/language-transforms.json'), {encoding: 'utf8'}));
+const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'js/language/ja/japanese-transforms.json'), {encoding: 'utf8'}));
 const languageTransformer = new LanguageTransformer();
 languageTransformer.addDescriptor(descriptor);
 
@@ -208,14 +208,14 @@ describe('language transformer', () => {
         const basicTransformations = [...adjectiveInflections, ...verbInflections, ...inflectionCombinations];
         bench(`transformations (n=${basicTransformations.length})`, () => {
             for (const transform of basicTransformations) {
-                languageTransformer.transform('ja', transform);
+                languageTransformer.transform(transform);
             }
         });
 
         const transformationsFull = [...basicTransformations, ...kuruInflections, ...suruInflections, ...kansaibenInflections];
         bench(`transformations-full (n=${transformationsFull.length})`, () => {
             for (const transform of transformationsFull) {
-                languageTransformer.transform('ja', transform);
+                languageTransformer.transform(transform);
             }
         });
     });

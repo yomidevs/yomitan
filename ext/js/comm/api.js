@@ -321,11 +321,12 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'textHasJapaneseCharacters', 'text'>} text
-     * @returns {Promise<import('api').ApiReturn<'textHasJapaneseCharacters'>>}
+     * @param {import('api').ApiParam<'isTextLookupWorthy', 'text'>} text
+     * @param {import('api').ApiParam<'isTextLookupWorthy', 'language'>} language
+     * @returns {Promise<import('api').ApiReturn<'isTextLookupWorthy'>>}
      */
-    textHasJapaneseCharacters(text) {
-        return this._invoke('textHasJapaneseCharacters', {text});
+    isTextLookupWorthy(text, language) {
+        return this._invoke('isTextLookupWorthy', {text, language});
     }
 
     /**

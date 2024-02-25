@@ -19,10 +19,19 @@ import type {TextPreprocessor, BidirectionalConversionPreprocessor} from './lang
 import type {LanguageTransformDescriptor} from './language-transformer';
 import type {SafeAny} from './core';
 
+export type IsTextLookupWorthyFunction = (text: string) => boolean;
+
 type LanguageDescriptor<TIso extends string, TTextPreprocessorDescriptor extends TextPreprocessorDescriptor> = {
     iso: TIso;
     name: string;
     exampleText: string;
+    /**
+     * An optional function which returns whether or not a given string may be translatable.
+     * This is used as a filter for several situations, such as whether the clipboard monitor
+     * window should activate when text is copied to the clipboard.
+     * If no value is provided, `true` is assumed for all inputs.
+     */
+    isTextLookupWorthy?: IsTextLookupWorthyFunction;
     textPreprocessors: TTextPreprocessorDescriptor;
     languageTransforms?: LanguageTransformDescriptor;
 };

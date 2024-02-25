@@ -92,7 +92,7 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('display').QueryParserOptions} display
      */
-    setOptions({selectedParser, termSpacing, readingMode, useInternalParser, useMecabParser, scanning}) {
+    setOptions({selectedParser, termSpacing, readingMode, useInternalParser, useMecabParser, language, scanning}) {
         let selectedParserChanged = false;
         if (selectedParser === null || typeof selectedParser === 'string') {
             selectedParserChanged = (this._selectedParser !== selectedParser);
@@ -115,6 +115,7 @@ export class QueryParser extends EventDispatcher {
             if (typeof scanLength === 'number') {
                 this._scanLength = scanLength;
             }
+            this._textScanner.language = language;
             this._textScanner.setOptions(scanning);
         }
         this._textScanner.setEnabled(true);

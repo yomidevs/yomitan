@@ -474,6 +474,7 @@ export class Frontend {
         await this._updatePopup();
 
         const preventMiddleMouse = this._getPreventMiddleMouseValueForPageType(scanningOptions.preventMiddleMouse);
+        this._textScanner.language = options.general.language;
         this._textScanner.setOptions({
             inputs: scanningOptions.inputs,
             deepContentScan: scanningOptions.deepDomScan,

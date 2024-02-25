@@ -15,9 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {readFileSync} from 'fs';
+import {join} from 'path';
+import {fileURLToPath} from 'url';
 import {describe, test} from 'vitest';
+import {parseJson} from '../dev/json.js';
 import {japaneseTransforms} from '../ext/js/language/ja/language-transforms.js';
 import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
+import {getLanguageSummaries} from '../ext/js/language/languages.js';
 
 class DeinflectionNode {
     /**
@@ -100,7 +105,17 @@ function arraysAreEqual(rules1, rules2) {
     return true;
 }
 
-describe('Deinflection data', () => {
+const dirname = pathDirname(fileURLToPath(import.meta.url));
+const descriptors = [];
+const languageSummaries = getLanguageSummaries();
+for (const {languageTransformsFile} of languageSummaries) {
+    if (!languageTransformsFile) { continue; }
+    /** @type {import('language-transformer').LanguageTransformDescriptor} */
+    const descriptor = parseJson(readFileSync(join(dirname, `../ext/${languageTransformsFile}`), {encoding: 'utf8'}));
+    descriptors.push(descriptor);
+}
+
+describe.each(descriptors)('Cycles Test $language', (descriptor) => {
     test('Check for cycles', ({expect}) => {
         const languageTransformer = new LanguageTransformer();
         languageTransformer.addDescriptor(japaneseTransforms);
@@ -125,8 +140,8 @@ describe('Deinflection data', () => {
                 const {suffixIn, suffixOut, conditionsIn, conditionsOut} = ruleNode.rule;
                 if (
                     !LanguageTransformer.conditionsMatch(
-                        languageTransformer.getConditionFlagsFromConditionTypes('ja', ruleNames),
-                        languageTransformer.getConditionFlagsFromConditionTypes('ja', conditionsIn)
+                        languageTransformer.getConditionFlagsFromConditionTypes(ruleNames),
+                        languageTransformer.getConditionFlagsFromConditionTypes(conditionsIn)
                     ) ||
                     !text.endsWith(suffixIn) ||
                     (text.length - suffixIn.length + suffixOut.length) <= 0

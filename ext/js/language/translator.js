@@ -21,6 +21,7 @@ import {TextSourceMap} from '../general/text-source-map.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
 import {getAllLanguageTextPreprocessors} from './languages.js';
+import {MultiLanguageTransformer} from './multi-language-transformer.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
@@ -32,8 +33,8 @@ export class Translator {
     constructor(database) {
         /** @type {import('../dictionary/dictionary-database.js').DictionaryDatabase} */
         this._database = database;
-        /** @type {LanguageTransformer} */
-        this._languageTransformer = new LanguageTransformer();
+        /** @type {MultiLanguageTransformer} */
+        this._multiLanguageTransformer = new MultiLanguageTransformer();
         /** @type {import('translator').DictionaryTagCache} */
         this._tagCache = new Map();
         /** @type {Intl.Collator} */
@@ -49,9 +50,7 @@ export class Translator {
      * @param {import('language-transformer').LanguageTransformDescriptor[]} languageTransformDescriptors
      */
     prepare(languageTransformDescriptors) {
-        for (const descriptor of languageTransformDescriptors) {
-            this._languageTransformer.addDescriptor(descriptor);
-        }
+        this._multiLanguageTransformer.prepare(languageTransformDescriptors);
         for (const {iso, textPreprocessors} of getAllLanguageTextPreprocessors()) {
             /** @type {Map<string, import('language').TextPreprocessorOptions<unknown>>} */
             const optionSpace = new Map();
@@ -421,7 +420,7 @@ export class Translator {
             const entryDictionary = /** @type {import('translation').FindTermDictionary} */ (enabledDictionaryMap.get(databaseEntry.dictionary));
             const {partsOfSpeechFilter} = entryDictionary;
 
-            const definitionConditions = this._languageTransformer.getConditionFlagsFromPartsOfSpeech(language, databaseEntry.rules);
+            const definitionConditions = this._multiLanguageTransformer.getConditionFlagsFromPartsOfSpeech(language, databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
                 if (!partsOfSpeechFilter || LanguageTransformer.conditionsMatch(deinflection.conditions, definitionConditions)) {
                     deinflection.databaseEntries.push(databaseEntry);
@@ -480,7 +479,7 @@ export class Translator {
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                for (const {text: transformedText, conditions, trace} of this._languageTransformer.transform(language, source)) {
+                for (const {text: transformedText, conditions, trace} of this._multiLanguageTransformer.transform(language, source)) {
                     /** @type {import('dictionary').InflectionRuleChainCandidate} */
                     const inflectionRuleChainCandidate = {
                         source: 'algorithm',

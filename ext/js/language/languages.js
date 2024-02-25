@@ -49,6 +49,17 @@ export function getAllLanguageTextPreprocessors() {
 }
 
 /**
+ * @param {string} text
+ * @param {string} language
+ * @returns {boolean}
+ */
+export function isTextLookupWorthy(text, language) {
+    const descriptor = languageDescriptorMap.get(language);
+    if (typeof descriptor === 'undefined') { return false; }
+    return typeof descriptor.isTextLookupWorthy === 'undefined' || descriptor.isTextLookupWorthy(text);
+}
+
+/**
  * @returns {import('language').LanguageAndTransforms[]}
  */
 export function getAllLanguageTransformDescriptors() {
