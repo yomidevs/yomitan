@@ -281,24 +281,31 @@ export class AnkiController {
 
     /** */
     _setupFieldMenus() {
-        /** @type {[types: import('dictionary').DictionaryEntryType[], selector: string][]} */
+        /** @type {[types: import('dictionary').DictionaryEntryType[], templateName: string][]} */
         const fieldMenuTargets = [
-            [['term'], '#anki-card-terms-field-menu-template'],
-            [['kanji'], '#anki-card-kanji-field-menu-template'],
-            [['term', 'kanji'], '#anki-card-all-field-menu-template']
+            [['term'], 'anki-card-terms-field-menu'],
+            [['kanji'], 'anki-card-kanji-field-menu'],
+            [['term', 'kanji'], 'anki-card-all-field-menu']
         ];
-        for (const [types, selector] of fieldMenuTargets) {
-            const element = /** @type {HTMLTemplateElement} */ (document.querySelector(selector));
-            if (element === null) { continue; }
+        const {templates} = this._settingsController;
+        for (const [types, templateName] of fieldMenuTargets) {
+            const templateContent = templates.getTemplateContent(templateName);
+            if (templateContent === null) {
+                log.warn(new Error(`Failed to set up menu "${templateName}": element not found`));
+                continue;
+            }
+
+            const container = templateContent.querySelector('.popup-menu-body');
+            if (container === null) {
+                log.warn(new Error(`Failed to set up menu "${templateName}": body not found`));
+                return;
+            }
 
             let markers = [];
             for (const type of types) {
                 markers.push(...getStandardFieldMarkers(type));
             }
             markers = [...new Set(markers)];
-
-            const container = element.content.querySelector('.popup-menu-body');
-            if (container === null) { return; }
 
             const fragment = document.createDocumentFragment();
             for (const marker of markers) {
