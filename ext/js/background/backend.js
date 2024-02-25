@@ -23,7 +23,7 @@ import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {fetchJson, fetchText} from '../core/fetch-utilities.js';
+import {fetchText} from '../core/fetch-utilities.js';
 import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {clone, deferPromise, isObject, promiseTimeout} from '../core/utilities.js';
@@ -35,7 +35,7 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {getLanguageSummaries} from '../language/languages.js';
+import {getAllLanguageTransformDescriptors, getLanguageSummaries} from '../language/languages.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -276,12 +276,9 @@ export class Backend {
 
             /** @type {import('language-transformer').LanguageTransformDescriptor[]} */
             const descriptors = [];
-            const languageSummaries = getLanguageSummaries();
-            for (const {iso, hasLanguageTransforms} of languageSummaries) {
-                if (!hasLanguageTransforms) { continue; }
-                /** @type {import('language-transformer').LanguageTransformDescriptor} */
-                const descriptor = await fetchJson(`/js/language/${iso}/language-transforms.json`);
-                descriptors.push(descriptor);
+            const languagesWithTransforms = getAllLanguageTransformDescriptors();
+            for (const {languageTransforms} of languagesWithTransforms) {
+                descriptors.push(languageTransforms);
             }
             void this._translator.prepare(descriptors);
 

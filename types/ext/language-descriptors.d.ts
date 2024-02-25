@@ -16,6 +16,7 @@
  */
 
 import type {TextPreprocessor, BidirectionalConversionPreprocessor} from './language';
+import type {LanguageTransformDescriptor} from './language-transformer';
 import type {SafeAny} from './core';
 
 type LanguageDescriptor<TIso extends string, TTextPreprocessorDescriptor extends TextPreprocessorDescriptor> = {
@@ -23,7 +24,7 @@ type LanguageDescriptor<TIso extends string, TTextPreprocessorDescriptor extends
     name: string;
     exampleText: string;
     textPreprocessors: TTextPreprocessorDescriptor;
-    hasLanguageTransforms?: boolean;
+    languageTransforms?: LanguageTransformDescriptor;
 };
 
 type TextPreprocessorDescriptor = {

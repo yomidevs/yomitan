@@ -17,7 +17,9 @@
 
 import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
+import {englishTransforms} from './en/language-transforms.js';
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
+import {japaneseTransforms} from './ja/language-transforms.js';
 import {removeLatinDiacritics} from './la/latin-text-preprocessors.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
@@ -57,7 +59,7 @@ const languageDescriptors = [
         name: 'English',
         exampleText: 'read',
         textPreprocessors: capitalizationPreprocessors,
-        hasLanguageTransforms: true
+        languageTransforms: englishTransforms
     },
     {
         iso: 'es',
@@ -122,7 +124,7 @@ const languageDescriptors = [
             convertHiraganaToKatakana,
             collapseEmphaticSequences
         },
-        hasLanguageTransforms: true
+        languageTransforms: japaneseTransforms
     },
     {
         iso: 'km',
