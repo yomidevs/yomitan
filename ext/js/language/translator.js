@@ -289,6 +289,7 @@ export class Translator {
             return false;
         }
 
+        /** @type {Map<string, number>} */
         const frequencyCounter = new Map();
 
         for (const element of array1) {
@@ -400,6 +401,7 @@ export class Translator {
      * @returns {Map<string, import('translation-internal').DatabaseDeinflection[]>}
      */
     _groupDeinflectionsByTerm(deinflections) {
+        /** @type {Map<string, import('translation-internal').DatabaseDeinflection[]>} */
         const result = new Map();
         for (const deinflection of deinflections) {
             const {deinflectedText} = deinflection;
@@ -681,6 +683,7 @@ export class Translator {
         /** @type {import('dictionary-database').TermExactRequest[]} */
         const termList = [];
         const targetList = [];
+        /** @type {Map<string, {groups: import('translator').DictionaryEntryGroup[]}>} */
         const targetMap = new Map();
 
         for (const group of groupedDictionaryEntries) {
@@ -2076,6 +2079,7 @@ export class Translator {
      * @param {boolean} ascending
      */
     _updateSortFrequencies(dictionaryEntries, dictionary, ascending) {
+        /** @type {Map<number, number>} */
         const frequencyMap = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
             const {definitions, frequencies} = dictionaryEntry;
