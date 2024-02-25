@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core/object-utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
 import {deferPromise, generateId} from '../core/utilities.js';
 
 export class FrameClient {
@@ -122,9 +122,9 @@ export class FrameClient {
              */
             const onMessageInner = async (message) => {
                 try {
-                    if (!isObject(message)) { return; }
+                    if (!isObjectNotArray(message)) { return; }
                     const {action, params} = message;
-                    if (!isObject(params)) { return; }
+                    if (!isObjectNotArray(params)) { return; }
                     await frameLoadedPromise;
                     if (timer === null) { return; } // Done
 

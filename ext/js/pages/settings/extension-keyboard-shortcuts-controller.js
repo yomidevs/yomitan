@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {isObject} from '../../core/object-utilities.js';
+import {isObjectNotArray} from '../../core/object-utilities.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
@@ -149,7 +149,7 @@ export class ExtensionKeyboardShortcutController {
      */
     _getCommands() {
         return new Promise((resolve, reject) => {
-            if (!(isObject(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
+            if (!(isObjectNotArray(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
                 resolve([]);
                 return;
             }

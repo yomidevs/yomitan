@@ -26,7 +26,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {fetchJson, fetchText} from '../core/fetch-utilities.js';
 import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
-import {isObject} from '../core/object-utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
 import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
 import {isNoteDataValid} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
@@ -223,12 +223,12 @@ export class Backend {
      * @returns {void}
      */
     _prepareInternalSync() {
-        if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
+        if (isObjectNotArray(chrome.commands) && isObjectNotArray(chrome.commands.onCommand)) {
             const onCommand = this._onWebExtensionEventWrapper(this._onCommand.bind(this));
             chrome.commands.onCommand.addListener(onCommand);
         }
 
-        if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
+        if (isObjectNotArray(chrome.tabs) && isObjectNotArray(chrome.tabs.onZoomChange)) {
             const onZoomChange = this._onWebExtensionEventWrapper(this._onZoomChange.bind(this));
             chrome.tabs.onZoomChange.addListener(onZoomChange);
         }
@@ -1088,7 +1088,7 @@ export class Backend {
         }
 
         // chrome.windows not supported (e.g. on Firefox mobile)
-        if (!isObject(chrome.windows)) {
+        if (!isObjectNotArray(chrome.windows)) {
             throw new Error('Window creation not supported');
         }
 
@@ -1555,7 +1555,7 @@ export class Backend {
      */
     _getBrowserIconTitle() {
         return (
-            isObject(chrome.action) &&
+            isObjectNotArray(chrome.action) &&
             typeof chrome.action.getTitle === 'function' ?
                 new Promise((resolve) => { chrome.action.getTitle({}, resolve); }) :
                 Promise.resolve('')
@@ -1567,7 +1567,7 @@ export class Backend {
      */
     _updateBadge() {
         let title = this._defaultBrowserActionTitle;
-        if (title === null || !isObject(chrome.action)) {
+        if (title === null || !isObjectNotArray(chrome.action)) {
             // Not ready or invalid
             return;
         }
@@ -2574,7 +2574,7 @@ export class Backend {
      * @returns {boolean}
      */
     _canObservePermissionsChanges() {
-        return isObject(chrome.permissions) && isObject(chrome.permissions.onAdded) && isObject(chrome.permissions.onRemoved);
+        return isObjectNotArray(chrome.permissions) && isObjectNotArray(chrome.permissions.onAdded) && isObjectNotArray(chrome.permissions.onRemoved);
     }
 
     /**
