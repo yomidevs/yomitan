@@ -47,3 +47,14 @@ export function getAllLanguageTextPreprocessors() {
     }
     return results;
 }
+
+/**
+ * @param {string} language
+ * @param {string} text
+ * @returns {boolean}
+ */
+export function textMayBeTranslatable(language, text) {
+    const descriptor = languageDescriptorMap.get(language);
+    if (typeof descriptor === 'undefined') { return false; }
+    return typeof descriptor.textMayBeTranslatable === 'undefined' || descriptor.textMayBeTranslatable(text);
+}
