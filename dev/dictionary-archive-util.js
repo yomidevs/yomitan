@@ -29,7 +29,8 @@ import {parseJson} from './json.js';
 export async function createDictionaryArchiveData(dictionaryDirectory, dictionaryName) {
     const fileNames = readdirSync(dictionaryDirectory);
     const zipFileWriter = new BlobWriter();
-    // Curiously, any level other than 0 here will cause DictionaryImporter.importDictionary to fail.
+    // Level 0 compression used since decompression in the node environment is not supported.
+    // See dev/lib/zip.js for more details.
     const zipWriter = new ZipWriter(zipFileWriter, {
         level: 0
     });
