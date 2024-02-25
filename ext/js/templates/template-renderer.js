@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Handlebars} from '../../../lib/handlebars.js';
-import {ExtensionError} from '../../core/extension-error.js';
+import {Handlebars} from '../../lib/handlebars.js';
+import {ExtensionError} from '../core/extension-error.js';
 
 export class TemplateRenderer {
     constructor() {

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {readResponseJson} from '../../core/json.js';
+import {readResponseJson} from '../core/json.js';
 
 /**
  * This class is used to apply CSS styles to elements using a consistent method
