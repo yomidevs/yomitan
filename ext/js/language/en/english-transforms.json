@@ -7,7 +7,6 @@
         },
         "n": {
             "name": "Noun",
-            "aliases": ["noun"],
             "isDictionaryForm": true,
             "subConditions": ["np", "ns"]
         },

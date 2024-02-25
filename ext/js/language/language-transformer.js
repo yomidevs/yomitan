@@ -77,22 +77,12 @@ export class LanguageTransformer {
             this._transforms.push(transform);
         }
 
-        for (const [type, {isDictionaryForm, aliases}] of conditionEntries) {
+        for (const [type, {isDictionaryForm}] of conditionEntries) {
             const flags = conditionFlagsMap.get(type);
             if (typeof flags === 'undefined') { continue; } // This case should never happen
             this._conditionTypeToConditionFlagsMap.set(type, flags);
-            if (aliases) {
-                for (const alias of aliases) {
-                    this._conditionTypeToConditionFlagsMap.set(alias, flags);
-                }
-            }
             if (isDictionaryForm) {
                 this._partOfSpeechToConditionFlagsMap.set(type, flags);
-                if (aliases) {
-                    for (const alias of aliases) {
-                        this._partOfSpeechToConditionFlagsMap.set(alias, flags);
-                    }
-                }
             }
         }
     }

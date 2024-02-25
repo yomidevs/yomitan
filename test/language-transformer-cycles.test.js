@@ -107,10 +107,10 @@ function arraysAreEqual(rules1, rules2) {
 const dirname = pathDirname(fileURLToPath(import.meta.url));
 const descriptors = [];
 const languageSummaries = getLanguageSummaries();
-for (const {iso, languageTransformsFile} of languageSummaries) {
+for (const {languageTransformsFile} of languageSummaries) {
     if (!languageTransformsFile) { continue; }
     /** @type {import('language-transformer').LanguageTransformDescriptor} */
-    const descriptor = parseJson(readFileSync(join(dirname, `../ext/js/language/${iso}/${languageTransformsFile}.json`), {encoding: 'utf8'}));
+    const descriptor = parseJson(readFileSync(join(dirname, `../ext/${languageTransformsFile}`), {encoding: 'utf8'}));
     descriptors.push(descriptor);
 }
 

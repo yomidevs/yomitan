@@ -277,10 +277,10 @@ export class Backend {
             /** @type {import('language-transformer').LanguageTransformDescriptor[]} */
             const descriptors = [];
             const languageSummaries = getLanguageSummaries();
-            for (const {iso, languageTransformsFile} of languageSummaries) {
+            for (const {languageTransformsFile} of languageSummaries) {
                 if (!languageTransformsFile) { continue; }
                 /** @type {import('language-transformer').LanguageTransformDescriptor} */
-                const descriptor = await fetchJson(`/js/language/${iso}/${languageTransformsFile}.json`);
+                const descriptor = await fetchJson(languageTransformsFile);
                 descriptors.push(descriptor);
             }
             void this._translator.prepare(descriptors);
