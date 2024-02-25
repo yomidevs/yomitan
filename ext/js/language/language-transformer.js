@@ -125,7 +125,7 @@ export class LanguageTransformer {
      * @returns {import('language-transformer-internal').TransformedText[]}
      */
     transform(language, sourceText) {
-        const descriptor = /** @type {import('language-transformer-internal').LanguageTransformDescriptorInternal} */ (this._languageTransformDescriptors.get(language));
+        const descriptor = this._languageTransformDescriptors.get(language);
         const transforms = descriptor?.transforms ?? [];
         const results = [this._createTransformedText(sourceText, 0, [])];
         for (let i = 0; i < results.length; ++i) {
