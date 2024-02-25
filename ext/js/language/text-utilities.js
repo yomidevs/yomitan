@@ -24,8 +24,6 @@ import {isStringPartiallyJapanese} from './ja/japanese.js';
  * @returns {?string}
  */
 export function getLanguageFromText(text) {
-    if (isStringPartiallyJapanese(text)) {
-        return 'ja';
-    }
+    if (isStringPartiallyJapanese(text)) { return 'ja'; }
     return null;
 }
