@@ -17,24 +17,6 @@
 
 /**
  * @param {unknown} value
- * @returns {?Record<string, unknown>}
- */
-export function asObjectOrNull(value) {
-    return isObject(value) ? value : null;
-}
-
-/**
- * @param {unknown} value
- * @returns {Record<string, unknown>}
- * @throws {Error}
- */
-export function asObjectOrThrow(value) {
-    if (isObject(value)) { return value; }
-    throw new Error(`Value is not an object, type is ${getType(value)}`);
-}
-
-/**
- * @param {unknown} value
  * @returns {value is Record<string, unknown>}
  */
 export function isObject(value) {
@@ -47,14 +29,4 @@ export function isObject(value) {
  */
 export function isObjectOrArray(value) {
     return typeof value === 'object' && value !== null;
-}
-
-/**
- * @param {unknown} value
- * @returns {string}
- */
-function getType(value) {
-    if (value === null) { return 'null'; }
-    if (Array.isArray(value)) { return 'array'; }
-    return typeof value;
 }

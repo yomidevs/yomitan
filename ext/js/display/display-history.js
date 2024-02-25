@@ -17,7 +17,7 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
-import {asObjectOrNull, isObject} from '../core/object-utilities.js';
+import {isObject} from '../core/object-utilities.js';
 import {generateId} from '../core/utilities.js';
 
 /**
@@ -44,7 +44,7 @@ export class DisplayHistory extends EventDispatcher {
             {id: null, state: null}
         );
         /** @type {?import('display-history').EntryState} */
-        const stateObject = asObjectOrNull(state);
+        const stateObject = isObject(state) ? state : null;
         /** @type {import('display-history').Entry} */
         this._current = this._createHistoryEntry(id, location.href, stateObject, null, null);
     }
