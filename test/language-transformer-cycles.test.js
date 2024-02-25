@@ -15,14 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {readFileSync} from 'fs';
-import {join} from 'path';
-import {fileURLToPath} from 'url';
 import {describe, test} from 'vitest';
-import {parseJson} from '../dev/json.js';
-import {japaneseTransforms} from '../ext/js/language/ja/language-transforms.js';
 import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
-import {getLanguageSummaries} from '../ext/js/language/languages.js';
+import {getAllLanguageTransformDescriptors} from '../ext/js/language/languages.js';
 
 class DeinflectionNode {
     /**
@@ -105,24 +100,16 @@ function arraysAreEqual(rules1, rules2) {
     return true;
 }
 
-const dirname = pathDirname(fileURLToPath(import.meta.url));
-const descriptors = [];
-const languageSummaries = getLanguageSummaries();
-for (const {languageTransformsFile} of languageSummaries) {
-    if (!languageTransformsFile) { continue; }
-    /** @type {import('language-transformer').LanguageTransformDescriptor} */
-    const descriptor = parseJson(readFileSync(join(dirname, `../ext/${languageTransformsFile}`), {encoding: 'utf8'}));
-    descriptors.push(descriptor);
-}
+const languagesWithTransforms = getAllLanguageTransformDescriptors();
 
-describe.each(descriptors)('Cycles Test $language', (descriptor) => {
+describe.each(languagesWithTransforms)('Cycles Test $iso', ({languageTransforms}) => {
     test('Check for cycles', ({expect}) => {
         const languageTransformer = new LanguageTransformer();
-        languageTransformer.addDescriptor(japaneseTransforms);
+        languageTransformer.addDescriptor(languageTransforms);
 
         /** @type {RuleNode[]} */
         const ruleNodes = [];
-        for (const [groupName, reasonInfo] of Object.entries(japaneseTransforms.transforms)) {
+        for (const [groupName, reasonInfo] of Object.entries(languageTransforms.transforms)) {
             for (const rule of reasonInfo.rules) {
                 ruleNodes.push(new RuleNode(groupName, rule));
             }
