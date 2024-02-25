@@ -175,7 +175,7 @@ export class Backend {
             ['isTabSearchPopup',             this._onApiIsTabSearchPopup.bind(this)],
             ['triggerDatabaseUpdated',       this._onApiTriggerDatabaseUpdated.bind(this)],
             ['testMecab',                    this._onApiTestMecab.bind(this)],
-            ['textHasJapaneseCharacters',    this._onApiTextHasJapaneseCharacters.bind(this)],
+            ['textMayBeTranslatable',        this._onApiTextMayBeTranslatable.bind(this)],
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
@@ -834,8 +834,8 @@ export class Backend {
         return true;
     }
 
-    /** @type {import('api').ApiHandler<'textHasJapaneseCharacters'>} */
-    _onApiTextHasJapaneseCharacters({text}) {
+    /** @type {import('api').ApiHandler<'textMayBeTranslatable'>} */
+    _onApiTextMayBeTranslatable({text}) {
         return isStringPartiallyJapanese(text);
     }
 

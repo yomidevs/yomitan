@@ -1551,7 +1551,7 @@ export class TextScanner extends EventDispatcher {
      */
     async _hasJapanese(text) {
         try {
-            return await this._api.textHasJapaneseCharacters(text);
+            return await this._api.textMayBeTranslatable(text);
         } catch (e) {
             return false;
         }

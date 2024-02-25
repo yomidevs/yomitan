@@ -321,11 +321,11 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'textHasJapaneseCharacters', 'text'>} text
-     * @returns {Promise<import('api').ApiReturn<'textHasJapaneseCharacters'>>}
+     * @param {import('api').ApiParam<'textMayBeTranslatable', 'text'>} text
+     * @returns {Promise<import('api').ApiReturn<'textMayBeTranslatable'>>}
      */
-    textHasJapaneseCharacters(text) {
-        return this._invoke('textHasJapaneseCharacters', {text});
+    textMayBeTranslatable(text) {
+        return this._invoke('textMayBeTranslatable', {text});
     }
 
     /**

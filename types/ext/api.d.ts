@@ -344,7 +344,7 @@ type ApiSurface = {
         params: void;
         return: true;
     };
-    textHasJapaneseCharacters: {
+    textMayBeTranslatable: {
         params: {
             text: string;
         };
