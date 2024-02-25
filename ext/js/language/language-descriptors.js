@@ -19,7 +19,7 @@ import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
-import {capitalizeFirstLetter, decapitalize, removeDiacritics} from './text-preprocessors.js';
+import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-preprocessors.js';
 
 const capitalizationPreprocessors = {
     decapitalize,
@@ -83,7 +83,7 @@ const languageDescriptors = [
         exampleText: 'γράφω',
         textPreprocessors: {
             ...capitalizationPreprocessors,
-            removeDiacritics
+            removeAlphabeticDiacritics
         }
     },
     {
@@ -110,7 +110,7 @@ const languageDescriptors = [
         exampleText: 'legere',
         textPreprocessors: {
             ...capitalizationPreprocessors,
-            removeDiacritics
+            removeAlphabeticDiacritics
         }
     },
     {
