@@ -18,7 +18,6 @@
 
 import {getLanguageFromText} from '../../language/text-utilities.js';
 
-
 export class StructuredContentGenerator {
     /**
      * @param {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} contentManager
