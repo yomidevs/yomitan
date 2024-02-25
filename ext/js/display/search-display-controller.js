@@ -290,7 +290,7 @@ export class SearchDisplayController {
     async _updateSearchFromClipboard(text, animate, checkText) {
         const options = this._display.getOptions();
         if (options === null) { return; }
-        if (checkText && !await this._display.application.api.textMayBeTranslatable(text, options.general.language)) { return; }
+        if (checkText && !await this._display.application.api.isTextLookupWorthy(text, options.general.language)) { return; }
         const {clipboard: {autoSearchContent, maximumSearchLength}} = options;
         if (text.length > maximumSearchLength) {
             text = text.substring(0, maximumSearchLength);

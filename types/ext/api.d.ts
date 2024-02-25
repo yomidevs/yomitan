@@ -344,7 +344,7 @@ type ApiSurface = {
         params: void;
         return: true;
     };
-    textMayBeTranslatable: {
+    isTextLookupWorthy: {
         params: {
             text: string;
             language: string;

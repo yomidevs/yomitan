@@ -115,7 +115,7 @@ const languageDescriptors = [
         iso: 'ja',
         name: 'Japanese',
         exampleText: '読め',
-        textMayBeTranslatable: isStringPartiallyJapanese,
+        isTextLookupWorthy: isStringPartiallyJapanese,
         textPreprocessors: {
             convertHalfWidthCharacters,
             convertNumericCharacters,

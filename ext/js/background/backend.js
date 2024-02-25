@@ -35,7 +35,7 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {getLanguageSummaries, textMayBeTranslatable} from '../language/languages.js';
+import {getLanguageSummaries, isTextLookupWorthy} from '../language/languages.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -175,7 +175,7 @@ export class Backend {
             ['isTabSearchPopup',             this._onApiIsTabSearchPopup.bind(this)],
             ['triggerDatabaseUpdated',       this._onApiTriggerDatabaseUpdated.bind(this)],
             ['testMecab',                    this._onApiTestMecab.bind(this)],
-            ['textMayBeTranslatable',        this._onApiTextMayBeTranslatable.bind(this)],
+            ['isTextLookupWorthy',           this._onApiIsTextLookupWorthy.bind(this)],
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
@@ -314,7 +314,7 @@ export class Backend {
             general: {language},
             clipboard: {maximumSearchLength}
         } = this._getProfileOptions({current: true}, false);
-        if (!textMayBeTranslatable(text, language)) { return; }
+        if (!isTextLookupWorthy(text, language)) { return; }
         if (text.length > maximumSearchLength) {
             text = text.substring(0, maximumSearchLength);
         }
@@ -837,9 +837,9 @@ export class Backend {
         return true;
     }
 
-    /** @type {import('api').ApiHandler<'textMayBeTranslatable'>} */
-    _onApiTextMayBeTranslatable({text, language}) {
-        return textMayBeTranslatable(text, language);
+    /** @type {import('api').ApiHandler<'isTextLookupWorthy'>} */
+    _onApiIsTextLookupWorthy({text, language}) {
+        return isTextLookupWorthy(text, language);
     }
 
     /** @type {import('api').ApiHandler<'getTermFrequencies'>} */

@@ -18,7 +18,7 @@
 import type {TextPreprocessor, BidirectionalConversionPreprocessor} from './language';
 import type {SafeAny} from './core';
 
-export type TextMayBeTranslatableFunction = (text: string) => boolean;
+export type IsTextLookupWorthyFunction = (text: string) => boolean;
 
 type LanguageDescriptor<TIso extends string, TTextPreprocessorDescriptor extends TextPreprocessorDescriptor> = {
     iso: TIso;
@@ -30,7 +30,7 @@ type LanguageDescriptor<TIso extends string, TTextPreprocessorDescriptor extends
      * window should activate when text is copied to the clipboard.
      * If no value is provided, `true` is assumed for all inputs.
      */
-    textMayBeTranslatable?: TextMayBeTranslatableFunction;
+    isTextLookupWorthy?: IsTextLookupWorthyFunction;
     textPreprocessors: TTextPreprocessorDescriptor;
 };
 
