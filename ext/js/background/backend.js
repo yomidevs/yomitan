@@ -310,6 +310,7 @@ export class Backend {
      * @param {import('clipboard-monitor').EventArgument<'change'>} details
      */
     async _onClipboardTextChange({text}) {
+        if (!isStringPartiallyJapanese(text)) { return; }
         const {clipboard: {maximumSearchLength}} = this._getProfileOptions({current: true}, false);
         if (text.length > maximumSearchLength) {
             text = text.substring(0, maximumSearchLength);

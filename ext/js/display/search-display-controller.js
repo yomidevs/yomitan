@@ -21,6 +21,7 @@ import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {isStringPartiallyJapanese} from '../language/ja/japanese.js';
 
 export class SearchDisplayController {
     /**
@@ -272,6 +273,7 @@ export class SearchDisplayController {
 
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
     _onExternalSearchUpdate({text, animate = true}) {
+        if (!isStringPartiallyJapanese(text)) { return; }
         const options = this._display.getOptions();
         if (options === null) { return; }
         const {clipboard: {autoSearchContent, maximumSearchLength}} = options;
