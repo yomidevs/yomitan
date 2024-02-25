@@ -1154,6 +1154,7 @@ describe('LanguageTransformer', () => {
     describe('deinflections', () => {
         describe.each(data)('$category', ({valid, tests}) => {
             for (const {source, term, rule, reasons} of tests) {
+                const {has} = hasTermReasons(languageTransformer, source, term, rule, reasons);
                 let message = `${source} ${valid ? 'has' : 'does not have'} term candidate ${JSON.stringify(term)}`;
                 if (rule !== null) {
                     message += ` with rule ${JSON.stringify(rule)}`;
@@ -1162,8 +1163,7 @@ describe('LanguageTransformer', () => {
                     message += (typeof rule !== 'undefined' ? ' and' : ' with');
                     message += ` reasons ${JSON.stringify(reasons)}`;
                 }
-                test(`${message}`, async () => {
-                    const {has} = hasTermReasons(languageTransformer, source, term, rule, reasons);
+                test(`${message}`, () => {
                     expect(has).toStrictEqual(valid);
                 });
             }
