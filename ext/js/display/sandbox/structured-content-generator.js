@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isStringPartiallyJapanese} from '../../language/ja/japanese.js';
+import {getLanguageFromText} from '../../language/text-utilities.js';
+
 
 export class StructuredContentGenerator {
     /**
@@ -163,8 +164,11 @@ export class StructuredContentGenerator {
         if (typeof content === 'string') {
             if (content.length > 0) {
                 container.appendChild(this._createTextNode(content));
-                if (language === null && isStringPartiallyJapanese(content)) {
-                    container.lang = 'ja';
+                if (language === null) {
+                    const language2 = getLanguageFromText(content);
+                    if (language2 !== null) {
+                        container.lang = language2;
+                    }
                 }
             }
             return;
