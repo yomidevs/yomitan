@@ -27,6 +27,7 @@ import {JsonSchema} from './json-schema.js';
 // of the options object to a newer format. SafeAny is used for much of this, since every single
 // legacy format does not contain type definitions.
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 export class OptionsUtil {
     constructor() {
@@ -1226,4 +1227,5 @@ export class OptionsUtil {
     }
 }
 
+/* eslint-enable @typescript-eslint/no-unsafe-assignment */
 /* eslint-enable @typescript-eslint/no-unsafe-argument */

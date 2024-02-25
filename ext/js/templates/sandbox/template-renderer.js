@@ -117,6 +117,8 @@ export class TemplateRenderer {
         let instance = cache.get(template);
         if (typeof instance === 'undefined') {
             this._updateCacheSize(this._cacheMaxSize - 1);
+            // Handlebars is a custom version of the library without type information, so it's assumed to be "any".
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             instance = /** @type {import('handlebars').TemplateDelegate<import('anki-templates').NoteData>} */ (Handlebars.compileAST(template));
             cache.set(template, instance);
         }

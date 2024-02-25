@@ -605,15 +605,15 @@ export class AnkiConnect {
             if (typeof modelName !== 'string') {
                 throw this._createError(`Unexpected result type at index ${i}, field modelName: expected string, received ${this._getTypeName(modelName)}`, result);
             }
-            if (typeof fields !== 'object' || fields === null) {
-                throw this._createError(`Unexpected result type at index ${i}, field fields: expected string, received ${this._getTypeName(fields)}`, result);
+            if (!isObjectNotArray(fields)) {
+                throw this._createError(`Unexpected result type at index ${i}, field fields: expected object, received ${this._getTypeName(fields)}`, result);
             }
             const tags2 = /** @type {string[]} */ (this._normalizeArray(tags, -1, 'string', ', field tags'));
             const cards2 = /** @type {number[]} */ (this._normalizeArray(cards, -1, 'number', ', field cards'));
             /** @type {{[key: string]: import('anki').NoteFieldInfo}} */
             const fields2 = {};
             for (const [key, fieldInfo] of Object.entries(fields)) {
-                if (typeof fieldInfo !== 'object' || fieldInfo === null) { continue; }
+                if (!isObjectNotArray(fieldInfo)) { continue; }
                 const {value, order} = fieldInfo;
                 if (typeof value !== 'string' || typeof order !== 'number') { continue; }
                 fields2[key] = {value, order};

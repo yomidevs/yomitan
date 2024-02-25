@@ -88,6 +88,7 @@ export class OffscreenProxy {
         if (!chrome.runtime.getContexts) { // Chrome version below 116
             // Clients: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/clients
             // @ts-expect-error - Types not set up for service workers yet
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const matchedClients = await clients.matchAll();
             // @ts-expect-error - Types not set up for service workers yet
             return await matchedClients.some((client) => client.url === offscreenUrl);
