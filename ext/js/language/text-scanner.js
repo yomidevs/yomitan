@@ -449,7 +449,7 @@ export class TextScanner extends EventDispatcher {
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
-            } else if (textSource !== null && textSource instanceof TextSourceElement && await this._hasJapanese(textSource.fullContent)) {
+            } else if (textSource !== null && textSource instanceof TextSourceElement && await this._textMayBeTranslatable(textSource.fullContent)) {
                 dictionaryEntries = [];
                 sentence = {text: '', offset: 0};
             }
@@ -1549,7 +1549,7 @@ export class TextScanner extends EventDispatcher {
      * @param {string} text
      * @returns {Promise<boolean>}
      */
-    async _hasJapanese(text) {
+    async _textMayBeTranslatable(text) {
         try {
             return await this._api.textMayBeTranslatable(text);
         } catch (e) {
