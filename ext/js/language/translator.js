@@ -139,6 +139,7 @@ export class Translator {
             text = this._getJapaneseOnlyText(text);
         }
         const {enabledDictionaryMap} = options;
+        /** @type {Set<string>} */
         const kanjiUnique = new Set();
         for (const c of text) {
             kanjiUnique.add(c);
@@ -707,6 +708,7 @@ export class Translator {
      * @returns {import('dictionary').TermDictionaryEntry[]}
      */
     _groupDictionaryEntriesByHeadword(dictionaryEntries, tagAggregator) {
+        /** @type {Map<string, import('dictionary').TermDictionaryEntry[]>} */
         const groups = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
             const {inflectionRuleChainCandidates, headwords: [{term, reading}]} = dictionaryEntry;
@@ -1044,8 +1046,11 @@ export class Translator {
      * @param {TranslatorTagAggregator} tagAggregator
      */
     async _addTermMeta(dictionaryEntries, enabledDictionaryMap, tagAggregator) {
+        /** @type {Map<string, Map<string, {headwordIndex: number, pronunciations: import('dictionary').TermPronunciation[], frequencies: import('dictionary').TermFrequency[]}[]>>} */
         const headwordMap = new Map();
+        /** @type {string[]} */
         const headwordMapKeys = [];
+        /** @type {Map<string, {headwordIndex: number, pronunciations: import('dictionary').TermPronunciation[], frequencies: import('dictionary').TermFrequency[]}[]>[]} */
         const headwordReadingMaps = [];
 
         for (const {headwords, pronunciations, frequencies} of dictionaryEntries) {

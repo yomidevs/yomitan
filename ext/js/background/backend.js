@@ -356,12 +356,18 @@ export class Backend {
     _onWebExtensionEventWrapper(handler) {
         return /** @type {T} */ ((...args) => {
             if (this._isPrepared) {
+                // This is using SafeAny to just forward the parameters
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 handler(...args);
                 return;
             }
 
             this._prepareCompletePromise.then(
-                () => { handler(...args); },
+                () => {
+                    // This is using SafeAny to just forward the parameters
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                    handler(...args);
+                },
                 () => {} // NOP
             );
         });

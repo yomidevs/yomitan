@@ -734,7 +734,8 @@ export class DictionaryImporter {
         const results = [];
         for (const file of files) {
             const content = await this._getData(file, new TextWriter());
-            const entries = /** @type {unknown} */ (parseJson(content));
+            /** @type {unknown} */
+            const entries = parseJson(content);
 
             startIndex = progressData.index;
             this._progress();
@@ -748,8 +749,8 @@ export class DictionaryImporter {
             this._progress();
 
             if (Array.isArray(entries)) {
-                for (const entry of entries) {
-                    results.push(convertEntry(/** @type {TEntry} */ (entry), dictionaryTitle));
+                for (const entry of /** @type {TEntry[]} */ (entries)) {
+                    results.push(convertEntry(entry, dictionaryTitle));
                 }
             }
         }

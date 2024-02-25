@@ -397,7 +397,7 @@
                 "@typescript-eslint/no-floating-promises": ["error", {"ignoreIIFE": true}],
                 "@typescript-eslint/no-misused-promises": "off",
                 "@typescript-eslint/no-redundant-type-constituents": "error",
-                "@typescript-eslint/no-unsafe-argument": "off",
+                "@typescript-eslint/no-unsafe-argument": "error",
                 "@typescript-eslint/no-unsafe-assignment": "off",
                 "@typescript-eslint/no-unsafe-call": "off",
                 "@typescript-eslint/no-unsafe-enum-comparison": "off",

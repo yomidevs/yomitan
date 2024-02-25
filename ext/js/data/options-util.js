@@ -22,6 +22,11 @@ import {escapeRegExp, isObject} from '../core/utilities.js';
 import {TemplatePatcher} from '../templates/template-patcher.js';
 import {JsonSchema} from './json-schema.js';
 
+// Some type safety rules are disabled for this file since it deals with upgrading an older format
+// of the options object to a newer format. SafeAny is used for much of this, since every single
+// legacy format does not contain type definitions.
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 export class OptionsUtil {
     constructor() {
         /** @type {?TemplatePatcher} */
@@ -119,6 +124,9 @@ export class OptionsUtil {
                     }
                 });
             });
+            if (typeof optionsStr !== 'string') {
+                throw new Error('Invalid value for options');
+            }
             options = parseJson(optionsStr);
         } catch (e) {
             // NOP
@@ -1197,3 +1205,5 @@ export class OptionsUtil {
         });
     }
 }
+
+/* eslint-enable @typescript-eslint/no-unsafe-argument */

@@ -462,6 +462,7 @@ export class TextSourceGenerator {
      * @returns {?Range}
      */
     _caretPositionFromPointNormalizeStyles(x, y, nextElement) {
+        /** @type {Map<Element, ?string>} */
         const previousStyles = new Map();
         try {
             while (true) {
@@ -490,7 +491,7 @@ export class TextSourceGenerator {
                         // Elements with user-select: all will return the element
                         // instead of a text point inside the element.
                         if (this._isElementUserSelectAll(/** @type {Element} */ (node))) {
-                            if (previousStyles.has(node)) {
+                            if (previousStyles.has(/** @type {Element} */ (node))) {
                                 // Recursive
                                 return null;
                             }
@@ -524,6 +525,7 @@ export class TextSourceGenerator {
      * @returns {?Range}
      */
     _caretRangeFromPointExt(x, y, elements, normalizeCssZoom) {
+        /** @type {?Map<Element, ?string>} */
         let previousStyles = null;
         try {
             let i = 0;

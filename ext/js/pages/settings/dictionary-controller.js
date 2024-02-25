@@ -548,6 +548,7 @@ export class DictionaryController {
             optionsFull = await settingsController.getOptionsFull();
         }
 
+        /** @type {Set<string>} */
         const installedDictionaries = new Set();
         for (const {title} of dictionaries) {
             installedDictionaries.add(title);

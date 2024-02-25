@@ -37,9 +37,15 @@ export class DisplayHistory extends EventDispatcher {
         this._historyMap = new Map();
 
         const historyState = history.state;
-        const {id, state} = isObject(historyState) ? historyState : {id: null, state: null};
+        const {id, state} = (
+            typeof historyState === 'object' && historyState !== null ?
+            historyState :
+            {id: null, state: null}
+        );
+        /** @type {?import('display-history').EntryState} */
+        const stateObject = typeof state === 'object' || state === null ? state : null;
         /** @type {import('display-history').Entry} */
-        this._current = this._createHistoryEntry(id, location.href, state, null, null);
+        this._current = this._createHistoryEntry(id, location.href, stateObject, null, null);
     }
 
     /** @type {?import('display-history').EntryState} */

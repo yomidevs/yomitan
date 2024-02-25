@@ -66,6 +66,11 @@ export class SettingsController extends EventDispatcher {
         this._setProfileIndex(value, true);
     }
 
+    /** @type {HtmlTemplateCollection} */
+    get templates() {
+        return this._templates;
+    }
+
     /** */
     async prepare() {
         await this._templates.loadFromFiles(['/templates-settings.html']);
