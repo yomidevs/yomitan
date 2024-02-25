@@ -34,7 +34,7 @@ import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
-import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
+import {distributeFuriganaInflected, isCodePointJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
 import {getLanguageSummaries, textMayBeTranslatable} from '../language/languages.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
@@ -310,8 +310,11 @@ export class Backend {
      * @param {import('clipboard-monitor').EventArgument<'change'>} details
      */
     async _onClipboardTextChange({text}) {
-        if (!isStringPartiallyJapanese(text)) { return; }
-        const {clipboard: {maximumSearchLength}} = this._getProfileOptions({current: true}, false);
+        const {
+            general: {language},
+            clipboard: {maximumSearchLength}
+        } = this._getProfileOptions({current: true}, false);
+        if (!textMayBeTranslatable(text, language)) { return; }
         if (text.length > maximumSearchLength) {
             text = text.substring(0, maximumSearchLength);
         }
