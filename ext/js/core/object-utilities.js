@@ -25,7 +25,7 @@ export function isObjectNotArray(value) {
 
 /**
  * @param {unknown} value
- * @returns {value is Record<string, unknown>}
+ * @returns {value is Record<string|number|symbol, unknown>}
  */
 export function isObject(value) {
     return typeof value === 'object' && value !== null;
