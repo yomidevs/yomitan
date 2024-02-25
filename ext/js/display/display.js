@@ -425,6 +425,7 @@ export class Display extends EventDispatcher {
             readingMode: options.parsing.readingMode,
             useInternalParser: options.parsing.enableScanningParser,
             useMecabParser: options.parsing.enableMecabParser,
+            language: options.general.language,
             scanning: {
                 inputs: scanningOptions.inputs,
                 deepContentScan: scanningOptions.deepDomScan,
@@ -1834,6 +1835,7 @@ export class Display extends EventDispatcher {
         }
 
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
+        this._contentTextScanner.language = options.general.language;
         this._contentTextScanner.setOptions({
             inputs: [{
                 include: 'mouse0',
