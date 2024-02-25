@@ -208,14 +208,14 @@ describe('language transformer', () => {
         const basicTransformations = [...adjectiveInflections, ...verbInflections, ...inflectionCombinations];
         bench(`transformations (n=${basicTransformations.length})`, () => {
             for (const transform of basicTransformations) {
-                languageTransformer.transform('ja', transform);
+                languageTransformer.transform(transform);
             }
         });
 
         const transformationsFull = [...basicTransformations, ...kuruInflections, ...suruInflections, ...kansaibenInflections];
         bench(`transformations-full (n=${transformationsFull.length})`, () => {
             for (const transform of transformationsFull) {
-                languageTransformer.transform('ja', transform);
+                languageTransformer.transform(transform);
             }
         });
     });

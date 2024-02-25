@@ -34,10 +34,10 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
  * @returns {{has: false, reasons: null, rules: null}|{has: true, reasons: string[], rules: number}}
  */
 function hasTermReasons(languageTransformer, source, expectedTerm, expectedConditionName, expectedReasons) {
-    for (const {text, conditions, trace} of languageTransformer.transform('ja', source)) {
+    for (const {text, conditions, trace} of languageTransformer.transform(source)) {
         if (text !== expectedTerm) { continue; }
         if (expectedConditionName !== null) {
-            const expectedConditions = languageTransformer.getConditionFlagsFromConditionType('ja', expectedConditionName);
+            const expectedConditions = languageTransformer.getConditionFlagsFromConditionType(expectedConditionName);
             if (!LanguageTransformer.conditionsMatch(conditions, expectedConditions)) { continue; }
         }
         let okay = true;

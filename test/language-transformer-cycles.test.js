@@ -132,8 +132,8 @@ describe('Deinflection data', () => {
                 const {suffixIn, suffixOut, conditionsIn, conditionsOut} = ruleNode.rule;
                 if (
                     !LanguageTransformer.conditionsMatch(
-                        languageTransformer.getConditionFlagsFromConditionTypes('ja', ruleNames),
-                        languageTransformer.getConditionFlagsFromConditionTypes('ja', conditionsIn)
+                        languageTransformer.getConditionFlagsFromConditionTypes(ruleNames),
+                        languageTransformer.getConditionFlagsFromConditionTypes(conditionsIn)
                     ) ||
                     !text.endsWith(suffixIn) ||
                     (text.length - suffixIn.length + suffixOut.length) <= 0
