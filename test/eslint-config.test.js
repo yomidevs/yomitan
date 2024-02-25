@@ -55,8 +55,8 @@ function removeLibraryDependencies(dependencies) {
 }
 
 /**
- * @param {{[key: string]: boolean}|undefined} env1
- * @param {{[key: string]: boolean}} env2
+ * @param {import('test/eslint-config').MinimalEslintConfigEnv|undefined} env1
+ * @param {import('test/eslint-config').MinimalEslintConfigEnv} env2
  * @returns {boolean}
  */
 function envMatches(env1, env2) {
@@ -92,7 +92,7 @@ const targets = [
         paths: [
             'ext/js/templates/sandbox/template-renderer-frame-main.js'
         ],
-        /** @type {{[key: string]: boolean}} */
+        /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
             webextensions: false
         }
@@ -102,7 +102,7 @@ const targets = [
         paths: [
             'ext/js/dictionary/dictionary-worker-main.js'
         ],
-        /** @type {{[key: string]: boolean}} */
+        /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
             browser: false,
             worker: true
@@ -113,7 +113,7 @@ const targets = [
         paths: [
             'ext/js/background/background-main.js'
         ],
-        /** @type {{[key: string]: boolean}} */
+        /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
             browser: false,
             serviceworker: true
@@ -123,7 +123,7 @@ const targets = [
 
 describe('Eslint configuration', () => {
     const eslintConfigPath = '.eslintrc.json';
-    /** @type {import('core').SafeAny} */
+    /** @type {import('test/eslint-config').MinimalEslintConfig} */
     const eslintConfig = parseJson(readFileSync(join(rootDir, eslintConfigPath), 'utf8'));
     describe.each(targets)('Environment is $name', ({name, paths, env}) => {
         test('Entry exists', async ({expect}) => {
