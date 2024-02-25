@@ -58,7 +58,7 @@ const languageDescriptors = [
         name: 'English',
         exampleText: 'read',
         textPreprocessors: capitalizationPreprocessors,
-        hasLanguageTransforms: true
+        languageTransformsFile: 'english-transforms'
     },
     {
         iso: 'es',
@@ -124,7 +124,7 @@ const languageDescriptors = [
             convertHiraganaToKatakana,
             collapseEmphaticSequences
         },
-        hasLanguageTransforms: true
+        languageTransformsFile: 'japanese-transforms'
     },
     {
         iso: 'km',

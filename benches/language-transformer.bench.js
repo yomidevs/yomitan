@@ -25,7 +25,7 @@ import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('language-transformer').LanguageTransformDescriptor} */
-const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'js/language/ja/language-transforms.json'), {encoding: 'utf8'}));
+const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'js/language/ja/japanese-transforms.json'), {encoding: 'utf8'}));
 const languageTransformer = new LanguageTransformer();
 languageTransformer.addDescriptor(descriptor);
 

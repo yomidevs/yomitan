@@ -93,12 +93,12 @@
             "type": "AjvSchema"
         },
         {
-            "path": "ext/js/language/ja/language-transforms.json",
+            "path": "ext/js/language/ja/japanese-transforms.json",
             "typeFile": "types/ext/language-transformer.d.ts",
             "type": "LanguageTransformDescriptor"
         },
         {
-            "path": "ext/js/language/en/language-transforms.json",
+            "path": "ext/js/language/en/english-transforms.json",
             "typeFile": "types/ext/language-transformer.d.ts",
             "type": "LanguageTransformDescriptor"
         },

@@ -150,6 +150,27 @@ export class LanguageTransformer {
     }
 
     /**
+     * @param {string} text
+     * @param {number} conditions
+     * @param {import('language-transformer-internal').Trace} trace
+     * @returns {import('language-transformer-internal').TransformedText}
+     */
+    static createTransformedText(text, conditions, trace) {
+        return {text, conditions, trace};
+    }
+
+    /**
+     * If `currentConditions` is `0`, then `nextConditions` is ignored and `true` is returned.
+     * Otherwise, there must be at least one shared condition between `currentConditions` and `nextConditions`.
+     * @param {number} currentConditions
+     * @param {number} nextConditions
+     * @returns {boolean}
+     */
+    static conditionsMatch(currentConditions, nextConditions) {
+        return currentConditions === 0 || (currentConditions & nextConditions) !== 0;
+    }
+
+    /**
      * @param {import('language-transformer').ConditionMapEntries} conditions
      * @param {number} nextFlagIndex
      * @returns {{conditionFlagsMap: Map<string, number>, nextFlagIndex: number}}
@@ -228,16 +249,6 @@ export class LanguageTransformer {
     }
 
     /**
-     * @param {string} text
-     * @param {number} conditions
-     * @param {import('language-transformer-internal').Trace} trace
-     * @returns {import('language-transformer-internal').TransformedText}
-     */
-    static createTransformedText(text, conditions, trace) {
-        return {text, conditions, trace};
-    }
-
-    /**
      * @param {import('language-transformer-internal').Trace} trace
      * @param {import('language-transformer-internal').TraceFrame} newFrame
      * @returns {import('language-transformer-internal').Trace}
@@ -248,16 +259,5 @@ export class LanguageTransformer {
             newTrace.push({transform, ruleIndex});
         }
         return newTrace;
-    }
-
-    /**
-     * If `currentConditions` is `0`, then `nextConditions` is ignored and `true` is returned.
-     * Otherwise, there must be at least one shared condition between `currentConditions` and `nextConditions`.
-     * @param {number} currentConditions
-     * @param {number} nextConditions
-     * @returns {boolean}
-     */
-    static conditionsMatch(currentConditions, nextConditions) {
-        return currentConditions === 0 || (currentConditions & nextConditions) !== 0;
     }
 }

@@ -31,7 +31,7 @@ import {DictionaryImporterMediaLoader} from '../mocks/dictionary-importer-media-
 import {createDomTest} from './dom-test.js';
 
 const extDir = join(dirname(fileURLToPath(import.meta.url)), '../../ext');
-const languageTransformDescriptorPath = join(extDir, 'js/language/ja/language-transforms.json');
+const languageTransformDescriptorPath = join(extDir, 'js/language/ja/japanese-transforms.json');
 
 vi.stubGlobal('indexedDB', indexedDB);
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);

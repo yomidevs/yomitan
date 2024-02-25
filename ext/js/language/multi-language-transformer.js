@@ -41,8 +41,7 @@ export class MultiLanguageTransformer {
      */
     getConditionFlagsFromPartsOfSpeech(language, partsOfSpeech) {
         const languageTransformer = this._languageTransformers.get(language);
-        if (typeof languageTransformer === 'undefined') { return 0; }
-        return languageTransformer.getConditionFlagsFromPartsOfSpeech(partsOfSpeech);
+        return typeof languageTransformer !== 'undefined' ? languageTransformer.getConditionFlagsFromPartsOfSpeech(partsOfSpeech) : 0;
     }
 
     /**
@@ -52,8 +51,7 @@ export class MultiLanguageTransformer {
      */
     getConditionFlagsFromConditionTypes(language, conditionTypes) {
         const languageTransformer = this._languageTransformers.get(language);
-        if (typeof languageTransformer === 'undefined') { return 0; }
-        return languageTransformer.getConditionFlagsFromConditionTypes(conditionTypes);
+        return typeof languageTransformer !== 'undefined' ? languageTransformer.getConditionFlagsFromConditionTypes(conditionTypes) : 0;
     }
 
     /**
@@ -63,8 +61,7 @@ export class MultiLanguageTransformer {
      */
     getConditionFlagsFromConditionType(language, conditionType) {
         const languageTransformer = this._languageTransformers.get(language);
-        if (typeof languageTransformer === 'undefined') { return 0; }
-        return languageTransformer.getConditionFlagsFromConditionType(conditionType);
+        return typeof languageTransformer !== 'undefined' ? languageTransformer.getConditionFlagsFromConditionType(conditionType) : 0;
     }
 
     /**

@@ -1147,7 +1147,7 @@ describe('LanguageTransformer', () => {
     /* eslint-enable @stylistic/no-multi-spaces */
 
     /** @type {import('language-transformer').LanguageTransformDescriptor} */
-    const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'js/language/ja/language-transforms.json'), {encoding: 'utf8'}));
+    const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'js/language/ja/japanese-transforms.json'), {encoding: 'utf8'}));
     const languageTransformer = new LanguageTransformer();
     languageTransformer.addDescriptor(descriptor);
 
