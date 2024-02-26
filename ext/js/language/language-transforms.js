@@ -27,7 +27,7 @@ export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsI
     const suffixRegExp = new RegExp(inflectedSuffix + '$');
     return {
         isInflected: suffixRegExp,
-        uninflect: (term) => term.replace(suffixRegExp, deinflectedSuffix),
+        uninflect: (text) => text.substring(0, text.length - inflectedSuffix.length) + deinflectedSuffix,
         conditionsIn,
         conditionsOut
     };
