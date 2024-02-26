@@ -119,7 +119,7 @@ export class LanguageTransformer {
         for (let i = 0; i < results.length; ++i) {
             const {text, conditions, trace} = results[i];
             for (const transform of this._transforms) {
-                if (!transform.heuristic.test(text)) { continue; }
+                // If (!transform.heuristic.test(text)) { continue; }
 
                 const {name, rules} = transform;
                 for (let j = 0, jj = rules.length; j < jj; ++j) {
