@@ -27,7 +27,29 @@ export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsI
     const suffixRegExp = new RegExp(inflectedSuffix + '$');
     return {
         isInflected: suffixRegExp,
-        uninflect: (text) => text.substring(0, text.length - inflectedSuffix.length) + deinflectedSuffix,
+        uninflect: (text) => text.replace(suffixRegExp, deinflectedSuffix),
+        conditionsIn,
+        conditionsOut
+    };
+}
+
+/**
+ * @param {Map<string, string>} suffixMap
+ * @param {string[]} conditionsIn
+ * @param {string[]} conditionsOut
+ * @returns {import('language-transformer').Rule}
+ */
+export function suffixInflectionMap(suffixMap, conditionsIn, conditionsOut) {
+    const inflectedSuffixes = Object.keys(suffixMap);
+    const isInflected = new RegExp(`(${inflectedSuffixes.join('|')})$`);
+    return {
+        isInflected,
+        uninflect: (text) => {
+            const match = /** @type {RegExpMatchArray} */ (text.match(isInflected));
+            const inflectedSuffix = match[0];
+            const deinflectedSuffix = /** @type {string} */ (suffixMap.get(inflectedSuffix));
+            return text.replace(inflectedSuffix, deinflectedSuffix);
+        },
         conditionsIn,
         conditionsOut
     };
