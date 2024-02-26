@@ -15,6 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {suffixInflection} from '../language-transforms.js';
+
+/** @type {import('language-transformer').LanguageTransformDescriptor} */
 export const englishTransforms = {
     language: 'en',
     conditions: {
@@ -24,7 +27,6 @@ export const englishTransforms = {
         },
         n: {
             name: 'Noun',
-            aliases: ['noun'],
             isDictionaryForm: true,
             subConditions: ['np', 'ns']
         },
@@ -46,11 +48,11 @@ export const englishTransforms = {
             name: 'plural',
             description: 'Plural form of a noun',
             rules: [
-                {suffixIn: 's', suffixOut: '', conditionsIn: ['np'], conditionsOut: ['ns']},
-                {suffixIn: 'es', suffixOut: '', conditionsIn: ['np'], conditionsOut: ['ns']},
-                {suffixIn: 'ies', suffixOut: 'y', conditionsIn: ['np'], conditionsOut: ['ns']},
-                {suffixIn: 'ves', suffixOut: 'fe', conditionsIn: ['np'], conditionsOut: ['ns']},
-                {suffixIn: 'ves', suffixOut: 'f', conditionsIn: ['np'], conditionsOut: ['ns']}
+                suffixInflection('s', '', ['np'], ['ns']),
+                suffixInflection('es', '', ['np'], ['ns']),
+                suffixInflection('ies', 'y', ['np'], ['ns']),
+                suffixInflection('ves', 'fe', ['np'], ['ns']),
+                suffixInflection('ves', 'f', ['np'], ['ns'])
             ]
         }
     ]

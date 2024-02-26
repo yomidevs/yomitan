@@ -18,12 +18,12 @@
 export type Transform = {
     name: string;
     rules: Rule[];
-    suffixHeuristic: RegExp;
+    heuristic: RegExp;
 };
 
 export type Rule = {
-    suffixIn: string;
-    suffixOut: string;
+    isInflected: RegExp;
+    uninflect: (inflectedWord: string) => string;
     conditionsIn: number;
     conditionsOut: number;
 };

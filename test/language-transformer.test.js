@@ -17,7 +17,7 @@
  */
 
 import {describe, expect, test} from 'vitest';
-import {japaneseTransforms} from '../ext/js/language/ja/language-transforms.js';
+import {japaneseTransforms} from '../ext/js/language/ja/japanese-transforms.js';
 import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
 
 /**
