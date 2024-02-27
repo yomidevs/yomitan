@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core/utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
 
 /** @type {RegExp} @readonly */
 const markerPattern = /\{([\w-]+)\}/g;
@@ -74,7 +74,7 @@ export function cloneFieldMarkerPattern(global) {
  * @returns {boolean} `true` if the note is valid, `false` otherwise.
  */
 export function isNoteDataValid(note) {
-    if (!isObject(note)) { return false; }
+    if (!isObjectNotArray(note)) { return false; }
     const {fields, deckName, modelName} = note;
     return (
         typeof deckName === 'string' &&
