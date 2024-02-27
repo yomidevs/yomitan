@@ -56,6 +56,7 @@ export type TransformI18n = {
 
 export type Rule = {
     isInflected: RegExp;
+    deinflected?: string;
     uninflect: (inflectedWord: string) => string;
     conditionsIn: string[];
     conditionsOut: string[];

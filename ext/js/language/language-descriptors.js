@@ -23,6 +23,7 @@ import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
 import {removeLatinDiacritics} from './la/latin-text-preprocessors.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
+import {albanianTransforms} from './sq/albanian-transforms.js';
 import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
 
 const capitalizationPreprocessors = {
@@ -111,6 +112,7 @@ const languageDescriptors = [
         name: 'Latin',
         exampleText: 'legere',
         textPreprocessors: {
+            ...capitalizationPreprocessors,
             removeLatinDiacritics
         }
     },
@@ -172,7 +174,8 @@ const languageDescriptors = [
         iso: 'sq',
         name: 'Albanian',
         exampleText: 'ndihmojme',
-        textPreprocessors: capitalizationPreprocessors
+        textPreprocessors: capitalizationPreprocessors,
+        languageTransforms: albanianTransforms
     },
     {
         iso: 'sv',

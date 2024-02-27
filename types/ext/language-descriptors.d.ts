@@ -73,7 +73,7 @@ type AllTextPreprocessors = {
     hu: CapitalizationPreprocessors;
     id: CapitalizationPreprocessors;
     it: CapitalizationPreprocessors;
-    la: {
+    la: CapitalizationPreprocessors & {
         removeLatinDiacritics: TextPreprocessor<boolean>;
     };
     ja: {

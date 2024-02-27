@@ -653,6 +653,7 @@
                 "ext/js/language/languages.js",
                 "ext/js/language/multi-language-transformer.js",
                 "ext/js/language/ru/russian-text-preprocessors.js",
+                "ext/js/language/sq/albanian-transforms.js",
                 "ext/js/language/text-preprocessors.js",
                 "ext/js/language/translator.js",
                 "ext/js/media/audio-downloader.js",

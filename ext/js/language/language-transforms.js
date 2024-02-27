@@ -27,6 +27,7 @@ export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsI
     const suffixRegExp = new RegExp(inflectedSuffix + '$');
     return {
         isInflected: suffixRegExp,
+        deinflected: deinflectedSuffix,
         uninflect: (text) => text.replace(suffixRegExp, deinflectedSuffix),
         conditionsIn,
         conditionsOut
@@ -34,22 +35,17 @@ export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsI
 }
 
 /**
- * @param {Map<string, string>} suffixMap
+ * @param {string} inflectedPrefix
+ * @param {string} deinflectedPrefix
  * @param {string[]} conditionsIn
  * @param {string[]} conditionsOut
  * @returns {import('language-transformer').Rule}
  */
-export function suffixInflectionMap(suffixMap, conditionsIn, conditionsOut) {
-    const inflectedSuffixes = Object.keys(suffixMap);
-    const isInflected = new RegExp(`(${inflectedSuffixes.join('|')})$`);
+export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsIn, conditionsOut) {
+    const prefixRegExp = new RegExp('^' + inflectedPrefix);
     return {
-        isInflected,
-        uninflect: (text) => {
-            const match = /** @type {RegExpMatchArray} */ (text.match(isInflected));
-            const inflectedSuffix = match[0];
-            const deinflectedSuffix = /** @type {string} */ (suffixMap.get(inflectedSuffix));
-            return text.replace(inflectedSuffix, deinflectedSuffix);
-        },
+        isInflected: prefixRegExp,
+        uninflect: (text) => text.replace(prefixRegExp, deinflectedPrefix),
         conditionsIn,
         conditionsOut
     };
