@@ -77,11 +77,11 @@ export class LanguageTransformer {
             this._transforms.push(transform);
         }
 
-        for (const [type, condition] of conditionEntries) {
+        for (const [type, {isDictionaryForm}] of conditionEntries) {
             const flags = conditionFlagsMap.get(type);
             if (typeof flags === 'undefined') { continue; } // This case should never happen
             this._conditionTypeToConditionFlagsMap.set(type, flags);
-            if (condition.isDictionaryForm) {
+            if (isDictionaryForm) {
                 this._partOfSpeechToConditionFlagsMap.set(type, flags);
             }
         }
@@ -116,7 +116,7 @@ export class LanguageTransformer {
      * @returns {import('language-transformer-internal').TransformedText[]}
      */
     transform(sourceText) {
-        const results = [this._createTransformedText(sourceText, 0, [])];
+        const results = [LanguageTransformer.createTransformedText(sourceText, 0, [])];
         for (let i = 0; i < results.length; ++i) {
             const {text, conditions, trace} = results[i];
             for (const transform of this._transforms) {
@@ -128,7 +128,7 @@ export class LanguageTransformer {
                     if (!LanguageTransformer.conditionsMatch(conditions, rule.conditionsIn)) { continue; }
                     const {suffixIn, suffixOut} = rule;
                     if (!text.endsWith(suffixIn) || (text.length - suffixIn.length + suffixOut.length) <= 0) { continue; }
-                    results.push(this._createTransformedText(
+                    results.push(LanguageTransformer.createTransformedText(
                         text.substring(0, text.length - suffixIn.length) + suffixOut,
                         rule.conditionsOut,
                         this._extendTrace(trace, {transform: name, ruleIndex: j})
@@ -137,6 +137,27 @@ export class LanguageTransformer {
             }
         }
         return results;
+    }
+
+    /**
+     * @param {string} text
+     * @param {number} conditions
+     * @param {import('language-transformer-internal').Trace} trace
+     * @returns {import('language-transformer-internal').TransformedText}
+     */
+    static createTransformedText(text, conditions, trace) {
+        return {text, conditions, trace};
+    }
+
+    /**
+     * If `currentConditions` is `0`, then `nextConditions` is ignored and `true` is returned.
+     * Otherwise, there must be at least one shared condition between `currentConditions` and `nextConditions`.
+     * @param {number} currentConditions
+     * @param {number} nextConditions
+     * @returns {boolean}
+     */
+    static conditionsMatch(currentConditions, nextConditions) {
+        return currentConditions === 0 || (currentConditions & nextConditions) !== 0;
     }
 
     /**
@@ -218,16 +239,6 @@ export class LanguageTransformer {
     }
 
     /**
-     * @param {string} text
-     * @param {number} conditions
-     * @param {import('language-transformer-internal').Trace} trace
-     * @returns {import('language-transformer-internal').TransformedText}
-     */
-    _createTransformedText(text, conditions, trace) {
-        return {text, conditions, trace};
-    }
-
-    /**
      * @param {import('language-transformer-internal').Trace} trace
      * @param {import('language-transformer-internal').TraceFrame} newFrame
      * @returns {import('language-transformer-internal').Trace}
@@ -238,16 +249,5 @@ export class LanguageTransformer {
             newTrace.push({transform, ruleIndex});
         }
         return newTrace;
-    }
-
-    /**
-     * If `currentConditions` is `0`, then `nextConditions` is ignored and `true` is returned.
-     * Otherwise, there must be at least one shared condition between `currentConditions` and `nextConditions`.
-     * @param {number} currentConditions
-     * @param {number} nextConditions
-     * @returns {boolean}
-     */
-    static conditionsMatch(currentConditions, nextConditions) {
-        return currentConditions === 0 || (currentConditions & nextConditions) !== 0;
     }
 }

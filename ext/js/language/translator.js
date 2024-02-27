@@ -21,6 +21,7 @@ import {TextSourceMap} from '../general/text-source-map.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
 import {getAllLanguageTextPreprocessors} from './languages.js';
+import {MultiLanguageTransformer} from './multi-language-transformer.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
@@ -32,8 +33,8 @@ export class Translator {
     constructor(database) {
         /** @type {import('../dictionary/dictionary-database.js').DictionaryDatabase} */
         this._database = database;
-        /** @type {LanguageTransformer} */
-        this._languageTransformer = new LanguageTransformer();
+        /** @type {MultiLanguageTransformer} */
+        this._multiLanguageTransformer = new MultiLanguageTransformer();
         /** @type {import('translator').DictionaryTagCache} */
         this._tagCache = new Map();
         /** @type {Intl.Collator} */
@@ -46,10 +47,10 @@ export class Translator {
 
     /**
      * Initializes the instance for use. The public API should not be used until this function has been called.
-     * @param {import('language-transformer').LanguageTransformDescriptor} descriptor
+     * @param {import('language-transformer').LanguageTransformDescriptor[]} languageTransformDescriptors
      */
-    prepare(descriptor) {
-        this._languageTransformer.addDescriptor(descriptor);
+    prepare(languageTransformDescriptors) {
+        this._multiLanguageTransformer.prepare(languageTransformDescriptors);
         for (const {iso, textPreprocessors} of getAllLanguageTextPreprocessors()) {
             /** @type {Map<string, import('language').TextPreprocessorOptions<unknown>>} */
             const optionSpace = new Map();
@@ -316,11 +317,11 @@ export class Translator {
         );
         if (deinflections.length === 0) { return []; }
 
-        const {matchType} = options;
+        const {matchType, language} = options;
 
-        await this._addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType);
+        await this._addEntriesToDeinflections(language, deinflections, enabledDictionaryMap, matchType);
 
-        const dictionaryDeinflections = await this._getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType);
+        const dictionaryDeinflections = await this._getDictionaryDeinflections(language, deinflections, enabledDictionaryMap, matchType);
         deinflections.push(...dictionaryDeinflections);
 
         for (const deinflection of deinflections) {
@@ -335,12 +336,13 @@ export class Translator {
     }
 
     /**
+     * @param {string} language
      * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
      * @param {import('dictionary').TermSourceMatchType} matchType
      * @returns {Promise<import('translation-internal').DatabaseDeinflection[]>}
      */
-    async _getDictionaryDeinflections(deinflections, enabledDictionaryMap, matchType) {
+    async _getDictionaryDeinflections(language, deinflections, enabledDictionaryMap, matchType) {
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const dictionaryDeinflections = [];
         for (const deinflection of deinflections) {
@@ -369,23 +371,24 @@ export class Translator {
             }
         }
 
-        await this._addEntriesToDeinflections(dictionaryDeinflections, enabledDictionaryMap, matchType);
+        await this._addEntriesToDeinflections(language, dictionaryDeinflections, enabledDictionaryMap, matchType);
 
         return dictionaryDeinflections;
     }
 
     /**
+     * @param {string} language
      * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
      * @param {import('dictionary').TermSourceMatchType} matchType
      */
-    async _addEntriesToDeinflections(deinflections, enabledDictionaryMap, matchType) {
+    async _addEntriesToDeinflections(language, deinflections, enabledDictionaryMap, matchType) {
         const uniqueDeinflectionsMap = this._groupDeinflectionsByTerm(deinflections);
         const uniqueDeinflectionArrays = [...uniqueDeinflectionsMap.values()];
         const uniqueDeinflectionTerms = [...uniqueDeinflectionsMap.keys()];
 
         const databaseEntries = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, matchType);
-        this._matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, enabledDictionaryMap);
+        this._matchEntriesToDeinflections(language, databaseEntries, uniqueDeinflectionArrays, enabledDictionaryMap);
     }
 
     /**
@@ -407,16 +410,17 @@ export class Translator {
     }
 
     /**
+     * @param {string} language
      * @param {import('dictionary-database').TermEntry[]} databaseEntries
      * @param {import('translation-internal').DatabaseDeinflection[][]} uniqueDeinflectionArrays
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
      */
-    _matchEntriesToDeinflections(databaseEntries, uniqueDeinflectionArrays, enabledDictionaryMap) {
+    _matchEntriesToDeinflections(language, databaseEntries, uniqueDeinflectionArrays, enabledDictionaryMap) {
         for (const databaseEntry of databaseEntries) {
             const entryDictionary = /** @type {import('translation').FindTermDictionary} */ (enabledDictionaryMap.get(databaseEntry.dictionary));
             const {partsOfSpeechFilter} = entryDictionary;
 
-            const definitionConditions = this._languageTransformer.getConditionFlagsFromPartsOfSpeech(databaseEntry.rules);
+            const definitionConditions = this._multiLanguageTransformer.getConditionFlagsFromPartsOfSpeech(language, databaseEntry.rules);
             for (const deinflection of uniqueDeinflectionArrays[databaseEntry.index]) {
                 if (!partsOfSpeechFilter || LanguageTransformer.conditionsMatch(deinflection.conditions, definitionConditions)) {
                     deinflection.databaseEntries.push(databaseEntry);
@@ -475,7 +479,7 @@ export class Translator {
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                for (const {text: transformedText, conditions, trace} of this._languageTransformer.transform(source)) {
+                for (const {text: transformedText, conditions, trace} of this._multiLanguageTransformer.transform(language, source)) {
                     /** @type {import('dictionary').InflectionRuleChainCandidate} */
                     const inflectionRuleChainCandidate = {
                         source: 'algorithm',

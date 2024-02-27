@@ -57,7 +57,8 @@ const languageDescriptors = [
         iso: 'en',
         name: 'English',
         exampleText: 'read',
-        textPreprocessors: capitalizationPreprocessors
+        textPreprocessors: capitalizationPreprocessors,
+        languageTransformsFile: '/js/language/en/english-transforms.json'
     },
     {
         iso: 'es',
@@ -122,7 +123,8 @@ const languageDescriptors = [
             convertAlphabeticCharacters,
             convertHiraganaToKatakana,
             collapseEmphaticSequences
-        }
+        },
+        languageTransformsFile: '/js/language/ja/japanese-transforms.json'
     },
     {
         iso: 'km',

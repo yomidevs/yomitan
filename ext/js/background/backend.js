@@ -274,9 +274,16 @@ export class Backend {
                 log.error(e);
             }
 
-            /** @type {import('language-transformer').LanguageTransformDescriptor} */
-            const descriptor = await fetchJson('/data/language/japanese-transforms.json');
-            void this._translator.prepare(descriptor);
+            /** @type {import('language-transformer').LanguageTransformDescriptor[]} */
+            const descriptors = [];
+            const languageSummaries = getLanguageSummaries();
+            for (const {languageTransformsFile} of languageSummaries) {
+                if (!languageTransformsFile) { continue; }
+                /** @type {import('language-transformer').LanguageTransformDescriptor} */
+                const descriptor = await fetchJson(languageTransformsFile);
+                descriptors.push(descriptor);
+            }
+            void this._translator.prepare(descriptors);
 
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
