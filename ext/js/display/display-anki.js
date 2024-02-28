@@ -371,6 +371,36 @@ export class DisplayAnki {
     }
 
     /**
+     * @param {HTMLButtonElement} button
+     */
+    _showDuplicateAddButton(button) {
+        const isKanjiAdd = button.dataset.mode === 'term-kanji';
+
+        const title = button.getAttribute('title');
+        if (title) {
+            button.setAttribute('title', title.replace(/Add (?!duplicate)/, 'Add duplicate '));
+        }
+
+        // eslint-disable-next-line no-underscore-dangle
+        const hotkeyLabel = this._display._hotkeyHelpController.getHotkeyLabel(button);
+
+        if (hotkeyLabel) {
+            if (hotkeyLabel === 'Add expression ({0})') {
+                // eslint-disable-next-line no-underscore-dangle
+                this._display._hotkeyHelpController.setHotkeyLabel(button, 'Add duplicate expression ({0})');
+            } else if (hotkeyLabel === 'Add reading ({0})') {
+                // eslint-disable-next-line no-underscore-dangle
+                this._display._hotkeyHelpController.setHotkeyLabel(button, 'Add duplicate reading ({0})');
+            }
+        }
+
+        const actionIcon = button.querySelector('.action-icon');
+        if (actionIcon instanceof HTMLElement) {
+            actionIcon.dataset.icon = isKanjiAdd ? 'add-duplicate-term-kanji' : 'add-duplicate-term-kana';
+        }
+    }
+
+    /**
      * @param {import('display-anki').DictionaryEntryDetails[]} dictionaryEntryDetails
      */
     _updateAdderButtons(dictionaryEntryDetails) {
@@ -383,6 +413,11 @@ export class DisplayAnki {
                 if (button !== null) {
                     button.disabled = !canAdd;
                     button.hidden = (ankiError !== null);
+
+                    // If entry has noteIds, show the "add duplicate" button.
+                    if (Array.isArray(noteIds) && noteIds.length > 0) {
+                        this._showDuplicateAddButton(button);
+                    }
                 }
 
                 if (Array.isArray(noteIds) && noteIds.length > 0) {
@@ -507,6 +542,9 @@ export class DisplayAnki {
                             allErrors.push(toError(e));
                         }
                     }
+                    // Now that this dictionary entry has a duplicate in Anki, show the "add duplicate" buttons.
+                    this._showDuplicateAddButton(button);
+
                     this._updateViewNoteButton(dictionaryEntryIndex, [noteId], true);
                 }
             }
