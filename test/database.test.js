@@ -21,8 +21,8 @@ import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {join, dirname as pathDirname} from 'path';
 import {beforeEach, describe, test, vi} from 'vitest';
+import {createDictionaryArchiveData, getDictionaryArchiveIndex} from '../dev/dictionary-archive-util.js';
 import {parseJson} from '../dev/json.js';
-import {createDictionaryArchive} from '../dev/util.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
@@ -34,11 +34,11 @@ vi.stubGlobal('IDBKeyRange', IDBKeyRange);
 /**
  * @param {string} dictionary
  * @param {string} [dictionaryName]
- * @returns {import('jszip')}
+ * @returns {Promise<ArrayBuffer>}
  */
-function createTestDictionaryArchive(dictionary, dictionaryName) {
+async function createTestDictionaryArchiveData(dictionary, dictionaryName) {
     const dictionaryDirectory = join(dirname, 'data', 'dictionaries', dictionary);
-    return createDictionaryArchive(dictionaryDirectory, dictionaryName);
+    return await createDictionaryArchiveData(dictionaryDirectory, dictionaryName);
 }
 
 /**
@@ -110,10 +110,8 @@ describe('Database', () => {
     });
     test('Database invalid usage', async ({expect}) => {
         // Load dictionary data
-        const testDictionary = createTestDictionaryArchive('valid-dictionary1');
-        const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
-        /** @type {import('dictionary-data').Index} */
-        const testDictionaryIndex = parseJson(await testDictionary.files['index.json'].async('string'));
+        const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+        const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
 
         const title = testDictionaryIndex.title;
         const titles = new Map([
@@ -165,8 +163,7 @@ describe('Database', () => {
                 const dictionaryDatabase = new DictionaryDatabase();
                 await dictionaryDatabase.prepare();
 
-                const testDictionary = createTestDictionaryArchive(name);
-                const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
+                const testDictionarySource = await createTestDictionaryArchiveData(name);
 
                 /** @type {import('dictionary-importer').ImportDetails} */
                 const detaultImportDetails = {prefixWildcardsSupported: false};
@@ -183,10 +180,8 @@ describe('Database', () => {
             const fakeImportDate = testData.expectedSummary.importDate;
 
             // Load dictionary data
-            const testDictionary = createTestDictionaryArchive('valid-dictionary1');
-            const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
-            /** @type {import('dictionary-data').Index} */
-            const testDictionaryIndex = parseJson(await testDictionary.files['index.json'].async('string'));
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
 
             const title = testDictionaryIndex.title;
             const titles = new Map([
@@ -315,10 +310,8 @@ describe('Database', () => {
         describe.each(cleanupTestCases)('Testing cleanup method $clearMethod', ({clearMethod}) => {
             test('Import data and test', async ({expect}) => {
                 // Load dictionary data
-                const testDictionary = createTestDictionaryArchive('valid-dictionary1');
-                const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
-                /** @type {import('dictionary-data').Index} */
-                const testDictionaryIndex = parseJson(await testDictionary.files['index.json'].async('string'));
+                const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+                const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
 
                 // Setup database
                 const dictionaryDatabase = new DictionaryDatabase();

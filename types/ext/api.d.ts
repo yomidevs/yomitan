@@ -344,9 +344,10 @@ type ApiSurface = {
         params: void;
         return: true;
     };
-    textHasJapaneseCharacters: {
+    isTextLookupWorthy: {
         params: {
             text: string;
+            language: string;
         };
         return: boolean;
     };

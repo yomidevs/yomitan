@@ -57,7 +57,7 @@ export type HelperOptionsFunction<TResult = unknown> = (context: unknown) => TRe
 export type HelperOptions = {
     fn?: HelperOptionsFunction;
     inverse?: HelperOptionsFunction;
-    hash: Core.SafeAny;
+    hash: Core.SerializableObject;
     data?: Core.SafeAny;
 };
 

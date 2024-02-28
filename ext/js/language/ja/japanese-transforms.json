@@ -3,107 +3,107 @@
     "conditions": {
         "v": {
             "name": "Verb",
-            "partsOfSpeech": ["v1", "v5", "vk", "vs", "vz"],
             "i18n": [
                 {
                     "language": "ja",
                     "name": "動詞"
                 }
             ],
+            "isDictionaryForm": false,
             "subConditions": ["v1", "v5", "vk", "vs", "vz"]
         },
         "v1": {
             "name": "Ichidan verb",
-            "partsOfSpeech": ["v1"],
             "i18n": [
                 {
                     "language": "ja",
                     "name": "一段動詞"
                 }
             ],
+            "isDictionaryForm": true,
             "subConditions": ["v1d", "v1p"]
         },
         "v1d": {
             "name": "Ichidan verb, dictionary form",
-            "partsOfSpeech": ["v1"],
             "i18n": [
                 {
                     "language": "ja",
                     "name": "一段動詞、辞書形"
                 }
-            ]
+            ],
+            "isDictionaryForm": false
         },
         "v1p": {
             "name": "Ichidan verb, progressive or perfect form",
-            "partsOfSpeech": ["v1"],
             "i18n": [
                 {
                     "language": "ja",
                     "name": "一段動詞、進行形または完了形"
                 }
-            ]
+            ],
+            "isDictionaryForm": false
         },
         "v5": {
             "name": "Godan verb",
-            "partsOfSpeech": ["v5"],
             "i18n": [
                 {
                     "language": "ja",
                     "name": "五段動詞"
                 }
-            ]
+            ],
+            "isDictionaryForm": true
         },
         "vk": {
             "name": "Kuru verb",
-            "partsOfSpeech": ["vk"],
             "i18n": [
                 {
                     "language": "ja",
                     "name": "来る動詞"
                 }
-            ]
+            ],
+            "isDictionaryForm": true
         },
         "vs": {
             "name": "Suru verb",
-            "partsOfSpeech": ["vs"],
             "i18n": [
                 {
                     "language": "ja",
                     "name": "する動詞"
                 }
-            ]
+            ],
+            "isDictionaryForm": true
         },
         "vz": {
             "name": "Zuru verb",
-            "partsOfSpeech": ["vz"],
             "i18n": [
                 {
                     "language": "ja",
                     "name": "ずる動詞"
                 }
-            ]
+            ],
+            "isDictionaryForm": true
         },
         "adj-i": {
             "name": "Adjective with i ending",
-            "partsOfSpeech": ["adj-i"],
             "i18n": [
                 {
                     "language": "ja",
                     "name": "形容詞"
                 }
-            ]
+            ],
+            "isDictionaryForm": true
         },
         "-te": {
             "name": "Intermediate -te endings for progressive or perfect tense",
-            "partsOfSpeech": []
+            "isDictionaryForm": false
         },
         "adv": {
             "name": "Intermediate -ku endings for adverbs",
-            "partsOfSpeech": []
+            "isDictionaryForm": false
         },
         "past": {
             "name": "-ta past form ending",
-            "partsOfSpeech": []
+            "isDictionaryForm": false
         }
     },
     "transforms": [

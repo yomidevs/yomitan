@@ -15,14 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {TextPreprocessor} from './language';
+import type {TextPreprocessor, BidirectionalConversionPreprocessor} from './language';
 import type {SafeAny} from './core';
+
+export type IsTextLookupWorthyFunction = (text: string) => boolean;
 
 type LanguageDescriptor<TIso extends string, TTextPreprocessorDescriptor extends TextPreprocessorDescriptor> = {
     iso: TIso;
     name: string;
     exampleText: string;
+    /**
+     * An optional function which returns whether or not a given string may be translatable.
+     * This is used as a filter for several situations, such as whether the clipboard monitor
+     * window should activate when text is copied to the clipboard.
+     * If no value is provided, `true` is assumed for all inputs.
+     */
+    isTextLookupWorthy?: IsTextLookupWorthyFunction;
     textPreprocessors: TTextPreprocessorDescriptor;
+    languageTransformsFile?: string;
 };
 
 type TextPreprocessorDescriptor = {
@@ -35,21 +45,55 @@ type LanguageDescriptorObjectMap = {
 
 export type LanguageDescriptorAny = LanguageDescriptorObjectMap[keyof LanguageDescriptorObjectMap];
 
+type CapitalizationPreprocessors = {
+    capitalizeFirstLetter: TextPreprocessor<boolean>;
+    decapitalize: TextPreprocessor<boolean>;
+};
+
 /**
  * This is a mapping of the iso tag to all of the preprocessors for that language.
  * Any new language should be added to this object.
  */
 type AllTextPreprocessors = {
-    en: {
-        capitalizeFirstLetter: TextPreprocessor<boolean>;
-        decapitalize: TextPreprocessor<boolean>;
+    ar: {
+        removeArabicScriptDiacritics: TextPreprocessor<boolean>;
+    };
+    de: CapitalizationPreprocessors & {
+        eszettPreprocessor: BidirectionalConversionPreprocessor;
+    };
+    el: CapitalizationPreprocessors;
+    en: CapitalizationPreprocessors;
+    es: CapitalizationPreprocessors;
+    fa: {
+        removeArabicScriptDiacritics: TextPreprocessor<boolean>;
+    };
+    fr: CapitalizationPreprocessors;
+    grc: CapitalizationPreprocessors;
+    hu: CapitalizationPreprocessors;
+    id: CapitalizationPreprocessors;
+    it: CapitalizationPreprocessors;
+    la: {
+        removeLatinDiacritics: TextPreprocessor<boolean>;
     };
     ja: {
         convertHalfWidthCharacters: TextPreprocessor<boolean>;
         convertNumericCharacters: TextPreprocessor<boolean>;
         convertAlphabeticCharacters: TextPreprocessor<boolean>;
-        convertHiraganaToKatakana: TextPreprocessor<boolean>;
-        convertKatakanaToHiragana: TextPreprocessor<boolean>;
+        convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
         collapseEmphaticSequences: TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
     };
+    km: Record<string, never>;
+    pl: CapitalizationPreprocessors;
+    pt: CapitalizationPreprocessors;
+    ro: CapitalizationPreprocessors;
+    ru: CapitalizationPreprocessors & {
+        yoToE: TextPreprocessor<boolean>;
+        removeRussianDiacritics: TextPreprocessor<boolean>;
+    };
+    sh: CapitalizationPreprocessors;
+    sq: CapitalizationPreprocessors;
+    sv: CapitalizationPreprocessors;
+    th: Record<string, never>;
+    vi: CapitalizationPreprocessors;
+    zh: Record<string, never>;
 };

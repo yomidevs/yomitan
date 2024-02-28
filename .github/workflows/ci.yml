@@ -10,9 +10,72 @@ on:
   merge_group:
 
 jobs:
-  test:
+  static-analysis:
+    name: Static Analysis
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build third-party libraries
+        run: npm run build:libs
+
+      - name: Run static analysis tests
+        run: npm run test:static-analysis
+
+  static-analysis-json:
+    name: Static Analysis (JSON)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build third-party libraries
+        run: npm run build:libs
+
+      - name: Run static analysis tests
+        run: npm run test:json
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build third-party libraries
+        run: npm run build:libs
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+  test-build:
+    name: Test Build
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,40 +89,10 @@ jobs:
         run: npm ci
 
       - name: Build Libs
-        run: npm run build-libs
-
-      - name: Lint JS
-        run: npm run test-lint-js
-        env:
-          CI: true
-
-      - name: Validate JS Types
-        run: npm run test-ts
-        env:
-          CI: true
-
-      - name: Lint CSS
-        run: npm run test-lint-css
-        env:
-          CI: true
-
-      - name: Lint HTML
-        run: npm run test-lint-html
-        env:
-          CI: true
-
-      - name: Tests
-        run: npm run test-code
-        env:
-          CI: true
-
-      - name: Test JSON
-        run: npm run test-json
-        env:
-          CI: true
+        run: npm run build:libs
 
       - name: Build Legal
-        run: npm run license-report
+        run: npm run license-report:html
 
       - name: Build
         run: npm run build

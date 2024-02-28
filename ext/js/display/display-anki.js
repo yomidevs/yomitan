@@ -376,6 +376,7 @@ export class DisplayAnki {
     _updateAdderButtons(dictionaryEntryDetails) {
         const displayTags = this._displayTags;
         for (let i = 0, ii = dictionaryEntryDetails.length; i < ii; ++i) {
+            /** @type {?Set<number>} */
             let allNoteIds = null;
             for (const {mode, canAdd, noteIds, noteInfos, ankiError} of dictionaryEntryDetails[i].modeMap.values()) {
                 const button = this._adderButtonFind(i, mode);

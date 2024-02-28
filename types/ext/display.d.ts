@@ -129,6 +129,7 @@ export type QueryParserOptions = {
     readingMode: Settings.ParsingReadingMode;
     useInternalParser: boolean;
     useMecabParser: boolean;
+    language: string;
     scanning: TextScannerTypes.Options;
 };
 

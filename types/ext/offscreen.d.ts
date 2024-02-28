@@ -52,7 +52,7 @@ type ApiSurface = {
     };
     translatorPrepareOffscreen: {
         params: {
-            descriptor: LanguageTransformDescriptor;
+            descriptors: LanguageTransformDescriptor[];
         };
         return: void;
     };

@@ -206,12 +206,15 @@ describe('Document utility tests', () => {
 
                     // Sentence info
                     const terminatorString = '…。．.？?！!';
+                    /** @type {import('text-scanner').SentenceTerminatorMap} */
                     const terminatorMap = new Map();
                     for (const char of terminatorString) {
                         terminatorMap.set(char, [false, true]);
                     }
                     const quoteArray = [['「', '」'], ['『', '』'], ['\'', '\''], ['"', '"']];
+                    /** @type {import('text-scanner').SentenceForwardQuoteMap} */
                     const forwardQuoteMap = new Map();
+                    /** @type {import('text-scanner').SentenceBackwardQuoteMap} */
                     const backwardQuoteMap = new Map();
                     for (const [char1, char2] of quoteArray) {
                         forwardQuoteMap.set(char1, [char2, false]);

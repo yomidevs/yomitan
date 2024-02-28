@@ -15,32 +15,186 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertKatakanaToHiragana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
+import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
+import {eszettPreprocessor} from './de/german-text-preprocessors.js';
+import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
+import {isStringPartiallyJapanese} from './ja/japanese.js';
+import {removeLatinDiacritics} from './la/latin-text-preprocessors.js';
+import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
+
+const capitalizationPreprocessors = {
+    decapitalize,
+    capitalizeFirstLetter
+};
 
 /** @type {import('language-descriptors').LanguageDescriptorAny[]} */
 const languageDescriptors = [
     {
+        iso: 'ar',
+        name: 'Arabic',
+        exampleText: 'قَرَأَ',
+        textPreprocessors: {
+            removeArabicScriptDiacritics
+        }
+    },
+    {
+        iso: 'de',
+        name: 'German',
+        exampleText: 'gelesen',
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            eszettPreprocessor
+        }
+    },
+    {
+        iso: 'el',
+        name: 'Greek',
+        exampleText: 'διαβάζω',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
         iso: 'en',
         name: 'English',
         exampleText: 'read',
+        textPreprocessors: capitalizationPreprocessors,
+        languageTransformsFile: '/js/language/en/english-transforms.json'
+    },
+    {
+        iso: 'es',
+        name: 'Spanish',
+        exampleText: 'acabar de',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'fa',
+        name: 'Persian',
+        exampleText: 'خواندن',
         textPreprocessors: {
-            capitalizeFirstLetter,
-            decapitalize
+            removeArabicScriptDiacritics
+        }
+    },
+    {
+        iso: 'fr',
+        name: 'French',
+        exampleText: 'lire',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'grc',
+        name: 'Ancient Greek',
+        exampleText: 'γράφω',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'hu',
+        name: 'Hungarian',
+        exampleText: 'olvasni',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'id',
+        name: 'Indonesian',
+        exampleText: 'membaca',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'it',
+        name: 'Italian',
+        exampleText: 'leggere',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'la',
+        name: 'Latin',
+        exampleText: 'legere',
+        textPreprocessors: {
+            removeLatinDiacritics
         }
     },
     {
         iso: 'ja',
         name: 'Japanese',
         exampleText: '読め',
+        isTextLookupWorthy: isStringPartiallyJapanese,
         textPreprocessors: {
             convertHalfWidthCharacters,
             convertNumericCharacters,
             convertAlphabeticCharacters,
             convertHiraganaToKatakana,
-            convertKatakanaToHiragana,
             collapseEmphaticSequences
+        },
+        languageTransformsFile: '/js/language/ja/japanese-transforms.json'
+    },
+    {
+        iso: 'km',
+        name: 'Khmer',
+        exampleText: 'អាន',
+        textPreprocessors: {}
+    },
+    {
+        iso: 'pl',
+        name: 'Polish',
+        exampleText: 'czytacie',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'pt',
+        name: 'Portuguese',
+        exampleText: 'ler',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'ro',
+        name: 'Romanian',
+        exampleText: 'citit',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'ru',
+        name: 'Russian',
+        exampleText: 'читать',
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            yoToE,
+            removeRussianDiacritics
         }
+    },
+    {
+        iso: 'sh',
+        name: 'Serbo-Croatian',
+        exampleText: 'čitaše',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'sq',
+        name: 'Albanian',
+        exampleText: 'ndihmojme',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'sv',
+        name: 'Swedish',
+        exampleText: 'läsa',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'th',
+        name: 'Thai',
+        exampleText: 'อ่าน',
+        textPreprocessors: {}
+    },
+    {
+        iso: 'vi',
+        name: 'Vietnamese',
+        exampleText: 'đọc',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'zh',
+        name: 'Chinese',
+        exampleText: '读',
+        textPreprocessors: {}
     }
 ];
 
