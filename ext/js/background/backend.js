@@ -1550,6 +1550,7 @@ export class Backend {
     }
 
     /**
+     * Returns a base title string with any status removed.
      * @returns {Promise<string>}
      */
     _getBrowserIconTitle() {
