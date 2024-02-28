@@ -1582,6 +1582,7 @@ export class Backend {
         let text = '';
         let color = null;
         let status = null;
+        let changedStatus = false;
 
         if (this._logErrorLevel !== null) {
             switch (this._logErrorLevel) {
@@ -1589,11 +1590,13 @@ export class Backend {
                     text = '!!';
                     color = '#f04e4e';
                     status = 'Error';
+                    changedStatus = true;
                     break;
                 default: // 'warn'
                     text = '!';
                     color = '#f0ad4e';
                     status = 'Warning';
+                    changedStatus = true;
                     break;
             }
         } else if (!this._isPrepared) {
@@ -1601,10 +1604,12 @@ export class Backend {
                 text = '!!';
                 color = '#f04e4e';
                 status = 'Error';
+                changedStatus = true;
             } else if (this._badgePrepareDelayTimer === null) {
                 text = '...';
                 color = '#f0ad4e';
                 status = 'Loading';
+                changedStatus = true;
             }
         } else {
             const options = this._getProfileOptions({current: true}, false);
@@ -1612,14 +1617,17 @@ export class Backend {
                 text = 'off';
                 color = '#555555';
                 status = 'Disabled';
+                changedStatus = true;
             } else if (!this._hasRequiredPermissionsForSettings(options)) {
                 text = '!';
                 color = '#f0ad4e';
                 status = 'Some settings require additional permissions';
+                changedStatus = true;
             } else if (!this._isAnyDictionaryEnabled(options)) {
                 text = '!';
                 color = '#f0ad4e';
                 status = 'No dictionaries installed';
+                changedStatus = true;
             }
         }
 
@@ -1630,11 +1638,12 @@ export class Backend {
             void chrome.action.setBadgeText({text});
         }
         if (typeof chrome.action.setTitle === 'function') {
-            if (title.includes('No dictionaries installed')) {
+            if (changedStatus) {
                 title = 'Yomitan';
             }
             if (status !== null) {
                 title = `${title} - ${status}`;
+                changedStatus = false;
             }
             void chrome.action.setTitle({title});
         }
