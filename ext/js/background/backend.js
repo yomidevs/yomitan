@@ -1556,6 +1556,7 @@ export class Backend {
      */
     _updateBadge() {
         let title = this._defaultBrowserActionTitle;
+
         if (title === null || !isObject(chrome.action)) {
             // Not ready or invalid
             return;
@@ -1612,6 +1613,9 @@ export class Backend {
             void chrome.action.setBadgeText({text});
         }
         if (typeof chrome.action.setTitle === 'function') {
+            if (title.includes('No dictionaries installed')) {
+                title = 'Yomitan';
+            }
             if (status !== null) {
                 title = `${title} - ${status}`;
             }
