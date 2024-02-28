@@ -411,7 +411,8 @@
                 "@typescript-eslint/no-explicit-any": "error",
                 "@typescript-eslint/no-shadow": ["error", {"builtinGlobals": false}],
                 "@typescript-eslint/no-this-alias": "error",
-                "@typescript-eslint/no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}]
+                "@typescript-eslint/no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
+                "@typescript-eslint/switch-exhaustiveness-check": ["error"]
             }
         },
         {
