@@ -1556,7 +1556,7 @@ export class Backend {
         return (
             isObject(chrome.action) &&
             typeof chrome.action.getTitle === 'function' ?
-                new Promise((resolve) => { chrome.action.getTitle({}, resolve); }) :
+                new Promise((resolve) => { chrome.action.getTitle({}, (title) => { resolve(title.split(' - ')[0]) }); }) :
                 Promise.resolve('')
         );
     }
