@@ -21,11 +21,12 @@
  * @param {string} deinflectedSuffix
  * @param {string[]} conditionsIn
  * @param {string[]} conditionsOut
- * @returns {import('language-transformer').Rule}
+ * @returns {import('language-transformer').SuffixRule}
  */
 export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsIn, conditionsOut) {
     const suffixRegExp = new RegExp(inflectedSuffix + '$');
     return {
+        type: 'suffix',
         isInflected: suffixRegExp,
         deinflected: deinflectedSuffix,
         uninflect: (text) => text.replace(suffixRegExp, deinflectedSuffix),
@@ -44,6 +45,7 @@ export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsI
 export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsIn, conditionsOut) {
     const prefixRegExp = new RegExp('^' + inflectedPrefix);
     return {
+        type: 'prefix',
         isInflected: prefixRegExp,
         uninflect: (text) => text.replace(prefixRegExp, deinflectedPrefix),
         conditionsIn,

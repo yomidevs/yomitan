@@ -21,7 +21,6 @@ import {expect, vi} from 'vitest';
 import {createDictionaryArchive} from '../../dev/util.js';
 import {DictionaryDatabase} from '../../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../../ext/js/dictionary/dictionary-importer.js';
-import {japaneseTransforms} from '../../ext/js/language/ja/japanese-transforms.js';
 import {Translator} from '../../ext/js/language/translator.js';
 import {chrome, fetch} from '../mocks/common.js';
 import {DictionaryImporterMediaLoader} from '../mocks/dictionary-importer-media-loader.js';
@@ -58,7 +57,7 @@ export async function createTranslatorContext(dictionaryDirectory, dictionaryNam
 
     // Setup translator
     const translator = new Translator(dictionaryDatabase);
-    translator.prepare([japaneseTransforms]);
+    translator.prepare();
 
     return translator;
 }

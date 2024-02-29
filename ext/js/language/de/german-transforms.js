@@ -30,6 +30,7 @@ function separatedPrefix(prefix, conditionsIn, conditionsOut) {
     const germanLetters = 'a-zA-ZäöüßÄÖÜẞ';
     const regex = new RegExp(`^([${germanLetters}]+) .+ ${prefix}$`);
     return {
+        type: 'other',
         isInflected: regex,
         uninflect: (term) => {
             return term.replace(regex, '$1 ' + prefix);

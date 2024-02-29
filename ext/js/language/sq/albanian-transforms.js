@@ -27,6 +27,7 @@ import {suffixInflection} from '../language-transforms.js';
 function conjugationIISuffixInflection(inflectedSuffix, deinflectedSuffix, conditionsIn, conditionsOut) {
     return {
         ...suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsIn, conditionsOut),
+        type: 'other',
         isInflected: new RegExp('.*[^j]' + inflectedSuffix + '$')
     };
 }

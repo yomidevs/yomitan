@@ -35,7 +35,7 @@ import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
 import {distributeFuriganaInflected, isCodePointJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {getAllLanguageTransformDescriptors, getLanguageSummaries, isTextLookupWorthy} from '../language/languages.js';
+import {getLanguageSummaries, isTextLookupWorthy} from '../language/languages.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -274,13 +274,7 @@ export class Backend {
                 log.error(e);
             }
 
-            /** @type {import('language-transformer').LanguageTransformDescriptor[]} */
-            const descriptors = [];
-            const languagesWithTransforms = getAllLanguageTransformDescriptors();
-            for (const {languageTransforms} of languagesWithTransforms) {
-                descriptors.push(languageTransforms);
-            }
-            void this._translator.prepare(descriptors);
+            void this._translator.prepare();
 
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();

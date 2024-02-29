@@ -22,7 +22,7 @@ import {prefixInflection, suffixInflection} from '../language-transforms.js';
  * @param {string} suffix
  * @param {string[]} conditionsIn
  * @param {string[]} conditionsOut
- * @returns {import('language-transformer').Rule[]}
+ * @returns {import('language-transformer').SuffixRule[]}
  */
 function doubledConsonantInflection(consonants, suffix, conditionsIn, conditionsOut) {
     const inflections = [];
@@ -66,6 +66,7 @@ const phrasalVerbWordSet = new Set([...phrasalVerbParticles, ...phrasalVerbPrepo
 const phrasalVerbWordDisjunction = [...phrasalVerbWordSet].join('|');
 /** @type {import('language-transformer').Rule} */
 const phrasalVerbInterposedObjectRule = {
+    type: 'other',
     isInflected: new RegExp(`^\\w* (?:(?!\\b(${phrasalVerbWordDisjunction})\\b).)+ (?:${particlesDisjunction})`),
     uninflect: (term) => {
         return term.replace(new RegExp(`(?<=\\w) (?:(?!\\b(${phrasalVerbWordDisjunction})\\b).)+ (?=(?:${particlesDisjunction}))`), ' ');
@@ -81,6 +82,7 @@ const phrasalVerbInterposedObjectRule = {
  */
 function createPhrasalVerbInflection(inflected, deinflected) {
     return {
+        type: 'other',
         isInflected: new RegExp(`^\\w*${inflected} (?:${phrasalVerbWordDisjunction})`),
         uninflect: (term) => {
             return term.replace(new RegExp(`(?<=)${inflected}(?= (?:${phrasalVerbWordDisjunction}))`), deinflected);
@@ -91,7 +93,7 @@ function createPhrasalVerbInflection(inflected, deinflected) {
 }
 
 /**
- * @param {import('language-transformer').Rule[]} sourceRules
+ * @param {import('language-transformer').SuffixRule[]} sourceRules
  * @returns {import('language-transformer').Rule[]}
  */
 function createPhrasalVerbInflectionsFromSuffixInflections(sourceRules) {

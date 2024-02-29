@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 export class LanguageTransformer {
     constructor() {
         /** @type {number} */
@@ -54,12 +53,13 @@ export class LanguageTransformer {
             /** @type {import('language-transformer-internal').Rule[]} */
             const rules2 = [];
             for (let j = 0, jj = rules.length; j < jj; ++j) {
-                const {isInflected, uninflect, conditionsIn, conditionsOut} = rules[j];
+                const {type, isInflected, uninflect, conditionsIn, conditionsOut} = rules[j];
                 const conditionFlagsIn = this._getConditionFlagsStrict(conditionFlagsMap, conditionsIn);
                 if (conditionFlagsIn === null) { throw new Error(`Invalid conditionsIn for transform[${i}].rules[${j}]`); }
                 const conditionFlagsOut = this._getConditionFlagsStrict(conditionFlagsMap, conditionsOut);
                 if (conditionFlagsOut === null) { throw new Error(`Invalid conditionsOut for transform[${i}].rules[${j}]`); }
                 rules2.push({
+                    type,
                     isInflected,
                     uninflect,
                     conditionsIn: conditionFlagsIn,
