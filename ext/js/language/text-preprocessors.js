@@ -15,8 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @type {import('language').TextPreprocessorOptions<boolean>} */
-export const basicTextPreprocessorOptions = [false, true];
+import {basicTextPreprocessorOptions} from './language-util.js';
 
 /** @type {import('language').TextPreprocessor<boolean>} */
 export const decapitalize = {

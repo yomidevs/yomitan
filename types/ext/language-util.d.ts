@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024  Yomitan Authors
+ * Copyright (C) 2023-2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextPreprocessorOptions} from '../language-util.js';
-
-/** @type {import('language').TextPreprocessor<boolean>} */
-export const removeArabicScriptDiacritics = {
-    name: 'Remove diacritics',
-    description: 'وَلَدَ ⬅️ ولد',
-    options: basicTextPreprocessorOptions,
-    process: (text, setting) => {
-        return setting ? text.replace(/[\u064E-\u0650]/g, '') : text;
-    }
-};
+export type CodepointRange = [
+    minInclusive: number,
+    maxInclusive: number,
+];

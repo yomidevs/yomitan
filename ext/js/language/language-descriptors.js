@@ -22,6 +22,7 @@ import {isStringPartiallyJapanese} from './ja/japanese.js';
 import {removeLatinDiacritics} from './la/latin-text-preprocessors.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
+import {isStringPartiallyChinese} from './zh/chinese.js';
 
 const capitalizationPreprocessors = {
     decapitalize,
@@ -192,6 +193,7 @@ const languageDescriptors = [
         iso: 'zh',
         name: 'Chinese',
         exampleText: '读',
+        isTextLookupWorthy: isStringPartiallyChinese,
         textPreprocessors: {}
     }
 ];
