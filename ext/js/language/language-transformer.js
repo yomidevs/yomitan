@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {log} from '../core/log.js';
+
 export class LanguageTransformer {
     constructor() {
         /** @type {number} */
@@ -127,10 +129,17 @@ export class LanguageTransformer {
                     if (!LanguageTransformer.conditionsMatch(conditions, rule.conditionsIn)) { continue; }
                     const {isInflected, uninflect} = rule;
                     if (!isInflected.test(text)) { continue; }
+
+                    const isCycle = trace.some((frame) => frame.transform === name && frame.ruleIndex === j && frame.text === text);
+                    if (isCycle) {
+                        log.warn(new Error(`Cycle detected in transform[${name}] rule[${j}] for text: ${text}`));
+                        continue;
+                    }
+
                     results.push(LanguageTransformer.createTransformedText(
                         uninflect(text),
                         rule.conditionsOut,
-                        this._extendTrace(trace, {transform: name, ruleIndex: j})
+                        this._extendTrace(trace, {transform: name, ruleIndex: j, text})
                     ));
                 }
             }
@@ -244,8 +253,8 @@ export class LanguageTransformer {
      */
     _extendTrace(trace, newFrame) {
         const newTrace = [newFrame];
-        for (const {transform, ruleIndex} of trace) {
-            newTrace.push({transform, ruleIndex});
+        for (const {transform, ruleIndex, text} of trace) {
+            newTrace.push({transform, ruleIndex, text});
         }
         return newTrace;
     }

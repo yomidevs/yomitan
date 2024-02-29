@@ -38,6 +38,7 @@ export type TransformedText = {
 export type Trace = TraceFrame[];
 
 export type TraceFrame = {
+    text: string;
     transform: string;
     ruleIndex: number;
 };
