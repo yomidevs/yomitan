@@ -1,0 +1,39 @@
+{
+    "language": "en",
+    "conditions": {
+        "v": {
+            "name": "Verb",
+            "isDictionaryForm": true
+        },
+        "n": {
+            "name": "Noun",
+            "isDictionaryForm": true,
+            "subConditions": ["np", "ns"]
+        },
+        "np": {
+            "name": "Noun plural",
+            "isDictionaryForm": true
+        },
+        "ns": {
+            "name": "Noun singular",
+            "isDictionaryForm": true
+        },
+        "adj": {
+            "name": "Adjective",
+            "isDictionaryForm": true
+        }
+    },
+    "transforms": [
+        {
+            "name": "plural",
+            "description": "Plural form of a noun",
+            "rules": [
+                {"suffixIn": "s", "suffixOut": "", "conditionsIn": ["np"], "conditionsOut": ["ns"]},
+                {"suffixIn": "es", "suffixOut": "", "conditionsIn": ["np"], "conditionsOut": ["ns"]},
+                {"suffixIn": "ies", "suffixOut": "y", "conditionsIn": ["np"], "conditionsOut": ["ns"]},
+                {"suffixIn": "ves", "suffixOut": "fe", "conditionsIn": ["np"], "conditionsOut": ["ns"]},
+                {"suffixIn": "ves", "suffixOut": "f", "conditionsIn": ["np"], "conditionsOut": ["ns"]}
+            ]
+        }
+    ]
+}

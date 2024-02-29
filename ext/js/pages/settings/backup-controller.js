@@ -19,8 +19,8 @@
 import {Dexie} from '../../../lib/dexie.js';
 import {parseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
+import {isObjectNotArray} from '../../core/object-utilities.js';
 import {toError} from '../../core/to-error.js';
-import {isObject} from '../../core/utilities.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {getAllPermissions} from '../../data/permissions-util.js';
 import {arrayBufferUtf8Decode} from '../../data/sandbox/array-buffer-util.js';
@@ -354,7 +354,7 @@ export class BackupController {
         const warnings = [];
 
         const anki = options.anki;
-        if (isObject(anki)) {
+        if (isObjectNotArray(anki)) {
             const fieldTemplates = anki.fieldTemplates;
             if (typeof fieldTemplates === 'string') {
                 warnings.push('anki.fieldTemplates contains a non-default value');
@@ -372,12 +372,12 @@ export class BackupController {
         }
 
         const audio = options.audio;
-        if (isObject(audio)) {
+        if (isObjectNotArray(audio)) {
             const sources = audio.sources;
             if (Array.isArray(sources)) {
                 for (let i = 0, ii = sources.length; i < ii; ++i) {
                     const source = sources[i];
-                    if (!isObject(source)) { continue; }
+                    if (!isObjectNotArray(source)) { continue; }
                     const {url} = source;
                     if (typeof url === 'string' && url.length > 0 && !this._isLocalhostUrl(url)) {
                         warnings.push(`audio.sources[${i}].url uses a non-localhost URL`);
@@ -403,9 +403,9 @@ export class BackupController {
         const profiles = optionsFull.profiles;
         if (Array.isArray(profiles)) {
             for (const profile of profiles) {
-                if (!isObject(profile)) { continue; }
+                if (!isObjectNotArray(profile)) { continue; }
                 const options = profile.options;
-                if (!isObject(options)) { continue; }
+                if (!isObjectNotArray(options)) { continue; }
 
                 const warnings2 = this._settingsImportSanitizeProfileOptions(options, dryRun);
                 for (const warning of warnings2) {
@@ -428,7 +428,7 @@ export class BackupController {
         const data = parseJson(dataString);
 
         // Type check
-        if (!isObject(data)) {
+        if (!isObjectNotArray(data)) {
             throw new Error(`Invalid data type: ${typeof data}`);
         }
 
@@ -451,7 +451,7 @@ export class BackupController {
 
         // Verify options exists
         let optionsFull = data.options;
-        if (!isObject(optionsFull)) {
+        if (!isObjectNotArray(optionsFull)) {
             throw new Error(`Invalid options type: ${typeof optionsFull}`);
         }
 
