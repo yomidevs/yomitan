@@ -140,7 +140,7 @@ export class TemplateRenderer {
         let additions2;
         try {
             additions1 = (typeof renderSetup === 'function' ? renderSetup(data) : null);
-            result = instance(data).trim();
+            result = instance(data).replace(/^\n+|\n+$/g, '');
         } finally {
             additions2 = (typeof renderCleanup === 'function' ? renderCleanup(data) : null);
         }
