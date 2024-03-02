@@ -36,9 +36,9 @@ export const capitalizeFirstLetter = {
 
 /**
  * WARNING: This should NOT be used with languages that use Han characters,
- *          as it can result in undesirable normalization: 
- *            - '\u9038'.normalize('NFD') => '\u9038' (逸) 
- *            - '\ufa67'.normalize('NFD') => '\u9038' (逸 => 逸) 
+ *          as it can result in undesirable normalization:
+ *            - '\u9038'.normalize('NFD') => '\u9038' (逸)
+ *            - '\ufa67'.normalize('NFD') => '\u9038' (逸 => 逸)
  * @type {import('language').TextPreprocessor<boolean>}
  */
 export const removeAlphabeticDiacritics = {
