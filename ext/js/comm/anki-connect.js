@@ -18,6 +18,7 @@
 
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
 import {getRootDeckName} from '../data/anki-util.js';
 
 /**
