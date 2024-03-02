@@ -17,12 +17,28 @@
 
 import {basicTextPreprocessorOptions} from '../text-preprocessors.js';
 
+const optionalDiacritics = [
+    '\u0618', // Small Fatha
+    '\u0619', // Small Damma
+    '\u061A', // Small Kasra
+    '\u064B', // Fathatan
+    '\u064C', // Dammatan
+    '\u064D', // Kasratan
+    '\u064E', // Fatha
+    '\u064F', // Damma
+    '\u0650', // Kasra
+    '\u0651', // Shadda
+    '\u0652' // Sukun
+];
+
+const diacriticsRegex = new RegExp(`[${optionalDiacritics.join('')}]`, 'g');
+
 /** @type {import('language').TextPreprocessor<boolean>} */
 export const removeArabicScriptDiacritics = {
     name: 'Remove diacritics',
     description: 'وَلَدَ ⬅️ ولد',
     options: basicTextPreprocessorOptions,
     process: (text, setting) => {
-        return setting ? text.replace(/[\u064E-\u0650]/g, '') : text;
+        return setting ? text.replace(diacriticsRegex, '') : text;
     }
 };
