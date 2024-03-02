@@ -1,7 +1,7 @@
 {
     "test": {
         "include": [
-            "../**/options-util.test.js"
+            "test/options-util.test.js"
         ]
     }
 }
