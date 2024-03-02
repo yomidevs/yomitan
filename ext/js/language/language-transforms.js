@@ -29,7 +29,7 @@ export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsI
         type: 'suffix',
         isInflected: suffixRegExp,
         deinflected: deinflectedSuffix,
-        uninflect: (text) => text.replace(suffixRegExp, deinflectedSuffix),
+        deinflect: (text) => text.replace(suffixRegExp, deinflectedSuffix),
         conditionsIn,
         conditionsOut
     };
@@ -47,7 +47,7 @@ export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsI
     return {
         type: 'prefix',
         isInflected: prefixRegExp,
-        uninflect: (text) => text.replace(prefixRegExp, deinflectedPrefix),
+        deinflect: (text) => text.replace(prefixRegExp, deinflectedPrefix),
         conditionsIn,
         conditionsOut
     };

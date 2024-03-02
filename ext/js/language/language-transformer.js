@@ -55,7 +55,7 @@ export class LanguageTransformer {
             /** @type {import('language-transformer-internal').Rule[]} */
             const rules2 = [];
             for (let j = 0, jj = rules.length; j < jj; ++j) {
-                const {type, isInflected, uninflect, conditionsIn, conditionsOut} = rules[j];
+                const {type, isInflected, deinflect, conditionsIn, conditionsOut} = rules[j];
                 const conditionFlagsIn = this._getConditionFlagsStrict(conditionFlagsMap, conditionsIn);
                 if (conditionFlagsIn === null) { throw new Error(`Invalid conditionsIn for transform[${i}].rules[${j}]`); }
                 const conditionFlagsOut = this._getConditionFlagsStrict(conditionFlagsMap, conditionsOut);
@@ -63,7 +63,7 @@ export class LanguageTransformer {
                 rules2.push({
                     type,
                     isInflected,
-                    uninflect,
+                    deinflect,
                     conditionsIn: conditionFlagsIn,
                     conditionsOut: conditionFlagsOut
                 });
@@ -127,7 +127,7 @@ export class LanguageTransformer {
                 for (let j = 0, jj = rules.length; j < jj; ++j) {
                     const rule = rules[j];
                     if (!LanguageTransformer.conditionsMatch(conditions, rule.conditionsIn)) { continue; }
-                    const {isInflected, uninflect} = rule;
+                    const {isInflected, deinflect} = rule;
                     if (!isInflected.test(text)) { continue; }
 
                     const isCycle = trace.some((frame) => frame.transform === name && frame.ruleIndex === j && frame.text === text);
@@ -137,7 +137,7 @@ export class LanguageTransformer {
                     }
 
                     results.push(LanguageTransformer.createTransformedText(
-                        uninflect(text),
+                        deinflect(text),
                         rule.conditionsOut,
                         this._extendTrace(trace, {transform: name, ruleIndex: j, text})
                     ));

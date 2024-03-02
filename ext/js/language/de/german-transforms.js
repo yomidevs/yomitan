@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {prefixInflection, suffixInflection} from '../language-transforms.js';
+import { prefixInflection, suffixInflection } from '../language-transforms.js';
 
 // https://www.dartmouth.edu/~deutsch/Grammatik/Wortbildung/Separables.html
 const separablePrefixes = ['ab', 'an', 'auf', 'aus', 'auseinander', 'bei', 'da', 'dabei', 'dar', 'daran', 'dazwischen', 'durch', 'ein', 'empor', 'entgegen', 'entlang', 'entzwei', 'fehl', 'fern', 'fest', 'fort', 'frei', 'gegenüber', 'gleich', 'heim', 'her', 'herab', 'heran', 'herauf', 'heraus', 'herbei', 'herein', 'herüber', 'herum', 'herunter', 'hervor', 'hin', 'hinab', 'hinauf', 'hinaus', 'hinein', 'hinterher', 'hinunter', 'hinweg', 'hinzu', 'hoch', 'los', 'mit', 'nach', 'nebenher', 'nieder', 'statt', 'um', 'vor', 'voran', 'voraus', 'vorbei', 'vorüber', 'vorweg', 'weg', 'weiter', 'wieder', 'zu', 'zurecht', 'zurück', 'zusammen'];
@@ -32,7 +32,7 @@ function separatedPrefix(prefix, conditionsIn, conditionsOut) {
     return {
         type: 'other',
         isInflected: regex,
-        uninflect: (term) => {
+        deinflect: (term) => {
             return term.replace(regex, '$1 ' + prefix);
         },
         conditionsIn,

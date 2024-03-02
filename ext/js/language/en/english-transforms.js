@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {prefixInflection, suffixInflection} from '../language-transforms.js';
+import { prefixInflection, suffixInflection } from '../language-transforms.js';
 
 /**
  * @param {string} consonants
@@ -68,7 +68,7 @@ const phrasalVerbWordDisjunction = [...phrasalVerbWordSet].join('|');
 const phrasalVerbInterposedObjectRule = {
     type: 'other',
     isInflected: new RegExp(`^\\w* (?:(?!\\b(${phrasalVerbWordDisjunction})\\b).)+ (?:${particlesDisjunction})`),
-    uninflect: (term) => {
+    deinflect: (term) => {
         return term.replace(new RegExp(`(?<=\\w) (?:(?!\\b(${phrasalVerbWordDisjunction})\\b).)+ (?=(?:${particlesDisjunction}))`), ' ');
     },
     conditionsIn: [],
@@ -84,7 +84,7 @@ function createPhrasalVerbInflection(inflected, deinflected) {
     return {
         type: 'other',
         isInflected: new RegExp(`^\\w*${inflected} (?:${phrasalVerbWordDisjunction})`),
-        uninflect: (term) => {
+        deinflect: (term) => {
             return term.replace(new RegExp(`(?<=)${inflected}(?= (?:${phrasalVerbWordDisjunction}))`), deinflected);
         },
         conditionsIn: [],
