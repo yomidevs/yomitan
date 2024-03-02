@@ -26,7 +26,8 @@ import {ExtensionError} from '../core/extension-error.js';
 import {fetchJson, fetchText} from '../core/fetch-utilities.js';
 import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
-import {clone, deferPromise, isObject, promiseTimeout} from '../core/utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
+import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
 import {isNoteDataValid} from '../data/anki-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
@@ -34,8 +35,8 @@ import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
-import {distributeFuriganaInflected, isCodePointJapanese, isStringPartiallyJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
-import {getLanguageSummaries} from '../language/languages.js';
+import {distributeFuriganaInflected, isCodePointJapanese, convertKatakanaToHiragana as jpConvertKatakanaToHiragana} from '../language/ja/japanese.js';
+import {getLanguageSummaries, isTextLookupWorthy} from '../language/languages.js';
 import {Translator} from '../language/translator.js';
 import {AudioDownloader} from '../media/audio-downloader.js';
 import {getFileExtensionFromAudioMediaType, getFileExtensionFromImageMediaType} from '../media/media-util.js';
@@ -175,7 +176,7 @@ export class Backend {
             ['isTabSearchPopup',             this._onApiIsTabSearchPopup.bind(this)],
             ['triggerDatabaseUpdated',       this._onApiTriggerDatabaseUpdated.bind(this)],
             ['testMecab',                    this._onApiTestMecab.bind(this)],
-            ['textHasJapaneseCharacters',    this._onApiTextHasJapaneseCharacters.bind(this)],
+            ['isTextLookupWorthy',           this._onApiIsTextLookupWorthy.bind(this)],
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
@@ -222,12 +223,12 @@ export class Backend {
      * @returns {void}
      */
     _prepareInternalSync() {
-        if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
+        if (isObjectNotArray(chrome.commands) && isObjectNotArray(chrome.commands.onCommand)) {
             const onCommand = this._onWebExtensionEventWrapper(this._onCommand.bind(this));
             chrome.commands.onCommand.addListener(onCommand);
         }
 
-        if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
+        if (isObjectNotArray(chrome.tabs) && isObjectNotArray(chrome.tabs.onZoomChange)) {
             const onZoomChange = this._onWebExtensionEventWrapper(this._onZoomChange.bind(this));
             chrome.tabs.onZoomChange.addListener(onZoomChange);
         }
@@ -274,9 +275,16 @@ export class Backend {
                 log.error(e);
             }
 
-            /** @type {import('language-transformer').LanguageTransformDescriptor} */
-            const descriptor = await fetchJson('/data/language/japanese-transforms.json');
-            void this._translator.prepare(descriptor);
+            /** @type {import('language-transformer').LanguageTransformDescriptor[]} */
+            const descriptors = [];
+            const languageSummaries = getLanguageSummaries();
+            for (const {languageTransformsFile} of languageSummaries) {
+                if (!languageTransformsFile) { continue; }
+                /** @type {import('language-transformer').LanguageTransformDescriptor} */
+                const descriptor = await fetchJson(languageTransformsFile);
+                descriptors.push(descriptor);
+            }
+            void this._translator.prepare(descriptors);
 
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
@@ -310,7 +318,11 @@ export class Backend {
      * @param {import('clipboard-monitor').EventArgument<'change'>} details
      */
     async _onClipboardTextChange({text}) {
-        const {clipboard: {maximumSearchLength}} = this._getProfileOptions({current: true}, false);
+        const {
+            general: {language},
+            clipboard: {maximumSearchLength}
+        } = this._getProfileOptions({current: true}, false);
+        if (!isTextLookupWorthy(text, language)) { return; }
         if (text.length > maximumSearchLength) {
             text = text.substring(0, maximumSearchLength);
         }
@@ -349,12 +361,18 @@ export class Backend {
     _onWebExtensionEventWrapper(handler) {
         return /** @type {T} */ ((...args) => {
             if (this._isPrepared) {
+                // This is using SafeAny to just forward the parameters
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 handler(...args);
                 return;
             }
 
             this._prepareCompletePromise.then(
-                () => { handler(...args); },
+                () => {
+                    // This is using SafeAny to just forward the parameters
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                    handler(...args);
+                },
                 () => {} // NOP
             );
         });
@@ -833,9 +851,9 @@ export class Backend {
         return true;
     }
 
-    /** @type {import('api').ApiHandler<'textHasJapaneseCharacters'>} */
-    _onApiTextHasJapaneseCharacters({text}) {
-        return isStringPartiallyJapanese(text);
+    /** @type {import('api').ApiHandler<'isTextLookupWorthy'>} */
+    _onApiIsTextLookupWorthy({text, language}) {
+        return isTextLookupWorthy(text, language);
     }
 
     /** @type {import('api').ApiHandler<'getTermFrequencies'>} */
@@ -1077,7 +1095,7 @@ export class Backend {
         }
 
         // chrome.windows not supported (e.g. on Firefox mobile)
-        if (!isObject(chrome.windows)) {
+        if (!isObjectNotArray(chrome.windows)) {
             throw new Error('Window creation not supported');
         }
 
@@ -1544,7 +1562,7 @@ export class Backend {
      */
     _getBrowserIconTitle() {
         return (
-            isObject(chrome.action) &&
+            isObjectNotArray(chrome.action) &&
             typeof chrome.action.getTitle === 'function' ?
                 new Promise((resolve) => { chrome.action.getTitle({}, resolve); }) :
                 Promise.resolve('')
@@ -1556,7 +1574,7 @@ export class Backend {
      */
     _updateBadge() {
         let title = this._defaultBrowserActionTitle;
-        if (title === null || !isObject(chrome.action)) {
+        if (title === null || !isObjectNotArray(chrome.action)) {
             // Not ready or invalid
             return;
         }
@@ -2563,7 +2581,7 @@ export class Backend {
      * @returns {boolean}
      */
     _canObservePermissionsChanges() {
-        return isObject(chrome.permissions) && isObject(chrome.permissions.onAdded) && isObject(chrome.permissions.onRemoved);
+        return isObjectNotArray(chrome.permissions) && isObjectNotArray(chrome.permissions.onAdded) && isObjectNotArray(chrome.permissions.onRemoved);
     }
 
     /**

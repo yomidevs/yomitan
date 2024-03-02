@@ -21,8 +21,8 @@ import {readFileSync} from 'fs';
 import {fileURLToPath} from 'node:url';
 import {dirname, join} from 'path';
 import {expect, vi} from 'vitest';
+import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
 import {parseJson} from '../../dev/json.js';
-import {createDictionaryArchive} from '../../dev/util.js';
 import {DictionaryDatabase} from '../../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../../ext/js/dictionary/dictionary-importer.js';
 import {Translator} from '../../ext/js/language/translator.js';
@@ -31,7 +31,7 @@ import {DictionaryImporterMediaLoader} from '../mocks/dictionary-importer-media-
 import {createDomTest} from './dom-test.js';
 
 const extDir = join(dirname(fileURLToPath(import.meta.url)), '../../ext');
-const languageTransformDescriptorPath = join(extDir, 'data/language/japanese-transforms.json');
+const languageTransformDescriptorPath = join(extDir, 'js/language/ja/japanese-transforms.json');
 
 vi.stubGlobal('indexedDB', indexedDB);
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
@@ -45,8 +45,7 @@ vi.stubGlobal('chrome', chrome);
  */
 export async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
     // Dictionary
-    const testDictionary = createDictionaryArchive(dictionaryDirectory, dictionaryName);
-    const testDictionaryContent = await testDictionary.generateAsync({type: 'arraybuffer'});
+    const testDictionaryData = await createDictionaryArchiveData(dictionaryDirectory, dictionaryName);
 
     // Setup database
     const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
@@ -56,7 +55,7 @@ export async function createTranslatorContext(dictionaryDirectory, dictionaryNam
 
     const {errors} = await dictionaryImporter.importDictionary(
         dictionaryDatabase,
-        testDictionaryContent,
+        testDictionaryData,
         {prefixWildcardsSupported: true}
     );
 
@@ -66,7 +65,7 @@ export async function createTranslatorContext(dictionaryDirectory, dictionaryNam
     const translator = new Translator(dictionaryDatabase);
     /** @type {import('language-transformer').LanguageTransformDescriptor} */
     const deinflectionReasons = parseJson(readFileSync(languageTransformDescriptorPath, {encoding: 'utf8'}));
-    translator.prepare(deinflectionReasons);
+    translator.prepare([deinflectionReasons]);
 
     return translator;
 }

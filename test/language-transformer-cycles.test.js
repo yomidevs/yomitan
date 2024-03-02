@@ -21,6 +21,7 @@ import {fileURLToPath} from 'url';
 import {describe, test} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
+import {getLanguageSummaries} from '../ext/js/language/languages.js';
 
 class DeinflectionNode {
     /**
@@ -103,12 +104,18 @@ function arraysAreEqual(rules1, rules2) {
     return true;
 }
 
-describe('Deinflection data', () => {
-    test('Check for cycles', ({expect}) => {
-        const dirname = pathDirname(fileURLToPath(import.meta.url));
+const dirname = pathDirname(fileURLToPath(import.meta.url));
+const descriptors = [];
+const languageSummaries = getLanguageSummaries();
+for (const {languageTransformsFile} of languageSummaries) {
+    if (!languageTransformsFile) { continue; }
+    /** @type {import('language-transformer').LanguageTransformDescriptor} */
+    const descriptor = parseJson(readFileSync(join(dirname, `../ext/${languageTransformsFile}`), {encoding: 'utf8'}));
+    descriptors.push(descriptor);
+}
 
-        /** @type {import('language-transformer').LanguageTransformDescriptor} */
-        const descriptor = parseJson(readFileSync(join(dirname, '../ext/data/language/japanese-transforms.json'), {encoding: 'utf8'}));
+describe.each(descriptors)('Cycles Test $language', (descriptor) => {
+    test('Check for cycles', ({expect}) => {
         const languageTransformer = new LanguageTransformer();
         languageTransformer.addDescriptor(descriptor);
 

@@ -22,8 +22,8 @@ import {languageDescriptorMap} from './language-descriptors.js';
  */
 export function getLanguageSummaries() {
     const results = [];
-    for (const {name, iso, exampleText} of languageDescriptorMap.values()) {
-        results.push({name, iso, exampleText});
+    for (const {name, iso, exampleText, languageTransformsFile} of languageDescriptorMap.values()) {
+        results.push({name, iso, exampleText, languageTransformsFile});
     }
     return results;
 }
@@ -46,4 +46,15 @@ export function getAllLanguageTextPreprocessors() {
         results.push({iso, textPreprocessors: textPreprocessorsArray});
     }
     return results;
+}
+
+/**
+ * @param {string} text
+ * @param {string} language
+ * @returns {boolean}
+ */
+export function isTextLookupWorthy(text, language) {
+    const descriptor = languageDescriptorMap.get(language);
+    if (typeof descriptor === 'undefined') { return false; }
+    return typeof descriptor.isTextLookupWorthy === 'undefined' || descriptor.isTextLookupWorthy(text);
 }

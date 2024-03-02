@@ -17,7 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {isObject} from '../core/utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
 import {base64ToArrayBuffer} from '../data/sandbox/array-buffer-util.js';
 
 /**
@@ -123,7 +123,7 @@ export class OffscreenProxy {
         if (typeof runtimeError !== 'undefined') {
             throw new Error(runtimeError.message);
         }
-        if (!isObject(response)) {
+        if (!isObjectNotArray(response)) {
             throw new Error('Offscreen document did not respond');
         }
         const responseError = response.error;
@@ -184,10 +184,10 @@ export class TranslatorProxy {
     }
 
     /**
-     * @param {import('language-transformer').LanguageTransformDescriptor} descriptor
+     * @param {import('language-transformer').LanguageTransformDescriptor[]} descriptors
      */
-    async prepare(descriptor) {
-        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {descriptor}});
+    async prepare(descriptors) {
+        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {descriptors}});
     }
 
     /**

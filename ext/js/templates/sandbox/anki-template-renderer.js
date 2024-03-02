@@ -142,14 +142,6 @@ export class AnkiTemplateRenderer {
      * @param {string} text
      * @returns {string}
      */
-    _escape(text) {
-        return Handlebars.Utils.escapeExpression(text);
-    }
-
-    /**
-     * @param {string} text
-     * @returns {string}
-     */
     _safeString(text) {
         return new Handlebars.SafeString(text);
     }
@@ -158,8 +150,7 @@ export class AnkiTemplateRenderer {
 
     /** @type {import('template-renderer').HelperFunction<string>} */
     _dumpObject(object) {
-        const dump = JSON.stringify(object, null, 4);
-        return this._escape(dump);
+        return JSON.stringify(object, null, 4);
     }
 
     /** @type {import('template-renderer').HelperFunction<string>} */
@@ -169,12 +160,10 @@ export class AnkiTemplateRenderer {
 
         let result = '';
         for (const {text, reading: reading2} of segments) {
-            const safeText = this._escape(text);
-            const safeReading = this._escape(reading2);
             result += (
-                safeReading.length > 0 ?
-                `<ruby>${safeText}<rt>${safeReading}</rt></ruby>` :
-                safeText
+                reading2.length > 0 ?
+                `<ruby>${text}<rt>${reading2}</rt></ruby>` :
+                text
             );
         }
 
@@ -674,13 +663,14 @@ export class AnkiTemplateRenderer {
      */
     _formatGlossary(args, _context, options) {
         const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossaryContent]} */ (args);
+        /** @type {import('anki-templates').NoteData} */
         const data = options.data.root;
-        if (typeof content === 'string') { return this._stringToMultiLineHtml(this._escape(content)); }
+        if (typeof content === 'string') { return this._stringToMultiLineHtml(content); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
         switch (content.type) {
             case 'image': return this._formatGlossaryImage(content, dictionary, data);
             case 'structured-content': return this._formatStructuredContent(content, dictionary, data);
-            case 'text': return this._stringToMultiLineHtml(this._escape(content.text));
+            case 'text': return this._stringToMultiLineHtml(content.text);
         }
         return '';
     }
@@ -713,31 +703,42 @@ export class AnkiTemplateRenderer {
      * @type {import('template-renderer').HelperFunction<boolean>}
      */
     _hasMedia(args, _context, options) {
-        return this._mediaProvider.hasMedia(options.data.root, args, options.hash);
+        /** @type {import('anki-templates').NoteData} */
+        const data = options.data.root;
+        return this._mediaProvider.hasMedia(data, args, options.hash);
     }
 
     /**
      * @type {import('template-renderer').HelperFunction<?string>}
      */
     _getMedia(args, _context, options) {
-        return this._mediaProvider.getMedia(options.data.root, args, options.hash);
+        /** @type {import('anki-templates').NoteData} */
+        const data = options.data.root;
+        return this._mediaProvider.getMedia(data, args, options.hash);
     }
 
     /**
      * @type {import('template-renderer').HelperFunction<string>}
      */
     _pronunciation(_args, _context, options) {
-        let {format, reading, downstepPosition, nasalPositions, devoicePositions} = options.hash;
+        const {format, reading, downstepPosition} = options.hash;
 
-        if (typeof reading !== 'string' || reading.length === 0) { return ''; }
-        if (typeof downstepPosition !== 'number') { return ''; }
-        if (!Array.isArray(nasalPositions)) { nasalPositions = []; }
-        if (!Array.isArray(devoicePositions)) { devoicePositions = []; }
+        if (
+            typeof reading !== 'string' ||
+            reading.length === 0 ||
+            typeof downstepPosition !== 'number'
+        ) {
+            return '';
+        }
         const morae = getKanaMorae(reading);
 
         switch (format) {
             case 'text':
+            {
+                const nasalPositions = this._getValidNumberArray(options.hash.nasalPositions);
+                const devoicePositions = this._getValidNumberArray(options.hash.devoicePositions);
                 return this._getPronunciationHtml(createPronunciationText(morae, downstepPosition, nasalPositions, devoicePositions));
+            }
             case 'graph':
                 return this._getPronunciationHtml(createPronunciationGraph(morae, downstepPosition));
             case 'position':
@@ -745,6 +746,20 @@ export class AnkiTemplateRenderer {
             default:
                 return '';
         }
+    }
+
+    /**
+     * @param {unknown} value
+     * @returns {number[]}
+     */
+    _getValidNumberArray(value) {
+        const result = [];
+        if (Array.isArray(value)) {
+            for (const item of value) {
+                if (typeof item === 'number') { result.push(item); }
+            }
+        }
+        return result;
     }
 
     /**

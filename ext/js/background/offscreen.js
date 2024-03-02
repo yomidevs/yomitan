@@ -111,8 +111,8 @@ export class Offscreen {
     }
 
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */
-    _prepareTranslatorHandler({descriptor}) {
-        this._translator.prepare(descriptor);
+    _prepareTranslatorHandler({descriptors}) {
+        this._translator.prepare(descriptors);
     }
 
     /** @type {import('offscreen').ApiHandler<'findKanjiOffscreen'>} */

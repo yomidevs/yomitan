@@ -15,4 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * This script is importing a file within the '@zip.js/zip.js' dependency rather than
+ * simply importing '@zip.js/zip.js'.
+ *
+ * This is done in order to only import the subset of functionality that the extension needs.
+ *
+ * In this case, this subset only includes the components to support decompression using web workers.
+ *
+ * Therefore, if this file or the built library file is imported in a development, testing, or
+ * benchmark script, it will not be able to properly decompress the data of compressed zip files.
+ *
+ * As a workaround, testing zip data can be generated using {level: 0} compression.
+ */
+
 export * from '@zip.js/zip.js/lib/zip.js';

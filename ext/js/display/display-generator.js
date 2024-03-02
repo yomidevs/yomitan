@@ -17,10 +17,10 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {isObject} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
-import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji, isStringPartiallyJapanese} from '../language/ja/japanese.js';
+import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji} from '../language/ja/japanese.js';
+import {getLanguageFromText} from '../language/text-utilities.js';
 import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './sandbox/pronunciation-generator.js';
 import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
 
@@ -256,7 +256,7 @@ export class DisplayGenerator {
             if (error instanceof DocumentFragment || error instanceof Node) {
                 div.appendChild(error);
             } else {
-                let message = isObject(error) && typeof error.message === 'string' ? error.message : `${error}`;
+                let message = error.message;
                 let link = null;
                 if (error instanceof ExtensionError && error.data !== null && typeof error.data === 'object') {
                     const {referenceUrl} = /** @type {import('core').UnknownObject} */ (error.data);
@@ -991,12 +991,7 @@ export class DisplayGenerator {
      * @param {string} [language]
      */
     _setTextContent(node, value, language) {
-        if (typeof language === 'string') {
-            node.lang = language;
-        } else if (isStringPartiallyJapanese(value)) {
-            node.lang = 'ja';
-        }
-
+        this._setElementLanguage(node, language, value);
         node.textContent = value;
     }
 
@@ -1008,11 +1003,7 @@ export class DisplayGenerator {
     _setMultilineTextContent(node, value, language) {
         // This can't just call _setTextContent because the lack of <br> elements will
         // cause the text to not copy correctly.
-        if (typeof language === 'string') {
-            node.lang = language;
-        } else if (isStringPartiallyJapanese(value)) {
-            node.lang = 'ja';
-        }
+        this._setElementLanguage(node, language, value);
 
         let start = 0;
         while (true) {
@@ -1025,6 +1016,22 @@ export class DisplayGenerator {
 
         if (start < value.length) {
             node.appendChild(document.createTextNode(start === 0 ? value : value.substring(start)));
+        }
+    }
+
+    /**
+     * @param {HTMLElement} element
+     * @param {string|undefined} language
+     * @param {string} content
+     */
+    _setElementLanguage(element, language, content) {
+        if (typeof language === 'string') {
+            element.lang = language;
+        } else {
+            const language2 = getLanguageFromText(content);
+            if (language2 !== null) {
+                element.lang = language2;
+            }
         }
     }
 

@@ -17,7 +17,8 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
-import {generateId, isObject} from '../core/utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
+import {generateId} from '../core/utilities.js';
 
 /**
  * @augments EventDispatcher<import('display-history').Events>
@@ -37,9 +38,15 @@ export class DisplayHistory extends EventDispatcher {
         this._historyMap = new Map();
 
         const historyState = history.state;
-        const {id, state} = isObject(historyState) ? historyState : {id: null, state: null};
+        const {id, state} = (
+            isObjectNotArray(historyState) ?
+            historyState :
+            {id: null, state: null}
+        );
+        /** @type {?import('display-history').EntryState} */
+        const stateObject = isObjectNotArray(state) ? state : null;
         /** @type {import('display-history').Entry} */
-        this._current = this._createHistoryEntry(id, location.href, state, null, null);
+        this._current = this._createHistoryEntry(id, location.href, stateObject, null, null);
     }
 
     /** @type {?import('display-history').EntryState} */
@@ -183,7 +190,7 @@ export class DisplayHistory extends EventDispatcher {
     _updateStateFromHistory() {
         let state = history.state;
         let id = null;
-        if (isObject(state)) {
+        if (isObjectNotArray(state)) {
             id = state.id;
             if (typeof id === 'string') {
                 const entry = this._historyMap.get(id);

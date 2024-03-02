@@ -18,6 +18,7 @@
 import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
+import {isStringPartiallyJapanese} from './ja/japanese.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-preprocessors.js';
 
@@ -55,7 +56,8 @@ const languageDescriptors = [
         iso: 'en',
         name: 'English',
         exampleText: 'read',
-        textPreprocessors: capitalizationPreprocessors
+        textPreprocessors: capitalizationPreprocessors,
+        languageTransformsFile: '/js/language/en/english-transforms.json'
     },
     {
         iso: 'es',
@@ -117,13 +119,15 @@ const languageDescriptors = [
         iso: 'ja',
         name: 'Japanese',
         exampleText: '読め',
+        isTextLookupWorthy: isStringPartiallyJapanese,
         textPreprocessors: {
             convertHalfWidthCharacters,
             convertNumericCharacters,
             convertAlphabeticCharacters,
             convertHiraganaToKatakana,
             collapseEmphaticSequences
-        }
+        },
+        languageTransformsFile: '/js/language/ja/japanese-transforms.json'
     },
     {
         iso: 'km',
