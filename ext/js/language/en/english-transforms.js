@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { prefixInflection, suffixInflection } from '../language-transforms.js';
+import {prefixInflection, suffixInflection} from '../language-transforms.js';
 
 /**
  * @param {string} consonants
