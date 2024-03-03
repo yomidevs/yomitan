@@ -395,9 +395,9 @@
 {{#*inline "sentence-furigana"}}
     {{~#if definition.cloze~}}
         {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
-            {{getMedia "textFurigana" definition.cloze.sentence escape=false}}
+            {{{getMedia "textFurigana" definition.cloze.sentence escape=false}}}
         {{~else~}}
-            {{definition.cloze.sentence}}
+            {{{definition.cloze.sentence}}}
         {{~/if~}}
     {{~/if~}}
 {{/inline}}
