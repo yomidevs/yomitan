@@ -28,7 +28,12 @@ const optionalDiacritics = [
     '\u064F', // Damma
     '\u0650', // Kasra
     '\u0651', // Shadda
-    '\u0652' // Sukun
+    '\u0652', // Sukun
+    '\u0653', // Maddah
+    '\u0654', // Hamza Above
+    '\u0655', // Hamza Below
+    '\u0656', // Subscript Alef
+    '\u0670' // Dagger Alef
 ];
 
 const diacriticsRegex = new RegExp(`[${optionalDiacritics.join('')}]`, 'g');
