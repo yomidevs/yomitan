@@ -873,6 +873,7 @@
                                     "duplicateScope",
                                     "duplicateScopeCheckAllModels",
                                     "checkForDuplicates",
+                                    "allowDuplicates",
                                     "fieldTemplates",
                                     "suspendNewCards",
                                     "displayTags",
@@ -978,6 +979,10 @@
                                         "default": false
                                     },
                                     "checkForDuplicates": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "allowDuplicates": {
                                         "type": "boolean",
                                         "default": true
                                     },

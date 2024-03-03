@@ -441,6 +441,7 @@ function createProfileOptionsUpdatedTestData1() {
             duplicateScopeCheckAllModels: false,
             displayTags: 'never',
             checkForDuplicates: true,
+            allowDuplicates: false,
             fieldTemplates: null,
             suspendNewCards: false,
             noteGuiMode: 'browse',

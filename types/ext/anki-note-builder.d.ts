@@ -36,6 +36,7 @@ export type CreateNoteDetails = {
     tags: string[];
     requirements: Requirement[];
     checkForDuplicates: boolean;
+    allowDuplicates: boolean;
     duplicateScope: Settings.AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
     resultOutputMode: Settings.ResultOutputMode;

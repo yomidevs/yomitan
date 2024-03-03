@@ -281,6 +281,7 @@ export type AnkiOptions = {
     duplicateScope: AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
     checkForDuplicates: boolean;
+    allowDuplicates: boolean;
     fieldTemplates: string | null;
     suspendNewCards: boolean;
     displayTags: AnkiDisplayTags;

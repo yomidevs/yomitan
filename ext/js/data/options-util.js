@@ -533,7 +533,8 @@ export class OptionsUtil {
             this._updateVersion24,
             this._updateVersion25,
             this._updateVersion26,
-            this._updateVersion27
+            this._updateVersion27,
+            this._updateVersion28
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1199,6 +1200,15 @@ export class OptionsUtil {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v27.handlebars');
     }
 
+    /**
+     * - Added anki.allowDuplicates.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion28(options) {
+        for (const profile of options.profiles) {
+            profile.options.anki.allowDuplicates = false;
+        }
+    }
 
     /**
      * @param {string} url

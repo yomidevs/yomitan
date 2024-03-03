@@ -61,6 +61,8 @@ export class DisplayAnki {
         /** @type {boolean} */
         this._checkForDuplicates = false;
         /** @type {boolean} */
+        this._allowDuplicates = false;
+        /** @type {boolean} */
         this._suspendNewCards = false;
         /** @type {boolean} */
         this._compactTags = false;
@@ -158,7 +160,7 @@ export class DisplayAnki {
             let errors;
             let requirements;
             try {
-                ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, mode, []));
+                ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, mode, [], true));
             } catch (e) {
                 errors = [toError(e)];
             }
@@ -194,6 +196,7 @@ export class DisplayAnki {
                 duplicateScopeCheckAllModels,
                 suspendNewCards,
                 checkForDuplicates,
+                allowDuplicates,
                 displayTags,
                 kanji,
                 terms,
@@ -205,6 +208,7 @@ export class DisplayAnki {
         } = options;
 
         this._checkForDuplicates = checkForDuplicates;
+        this._allowDuplicates = allowDuplicates;
         this._suspendNewCards = suspendNewCards;
         this._compactTags = compactTags;
         this._resultOutputMode = resultOutputMode;
@@ -479,7 +483,7 @@ export class DisplayAnki {
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
         try {
-            const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, mode, requirements);
+            const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, mode, requirements, false);
             allErrors.push(...errors);
 
             const error = this._getAddNoteRequirementsError(requirements, outputRequirements);
@@ -626,7 +630,7 @@ export class DisplayAnki {
             const modes = this._dictionaryEntryTypeModeMap.get(type);
             if (typeof modes === 'undefined') { continue; }
             for (const mode of modes) {
-                const notePromise = this._createNote(dictionaryEntry, mode, []);
+                const notePromise = this._createNote(dictionaryEntry, mode, [], true);
                 notePromises.push(notePromise);
                 noteTargets.push({index: i, mode});
             }
@@ -663,7 +667,20 @@ export class DisplayAnki {
             const {note, errors, requirements} = noteInfoList[i];
             const {canAdd, valid, noteIds, noteInfos} = infos[i];
             const {mode, index} = noteTargets[i];
-            results[index].modeMap.set(mode, {mode, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
+            results[index].modeMap.set(
+                mode,
+                {
+                    mode,
+                    note,
+                    errors,
+                    requirements,
+                    canAdd: canAdd || (this._checkForDuplicates && this._allowDuplicates),
+                    valid,
+                    noteIds,
+                    noteInfos,
+                    ankiError
+                }
+            );
         }
         return results;
     }
@@ -686,9 +703,10 @@ export class DisplayAnki {
      * @param {import('dictionary').DictionaryEntry} dictionaryEntry
      * @param {import('display-anki').CreateMode} mode
      * @param {import('anki-note-builder').Requirement[]} requirements
+     * @param {boolean} forceNoDuplicates
      * @returns {Promise<import('display-anki').CreateNoteResult>}
      */
-    async _createNote(dictionaryEntry, mode, requirements) {
+    async _createNote(dictionaryEntry, mode, requirements, forceNoDuplicates) {
         const context = this._noteContext;
         if (context === null) { throw new Error('Note context not initialized'); }
         const modeOptions = this._modeOptions.get(mode);
@@ -712,6 +730,7 @@ export class DisplayAnki {
             fields,
             tags: this._noteTags,
             checkForDuplicates: this._checkForDuplicates,
+            allowDuplicates: forceNoDuplicates ? false : this._allowDuplicates,
             duplicateScope: this._duplicateScope,
             duplicateScopeCheckAllModels: this._duplicateScopeCheckAllModels,
             resultOutputMode: this._resultOutputMode,
