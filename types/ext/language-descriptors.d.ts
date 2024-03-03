@@ -32,6 +32,7 @@ type LanguageDescriptor<TIso extends string, TTextPreprocessorDescriptor extends
      */
     isTextLookupWorthy?: IsTextLookupWorthyFunction;
     textPreprocessors: TTextPreprocessorDescriptor;
+    languageTransformsFile?: string;
 };
 
 type TextPreprocessorDescriptor = {

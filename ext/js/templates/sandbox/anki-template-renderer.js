@@ -142,14 +142,6 @@ export class AnkiTemplateRenderer {
      * @param {string} text
      * @returns {string}
      */
-    _escape(text) {
-        return Handlebars.Utils.escapeExpression(text);
-    }
-
-    /**
-     * @param {string} text
-     * @returns {string}
-     */
     _safeString(text) {
         return new Handlebars.SafeString(text);
     }
@@ -158,8 +150,7 @@ export class AnkiTemplateRenderer {
 
     /** @type {import('template-renderer').HelperFunction<string>} */
     _dumpObject(object) {
-        const dump = JSON.stringify(object, null, 4);
-        return this._escape(dump);
+        return JSON.stringify(object, null, 4);
     }
 
     /** @type {import('template-renderer').HelperFunction<string>} */
@@ -169,12 +160,10 @@ export class AnkiTemplateRenderer {
 
         let result = '';
         for (const {text, reading: reading2} of segments) {
-            const safeText = this._escape(text);
-            const safeReading = this._escape(reading2);
             result += (
-                safeReading.length > 0 ?
-                `<ruby>${safeText}<rt>${safeReading}</rt></ruby>` :
-                safeText
+                reading2.length > 0 ?
+                `<ruby>${text}<rt>${reading2}</rt></ruby>` :
+                text
             );
         }
 
@@ -676,12 +665,12 @@ export class AnkiTemplateRenderer {
         const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossaryContent]} */ (args);
         /** @type {import('anki-templates').NoteData} */
         const data = options.data.root;
-        if (typeof content === 'string') { return this._stringToMultiLineHtml(this._escape(content)); }
+        if (typeof content === 'string') { return this._safeString(this._stringToMultiLineHtml(content)); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
         switch (content.type) {
             case 'image': return this._formatGlossaryImage(content, dictionary, data);
             case 'structured-content': return this._formatStructuredContent(content, dictionary, data);
-            case 'text': return this._stringToMultiLineHtml(this._escape(content.text));
+            case 'text': return this._safeString(this._stringToMultiLineHtml(content.text));
         }
         return '';
     }

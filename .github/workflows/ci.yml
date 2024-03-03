@@ -73,6 +73,9 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit
 
+      - name: Run unit tests (options)
+        run: npm run test:unit:options
+
   test-build:
     name: Test Build
     runs-on: ubuntu-latest

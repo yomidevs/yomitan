@@ -16,7 +16,7 @@
  */
 
 import path from 'path';
-import {createDictionaryArchive} from '../../dev/util.js';
+import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
 import {deferPromise} from '../../ext/js/core/utilities.js';
 import {
     expect,
@@ -67,12 +67,11 @@ test('anki add', async ({context, page, extensionId}) => {
     await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
     // Load in test dictionary
-    const dictionary = createDictionaryArchive(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1');
-    const testDictionarySource = await dictionary.generateAsync({type: 'arraybuffer'});
+    const dictionary = await createDictionaryArchiveData(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1');
     await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
         name: 'valid-dictionary1.zip',
         mimeType: 'application/x-zip',
-        buffer: Buffer.from(testDictionarySource)
+        buffer: Buffer.from(dictionary)
     });
     await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 

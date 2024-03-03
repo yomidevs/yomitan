@@ -40,3 +40,11 @@ export type TraceFrame = {
     transform: string;
     ruleIndex: number;
 };
+
+export type ConditionTypeToConditionFlagsMap = Map<string, number>;
+
+export type LanguageTransformDescriptorInternal = {
+    transforms: Transform[];
+    conditionTypeToConditionFlagsMap: ConditionTypeToConditionFlagsMap;
+    partOfSpeechToConditionFlagsMap: ConditionTypeToConditionFlagsMap;
+};

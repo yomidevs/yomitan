@@ -1,7 +1,7 @@
 {
     "test": {
         "include": [
-            "../**/*.write.js"
+            "test/*.write.js"
         ]
     }
 }

@@ -18,7 +18,8 @@
 
 import {fetchJson, fetchText} from '../core/fetch-utilities.js';
 import {parseJson} from '../core/json.js';
-import {escapeRegExp, isObject} from '../core/utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
+import {escapeRegExp} from '../core/utilities.js';
 import {TemplatePatcher} from '../templates/template-patcher.js';
 import {JsonSchema} from './json-schema.js';
 
@@ -70,7 +71,7 @@ export class OptionsUtil {
         // Remove invalid profiles
         const profiles = /** @type {unknown[]} */ (options.profiles);
         for (let i = profiles.length - 1; i >= 0; --i) {
-            if (!isObject(profiles[i])) {
+            if (!isObjectNotArray(profiles[i])) {
                 profiles.splice(i, 1);
             }
         }
@@ -531,7 +532,8 @@ export class OptionsUtil {
             this._updateVersion23,
             this._updateVersion24,
             this._updateVersion25,
-            this._updateVersion26
+            this._updateVersion26,
+            this._updateVersion27
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1102,7 +1104,7 @@ export class OptionsUtil {
             }
         }
 
-        if (customTemplates && isObject(chrome.storage)) {
+        if (customTemplates && isObjectNotArray(chrome.storage)) {
             void chrome.storage.session.set({needsCustomTemplatesWarning: true});
             await this._createTab(chrome.runtime.getURL('/welcome.html'));
             void chrome.storage.session.set({openedWelcomePage: true});
@@ -1155,9 +1157,11 @@ export class OptionsUtil {
      */
     async _updateVersion25(options) {
         for (const profile of options.profiles) {
-            for (const hotkey of profile.options.inputs.hotkeys) {
-                if (hotkey.action === 'viewNote') {
-                    hotkey.action = 'viewNotes';
+            if ('inputs' in profile.options && 'hotkeys' in profile.options.inputs) {
+                for (const hotkey of profile.options.inputs.hotkeys) {
+                    if (hotkey.action === 'viewNote') {
+                        hotkey.action = 'viewNotes';
+                    }
                 }
             }
         }
@@ -1185,6 +1189,14 @@ export class OptionsUtil {
                 delete profileOptions.translation[preprocessor];
             }
         }
+    }
+
+    /**
+     * - Updated handlebars.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion27(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v27.handlebars');
     }
 
 
