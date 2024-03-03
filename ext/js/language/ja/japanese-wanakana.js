@@ -19,12 +19,20 @@ import * as wanakana from '../../../lib/wanakana.js';
 
 /**
  * @param {string} text
+ * @returns {string}
+ */
+function toHiragana(text) {
+    return /** @type {import('wanakana')} */ (/** @type {unknown} */ (wanakana)).toHiragana(text);
+}
+
+/**
+ * @param {string} text
  * @param {?import('../../general/text-source-map.js').TextSourceMap} sourceMap
  * @param {number} sourceMapStart
  * @returns {string}
  */
 function convertAlphabeticPartToKana(text, sourceMap, sourceMapStart) {
-    const result = wanakana.toHiragana(text);
+    const result = toHiragana(text);
 
     // Generate source mapping
     if (sourceMap !== null) {
@@ -36,7 +44,7 @@ function convertAlphabeticPartToKana(text, sourceMap, sourceMapStart) {
             let iNext = i + 1;
             let resultPosNext = result.length;
             while (iNext < ii) {
-                const t = wanakana.toHiragana(text.substring(0, iNext));
+                const t = toHiragana(text.substring(0, iNext));
                 if (t === result.substring(0, t.length)) {
                     resultPosNext = t.length;
                     break;

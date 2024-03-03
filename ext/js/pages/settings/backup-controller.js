@@ -574,12 +574,16 @@ export class BackupController {
      * @returns {Promise<Blob>}
      */
     async _exportDatabase(databaseName) {
-        const db = await new Dexie(databaseName).open();
+        const DexieConstructor = /** @type {import('dexie').DexieConstructor} */ (/** @type {unknown} */ (Dexie));
+        const db = new DexieConstructor(databaseName);
+        await db.open();
+        /** @type {unknown} */
+        // @ts-expect-error - The export function is declared as an extension which has no type information.
         const blob = await db.export({
             progressCallback: this._databaseExportProgressCallback.bind(this)
         });
-        await db.close();
-        return blob;
+        db.close();
+        return /** @type {Blob} */ (blob);
     }
 
     /** */
