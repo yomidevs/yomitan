@@ -21,8 +21,8 @@ import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKan
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji} from '../language/ja/japanese.js';
 import {getLanguageFromText} from '../language/text-utilities.js';
-import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './sandbox/pronunciation-generator.js';
-import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
+import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './pronunciation-generator.js';
+import {StructuredContentGenerator} from './structured-content-generator.js';
 
 export class DisplayGenerator {
     /**
