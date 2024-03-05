@@ -18,7 +18,7 @@
 
 import {ExtensionError} from '../core/extension-error.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
-import {base64ToArrayBuffer} from '../data/sandbox/array-buffer-util.js';
+import {base64ToArrayBuffer} from '../data/array-buffer-util.js';
 
 /**
  * This class is responsible for creating and communicating with an offscreen document.

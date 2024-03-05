@@ -18,7 +18,7 @@
 
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
-import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
+import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Translator} from '../language/translator.js';
 

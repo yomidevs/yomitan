@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../../dictionary/dictionary-data-util.js';
-import {distributeFurigana, distributeFuriganaInflected} from '../../language/ja/japanese.js';
+import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../dictionary/dictionary-data-util.js';
+import {distributeFurigana, distributeFuriganaInflected} from '../language/ja/japanese.js';
 
 /**
  * Creates a compatibility representation of the specified data.

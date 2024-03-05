@@ -28,7 +28,7 @@ import {createFindKanjiOptions, createFindTermsOptions} from './utilities/transl
  * @param {unknown} content
  */
 function writeJson(fileName, content) {
-    writeFileSync(fileName, JSON.stringify(content, null, 2));
+    writeFileSync(fileName, JSON.stringify(content, null, 2) + '\n');
 }
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));

@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Handlebars} from '../../../lib/handlebars.js';
-import {ExtensionError} from '../../core/extension-error.js';
+import {Handlebars} from '../../lib/handlebars.js';
+import {ExtensionError} from '../core/extension-error.js';
 
 export class TemplateRenderer {
     constructor() {
@@ -140,7 +140,7 @@ export class TemplateRenderer {
         let additions2;
         try {
             additions1 = (typeof renderSetup === 'function' ? renderSetup(data) : null);
-            result = instance(data).trim();
+            result = instance(data).replace(/^\n+|\n+$/g, '');
         } finally {
             additions2 = (typeof renderCleanup === 'function' ? renderCleanup(data) : null);
         }

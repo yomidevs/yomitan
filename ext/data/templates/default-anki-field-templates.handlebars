@@ -172,9 +172,9 @@
     {{~#mergeTags definition group merge}}{{this}}{{/mergeTags~}}
 {{/inline}}
 
-{{#*inline "url"}}
+{{~#*inline "url"~}}
     <a href="{{definition.url}}">{{definition.url}}</a>
-{{/inline}}
+{{~/inline~}}
 
 {{#*inline "screenshot"}}
     {{~#if (hasMedia "screenshot")~}}

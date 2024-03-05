@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Handlebars} from '../../../lib/handlebars.js';
-import {createAnkiNoteData} from '../../data/sandbox/anki-note-data-creator.js';
-import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../../dictionary/dictionary-data-util.js';
-import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../../display/sandbox/pronunciation-generator.js';
-import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
-import {CssStyleApplier} from '../../dom/sandbox/css-style-applier.js';
-import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../../language/ja/japanese.js';
+import {Handlebars} from '../../lib/handlebars.js';
+import {createAnkiNoteData} from '../data/anki-note-data-creator.js';
+import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
+import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../display/pronunciation-generator.js';
+import {StructuredContentGenerator} from '../display/structured-content-generator.js';
+import {CssStyleApplier} from '../dom/css-style-applier.js';
+import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../language/ja/japanese.js';
 import {AnkiTemplateRendererContentManager} from './anki-template-renderer-content-manager.js';
 import {TemplateRendererMediaProvider} from './template-renderer-media-provider.js';
 import {TemplateRenderer} from './template-renderer.js';
