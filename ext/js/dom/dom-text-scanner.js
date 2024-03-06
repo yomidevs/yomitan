@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {readCodePointsBackward, readCodePointsForward} from '../data/sandbox/string-util.js';
+import {readCodePointsBackward, readCodePointsForward} from '../data/string-util.js';
 
 /**
  * A class used to scan text in a document.
