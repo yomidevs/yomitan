@@ -109,6 +109,15 @@ export const latinTransforms = {
         },
         adj: {
             name: 'Adjective',
+            isDictionaryForm: true,
+            subConditions: ['adj3', 'adj12']
+        },
+        adj12: {
+            name: 'Adjective, 1st-2nd declension',
+            isDictionaryForm: true
+        },
+        adj3: {
+            name: 'Adjective, 3rd declension',
             isDictionaryForm: true
         },
         adv: {
@@ -121,7 +130,32 @@ export const latinTransforms = {
             name: 'plural',
             description: 'Plural form of a noun',
             rules: [
-                suffixInflection('i', 'us', ['n2p'], ['n2s'])
+                suffixInflection('i', 'us', ['n2p'], ['n2s']),
+                suffixInflection('i', 'us', ['adj12'], ['adj12']),
+                suffixInflection('e', '', ['n1p'], ['n1s']),
+                suffixInflection('ae', 'a', ['adj12'], ['adj12']),
+                suffixInflection('a', 'um', ['adj12'], ['adj12'])
+            ]
+        },
+        {
+            name: 'feminine',
+            description: 'Adjective form',
+            rules: [
+                suffixInflection('a', 'us', ['adj12'], ['adj12'])
+            ]
+        },
+        {
+            name: 'neuter',
+            description: 'Adjective form',
+            rules: [
+                suffixInflection('um', 'us', ['adj12'], ['adj12'])
+            ]
+        },
+        {
+            name: 'ablative',
+            description: 'Ablative case',
+            rules: [
+                suffixInflection('o', 'um', ['n2s'], ['n2s'])
             ]
         }
     ]
