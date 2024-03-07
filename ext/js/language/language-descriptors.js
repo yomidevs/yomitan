@@ -22,6 +22,7 @@ import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidth
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
 import {removeLatinDiacritics} from './la/latin-text-preprocessors.js';
+import {latinTransforms} from './la/latin-transforms.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
 import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
@@ -114,7 +115,8 @@ const languageDescriptors = [
         textPreprocessors: {
             ...capitalizationPreprocessors,
             removeLatinDiacritics
-        }
+        },
+        languageTransforms: latinTransforms
     },
     {
         iso: 'ja',
