@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {japaneseTransforms} from '../../../ext/js/language/ja/japanese-transforms.js';
-import {LanguageTransformer} from '../../../ext/js/language/language-transformer.js';
-import {testLanguageTransformer} from '../../fixtures/language-transformer-test.js';
+import {japaneseTransforms} from '../../ext/js/language/ja/japanese-transforms.js';
+import {LanguageTransformer} from '../../ext/js/language/language-transformer.js';
+import {testLanguageTransformer} from '../fixtures/language-transformer-test.js';
 
 /* eslint-disable @stylistic/no-multi-spaces */
 const tests = [
