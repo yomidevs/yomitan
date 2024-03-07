@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../core/event-listener-collection.js';
-import {base64ToArrayBuffer} from '../data/sandbox/array-buffer-util.js';
+import {base64ToArrayBuffer} from '../data/array-buffer-util.js';
 
 /**
  * The content manager which is used when generating HTML display content.

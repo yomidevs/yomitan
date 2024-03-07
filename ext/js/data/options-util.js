@@ -532,7 +532,9 @@ export class OptionsUtil {
             this._updateVersion23,
             this._updateVersion24,
             this._updateVersion25,
-            this._updateVersion26
+            this._updateVersion26,
+            this._updateVersion27,
+            this._updateVersion28
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1156,9 +1158,11 @@ export class OptionsUtil {
      */
     async _updateVersion25(options) {
         for (const profile of options.profiles) {
-            for (const hotkey of profile.options.inputs.hotkeys) {
-                if (hotkey.action === 'viewNote') {
-                    hotkey.action = 'viewNotes';
+            if ('inputs' in profile.options && 'hotkeys' in profile.options.inputs) {
+                for (const hotkey of profile.options.inputs.hotkeys) {
+                    if (hotkey.action === 'viewNote') {
+                        hotkey.action = 'viewNotes';
+                    }
                 }
             }
         }
@@ -1188,6 +1192,21 @@ export class OptionsUtil {
         }
     }
 
+    /**
+     * - Updated handlebars.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion27(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v27.handlebars');
+    }
+
+    /**
+     *  - Removed whitespace in URL handlebars template.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion28(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v28.handlebars');
+    }
 
     /**
      * @param {string} url

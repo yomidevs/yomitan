@@ -21,9 +21,9 @@ import {parseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {isObjectNotArray} from '../../core/object-utilities.js';
 import {toError} from '../../core/to-error.js';
+import {arrayBufferUtf8Decode} from '../../data/array-buffer-util.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {getAllPermissions} from '../../data/permissions-util.js';
-import {arrayBufferUtf8Decode} from '../../data/sandbox/array-buffer-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryController} from './dictionary-controller.js';
 

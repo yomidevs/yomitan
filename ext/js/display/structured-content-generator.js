@@ -16,15 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {getLanguageFromText} from '../../language/text-utilities.js';
+import {getLanguageFromText} from '../language/text-utilities.js';
 
 export class StructuredContentGenerator {
     /**
-     * @param {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} contentManager
+     * @param {import('./display-content-manager.js').DisplayContentManager|import('../templates/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} contentManager
      * @param {Document} document
      */
     constructor(contentManager, document) {
-        /** @type {import('../../display/display-content-manager.js').DisplayContentManager|import('../../templates/sandbox/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} */
+        /** @type {import('./display-content-manager.js').DisplayContentManager|import('../templates/anki-template-renderer-content-manager.js').AnkiTemplateRendererContentManager} */
         this._contentManager = contentManager;
         /** @type {Document} */
         this._document = document;

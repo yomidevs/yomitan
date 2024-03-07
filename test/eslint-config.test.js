@@ -90,7 +90,7 @@ const targets = [
     {
         name: 'sandbox',
         paths: [
-            'ext/js/templates/sandbox/template-renderer-frame-main.js'
+            'ext/js/templates/template-renderer-frame-main.js'
         ],
         /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
