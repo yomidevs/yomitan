@@ -128,7 +128,7 @@ export const latinTransforms = {
     transforms: [
         {
             name: 'plural',
-            description: 'Plural form of a noun',
+            description: 'Plural declension',
             rules: [
                 suffixInflection('i', 'us', ['n2p'], ['n2s']),
                 suffixInflection('i', 'us', ['adj12'], ['adj12']),
