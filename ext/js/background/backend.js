@@ -95,6 +95,10 @@ export class Backend {
         /** @type {import('../data/json-schema.js').JsonSchema[]} */
         this._profileConditionsSchemaCache = [];
         /** @type {?string} */
+        this._ankiClipboardImageFilenameCache = null;
+        /** @type {?string} */
+        this._ankiClipboardImageDataUrlCache = null;
+        /** @type {?string} */
         this._defaultAnkiFieldTemplates = null;
         /** @type {RequestBuilder} */
         this._requestBuilder = new RequestBuilder();
@@ -2025,7 +2029,7 @@ export class Backend {
 
         try {
             if (clipboardDetails !== null && clipboardDetails.image) {
-                clipboardImageFileName = await this._injectAnkiNoteClipboardImage(ankiConnect, timestamp, definitionDetails);
+                clipboardImageFileName = await this._injectAnkiNoteClipboardImage(ankiConnect, timestamp);
             }
         } catch (e) {
             errors.push(ExtensionError.serialize(e));
@@ -2131,10 +2135,9 @@ export class Backend {
     /**
      * @param {AnkiConnect} ankiConnect
      * @param {number} timestamp
-     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
      * @returns {Promise<?string>}
      */
-    async _injectAnkiNoteClipboardImage(ankiConnect, timestamp, definitionDetails) {
+    async _injectAnkiNoteClipboardImage(ankiConnect, timestamp) {
         const dataUrl = await this._clipboardReader.getImage();
         if (dataUrl === null) {
             return null;
@@ -2146,8 +2149,18 @@ export class Backend {
             throw new Error('Unknown media type for clipboard image');
         }
 
-        const fileName = this._generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp, definitionDetails);
-        return await ankiConnect.storeMediaFile(fileName, data);
+        const fileName = dataUrl === this._ankiClipboardImageDataUrlCache && this._ankiClipboardImageFilenameCache ?
+            this._ankiClipboardImageFilenameCache :
+            this._generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp);
+
+        const storedFileName = await ankiConnect.storeMediaFile(fileName, data);
+
+        if (storedFileName !== null) {
+            this._ankiClipboardImageDataUrlCache = dataUrl;
+            this._ankiClipboardImageFilenameCache = storedFileName;
+        }
+
+        return storedFileName;
     }
 
     /**
@@ -2273,26 +2286,28 @@ export class Backend {
      * @param {string} prefix
      * @param {string} extension
      * @param {number} timestamp
-     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
+     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails?} definitionDetails
      * @returns {string}
      */
-    _generateAnkiNoteMediaFileName(prefix, extension, timestamp, definitionDetails) {
+    _generateAnkiNoteMediaFileName(prefix, extension, timestamp, definitionDetails = null) {
         let fileName = prefix;
 
-        switch (definitionDetails.type) {
-            case 'kanji':
-                {
-                    const {character} = definitionDetails;
-                    if (character) { fileName += `_${character}`; }
-                }
-                break;
-            default:
-                {
-                    const {reading, term} = definitionDetails;
-                    if (reading) { fileName += `_${reading}`; }
-                    if (term) { fileName += `_${term}`; }
-                }
-                break;
+        if (definitionDetails) {
+            switch (definitionDetails.type) {
+                case 'kanji':
+                    {
+                        const {character} = definitionDetails;
+                        if (character) { fileName += `_${character}`; }
+                    }
+                    break;
+                default:
+                    {
+                        const {reading, term} = definitionDetails;
+                        if (reading) { fileName += `_${reading}`; }
+                        if (term) { fileName += `_${term}`; }
+                    }
+                    break;
+            }
         }
 
         fileName += `_${this._ankNoteDateToString(new Date(timestamp))}`;
