@@ -534,7 +534,8 @@ export class OptionsUtil {
             this._updateVersion25,
             this._updateVersion26,
             this._updateVersion27,
-            this._updateVersion28
+            this._updateVersion28,
+            this._updateVersion29
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1207,6 +1208,15 @@ export class OptionsUtil {
     async _updateVersion28(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v28.handlebars');
     }
+
+    /**
+     *  - Added new handlebar for different pitch accent graph style.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion29(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v29.handlebars');
+    }
+
 
     /**
      * @param {string} url
