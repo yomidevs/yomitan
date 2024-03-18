@@ -45,7 +45,7 @@ export type ProgressData = {
 };
 
 export type ImportResult = {
-    result: Summary;
+    result: Summary | null;
     errors: Error[];
 };
 
