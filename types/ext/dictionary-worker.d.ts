@@ -59,12 +59,12 @@ export type MessageGetImageDetailsParams = {
 export type MessageData<TResponseRaw = unknown> = MessageCompleteData<TResponseRaw> | MessageProgressData | MessageGetImageDetailsData;
 
 export type MessageCompleteResultSerialized = {
-    result: DictionaryImporter.Summary;
+    result: DictionaryImporter.Summary | null;
     errors: Core.SerializedError[];
 };
 
 export type MessageCompleteResult = {
-    result: DictionaryImporter.Summary;
+    result: DictionaryImporter.Summary | null;
     errors: Error[];
 };
 

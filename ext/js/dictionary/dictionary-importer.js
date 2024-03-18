@@ -106,7 +106,10 @@ export class DictionaryImporter {
 
         // Verify database is not already imported
         if (await dictionaryDatabase.dictionaryExists(dictionaryTitle)) {
-            throw new Error('Dictionary is already imported');
+            return {
+                errors: [new Error(`Dictionary ${dictionaryTitle} is already imported, skipped it.`)],
+                result: null
+            };
         }
 
         // Load schemas

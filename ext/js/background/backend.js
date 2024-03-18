@@ -535,22 +535,89 @@ export class Backend {
         return await this._anki.addNote(note);
     }
 
+    /**
+     * @param {import('anki').Note[]} notes
+     * @returns {Promise<({ canAdd: true; } | { canAdd: false; error: string; })[]>}
+     */
+    async detectDuplicateNotes(notes) {
+        // `allowDuplicate` is on for all notes by default, so we temporarily set it to false
+        // to check which notes are duplicates.
+        const notesNoDuplicatesAllowed = notes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}}));
+
+        return await this._anki.canAddNotesWithErrorDetail(notesNoDuplicatesAllowed);
+    }
+
+    /**
+     * Partitions notes between those that can / cannot be added.
+     * It further sets the `isDuplicate` strings for notes that have a duplicate.
+     * @param {import('anki').Note[]} notes
+     * @returns {Promise<import('backend').CanAddResults>}
+     */
+    async partitionAddibleNotes(notes) {
+        const canAddResults = await this.detectDuplicateNotes(notes);
+
+        /** @type {{ note: import('anki').Note, isDuplicate: boolean }[]} */
+        const canAddArray = [];
+
+        /** @type {import('anki').Note[]} */
+        const cannotAddArray = [];
+
+        for (let i = 0; i < canAddResults.length; i++) {
+            const result = canAddResults[i];
+
+            // If the note is a duplicate, the error is "cannot create note because it is a duplicate".
+            if (result.canAdd) {
+                canAddArray.push({note: notes[i], isDuplicate: false});
+            } else if (result.error.endsWith('duplicate')) {
+                canAddArray.push({note: notes[i], isDuplicate: true});
+            } else {
+                cannotAddArray.push(notes[i]);
+            }
+        }
+
+        return {canAddArray, cannotAddArray};
+    }
+
     /** @type {import('api').ApiHandler<'getAnkiNoteInfo'>} */
     async _onApiGetAnkiNoteInfo({notes, fetchAdditionalInfo}) {
-        /** @type {import('anki').NoteInfoWrapper[]} */
-        const results = [];
-        /** @type {{note: import('anki').Note, info: import('anki').NoteInfoWrapper}[]} */
-        const cannotAdd = [];
-        const canAddArray = await this._anki.canAddNotes(notes);
+        const {canAddArray, cannotAddArray} = await this.partitionAddibleNotes(notes);
 
-        for (let i = 0; i < notes.length; ++i) {
-            const note = notes[i];
-            let canAdd = canAddArray[i];
+        /** @type {{note: import('anki').Note, info: import('anki').NoteInfoWrapper}[]} */
+        const cannotAdd = cannotAddArray.filter((note) => isNoteDataValid(note)).map((note) => ({note, info: {canAdd: false, valid: false, noteIds: null}}));
+
+        /** @type {import('anki').NoteInfoWrapper[]} */
+        const results = cannotAdd.map(({info}) => info);
+
+        /** @type {import('anki').Note[]} */
+        const duplicateNotes = [];
+
+        /** @type {number[]} */
+        const originalIndices = [];
+
+        for (let i = 0; i < canAddArray.length; i++) {
+            if (canAddArray[i].isDuplicate) {
+                duplicateNotes.push(canAddArray[i].note);
+                // Keep original indices to locate duplicate inside `duplicateNoteIds`
+                originalIndices.push(i);
+            }
+        }
+
+        const duplicateNoteIds = await this._anki.findNoteIds(duplicateNotes);
+
+        for (let i = 0; i < canAddArray.length; ++i) {
+            const {note, isDuplicate} = canAddArray[i];
+
             const valid = isNoteDataValid(note);
-            if (!valid) { canAdd = false; }
-            const info = {canAdd, valid, noteIds: null};
+
+            const info = {
+                canAdd: valid,
+                valid,
+                noteIds: isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null
+            };
+
             results.push(info);
-            if (!canAdd && valid) {
+
+            if (!valid) {
                 cannotAdd.push({note, info});
             }
         }
