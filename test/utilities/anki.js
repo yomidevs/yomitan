@@ -107,7 +107,6 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
             modelName: 'modelName',
             fields: createTestFields(dictionaryEntry.type),
             tags: ['yomitan'],
-            checkForDuplicates: true,
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
             resultOutputMode: mode,

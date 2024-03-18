@@ -588,6 +588,7 @@
                 {"suffixIn": "び", "suffixOut": "ぶ", "conditionsIn": [], "conditionsOut": ["v5"]},
                 {"suffixIn": "み", "suffixOut": "む", "conditionsIn": [], "conditionsOut": ["v5"]},
                 {"suffixIn": "り", "suffixOut": "る", "conditionsIn": [], "conditionsOut": ["v5"]},
+                {"suffixIn": "し", "suffixOut": "する", "conditionsIn": [], "conditionsOut": ["vs"]},
                 {"suffixIn": "き", "suffixOut": "くる", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "来", "suffixOut": "来る", "conditionsIn": [], "conditionsOut": ["vk"]},
                 {"suffixIn": "來", "suffixOut": "來る", "conditionsIn": [], "conditionsOut": ["vk"]}
