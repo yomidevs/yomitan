@@ -95,6 +95,7 @@ type AllTextPreprocessors = {
     sq: CapitalizationPreprocessors;
     sv: CapitalizationPreprocessors;
     th: Record<string, never>;
+    tr: CapitalizationPreprocessors;
     vi: CapitalizationPreprocessors;
     zh: Record<string, never>;
 };

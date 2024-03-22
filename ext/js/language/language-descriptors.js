@@ -190,6 +190,12 @@ const languageDescriptors = [
         textPreprocessors: {}
     },
     {
+        iso: 'tr',
+        name: 'Turkish',
+        exampleText: 'okuyor',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
         iso: 'vi',
         name: 'Vietnamese',
         exampleText: 'đọc',
