@@ -16,14 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import fs from 'fs';
-import {fileURLToPath} from 'node:url';
-import path from 'path';
 import {describe, expect, test} from 'vitest';
-import {parseJson} from '../dev/json.js';
+import {japaneseTransforms} from '../ext/js/language/ja/japanese-transforms.js';
 import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
-
-const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * @param {LanguageTransformer} languageTransformer
@@ -1146,10 +1141,8 @@ describe('LanguageTransformer', () => {
     ];
     /* eslint-enable @stylistic/no-multi-spaces */
 
-    /** @type {import('language-transformer').LanguageTransformDescriptor} */
-    const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'js/language/ja/japanese-transforms.json'), {encoding: 'utf8'}));
     const languageTransformer = new LanguageTransformer();
-    languageTransformer.addDescriptor(descriptor);
+    languageTransformer.addDescriptor(japaneseTransforms);
 
     describe('deinflections', () => {
         describe.each(data)('$category', ({valid, tests}) => {
