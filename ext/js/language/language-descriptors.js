@@ -21,6 +21,7 @@ import {englishTransforms} from './en/english-transforms.js';
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
+import {disassembleHangul} from './ko/korean-text-preprocessors.js';
 import {removeLatinDiacritics} from './la/latin-text-preprocessors.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
@@ -135,6 +136,14 @@ const languageDescriptors = [
         name: 'Khmer',
         exampleText: 'អាន',
         textPreprocessors: {}
+    },
+    {
+        iso: 'ko',
+        name: 'Korean',
+        exampleText: '읽다',
+        textPreprocessors: {
+            disassembleHangul
+        }
     },
     {
         iso: 'pl',

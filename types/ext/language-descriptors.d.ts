@@ -83,6 +83,9 @@ type AllTextPreprocessors = {
         convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
         collapseEmphaticSequences: TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
     };
+    ko: {
+        disassembleHangul: TextPreprocessor<boolean>;
+    };
     km: Record<string, never>;
     pl: CapitalizationPreprocessors;
     pt: CapitalizationPreprocessors;
