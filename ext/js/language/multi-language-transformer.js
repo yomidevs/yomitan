@@ -16,6 +16,7 @@
  */
 
 import {LanguageTransformer} from './language-transformer.js';
+import {getAllLanguageTransformDescriptors} from './languages.js';
 
 export class MultiLanguageTransformer {
     constructor() {
@@ -23,11 +24,10 @@ export class MultiLanguageTransformer {
         this._languageTransformers = new Map();
     }
 
-    /**
-     * @param {import('language-transformer').LanguageTransformDescriptor[]} languageTransformDescriptors
-     */
-    prepare(languageTransformDescriptors) {
-        for (const descriptor of languageTransformDescriptors) {
+    /** */
+    prepare() {
+        const languagesWithTransforms = getAllLanguageTransformDescriptors();
+        for (const {languageTransforms: descriptor} of languagesWithTransforms) {
             const languageTransformer = new LanguageTransformer();
             languageTransformer.addDescriptor(descriptor);
             this._languageTransformers.set(descriptor.language, languageTransformer);

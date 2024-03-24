@@ -16,6 +16,7 @@
  */
 
 import type {TextPreprocessor, BidirectionalConversionPreprocessor} from './language';
+import type {LanguageTransformDescriptor} from './language-transformer';
 import type {SafeAny} from './core';
 
 export type IsTextLookupWorthyFunction = (text: string) => boolean;
@@ -32,7 +33,7 @@ type LanguageDescriptor<TIso extends string, TTextPreprocessorDescriptor extends
      */
     isTextLookupWorthy?: IsTextLookupWorthyFunction;
     textPreprocessors: TTextPreprocessorDescriptor;
-    languageTransformsFile?: string;
+    languageTransforms?: LanguageTransformDescriptor;
 };
 
 type TextPreprocessorDescriptor = {
@@ -72,7 +73,7 @@ type AllTextPreprocessors = {
     hu: CapitalizationPreprocessors;
     id: CapitalizationPreprocessors;
     it: CapitalizationPreprocessors;
-    la: {
+    la: CapitalizationPreprocessors & {
         removeLatinDiacritics: TextPreprocessor<boolean>;
     };
     ja: {
@@ -94,6 +95,7 @@ type AllTextPreprocessors = {
     sq: CapitalizationPreprocessors;
     sv: CapitalizationPreprocessors;
     th: Record<string, never>;
+    tr: CapitalizationPreprocessors;
     vi: CapitalizationPreprocessors;
     zh: Record<string, never>;
 };

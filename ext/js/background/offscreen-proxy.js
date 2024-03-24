@@ -183,11 +183,9 @@ export class TranslatorProxy {
         this._offscreen = offscreen;
     }
 
-    /**
-     * @param {import('language-transformer').LanguageTransformDescriptor[]} descriptors
-     */
-    async prepare(descriptors) {
-        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {descriptors}});
+    /** */
+    async prepare() {
+        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen'});
     }
 
     /**

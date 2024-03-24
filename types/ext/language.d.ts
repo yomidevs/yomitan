@@ -16,6 +16,7 @@
  */
 
 import type {TextSourceMap} from '../../ext/js/general/text-source-map.js';
+import type {LanguageTransformDescriptor} from './language-transformer.js';
 
 export type TextPreprocessorOptions<T = unknown> = T[];
 
@@ -42,6 +43,11 @@ export type LanguageAndPreprocessors = {
     textPreprocessors: TextPreprocessorWithId<unknown>[];
 };
 
+export type LanguageAndTransforms = {
+    iso: string;
+    languageTransforms: LanguageTransformDescriptor;
+};
+
 export type TextPreprocessorWithId<T = unknown> = {
     id: string;
     textPreprocessor: TextPreprocessor<T>;
@@ -51,5 +57,4 @@ export type LanguageSummary = {
     name: string;
     iso: string;
     exampleText: string;
-    languageTransformsFile?: string;
 };

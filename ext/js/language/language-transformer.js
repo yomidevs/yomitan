@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {escapeRegExp} from '../core/utilities.js';
+import {log} from '../core/log.js';
 
 export class LanguageTransformer {
     constructor() {
@@ -55,21 +55,22 @@ export class LanguageTransformer {
             /** @type {import('language-transformer-internal').Rule[]} */
             const rules2 = [];
             for (let j = 0, jj = rules.length; j < jj; ++j) {
-                const {suffixIn, suffixOut, conditionsIn, conditionsOut} = rules[j];
+                const {type, isInflected, deinflect, conditionsIn, conditionsOut} = rules[j];
                 const conditionFlagsIn = this._getConditionFlagsStrict(conditionFlagsMap, conditionsIn);
                 if (conditionFlagsIn === null) { throw new Error(`Invalid conditionsIn for transform[${i}].rules[${j}]`); }
                 const conditionFlagsOut = this._getConditionFlagsStrict(conditionFlagsMap, conditionsOut);
                 if (conditionFlagsOut === null) { throw new Error(`Invalid conditionsOut for transform[${i}].rules[${j}]`); }
                 rules2.push({
-                    suffixIn,
-                    suffixOut,
+                    type,
+                    isInflected,
+                    deinflect,
                     conditionsIn: conditionFlagsIn,
                     conditionsOut: conditionFlagsOut
                 });
             }
-            const suffixes = rules.map((rule) => rule.suffixIn);
-            const suffixHeuristic = new RegExp(`(${suffixes.map((suffix) => escapeRegExp(suffix)).join('|')})$`);
-            transforms2.push({name, rules: rules2, suffixHeuristic});
+            const isInflectedTests = rules.map((rule) => rule.isInflected);
+            const heuristic = new RegExp(isInflectedTests.map((regExp) => regExp.source).join('|'));
+            transforms2.push({name, rules: rules2, heuristic});
         }
 
         this._nextFlagIndex = nextFlagIndex;
@@ -120,18 +121,25 @@ export class LanguageTransformer {
         for (let i = 0; i < results.length; ++i) {
             const {text, conditions, trace} = results[i];
             for (const transform of this._transforms) {
-                if (!transform.suffixHeuristic.test(text)) { continue; }
+                if (!transform.heuristic.test(text)) { continue; }
 
                 const {name, rules} = transform;
                 for (let j = 0, jj = rules.length; j < jj; ++j) {
                     const rule = rules[j];
                     if (!LanguageTransformer.conditionsMatch(conditions, rule.conditionsIn)) { continue; }
-                    const {suffixIn, suffixOut} = rule;
-                    if (!text.endsWith(suffixIn) || (text.length - suffixIn.length + suffixOut.length) <= 0) { continue; }
+                    const {isInflected, deinflect} = rule;
+                    if (!isInflected.test(text)) { continue; }
+
+                    const isCycle = trace.some((frame) => frame.transform === name && frame.ruleIndex === j && frame.text === text);
+                    if (isCycle) {
+                        log.warn(new Error(`Cycle detected in transform[${name}] rule[${j}] for text: ${text}`));
+                        continue;
+                    }
+
                     results.push(LanguageTransformer.createTransformedText(
-                        text.substring(0, text.length - suffixIn.length) + suffixOut,
+                        deinflect(text),
                         rule.conditionsOut,
-                        this._extendTrace(trace, {transform: name, ruleIndex: j})
+                        this._extendTrace(trace, {transform: name, ruleIndex: j, text})
                     ));
                 }
             }
@@ -245,8 +253,8 @@ export class LanguageTransformer {
      */
     _extendTrace(trace, newFrame) {
         const newTrace = [newFrame];
-        for (const {transform, ruleIndex} of trace) {
-            newTrace.push({transform, ruleIndex});
+        for (const {transform, ruleIndex, text} of trace) {
+            newTrace.push({transform, ruleIndex, text});
         }
         return newTrace;
     }

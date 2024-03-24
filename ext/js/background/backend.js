@@ -23,7 +23,7 @@ import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {fetchJson, fetchText} from '../core/fetch-utilities.js';
+import {fetchText} from '../core/fetch-utilities.js';
 import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
@@ -279,16 +279,7 @@ export class Backend {
                 log.error(e);
             }
 
-            /** @type {import('language-transformer').LanguageTransformDescriptor[]} */
-            const descriptors = [];
-            const languageSummaries = getLanguageSummaries();
-            for (const {languageTransformsFile} of languageSummaries) {
-                if (!languageTransformsFile) { continue; }
-                /** @type {import('language-transformer').LanguageTransformDescriptor} */
-                const descriptor = await fetchJson(languageTransformsFile);
-                descriptors.push(descriptor);
-            }
-            void this._translator.prepare(descriptors);
+            void this._translator.prepare();
 
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
