@@ -21,7 +21,7 @@ import {englishTransforms} from './en/english-transforms.js';
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
-import {disassembleHangul} from './ko/korean-text-preprocessors.js';
+import {disassembleHangul, reassembleHangul} from './ko/korean-text-processors.js';
 import {removeLatinDiacritics} from './la/latin-text-preprocessors.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
@@ -134,8 +134,7 @@ const languageDescriptors = [
     {
         iso: 'km',
         name: 'Khmer',
-        exampleText: 'អាន',
-        textPreprocessors: {}
+        exampleText: 'អាន'
     },
     {
         iso: 'ko',
@@ -143,7 +142,11 @@ const languageDescriptors = [
         exampleText: '읽다',
         textPreprocessors: {
             disassembleHangul
+        },
+        textPostprocessors: {
+            reassembleHangul
         }
+        // languageTransforms: koreanTransforms
     },
     {
         iso: 'pl',
@@ -195,8 +198,7 @@ const languageDescriptors = [
     {
         iso: 'th',
         name: 'Thai',
-        exampleText: 'อ่าน',
-        textPreprocessors: {}
+        exampleText: 'อ่าน'
     },
     {
         iso: 'tr',
@@ -213,8 +215,7 @@ const languageDescriptors = [
     {
         iso: 'zh',
         name: 'Chinese',
-        exampleText: '读',
-        textPreprocessors: {}
+        exampleText: '读'
     }
 ];
 

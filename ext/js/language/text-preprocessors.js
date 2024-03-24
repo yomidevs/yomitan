@@ -15,21 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @type {import('language').TextPreprocessorOptions<boolean>} */
-export const basicTextPreprocessorOptions = [false, true];
+/** @type {import('language').TextProcessorOptions<boolean>} */
+export const basicTextProcessorOptions = [false, true];
 
-/** @type {import('language').TextPreprocessor<boolean>} */
+/** @type {import('language').TextProcessor<boolean>} */
 export const decapitalize = {
     name: 'Decapitalize text',
     description: 'CAPITALIZED TEXT → capitalized text',
-    options: basicTextPreprocessorOptions,
+    options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? str.toLowerCase() : str)
 };
 
-/** @type {import('language').TextPreprocessor<boolean>} */
+/** @type {import('language').TextProcessor<boolean>} */
 export const capitalizeFirstLetter = {
     name: 'Capitalize first letter',
     description: 'lowercase text → Lowercase text',
-    options: basicTextPreprocessorOptions,
+    options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? str.charAt(0).toUpperCase() + str.slice(1) : str)
 };

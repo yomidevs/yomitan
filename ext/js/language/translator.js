@@ -20,7 +20,7 @@ import {applyTextReplacement} from '../general/regex-util.js';
 import {TextSourceMap} from '../general/text-source-map.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
-import {getAllLanguageTextPreprocessors} from './languages.js';
+import {getAllLanguageTextProcessors} from './languages.js';
 import {MultiLanguageTransformer} from './multi-language-transformer.js';
 
 /**
@@ -41,7 +41,7 @@ export class Translator {
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
         /** @type {RegExp} */
         this._numberRegex = /[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/;
-        /** @type {Map<string, {textPreprocessors: import('language').TextPreprocessorWithId<unknown>[], optionSpace: import('translation-internal').PreprocessorOptionsSpace}>} */
+        /** @type {import('translation-internal').TextPreprocessorMap} */
         this._textPreprocessors = new Map();
     }
 
@@ -50,13 +50,19 @@ export class Translator {
      */
     prepare() {
         this._multiLanguageTransformer.prepare();
-        for (const {iso, textPreprocessors} of getAllLanguageTextPreprocessors()) {
-            /** @type {Map<string, import('language').TextPreprocessorOptions<unknown>>} */
-            const optionSpace = new Map();
-            for (const {id, textPreprocessor} of textPreprocessors) {
-                optionSpace.set(id, textPreprocessor.options);
+        for (const {iso, textPreprocessors = [], textPostprocessors = []} of getAllLanguageTextProcessors()) {
+            /** @type {import('translation-internal').TextProcessorOptionsSpace}>} */
+            const preprocessorOptionsSpace = new Map();
+            /** @type {import('translation-internal').TextProcessorOptionsSpace}>} */
+            const postprocessorOptionsSpace = new Map();
+
+            for (const {id, textProcessor} of textPreprocessors) {
+                preprocessorOptionsSpace.set(id, textProcessor.options);
             }
-            this._textPreprocessors.set(iso, {textPreprocessors, optionSpace});
+            for (const {id, textProcessor} of textPostprocessors) {
+                postprocessorOptionsSpace.set(id, textProcessor.options);
+            }
+            this._textPreprocessors.set(iso, {textPreprocessors, preprocessorOptionsSpace, textPostprocessors, postprocessorOptionsSpace});
         }
     }
 
@@ -440,21 +446,17 @@ export class Translator {
         const {language} = options;
         const info = this._textPreprocessors.get(language);
         if (typeof info === 'undefined') { throw new Error(`Unsupported language: ${language}`); }
-        const {textPreprocessors, optionSpace: textPreprocessorOptionsSpace} = info;
+        const {textPreprocessors, preprocessorOptionsSpace, textPostprocessors, postprocessorOptionsSpace} = info;
 
-        /** @type {Map<string, import('language').TextPreprocessorOptions<unknown>>} */
-        const variantSpace = new Map();
-        variantSpace.set('textReplacements', this._getTextReplacementsVariants(options));
-        for (const [key, value] of textPreprocessorOptionsSpace) {
-            variantSpace.set(key, value);
-        }
+        const preprocessorVariantSpace = new Map(preprocessorOptionsSpace);
+        preprocessorVariantSpace.set('textReplacements', this._getTextReplacementsVariants(options));
 
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const deinflections = [];
         const used = new Set();
 
-        for (const arrayVariant of this._generateArrayVariants(variantSpace)) {
-            const textReplacements = /** @type {import('translation').FindTermsTextReplacement[] | null} */ (arrayVariant.get('textReplacements'));
+        for (const preprocessorVariant of this._generateArrayVariants(preprocessorVariantSpace)) {
+            const textReplacements = /** @type {import('translation').FindTermsTextReplacement[] | null} */ (preprocessorVariant.get('textReplacements'));
 
             let text2 = text;
             const sourceMap = new TextSourceMap(text2);
@@ -464,9 +466,9 @@ export class Translator {
             }
 
             for (const preprocessor of textPreprocessors.values()) {
-                const {id, textPreprocessor} = preprocessor;
-                const setting = arrayVariant.get(id);
-                text2 = textPreprocessor.process(text2, setting, sourceMap);
+                const {id, textProcessor} = preprocessor;
+                const setting = preprocessorVariant.get(id);
+                text2 = textProcessor.process(text2, setting, sourceMap);
             }
 
             for (
@@ -479,12 +481,20 @@ export class Translator {
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
                 for (const {text: transformedText, conditions, trace} of this._multiLanguageTransformer.transform(language, source)) {
-                    /** @type {import('dictionary').InflectionRuleChainCandidate} */
-                    const inflectionRuleChainCandidate = {
-                        source: 'algorithm',
-                        inflectionRules: trace.map((frame) => frame.transform)
-                    };
-                    deinflections.push(this._createDeinflection(rawSource, source, transformedText, conditions, [inflectionRuleChainCandidate]));
+                    for (const postprocessorVariant of this._generateArrayVariants(postprocessorOptionsSpace)) {
+                        for (const postprocessor of textPostprocessors.values()) {
+                            const {id, textProcessor} = postprocessor;
+                            const setting = postprocessorVariant.get(id);
+                            text2 = textProcessor.process(text2, setting, sourceMap);
+                        }
+
+                        /** @type {import('dictionary').InflectionRuleChainCandidate} */
+                        const inflectionRuleChainCandidate = {
+                            source: 'algorithm',
+                            inflectionRules: trace.map((frame) => frame.transform)
+                        };
+                        deinflections.push(this._createDeinflection(rawSource, source, transformedText, conditions, [inflectionRuleChainCandidate]));
+                    }
                 }
             }
         }

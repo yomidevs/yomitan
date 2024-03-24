@@ -15,11 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @type {import('language').TextPreprocessor<boolean>} */
+/** @type {import('language').TextProcessor<boolean>} */
 export const disassembleHangul = {
     name: 'Disassemble Hangul',
     description: 'Disassemble Hangul characters into jamo.',
-    options: [true],
+    options: [true], // Could probably also be set to [false, true], but this way it is always on
+    process: (str) => {
+        return str; // Import from hangul.js
+    }
+};
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const reassembleHangul = {
+    name: 'Reassemble Hangul',
+    description: 'Reassemble Hangul characters from jamo.',
+    options: [true], // Could probably also be set to [false, true], but this way it is always on
     process: (str) => {
         return str; // Import from hangul.js
     }

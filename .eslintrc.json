@@ -647,7 +647,7 @@
                 "ext/js/language/ja/japanese-transforms.js",
                 "ext/js/language/ja/japanese-wanakana.js",
                 "ext/js/language/ja/japanese.js",
-                "ext/js/language/ko/korean-text-preprocessors.js",
+                "ext/js/language/ko/korean-text-processors.js",
                 "ext/js/language/la/latin-text-preprocessors.js",
                 "ext/js/language/language-descriptors.js",
                 "ext/js/language/language-transformer.js",

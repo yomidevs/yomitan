@@ -15,23 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextPreprocessorOptions} from '../text-preprocessors.js';
+import {basicTextProcessorOptions} from '../text-preprocessors.js';
 
-/** @type {import('language').TextPreprocessor<boolean>} */
+/** @type {import('language').TextProcessor<boolean>} */
 export const removeRussianDiacritics = {
     name: 'Remove diacritics',
     description: 'A\u0301 → A, a\u0301 → a',
-    options: basicTextPreprocessorOptions,
+    options: basicTextProcessorOptions,
     process: (str, setting) => {
         return setting ? str.replace(/\u0301/g, '') : str;
     }
 };
 
-/** @type {import('language').TextPreprocessor<boolean>} */
+/** @type {import('language').TextProcessor<boolean>} */
 export const yoToE = {
     name: 'Yo to E',
     description: 'ё → е, Ё → Е',
-    options: basicTextPreprocessorOptions,
+    options: basicTextProcessorOptions,
     process: (str, setting) => {
         return setting ? str.replace(/ё/g, 'е').replace(/Ё/g, 'Е') : str;
     }

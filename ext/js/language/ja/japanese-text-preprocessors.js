@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextPreprocessorOptions} from '../text-preprocessors.js';
+import {basicTextProcessorOptions} from '../text-preprocessors.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {
     collapseEmphaticSequences as collapseEmphaticSequencesFunction,
@@ -25,27 +25,27 @@ import {
     convertNumericToFullWidth
 } from './japanese.js';
 
-/** @type {import('language').TextPreprocessor<boolean>} */
+/** @type {import('language').TextProcessor<boolean>} */
 export const convertHalfWidthCharacters = {
     name: 'Convert half width characters to full width',
     description: 'ﾖﾐﾁｬﾝ → ヨミチャン',
-    options: basicTextPreprocessorOptions,
+    options: basicTextProcessorOptions,
     process: (str, setting, sourceMap) => (setting ? convertHalfWidthKanaToFullWidth(str, sourceMap) : str)
 };
 
-/** @type {import('language').TextPreprocessor<boolean>} */
+/** @type {import('language').TextProcessor<boolean>} */
 export const convertNumericCharacters = {
     name: 'Convert numeric characters to full width',
     description: '1234 → １２３４',
-    options: basicTextPreprocessorOptions,
+    options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? convertNumericToFullWidth(str) : str)
 };
 
-/** @type {import('language').TextPreprocessor<boolean>} */
+/** @type {import('language').TextProcessor<boolean>} */
 export const convertAlphabeticCharacters = {
     name: 'Convert alphabetic characters to hiragana',
     description: 'yomichan → よみちゃん',
-    options: basicTextPreprocessorOptions,
+    options: basicTextProcessorOptions,
     process: (str, setting, sourceMap) => (setting ? convertAlphabeticToKana(str, sourceMap) : str)
 };
 
@@ -66,7 +66,7 @@ export const convertHiraganaToKatakana = {
     }
 };
 
-/** @type {import('language').TextPreprocessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>} */
+/** @type {import('language').TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>} */
 export const collapseEmphaticSequences = {
     name: 'Collapse emphatic character sequences',
     description: 'すっっごーーい → すっごーい / すごい',

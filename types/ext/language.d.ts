@@ -18,29 +18,30 @@
 import type {TextSourceMap} from '../../ext/js/general/text-source-map.js';
 import type {LanguageTransformDescriptor} from './language-transformer.js';
 
-export type TextPreprocessorOptions<T = unknown> = T[];
+export type TextProcessorOptions<T = unknown> = T[];
 
-export type TextPreprocessorFunction<T = unknown> = (str: string, setting: T, sourceMap: TextSourceMap) => string;
+export type TextProcessorFunction<T = unknown> = (str: string, setting: T, sourceMap: TextSourceMap) => string;
 
 /**
- * Text preprocessors are used during the translation process to create alternate versions of the input text to search for.
+ * Text pre- and post-processors are used during the translation process to create alternate versions of the input text to search for.
  * This is helpful when the input text doesn't exactly match the term or expression found in the database.
- * When a language has multiple preprocessors, the translator will generate variants of the text by applying all combinations of the preprocessors.
+ * When a language has multiple processors, the translator will generate variants of the text by applying all combinations of the processors.
  */
-export type TextPreprocessor<T = unknown> = {
+export type TextProcessor<T = unknown> = {
     name: string;
     description: string;
-    options: TextPreprocessorOptions<T>;
-    process: TextPreprocessorFunction<T>;
+    options: TextProcessorOptions<T>;
+    process: TextProcessorFunction<T>;
 };
 
 export type BidirectionalPreprocessorOptions = 'off' | 'direct' | 'inverse';
 
-export type BidirectionalConversionPreprocessor = TextPreprocessor<BidirectionalPreprocessorOptions>;
+export type BidirectionalConversionPreprocessor = TextProcessor<BidirectionalPreprocessorOptions>;
 
-export type LanguageAndPreprocessors = {
+export type LanguageAndProcessors = {
     iso: string;
-    textPreprocessors: TextPreprocessorWithId<unknown>[];
+    textPreprocessors?: TextProcessorWithId<unknown>[];
+    textPostprocessors?: TextProcessorWithId<unknown>[];
 };
 
 export type LanguageAndTransforms = {
@@ -48,9 +49,9 @@ export type LanguageAndTransforms = {
     languageTransforms: LanguageTransformDescriptor;
 };
 
-export type TextPreprocessorWithId<T = unknown> = {
+export type TextProcessorWithId<T = unknown> = {
     id: string;
-    textPreprocessor: TextPreprocessor<T>;
+    textProcessor: TextProcessor<T>;
 };
 
 export type LanguageSummary = {
