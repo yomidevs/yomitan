@@ -15,13 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {assemble, disassemble} from './korean-hangul.js';
+
 /** @type {import('language').TextProcessor<boolean>} */
 export const disassembleHangul = {
     name: 'Disassemble Hangul',
     description: 'Disassemble Hangul characters into jamo.',
     options: [true], // Could probably also be set to [false, true], but this way it is always on
     process: (str) => {
-        return str; // Import from hangul.js
+        return disassemble(str);
     }
 };
 
@@ -31,6 +33,6 @@ export const reassembleHangul = {
     description: 'Reassemble Hangul characters from jamo.',
     options: [true], // Could probably also be set to [false, true], but this way it is always on
     process: (str) => {
-        return str; // Import from hangul.js
+        return assemble(str);
     }
 };
