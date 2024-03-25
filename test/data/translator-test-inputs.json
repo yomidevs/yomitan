@@ -456,6 +456,20 @@
                     "removeNonJapaneseCharacters": false
                 }
             ]
+        },
+        {
+            "name": "Test text postprocessing",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "마시거나",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "language": "ko",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
         }
     ]
 }

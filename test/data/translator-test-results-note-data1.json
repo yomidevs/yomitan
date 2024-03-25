@@ -32940,5 +32940,121 @@
         "media": {}
       }
     ]
+  },
+  {
+    "name": "Test text postprocessing",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 29,
+          "source": "ㅁㅏㅅㅣㄱㅓㄴㅏ",
+          "rawSource": "마시거나",
+          "sourceTerm": "마시다",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "거나"
+              ]
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 21,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "마시다",
+          "reading": "마시다",
+          "expressions": [
+            {
+              "sourceTerm": "마시다",
+              "expression": "마시다",
+              "reading": "마시다",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "마시다",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v"
+              ]
+            }
+          ],
+          "glossary": [
+            "masida definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "v",
+              "category": "default",
+              "notes": "",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "마시다",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "마시다"
+        ],
+        "uniqueReadings": [
+          "마시다"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
   }
 ]

@@ -18604,5 +18604,86 @@
         "frequencies": []
       }
     ]
+  },
+  {
+    "name": "Test text postprocessing",
+    "originalTextLength": 4,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": [
+              "거나"
+            ]
+          }
+        ],
+        "score": 1,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxTransformedTextLength": 8,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "마시다",
+            "reading": "마시다",
+            "sources": [
+              {
+                "originalText": "마시거나",
+                "transformedText": "ㅁㅏㅅㅣㄱㅓㄴㅏ",
+                "deinflectedText": "마시다",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "v"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 29,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              21
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "v",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "masida definition"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      }
+    ]
   }
 ]

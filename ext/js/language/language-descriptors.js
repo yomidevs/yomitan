@@ -22,6 +22,7 @@ import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidth
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
 import {disassembleHangul, reassembleHangul} from './ko/korean-text-processors.js';
+import {koreanTransforms} from './ko/korean-transforms.js';
 import {removeLatinDiacritics} from './la/latin-text-preprocessors.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
@@ -145,8 +146,8 @@ const languageDescriptors = [
         },
         textPostprocessors: {
             reassembleHangul
-        }
-        // languageTransforms: koreanTransforms
+        },
+        languageTransforms: koreanTransforms
     },
     {
         iso: 'pl',

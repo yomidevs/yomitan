@@ -480,12 +480,14 @@ export class Translator {
                 if (used.has(source)) { break; }
                 used.add(source);
                 const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                for (const {text: transformedText, conditions, trace} of this._multiLanguageTransformer.transform(language, source)) {
+                for (const deinflection of this._multiLanguageTransformer.transform(language, source)) {
+                    const {trace, conditions} = deinflection;
                     for (const postprocessorVariant of this._generateArrayVariants(postprocessorOptionsSpace)) {
+                        let {text: transformedText} = deinflection;
                         for (const postprocessor of textPostprocessors.values()) {
                             const {id, textProcessor} = postprocessor;
                             const setting = postprocessorVariant.get(id);
-                            text2 = textProcessor.process(text2, setting, sourceMap);
+                            transformedText = textProcessor.process(transformedText, setting, sourceMap);
                         }
 
                         /** @type {import('dictionary').InflectionRuleChainCandidate} */

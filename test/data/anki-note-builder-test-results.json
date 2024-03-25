@@ -3919,5 +3919,47 @@
         "url": "<a href=\"url:\">url:</a>"
       }
     ]
+  },
+  {
+    "name": "Test text postprocessing",
+    "results": [
+      {
+        "audio": "",
+        "clipboard-image": "",
+        "clipboard-text": "",
+        "cloze-body": "마시거나",
+        "cloze-body-kana": "마시거나",
+        "cloze-prefix": "cloze-prefix",
+        "cloze-suffix": "cloze-suffix",
+        "conjugation": "거나",
+        "dictionary": "Test Dictionary 2",
+        "document-title": "title",
+        "expression": "마시다",
+        "frequencies": "",
+        "frequency-harmonic-rank": "9999999",
+        "frequency-harmonic-occurrence": "0",
+        "frequency-average-rank": "9999999",
+        "frequency-average-occurrence": "0",
+        "furigana": "마시다",
+        "furigana-plain": "마시다",
+        "glossary": "<div style=\"text-align: left;\"><i>(v, Test Dictionary 2)</i> masida definition</div>",
+        "glossary-brief": "<div style=\"text-align: left;\">masida definition</div>",
+        "glossary-no-dictionary": "<div style=\"text-align: left;\"><i>(v)</i> masida definition</div>",
+        "part-of-speech": "v",
+        "pitch-accents": "No pitch accent data",
+        "pitch-accent-graphs": "No pitch accent data",
+        "pitch-accent-positions": "No pitch accent data",
+        "pitch-accent-categories": "",
+        "phonetic-transcriptions": "",
+        "reading": "마시다",
+        "screenshot": "",
+        "search-query": "fullQuery",
+        "selection-text": "",
+        "sentence": "cloze-prefix마시거나cloze-suffix",
+        "sentence-furigana": "cloze-prefix마시거나cloze-suffix",
+        "tags": "v",
+        "url": "<a href=\"url:\">url:</a>"
+      }
+    ]
   }
 ]
