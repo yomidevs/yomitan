@@ -1303,7 +1303,7 @@ export class Backend {
 
         this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);
 
-        if (options.clipboard.enableBackgroundMonitor && enabled) {
+        if (options.clipboard.enableBackgroundMonitor || options.clipboard.enableSearchPageMonitor && enabled) {
             this._clipboardMonitor.start();
         } else {
             this._clipboardMonitor.stop();
