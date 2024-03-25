@@ -1159,6 +1159,27 @@ export class Backend {
 
         // Create a new window
         const options = this._getProfileOptions({current: true}, false);
+        if (!options.clipboard.enableBackgroundMonitor) {
+            return {
+                tab: {
+                    id: undefined,
+                    index: -1,
+                    windowId: -1,
+                    highlighted: false,
+                    active: false,
+                    pinned: false,
+                    url: undefined,
+                    title: undefined,
+                    incognito: false,
+                    selected: false,
+                    discarded: true,
+                    autoDiscardable: true,
+                    groupId: -1
+                },
+                created: false
+            };
+        }
+
         const createData = this._getSearchPopupWindowCreateData(baseUrl, options);
         const {popupWindow: {windowState}} = options;
         const popupWindow = await this._createWindow(createData);
