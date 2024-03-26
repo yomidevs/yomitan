@@ -846,7 +846,6 @@ export class Backend {
 
     /** @type {import('api').ApiHandlerNoExtraArgs<'getOrCreateSearchPopup'>} */
     async _onApiGetOrCreateSearchPopup({focus = false, text, isShortcut}) {
-        isShortcut = isShortcut ? true : false;
         const {tab, created} = await this._getOrCreateSearchPopupWrapper(isShortcut);
         if (focus === true || (focus === 'ifCreated' && created)) {
             await this._focusTab(tab);
@@ -1112,7 +1111,7 @@ export class Backend {
     }
 
     /**
-     * @param {boolean} isShortcut
+     * @param {boolean | undefined} isShortcut
      * @returns {Promise<{tab: chrome.tabs.Tab, created: boolean}>}
      */
     _getOrCreateSearchPopupWrapper(isShortcut) {
@@ -1125,7 +1124,7 @@ export class Backend {
     }
 
     /**
-     * @param {boolean} isShortcut
+     * @param {boolean | undefined} isShortcut
      * @returns {Promise<{tab: chrome.tabs.Tab, created: boolean}>}
      */
     async _getOrCreateSearchPopup(isShortcut) {
@@ -1162,19 +1161,18 @@ export class Backend {
 
         // Create a new window
         const options = this._getProfileOptions({current: true}, false);
-        // don't create a tab if it's not a shortcut command..
-        // ..&& enableBackgroundMonitor isn't enabled
+        // Don't create a tab if it's not a shortcut command && enableBackgroundMonitor isn't enabled
         if (!options.clipboard.enableBackgroundMonitor && !isShortcut) {
             return {
                 tab: {
-                    id: undefined,
+                    id: 0,
                     index: -1,
                     windowId: -1,
                     highlighted: false,
                     active: false,
                     pinned: false,
-                    url: undefined,
-                    title: undefined,
+                    url: '',
+                    title: '',
                     incognito: false,
                     selected: false,
                     discarded: true,
@@ -1329,7 +1327,7 @@ export class Backend {
 
         this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);
 
-        if (options.clipboard.enableBackgroundMonitor || options.clipboard.enableSearchPageMonitor && enabled) {
+        if ((options.clipboard.enableBackgroundMonitor || options.clipboard.enableSearchPageMonitor) && enabled) {
             this._clipboardMonitor.start();
         } else {
             this._clipboardMonitor.stop();
