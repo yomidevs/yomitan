@@ -318,7 +318,7 @@ export class Backend {
             text = text.substring(0, maximumSearchLength);
         }
         try {
-            const {tab, created} = await this._getOrCreateSearchPopupWrapper();
+            const {tab, created} = await this._getOrCreateSearchPopupWrapper(false);
             const {id} = tab;
             if (typeof id !== 'number') {
                 throw new Error('Tab does not have an id');
@@ -845,8 +845,9 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandlerNoExtraArgs<'getOrCreateSearchPopup'>} */
-    async _onApiGetOrCreateSearchPopup({focus = false, text}) {
-        const {tab, created} = await this._getOrCreateSearchPopupWrapper();
+    async _onApiGetOrCreateSearchPopup({focus = false, text, isShortcut}) {
+        isShortcut = isShortcut ? true : false;
+        const {tab, created} = await this._getOrCreateSearchPopupWrapper(isShortcut);
         if (focus === true || (focus === 'ifCreated' && created)) {
             await this._focusTab(tab);
         }
@@ -1085,7 +1086,7 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _onCommandOpenPopupWindow() {
-        await this._onApiGetOrCreateSearchPopup({focus: true});
+        await this._onApiGetOrCreateSearchPopup({focus: true, isShortcut: true});
     }
 
     // Utilities
@@ -1111,11 +1112,12 @@ export class Backend {
     }
 
     /**
+     * @param {boolean} isShortcut
      * @returns {Promise<{tab: chrome.tabs.Tab, created: boolean}>}
      */
-    _getOrCreateSearchPopupWrapper() {
+    _getOrCreateSearchPopupWrapper(isShortcut) {
         if (this._searchPopupTabCreatePromise === null) {
-            const promise = this._getOrCreateSearchPopup();
+            const promise = this._getOrCreateSearchPopup(isShortcut);
             this._searchPopupTabCreatePromise = promise;
             void promise.then(() => { this._searchPopupTabCreatePromise = null; });
         }
@@ -1123,9 +1125,10 @@ export class Backend {
     }
 
     /**
+     * @param {boolean} isShortcut
      * @returns {Promise<{tab: chrome.tabs.Tab, created: boolean}>}
      */
-    async _getOrCreateSearchPopup() {
+    async _getOrCreateSearchPopup(isShortcut) {
         // Use existing tab
         const baseUrl = chrome.runtime.getURL('/search.html');
         /**
@@ -1159,7 +1162,9 @@ export class Backend {
 
         // Create a new window
         const options = this._getProfileOptions({current: true}, false);
-        if (!options.clipboard.enableBackgroundMonitor) {
+        // don't create a tab if it's not a shortcut command..
+        // ..&& enableBackgroundMonitor isn't enabled
+        if (!options.clipboard.enableBackgroundMonitor && !isShortcut) {
             return {
                 tab: {
                     id: undefined,

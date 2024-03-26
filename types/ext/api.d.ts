@@ -321,6 +321,7 @@ type ApiSurface = {
         params: {
             focus?: boolean | 'ifCreated';
             text?: string;
+            isShortcut?: boolean
         };
         return: {
             tabId: number | null;
