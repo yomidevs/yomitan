@@ -1165,7 +1165,7 @@ export class Backend {
         if (!options.clipboard.enableBackgroundMonitor && !isShortcut) {
             return {
                 tab: {
-                    id: 0,
+                    id: 999,
                     index: -1,
                     windowId: -1,
                     highlighted: false,
