@@ -181,4 +181,36 @@ export class HotkeyHelpController {
             defaultAttributeValues
         };
     }
+
+    /**
+     * @param {HTMLElement} node
+     * @returns {?string}
+     */
+    getHotkeyLabel(node) {
+        const {hotkey} = node.dataset;
+        if (typeof hotkey !== 'string') { return null; }
+
+        const data = /** @type {unknown} */ (parseJson(hotkey));
+        if (!Array.isArray(data)) { return null; }
+
+        const values = /** @type {unknown[]} */ (data)[2];
+        if (typeof values !== 'string') { return null; }
+
+        return values;
+    }
+
+    /**
+     * @param {HTMLElement} node
+     * @param {string} label
+     */
+    setHotkeyLabel(node, label) {
+        const {hotkey} = node.dataset;
+        if (typeof hotkey !== 'string') { return; }
+
+        const data = /** @type {unknown} */ (parseJson(hotkey));
+        if (!Array.isArray(data)) { return; }
+
+        data[2] = label;
+        node.dataset.hotkey = JSON.stringify(data);
+    }
 }

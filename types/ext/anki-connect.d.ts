@@ -15,25 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as Api from './api';
+type CanAddNote = {canAdd: true};
 
-export type DatabaseUpdateType = 'dictionary';
+type CannotAddNote = {canAdd: false, error: string};
 
-export type DatabaseUpdateCause = 'purge' | 'delete' | 'import';
-
-export type MecabParseResults = [
-    dictionary: string,
-    content: Api.ParseTextLine[],
-][];
-
-export type TabInfo = {
-    tab: chrome.tabs.Tab;
-    url: string | null;
-};
-
-export type FindTabsPredicate = (tabInfo: TabInfo) => boolean | Promise<boolean>;
-
-export type CanAddResults = {
-    canAddArray: {note: import('anki').Note, isDuplicate: boolean}[];
-    cannotAddArray: import('anki').Note[];
-};
+export type CanAddResult = CanAddNote | CannotAddNote;

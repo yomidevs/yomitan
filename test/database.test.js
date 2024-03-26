@@ -121,7 +121,7 @@ describe('Database', () => {
         // Setup database
         const dictionaryDatabase = new DictionaryDatabase();
         /** @type {import('dictionary-importer').ImportDetails} */
-        const detaultImportDetails = {prefixWildcardsSupported: false};
+        const defaultImportDetails = {prefixWildcardsSupported: false};
 
         // Database not open
         await expect.soft(dictionaryDatabase.deleteDictionary(title, 1000, () => {})).rejects.toThrow('Database not open');
@@ -135,17 +135,17 @@ describe('Database', () => {
         await expect.soft(dictionaryDatabase.findTagForTitle('tag', title)).rejects.toThrow('Database not open');
         await expect.soft(dictionaryDatabase.getDictionaryInfo()).rejects.toThrow('Database not open');
         await expect.soft(dictionaryDatabase.getDictionaryCounts([...titles.keys()], true)).rejects.toThrow('Database not open');
-        await expect.soft(createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Database is not ready');
+        await expect.soft(createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails)).rejects.toThrow('Database is not ready');
 
         await dictionaryDatabase.prepare();
 
         // Already prepared
         await expect.soft(dictionaryDatabase.prepare()).rejects.toThrow('Database already open');
 
-        await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails);
+        await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails);
 
         // Dictionary already imported
-        await expect.soft(createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary is already imported');
+        expect.soft(await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails)).toEqual({result: null, errors: [new Error('Dictionary Test Dictionary is already imported, skipped it.')]});
 
         await dictionaryDatabase.close();
     });
@@ -200,7 +200,11 @@ describe('Database', () => {
                 testDictionarySource,
                 {prefixWildcardsSupported: true}
             );
-            importDictionaryResult.importDate = fakeImportDate;
+
+            if (importDictionaryResult) {
+                importDictionaryResult.importDate = fakeImportDate;
+            }
+
             expect.soft(importDictionaryErrors).toStrictEqual([]);
             expect.soft(importDictionaryResult).toStrictEqual(testData.expectedSummary);
             expect.soft(progressEvent1).toBe(true);
