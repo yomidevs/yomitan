@@ -29,7 +29,6 @@ import type {
     ApiReturn as BaseApiReturn,
     ApiNames as BaseApiNames,
 } from './api-map';
-import type {LanguageTransformDescriptor} from './language-transformer';
 
 type ApiSurface = {
     databasePrepareOffscreen: {
@@ -51,9 +50,7 @@ type ApiSurface = {
         return: DictionaryDatabase.Media<string>[];
     };
     translatorPrepareOffscreen: {
-        params: {
-            descriptors: LanguageTransformDescriptor[];
-        };
+        params: void;
         return: void;
     };
     findKanjiOffscreen: {

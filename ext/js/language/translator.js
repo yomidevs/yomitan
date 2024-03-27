@@ -47,10 +47,9 @@ export class Translator {
 
     /**
      * Initializes the instance for use. The public API should not be used until this function has been called.
-     * @param {import('language-transformer').LanguageTransformDescriptor[]} languageTransformDescriptors
      */
-    prepare(languageTransformDescriptors) {
-        this._multiLanguageTransformer.prepare(languageTransformDescriptors);
+    prepare() {
+        this._multiLanguageTransformer.prepare();
         for (const {iso, textPreprocessors} of getAllLanguageTextPreprocessors()) {
             /** @type {Map<string, import('language').TextPreprocessorOptions<unknown>>} */
             const optionSpace = new Map();

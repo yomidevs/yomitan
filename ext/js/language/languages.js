@@ -22,8 +22,8 @@ import {languageDescriptorMap} from './language-descriptors.js';
  */
 export function getLanguageSummaries() {
     const results = [];
-    for (const {name, iso, exampleText, languageTransformsFile} of languageDescriptorMap.values()) {
-        results.push({name, iso, exampleText, languageTransformsFile});
+    for (const {name, iso, exampleText} of languageDescriptorMap.values()) {
+        results.push({name, iso, exampleText});
     }
     return results;
 }
@@ -57,4 +57,17 @@ export function isTextLookupWorthy(text, language) {
     const descriptor = languageDescriptorMap.get(language);
     if (typeof descriptor === 'undefined') { return false; }
     return typeof descriptor.isTextLookupWorthy === 'undefined' || descriptor.isTextLookupWorthy(text);
+}
+
+/**
+ * @returns {import('language').LanguageAndTransforms[]}
+ */
+export function getAllLanguageTransformDescriptors() {
+    const results = [];
+    for (const {iso, languageTransforms} of languageDescriptorMap.values()) {
+        if (languageTransforms) {
+            results.push({iso, languageTransforms});
+        }
+    }
+    return results;
 }

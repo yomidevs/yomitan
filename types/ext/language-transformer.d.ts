@@ -55,8 +55,18 @@ export type TransformI18n = {
 };
 
 export type Rule = {
-    suffixIn: string;
-    suffixOut: string;
+    type: 'suffix' | 'prefix' | 'other';
+    isInflected: RegExp;
+    deinflect: (inflectedWord: string) => string;
+    conditionsIn: string[];
+    conditionsOut: string[];
+};
+
+export type SuffixRule = {
+    type: 'suffix';
+    isInflected: RegExp;
+    deinflected: string;
+    deinflect: (inflectedWord: string) => string;
     conditionsIn: string[];
     conditionsOut: string[];
 };

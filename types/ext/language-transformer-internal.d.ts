@@ -18,12 +18,13 @@
 export type Transform = {
     name: string;
     rules: Rule[];
-    suffixHeuristic: RegExp;
+    heuristic: RegExp;
 };
 
 export type Rule = {
-    suffixIn: string;
-    suffixOut: string;
+    type: 'suffix' | 'prefix' | 'other';
+    isInflected: RegExp;
+    deinflect: (inflectedWord: string) => string;
     conditionsIn: number;
     conditionsOut: number;
 };
@@ -37,6 +38,7 @@ export type TransformedText = {
 export type Trace = TraceFrame[];
 
 export type TraceFrame = {
+    text: string;
     transform: string;
     ruleIndex: number;
 };
