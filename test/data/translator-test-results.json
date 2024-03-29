@@ -12912,7 +12912,7 @@
             "reading": "だ",
             "sources": [
               {
-                "originalText": "打",
+                "originalText": "打(う)",
                 "transformedText": "打",
                 "deinflectedText": "打",
                 "matchType": "exact",
@@ -13080,7 +13080,7 @@
             "reading": "ダース",
             "sources": [
               {
-                "originalText": "打",
+                "originalText": "打(う)",
                 "transformedText": "打",
                 "deinflectedText": "打",
                 "matchType": "exact",

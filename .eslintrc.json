@@ -639,7 +639,6 @@
                 "ext/js/general/cache-map.js",
                 "ext/js/general/object-property-accessor.js",
                 "ext/js/general/regex-util.js",
-                "ext/js/general/text-source-map.js",
                 "ext/js/language/ar/arabic-text-preprocessors.js",
                 "ext/js/language/de/german-text-preprocessors.js",
                 "ext/js/language/en/english-transforms.js",

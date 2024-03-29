@@ -133,8 +133,7 @@ const languageDescriptors = [
     {
         iso: 'km',
         name: 'Khmer',
-        exampleText: 'អាន',
-        textPreprocessors: {}
+        exampleText: 'អាន'
     },
     {
         iso: 'pl',
@@ -186,8 +185,7 @@ const languageDescriptors = [
     {
         iso: 'th',
         name: 'Thai',
-        exampleText: 'อ่าน',
-        textPreprocessors: {}
+        exampleText: 'อ่าน'
     },
     {
         iso: 'tr',
@@ -204,8 +202,7 @@ const languageDescriptors = [
     {
         iso: 'zh',
         name: 'Chinese',
-        exampleText: '读',
-        textPreprocessors: {}
+        exampleText: '读'
     }
 ];
 

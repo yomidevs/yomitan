@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextPreprocessorOptions} from '../text-preprocessors.js';
+import {basicTextProcessorOptions} from '../text-preprocessors.js';
 
 /** @type {Record<string, string>} */
 const diacriticMap = {
@@ -45,11 +45,11 @@ const diacriticMap = {
     Ý: 'Y'
 };
 
-/** @type {import('language').TextPreprocessor<boolean>} */
+/** @type {import('language').TextProcessor<boolean>} */
 export const removeLatinDiacritics = {
     name: 'Remove diacritics',
     description: 'āēīōūȳ → aeiouy, áéíóúý → aeiouy',
-    options: basicTextPreprocessorOptions,
+    options: basicTextProcessorOptions,
     process: (str, setting) => {
         return setting ? str.replace(/[āēīōūȳáéíóúýĀĒĪŌŪȲÁÉÍÓÚÝ]/g, (match) => diacriticMap[match] || match) : str;
     }
