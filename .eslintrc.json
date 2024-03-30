@@ -568,6 +568,7 @@
                 "ext/js/display/structured-content-generator.js",
                 "ext/js/dom/css-style-applier.js",
                 "ext/js/language/ja/japanese.js",
+                "ext/js/language/language-util.js",
                 "ext/js/language/text-utilities.js",
                 "ext/js/templates/anki-template-renderer-content-manager.js",
                 "ext/js/templates/anki-template-renderer.js",
@@ -650,6 +651,7 @@
                 "ext/js/language/la/latin-text-preprocessors.js",
                 "ext/js/language/language-descriptors.js",
                 "ext/js/language/language-transformer.js",
+                "ext/js/language/language-util.js",
                 "ext/js/language/language-transforms.js",
                 "ext/js/language/languages.js",
                 "ext/js/language/multi-language-transformer.js",
@@ -657,6 +659,7 @@
                 "ext/js/language/sq/albanian-transforms.js",
                 "ext/js/language/text-preprocessors.js",
                 "ext/js/language/translator.js",
+                "ext/js/language/zh/chinese.js",
                 "ext/js/media/audio-downloader.js",
                 "ext/js/media/media-util.js",
                 "ext/js/templates/template-patcher.js"
