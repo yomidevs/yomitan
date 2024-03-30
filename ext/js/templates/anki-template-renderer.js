@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Handlebars} from '../../../lib/handlebars.js';
-import {createAnkiNoteData} from '../../data/sandbox/anki-note-data-creator.js';
-import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../../dictionary/dictionary-data-util.js';
-import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../../display/sandbox/pronunciation-generator.js';
-import {StructuredContentGenerator} from '../../display/sandbox/structured-content-generator.js';
-import {CssStyleApplier} from '../../dom/sandbox/css-style-applier.js';
-import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../../language/ja/japanese.js';
+import {Handlebars} from '../../lib/handlebars.js';
+import {createAnkiNoteData} from '../data/anki-note-data-creator.js';
+import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
+import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../display/pronunciation-generator.js';
+import {StructuredContentGenerator} from '../display/structured-content-generator.js';
+import {CssStyleApplier} from '../dom/css-style-applier.js';
+import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../language/ja/japanese.js';
 import {AnkiTemplateRendererContentManager} from './anki-template-renderer-content-manager.js';
 import {TemplateRendererMediaProvider} from './template-renderer-media-provider.js';
 import {TemplateRenderer} from './template-renderer.js';
@@ -142,14 +142,6 @@ export class AnkiTemplateRenderer {
      * @param {string} text
      * @returns {string}
      */
-    _escape(text) {
-        return Handlebars.Utils.escapeExpression(text);
-    }
-
-    /**
-     * @param {string} text
-     * @returns {string}
-     */
     _safeString(text) {
         return new Handlebars.SafeString(text);
     }
@@ -158,8 +150,7 @@ export class AnkiTemplateRenderer {
 
     /** @type {import('template-renderer').HelperFunction<string>} */
     _dumpObject(object) {
-        const dump = JSON.stringify(object, null, 4);
-        return this._escape(dump);
+        return JSON.stringify(object, null, 4);
     }
 
     /** @type {import('template-renderer').HelperFunction<string>} */
@@ -169,12 +160,10 @@ export class AnkiTemplateRenderer {
 
         let result = '';
         for (const {text, reading: reading2} of segments) {
-            const safeText = this._escape(text);
-            const safeReading = this._escape(reading2);
             result += (
-                safeReading.length > 0 ?
-                `<ruby>${safeText}<rt>${safeReading}</rt></ruby>` :
-                safeText
+                reading2.length > 0 ?
+                `<ruby>${text}<rt>${reading2}</rt></ruby>` :
+                text
             );
         }
 
@@ -676,12 +665,12 @@ export class AnkiTemplateRenderer {
         const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossaryContent]} */ (args);
         /** @type {import('anki-templates').NoteData} */
         const data = options.data.root;
-        if (typeof content === 'string') { return this._stringToMultiLineHtml(this._escape(content)); }
+        if (typeof content === 'string') { return this._safeString(this._stringToMultiLineHtml(content)); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
         switch (content.type) {
             case 'image': return this._formatGlossaryImage(content, dictionary, data);
             case 'structured-content': return this._formatStructuredContent(content, dictionary, data);
-            case 'text': return this._stringToMultiLineHtml(this._escape(content.text));
+            case 'text': return this._safeString(this._stringToMultiLineHtml(content.text));
         }
         return '';
     }

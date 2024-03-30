@@ -247,7 +247,7 @@ export async function main() {
     };
 
     const argv = process.argv.slice(2);
-    const {values: args} = parseArgs({args: argv, options: parseArgsConfigOptions});
+    const {values: args, positionals: targets} = parseArgs({args: argv, options: parseArgsConfigOptions, allowPositionals: true});
 
     const dryRun = /** @type {boolean} */ (args.dryRun);
     const dryRunBuildZip = /** @type {boolean} */ (args.dryRunBuildZip);
@@ -265,7 +265,7 @@ export async function main() {
         const variantNames = /** @type {string[]} */ ((
             argv.length === 0 || args.all ?
             manifestUtil.getVariants().filter(({buildable}) => buildable !== false).map(({name}) => name) :
-            []
+            targets
         ));
         await build(buildDir, extDir, manifestUtil, variantNames, manifestPath, dryRun, dryRunBuildZip, yomitanVersion);
     } finally {

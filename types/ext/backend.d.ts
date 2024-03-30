@@ -32,3 +32,8 @@ export type TabInfo = {
 };
 
 export type FindTabsPredicate = (tabInfo: TabInfo) => boolean | Promise<boolean>;
+
+export type CanAddResults = {
+    canAddArray: {note: import('anki').Note, isDuplicate: boolean}[];
+    cannotAddArray: import('anki').Note[];
+};

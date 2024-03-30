@@ -23,14 +23,15 @@ import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {Mecab} from '../comm/mecab.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {fetchJson, fetchText} from '../core/fetch-utilities.js';
+import {fetchText} from '../core/fetch-utilities.js';
 import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
-import {clone, deferPromise, isObject, promiseTimeout} from '../core/utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
+import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
 import {isNoteDataValid} from '../data/anki-util.js';
+import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
-import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Environment} from '../extension/environment.js';
 import {ObjectPropertyAccessor} from '../general/object-property-accessor.js';
@@ -222,12 +223,12 @@ export class Backend {
      * @returns {void}
      */
     _prepareInternalSync() {
-        if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
+        if (isObjectNotArray(chrome.commands) && isObjectNotArray(chrome.commands.onCommand)) {
             const onCommand = this._onWebExtensionEventWrapper(this._onCommand.bind(this));
             chrome.commands.onCommand.addListener(onCommand);
         }
 
-        if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
+        if (isObjectNotArray(chrome.tabs) && isObjectNotArray(chrome.tabs.onZoomChange)) {
             const onZoomChange = this._onWebExtensionEventWrapper(this._onZoomChange.bind(this));
             chrome.tabs.onZoomChange.addListener(onZoomChange);
         }
@@ -274,9 +275,7 @@ export class Backend {
                 log.error(e);
             }
 
-            /** @type {import('language-transformer').LanguageTransformDescriptor} */
-            const descriptor = await fetchJson('/data/language/japanese-transforms.json');
-            void this._translator.prepare(descriptor);
+            void this._translator.prepare();
 
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await fetchText('/data/templates/default-anki-field-templates.handlebars')).trim();
@@ -536,22 +535,89 @@ export class Backend {
         return await this._anki.addNote(note);
     }
 
+    /**
+     * @param {import('anki').Note[]} notes
+     * @returns {Promise<({ canAdd: true; } | { canAdd: false; error: string; })[]>}
+     */
+    async detectDuplicateNotes(notes) {
+        // `allowDuplicate` is on for all notes by default, so we temporarily set it to false
+        // to check which notes are duplicates.
+        const notesNoDuplicatesAllowed = notes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}}));
+
+        return await this._anki.canAddNotesWithErrorDetail(notesNoDuplicatesAllowed);
+    }
+
+    /**
+     * Partitions notes between those that can / cannot be added.
+     * It further sets the `isDuplicate` strings for notes that have a duplicate.
+     * @param {import('anki').Note[]} notes
+     * @returns {Promise<import('backend').CanAddResults>}
+     */
+    async partitionAddibleNotes(notes) {
+        const canAddResults = await this.detectDuplicateNotes(notes);
+
+        /** @type {{ note: import('anki').Note, isDuplicate: boolean }[]} */
+        const canAddArray = [];
+
+        /** @type {import('anki').Note[]} */
+        const cannotAddArray = [];
+
+        for (let i = 0; i < canAddResults.length; i++) {
+            const result = canAddResults[i];
+
+            // If the note is a duplicate, the error is "cannot create note because it is a duplicate".
+            if (result.canAdd) {
+                canAddArray.push({note: notes[i], isDuplicate: false});
+            } else if (result.error.endsWith('duplicate')) {
+                canAddArray.push({note: notes[i], isDuplicate: true});
+            } else {
+                cannotAddArray.push(notes[i]);
+            }
+        }
+
+        return {canAddArray, cannotAddArray};
+    }
+
     /** @type {import('api').ApiHandler<'getAnkiNoteInfo'>} */
     async _onApiGetAnkiNoteInfo({notes, fetchAdditionalInfo}) {
-        /** @type {import('anki').NoteInfoWrapper[]} */
-        const results = [];
-        /** @type {{note: import('anki').Note, info: import('anki').NoteInfoWrapper}[]} */
-        const cannotAdd = [];
-        const canAddArray = await this._anki.canAddNotes(notes);
+        const {canAddArray, cannotAddArray} = await this.partitionAddibleNotes(notes);
 
-        for (let i = 0; i < notes.length; ++i) {
-            const note = notes[i];
-            let canAdd = canAddArray[i];
+        /** @type {{note: import('anki').Note, info: import('anki').NoteInfoWrapper}[]} */
+        const cannotAdd = cannotAddArray.filter((note) => isNoteDataValid(note)).map((note) => ({note, info: {canAdd: false, valid: false, noteIds: null}}));
+
+        /** @type {import('anki').NoteInfoWrapper[]} */
+        const results = cannotAdd.map(({info}) => info);
+
+        /** @type {import('anki').Note[]} */
+        const duplicateNotes = [];
+
+        /** @type {number[]} */
+        const originalIndices = [];
+
+        for (let i = 0; i < canAddArray.length; i++) {
+            if (canAddArray[i].isDuplicate) {
+                duplicateNotes.push(canAddArray[i].note);
+                // Keep original indices to locate duplicate inside `duplicateNoteIds`
+                originalIndices.push(i);
+            }
+        }
+
+        const duplicateNoteIds = await this._anki.findNoteIds(duplicateNotes);
+
+        for (let i = 0; i < canAddArray.length; ++i) {
+            const {note, isDuplicate} = canAddArray[i];
+
             const valid = isNoteDataValid(note);
-            if (!valid) { canAdd = false; }
-            const info = {canAdd, valid, noteIds: null};
+
+            const info = {
+                canAdd: valid,
+                valid,
+                noteIds: isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null
+            };
+
             results.push(info);
-            if (!canAdd && valid) {
+
+            if (!valid) {
                 cannotAdd.push({note, info});
             }
         }
@@ -1087,7 +1153,7 @@ export class Backend {
         }
 
         // chrome.windows not supported (e.g. on Firefox mobile)
-        if (!isObject(chrome.windows)) {
+        if (!isObjectNotArray(chrome.windows)) {
             throw new Error('Window creation not supported');
         }
 
@@ -1554,7 +1620,7 @@ export class Backend {
      */
     _getBrowserIconTitle() {
         return (
-            isObject(chrome.action) &&
+            isObjectNotArray(chrome.action) &&
             typeof chrome.action.getTitle === 'function' ?
                 new Promise((resolve) => { chrome.action.getTitle({}, resolve); }) :
                 Promise.resolve('')
@@ -1566,7 +1632,7 @@ export class Backend {
      */
     _updateBadge() {
         let title = this._defaultBrowserActionTitle;
-        if (title === null || !isObject(chrome.action)) {
+        if (title === null || !isObjectNotArray(chrome.action)) {
             // Not ready or invalid
             return;
         }
@@ -2573,7 +2639,7 @@ export class Backend {
      * @returns {boolean}
      */
     _canObservePermissionsChanges() {
-        return isObject(chrome.permissions) && isObject(chrome.permissions.onAdded) && isObject(chrome.permissions.onRemoved);
+        return isObjectNotArray(chrome.permissions) && isObjectNotArray(chrome.permissions.onAdded) && isObjectNotArray(chrome.permissions.onRemoved);
     }
 
     /**

@@ -25,14 +25,14 @@ export class AnkiNoteBuilder {
     /**
      * Initiate an instance of AnkiNoteBuilder.
      * @param {import('anki-note-builder').MinimalApi} api
-     * @param {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} templateRenderer
+     * @param {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/template-renderer.js').TemplateRenderer} templateRenderer
      */
     constructor(api, templateRenderer) {
         /** @type {import('anki-note-builder').MinimalApi} */
         this._api = api;
         /** @type {RegExp} */
         this._markerPattern = cloneFieldMarkerPattern(true);
-        /** @type {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} */
+        /** @type {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/template-renderer.js').TemplateRenderer} */
         this._templateRenderer = templateRenderer;
         /** @type {import('anki-note-builder').BatchedRequestGroup[]} */
         this._batchedRequests = [];
@@ -54,7 +54,6 @@ export class AnkiNoteBuilder {
         fields,
         tags = [],
         requirements = [],
-        checkForDuplicates = true,
         duplicateScope = 'collection',
         duplicateScopeCheckAllModels = false,
         resultOutputMode = 'split',
@@ -111,7 +110,7 @@ export class AnkiNoteBuilder {
             deckName,
             modelName,
             options: {
-                allowDuplicate: !checkForDuplicates,
+                allowDuplicate: true,
                 duplicateScope,
                 duplicateScopeOptions: {
                     deckName: duplicateScopeDeckName,
