@@ -16,7 +16,7 @@
  */
 
 import {vi} from 'vitest';
-import {AnkiTemplateRenderer} from '../../ext/js/templates/sandbox/anki-template-renderer.js';
+import {AnkiTemplateRenderer} from '../../ext/js/templates/anki-template-renderer.js';
 import {fetch} from '../mocks/common.js';
 import {createDomTest} from './dom-test.js';
 

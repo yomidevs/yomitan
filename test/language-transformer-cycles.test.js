@@ -15,12 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {readFileSync} from 'fs';
-import {join, dirname as pathDirname} from 'path';
-import {fileURLToPath} from 'url';
 import {describe, test} from 'vitest';
-import {parseJson} from '../dev/json.js';
 import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
+import {getAllLanguageTransformDescriptors} from '../ext/js/language/languages.js';
 
 class DeinflectionNode {
     /**
@@ -79,12 +76,12 @@ class DeinflectionNode {
 class RuleNode {
     /**
      * @param {string} groupName
-     * @param {import('language-transformer').Rule} rule
+     * @param {import('language-transformer').SuffixRule} rule
      */
     constructor(groupName, rule) {
         /** @type {string} */
         this.groupName = groupName;
-        /** @type {import('language-transformer').Rule} */
+        /** @type {import('language-transformer').SuffixRule} */
         this.rule = rule;
     }
 }
@@ -103,33 +100,36 @@ function arraysAreEqual(rules1, rules2) {
     return true;
 }
 
-describe('Deinflection data', () => {
-    test('Check for cycles', ({expect}) => {
-        const dirname = pathDirname(fileURLToPath(import.meta.url));
+const languagesWithTransforms = getAllLanguageTransformDescriptors();
 
-        /** @type {import('language-transformer').LanguageTransformDescriptor} */
-        const descriptor = parseJson(readFileSync(join(dirname, '../ext/data/language/japanese-transforms.json'), {encoding: 'utf8'}));
+describe.each(languagesWithTransforms)('Cycles Test $iso', ({languageTransforms}) => {
+    test('Check for cycles', ({expect}) => {
         const languageTransformer = new LanguageTransformer();
-        languageTransformer.addDescriptor(descriptor);
+        languageTransformer.addDescriptor(languageTransforms);
 
         /** @type {RuleNode[]} */
         const ruleNodes = [];
-        for (const [groupName, reasonInfo] of Object.entries(descriptor.transforms)) {
+        for (const [groupName, reasonInfo] of Object.entries(languageTransforms.transforms)) {
             for (const rule of reasonInfo.rules) {
-                ruleNodes.push(new RuleNode(groupName, rule));
+                if (rule.type === 'suffix') {
+                    ruleNodes.push(new RuleNode(groupName, /** @type {import('language-transformer').SuffixRule}*/ (rule)));
+                }
             }
         }
 
         /** @type {DeinflectionNode[]} */
         const deinflectionNodes = [];
-        for (const ruleNode of ruleNodes) {
-            deinflectionNodes.push(new DeinflectionNode(`?${ruleNode.rule.suffixIn}`, [], null, null));
+        for (const {rule: {isInflected}} of ruleNodes) {
+            const suffixIn = isInflected.source.substring(0, isInflected.source.length - 1);
+            deinflectionNodes.push(new DeinflectionNode(`?${suffixIn}`, [], null, null));
         }
+
         for (let i = 0; i < deinflectionNodes.length; ++i) {
             const deinflectionNode = deinflectionNodes[i];
             const {text, ruleNames} = deinflectionNode;
             for (const ruleNode of ruleNodes) {
-                const {suffixIn, suffixOut, conditionsIn, conditionsOut} = ruleNode.rule;
+                const {isInflected, deinflected: suffixOut, conditionsIn, conditionsOut} = ruleNode.rule;
+                const suffixIn = isInflected.source.substring(0, isInflected.source.length - 1);
                 if (
                     !LanguageTransformer.conditionsMatch(
                         languageTransformer.getConditionFlagsFromConditionTypes(ruleNames),
@@ -151,12 +151,14 @@ describe('Deinflection data', () => {
                 // Cycle check
                 if (deinflectionNode.historyIncludes(newDeinflectionNode)) {
                     const stack = [];
-                    for (const item of newDeinflectionNode.getHistory()) {
-                        stack.push(
-                            item.ruleNode === null ?
-                                `${item.text} (start)` :
-                                `${item.text} (${item.ruleNode.groupName}, ${item.ruleNode.rule.conditionsIn.join(',')}=>${item.ruleNode.rule.conditionsOut.join(',')}, ${item.ruleNode.rule.suffixIn}=>${item.ruleNode.rule.suffixOut})`
-                        );
+                    for (const {text: itemText, ruleNode: itemNode} of newDeinflectionNode.getHistory()) {
+                        if (itemNode !== null) {
+                            const itemSuffixIn = itemNode.rule.isInflected.source.substring(0, itemNode.rule.isInflected.source.length - 1);
+                            const itemSuffixOut = itemNode.rule.deinflected;
+                            stack.push(`${itemText} (${itemNode.groupName}, ${itemNode.rule.conditionsIn.join(',')}=>${itemNode.rule.conditionsOut.join(',')}, ${itemSuffixIn}=>${itemSuffixOut})`);
+                        } else {
+                            stack.push(`${itemText} (start)`);
+                        }
                     }
                     const message = `Cycle detected:\n  ${stack.join('\n  ')}`;
                     expect.soft(true, message).toEqual(false);

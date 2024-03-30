@@ -17,10 +17,13 @@
 
 import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
+import {englishTransforms} from './en/english-transforms.js';
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
+import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
 import {removeLatinDiacritics} from './la/latin-text-preprocessors.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
+import {albanianTransforms} from './sq/albanian-transforms.js';
 import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
 
 const capitalizationPreprocessors = {
@@ -57,7 +60,8 @@ const languageDescriptors = [
         iso: 'en',
         name: 'English',
         exampleText: 'read',
-        textPreprocessors: capitalizationPreprocessors
+        textPreprocessors: capitalizationPreprocessors,
+        languageTransforms: englishTransforms
     },
     {
         iso: 'es',
@@ -108,6 +112,7 @@ const languageDescriptors = [
         name: 'Latin',
         exampleText: 'legere',
         textPreprocessors: {
+            ...capitalizationPreprocessors,
             removeLatinDiacritics
         }
     },
@@ -122,7 +127,8 @@ const languageDescriptors = [
             convertAlphabeticCharacters,
             convertHiraganaToKatakana,
             collapseEmphaticSequences
-        }
+        },
+        languageTransforms: japaneseTransforms
     },
     {
         iso: 'km',
@@ -168,7 +174,8 @@ const languageDescriptors = [
         iso: 'sq',
         name: 'Albanian',
         exampleText: 'ndihmojme',
-        textPreprocessors: capitalizationPreprocessors
+        textPreprocessors: capitalizationPreprocessors,
+        languageTransforms: albanianTransforms
     },
     {
         iso: 'sv',
@@ -181,6 +188,12 @@ const languageDescriptors = [
         name: 'Thai',
         exampleText: 'อ่าน',
         textPreprocessors: {}
+    },
+    {
+        iso: 'tr',
+        name: 'Turkish',
+        exampleText: 'okuyor',
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'vi',

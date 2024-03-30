@@ -114,7 +114,7 @@ export function getExpectedAddNoteBody() {
                 deckName: 'Mock Deck',
                 modelName: 'Mock Model',
                 options: {
-                    allowDuplicate: false,
+                    allowDuplicate: true,
                     duplicateScope: 'collection',
                     duplicateScopeOptions: {
                         deckName: null,

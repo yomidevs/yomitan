@@ -16,14 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import fs from 'fs';
-import {fileURLToPath} from 'node:url';
-import path from 'path';
 import {describe, expect, test} from 'vitest';
-import {parseJson} from '../dev/json.js';
+import {japaneseTransforms} from '../ext/js/language/ja/japanese-transforms.js';
 import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
-
-const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * @param {LanguageTransformer} languageTransformer
@@ -685,7 +680,7 @@ describe('LanguageTransformer', () => {
                 {term: 'する', source: 'せぬ',           rule: 'vs', reasons: ['-nu']},
                 {term: 'する', source: 'せざる',           rule: 'vs', reasons: ['-zaru']},
                 {term: 'する', source: 'せねば',           rule: 'vs', reasons: ['-neba']},
-                // ['masu stem']
+                {term: 'する', source: 'し',             rule: 'vs', reasons: ['masu stem']},
                 {term: 'する', source: 'しましょう',     rule: 'vs', reasons: ['polite', 'volitional']},
                 {term: 'する', source: 'しよう',         rule: 'vs', reasons: ['volitional']},
                 // ['causative passive']
@@ -1146,10 +1141,8 @@ describe('LanguageTransformer', () => {
     ];
     /* eslint-enable @stylistic/no-multi-spaces */
 
-    /** @type {import('language-transformer').LanguageTransformDescriptor} */
-    const descriptor = parseJson(fs.readFileSync(path.join(dirname, '..', 'ext', 'data/language/japanese-transforms.json'), {encoding: 'utf8'}));
     const languageTransformer = new LanguageTransformer();
-    languageTransformer.addDescriptor(descriptor);
+    languageTransformer.addDescriptor(japaneseTransforms);
 
     describe('deinflections', () => {
         describe.each(data)('$category', ({valid, tests}) => {

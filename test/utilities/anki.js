@@ -16,9 +16,9 @@
  */
 
 import {AnkiNoteBuilder} from '../../ext/js/data/anki-note-builder.js';
+import {createAnkiNoteData} from '../../ext/js/data/anki-note-data-creator.js';
 import {getStandardFieldMarkers} from '../../ext/js/data/anki-template-util.js';
-import {createAnkiNoteData} from '../../ext/js/data/sandbox/anki-note-data-creator.js';
-import {AnkiTemplateRenderer} from '../../ext/js/templates/sandbox/anki-template-renderer.js';
+import {AnkiTemplateRenderer} from '../../ext/js/templates/anki-template-renderer.js';
 
 /**
  * @param {import('dictionary').DictionaryEntryType} type
@@ -107,7 +107,6 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
             modelName: 'modelName',
             fields: createTestFields(dictionaryEntry.type),
             tags: ['yomitan'],
-            checkForDuplicates: true,
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
             resultOutputMode: mode,

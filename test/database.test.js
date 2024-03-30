@@ -21,8 +21,8 @@ import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {join, dirname as pathDirname} from 'path';
 import {beforeEach, describe, test, vi} from 'vitest';
+import {createDictionaryArchiveData, getDictionaryArchiveIndex} from '../dev/dictionary-archive-util.js';
 import {parseJson} from '../dev/json.js';
-import {createDictionaryArchive} from '../dev/util.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
@@ -34,11 +34,11 @@ vi.stubGlobal('IDBKeyRange', IDBKeyRange);
 /**
  * @param {string} dictionary
  * @param {string} [dictionaryName]
- * @returns {import('jszip')}
+ * @returns {Promise<ArrayBuffer>}
  */
-function createTestDictionaryArchive(dictionary, dictionaryName) {
+async function createTestDictionaryArchiveData(dictionary, dictionaryName) {
     const dictionaryDirectory = join(dirname, 'data', 'dictionaries', dictionary);
-    return createDictionaryArchive(dictionaryDirectory, dictionaryName);
+    return await createDictionaryArchiveData(dictionaryDirectory, dictionaryName);
 }
 
 /**
@@ -110,10 +110,8 @@ describe('Database', () => {
     });
     test('Database invalid usage', async ({expect}) => {
         // Load dictionary data
-        const testDictionary = createTestDictionaryArchive('valid-dictionary1');
-        const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
-        /** @type {import('dictionary-data').Index} */
-        const testDictionaryIndex = parseJson(await testDictionary.files['index.json'].async('string'));
+        const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+        const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
 
         const title = testDictionaryIndex.title;
         const titles = new Map([
@@ -123,7 +121,7 @@ describe('Database', () => {
         // Setup database
         const dictionaryDatabase = new DictionaryDatabase();
         /** @type {import('dictionary-importer').ImportDetails} */
-        const detaultImportDetails = {prefixWildcardsSupported: false};
+        const defaultImportDetails = {prefixWildcardsSupported: false};
 
         // Database not open
         await expect.soft(dictionaryDatabase.deleteDictionary(title, 1000, () => {})).rejects.toThrow('Database not open');
@@ -137,17 +135,17 @@ describe('Database', () => {
         await expect.soft(dictionaryDatabase.findTagForTitle('tag', title)).rejects.toThrow('Database not open');
         await expect.soft(dictionaryDatabase.getDictionaryInfo()).rejects.toThrow('Database not open');
         await expect.soft(dictionaryDatabase.getDictionaryCounts([...titles.keys()], true)).rejects.toThrow('Database not open');
-        await expect.soft(createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Database is not ready');
+        await expect.soft(createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails)).rejects.toThrow('Database is not ready');
 
         await dictionaryDatabase.prepare();
 
         // Already prepared
         await expect.soft(dictionaryDatabase.prepare()).rejects.toThrow('Database already open');
 
-        await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails);
+        await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails);
 
         // Dictionary already imported
-        await expect.soft(createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary is already imported');
+        expect.soft(await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails)).toEqual({result: null, errors: [new Error('Dictionary Test Dictionary is already imported, skipped it.')]});
 
         await dictionaryDatabase.close();
     });
@@ -165,8 +163,7 @@ describe('Database', () => {
                 const dictionaryDatabase = new DictionaryDatabase();
                 await dictionaryDatabase.prepare();
 
-                const testDictionary = createTestDictionaryArchive(name);
-                const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
+                const testDictionarySource = await createTestDictionaryArchiveData(name);
 
                 /** @type {import('dictionary-importer').ImportDetails} */
                 const detaultImportDetails = {prefixWildcardsSupported: false};
@@ -183,10 +180,8 @@ describe('Database', () => {
             const fakeImportDate = testData.expectedSummary.importDate;
 
             // Load dictionary data
-            const testDictionary = createTestDictionaryArchive('valid-dictionary1');
-            const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
-            /** @type {import('dictionary-data').Index} */
-            const testDictionaryIndex = parseJson(await testDictionary.files['index.json'].async('string'));
+            const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+            const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
 
             const title = testDictionaryIndex.title;
             const titles = new Map([
@@ -205,7 +200,11 @@ describe('Database', () => {
                 testDictionarySource,
                 {prefixWildcardsSupported: true}
             );
-            importDictionaryResult.importDate = fakeImportDate;
+
+            if (importDictionaryResult) {
+                importDictionaryResult.importDate = fakeImportDate;
+            }
+
             expect.soft(importDictionaryErrors).toStrictEqual([]);
             expect.soft(importDictionaryResult).toStrictEqual(testData.expectedSummary);
             expect.soft(progressEvent1).toBe(true);
@@ -315,10 +314,8 @@ describe('Database', () => {
         describe.each(cleanupTestCases)('Testing cleanup method $clearMethod', ({clearMethod}) => {
             test('Import data and test', async ({expect}) => {
                 // Load dictionary data
-                const testDictionary = createTestDictionaryArchive('valid-dictionary1');
-                const testDictionarySource = await testDictionary.generateAsync({type: 'arraybuffer'});
-                /** @type {import('dictionary-data').Index} */
-                const testDictionaryIndex = parseJson(await testDictionary.files['index.json'].async('string'));
+                const testDictionarySource = await createTestDictionaryArchiveData('valid-dictionary1');
+                const testDictionaryIndex = await getDictionaryArchiveIndex(testDictionarySource);
 
                 // Setup database
                 const dictionaryDatabase = new DictionaryDatabase();

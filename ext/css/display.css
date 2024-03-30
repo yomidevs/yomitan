@@ -669,6 +669,8 @@ button.action-button:active {
 .icon[data-icon=view-note]      { background-image: url('/images/view-note.svg'); }
 .icon[data-icon=add-term-kanji] { background-image: url('/images/add-term-kanji.svg'); }
 .icon[data-icon=add-term-kana]  { background-image: url('/images/add-term-kana.svg'); }
+.icon[data-icon=add-duplicate-term-kanji] { background-image: url('/images/add-duplicate-term-kanji.svg'); }
+.icon[data-icon=add-duplicate-term-kana]  { background-image: url('/images/add-duplicate-term-kana.svg'); }
 .icon[data-icon=play-audio]     { background-image: url('/images/play-audio.svg'); }
 .icon[data-icon=source-term]    { background-image: url('/images/source-term.svg'); }
 .icon[data-icon=entry-current]  { background-image: url('/images/entry-current.svg'); }

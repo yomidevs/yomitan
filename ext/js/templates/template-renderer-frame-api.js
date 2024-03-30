@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {createApiMap, invokeApiMapHandler} from '../../core/api-map.js';
-import {parseJson} from '../../core/json.js';
+import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {parseJson} from '../core/json.js';
 
 export class TemplateRendererFrameApi {
     /**

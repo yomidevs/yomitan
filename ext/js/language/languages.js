@@ -58,3 +58,16 @@ export function isTextLookupWorthy(text, language) {
     if (typeof descriptor === 'undefined') { return false; }
     return typeof descriptor.isTextLookupWorthy === 'undefined' || descriptor.isTextLookupWorthy(text);
 }
+
+/**
+ * @returns {import('language').LanguageAndTransforms[]}
+ */
+export function getAllLanguageTransformDescriptors() {
+    const results = [];
+    for (const {iso, languageTransforms} of languageDescriptorMap.values()) {
+        if (languageTransforms) {
+            results.push({iso, languageTransforms});
+        }
+    }
+    return results;
+}

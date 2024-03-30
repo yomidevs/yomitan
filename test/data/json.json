@@ -93,11 +93,6 @@
             "type": "AjvSchema"
         },
         {
-            "path": "ext/data/language/japanese-transforms.json",
-            "typeFile": "types/ext/language-transformer.d.ts",
-            "type": "LanguageTransformDescriptor"
-        },
-        {
             "path": "test/data/translator-test-inputs.json",
             "typeFile": "types/test/translator.d.ts",
             "type": "TranslatorTestInputs",
