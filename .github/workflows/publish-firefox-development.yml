@@ -28,7 +28,7 @@ jobs:
       - name: Sign Firefox xpi for offline distribution
         id: ffSignXpi
         continue-on-error: true
-        uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@94a2e58141e33c4306a72a93f191e8540189df92 # pin@v1.0.6
+        uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@ed44ff06ca9eae47ac45dd34b12833379b683c78 # pin@v1.0.7
         with:
           timeoutMs: 1200000
           extensionId: ${{ secrets.FF_OFFLINE_EXT_ID }}
@@ -101,7 +101,7 @@ jobs:
       actions: read # To read the workflow path.
       id-token: write # To sign the provenance.
       contents: write # To add assets to a release.
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.9.0
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.10.0
     with:
       base64-subjects: "${{ needs.build.outputs.hashes }}"
       upload-assets: true
