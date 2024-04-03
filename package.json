@@ -105,7 +105,6 @@
     },
     "dependencies": {
         "@zip.js/zip.js": "^2.7.36",
-        "cal-heatmap": "^4.2.4",
         "dexie": "^3.2.5",
         "dexie-export-import": "^4.1.1",
         "parse5": "^7.1.2",
