@@ -49,7 +49,7 @@ import {SortFrequencyDictionaryController} from './sort-frequency-dictionary-con
 import {StatusFooter} from './status-footer.js';
 import {StorageController} from './storage-controller.js';
 import {TranslationTextReplacementsController} from './translation-text-replacements-controller.js';
-import {HeatmapController} from './heatmap-controller.js';
+import {StatisticsController} from './statistics-controller.js';
 
 
 /**
@@ -174,7 +174,7 @@ await Application.main(true, async (application) => {
     const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
     settingsDisplayController.prepare();
 
-    const heatmapController = new HeatmapController();
-    heatmapController.prepare();
+    const statisticsController = new StatisticsController();
+    statisticsController.prepare();
 
 });

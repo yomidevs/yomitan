@@ -18,10 +18,10 @@
 
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
-export class HeatmapController {
+export class StatisticsController {
     async prepare() {
-        const item = querySelectorNotNull(document, "#insert-heatmap")
-        item.innerHTML = "asdasd"
+        const item = querySelectorNotNull(document, "#total-lookups");
+        item.placeholder = "sus"
     }
 
 }
