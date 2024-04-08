@@ -33,3 +33,17 @@ export const capitalizeFirstLetter = {
     options: basicTextPreprocessorOptions,
     process: (str, setting) => (setting ? str.charAt(0).toUpperCase() + str.slice(1) : str)
 };
+
+/**
+ * WARNING: This should NOT be used with languages that use Han characters,
+ *          as it can result in undesirable normalization:
+ *            - '\u9038'.normalize('NFD') => '\u9038' (逸)
+ *            - '\ufa67'.normalize('NFD') => '\u9038' (逸 => 逸)
+ * @type {import('language').TextPreprocessor<boolean>}
+ */
+export const removeAlphabeticDiacritics = {
+    name: 'Remove Alphabetic Diacritics',
+    description: 'ἄήé -> αηe',
+    options: basicTextPreprocessorOptions,
+    process: (str, setting) => (setting ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : str)
+};
