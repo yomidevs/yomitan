@@ -23,10 +23,18 @@ import {testLanguageTransformer} from '../fixtures/language-transformer-test.js'
 /* eslint-disable @stylistic/no-multi-spaces */
 const tests = [
     {
-        category: 'adjectives',
+        category: 'nouns',
         valid: true,
         tests: [
             {term: 'cat', source: 'cats',  rule: 'ns', reasons: ['plural']}
+        ]
+    },
+    {
+        category: 'verbs',
+        valid: true,
+        tests: [
+            {term: 'look up', source: 'look something up',  rule: 'v_phr', reasons: ['interposed object']},
+            {term: 'look up', source: 'looked something up',  rule: 'v_phr', reasons: ['past', 'interposed object']}
         ]
     }
 ];
