@@ -210,7 +210,9 @@ export const englishTransforms = {
             name: 'adverb',
             description: 'Adverb form of an adjective',
             rules: [
-                suffixInflection('ly', '', ['adv'], ['adj'])
+                suffixInflection('ly', '', ['adv'], ['adj']), // 'quickly'
+                suffixInflection('ily', 'y', ['adv'], ['adj']), // 'happily'
+                suffixInflection('ly', 'le', ['adv'], ['adj']) // 'humbly'
             ]
         },
         {
