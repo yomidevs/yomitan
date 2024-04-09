@@ -72,7 +72,7 @@ const phrasalVerbInterposedObjectRule = {
         return term.replace(new RegExp(`(?<=\\w) (?:(?!\\b(${phrasalVerbWordDisjunction})\\b).)+ (?=(?:${particlesDisjunction}))`), ' ');
     },
     conditionsIn: [],
-    conditionsOut: ['v']
+    conditionsOut: ['v_phr']
 };
 
 /**
@@ -87,7 +87,7 @@ function createPhrasalVerbInflection(inflected, deinflected) {
         deinflect: (term) => {
             return term.replace(new RegExp(`(?<=)${inflected}(?= (?:${phrasalVerbWordDisjunction}))`), deinflected);
         },
-        conditionsIn: [],
+        conditionsIn: ['v_phr'],
         conditionsOut: ['v_phr']
     };
 }
