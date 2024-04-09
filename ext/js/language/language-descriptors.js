@@ -17,11 +17,13 @@
 
 import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
+import {englishTransforms} from './en/english-transforms.js';
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
+import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
-import {removeLatinDiacritics} from './la/latin-text-preprocessors.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
-import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
+import {albanianTransforms} from './sq/albanian-transforms.js';
+import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-preprocessors.js';
 
 const capitalizationPreprocessors = {
     decapitalize,
@@ -58,7 +60,7 @@ const languageDescriptors = [
         name: 'English',
         exampleText: 'read',
         textPreprocessors: capitalizationPreprocessors,
-        languageTransformsFile: '/js/language/en/english-transforms.json'
+        languageTransforms: englishTransforms
     },
     {
         iso: 'es',
@@ -84,7 +86,10 @@ const languageDescriptors = [
         iso: 'grc',
         name: 'Ancient Greek',
         exampleText: 'γράφω',
-        textPreprocessors: capitalizationPreprocessors
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics
+        }
     },
     {
         iso: 'hu',
@@ -109,7 +114,8 @@ const languageDescriptors = [
         name: 'Latin',
         exampleText: 'legere',
         textPreprocessors: {
-            removeLatinDiacritics
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics
         }
     },
     {
@@ -124,7 +130,7 @@ const languageDescriptors = [
             convertHiraganaToKatakana,
             collapseEmphaticSequences
         },
-        languageTransformsFile: '/js/language/ja/japanese-transforms.json'
+        languageTransforms: japaneseTransforms
     },
     {
         iso: 'km',
@@ -170,7 +176,8 @@ const languageDescriptors = [
         iso: 'sq',
         name: 'Albanian',
         exampleText: 'ndihmojme',
-        textPreprocessors: capitalizationPreprocessors
+        textPreprocessors: capitalizationPreprocessors,
+        languageTransforms: albanianTransforms
     },
     {
         iso: 'sv',
@@ -183,6 +190,12 @@ const languageDescriptors = [
         name: 'Thai',
         exampleText: 'อ่าน',
         textPreprocessors: {}
+    },
+    {
+        iso: 'tr',
+        name: 'Turkish',
+        exampleText: 'okuyor',
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'vi',
