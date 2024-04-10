@@ -605,7 +605,7 @@ export class OptionsUtil {
             showAdvanced: false,
             searchTerms: true,
             searchKanji: true,
-            scanOnTouchMove: true,
+            scanOnTouchMove: false,
             scanOnPenHover: true,
             scanOnPenPress: true,
             scanOnPenRelease: false,
@@ -1217,6 +1217,20 @@ export class OptionsUtil {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v29.handlebars');
     }
 
+    /**
+     *  - Added scanning.inputs[].options.scanOnTouchTap.
+     *  - Set touch settings to be more sensible.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion30(options) {
+        for (const profile of options.profiles) {
+            for (const input of profile.options.scanning.inputs) {
+                input.options.scanOnTouchTap = true;
+                input.options.scanOnTouchPress = false;
+                input.options.scanOnTouchRelease = false;
+            }
+        }
+    }
 
     /**
      * @param {string} url

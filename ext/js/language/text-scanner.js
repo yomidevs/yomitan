@@ -137,6 +137,8 @@ export class TextScanner extends EventDispatcher {
         /** @type {() => void} */
         this._preventNextClickScanTimerCallback = this._onPreventNextClickScanTimeout.bind(this);
 
+        /** @type {boolean} */
+        this._touchTapValid = false;
         /** @type {?number} */
         this._primaryTouchIdentifier = null;
         /** @type {boolean} */
@@ -662,6 +664,7 @@ export class TextScanner extends EventDispatcher {
         this._preventNextContextMenu = false;
         this._preventNextMouseDown = false;
         this._preventNextClick = false;
+        this._touchTapValid = true;
 
         const selection = window.getSelection();
         if (selection !== null && isPointInSelection(x, y, selection)) {
@@ -707,8 +710,7 @@ export class TextScanner extends EventDispatcher {
         if (!allowSearch) { return; }
 
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchEnd', e);
-        if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchRelease)) { return; }
-
+        if (inputInfo === null || !((inputInfo.input !== null && inputInfo.input.scanOnTouchRelease) || (inputInfo.input !== null && inputInfo.input.scanOnTouchTap && this._touchTapValid))) { return; }
         void this._searchAtFromTouchEnd(x, y, inputInfo);
     }
 
@@ -728,6 +730,8 @@ export class TextScanner extends EventDispatcher {
      * @param {TouchEvent} e
      */
     _onTouchMove(e) {
+        this._touchTapValid = false;
+
         if (this._primaryTouchIdentifier === null) { return; }
 
         if (!e.cancelable) {
@@ -1477,6 +1481,7 @@ export class TextScanner extends EventDispatcher {
             scanOnTouchMove: this._getInputBoolean(options.scanOnTouchMove),
             scanOnTouchPress: this._getInputBoolean(options.scanOnTouchPress),
             scanOnTouchRelease: this._getInputBoolean(options.scanOnTouchRelease),
+            scanOnTouchTap: this._getInputBoolean(options.scanOnTouchTap),
             scanOnPenMove: this._getInputBoolean(options.scanOnPenMove),
             scanOnPenHover: this._getInputBoolean(options.scanOnPenHover),
             scanOnPenReleaseHover: this._getInputBoolean(options.scanOnPenReleaseHover),
