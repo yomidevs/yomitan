@@ -114,7 +114,6 @@ export class PopupFactory {
 
         const currentFrameId = this._application.frameId;
         if (currentFrameId === null) { throw new Error('Cannot create popup: no frameId'); }
-
         if (popupWindow) {
             // New unique id
             if (id === null) {

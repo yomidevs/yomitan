@@ -182,7 +182,9 @@ export class Application extends EventDispatcher {
 
     /** */
     triggerClosePopups() {
+        // console.log("close")
         this.trigger('closePopups', {});
+        
     }
 
     /**

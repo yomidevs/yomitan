@@ -1085,6 +1085,7 @@ export class Backend {
      * @returns {Promise<void>}
      */
     async _onCommandOpenPopupWindow() {
+        
         await this._onApiGetOrCreateSearchPopup({focus: true});
     }
 

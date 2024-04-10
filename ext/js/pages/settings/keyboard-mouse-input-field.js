@@ -185,6 +185,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
      */
     _onModifierKeyDown(e) {
         e.preventDefault();
+       
 
         /** @type {string|undefined} */
         let key = e.code;

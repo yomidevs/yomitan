@@ -21,7 +21,6 @@ import {log} from '../core/log.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, isStringEntirelyKana} from '../language/ja/japanese.js';
 import {TextScanner} from '../language/text-scanner.js';
-
 /**
  * @augments EventDispatcher<import('query-parser').Events>
  */

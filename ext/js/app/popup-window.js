@@ -144,6 +144,8 @@ export class PopupWindow extends EventDispatcher {
         return (this._popupTabId !== null && await this._application.api.isTabSearchPopup(this._popupTabId));
     }
 
+    
+
     /**
      * Force assigns the visibility of the popup.
      * @param {boolean} _value Whether or not the popup should be visible.

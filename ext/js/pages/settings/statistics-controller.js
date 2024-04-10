@@ -22,6 +22,7 @@ export class StatisticsController {
     async prepare() {
         const item = querySelectorNotNull(document, "#total-lookups");
         item.placeholder = "sus"
+        console.log("sus")
     }
 
 }

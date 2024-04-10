@@ -348,6 +348,7 @@ export class SettingsDisplayController {
         const lineWhitespace = lineWhitespaceMatch !== null ? lineWhitespaceMatch[0] : '';
 
         if (e.shiftKey) {
+        
             const whitespaceLength = Math.max(0, Math.floor((lineWhitespace.length - 1) / 4) * 4);
             const selectionStartNew = lineStart + whitespaceLength;
             const selectionEndNew = lineStart + lineWhitespace.length;

@@ -931,6 +931,7 @@ export class Display extends EventDispatcher {
                 e.preventDefault();
             }
         } else if (e.shiftKey) {
+            
             this._onHistoryWheel(e);
         }
     }
@@ -1636,6 +1637,7 @@ export class Display extends EventDispatcher {
 
     /** */
     _closePopups() {
+        
         this._application.triggerClosePopups();
     }
 

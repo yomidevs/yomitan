@@ -190,6 +190,7 @@ export class TextSourceRange {
     select() {
         if (this._imposterElement !== null) { return; }
         const selection = window.getSelection();
+        console.log("HELLO")
         if (selection === null) { return; }
         selection.removeAllRanges();
         selection.addRange(this._range);
