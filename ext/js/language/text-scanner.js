@@ -710,8 +710,10 @@ export class TextScanner extends EventDispatcher {
         if (!allowSearch) { return; }
 
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchEnd', e);
-        if (inputInfo === null || !((inputInfo.input !== null && inputInfo.input.scanOnTouchRelease) || (inputInfo.input !== null && inputInfo.input.scanOnTouchTap && this._touchTapValid))) { return; }
-        void this._searchAtFromTouchEnd(x, y, inputInfo);
+        if (inputInfo === null || inputInfo.input === null) { return; }
+        if (inputInfo.input.scanOnTouchRelease || (inputInfo.input.scanOnTouchTap && this._touchTapValid)) {
+            void this._searchAtFromTouchEnd(x, y, inputInfo);
+        }
     }
 
     /**
