@@ -21,12 +21,26 @@ import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {Frontend} from './frontend.js';
 import {PopupFactory} from './popup-factory.js';
 
+
+
 await Application.main(false, async (application) => {
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 
     const popupFactory = new PopupFactory(application);
     popupFactory.prepare();
+
+    chrome.storage.sync.get('numSelects', function(data) {
+        if (typeof data.numSelects === 'undefined') {
+          // if already set it then nothing to do 
+          chrome.storage.local.set({ numSelects: 0 }).then(() => {
+            console.log("Value is set");
+          });
+        } 
+      });
+    
+
+
 
     const frontend = new Frontend({
         application,
@@ -41,5 +55,10 @@ await Application.main(false, async (application) => {
         childrenSupported: true,
         hotkeyHandler
     });
+
+
+
+
     await frontend.prepare();
+
 });

@@ -187,10 +187,23 @@ export class TextSourceRange {
     /**
      * Selects the text source in the document.
      */
+    
     select() {
         if (this._imposterElement !== null) { return; }
         const selection = window.getSelection();
-        console.log("ENTRY POINT HERE")
+        
+
+          chrome.storage.local.get(["numSelects"]).then((result) => {
+            chrome.storage.local.set({ numSelects: result.numSelects + 1 }).then(() => {
+                console.log("Value is set");
+              });
+            console.log("Value currently is " + result.numSelects);
+          });
+
+        
+
+
+        
 
         if (selection === null) { return; }
         selection.removeAllRanges();
@@ -201,8 +214,10 @@ export class TextSourceRange {
      * Deselects the text source in the document.
      */
     deselect() {
+        console.log("EXIT POINT HERE")
         if (this._imposterElement !== null) { return; }
         const selection = window.getSelection();
+        
         if (selection === null) { return; }
         selection.removeAllRanges();
     }
