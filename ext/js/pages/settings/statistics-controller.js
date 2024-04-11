@@ -20,13 +20,10 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class StatisticsController {
     async prepare() {
-        
-        const item = querySelectorNotNull(document, "#total-lookups");
-        
 
+        const item = querySelectorNotNull(document, "#total-lookups");
           chrome.storage.local.get(["numSelects"]).then((result) => {
             item.placeholder = result.numSelects;
-            
           });
 
         
