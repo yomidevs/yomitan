@@ -314,7 +314,7 @@ export class AnkiController {
             }
 
             markers.push(...getDynamicFieldMarkers(dictionaries));
-            markers = [...new Set(markers)];
+            markers = [...new Set(markers.sort())];
 
             const fragment = document.createDocumentFragment();
             for (const marker of markers) {
