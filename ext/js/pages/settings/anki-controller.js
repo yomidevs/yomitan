@@ -21,7 +21,7 @@ import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {ExtensionError} from '../../core/extension-error.js';
 import {log} from '../../core/log.js';
 import {toError} from '../../core/to-error.js';
-import {getStandardFieldMarkers} from '../../data/anki-template-util.js';
+import {getDynamicFieldMarkers, getStandardFieldMarkers} from '../../data/anki-template-util.js';
 import {stringContainsAnyFieldMarker} from '../../data/anki-util.js';
 import {getRequiredPermissionsForAnkiFieldValue, hasPermissions, setPermissionsGranted} from '../../data/permissions-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -85,7 +85,6 @@ export class AnkiController {
         /** @type {HTMLElement} */
         const ankiErrorLog = querySelectorNotNull(document, '#anki-error-log');
 
-        this._setupFieldMenus();
 
         this._ankiErrorMessageDetailsToggle.addEventListener('click', this._onAnkiErrorMessageDetailsToggleClick.bind(this), false);
         if (this._ankiEnableCheckbox !== null) {
@@ -110,14 +109,14 @@ export class AnkiController {
         ankiApiKeyInput.addEventListener('focus', this._onApiKeyInputFocus.bind(this));
         ankiApiKeyInput.addEventListener('blur', this._onApiKeyInputBlur.bind(this));
 
+        await this._updateOptions();
+        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+
         const onAnkiSettingChanged = () => { void this._updateOptions(); };
         const nodes = [ankiApiKeyInput, ...document.querySelectorAll('[data-setting="anki.enable"]')];
         for (const node of nodes) {
             node.addEventListener('settingChanged', onAnkiSettingChanged);
         }
-
-        await this._updateOptions();
-        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
     }
 
     /**
@@ -161,7 +160,7 @@ export class AnkiController {
     /**
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
-    _onOptionsChanged({options: {anki}}) {
+    _onOptionsChanged({options: {anki, dictionaries}}) {
         /** @type {?string} */
         let apiKey = anki.apiKey;
         if (apiKey === '') { apiKey = null; }
@@ -171,6 +170,8 @@ export class AnkiController {
 
         this._selectorObserver.disconnect();
         this._selectorObserver.observe(document.documentElement, true);
+
+        this._setupFieldMenus(dictionaries);
     }
 
     /** */
@@ -279,8 +280,10 @@ export class AnkiController {
         return cardController.isStale();
     }
 
-    /** */
-    _setupFieldMenus() {
+    /**
+     * @param {import('settings').DictionariesOptions} dictionaries
+     */
+    _setupFieldMenus(dictionaries) {
         /** @type {[types: import('dictionary').DictionaryEntryType[], templateName: string][]} */
         const fieldMenuTargets = [
             [['term'], 'anki-card-terms-field-menu'],
@@ -301,10 +304,16 @@ export class AnkiController {
                 return;
             }
 
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+
             let markers = [];
             for (const type of types) {
                 markers.push(...getStandardFieldMarkers(type));
             }
+
+            markers.push(...getDynamicFieldMarkers(dictionaries));
             markers = [...new Set(markers)];
 
             const fragment = document.createDocumentFragment();

@@ -92,3 +92,46 @@ export function getStandardFieldMarkers(type) {
             throw new Error(`Unsupported type: ${type}`);
     }
 }
+
+/**
+ * @param {import('settings').ProfileOptions} options
+ * @returns {string}
+ */
+export function getDynamicTemplates(options) {
+    let dynamicTemplates = '\n';
+    for (const dictionary of options.dictionaries) {
+        if (!dictionary.enabled) { continue; }
+        dynamicTemplates += `
+{{#*inline "glossary-${getKebabCase(dictionary.name)}"}}
+    {{~> glossary selectedDictionary='${dictionary.name}'}}
+{{/inline}}
+        `;
+    }
+    return dynamicTemplates;
+}
+
+/**
+ * @param {import('settings').DictionariesOptions} dictionaries
+ * @returns {string[]} The list of field markers.
+ */
+export function getDynamicFieldMarkers(dictionaries) {
+    const markers = [];
+    for (const dictionary of dictionaries) {
+        if (!dictionary.enabled) { continue; }
+        markers.push(`glossary-${getKebabCase(dictionary.name)}`);
+    }
+    return markers;
+}
+
+/**
+ * @param {string} str
+ * @returns {string}
+ */
+function getKebabCase(str) {
+    return str
+        .replace(/[\s_\u3000]/g, '-')
+        .replace(/[^\p{L}\p{N}-]/gu, '')
+        .replace(/--+/g, '-')
+        .replace(/^-|-$/g, '')
+        .toLowerCase();
+}

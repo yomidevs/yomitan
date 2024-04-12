@@ -21,6 +21,7 @@ import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
+import {getDynamicTemplates} from '../data/anki-template-util.js';
 import {isNoteDataValid} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
@@ -637,6 +638,16 @@ export class DisplayAnki {
      * @returns {Promise<string>}
      */
     async _getAnkiFieldTemplates(options) {
+        const staticTemplates = await this._getStaticAnkiFieldTemplates(options);
+        const dynamicTemplates = getDynamicTemplates(options);
+        return staticTemplates + dynamicTemplates;
+    }
+
+    /**
+     * @param {import('settings').ProfileOptions} options
+     * @returns {Promise<string>}
+     */
+    async _getStaticAnkiFieldTemplates(options) {
         let templates = options.anki.fieldTemplates;
         if (typeof templates === 'string') { return templates; }
 
