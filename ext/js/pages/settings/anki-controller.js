@@ -312,8 +312,9 @@ export class AnkiController {
             for (const type of types) {
                 markers.push(...getStandardFieldMarkers(type));
             }
-
-            markers.push(...getDynamicFieldMarkers(dictionaries));
+            if (types.includes('term')) {
+                markers.push(...getDynamicFieldMarkers(dictionaries));
+            }
             markers = [...new Set(markers.sort())];
 
             const fragment = document.createDocumentFragment();
