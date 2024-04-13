@@ -20,6 +20,8 @@ import {toError} from '../core/to-error.js';
 import {convertMultipleRectZoomCoordinates, convertRectZoomCoordinates, getElementWritingMode, getNodesInRange, offsetDOMRects} from './document-util.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
 
+import { StatisticsHandler } from '../app/statistics-handler.js';
+
 /**
  * This class represents a text source that comes from text nodes in the document.
  * Sometimes a temporary "imposter" element is created and used to store the text.
@@ -192,19 +194,9 @@ export class TextSourceRange {
         if (this._imposterElement !== null) { return; }
         const selection = window.getSelection();
         
-
-          chrome.storage.local.get(["numSelects"]).then((result) => {
-            chrome.storage.local.set({ numSelects: result.numSelects + 1 }).then(() => {
-                console.log("Value is set");
-              });
-            console.log("Value currently is " + result.numSelects);
-          });
-
+        const statHandler = new StatisticsHandler()
+        statHandler.incrementNumSelects()
         
-
-
-        
-
         if (selection === null) { return; }
         selection.removeAllRanges();
         selection.addRange(this._range);
@@ -214,7 +206,7 @@ export class TextSourceRange {
      * Deselects the text source in the document.
      */
     deselect() {
-        console.log("EXIT POINT HERE")
+        
         if (this._imposterElement !== null) { return; }
         const selection = window.getSelection();
         

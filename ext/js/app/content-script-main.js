@@ -20,6 +20,7 @@ import {Application} from '../application.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
 import {Frontend} from './frontend.js';
 import {PopupFactory} from './popup-factory.js';
+import {StatisticsHandler} from './statistics-handler.js'
 
 
 
@@ -30,46 +31,9 @@ await Application.main(false, async (application) => {
     const popupFactory = new PopupFactory(application);
     popupFactory.prepare();
 
-    // const currentDate = new Date();
-    const currentDate = new Date('2025-03-25');
-    console.log(`current time: ${currentDate}`);
+    const statisticsHandler = new StatisticsHandler();
+    statisticsHandler.prepare();
     
-    chrome.storage.local.get(["lastUpdate"]).then((result) => {
-        if (typeof result.lastUpdate === 'undefined') {
-            const todayEnd = new Date(new Date().setHours(23, 59, 59, 999));
-            chrome.storage.local.set({ lastUpdate: todayEnd.toJSON() }).then(() => {
-            });
-          } 
-          else {
-                var storedJSONDate = result.lastUpdate;
-                var lastUpdate = new Date(storedJSONDate);
-                console.log(`LAST UPDATE: ${lastUpdate}`);
-                if (currentDate > lastUpdate) { // new day found.
-                    console.log("NEW DAY FOUND, RESETTING.")
-                    chrome.storage.local.set({ numSelects: 0 }).then(() => {
-                    });
-                    const todayEnd = new Date(new Date().setHours(23, 59, 59, 999));
-                    chrome.storage.local.set({ lastUpdate: todayEnd.toJSON() }).then(() => {
-                      });
-              }
-  
-          }
-      });
-
-
-   
-
-    chrome.storage.local.get('numSelects', function(data) {
-        if (typeof data.numSelects === 'undefined') {
-          chrome.storage.local.set({ numSelects: 0 }).then(() => {
-            console.log("num selects is set");
-          });
-        } 
-    });
-
-
-    
-
     const frontend = new Frontend({
         application,
         popupFactory,

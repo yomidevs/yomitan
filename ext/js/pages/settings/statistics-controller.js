@@ -21,17 +21,11 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 export class StatisticsController {
     async prepare() {
 
-        const item = querySelectorNotNull(document, "#total-lookups");
-          chrome.storage.local.get(["numSelects"]).then((result) => {
-            item.placeholder = result.numSelects;
+        const totalLookups = querySelectorNotNull(document, "#total-lookups");
+        chrome.storage.local.get(["numSelects"]).then((result) => {
+            totalLookups.placeholder = result.numSelects;
           });
 
-        
-        
-        // chrome.storage.local.get('numSelects', function(data) {
-        //     console.log(data.key);
-        //     item.placeholder = data.key;
-        // })
     }
 
 }
