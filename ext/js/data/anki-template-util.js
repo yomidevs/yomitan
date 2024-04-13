@@ -102,7 +102,7 @@ export function getDynamicTemplates(options) {
     for (const dictionary of options.dictionaries) {
         if (!dictionary.enabled) { continue; }
         dynamicTemplates += `
-{{#*inline "glossary-${getKebabCase(dictionary.name)}"}}
+{{#*inline "single-glossary-${getKebabCase(dictionary.name)}"}}
     {{~> glossary selectedDictionary='${dictionary.name}'}}
 {{/inline}}
         `;
@@ -118,7 +118,7 @@ export function getDynamicFieldMarkers(dictionaries) {
     const markers = [];
     for (const dictionary of dictionaries) {
         if (!dictionary.enabled) { continue; }
-        markers.push(`glossary-${getKebabCase(dictionary.name)}`);
+        markers.push(`single-glossary-${getKebabCase(dictionary.name)}`);
     }
     return markers;
 }
