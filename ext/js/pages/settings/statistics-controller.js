@@ -17,7 +17,6 @@
  */
 
 import {querySelectorNotNull} from '../../dom/query-selector.js';
-
 export class StatisticsController {
     async prepare() {
 

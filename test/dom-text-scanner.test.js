@@ -30,6 +30,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
  * @param {string} selector
  * @returns {?Node}
  */
+
 function querySelectorTextNode(element, selector) {
     let textIndex = -1;
     const match = /::text$|::nth-text\((\d+)\)$/.exec(selector);

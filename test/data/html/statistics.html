@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Statistics</title>
+    <link rel="icon" type="image/gif" href="data:image/gif;base64,R0lGODdhAQABAIABAAAAAP///ywAAAAAAQABAAACAkQBADs=">
+    <link rel="stylesheet" href="test-stylesheet.css">
+</head>
+<body>
+
+    <h1>Statistics Tests</h1>
+
+    <test-description>Automated test cases for Statistics.</test-description>
+
+    <test-case
+    data-test-data='{
+        "node": "div::text",
+        "offset": 0,
+        "length": 2,
+        "expected": {
+            "node": "div::text",
+            "offset": 2,
+            "content": "東京"
+        }
+    }'
+>
+    <test-description>Scan 1 times and check</test-description>
+    <div>東京</div>
+    </test-case>
+
+<!-- <test-case
+data-test-data='{
+    "node": "div:nth-of-type(1)",
+    "offset": 0,
+    "length": 15,
+    "expected": {
+        "node": "div:nth-of-type(1)>div::text",
+        "offset": 3,
+        "content": "小ぢん\nまり1\n小ぢん\nまり2"
+    }
+}'
+>
+<test-description>Layout newlines expected due to entering and exiting display:block nodes.</test-description>
+<div><div>小ぢん</div>まり1</div>
+<div>小ぢん<div>まり2</div></div>
+</test-case> -->
+
+</body>
+</html>
