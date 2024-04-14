@@ -130,17 +130,6 @@ export class AnkiConnect {
 
     /**
      * @param {import('anki').Note[]} notes
-     * @returns {Promise<boolean[]>}
-     */
-    async canAddNotes(notes) {
-        if (!this._enabled) { return []; }
-        await this._checkVersion();
-        const result = await this._invoke('canAddNotes', {notes});
-        return this._normalizeArray(result, notes.length, 'boolean');
-    }
-
-    /**
-     * @param {import('anki').Note[]} notes
      * @returns {Promise<({ canAdd: true } | { canAdd: false, error: string })[]>}
      */
     async canAddNotesWithErrorDetail(notes) {

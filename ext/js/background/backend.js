@@ -253,7 +253,7 @@ export class Backend {
             this._prepareInternalSync();
 
             this._permissions = await getAllPermissions();
-            this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
+            this._defaultBrowserActionTitle = this._getBrowserIconTitle();
             this._badgePrepareDelayTimer = setTimeout(() => {
                 this._badgePrepareDelayTimer = null;
                 this._updateBadge();
@@ -1640,15 +1640,18 @@ export class Backend {
     }
 
     /**
-     * @returns {Promise<string>}
+     * Returns the action's default title.
+     * @throws {Error}
+     * @returns {string}
      */
     _getBrowserIconTitle() {
-        return (
-            isObjectNotArray(chrome.action) &&
-            typeof chrome.action.getTitle === 'function' ?
-                new Promise((resolve) => { chrome.action.getTitle({}, resolve); }) :
-                Promise.resolve('')
-        );
+        const manifest = /** @type {chrome.runtime.ManifestV3} */ (chrome.runtime.getManifest());
+        const action = manifest.action;
+        if (typeof action === 'undefined') { throw new Error('Failed to find action'); }
+        const defaultTitle = action.default_title;
+        if (typeof defaultTitle === 'undefined') { throw new Error('Failed to find default_title'); }
+
+        return defaultTitle;
     }
 
     /**

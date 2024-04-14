@@ -103,8 +103,12 @@ icons next to term definitions:
 - Clicking ![](../img/btn-add-expression.png) adds the current expression as kanji (e.g. 食べる).
 - Clicking ![](../img/btn-add-reading.png) adds the current expression as hiragana or katakana (e.g. たべる).
 
+If "Check for card duplicates" is on, and a card for the current definition already exists in the deck, you will see the following icons instead:
+
+- Adding the current expression: ![](../img/btn-add-duplicate-expression.png)
+- Adding as hiragana or katakana: ![](../img/btn-add-duplicate-reading.png)
+
 Below are some troubleshooting tips you can try if you are unable to create new flashcards:
 
-- Individual icons will appear grayed out if a flashcard cannot be created for the current definition (e.g. it already exists in the deck).
 - If all of the buttons appear grayed out, then you should double-check your deck and model configuration settings.
 - If no icons appear at all, make sure that Anki is running in the background and that [AnkiConnect](https://foosoft.net/projects/anki-connect) has been installed.
