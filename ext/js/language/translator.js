@@ -2080,6 +2080,7 @@ export class Translator {
      * @returns {number}
      */
     _getShortestInflectionChainLength(inflectionRuleChainCandidates) {
+        if (inflectionRuleChainCandidates.length === 0) { return 0; }
         let length = Number.MAX_SAFE_INTEGER;
         for (const {inflectionRules} of inflectionRuleChainCandidates) {
             length = Math.min(length, inflectionRules.length);
