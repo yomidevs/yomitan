@@ -582,11 +582,10 @@ export class Backend {
     async _onApiGetAnkiNoteInfo({notes, fetchAdditionalInfo}) {
         const {canAddArray, cannotAddArray} = await this.partitionAddibleNotes(notes);
 
-        /** @type {{note: import('anki').Note, info: import('anki').NoteInfoWrapper}[]} */
-        const cannotAdd = cannotAddArray.filter((note) => isNoteDataValid(note)).map((note) => ({note, info: {canAdd: false, valid: false, noteIds: null}}));
-
         /** @type {import('anki').NoteInfoWrapper[]} */
-        const results = cannotAdd.map(({info}) => info);
+        const results = cannotAddArray
+            .filter((note) => isNoteDataValid(note))
+            .map(() => ({canAdd: false, valid: false, noteIds: null}));
 
         /** @type {import('anki').Note[]} */
         const duplicateNotes = [];
@@ -620,10 +619,6 @@ export class Backend {
             };
 
             results.push(info);
-
-            if (!valid) {
-                cannotAdd.push({note, info});
-            }
         }
 
         return results;
