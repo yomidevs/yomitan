@@ -536,7 +536,8 @@ export class OptionsUtil {
             this._updateVersion27,
             this._updateVersion28,
             this._updateVersion29,
-            this._updateVersion30
+            this._updateVersion30,
+            this._updateVersion31
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -606,7 +607,7 @@ export class OptionsUtil {
             showAdvanced: false,
             searchTerms: true,
             searchKanji: true,
-            scanOnTouchMove: true,
+            scanOnTouchMove: false,
             scanOnPenHover: true,
             scanOnPenPress: true,
             scanOnPenRelease: false,
@@ -1219,11 +1220,26 @@ export class OptionsUtil {
     }
 
     /**
-     *  - Added dynamic handlebars for single dictionaries.
+     *  - Added scanning.inputs[].options.scanOnTouchTap.
+     *  - Set touch settings to be more sensible.
      *  @type {import('options-util').UpdateFunction}
      */
     async _updateVersion30(options) {
-        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v30.handlebars');
+        for (const profile of options.profiles) {
+            for (const input of profile.options.scanning.inputs) {
+                input.options.scanOnTouchTap = true;
+                input.options.scanOnTouchPress = false;
+                input.options.scanOnTouchRelease = false;
+            }
+        }
+    }
+
+    /**
+     *  - Added dynamic handlebars for single dictionaries.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion31(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v31.handlebars');
     }
 
 
