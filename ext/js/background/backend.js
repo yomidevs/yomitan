@@ -609,30 +609,20 @@ export class Backend {
 
             const valid = isNoteDataValid(note);
 
+            const noteIds = isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null;
+            const noteInfos = (fetchAdditionalInfo && noteIds !== null && noteIds.length > 0) ? await this._anki.notesInfo(noteIds) : [];
+
             const info = {
                 canAdd: valid,
                 valid,
-                noteIds: isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null
+                noteIds: noteIds,
+                noteInfos: noteInfos
             };
 
             results.push(info);
 
             if (!valid) {
                 cannotAdd.push({note, info});
-            }
-        }
-
-        if (cannotAdd.length > 0) {
-            const cannotAddNotes = cannotAdd.map(({note}) => note);
-            const noteIdsArray = await this._anki.findNoteIds(cannotAddNotes);
-            for (let i = 0, ii = Math.min(cannotAdd.length, noteIdsArray.length); i < ii; ++i) {
-                const noteIds = noteIdsArray[i];
-                if (noteIds.length > 0) {
-                    cannotAdd[i].info.noteIds = noteIds;
-                    if (fetchAdditionalInfo) {
-                        cannotAdd[i].info.noteInfos = await this._anki.notesInfo(noteIds);
-                    }
-                }
             }
         }
 
