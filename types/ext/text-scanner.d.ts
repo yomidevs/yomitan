@@ -60,7 +60,6 @@ export type InputOptions = {
     scanOnTouchMove: boolean;
     scanOnTouchPress: boolean;
     scanOnTouchRelease: boolean;
-    scanOnTouchTap: boolean;
     scanOnPenMove: boolean;
     scanOnPenHover: boolean;
     scanOnPenReleaseHover: boolean;
@@ -85,7 +84,6 @@ export type InputConfig = {
     scanOnTouchMove: boolean;
     scanOnTouchPress: boolean;
     scanOnTouchRelease: boolean;
-    scanOnTouchTap: boolean;
     scanOnPenMove: boolean;
     scanOnPenHover: boolean;
     scanOnPenReleaseHover: boolean;

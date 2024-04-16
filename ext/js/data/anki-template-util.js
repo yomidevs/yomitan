@@ -49,7 +49,6 @@ export function getStandardFieldMarkers(type) {
                 'part-of-speech',
                 'pitch-accents',
                 'pitch-accent-graphs',
-                'pitch-accent-graphs-jj',
                 'pitch-accent-positions',
                 'pitch-accent-categories',
                 'phonetic-transcriptions',
