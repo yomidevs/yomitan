@@ -28,7 +28,7 @@ import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
 import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
-import {isNoteDataValid} from '../data/anki-util.js';
+import {invalidNoteId, isNoteDataValid} from '../data/anki-util.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
@@ -596,8 +596,7 @@ export class Backend {
             const valid = isNoteDataValid(note);
 
             if (isDuplicate && duplicateNoteIds[originalIndices.indexOf(i)].length === 0) {
-                // -1 indicates an invalid/unknown noteId, this id will never exist in anki
-                duplicateNoteIds[originalIndices.indexOf(i)] = [-1];
+                duplicateNoteIds[originalIndices.indexOf(i)] = [invalidNoteId];
             }
 
             const noteIds = isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null;
