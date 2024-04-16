@@ -211,6 +211,7 @@ export type ScanningInputOptions = {
     scanOnTouchMove: boolean;
     scanOnTouchPress: boolean;
     scanOnTouchRelease: boolean;
+    scanOnTouchTap: boolean;
     scanOnPenMove: boolean;
     scanOnPenHover: boolean;
     scanOnPenReleaseHover: boolean;

@@ -42,7 +42,7 @@ export class LanguagesController {
         for (const {iso, name} of languages) {
             const option = document.createElement('option');
             option.value = iso;
-            option.text = `(${iso}) ${name}`;
+            option.text = `${name} (${iso})`;
             selectElement.appendChild(option);
         }
     }
