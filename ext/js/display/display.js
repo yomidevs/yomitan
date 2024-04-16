@@ -1844,6 +1844,7 @@ export class Display extends EventDispatcher {
                 options: {
                     searchTerms: true,
                     searchKanji: true,
+                    scanOnTouchTap: true,
                     scanOnTouchMove: false,
                     scanOnTouchPress: false,
                     scanOnTouchRelease: false,
