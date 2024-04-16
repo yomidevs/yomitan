@@ -28,7 +28,7 @@ import {suffixInflection, prefixInflection} from '../language-transforms.js';
 function tryAlternateOrthography(notBeginning, originalOrthography, alternateOrthography, conditionsIn, conditionsOut) {
     const orthographyRegExp = notBeginning ? new RegExp('(?<!^)' + originalOrthography, 'g') : new RegExp(originalOrthography, 'g');
     return {
-        type: 'orthography',
+        type: 'other',
         isInflected: orthographyRegExp,
         deinflect: (text) => text.replace(orthographyRegExp, alternateOrthography),
         conditionsIn,
