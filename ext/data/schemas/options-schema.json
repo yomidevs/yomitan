@@ -1149,8 +1149,8 @@
                                             }
                                         },
                                         "default": [
-                                            {"action": "close",             "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["popup"], "enabled": true},
-                                            {"action": "focusSearchBox",    "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["search"], "enabled": true},
+                                            {"action": "close",             "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["popup"],           "enabled": true},
+                                            {"action": "focusSearchBox",    "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["search"],          "enabled": true},
                                             {"action": "previousEntry",     "argument": "3", "key": "PageUp",    "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "nextEntry",         "argument": "3", "key": "PageDown",  "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "lastEntry",         "argument": "",  "key": "End",       "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
@@ -1159,12 +1159,14 @@
                                             {"action": "nextEntry",         "argument": "1", "key": "ArrowDown", "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "historyBackward",   "argument": "",  "key": "KeyB",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "historyForward",    "argument": "",  "key": "KeyF",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "profilePrevious",   "argument": "",  "key": "Minus",     "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "profileNext",       "argument": "",  "key": "Equal",     "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "addNoteKanji",      "argument": "",  "key": "KeyK",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "addNoteTermKanji",  "argument": "",  "key": "KeyE",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "addNoteTermKana",   "argument": "",  "key": "KeyR",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "playAudio",         "argument": "",  "key": "KeyP",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "viewNotes",         "argument": "",  "key": "KeyV",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "copyHostSelection", "argument": "",  "key": "KeyC",      "modifiers": ["ctrl"], "scopes": ["popup"], "enabled": true}
+                                            {"action": "copyHostSelection", "argument": "",  "key": "KeyC",      "modifiers": ["ctrl"], "scopes": ["popup"],           "enabled": true}
                                         ]
                                     }
                                 }
