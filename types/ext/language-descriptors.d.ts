@@ -93,7 +93,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     grc: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & {
+            removeAlphabeticDiacritics: TextProcessor<boolean>;
+        };
     };
     hu: {
         pre: CapitalizationPreprocessors;
@@ -106,7 +108,7 @@ type AllTextProcessors = {
     };
     la: {
         pre: CapitalizationPreprocessors & {
-            removeLatinDiacritics: TextProcessor<boolean>;
+            removeAlphabeticDiacritics: TextProcessor<boolean>;
         };
     };
     ja: {

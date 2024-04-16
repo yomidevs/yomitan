@@ -1586,12 +1586,12 @@ export class Translator {
      * @param {number} dictionaryIndex
      * @param {number} dictionaryPriority
      * @param {number} sourceTermExactMatchCount
-     * @param {number} maxTransformedTextLength
+     * @param {number} maxOriginalTextLength
      * @param {import('dictionary').TermHeadword[]} headwords
      * @param {import('dictionary').TermDefinition[]} definitions
      * @returns {import('dictionary').TermDictionaryEntry}
      */
-    _createTermDictionaryEntry(isPrimary, inflectionRuleChainCandidates, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxTransformedTextLength, headwords, definitions) {
+    _createTermDictionaryEntry(isPrimary, inflectionRuleChainCandidates, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxOriginalTextLength, headwords, definitions) {
         return {
             type: 'term',
             isPrimary,
@@ -1601,7 +1601,7 @@ export class Translator {
             dictionaryIndex,
             dictionaryPriority,
             sourceTermExactMatchCount,
-            maxTransformedTextLength,
+            maxOriginalTextLength,
             headwords,
             definitions,
             pronunciations: [],
@@ -1641,7 +1641,7 @@ export class Translator {
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const sourceTermExactMatchCount = (isPrimary && deinflectedText === term ? 1 : 0);
         const source = this._createSource(originalText, transformedText, deinflectedText, matchType, matchSource, isPrimary);
-        const maxTransformedTextLength = transformedText.length;
+        const maxOriginalTextLength = originalText.length;
         const hasSequence = (rawSequence >= 0);
         const sequence = hasSequence ? rawSequence : -1;
 
@@ -1659,7 +1659,7 @@ export class Translator {
             dictionaryIndex,
             dictionaryPriority,
             sourceTermExactMatchCount,
-            maxTransformedTextLength,
+            maxOriginalTextLength,
             [this._createTermHeadword(0, term, reading, [source], headwordTagGroups, rules)],
             [this._createTermDefinition(0, [0], dictionary, dictionaryIndex, dictionaryPriority, id, score, [sequence], isPrimary, definitionTagGroups, contentDefinitions)]
         );
@@ -1690,7 +1690,7 @@ export class Translator {
         let score = Number.MIN_SAFE_INTEGER;
         let dictionaryIndex = Number.MAX_SAFE_INTEGER;
         let dictionaryPriority = Number.MIN_SAFE_INTEGER;
-        let maxTransformedTextLength = 0;
+        let maxOriginalTextLength = 0;
         let isPrimary = false;
         /** @type {import('dictionary').TermDefinition[]} */
         const definitions = [];
@@ -1704,7 +1704,7 @@ export class Translator {
             dictionaryPriority = Math.max(dictionaryPriority, dictionaryEntry.dictionaryPriority);
             if (dictionaryEntry.isPrimary) {
                 isPrimary = true;
-                maxTransformedTextLength = Math.max(maxTransformedTextLength, dictionaryEntry.maxTransformedTextLength);
+                maxOriginalTextLength = Math.max(maxOriginalTextLength, dictionaryEntry.maxOriginalTextLength);
                 const dictionaryEntryInflections = dictionaryEntry.inflectionRuleChainCandidates;
                 if (inflections === null || dictionaryEntryInflections.length < inflections.length) {
                     inflections = dictionaryEntryInflections;
@@ -1736,7 +1736,7 @@ export class Translator {
             dictionaryIndex,
             dictionaryPriority,
             sourceTermExactMatchCount,
-            maxTransformedTextLength,
+            maxOriginalTextLength,
             headwordsArray,
             definitions
         );
@@ -1913,11 +1913,11 @@ export class Translator {
          */
         const compareFunction = (v1, v2) => {
             // Sort by length of source term
-            let i = v2.maxTransformedTextLength - v1.maxTransformedTextLength;
+            let i = v2.maxOriginalTextLength - v1.maxOriginalTextLength;
             if (i !== 0) { return i; }
 
             // Sort by the number of inflection reasons
-            i = v1.inflectionRuleChainCandidates.length - v2.inflectionRuleChainCandidates.length;
+            i = this._getShortestInflectionChainLength(v1.inflectionRuleChainCandidates) - this._getShortestInflectionChainLength(v2.inflectionRuleChainCandidates);
             if (i !== 0) { return i; }
 
             // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)
@@ -2112,6 +2112,19 @@ export class Translator {
             }
             frequencyMap.clear();
         }
+    }
+
+    /**
+     * @param {import('dictionary').InflectionRuleChainCandidate[]} inflectionRuleChainCandidates
+     * @returns {number}
+     */
+    _getShortestInflectionChainLength(inflectionRuleChainCandidates) {
+        if (inflectionRuleChainCandidates.length === 0) { return 0; }
+        let length = Number.MAX_SAFE_INTEGER;
+        for (const {inflectionRules} of inflectionRuleChainCandidates) {
+            length = Math.min(length, inflectionRules.length);
+        }
+        return length;
     }
 
     // Miscellaneous
