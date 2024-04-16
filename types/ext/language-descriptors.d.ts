@@ -93,6 +93,9 @@ type AllTextPreprocessors = {
         yoToE: TextPreprocessor<boolean>;
         removeRussianDiacritics: TextPreprocessor<boolean>;
     };
+    sga: CapitalizationPreprocessors & {
+        removeAlphabeticDiacritics: TextPreprocessor<boolean>;
+    };
     sh: CapitalizationPreprocessors;
     sq: CapitalizationPreprocessors;
     sv: CapitalizationPreprocessors;
