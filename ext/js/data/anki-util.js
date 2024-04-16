@@ -82,3 +82,5 @@ export function isNoteDataValid(note) {
         Object.entries(fields).length > 0
     );
 }
+
+export const invalidNoteId = -1;
