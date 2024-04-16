@@ -425,7 +425,11 @@ export class DisplayAnki {
 
                 if (Array.isArray(noteIds) && noteIds.length > 0) {
                     if (allNoteIds === null) { allNoteIds = new Set(); }
-                    for (const noteId of noteIds) { allNoteIds.add(noteId); }
+                    for (const noteId of noteIds) {
+                        if (noteId !== -1) {
+                            allNoteIds.add(noteId);
+                        }
+                    }
                 }
 
                 if (displayTags !== 'never' && Array.isArray(noteInfos)) {

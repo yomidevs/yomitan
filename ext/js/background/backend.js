@@ -596,6 +596,11 @@ export class Backend {
 
             const valid = isNoteDataValid(note);
 
+            if (isDuplicate && duplicateNoteIds[originalIndices.indexOf(i)].length === 0) {
+                // -1 indicates an invalid/unknown noteId, this id will never exist in anki
+                duplicateNoteIds[originalIndices.indexOf(i)] = [-1];
+            }
+
             const noteIds = isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null;
             const noteInfos = (fetchAdditionalInfo && noteIds !== null && noteIds.length > 0) ? await this._anki.notesInfo(noteIds) : [];
 
