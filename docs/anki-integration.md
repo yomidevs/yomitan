@@ -50,7 +50,6 @@ Flashcard fields can be configured with the following steps:
     | `{phonetic-transcriptions}`       | List of phonetic transcriptions for the term.                                                                                                                          |
     | `{pitch-accents}`                 | List of pitch accent downstep notations for the term.                                                                                                                  |
     | `{pitch-accent-graphs}`           | List of pitch accent graphs for the term.                                                                                                                              |
-    | `{pitch-accent-graphs-jj}`        | List of pitch accent graphs for the term (styled after Jidoujisho).                                                                                                    |
     | `{pitch-accent-positions}`        | List of accent downstep positions for the term as a number.                                                                                                            |
     | `{pitch-accent-categories}`       | List of pitch accent categories for the term (e.g. heiban, kifuku, atamadaka, odaka, nakadaka).                                                                        |
     | `{reading}`                       | Kana reading for the term (empty for terms where the expression is the reading).                                                                                       |
