@@ -136,6 +136,11 @@ type AllTextProcessors = {
             removeRussianDiacritics: TextProcessor<boolean>;
         };
     };
+    sga: {
+        pre: CapitalizationPreprocessors & {
+            removeAlphabeticDiacritics: TextProcessor<boolean>;
+        };
+    };
     sh: {
         pre: CapitalizationPreprocessors;
     };

@@ -23,6 +23,7 @@ import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
+import {oldIrishTransforms} from './sga/old-irish-transforms.js';
 import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-preprocessors.js';
 
 const capitalizationPreprocessors = {
@@ -164,6 +165,16 @@ const languageDescriptors = [
             yoToE,
             removeRussianDiacritics
         }
+    },
+    {
+        iso: 'sga',
+        name: 'Old Irish',
+        exampleText: 'légaid',
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics
+        },
+        languageTransforms: oldIrishTransforms
     },
     {
         iso: 'sh',
