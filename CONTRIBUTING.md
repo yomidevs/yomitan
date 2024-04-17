@@ -22,7 +22,7 @@ Below are a few guidelines to ensure contributions have a good level of quality 
 ## Setup
 
 Yomitan uses [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) tools for building and testing.
-After installing these Node.js, the development environment can be set up by running `npm ci`.
+After installing these, the development environment can be set up by running `npm ci` and subsequently `npm run build`.
 
 ## Testing
 
