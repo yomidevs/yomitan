@@ -95,6 +95,10 @@ export class Backend {
         /** @type {import('../data/json-schema.js').JsonSchema[]} */
         this._profileConditionsSchemaCache = [];
         /** @type {?string} */
+        this._ankiClipboardImageFilenameCache = null;
+        /** @type {?string} */
+        this._ankiClipboardImageDataUrlCache = null;
+        /** @type {?string} */
         this._defaultAnkiFieldTemplates = null;
         /** @type {RequestBuilder} */
         this._requestBuilder = new RequestBuilder();
@@ -2054,7 +2058,7 @@ export class Backend {
 
         try {
             if (screenshotDetails !== null) {
-                screenshotFileName = await this._injectAnkiNoteScreenshot(ankiConnect, timestamp, definitionDetails, screenshotDetails);
+                screenshotFileName = await this._injectAnkiNoteScreenshot(ankiConnect, timestamp, screenshotDetails);
             }
         } catch (e) {
             errors.push(ExtensionError.serialize(e));
@@ -2062,7 +2066,7 @@ export class Backend {
 
         try {
             if (clipboardDetails !== null && clipboardDetails.image) {
-                clipboardImageFileName = await this._injectAnkiNoteClipboardImage(ankiConnect, timestamp, definitionDetails);
+                clipboardImageFileName = await this._injectAnkiNoteClipboardImage(ankiConnect, timestamp);
             }
         } catch (e) {
             errors.push(ExtensionError.serialize(e));
@@ -2088,7 +2092,7 @@ export class Backend {
         let dictionaryMedia;
         try {
             let errors2;
-            ({results: dictionaryMedia, errors: errors2} = await this._injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, definitionDetails, dictionaryMediaDetails));
+            ({results: dictionaryMedia, errors: errors2} = await this._injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, dictionaryMediaDetails));
             for (const error of errors2) {
                 errors.push(ExtensionError.serialize(error));
             }
@@ -2139,7 +2143,7 @@ export class Backend {
 
         let extension = contentType !== null ? getFileExtensionFromAudioMediaType(contentType) : null;
         if (extension === null) { extension = '.mp3'; }
-        let fileName = this._generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp, definitionDetails);
+        let fileName = this._generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp);
         fileName = fileName.replace(/\]/g, '');
         return await ankiConnect.storeMediaFile(fileName, data);
     }
@@ -2147,11 +2151,10 @@ export class Backend {
     /**
      * @param {AnkiConnect} ankiConnect
      * @param {number} timestamp
-     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
      * @param {import('api').InjectAnkiNoteMediaScreenshotDetails} details
      * @returns {Promise<?string>}
      */
-    async _injectAnkiNoteScreenshot(ankiConnect, timestamp, definitionDetails, details) {
+    async _injectAnkiNoteScreenshot(ankiConnect, timestamp, details) {
         const {tabId, frameId, format, quality} = details;
         const dataUrl = await this._getScreenshot(tabId, frameId, format, quality);
 
@@ -2161,17 +2164,16 @@ export class Backend {
             throw new Error('Unknown media type for screenshot image');
         }
 
-        const fileName = this._generateAnkiNoteMediaFileName('yomitan_browser_screenshot', extension, timestamp, definitionDetails);
+        const fileName = this._generateAnkiNoteMediaFileName('yomitan_browser_screenshot', extension, timestamp);
         return await ankiConnect.storeMediaFile(fileName, data);
     }
 
     /**
      * @param {AnkiConnect} ankiConnect
      * @param {number} timestamp
-     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
      * @returns {Promise<?string>}
      */
-    async _injectAnkiNoteClipboardImage(ankiConnect, timestamp, definitionDetails) {
+    async _injectAnkiNoteClipboardImage(ankiConnect, timestamp) {
         const dataUrl = await this._clipboardReader.getImage();
         if (dataUrl === null) {
             return null;
@@ -2183,18 +2185,27 @@ export class Backend {
             throw new Error('Unknown media type for clipboard image');
         }
 
-        const fileName = this._generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp, definitionDetails);
-        return await ankiConnect.storeMediaFile(fileName, data);
+        const fileName = dataUrl === this._ankiClipboardImageDataUrlCache && this._ankiClipboardImageFilenameCache ?
+            this._ankiClipboardImageFilenameCache :
+            this._generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp);
+
+        const storedFileName = await ankiConnect.storeMediaFile(fileName, data);
+
+        if (storedFileName !== null) {
+            this._ankiClipboardImageDataUrlCache = dataUrl;
+            this._ankiClipboardImageFilenameCache = storedFileName;
+        }
+
+        return storedFileName;
     }
 
     /**
      * @param {AnkiConnect} ankiConnect
      * @param {number} timestamp
-     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
      * @param {import('api').InjectAnkiNoteMediaDictionaryMediaDetails[]} dictionaryMediaDetails
      * @returns {Promise<{results: import('api').InjectAnkiNoteDictionaryMediaResult[], errors: unknown[]}>}
      */
-    async _injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, definitionDetails, dictionaryMediaDetails) {
+    async _injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, dictionaryMediaDetails) {
         const targets = [];
         const detailsList = [];
         const detailsMap = new Map();
@@ -2228,8 +2239,7 @@ export class Backend {
                 fileName = this._generateAnkiNoteMediaFileName(
                     `yomitan_dictionary_media_${i + 1}`,
                     extension !== null ? extension : '',
-                    timestamp,
-                    definitionDetails
+                    timestamp
                 );
                 try {
                     fileName = await ankiConnect.storeMediaFile(fileName, content);
@@ -2310,27 +2320,10 @@ export class Backend {
      * @param {string} prefix
      * @param {string} extension
      * @param {number} timestamp
-     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
      * @returns {string}
      */
-    _generateAnkiNoteMediaFileName(prefix, extension, timestamp, definitionDetails) {
+    _generateAnkiNoteMediaFileName(prefix, extension, timestamp) {
         let fileName = prefix;
-
-        switch (definitionDetails.type) {
-            case 'kanji':
-                {
-                    const {character} = definitionDetails;
-                    if (character) { fileName += `_${character}`; }
-                }
-                break;
-            default:
-                {
-                    const {reading, term} = definitionDetails;
-                    if (reading) { fileName += `_${reading}`; }
-                    if (term) { fileName += `_${term}`; }
-                }
-                break;
-        }
 
         fileName += `_${this._ankNoteDateToString(new Date(timestamp))}`;
         fileName += extension;
@@ -2360,7 +2353,8 @@ export class Backend {
         const hours = date.getUTCHours().toString().padStart(2, '0');
         const minutes = date.getUTCMinutes().toString().padStart(2, '0');
         const seconds = date.getUTCSeconds().toString().padStart(2, '0');
-        return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
+        const milliseconds = date.getUTCMilliseconds().toString().padStart(3, '0');
+        return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}-${milliseconds}`;
     }
 
     /**
