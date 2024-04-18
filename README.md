@@ -1,7 +1,4 @@
 # Yomitan <!-- omit from toc -->
-
-(working on lookupstats)
-
 [![Chrome Release](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&logoColor=lightblue&color=lightblue&label=chrome%20release%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn)
 [![Firefox Release](<https://img.shields.io/amo/v/yomitan?logo=Firefox&color=orange&label=firefox%20release%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
