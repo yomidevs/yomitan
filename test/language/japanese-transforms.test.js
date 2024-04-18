@@ -643,7 +643,7 @@ const tests = [
             {term: 'する', source: 'せぬ',           rule: 'vs', reasons: ['-nu']},
             {term: 'する', source: 'せざる',           rule: 'vs', reasons: ['-zaru']},
             {term: 'する', source: 'せねば',           rule: 'vs', reasons: ['-neba']},
-            // ['masu stem']
+            {term: 'する', source: 'し',             rule: 'vs', reasons: ['masu stem']},
             {term: 'する', source: 'しましょう',     rule: 'vs', reasons: ['polite', 'volitional']},
             {term: 'する', source: 'しよう',         rule: 'vs', reasons: ['volitional']},
             // ['causative passive']
