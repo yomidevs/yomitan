@@ -234,3 +234,194 @@ function createGraphCircle(svgns, className, x, y, radius) {
     node.setAttribute('r', radius);
     return node;
 }
+
+// The following Jidoujisho pitch graph code is based on code from
+// https://github.com/lrorpilla/jidoujisho licensed under the
+// GNU General Public License v3.0
+
+/**
+ * Create a pronounciation graph in the style of Jidoujisho
+ * @param {string[]} mora
+ * @param {number} downstepPosition
+ * @returns {SVGSVGElement}
+ */
+export function createPronunciationGraphJJ(mora, downstepPosition) {
+    const patt = pitchValueToPattJJ(mora.length, downstepPosition);
+
+    const positions = Math.max(mora.length, patt.length);
+    const stepWidth = 35;
+    const marginLr = 16;
+    const svgWidth = Math.max(0, ((positions - 1) * stepWidth) + (marginLr * 2));
+
+    const svgns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgns, 'svg');
+    svg.setAttribute('xmlns', svgns);
+    svg.setAttribute('width', `${(svgWidth * (3 / 5))}px`);
+    svg.setAttribute('height', '45px');
+    svg.setAttribute('viewBox', `0 0 ${svgWidth} 75`);
+
+
+    if (mora.length <= 0) { return svg; }
+
+    for (let i = 0; i < mora.length; i++) {
+        const xCenter = marginLr + (i * stepWidth);
+        textJJ(xCenter - 11, mora[i], svgns, svg);
+    }
+
+
+    let pathType = '';
+
+    const circles = [];
+    const paths = [];
+
+    let prevCenter = [-1, -1];
+    for (let i = 0; i < patt.length; i++) {
+        const xCenter = marginLr + (i * stepWidth);
+        const accent = patt[i];
+        let yCenter = 0;
+        if (accent === 'H') {
+            yCenter = 5;
+        } else if (accent === 'L') {
+            yCenter = 30;
+        }
+        circles.push(circleJJ(xCenter, yCenter, i >= mora.length, svgns));
+
+
+        if (i > 0) {
+            if (prevCenter[1] === yCenter) {
+                pathType = 's';
+            } else if (prevCenter[1] < yCenter) {
+                pathType = 'd';
+            } else if (prevCenter[1] > yCenter) {
+                pathType = 'u';
+            }
+            paths.push(pathJJ(prevCenter[0], prevCenter[1], pathType, stepWidth, svgns));
+        }
+        prevCenter = [xCenter, yCenter];
+    }
+
+    for (const path of paths) {
+        svg.appendChild(path);
+    }
+
+    for (const circle of circles) {
+        svg.appendChild(circle);
+    }
+
+    return svg;
+}
+
+/**
+ * Get H&L pattern
+ * @param {number} numberOfMora
+ * @param {number} pitchValue
+ * @returns {string}
+ */
+function pitchValueToPattJJ(numberOfMora, pitchValue) {
+    if (numberOfMora >= 1) {
+        if (pitchValue === 0) {
+        // Heiban
+            return `L${'H'.repeat(numberOfMora)}`;
+        } else if (pitchValue === 1) {
+        // Atamadaka
+            return `H${'L'.repeat(numberOfMora)}`;
+        } else if (pitchValue >= 2) {
+            const stepdown = pitchValue - 2;
+            return `LH${'H'.repeat(stepdown)}${'L'.repeat(numberOfMora - pitchValue + 1)}`;
+        }
+    }
+    return '';
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {boolean} o
+ * @param {string} svgns
+ * @returns {Element}
+ */
+function circleJJ(x, y, o, svgns) {
+    if (o) {
+        const node = document.createElementNS(svgns, 'circle');
+
+        node.setAttribute('r', '4');
+        node.setAttribute('cx', `${(x + 4)}`);
+        node.setAttribute('cy', `${y}`);
+        node.setAttribute('stroke', 'currentColor');
+        node.setAttribute('stroke-width', '2');
+        node.setAttribute('fill', 'none');
+
+        return node;
+    } else {
+        const node = document.createElementNS(svgns, 'circle');
+
+        node.setAttribute('r', '5');
+        node.setAttribute('cx', `${x}`);
+        node.setAttribute('cy', `${y}`);
+        node.setAttribute('style', 'opacity:1;fill:currentColor;');
+
+        return node;
+    }
+}
+
+/**
+ * @param {number} x
+ * @param {string} mora
+ * @param {string} svgns
+ * @param {SVGSVGElement} svg
+ * @returns {void}
+ */
+function textJJ(x, mora, svgns, svg) {
+    if (mora.length === 1) {
+        const path = document.createElementNS(svgns, 'text');
+        path.setAttribute('x', `${x}`);
+        path.setAttribute('y', '67.5');
+        path.setAttribute('style', 'font-size:20px;font-family:sans-serif;fill:currentColor;');
+        path.textContent = mora;
+        svg.appendChild(path);
+    } else {
+        const path1 = document.createElementNS(svgns, 'text');
+        path1.setAttribute('x', `${x - 5}`);
+        path1.setAttribute('y', '67.5');
+        path1.setAttribute('style', 'font-size:20px;font-family:sans-serif;fill:currentColor;');
+        path1.textContent = mora[0];
+        svg.appendChild(path1);
+
+
+        const path2 = document.createElementNS(svgns, 'text');
+        path2.setAttribute('x', `${x + 12}`);
+        path2.setAttribute('y', '67.5');
+        path2.setAttribute('style', 'font-size:14px;font-family:sans-serif;fill:currentColor;');
+        path2.textContent = mora[1];
+        svg.appendChild(path2);
+    }
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {string} type
+ * @param {number} stepWidth
+ * @param {string} svgns
+ * @returns {Element}
+ */
+function pathJJ(x, y, type, stepWidth, svgns) {
+    let delta = '';
+    switch (type) {
+        case 's':
+            delta = stepWidth + ',0';
+            break;
+        case 'u':
+            delta = stepWidth + ',-25';
+            break;
+        case 'd':
+            delta = stepWidth + ',25';
+            break;
+    }
+
+    const path = document.createElementNS(svgns, 'path');
+    path.setAttribute('d', `m ${x},${y} ${delta}`);
+    path.setAttribute('style', 'fill:none;stroke:currentColor;stroke-width:1.5;');
+
+    return path;
+}
