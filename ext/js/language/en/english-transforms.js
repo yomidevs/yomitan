@@ -72,7 +72,7 @@ const phrasalVerbInterposedObjectRule = {
         return term.replace(new RegExp(`(?<=\\w) (?:(?!\\b(${phrasalVerbWordDisjunction})\\b).)+ (?=(?:${particlesDisjunction}))`), ' ');
     },
     conditionsIn: [],
-    conditionsOut: ['v']
+    conditionsOut: ['v_phr']
 };
 
 /**
@@ -87,7 +87,7 @@ function createPhrasalVerbInflection(inflected, deinflected) {
         deinflect: (term) => {
             return term.replace(new RegExp(`(?<=)${inflected}(?= (?:${phrasalVerbWordDisjunction}))`), deinflected);
         },
-        conditionsIn: [],
+        conditionsIn: ['v_phr'],
         conditionsOut: ['v_phr']
     };
 }
@@ -210,7 +210,9 @@ export const englishTransforms = {
             name: 'adverb',
             description: 'Adverb form of an adjective',
             rules: [
-                suffixInflection('ly', '', ['adv'], ['adj'])
+                suffixInflection('ly', '', ['adv'], ['adj']), // 'quickly'
+                suffixInflection('ily', 'y', ['adv'], ['adj']), // 'happily'
+                suffixInflection('ly', 'le', ['adv'], ['adj']) // 'humbly'
             ]
         },
         {

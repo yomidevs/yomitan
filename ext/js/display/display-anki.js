@@ -21,7 +21,7 @@ import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
-import {isNoteDataValid} from '../data/anki-util.js';
+import {invalidNoteId, isNoteDataValid} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
@@ -413,6 +413,9 @@ export class DisplayAnki {
                 if (button !== null) {
                     button.disabled = !canAdd;
                     button.hidden = (ankiError !== null);
+                    if (ankiError) {
+                        log.error(ankiError);
+                    }
 
                     // If entry has noteIds, show the "add duplicate" button.
                     if (Array.isArray(noteIds) && noteIds.length > 0) {
@@ -422,7 +425,11 @@ export class DisplayAnki {
 
                 if (Array.isArray(noteIds) && noteIds.length > 0) {
                     if (allNoteIds === null) { allNoteIds = new Set(); }
-                    for (const noteId of noteIds) { allNoteIds.add(noteId); }
+                    for (const noteId of noteIds) {
+                        if (noteId !== invalidNoteId) {
+                            allNoteIds.add(noteId);
+                        }
+                    }
                 }
 
                 if (displayTags !== 'never' && Array.isArray(noteInfos)) {
