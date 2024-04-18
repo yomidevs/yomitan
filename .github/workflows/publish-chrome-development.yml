@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: Get the next attempt number
         id: getNextAttemptNumber
-        uses: cardinalby/js-eval-action@b34865f1d9cfdf35356013627474857cfe0d5091 # pin@v1.0.7
+        uses: cardinalby/js-eval-action@e905fd3681d757e992c976f61c2784dcb4060e13 # pin@v1.0.9
         env:
           attemptNumber: ${{ github.event.inputs.attemptNumber }}
           maxAttempts: ${{ github.event.inputs.maxAttempts }}
