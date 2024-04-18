@@ -22,11 +22,11 @@ import {englishTransforms} from './en/english-transforms.js';
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
-import {removeLatinDiacritics} from './la/latin-text-preprocessors.js';
 import {latinTransforms} from './la/latin-transforms.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
+import {oldIrishTransforms} from './sga/old-irish-transforms.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
-import {capitalizeFirstLetter, decapitalize} from './text-preprocessors.js';
+import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-preprocessors.js';
 
 const capitalizationPreprocessors = {
     decapitalize,
@@ -90,7 +90,10 @@ const languageDescriptors = [
         iso: 'grc',
         name: 'Ancient Greek',
         exampleText: 'γράφω',
-        textPreprocessors: capitalizationPreprocessors
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics
+        }
     },
     {
         iso: 'hu',
@@ -116,7 +119,7 @@ const languageDescriptors = [
         exampleText: 'legere',
         textPreprocessors: {
             ...capitalizationPreprocessors,
-            removeLatinDiacritics
+            removeAlphabeticDiacritics
         },
         languageTransforms: latinTransforms
     },
@@ -169,6 +172,16 @@ const languageDescriptors = [
         }
     },
     {
+        iso: 'sga',
+        name: 'Old Irish',
+        exampleText: 'légaid',
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics
+        },
+        languageTransforms: oldIrishTransforms
+    },
+    {
         iso: 'sh',
         name: 'Serbo-Croatian',
         exampleText: 'čitaše',
@@ -192,6 +205,12 @@ const languageDescriptors = [
         name: 'Thai',
         exampleText: 'อ่าน',
         textPreprocessors: {}
+    },
+    {
+        iso: 'tr',
+        name: 'Turkish',
+        exampleText: 'okuyor',
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'vi',

@@ -19,7 +19,7 @@
 import {Handlebars} from '../../lib/handlebars.js';
 import {createAnkiNoteData} from '../data/anki-note-data-creator.js';
 import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
-import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../display/pronunciation-generator.js';
+import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationGraphJJ, createPronunciationText} from '../display/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../display/structured-content-generator.js';
 import {CssStyleApplier} from '../dom/css-style-applier.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../language/ja/japanese.js';
@@ -741,6 +741,8 @@ export class AnkiTemplateRenderer {
             }
             case 'graph':
                 return this._getPronunciationHtml(createPronunciationGraph(morae, downstepPosition));
+            case 'graph-jj':
+                return this._getPronunciationHtml(createPronunciationGraphJJ(morae, downstepPosition));
             case 'position':
                 return this._getPronunciationHtml(createPronunciationDownstepPosition(downstepPosition));
             default:

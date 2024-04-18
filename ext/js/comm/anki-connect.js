@@ -128,6 +128,7 @@ export class AnkiConnect {
         return result;
     }
 
+
     /**
      * @param {import('anki').Note[]} notes
      * @returns {Promise<boolean[]>}

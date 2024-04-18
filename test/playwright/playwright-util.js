@@ -114,7 +114,7 @@ export function getExpectedAddNoteBody() {
                 deckName: 'Mock Deck',
                 modelName: 'Mock Model',
                 options: {
-                    allowDuplicate: false,
+                    allowDuplicate: true,
                     duplicateScope: 'collection',
                     duplicateScopeOptions: {
                         deckName: null,
@@ -141,6 +141,7 @@ function getResponseBody(action) {
         case 'canAddNotes': return [true, true];
         case 'storeMediaFile': return 'mock_audio.mp3';
         case 'addNote': return 102312488912;
+        case 'multi': return [];
         default: throw new Error(`Unknown action: ${action}`);
     }
 }

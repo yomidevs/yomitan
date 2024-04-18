@@ -21,7 +21,7 @@ import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
-import {isNoteDataValid} from '../data/anki-util.js';
+import {invalidNoteId, isNoteDataValid} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
@@ -371,6 +371,36 @@ export class DisplayAnki {
     }
 
     /**
+     * @param {HTMLButtonElement} button
+     */
+    _showDuplicateAddButton(button) {
+        const isKanjiAdd = button.dataset.mode === 'term-kanji';
+
+        const title = button.getAttribute('title');
+        if (title) {
+            button.setAttribute('title', title.replace(/Add (?!duplicate)/, 'Add duplicate '));
+        }
+
+        // eslint-disable-next-line no-underscore-dangle
+        const hotkeyLabel = this._display._hotkeyHelpController.getHotkeyLabel(button);
+
+        if (hotkeyLabel) {
+            if (hotkeyLabel === 'Add expression ({0})') {
+                // eslint-disable-next-line no-underscore-dangle
+                this._display._hotkeyHelpController.setHotkeyLabel(button, 'Add duplicate expression ({0})');
+            } else if (hotkeyLabel === 'Add reading ({0})') {
+                // eslint-disable-next-line no-underscore-dangle
+                this._display._hotkeyHelpController.setHotkeyLabel(button, 'Add duplicate reading ({0})');
+            }
+        }
+
+        const actionIcon = button.querySelector('.action-icon');
+        if (actionIcon instanceof HTMLElement) {
+            actionIcon.dataset.icon = isKanjiAdd ? 'add-duplicate-term-kanji' : 'add-duplicate-term-kana';
+        }
+    }
+
+    /**
      * @param {import('display-anki').DictionaryEntryDetails[]} dictionaryEntryDetails
      */
     _updateAdderButtons(dictionaryEntryDetails) {
@@ -383,17 +413,30 @@ export class DisplayAnki {
                 if (button !== null) {
                     button.disabled = !canAdd;
                     button.hidden = (ankiError !== null);
+                    if (ankiError) {
+                        log.error(ankiError);
+                    }
+
+                    // If entry has noteIds, show the "add duplicate" button.
+                    if (Array.isArray(noteIds) && noteIds.length > 0) {
+                        this._showDuplicateAddButton(button);
+                    }
                 }
 
                 if (Array.isArray(noteIds) && noteIds.length > 0) {
                     if (allNoteIds === null) { allNoteIds = new Set(); }
-                    for (const noteId of noteIds) { allNoteIds.add(noteId); }
+                    for (const noteId of noteIds) {
+                        if (noteId !== invalidNoteId) {
+                            allNoteIds.add(noteId);
+                        }
+                    }
                 }
 
                 if (displayTags !== 'never' && Array.isArray(noteInfos)) {
                     this._setupTagsIndicator(i, noteInfos);
                 }
             }
+
             this._updateViewNoteButton(i, allNoteIds !== null ? [...allNoteIds] : [], false);
         }
     }
@@ -506,7 +549,9 @@ export class DisplayAnki {
                             allErrors.push(toError(e));
                         }
                     }
-                    button.disabled = true;
+                    // Now that this dictionary entry has a duplicate in Anki, show the "add duplicate" buttons.
+                    this._showDuplicateAddButton(button);
+
                     this._updateViewNoteButton(dictionaryEntryIndex, [noteId], true);
                 }
             }
@@ -615,7 +660,6 @@ export class DisplayAnki {
      * @returns {Promise<import('display-anki').DictionaryEntryDetails[]>}
      */
     async _getDictionaryEntryDetails(dictionaryEntries) {
-        const forceCanAddValue = (this._checkForDuplicates ? null : true);
         const fetchAdditionalInfo = (this._displayTags !== 'never');
 
         const notePromises = [];
@@ -638,14 +682,13 @@ export class DisplayAnki {
         let infos;
         let ankiError = null;
         try {
-            if (forceCanAddValue !== null) {
-                if (!await this._display.application.api.isAnkiConnected()) {
-                    throw new Error('Anki not connected');
-                }
-                infos = this._getAnkiNoteInfoForceValue(notes, forceCanAddValue);
-            } else {
-                infos = await this._display.application.api.getAnkiNoteInfo(notes, fetchAdditionalInfo);
+            if (!await this._display.application.api.isAnkiConnected()) {
+                throw new Error('Anki not connected');
             }
+
+            infos = this._checkForDuplicates ?
+                await this._display.application.api.getAnkiNoteInfo(notes, fetchAdditionalInfo) :
+                this._getAnkiNoteInfoForceValue(notes, true);
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValue(notes, false);
             ankiError = toError(e);
@@ -711,7 +754,6 @@ export class DisplayAnki {
             modelName,
             fields,
             tags: this._noteTags,
-            checkForDuplicates: this._checkForDuplicates,
             duplicateScope: this._duplicateScope,
             duplicateScopeCheckAllModels: this._duplicateScopeCheckAllModels,
             resultOutputMode: this._resultOutputMode,

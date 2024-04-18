@@ -149,6 +149,8 @@ export class DictionaryImportController {
 
         const prevention = this._preventPageExit();
 
+        /** @type {Error[]} */
+        let errors = [];
         try {
             this._setModifying(true);
             this._hideErrors();
@@ -196,12 +198,12 @@ export class DictionaryImportController {
                     count: 0
                 });
                 if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
-
-                await this._importDictionary(files[i], importDetails, onProgress);
+                errors = [...errors, ...(await this._importDictionary(files[i], importDetails, onProgress) ?? [])];
             }
         } catch (error) {
-            this._showErrors([toError(error)]);
+            errors.push(toError(error));
         } finally {
+            this._showErrors(errors);
             prevention.end();
             for (const progress of progressContainers) { progress.hidden = true; }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
@@ -231,10 +233,15 @@ export class DictionaryImportController {
      * @param {File} file
      * @param {import('dictionary-importer').ImportDetails} importDetails
      * @param {import('dictionary-worker').ImportProgressCallback} onProgress
+     * @returns {Promise<Error[] | undefined>}
      */
     async _importDictionary(file, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
         const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
+        if (!result) {
+            return errors;
+        }
+
         void this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
         const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
 
