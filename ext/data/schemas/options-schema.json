@@ -463,8 +463,9 @@
                                                     "showAdvanced": false,
                                                     "searchTerms": true,
                                                     "searchKanji": true,
-                                                    "scanOnTouchMove": true,
-                                                    "scanOnTouchPress": true,
+                                                    "scanOnTouchTap": true,
+                                                    "scanOnTouchMove": false,
+                                                    "scanOnTouchPress": false,
                                                     "scanOnTouchRelease": false,
                                                     "scanOnPenMove": true,
                                                     "scanOnPenHover": true,
@@ -487,8 +488,9 @@
                                                     "showAdvanced": false,
                                                     "searchTerms": true,
                                                     "searchKanji": true,
-                                                    "scanOnTouchMove": true,
-                                                    "scanOnTouchPress": true,
+                                                    "scanOnTouchTap": true,
+                                                    "scanOnTouchMove": false,
+                                                    "scanOnTouchPress": false,
                                                     "scanOnTouchRelease": false,
                                                     "scanOnPenMove": true,
                                                     "scanOnPenHover": true,
@@ -545,6 +547,7 @@
                                                         "showAdvanced",
                                                         "searchTerms",
                                                         "searchKanji",
+                                                        "scanOnTouchTap",
                                                         "scanOnTouchMove",
                                                         "scanOnTouchPress",
                                                         "scanOnTouchRelease",
@@ -569,13 +572,17 @@
                                                             "type": "boolean",
                                                             "default": true
                                                         },
-                                                        "scanOnTouchMove": {
+                                                        "scanOnTouchTap": {
                                                             "type": "boolean",
                                                             "default": true
                                                         },
+                                                        "scanOnTouchMove": {
+                                                            "type": "boolean",
+                                                            "default": false
+                                                        },
                                                         "scanOnTouchPress": {
                                                             "type": "boolean",
-                                                            "default": true
+                                                            "default": false
                                                         },
                                                         "scanOnTouchRelease": {
                                                             "type": "boolean",
