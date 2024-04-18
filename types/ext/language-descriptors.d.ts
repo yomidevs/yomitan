@@ -69,12 +69,14 @@ type AllTextPreprocessors = {
         removeArabicScriptDiacritics: TextPreprocessor<boolean>;
     };
     fr: CapitalizationPreprocessors;
-    grc: CapitalizationPreprocessors;
+    grc: CapitalizationPreprocessors & {
+        removeAlphabeticDiacritics: TextPreprocessor<boolean>;
+    };
     hu: CapitalizationPreprocessors;
     id: CapitalizationPreprocessors;
     it: CapitalizationPreprocessors;
     la: CapitalizationPreprocessors & {
-        removeLatinDiacritics: TextPreprocessor<boolean>;
+        removeAlphabeticDiacritics: TextPreprocessor<boolean>;
     };
     ja: {
         convertHalfWidthCharacters: TextPreprocessor<boolean>;
@@ -90,6 +92,9 @@ type AllTextPreprocessors = {
     ru: CapitalizationPreprocessors & {
         yoToE: TextPreprocessor<boolean>;
         removeRussianDiacritics: TextPreprocessor<boolean>;
+    };
+    sga: CapitalizationPreprocessors & {
+        removeAlphabeticDiacritics: TextPreprocessor<boolean>;
     };
     sh: CapitalizationPreprocessors;
     sq: CapitalizationPreprocessors;
