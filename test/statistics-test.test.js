@@ -1,5 +1,5 @@
 //src/components/__tests/example.test.js
-import {afterAll, describe, expect, test} from "vitest";
+import {afterAll, beforeEach, describe, expect, test, it, vi} from "vitest";
 import {setupDomTest} from './fixtures/dom-test.js';
 import path from 'path';
 import {fileURLToPath} from 'node:url';
@@ -41,21 +41,29 @@ function querySelectorTextNode(element, selector) {
     return null;
 }
 
+function setNewDate() {
+    var date = new Date();
+    date.setDate(date.getDate() + 1)
+    vi.setSystemTime(date)
+}
+
+function setDateBack() {
+    vi.setSystemTime(new Date())
+}
+
 describe('Statistics', () => {
     const {window, teardown} = domTestEnv;
     afterAll(() => teardown(global));
-    test('Seek tests', () => {
-        const {document} = window;
 
+    let counter = 0 // VERY DUMB HACK - CANT FIGURE OUT HOW TO BREAK THE FOR LOOP INTO INDIVIDUAL ELEMENTS...
+    test('Scan 0 check', () => {
+        const {document} = window;
         for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case'))) {
             /** @type {import('test/dom-text-scanner').TestData|import('test/dom-text-scanner').TestData[]} */
             let testData = parseJson(/** @type {string} */ (testElement.dataset.testData));
-
-
             if (!Array.isArray(testData)) {
                 testData = [testData];
             }
-
             for (const testDataItem of testData) {
                 const {
                     node: nodeSelector,
@@ -71,7 +79,6 @@ describe('Statistics', () => {
                         remainder: expectedRemainder
                     }
                 } = testDataItem;
-             
 
                 const node = querySelectorTextNode(testElement, nodeSelector);
                 const expectedNode = querySelectorTextNode(testElement, expectedNodeSelector);
@@ -90,20 +97,148 @@ describe('Statistics', () => {
                     expect(actualOffset1).toStrictEqual(expectedOffset);
                     expect(actualNode1).toStrictEqual(expectedNode);
                     expect(actualRemainder1).toStrictEqual(expectedRemainder || 0);
+                    if (counter == 0) { // test first case
+                        counter += 1
+                        chrome.storage.local.get('numSelects', function(data) {
+                            expect(data.numSelects).toStrictEqual(0);
+                        });
+                        break
+                    }
                 }
 
 
             }
         }
+        setNewDate()
+        chrome.storage.local.get('numSelects', function(data) {
+            expect(data.numSelects).toStrictEqual(0);
+        });
+        setDateBack()
+    });
+
+    test('Scan 1 check', () => {
+        const {document} = window;
+        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case'))) {
+            /** @type {import('test/dom-text-scanner').TestData|import('test/dom-text-scanner').TestData[]} */
+            let testData = parseJson(/** @type {string} */ (testElement.dataset.testData));
+            if (!Array.isArray(testData)) {
+                testData = [testData];
+            }
+            for (const testDataItem of testData) {
+                const {
+                    node: nodeSelector,
+                    offset,
+                    length,
+                    forcePreserveWhitespace,
+                    generateLayoutContent,
+                    reversible,
+                    expected: {
+                        node: expectedNodeSelector,
+                        offset: expectedOffset,
+                        content: expectedContent,
+                        remainder: expectedRemainder
+                    }
+                } = testDataItem;
+
+                const node = querySelectorTextNode(testElement, nodeSelector);
+                const expectedNode = querySelectorTextNode(testElement, expectedNodeSelector);
+
+                expect(node).not.toEqual(null);
+                expect(expectedNode).not.toEqual(null);
+                if (node === null || expectedNode === null) { continue; }
+
+                // Standard test
+                {
+                    const scanner = new DOMTextScanner(node, offset, forcePreserveWhitespace, generateLayoutContent);
+                    scanner.seek(length);
+
+                    const {node: actualNode1, offset: actualOffset1, content: actualContent1, remainder: actualRemainder1} = scanner;
+                    expect(actualContent1).toStrictEqual(expectedContent);
+                    expect(actualOffset1).toStrictEqual(expectedOffset);
+                    expect(actualNode1).toStrictEqual(expectedNode);
+                    expect(actualRemainder1).toStrictEqual(expectedRemainder || 0);
+                    if (counter == 1) { // test second case
+                        counter += 1
+                        chrome.storage.local.get('numSelects', function(data) {
+                            expect(data.numSelects).toStrictEqual(1);
+                        });
+                        break
+                    }
+                }
+
+
+            }
+        }
+        setNewDate()
+        chrome.storage.local.get('numSelects', function(data) {
+            expect(data.numSelects).toStrictEqual(0);
+        });
+        setDateBack()
+    });
+
+    test('Scan 3 check', () => {
+        const {document} = window;
+        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case'))) {
+            /** @type {import('test/dom-text-scanner').TestData|import('test/dom-text-scanner').TestData[]} */
+            let testData = parseJson(/** @type {string} */ (testElement.dataset.testData));
+            if (!Array.isArray(testData)) {
+                testData = [testData];
+            }
+            for (const testDataItem of testData) {
+                const {
+                    node: nodeSelector,
+                    offset,
+                    length,
+                    forcePreserveWhitespace,
+                    generateLayoutContent,
+                    reversible,
+                    expected: {
+                        node: expectedNodeSelector,
+                        offset: expectedOffset,
+                        content: expectedContent,
+                        remainder: expectedRemainder
+                    }
+                } = testDataItem;
+
+                const node = querySelectorTextNode(testElement, nodeSelector);
+                const expectedNode = querySelectorTextNode(testElement, expectedNodeSelector);
+
+                expect(node).not.toEqual(null);
+                expect(expectedNode).not.toEqual(null);
+                if (node === null || expectedNode === null) { continue; }
+
+                // Standard test
+                {
+                    const scanner = new DOMTextScanner(node, offset, forcePreserveWhitespace, generateLayoutContent);
+                    scanner.seek(length);
+
+                    const {node: actualNode1, offset: actualOffset1, content: actualContent1, remainder: actualRemainder1} = scanner;
+                    expect(actualContent1).toStrictEqual(expectedContent);
+                    expect(actualOffset1).toStrictEqual(expectedOffset);
+                    expect(actualNode1).toStrictEqual(expectedNode);
+                    expect(actualRemainder1).toStrictEqual(expectedRemainder || 0);
+                    if (counter == 2) { // test first case
+                        counter += 1
+                        chrome.storage.local.get('numSelects', function(data) {
+                            expect(data.numSelects).toStrictEqual(3);
+                        });
+                        break
+                    }
+                }
+
+
+            }
+        }
+        setNewDate()
+        chrome.storage.local.get('numSelects', function(data) {
+            expect(data.numSelects).toStrictEqual(0);
+        });
+        setDateBack()
     });
 
 
 
-    // test scanned no items + check, then reset date and check
 
-    // test scanned 1 item + check, then reset date and check
-
-    // test scanned 10 items + check, then reset date and check
 
 })
 
