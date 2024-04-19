@@ -413,6 +413,9 @@ export class DisplayAnki {
                 if (button !== null) {
                     button.disabled = !canAdd;
                     button.hidden = (ankiError !== null);
+                    if (ankiError && ankiError.message !== 'Anki not connected') {
+                        log.error(ankiError);
+                    }
 
                     // If entry has noteIds, show the "add duplicate" button.
                     if (Array.isArray(noteIds) && noteIds.length > 0) {
@@ -689,9 +692,6 @@ export class DisplayAnki {
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValue(notes, false);
             ankiError = toError(e);
-            if (ankiError.message !== 'Anki not connected') {
-                log.error(e);
-            }
         }
 
         /** @type {import('display-anki').DictionaryEntryDetails[]} */
