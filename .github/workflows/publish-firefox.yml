@@ -15,7 +15,7 @@ jobs:
 
       - name: Deploy to Firefox Addons
         id: addonsDeploy
-        uses: cardinalby/webext-buildtools-firefox-addons-action@924ad87df7e4af50a654c164ad9e498dce260ffa # pin@v1.0.9
+        uses: cardinalby/webext-buildtools-firefox-addons-action@987e338100095280ec8daf942e5640aeb55d3647 # pin@v1.0.10
         continue-on-error: true
         with:
           zipFilePath: yomitan-firefox.zip
