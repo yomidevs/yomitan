@@ -122,7 +122,7 @@ export type TableElement = {
 };
 
 export type StyledElement = {
-    tag: 'span' | 'div' | 'ol' | 'ul' | 'li';
+    tag: 'span' | 'div' | 'ol' | 'ul' | 'li' | 'details' | 'summary';
     content?: Content;
     data?: Data;
     style?: StructuredContentStyle;

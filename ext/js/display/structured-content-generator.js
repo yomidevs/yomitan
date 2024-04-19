@@ -275,6 +275,8 @@ export class StructuredContentGenerator {
             case 'ol':
             case 'ul':
             case 'li':
+            case 'details':
+            case 'summary':
                 return this._createStructuredContentElement(tag, content, dictionary, language, 'simple', true, true);
             case 'img':
                 return this.createDefinitionImage(content, dictionary);
