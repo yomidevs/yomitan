@@ -22,9 +22,9 @@ import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidth
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
-import {albanianTransforms} from './sq/albanian-transforms.js';
 import {oldIrishTransforms} from './sga/old-irish-transforms.js';
-import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-preprocessors.js';
+import {albanianTransforms} from './sq/albanian-transforms.js';
+import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-processors.js';
 
 const capitalizationPreprocessors = {
     decapitalize,

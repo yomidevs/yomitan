@@ -654,7 +654,7 @@
                 "ext/js/language/ru/russian-text-preprocessors.js",
                 "ext/js/language/sga/old-irish-transforms.js",
                 "ext/js/language/sq/albanian-transforms.js",
-                "ext/js/language/text-preprocessors.js",
+                "ext/js/language/text-processors.js",
                 "ext/js/language/translator.js",
                 "ext/js/media/audio-downloader.js",
                 "ext/js/media/media-util.js",
