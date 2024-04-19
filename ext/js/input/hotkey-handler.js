@@ -279,6 +279,6 @@ export class HotkeyHandler extends EventDispatcher {
      * @returns {boolean}
      */
     _isKeyCharacterInput(key) {
-        return key.length === 1;
+        return key.length === 1 || key === 'Process';
     }
 }
