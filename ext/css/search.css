@@ -87,7 +87,6 @@ h1 {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     white-space: pre-wrap;
     z-index: 1;
-    margin: 0 calc(-1 * var(--main-content-horizontal-padding));
 }
 .search-button {
     flex: 0 0 auto;
@@ -132,7 +131,7 @@ h1 {
 .search-options {
     display: flex;
     flex-flow: row wrap;
-    margin: 0.5em calc(-1 * var(--main-content-horizontal-padding));
+    margin: 0.5em 0;
     align-items: center;
 }
 .search-option {
