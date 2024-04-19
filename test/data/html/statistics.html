@@ -17,6 +17,24 @@
     data-test-data='{
         "node": "div::text",
         "offset": 0,
+        "length": 0,
+        "expected": {
+            "node": "div::text",
+            "offset": 0,
+            "content": ""
+        }
+    }'
+>
+    <test-description>Don't scan anything and check</test-description>
+    <div></div>
+    </test-case>
+
+    <!-- Create a new day and ensure lookups = 0 -->
+
+    <test-case
+    data-test-data='{
+        "node": "div::text",
+        "offset": 0,
         "length": 2,
         "expected": {
             "node": "div::text",
@@ -29,22 +47,25 @@
     <div>東京</div>
     </test-case>
 
-<!-- <test-case
-data-test-data='{
-    "node": "div:nth-of-type(1)",
-    "offset": 0,
-    "length": 15,
-    "expected": {
-        "node": "div:nth-of-type(1)>div::text",
-        "offset": 3,
-        "content": "小ぢん\nまり1\n小ぢん\nまり2"
-    }
-}'
+    <test-case
+    data-test-data='{
+        "node": "div::text",
+        "offset": 0,
+        "length": 10,
+        "expected": {
+            "node": "div::text",
+            "offset": 10,
+            "content": "東京"
+        }
+    }'
 >
-<test-description>Layout newlines expected due to entering and exiting display:block nodes.</test-description>
-<div><div>小ぢん</div>まり1</div>
-<div>小ぢん<div>まり2</div></div>
-</test-case> -->
+    <test-description>Scan 3 times and check</test-description>
+    <div>東京</div>
+    <div>仕方がない</div>
+    <div>北海道</div>
+    </test-case>
+
+    <!-- Create a new day and ensure lookups = 0 -->
 
 </body>
 </html>
