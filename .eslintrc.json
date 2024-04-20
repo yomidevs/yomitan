@@ -642,6 +642,7 @@
                 "ext/js/general/text-source-map.js",
                 "ext/js/language/ar/arabic-text-preprocessors.js",
                 "ext/js/language/de/german-text-preprocessors.js",
+                "ext/js/language/de/german-transforms.js",
                 "ext/js/language/en/english-transforms.js",
                 "ext/js/language/ja/japanese-text-preprocessors.js",
                 "ext/js/language/ja/japanese-transforms.js",
