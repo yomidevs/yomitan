@@ -59,6 +59,8 @@ export class DisplayAnki {
         /** @type {?import('anki-templates-internal').Context} */
         this._noteContext = null;
         /** @type {boolean} */
+        this._enable = false;
+        /** @type {boolean} */
         this._checkForDuplicates = false;
         /** @type {boolean} */
         this._suspendNewCards = false;
@@ -189,6 +191,7 @@ export class DisplayAnki {
         const {
             general: {resultOutputMode, glossaryLayoutMode, compactTags},
             anki: {
+                enable,
                 tags,
                 duplicateScope,
                 duplicateScopeCheckAllModels,
@@ -204,6 +207,7 @@ export class DisplayAnki {
             scanning: {length: scanLength}
         } = options;
 
+        this._enable = enable;
         this._checkForDuplicates = checkForDuplicates;
         this._suspendNewCards = suspendNewCards;
         this._compactTags = compactTags;
@@ -258,7 +262,9 @@ export class DisplayAnki {
 
     /** */
     _onContentUpdateComplete() {
-        void this._updateDictionaryEntryDetails();
+        if (this._enable) {
+            void this._updateDictionaryEntryDetails();
+        }
     }
 
     /**
