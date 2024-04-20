@@ -69,7 +69,7 @@ const tests = [
             {term: '食べる', source: '食べまして',        rule: 'v1', reasons: ['polite', '-te']},
 
             {term: '食べる', source: '食べれば',         rule: 'v1', reasons: ['-ba']},
-            {term: '食べる', source: '食べりゃ',         rule: 'v1', reasons: ['-rya']},
+            {term: '食べる', source: '食べりゃ',         rule: 'v1', reasons: ['-ba', '-ya']},
             {term: '食べる', source: '食べちゃ',         rule: 'v1', reasons: ['-cha']},
             {term: '食べる', source: '食べちゃう',       rule: 'v1', reasons: ['-chau']},
             {term: '食べる', source: '食べちまう',       rule: 'v1', reasons: ['-chimau']},
@@ -123,7 +123,7 @@ const tests = [
             {term: '買う', source: '買いまして',     rule: 'v5', reasons: ['polite', '-te']},
 
             {term: '買う', source: '買えば',           rule: 'v5', reasons: ['-ba']},
-            {term: '買う', source: '買や',           rule: 'v5', reasons: ['-rya']},
+            {term: '買う', source: '買や',           rule: 'v5', reasons: ['-ba', '-ya']},
             {term: '買う', source: '買っちゃ',       rule: 'v5', reasons: ['-cha']},
             {term: '買う', source: '買っちゃう',       rule: 'v5', reasons: ['-chau']},
             {term: '買う', source: '買っちまう',       rule: 'v5', reasons: ['-chimau']},
@@ -177,7 +177,7 @@ const tests = [
             {term: '行く', source: '行きまして',     rule: 'v5', reasons: ['polite', '-te']},
 
             {term: '行く', source: '行けば',           rule: 'v5', reasons: ['-ba']},
-            {term: '行く', source: '行きゃ',           rule: 'v5', reasons: ['-rya']},
+            {term: '行く', source: '行きゃ',           rule: 'v5', reasons: ['-ba', '-ya']},
             {term: '行く', source: '行っちゃ',       rule: 'v5', reasons: ['-cha']},
             {term: '行く', source: '行っちゃう',       rule: 'v5', reasons: ['-chau']},
             {term: '行く', source: '行っちまう',       rule: 'v5', reasons: ['-chimau']},
@@ -231,7 +231,7 @@ const tests = [
             {term: '泳ぐ', source: '泳ぎまして',     rule: 'v5', reasons: ['polite', '-te']},
 
             {term: '泳ぐ', source: '泳げば',           rule: 'v5', reasons: ['-ba']},
-            {term: '泳ぐ', source: '泳ぎゃ',           rule: 'v5', reasons: ['-rya']},
+            {term: '泳ぐ', source: '泳ぎゃ',           rule: 'v5', reasons: ['-ba', '-ya']},
             {term: '泳ぐ', source: '泳いじゃ',       rule: 'v5', reasons: ['-cha']},
             {term: '泳ぐ', source: '泳いじゃう',       rule: 'v5', reasons: ['-chau']},
             {term: '泳ぐ', source: '泳いじまう',       rule: 'v5', reasons: ['-chimau']},
@@ -284,7 +284,7 @@ const tests = [
             {term: '話す', source: '話しまして',     rule: 'v5', reasons: ['polite', '-te']},
 
             {term: '話す', source: '話せば',           rule: 'v5', reasons: ['-ba']},
-            {term: '話す', source: '話しゃ',           rule: 'v5', reasons: ['-rya']},
+            {term: '話す', source: '話しゃ',           rule: 'v5', reasons: ['-ba', '-ya']},
             {term: '話す', source: '話しちゃ',       rule: 'v5', reasons: ['-cha']},
             {term: '話す', source: '話しちゃう',       rule: 'v5', reasons: ['-chau']},
             {term: '話す', source: '話しちまう',       rule: 'v5', reasons: ['-chimau']},
@@ -338,7 +338,7 @@ const tests = [
             {term: '待つ', source: '待ちまして',     rule: 'v5', reasons: ['polite', '-te']},
 
             {term: '待つ', source: '待てば',           rule: 'v5', reasons: ['-ba']},
-            {term: '待つ', source: '待ちゃ',           rule: 'v5', reasons: ['-rya']},
+            {term: '待つ', source: '待ちゃ',           rule: 'v5', reasons: ['-ba', '-ya']},
             {term: '待つ', source: '待っちゃ',       rule: 'v5', reasons: ['-cha']},
             {term: '待つ', source: '待っちゃう',       rule: 'v5', reasons: ['-chau']},
             {term: '待つ', source: '待っちまう',       rule: 'v5', reasons: ['-chimau']},
@@ -392,7 +392,7 @@ const tests = [
             {term: '死ぬ', source: '死にまして',     rule: 'v5', reasons: ['polite', '-te']},
 
             {term: '死ぬ', source: '死ねば',           rule: 'v5', reasons: ['-ba']},
-            {term: '死ぬ', source: '死にゃ',           rule: 'v5', reasons: ['-rya']},
+            {term: '死ぬ', source: '死にゃ',           rule: 'v5', reasons: ['-ba', '-ya']},
             {term: '死ぬ', source: '死んじゃ',       rule: 'v5', reasons: ['-cha']},
             {term: '死ぬ', source: '死んじゃう',       rule: 'v5', reasons: ['-chau']},
             {term: '死ぬ', source: '死んじまう',       rule: 'v5', reasons: ['-chimau']},
@@ -445,7 +445,7 @@ const tests = [
             {term: '遊ぶ', source: '遊びまして',     rule: 'v5', reasons: ['polite', '-te']},
 
             {term: '遊ぶ', source: '遊べば',           rule: 'v5', reasons: ['-ba']},
-            {term: '遊ぶ', source: '遊びゃ',           rule: 'v5', reasons: ['-rya']},
+            {term: '遊ぶ', source: '遊びゃ',           rule: 'v5', reasons: ['-ba', '-ya']},
             {term: '遊ぶ', source: '遊んじゃ',       rule: 'v5', reasons: ['-cha']},
             {term: '遊ぶ', source: '遊んじゃう',       rule: 'v5', reasons: ['-chau']},
             {term: '遊ぶ', source: '遊んじまう',       rule: 'v5', reasons: ['-chimau']},
@@ -498,7 +498,7 @@ const tests = [
             {term: '飲む', source: '飲みまして',     rule: 'v5', reasons: ['polite', '-te']},
 
             {term: '飲む', source: '飲めば',           rule: 'v5', reasons: ['-ba']},
-            {term: '飲む', source: '飲みゃ',           rule: 'v5', reasons: ['-rya']},
+            {term: '飲む', source: '飲みゃ',           rule: 'v5', reasons: ['-ba', '-ya']},
             {term: '飲む', source: '飲んじゃ',       rule: 'v5', reasons: ['-cha']},
             {term: '飲む', source: '飲んじゃう',       rule: 'v5', reasons: ['-chau']},
             {term: '飲む', source: '飲んじまう',       rule: 'v5', reasons: ['-chimau']},
@@ -551,7 +551,7 @@ const tests = [
             {term: '作る', source: '作りまして',     rule: 'v5', reasons: ['polite', '-te']},
 
             {term: '作る', source: '作れば',           rule: 'v5', reasons: ['-ba']},
-            {term: '作る', source: '作りゃ',           rule: 'v5', reasons: ['-rya']},
+            {term: '作る', source: '作りゃ',           rule: 'v5', reasons: ['-ba', '-ya']},
             {term: '作る', source: '作っちゃ',       rule: 'v5', reasons: ['-cha']},
             {term: '作る', source: '作っちゃう',       rule: 'v5', reasons: ['-chau']},
             {term: '作る', source: '作っちまう',       rule: 'v5', reasons: ['-chimau']},
@@ -609,7 +609,7 @@ const tests = [
             {term: '為る', source: '為まして',     rule: 'vs', reasons: ['polite', '-te']},
 
             {term: '為る', source: '為れば',         rule: 'vs', reasons: ['-ba']},
-            {term: '為る', source: '為りゃ',         rule: 'vs', reasons: ['-rya']},
+            {term: '為る', source: '為りゃ',         rule: 'vs', reasons: ['-ba', '-ya']},
             {term: '為る', source: '為ちゃ',       rule: 'vs', reasons: ['-cha']},
             {term: '為る', source: '為ちゃう',       rule: 'vs', reasons: ['-chau']},
             {term: '為る', source: '為ちまう',       rule: 'vs', reasons: ['-chimau']},
@@ -664,7 +664,7 @@ const tests = [
             {term: 'する', source: 'しまして',     rule: 'vs', reasons: ['polite', '-te']},
 
             {term: 'する', source: 'すれば',         rule: 'vs', reasons: ['-ba']},
-            {term: 'する', source: 'すりゃ',         rule: 'vs', reasons: ['-rya']},
+            {term: 'する', source: 'すりゃ',         rule: 'vs', reasons: ['-ba', '-ya']},
             {term: 'する', source: 'しちゃ',       rule: 'vs', reasons: ['-cha']},
             {term: 'する', source: 'しちゃう',       rule: 'vs', reasons: ['-chau']},
             {term: 'する', source: 'しちまう',       rule: 'vs', reasons: ['-chimau']},
@@ -682,6 +682,7 @@ const tests = [
             {term: 'する', source: 'し',             rule: 'vs', reasons: ['masu stem']},
             {term: 'する', source: 'しましょう',     rule: 'vs', reasons: ['polite', 'volitional']},
             {term: 'する', source: 'しよう',         rule: 'vs', reasons: ['volitional']},
+            {term: 'する', source: 'しなきゃ',        rule: 'vs', reasons: ['negative', '-ba', '-ya']},
             // ['causative passive']
             {term: 'する', source: 'しとく',         rule: 'vs', reasons: ['-toku']},
             {term: 'する', source: 'している',       rule: 'vs', reasons: ['-te', 'progressive or perfect']},
@@ -713,7 +714,7 @@ const tests = [
             {term: '来る', source: '来まして',     rule: 'vk', reasons: ['polite', '-te']},
 
             {term: '来る', source: '来れば',         rule: 'vk', reasons: ['-ba']},
-            {term: '来る', source: '来りゃ',         rule: 'vk', reasons: ['-rya']},
+            {term: '来る', source: '来りゃ',         rule: 'vk', reasons: ['-ba', '-ya']},
             {term: '来る', source: '来ちゃ',       rule: 'vk', reasons: ['-cha']},
             {term: '来る', source: '来ちゃう',       rule: 'vk', reasons: ['-chau']},
             {term: '来る', source: '来ちまう',       rule: 'vk', reasons: ['-chimau']},
@@ -762,7 +763,7 @@ const tests = [
             {term: '來る', source: '來まして',     rule: 'vk', reasons: ['polite', '-te']},
 
             {term: '來る', source: '來れば',         rule: 'vk', reasons: ['-ba']},
-            {term: '來る', source: '來りゃ',         rule: 'vk', reasons: ['-rya']},
+            {term: '來る', source: '來りゃ',         rule: 'vk', reasons: ['-ba', '-ya']},
             {term: '來る', source: '來ちゃ',       rule: 'vk', reasons: ['-cha']},
             {term: '來る', source: '來ちゃう',       rule: 'vk', reasons: ['-chau']},
             {term: '來る', source: '來ちまう',       rule: 'vk', reasons: ['-chimau']},
@@ -811,7 +812,7 @@ const tests = [
             {term: 'くる', source: 'きまして',     rule: 'vk', reasons: ['polite', '-te']},
 
             {term: 'くる', source: 'くれば',         rule: 'vk', reasons: ['-ba']},
-            {term: 'くる', source: 'くりゃ',         rule: 'vk', reasons: ['-rya']},
+            {term: 'くる', source: 'くりゃ',         rule: 'vk', reasons: ['-ba', '-ya']},
             {term: 'くる', source: 'きちゃ',       rule: 'vk', reasons: ['-cha']},
             {term: 'くる', source: 'きちゃう',       rule: 'vk', reasons: ['-chau']},
             {term: 'くる', source: 'きちまう',       rule: 'vk', reasons: ['-chimau']},
@@ -872,7 +873,7 @@ const tests = [
             {term: '論ずる', source: '論じまして',     rule: 'vz', reasons: ['polite', '-te']},
 
             {term: '論ずる', source: '論ずれば',         rule: 'vz', reasons: ['-ba']},
-            {term: '論ずる', source: '論ずりゃ',         rule: 'vz', reasons: ['-rya']},
+            {term: '論ずる', source: '論ずりゃ',         rule: 'vz', reasons: ['-ba', '-ya']},
             {term: '論ずる', source: '論じちゃ',       rule: 'vz', reasons: ['-cha']},
             {term: '論ずる', source: '論じちゃう',       rule: 'vz', reasons: ['-chau']},
             {term: '論ずる', source: '論じちまう',       rule: 'vz', reasons: ['-chimau']},
