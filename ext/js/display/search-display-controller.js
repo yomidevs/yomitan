@@ -163,7 +163,7 @@ export class SearchDisplayController {
             !e.ctrlKey &&
             !e.metaKey &&
             !e.altKey &&
-            e.key.length === 1 &&
+            (e.key.length === 1 || e.key === 'Backspace') &&
             e.key !== ' '
         ) {
             this._queryInput.focus({preventScroll: true});
