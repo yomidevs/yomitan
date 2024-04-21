@@ -17,7 +17,6 @@
  */
 
 import {describe, expect, test} from 'vitest';
-import {TextSourceMap} from '../ext/js/general/text-source-map.js';
 import * as jpw from '../ext/js/language/ja/japanese-wanakana.js';
 import * as jp from '../ext/js/language/ja/japanese.js';
 
@@ -194,54 +193,46 @@ describe('Japanese utility functions', () => {
     });
 
     describe('convertHalfWidthKanaToFullWidth', () => {
-        /** @type {[string: string, expected: string, expectedSourceMapping?: number[]][]} */
+        /** @type {[string: string, expected: string][]} */
         const data = [
             ['0123456789', '0123456789'],
             ['abcdefghij', 'abcdefghij'],
             ['カタカナ', 'カタカナ'],
             ['ひらがな', 'ひらがな'],
-            ['ｶｷ', 'カキ', [1, 1]],
-            ['ｶﾞｷ', 'ガキ', [2, 1]],
-            ['ﾆﾎﾝ', 'ニホン', [1, 1, 1]],
-            ['ﾆｯﾎﾟﾝ', 'ニッポン', [1, 1, 2, 1]]
+            ['ｶｷ', 'カキ'],
+            ['ｶﾞｷ', 'ガキ'],
+            ['ﾆﾎﾝ', 'ニホン'],
+            ['ﾆｯﾎﾟﾝ', 'ニッポン']
         ];
 
-        for (const [string, expected, expectedSourceMapping] of data) {
-            test(`${string} -> ${expected}${typeof expectedSourceMapping !== 'undefined' ? ', ' + JSON.stringify(expectedSourceMapping) : ''}`, () => {
-                const sourceMap = new TextSourceMap(string);
-                const actual1 = jp.convertHalfWidthKanaToFullWidth(string, null);
-                const actual2 = jp.convertHalfWidthKanaToFullWidth(string, sourceMap);
+        for (const [string, expected] of data) {
+            test(`${string} -> ${expected}`, () => {
+                const actual1 = jp.convertHalfWidthKanaToFullWidth(string);
+                const actual2 = jp.convertHalfWidthKanaToFullWidth(string);
                 expect(actual1).toStrictEqual(expected);
                 expect(actual2).toStrictEqual(expected);
-                if (typeof expectedSourceMapping !== 'undefined') {
-                    expect(sourceMap.equals(new TextSourceMap(string, expectedSourceMapping))).toBe(true);
-                }
             });
         }
     });
 
     describe('convertAlphabeticToKana', () => {
-        /** @type {[string: string, expected: string, expectedSourceMapping?: number[]][]} */
+        /** @type {[string: string, expected: string][]} */
         const data = [
             ['0123456789', '0123456789'],
-            ['abcdefghij', 'あbcでfgひj', [1, 1, 1, 2, 1, 1, 2, 1]],
-            ['ABCDEFGHIJ', 'あbcでfgひj', [1, 1, 1, 2, 1, 1, 2, 1]], // wanakana.toHiragana converts text to lower case
+            ['abcdefghij', 'あbcでfgひj'],
+            ['ABCDEFGHIJ', 'あbcでfgひj'], // wanakana.toHiragana converts text to lower case
             ['カタカナ', 'カタカナ'],
             ['ひらがな', 'ひらがな'],
-            ['chikara', 'ちから', [3, 2, 2]],
-            ['CHIKARA', 'ちから', [3, 2, 2]]
+            ['chikara', 'ちから'],
+            ['CHIKARA', 'ちから']
         ];
 
-        for (const [string, expected, expectedSourceMapping] of data) {
-            test(`${string} -> ${string}${typeof expectedSourceMapping !== 'undefined' ? ', ' + JSON.stringify(expectedSourceMapping) : ''}`, () => {
-                const sourceMap = new TextSourceMap(string);
-                const actual1 = jpw.convertAlphabeticToKana(string, null);
-                const actual2 = jpw.convertAlphabeticToKana(string, sourceMap);
+        for (const [string, expected] of data) {
+            test(`${string} -> ${string}`, () => {
+                const actual1 = jpw.convertAlphabeticToKana(string);
+                const actual2 = jpw.convertAlphabeticToKana(string);
                 expect(actual1).toStrictEqual(expected);
                 expect(actual2).toStrictEqual(expected);
-                if (typeof expectedSourceMapping !== 'undefined') {
-                    expect(sourceMap.equals(new TextSourceMap(string, expectedSourceMapping))).toBe(true);
-                }
             });
         }
     });
@@ -765,59 +756,54 @@ describe('Japanese utility functions', () => {
     });
 
     describe('collapseEmphaticSequences', () => {
-        /** @type {[input: [text: string, fullCollapse: boolean], output: [expected: string, expectedSourceMapping: number[]]][]} */
+        /** @type {[input: [text: string, fullCollapse: boolean], output: string][]} */
         const data = [
-            [['かこい', false], ['かこい', [1, 1, 1]]],
-            [['かこい', true], ['かこい', [1, 1, 1]]],
-            [['かっこい', false], ['かっこい', [1, 1, 1, 1]]],
-            [['かっこい', true], ['かこい', [2, 1, 1]]],
-            [['かっっこい', false], ['かっこい', [1, 2, 1, 1]]],
-            [['かっっこい', true], ['かこい', [3, 1, 1]]],
-            [['かっっっこい', false], ['かっこい', [1, 3, 1, 1]]],
-            [['かっっっこい', true], ['かこい', [4, 1, 1]]],
+            [['かこい', false], 'かこい'],
+            [['かこい', true], 'かこい'],
+            [['かっこい', false], 'かっこい'],
+            [['かっこい', true], 'かこい'],
+            [['かっっこい', false], 'かっこい'],
+            [['かっっこい', true], 'かこい'],
+            [['かっっっこい', false], 'かっこい'],
+            [['かっっっこい', true], 'かこい'],
 
-            [['こい', false], ['こい', [1, 1]]],
-            [['こい', true], ['こい', [1, 1]]],
-            [['っこい', false], ['っこい', [1, 1, 1]]],
-            [['っこい', true], ['こい', [2, 1]]],
-            [['っっこい', false], ['っこい', [2, 1, 1]]],
-            [['っっこい', true], ['こい', [3, 1]]],
-            [['っっっこい', false], ['っこい', [3, 1, 1]]],
-            [['っっっこい', true], ['こい', [4, 1]]],
+            [['こい', false], 'こい'],
+            [['こい', true], 'こい'],
+            [['っこい', false], 'っこい'],
+            [['っこい', true], 'こい'],
+            [['っっこい', false], 'っこい'],
+            [['っっこい', true], 'こい'],
+            [['っっっこい', false], 'っこい'],
+            [['っっっこい', true], 'こい'],
 
-            [['すごい', false], ['すごい', [1, 1, 1]]],
-            [['すごい', true], ['すごい', [1, 1, 1]]],
-            [['すごーい', false], ['すごーい', [1, 1, 1, 1]]],
-            [['すごーい', true], ['すごい', [1, 2, 1]]],
-            [['すごーーい', false], ['すごーい', [1, 1, 2, 1]]],
-            [['すごーーい', true], ['すごい', [1, 3, 1]]],
-            [['すっごーい', false], ['すっごーい', [1, 1, 1, 1, 1]]],
-            [['すっごーい', true], ['すごい', [2, 2, 1]]],
-            [['すっっごーーい', false], ['すっごーい', [1, 2, 1, 2, 1]]],
-            [['すっっごーーい', true], ['すごい', [3, 3, 1]]],
+            [['すごい', false], 'すごい'],
+            [['すごい', true], 'すごい'],
+            [['すごーい', false], 'すごーい'],
+            [['すごーい', true], 'すごい'],
+            [['すごーーい', false], 'すごーい'],
+            [['すごーーい', true], 'すごい'],
+            [['すっごーい', false], 'すっごーい'],
+            [['すっごーい', true], 'すごい'],
+            [['すっっごーーい', false], 'すっごーい'],
+            [['すっっごーーい', true], 'すごい'],
 
-            [['', false], ['', []]],
-            [['', true], ['', []]],
-            [['っ', false], ['っ', [1]]],
-            [['っ', true], ['', [1]]],
-            [['っっ', false], ['っ', [2]]],
-            [['っっ', true], ['', [2]]],
-            [['っっっ', false], ['っ', [3]]],
-            [['っっっ', true], ['', [3]]]
+            [['', false], ''],
+            [['', true], ''],
+            [['っ', false], 'っ'],
+            [['っ', true], ''],
+            [['っっ', false], 'っ'],
+            [['っっ', true], ''],
+            [['っっっ', false], 'っ'],
+            [['っっっ', true], '']
         ];
 
         test.each(data)('%o -> %o', (input, output) => {
             const [text, fullCollapse] = input;
-            const [expected, expectedSourceMapping] = output;
 
-            const sourceMap = new TextSourceMap(text);
-            const actual1 = jp.collapseEmphaticSequences(text, fullCollapse, null);
-            const actual2 = jp.collapseEmphaticSequences(text, fullCollapse, sourceMap);
-            expect(actual1).toStrictEqual(expected);
-            expect(actual2).toStrictEqual(expected);
-            if (typeof expectedSourceMapping !== 'undefined') {
-                expect(sourceMap.equals(new TextSourceMap(text, expectedSourceMapping))).toBe(true);
-            }
+            const actual1 = jp.collapseEmphaticSequences(text, fullCollapse);
+            const actual2 = jp.collapseEmphaticSequences(text, fullCollapse);
+            expect(actual1).toStrictEqual(output);
+            expect(actual2).toStrictEqual(output);
         });
     });
 

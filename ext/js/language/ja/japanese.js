@@ -539,10 +539,9 @@ export function convertNumericToFullWidth(text) {
 
 /**
  * @param {string} text
- * @param {?import('../../general/text-source-map.js').TextSourceMap} [sourceMap]
  * @returns {string}
  */
-export function convertHalfWidthKanaToFullWidth(text, sourceMap = null) {
+export function convertHalfWidthKanaToFullWidth(text) {
     let result = '';
 
     // This function is safe to use charCodeAt instead of codePointAt, since all
@@ -575,9 +574,6 @@ export function convertHalfWidthKanaToFullWidth(text, sourceMap = null) {
             }
         }
 
-        if (sourceMap !== null && index > 0) {
-            sourceMap.combine(result.length, 1);
-        }
         result += c2;
     }
 
@@ -705,13 +701,11 @@ export function distributeFuriganaInflected(term, reading, source) {
 /**
  * @param {string} text
  * @param {boolean} fullCollapse
- * @param {?import('../../general/text-source-map.js').TextSourceMap} [sourceMap]
  * @returns {string}
  */
-export function collapseEmphaticSequences(text, fullCollapse, sourceMap = null) {
+export function collapseEmphaticSequences(text, fullCollapse) {
     let result = '';
     let collapseCodePoint = -1;
-    const hasSourceMap = (sourceMap !== null);
     for (const char of text) {
         const c = char.codePointAt(0);
         if (
@@ -729,11 +723,6 @@ export function collapseEmphaticSequences(text, fullCollapse, sourceMap = null) 
         } else {
             collapseCodePoint = -1;
             result += char;
-            continue;
-        }
-
-        if (hasSourceMap) {
-            sourceMap.combine(Math.max(0, result.length - 1), 1);
         }
     }
     return result;

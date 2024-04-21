@@ -414,7 +414,7 @@ export class DisplayAnki {
                 if (button !== null) {
                     button.disabled = !canAdd;
                     button.hidden = (ankiError !== null);
-                    if (ankiError) {
+                    if (ankiError && ankiError.message !== 'Anki not connected') {
                         log.error(ankiError);
                     }
 
