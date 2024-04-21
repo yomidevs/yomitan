@@ -137,7 +137,6 @@ const tests = [
             {term: 'zbuloj', source: 'zbulim', rule: 'v', reasons: ['nominalization']},
             {term: 'përkthej', source: 'përkthim', rule: 'v', reasons: ['nominalization']},
             {term: 'lëviz', source: 'lëvizje', rule: 'v', reasons: ['nominalization']}
-
         ]
     }
 ];
