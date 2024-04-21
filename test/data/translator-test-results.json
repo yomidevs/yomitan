@@ -12904,7 +12904,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxOriginalTextLength": 1,
+        "maxOriginalTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -12912,7 +12912,7 @@
             "reading": "だ",
             "sources": [
               {
-                "originalText": "打",
+                "originalText": "打(う)",
                 "transformedText": "打",
                 "deinflectedText": "打",
                 "matchType": "exact",
@@ -13072,7 +13072,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxOriginalTextLength": 1,
+        "maxOriginalTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -13080,7 +13080,7 @@
             "reading": "ダース",
             "sources": [
               {
-                "originalText": "打",
+                "originalText": "打(う)",
                 "transformedText": "打",
                 "deinflectedText": "打",
                 "matchType": "exact",
