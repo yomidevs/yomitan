@@ -536,7 +536,8 @@ export class OptionsUtil {
             this._updateVersion27,
             this._updateVersion28,
             this._updateVersion29,
-            this._updateVersion30
+            this._updateVersion30,
+            this._updateVersion31
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1230,6 +1231,16 @@ export class OptionsUtil {
                 input.options.scanOnTouchPress = false;
                 input.options.scanOnTouchRelease = false;
             }
+        }
+    }
+
+    /**
+     *  - Added anki.duplicateBehavior
+     *  @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion31(options) {
+        for (const {options: profileOptions} of options.profiles) {
+            profileOptions.anki.duplicateBehavior = 'prevent';
         }
     }
 

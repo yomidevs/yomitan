@@ -440,6 +440,7 @@ function createProfileOptionsUpdatedTestData1() {
             screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
+            duplicateBehavior: 'prevent',
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
             displayTags: 'never',
@@ -602,7 +603,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 30,
+        version: 31,
         global: {
             database: {
                 prefixWildcardsSupported: false
