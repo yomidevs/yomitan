@@ -97,7 +97,7 @@ export const albanianTransforms = {
             description: 'Plural form of a noun',
             rules: [
                 suffixInflection('e', '', ['np'], ['ns']),
-                suffixInflection('t', '', ['np'], ['ns']) // Pijet
+                suffixInflection('t', '', ['np'], ['ns'])
             ]
         },
         // Verbs
@@ -107,7 +107,7 @@ export const albanianTransforms = {
             rules: [
                 suffixInflection('on', 'oj', [], ['v']),
                 suffixInflection('uan', 'uaj', [], ['v']),
-                suffixInflection('n', 'j', [], ['v']), // Fshin
+                suffixInflection('n', 'j', [], ['v']),
                 suffixInflection('hesh', 'hem', [], ['v'])
             ]
         },
@@ -117,7 +117,7 @@ export const albanianTransforms = {
             rules: [
                 suffixInflection('on', 'oj', [], ['v']),
                 suffixInflection('uan', 'uaj', [], ['v']),
-                suffixInflection('n', 'j', [], ['v']), // Fshin
+                suffixInflection('n', 'j', [], ['v']),
                 suffixInflection('het', 'hem', [], ['v'])
             ]
         },
@@ -125,8 +125,8 @@ export const albanianTransforms = {
             name: 'present indicative first-person plural',
             description: 'Present indicative first-person plural form of a verb',
             rules: [
-                suffixInflection('më', '', [], ['v']), // Ndihmojmë, paguajmë, fshijmë
-                suffixInflection('im', '', [], ['v']), // Vendosim, hapim
+                suffixInflection('më', '', [], ['v']),
+                suffixInflection('im', '', [], ['v']),
                 suffixInflection('hemi', 'hem', [], ['v'])
             ]
         },
@@ -134,8 +134,8 @@ export const albanianTransforms = {
             name: 'present indicative second-person plural',
             description: 'Present indicative second-person plural form of a verb',
             rules: [
-                suffixInflection('ni', 'j', [], ['v']), // Ndihmoni, paguani, fshini
-                suffixInflection('ni', '', [], ['v']), // Vendosni, hapni
+                suffixInflection('ni', 'j', [], ['v']),
+                suffixInflection('ni', '', [], ['v']),
                 suffixInflection('heni', 'hem', [], ['v'])
             ]
         },
@@ -143,8 +143,8 @@ export const albanianTransforms = {
             name: 'present indicative third-person plural',
             description: 'Present indicative third-person plural form of a verb',
             rules: [
-                suffixInflection('në', '', [], ['v']), // Ndihmojnë, paguajnë, fshijnë
-                suffixInflection('in', '', [], ['v']), // Vendosin, hapin
+                suffixInflection('në', '', [], ['v']),
+                suffixInflection('in', '', [], ['v']),
                 suffixInflection('hen', 'hem', [], ['v'])
             ]
         },
@@ -152,8 +152,8 @@ export const albanianTransforms = {
             name: 'imperfect first-person singular indicative',
             description: 'Imperfect first-person singular indicative form of a verb',
             rules: [
-                suffixInflection('ja', 'j', [], ['v']), // Ndihmoja, paguaja, fshija
-                suffixInflection('ja', '', [], ['v']), // Vendosja, hapja
+                suffixInflection('ja', 'j', [], ['v']),
+                suffixInflection('ja', '', [], ['v']),
                 suffixInflection('hesha', 'hem', [], ['v'])
             ]
         },
@@ -161,8 +161,8 @@ export const albanianTransforms = {
             name: 'imperfect second-person singular indicative',
             description: 'Imperfect second-person singular indicative form of a verb',
             rules: [
-                suffixInflection('je', 'j', [], ['v']), // Ndihmoje, paguaje, fshije
-                suffixInflection('je', '', [], ['v']), // Vendosje, hapje
+                suffixInflection('je', 'j', [], ['v']),
+                suffixInflection('je', '', [], ['v']),
                 suffixInflection('heshe', 'hem', [], ['v'])
             ]
         },
@@ -170,8 +170,8 @@ export const albanianTransforms = {
             name: 'imperfect third-person singular indicative',
             description: 'Imperfect third-person singular indicative form of a verb',
             rules: [
-                suffixInflection('nte', 'j', [], ['v']), // Ndihmonte, paguante, fshinte
-                suffixInflection('te', '', [], ['v']), // Vendoste, hapte
+                suffixInflection('nte', 'j', [], ['v']),
+                suffixInflection('te', '', [], ['v']),
                 suffixInflection('hej', 'hem', [], ['v'])
             ]
         },
@@ -179,8 +179,8 @@ export const albanianTransforms = {
             name: 'imperfect first-person plural indicative',
             description: 'Imperfect first-person plural indicative form of a verb',
             rules: [
-                suffixInflection('nim', 'j', [], ['v']), // Ndihmonim, paguanim, fshinim
-                suffixInflection('nim', '', [], ['v']), // Vendosnim, hapnim
+                suffixInflection('nim', 'j', [], ['v']),
+                suffixInflection('nim', '', [], ['v']),
                 suffixInflection('heshim', 'hem', [], ['v'])
             ]
         },
@@ -188,8 +188,8 @@ export const albanianTransforms = {
             name: 'imperfect second-person plural indicative',
             description: 'Imperfect second-person plural indicative form of a verb',
             rules: [
-                suffixInflection('nit', 'j', [], ['v']), // Ndihmonit, paguanit, fshinit
-                suffixInflection('nit', '', [], ['v']), // Vendosnit, hapnit
+                suffixInflection('nit', 'j', [], ['v']),
+                suffixInflection('nit', '', [], ['v']),
                 suffixInflection('heshit', 'hem', [], ['v'])
             ]
         },
@@ -197,8 +197,8 @@ export const albanianTransforms = {
             name: 'imperfect third-person plural indicative',
             description: 'Imperfect third-person plural indicative form of a verb',
             rules: [
-                suffixInflection('nin', 'j', [], ['v']), // Ndihmonin, paguanin, fshinin
-                suffixInflection('nin', '', [], ['v']), // Vendosnin, hapnin
+                suffixInflection('nin', 'j', [], ['v']),
+                suffixInflection('nin', '', [], ['v']),
                 suffixInflection('heshin', 'hem', [], ['v'])
             ]
         },
@@ -206,59 +206,59 @@ export const albanianTransforms = {
             name: 'aorist first-person singular indicative',
             description: 'Aorist first-person singular indicative form of a verb',
             rules: [
-                suffixInflection('ova', 'uaj', [], ['v']), // Pagova
-                suffixInflection('va', 'j', [], ['v']), // Ndihmova, fshiva
-                conjugationIISuffixInflection('a', '', [], ['v']) // Vendosa, hapa
+                suffixInflection('ova', 'uaj', [], ['v']),
+                suffixInflection('va', 'j', [], ['v']),
+                conjugationIISuffixInflection('a', '', [], ['v'])
             ]
         },
         {
             name: 'aorist second-person singular indicative',
             description: 'Aorist second-person singular indicative form of a verb',
             rules: [
-                suffixInflection('ove', 'uaj', [], ['v']), // Pagove
-                suffixInflection('ve', 'j', [], ['v']), // Ndihmove, fshive
-                conjugationIISuffixInflection('e', '', [], ['v']) // Vendose, hape
+                suffixInflection('ove', 'uaj', [], ['v']),
+                suffixInflection('ve', 'j', [], ['v']),
+                conjugationIISuffixInflection('e', '', [], ['v'])
             ]
         },
         {
             name: 'aorist third-person singular indicative',
             description: 'Aorist third-person singular indicative form of a verb',
             rules: [
-                suffixInflection('oi', 'oj', [], ['v']), // Ndihmoi
-                suffixInflection('oi', 'uaj', [], ['v']), // Pagoi
-                suffixInflection('u', 'j', [], ['v']), // Fshiu
-                conjugationIISuffixInflection('i', '', [], ['v']) // Vendosi, hapi
+                suffixInflection('oi', 'oj', [], ['v']),
+                suffixInflection('oi', 'uaj', [], ['v']),
+                suffixInflection('u', 'j', [], ['v']),
+                conjugationIISuffixInflection('i', '', [], ['v']),
+                suffixInflection('ye', 'ej', [], ['v'])
             ]
         },
         {
             name: 'aorist first-person plural indicative',
             description: 'Aorist first-person plural indicative form of a verb',
             rules: [
-                suffixInflection('uam', 'oj', [], ['v']), // Ndihmuam
-                suffixInflection('uam', 'uaj', [], ['v']), // Paguam
-                suffixInflection('më', 'j', [], ['v']), // Fshimë
-                conjugationIISuffixInflection('ëm', '', [], ['v']) // Vendosëm, hapëm
+                suffixInflection('uam', 'oj', [], ['v']),
+                suffixInflection('uam', 'uaj', [], ['v']),
+                suffixInflection('më', 'j', [], ['v']),
+                conjugationIISuffixInflection('ëm', '', [], ['v'])
             ]
         },
         {
             name: 'aorist second-person plural indicative',
             description: 'Aorist second-person plural indicative form of a verb',
             rules: [
-                suffixInflection('uat', 'oj', [], ['v']), // Ndihmuat
-                suffixInflection('uat', 'uaj', [], ['v']), // Paguat
-                suffixInflection('të', 'j', [], ['v']), // Fshitë
-                conjugationIISuffixInflection('ët', '', [], ['v']) // Vendosët, hapët
+                suffixInflection('uat', 'oj', [], ['v']),
+                suffixInflection('uat', 'uaj', [], ['v']),
+                suffixInflection('të', 'j', [], ['v']),
+                conjugationIISuffixInflection('ët', '', [], ['v'])
             ]
         },
         {
             name: 'aorist third-person plural indicative',
             description: 'Aorist third-person plural indicative form of a verb',
             rules: [
-                suffixInflection('uan', 'oj', [], ['v']), // Ndihmuan
-                suffixInflection('uan', 'uaj', [], ['v']), // Paguan
-                suffixInflection('në', 'j', [], ['v']), // Fshinë
-                suffixInflection('ye', 'ej', [], ['v']), // U kthye ?
-                conjugationIISuffixInflection('ën', '', [], ['v']) // Vendosën, hapën
+                suffixInflection('uan', 'oj', [], ['v']),
+                suffixInflection('uan', 'uaj', [], ['v']),
+                suffixInflection('në', 'j', [], ['v']),
+                conjugationIISuffixInflection('ën', '', [], ['v'])
             ]
         },
         {
@@ -266,16 +266,16 @@ export const albanianTransforms = {
             description: 'Imperative second-person singular present form of a verb',
             rules: [
                 suffixInflection('o', 'oj', [], ['v']),
-                suffixInflection('hu', 'hem', [], ['v']) // Kujtohu
+                suffixInflection('hu', 'hem', [], ['v'])
             ]
         },
         {
             name: 'imperative second-person plural present',
             description: 'Imperative second-person plural present form of a verb',
             rules: [
-                suffixInflection('ni', 'j', [], ['v']), // Ndihmoni, paguani, fshini
-                suffixInflection('ni', '', [], ['v']), // Vendosni, hapni
-                suffixInflection('huni', 'hem', [], ['v']) // Kujtohuni
+                suffixInflection('ni', 'j', [], ['v']),
+                suffixInflection('ni', '', [], ['v']),
+                suffixInflection('huni', 'hem', [], ['v'])
             ]
         },
         {
@@ -284,8 +284,8 @@ export const albanianTransforms = {
             rules: [
                 suffixInflection('uar', 'oj', [], ['v']),
                 suffixInflection('ur', '', [], ['v']),
-                suffixInflection('rë', 'j', [], ['v']), // Fshirë,
-                suffixInflection('yer', 'ej', [], ['v']) // Shkëlqyer
+                suffixInflection('rë', 'j', [], ['v']),
+                suffixInflection('yer', 'ej', [], ['v'])
             ]
         },
         {
@@ -300,51 +300,51 @@ export const albanianTransforms = {
             name: 'optative first-person singular present',
             description: 'Optative first-person singular present form of a verb',
             rules: [
-                suffixInflection('fsha', 'j', [], ['v']) // Ndihmofsha
+                suffixInflection('fsha', 'j', [], ['v'])
             ]
         },
         {
             name: 'optative second-person singular present',
             description: 'Optative second-person singular present form of a verb',
             rules: [
-                suffixInflection('fsh', 'j', [], ['v']) // Ndihmofsh
+                suffixInflection('fsh', 'j', [], ['v'])
             ]
         },
         {
             name: 'optative third-person singular present',
             description: 'Optative third-person singular present form of a verb',
             rules: [
-                suffixInflection('ftë', 'j', [], ['v']) // Ndihmoftë
+                suffixInflection('ftë', 'j', [], ['v'])
             ]
         },
         {
             name: 'optative first-person plural present',
             description: 'Optative first-person plural present form of a verb',
             rules: [
-                suffixInflection('fshim', 'j', [], ['v']) // Ndihmofshim
+                suffixInflection('fshim', 'j', [], ['v'])
             ]
         },
         {
             name: 'optative second-person plural present',
             description: 'Optative second-person plural present form of a verb',
             rules: [
-                suffixInflection('fshi', 'j', [], ['v']) // Ndihmofshi
+                suffixInflection('fshi', 'j', [], ['v'])
             ]
         },
         {
             name: 'optative third-person plural present',
             description: 'Optative third-person plural present form of a verb',
             rules: [
-                suffixInflection('fshin', 'j', [], ['v']) // Ndihmofshin
+                suffixInflection('fshin', 'j', [], ['v'])
             ]
         },
         {
-            name: 'noun',
+            name: 'nominalization',
             description: 'Noun form of a verb',
             rules: [
-                suffixInflection('im', 'oj', [], ['v']), // Gëzim, zbulim
-                suffixInflection('im', 'ej', [], ['v']), // Përkthim
-                suffixInflection('je', '', [], ['v']) // Lëvizje
+                suffixInflection('im', 'oj', [], ['v']),
+                suffixInflection('im', 'ej', [], ['v']),
+                suffixInflection('je', '', [], ['v'])
             ]
         }
     ]
