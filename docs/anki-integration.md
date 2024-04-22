@@ -106,7 +106,6 @@ icons next to term definitions:
 
 If _Check for card duplicates_ is on, and a card for the current definition already exists in the deck, you will see the book icon.
 If _When a duplicate is detected_ is set to `Prevent adding`, the icons will appear grayed out. If set to `Allow adding`, the icons will change to:
-``` I think backticks make it more clear it's a literal
 
 - ![](../img/btn-add-duplicate-expression.png): to add the expression
 - ![](../img/btn-add-duplicate-reading.png): to add the reading
