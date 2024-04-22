@@ -988,6 +988,11 @@
                                         "type": "boolean",
                                         "default": true
                                     },
+                                    "duplicateBehavior": {
+                                        "type": "string",
+                                        "enum": ["prevent", "new"],
+                                        "default": "prevent"
+                                    },
                                     "fieldTemplates": {
                                         "type": ["string", "null"],
                                         "default": null
