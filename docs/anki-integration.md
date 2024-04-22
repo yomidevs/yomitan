@@ -105,13 +105,14 @@ be able to create a flashcard for <ruby>箸<rt>はし</rt></ruby> because they s
 Once Yomitan is configured, it becomes trivial to create new flashcards with a single click. You will see the following
 icons next to term definitions:
 
-- Clicking ![](../img/btn-add-expression.png) adds the current expression as kanji (e.g. 食べる).
-- Clicking ![](../img/btn-add-reading.png) adds the current expression as hiragana or katakana (e.g. たべる).
+- Clicking ![](../img/btn-add-expression.png) adds the current expression (e.g. 食べる).
+- Clicking ![](../img/btn-add-reading.png) adds the current expression's reading (e.g. たべる).
 
-If "Check for card duplicates" is on, and a card for the current definition already exists in the deck, you will see the following icons instead:
+If _Check for card duplicates_ is on, and a card for the current definition already exists in the deck, you will see the book icon.
+If _When a duplicate is detected_ is set to `Prevent adding`, the icons will appear grayed out. If set to `Allow adding`, the icons will change to:
 
-- Adding the current expression: ![](../img/btn-add-duplicate-expression.png)
-- Adding as hiragana or katakana: ![](../img/btn-add-duplicate-reading.png)
+- ![](../img/btn-add-duplicate-expression.png): to add the expression
+- ![](../img/btn-add-duplicate-reading.png): to add the reading
 
 Below are some troubleshooting tips you can try if you are unable to create new flashcards:
 

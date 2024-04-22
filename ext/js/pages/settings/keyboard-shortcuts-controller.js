@@ -59,6 +59,8 @@ export class KeyboardShortcutController {
             ['previousEntryDifferentDictionary', {scopes: new Set(['popup', 'search'])}],
             ['historyBackward',                  {scopes: new Set(['popup', 'search'])}],
             ['historyForward',                   {scopes: new Set(['popup', 'search'])}],
+            ['profilePrevious',                  {scopes: new Set(['popup', 'search'])}],
+            ['profileNext',                      {scopes: new Set(['popup', 'search'])}],
             ['addNoteKanji',                     {scopes: new Set(['popup', 'search'])}],
             ['addNoteTermKanji',                 {scopes: new Set(['popup', 'search'])}],
             ['addNoteTermKana',                  {scopes: new Set(['popup', 'search'])}],

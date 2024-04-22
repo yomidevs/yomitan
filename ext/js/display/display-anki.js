@@ -75,6 +75,8 @@ export class DisplayAnki {
         this._duplicateScope = 'collection';
         /** @type {boolean} */
         this._duplicateScopeCheckAllModels = false;
+        /** @type {import('settings').AnkiDuplicateBehavior} */
+        this._duplicateBehavior = 'prevent';
         /** @type {import('settings').AnkiScreenshotFormat} */
         this._screenshotFormat = 'png';
         /** @type {number} */
@@ -193,6 +195,7 @@ export class DisplayAnki {
                 tags,
                 duplicateScope,
                 duplicateScopeCheckAllModels,
+                duplicateBehavior,
                 suspendNewCards,
                 checkForDuplicates,
                 displayTags,
@@ -213,6 +216,7 @@ export class DisplayAnki {
         this._displayTags = displayTags;
         this._duplicateScope = duplicateScope;
         this._duplicateScopeCheckAllModels = duplicateScopeCheckAllModels;
+        this._duplicateBehavior = duplicateBehavior;
         this._screenshotFormat = format;
         this._screenshotQuality = quality;
         this._scanLength = scanLength;
@@ -420,7 +424,7 @@ export class DisplayAnki {
 
                     // If entry has noteIds, show the "add duplicate" button.
                     if (Array.isArray(noteIds) && noteIds.length > 0) {
-                        this._showDuplicateAddButton(button);
+                        this._updateButtonForDuplicate(button);
                     }
                 }
 
@@ -439,6 +443,17 @@ export class DisplayAnki {
             }
 
             this._updateViewNoteButton(i, allNoteIds !== null ? [...allNoteIds] : [], false);
+        }
+    }
+
+    /**
+     * @param {HTMLButtonElement} button
+     */
+    _updateButtonForDuplicate(button) {
+        if (this._duplicateBehavior === 'prevent') {
+            button.disabled = true;
+        } else {
+            this._showDuplicateAddButton(button);
         }
     }
 
@@ -551,7 +566,7 @@ export class DisplayAnki {
                         }
                     }
                     // Now that this dictionary entry has a duplicate in Anki, show the "add duplicate" buttons.
-                    this._showDuplicateAddButton(button);
+                    this._updateButtonForDuplicate(button);
 
                     this._updateViewNoteButton(dictionaryEntryIndex, [noteId], true);
                 }
