@@ -75,3 +75,9 @@
 :root[data-glossary-layout-mode=compact] .gloss-sc-ul[data-sc-content=glossary] .gloss-sc-li:not(:first-child)::before {
     /* remove-rule */
 }
+.gloss-sc-details {
+    /* remove-rule */
+}
+.gloss-sc-summary {
+    /* remove-rule */
+}
