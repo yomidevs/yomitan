@@ -1240,7 +1240,7 @@ export class OptionsUtil {
      */
     _updateVersion31(options) {
         for (const {options: profileOptions} of options.profiles) {
-            profileOptions.anki.duplicateBehavior = 'prevent';
+            profileOptions.anki.duplicateBehavior = 'new';
         }
     }
 

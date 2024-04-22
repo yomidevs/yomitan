@@ -440,7 +440,7 @@ function createProfileOptionsUpdatedTestData1() {
             screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
-            duplicateBehavior: 'prevent',
+            duplicateBehavior: 'new',
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
             displayTags: 'never',
