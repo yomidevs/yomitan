@@ -537,7 +537,8 @@ export class OptionsUtil {
             this._updateVersion28,
             this._updateVersion29,
             this._updateVersion30,
-            this._updateVersion31
+            this._updateVersion31,
+            this._updateVersion32
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1243,6 +1244,20 @@ export class OptionsUtil {
             profileOptions.anki.duplicateBehavior = 'new';
         }
     }
+
+    /**
+     *  - Added profilePrevious and profileNext to hotkeys.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion32(options) {
+        for (const profile of options.profiles) {
+            profile.options.inputs.hotkeys.push(
+                {action: 'profilePrevious', key: 'Minus', modifiers: ['alt'], scopes: ['popup', 'search'], enabled: true},
+                {action: 'profileNext', key: 'Equal', modifiers: ['alt'], scopes: ['popup', 'search'], enabled: true}
+            );
+        }
+    }
+
 
     /**
      * @param {string} url
