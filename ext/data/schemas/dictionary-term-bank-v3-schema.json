@@ -104,7 +104,7 @@
                             "properties": {
                                 "tag": {
                                     "type": "string",
-                                    "enum": ["span", "div", "ol", "ul", "li"]
+                                    "enum": ["span", "div", "ol", "ul", "li", "details", "summary"]
                                 },
                                 "content": {
                                     "$ref": "#/definitions/structuredContent"
