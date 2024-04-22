@@ -108,7 +108,7 @@ If _Check for card duplicates_ is on, and a card for the current definition alre
 If _When a duplicate is detected_ is set to _Prevent adding_, the icons will appear grayed out. If set to _Allow adding_, the icons will change to:
 
 - ![](../img/btn-add-duplicate-expression.png): to add the expression
-- Adding the expression's reading: ![](../img/btn-add-duplicate-reading.png)
+- ![](../img/btn-add-duplicate-reading.png): to add the reading
 
 Below are some troubleshooting tips you can try if you are unable to create new flashcards:
 
