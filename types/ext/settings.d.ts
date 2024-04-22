@@ -281,6 +281,7 @@ export type AnkiOptions = {
     kanji: AnkiNoteOptions;
     duplicateScope: AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
+    duplicateBehavior: AnkiDuplicateBehavior;
     checkForDuplicates: boolean;
     fieldTemplates: string | null;
     suspendNewCards: boolean;
@@ -393,6 +394,8 @@ export type ParsingReadingMode = 'hiragana' | 'katakana' | 'romaji' | 'dictionar
 export type AnkiScreenshotFormat = 'png' | 'jpeg';
 
 export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
+
+export type AnkiDuplicateBehavior = 'prevent' | 'new';
 
 export type AnkiDisplayTags = 'never' | 'always' | 'non-standard';
 
