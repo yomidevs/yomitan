@@ -376,31 +376,26 @@ export class DisplayAnki {
 
     /**
      * @param {HTMLButtonElement} button
+     * @param {import('settings').AnkiDuplicateBehavior} behavior
      */
-    _showDuplicateAddButton(button) {
-        const isKanjiAdd = button.dataset.mode === 'term-kanji';
+    _updateAddButtonAppearance(button, behavior) {
+        const mode = button.dataset.mode;
+        const verb = behavior === 'overwrite' ? 'Overwrite' : 'Add duplicate';
+        const iconPrefix = behavior === 'overwrite' ? 'overwrite' : 'add-duplicate';
+        const target = mode === 'term-kanji' ? 'expression' : 'reading';
 
-        const title = button.getAttribute('title');
-        if (title) {
-            button.setAttribute('title', title.replace(/Add (?!duplicate)/, 'Add duplicate '));
-        }
+        button.setAttribute('title', `${verb} ${target}`);
 
         // eslint-disable-next-line no-underscore-dangle
         const hotkeyLabel = this._display._hotkeyHelpController.getHotkeyLabel(button);
-
         if (hotkeyLabel) {
-            if (hotkeyLabel === 'Add expression ({0})') {
-                // eslint-disable-next-line no-underscore-dangle
-                this._display._hotkeyHelpController.setHotkeyLabel(button, 'Add duplicate expression ({0})');
-            } else if (hotkeyLabel === 'Add reading ({0})') {
-                // eslint-disable-next-line no-underscore-dangle
-                this._display._hotkeyHelpController.setHotkeyLabel(button, 'Add duplicate reading ({0})');
-            }
+            // eslint-disable-next-line no-underscore-dangle
+            this._display._hotkeyHelpController.setHotkeyLabel(button, `${verb} ${target} ({0})`);
         }
 
         const actionIcon = button.querySelector('.action-icon');
         if (actionIcon instanceof HTMLElement) {
-            actionIcon.dataset.icon = isKanjiAdd ? 'add-duplicate-term-kanji' : 'add-duplicate-term-kana';
+            actionIcon.dataset.icon = `${iconPrefix}-${mode}`;
         }
     }
 
@@ -423,7 +418,7 @@ export class DisplayAnki {
 
                     // If entry has noteIds, show the "add duplicate" button.
                     if (Array.isArray(noteIds) && noteIds.length > 0) {
-                        this._updateButtonForDuplicate(button);
+                        this._updateAddButtonForDuplicateBehavior(button);
                     }
                 }
 
@@ -448,11 +443,17 @@ export class DisplayAnki {
     /**
      * @param {HTMLButtonElement} button
      */
-    _updateButtonForDuplicate(button) {
-        if (this._duplicateBehavior === 'prevent') {
-            button.disabled = true;
-        } else {
-            this._showDuplicateAddButton(button);
+    _updateAddButtonForDuplicateBehavior(button) {
+        switch (this._duplicateBehavior) {
+            case 'prevent':
+                button.disabled = true;
+                break;
+            case 'overwrite':
+                this._updateAddButtonAppearance(button, 'overwrite');
+                break;
+            case 'new':
+                this._updateAddButtonAppearance(button, 'new');
+                break;
         }
     }
 
@@ -564,8 +565,7 @@ export class DisplayAnki {
                             allErrors.push(toError(e));
                         }
                     }
-                    // Now that this dictionary entry has a duplicate in Anki, show the "add duplicate" buttons.
-                    this._updateButtonForDuplicate(button);
+                    this._updateAddButtonForDuplicateBehavior(button);
 
                     this._updateViewNoteButton(dictionaryEntryIndex, [noteId], true);
                 }
