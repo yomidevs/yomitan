@@ -1924,7 +1924,7 @@ button.footer-notification-close-button {
     display: none;
 }
 :root[data-anki-enabled=false] .action-button[data-action=view-note],
-:root[data-anki-enabled=false] .action-button[data-action=add-note] {
+:root[data-anki-enabled=false] .action-button[data-action=save-note] {
     display: none;
 }
 :root[data-audio-enabled=false] .action-button[data-action=play-audio] {

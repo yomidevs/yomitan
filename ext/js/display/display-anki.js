@@ -49,7 +49,7 @@ export class DisplayAnki {
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._tagsNotification = null;
         /** @type {?Promise<void>} */
-        this._updateAdderButtonsPromise = null;
+        this._updateSaveButtonsPromise = null;
         /** @type {?import('core').TokenObject} */
         this._updateDictionaryEntryDetailsToken = null;
         /** @type {EventListenerCollection} */
@@ -100,7 +100,7 @@ export class DisplayAnki {
         /** @type {(event: MouseEvent) => void} */
         this._onShowTagsBind = this._onShowTags.bind(this);
         /** @type {(event: MouseEvent) => void} */
-        this._onNoteAddBind = this._onNoteAdd.bind(this);
+        this._onNoteSaveBind = this._onNoteSave.bind(this);
         /** @type {(event: MouseEvent) => void} */
         this._onViewNotesButtonClickBind = this._onViewNotesButtonClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
@@ -114,9 +114,9 @@ export class DisplayAnki {
         this._noteContext = this._getNoteContext();
         /* eslint-disable @stylistic/no-multi-spaces */
         this._display.hotkeyHandler.registerActions([
-            ['addNoteKanji',      () => { this._tryAddAnkiNoteForSelectedEntry('kanji'); }],
-            ['addNoteTermKanji',  () => { this._tryAddAnkiNoteForSelectedEntry('term-kanji'); }],
-            ['addNoteTermKana',   () => { this._tryAddAnkiNoteForSelectedEntry('term-kana'); }],
+            ['addNoteKanji',      () => { this._hotkeySaveAnkiNoteForSelectedEntry('kanji'); }],
+            ['addNoteTermKanji',  () => { this._hotkeySaveAnkiNoteForSelectedEntry('term-kanji'); }],
+            ['addNoteTermKana',   () => { this._hotkeySaveAnkiNoteForSelectedEntry('term-kana'); }],
             ['viewNotes',         this._viewNotesForSelectedEntry.bind(this)]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
@@ -250,8 +250,8 @@ export class DisplayAnki {
         for (const node of element.querySelectorAll('.action-button[data-action=view-tags]')) {
             eventListeners.addEventListener(node, 'click', this._onShowTagsBind);
         }
-        for (const node of element.querySelectorAll('.action-button[data-action=add-note]')) {
-            eventListeners.addEventListener(node, 'click', this._onNoteAddBind);
+        for (const node of element.querySelectorAll('.action-button[data-action=save-note]')) {
+            eventListeners.addEventListener(node, 'click', this._onNoteSaveBind);
         }
         for (const node of element.querySelectorAll('.action-button[data-action=view-note]')) {
             eventListeners.addEventListener(node, 'click', this._onViewNotesButtonClickBind);
@@ -275,13 +275,13 @@ export class DisplayAnki {
     /**
      * @param {MouseEvent} e
      */
-    _onNoteAdd(e) {
+    _onNoteSave(e) {
         e.preventDefault();
         const element = /** @type {HTMLElement} */ (e.currentTarget);
         const mode = this._getValidCreateMode(element.dataset.mode);
         if (mode === null) { return; }
         const index = this._display.getElementDictionaryEntryIndex(element);
-        void this._addAnkiNote(index, mode);
+        void this._saveAnkiNote(index, mode);
     }
 
     /**
@@ -299,9 +299,9 @@ export class DisplayAnki {
      * @param {import('display-anki').CreateMode} mode
      * @returns {?HTMLButtonElement}
      */
-    _adderButtonFind(index, mode) {
+    _saveButtonFind(index, mode) {
         const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector(`.action-button[data-action=add-note][data-mode="${mode}"]`) : null;
+        return entry !== null ? entry.querySelector(`.action-button[data-action=save-note][data-mode="${mode}"]`) : null;
     }
 
     /**
@@ -354,22 +354,22 @@ export class DisplayAnki {
         /** @type {?import('core').TokenObject} */
         const token = {};
         this._updateDictionaryEntryDetailsToken = token;
-        if (this._updateAdderButtonsPromise !== null) {
-            await this._updateAdderButtonsPromise;
+        if (this._updateSaveButtonsPromise !== null) {
+            await this._updateSaveButtonsPromise;
         }
         if (this._updateDictionaryEntryDetailsToken !== token) { return; }
 
         const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
         try {
-            this._updateAdderButtonsPromise = promise;
+            this._updateSaveButtonsPromise = promise;
             const dictionaryEntryDetails = await this._getDictionaryEntryDetails(dictionaryEntries);
             if (this._updateDictionaryEntryDetailsToken !== token) { return; }
             this._dictionaryEntryDetails = dictionaryEntryDetails;
-            this._updateAdderButtons(dictionaryEntryDetails);
+            this._updateSaveButtons(dictionaryEntryDetails);
         } finally {
             resolve();
-            if (this._updateAdderButtonsPromise === promise) {
-                this._updateAdderButtonsPromise = null;
+            if (this._updateSaveButtonsPromise === promise) {
+                this._updateSaveButtonsPromise = null;
             }
         }
     }
@@ -378,11 +378,17 @@ export class DisplayAnki {
      * @param {HTMLButtonElement} button
      * @param {import('settings').AnkiDuplicateBehavior} behavior
      */
-    _updateAddButtonAppearance(button, behavior) {
+    _updateSaveButtonAppearance(button, behavior) {
         const mode = button.dataset.mode;
         const verb = behavior === 'overwrite' ? 'Overwrite' : 'Add duplicate';
         const iconPrefix = behavior === 'overwrite' ? 'overwrite' : 'add-duplicate';
         const target = mode === 'term-kanji' ? 'expression' : 'reading';
+
+        if (behavior === 'overwrite') {
+            button.dataset.overwrite = 'true';
+        } else {
+            delete button.dataset.overwrite;
+        }
 
         button.setAttribute('title', `${verb} ${target}`);
 
@@ -402,13 +408,13 @@ export class DisplayAnki {
     /**
      * @param {import('display-anki').DictionaryEntryDetails[]} dictionaryEntryDetails
      */
-    _updateAdderButtons(dictionaryEntryDetails) {
+    _updateSaveButtons(dictionaryEntryDetails) {
         const displayTags = this._displayTags;
         for (let i = 0, ii = dictionaryEntryDetails.length; i < ii; ++i) {
             /** @type {?Set<number>} */
             let allNoteIds = null;
             for (const {mode, canAdd, noteIds, noteInfos, ankiError} of dictionaryEntryDetails[i].modeMap.values()) {
-                const button = this._adderButtonFind(i, mode);
+                const button = this._saveButtonFind(i, mode);
                 if (button !== null) {
                     button.disabled = !canAdd;
                     button.hidden = (ankiError !== null);
@@ -418,7 +424,7 @@ export class DisplayAnki {
 
                     // If entry has noteIds, show the "add duplicate" button.
                     if (Array.isArray(noteIds) && noteIds.length > 0) {
-                        this._updateAddButtonForDuplicateBehavior(button);
+                        this._updateSaveButtonForDuplicateBehavior(button);
                     }
                 }
 
@@ -443,16 +449,16 @@ export class DisplayAnki {
     /**
      * @param {HTMLButtonElement} button
      */
-    _updateAddButtonForDuplicateBehavior(button) {
+    _updateSaveButtonForDuplicateBehavior(button) {
         switch (this._duplicateBehavior) {
             case 'prevent':
                 button.disabled = true;
                 break;
             case 'overwrite':
-                this._updateAddButtonAppearance(button, 'overwrite');
+                this._updateSaveButtonAppearance(button, 'overwrite');
                 break;
             case 'new':
-                this._updateAddButtonAppearance(button, 'new');
+                this._updateSaveButtonAppearance(button, 'new');
                 break;
         }
     }
@@ -502,16 +508,16 @@ export class DisplayAnki {
     /**
      * @param {import('display-anki').CreateMode} mode
      */
-    _tryAddAnkiNoteForSelectedEntry(mode) {
+    _hotkeySaveAnkiNoteForSelectedEntry(mode) {
         const index = this._display.selectedIndex;
-        void this._addAnkiNote(index, mode);
+        void this._saveAnkiNote(index, mode);
     }
 
     /**
      * @param {number} dictionaryEntryIndex
      * @param {import('display-anki').CreateMode} mode
      */
-    async _addAnkiNote(dictionaryEntryIndex, mode) {
+    async _saveAnkiNote(dictionaryEntryIndex, mode) {
         const dictionaryEntries = this._display.dictionaryEntries;
         const dictionaryEntryDetails = this._dictionaryEntryDetails;
         if (!(
@@ -528,7 +534,7 @@ export class DisplayAnki {
 
         const {requirements} = details;
 
-        const button = this._adderButtonFind(dictionaryEntryIndex, mode);
+        const button = this._saveButtonFind(dictionaryEntryIndex, mode);
         if (button === null || button.disabled) { return; }
 
         this._hideErrorNotification(true);
@@ -543,33 +549,9 @@ export class DisplayAnki {
 
             const error = this._getAddNoteRequirementsError(requirements, outputRequirements);
             if (error !== null) { allErrors.push(error); }
-
-            let noteId = null;
-            let addNoteOkay = false;
-            try {
-                noteId = await this._display.application.api.addAnkiNote(note);
-                addNoteOkay = true;
-            } catch (e) {
-                allErrors.length = 0;
-                allErrors.push(toError(e));
-            }
-
-            if (addNoteOkay) {
-                if (noteId === null) {
-                    allErrors.push(new Error('Note could not be added'));
-                } else {
-                    if (this._suspendNewCards) {
-                        try {
-                            await this._display.application.api.suspendAnkiCardsForNote(noteId);
-                        } catch (e) {
-                            allErrors.push(toError(e));
-                        }
-                    }
-                    this._updateAddButtonForDuplicateBehavior(button);
-
-                    this._updateViewNoteButton(dictionaryEntryIndex, [noteId], true);
-                }
-            }
+            await (button.dataset.overwrite ?
+                this._updateAnkiNote(note, allErrors) :
+                this._addNewAnkiNote(note, allErrors, button, dictionaryEntryIndex));
         } catch (e) {
             allErrors.push(toError(e));
         } finally {
@@ -581,6 +563,49 @@ export class DisplayAnki {
         } else {
             this._hideErrorNotification(true);
         }
+    }
+
+    /**
+     * @param {import('anki').Note} note
+     * @param {Error[]} allErrors
+     * @param {HTMLButtonElement} button
+     * @param {number} dictionaryEntryIndex
+     */
+    async _addNewAnkiNote(note, allErrors, button, dictionaryEntryIndex) {
+        let noteId = null;
+        let addNoteOkay = false;
+        try {
+            noteId = await this._display.application.api.addAnkiNote(note);
+            addNoteOkay = true;
+        } catch (e) {
+            allErrors.length = 0;
+            allErrors.push(toError(e));
+        }
+
+        if (addNoteOkay) {
+            if (noteId === null) {
+                allErrors.push(new Error('Note could not be added'));
+            } else {
+                if (this._suspendNewCards) {
+                    try {
+                        await this._display.application.api.suspendAnkiCardsForNote(noteId);
+                    } catch (e) {
+                        allErrors.push(toError(e));
+                    }
+                }
+                this._updateSaveButtonForDuplicateBehavior(button);
+
+                this._updateViewNoteButton(dictionaryEntryIndex, [noteId], true);
+            }
+        }
+    }
+
+    /**
+     * @param {import('anki').Note} note
+     * @param {Error[]} allErrors
+     */
+    async _updateAnkiNote(note, allErrors) {
+        console.log('updateAnkiNote', note, allErrors);
     }
 
     /**
