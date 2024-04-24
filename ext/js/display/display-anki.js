@@ -376,9 +376,14 @@ export class DisplayAnki {
 
     /**
      * @param {HTMLButtonElement} button
-     * @param {import('settings').AnkiDuplicateBehavior} behavior
      */
-    _updateSaveButtonAppearance(button, behavior) {
+    _updateSaveButtonForDuplicateBehavior(button) {
+        const behavior = this._duplicateBehavior;
+        if (behavior === 'prevent') {
+            button.disabled = true;
+            return;
+        }
+
         const mode = button.dataset.mode;
         const verb = behavior === 'overwrite' ? 'Overwrite' : 'Add duplicate';
         const iconPrefix = behavior === 'overwrite' ? 'overwrite' : 'add-duplicate';
@@ -443,23 +448,6 @@ export class DisplayAnki {
             }
 
             this._updateViewNoteButton(i, allNoteIds !== null ? [...allNoteIds] : [], false);
-        }
-    }
-
-    /**
-     * @param {HTMLButtonElement} button
-     */
-    _updateSaveButtonForDuplicateBehavior(button) {
-        switch (this._duplicateBehavior) {
-            case 'prevent':
-                button.disabled = true;
-                break;
-            case 'overwrite':
-                this._updateSaveButtonAppearance(button, 'overwrite');
-                break;
-            case 'new':
-                this._updateSaveButtonAppearance(button, 'new');
-                break;
         }
     }
 
@@ -721,6 +709,7 @@ export class DisplayAnki {
      */
     async _getDictionaryEntryDetails(dictionaryEntries) {
         const fetchAdditionalInfo = (this._displayTags !== 'never');
+
         const notePromises = [];
         const noteTargets = [];
         for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
