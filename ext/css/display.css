@@ -951,6 +951,9 @@ button.action-button:active {
 :root[data-term-display-mode=term-only] .headword-term>ruby>rt {
     display: none;
 }
+:root[data-term-display-mode=term-only] .query-parser-term>ruby>rt {
+    display: none;
+}
 
 
 /* Entry indicator */
