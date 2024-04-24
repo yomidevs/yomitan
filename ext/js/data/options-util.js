@@ -1260,7 +1260,7 @@ export class OptionsUtil {
     }
 
     /**
-     * - Updated handlebars to fix escaping when using `definition.cloze`.
+     * - Updated handlebars to fix escaping when using `definition.cloze` or text-based `getMedia`.
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion33(options) {
