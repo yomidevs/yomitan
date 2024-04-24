@@ -1751,6 +1751,10 @@ describe('OptionsUtil', () => {
 {{#*inline "clipboard-text"}}
     {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
 {{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
+{{/inline}}
 `.trimStart(),
 
                 expected: `
@@ -1776,6 +1780,10 @@ describe('OptionsUtil', () => {
 
 {{#*inline "clipboard-text"}}
     {{~#if (hasMedia "clipboardText")}}{{{getMedia "clipboardText"}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
 {{/inline}}
 `.trimStart()
             }
