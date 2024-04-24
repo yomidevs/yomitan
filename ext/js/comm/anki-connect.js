@@ -128,6 +128,20 @@ export class AnkiConnect {
         return result;
     }
 
+    /**
+     * @param {import('anki').Note} noteWithId
+     * @returns {Promise<null>}
+     */
+    async updateNoteFields(noteWithId) {
+        if (!this._enabled) { return null; }
+        await this._checkVersion();
+        const result = await this._invoke('updateNoteFields', {note: noteWithId});
+        if (result !== null) {
+            throw this._createUnexpectedResultError('null', result);
+        }
+        return result;
+    }
+
 
     /**
      * @param {import('anki').Note[]} notes

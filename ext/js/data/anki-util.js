@@ -83,4 +83,4 @@ export function isNoteDataValid(note) {
     );
 }
 
-export const invalidNoteId = -1;
+export const INVALID_NOTE_ID = -1;

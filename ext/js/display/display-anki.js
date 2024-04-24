@@ -21,7 +21,7 @@ import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
-import {invalidNoteId, isNoteDataValid} from '../data/anki-util.js';
+import {INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {TemplateRendererProxy} from '../templates/template-renderer-proxy.js';
@@ -431,7 +431,7 @@ export class DisplayAnki {
                 if (Array.isArray(noteIds) && noteIds.length > 0) {
                     if (allNoteIds === null) { allNoteIds = new Set(); }
                     for (const noteId of noteIds) {
-                        if (noteId !== invalidNoteId) {
+                        if (noteId !== INVALID_NOTE_ID) {
                             allNoteIds.add(noteId);
                         }
                     }
@@ -550,7 +550,7 @@ export class DisplayAnki {
             const error = this._getAddNoteRequirementsError(requirements, outputRequirements);
             if (error !== null) { allErrors.push(error); }
             await (button.dataset.overwrite ?
-                this._updateAnkiNote(note, allErrors) :
+                this._updateAnkiNote(note, allErrors, button, dictionaryEntryIndex) :
                 this._addNewAnkiNote(note, allErrors, button, dictionaryEntryIndex));
         } catch (e) {
             allErrors.push(toError(e));
@@ -603,9 +603,29 @@ export class DisplayAnki {
     /**
      * @param {import('anki').Note} note
      * @param {Error[]} allErrors
+     * @param {HTMLButtonElement} button
+     * @param {number} dictionaryEntryIndex
      */
-    async _updateAnkiNote(note, allErrors) {
-        console.log('updateAnkiNote', note, allErrors);
+    async _updateAnkiNote(note, allErrors, button, dictionaryEntryIndex) {
+        const dictionaryEntries = this._display.dictionaryEntries;
+        const allEntryDetails = await this._getDictionaryEntryDetails(dictionaryEntries);
+        const relevantEntryDetails = allEntryDetails[dictionaryEntryIndex];
+        const mode = this._getValidCreateMode(button.dataset.mode);
+        if (mode === null) { return; }
+        const relevantModeDetails = relevantEntryDetails.modeMap.get(mode);
+        if (typeof relevantModeDetails === 'undefined') { return; }
+        const {noteIds} = relevantModeDetails;
+        if (noteIds === null) { return; }
+        const overwriteTarget = noteIds.find((id) => id !== INVALID_NOTE_ID);
+        if (typeof overwriteTarget === 'undefined') { return; }
+
+        try {
+            const noteWithId = {...note, id: overwriteTarget};
+            await this._display.application.api.updateAnkiNote(noteWithId);
+        } catch (e) {
+            allErrors.length = 0;
+            allErrors.push(toError(e));
+        }
     }
 
     /**
@@ -701,7 +721,6 @@ export class DisplayAnki {
      */
     async _getDictionaryEntryDetails(dictionaryEntries) {
         const fetchAdditionalInfo = (this._displayTags !== 'never');
-
         const notePromises = [];
         const noteTargets = [];
         for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
