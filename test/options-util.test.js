@@ -1747,6 +1747,10 @@ describe('OptionsUtil', () => {
 {{#*inline "cloze-suffix"}}
     {{~#if definition.cloze}}{{definition.cloze.suffix}}{{/if~}}
 {{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
+{{/inline}}
 `.trimStart(),
 
                 expected: `
@@ -1768,6 +1772,10 @@ describe('OptionsUtil', () => {
 
 {{#*inline "cloze-suffix"}}
     {{~#if definition.cloze}}{{{definition.cloze.suffix}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{{getMedia "clipboardText"}}}{{/if~}}
 {{/inline}}
 `.trimStart()
             }
