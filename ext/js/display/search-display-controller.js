@@ -47,6 +47,8 @@ export class SearchDisplayController {
         this._clipboardMonitorEnableCheckbox = querySelectorNotNull(document, '#clipboard-monitor-enable');
         /** @type {HTMLInputElement} */
         this._wanakanaEnableCheckbox = querySelectorNotNull(document, '#wanakana-enable');
+        /** @type {HTMLSelectElement} */
+        this._profileSelect = querySelectorNotNull(document, '#profile-select');
         /** @type {HTMLElement} */
         this._wanakanaSearchOption = querySelectorNotNull(document, '#search-option-wanakana');
         /** @type {EventListenerCollection} */
@@ -109,12 +111,8 @@ export class SearchDisplayController {
 
         const displayOptions = this._display.getOptions();
         if (displayOptions !== null) {
-            this._onDisplayOptionsUpdated({options: displayOptions});
+            await this._onDisplayOptionsUpdated({options: displayOptions});
         }
-
-        const {profiles, profileCurrent} = await this._display.application.api.optionsGetFull();
-
-        this._updateProfileSelect(profiles, profileCurrent);
     }
 
     /**
@@ -182,10 +180,17 @@ export class SearchDisplayController {
     /**
      * @param {import('display').EventArgument<'optionsUpdated'>} details
      */
-    _onDisplayOptionsUpdated({options}) {
+    async _onDisplayOptionsUpdated({options}) {
         this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
         this._updateClipboardMonitorEnabled();
+        this._updateWanakanaCheckbox(options);
+        await this._updateProfileSelect();
+    }
 
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
+    _updateWanakanaCheckbox(options) {
         const {language, enableWanakana} = options.general;
         const wanakanaEnabled = language === 'ja' && enableWanakana;
         this._wanakanaEnableCheckbox.checked = wanakanaEnabled;
@@ -590,15 +595,16 @@ export class SearchDisplayController {
         return element instanceof HTMLElement && !!element.isContentEditable;
     }
 
-    /**
-     * @param {import('settings').Profile[]} profiles
-     * @param {number} profileCurrent
-     */
-    _updateProfileSelect(profiles, profileCurrent) {
-        /** @type {HTMLSelectElement} */
-        const select = querySelectorNotNull(document, '#profile-select');
+    /** */
+    async _updateProfileSelect() {
+        const {profiles, profileCurrent} = await this._display.application.api.optionsGetFull();
+
         /** @type {HTMLElement} */
         const optionGroup = querySelectorNotNull(document, '#profile-select-option-group');
+        while (optionGroup.firstChild) {
+            optionGroup.removeChild(optionGroup.firstChild);
+        }
+
         const fragment = document.createDocumentFragment();
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
             const {name} = profiles[i];
@@ -609,8 +615,8 @@ export class SearchDisplayController {
         }
         optionGroup.textContent = '';
         optionGroup.appendChild(fragment);
-        select.value = `${profileCurrent}`;
+        this._profileSelect.value = `${profileCurrent}`;
 
-        select.addEventListener('change', this._onProfileSelectChange.bind(this), false);
+        this._profileSelect.addEventListener('change', this._onProfileSelectChange.bind(this), false);
     }
 }
