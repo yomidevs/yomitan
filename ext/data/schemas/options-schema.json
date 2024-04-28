@@ -290,7 +290,7 @@
                                     },
                                     "termDisplayMode": {
                                         "type": "string",
-                                        "enum": ["ruby", "ruby-and-reading", "term-and-reading"],
+                                        "enum": ["ruby", "ruby-and-reading", "term-and-reading", "term-only"],
                                         "default": "ruby"
                                     },
                                     "sortFrequencyDictionary": {

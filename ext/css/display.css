@@ -947,7 +947,11 @@ button.action-button:active {
 :root[data-term-display-mode=term-and-reading] .headword[data-reading-is-same=true] .headword-reading-outer {
     display: none;
 }
-:root[data-term-display-mode=term-and-reading] .headword-term>ruby>rt {
+:root[data-term-display-mode=term-and-reading] .headword-term>ruby>rt,
+:root[data-term-display-mode=term-only] .headword-term>ruby>rt {
+    display: none;
+}
+:root[data-term-display-mode=term-only] .query-parser-term>ruby>rt {
     display: none;
 }
 

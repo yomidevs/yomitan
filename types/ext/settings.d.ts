@@ -373,7 +373,7 @@ export type PopupActionBarLocation = 'left' | 'right' | 'top' | 'bottom';
 
 export type FrequencyDisplayMode = 'tags' | 'tags-grouped' | 'split-tags' | 'split-tags-grouped' | 'inline-list' | 'list';
 
-export type TermDisplayMode = 'ruby' | 'ruby-and-reading' | 'term-and-reading';
+export type TermDisplayMode = 'ruby' | 'ruby-and-reading' | 'term-and-reading' | 'term-only';
 
 export type SortFrequencyDictionaryOrder = 'ascending' | 'descending';
 
