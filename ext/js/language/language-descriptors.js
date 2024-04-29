@@ -80,6 +80,12 @@ const languageDescriptors = [
         }
     },
     {
+        iso: 'fi',
+        name: 'Finnish',
+        exampleText: 'lukea',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
         iso: 'fr',
         name: 'French',
         exampleText: 'lire',
