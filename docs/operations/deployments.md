@@ -7,6 +7,10 @@ Only collaborators with deployment permissions are allowed to deploy.
 ## Deploying a dev build
 
 1. Tag the commit with a version number. Like: `git tag 24.4.28.0 HEAD` (do this after pulling in the latest changes in master) or `git tag 24.4.28.0 abc123`
+
+> [!WARNING]
+> You can not use leading zeroes in the version tags (e.g. `24.04.28.0`). Firefox store does not allow them and the deploy will fail.
+
 2. Push the tag to origin. `git push origin 24.4.28.0`
 3. The [`Create prerelease on tag`](https://github.com/themoeway/yomitan/actions/workflows/create-prerelease-on-tag.yml) GH workflow will run and will publish a new release in [Releases](https://github.com/themoeway/yomitan/releases) as well as kick off a workflow each for publishing to Firefox and Chrome.
 4. Find the corresponding `publish-chrome-development` GH action run and unblock the deployment.
