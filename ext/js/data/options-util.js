@@ -539,7 +539,8 @@ export class OptionsUtil {
             this._updateVersion30,
             this._updateVersion31,
             this._updateVersion32,
-            this._updateVersion33
+            this._updateVersion33,
+            this._updateVersion34
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1259,13 +1260,20 @@ export class OptionsUtil {
         }
     }
 
+    /**
+     * - Updated handlebars to fix escaping when using `definition.cloze` or text-based `getMedia`.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion33(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v33.handlebars');
+    }
 
     /**
      *  - Added dynamic handlebars for single dictionaries.
      *  @type {import('options-util').UpdateFunction}
      */
-    async _updateVersion33(options) {
-        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v33.handlebars');
+    async _updateVersion34(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v34.handlebars');
     }
 
 

@@ -605,7 +605,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 33,
+        version: 34,
         global: {
             database: {
                 prefixWildcardsSupported: false
@@ -1721,6 +1721,69 @@ describe('OptionsUtil', () => {
             {{{definition.cloze.sentence}}}
         {{~/if~}}
     {{~/if~}}
+{{/inline}}
+`.trimStart()
+            },
+            {
+                oldVersion: 32,
+                newVersion: 33,
+                old: `
+{{#*inline "sentence"}}
+    {{~#if definition.cloze}}{{definition.cloze.sentence}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-prefix"}}
+    {{~#if definition.cloze}}{{definition.cloze.prefix}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body"}}
+    {{~#if definition.cloze}}{{definition.cloze.body}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body-kana"}}
+    {{~#if definition.cloze}}{{definition.cloze.bodyKana}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-suffix"}}
+    {{~#if definition.cloze}}{{definition.cloze.suffix}}{{/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
+{{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
+{{/inline}}
+`.trimStart(),
+
+                expected: `
+{{#*inline "sentence"}}
+    {{~#if definition.cloze}}{{{definition.cloze.sentence}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-prefix"}}
+    {{~#if definition.cloze}}{{{definition.cloze.prefix}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body"}}
+    {{~#if definition.cloze}}{{{definition.cloze.body}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body-kana"}}
+    {{~#if definition.cloze}}{{{definition.cloze.bodyKana}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-suffix"}}
+    {{~#if definition.cloze}}{{{definition.cloze.suffix}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{{getMedia "clipboardText"}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
 {{/inline}}
 `.trimStart()
             }
