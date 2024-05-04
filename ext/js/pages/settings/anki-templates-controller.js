@@ -299,7 +299,7 @@ export class AnkiTemplatesController {
      * @returns {string}
      */
     _getAnkiTemplate(options) {
-        let staticTemplates = options.anki.fieldTemplates; //
+        let staticTemplates = options.anki.fieldTemplates;
         if (typeof staticTemplates !== 'string') { staticTemplates = this._defaultFieldTemplates; }
         const dynamicTemplates = getDynamicTemplates(options);
         return staticTemplates + '\n' + dynamicTemplates;
