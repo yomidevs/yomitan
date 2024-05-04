@@ -117,6 +117,10 @@ export const japaneseTransforms = {
             name: 'Intermediate -te endings for progressive or perfect tense',
             isDictionaryForm: false
         },
+        '-ba': {
+            name: 'Intermediate -ba endings for conditional contraction',
+            isDictionaryForm: false
+        },
         'adv': {
             name: 'Intermediate -ku endings for adverbs',
             isDictionaryForm: false
@@ -138,16 +142,70 @@ export const japaneseTransforms = {
                 }
             ],
             rules: [
-                suffixInflection('ければ', 'い', [], ['adj-i']),
-                suffixInflection('えば', 'う', [], ['v5']),
-                suffixInflection('けば', 'く', [], ['v5']),
-                suffixInflection('げば', 'ぐ', [], ['v5']),
-                suffixInflection('せば', 'す', [], ['v5']),
-                suffixInflection('てば', 'つ', [], ['v5']),
-                suffixInflection('ねば', 'ぬ', [], ['v5']),
-                suffixInflection('べば', 'ぶ', [], ['v5']),
-                suffixInflection('めば', 'む', [], ['v5']),
-                suffixInflection('れば', 'る', [], ['v1', 'v5', 'vk', 'vs', 'vz'])
+                suffixInflection('ければ', 'い', ['-ba'], ['adj-i']),
+                suffixInflection('えば', 'う', ['-ba'], ['v5']),
+                suffixInflection('けば', 'く', ['-ba'], ['v5']),
+                suffixInflection('げば', 'ぐ', ['-ba'], ['v5']),
+                suffixInflection('せば', 'す', ['-ba'], ['v5']),
+                suffixInflection('てば', 'つ', ['-ba'], ['v5']),
+                suffixInflection('ねば', 'ぬ', ['-ba'], ['v5']),
+                suffixInflection('べば', 'ぶ', ['-ba'], ['v5']),
+                suffixInflection('めば', 'む', ['-ba'], ['v5']),
+                suffixInflection('れば', 'る', ['-ba'], ['v1', 'v5', 'vk', 'vs', 'vz'])
+            ]
+        },
+        {
+            name: '-ya',
+            description: 'Conditional (Contraction)',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～ゃ',
+                    description: '仮定形の縮約系'
+                }
+            ],
+            rules: [
+                suffixInflection('けりゃ', 'ければ', [], ['-ba']),
+                suffixInflection('きゃ', 'ければ', [], ['-ba']),
+                suffixInflection('や', 'えば', [], ['-ba']),
+                suffixInflection('きゃ', 'けば', [], ['-ba']),
+                suffixInflection('ぎゃ', 'げば', [], ['-ba']),
+                suffixInflection('しゃ', 'せば', [], ['-ba']),
+                suffixInflection('ちゃ', 'てば', [], ['-ba']),
+                suffixInflection('にゃ', 'ねば', [], ['-ba']),
+                suffixInflection('びゃ', 'べば', [], ['-ba']),
+                suffixInflection('みゃ', 'めば', [], ['-ba']),
+                suffixInflection('りゃ', 'れば', [], ['-ba'])
+            ]
+        },
+        {
+            name: '-cha',
+            description: 'Contraction of -teha',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～ちゃ',
+                    description: '「～テハ」の縮約系'
+                }
+            ],
+            rules: [
+                suffixInflection('ちゃ', 'る', ['v5'], ['v1']),
+                suffixInflection('いじゃ', 'ぐ', ['v5'], ['v5']),
+                suffixInflection('いちゃ', 'く', ['v5'], ['v5']),
+                suffixInflection('しちゃ', 'す', ['v5'], ['v5']),
+                suffixInflection('っちゃ', 'う', ['v5'], ['v5']),
+                suffixInflection('っちゃ', 'く', ['v5'], ['v5']),
+                suffixInflection('っちゃ', 'つ', ['v5'], ['v5']),
+                suffixInflection('っちゃ', 'る', ['v5'], ['v5']),
+                suffixInflection('んじゃ', 'ぬ', ['v5'], ['v5']),
+                suffixInflection('んじゃ', 'ぶ', ['v5'], ['v5']),
+                suffixInflection('んじゃ', 'む', ['v5'], ['v5']),
+                suffixInflection('じちゃ', 'ずる', ['v5'], ['vz']),
+                suffixInflection('しちゃ', 'する', ['v5'], ['vs']),
+                suffixInflection('為ちゃ', '為る', ['v5'], ['vs']),
+                suffixInflection('きちゃ', 'くる', ['v5'], ['vk']),
+                suffixInflection('来ちゃ', '来る', ['v5'], ['vk']),
+                suffixInflection('來ちゃ', '來る', ['v5'], ['vk'])
             ]
         },
         {
@@ -448,6 +506,27 @@ export const japaneseTransforms = {
                 suffixInflection('こぬ', 'くる', [], ['vk']),
                 suffixInflection('来ぬ', '来る', [], ['vk']),
                 suffixInflection('來ぬ', '來る', [], ['vk'])
+            ]
+        },
+        {
+            name: '-n',
+            rules: [
+                suffixInflection('ん', 'る', [], ['v1']),
+                suffixInflection('かん', 'く', [], ['v5']),
+                suffixInflection('がん', 'ぐ', [], ['v5']),
+                suffixInflection('さん', 'す', [], ['v5']),
+                suffixInflection('たん', 'つ', [], ['v5']),
+                suffixInflection('なん', 'ぬ', [], ['v5']),
+                suffixInflection('ばん', 'ぶ', [], ['v5']),
+                suffixInflection('まん', 'む', [], ['v5']),
+                suffixInflection('らん', 'る', [], ['v5']),
+                suffixInflection('わん', 'う', [], ['v5']),
+                suffixInflection('ぜん', 'ずる', [], ['vz']),
+                suffixInflection('せん', 'する', [], ['vs']),
+                suffixInflection('為ん', '為る', [], ['vs']),
+                suffixInflection('こん', 'くる', [], ['vk']),
+                suffixInflection('来ん', '来る', [], ['vk']),
+                suffixInflection('來ん', '來る', [], ['vk'])
             ]
         },
         {
