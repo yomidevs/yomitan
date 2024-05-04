@@ -89,6 +89,9 @@ type AllTextProcessors = {
             removeArabicScriptDiacritics: TextProcessor<boolean>;
         };
     };
+    fi: {
+        pre: CapitalizationPreprocessors;
+    };
     fr: {
         pre: CapitalizationPreprocessors;
     };
