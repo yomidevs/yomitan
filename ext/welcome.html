@@ -26,6 +26,21 @@
 
     <h1>Welcome to Yomitan!</h1>
 
+    <h2><strong>Recommended Permissions &#40;Important&#41;</strong></h2>
+    <div class="settings-group">
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Enable recommended permissions</div>
+                <div class="settings-item-description">This will allow Yomitan to scan text from most sites. Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a>.</div>
+                <div class="warning-text margin-above"><strong>If not enabled, Yomitan features will be limited.</strong></div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" class="recommended-permissions-toggle" data-origin="&lt;all_urls&gt;"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+            <div id="recommended-permissions-error" class="margin-above danger-text" hidden></div>
+        </div></div>
+    </div>
+
     <!-- Notifications -->
     <div class="settings-group settings-group-top-margin warn-custom-templates-notification">
       <div class="settings-item">
@@ -114,20 +129,6 @@
                 This startup notification can be turned off using the options below, or later from the <a href="/settings.html" rel="noopener">Settings</a> page.
             </div></div></div>
         </div>
-    </div>
-
-    <h2>Recommended Permissions &#40;Important&#41;</h2>
-    <div class="settings-group">
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Enable recommended permissions</div>
-                <div class="settings-item-description">This will allow Yomitan to scan text from most sites. Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a>.</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" class="recommended-permissions-toggle" data-origin="&lt;all_urls&gt;"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-            <div id="recommended-permissions-error" class="margin-above danger-text" hidden></div>
-        </div></div>
     </div>
 
     <h2>Basic customization</h2>
