@@ -112,6 +112,52 @@
         </div></div>
     </div>
 
+        <!-- General -->
+        <div class="heading-container">
+            <div class="heading-container-icon"><span class="icon" data-icon="cog"></span></div>
+            <div class="heading-container-left"><h2 id="general"><a href="#!general">General</a></h2></div>
+        </div>
+        <div class="settings-group">
+            <div class="settings-item"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Enable content scanning</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div></div>
+            <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Language
+                    </div>
+                    <div class="settings-item-description">
+                        Language of the text that is being looked up.
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select id="language-select" data-setting="general.language"></select>
+                </div>
+            </div></div>
+            <div class="settings-item"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Show the <a href="/welcome.html" target="_blank" rel="noopener">welcome guide</a> on browser startup</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.showGuide"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div></div>
+            <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Maximum number of results</div>
+                    <div class="settings-item-description">Adjust the maximum number of results shown for lookups.</div>
+                </div>
+                <div class="settings-item-right">
+                    <input type="number" min="1" data-setting="general.maxResults">
+                </div>
+            </div></div>
+        </div>
+
     <!-- Dictionaries -->
     <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="book"></span></div>
@@ -266,51 +312,6 @@
         </div>
     </div>
 
-    <!-- General -->
-    <div class="heading-container">
-        <div class="heading-container-icon"><span class="icon" data-icon="cog"></span></div>
-        <div class="heading-container-left"><h2 id="general"><a href="#!general">General</a></h2></div>
-    </div>
-    <div class="settings-group">
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Enable content scanning</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="general.enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">
-                    Language
-                </div>
-                <div class="settings-item-description">
-                    Language of the text that is being looked up.
-                </div>
-            </div>
-            <div class="settings-item-right">
-                <select id="language-select" data-setting="general.language"></select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Show the <a href="/welcome.html" target="_blank" rel="noopener">welcome guide</a> on browser startup</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="general.showGuide"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Maximum number of results</div>
-                <div class="settings-item-description">Adjust the maximum number of results shown for lookups.</div>
-            </div>
-            <div class="settings-item-right">
-                <input type="number" min="1" data-setting="general.maxResults">
-            </div>
-        </div></div>
-    </div>
     <!-- Scanning -->
     <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="scanning"></span></div>
