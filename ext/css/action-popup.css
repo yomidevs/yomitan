@@ -129,21 +129,19 @@ label {
     vertical-align: middle;
     display: inline-block;
     margin-right: 0.25em;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 .link-group-icon>input {
     margin: 0;
     padding: 0;
 }
-.link-group-icon[data-icon=chevron]::after {
-    content: '';
-    display: block;
-    width: 100%;
-    height: 100%;
-    background-image: url(/images/right-chevron.svg);
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: contain;
-}
+.link-group-icon[data-icon=chevron] { background-image: url(/images/right-chevron.svg); }
+.link-group-icon[data-icon=cog] { background-image: url(/images/cog.svg); }
+.link-group-icon[data-icon=key] { background-image: url(/images/key.svg); }
+.link-group-icon[data-icon=magnifying-glass] { background-image: url(/images/magnifying-glass.svg); }
+.link-group-icon[data-icon=question-mark-circle] { background-image: url(/images/question-mark-circle.svg); }
+
 .link-group-label {
     vertical-align: middle;
 }
