@@ -478,7 +478,8 @@ select.profile-select {
         display: none;
     }
     body {
-        width: 95%;
+        min-width: 95%;
+        width: max-content;
         font-size: calc(var(--font-size) * 2);
         text-align: center;
     }
