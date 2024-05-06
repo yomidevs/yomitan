@@ -35,6 +35,7 @@ body {
     font-family: 'Segoe UI', Tahoma, sans-serif;
     font-size: var(--font-size);
     width: max-content;
+    height: max-content;
 }
 
 h3 {
@@ -165,14 +166,13 @@ label {
 }
 .toggle {
     box-sizing: border-box;
-    width: 60px;
-    height: 34px;
+    width: 100%;
+    padding-top: 37.7%;
     position: relative;
     overflow: hidden;
     border: 1px solid #245580;
     border-radius: 4px;
     display: inline-block;
-    padding: 6px 12px;
 }
 .toggle-group {
     position: absolute;
@@ -189,7 +189,9 @@ body[data-loaded=true] .toggle-group {
 .toggle-on,
 .toggle-off,
 .toggle-handle {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 6px 12px;
     font-size: var(--font-size);
     font-weight: normal;
@@ -463,4 +465,27 @@ select.profile-select {
     right: 0;
     bottom: 0;
     background-color: var(--warning-color);
+}
+
+/* Mobile overrides */
+
+/* Treat devices that can't hover as mobile devices */
+@media (hover: none) {
+    #full {
+        display: initial;
+    }
+    #mini {
+        display: none;
+    }
+    body {
+        width: 95%;
+        font-size: calc(var(--font-size) * 2);
+        text-align: center;
+    }
+    h3 {
+        font-size: calc(var(--font-size) * 3.4);
+    }
+    .toggle-on, .toggle-off, .toggle-handle {
+        font-size: calc(var(--font-size) * 4);
+    }
 }
