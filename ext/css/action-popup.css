@@ -123,8 +123,8 @@ label {
     background-color: rgba(0, 0, 0, 0.1);
 }
 .link-group-icon {
-    width: 16px;
-    height: 16px;
+    width: 26px;
+    height: 26px;
     text-align: center;
     vertical-align: middle;
     display: inline-block;
@@ -485,7 +485,12 @@ select.profile-select {
     h3 {
         font-size: calc(var(--font-size) * 3.4);
     }
-    .toggle-on, .toggle-off, .toggle-handle {
+    .toggle-on, .toggle-off {
         font-size: calc(var(--font-size) * 4);
+    }
+    .toggle-handle {
+        padding-left: 65px;
+        padding-right: 65px;
+        border-radius: 10px;
     }
 }
