@@ -457,7 +457,7 @@ export class Translator {
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const deinflections = [];
         const used = new Set();
-        /** @type {Map<string, Map<string, Map<string, string>>>} */
+        /** @type {Map<string, Map<any, Map<any, string>>>} */
         const sourceCache = new Map(); // For reusing text processors' outputs
 
         for (
@@ -502,12 +502,12 @@ export class Translator {
      * @param {import('language').TextProcessorWithId<unknown>[]} textProcessors
      * @param {Map<string, unknown>} processorVariant
      * @param {string} text
-     * @param {Map<string, Map<string, Map<string, string>>>} textCache
+     * @param {Map<string, Map<any, Map<any, string>>>} textCache
      * @returns {string}
      */
     _applyTextProcessors(textProcessors, processorVariant, text, textCache) {
         for (const {id, textProcessor: {process}} of textProcessors) {
-            const setting = String(processorVariant.get(id));
+            const setting = processorVariant.get(id);
 
             let level1 = textCache.get(text);
             if (!level1) {
