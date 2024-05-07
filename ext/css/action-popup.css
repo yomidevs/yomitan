@@ -164,8 +164,8 @@ label {
 }
 .toggle {
     box-sizing: border-box;
-    width: 100%;
-    padding-top: 37.7%;
+    width: 60px;
+    height: 34px;
     position: relative;
     overflow: hidden;
     border: 1px solid #245580;
@@ -491,5 +491,9 @@ select.profile-select {
         padding-left: 65px;
         padding-right: 65px;
         border-radius: 10px;
+    }
+    .toggle {
+        width: 100%;
+        padding-top: 37.7%;
     }
 }
