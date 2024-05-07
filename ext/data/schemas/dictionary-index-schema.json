@@ -47,6 +47,14 @@
             "type": "string",
             "description": "Attribution information for the dictionary data."
         },
+        "sourceLanguage": {
+            "type": "string",
+            "description": "Language of the terms in the dictionary."
+        },
+        "targetLanguage": {
+            "type": "string",
+            "description": "Main language of the definitions in the dictionary."
+        },
         "frequencyMode": {
             "type": "string",
             "enum": ["occurrence-based", "rank-based"]

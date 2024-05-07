@@ -285,12 +285,14 @@ export class DictionaryImporter {
             counts
         };
 
-        const {author, url, description, attribution, frequencyMode} = index;
+        const {author, url, description, attribution, frequencyMode, sourceLanguage, targetLanguage} = index;
         if (typeof author === 'string') { summary.author = author; }
         if (typeof url === 'string') { summary.url = url; }
         if (typeof description === 'string') { summary.description = description; }
         if (typeof attribution === 'string') { summary.attribution = attribution; }
         if (typeof frequencyMode === 'string') { summary.frequencyMode = frequencyMode; }
+        if (typeof sourceLanguage === 'string') { summary.sourceLanguage = sourceLanguage; }
+        if (typeof targetLanguage === 'string') { summary.targetLanguage = targetLanguage; }
 
         return summary;
     }
