@@ -241,7 +241,7 @@ export class AnkiDeckGeneratorController {
         let tsv = '';
         for (const key in noteFields) {
             if (Object.prototype.hasOwnProperty.call(noteFields, key)) {
-                tsv += noteFields[key].replace('\t', '&nbsp;&nbsp;&nbsp;') + '\t';
+                tsv += noteFields[key].replaceAll('\t', '&nbsp;&nbsp;&nbsp;') + '\t';
             }
         }
         return tsv;
