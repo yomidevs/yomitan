@@ -60,3 +60,5 @@ export type TextProcessorMap = Map<
         postprocessorOptionsSpace: TextProcessorOptionsSpace;
     }
 >;
+
+export type TextCache = Map<string, Map<import('core').SafeAny, Map<import('core').SafeAny, string>>>;
