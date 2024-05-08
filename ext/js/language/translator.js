@@ -500,7 +500,7 @@ export class Translator {
 
     /**
      * @param {import('language').TextProcessorWithId<unknown>[]} textProcessors
-     * @param {Map<string, unknown>} processorVariant
+     * @param {import('translation-internal').TextProcessorVariant} processorVariant
      * @param {string} text
      * @param {import('translation-internal').TextCache} textCache
      * @returns {string}
@@ -1366,10 +1366,10 @@ export class Translator {
 
     /**
      * @param {Map<string, unknown[]>} arrayVariants
-     * @returns {Map<string, unknown>[]}
+     * @returns {import('translation-internal').TextProcessorVariant[]}
      */
     _getArrayVariants(arrayVariants) {
-        /** @type {Map<string, unknown>[]} */
+        /** @type {import('translation-internal').TextProcessorVariant[]} */
         const results = [];
         const variantKeys = [...arrayVariants.keys()];
         const entryVariantLengths = [];
@@ -1380,7 +1380,7 @@ export class Translator {
         const totalVariants = entryVariantLengths.reduce((acc, length) => acc * length, 1);
 
         for (let variantIndex = 0; variantIndex < totalVariants; ++variantIndex) {
-            /** @type {Map<string, unknown>} */
+            /** @type {import('translation-internal').TextProcessorVariant}} */
             const variant = new Map();
             let remainingIndex = variantIndex;
 
