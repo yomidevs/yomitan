@@ -60,3 +60,7 @@ export type TextProcessorMap = Map<
         postprocessorOptionsSpace: TextProcessorOptionsSpace;
     }
 >;
+
+export type TextProcessorVariant = Map<string, unknown>;
+
+export type TextCache = Map<string, Map<string, Map<unknown, string>>>;

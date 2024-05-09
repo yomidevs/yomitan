@@ -306,6 +306,7 @@ export class DictionaryImportController {
      * @param {Error[]} errors
      */
     _showErrors(errors) {
+        /** @type {Map<string, number>} */
         const uniqueErrors = new Map();
         for (const error of errors) {
             log.error(error);

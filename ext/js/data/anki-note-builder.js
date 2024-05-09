@@ -88,6 +88,7 @@ export class AnkiNoteBuilder {
         }
 
         const formattedFieldValues = await Promise.all(formattedFieldValuePromises);
+        /** @type {Map<string, import('anki-note-builder').Requirement>} */
         const uniqueRequirements = new Map();
         /** @type {import('anki').NoteFields} */
         const noteFields = {};
