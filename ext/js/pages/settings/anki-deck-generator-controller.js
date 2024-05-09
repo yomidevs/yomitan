@@ -156,9 +156,6 @@ export class AnkiDeckGeneratorController {
         const words = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         const addMedia = this._addMediaCheckbox.checked;
         this._updateProgressBar(true, 'Sending to Anki...', 0, words.length);
-        /**
-         * @type {import("anki.js").Note[]}
-         */
         let notes = [];
         let index = 0;
         for (const value of words) {
