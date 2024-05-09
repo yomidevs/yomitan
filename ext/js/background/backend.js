@@ -1831,16 +1831,7 @@ export class Backend {
         }
 
         try {
-            const tabWindow = await new Promise((resolve, reject) => {
-                chrome.windows.get(tab.windowId, {}, (value) => {
-                    const e = chrome.runtime.lastError;
-                    if (e) {
-                        reject(new Error(e.message));
-                    } else {
-                        resolve(value);
-                    }
-                });
-            });
+            const tabWindow = await this._getWindow(tab.windowId);
             if (!tabWindow.focused) {
                 await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
                     chrome.windows.update(tab.windowId, {focused: true}, () => {
@@ -1856,6 +1847,23 @@ export class Backend {
         } catch (e) {
             // Edge throws exception for no reason here.
         }
+    }
+
+    /**
+     * @param {number} windowId
+     * @returns {Promise<chrome.windows.Window>}
+     */
+    _getWindow(windowId) {
+        return new Promise((resolve, reject) => {
+            chrome.windows.get(windowId, {}, (value) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(value);
+                }
+            });
+        });
     }
 
     /**
@@ -2208,6 +2216,7 @@ export class Backend {
     async _injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, dictionaryMediaDetails) {
         const targets = [];
         const detailsList = [];
+        /** @type {Map<string, {dictionary: string, path: string, media: ?import('dictionary-database').MediaDataStringContent}>} */
         const detailsMap = new Map();
         for (const {dictionary, path} of dictionaryMediaDetails) {
             const target = {dictionary, path};
