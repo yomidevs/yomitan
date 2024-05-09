@@ -64,6 +64,8 @@ export class AnkiDeckGeneratorController {
         this._sendToAnkiConfirmModal = null;
         /** @type {?import('./modal.js').Modal} */
         this._exportConfirmModal = null;
+        /** @type {boolean} */
+        this._cancel = false;
         /** @type {AnkiNoteBuilder} */
         this._ankiNoteBuilder = new AnkiNoteBuilder(settingsController.application.api, new TemplateRendererProxy());
     }
@@ -79,9 +81,13 @@ export class AnkiDeckGeneratorController {
         /** @type {HTMLButtonElement} */
         const sendToAnkiButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-deck-send-button-confirm');
         /** @type {HTMLButtonElement} */
+        const sendToAnkiCancelButton = querySelectorNotNull(document, '#generate-anki-deck-send-to-anki-cancel-button');
+        /** @type {HTMLButtonElement} */
         const exportButton = querySelectorNotNull(document, '#generate-anki-deck-export-button');
         /** @type {HTMLButtonElement} */
         const exportButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-deck-export-button-confirm');
+        /** @type {HTMLButtonElement} */
+        const exportCancelButton = querySelectorNotNull(document, '#generate-anki-deck-export-cancel-button');
         /** @type {HTMLButtonElement} */
         const generateButton = querySelectorNotNull(document, '#generate-anki-deck-export-button');
 
@@ -91,8 +97,10 @@ export class AnkiDeckGeneratorController {
         testRenderButton.addEventListener('click', this._onRender.bind(this), false);
         sendToAnkiButton.addEventListener('click', this._onSendToAnki.bind(this), false);
         sendToAnkiButtonConfirmButton.addEventListener('click', this._onSendToAnkiConfirm.bind(this), false);
+        sendToAnkiCancelButton.addEventListener('click', this._cancelButton.bind(this), false);
         exportButton.addEventListener('click', this._onExport.bind(this), false);
         exportButtonConfirmButton.addEventListener('click', this._onExportConfirm.bind(this), false);
+        exportCancelButton.addEventListener('click', this._cancelButton.bind(this), false);
         generateButton.addEventListener('click', this._onExport.bind(this), false);
 
         void this._updateActiveCardFormat();
@@ -140,6 +148,11 @@ export class AnkiDeckGeneratorController {
             setTimeout(async () => {
                 for (const value of terms) {
                     if (!value) { continue; }
+                    if (this._cancel) {
+                        this._cancel = false;
+                        this._updateProgressBar(false, '', terms.length, terms.length, false);
+                        return;
+                    }
                     const noteData = await this._generateNoteData(value, 'term-kanji', false);
                     const fieldsTSV = noteData ? this._fieldsToTSV(noteData.fields) : '';
                     if (fieldsTSV) {
@@ -191,6 +204,11 @@ export class AnkiDeckGeneratorController {
             setTimeout(async () => {
                 for (const value of terms) {
                     if (!value) { continue; }
+                    if (this._cancel) {
+                        this._cancel = false;
+                        this._updateProgressBar(false, '', terms.length, terms.length, false);
+                        return;
+                    }
                     const noteData = await this._generateNoteData(value, 'term-kanji', addMedia);
                     if (noteData) {
                         notes.push(noteData);
@@ -241,6 +259,13 @@ export class AnkiDeckGeneratorController {
             const progressBars = progress.querySelectorAll('.progress-bar');
             for (const progressBar of progressBars) { progressBar.style.width = ((current / end) * 100).toString() + '%'; }
         }
+    }
+
+    /**
+     *
+     */
+    _cancelButton() {
+        this._cancel = true;
     }
 
     /**
