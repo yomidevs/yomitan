@@ -118,6 +118,7 @@ export class AnkiDeckGeneratorController {
         e.preventDefault();
         const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n';
+        let index = 0;
         for (const value of terms) {
             if (!value) { continue; }
             const noteData = await this._generateNoteData(value, 'term-kanji', false);
@@ -127,7 +128,12 @@ export class AnkiDeckGeneratorController {
                 ankiTSV += fieldsTSV;
                 ankiTSV += '\n';
             }
+            index++;
+            // eslint-disable-next-line no-console
+            console.log(index.toString() + '/' + terms.length + ' terms remaining.');
         }
+        // eslint-disable-next-line no-console
+        console.log('Finished exporting terms to Notes in plain text');
         const today = new Date();
         const fileName = `anki-deck-${today.getFullYear()}-${today.getMonth()}-${today.getDay()}.txt`;
         const blob = new Blob([ankiTSV], {type: 'application/octet-stream'});
@@ -166,11 +172,15 @@ export class AnkiDeckGeneratorController {
                 notes = [];
             }
             index++;
+            // eslint-disable-next-line no-console
+            console.log(index.toString() + '/' + terms.length + ' terms remaining.');
             this._updateProgressBar(false, '', index, terms.length);
         }
         if (notes.length > 0) {
             await this._ankiController.addNotes(notes);
         }
+        // eslint-disable-next-line no-console
+        console.log('Finished sending terms to Anki');
 
         if (this._fieldTemplateSendToAnkiConfirmModal !== null) {
             this._fieldTemplateSendToAnkiConfirmModal.setVisible(false);
