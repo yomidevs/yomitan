@@ -63,4 +63,4 @@ export type TextProcessorMap = Map<
 
 export type TextProcessorVariant = Map<string, unknown>;
 
-export type TextCache = Map<string, Map<import('core').SafeAny, Map<import('core').SafeAny, string>>>;
+export type TextCache = Map<string, Map<string, Map<unknown, string>>>;
