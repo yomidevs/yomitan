@@ -246,7 +246,7 @@ export class AnkiDeckGeneratorController {
             }
         }
         const mediaOptions = addMedia ? {audio: {sources: options.audio.sources, preferredAudioIndex: null, idleTimeout: null}} : null;
-        const requirements = addMedia ? [{type: 'audio'}] : [];
+        const requirements = addMedia ? [...this._getDictionaryEntryMedia(dictionaryEntry), {type: 'audio'}] : [];
         const {note} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
             dictionaryEntry,
             mode,
@@ -279,6 +279,35 @@ export class AnkiDeckGeneratorController {
             dictionaryEntry: /** @type {import('dictionary').TermDictionaryEntry} */ (this._cachedDictionaryEntryValue),
             text: text
         };
+    }
+
+    /**
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @returns {Array<object>}
+     */
+    _getDictionaryEntryMedia(dictionaryEntry) {
+        const media = [];
+        const definitions = dictionaryEntry.definitions;
+        for (const definition of definitions) {
+            const dictionary = definition.dictionary;
+            const paths = this._findAllByKey(definition, 'path');
+            for (const path of paths) {
+                media.push({dictionary: dictionary, path: path, type: 'dictionaryMedia'});
+            }
+        }
+        return media;
+    }
+
+    /**
+     *
+     * @param {object} obj
+     * @param {string} keyToFind
+     * @returns {Array<string>}
+     */
+    _findAllByKey(obj, keyToFind) {
+        // @ts-expect-error - Recursive function to find object keys deeply nested in objects and arrays. Essentially impossible to type correctly.
+        // eslint-disable-next-line unicorn/no-array-reduce, @typescript-eslint/no-unsafe-argument
+        return Object.entries(obj).reduce((acc, [key, value]) => (key === keyToFind ? [...acc, value] : (typeof value === 'object' ? [...acc, ...this._findAllByKey(value, keyToFind)] : acc)), []);
     }
 
     /**
