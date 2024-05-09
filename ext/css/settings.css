@@ -1647,9 +1647,6 @@ code.anki-field-marker {
 .generate-anki-deck-info {
     flex: 0 1 auto;
 }
-.generate-anki-deck-test-input-container {
-    width: 100%;
-}
 .generate-anki-deck-test-container {
     flex: 0 1 auto;
 }
