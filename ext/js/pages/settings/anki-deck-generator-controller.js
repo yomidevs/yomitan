@@ -57,6 +57,14 @@ export class AnkiDeckGeneratorController {
         this._activeAnkiDeck = '';
         /** @type {HTMLSpanElement} */
         this._wordcount = querySelectorNotNull(document, '#generate-anki-deck-wordcount');
+        /** @type {NodeListOf<HTMLElement>} */
+        this._progressContainers = (document.querySelectorAll('#dictionaries-modal .generate-anki-deck-import-progress'));
+        /** @type {NodeListOf<HTMLElement>} */
+        this._progressBars = (document.querySelectorAll('.generate-anki-deck-import-progress .progress-bar'));
+        /** @type {NodeListOf<HTMLElement>} */
+        this._infoLabels = (document.querySelectorAll('.generate-anki-deck-import-progress .progress-info'));
+        /** @type {NodeListOf<HTMLElement>} */
+        this._statusLabels = (document.querySelectorAll('.generate-anki-deck-import-progress .progress-status'));
         /** @type {?import('./modal.js').Modal} */
         this._fieldTemplateSendToAnkiConfirmModal = null;
         /** @type {AnkiNoteBuilder} */
@@ -147,7 +155,12 @@ export class AnkiDeckGeneratorController {
         e.preventDefault();
         const words = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         const addMedia = this._addMediaCheckbox.checked;
+        this._updateProgressBar(true, 'Sending to Anki...', 0, words.length);
+        /**
+         * @type {import("anki.js").Note[]}
+         */
         let notes = [];
+        let index = 0;
         for (const value of words) {
             if (!value) { continue; }
             const noteData = await this._generateNoteData(value, 'term-kanji', addMedia);
@@ -158,6 +171,8 @@ export class AnkiDeckGeneratorController {
                 await this._ankiController.addNotes(notes);
                 notes = [];
             }
+            index++;
+            this._updateProgressBar(false, '', index, words.length);
         }
         if (notes.length > 0) {
             await this._ankiController.addNotes(notes);
@@ -166,6 +181,26 @@ export class AnkiDeckGeneratorController {
         if (this._fieldTemplateSendToAnkiConfirmModal !== null) {
             this._fieldTemplateSendToAnkiConfirmModal.setVisible(false);
         }
+    }
+
+    /**
+     *
+     * @param {boolean} init
+     * @param {string} text
+     * @param {number} current
+     * @param {number} end
+     */
+    _updateProgressBar(init, text, current, end) {
+        if (current === end) {
+            for (const progress of this._progressContainers) { progress.hidden = true; }
+            return;
+        }
+        if (init) {
+            for (const progress of this._progressContainers) { progress.hidden = false; }
+            for (const infoLabel of this._infoLabels) { infoLabel.textContent = text; }
+        }
+        for (const statusLabel of this._statusLabels) { statusLabel.textContent = (current / end).toString(); }
+        for (const progressBar of this._progressBars) { progressBar.style.width = (current / end).toString(); }
     }
 
     /**
