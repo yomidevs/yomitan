@@ -128,6 +128,19 @@ export class AnkiConnect {
         return result;
     }
 
+    /**
+     * @param {import('anki').Note[]} notes
+     * @returns {Promise<?(object | null)>}
+     */
+    async addNotes(notes) {
+        if (!this._enabled) { return null; }
+        await this._checkVersion();
+        const result = await this._invoke('addNotes', {notes});
+        if (result !== null && typeof result !== 'object') {
+            throw this._createUnexpectedResultError('object|null', result);
+        }
+        return result;
+    }
 
     /**
      * @param {import('anki').Note[]} notes
