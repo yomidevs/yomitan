@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {AnkiConnect} from '../../comm/anki-connect.js';
 import {ExtensionError} from '../../core/extension-error.js';
 import {toError} from '../../core/to-error.js';
 import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
@@ -69,8 +68,6 @@ export class AnkiDeckGeneratorController {
         this._fieldTemplateSendToAnkiConfirmModal = null;
         /** @type {AnkiNoteBuilder} */
         this._ankiNoteBuilder = new AnkiNoteBuilder(settingsController.application.api, new TemplateRendererProxy());
-        /** @type {AnkiConnect} */
-        this._ankiConnect = new AnkiConnect();
     }
 
     /** */
