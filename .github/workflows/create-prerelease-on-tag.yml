@@ -40,7 +40,7 @@ jobs:
 
       - name: Release
         id: release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v0.1.15
+        uses: softprops/action-gh-release@69320dbe05506a9a39fc8ae11030b214ec2d1f87 # pin@v0.1.15
         with:
           generate_release_notes: true
           prerelease: true
