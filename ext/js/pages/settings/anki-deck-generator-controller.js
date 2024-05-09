@@ -116,9 +116,9 @@ export class AnkiDeckGeneratorController {
      */
     async _onExport(e) {
         e.preventDefault();
-        const words = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
+        const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n';
-        for (const value of words) {
+        for (const value of terms) {
             if (!value) { continue; }
             const noteData = await this._generateNoteData(value, 'term-kanji', false);
             const fieldsTSV = noteData ? this._fieldsToTSV(noteData.fields) : '';
@@ -150,12 +150,12 @@ export class AnkiDeckGeneratorController {
      */
     async _onSendToAnkiConfirm(e) {
         e.preventDefault();
-        const words = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
+        const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         const addMedia = this._addMediaCheckbox.checked;
-        this._updateProgressBar(true, 'Sending to Anki...', 0, words.length);
+        this._updateProgressBar(true, 'Sending to Anki...', 0, terms.length);
         let notes = [];
         let index = 0;
-        for (const value of words) {
+        for (const value of terms) {
             if (!value) { continue; }
             const noteData = await this._generateNoteData(value, 'term-kanji', addMedia);
             if (noteData) {
@@ -166,7 +166,7 @@ export class AnkiDeckGeneratorController {
                 notes = [];
             }
             index++;
-            this._updateProgressBar(false, '', index, words.length);
+            this._updateProgressBar(false, '', index, terms.length);
         }
         if (notes.length > 0) {
             await this._ankiController.addNotes(notes);
