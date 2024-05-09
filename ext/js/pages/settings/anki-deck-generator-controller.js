@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {AnkiConnect} from '../../comm/anki-connect.js';
 import {ExtensionError} from '../../core/extension-error.js';
 import {toError} from '../../core/to-error.js';
 import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
@@ -45,15 +46,21 @@ export class AnkiDeckGeneratorController {
         /** @type {HTMLElement} */
         this._renderResult = querySelectorNotNull(document, '#generate-anki-deck-render-result');
         /** @type {HTMLElement} */
-        this._activeCardFormat = querySelectorNotNull(document, '#generate-anki-deck-active-card-format');
+        this._activeCardFormatText = querySelectorNotNull(document, '#generate-anki-deck-active-card-format');
+        /** @type {HTMLElement} */
+        this._activeDeckText = querySelectorNotNull(document, '#generate-anki-deck-active-deck');
         /** @type {string} */
         this._activeNoteType = '';
         /** @type {string} */
         this._activeAnkiDeck = '';
+        /** @type {HTMLSpanElement} */
+        this._wordcount = querySelectorNotNull(document, '#generate-anki-deck-wordcount');
         /** @type {?import('./modal.js').Modal} */
-        this._fieldTemplateResetModal = null;
+        this._fieldTemplateSendToAnkiConfirmModal = null;
         /** @type {AnkiNoteBuilder} */
         this._ankiNoteBuilder = new AnkiNoteBuilder(settingsController.application.api, new TemplateRendererProxy());
+        /** @type {AnkiConnect} */
+        this._ankiConnect = new AnkiConnect();
     }
 
     /** */
@@ -63,10 +70,18 @@ export class AnkiDeckGeneratorController {
         /** @type {HTMLButtonElement} */
         const testRenderButton = querySelectorNotNull(document, '#generate-anki-deck-test-render-button');
         /** @type {HTMLButtonElement} */
-        const generateButton = querySelectorNotNull(document, '#generate-anki-deck-generate-button');
+        const sendToAnkiButton = querySelectorNotNull(document, '#generate-anki-deck-send-to-anki-button');
+        /** @type {HTMLButtonElement} */
+        const sendToAnkiButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-deck-send-button-confirm');
+        /** @type {HTMLButtonElement} */
+        const generateButton = querySelectorNotNull(document, '#generate-anki-deck-export-button');
+
+        this._fieldTemplateSendToAnkiConfirmModal = this._modalController.getModal('generate-anki-deck-send-to-anki');
 
         testRenderButton.addEventListener('click', this._onRender.bind(this), false);
-        generateButton.addEventListener('click', this._onGenerate.bind(this), false);
+        sendToAnkiButton.addEventListener('click', this._onSendToAnki.bind(this), false);
+        sendToAnkiButtonConfirmButton.addEventListener('click', this._onSendToAnkiConfirm.bind(this), false);
+        generateButton.addEventListener('click', this._onExport.bind(this), false);
 
         void this._updateActiveCardFormat();
     }
@@ -77,24 +92,29 @@ export class AnkiDeckGeneratorController {
      *
      */
     async _updateActiveCardFormat() {
-        const activeCardFormat = /** @type {HTMLElement} */ (this._activeCardFormat);
+        const activeCardFormatText = /** @type {HTMLElement} */ (this._activeCardFormatText);
+        const activeDeckText = /** @type {HTMLElement} */ (this._activeDeckText);
+        const activeDeckTextConfirm = querySelectorNotNull(document, '#generate-anki-deck-active-deck-confirm');
         const options = await this._settingsController.getOptions();
+
         this._activeNoteType = options.anki.terms.model;
-        this._activeAnkiDeck = options.anki.terms.model;
-        activeCardFormat.textContent = this._activeNoteType;
+        this._activeAnkiDeck = options.anki.terms.deck;
+        activeCardFormatText.textContent = this._activeNoteType;
+        activeDeckText.textContent = this._activeAnkiDeck;
+        activeDeckTextConfirm.textContent = this._activeAnkiDeck;
     }
 
     /**
      * @param {MouseEvent} e
      */
-    async _onGenerate(e) {
+    async _onExport(e) {
         e.preventDefault();
         const words = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n';
         for (const value of words) {
             if (!value) { continue; }
             const noteData = await this._generateNoteData(value, 'term-kanji');
-            const fieldsTSV = noteData ? this._fieldsToTSV(noteData) : '';
+            const fieldsTSV = noteData ? this._fieldsToTSV(noteData.fields) : '';
             if (fieldsTSV) {
                 ankiTSV += this._activeNoteType + '\t';
                 ankiTSV += fieldsTSV;
@@ -105,6 +125,44 @@ export class AnkiDeckGeneratorController {
         const fileName = `anki-deck-${today.getFullYear()}-${today.getMonth()}-${today.getDay()}.txt`;
         const blob = new Blob([ankiTSV], {type: 'application/octet-stream'});
         this._saveBlob(blob, fileName);
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    _onSendToAnki(e) {
+        e.preventDefault();
+        if (this._fieldTemplateSendToAnkiConfirmModal !== null) {
+            this._wordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
+            this._fieldTemplateSendToAnkiConfirmModal.setVisible(true);
+        }
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    async _onSendToAnkiConfirm(e) {
+        e.preventDefault();
+        const words = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
+        let notes = [];
+        for (const value of words) {
+            if (!value) { continue; }
+            const noteData = await this._generateNoteData(value, 'term-kanji');
+            if (noteData) {
+                notes.push(noteData);
+            }
+            if (notes.length >= 100) {
+                await this._ankiController.addNotes(notes);
+                notes = [];
+            }
+        }
+        if (notes.length > 0) {
+            await this._ankiController.addNotes(notes);
+        }
+
+        if (this._fieldTemplateSendToAnkiConfirmModal !== null) {
+            this._fieldTemplateSendToAnkiConfirmModal.setVisible(false);
+        }
     }
 
     /**
@@ -119,7 +177,7 @@ export class AnkiDeckGeneratorController {
         let result;
         try {
             const noteData = await this._generateNoteData(text, mode);
-            result = noteData ? this._fieldsToTSV(noteData) : `No definition found for ${text}`;
+            result = noteData ? this._fieldsToTSV(noteData.fields) : `No definition found for ${text}`;
         } catch (e) {
             allErrors.push(toError(e));
         }
@@ -154,7 +212,7 @@ export class AnkiDeckGeneratorController {
     /**
      * @param {string} word
      * @param {import('anki-templates-internal').CreateModeNoTest} mode
-     * @returns {Promise<?import('anki.js').NoteFields>}
+     * @returns {Promise<?import('anki.js').Note>}
      */
     async _generateNoteData(word, mode) {
         const optionsContext = this._settingsController.getOptionsContext();
@@ -193,9 +251,10 @@ export class AnkiDeckGeneratorController {
             fields: fields,
             resultOutputMode,
             glossaryLayoutMode,
-            compactTags
+            compactTags,
+            tags: ['yomitan']
         }));
-        return note.fields;
+        return note;
     }
 
     /**

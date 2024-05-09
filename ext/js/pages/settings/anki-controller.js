@@ -505,6 +505,14 @@ export class AnkiController {
                 return null;
         }
     }
+
+    /**
+     * @param {import('anki').Note[]} notes
+     * @returns {Promise<?(object | null)>}
+     */
+    async addNotes(notes) {
+        return await this._ankiConnect.addNotes(notes);
+    }
 }
 
 class AnkiCardController {

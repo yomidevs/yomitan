@@ -3227,12 +3227,13 @@
     <div class="modal-body generate-anki-deck-layout">
         <div class="generate-anki-deck-info">
             <p>
-                Enter a newline separated list of words below to generate an Anki deck in <code>Notes in plain text (.txt)</code> format.
+                Enter a newline separated list of words below to send directly to Anki or export an Anki deck in <code>Notes in plain text (.txt)</code> format.
             </p>
         </div>
         <textarea autocomplete="off" spellcheck="false" id="generate-anki-deck-textarea" class="no-wrap margin-above" data-tab-action="indent,4"></textarea>
         <div class="generate-anki-deck-test-container margin-above">
             <p>
+                Active Anki deck: <code id="generate-anki-deck-active-deck"></code><br>
                 Active Anki card format: <code id="generate-anki-deck-active-card-format"></code>
             </p>
             <div class="generate-anki-deck-test-table margin-above">
@@ -3245,8 +3246,22 @@
         <div class="code margin-above" id="generate-anki-deck-render-result"><em>Card render result</em></div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="generate" id="generate-anki-deck-generate-button">Generate</button>
+        <button type="button" class="low-emphasis" id="generate-anki-deck-send-to-anki-button">Send to Anki</button>
+        <button type="button" class="low-emphasis" id="generate-anki-deck-export-button">Export to File</button>
         <button type="button" data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
+<div id="generate-anki-deck-send-to-anki-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+    <div class="modal-header"><div class="modal-title">Send Words to Anki</div></div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to send <strong id="generate-anki-deck-wordcount"></strong> words to <code id="generate-anki-deck-active-deck-confirm"></code>? This action cannot be undone.
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+        <button type="button" class="danger" id="generate-anki-deck-send-button-confirm">Send to Anki</button>
     </div>
 </div></div>
 
