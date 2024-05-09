@@ -851,6 +851,7 @@
                     <option value="ruby">Term furigana</option>
                     <option value="ruby-and-reading">Term furigana and reading</option>
                     <option value="term-and-reading">Plain term and reading</option>
+                    <option value="term-only">Plain term</option>
                 </select>
             </div>
         </div></div>
@@ -1619,7 +1620,6 @@
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Check for card duplicates</div>
-                    <div class="settings-item-description">When a card is detected as a duplicate, the add buttons will turn red and change appearance.</div>
                 </div>
                 <div class="settings-item-right">
                     <label class="toggle"><input type="checkbox" data-setting="anki.checkForDuplicates"
@@ -1685,6 +1685,21 @@
                         <p>
                             <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
                         </p>
+                    </div>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item-inner settings-item-inner-wrappable">
+                        <div class="settings-item-left">
+                            <div class="settings-item-label">
+                                When a duplicate is detected
+                            </div>
+                        </div>
+                        <div class="settings-item-right">
+                            <select data-setting="anki.duplicateBehavior">
+                                <option value="prevent">Prevent adding</option>
+                                <option value="new">Allow adding</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2993,6 +3008,25 @@
                 <tr>
                     <td><code class="anki-field-marker">{reading}</code></td>
                     <td>Kana reading for the term, or empty for terms where the expression is the reading.</td>
+                </tr>
+                <tr>
+                    <td><code class="anki-field-marker">{single-glossary-DICT-NAME}</code></td>
+                    <td>
+                        Same as <code class="anki-field-marker">{glossary}</code>, but with entries from only a single dictionary.
+                        The dictionary name will likely be modified, use the options from the ▼ dropdown.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code class="anki-field-marker">{single-glossary-DICT-NAME-brief}</code></td>
+                    <td>
+                        See <code class="anki-field-marker">{single-glossary-DICT-NAME}</code> and <code class="anki-field-marker">{glossary-brief}</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td><code class="anki-field-marker">{single-glossary-DICT-NAME-no-dictionary}</code></td>
+                    <td>
+                        See <code class="anki-field-marker">{single-glossary-DICT-NAME}</code> and <code class="anki-field-marker">{glossary-no-dictionary}</code>.
+                    </td>
                 </tr>
                 <tr>
                     <td><code class="anki-field-marker">{tags}</code></td>

@@ -26,7 +26,7 @@ import {latinTransforms} from './la/latin-transforms.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {oldIrishTransforms} from './sga/old-irish-transforms.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
-import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-preprocessors.js';
+import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-processors.js';
 
 const capitalizationPreprocessors = {
     decapitalize,
@@ -79,6 +79,12 @@ const languageDescriptors = [
         textPreprocessors: {
             removeArabicScriptDiacritics
         }
+    },
+    {
+        iso: 'fi',
+        name: 'Finnish',
+        exampleText: 'lukea',
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'fr',
@@ -140,8 +146,7 @@ const languageDescriptors = [
     {
         iso: 'km',
         name: 'Khmer',
-        exampleText: 'អាន',
-        textPreprocessors: {}
+        exampleText: 'អាន'
     },
     {
         iso: 'pl',
@@ -203,8 +208,7 @@ const languageDescriptors = [
     {
         iso: 'th',
         name: 'Thai',
-        exampleText: 'อ่าน',
-        textPreprocessors: {}
+        exampleText: 'อ่าน'
     },
     {
         iso: 'tr',
@@ -221,8 +225,7 @@ const languageDescriptors = [
     {
         iso: 'zh',
         name: 'Chinese',
-        exampleText: '读',
-        textPreprocessors: {}
+        exampleText: '读'
     }
 ];
 

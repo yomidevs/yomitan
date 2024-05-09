@@ -85,8 +85,13 @@ function createAbsoluteGetComputedStyle(window) {
     return (element, ...args) => {
         const style = getComputedStyleOld(element, ...args);
         return new Proxy(style, {
+            /**
+             * @param {CSSStyleDeclaration} target
+             * @param {string|symbol} property
+             * @returns {unknown}
+             */
             get: (target, property) => {
-                let result = /** @type {import('core').SafeAny} */ (target)[property];
+                let result = /** @type {Record<string|symbol, unknown>} */ (/** @type {unknown} */ (target))[property];
                 if (typeof result === 'string') {
                     /**
                      * @param {string} g0

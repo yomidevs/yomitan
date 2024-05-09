@@ -38,14 +38,14 @@ jobs:
               return attempt < max ? attempt + 1 : '';
             }
 
-      - uses: robinraju/release-downloader@368754b9c6f47c345fcfbf42bcb577c2f0f5f395 # pin@v1.9
+      - uses: robinraju/release-downloader@c39a3b234af58f0cf85888573d361fb6fa281534 # pin@v1.10
         with:
           tag: ${{ github.ref_name }}
           fileName: "*"
 
       - name: Fetch Google API access token
         id: fetchAccessToken
-        uses: cardinalby/google-api-fetch-token-action@24c99245e2a2494cc4c4b1037203d319a184b15b # pin@v1.0.3
+        uses: cardinalby/google-api-fetch-token-action@f455422472a558d48d939e77a65cdcec38e707b5 # pin@v1.0.4
         with:
           clientId: ${{ secrets.G_CLIENT_ID }}
           clientSecret: ${{ secrets.G_CLIENT_SECRET }}

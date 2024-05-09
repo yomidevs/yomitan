@@ -281,6 +281,7 @@ export type AnkiOptions = {
     kanji: AnkiNoteOptions;
     duplicateScope: AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
+    duplicateBehavior: AnkiDuplicateBehavior;
     checkForDuplicates: boolean;
     fieldTemplates: string | null;
     suspendNewCards: boolean;
@@ -372,7 +373,7 @@ export type PopupActionBarLocation = 'left' | 'right' | 'top' | 'bottom';
 
 export type FrequencyDisplayMode = 'tags' | 'tags-grouped' | 'split-tags' | 'split-tags-grouped' | 'inline-list' | 'list';
 
-export type TermDisplayMode = 'ruby' | 'ruby-and-reading' | 'term-and-reading';
+export type TermDisplayMode = 'ruby' | 'ruby-and-reading' | 'term-and-reading' | 'term-only';
 
 export type SortFrequencyDictionaryOrder = 'ascending' | 'descending';
 
@@ -393,6 +394,8 @@ export type ParsingReadingMode = 'hiragana' | 'katakana' | 'romaji' | 'dictionar
 export type AnkiScreenshotFormat = 'png' | 'jpeg';
 
 export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
+
+export type AnkiDuplicateBehavior = 'prevent' | 'new';
 
 export type AnkiDisplayTags = 'never' | 'always' | 'non-standard';
 
