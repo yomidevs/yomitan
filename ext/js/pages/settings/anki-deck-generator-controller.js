@@ -55,7 +55,9 @@ export class AnkiDeckGeneratorController {
         /** @type {string} */
         this._activeAnkiDeck = '';
         /** @type {HTMLSpanElement} */
-        this._wordcount = querySelectorNotNull(document, '#generate-anki-deck-wordcount');
+        this._sendWordcount = querySelectorNotNull(document, '#generate-anki-deck-send-wordcount');
+        /** @type {HTMLSpanElement} */
+        this._exportWordcount = querySelectorNotNull(document, '#generate-anki-deck-export-wordcount');
         /** @type {NodeListOf<HTMLElement>} */
         this._progressContainers = (document.querySelectorAll('#dictionaries-modal .generate-anki-deck-import-progress'));
         /** @type {NodeListOf<HTMLElement>} */
@@ -65,7 +67,9 @@ export class AnkiDeckGeneratorController {
         /** @type {NodeListOf<HTMLElement>} */
         this._statusLabels = (document.querySelectorAll('.generate-anki-deck-import-progress .progress-status'));
         /** @type {?import('./modal.js').Modal} */
-        this._fieldTemplateSendToAnkiConfirmModal = null;
+        this._sendToAnkiConfirmModal = null;
+        /** @type {?import('./modal.js').Modal} */
+        this._exportConfirmModal = null;
         /** @type {AnkiNoteBuilder} */
         this._ankiNoteBuilder = new AnkiNoteBuilder(settingsController.application.api, new TemplateRendererProxy());
     }
@@ -81,13 +85,20 @@ export class AnkiDeckGeneratorController {
         /** @type {HTMLButtonElement} */
         const sendToAnkiButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-deck-send-button-confirm');
         /** @type {HTMLButtonElement} */
+        const exportButton = querySelectorNotNull(document, '#generate-anki-deck-export-button');
+        /** @type {HTMLButtonElement} */
+        const exportButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-deck-export-button-confirm');
+        /** @type {HTMLButtonElement} */
         const generateButton = querySelectorNotNull(document, '#generate-anki-deck-export-button');
 
-        this._fieldTemplateSendToAnkiConfirmModal = this._modalController.getModal('generate-anki-deck-send-to-anki');
+        this._sendToAnkiConfirmModal = this._modalController.getModal('generate-anki-deck-send-to-anki');
+        this._exportConfirmModal = this._modalController.getModal('generate-anki-deck-export');
 
         testRenderButton.addEventListener('click', this._onRender.bind(this), false);
         sendToAnkiButton.addEventListener('click', this._onSendToAnki.bind(this), false);
         sendToAnkiButtonConfirmButton.addEventListener('click', this._onSendToAnkiConfirm.bind(this), false);
+        exportButton.addEventListener('click', this._onExport.bind(this), false);
+        exportButtonConfirmButton.addEventListener('click', this._onExportConfirm.bind(this), false);
         generateButton.addEventListener('click', this._onExport.bind(this), false);
 
         void this._updateActiveCardFormat();
@@ -114,7 +125,18 @@ export class AnkiDeckGeneratorController {
     /**
      * @param {MouseEvent} e
      */
-    async _onExport(e) {
+    _onExport(e) {
+        e.preventDefault();
+        if (this._exportConfirmModal !== null) {
+            this._exportWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
+            this._exportConfirmModal.setVisible(true);
+        }
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    async _onExportConfirm(e) {
         e.preventDefault();
         const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n';
@@ -138,6 +160,10 @@ export class AnkiDeckGeneratorController {
         const fileName = `anki-deck-${today.getFullYear()}-${today.getMonth()}-${today.getDay()}.txt`;
         const blob = new Blob([ankiTSV], {type: 'application/octet-stream'});
         this._saveBlob(blob, fileName);
+
+        if (this._exportConfirmModal !== null) {
+            this._exportConfirmModal.setVisible(false);
+        }
     }
 
     /**
@@ -145,9 +171,9 @@ export class AnkiDeckGeneratorController {
      */
     _onSendToAnki(e) {
         e.preventDefault();
-        if (this._fieldTemplateSendToAnkiConfirmModal !== null) {
-            this._wordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
-            this._fieldTemplateSendToAnkiConfirmModal.setVisible(true);
+        if (this._sendToAnkiConfirmModal !== null) {
+            this._sendWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
+            this._sendToAnkiConfirmModal.setVisible(true);
         }
     }
 
@@ -182,8 +208,8 @@ export class AnkiDeckGeneratorController {
         // eslint-disable-next-line no-console
         console.log('Finished sending terms to Anki');
 
-        if (this._fieldTemplateSendToAnkiConfirmModal !== null) {
-            this._fieldTemplateSendToAnkiConfirmModal.setVisible(false);
+        if (this._sendToAnkiConfirmModal !== null) {
+            this._sendToAnkiConfirmModal.setVisible(false);
         }
     }
 

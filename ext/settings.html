@@ -3256,7 +3256,7 @@
     <div class="modal-header"><div class="modal-title">Send Words to Anki</div></div>
     <div class="modal-body">
         <p>
-            Are you sure you want to send <strong id="generate-anki-deck-wordcount"></strong> words to <code id="generate-anki-deck-active-deck-confirm"></code>? This action cannot be undone.
+            Are you sure you want to send <strong id="generate-anki-deck-send-wordcount"></strong> words to <code id="generate-anki-deck-active-deck-confirm"></code>? This action cannot be undone.
         </p>
         <div class="settings-item margin-above"><div class="settings-item-inner">
             <div class="settings-item-left">
@@ -3272,13 +3272,30 @@
             </div>
         </div></div>
     </div>
-    <div class="modal-body-addon" id="generate-anki-deck-import-progress" hidden>
+    <div class="modal-body-addon" id="generate-anki-deck-send-import-progress" hidden>
         <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
         <div class="progress-bar-track"><div class="progress-bar"></div></div>
     </div>
     <div class="modal-footer">
         <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
         <button type="button" class="danger" id="generate-anki-deck-send-button-confirm">Send to Anki</button>
+    </div>
+</div></div>
+
+<div id="generate-anki-deck-export-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+    <div class="modal-header"><div class="modal-title">Send Words to Anki</div></div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to export <strong id="generate-anki-deck-export-wordcount"></strong> words to <code>Notes in plain text (.txt)</code> format?
+        </p>
+    </div>
+    <div class="modal-body-addon" id="generate-anki-deck-export-import-progress" hidden>
+        <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
+        <div class="progress-bar-track"><div class="progress-bar"></div></div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+        <button type="button" class="danger" id="generate-anki-deck-export-button-confirm">Export to File</button>
     </div>
 </div></div>
 
