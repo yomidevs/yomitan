@@ -47,7 +47,9 @@ export class AnkiDeckGeneratorController {
         /** @type {HTMLElement} */
         this._activeCardFormat = querySelectorNotNull(document, '#generate-anki-deck-active-card-format');
         /** @type {string} */
-        this._notetype = '';
+        this._activeNoteType = '';
+        /** @type {string} */
+        this._activeAnkiDeck = '';
         /** @type {?import('./modal.js').Modal} */
         this._fieldTemplateResetModal = null;
         /** @type {AnkiNoteBuilder} */
@@ -77,8 +79,9 @@ export class AnkiDeckGeneratorController {
     async _updateActiveCardFormat() {
         const activeCardFormat = /** @type {HTMLElement} */ (this._activeCardFormat);
         const options = await this._settingsController.getOptions();
-        this.notetype = options.anki.terms.model;
-        activeCardFormat.textContent = this.notetype;
+        this._activeNoteType = options.anki.terms.model;
+        this._activeAnkiDeck = options.anki.terms.model;
+        activeCardFormat.textContent = this._activeNoteType;
     }
 
     /**
@@ -93,7 +96,7 @@ export class AnkiDeckGeneratorController {
             const noteData = await this._generateNoteData(value, 'term-kanji');
             const fieldsTSV = noteData ? this._fieldsToTSV(noteData) : '';
             if (fieldsTSV) {
-                ankiTSV += this.notetype + '\t';
+                ankiTSV += this._activeNoteType + '\t';
                 ankiTSV += fieldsTSV;
                 ankiTSV += '\n';
             }
@@ -185,8 +188,8 @@ export class AnkiDeckGeneratorController {
             mode,
             context,
             template,
-            deckName: '',
-            modelName: '',
+            deckName: this._activeAnkiDeck,
+            modelName: this._activeNoteType,
             fields: fields,
             resultOutputMode,
             glossaryLayoutMode,
