@@ -49,6 +49,8 @@ export class AnkiDeckGeneratorController {
         this._activeCardFormatText = querySelectorNotNull(document, '#generate-anki-deck-active-card-format');
         /** @type {HTMLElement} */
         this._activeDeckText = querySelectorNotNull(document, '#generate-anki-deck-active-deck');
+        /** @type {HTMLInputElement} */
+        this._addMediaCheckbox = querySelectorNotNull(document, '#generate-anki-deck-add-media');
         /** @type {string} */
         this._activeNoteType = '';
         /** @type {string} */
@@ -113,7 +115,7 @@ export class AnkiDeckGeneratorController {
         let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n';
         for (const value of words) {
             if (!value) { continue; }
-            const noteData = await this._generateNoteData(value, 'term-kanji');
+            const noteData = await this._generateNoteData(value, 'term-kanji', false);
             const fieldsTSV = noteData ? this._fieldsToTSV(noteData.fields) : '';
             if (fieldsTSV) {
                 ankiTSV += this._activeNoteType + '\t';
@@ -144,10 +146,11 @@ export class AnkiDeckGeneratorController {
     async _onSendToAnkiConfirm(e) {
         e.preventDefault();
         const words = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
+        const addMedia = this._addMediaCheckbox.checked;
         let notes = [];
         for (const value of words) {
             if (!value) { continue; }
-            const noteData = await this._generateNoteData(value, 'term-kanji');
+            const noteData = await this._generateNoteData(value, 'term-kanji', addMedia);
             if (noteData) {
                 notes.push(noteData);
             }
@@ -176,7 +179,7 @@ export class AnkiDeckGeneratorController {
         const text = /** @type {HTMLInputElement} */ (this._renderTextInput).value;
         let result;
         try {
-            const noteData = await this._generateNoteData(text, mode);
+            const noteData = await this._generateNoteData(text, mode, false);
             result = noteData ? this._fieldsToTSV(noteData.fields) : `No definition found for ${text}`;
         } catch (e) {
             allErrors.push(toError(e));
@@ -212,9 +215,10 @@ export class AnkiDeckGeneratorController {
     /**
      * @param {string} word
      * @param {import('anki-templates-internal').CreateModeNoTest} mode
+     * @param {boolean} addMedia
      * @returns {Promise<?import('anki.js').Note>}
      */
-    async _generateNoteData(word, mode) {
+    async _generateNoteData(word, mode, addMedia) {
         const optionsContext = this._settingsController.getOptionsContext();
         const data = await this._getDictionaryEntry(word, optionsContext);
         if (data === null) {
@@ -241,6 +245,8 @@ export class AnkiDeckGeneratorController {
                 fields.push([deckField, deckOptionsFields[deckField]]);
             }
         }
+        const mediaOptions = addMedia ? {audio: {sources: options.audio.sources, preferredAudioIndex: null, idleTimeout: null}} : null;
+        const requirements = addMedia ? [{type: 'audio'}] : [];
         const {note} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
             dictionaryEntry,
             mode,
@@ -252,7 +258,9 @@ export class AnkiDeckGeneratorController {
             resultOutputMode,
             glossaryLayoutMode,
             compactTags,
-            tags: ['yomitan']
+            tags: ['yomitan'],
+            mediaOptions: mediaOptions,
+            requirements: requirements
         }));
         return note;
     }
