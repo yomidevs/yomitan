@@ -58,6 +58,10 @@ export class AnkiDeckGeneratorController {
         this._sendWordcount = querySelectorNotNull(document, '#generate-anki-deck-send-wordcount');
         /** @type {HTMLSpanElement} */
         this._exportWordcount = querySelectorNotNull(document, '#generate-anki-deck-export-wordcount');
+        /** @type {HTMLButtonElement} */
+        this._sendToAnkiButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-deck-send-button-confirm');
+        /** @type {HTMLButtonElement} */
+        this._exportButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-deck-export-button-confirm');
         /** @type {NodeListOf<HTMLElement>} */
         this._progressContainers = (document.querySelectorAll('.generate-anki-deck-progress'));
         /** @type {?import('./modal.js').Modal} */
@@ -79,13 +83,9 @@ export class AnkiDeckGeneratorController {
         /** @type {HTMLButtonElement} */
         const sendToAnkiButton = querySelectorNotNull(document, '#generate-anki-deck-send-to-anki-button');
         /** @type {HTMLButtonElement} */
-        const sendToAnkiButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-deck-send-button-confirm');
-        /** @type {HTMLButtonElement} */
         const sendToAnkiCancelButton = querySelectorNotNull(document, '#generate-anki-deck-send-to-anki-cancel-button');
         /** @type {HTMLButtonElement} */
         const exportButton = querySelectorNotNull(document, '#generate-anki-deck-export-button');
-        /** @type {HTMLButtonElement} */
-        const exportButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-deck-export-button-confirm');
         /** @type {HTMLButtonElement} */
         const exportCancelButton = querySelectorNotNull(document, '#generate-anki-deck-export-cancel-button');
         /** @type {HTMLButtonElement} */
@@ -96,10 +96,10 @@ export class AnkiDeckGeneratorController {
 
         testRenderButton.addEventListener('click', this._onRender.bind(this), false);
         sendToAnkiButton.addEventListener('click', this._onSendToAnki.bind(this), false);
-        sendToAnkiButtonConfirmButton.addEventListener('click', this._onSendToAnkiConfirm.bind(this), false);
+        this._sendToAnkiButtonConfirmButton.addEventListener('click', this._onSendToAnkiConfirm.bind(this), false);
         sendToAnkiCancelButton.addEventListener('click', this._cancelButton.bind(this), false);
         exportButton.addEventListener('click', this._onExport.bind(this), false);
-        exportButtonConfirmButton.addEventListener('click', this._onExportConfirm.bind(this), false);
+        this._exportButtonConfirmButton.addEventListener('click', this._onExportConfirm.bind(this), false);
         exportCancelButton.addEventListener('click', this._cancelButton.bind(this), false);
         generateButton.addEventListener('click', this._onExport.bind(this), false);
 
@@ -130,6 +130,7 @@ export class AnkiDeckGeneratorController {
     _onExport(e) {
         e.preventDefault();
         if (this._exportConfirmModal !== null) {
+            this._exportButtonConfirmButton.disabled = false;
             this._exportWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
             this._exportConfirmModal.setVisible(true);
         }
@@ -144,6 +145,7 @@ export class AnkiDeckGeneratorController {
         let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n';
         let index = 0;
         requestAnimationFrame(() => {
+            this._exportButtonConfirmButton.disabled = true;
             this._updateProgressBar(true, 'Exporting to File...', 0, terms.length, true);
             setTimeout(async () => {
                 for (const value of terms) {
@@ -182,6 +184,7 @@ export class AnkiDeckGeneratorController {
     _onSendToAnki(e) {
         e.preventDefault();
         if (this._sendToAnkiConfirmModal !== null) {
+            this._sendToAnkiButtonConfirmButton.disabled = false;
             this._sendWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
             this._sendToAnkiConfirmModal.setVisible(true);
         }
@@ -200,6 +203,7 @@ export class AnkiDeckGeneratorController {
         let notes = [];
         let index = 0;
         requestAnimationFrame(() => {
+            this._sendToAnkiButtonConfirmButton.disabled = true;
             this._updateProgressBar(true, 'Sending to Anki...', 0, terms.length, true);
             setTimeout(async () => {
                 for (const value of terms) {
