@@ -59,13 +59,7 @@ export class AnkiDeckGeneratorController {
         /** @type {HTMLSpanElement} */
         this._exportWordcount = querySelectorNotNull(document, '#generate-anki-deck-export-wordcount');
         /** @type {NodeListOf<HTMLElement>} */
-        this._progressContainers = (document.querySelectorAll('#dictionaries-modal .generate-anki-deck-import-progress'));
-        /** @type {NodeListOf<HTMLElement>} */
-        this._progressBars = (document.querySelectorAll('.generate-anki-deck-import-progress .progress-bar'));
-        /** @type {NodeListOf<HTMLElement>} */
-        this._infoLabels = (document.querySelectorAll('.generate-anki-deck-import-progress .progress-info'));
-        /** @type {NodeListOf<HTMLElement>} */
-        this._statusLabels = (document.querySelectorAll('.generate-anki-deck-import-progress .progress-status'));
+        this._progressContainers = (document.querySelectorAll('.generate-anki-deck-progress'));
         /** @type {?import('./modal.js').Modal} */
         this._sendToAnkiConfirmModal = null;
         /** @type {?import('./modal.js').Modal} */
@@ -141,29 +135,32 @@ export class AnkiDeckGeneratorController {
         const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n';
         let index = 0;
-        for (const value of terms) {
-            if (!value) { continue; }
-            const noteData = await this._generateNoteData(value, 'term-kanji', false);
-            const fieldsTSV = noteData ? this._fieldsToTSV(noteData.fields) : '';
-            if (fieldsTSV) {
-                ankiTSV += this._activeNoteType + '\t';
-                ankiTSV += fieldsTSV;
-                ankiTSV += '\n';
-            }
-            index++;
-            // eslint-disable-next-line no-console
-            console.log(index + '/' + terms.length + ' terms, ' + (terms.length - index) + ' terms remaining.');
-        }
-        // eslint-disable-next-line no-console
-        console.log('Finished exporting terms to Notes in plain text');
-        const today = new Date();
-        const fileName = `anki-deck-${today.getFullYear()}-${today.getMonth()}-${today.getDay()}.txt`;
-        const blob = new Blob([ankiTSV], {type: 'application/octet-stream'});
-        this._saveBlob(blob, fileName);
+        requestAnimationFrame(() => {
+            this._updateProgressBar(true, 'Exporting to File...', 0, terms.length, true);
+            setTimeout(async () => {
+                for (const value of terms) {
+                    if (!value) { continue; }
+                    const noteData = await this._generateNoteData(value, 'term-kanji', false);
+                    const fieldsTSV = noteData ? this._fieldsToTSV(noteData.fields) : '';
+                    if (fieldsTSV) {
+                        ankiTSV += this._activeNoteType + '\t';
+                        ankiTSV += fieldsTSV;
+                        ankiTSV += '\n';
+                    }
+                    index++;
+                    this._updateProgressBar(false, '', index, terms.length, true);
+                }
+                const today = new Date();
+                const fileName = `anki-deck-${today.getFullYear()}-${today.getMonth()}-${today.getDay()}.txt`;
+                const blob = new Blob([ankiTSV], {type: 'application/octet-stream'});
+                this._saveBlob(blob, fileName);
 
-        if (this._exportConfirmModal !== null) {
-            this._exportConfirmModal.setVisible(false);
-        }
+                if (this._exportConfirmModal !== null) {
+                    this._exportConfirmModal.setVisible(false);
+                }
+                this._updateProgressBar(false, '', terms.length, terms.length, false);
+            }, 1);
+        });
     }
 
     /**
@@ -184,33 +181,37 @@ export class AnkiDeckGeneratorController {
         e.preventDefault();
         const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         const addMedia = this._addMediaCheckbox.checked;
-        this._updateProgressBar(true, 'Sending to Anki...', 0, terms.length);
+        /**
+         * @type {import("anki.js").Note[]}
+         */
         let notes = [];
         let index = 0;
-        for (const value of terms) {
-            if (!value) { continue; }
-            const noteData = await this._generateNoteData(value, 'term-kanji', addMedia);
-            if (noteData) {
-                notes.push(noteData);
-            }
-            if (notes.length >= 100) {
-                await this._ankiController.addNotes(notes);
-                notes = [];
-            }
-            index++;
-            // eslint-disable-next-line no-console
-            console.log(index + '/' + terms.length + ' terms, ' + (terms.length - index) + ' terms remaining.');
-            this._updateProgressBar(false, '', index, terms.length);
-        }
-        if (notes.length > 0) {
-            await this._ankiController.addNotes(notes);
-        }
-        // eslint-disable-next-line no-console
-        console.log('Finished sending terms to Anki');
+        requestAnimationFrame(() => {
+            this._updateProgressBar(true, 'Sending to Anki...', 0, terms.length, true);
+            setTimeout(async () => {
+                for (const value of terms) {
+                    if (!value) { continue; }
+                    const noteData = await this._generateNoteData(value, 'term-kanji', addMedia);
+                    if (noteData) {
+                        notes.push(noteData);
+                    }
+                    if (notes.length >= 100) {
+                        await this._ankiController.addNotes(notes);
+                        notes = [];
+                    }
+                    index++;
+                    this._updateProgressBar(false, '', index, terms.length, true);
+                }
+                if (notes.length > 0) {
+                    await this._ankiController.addNotes(notes);
+                }
 
-        if (this._sendToAnkiConfirmModal !== null) {
-            this._sendToAnkiConfirmModal.setVisible(false);
-        }
+                if (this._sendToAnkiConfirmModal !== null) {
+                    this._sendToAnkiConfirmModal.setVisible(false);
+                }
+                this._updateProgressBar(false, '', terms.length, terms.length, false);
+            }, 1);
+        });
     }
 
     /**
@@ -219,18 +220,27 @@ export class AnkiDeckGeneratorController {
      * @param {string} text
      * @param {number} current
      * @param {number} end
+     * @param {boolean} visible
      */
-    _updateProgressBar(init, text, current, end) {
-        if (current === end) {
+    _updateProgressBar(init, text, current, end, visible) {
+        if (!visible) {
             for (const progress of this._progressContainers) { progress.hidden = true; }
             return;
         }
         if (init) {
-            for (const progress of this._progressContainers) { progress.hidden = false; }
-            for (const infoLabel of this._infoLabels) { infoLabel.textContent = text; }
+            for (const progress of this._progressContainers) {
+                progress.hidden = false;
+                for (const infoLabel of progress.querySelectorAll('.progress-info')) { infoLabel.textContent = text; }
+            }
         }
-        for (const statusLabel of this._statusLabels) { statusLabel.textContent = (current / end).toString(); }
-        for (const progressBar of this._progressBars) { progressBar.style.width = (current / end).toString(); }
+        for (const progress of this._progressContainers) {
+            /** @type {NodeListOf<HTMLElement>} */
+            const statusLabels = progress.querySelectorAll('.progress-status');
+            for (const statusLabel of statusLabels) { statusLabel.textContent = ((current / end) * 100).toFixed(0).toString() + '%'; }
+            /** @type {NodeListOf<HTMLElement>} */
+            const progressBars = progress.querySelectorAll('.progress-bar');
+            for (const progressBar of progressBars) { progressBar.style.width = ((current / end) * 100).toString() + '%'; }
+        }
     }
 
     /**
