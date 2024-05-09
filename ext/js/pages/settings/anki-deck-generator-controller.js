@@ -152,7 +152,7 @@ export class AnkiDeckGeneratorController {
             }
             index++;
             // eslint-disable-next-line no-console
-            console.log(index.toString() + '/' + terms.length + ' terms remaining.');
+            console.log(index + '/' + terms.length + ' terms, ' + (terms.length - index) + ' terms remaining.');
         }
         // eslint-disable-next-line no-console
         console.log('Finished exporting terms to Notes in plain text');
@@ -199,7 +199,7 @@ export class AnkiDeckGeneratorController {
             }
             index++;
             // eslint-disable-next-line no-console
-            console.log(index.toString() + '/' + terms.length + ' terms remaining.');
+            console.log(index + '/' + terms.length + ' terms, ' + (terms.length - index) + ' terms remaining.');
             this._updateProgressBar(false, '', index, terms.length);
         }
         if (notes.length > 0) {
