@@ -289,10 +289,9 @@ export class AnkiDeckGeneratorController {
         const media = [];
         const definitions = dictionaryEntry.definitions;
         for (const definition of definitions) {
-            const dictionary = definition.dictionary;
             const paths = this._findAllByKey(definition, 'path');
             for (const path of paths) {
-                media.push({dictionary: dictionary, path: path, type: 'dictionaryMedia'});
+                media.push({dictionary: definition.dictionary, path: path, type: 'dictionaryMedia'});
             }
         }
         return media;
