@@ -121,7 +121,7 @@ Below are some troubleshooting tips you can try if you are unable to create new 
 
 ### Anki Note Generation
 
-Using the `Generate Anki Deck (Experimental)...` feature in the settings page it is possible to easily generate and export large amounts of Anki cards.
+Using the `Generate Anki Notes (Experimental)...` feature in the settings page it is possible to easily generate and export large amounts of Anki cards.
 
 > [!WARNING]
 > This feature is experimental!
@@ -134,17 +134,17 @@ First, get a newline separated list of terms. For example:
 竜巻
 ```
 
-Enter this list into the large text box in the `Anki Deck Generator` popup window.
+Enter this list into the large text box in the `Anki Note Generator` popup window.
 
 Next, select either `Send to Anki` or `Export to File`.
 
 **Send to Anki:**
 
-`Send to Anki` will send all the terms to the active Anki deck using the active Anki card format specified on the page. To change the active Anki deck or Anki card format, edit them in the `Configure Anki card format...` setting.
+`Send to Anki` will send all the terms to the active Anki deck using the active Anki model specified on the page. To change the active Anki deck or Anki model, edit them in the `Configure Anki card format...` setting.
 
-Make sure to confirm you are exporting to the correct deck and with the correct Anki card format. After the cards are sent to Anki there is no way to automatically undo the changes.
+Make sure to confirm you are exporting to the correct deck and with the correct Anki model. After the notes are sent to Anki there is no way to automatically undo the changes.
 
-To include media in cards sent to Anki, make sure to enable the `Add media to cards` option. Media includes audio, images, and svgs. Exporting with media may take significantly longer than without it.
+To include media in notes sent to Anki, make sure to enable the `Add media to notes` option. Media includes audio, images, and svgs. Exporting with media may take significantly longer than without it.
 
 **Export to File:**
 
