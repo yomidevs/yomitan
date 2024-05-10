@@ -26,25 +26,25 @@ const tests = [
         category: 'plural',
         valid: true,
         tests: [
-            {term: 'fluvius', source: 'fluvii',  rule: 'n', reasons: null},
-            {term: 'magnus', source: 'magni',   rule: 'adj', reasons: null},
-            {term: 'insula', source: 'insulae',  rule: 'n', reasons: null}
+            {term: 'fluvius',   source: 'fluvii',    rule: 'n',   reasons: ['plural']},
+            {term: 'magnus',    source: 'magni',     rule: 'adj', reasons: ['plural']},
+            {term: 'insula',    source: 'insulae',   rule: 'n',   reasons: ['plural']}
         ]
     },
     {
         category: 'adjective',
         valid: true,
         tests: [
-            {term: 'magnus', source: 'magna',  rule: 'adj', reasons: null},
-            {term: 'Graecus', source: 'Graecum', rule: 'adj', reasons: null},
-            {term: 'primus', source: 'prima',  rule: 'adj', reasons: ['neuter', 'plural']}
+            {term: 'magnus',    source: 'magna',    rule: 'adj',  reasons: ['feminine']},
+            {term: 'Graecus',   source: 'Graecum',  rule: 'adj',  reasons: ['neuter']},
+            {term: 'primus',    source: 'prima',    rule: 'adj',  reasons: ['neuter', 'plural']}
         ]
     },
     {
         category: 'ablative',
         valid: true,
         tests: [
-            {term: 'vocabulum', source: 'vocabulo',  rule: 'n', reasons: null}
+            {term: 'vocabulum', source: 'vocabulo', rule: 'n',    reasons: ['ablative']}
         ]
     }
 ];
