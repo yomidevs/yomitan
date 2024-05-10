@@ -42,6 +42,8 @@ export class AnkiDeckGeneratorController {
         /** @type {?string} */
         this._defaultFieldTemplates = null;
         /** @type {HTMLTextAreaElement} */
+        this._mainSettingsEntry = querySelectorNotNull(document, '#generate-anki-deck-main-settings-entry');
+        /** @type {HTMLTextAreaElement} */
         this._wordInputTextarea = querySelectorNotNull(document, '#generate-anki-deck-textarea');
         /** @type {HTMLInputElement} */
         this._renderTextInput = querySelectorNotNull(document, '#generate-anki-deck-test-text-input');
@@ -111,6 +113,7 @@ export class AnkiDeckGeneratorController {
         void this._updateExampleText();
 
         void this._updateActiveModel();
+        this._mainSettingsEntry.addEventListener('click', this._updateActiveModel.bind(this), false);
     }
 
     // Private
