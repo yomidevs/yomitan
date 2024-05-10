@@ -16,6 +16,7 @@
  */
 
 import {ExtensionError} from '../../core/extension-error.js';
+import {log} from '../../core/log.js';
 import {toError} from '../../core/to-error.js';
 import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
 import {getDynamicTemplates} from '../../data/anki-template-util.js';
@@ -188,6 +189,7 @@ export class AnkiDeckGeneratorController {
     _onSendToAnki(e) {
         e.preventDefault();
         if (this._sendToAnkiConfirmModal !== null) {
+            this._updateProgressBar(true, '', 0, 1, false);
             this._sendToAnkiButtonConfirmButton.disabled = false;
             this._sendWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
             this._sendToAnkiConfirmModal.setVisible(true);
@@ -222,14 +224,16 @@ export class AnkiDeckGeneratorController {
                         notes.push(noteData);
                     }
                     if (notes.length >= 100) {
-                        await this._ankiController.addNotes(notes);
+                        const sendNotesResult = await this._sendNotes(notes);
+                        if (sendNotesResult === false) { return; }
                         notes = [];
                     }
                     index++;
                     this._updateProgressBar(false, '', index, terms.length, true);
                 }
                 if (notes.length > 0) {
-                    await this._ankiController.addNotes(notes);
+                    const sendNotesResult = await this._sendNotes(notes);
+                    if (sendNotesResult === false) { return; }
                 }
 
                 if (this._sendToAnkiConfirmModal !== null) {
@@ -238,6 +242,28 @@ export class AnkiDeckGeneratorController {
                 this._updateProgressBar(false, '', terms.length, terms.length, false);
             }, 1);
         });
+    }
+
+    /**
+     *
+     * @param {import("anki.js").Note[]} notes
+     * @returns {Promise<boolean>}
+     */
+    async _sendNotes(notes) {
+        try {
+            const addNotesResult = await this._ankiController.addNotes(notes);
+            if (addNotesResult === null || addNotesResult.includes(null)) {
+                this._updateProgressBarError('Ankiconnect error: failed to add cards');
+                return false;
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                this._updateProgressBarError('Ankiconnect error: ' + error.message + '');
+                log.error(error);
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -256,7 +282,10 @@ export class AnkiDeckGeneratorController {
         if (init) {
             for (const progress of this._progressContainers) {
                 progress.hidden = false;
-                for (const infoLabel of progress.querySelectorAll('.progress-info')) { infoLabel.textContent = text; }
+                for (const infoLabel of progress.querySelectorAll('.progress-info')) {
+                    infoLabel.textContent = text;
+                    infoLabel.classList.remove('danger-text');
+                }
             }
         }
         for (const progress of this._progressContainers) {
@@ -266,6 +295,20 @@ export class AnkiDeckGeneratorController {
             /** @type {NodeListOf<HTMLElement>} */
             const progressBars = progress.querySelectorAll('.progress-bar');
             for (const progressBar of progressBars) { progressBar.style.width = ((current / end) * 100).toString() + '%'; }
+        }
+    }
+
+    /**
+     *
+     * @param {string} text
+     */
+    _updateProgressBarError(text) {
+        for (const progress of this._progressContainers) {
+            progress.hidden = false;
+            for (const infoLabel of progress.querySelectorAll('.progress-info')) {
+                infoLabel.textContent = text;
+                infoLabel.classList.add('danger-text');
+            }
         }
     }
 
