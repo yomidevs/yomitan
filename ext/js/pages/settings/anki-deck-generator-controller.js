@@ -111,6 +111,7 @@ export class AnkiDeckGeneratorController {
         generateButton.addEventListener('click', this._onExport.bind(this), false);
 
         void this._updateExampleText();
+        this._mainSettingsEntry.addEventListener('click', this._updateExampleText.bind(this), false);
 
         void this._updateActiveModel();
         this._mainSettingsEntry.addEventListener('click', this._updateActiveModel.bind(this), false);
