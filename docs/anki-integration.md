@@ -123,6 +123,9 @@ Below are some troubleshooting tips you can try if you are unable to create new 
 
 Using the `Generate Anki Deck (Experimental)...` feature in the settings page it is possible to easily generate and export large amounts of Anki cards.
 
+> [!WARNING]
+> This feature is experimental!
+
 First, get a newline separated list of terms. For example:
 
 ```
