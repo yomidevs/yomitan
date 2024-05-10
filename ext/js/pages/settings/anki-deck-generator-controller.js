@@ -118,9 +118,7 @@ export class AnkiDeckGeneratorController {
 
     // Private
 
-    /**
-     *
-     */
+    /** */
     async _updateActiveModel() {
         const activeModelText = /** @type {HTMLElement} */ (this._activeModelText);
         const activeDeckText = /** @type {HTMLElement} */ (this._activeDeckText);
@@ -211,9 +209,7 @@ export class AnkiDeckGeneratorController {
         const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         const addMedia = this._addMediaCheckbox.checked;
         const disallowDuplicates = this._disallowDuplicatesCheckbox.checked;
-        /**
-         * @type {import("anki.js").Note[]}
-         */
+        /** @type {import("anki.js").Note[]} */
         let notes = [];
         let index = 0;
         requestAnimationFrame(() => {
@@ -255,7 +251,6 @@ export class AnkiDeckGeneratorController {
     }
 
     /**
-     *
      * @param {import("anki.js").Note[]} notes
      * @param {boolean} disallowDuplicates
      * @returns {Promise<boolean>}
@@ -282,7 +277,6 @@ export class AnkiDeckGeneratorController {
     }
 
     /**
-     *
      * @param {boolean} init
      * @param {string} text
      * @param {number} current
@@ -314,7 +308,6 @@ export class AnkiDeckGeneratorController {
     }
 
     /**
-     *
      * @param {string} text
      */
     _updateProgressBarError(text) {
@@ -459,7 +452,6 @@ export class AnkiDeckGeneratorController {
     }
 
     /**
-     *
      * @param {object} obj
      * @param {string} keyToFind
      * @returns {Array<string>}
@@ -492,8 +484,7 @@ export class AnkiDeckGeneratorController {
         void this._testNoteData(infoNode, 'term-kanji', true);
     }
 
-    /**
-     */
+    /** */
     async _updateExampleText() {
         this._languageSummaries = await this._application.api.getLanguageSummaries();
         const options = await this._settingsController.getOptions();
