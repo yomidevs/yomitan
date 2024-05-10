@@ -513,6 +513,14 @@ export class AnkiController {
     async addNotes(notes) {
         return await this._ankiConnect.addNotes(notes);
     }
+
+    /**
+     * @param {import('anki').Note[]} notes
+     * @returns {Promise<boolean[]>}
+     */
+    async canAddNotes(notes) {
+        return await this._ankiConnect.canAddNotes(notes);
+    }
 }
 
 class AnkiCardController {

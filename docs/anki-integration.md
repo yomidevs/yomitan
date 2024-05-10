@@ -146,6 +146,8 @@ Make sure to confirm you are exporting to the correct deck and with the correct 
 
 To include media in notes sent to Anki, make sure to enable the `Add media to notes` option. Media includes audio, images, and svgs. Exporting with media may take significantly longer than without it.
 
+To prevent duplicate notes being sent to Anki, enable the `Prevent sending duplicate notes` option. This will check for duplicate notes that already exist. The `Check for duplicates across all models` and `Duplicate card scope` settings are used to determine what is considered a duplicate card. **This does not remove duplicates in the term list.**
+
 **Export to File:**
 
 `Export to File` will export all the terms to an Anki deck file using the active Anki card format specified on the page and in Anki's `Notes in plain text (.txt)` format. After exporting completes you will be prompted to save the file. This file can later be imported into Anki.

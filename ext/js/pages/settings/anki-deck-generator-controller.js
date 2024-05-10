@@ -53,6 +53,8 @@ export class AnkiDeckGeneratorController {
         this._activeDeckText = querySelectorNotNull(document, '#generate-anki-deck-active-deck');
         /** @type {HTMLInputElement} */
         this._addMediaCheckbox = querySelectorNotNull(document, '#generate-anki-deck-add-media');
+        /** @type {HTMLInputElement} */
+        this._disallowDuplicatesCheckbox = querySelectorNotNull(document, '#generate-anki-deck-disallow-duplicates');
         /** @type {string} */
         this._activeNoteType = '';
         /** @type {string} */
@@ -191,6 +193,8 @@ export class AnkiDeckGeneratorController {
         if (this._sendToAnkiConfirmModal !== null) {
             this._updateProgressBar(true, '', 0, 1, false);
             this._sendToAnkiButtonConfirmButton.disabled = false;
+            this._addMediaCheckbox.disabled = false;
+            this._disallowDuplicatesCheckbox.disabled = false;
             this._sendWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
             this._sendToAnkiConfirmModal.setVisible(true);
         }
@@ -203,6 +207,7 @@ export class AnkiDeckGeneratorController {
         e.preventDefault();
         const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         const addMedia = this._addMediaCheckbox.checked;
+        const disallowDuplicates = this._disallowDuplicatesCheckbox.checked;
         /**
          * @type {import("anki.js").Note[]}
          */
@@ -210,6 +215,8 @@ export class AnkiDeckGeneratorController {
         let index = 0;
         requestAnimationFrame(() => {
             this._sendToAnkiButtonConfirmButton.disabled = true;
+            this._addMediaCheckbox.disabled = true;
+            this._disallowDuplicatesCheckbox.disabled = true;
             this._updateProgressBar(true, 'Sending to Anki...', 0, terms.length, true);
             setTimeout(async () => {
                 for (const value of terms) {
@@ -224,7 +231,7 @@ export class AnkiDeckGeneratorController {
                         notes.push(noteData);
                     }
                     if (notes.length >= 100) {
-                        const sendNotesResult = await this._sendNotes(notes);
+                        const sendNotesResult = await this._sendNotes(notes, disallowDuplicates);
                         if (sendNotesResult === false) { return; }
                         notes = [];
                     }
@@ -232,7 +239,7 @@ export class AnkiDeckGeneratorController {
                     this._updateProgressBar(false, '', index, terms.length, true);
                 }
                 if (notes.length > 0) {
-                    const sendNotesResult = await this._sendNotes(notes);
+                    const sendNotesResult = await this._sendNotes(notes, disallowDuplicates);
                     if (sendNotesResult === false) { return; }
                 }
 
@@ -247,10 +254,15 @@ export class AnkiDeckGeneratorController {
     /**
      *
      * @param {import("anki.js").Note[]} notes
+     * @param {boolean} disallowDuplicates
      * @returns {Promise<boolean>}
      */
-    async _sendNotes(notes) {
+    async _sendNotes(notes, disallowDuplicates) {
         try {
+            if (disallowDuplicates) {
+                const duplicateNotes = await this._ankiController.canAddNotes(notes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}})));
+                notes = notes.filter((_, i) => duplicateNotes[i]);
+            }
             const addNotesResult = await this._ankiController.addNotes(notes);
             if (addNotesResult === null || addNotesResult.includes(null)) {
                 this._updateProgressBarError('Ankiconnect error: failed to add cards');
@@ -404,7 +416,9 @@ export class AnkiDeckGeneratorController {
             compactTags,
             tags: ['yomitan'],
             mediaOptions: mediaOptions,
-            requirements: requirements
+            requirements: requirements,
+            duplicateScope: options.anki.duplicateScope,
+            duplicateScopeCheckAllModels: options.anki.duplicateScopeCheckAllModels
         }));
         return note;
     }
