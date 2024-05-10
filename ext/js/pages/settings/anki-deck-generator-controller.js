@@ -143,6 +143,7 @@ export class AnkiDeckGeneratorController {
         if (this._exportConfirmModal !== null) {
             this._exportConfirmModal.setVisible(true);
             if (this._inProgress) { return; }
+            this._cancel = false;
             this._exportButtonConfirmButton.disabled = false;
             this._exportWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
         }
@@ -201,6 +202,7 @@ export class AnkiDeckGeneratorController {
         if (this._sendToAnkiConfirmModal !== null) {
             this._sendToAnkiConfirmModal.setVisible(true);
             if (this._inProgress) { return; }
+            this._cancel = false;
             this._updateProgressBar(true, '', 0, 1, false);
             this._sendToAnkiButtonConfirmButton.disabled = false;
             this._addMediaCheckbox.disabled = false;
