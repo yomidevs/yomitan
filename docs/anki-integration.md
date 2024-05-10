@@ -119,7 +119,7 @@ Below are some troubleshooting tips you can try if you are unable to create new 
 - If all of the buttons appear grayed out, then you should double-check your deck and model configuration settings.
 - If no icons appear at all, make sure that Anki is running in the background and that [AnkiConnect](https://foosoft.net/projects/anki-connect) has been installed.
 
-### Anki Deck Generation
+### Anki Note Generation
 
 Using the `Generate Anki Deck (Experimental)...` feature in the settings page it is possible to easily generate and export large amounts of Anki cards.
 
