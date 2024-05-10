@@ -118,3 +118,33 @@ Below are some troubleshooting tips you can try if you are unable to create new 
 
 - If all of the buttons appear grayed out, then you should double-check your deck and model configuration settings.
 - If no icons appear at all, make sure that Anki is running in the background and that [AnkiConnect](https://foosoft.net/projects/anki-connect) has been installed.
+
+### Anki Deck Generation
+
+Using the `Generate Anki Deck (Experimental)...` feature in the settings page it is possible to easily generate and export large amounts of Anki cards.
+
+First, get a newline separated list of terms. For example:
+
+```
+雪
+雨
+竜巻
+```
+
+Enter this list into the large text box in the `Anki Deck Generator` popup window.
+
+Next, select either `Send to Anki` or `Export to File`.
+
+**Send to Anki:**
+
+`Send to Anki` will send all the terms to the active Anki deck using the active Anki card format specified on the page. To change the active Anki deck or Anki card format, edit them in the `Configure Anki card format...` setting.
+
+Make sure to confirm you are exporting to the correct deck and with the correct Anki card format. After the cards are sent to Anki there is no way to automatically undo the changes.
+
+To include media in cards sent to Anki, make sure to enable the `Add media to cards` option. Media includes audio, images, and svgs. Exporting with media may take significantly longer than without it.
+
+**Export to File:**
+
+`Export to File` will export all the terms to an Anki deck file using the active Anki card format specified on the page and in Anki's `Notes in plain text (.txt)` format. After exporting completes you will be prompted to save the file. This file can later be imported into Anki.
+
+Media cannot be included when exporting in this format.
