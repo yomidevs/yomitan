@@ -508,7 +508,7 @@ export class AnkiController {
 
     /**
      * @param {import('anki').Note[]} notes
-     * @returns {Promise<?(object | null)>}
+     * @returns {Promise<?((number | null)[] | null)>}
      */
     async addNotes(notes) {
         return await this._ankiConnect.addNotes(notes);

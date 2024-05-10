@@ -131,14 +131,14 @@ export class AnkiConnect {
 
     /**
      * @param {import('anki').Note[]} notes
-     * @returns {Promise<?(object | null)>}
+     * @returns {Promise<?((number | null)[] | null)>}
      */
     async addNotes(notes) {
         if (!this._enabled) { return null; }
         await this._checkVersion();
         const result = await this._invoke('addNotes', {notes});
-        if (result !== null && typeof result !== 'object') {
-            throw this._createUnexpectedResultError('object|null', result);
+        if (result !== null && !Array.isArray(result)) {
+            throw this._createUnexpectedResultError('(number | null)[] | null', result);
         }
         return result;
     }
