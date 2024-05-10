@@ -42,35 +42,35 @@ export class AnkiDeckGeneratorController {
         /** @type {?string} */
         this._defaultFieldTemplates = null;
         /** @type {HTMLTextAreaElement} */
-        this._mainSettingsEntry = querySelectorNotNull(document, '#generate-anki-deck-main-settings-entry');
+        this._mainSettingsEntry = querySelectorNotNull(document, '#generate-anki-notes-main-settings-entry');
         /** @type {HTMLTextAreaElement} */
-        this._wordInputTextarea = querySelectorNotNull(document, '#generate-anki-deck-textarea');
+        this._wordInputTextarea = querySelectorNotNull(document, '#generate-anki-notes-textarea');
         /** @type {HTMLInputElement} */
-        this._renderTextInput = querySelectorNotNull(document, '#generate-anki-deck-test-text-input');
+        this._renderTextInput = querySelectorNotNull(document, '#generate-anki-notes-test-text-input');
         /** @type {HTMLElement} */
-        this._renderResult = querySelectorNotNull(document, '#generate-anki-deck-render-result');
+        this._renderResult = querySelectorNotNull(document, '#generate-anki-notes-render-result');
         /** @type {HTMLElement} */
-        this._activeModelText = querySelectorNotNull(document, '#generate-anki-deck-active-model');
+        this._activeModelText = querySelectorNotNull(document, '#generate-anki-notes-active-model');
         /** @type {HTMLElement} */
-        this._activeDeckText = querySelectorNotNull(document, '#generate-anki-deck-active-deck');
+        this._activeDeckText = querySelectorNotNull(document, '#generate-anki-notes-active-deck');
         /** @type {HTMLInputElement} */
-        this._addMediaCheckbox = querySelectorNotNull(document, '#generate-anki-deck-add-media');
+        this._addMediaCheckbox = querySelectorNotNull(document, '#generate-anki-notes-add-media');
         /** @type {HTMLInputElement} */
-        this._disallowDuplicatesCheckbox = querySelectorNotNull(document, '#generate-anki-deck-disallow-duplicates');
+        this._disallowDuplicatesCheckbox = querySelectorNotNull(document, '#generate-anki-notes-disallow-duplicates');
         /** @type {string} */
         this._activeNoteType = '';
         /** @type {string} */
         this._activeAnkiDeck = '';
         /** @type {HTMLSpanElement} */
-        this._sendWordcount = querySelectorNotNull(document, '#generate-anki-deck-send-wordcount');
+        this._sendWordcount = querySelectorNotNull(document, '#generate-anki-notes-send-wordcount');
         /** @type {HTMLSpanElement} */
-        this._exportWordcount = querySelectorNotNull(document, '#generate-anki-deck-export-wordcount');
+        this._exportWordcount = querySelectorNotNull(document, '#generate-anki-notes-export-wordcount');
         /** @type {HTMLButtonElement} */
-        this._sendToAnkiButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-deck-send-button-confirm');
+        this._sendToAnkiButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-notes-send-button-confirm');
         /** @type {HTMLButtonElement} */
-        this._exportButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-deck-export-button-confirm');
+        this._exportButtonConfirmButton = querySelectorNotNull(document, '#generate-anki-notes-export-button-confirm');
         /** @type {NodeListOf<HTMLElement>} */
-        this._progressContainers = (document.querySelectorAll('.generate-anki-deck-progress'));
+        this._progressContainers = (document.querySelectorAll('.generate-anki-notes-progress'));
         /** @type {?import('./modal.js').Modal} */
         this._sendToAnkiConfirmModal = null;
         /** @type {?import('./modal.js').Modal} */
@@ -86,20 +86,20 @@ export class AnkiDeckGeneratorController {
         this._defaultFieldTemplates = await this._settingsController.application.api.getDefaultAnkiFieldTemplates();
 
         /** @type {HTMLButtonElement} */
-        const testRenderButton = querySelectorNotNull(document, '#generate-anki-deck-test-render-button');
+        const testRenderButton = querySelectorNotNull(document, '#generate-anki-notes-test-render-button');
         /** @type {HTMLButtonElement} */
-        const sendToAnkiButton = querySelectorNotNull(document, '#generate-anki-deck-send-to-anki-button');
+        const sendToAnkiButton = querySelectorNotNull(document, '#generate-anki-notes-send-to-anki-button');
         /** @type {HTMLButtonElement} */
-        const sendToAnkiCancelButton = querySelectorNotNull(document, '#generate-anki-deck-send-to-anki-cancel-button');
+        const sendToAnkiCancelButton = querySelectorNotNull(document, '#generate-anki-notes-send-to-anki-cancel-button');
         /** @type {HTMLButtonElement} */
-        const exportButton = querySelectorNotNull(document, '#generate-anki-deck-export-button');
+        const exportButton = querySelectorNotNull(document, '#generate-anki-notes-export-button');
         /** @type {HTMLButtonElement} */
-        const exportCancelButton = querySelectorNotNull(document, '#generate-anki-deck-export-cancel-button');
+        const exportCancelButton = querySelectorNotNull(document, '#generate-anki-notes-export-cancel-button');
         /** @type {HTMLButtonElement} */
-        const generateButton = querySelectorNotNull(document, '#generate-anki-deck-export-button');
+        const generateButton = querySelectorNotNull(document, '#generate-anki-notes-export-button');
 
-        this._sendToAnkiConfirmModal = this._modalController.getModal('generate-anki-deck-send-to-anki');
-        this._exportConfirmModal = this._modalController.getModal('generate-anki-deck-export');
+        this._sendToAnkiConfirmModal = this._modalController.getModal('generate-anki-notes-send-to-anki');
+        this._exportConfirmModal = this._modalController.getModal('generate-anki-notes-export');
 
         testRenderButton.addEventListener('click', this._onRender.bind(this), false);
         sendToAnkiButton.addEventListener('click', this._onSendToAnki.bind(this), false);
@@ -124,7 +124,7 @@ export class AnkiDeckGeneratorController {
     async _updateActiveModel() {
         const activeModelText = /** @type {HTMLElement} */ (this._activeModelText);
         const activeDeckText = /** @type {HTMLElement} */ (this._activeDeckText);
-        const activeDeckTextConfirm = querySelectorNotNull(document, '#generate-anki-deck-active-deck-confirm');
+        const activeDeckTextConfirm = querySelectorNotNull(document, '#generate-anki-notes-active-deck-confirm');
         const options = await this._settingsController.getOptions();
 
         this._activeNoteType = options.anki.terms.model;
