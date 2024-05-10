@@ -77,6 +77,8 @@ export class AnkiDeckGeneratorController {
         this._exportConfirmModal = null;
         /** @type {boolean} */
         this._cancel = false;
+        /** @type {boolean} */
+        this._inProgress = false;
         /** @type {AnkiNoteBuilder} */
         this._ankiNoteBuilder = new AnkiNoteBuilder(settingsController.application.api, new TemplateRendererProxy());
     }
@@ -139,9 +141,10 @@ export class AnkiDeckGeneratorController {
     _onExport(e) {
         e.preventDefault();
         if (this._exportConfirmModal !== null) {
+            this._exportConfirmModal.setVisible(true);
+            if (this._inProgress) { return; }
             this._exportButtonConfirmButton.disabled = false;
             this._exportWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
-            this._exportConfirmModal.setVisible(true);
         }
     }
 
@@ -150,6 +153,7 @@ export class AnkiDeckGeneratorController {
      */
     async _onExportConfirm(e) {
         e.preventDefault();
+        this._inProgress = true;
         const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n';
         let index = 0;
@@ -161,6 +165,7 @@ export class AnkiDeckGeneratorController {
                     if (!value) { continue; }
                     if (this._cancel) {
                         this._cancel = false;
+                        this._inProgress = false;
                         this._updateProgressBar(false, '', terms.length, terms.length, false);
                         return;
                     }
@@ -183,6 +188,7 @@ export class AnkiDeckGeneratorController {
                     this._exportConfirmModal.setVisible(false);
                 }
                 this._updateProgressBar(false, '', terms.length, terms.length, false);
+                this._inProgress = false;
             }, 1);
         });
     }
@@ -193,12 +199,13 @@ export class AnkiDeckGeneratorController {
     _onSendToAnki(e) {
         e.preventDefault();
         if (this._sendToAnkiConfirmModal !== null) {
+            this._sendToAnkiConfirmModal.setVisible(true);
+            if (this._inProgress) { return; }
             this._updateProgressBar(true, '', 0, 1, false);
             this._sendToAnkiButtonConfirmButton.disabled = false;
             this._addMediaCheckbox.disabled = false;
             this._disallowDuplicatesCheckbox.disabled = false;
             this._sendWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
-            this._sendToAnkiConfirmModal.setVisible(true);
         }
     }
 
@@ -207,6 +214,7 @@ export class AnkiDeckGeneratorController {
      */
     async _onSendToAnkiConfirm(e) {
         e.preventDefault();
+        this._inProgress = true;
         const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         const addMedia = this._addMediaCheckbox.checked;
         const disallowDuplicates = this._disallowDuplicatesCheckbox.checked;
@@ -223,6 +231,7 @@ export class AnkiDeckGeneratorController {
                     if (!value) { continue; }
                     if (this._cancel) {
                         this._cancel = false;
+                        this._inProgress = false;
                         this._updateProgressBar(false, '', terms.length, terms.length, false);
                         return;
                     }
@@ -232,7 +241,10 @@ export class AnkiDeckGeneratorController {
                     }
                     if (notes.length >= 100) {
                         const sendNotesResult = await this._sendNotes(notes, disallowDuplicates);
-                        if (sendNotesResult === false) { return; }
+                        if (sendNotesResult === false) {
+                            this._inProgress = false;
+                            return;
+                        }
                         notes = [];
                     }
                     index++;
@@ -240,13 +252,17 @@ export class AnkiDeckGeneratorController {
                 }
                 if (notes.length > 0) {
                     const sendNotesResult = await this._sendNotes(notes, disallowDuplicates);
-                    if (sendNotesResult === false) { return; }
+                    if (sendNotesResult === false) {
+                        this._inProgress = false;
+                        return;
+                    }
                 }
 
                 if (this._sendToAnkiConfirmModal !== null) {
                     this._sendToAnkiConfirmModal.setVisible(false);
                 }
                 this._updateProgressBar(false, '', terms.length, terms.length, false);
+                this._inProgress = false;
             }, 1);
         });
     }
