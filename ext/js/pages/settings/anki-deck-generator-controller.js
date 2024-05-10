@@ -24,11 +24,14 @@ import {TemplateRendererProxy} from '../../templates/template-renderer-proxy.js'
 
 export class AnkiDeckGeneratorController {
     /**
+     * @param {import('../../application.js').Application} application
      * @param {import('./settings-controller.js').SettingsController} settingsController
      * @param {import('./modal-controller.js').ModalController} modalController
      * @param {import('./anki-controller.js').AnkiController} ankiController
      */
-    constructor(settingsController, modalController, ankiController) {
+    constructor(application, settingsController, modalController, ankiController) {
+        /** @type {import('../../application.js').Application} */
+        this._application = application;
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {import('./modal-controller.js').ModalController} */
@@ -101,6 +104,8 @@ export class AnkiDeckGeneratorController {
         this._exportButtonConfirmButton.addEventListener('click', this._onExportConfirm.bind(this), false);
         exportCancelButton.addEventListener('click', this._cancelButton.bind(this), false);
         generateButton.addEventListener('click', this._onExport.bind(this), false);
+
+        void this._updateExampleText();
 
         void this._updateActiveCardFormat();
     }
@@ -432,6 +437,16 @@ export class AnkiDeckGeneratorController {
         const infoNode = /** @type {HTMLElement} */ (this._renderResult);
         infoNode.hidden = true;
         void this._testNoteData(infoNode, 'term-kanji', true);
+    }
+
+    /**
+     */
+    async _updateExampleText() {
+        this._languageSummaries = await this._application.api.getLanguageSummaries();
+        const options = await this._settingsController.getOptions();
+        const activeLanguage = /** @type {import('language').LanguageSummary} */ (this._languageSummaries.find(({iso}) => iso === options.general.language));
+        this._renderTextInput.lang = options.general.language;
+        this._renderTextInput.value = activeLanguage.exampleText;
     }
 
     /**
