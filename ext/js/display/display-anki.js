@@ -263,7 +263,9 @@ export class DisplayAnki {
 
     /** */
     _onContentUpdateComplete() {
-        void this._updateDictionaryEntryDetails();
+        if (this._display.getOptions()?.anki.enable) {
+            void this._updateDictionaryEntryDetails();
+        }
     }
 
     /**
