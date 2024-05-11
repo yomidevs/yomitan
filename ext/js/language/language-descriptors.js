@@ -149,6 +149,12 @@ const languageDescriptors = [
         exampleText: 'អាន'
     },
     {
+        iso: 'nl',
+        name: 'Dutch',
+        exampleText: 'lezen',
+        textPreprocessors: capitalizationPreprocessors
+    },
+    {
         iso: 'pl',
         name: 'Polish',
         exampleText: 'czytacie',

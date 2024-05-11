@@ -124,6 +124,9 @@ type AllTextProcessors = {
         };
     };
     km: Record<string, never>;
+    nl: {
+        pre: CapitalizationPreprocessors;
+    };
     pl: {
         pre: CapitalizationPreprocessors;
     };
