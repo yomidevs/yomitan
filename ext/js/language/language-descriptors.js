@@ -19,6 +19,7 @@ import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {germanTransforms} from './de/german-transforms.js';
 import {englishTransforms} from './en/english-transforms.js';
+import {spanishTransforms} from './es/spanish-transforms.js';
 import {
     alphabeticToHiragana,
     alphanumericWidthVariants,
@@ -78,7 +79,8 @@ const languageDescriptors = [
         iso: 'es',
         name: 'Spanish',
         exampleText: 'acabar de',
-        textPreprocessors: capitalizationPreprocessors
+        textPreprocessors: capitalizationPreprocessors,
+        languageTransforms: spanishTransforms
     },
     {
         iso: 'fa',
