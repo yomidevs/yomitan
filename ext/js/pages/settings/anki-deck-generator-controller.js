@@ -212,7 +212,7 @@ export class AnkiDeckGeneratorController {
                     }
                     const noteData = await this._generateNoteData(value, 'term-kanji', false);
                     if (noteData !== null) {
-                        const fieldsTSV = noteData ? this._fieldsToTSV(noteData.fields) : '';
+                        const fieldsTSV = this._fieldsToTSV(noteData.fields);
                         if (fieldsTSV) {
                             ankiTSV += this._activeNoteType + '\t';
                             ankiTSV += this._activeAnkiDeck + '\t';
