@@ -119,7 +119,7 @@ export class Frontend {
 
         this._hotkeyHandler.registerActions([
             ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
-            ['scanSelectedTextLazy', this._onActionScanSelectedTextLazy.bind(this)],
+            ['scanTextAtSelection', this._onActionScanTextAtSelection.bind(this)],
             ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
@@ -257,14 +257,14 @@ export class Frontend {
      * @returns {void}
      */
     _onActionScanSelectedText() {
-        void this._scanSelectedText(false, false);
+        void this._scanSelectedText(false, true);
     }
 
     /**
      * @returns {void}
      */
-    _onActionScanSelectedTextLazy() {
-        void this._scanSelectedText(false, true);
+    _onActionScanTextAtSelection() {
+        void this._scanSelectedText(false, false);
     }
 
     /**
