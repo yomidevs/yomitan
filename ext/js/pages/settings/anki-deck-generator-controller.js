@@ -452,7 +452,7 @@ export class AnkiDeckGeneratorController {
             resultOutputMode,
             glossaryLayoutMode,
             compactTags,
-            tags: ['yomitan'],
+            tags: options.anki.tags,
             mediaOptions: mediaOptions,
             requirements: requirements,
             duplicateScope: options.anki.duplicateScope,
