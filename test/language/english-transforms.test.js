@@ -37,7 +37,7 @@ const tests = [
             {term: 'slip', source: 'slippy',  rule: 'ns', reasons: ['-y']},
             {term: 'star', source: 'starry',  rule: 'ns', reasons: ['-y']},
             {term: 'gas', source: 'gassy',  rule: 'ns', reasons: ['-y']},
-            {term: 'wit', source: 'witty',  rule: 'ns', reasons: ['-y']},
+            {term: 'wit', source: 'witty',  rule: 'ns', reasons: ['-y']}
         ]
     },
     {
@@ -95,7 +95,7 @@ const tests = [
             {term: 'slip', source: 'slippy',  rule: 'v', reasons: ['-y']},
             {term: 'blur', source: 'blurry',  rule: 'v', reasons: ['-y']},
             {term: 'chat', source: 'chatty',  rule: 'v', reasons: ['-y']},
-            {term: 'learn', source: 'unlearn',  rule: 'v', reasons: ['un-']},
+            {term: 'learn', source: 'unlearn',  rule: 'v', reasons: ['un-']}
         ]
     },
     {
@@ -113,7 +113,7 @@ const tests = [
         category: 'adverbs',
         valid: true,
         tests: [
-            {term: 'interestingly', source: 'uninterestingly',  rule: 'adj', reasons: ['un-']},
+            {term: 'interestingly', source: 'uninterestingly',  rule: 'adj', reasons: ['un-']}
         ]
     },
     {
@@ -141,7 +141,7 @@ const tests = [
             {term: 'hot', source: 'hottest',  rule: 'adj', reasons: ['superlative']},
             {term: 'quick', source: 'quickly',  rule: 'adj', reasons: ['adverb']},
             {term: 'happy', source: 'happily',  rule: 'adj', reasons: ['adverb']},
-            {term: 'humble', source: 'humbly',  rule: 'adj', reasons: ['adverb']},
+            {term: 'humble', source: 'humbly',  rule: 'adj', reasons: ['adverb']}
         ]
     }
 ];
