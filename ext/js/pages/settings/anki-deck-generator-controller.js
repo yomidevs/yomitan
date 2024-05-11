@@ -199,7 +199,7 @@ export class AnkiDeckGeneratorController {
         e.preventDefault();
         void this._startGenerationState();
         const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
-        let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n';
+        let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n#deck column:2\n#tags column:3\n';
         let index = 0;
         requestAnimationFrame(() => {
             this._updateProgressBar(true, 'Exporting to File...', 0, terms.length, true);
@@ -211,11 +211,15 @@ export class AnkiDeckGeneratorController {
                         return;
                     }
                     const noteData = await this._generateNoteData(value, 'term-kanji', false);
-                    const fieldsTSV = noteData ? this._fieldsToTSV(noteData.fields) : '';
-                    if (fieldsTSV) {
-                        ankiTSV += this._activeNoteType + '\t';
-                        ankiTSV += fieldsTSV;
-                        ankiTSV += '\n';
+                    if (noteData !== null) {
+                        const fieldsTSV = noteData ? this._fieldsToTSV(noteData.fields) : '';
+                        if (fieldsTSV) {
+                            ankiTSV += this._activeNoteType + '\t';
+                            ankiTSV += this._activeAnkiDeck + '\t';
+                            ankiTSV += noteData.tags.join(' ') + '\t';
+                            ankiTSV += fieldsTSV;
+                            ankiTSV += '\n';
+                        }
                     }
                     index++;
                     this._updateProgressBar(false, '', index, terms.length, true);
