@@ -225,7 +225,7 @@ export class AnkiDeckGeneratorController {
                     this._updateProgressBar(false, '', index, terms.length, true);
                 }
                 const today = new Date();
-                const fileName = `anki-deck-${today.getFullYear()}-${today.getMonth()}-${today.getDay()}.txt`;
+                const fileName = 'anki-deck-' + today.toISOString().split('.')[0].replaceAll(/(T|:)/g, '-') + '.txt';
                 const blob = new Blob([ankiTSV], {type: 'application/octet-stream'});
                 this._saveBlob(blob, fileName);
 
