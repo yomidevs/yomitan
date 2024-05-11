@@ -263,9 +263,7 @@ export class DisplayAnki {
 
     /** */
     _onContentUpdateComplete() {
-        if (this._display.getOptions()?.anki.enable) {
-            void this._updateDictionaryEntryDetails();
-        }
+        void this._updateDictionaryEntryDetails();
     }
 
     /**
@@ -353,6 +351,7 @@ export class DisplayAnki {
 
     /** */
     async _updateDictionaryEntryDetails() {
+        if (this._display.getOptions()?.anki.enable) { return; }
         const {dictionaryEntries} = this._display;
         /** @type {?import('core').TokenObject} */
         const token = {};
