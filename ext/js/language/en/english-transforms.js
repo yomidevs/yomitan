@@ -255,7 +255,7 @@ export const englishTransforms = {
             name: 'un-',
             description: 'Negative form of an adjective, adverb, or verb',
             rules: [
-                suffixInflection('un', '', ['adj', 'adv', 'v'], ['adj', 'adv', 'v'])
+                prefixInflection('un', '', ['adj', 'adv', 'v'], ['adj', 'adv', 'v'])
             ]
         },
         {
