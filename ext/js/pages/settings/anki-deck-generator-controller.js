@@ -470,9 +470,8 @@ export class AnkiDeckGeneratorController {
         const {dictionaryEntries} = await this._settingsController.application.api.termsFind(text, {}, optionsContext);
         if (dictionaryEntries.length === 0) { return null; }
 
-        this._cachedDictionaryEntryValue = dictionaryEntries[0];
         return {
-            dictionaryEntry: /** @type {import('dictionary').TermDictionaryEntry} */ (this._cachedDictionaryEntryValue),
+            dictionaryEntry: /** @type {import('dictionary').TermDictionaryEntry} */ (dictionaryEntries[0]),
             text: text
         };
     }
