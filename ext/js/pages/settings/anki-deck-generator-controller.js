@@ -304,7 +304,7 @@ export class AnkiDeckGeneratorController {
             }
             const addNotesResult = await this._ankiController.addNotes(notes);
             if (addNotesResult === null || addNotesResult.includes(null)) {
-                this._updateProgressBarError('Ankiconnect error: failed to add cards');
+                this._updateProgressBarError('Ankiconnect error: Failed to add cards');
                 return false;
             }
         } catch (error) {
