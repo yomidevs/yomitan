@@ -158,7 +158,7 @@ export class SearchDisplayController {
         if (
             activeElement !== this._queryInput &&
             !this._isElementInput(activeElement) &&
-            !e.ctrlKey &&
+            (!e.ctrlKey || e.key === 'Backspace') &&
             !e.metaKey &&
             !e.altKey &&
             (e.key.length === 1 || e.key === 'Backspace') &&
