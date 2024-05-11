@@ -172,7 +172,7 @@ export class HotkeyHandler extends EventDispatcher {
      */
     _onKeyDown(event) {
         let hotkeyInfo = this._hotkeys.get(event.code);
-        const modifierKeycodes = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight'];
+        const modifierKeycodes = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'];
         if (modifierKeycodes.includes(event.code)) {
             hotkeyInfo = this._hotkeys.get(null); // Hotkeys with only modifiers are stored as null
         }
