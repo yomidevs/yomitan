@@ -36,6 +36,62 @@ const tests = [
             {term: 'luz', source: 'luces', rule: 'ns', reasons: ['plural']},
             {term: 'canción', source: 'canciones', rule: 'ns', reasons: ['plural']}
         ]
+    },
+    {
+        category: 'feminine adjectives',
+        valid: true,
+        tests: [
+            {term: 'rojo', source: 'roja', rule: 'adj', reasons: ['feminine adjective']}
+        ]
+    },
+    {
+        category: 'present indicative verbs',
+        valid: true,
+        tests: [
+            {term: 'hablar', source: 'hablo', rule: 'v', reasons: ['present indicative']},
+            {term: 'hablar', source: 'hablas', rule: 'v', reasons: ['present indicative']},
+            {term: 'hablar', source: 'habla', rule: 'v', reasons: ['present indicative']},
+            {term: 'hablar', source: 'hablamos', rule: 'v', reasons: ['present indicative']},
+            {term: 'hablar', source: 'habláis', rule: 'v', reasons: ['present indicative']},
+            {term: 'hablar', source: 'hablan', rule: 'v', reasons: ['present indicative']},
+            {term: 'comer', source: 'como', rule: 'v', reasons: ['present indicative']},
+            {term: 'comer', source: 'comes', rule: 'v', reasons: ['present indicative']},
+            {term: 'comer', source: 'come', rule: 'v', reasons: ['present indicative']},
+            {term: 'comer', source: 'comemos', rule: 'v', reasons: ['present indicative']},
+            {term: 'comer', source: 'coméis', rule: 'v', reasons: ['present indicative']},
+            {term: 'comer', source: 'comen', rule: 'v', reasons: ['present indicative']},
+            {term: 'vivir', source: 'vivo', rule: 'v', reasons: ['present indicative']},
+            {term: 'vivir', source: 'vives', rule: 'v', reasons: ['present indicative']},
+            {term: 'vivir', source: 'vive', rule: 'v', reasons: ['present indicative']},
+            {term: 'vivir', source: 'vivimos', rule: 'v', reasons: ['present indicative']},
+            {term: 'vivir', source: 'vivís', rule: 'v', reasons: ['present indicative']},
+            {term: 'vivir', source: 'viven', rule: 'v', reasons: ['present indicative']},
+            {term: 'tener', source: 'tengo', rule: 'v', reasons: ['present indicative']},
+            {term: 'tener', source: 'tienes', rule: 'v', reasons: ['present indicative']},
+            {term: 'tener', source: 'tiene', rule: 'v', reasons: ['present indicative']},
+            {term: 'tener', source: 'tenemos', rule: 'v', reasons: ['present indicative']},
+            {term: 'tener', source: 'tenéis', rule: 'v', reasons: ['present indicative']},
+            {term: 'tener', source: 'tienen', rule: 'v', reasons: ['present indicative']},
+            {term: 'exigir', source: 'exijo', rule: 'v', reasons: ['present indicative']},
+            {term: 'extinguir', source: 'extingo', rule: 'v', reasons: ['present indicative']},
+            {term: 'escoger', source: 'escojo', rule: 'v', reasons: ['present indicative']},
+            {term: 'caber', source: 'quepo', rule: 'v', reasons: ['present indicative']},
+            {term: 'caer', source: 'caigo', rule: 'v', reasons: ['present indicative']},
+            {term: 'conocer', source: 'conozco', rule: 'v', reasons: ['present indicative']},
+            {term: 'dar', source: 'doy', rule: 'v', reasons: ['present indicative']},
+            {term: 'hacer', source: 'hago', rule: 'v', reasons: ['present indicative']},
+            {term: 'poner', source: 'pongo', rule: 'v', reasons: ['present indicative']},
+            {term: 'saber', source: 'sé', rule: 'v', reasons: ['present indicative']},
+            {term: 'salir', source: 'salgo', rule: 'v', reasons: ['present indicative']},
+            {term: 'traducir', source: 'traduzco', rule: 'v', reasons: ['present indicative']},
+            {term: 'traer', source: 'traigo', rule: 'v', reasons: ['present indicative']},
+            {term: 'valer', source: 'valgo', rule: 'v', reasons: ['present indicative']},
+            {term: 'ver', source: 'veo', rule: 'v', reasons: ['present indicative']},
+            {term: 'ser', source: 'soy', rule: 'v', reasons: ['present indicative']},
+            {term: 'estar', source: 'estoy', rule: 'v', reasons: ['present indicative']},
+            {term: 'ir', source: 'voy', rule: 'v', reasons: ['present indicative']},
+            {term: 'haber', source: 'he', rule: 'v', reasons: ['present indicative']}
+        ]
     }
 ];
 

@@ -132,7 +132,7 @@ export class LanguageTransformer {
 
                     const isCycle = trace.some((frame) => frame.transform === name && frame.ruleIndex === j && frame.text === text);
                     if (isCycle) {
-                        log.warn(new Error(`Cycle detected in transform[${name}] rule[${j}] for text: ${text}`));
+                        log.warn(new Error(`Cycle detected in transform[${name}] rule[${j}] for text: ${text}\nTrace: ${JSON.stringify(trace)}`));
                         continue;
                     }
 
