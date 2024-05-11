@@ -135,6 +135,51 @@ export class AnkiDeckGeneratorController {
         activeDeckTextConfirm.textContent = this._activeAnkiDeck;
     }
 
+    /** */
+    async _resetState() {
+        this._updateProgressBar(true, '', 0, 1, false);
+        this._cancel = false;
+
+        this._exportButtonConfirmButton.disabled = false;
+        this._exportWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
+
+        this._sendToAnkiButtonConfirmButton.disabled = false;
+        this._addMediaCheckbox.disabled = false;
+        this._disallowDuplicatesCheckbox.disabled = false;
+        this._sendWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
+    }
+
+    /** */
+    async _startGenerationState() {
+        this._inProgress = true;
+
+        this._exportButtonConfirmButton.disabled = true;
+
+        this._sendToAnkiButtonConfirmButton.disabled = true;
+        this._addMediaCheckbox.disabled = true;
+        this._disallowDuplicatesCheckbox.disabled = true;
+    }
+
+    /** */
+    async _endGenerationState() {
+        this._inProgress = false;
+
+        if (this._exportConfirmModal !== null) {
+            this._exportConfirmModal.setVisible(false);
+        }
+
+        if (this._sendToAnkiConfirmModal !== null) {
+            this._sendToAnkiConfirmModal.setVisible(false);
+        }
+
+        this._updateProgressBar(false, '', 1, 1, false);
+    }
+
+    /** */
+    async _endGenerationStateError() {
+        this._inProgress = false;
+    }
+
     /**
      * @param {MouseEvent} e
      */
@@ -143,9 +188,7 @@ export class AnkiDeckGeneratorController {
         if (this._exportConfirmModal !== null) {
             this._exportConfirmModal.setVisible(true);
             if (this._inProgress) { return; }
-            this._cancel = false;
-            this._exportButtonConfirmButton.disabled = false;
-            this._exportWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
+            void this._resetState();
         }
     }
 
@@ -154,20 +197,17 @@ export class AnkiDeckGeneratorController {
      */
     async _onExportConfirm(e) {
         e.preventDefault();
-        this._inProgress = true;
+        void this._startGenerationState();
         const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         let ankiTSV = '#separator:tab\n#html:true\n#notetype column:1\n';
         let index = 0;
         requestAnimationFrame(() => {
-            this._exportButtonConfirmButton.disabled = true;
             this._updateProgressBar(true, 'Exporting to File...', 0, terms.length, true);
             setTimeout(async () => {
                 for (const value of terms) {
                     if (!value) { continue; }
                     if (this._cancel) {
-                        this._cancel = false;
-                        this._inProgress = false;
-                        this._updateProgressBar(false, '', terms.length, terms.length, false);
+                        void this._endGenerationState();
                         return;
                     }
                     const noteData = await this._generateNoteData(value, 'term-kanji', false);
@@ -185,11 +225,7 @@ export class AnkiDeckGeneratorController {
                 const blob = new Blob([ankiTSV], {type: 'application/octet-stream'});
                 this._saveBlob(blob, fileName);
 
-                if (this._exportConfirmModal !== null) {
-                    this._exportConfirmModal.setVisible(false);
-                }
-                this._updateProgressBar(false, '', terms.length, terms.length, false);
-                this._inProgress = false;
+                void this._endGenerationState();
             }, 1);
         });
     }
@@ -202,12 +238,7 @@ export class AnkiDeckGeneratorController {
         if (this._sendToAnkiConfirmModal !== null) {
             this._sendToAnkiConfirmModal.setVisible(true);
             if (this._inProgress) { return; }
-            this._cancel = false;
-            this._updateProgressBar(true, '', 0, 1, false);
-            this._sendToAnkiButtonConfirmButton.disabled = false;
-            this._addMediaCheckbox.disabled = false;
-            this._disallowDuplicatesCheckbox.disabled = false;
-            this._sendWordcount.textContent = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n').filter(Boolean).length.toString();
+            void this._resetState();
         }
     }
 
@@ -216,7 +247,7 @@ export class AnkiDeckGeneratorController {
      */
     async _onSendToAnkiConfirm(e) {
         e.preventDefault();
-        this._inProgress = true;
+        void this._startGenerationState();
         const terms = /** @type {HTMLTextAreaElement} */ (this._wordInputTextarea).value.split('\n');
         const addMedia = this._addMediaCheckbox.checked;
         const disallowDuplicates = this._disallowDuplicatesCheckbox.checked;
@@ -224,17 +255,12 @@ export class AnkiDeckGeneratorController {
         let notes = [];
         let index = 0;
         requestAnimationFrame(() => {
-            this._sendToAnkiButtonConfirmButton.disabled = true;
-            this._addMediaCheckbox.disabled = true;
-            this._disallowDuplicatesCheckbox.disabled = true;
             this._updateProgressBar(true, 'Sending to Anki...', 0, terms.length, true);
             setTimeout(async () => {
                 for (const value of terms) {
                     if (!value) { continue; }
                     if (this._cancel) {
-                        this._cancel = false;
-                        this._inProgress = false;
-                        this._updateProgressBar(false, '', terms.length, terms.length, false);
+                        void this._endGenerationState();
                         return;
                     }
                     const noteData = await this._generateNoteData(value, 'term-kanji', addMedia);
@@ -244,7 +270,7 @@ export class AnkiDeckGeneratorController {
                     if (notes.length >= 100) {
                         const sendNotesResult = await this._sendNotes(notes, disallowDuplicates);
                         if (sendNotesResult === false) {
-                            this._inProgress = false;
+                            void this._endGenerationStateError();
                             return;
                         }
                         notes = [];
@@ -255,16 +281,12 @@ export class AnkiDeckGeneratorController {
                 if (notes.length > 0) {
                     const sendNotesResult = await this._sendNotes(notes, disallowDuplicates);
                     if (sendNotesResult === false) {
-                        this._inProgress = false;
+                        void this._endGenerationStateError();
                         return;
                     }
                 }
 
-                if (this._sendToAnkiConfirmModal !== null) {
-                    this._sendToAnkiConfirmModal.setVisible(false);
-                }
-                this._updateProgressBar(false, '', terms.length, terms.length, false);
-                this._inProgress = false;
+                void this._endGenerationState();
             }, 1);
         });
     }
