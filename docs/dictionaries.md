@@ -16,6 +16,7 @@ Be aware that non-English dictionaries generally contain fewer entries than thei
 #### Other Languages
 
 - [KTY](https://github.com/themoeway/kaikki-to-yomitan) - Wiktionaries in various languages converted to Yomitan format.
+- [KRDICT/STDICT](https://github.com/Lyroxide/yomitan-ko-dic/releases) - Korean dictionaries for Yomitan.
 
 #### EPWING Dictionaries
 

@@ -17,7 +17,6 @@
  */
 
 import {applyTextReplacement} from '../general/regex-util.js';
-import {TextSourceMap} from '../general/text-source-map.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
 import {getAllLanguageTextProcessors} from './languages.js';
@@ -455,31 +454,29 @@ export class Translator {
         const deinflections = [];
         const used = new Set();
 
-        for (const preprocessorVariant of this._generateArrayVariants(preprocessorVariantSpace)) {
-            const textReplacements = /** @type {import('translation').FindTermsTextReplacement[] | null} */ (preprocessorVariant.get('textReplacements'));
+        for (
+            let source = text, i = text.length;
+            i > 0;
+            i = this._getNextSubstringLength(options.searchResolution, i, source)
+        ) {
+            for (const preprocessorVariant of this._generateArrayVariants(preprocessorVariantSpace)) {
+                source = text.substring(0, i);
 
-            let text2 = text;
-            const sourceMap = new TextSourceMap(text2);
+                const rawSource = source;
 
-            if (textReplacements !== null) {
-                text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
-            }
+                const textReplacements = /** @type {import('translation').FindTermsTextReplacement[] | null} */ (preprocessorVariant.get('textReplacements'));
+                if (textReplacements !== null) {
+                    source = this._applyTextReplacements(source, textReplacements);
+                }
 
-            for (const preprocessor of textPreprocessors.values()) {
-                const {id, textProcessor} = preprocessor;
-                const setting = preprocessorVariant.get(id);
-                text2 = textProcessor.process(text2, setting, sourceMap);
-            }
+                for (const preprocessor of textPreprocessors.values()) {
+                    const {id, textProcessor} = preprocessor;
+                    const setting = preprocessorVariant.get(id);
+                    source = textProcessor.process(source, setting);
+                }
 
-            for (
-                let source = text2, i = text2.length;
-                i > 0;
-                i = this._getNextSubstringLength(options.searchResolution, i, source)
-            ) {
-                source = text2.substring(0, i);
-                if (used.has(source)) { break; }
+                if (used.has(source)) { continue; }
                 used.add(source);
-                const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
                 for (const deinflection of this._multiLanguageTransformer.transform(language, source)) {
                     const {trace, conditions} = deinflection;
                     for (const postprocessorVariant of this._generateArrayVariants(postprocessorOptionsSpace)) {
@@ -487,7 +484,7 @@ export class Translator {
                         for (const postprocessor of textPostprocessors.values()) {
                             const {id, textProcessor} = postprocessor;
                             const setting = postprocessorVariant.get(id);
-                            transformedText = textProcessor.process(transformedText, setting, sourceMap);
+                            transformedText = textProcessor.process(transformedText, setting);
                         }
 
                         /** @type {import('dictionary').InflectionRuleChainCandidate} */
@@ -519,13 +516,12 @@ export class Translator {
 
     /**
      * @param {string} text
-     * @param {TextSourceMap} sourceMap
      * @param {import('translation').FindTermsTextReplacement[]} replacements
      * @returns {string}
      */
-    _applyTextReplacements(text, sourceMap, replacements) {
+    _applyTextReplacements(text, replacements) {
         for (const {pattern, replacement} of replacements) {
-            text = applyTextReplacement(text, sourceMap, pattern, replacement);
+            text = applyTextReplacement(text, pattern, replacement);
         }
         return text;
     }

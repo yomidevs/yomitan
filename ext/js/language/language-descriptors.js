@@ -140,7 +140,7 @@ const languageDescriptors = [
     {
         iso: 'ko',
         name: 'Korean',
-        exampleText: '읽다',
+        exampleText: '읽어',
         textPreprocessors: {
             disassembleHangul
         },

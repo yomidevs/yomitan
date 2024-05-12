@@ -15,12 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {TextSourceMap} from '../../ext/js/general/text-source-map.js';
 import type {LanguageTransformDescriptor} from './language-transformer.js';
 
 export type TextProcessorOptions<T = unknown> = T[];
 
-export type TextProcessorFunction<T = unknown> = (str: string, setting: T, sourceMap: TextSourceMap) => string;
+export type TextProcessorFunction<T = unknown> = (str: string, setting: T) => string;
 
 /**
  * Text pre- and post-processors are used during the translation process to create alternate versions of the input text to search for.
