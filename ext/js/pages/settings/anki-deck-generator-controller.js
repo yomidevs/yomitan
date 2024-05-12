@@ -488,7 +488,7 @@ export class AnkiDeckGeneratorController {
         const media = [];
         const definitions = dictionaryEntry.definitions;
         for (const definition of definitions) {
-            const paths = this._findAllByKey(definition, 'path');
+            const paths = this._findPathsByKey(definition);
             for (const path of paths) {
                 media.push({dictionary: definition.dictionary, path: path, type: 'dictionaryMedia'});
             }
@@ -498,13 +498,12 @@ export class AnkiDeckGeneratorController {
 
     /**
      * @param {object} obj
-     * @param {string} keyToFind
      * @returns {Array<string>}
      */
-    _findAllByKey(obj, keyToFind) {
+    _findPathsByKey(obj) {
         // @ts-expect-error - Recursive function to find object keys deeply nested in objects and arrays. Essentially impossible to type correctly.
         // eslint-disable-next-line unicorn/no-array-reduce, @typescript-eslint/no-unsafe-argument
-        return Object.entries(obj).reduce((acc, [key, value]) => (key === keyToFind ? [...acc, value] : (typeof value === 'object' ? [...acc, ...this._findAllByKey(value, keyToFind)] : acc)), []);
+        return Object.entries(obj).reduce((acc, [key, value]) => (key === 'path' ? [...acc, value] : (typeof value === 'object' ? [...acc, ...this._findPathsByKey(value)] : acc)), []);
     }
 
     /**
