@@ -32,12 +32,13 @@
             <div class="settings-item-left">
                 <div class="settings-item-label">Enable recommended permissions</div>
                 <div class="settings-item-description">This will allow Yomitan to scan text from most sites. Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a>.</div>
-                <div class="warning-text margin-above"><strong>Yomitan features will be limited if the recommended permissions are not enabled.</strong></div>
+                <div class="danger-text margin-above" id="permissions-disabled" hidden><strong>Yomitan features will be limited if the recommended permissions are not enabled.</strong></div>
+                <div class="success-text margin-above" id="permissions-enabled" hidden><strong>All Yomitan features are available.</strong></div>
+                <div id="recommended-permissions-error" class="margin-above danger-text" hidden></div>
             </div>
             <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" class="recommended-permissions-toggle" data-origin="&lt;all_urls&gt;"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                <label class="toggle"><input type="checkbox" id="recommended-permissions-toggle" data-origin="&lt;all_urls&gt;"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
-            <div id="recommended-permissions-error" class="margin-above danger-text" hidden></div>
         </div></div>
     </div>
 
