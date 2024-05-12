@@ -254,3 +254,12 @@
     display: inline;
     color: var(--text-color-light3);
 }
+.gloss-sc-details {
+    border-bottom: calc(1em / var(--font-size-no-units)) solid var(--medium-border-color);
+}
+.gloss-sc-summary {
+    list-style-position: outside;
+}
+.gloss-sc-details[open] .gloss-sc-summary {
+    border-bottom: calc(1em / var(--font-size-no-units)) solid var(--medium-border-color);
+}

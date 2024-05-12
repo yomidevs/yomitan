@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextProcessorOptions} from '../text-preprocessors.js';
+import {basicTextProcessorOptions} from '../text-processors.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {
     collapseEmphaticSequences as collapseEmphaticSequencesFunction,

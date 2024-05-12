@@ -67,9 +67,10 @@ export class HotkeyHelpController {
             const hotkey = (global ? this._globalActionHotkeys : this._localActionHotkeys).get(action);
             for (let i = 0, ii = attributes.length; i < ii; ++i) {
                 const attribute = attributes[i];
+                /** @type {unknown} */
                 let value;
                 if (typeof hotkey !== 'undefined') {
-                    value = /** @type {unknown} */ (multipleValues ? values[i] : values);
+                    value = multipleValues ? values[i] : values;
                     if (typeof value === 'string') {
                         value = value.replace(replacementPattern, hotkey);
                     }
@@ -158,7 +159,8 @@ export class HotkeyHelpController {
         if (typeof hotkey !== 'string') { return null; }
         const data = /** @type {unknown} */ (parseJson(hotkey));
         if (!Array.isArray(data)) { return null; }
-        const [action, attributes, values] = /** @type {unknown[]} */ (data);
+        const dataArray = /** @type {unknown[]} */ (data);
+        const [action, attributes, values] = dataArray;
         if (typeof action !== 'string') { return null; }
         /** @type {string[]} */
         const attributesArray = [];

@@ -51,7 +51,7 @@ export type DatabaseDeinflection = {
 
 export type TextProcessorOptionsSpace = Map<string, Language.TextProcessorOptions<unknown>>;
 
-export type TextPreprocessorMap = Map<
+export type TextProcessorMap = Map<
     string,
     {
         textPreprocessors: Language.TextProcessorWithId<unknown>[];
@@ -60,3 +60,7 @@ export type TextPreprocessorMap = Map<
         postprocessorOptionsSpace: TextProcessorOptionsSpace;
     }
 >;
+
+export type TextProcessorVariant = Map<string, unknown>;
+
+export type TextCache = Map<string, Map<string, Map<unknown, string>>>;

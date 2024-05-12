@@ -89,11 +89,16 @@ type AllTextProcessors = {
             removeArabicScriptDiacritics: TextProcessor<boolean>;
         };
     };
+    fi: {
+        pre: CapitalizationPreprocessors;
+    };
     fr: {
         pre: CapitalizationPreprocessors;
     };
     grc: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & {
+            removeAlphabeticDiacritics: TextProcessor<boolean>;
+        };
     };
     hu: {
         pre: CapitalizationPreprocessors;
@@ -106,7 +111,7 @@ type AllTextProcessors = {
     };
     la: {
         pre: CapitalizationPreprocessors & {
-            removeLatinDiacritics: TextProcessor<boolean>;
+            removeAlphabeticDiacritics: TextProcessor<boolean>;
         };
     };
     ja: {
@@ -127,6 +132,9 @@ type AllTextProcessors = {
         };
     };
     km: Record<string, never>;
+    nl: {
+        pre: CapitalizationPreprocessors;
+    };
     pl: {
         pre: CapitalizationPreprocessors;
     };
@@ -140,6 +148,11 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors & {
             yoToE: TextProcessor<boolean>;
             removeRussianDiacritics: TextProcessor<boolean>;
+        };
+    };
+    sga: {
+        pre: CapitalizationPreprocessors & {
+            removeAlphabeticDiacritics: TextProcessor<boolean>;
         };
     };
     sh: {

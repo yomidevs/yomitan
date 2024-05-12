@@ -24,6 +24,7 @@ export function groupTermTags(dictionaryEntry) {
     const {headwords} = dictionaryEntry;
     const headwordCount = headwords.length;
     const uniqueCheck = (headwordCount > 1);
+    /** @type {Map<string, number>} */
     const resultsIndexMap = new Map();
     const results = [];
     for (let i = 0; i < headwordCount; ++i) {

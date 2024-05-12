@@ -28,7 +28,7 @@ import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
 import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
-import {isNoteDataValid} from '../data/anki-util.js';
+import {invalidNoteId, isNoteDataValid} from '../data/anki-util.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
@@ -94,6 +94,10 @@ export class Backend {
         this._options = null;
         /** @type {import('../data/json-schema.js').JsonSchema[]} */
         this._profileConditionsSchemaCache = [];
+        /** @type {?string} */
+        this._ankiClipboardImageFilenameCache = null;
+        /** @type {?string} */
+        this._ankiClipboardImageDataUrlCache = null;
         /** @type {?string} */
         this._defaultAnkiFieldTemplates = null;
         /** @type {RequestBuilder} */
@@ -253,7 +257,7 @@ export class Backend {
             this._prepareInternalSync();
 
             this._permissions = await getAllPermissions();
-            this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
+            this._defaultBrowserActionTitle = this._getBrowserIconTitle();
             this._badgePrepareDelayTimer = setTimeout(() => {
                 this._badgePrepareDelayTimer = null;
                 this._updateBadge();
@@ -537,24 +541,16 @@ export class Backend {
 
     /**
      * @param {import('anki').Note[]} notes
-     * @returns {Promise<({ canAdd: true; } | { canAdd: false; error: string; })[]>}
+     * @returns {Promise<import('backend').CanAddResults>}
      */
-    async detectDuplicateNotes(notes) {
+    async partitionAddibleNotes(notes) {
         // `allowDuplicate` is on for all notes by default, so we temporarily set it to false
         // to check which notes are duplicates.
         const notesNoDuplicatesAllowed = notes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}}));
 
-        return await this._anki.canAddNotesWithErrorDetail(notesNoDuplicatesAllowed);
-    }
-
-    /**
-     * Partitions notes between those that can / cannot be added.
-     * It further sets the `isDuplicate` strings for notes that have a duplicate.
-     * @param {import('anki').Note[]} notes
-     * @returns {Promise<import('backend').CanAddResults>}
-     */
-    async partitionAddibleNotes(notes) {
-        const canAddResults = await this.detectDuplicateNotes(notes);
+        // If only older AnkiConnect available, use `canAddNotes`.
+        const withDuplicatesAllowed = await this._anki.canAddNotes(notes);
+        const noDuplicatesAllowed = await this._anki.canAddNotes(notesNoDuplicatesAllowed);
 
         /** @type {{ note: import('anki').Note, isDuplicate: boolean }[]} */
         const canAddArray = [];
@@ -562,16 +558,11 @@ export class Backend {
         /** @type {import('anki').Note[]} */
         const cannotAddArray = [];
 
-        for (let i = 0; i < canAddResults.length; i++) {
-            const result = canAddResults[i];
-
-            // If the note is a duplicate, the error is "cannot create note because it is a duplicate".
-            if (result.canAdd) {
+        for (let i = 0; i < withDuplicatesAllowed.length; i++) {
+            if (withDuplicatesAllowed[i] === noDuplicatesAllowed[i]) {
                 canAddArray.push({note: notes[i], isDuplicate: false});
-            } else if (result.error.endsWith('duplicate')) {
-                canAddArray.push({note: notes[i], isDuplicate: true});
             } else {
-                cannotAddArray.push(notes[i]);
+                canAddArray.push({note: notes[i], isDuplicate: true});
             }
         }
 
@@ -582,11 +573,10 @@ export class Backend {
     async _onApiGetAnkiNoteInfo({notes, fetchAdditionalInfo}) {
         const {canAddArray, cannotAddArray} = await this.partitionAddibleNotes(notes);
 
-        /** @type {{note: import('anki').Note, info: import('anki').NoteInfoWrapper}[]} */
-        const cannotAdd = cannotAddArray.filter((note) => isNoteDataValid(note)).map((note) => ({note, info: {canAdd: false, valid: false, noteIds: null}}));
-
         /** @type {import('anki').NoteInfoWrapper[]} */
-        const results = cannotAdd.map(({info}) => info);
+        const results = cannotAddArray
+            .filter((note) => isNoteDataValid(note))
+            .map(() => ({canAdd: false, valid: false, noteIds: null}));
 
         /** @type {import('anki').Note[]} */
         const duplicateNotes = [];
@@ -609,31 +599,21 @@ export class Backend {
 
             const valid = isNoteDataValid(note);
 
+            if (isDuplicate && duplicateNoteIds[originalIndices.indexOf(i)].length === 0) {
+                duplicateNoteIds[originalIndices.indexOf(i)] = [invalidNoteId];
+            }
+
+            const noteIds = isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null;
+            const noteInfos = (fetchAdditionalInfo && noteIds !== null && noteIds.length > 0) ? await this._anki.notesInfo(noteIds) : [];
+
             const info = {
                 canAdd: valid,
                 valid,
-                noteIds: isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null
+                noteIds: noteIds,
+                noteInfos: noteInfos
             };
 
             results.push(info);
-
-            if (!valid) {
-                cannotAdd.push({note, info});
-            }
-        }
-
-        if (cannotAdd.length > 0) {
-            const cannotAddNotes = cannotAdd.map(({note}) => note);
-            const noteIdsArray = await this._anki.findNoteIds(cannotAddNotes);
-            for (let i = 0, ii = Math.min(cannotAdd.length, noteIdsArray.length); i < ii; ++i) {
-                const noteIds = noteIdsArray[i];
-                if (noteIds.length > 0) {
-                    cannotAdd[i].info.noteIds = noteIds;
-                    if (fetchAdditionalInfo) {
-                        cannotAdd[i].info.noteInfos = await this._anki.notesInfo(noteIds);
-                    }
-                }
-            }
         }
 
         return results;
@@ -1616,15 +1596,18 @@ export class Backend {
     }
 
     /**
-     * @returns {Promise<string>}
+     * Returns the action's default title.
+     * @throws {Error}
+     * @returns {string}
      */
     _getBrowserIconTitle() {
-        return (
-            isObjectNotArray(chrome.action) &&
-            typeof chrome.action.getTitle === 'function' ?
-                new Promise((resolve) => { chrome.action.getTitle({}, resolve); }) :
-                Promise.resolve('')
-        );
+        const manifest = /** @type {chrome.runtime.ManifestV3} */ (chrome.runtime.getManifest());
+        const action = manifest.action;
+        if (typeof action === 'undefined') { throw new Error('Failed to find action'); }
+        const defaultTitle = action.default_title;
+        if (typeof defaultTitle === 'undefined') { throw new Error('Failed to find default_title'); }
+
+        return defaultTitle;
     }
 
     /**
@@ -1848,16 +1831,7 @@ export class Backend {
         }
 
         try {
-            const tabWindow = await new Promise((resolve, reject) => {
-                chrome.windows.get(tab.windowId, {}, (value) => {
-                    const e = chrome.runtime.lastError;
-                    if (e) {
-                        reject(new Error(e.message));
-                    } else {
-                        resolve(value);
-                    }
-                });
-            });
+            const tabWindow = await this._getWindow(tab.windowId);
             if (!tabWindow.focused) {
                 await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
                     chrome.windows.update(tab.windowId, {focused: true}, () => {
@@ -1873,6 +1847,23 @@ export class Backend {
         } catch (e) {
             // Edge throws exception for no reason here.
         }
+    }
+
+    /**
+     * @param {number} windowId
+     * @returns {Promise<chrome.windows.Window>}
+     */
+    _getWindow(windowId) {
+        return new Promise((resolve, reject) => {
+            chrome.windows.get(windowId, {}, (value) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(value);
+                }
+            });
+        });
     }
 
     /**
@@ -2075,7 +2066,7 @@ export class Backend {
 
         try {
             if (screenshotDetails !== null) {
-                screenshotFileName = await this._injectAnkiNoteScreenshot(ankiConnect, timestamp, definitionDetails, screenshotDetails);
+                screenshotFileName = await this._injectAnkiNoteScreenshot(ankiConnect, timestamp, screenshotDetails);
             }
         } catch (e) {
             errors.push(ExtensionError.serialize(e));
@@ -2083,7 +2074,7 @@ export class Backend {
 
         try {
             if (clipboardDetails !== null && clipboardDetails.image) {
-                clipboardImageFileName = await this._injectAnkiNoteClipboardImage(ankiConnect, timestamp, definitionDetails);
+                clipboardImageFileName = await this._injectAnkiNoteClipboardImage(ankiConnect, timestamp);
             }
         } catch (e) {
             errors.push(ExtensionError.serialize(e));
@@ -2109,7 +2100,7 @@ export class Backend {
         let dictionaryMedia;
         try {
             let errors2;
-            ({results: dictionaryMedia, errors: errors2} = await this._injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, definitionDetails, dictionaryMediaDetails));
+            ({results: dictionaryMedia, errors: errors2} = await this._injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, dictionaryMediaDetails));
             for (const error of errors2) {
                 errors.push(ExtensionError.serialize(error));
             }
@@ -2160,7 +2151,7 @@ export class Backend {
 
         let extension = contentType !== null ? getFileExtensionFromAudioMediaType(contentType) : null;
         if (extension === null) { extension = '.mp3'; }
-        let fileName = this._generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp, definitionDetails);
+        let fileName = this._generateAnkiNoteMediaFileName('yomitan_audio', extension, timestamp);
         fileName = fileName.replace(/\]/g, '');
         return await ankiConnect.storeMediaFile(fileName, data);
     }
@@ -2168,11 +2159,10 @@ export class Backend {
     /**
      * @param {AnkiConnect} ankiConnect
      * @param {number} timestamp
-     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
      * @param {import('api').InjectAnkiNoteMediaScreenshotDetails} details
      * @returns {Promise<?string>}
      */
-    async _injectAnkiNoteScreenshot(ankiConnect, timestamp, definitionDetails, details) {
+    async _injectAnkiNoteScreenshot(ankiConnect, timestamp, details) {
         const {tabId, frameId, format, quality} = details;
         const dataUrl = await this._getScreenshot(tabId, frameId, format, quality);
 
@@ -2182,17 +2172,16 @@ export class Backend {
             throw new Error('Unknown media type for screenshot image');
         }
 
-        const fileName = this._generateAnkiNoteMediaFileName('yomitan_browser_screenshot', extension, timestamp, definitionDetails);
+        const fileName = this._generateAnkiNoteMediaFileName('yomitan_browser_screenshot', extension, timestamp);
         return await ankiConnect.storeMediaFile(fileName, data);
     }
 
     /**
      * @param {AnkiConnect} ankiConnect
      * @param {number} timestamp
-     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
      * @returns {Promise<?string>}
      */
-    async _injectAnkiNoteClipboardImage(ankiConnect, timestamp, definitionDetails) {
+    async _injectAnkiNoteClipboardImage(ankiConnect, timestamp) {
         const dataUrl = await this._clipboardReader.getImage();
         if (dataUrl === null) {
             return null;
@@ -2204,20 +2193,30 @@ export class Backend {
             throw new Error('Unknown media type for clipboard image');
         }
 
-        const fileName = this._generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp, definitionDetails);
-        return await ankiConnect.storeMediaFile(fileName, data);
+        const fileName = dataUrl === this._ankiClipboardImageDataUrlCache && this._ankiClipboardImageFilenameCache ?
+            this._ankiClipboardImageFilenameCache :
+            this._generateAnkiNoteMediaFileName('yomitan_clipboard_image', extension, timestamp);
+
+        const storedFileName = await ankiConnect.storeMediaFile(fileName, data);
+
+        if (storedFileName !== null) {
+            this._ankiClipboardImageDataUrlCache = dataUrl;
+            this._ankiClipboardImageFilenameCache = storedFileName;
+        }
+
+        return storedFileName;
     }
 
     /**
      * @param {AnkiConnect} ankiConnect
      * @param {number} timestamp
-     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
      * @param {import('api').InjectAnkiNoteMediaDictionaryMediaDetails[]} dictionaryMediaDetails
      * @returns {Promise<{results: import('api').InjectAnkiNoteDictionaryMediaResult[], errors: unknown[]}>}
      */
-    async _injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, definitionDetails, dictionaryMediaDetails) {
+    async _injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, dictionaryMediaDetails) {
         const targets = [];
         const detailsList = [];
+        /** @type {Map<string, {dictionary: string, path: string, media: ?import('dictionary-database').MediaDataStringContent}>} */
         const detailsMap = new Map();
         for (const {dictionary, path} of dictionaryMediaDetails) {
             const target = {dictionary, path};
@@ -2249,8 +2248,7 @@ export class Backend {
                 fileName = this._generateAnkiNoteMediaFileName(
                     `yomitan_dictionary_media_${i + 1}`,
                     extension !== null ? extension : '',
-                    timestamp,
-                    definitionDetails
+                    timestamp
                 );
                 try {
                     fileName = await ankiConnect.storeMediaFile(fileName, content);
@@ -2331,27 +2329,10 @@ export class Backend {
      * @param {string} prefix
      * @param {string} extension
      * @param {number} timestamp
-     * @param {import('api').InjectAnkiNoteMediaDefinitionDetails} definitionDetails
      * @returns {string}
      */
-    _generateAnkiNoteMediaFileName(prefix, extension, timestamp, definitionDetails) {
+    _generateAnkiNoteMediaFileName(prefix, extension, timestamp) {
         let fileName = prefix;
-
-        switch (definitionDetails.type) {
-            case 'kanji':
-                {
-                    const {character} = definitionDetails;
-                    if (character) { fileName += `_${character}`; }
-                }
-                break;
-            default:
-                {
-                    const {reading, term} = definitionDetails;
-                    if (reading) { fileName += `_${reading}`; }
-                    if (term) { fileName += `_${term}`; }
-                }
-                break;
-        }
 
         fileName += `_${this._ankNoteDateToString(new Date(timestamp))}`;
         fileName += extension;
@@ -2381,7 +2362,8 @@ export class Backend {
         const hours = date.getUTCHours().toString().padStart(2, '0');
         const minutes = date.getUTCMinutes().toString().padStart(2, '0');
         const seconds = date.getUTCSeconds().toString().padStart(2, '0');
-        return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
+        const milliseconds = date.getUTCMilliseconds().toString().padStart(3, '0');
+        return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}-${milliseconds}`;
     }
 
     /**

@@ -19,6 +19,7 @@
 import {ExtensionError} from '../../core/extension-error.js';
 import {toError} from '../../core/to-error.js';
 import {AnkiNoteBuilder} from '../../data/anki-note-builder.js';
+import {getDynamicTemplates} from '../../data/anki-template-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {TemplateRendererProxy} from '../../templates/template-renderer-proxy.js';
 
@@ -244,8 +245,7 @@ export class AnkiTemplatesController {
                     query: sentenceText,
                     fullQuery: sentenceText
                 };
-                let template = options.anki.fieldTemplates;
-                if (typeof template !== 'string') { template = this._defaultFieldTemplates; }
+                const template = this._getAnkiTemplate(options);
                 const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
                 const {note, errors} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
                     dictionaryEntry,
@@ -292,5 +292,16 @@ export class AnkiTemplatesController {
         if (invalidateInput) {
             /** @type {HTMLTextAreaElement} */ (this._fieldTemplatesTextarea).dataset.invalid = `${hasError}`;
         }
+    }
+
+    /**
+     * @param {import('settings').ProfileOptions} options
+     * @returns {string}
+     */
+    _getAnkiTemplate(options) {
+        let staticTemplates = options.anki.fieldTemplates;
+        if (typeof staticTemplates !== 'string') { staticTemplates = this._defaultFieldTemplates; }
+        const dynamicTemplates = getDynamicTemplates(options);
+        return staticTemplates + '\n' + dynamicTemplates;
     }
 }

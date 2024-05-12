@@ -27,6 +27,7 @@ import {JsonSchema} from './json-schema.js';
 // of the options object to a newer format. SafeAny is used for much of this, since every single
 // legacy format does not contain type definitions.
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 export class OptionsUtil {
     constructor() {
@@ -534,7 +535,13 @@ export class OptionsUtil {
             this._updateVersion25,
             this._updateVersion26,
             this._updateVersion27,
-            this._updateVersion28
+            this._updateVersion28,
+            this._updateVersion29,
+            this._updateVersion30,
+            this._updateVersion31,
+            this._updateVersion32,
+            this._updateVersion33,
+            this._updateVersion34
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -604,7 +611,7 @@ export class OptionsUtil {
             showAdvanced: false,
             searchTerms: true,
             searchKanji: true,
-            scanOnTouchMove: true,
+            scanOnTouchMove: false,
             scanOnPenHover: true,
             scanOnPenPress: true,
             scanOnPenRelease: false,
@@ -1209,6 +1216,69 @@ export class OptionsUtil {
     }
 
     /**
+     *  - Added new handlebar for different pitch accent graph style.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion29(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v29.handlebars');
+    }
+
+    /**
+     *  - Added scanning.inputs[].options.scanOnTouchTap.
+     *  - Set touch settings to be more sensible.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion30(options) {
+        for (const profile of options.profiles) {
+            for (const input of profile.options.scanning.inputs) {
+                input.options.scanOnTouchTap = true;
+                input.options.scanOnTouchPress = false;
+                input.options.scanOnTouchRelease = false;
+            }
+        }
+    }
+
+    /**
+     *  - Added anki.duplicateBehavior
+     *  @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion31(options) {
+        for (const {options: profileOptions} of options.profiles) {
+            profileOptions.anki.duplicateBehavior = 'new';
+        }
+    }
+
+    /**
+     *  - Added profilePrevious and profileNext to hotkeys.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion32(options) {
+        for (const profile of options.profiles) {
+            profile.options.inputs.hotkeys.push(
+                {action: 'profilePrevious', key: 'Minus', modifiers: ['alt'], scopes: ['popup', 'search'], enabled: true},
+                {action: 'profileNext', key: 'Equal', modifiers: ['alt'], scopes: ['popup', 'search'], enabled: true}
+            );
+        }
+    }
+
+    /**
+     * - Updated handlebars to fix escaping when using `definition.cloze` or text-based `getMedia`.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion33(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v33.handlebars');
+    }
+
+    /**
+     *  - Added dynamic handlebars for single dictionaries.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion34(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v34.handlebars');
+    }
+
+
+    /**
      * @param {string} url
      * @returns {Promise<chrome.tabs.Tab>}
      */
@@ -1226,4 +1296,5 @@ export class OptionsUtil {
     }
 }
 
+/* eslint-enable @typescript-eslint/no-unsafe-assignment */
 /* eslint-enable @typescript-eslint/no-unsafe-argument */

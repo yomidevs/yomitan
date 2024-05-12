@@ -19,7 +19,7 @@
 import {Handlebars} from '../../lib/handlebars.js';
 import {createAnkiNoteData} from '../data/anki-note-data-creator.js';
 import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
-import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from '../display/pronunciation-generator.js';
+import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationGraphJJ, createPronunciationText} from '../display/pronunciation-generator.js';
 import {StructuredContentGenerator} from '../display/structured-content-generator.js';
 import {CssStyleApplier} from '../dom/css-style-applier.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, distributeFurigana, getKanaMorae, getPitchCategory, isMoraPitchHigh} from '../language/ja/japanese.js';
@@ -659,12 +659,19 @@ export class AnkiTemplateRenderer {
     }
 
     /**
+     * @param {import('template-renderer').HelperOptions} options
+     * @returns {import('anki-templates').NoteData}
+     */
+    _getNoteDataFromOptions(options) {
+        return options.data.root;
+    }
+
+    /**
      * @type {import('template-renderer').HelperFunction<string>}
      */
     _formatGlossary(args, _context, options) {
         const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossaryContent]} */ (args);
-        /** @type {import('anki-templates').NoteData} */
-        const data = options.data.root;
+        const data = this._getNoteDataFromOptions(options);
         if (typeof content === 'string') { return this._safeString(this._stringToMultiLineHtml(content)); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
         switch (content.type) {
@@ -703,8 +710,7 @@ export class AnkiTemplateRenderer {
      * @type {import('template-renderer').HelperFunction<boolean>}
      */
     _hasMedia(args, _context, options) {
-        /** @type {import('anki-templates').NoteData} */
-        const data = options.data.root;
+        const data = this._getNoteDataFromOptions(options);
         return this._mediaProvider.hasMedia(data, args, options.hash);
     }
 
@@ -712,8 +718,7 @@ export class AnkiTemplateRenderer {
      * @type {import('template-renderer').HelperFunction<?string>}
      */
     _getMedia(args, _context, options) {
-        /** @type {import('anki-templates').NoteData} */
-        const data = options.data.root;
+        const data = this._getNoteDataFromOptions(options);
         return this._mediaProvider.getMedia(data, args, options.hash);
     }
 
@@ -741,6 +746,8 @@ export class AnkiTemplateRenderer {
             }
             case 'graph':
                 return this._getPronunciationHtml(createPronunciationGraph(morae, downstepPosition));
+            case 'graph-jj':
+                return this._getPronunciationHtml(createPronunciationGraphJJ(morae, downstepPosition));
             case 'position':
                 return this._getPronunciationHtml(createPronunciationDownstepPosition(downstepPosition));
             default:

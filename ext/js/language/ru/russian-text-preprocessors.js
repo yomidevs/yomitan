@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextProcessorOptions} from '../text-preprocessors.js';
+import {basicTextProcessorOptions} from '../text-processors.js';
 
 /** @type {import('language').TextProcessor<boolean>} */
 export const removeRussianDiacritics = {

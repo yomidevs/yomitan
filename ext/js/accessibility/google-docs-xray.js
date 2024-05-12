@@ -17,7 +17,7 @@
 
 /** Entry point. */
 function main() {
-    /** @type {Window} */
+    /** @type {unknown} */
     // @ts-expect-error - Firefox Xray vision
     const window2 = window.wrappedJSObject;
     if (!(typeof window2 === 'object' && window2 !== null)) { return; }
