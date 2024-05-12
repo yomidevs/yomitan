@@ -161,33 +161,6 @@
                 <label class="toggle"><input type="checkbox" id="middle-mouse-button-scan"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Auto-hide search popup</div>
-                    <div class="settings-item-description">When no definitions are found after scanning text, the popup will be hidden.</div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="scanning.autoHideResults"
-                        data-transform='{
-                            "type": "setVisibility",
-                            "selector": "#auto-hide-search-popup-options",
-                            "condition": {"op": "===", "value": true}
-                        }'
-                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children settings-item-children-group" id="auto-hide-search-popup-options" hidden>
-                <div class="settings-item"><div class="settings-item-inner">
-                    <div class="settings-item-left">
-                        <div class="settings-item-label">Delay <span class="light">(in milliseconds)</span></div>
-                    </div>
-                    <div class="settings-item-right">
-                        <input type="number" data-setting="scanning.hideDelay" min="0">
-                    </div>
-                </div></div>
-            </div>
-        </div>
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Theme</div>
