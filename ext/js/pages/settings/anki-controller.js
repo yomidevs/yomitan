@@ -505,6 +505,22 @@ export class AnkiController {
                 return null;
         }
     }
+
+    /**
+     * @param {import('anki').Note[]} notes
+     * @returns {Promise<?((number | null)[] | null)>}
+     */
+    async addNotes(notes) {
+        return await this._ankiConnect.addNotes(notes);
+    }
+
+    /**
+     * @param {import('anki').Note[]} notes
+     * @returns {Promise<boolean[]>}
+     */
+    async canAddNotes(notes) {
+        return await this._ankiConnect.canAddNotes(notes);
+    }
 }
 
 class AnkiCardController {

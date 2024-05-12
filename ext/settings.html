@@ -1842,6 +1842,14 @@
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
             </div>
         </div></div>
+        <div class="settings-item settings-item-button advanced-only" data-modal-action="show,generate-anki-notes" id="generate-anki-notes-main-settings-entry"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Generate Anki Notes (Experimental)&hellip;</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></div>
     </div>
 
     <!-- Clipboard -->
@@ -3210,6 +3218,103 @@
     <div class="modal-footer">
         <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
         <button type="button" class="danger" id="anki-card-templates-reset-button-confirm">Reset Templates</button>
+    </div>
+</div></div>
+
+<!-- Generate anki deck modal -->
+<div id="generate-anki-notes-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-full">
+    <div class="modal-header"><div class="modal-title">Anki Note Generator</div></div>
+    <div class="modal-body generate-anki-notes-layout">
+        <div class="generate-anki-notes-info">
+            <p class="warning-text">
+                WARNING: This feature is experimental!
+            </p>
+            <p>
+                Enter a newline separated list of terms below to send notes directly to an Anki deck or export to an Anki deck file in <code>Notes in plain text (.txt)</code> format.
+            </p>
+            <p>
+                For more information check the <a href="https://github.com/themoeway/yomitan/blob/master/docs/anki-integration.md#anki-note-generation">documentation</a>.
+            </p>
+        </div>
+        <textarea autocomplete="off" spellcheck="false" id="generate-anki-notes-textarea" class="no-wrap margin-above" data-tab-action="indent,4"></textarea>
+        <div class="generate-anki-notes-test-container margin-above">
+            <p>
+                Active Anki deck: <code id="generate-anki-notes-active-deck"></code><br>
+                Active Anki model: <code id="generate-anki-notes-active-model"></code>
+            </p>
+            <div class="generate-anki-notes-test-table margin-above">
+                <div class="generate-anki-notes-test-table-header">Test word</div>
+                <div></div>
+                <input type="text" id="generate-anki-notes-test-text-input" class="form-control" value="読め" placeholder="Preview text" autocomplete="off" lang="ja">
+                <button type="button" id="generate-anki-notes-test-render-button">Preview Card</button>
+            </div>
+        </div>
+        <div class="code margin-above" id="generate-anki-notes-render-result"><em>Card render result</em></div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="low-emphasis" id="generate-anki-notes-send-to-anki-button">Send to Anki</button>
+        <button type="button" class="low-emphasis" id="generate-anki-notes-export-button">Export to File</button>
+        <button type="button" data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
+<div id="generate-anki-notes-send-to-anki-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+    <div class="modal-header"><div class="modal-title">Send Notes to Anki</div></div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to send <strong id="generate-anki-notes-send-wordcount"></strong> terms to <code id="generate-anki-notes-active-deck-confirm"></code>? This action cannot be undone.
+        </p>
+        <div class="settings-item margin-above"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">
+                    Add media to notes
+                </div>
+                <div class="settings-item-description">
+                    Adding media increases processing time.
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" id="generate-anki-notes-add-media"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item margin-above"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">
+                    Prevent sending duplicate notes
+                </div>
+                <div class="settings-item-description">
+                    Checking for duplicates increases processing time.
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" id="generate-anki-notes-disallow-duplicates"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+    </div>
+    <div class="modal-body-addon generate-anki-notes-progress" hidden>
+        <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
+        <div class="progress-bar-track"><div class="progress-bar"></div></div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="low-emphasis" data-modal-action="hide" id="generate-anki-notes-send-to-anki-cancel-button">Cancel</button>
+        <button type="button" class="danger" id="generate-anki-notes-send-button-confirm">Send to Anki</button>
+    </div>
+</div></div>
+
+<div id="generate-anki-notes-export-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+    <div class="modal-header"><div class="modal-title">Export Notes to File</div></div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to export <strong id="generate-anki-notes-export-wordcount"></strong> terms to <code>Notes in plain text (.txt)</code> format?
+        </p>
+    </div>
+    <div class="modal-body-addon generate-anki-notes-progress" hidden>
+        <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
+        <div class="progress-bar-track"><div class="progress-bar"></div></div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="low-emphasis" data-modal-action="hide" id="generate-anki-notes-export-cancel-button">Cancel</button>
+        <button type="button" class="danger" id="generate-anki-notes-export-button-confirm">Export to File</button>
     </div>
 </div></div>
 
