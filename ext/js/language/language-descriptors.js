@@ -22,6 +22,7 @@ import {englishTransforms} from './en/english-transforms.js';
 import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
+import {latinTransforms} from './la/latin-transforms.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {oldIrishTransforms} from './sga/old-irish-transforms.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
@@ -125,7 +126,8 @@ const languageDescriptors = [
         textPreprocessors: {
             ...capitalizationPreprocessors,
             removeAlphabeticDiacritics
-        }
+        },
+        languageTransforms: latinTransforms
     },
     {
         iso: 'ja',
@@ -145,6 +147,12 @@ const languageDescriptors = [
         iso: 'km',
         name: 'Khmer',
         exampleText: 'អាន'
+    },
+    {
+        iso: 'nl',
+        name: 'Dutch',
+        exampleText: 'lezen',
+        textPreprocessors: capitalizationPreprocessors
     },
     {
         iso: 'pl',

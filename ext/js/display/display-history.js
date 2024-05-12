@@ -37,6 +37,7 @@ export class DisplayHistory extends EventDispatcher {
         /** @type {Map<string, import('display-history').Entry>} */
         this._historyMap = new Map();
 
+        /** @type {unknown} */
         const historyState = history.state;
         const {id, state} = (
             isObjectNotArray(historyState) ?
@@ -188,6 +189,7 @@ export class DisplayHistory extends EventDispatcher {
 
     /** */
     _updateStateFromHistory() {
+        /** @type {unknown} */
         let state = history.state;
         let id = null;
         if (isObjectNotArray(state)) {
@@ -208,7 +210,7 @@ export class DisplayHistory extends EventDispatcher {
 
         // Fallback
         this._current.id = (typeof id === 'string' ? id : this._generateId());
-        this._current.state = state;
+        this._current.state = /** @type {import('display-history').EntryState} */ (state);
         this._current.content = null;
         this._clear();
     }

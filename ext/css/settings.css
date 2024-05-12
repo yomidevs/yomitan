@@ -1640,6 +1640,40 @@ code.anki-field-marker {
     min-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
 }
 
+.generate-anki-notes-layout {
+    display: flex;
+    flex-flow: column nowrap;
+}
+.generate-anki-notes-info {
+    flex: 0 1 auto;
+}
+.generate-anki-notes-test-container {
+    flex: 0 1 auto;
+}
+.generate-anki-notes-test-table {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    column-gap: 0.85em;
+}
+.generate-anki-notes-test-table-header {
+    font-size: var(--font-size-small);
+}
+#generate-anki-notes-textarea {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    resize: none;
+    min-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
+}
+#generate-anki-notes-test-text-input {
+    width: 100%;
+}
+
 .code {
     flex: 0 0 auto;
     width: 100%;

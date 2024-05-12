@@ -288,6 +288,7 @@ export class FrameAncestryHandler {
                 }
 
                 /** @type {?ShadowRoot|undefined} */
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const shadowRoot = (
                     element.shadowRoot ||
                     // @ts-expect-error - openOrClosedShadowRoot is available to Firefox 63+ for WebExtensions

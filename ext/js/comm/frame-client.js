@@ -83,6 +83,7 @@ export class FrameClient {
      */
     _connectInternal(frame, targetOrigin, hostFrameId, setupFrame, timeout) {
         return new Promise((resolve, reject) => {
+            /** @type {Map<string, string>} */
             const tokenMap = new Map();
             /** @type {?import('core').Timeout} */
             let timer = null;

@@ -80,6 +80,7 @@ async function validateDictionaryBanks(mode, entries, schemasDetails) {
 export async function validateDictionary(mode, archiveData, schemas) {
     const entries = await getDictionaryArchiveEntries(archiveData);
     const indexFileName = getIndexFileName();
+    /** @type {import('dictionary-data').Index} */
     const index = await getDictionaryArchiveJson(entries, indexFileName);
     const version = index.format || index.version;
 

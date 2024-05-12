@@ -211,12 +211,14 @@ class DictionaryEntry {
      * @returns {boolean}
      */
     _setupDetails(detailsTable) {
-        /** @type {[label: string, key: 'author'|'url'|'description'|'attribution'][]} */
+        /** @type {[label: string, key: 'author'|'url'|'description'|'attribution'|'sourceLanguage'|'targetLanguage'][]} */
         const targets = [
             ['Author', 'author'],
             ['URL', 'url'],
             ['Description', 'description'],
-            ['Attribution', 'attribution']
+            ['Attribution', 'attribution'],
+            ['Source Language', 'sourceLanguage'],
+            ['Target Language', 'targetLanguage']
         ];
 
         const dictionaryInfo = this._dictionaryInfo;

@@ -1263,7 +1263,7 @@ class JsonSchemaProxyHandler {
     /**
      * @param {import('ext/json-schema').ValueObjectOrArray} target
      * @param {string|number|symbol} property
-     * @param {import('core').SafeAny} value
+     * @param {unknown} value
      * @returns {boolean}
      * @throws {Error}
      */
