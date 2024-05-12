@@ -211,7 +211,9 @@ body {
 .danger-text {
     color: var(--danger-color);
 }
-
+.success-text {
+    color: var(--success-color);
+}
 
 /* Icons */
 .icon {
