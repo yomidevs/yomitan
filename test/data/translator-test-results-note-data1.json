@@ -25103,7 +25103,7 @@
           "type": "term",
           "id": 3,
           "source": "打ち",
-          "rawSource": "(打)(ち)(",
+          "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
           "inflectionRuleChainCandidates": [
             {
@@ -25419,7 +25419,7 @@
           "type": "term",
           "id": 5,
           "source": "打ち",
-          "rawSource": "(打)(ち)(",
+          "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
           "inflectionRuleChainCandidates": [
             {
@@ -25735,7 +25735,7 @@
           "type": "term",
           "id": 4,
           "source": "打ち",
-          "rawSource": "(打)(ち)(",
+          "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
           "inflectionRuleChainCandidates": [
             {
@@ -26051,7 +26051,7 @@
           "type": "term",
           "id": 6,
           "source": "打ち",
-          "rawSource": "(打)(ち)(",
+          "rawSource": "(打)(ち)",
           "sourceTerm": "打つ",
           "inflectionRuleChainCandidates": [
             {
@@ -26367,7 +26367,7 @@
           "type": "term",
           "id": 1,
           "source": "打",
-          "rawSource": "(打)(",
+          "rawSource": "(打)",
           "sourceTerm": "打",
           "inflectionRuleChainCandidates": [
             {
@@ -26681,7 +26681,7 @@
           "type": "term",
           "id": 2,
           "source": "打",
-          "rawSource": "(打)(",
+          "rawSource": "(打)",
           "sourceTerm": "打",
           "inflectionRuleChainCandidates": [
             {
