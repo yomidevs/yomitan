@@ -114,7 +114,15 @@ class DisplayController {
                         const result = customHandler(e);
                         if (typeof result !== 'undefined') { return; }
                     }
-                    void this._api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
+
+                    let mode = 'existingOrNewTab';
+                    if (e.ctrlKey) {
+                        mode = 'newTab';
+                    } else if (e.shiftKey) {
+                        mode = 'popup';
+                    }
+
+                    void this._api.commandExec(command, {mode: mode});
                     e.preventDefault();
                 };
                 /**
