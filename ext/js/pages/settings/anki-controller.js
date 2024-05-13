@@ -582,6 +582,17 @@ class AnkiCardController {
 
         this._ankiCardFieldsContainer = this._node.querySelector('.anki-card-fields');
 
+        /** @type {HTMLTextAreaElement} */
+        const mainSettingsEntry = querySelectorNotNull(document, '#configure-anki-card-format-main-settings-entry');
+        mainSettingsEntry.addEventListener('click', (() => {
+            const updatedCardOptions = this._getCardOptions(ankiOptions, this._optionsType);
+            if (updatedCardOptions === null) { return; }
+            this._deckController.prepare(deckControllerSelect, updatedCardOptions.deck);
+            this._modelController.prepare(modelControllerSelect, updatedCardOptions.model);
+            this._fields = updatedCardOptions.fields;
+            void this.updateAnkiState();
+        }).bind(this), false);
+
         this._setupFields();
 
         this._eventListeners.addEventListener(this._deckController.select, 'change', this._onCardDeckChange.bind(this), false);
