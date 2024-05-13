@@ -255,6 +255,7 @@
     color: var(--text-color-light3);
 }
 .gloss-sc-details {
+    padding-left: var(--list-padding1);
     border-bottom: calc(1em / var(--font-size-no-units)) solid var(--medium-border-color);
 }
 .gloss-sc-summary {
