@@ -542,7 +542,8 @@ export class OptionsUtil {
             this._updateVersion32,
             this._updateVersion33,
             this._updateVersion34,
-            this._updateVersion35
+            this._updateVersion35,
+            this._updateVersion36
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1284,6 +1285,20 @@ export class OptionsUtil {
      */
     async _updateVersion35(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v35.handlebars');
+    }
+
+    /**
+     *  - Added dynamic handlebars for first dictionary entry only.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion36(options) {
+        for (const profile of options.profiles) {
+            for (const hotkey of profile.options.inputs.hotkeys) {
+                if (hotkey.action === 'profilePrevious' || hotkey.action === 'profileNext') {
+                    hotkey.scopes = ['popup', 'search', 'web'];
+                }
+            }
+        }
     }
 
 

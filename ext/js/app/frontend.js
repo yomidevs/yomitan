@@ -119,7 +119,9 @@ export class Frontend {
 
         this._hotkeyHandler.registerActions([
             ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
-            ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)]
+            ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)],
+            ['profilePrevious',   async () => { await this._setProfile(-1); }],
+            ['profileNext',       async () => { await this._setProfile(1); }]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -963,5 +965,25 @@ export class Frontend {
         const {GoogleDocsUtil} = await import('../accessibility/google-docs-util.js');
         const googleDocsUtil = new GoogleDocsUtil();
         this._textSourceGenerator.registerGetRangeFromPointHandler(googleDocsUtil.getRangeFromPoint.bind(googleDocsUtil));
+    }
+
+    /**
+     * @param {number} direction
+     */
+    async _setProfile(direction) {
+        const optionsFull = await this._application.api.optionsGetFull();
+
+        const profileCount = optionsFull.profiles.length;
+        const newProfile = (optionsFull.profileCurrent + direction + profileCount) % profileCount;
+
+        /** @type {import('settings-modifications').ScopedModificationSet} */
+        const modification = {
+            action: 'set',
+            path: 'profileCurrent',
+            value: newProfile,
+            scope: 'global',
+            optionsContext: null
+        };
+        await this._application.api.modifySettings([modification], 'search');
     }
 }
