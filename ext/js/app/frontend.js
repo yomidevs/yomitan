@@ -378,7 +378,12 @@ export class Frontend {
     }
 
     /** */
-    _onSearchEmpty() {}
+    _onSearchEmpty() {
+        const scanningOptions = /** @type {import('settings').ProfileOptions} */ (this._options).scanning;
+        if (scanningOptions.autoHideResults) {
+            this._clearSelectionDelayed(scanningOptions.hideDelay, false, false);
+        }
+    }
 
     /**
      * @param {import('text-scanner').EventArgument<'searchError'>} details
