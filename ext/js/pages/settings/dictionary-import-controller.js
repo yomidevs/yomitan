@@ -131,10 +131,8 @@ export class DictionaryImportController {
         const fileFromURL = await fetch(this._importURLText.value)
             .then((res) => res.blob())
             .then((blob) => {
-                return new File([blob], 'testfile');
+                return new File([blob], 'fileFromURL');
             });
-        console.log(fileFromURL);
-        console.log(this._importURLText.value);
         void this._importDictionaries([fileFromURL]);
     }
 
