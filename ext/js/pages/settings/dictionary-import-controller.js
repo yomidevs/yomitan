@@ -44,8 +44,14 @@ export class DictionaryImportController {
         this._purgeConfirmButton = querySelectorNotNull(document, '#dictionary-confirm-delete-all-button');
         /** @type {HTMLButtonElement} */
         this._importFileButton = querySelectorNotNull(document, '#dictionary-import-file-button');
-        /** @type {HTMLInputElement} */
+        /** @type {HTMLButtonElement} */
         this._importFileInput = querySelectorNotNull(document, '#dictionary-import-file-input');
+        /** @type {HTMLInputElement} */
+        this._importURLButton = querySelectorNotNull(document, '#dictionary-import-url-button');
+        /** @type {HTMLInputElement} */
+        this._importURLConfirmButton = querySelectorNotNull(document, '#dictionary-import-url-confirm-button');
+        /** @type {HTMLInputElement} */
+        this._importURLText = querySelectorNotNull(document, '#dictionary-import-url-text');
         /** @type {?import('./modal.js').Modal} */
         this._purgeConfirmModal = null;
         /** @type {HTMLElement} */
@@ -65,12 +71,15 @@ export class DictionaryImportController {
 
     /** */
     prepare() {
+        this._importURLModal = this._modalController.getModal('dictionary-import-url');
         this._purgeConfirmModal = this._modalController.getModal('dictionary-confirm-delete-all');
 
         this._purgeButton.addEventListener('click', this._onPurgeButtonClick.bind(this), false);
         this._purgeConfirmButton.addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
         this._importFileButton.addEventListener('click', this._onImportButtonClick.bind(this), false);
         this._importFileInput.addEventListener('change', this._onImportFileChange.bind(this), false);
+        this._importURLButton.addEventListener('click', this._onImportFromURLButtonClick.bind(this), false);
+        this._importURLConfirmButton.addEventListener('click', this._onImportFromURLConfirm.bind(this), false);
     }
 
     // Private
@@ -78,6 +87,14 @@ export class DictionaryImportController {
     /** */
     _onImportButtonClick() {
         /** @type {HTMLInputElement} */ (this._importFileInput).click();
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    _onImportFromURLButtonClick(e) {
+        e.preventDefault();
+        /** @type {import('./modal.js').Modal} */ (this._importURLModal).setVisible(true);
     }
 
     /**
@@ -100,13 +117,25 @@ export class DictionaryImportController {
     /**
      * @param {Event} e
      */
-    _onImportFileChange(e) {
+    async _onImportFileChange(e) {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const {files} = node;
         if (files === null) { return; }
         const files2 = [...files];
         node.value = '';
         void this._importDictionaries(files2);
+    }
+
+    /** */
+    async _onImportFromURLConfirm() {
+        const fileFromURL = await fetch(this._importURLText.value)
+            .then((res) => res.blob())
+            .then((blob) => {
+                return new File([blob], 'testfile');
+            });
+        console.log(fileFromURL);
+        console.log(this._importURLText.value);
+        void this._importDictionaries([fileFromURL]);
     }
 
     /** */
