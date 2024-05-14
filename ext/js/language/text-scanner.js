@@ -88,6 +88,9 @@ export class TextScanner extends EventDispatcher {
         /** @type {?import('text-scanner').SelectionRestoreInfo} */
         this._selectionRestoreInfo = null;
 
+        /** @type {MouseEvent | null} */
+        this._lastMouseMove = null;
+
         /** @type {boolean} */
         this._deepContentScan = false;
         /** @type {boolean} */
@@ -546,11 +549,34 @@ export class TextScanner extends EventDispatcher {
      */
     _onMouseMove(e) {
         this._scanTimerClear();
+        this._lastMouseMove = e;
 
         const inputInfo = this._getMatchingInputGroupFromEvent('mouse', 'mouseMove', e);
         if (inputInfo === null) { return; }
 
         void this._searchAtFromMouseMove(e.clientX, e.clientY, inputInfo);
+    }
+
+    /**
+     * @param {KeyboardEvent} e
+     */
+    _onKeyDown(e) {
+        if (this._lastMouseMove !== null && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey)) {
+            const syntheticMouseEvent = new MouseEvent(this._lastMouseMove.type, {
+                screenX: this._lastMouseMove.screenX,
+                screenY: this._lastMouseMove.screenY,
+                clientX: this._lastMouseMove.clientX,
+                clientY: this._lastMouseMove.clientY,
+                ctrlKey: e.ctrlKey,
+                shiftKey: e.shiftKey,
+                altKey: e.altKey,
+                metaKey: e.metaKey,
+                button: this._lastMouseMove.button,
+                buttons: this._lastMouseMove.buttons,
+                relatedTarget: this._lastMouseMove.relatedTarget
+            });
+            this._onMouseMove(syntheticMouseEvent);
+        }
     }
 
     /**
@@ -1050,7 +1076,7 @@ export class TextScanner extends EventDispatcher {
         } else if (this._arePointerEventsSupported()) {
             eventListenerInfos = this._getPointerEventListeners(capture);
         } else {
-            eventListenerInfos = this._getMouseEventListeners(capture);
+            eventListenerInfos = [...this._getMouseEventListeners(capture), ...this._getKeyboardEventListeners(capture)];
             if (this._touchInputEnabled) {
                 eventListenerInfos.push(...this._getTouchEventListeners(capture));
             }
@@ -1096,6 +1122,16 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'mouseover', this._onMouseOver.bind(this), capture],
             [this._node, 'mouseout', this._onMouseOut.bind(this), capture],
             [this._node, 'click', this._onClick.bind(this), capture]
+        ];
+    }
+
+    /**
+     * @param {boolean} capture
+     * @returns {import('event-listener-collection').AddEventListenerArgs[]}
+     */
+    _getKeyboardEventListeners(capture) {
+        return [
+            [this._node, 'keydown', this._onKeyDown.bind(this), capture]
         ];
     }
 
