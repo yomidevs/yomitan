@@ -108,9 +108,8 @@ export class RecommendedPermissionsController {
                 this._errorContainer.textContent = toError(e).message;
             }
         }
-        if (!added) { return false; }
         await this._updatePermissions();
-        return true;
+        return added;
     }
 
     /** */
