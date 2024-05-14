@@ -583,7 +583,7 @@ class AnkiCardController {
         this._ankiCardFieldsContainer = this._node.querySelector('.anki-card-fields');
 
         /** @type {HTMLTextAreaElement} */
-        const mainSettingsEntry = querySelectorNotNull(document, '#configure-anki-card-format-main-settings-entry');
+        const mainSettingsEntry = querySelectorNotNull(document, '[data-modal-action="show,anki-cards"]');
         mainSettingsEntry.addEventListener('click', (() => {
             const updatedCardOptions = this._getCardOptions(ankiOptions, this._optionsType);
             if (updatedCardOptions === null) { return; }
