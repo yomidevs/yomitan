@@ -27,8 +27,9 @@
             <a href="#!dictionaries"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-enabled-warning" hidden><div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div></span></span><span class="outline-item-label">Dictionaries</span></a>
             <a href="#!general"          class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="cog"></span></span><span class="outline-item-label">General</span></a>
             <a href="#!scanning"         class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="scanning"></span></span><span class="outline-item-label">Scanning</span></a>
-            <a href="#!popup"            class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup"></span></span><span class="outline-item-label">Popup</span></a>
-            <a href="#!popup-appearance" class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="palette"></span></span><span class="outline-item-label">Appearance</span></a>
+            <a href="#!popup"            class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup"></span></span><span class="outline-item-label">Popup Behavior</span></a>
+            <a href="#!appearance"       class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="palette"></span></span><span class="outline-item-label">Appearance</span></a>
+            <a href="#!result-display"   class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="monitor"></span></span><span class="outline-item-label">Result Display</span></a>
             <a href="#!popup-size"       class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup-size"></span></span><span class="outline-item-label">Position &amp; Size</span></a>
             <a href="#!window"           class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="window"></span></span><span class="outline-item-label">Window</span></a>
             <a href="#!audio"            class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="speaker"></span></span><span class="outline-item-label">Audio</span></a>
@@ -39,7 +40,7 @@
             <a href="#!shortcuts"        class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="keyboard"></span></span><span class="outline-item-label">Shortcuts</span></a>
             <a href="#!backup"           class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="backup"></span></span><span class="outline-item-label">Backup</span></a>
             <a href="#!accessibility"    class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="accessibility"></span></span><span class="outline-item-label">Accessibility</span></a>
-            <a href="#!security"         class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="lock"></span></span><span class="outline-item-label">Security</span></a>
+            <a href="#!security"         class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="lock"></span></span><span class="outline-item-label">Security</span></a>
         </div>
         <div class="sidebar-bottom">
             <label class="button outline-item"><span class="outline-item-left">
@@ -112,6 +113,52 @@
         </div></div>
     </div>
 
+        <!-- General -->
+        <div class="heading-container">
+            <div class="heading-container-icon"><span class="icon" data-icon="cog"></span></div>
+            <div class="heading-container-left"><h2 id="general"><a href="#!general">General</a></h2></div>
+        </div>
+        <div class="settings-group">
+            <div class="settings-item"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Enable Yomitan</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div></div>
+            <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Language
+                    </div>
+                    <div class="settings-item-description">
+                        Language of the text that is being looked up.
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select id="language-select" data-setting="general.language"></select>
+                </div>
+            </div></div>
+            <div class="settings-item"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Show the <a href="/welcome.html" target="_blank" rel="noopener">welcome guide</a> on browser startup</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.showGuide"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div></div>
+            <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Maximum number of results</div>
+                    <div class="settings-item-description">Adjust the maximum number of results shown for lookups.</div>
+                </div>
+                <div class="settings-item-right">
+                    <input type="number" min="1" data-setting="general.maxResults">
+                </div>
+            </div></div>
+        </div>
+
     <!-- Dictionaries -->
     <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="book"></span></div>
@@ -159,153 +206,6 @@
             </div>
         </div>
         <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Persistent storage</div>
-                    <div class="settings-item-description">
-                        Enable to help prevent the browser from unexpectedly clearing the database.
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" id="storage-persistent-checkbox"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    Web browsers will sometimes clear stored data if the device is running low on storage space.
-                    This can result in the imported dictionaries being deleted unexpectedly, causing Yomitan to stop functioning.
-                    Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.
-                </p>
-                <p data-show-for-browser="firefox firefox-mobile" class="storage-use-invalid" hidden>
-                    On Firefox and Firefox for Android, the storage information feature may be hidden behind a browser flag.
-
-                    To enable this flag, open <a href="about:config" target="_blank" rel="noopener">about:config</a> and search for
-                    <strong>dom.storageManager.enabled</strong>.
-
-                    Setting its value to <strong>true</strong> should allow storage information to be calculated.
-                </p>
-                <p data-show-for-browser="firefox-mobile">
-                    It may not be possible to enable Persistent Storage on Firefox for Android.
-                </p>
-                <p data-show-for-browser="chrome edge">
-                    Chromium-based browsers should not need to enable this setting since the Yomitan extension has
-                    the <code>unlimitedStorage</code> permission, which should prevent data deletion.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
-                </p>
-                <p>
-                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- General -->
-    <div class="heading-container">
-        <div class="heading-container-icon"><span class="icon" data-icon="cog"></span></div>
-        <div class="heading-container-left"><h2 id="general"><a href="#!general">General</a></h2></div>
-    </div>
-    <div class="settings-group">
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Enable content scanning</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="general.enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">
-                    Language
-                </div>
-                <div class="settings-item-description">
-                    Language of the text that is being looked up.
-                </div>
-            </div>
-            <div class="settings-item-right">
-                <select id="language-select" data-setting="general.language"></select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Show the <a href="/welcome.html" target="_blank" rel="noopener">welcome guide</a> on browser startup</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="general.showGuide"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item">
-            <div class="settings-item-inner settings-item-inner-wrappable">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Result grouping mode</div>
-                    <div class="settings-item-description">
-                        Change how related results are grouped.
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <select data-setting="general.resultOutputMode"
-                        data-transform='{
-                            "type": "setVisibility",
-                            "selector": "#main-dictionary-container",
-                            "condition": {"op": "===", "value": "merge"}
-                        }'
-                    >
-                        <option value="split">No grouping</option>
-                        <option value="group">Group term-reading pairs</option>
-                        <option value="merge">Group related terms</option>
-                    </select>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <ul>
-                    <li>
-                        <strong>No grouping</strong> -
-                        Every definition will be listed as a separate entry.
-                    </li>
-                    <li>
-                        <strong>Group term-reading pairs</strong> -
-                        Definitions for the same term with the same reading will be grouped together.
-                    </li>
-                    <li>
-                        <p>
-                            <strong>Group related terms</strong> -
-                            Related terms that share the same definitions will be grouped together.
-                        </p>
-                        <p>
-                            The <em>Primary dictionary</em> option should be assigned to a dictionary which contains related term information,
-                            and configuring the <em>Secondary dictionaries</em> will allow definitions for the related terms to be
-                            included from other dictionaries.
-                        </p>
-                        <p class="warning-text">
-                            Not all dictionaries are able to be selected as the <em>Primary dictionary</em>.
-                        </p>
-                    </li>
-                </ul>
-                <p>
-                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-            <div class="settings-item-children settings-item-children-group" id="main-dictionary-container" hidden>
-                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-                    <div class="settings-item-left">
-                        <div class="settings-item-label">Primary dictionary</div>
-                    </div>
-                    <div class="settings-item-right">
-                        <select data-setting="general.mainDictionary"></select>
-                    </div>
-                </div></div>
-                <div class="settings-item settings-item-button" data-modal-action="show,secondary-search-dictionaries"><div class="settings-item-inner">
-                    <div class="settings-item-left">
-                        <div class="settings-item-label">Secondary dictionaries&hellip;</div>
-                    </div>
-                    <div class="settings-item-right open-panel-button-container">
-                        <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
-                    </div>
-                </div></div>
-            </div>
-        </div>
-        <div class="settings-item advanced-only">
             <div class="settings-item-inner settings-item-inner-wrappable">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Frequency sorting dictionary</div>
@@ -328,7 +228,7 @@
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
                 </p>
             </div>
-            <div class="settings-item-children settings-item-children-group" id="sort-frequency-dictionary-order-container" hidden>
+            <div class="settings-item-children settings-item-children-group advanced-only" id="sort-frequency-dictionary-order-container" hidden>
                 <div class="settings-item">
                     <div class="settings-item-inner settings-item-inner-wrappable">
                         <div class="settings-item-left">
@@ -372,15 +272,45 @@
                 </div>
             </div>
         </div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Maximum number of results</div>
-                <div class="settings-item-description">Adjust the maximum number of results shown for lookups.</div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Persistent storage</div>
+                    <div class="settings-item-description">
+                        Enable to help prevent the browser from unexpectedly clearing the database.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" id="storage-persistent-checkbox"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
             </div>
-            <div class="settings-item-right">
-                <input type="number" min="1" data-setting="general.maxResults">
+            <div class="settings-item-children more" hidden>
+                <p>
+                    Web browsers will sometimes clear stored data if the device is running low on storage space.
+                    This can result in the imported dictionaries being deleted unexpectedly, causing Yomitan to stop functioning.
+                    Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.
+                </p>
+                <p data-show-for-browser="firefox firefox-mobile" class="storage-use-invalid" hidden>
+                    On Firefox and Firefox for Android, the storage information feature may be hidden behind a browser flag.
+
+                    To enable this flag, open <a href="about:config" target="_blank" rel="noopener">about:config</a> and search for
+                    <strong>dom.storageManager.enabled</strong>.
+
+                    Setting its value to <strong>true</strong> should allow storage information to be calculated.
+                </p>
+                <p data-show-for-browser="firefox-mobile">
+                    It may not be possible to enable Persistent Storage on Firefox for Android.
+                </p>
+                <p data-show-for-browser="chrome edge">
+                    Chromium-based browsers should not need to enable this setting since the Yomitan extension has
+                    the <code>unlimitedStorage</code> permission, which should prevent data deletion.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
             </div>
-        </div></div>
+        </div>
     </div>
 
     <!-- Scanning -->
@@ -434,61 +364,7 @@
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
             </div>
         </div></div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Auto-hide search popup</div>
-                    <div class="settings-item-description">When no definitions are found after scanning text, the popup will be hidden.</div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="scanning.autoHideResults"
-                        data-transform='{
-                            "type": "setVisibility",
-                            "selector": "#auto-hide-search-popup-options",
-                            "condition": {"op": "===", "value": true}
-                        }'
-                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children settings-item-children-group" id="auto-hide-search-popup-options" hidden>
-                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-                    <div class="settings-item-left">
-                        <div class="settings-item-label">Delay <span class="light">(in milliseconds)</span></div>
-                    </div>
-                    <div class="settings-item-right">
-                        <input type="number" data-setting="scanning.hideDelay" min="0">
-                    </div>
-                </div></div>
-            </div>
-        </div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Hide popup on cursor exit</div>
-                    <div class="settings-item-description">When the cursor exits the popup, the popup will be hidden.</div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="scanning.hidePopupOnCursorExit"
-                        data-transform='{
-                            "type": "setVisibility",
-                            "selector": "#hide-popup-on-cursor-exit-options",
-                            "condition": {"op": "===", "value": true}
-                        }'
-                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children settings-item-children-group" id="hide-popup-on-cursor-exit-options" hidden>
-                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-                    <div class="settings-item-left">
-                        <div class="settings-item-label">Delay <span class="light">(in milliseconds)</span></div>
-                    </div>
-                    <div class="settings-item-right">
-                        <input type="number" data-setting="scanning.hidePopupOnCursorExitDelay" min="0">
-                    </div>
-                </div></div>
-            </div>
-        </div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Scan delay <span class="light">(in milliseconds)</span></div>
                 <div class="settings-item-description">Change the delay before scanning occurs when no modifier key is required.</div>
@@ -589,6 +465,9 @@
             <div class="settings-item-left">
                 <div class="settings-item-label">Text scan length</div>
                 <div class="settings-item-description">Change how many characters are read when scanning for terms.</div>
+                <div class="warning-text margin-above">
+                    <strong>Setting this value too high (100+) may impact performance.</strong>
+                </div>
             </div>
             <div class="settings-item-right">
                 <input type="number" data-setting="scanning.length" min="1" step="1">
@@ -640,10 +519,10 @@
         </div></div>
     </div>
 
-    <!-- Popup -->
+    <!-- Popup Behavior -->
     <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="popup"></span></div>
-        <div class="heading-container-left"><h2 id="popup"><a href="#!popup">Popup</a></h2></div>
+        <div class="heading-container-left"><h2 id="popup"><a href="#!popup">Popup Behavior</a></h2></div>
     </div>
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner">
@@ -681,6 +560,60 @@
                     </div>
                     <div class="settings-item-right">
                         <label class="toggle"><input type="checkbox" data-setting="scanning.enableOnPopupExpressions"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    </div>
+                </div></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Auto-hide search popup</div>
+                    <div class="settings-item-description">When an existing popup is present, upon scanning again, hide the existing popup even if no definitions are found when scanning again.</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="scanning.autoHideResults"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#auto-hide-search-popup-options",
+                            "condition": {"op": "===", "value": true}
+                        }'
+                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children settings-item-children-group" id="auto-hide-search-popup-options" hidden>
+                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Delay <span class="light">(in milliseconds)</span></div>
+                    </div>
+                    <div class="settings-item-right">
+                        <input type="number" data-setting="scanning.hideDelay" min="0">
+                    </div>
+                </div></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Hide popup on cursor exit</div>
+                    <div class="settings-item-description">When the cursor exits the popup, the popup will be hidden.</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="scanning.hidePopupOnCursorExit"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#hide-popup-on-cursor-exit-options",
+                            "condition": {"op": "===", "value": true}
+                        }'
+                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children settings-item-children-group" id="hide-popup-on-cursor-exit-options" hidden>
+                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Delay <span class="light">(in milliseconds)</span></div>
+                    </div>
+                    <div class="settings-item-right">
+                        <input type="number" data-setting="scanning.hidePopupOnCursorExitDelay" min="0">
                     </div>
                 </div></div>
             </div>
@@ -723,10 +656,10 @@
         </div>
     </div>
 
-    <!-- Popup Appearance -->
+    <!-- Appearance -->
     <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="palette"></span></div>
-        <div class="heading-container-left"><h2 id="popup-appearance"><a href="#!popup-appearance">Popup Appearance</a></h2></div>
+        <div class="heading-container-left"><h2 id="appearance"><a href="#!appearance">Appearance</a></h2></div>
     </div>
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
@@ -855,6 +788,21 @@
                 </select>
             </div>
         </div></div>
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Reading mode</div>
+                <div class="settings-item-description">Change what type of furigana is displayed for parsed text.</div>
+            </div>
+            <div class="settings-item-right">
+                <select data-setting="parsing.readingMode" lang="ja">
+                    <option value="none">None</option>
+                    <option value="hiragana">ひらがな</option>
+                    <option value="katakana">カタカナ</option>
+                    <option value="romaji">Romaji</option>
+                    <option value="dictionary-reading">Dictionary reading</option>
+                </select>
+            </div>
+        </div></div>
         <div class="settings-item advanced-only"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Frequency display style</div>
@@ -890,7 +838,7 @@
                 </div>
             </div>
         </div>
-        <div class="settings-item advanced-only">
+        <div class="settings-item">
             <div class="settings-item-inner settings-item-inner-wrappable">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
@@ -962,7 +910,7 @@
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
             </div>
         </div></div>
-        <div class="settings-item settings-item-button" data-modal-action="show,custom-css"><div class="settings-item-inner">
+        <div class="settings-item settings-item-button advanced-only" data-modal-action="show,custom-css"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure custom CSS&hellip;</div>
             </div>
@@ -970,6 +918,85 @@
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
             </div>
         </div></div>
+    </div>
+
+    <!-- Result Display -->
+    <div class="heading-container">
+        <div class="heading-container-icon"><span class="icon" data-icon="monitor"></span></div>
+        <div class="heading-container-left"><h2 id="result-display"><a href="#!result-display">Result Display</a></h2></div>
+    </div>
+    <div class="settings-group">
+        <div class="settings-item">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Result grouping mode</div>
+                    <div class="settings-item-description">
+                        Change how related results are grouped.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select data-setting="general.resultOutputMode"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#main-dictionary-container",
+                            "condition": {"op": "===", "value": "merge"}
+                        }'
+                    >
+                        <option value="split">No grouping</option>
+                        <option value="group">Group term-reading pairs</option>
+                        <option value="merge">Group related terms</option>
+                    </select>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <ul>
+                    <li>
+                        <strong>No grouping</strong> -
+                        Every definition will be listed as a separate entry.
+                    </li>
+                    <li>
+                        <strong>Group term-reading pairs</strong> -
+                        Definitions for the same term with the same reading will be grouped together.
+                    </li>
+                    <li>
+                        <p>
+                            <strong>Group related terms</strong> -
+                            Related terms that share the same definitions will be grouped together.
+                        </p>
+                        <p>
+                            The <em>Primary dictionary</em> option should be assigned to a dictionary which contains related term information,
+                            and configuring the <em>Secondary dictionaries</em> will allow definitions for the related terms to be
+                            included from other dictionaries.
+                        </p>
+                        <p class="warning-text">
+                            Not all dictionaries are able to be selected as the <em>Primary dictionary</em>.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+            <div class="settings-item-children settings-item-children-group" id="main-dictionary-container" hidden>
+                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Primary dictionary</div>
+                    </div>
+                    <div class="settings-item-right">
+                        <select data-setting="general.mainDictionary"></select>
+                    </div>
+                </div></div>
+                <div class="settings-item settings-item-button" data-modal-action="show,secondary-search-dictionaries"><div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Secondary dictionaries&hellip;</div>
+                    </div>
+                    <div class="settings-item-right open-panel-button-container">
+                        <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+                    </div>
+                </div></div>
+            </div>
+        </div>
     </div>
 
     <!-- Popup Position & Size -->
@@ -1368,7 +1395,7 @@
         </div>
     </div>
     <div class="settings-group">
-        <div class="settings-item">
+        <div class="settings-item advanced-only">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Parse sentences using Yomitan's internal parser</div>
@@ -1433,21 +1460,6 @@
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" data-setting="parsing.termSpacing"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Reading mode</div>
-                <div class="settings-item-description">Change what type of furigana is displayed for parsed text.</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="parsing.readingMode" lang="ja">
-                    <option value="none">None</option>
-                    <option value="hiragana">ひらがな</option>
-                    <option value="katakana">カタカナ</option>
-                    <option value="romaji">Romaji</option>
-                    <option value="dictionary-reading">Dictionary reading</option>
-                </select>
             </div>
         </div></div>
         <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
@@ -1895,7 +1907,7 @@
                 <label class="toggle"><input type="checkbox" class="permissions-toggle" data-permissions-setting="clipboard.enableSearchPageMonitor" data-required-permissions="clipboardRead"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Maximum clipboard text search length</div>
                 <div class="settings-item-description">Limit the number of characters used when searching clipboard text.</div>
@@ -2039,20 +2051,6 @@
                 </div>
             </div>
         </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-progress-report" id="db-ops-progress-report">
-                    Placeholder text.
-                </div>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-error-report" id="db-ops-error-report">
-                    Placeholder text.
-                </div>
-            </div>
-        </div></div>
     </div>
 
     <!-- Accessibility -->
@@ -2098,12 +2096,20 @@
     </div>
 
     <!-- Security -->
-    <div class="heading-container advanced-only">
+    <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="lock"></span></div>
         <div class="heading-container-left"><h2 id="security"><a href="#!security">Security</a></h2></div>
     </div>
-    <div class="settings-group advanced-only">
-        <div class="settings-item">
+    <div class="settings-group">
+        <a href="/permissions.html" rel="noopener" class="settings-item settings-item-button"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Configure Yomitan Permissions</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></a>
+        <div class="settings-item advanced-only">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
@@ -2127,7 +2133,7 @@
                 </p>
             </div>
         </div>
-        <div class="settings-item">
+        <div class="settings-item advanced-only">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
@@ -2984,6 +2990,18 @@
                 <tr>
                     <td><code class="anki-field-marker">{glossary-no-dictionary}</code></td>
                     <td>List of definitions for the term, except the dictionary tag is omitted.</td>
+                </tr>
+                <tr>
+                    <td><code class="anki-field-marker">{glossary}</code></td>
+                    <td>First definition for the term.</td>
+                </tr>
+                <tr>
+                    <td><code class="anki-field-marker">{glossary-brief}</code></td>
+                    <td>First definition for the term in a more compact format.</td>
+                </tr>
+                <tr>
+                    <td><code class="anki-field-marker">{glossary-no-dictionary}</code></td>
+                    <td>First definition for the term, except the dictionary tag is omitted.</td>
                 </tr>
                 <tr>
                     <td><code class="anki-field-marker">{part-of-speech}</code></td>
