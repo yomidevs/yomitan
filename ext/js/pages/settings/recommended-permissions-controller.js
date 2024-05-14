@@ -74,7 +74,7 @@ export class RecommendedPermissionsController {
     async _updatePermissions() {
         const permissions = await getAllPermissions();
         this._onPermissionsChanged({permissions});
-        this._setWelcomePageText();
+        void this._setWelcomePageText();
     }
 
     /**
@@ -98,17 +98,27 @@ export class RecommendedPermissionsController {
     }
 
     /** */
-    _setWelcomePageText() {
+    async _setWelcomePageText() {
+        const permissions = await getAllPermissions();
+        const recommendedPermissions = permissions.origins?.includes('<all_urls>');
+        const extraPermissions = permissions.permissions?.includes('clipboardRead') && permissions.permissions?.includes('nativeMessaging');
         /** @type {HTMLElement | null} */
-        this._textIfEnabled = document.querySelector('#permissions-enabled');
+        this._textIfFullEnabled = document.querySelector('#full-permissions-enabled');
+        /** @type {HTMLElement | null} */
+        this._textIfRecommendedEnabled = document.querySelector('#recommended-permissions-enabled');
         /** @type {HTMLElement | null} */
         this._textIfDisabled = document.querySelector('#permissions-disabled');
-        if (this._textIfEnabled && this._textIfDisabled) {
-            if (this._originToggleNode.checked) {
-                this._textIfEnabled.hidden = false;
-                this._textIfDisabled.hidden = true;
+
+        if (this._textIfFullEnabled && this._textIfRecommendedEnabled && this._textIfDisabled) {
+            this._textIfFullEnabled.hidden = true;
+            this._textIfRecommendedEnabled.hidden = true;
+            this._textIfDisabled.hidden = true;
+
+            if (extraPermissions && recommendedPermissions) {
+                this._textIfFullEnabled.hidden = false;
+            } else if (recommendedPermissions) {
+                this._textIfRecommendedEnabled.hidden = false;
             } else {
-                this._textIfEnabled.hidden = true;
                 this._textIfDisabled.hidden = false;
             }
         }
