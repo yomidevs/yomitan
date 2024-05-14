@@ -461,12 +461,10 @@ export class Translator {
         const sourceCache = new Map(); // For reusing text processors' outputs
 
         for (
-            let i = text.length;
-            i > 0;
-            i = this._getNextSubstringLength(options.searchResolution, i, text)
+            let rawSource = text;
+            rawSource.length > 0;
+            rawSource = this._getNextSubstring(options.searchResolution, rawSource)
         ) {
-            const rawSource = text.substring(0, i);
-
             for (const preprocessorVariant of preprocessorVariants) {
                 let source = rawSource;
 
@@ -534,16 +532,14 @@ export class Translator {
 
     /**
      * @param {string} searchResolution
-     * @param {number} currentLength
-     * @param {string} source
-     * @returns {number}
+     * @param {string} currentString
+     * @returns {string}
      */
-    _getNextSubstringLength(searchResolution, currentLength, source) {
-        return (
-            searchResolution === 'word' ?
-            source.search(/[^\p{Letter}][\p{Letter}\p{Number}]*$/u) :
-            currentLength - 1
-        );
+    _getNextSubstring(searchResolution, currentString) {
+        const nextSubstringLength = searchResolution === 'word' ?
+            currentString.search(/[^\p{Letter}][\p{Letter}\p{Number}]*$/u) :
+            currentString.length - 1;
+        return currentString.substring(0, nextSubstringLength);
     }
 
     /**
