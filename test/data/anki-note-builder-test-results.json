@@ -4361,5 +4361,51 @@
         "url": "<a href=\"url:\">url:</a>"
       }
     ]
+  },
+  {
+    "name": "Test search resolution - word",
+    "results": [
+      {
+        "audio": "",
+        "clipboard-image": "",
+        "clipboard-text": "",
+        "cloze-body": "english",
+        "cloze-body-kana": "english",
+        "cloze-prefix": "cloze-prefix",
+        "cloze-suffix": "cloze-suffix",
+        "conjugation": "",
+        "dictionary": "Test Dictionary 2",
+        "document-title": "title",
+        "expression": "English",
+        "frequencies": "",
+        "frequency-harmonic-rank": "9999999",
+        "frequency-harmonic-occurrence": "0",
+        "frequency-average-rank": "9999999",
+        "frequency-average-occurrence": "0",
+        "furigana": "English",
+        "furigana-plain": "English",
+        "glossary": "<div style=\"text-align: left;\"><i>(n, Test Dictionary 2)</i> English definition</div>",
+        "glossary-brief": "<div style=\"text-align: left;\">English definition</div>",
+        "glossary-no-dictionary": "<div style=\"text-align: left;\"><i>(n)</i> English definition</div>",
+        "glossary-first": "<div style=\"text-align: left;\"><i>(n, Test Dictionary 2)</i> English definition</div>",
+        "glossary-first-brief": "<div style=\"text-align: left;\">English definition</div>",
+        "glossary-first-no-dictionary": "<div style=\"text-align: left;\"><i>(n)</i> English definition</div>",
+        "part-of-speech": "Noun",
+        "pitch-accents": "No pitch accent data",
+        "pitch-accent-graphs": "No pitch accent data",
+        "pitch-accent-graphs-jj": "No pitch accent data",
+        "pitch-accent-positions": "No pitch accent data",
+        "pitch-accent-categories": "",
+        "phonetic-transcriptions": "",
+        "reading": "English",
+        "screenshot": "",
+        "search-query": "fullQuery",
+        "selection-text": "",
+        "sentence": "cloze-prefixenglishcloze-suffix",
+        "sentence-furigana": "cloze-prefixenglishcloze-suffix",
+        "tags": "n",
+        "url": "<a href=\"url:\">url:</a>"
+      }
+    ]
   }
 ]
