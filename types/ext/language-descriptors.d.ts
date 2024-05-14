@@ -123,6 +123,14 @@ type AllTextProcessors = {
             collapseEmphaticSequences: TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
         };
     };
+    ko: {
+        pre: {
+            disassembleHangul: TextProcessor<boolean>;
+        };
+        post: {
+            reassembleHangul: TextProcessor<boolean>;
+        };
+    };
     km: Record<string, never>;
     nl: {
         pre: CapitalizationPreprocessors;
