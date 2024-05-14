@@ -30,6 +30,8 @@ export class RecommendedPermissionsController {
         this._settingsController = settingsController;
         /** @type {HTMLInputElement} */
         this._originToggleNode = querySelectorNotNull(document, '#recommended-permissions-toggle');
+        /** @type {HTMLInputElement} */
+        this._optionalPermissionsToggleNode = querySelectorNotNull(document, '#optional-permissions-toggle');
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
         /** @type {?HTMLElement} */
@@ -40,6 +42,7 @@ export class RecommendedPermissionsController {
     async prepare() {
         this._errorContainer = document.querySelector('#recommended-permissions-error');
         this._originToggleNode.addEventListener('change', this._onOriginToggleChange.bind(this), false);
+        this._optionalPermissionsToggleNode.addEventListener('change', this._onOptionalPermissionsToggleChange.bind(this), false);
 
         this._settingsController.on('permissionsChanged', this._onPermissionsChanged.bind(this));
         await this._updatePermissions();
@@ -55,6 +58,8 @@ export class RecommendedPermissionsController {
         const originsSet = new Set(permissions.origins);
         const {origin} = this._originToggleNode.dataset;
         this._originToggleNode.checked = typeof origin === 'string' && originsSet.has(origin);
+
+        this._optionalPermissionsToggleNode.checked = Array.isArray(permissions.permissions) && permissions.permissions.includes('clipboardRead') && permissions.permissions.includes('nativeMessaging');
     }
 
     /**
@@ -68,6 +73,17 @@ export class RecommendedPermissionsController {
         const {origin} = node.dataset;
         if (typeof origin !== 'string') { return; }
         void this._setOriginPermissionEnabled(origin, value);
+    }
+
+    /**
+     * @param {Event} e
+     */
+    async _onOptionalPermissionsToggleChange(e) {
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
+        const value = node.checked;
+        const permissions = ['clipboardRead', 'nativeMessaging'];
+        await setPermissionsGranted({permissions}, value);
+        await this._updatePermissions();
     }
 
     /** */
@@ -101,7 +117,7 @@ export class RecommendedPermissionsController {
     async _setWelcomePageText() {
         const permissions = await getAllPermissions();
         const recommendedPermissions = permissions.origins?.includes('<all_urls>');
-        const extraPermissions = permissions.permissions?.includes('clipboardRead') && permissions.permissions?.includes('nativeMessaging');
+        const optionalPermissions = permissions.permissions?.includes('clipboardRead') && permissions.permissions?.includes('nativeMessaging');
         /** @type {HTMLElement | null} */
         this._textIfFullEnabled = document.querySelector('#full-permissions-enabled');
         /** @type {HTMLElement | null} */
@@ -114,7 +130,7 @@ export class RecommendedPermissionsController {
             this._textIfRecommendedEnabled.hidden = true;
             this._textIfDisabled.hidden = true;
 
-            if (extraPermissions && recommendedPermissions) {
+            if (optionalPermissions && recommendedPermissions) {
                 this._textIfFullEnabled.hidden = false;
             } else if (recommendedPermissions) {
                 this._textIfRecommendedEnabled.hidden = false;
