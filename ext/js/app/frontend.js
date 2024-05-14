@@ -927,13 +927,13 @@ export class Frontend {
 
     /**
      * @param {boolean} allowEmptyRange
-     * @param {boolean} lazy
+     * @param {boolean} disallowExpandSelection
      * @returns {Promise<boolean>}
      */
-    async _scanSelectedText(allowEmptyRange, lazy) {
+    async _scanSelectedText(allowEmptyRange, disallowExpandSelection) {
         const range = this._getFirstSelectionRange(allowEmptyRange);
         if (range === null) { return false; }
-        const source = lazy ? TextSourceRange.createLazy(range) : TextSourceRange.create(range);
+        const source = disallowExpandSelection ? TextSourceRange.createLazy(range) : TextSourceRange.create(range);
         await this._textScanner.search(source, {focus: true, restoreSelection: true});
         return true;
     }

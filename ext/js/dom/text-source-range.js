@@ -42,9 +42,9 @@ export class TextSourceRange {
      * @param {?DOMRect} cachedSourceRect A cached `DOMRect` representing the rect of the `imposterSourceElement`,
      *   which can be used after the imposter element is removed from the page.
      *   Must not be `null` if imposterElement is specified.
-     * @param {boolean} selectContentLazy
+     * @param {boolean} disallowExpandSelection
      */
-    constructor(range, rangeStartOffset, content, imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, selectContentLazy) {
+    constructor(range, rangeStartOffset, content, imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, disallowExpandSelection) {
         /** @type {Range} */
         this._range = range;
         /** @type {number} */
@@ -60,7 +60,7 @@ export class TextSourceRange {
         /** @type {?DOMRect} */
         this._cachedSourceRect = cachedSourceRect;
         /** @type {boolean} */
-        this._selectContentLazy = selectContentLazy;
+        this._disallowExpandSelection = disallowExpandSelection;
     }
 
     /**
@@ -108,7 +108,7 @@ export class TextSourceRange {
             this._imposterSourceElement,
             this._cachedRects,
             this._cachedSourceRect,
-            this._selectContentLazy
+            this._disallowExpandSelection
         );
     }
 
@@ -150,7 +150,7 @@ export class TextSourceRange {
         const state = new DOMTextScanner(node, offset, !layoutAwareScan, layoutAwareScan).seek(length);
         this._range.setEnd(state.node, state.offset);
         const expandedContent = fromEnd ? this._content + state.content : state.content;
-        this._content = this._selectContentLazy ? expandedContent : this._content;
+        this._content = this._disallowExpandSelection ? expandedContent : this._content;
         return length - state.remainder;
     }
 
