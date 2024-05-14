@@ -257,21 +257,21 @@ export class Frontend {
      * @returns {void}
      */
     _onActionScanSelectedText() {
-        void this._scanSelectedText({allowEmptyRange: false, disallowExpandSelection: true});
+        void this._scanSelectedText(false, true);
     }
 
     /**
      * @returns {void}
      */
     _onActionScanTextAtSelection() {
-        void this._scanSelectedText({allowEmptyRange: false, disallowExpandSelection: false});
+        void this._scanSelectedText(false, false);
     }
 
     /**
      * @returns {void}
      */
     _onActionScanTextAtCaret() {
-        void this._scanSelectedText({allowEmptyRange: true, disallowExpandSelection: false});
+        void this._scanSelectedText(true, false);
     }
 
     // API message handlers
@@ -926,12 +926,11 @@ export class Frontend {
     }
 
     /**
-     * @param {object} params
-     * @param {boolean} params.allowEmptyRange
-     * @param {boolean} params.disallowExpandSelection
+     * @param {boolean} allowEmptyRange
+     * @param {boolean} disallowExpandSelection
      * @returns {Promise<boolean>}
      */
-    async _scanSelectedText({allowEmptyRange, disallowExpandSelection}) {
+    async _scanSelectedText(allowEmptyRange, disallowExpandSelection) {
         const range = this._getFirstSelectionRange(allowEmptyRange);
         if (range === null) { return false; }
         const source = disallowExpandSelection ? TextSourceRange.createLazy(range) : TextSourceRange.create(range);
