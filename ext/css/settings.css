@@ -2348,19 +2348,16 @@ input[type=number].dictionary-priority {
 
 
 /* Dictionary Import */
-#dictionary-import-file-button,
 #dictionary-import-url-text {
     width: 100%;
-}
-
-#dictionary-import-url-button {
-    flex: auto;
-}
-
-#dictionary-import-url-text {
-    height: 10em;
+    height: 4em;
     white-space: nowrap;
     resize: none;
+}
+
+#dictionary-import-file-button,
+#dictionary-import-url-button {
+    flex: auto;
 }
 
 #dictionary-drop-file-zone {
@@ -2368,7 +2365,7 @@ input[type=number].dictionary-priority {
     background-color: rgb(242, 242, 242);
     border-radius: 5px;
     flex: auto;
-    height: 100px;
+    height: 10em;
     margin: auto;
 }
 
