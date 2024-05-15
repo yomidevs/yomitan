@@ -92,7 +92,13 @@ describe('Keyboard Event Handling', () => {
         new KeyboardEvent('keydown', {key: '', ctrlKey: true, metaKey: false, altKey: false}),
         new KeyboardEvent('keydown', {key: '', ctrlKey: false, metaKey: true, altKey: false}),
         new KeyboardEvent('keydown', {key: '', ctrlKey: false, metaKey: false, altKey: true}),
-        new KeyboardEvent('keydown', {key: ' ', ctrlKey: false, metaKey: false, altKey: false})
+        new KeyboardEvent('keydown', {key: ' ', ctrlKey: false, metaKey: false, altKey: false}),
+        new KeyboardEvent('keydown', {key: 'a', ctrlKey: true, metaKey: false, altKey: false}),
+        new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: true, altKey: false}),
+        new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: false, altKey: true}),
+        new KeyboardEvent('keydown', {key: 'Backspace'}),
+        new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: true, metaKey: false, altKey: false}),
+        new KeyboardEvent('keydown', {key: 'ArrowDown'})
     ];
 
     test('should test that onKeyDownCurrent function focuses input', () => {
