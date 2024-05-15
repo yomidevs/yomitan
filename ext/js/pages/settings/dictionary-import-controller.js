@@ -46,6 +46,8 @@ export class DictionaryImportController {
         this._importFileButton = querySelectorNotNull(document, '#dictionary-import-file-button');
         /** @type {HTMLButtonElement} */
         this._importFileInput = querySelectorNotNull(document, '#dictionary-import-file-input');
+        /** @type {HTMLButtonElement} */
+        this._importFileDrop = querySelectorNotNull(document, '#dictionary-drop-file-zone');
         /** @type {HTMLInputElement} */
         this._importButton = querySelectorNotNull(document, '#dictionary-import-button');
         /** @type {HTMLInputElement} */
@@ -71,15 +73,20 @@ export class DictionaryImportController {
 
     /** */
     prepare() {
-        this._importURLModal = this._modalController.getModal('dictionary-import-url');
+        this._importModal = this._modalController.getModal('dictionary-import');
         this._purgeConfirmModal = this._modalController.getModal('dictionary-confirm-delete-all');
 
         this._purgeButton.addEventListener('click', this._onPurgeButtonClick.bind(this), false);
         this._purgeConfirmButton.addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
-        this._importFileButton.addEventListener('click', this._onImportFileButtonClick.bind(this), false);
-        this._importFileInput.addEventListener('change', this._onImportFileChange.bind(this), false);
         this._importButton.addEventListener('click', this._onImportButtonClick.bind(this), false);
         this._importURLButton.addEventListener('click', this._onImportFromURL.bind(this), false);
+        this._importFileButton.addEventListener('click', this._onImportFileButtonClick.bind(this), false);
+        this._importFileInput.addEventListener('change', this._onImportFileChange.bind(this), false);
+
+        this._importFileDrop.addEventListener('dragenter', this._onFileDropEnter.bind(this), false);
+        this._importFileDrop.addEventListener('dragover', this._onFileDropOver.bind(this), false);
+        this._importFileDrop.addEventListener('dragleave', this._onFileDropLeave.bind(this), false);
+        this._importFileDrop.addEventListener('drop', this._onFileDrop.bind(this), false);
     }
 
     // Private
@@ -90,11 +97,49 @@ export class DictionaryImportController {
     }
 
     /**
+     * @param {DragEvent} e
+     */
+    _onFileDropEnter(e) {
+        e.preventDefault();
+        /** @type {HTMLInputElement} */ this._importFileDrop.style.borderColor = 'rgb(26, 115, 232)';
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    _onFileDropOver(e) {
+        e.preventDefault();
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    _onFileDropLeave(e) {
+        e.preventDefault();
+        /** @type {HTMLInputElement} */ this._importFileDrop.style.border = '';
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    _onFileDrop(e) {
+        e.preventDefault();
+        /** @type {HTMLInputElement} */ this._importFileDrop.style.border = '';
+        if (e.dataTransfer === null) { return; }
+        /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(false);
+        const fileArray = [];
+        for (const file of e.dataTransfer.files) {
+            fileArray.push(file);
+        }
+        void this._importDictionaries(fileArray);
+    }
+
+    /**
      * @param {MouseEvent} e
      */
     _onImportButtonClick(e) {
         e.preventDefault();
-        /** @type {import('./modal.js').Modal} */ (this._importURLModal).setVisible(true);
+        /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(true);
     }
 
     /**
@@ -118,7 +163,7 @@ export class DictionaryImportController {
      * @param {Event} e
      */
     async _onImportFileChange(e) {
-        /** @type {import('./modal.js').Modal} */ (this._importURLModal).setVisible(false);
+        /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(false);
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const {files} = node;
         if (files === null) { return; }

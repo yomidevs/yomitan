@@ -2360,6 +2360,15 @@ input[type=number].dictionary-priority {
     resize: none;
 }
 
+#dictionary-drop-file-zone {
+    border: 2px solid rgba(0, 0, 0, 0); /* invisible border prevents reflowing */
+    background-color: rgb(242, 242, 242);
+    border-radius: 5px;
+    flex: auto;
+    height: 100px;
+    margin: auto;
+}
+
 /* Generic layouts */
 .margin-above {
     margin-top: 0.85em;
