@@ -83,6 +83,7 @@ export class DictionaryImportController {
         this._importFileButton.addEventListener('click', this._onImportFileButtonClick.bind(this), false);
         this._importFileInput.addEventListener('change', this._onImportFileChange.bind(this), false);
 
+        this._importFileDrop.addEventListener('click', this._onImportFileButtonClick.bind(this), false);
         this._importFileDrop.addEventListener('dragenter', this._onFileDropEnter.bind(this), false);
         this._importFileDrop.addEventListener('dragover', this._onFileDropOver.bind(this), false);
         this._importFileDrop.addEventListener('dragleave', this._onFileDropLeave.bind(this), false);

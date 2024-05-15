@@ -2369,6 +2369,7 @@ input[type=number].dictionary-priority {
     margin: auto;
     user-select: none;
     text-align: center;
+    cursor: pointer;
 }
 
 #dictionary-drag-drop-text {
