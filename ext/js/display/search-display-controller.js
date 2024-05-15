@@ -154,16 +154,14 @@ export class SearchDisplayController {
      * @param {KeyboardEvent} e
      */
     _onKeyDown(e) {
-        const {activeElement} = document;
-        if (
-            activeElement !== this._queryInput &&
-            !this._isElementInput(activeElement) &&
-            (!e.ctrlKey || e.key === 'Backspace') &&
-            !e.metaKey &&
-            !e.altKey &&
-            (e.key.length === 1 || e.key === 'Backspace') &&
-            e.key !== ' '
-        ) {
+        const activeElement = document.activeElement;
+
+        const isInputField = this._isElementInput(activeElement);
+        const isAllowedKey = e.key.length === 1 || e.key === 'Backspace';
+        const isModifierKey = e.ctrlKey || e.metaKey || e.altKey;
+        const isSpaceKey = e.key === ' ';
+
+        if (!isInputField && !isModifierKey && isAllowedKey && !isSpaceKey) {
             this._queryInput.focus({preventScroll: true});
         }
     }
