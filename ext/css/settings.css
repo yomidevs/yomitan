@@ -587,6 +587,9 @@ a.heading-link-light {
 :root:not([data-advanced=true]) .advanced-only {
     display: none;
 }
+:root:not([data-advanced=false]) .basic-only {
+    display: none;
+}
 .settings-item.settings-item-button,
 a.settings-item.settings-item-button {
     cursor: pointer;
