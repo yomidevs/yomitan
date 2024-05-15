@@ -101,7 +101,9 @@ export class DictionaryImportController {
      */
     _onFileDropEnter(e) {
         e.preventDefault();
-        /** @type {HTMLInputElement} */ this._importFileDrop.style.borderColor = 'rgb(26, 115, 232)';
+        this._importFileDrop.style.borderColor = 'rgb(26, 115, 232)';
+        this._importFileDrop.style.borderStyle = 'solid';
+        this._importFileDrop.style.backgroundColor = 'rgb(191, 209, 255)';
     }
 
     /**
@@ -116,7 +118,8 @@ export class DictionaryImportController {
      */
     _onFileDropLeave(e) {
         e.preventDefault();
-        /** @type {HTMLInputElement} */ this._importFileDrop.style.border = '';
+        this._importFileDrop.style.border = '';
+        this._importFileDrop.style.backgroundColor = '';
     }
 
     /**
@@ -124,7 +127,8 @@ export class DictionaryImportController {
      */
     _onFileDrop(e) {
         e.preventDefault();
-        /** @type {HTMLInputElement} */ this._importFileDrop.style.border = '';
+        this._importFileDrop.style.border = '';
+        this._importFileDrop.style.backgroundColor = '';
         if (e.dataTransfer === null) { return; }
         /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(false);
         const fileArray = [];

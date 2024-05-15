@@ -2361,12 +2361,21 @@ input[type=number].dictionary-priority {
 }
 
 #dictionary-drop-file-zone {
-    border: 2px solid rgba(0, 0, 0, 0); /* invisible border prevents reflowing */
-    background-color: rgb(242, 242, 242);
+    border: 2px dashed rgb(204, 204, 204) /* rgba(0, 0, 0, 0) */; /* invisible border prevents reflowing */
     border-radius: 5px;
     flex: auto;
     height: 10em;
+    line-height: 10em;
     margin: auto;
+    user-select: none;
+    text-align: center;
+}
+
+#dictionary-drag-drop-text {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
+    pointer-events: none;
 }
 
 /* Generic layouts */
