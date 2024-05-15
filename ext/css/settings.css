@@ -2361,7 +2361,7 @@ input[type=number].dictionary-priority {
 }
 
 #dictionary-drop-file-zone {
-    border: 2px dashed rgb(204, 204, 204) /* rgba(0, 0, 0, 0) */; /* invisible border prevents reflowing */
+    border: 2px dashed rgb(204, 204, 204);
     border-radius: 5px;
     flex: auto;
     height: 10em;
