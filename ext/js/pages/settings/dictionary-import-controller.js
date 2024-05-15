@@ -126,17 +126,65 @@ export class DictionaryImportController {
     /**
      * @param {DragEvent} e
      */
-    _onFileDrop(e) {
+    async _onFileDrop(e) {
         e.preventDefault();
         this._importFileDrop.style.border = '';
         this._importFileDrop.style.backgroundColor = '';
         if (e.dataTransfer === null) { return; }
         /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(false);
+        /** @type {File[]} */
         const fileArray = [];
-        for (const file of e.dataTransfer.files) {
-            fileArray.push(file);
+        for (const fileEntry of await this.getAllFileEntries(e.dataTransfer.items)) {
+            if (!fileEntry) { return; }
+            try {
+                // @ts-expect-error - FileEntry.file() is not recognized
+                fileArray.push(await new Promise((resolve, reject) => { fileEntry.file(resolve, reject); }));
+            } catch (error) {
+                log.error(error);
+            }
         }
         void this._importDictionaries(fileArray);
+    }
+
+    /**
+     * @param {DataTransferItemList} dataTransferItemList
+     * @returns {Promise<FileSystemEntry[]>}
+     */
+    async getAllFileEntries(dataTransferItemList) {
+        const fileEntries = [];
+        /** @type {(FileSystemEntry | FileSystemDirectoryEntry | null)[]} */
+        const entries = [];
+        for (let i = 0; i < dataTransferItemList.length; i++) {
+            entries.push(dataTransferItemList[i].webkitGetAsEntry());
+        }
+        while (entries.length > 0) {
+            /** @type {(FileSystemEntry | FileSystemDirectoryEntry | null) | undefined} */
+            const entry = entries.shift();
+            if (!entry) { continue; }
+            if (entry.isFile) {
+                fileEntries.push(entry);
+            } else if (entry.isDirectory) {
+                // @ts-expect-error - Typescript does not recognize `if (entry.isDirectory)` as verifying `entry` is type `FileSystemDirectoryEntry`
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                entries.push(...await this.readAllDirectoryEntries(entry.createReader()));
+            }
+        }
+        return fileEntries;
+    }
+
+    /**
+     * @param {FileSystemDirectoryReader} directoryReader
+     * @returns {Promise<FileSystemEntry[]>}
+     */
+    async readAllDirectoryEntries(directoryReader) {
+        const entries = [];
+        /** @type {FileSystemEntry[]} */
+        let readEntries = await new Promise((resolve) => { directoryReader.readEntries(resolve); });
+        while (readEntries.length > 0) {
+            entries.push(...readEntries);
+            readEntries = await new Promise((resolve) => { directoryReader.readEntries(resolve); });
+        }
+        return entries;
     }
 
     /**
