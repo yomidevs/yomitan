@@ -2344,6 +2344,22 @@ input[type=number].dictionary-priority {
 }
 
 
+/* Dictionary Import */
+#dictionary-import-file-button,
+#dictionary-import-url-text {
+    width: 100%;
+}
+
+#dictionary-import-url-button {
+    flex: auto;
+}
+
+#dictionary-import-url-text {
+    height: 10em;
+    white-space: nowrap;
+    resize: none;
+}
+
 /* Generic layouts */
 .margin-above {
     margin-top: 0.85em;

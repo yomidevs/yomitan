@@ -2389,21 +2389,23 @@
     <div class="modal-footer">
         <button type="button" class="low-emphasis danger dictionary-database-mutating-input" id="dictionary-delete-all-button">Delete All</button>
         <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-check-integrity">Check Integrity</button>
-        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-file-button">Import</button>
-        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-url-button">Import from URL</button>
+        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-button">Import</button>
         <button type="button" data-modal-action="hide">Close</button>
     </div>
 </div></div>
 
 <div id="dictionary-import-url-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Import from URL</div></div>
+    <div class="modal-header"><div class="modal-title">Import Dictionaries</div></div>
     <div class="modal-body">
-        <p>Enter dictionary URL:</p>
-        <input type="text" id="dictionary-import-url-text">
+        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-file-button">Import from file</button>
+    </div>
+    <div class="modal-body">
+        <p>Import dictionaries from URLs:</p>
+        <textarea type="text" id="dictionary-import-url-text"></textarea>
     </div>
     <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" data-modal-action="hide" id="dictionary-import-url-confirm-button">Import</button>
+        <button type="button" data-modal-action="hide" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-url-button">Import from URLs</button>
+        <button type="button" data-modal-action="hide">Close</button>
     </div>
 </div></div>
 
