@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2023-2024  Yomitan Authors
- * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {describe, expect, afterAll, test} from 'vitest';
+import {describe, expect, afterAll, test, vi} from 'vitest';
 import {setupDomTest} from './fixtures/dom-test.js';
 import {querySelectorNotNull} from '../ext/js/dom/query-selector.js';
+import {SearchDisplayController} from '../ext/js/display/search-display-controller.js';
+import {Display} from '../ext/js/display/display.js';
+import {DisplayAudio} from '../ext/js/display/display-audio.js';
+import {SearchPersistentStateController} from '../ext/js/display/search-persistent-state-controller.js';
+import {Application} from '../ext/js/application.js';
+import {CrossFrameAPI} from '../ext/js/comm/cross-frame-api.js';
+import {API} from '../ext/js/comm/api.js';
+import {DocumentFocusController} from '../ext/js/dom/document-focus-controller.js';
+import {HotkeyHandler} from '../ext/js/input/hotkey-handler.js';
+import {WebExtension} from '../ext/js/extension/web-extension.js';
 
 const documentSearchDisplayControllerEnv = await setupDomTest('ext/search.html');
 
@@ -26,63 +35,30 @@ const {window, teardown} = documentSearchDisplayControllerEnv;
 
 const {document} = window;
 
-let queryInputCount = 0;
+const frameId = 1;
+const tabId = 1;
+const webExtension = new WebExtension();
+const hotkeyHandler = new HotkeyHandler();
+const documentFocusController = new DocumentFocusController();
+const displayPageType = 'search';
+const api = new API(webExtension);
+const crossFrameAPI = new CrossFrameAPI(api, tabId, frameId);
+const application = new Application(api, crossFrameAPI);
+const display = new Display(application, displayPageType, documentFocusController, hotkeyHandler);
+const displayAudio = new DisplayAudio(display);
+const searchPersistentStateController = new SearchPersistentStateController();
 
-/**
- * @param {?Element} element
- * @returns {boolean}
- */
-function isElementInput(element) {
-    if (element === null) { return false; }
-    switch (element.tagName.toLowerCase()) {
-        case 'input':
-        case 'textarea':
-        case 'button':
-        case 'select':
-            return true;
-    }
-    return element instanceof HTMLElement && !!element.isContentEditable;
-}
+const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
+
+// eslint-disable-next-line no-underscore-dangle
+const onKeyDownMethod = searchDisplayController._onKeyDown.bind(searchDisplayController);
 
 /**
  * @type {HTMLInputElement}
  */
 const queryInput = querySelectorNotNull(document, '#search-textbox');
 
-/**
- * @param {KeyboardEvent} e
- */
-function onKeyDownCurrent(e) {
-    const {activeElement} = document;
-    if (
-        activeElement !== queryInput &&
-        !isElementInput(activeElement) &&
-        (!e.ctrlKey || e.key === 'Backspace') &&
-        !e.metaKey &&
-        !e.altKey &&
-        (e.key.length === 1 || e.key === 'Backspace') &&
-        e.key !== ' '
-    ) {
-        queryInput.focus({preventScroll: true});
-        queryInputCount += 1;
-    }
-}
-
-/**
- * @param {KeyboardEvent} e
- */
-function onKeyDownNew(e) {
-    const activeElement = document.activeElement;
-    const isInputField = isElementInput(activeElement);
-    const isAllowedKey = e.key.length === 1 || e.key === 'Backspace';
-    const isModifierKey = e.ctrlKey || e.metaKey || e.altKey;
-    const isSpaceKey = e.key === ' ';
-
-    if (!isInputField && !isModifierKey && isAllowedKey && !isSpaceKey) {
-        queryInput.focus({preventScroll: true});
-        queryInputCount += 1;
-    }
-}
+const focusSpy = vi.spyOn(queryInput, 'focus');
 
 describe('Keyboard Event Handling', () => {
     afterAll(() => teardown(global));
@@ -101,21 +77,12 @@ describe('Keyboard Event Handling', () => {
         new KeyboardEvent('keydown', {key: 'ArrowDown'})
     ];
 
-    test('should test that onKeyDownCurrent function focuses input', () => {
+    test('should test that onKeyDown function focuses input for valid keys', () => {
         for (const event of keypressEvents) {
-            onKeyDownCurrent(event);
+            queryInput.blur();
+            onKeyDownMethod(event);
         }
 
-        expect(queryInputCount).toBe(1);
-
-        queryInput.blur();
-    });
-
-    test('should test that onKeyDownNew function focuses input', () => {
-        for (const event of keypressEvents) {
-            onKeyDownNew(event);
-        }
-
-        expect(queryInputCount).toBe(2);
+        expect(focusSpy.mock.calls.length).toBe(2);
     });
 });
