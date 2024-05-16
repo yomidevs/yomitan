@@ -161,8 +161,10 @@ export class DictionaryImportController {
             const entry = entries.shift();
             if (!entry) { continue; }
             if (entry.isFile) {
-                // @ts-expect-error - ts does not recognize `if (entry.isFile)` as verifying `entry` is type `FileSystemFileEntry`
-                fileEntries.push(entry);
+                if (entry.name.substring(entry.name.lastIndexOf('.'), entry.name.length) === '.zip') {
+                    // @ts-expect-error - ts does not recognize `if (entry.isFile)` as verifying `entry` is type `FileSystemFileEntry`
+                    fileEntries.push(entry);
+                }
             } else if (entry.isDirectory) {
                 // @ts-expect-error - ts does not recognize `if (entry.isDirectory)` as verifying `entry` is type `FileSystemDirectoryEntry`
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
