@@ -124,8 +124,7 @@ export class DictionaryImportController {
      */
     async _onFileDrop(e) {
         e.preventDefault();
-        this._importFileDrop.style.border = '';
-        this._importFileDrop.style.backgroundColor = '';
+        this._importFileDrop.classList.remove('drag-over');
         if (e.dataTransfer === null) { return; }
         /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(false);
         /** @type {File[]} */
