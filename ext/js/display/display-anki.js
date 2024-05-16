@@ -21,6 +21,7 @@ import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {deferPromise} from '../core/utilities.js';
 import {AnkiNoteBuilder} from '../data/anki-note-builder.js';
+import {getDynamicTemplates} from '../data/anki-template-util.js';
 import {invalidNoteId, isNoteDataValid} from '../data/anki-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
@@ -74,6 +75,8 @@ export class DisplayAnki {
         this._duplicateScope = 'collection';
         /** @type {boolean} */
         this._duplicateScopeCheckAllModels = false;
+        /** @type {import('settings').AnkiDuplicateBehavior} */
+        this._duplicateBehavior = 'prevent';
         /** @type {import('settings').AnkiScreenshotFormat} */
         this._screenshotFormat = 'png';
         /** @type {number} */
@@ -192,6 +195,7 @@ export class DisplayAnki {
                 tags,
                 duplicateScope,
                 duplicateScopeCheckAllModels,
+                duplicateBehavior,
                 suspendNewCards,
                 checkForDuplicates,
                 displayTags,
@@ -212,6 +216,7 @@ export class DisplayAnki {
         this._displayTags = displayTags;
         this._duplicateScope = duplicateScope;
         this._duplicateScopeCheckAllModels = duplicateScopeCheckAllModels;
+        this._duplicateBehavior = duplicateBehavior;
         this._screenshotFormat = format;
         this._screenshotQuality = quality;
         this._scanLength = scanLength;
@@ -346,6 +351,7 @@ export class DisplayAnki {
 
     /** */
     async _updateDictionaryEntryDetails() {
+        if (!this._display.getOptions()?.anki.enable) { return; }
         const {dictionaryEntries} = this._display;
         /** @type {?import('core').TokenObject} */
         const token = {};
@@ -413,13 +419,13 @@ export class DisplayAnki {
                 if (button !== null) {
                     button.disabled = !canAdd;
                     button.hidden = (ankiError !== null);
-                    if (ankiError) {
+                    if (ankiError && ankiError.message !== 'Anki not connected') {
                         log.error(ankiError);
                     }
 
                     // If entry has noteIds, show the "add duplicate" button.
                     if (Array.isArray(noteIds) && noteIds.length > 0) {
-                        this._showDuplicateAddButton(button);
+                        this._updateButtonForDuplicate(button);
                     }
                 }
 
@@ -438,6 +444,17 @@ export class DisplayAnki {
             }
 
             this._updateViewNoteButton(i, allNoteIds !== null ? [...allNoteIds] : [], false);
+        }
+    }
+
+    /**
+     * @param {HTMLButtonElement} button
+     */
+    _updateButtonForDuplicate(button) {
+        if (this._duplicateBehavior === 'prevent') {
+            button.disabled = true;
+        } else {
+            this._showDuplicateAddButton(button);
         }
     }
 
@@ -550,7 +567,7 @@ export class DisplayAnki {
                         }
                     }
                     // Now that this dictionary entry has a duplicate in Anki, show the "add duplicate" buttons.
-                    this._showDuplicateAddButton(button);
+                    this._updateButtonForDuplicate(button);
 
                     this._updateViewNoteButton(dictionaryEntryIndex, [noteId], true);
                 }
@@ -644,6 +661,16 @@ export class DisplayAnki {
      * @returns {Promise<string>}
      */
     async _getAnkiFieldTemplates(options) {
+        const staticTemplates = await this._getStaticAnkiFieldTemplates(options);
+        const dynamicTemplates = getDynamicTemplates(options);
+        return staticTemplates + dynamicTemplates;
+    }
+
+    /**
+     * @param {import('settings').ProfileOptions} options
+     * @returns {Promise<string>}
+     */
+    async _getStaticAnkiFieldTemplates(options) {
         let templates = options.anki.fieldTemplates;
         if (typeof templates === 'string') { return templates; }
 

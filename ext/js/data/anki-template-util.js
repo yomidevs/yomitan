@@ -46,6 +46,9 @@ export function getStandardFieldMarkers(type) {
                 'glossary',
                 'glossary-brief',
                 'glossary-no-dictionary',
+                'glossary-first',
+                'glossary-first-brief',
+                'glossary-first-no-dictionary',
                 'part-of-speech',
                 'pitch-accents',
                 'pitch-accent-graphs',
@@ -92,4 +95,55 @@ export function getStandardFieldMarkers(type) {
         default:
             throw new Error(`Unsupported type: ${type}`);
     }
+}
+
+/**
+ * @param {import('settings').ProfileOptions} options
+ * @returns {string}
+ */
+export function getDynamicTemplates(options) {
+    let dynamicTemplates = '\n';
+    for (const dictionary of options.dictionaries) {
+        if (!dictionary.enabled) { continue; }
+        dynamicTemplates += `
+{{#*inline "single-glossary-${getKebabCase(dictionary.name)}"}}
+    {{~> glossary selectedDictionary='${dictionary.name}'}}
+{{/inline}}
+
+{{#*inline "single-glossary-${getKebabCase(dictionary.name)}-no-dictionary"}}
+    {{~> glossary selectedDictionary='${dictionary.name}' noDictionaryTag=true}}
+{{/inline}}
+
+{{#*inline "single-glossary-${getKebabCase(dictionary.name)}-brief"}}
+    {{~> glossary selectedDictionary='${dictionary.name}' brief=true}}
+{{/inline}}
+`;
+    }
+    return dynamicTemplates;
+}
+
+/**
+ * @param {import('settings').DictionariesOptions} dictionaries
+ * @returns {string[]} The list of field markers.
+ */
+export function getDynamicFieldMarkers(dictionaries) {
+    const markers = [];
+    for (const dictionary of dictionaries) {
+        if (!dictionary.enabled) { continue; }
+        markers.push(`single-glossary-${getKebabCase(dictionary.name)}`);
+    }
+    return markers;
+}
+
+/**
+ * @param {string} str
+ * @returns {string}
+ */
+function getKebabCase(str) {
+    return str
+        .replace(/[\s_\u3000]/g, '-')
+        .replace(/[^\p{L}\p{N}-]/gu, '')
+        .replace(/--+/g, '-')
+        .replace(/^-|-$/g, '')
+        .toLowerCase();
 }

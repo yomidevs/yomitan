@@ -12904,7 +12904,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxOriginalTextLength": 1,
+        "maxOriginalTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -12912,7 +12912,7 @@
             "reading": "だ",
             "sources": [
               {
-                "originalText": "打",
+                "originalText": "打(う)",
                 "transformedText": "打",
                 "deinflectedText": "打",
                 "matchType": "exact",
@@ -13072,7 +13072,7 @@
         "dictionaryIndex": 0,
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "maxOriginalTextLength": 1,
+        "maxOriginalTextLength": 4,
         "headwords": [
           {
             "index": 0,
@@ -13080,7 +13080,7 @@
             "reading": "ダース",
             "sources": [
               {
-                "originalText": "打",
+                "originalText": "打(う)",
                 "transformedText": "打",
                 "deinflectedText": "打",
                 "matchType": "exact",
@@ -18597,6 +18597,168 @@
             ],
             "entries": [
               "language definition"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      }
+    ]
+  },
+  {
+    "name": "Test text postprocessing",
+    "originalTextLength": 4,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": [
+              "-거나"
+            ]
+          }
+        ],
+        "score": 1,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxOriginalTextLength": 4,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "마시다",
+            "reading": "마시다",
+            "sources": [
+              {
+                "originalText": "마시거나",
+                "transformedText": "ㅁㅏㅅㅣㄱㅓㄴㅏ",
+                "deinflectedText": "마시다",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "v"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 29,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              21
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "v",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "masida definition"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      }
+    ]
+  },
+  {
+    "name": "Test search resolution - word",
+    "originalTextLength": 7,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 1,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxOriginalTextLength": 7,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "English",
+            "reading": "English",
+            "sources": [
+              {
+                "originalText": "english",
+                "transformedText": "English",
+                "deinflectedText": "English",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 27,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              19
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "English definition"
             ]
           }
         ],

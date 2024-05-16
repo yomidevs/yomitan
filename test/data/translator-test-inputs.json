@@ -191,7 +191,7 @@
                         null,
                         [
                             {
-                                "pattern": "\\(([^)]*)(?:\\)|$)",
+                                "pattern": "\\(([^)]*)(?:\\))",
                                 "flags": "g",
                                 "replacement": ""
                             }
@@ -214,7 +214,7 @@
                         null,
                         [
                             {
-                                "pattern": "\\(([^)]*)(?:\\)|$)",
+                                "pattern": "\\(([^)]*)(?:\\))",
                                 "flags": "g",
                                 "replacement": "$1"
                             }
@@ -454,6 +454,35 @@
                     "type": "terms",
                     "language": "en",
                     "removeNonJapaneseCharacters": false
+                }
+            ]
+        },
+        {
+            "name": "Test text postprocessing",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "마시거나",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "language": "ko",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
+        },
+        {
+            "name": "Test search resolution - word",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "english example",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "language": "en",
+                    "removeNonJapaneseCharacters": false,
+                    "searchResolution": "word"
                 }
             ]
         }

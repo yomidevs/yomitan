@@ -1,0 +1,59 @@
+{{<<<<<<<}}
+{{~#*inline "glossary"~}}
+    <div style="text-align: left;">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                <ol>{{~#each definition.definitions~}}<li>{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}</li>{{~/each~}}</ol>
+            {{~else~}}
+                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/each~}}
+            {{~/if~}}
+        {{~else if (op "===" definition.type "kanji")~}}
+            {{~#if (op ">" definition.glossary.length 1)~}}
+                <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
+            {{~else~}}
+                {{~#each definition.glossary~}}{{.}}{{~/each~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+{{=======}}
+{{~#*inline "glossary"~}}
+    <div style="text-align: left;">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~#unless (op "&&" selectedDictionary (op "!=" selectedDictionary definition.dictionary))~}}
+                {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+            {{~/unless~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                <ol>
+                    {{~#each definition.definitions~}}
+                        {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                            <li>
+                                {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                            </li>
+                        {{~/unless~}}
+                    {{~/each~}}
+                </ol>
+            {{~else~}}
+                {{~#each definition.definitions~}}
+                    {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                        {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                    {{~/unless~}}
+                {{~/each~}}
+            {{~/if~}}
+        {{~else if (op "===" definition.type "kanji")~}}
+            {{~#if (op ">" definition.glossary.length 1)~}}
+                <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
+            {{~else~}}
+                {{~#each definition.glossary~}}{{.}}{{~/each~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+{{>>>>>>>}}
