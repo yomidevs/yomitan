@@ -133,7 +133,6 @@ export class DictionaryImportController {
         for (const fileEntry of await this._getAllFileEntries(e.dataTransfer.items)) {
             if (!fileEntry) { return; }
             try {
-                // @ts-expect-error - FileEntry.file() is not recognized
                 fileArray.push(await new Promise((resolve, reject) => { fileEntry.file(resolve, reject); }));
             } catch (error) {
                 log.error(error);
@@ -144,11 +143,12 @@ export class DictionaryImportController {
 
     /**
      * @param {DataTransferItemList} dataTransferItemList
-     * @returns {Promise<FileSystemEntry[]>}
+     * @returns {Promise<FileSystemFileEntry[]>}
      */
     async _getAllFileEntries(dataTransferItemList) {
+        /** @type {(FileSystemFileEntry)[]} */
         const fileEntries = [];
-        /** @type {(FileSystemEntry | FileSystemDirectoryEntry | null)[]} */
+        /** @type {(FileSystemEntry | null)[]} */
         const entries = [];
         for (let i = 0; i < dataTransferItemList.length; i++) {
             entries.push(dataTransferItemList[i].webkitGetAsEntry());
@@ -158,13 +158,14 @@ export class DictionaryImportController {
             this._importFileDropItemCount += 1;
             this._validateDirectoryItemCount();
 
-            /** @type {(FileSystemEntry | FileSystemDirectoryEntry | null) | undefined} */
+            /** @type {(FileSystemEntry | null) | undefined} */
             const entry = entries.shift();
             if (!entry) { continue; }
             if (entry.isFile) {
+                // @ts-expect-error - ts does not recognize `if (entry.isFile)` as verifying `entry` is type `FileSystemFileEntry`
                 fileEntries.push(entry);
             } else if (entry.isDirectory) {
-                // @ts-expect-error - Typescript does not recognize `if (entry.isDirectory)` as verifying `entry` is type `FileSystemDirectoryEntry`
+                // @ts-expect-error - ts does not recognize `if (entry.isDirectory)` as verifying `entry` is type `FileSystemDirectoryEntry`
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 entries.push(...await this._readAllDirectoryEntries(entry.createReader()));
             }
@@ -174,11 +175,11 @@ export class DictionaryImportController {
 
     /**
      * @param {FileSystemDirectoryReader} directoryReader
-     * @returns {Promise<FileSystemEntry[]>}
+     * @returns {Promise<(FileSystemEntry)[]>}
      */
     async _readAllDirectoryEntries(directoryReader) {
         const entries = [];
-        /** @type {FileSystemEntry[]} */
+        /** @type {(FileSystemEntry)[]} */
         let readEntries = await new Promise((resolve) => { directoryReader.readEntries(resolve); });
         while (readEntries.length > 0) {
             this._importFileDropItemCount += readEntries.length;
