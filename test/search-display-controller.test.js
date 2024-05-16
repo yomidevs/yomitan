@@ -63,8 +63,12 @@ const focusSpy = vi.spyOn(queryInput, 'focus');
 describe('Keyboard Event Handling', () => {
     afterAll(() => teardown(global));
 
-    const keypressEvents = [
+    const validKeypressEvents = [
         new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: false, altKey: false}),
+        new KeyboardEvent('keydown', {key: 'Backspace'})
+    ];
+
+    const invalidKeypressEvents = [
         new KeyboardEvent('keydown', {key: '', ctrlKey: true, metaKey: false, altKey: false}),
         new KeyboardEvent('keydown', {key: '', ctrlKey: false, metaKey: true, altKey: false}),
         new KeyboardEvent('keydown', {key: '', ctrlKey: false, metaKey: false, altKey: true}),
@@ -72,17 +76,27 @@ describe('Keyboard Event Handling', () => {
         new KeyboardEvent('keydown', {key: 'a', ctrlKey: true, metaKey: false, altKey: false}),
         new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: true, altKey: false}),
         new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: false, altKey: true}),
-        new KeyboardEvent('keydown', {key: 'Backspace'}),
         new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: true, metaKey: false, altKey: false}),
         new KeyboardEvent('keydown', {key: 'ArrowDown'})
     ];
 
     test('should test that onKeyDown function focuses input for valid keys', () => {
-        for (const event of keypressEvents) {
+        for (const event of validKeypressEvents) {
             queryInput.blur();
             onKeyDownMethod(event);
         }
 
         expect(focusSpy.mock.calls.length).toBe(2);
+        focusSpy.mockReset();
+    });
+
+
+    test('should test that onKeyDown function does not focus input for invalid keys', () => {
+        for (const event of invalidKeypressEvents) {
+            queryInput.blur();
+            onKeyDownMethod(event);
+        }
+
+        expect(focusSpy.mock.calls.length).toBe(0);
     });
 });
