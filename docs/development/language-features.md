@@ -32,7 +32,7 @@ nl: {
 }
 ```
 
-This is just for some type safety, the key is the ISO code and the value. Most languages will then only have a `pre` key (the other one is `post`), and its value is the type of text preprocessors you used in `language-descriptors.js`. Use the TypeScript operator `&` as needed. If you didn't use any text preprocessors, you can set the value to `Record<string, never>`.
+This is just for some type safety. The first key is the ISO code. Most languages will then only have a `pre` key (the other one is `post`), and its value is the type of text preprocessors you used in `language-descriptors.js`. Use the TypeScript operator `&` as needed. If you didn't use any text preprocessors, you can set the value to `Record<string, never>`.
 
 That's it! Your language should now be selectable from the dropdown, and may work perfectly fine already. For more advanced features, read on.
 
