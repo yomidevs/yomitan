@@ -48,6 +48,8 @@ export class DictionaryImportController {
         this._importFileInput = querySelectorNotNull(document, '#dictionary-import-file-input');
         /** @type {HTMLButtonElement} */
         this._importFileDrop = querySelectorNotNull(document, '#dictionary-drop-file-zone');
+        /** @type {number} */
+        this._importFileDropItemCount = 0;
         /** @type {HTMLInputElement} */
         this._importButton = querySelectorNotNull(document, '#dictionary-import-button');
         /** @type {HTMLInputElement} */
@@ -134,7 +136,7 @@ export class DictionaryImportController {
         /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(false);
         /** @type {File[]} */
         const fileArray = [];
-        for (const fileEntry of await this.getAllFileEntries(e.dataTransfer.items)) {
+        for (const fileEntry of await this._getAllFileEntries(e.dataTransfer.items)) {
             if (!fileEntry) { return; }
             try {
                 // @ts-expect-error - FileEntry.file() is not recognized
@@ -150,14 +152,18 @@ export class DictionaryImportController {
      * @param {DataTransferItemList} dataTransferItemList
      * @returns {Promise<FileSystemEntry[]>}
      */
-    async getAllFileEntries(dataTransferItemList) {
+    async _getAllFileEntries(dataTransferItemList) {
         const fileEntries = [];
         /** @type {(FileSystemEntry | FileSystemDirectoryEntry | null)[]} */
         const entries = [];
         for (let i = 0; i < dataTransferItemList.length; i++) {
             entries.push(dataTransferItemList[i].webkitGetAsEntry());
         }
+        this._importFileDropItemCount = entries.length - 1;
         while (entries.length > 0) {
+            this._importFileDropItemCount += 1;
+            this._validateDirectoryItemCount();
+
             /** @type {(FileSystemEntry | FileSystemDirectoryEntry | null) | undefined} */
             const entry = entries.shift();
             if (!entry) { continue; }
@@ -166,7 +172,7 @@ export class DictionaryImportController {
             } else if (entry.isDirectory) {
                 // @ts-expect-error - Typescript does not recognize `if (entry.isDirectory)` as verifying `entry` is type `FileSystemDirectoryEntry`
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                entries.push(...await this.readAllDirectoryEntries(entry.createReader()));
+                entries.push(...await this._readAllDirectoryEntries(entry.createReader()));
             }
         }
         return fileEntries;
@@ -176,15 +182,30 @@ export class DictionaryImportController {
      * @param {FileSystemDirectoryReader} directoryReader
      * @returns {Promise<FileSystemEntry[]>}
      */
-    async readAllDirectoryEntries(directoryReader) {
+    async _readAllDirectoryEntries(directoryReader) {
         const entries = [];
         /** @type {FileSystemEntry[]} */
         let readEntries = await new Promise((resolve) => { directoryReader.readEntries(resolve); });
         while (readEntries.length > 0) {
+            this._importFileDropItemCount += readEntries.length;
+            this._validateDirectoryItemCount();
+
             entries.push(...readEntries);
             readEntries = await new Promise((resolve) => { directoryReader.readEntries(resolve); });
         }
         return entries;
+    }
+
+    /**
+     * @throws
+     */
+    _validateDirectoryItemCount() {
+        if (this._importFileDropItemCount > 1000) {
+            this._importFileDropItemCount = 0;
+            const errorText = 'Directory upload item count too large';
+            this._showErrors([new Error(errorText)]);
+            throw new Error(errorText);
+        }
     }
 
     /**
