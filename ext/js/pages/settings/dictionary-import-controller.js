@@ -43,8 +43,6 @@ export class DictionaryImportController {
         /** @type {HTMLButtonElement} */
         this._purgeConfirmButton = querySelectorNotNull(document, '#dictionary-confirm-delete-all-button');
         /** @type {HTMLButtonElement} */
-        this._importFileButton = querySelectorNotNull(document, '#dictionary-import-file-button');
-        /** @type {HTMLButtonElement} */
         this._importFileInput = querySelectorNotNull(document, '#dictionary-import-file-input');
         /** @type {HTMLButtonElement} */
         this._importFileDrop = querySelectorNotNull(document, '#dictionary-drop-file-zone');
@@ -82,7 +80,6 @@ export class DictionaryImportController {
         this._purgeConfirmButton.addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
         this._importButton.addEventListener('click', this._onImportButtonClick.bind(this), false);
         this._importURLButton.addEventListener('click', this._onImportFromURL.bind(this), false);
-        this._importFileButton.addEventListener('click', this._onImportFileButtonClick.bind(this), false);
         this._importFileInput.addEventListener('change', this._onImportFileChange.bind(this), false);
 
         this._importFileDrop.addEventListener('click', this._onImportFileButtonClick.bind(this), false);
@@ -104,9 +101,7 @@ export class DictionaryImportController {
      */
     _onFileDropEnter(e) {
         e.preventDefault();
-        this._importFileDrop.style.borderColor = 'rgb(26, 115, 232)';
-        this._importFileDrop.style.borderStyle = 'solid';
-        this._importFileDrop.style.backgroundColor = 'rgb(191, 209, 255)';
+        this._importFileDrop.classList.add('drag-over');
     }
 
     /**
@@ -121,8 +116,7 @@ export class DictionaryImportController {
      */
     _onFileDropLeave(e) {
         e.preventDefault();
-        this._importFileDrop.style.border = '';
-        this._importFileDrop.style.backgroundColor = '';
+        this._importFileDrop.classList.remove('drag-over');
     }
 
     /**
