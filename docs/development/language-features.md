@@ -34,7 +34,7 @@ nl: {
 
 This is just for some type safety. The first key is the ISO code. Most languages will then only have a `pre` key (the other one is `post`), and its value is the type of text preprocessors you used in `language-descriptors.js`. Use the TypeScript operator `&` as needed. If you didn't use any text preprocessors, you can set the value to `Record<string, never>`.
 
-That's it! Your language should now be selectable from the dropdown, and may work perfectly fine already. For more advanced features, read on.
+That's it! Your language should now be selectable from the dropdown, and may work perfectly fine already. If you don't already have a dictionary to test with, check out [Dictionaries](../dictionaries.md). For more advanced features, read on.
 
 ## Language Features
 
@@ -44,7 +44,7 @@ A language descriptor in `language-descriptors.js` has several optional fields f
 
 ### Text Preprocessors
 
-The scanned text may not exactly match the headword in the dictionary. For example, an English dictionary will likely contain the word "read", but the text may contain "Read" or "READ". To handle cases like this, we use text preprocessors.
+The scanned text may not exactly match the word in the dictionary. For example, an English dictionary will likely contain the word "read", but the text may contain "Read" or "READ". To handle cases like this, we use text preprocessors.
 
 ```ts
 // from language.d.ts
@@ -128,7 +128,7 @@ This kind of text processing is to a degree interdependent with the dictionaries
 
 <img style="float: right; margin-left: 20px; " src="../../img/deinflection-example.png">
 
-Deinflection is the process of converting a word to its base or dictionary form. For example, "running" would be deinflected to "run". This is useful for finding the headword in the dictionary, as well as helping the user understand the grammar (morphology) of the language.
+Deinflection is the process of converting a word to its base or dictionary form. For example, "running" would be deinflected to "run". This is useful for finding the word in the dictionary, as well as helping the user understand the grammar (morphology) of the language.
 
 These grammatical rules are located in files such as `english-transforms.js`.
 
