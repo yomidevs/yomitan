@@ -126,7 +126,7 @@ This kind of text processing is to a degree interdependent with the dictionaries
 
 ### Deinflection Rules (a.k.a. Language Transforms)
 
-<img style="float: right; margin-left: 20px; " src="../../img/deinflection-example-simple.png">
+<img align="right" src="../../img/deinflection-example-simple.png">
 
 Deinflection is the process of converting a word to its base or dictionary form. For example, "running" would be deinflected to "run". This is useful for finding the word in the dictionary, as well as helping the user understand the grammar (morphology) of the language.
 
