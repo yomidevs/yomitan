@@ -562,11 +562,7 @@ export class TextScanner extends EventDispatcher {
      */
     _onKeyDown(e) {
         if (this._lastMouseMove !== null && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey)) {
-            const activeElement = document.activeElement;
-            if (activeElement && activeElement instanceof HTMLElement) {
-                if (activeElement.nodeName === 'INPUT' || activeElement.nodeName === 'TEXTAREA') { return; }
-                if (activeElement.isContentEditable) { return; }
-            }
+            if (this._inputtingText()) { return; }
             const syntheticMouseEvent = new MouseEvent(this._lastMouseMove.type, {
                 screenX: this._lastMouseMove.screenX,
                 screenY: this._lastMouseMove.screenY,
@@ -582,6 +578,18 @@ export class TextScanner extends EventDispatcher {
             });
             this._onMouseMove(syntheticMouseEvent);
         }
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    _inputtingText() {
+        const activeElement = document.activeElement;
+        if (activeElement && activeElement instanceof HTMLElement) {
+            if (activeElement.nodeName === 'INPUT' || activeElement.nodeName === 'TEXTAREA') { return true; }
+            if (activeElement.isContentEditable) { return true; }
+        }
+        return false;
     }
 
     /**
