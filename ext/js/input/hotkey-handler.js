@@ -232,7 +232,7 @@ export class HotkeyHandler extends EventDispatcher {
         this._hotkeys.clear();
         for (const [scope, registrations] of this._hotkeyRegistrations.entries()) {
             for (const {action, argument, key, modifiers, scopes, enabled} of registrations) {
-                if (!(enabled && (key !== null || modifiers !== null) && action !== '' && scopes.includes(scope))) { continue; }
+                if (!(enabled && (key !== null || modifiers.length > 0) && action !== '' && scopes.includes(scope))) { continue; }
                 let hotkeyInfo = this._hotkeys.get(key);
                 if (typeof hotkeyInfo === 'undefined') {
                     hotkeyInfo = {handlers: []};
