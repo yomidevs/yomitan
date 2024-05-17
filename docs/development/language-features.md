@@ -264,7 +264,7 @@ In special cases, text may need to be modified after deinflection. These work ex
 
 ### Text Lookup Worthiness
 
-Some features include checking whether a string is possibly a word in the language. For example, a word written in japanese characters (e.g. "日本語") is not a possible English word, and vice versa for text in the Latin script. To prevent unnecessary lookups, an `isTextLookupWorthy` function can be provided, otherwise all text will be looked up.
+Some features include checking whether a string is possibly a word in the language. For example, trying to look up a word written with non-Latin characters (e.g. "日本語") in an English dictionary will never yield any results. To prevent unnecessary lookups, an `isTextLookupWorthy` function can be provided, otherwise all text will be looked up.
 
 ## Stuck?
 
