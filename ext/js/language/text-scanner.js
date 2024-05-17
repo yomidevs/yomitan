@@ -562,6 +562,11 @@ export class TextScanner extends EventDispatcher {
      */
     _onKeyDown(e) {
         if (this._lastMouseMove !== null && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey)) {
+            const activeElement = document.activeElement;
+            if (activeElement && activeElement instanceof HTMLElement) {
+                if (activeElement.nodeName === 'INPUT' || activeElement.nodeName === 'TEXTAREA') { return; }
+                if (activeElement.isContentEditable) { return; }
+            }
             const syntheticMouseEvent = new MouseEvent(this._lastMouseMove.type, {
                 screenX: this._lastMouseMove.screenX,
                 screenY: this._lastMouseMove.screenY,
