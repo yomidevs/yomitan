@@ -162,9 +162,7 @@ export const englishTransforms = {
     {
       name: "plural",
       description: "Plural form of a noun",
-      rules: [
-        suffixInflection("s", "", [], [])
-      ],
+      rules: [suffixInflection("s", "", [], [])],
     },
   ],
 };
