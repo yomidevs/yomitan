@@ -4,7 +4,7 @@ Improving Yomitan's features for the language(s) you are interested in is pretty
 
 ## Adding a Language
 
-<img style="float: right; margin-left: 20px; " src="../../img/language-dropdown.png">
+<img align="right" src="../../img/language-dropdown.png">
 
 If your language is not already available in the Language dropdown, here is how you can add it with just a few lines. As an example, we'll use [PR #913](https://github.com/themoeway/yomitan/pull/913/files), where a first-time contributor added Dutch.
 
@@ -126,7 +126,7 @@ This kind of text processing is to a degree interdependent with the dictionaries
 
 ### Deinflection Rules (a.k.a. Language Transforms)
 
-<img style="float: right; margin-left: 20px; " src="../../img/deinflection-example.png">
+<img style="float: right; margin-left: 20px; " src="../../img/deinflection-example-simple.png">
 
 Deinflection is the process of converting a word to its base or dictionary form. For example, "running" would be deinflected to "run". This is useful for finding the word in the dictionary, as well as helping the user understand the grammar (morphology) of the language.
 
@@ -149,53 +149,114 @@ export type LanguageTransformDescriptor = {
 - `conditions` are an array of parts of speech, and grammatical forms that are used to check which deinflections make sense. They are referenced by the deinflection rules.
 - `transforms` are the actual deinflection rules
 
-Consider this example:
+Let's try and write a bit of deinflection for English, from scratch.
 
 ```js
-// abridged from english-transforms.js
+// english-transforms.js
 import { suffixInflection } from "../language-transforms.js";
 
 export const englishTransforms = {
   language: "en",
-  conditions: {
-    n: {
-      name: "Noun",
-      isDictionaryForm: true,
-      subConditions: ["np", "ns"],
-    },
-    np: {
-      name: "Noun plural",
-      isDictionaryForm: true,
-    },
-    ns: {
-      name: "Noun singular",
-      isDictionaryForm: true,
-    },
-  },
+  conditions: {},
   transforms: [
     {
       name: "plural",
       description: "Plural form of a noun",
-      rules: [suffixInflection("s", "", ["np"], ["ns"])],
+      rules: [suffixInflection("s", "", [], [])],
     },
   ],
 };
 ```
 
-This is a simple example for English, where the only deinflection rule is to remove the "s" from the end of a noun to get the singular form. The `suffixInflection` function is a helper that creates a deinflection rule for a suffix. It takes the suffix to remove, what to replace it with, and the conditions under which the rule can be applied. It is the most common type of deinflection rule across languages.
+This is a simple example for English, where the only deinflection rule is to remove the "s" from the end of a noun to get the singular form. The `suffixInflection` function is a helper that creates a deinflection rule for a suffix. It takes the suffix to remove, what to replace it with, and two more parameters for conditions, which we will look at next. The `suffixInflection` is the most common type of deinflection rule across languages.
 
 For the input string "cats", the following strings will be looked up:
 
 - `cats` (no deinflection)
-- `cat` with condition `ns` (deinflected by the `plural` rule)
+- `cat` (deinflected by the `plural` rule)
 
-If the dictionary contains an entry for `cat`, marked as a `n` (noun) it will successfully match the looked up string; since `ns` is a subcondition of `n`, they match.
+If the dictionary contains an entry for `cat`, it will successfully match the 2nd looked up string, (as shown in the image). Note the 🧩 symbol and the `plural` rule.
 
-It is important to note that rules chain together. If the `conditionsOut` of one rule match the `conditionsIn` of another rule, the algorithm will also attempt a lookup with the second rule applied to the output of the first rule. This is indispensable for agglutinative languages, but may cause unexpected behavior. For example, if the `plural` rule in the example were `suffixInflection('s', '', ['n'], ['n'])`. Scanning the word `boss` would also display results for the word `bo` (e.g. the staff) with the `plural` rule applied twice.
+However, this rule will also match the word "reads", and show the verb "read" from the dictionary, marked as being `plural`. This makes no sense, and we can use conditions to prevent it. Let's add a condition and use it in the rule.
 
-A list of the rule chains that were applied is shown in the search results, marked with a 🧩.
+```js
+conditions: {
+  n: {
+    name: 'Noun',
+    isDictionaryForm: true,
+  },
+},
+transforms: [
+  {
+    name: "plural",
+    description: "Plural form of a noun",
+    rules: [
+      suffixInflection("s", "", [], ["n"])
+    ],
+  },
+],
+```
 
-The `suffixInflection` is a helper function - you can write more complex rules, using regex and a function for deinflecting. There are examples of this across the language transforms files.
+Now, only dictionary entries marked with the same "n" condition will be eligible for matching the `plural` rule. The verb "read" should be marked as "v" in the dictionary, and will no longer be matched by the `plural` rule. The entries in the dictionary need to be marked with the exact same conditions defined in the `conditions` object. The `isDictionaryForm` field can be set to `false`, to allow some conditions to be sued only in between rules, and not in the dictionary. In most cases however, it will be set to `true`.
+
+<img align="right" src="../../img/deinflection-example-chain.png">
+
+Now consider the word `dogs'`, as in the `the dogs' bones`. This is the possessive of a plural noun. We can add a rule for the possessive:
+
+```js
+{
+  name: "possessive",
+  description: "Possessive form of a noun",
+  rules: [
+    suffixInflection("'", "", [], ["n"])
+  ],
+},
+```
+
+However, the only `conditionOut` of this rule, `n`, does not match any `conditionIn` of the `plural` rule, because the `plural` rules `conditionsIn` are an empty array. To fix this, we can add a condition to the `plural` rule:
+
+```js
+{
+  name: "plural",
+  description: "Plural form of a noun",
+  rules: [
+    suffixInflection("s", "", ["n"], ["n"])
+  ],
+},
+```
+
+Now the rules will chain together, as shown in the image. Chaining is can be very useful (for agglutinative languages it is indispensable), but may cause unexpected behavior. For example, `boss` will now display results for the word `bo` (e.g. the staff) with the `plural` rule applied twice, i.e. it can chain with itself because the `conditionsIn` and `conditionsOut` are the same. This leads us to the actual implementation of the `plural` rule in `english-transforms.js`:
+
+```js
+conditions: {
+  n: {
+    name: "Noun",
+    isDictionaryForm: true,
+    subConditions: ["np", "ns"],
+  },
+  np: {
+    name: "Noun plural",
+    isDictionaryForm: true,
+  },
+  ns: {
+    name: "Noun singular",
+    isDictionaryForm: true,
+  },
+},
+transforms: [
+  {
+    name: "plural",
+    description: "Plural form of a noun",
+    rules: [
+      suffixInflection("s", "", ["np"], ["ns"])
+    ],
+  },
+],
+```
+
+Since `ns` and `np` are subconditions of `n` they will both match with `n`, but not with each other. This covers all of the requirements we have considered.
+
+The `suffixInflection` is one of a few helper functions - you can write more complex rules, using regex and a function for deinflecting. There are examples of this across the language transforms files.
 
 ### Text Postprocessors
 
