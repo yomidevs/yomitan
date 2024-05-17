@@ -90,6 +90,8 @@ When applying preprocessors, each combination will be separately applied and loo
 - `read` (only `decapitalize` on)
 - `Read` (both preprocessors on)
 
+Note that the order of text processors can matter. Had we put capitalizeFirstLetter before decapitalize, the 4th string would be `read` instead of `Read`.
+
 #### Letter Variants
 
 A letter or a group of letters may have multiple variants in a language. For example, in German, "ß" can be written as "ss" and vice versa, or in Japanese every kana has a hiragana and a katakana variant. To handle this, we use a bidirectional conversion preprocessor.
