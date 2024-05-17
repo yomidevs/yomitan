@@ -162,11 +162,11 @@ export class DictionaryImportController {
             if (!entry) { continue; }
             if (entry.isFile) {
                 if (entry.name.substring(entry.name.lastIndexOf('.'), entry.name.length) === '.zip') {
-                    // @ts-expect-error - ts does not recognize `if (entry.isFile)` as verifying `entry` is type `FileSystemFileEntry`
+                    // @ts-expect-error - ts does not recognize `if (entry.isFile)` as verifying `entry` is type `FileSystemFileEntry` and instanceof does not work
                     fileEntries.push(entry);
                 }
             } else if (entry.isDirectory) {
-                // @ts-expect-error - ts does not recognize `if (entry.isDirectory)` as verifying `entry` is type `FileSystemDirectoryEntry`
+                // @ts-expect-error - ts does not recognize `if (entry.isDirectory)` as verifying `entry` is type `FileSystemDirectoryEntry` and instanceof does not work
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 entries.push(...await this._readAllDirectoryEntries(entry.createReader()));
             }
