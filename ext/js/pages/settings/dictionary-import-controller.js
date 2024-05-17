@@ -101,7 +101,14 @@ export class DictionaryImportController {
      */
     _onFileDropEnter(e) {
         e.preventDefault();
-        this._importFileDrop.classList.add('drag-over');
+        if (!e.dataTransfer) { return; }
+        for (const item of e.dataTransfer.items) {
+            // Directories and files with no extension both show as ''
+            if (item.type === '' || item.type === 'application/zip') {
+                this._importFileDrop.classList.add('drag-over');
+                break;
+            }
+        }
     }
 
     /**
