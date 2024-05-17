@@ -65,7 +65,8 @@ describe('Keyboard Event Handling', () => {
 
     const validKeypressEvents = [
         new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: false, altKey: false}),
-        new KeyboardEvent('keydown', {key: 'Backspace'})
+        new KeyboardEvent('keydown', {key: 'Backspace'}),
+        new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: true, metaKey: false, altKey: false})
     ];
 
     const invalidKeypressEvents = [
@@ -76,7 +77,8 @@ describe('Keyboard Event Handling', () => {
         new KeyboardEvent('keydown', {key: 'a', ctrlKey: true, metaKey: false, altKey: false}),
         new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: true, altKey: false}),
         new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: false, altKey: true}),
-        new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: true, metaKey: false, altKey: false}),
+        new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: false, metaKey: true, altKey: false}),
+        new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: false, metaKey: false, altKey: true}),
         new KeyboardEvent('keydown', {key: 'ArrowDown'})
     ];
 
@@ -86,7 +88,7 @@ describe('Keyboard Event Handling', () => {
             onKeyDownMethod(event);
         }
 
-        expect(focusSpy.mock.calls.length).toBe(2);
+        expect(focusSpy.mock.calls.length).toBe(validKeypressEvents.length);
         focusSpy.mockReset();
     });
 

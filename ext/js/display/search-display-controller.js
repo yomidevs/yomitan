@@ -160,8 +160,9 @@ export class SearchDisplayController {
         const isAllowedKey = e.key.length === 1 || e.key === 'Backspace';
         const isModifierKey = e.ctrlKey || e.metaKey || e.altKey;
         const isSpaceKey = e.key === ' ';
+        const isCtrlBackspace = e.ctrlKey && e.key === 'Backspace';
 
-        if (!isInputField && !isModifierKey && isAllowedKey && !isSpaceKey) {
+        if (!isInputField && (!isModifierKey || isCtrlBackspace) && isAllowedKey && !isSpaceKey) {
             this._queryInput.focus({preventScroll: true});
         }
     }
