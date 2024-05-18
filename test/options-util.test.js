@@ -520,9 +520,10 @@ function createProfileOptionsUpdatedTestData1() {
 }
 
 /**
+ * @param {number} versionUpdatesLength
  * @returns {unknown}
  */
-function createOptionsUpdatedTestData1() {
+function createOptionsUpdatedTestData1(versionUpdatesLength) {
     return {
         profiles: [
             {
@@ -605,7 +606,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 35,
+        version: versionUpdatesLength,
         global: {
             database: {
                 prefixWildcardsSupported: false
@@ -636,7 +637,9 @@ describe('OptionsUtil', () => {
 
         const options = createOptionsTestData1();
         const optionsUpdated = structuredClone(await optionsUtil.update(options));
-        const optionsExpected = createOptionsUpdatedTestData1();
+        // eslint-disable-next-line no-underscore-dangle
+        const versionUpdatesLength = optionsUtil._getVersionUpdates(null).length;
+        const optionsExpected = createOptionsUpdatedTestData1(versionUpdatesLength);
         expect(optionsUpdated).toStrictEqual(optionsExpected);
     });
 
