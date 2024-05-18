@@ -546,7 +546,6 @@ export function convertAlphanumericToFullWidth(text) {
  */
 export function convertFullWidthAlphanumericToNormal(text) {
     let result = '';
-    let i = 0;
     const length = text.length;
     for (let i = 0; i < length; i++) {
         let c = /** @type {number} */ (text[i].codePointAt(0));
