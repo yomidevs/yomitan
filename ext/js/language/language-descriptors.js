@@ -132,6 +132,11 @@ const languageDescriptors = [
         languageTransforms: latinTransforms
     },
     {
+        iso: 'lo',
+        name: 'Lao',
+        exampleText: 'ອ່ານ'
+    },
+    {
         iso: 'ja',
         name: 'Japanese',
         exampleText: '読め',
