@@ -19,7 +19,14 @@ import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {germanTransforms} from './de/german-transforms.js';
 import {englishTransforms} from './en/english-transforms.js';
-import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
+import {
+    alphabeticToHiragana,
+    alphabeticWidthVariants,
+    collapseEmphaticSequences,
+    convertHalfWidthCharacters,
+    convertHiraganaToKatakana,
+    convertNumericCharacters
+} from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
 import {disassembleHangul, reassembleHangul} from './ko/korean-text-processors.js';
@@ -139,7 +146,8 @@ const languageDescriptors = [
         textPreprocessors: {
             convertHalfWidthCharacters,
             convertNumericCharacters,
-            convertAlphabeticCharacters,
+            alphabeticToHiragana,
+            alphabeticWidthVariants,
             convertHiraganaToKatakana,
             collapseEmphaticSequences
         },

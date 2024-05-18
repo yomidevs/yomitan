@@ -541,6 +541,42 @@ export function convertNumericToFullWidth(text) {
  * @param {string} text
  * @returns {string}
  */
+export function convertAlphabeticToFullWidth(text) {
+    let result = '';
+    for (const char of text) {
+        let c = /** @type {number} */ (char.codePointAt(0));
+        if (c >= 0x41 && c <= 0x5a) { // ['A', 'Z']
+            c += 0xff21 - 0x41; // 0xff21 = 'A' full width
+        } else if (c >= 0x61 && c <= 0x7a) { // ['a', 'z']
+            c += 0xff41 - 0x61; // 0xff41 = 'a' full width
+        }
+        result += String.fromCodePoint(c);
+    }
+    return result;
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+export function convertFullWidthAlphabeticToNormal(text) {
+    let result = '';
+    for (const char of text) {
+        let c = /** @type {number} */ (char.codePointAt(0));
+        if (c >= 0xff21 && c <= 0xff3a) { // ['Ａ', 'Ｚ']
+            c -= 0xff21 - 0x41; // 0x41 = 'A'
+        } else if (c >= 0xff41 && c <= 0xff5a) { // ['ａ', 'ｚ']
+            c -= 0xff41 - 0x61; // 0x61 = 'a'
+        }
+        result += String.fromCodePoint(c);
+    }
+    return result;
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
 export function convertHalfWidthKanaToFullWidth(text) {
     let result = '';
 

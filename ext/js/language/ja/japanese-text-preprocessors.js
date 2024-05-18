@@ -19,6 +19,8 @@ import {basicTextProcessorOptions} from '../text-processors.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {
     collapseEmphaticSequences as collapseEmphaticSequencesFunction,
+    convertAlphabeticToFullWidth,
+    convertFullWidthAlphabeticToNormal,
     convertHalfWidthKanaToFullWidth,
     convertHiraganaToKatakana as convertHiraganaToKatakanaFunction,
     convertKatakanaToHiragana as convertKatakanaToHiraganaFunction,
@@ -42,11 +44,28 @@ export const convertNumericCharacters = {
 };
 
 /** @type {import('language').TextProcessor<boolean>} */
-export const convertAlphabeticCharacters = {
+export const alphabeticToHiragana = {
     name: 'Convert alphabetic characters to hiragana',
     description: 'yomichan → よみちゃん',
     options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? convertAlphabeticToKana(str) : str)
+};
+
+/** @type {import('language').BidirectionalConversionPreprocessor} */
+export const alphabeticWidthVariants = {
+    name: 'Convert between alphabetic width variants',
+    description: 'ｙｏｍｉｔａｎ → yomitan and vice versa',
+    options: ['off', 'direct', 'inverse'],
+    process: (str, setting) => {
+        switch (setting) {
+            case 'off':
+                return str;
+            case 'direct':
+                return convertFullWidthAlphabeticToNormal(str);
+            case 'inverse':
+                return convertAlphabeticToFullWidth(str);
+        }
+    }
 };
 
 /** @type {import('language').BidirectionalConversionPreprocessor} */

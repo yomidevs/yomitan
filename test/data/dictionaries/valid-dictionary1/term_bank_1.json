@@ -344,5 +344,6 @@
     ["凄い", "すごい", "adj-i", "adj-i", 1, ["sugoi definition"], 18, ""],
     ["English", "", "n", "n", 1, ["English definition"], 19, ""],
     ["language", "", "n", "n", 1, ["language definition"], 20, ""],
-    ["마시다", "", "v", "v", 1, ["masida definition"], 21, ""]
+    ["ＵＳＢ", "ユーエスビー", "n", "n", 1, ["ＵＳＢ definition"], 21, ""],
+    ["마시다", "", "v", "v", 1, ["masida definition"], 22, ""]
 ]
