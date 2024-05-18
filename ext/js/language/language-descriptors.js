@@ -134,7 +134,7 @@ const languageDescriptors = [
     {
         iso: 'lo',
         name: 'Lao',
-        exampleText: 'ອ່ານ',
+        exampleText: 'ອ່ານ'
     },
     {
         iso: 'ja',
