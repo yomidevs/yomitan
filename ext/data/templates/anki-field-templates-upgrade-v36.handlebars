@@ -1,0 +1,13 @@
+{{<<<<<<<}}
+{{#*inline "onyomi"}}
+    {{~#each definition.onyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+{{=======}}
+{{#*inline "onyomi"}}
+    {{~#each definition.onyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+
+{{#*inline "onyomi-hiragana"}}
+    {{~#each definition.onyomi}}{{hiragana (.)}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+{{>>>>>>>}}
