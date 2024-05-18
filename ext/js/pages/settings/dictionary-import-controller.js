@@ -242,13 +242,15 @@ export class DictionaryImportController {
             return errors;
         }
 
-        void this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
         const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
 
+        await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
+
         if (errors.length > 0) {
-            const allErrors = [...errors, ...errors2];
-            allErrors.push(new Error(`Dictionary may not have been imported properly: ${allErrors.length} error${allErrors.length === 1 ? '' : 's'} reported.`));
-            this._showErrors(allErrors);
+            errors.push(new Error(`Dictionary may not have been imported properly: ${errors.length} error${errors.length === 1 ? '' : 's'} reported.`));
+            this._showErrors([...errors, ...errors2]);
+        } else if (errors2.length > 0) {
+            this._showErrors(errors2);
         }
     }
 
@@ -258,7 +260,18 @@ export class DictionaryImportController {
      * @returns {Promise<Error[]>}
      */
     async _addDictionarySettings(sequenced, title) {
-        const optionsFull = await this._settingsController.getOptionsFull();
+        let optionsFull;
+        // Workaround Firefox bug sometimes causing getOptionsFull to fail
+        for (let i = 0, success = false; (i < 10) && (success === false); i++) {
+            try {
+                optionsFull = await this._settingsController.getOptionsFull();
+                success = true;
+            } catch (error) {
+                log.error(error);
+            }
+        }
+        if (!optionsFull) { return [new Error('Failed to automatically set dictionary settings. A page refresh and manual enabling of the dictionary may be required.')]; }
+
         const profileIndex = this._settingsController.profileIndex;
         /** @type {import('settings-modifications').Modification[]} */
         const targets = [];
@@ -306,6 +319,7 @@ export class DictionaryImportController {
      * @param {Error[]} errors
      */
     _showErrors(errors) {
+        /** @type {Map<string, number>} */
         const uniqueErrors = new Map();
         for (const error of errors) {
             log.error(error);

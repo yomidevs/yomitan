@@ -119,6 +119,7 @@ export class Frontend {
 
         this._hotkeyHandler.registerActions([
             ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
+            ['scanTextAtSelection', this._onActionScanTextAtSelection.bind(this)],
             ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
@@ -256,14 +257,21 @@ export class Frontend {
      * @returns {void}
      */
     _onActionScanSelectedText() {
-        void this._scanSelectedText(false);
+        void this._scanSelectedText(false, true);
+    }
+
+    /**
+     * @returns {void}
+     */
+    _onActionScanTextAtSelection() {
+        void this._scanSelectedText(false, false);
     }
 
     /**
      * @returns {void}
      */
     _onActionScanTextAtCaret() {
-        void this._scanSelectedText(true);
+        void this._scanSelectedText(true, false);
     }
 
     // API message handlers
@@ -919,12 +927,13 @@ export class Frontend {
 
     /**
      * @param {boolean} allowEmptyRange
+     * @param {boolean} disallowExpandSelection
      * @returns {Promise<boolean>}
      */
-    async _scanSelectedText(allowEmptyRange) {
+    async _scanSelectedText(allowEmptyRange, disallowExpandSelection) {
         const range = this._getFirstSelectionRange(allowEmptyRange);
         if (range === null) { return false; }
-        const source = TextSourceRange.create(range);
+        const source = disallowExpandSelection ? TextSourceRange.createLazy(range) : TextSourceRange.create(range);
         await this._textScanner.search(source, {focus: true, restoreSelection: true});
         return true;
     }

@@ -255,10 +255,7 @@
     color: var(--text-color-light3);
 }
 .gloss-sc-details {
-    cursor: pointer;
-    padding-left: var(--list-padding2);
-    border-top: calc(1em / var(--font-size-no-units)) solid var(--medium-border-color);
-    border-bottom: calc(1em / var(--font-size-no-units)) solid var(--medium-border-color);
+    padding-left: var(--list-padding1);
 }
 .gloss-sc-summary {
     list-style-position: outside;

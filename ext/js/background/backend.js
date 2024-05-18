@@ -970,10 +970,10 @@ export class Backend {
     // Command handlers
 
     /**
-     * @param {undefined|{mode: 'existingOrNewTab'|'newTab', query?: string}} params
+     * @param {undefined|{mode: 'existingOrNewTab'|'newTab'|'popup', query?: string}} params
      */
     async _onCommandOpenSearchPage(params) {
-        /** @type {'existingOrNewTab'|'newTab'} */
+        /** @type {'existingOrNewTab'|'newTab'|'popup'} */
         let mode = 'existingOrNewTab';
         let query = '';
         if (typeof params === 'object' && params !== null) {
@@ -1029,6 +1029,8 @@ export class Backend {
             case 'newTab':
                 await this._createTab(queryUrl);
                 return;
+            case 'popup':
+                return;
         }
     }
 
@@ -1040,10 +1042,10 @@ export class Backend {
     }
 
     /**
-     * @param {undefined|{mode: 'existingOrNewTab'|'newTab'}} params
+     * @param {undefined|{mode: 'existingOrNewTab'|'newTab'|'popup'}} params
      */
     async _onCommandOpenSettingsPage(params) {
-        /** @type {'existingOrNewTab'|'newTab'} */
+        /** @type {'existingOrNewTab'|'newTab'|'popup'} */
         let mode = 'existingOrNewTab';
         if (typeof params === 'object' && params !== null) {
             mode = this._normalizeOpenSettingsPageMode(params.mode, mode);
@@ -1837,16 +1839,7 @@ export class Backend {
         }
 
         try {
-            const tabWindow = await new Promise((resolve, reject) => {
-                chrome.windows.get(tab.windowId, {}, (value) => {
-                    const e = chrome.runtime.lastError;
-                    if (e) {
-                        reject(new Error(e.message));
-                    } else {
-                        resolve(value);
-                    }
-                });
-            });
+            const tabWindow = await this._getWindow(tab.windowId);
             if (!tabWindow.focused) {
                 await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
                     chrome.windows.update(tab.windowId, {focused: true}, () => {
@@ -1862,6 +1855,23 @@ export class Backend {
         } catch (e) {
             // Edge throws exception for no reason here.
         }
+    }
+
+    /**
+     * @param {number} windowId
+     * @returns {Promise<chrome.windows.Window>}
+     */
+    _getWindow(windowId) {
+        return new Promise((resolve, reject) => {
+            chrome.windows.get(windowId, {}, (value) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(value);
+                }
+            });
+        });
     }
 
     /**
@@ -2214,6 +2224,7 @@ export class Backend {
     async _injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, dictionaryMediaDetails) {
         const targets = [];
         const detailsList = [];
+        /** @type {Map<string, {dictionary: string, path: string, media: ?import('dictionary-database').MediaDataStringContent}>} */
         const detailsMap = new Map();
         for (const {dictionary, path} of dictionaryMediaDetails) {
             const target = {dictionary, path};
@@ -2541,7 +2552,7 @@ export class Backend {
     }
 
     /**
-     * @param {'existingOrNewTab'|'newTab'} mode
+     * @param {'existingOrNewTab'|'newTab'|'popup'} mode
      */
     async _openSettingsPage(mode) {
         const manifest = chrome.runtime.getManifest();
@@ -2670,13 +2681,14 @@ export class Backend {
 
     /**
      * @param {unknown} mode
-     * @param {'existingOrNewTab'|'newTab'} defaultValue
-     * @returns {'existingOrNewTab'|'newTab'}
+     * @param {'existingOrNewTab'|'newTab'|'popup'} defaultValue
+     * @returns {'existingOrNewTab'|'newTab'|'popup'}
      */
     _normalizeOpenSettingsPageMode(mode, defaultValue) {
         switch (mode) {
             case 'existingOrNewTab':
             case 'newTab':
+            case 'popup':
                 return mode;
             default:
                 return defaultValue;

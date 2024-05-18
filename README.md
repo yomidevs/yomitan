@@ -22,7 +22,7 @@ Since the owner requested forks be uniquely named, we have chosen a new name, _y
 
 ## Contributing
 
-Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the [issue tracker](https://github.com/themoeway/yomitan/issues), and read our [contributing guidelines](./CONTRIBUTING.md). You can also find us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
+Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the [issue tracker](https://github.com/themoeway/yomitan/issues), and read our [contributing guidelines](./CONTRIBUTING.md). If you want to add or improve support for a language, read the documentation on [language features](./docs/development/language-features.md). You can also find us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
 
 ## What's Yomitan?<!-- omit from toc -->
 
@@ -125,3 +125,4 @@ Yomitan uses several third-party libraries to function.
 | yomitan-handlebars  | 1.0.0             | MIT          | n/a                                              |
 | parse5              | 7.1.2             | MIT          | git://github.com/inikulin/parse5.git             |
 | wanakana            | 5.3.1             | MIT          | git+ssh://git@github.com/WaniKani/WanaKana.git   |
+| hangul.js           | 0.2.6             | MIT          | git+https://github.com/e-/Hangul.js.git          |

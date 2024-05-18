@@ -211,7 +211,9 @@ body {
 .danger-text {
     color: var(--danger-color);
 }
-
+.success-text {
+    color: var(--success-color);
+}
 
 /* Icons */
 .icon {
@@ -277,6 +279,7 @@ body {
 .icon[data-icon=accessibility]           { --icon-image: url(/images/accessibility.svg); }
 .icon[data-icon=connection]              { --icon-image: url(/images/connection.svg); }
 .icon[data-icon=external-link]           { --icon-image: url(/images/external-link.svg); }
+.icon[data-icon=monitor]                 { --icon-image: url(/images/monitor.svg); }
 .icon[data-icon=material-down-arrow] {
     --icon-image: url(/images/material-down-arrow.svg);
     --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1);

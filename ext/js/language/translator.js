@@ -289,6 +289,7 @@ export class Translator {
             return false;
         }
 
+        /** @type {Map<string, number>} */
         const frequencyCounter = new Map();
 
         for (const element of array1) {
@@ -400,6 +401,7 @@ export class Translator {
      * @returns {Map<string, import('translation-internal').DatabaseDeinflection[]>}
      */
     _groupDeinflectionsByTerm(deinflections) {
+        /** @type {Map<string, import('translation-internal').DatabaseDeinflection[]>} */
         const result = new Map();
         for (const deinflection of deinflections) {
             const {deinflectedText} = deinflection;
@@ -455,16 +457,14 @@ export class Translator {
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const deinflections = [];
         const used = new Set();
-        /** @type {Map<string, import('core').SafeAny>} */
+        /** @type {import('translation-internal').TextCache} */
         const sourceCache = new Map(); // For reusing text processors' outputs
 
         for (
-            let i = text.length;
-            i > 0;
-            i = this._getNextSubstringLength(options.searchResolution, i, text)
+            let rawSource = text;
+            rawSource.length > 0;
+            rawSource = this._getNextSubstring(options.searchResolution, rawSource)
         ) {
-            const rawSource = text.substring(0, i);
-
             for (const preprocessorVariant of preprocessorVariants) {
                 let source = rawSource;
 
@@ -498,14 +498,15 @@ export class Translator {
 
     /**
      * @param {import('language').TextProcessorWithId<unknown>[]} textProcessors
-     * @param {Map<string, unknown>} processorVariant
+     * @param {import('translation-internal').TextProcessorVariant} processorVariant
      * @param {string} text
-     * @param {Map<string, import('core').SafeAny>} textCache
+     * @param {import('translation-internal').TextCache} textCache
      * @returns {string}
      */
     _applyTextProcessors(textProcessors, processorVariant, text, textCache) {
         for (const {id, textProcessor: {process}} of textProcessors) {
             const setting = processorVariant.get(id);
+
             let level1 = textCache.get(text);
             if (!level1) {
                 level1 = new Map();
@@ -522,7 +523,7 @@ export class Translator {
                 text = process(text, setting);
                 level2.set(setting, text);
             } else {
-                text = level2.get(setting);
+                text = level2.get(setting) || '';
             }
         }
 
@@ -531,16 +532,14 @@ export class Translator {
 
     /**
      * @param {string} searchResolution
-     * @param {number} currentLength
-     * @param {string} source
-     * @returns {number}
+     * @param {string} currentString
+     * @returns {string}
      */
-    _getNextSubstringLength(searchResolution, currentLength, source) {
-        return (
-            searchResolution === 'word' ?
-            source.search(/[^\p{Letter}][\p{Letter}\p{Number}]*$/u) :
-            currentLength - 1
-        );
+    _getNextSubstring(searchResolution, currentString) {
+        const nextSubstringLength = searchResolution === 'word' ?
+            currentString.search(/[^\p{Letter}][\p{Letter}\p{Number}]*$/u) :
+            currentString.length - 1;
+        return currentString.substring(0, nextSubstringLength);
     }
 
     /**
@@ -681,6 +680,7 @@ export class Translator {
         /** @type {import('dictionary-database').TermExactRequest[]} */
         const termList = [];
         const targetList = [];
+        /** @type {Map<string, {groups: import('translator').DictionaryEntryGroup[]}>} */
         const targetMap = new Map();
 
         for (const group of groupedDictionaryEntries) {
@@ -1362,10 +1362,10 @@ export class Translator {
 
     /**
      * @param {Map<string, unknown[]>} arrayVariants
-     * @returns {Map<string, unknown>[]}
+     * @returns {import('translation-internal').TextProcessorVariant[]}
      */
     _getArrayVariants(arrayVariants) {
-        /** @type {Map<string, unknown>[]} */
+        /** @type {import('translation-internal').TextProcessorVariant[]} */
         const results = [];
         const variantKeys = [...arrayVariants.keys()];
         const entryVariantLengths = [];
@@ -1376,7 +1376,7 @@ export class Translator {
         const totalVariants = entryVariantLengths.reduce((acc, length) => acc * length, 1);
 
         for (let variantIndex = 0; variantIndex < totalVariants; ++variantIndex) {
-            /** @type {Map<string, unknown>} */
+            /** @type {import('translation-internal').TextProcessorVariant}} */
             const variant = new Map();
             let remainingIndex = variantIndex;
 
@@ -2076,6 +2076,7 @@ export class Translator {
      * @param {boolean} ascending
      */
     _updateSortFrequencies(dictionaryEntries, dictionary, ascending) {
+        /** @type {Map<number, number>} */
         const frequencyMap = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
             const {definitions, frequencies} = dictionaryEntry;
