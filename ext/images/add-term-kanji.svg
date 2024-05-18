@@ -9,7 +9,7 @@
    <stop stop-color="#34812c" offset="0"/>
    <stop stop-color="#87b870" offset="1"/>
   </linearGradient>
-  <radialGradient id="shadow" cx="2.1167" cy="2.1167" r=".66146" gradientTransform="matrix(4.5354 8.0301e-7 -8.0301e-7 4.5354 -1.6 -1.6)" gradientUnits="userSpaceOnUse">
+  <radialGradient id="center-shadow" cx="2.1167" cy="2.1167" r=".66146" gradientTransform="matrix(4.5354 8.0301e-7 -8.0301e-7 4.5354 -1.6 -1.6)" gradientUnits="userSpaceOnUse">
    <stop stop-opacity=".28986" offset="0"/>
    <stop stop-opacity="0" offset="1"/>
   </radialGradient>
@@ -18,7 +18,7 @@
   <circle cx="8" cy="8" r="6.5" fill="url(#inner-fill)"/>
   <circle cx="8" cy="8" r="5.75" fill="none" stroke="#fff" stroke-opacity=".50196" stroke-width="1.5"/>
   <circle cx="8" cy="8" r="6.5" fill="none" stroke="url(#outer-rim)"/>
-  <circle cx="8" cy="8" r="3" fill="url(#shadow)"/>
+  <circle cx="8" cy="8" r="3" fill="url(#center-shadow)"/>
   <path d="m5 7h2v-2h2v2h2v2h-2v2h-2v-2h-2v-2" fill="#fff"/>
  </g>
 </svg>
