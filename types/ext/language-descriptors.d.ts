@@ -113,6 +113,7 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors & {
             removeAlphabeticDiacritics: TextProcessor<boolean>;
         };
+    lo: Record<string, never>;
     };
     ja: {
         pre: {
