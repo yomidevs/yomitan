@@ -21,11 +21,10 @@ import {germanTransforms} from './de/german-transforms.js';
 import {englishTransforms} from './en/english-transforms.js';
 import {
     alphabeticToHiragana,
-    alphabeticWidthVariants,
+    alphanumericWidthVariants,
     collapseEmphaticSequences,
     convertHalfWidthCharacters,
-    convertHiraganaToKatakana,
-    convertNumericCharacters
+    convertHiraganaToKatakana
 } from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
@@ -145,9 +144,8 @@ const languageDescriptors = [
         isTextLookupWorthy: isStringPartiallyJapanese,
         textPreprocessors: {
             convertHalfWidthCharacters,
-            convertNumericCharacters,
             alphabeticToHiragana,
-            alphabeticWidthVariants,
+            alphanumericWidthVariants,
             convertHiraganaToKatakana,
             collapseEmphaticSequences
         },

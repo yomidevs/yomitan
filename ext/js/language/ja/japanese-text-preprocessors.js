@@ -19,12 +19,11 @@ import {basicTextProcessorOptions} from '../text-processors.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {
     collapseEmphaticSequences as collapseEmphaticSequencesFunction,
-    convertAlphabeticToFullWidth,
-    convertFullWidthAlphabeticToNormal,
+    convertAlphanumericToFullWidth,
+    convertFullWidthAlphanumericToNormal,
     convertHalfWidthKanaToFullWidth,
     convertHiraganaToKatakana as convertHiraganaToKatakanaFunction,
-    convertKatakanaToHiragana as convertKatakanaToHiraganaFunction,
-    convertNumericToFullWidth
+    convertKatakanaToHiragana as convertKatakanaToHiraganaFunction
 } from './japanese.js';
 
 /** @type {import('language').TextProcessor<boolean>} */
@@ -35,13 +34,6 @@ export const convertHalfWidthCharacters = {
     process: (str, setting) => (setting ? convertHalfWidthKanaToFullWidth(str) : str)
 };
 
-/** @type {import('language').TextProcessor<boolean>} */
-export const convertNumericCharacters = {
-    name: 'Convert numeric characters to full width',
-    description: '1234 → １２３４',
-    options: basicTextProcessorOptions,
-    process: (str, setting) => (setting ? convertNumericToFullWidth(str) : str)
-};
 
 /** @type {import('language').TextProcessor<boolean>} */
 export const alphabeticToHiragana = {
@@ -52,7 +44,7 @@ export const alphabeticToHiragana = {
 };
 
 /** @type {import('language').BidirectionalConversionPreprocessor} */
-export const alphabeticWidthVariants = {
+export const alphanumericWidthVariants = {
     name: 'Convert between alphabetic width variants',
     description: 'ｙｏｍｉｔａｎ → yomitan and vice versa',
     options: ['off', 'direct', 'inverse'],
@@ -61,9 +53,9 @@ export const alphabeticWidthVariants = {
             case 'off':
                 return str;
             case 'direct':
-                return convertFullWidthAlphabeticToNormal(str);
+                return convertFullWidthAlphanumericToNormal(str);
             case 'inverse':
-                return convertAlphabeticToFullWidth(str);
+                return convertAlphanumericToFullWidth(str);
         }
     }
 };
