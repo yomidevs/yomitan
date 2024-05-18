@@ -546,8 +546,10 @@ export function convertAlphanumericToFullWidth(text) {
  */
 export function convertFullWidthAlphanumericToNormal(text) {
     let result = '';
-    for (const char of text) {
-        let c = /** @type {number} */ (char.codePointAt(0));
+    let i = 0;
+    const length = text.length;
+    for (let i = 0; i < length; i++) {
+        let c = /** @type {number} */ (text[i].codePointAt(0));
         if (c >= 0xff10 && c <= 0xff19) { // ['０', '９']
             c -= 0xff10 - 0x30; // 0x30 = '0'
         } else if (c >= 0xff21 && c <= 0xff3a) { // ['Ａ', 'Ｚ']
