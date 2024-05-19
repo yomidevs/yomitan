@@ -121,8 +121,6 @@ class DictionaryEntry {
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
         const count = this._dictionaryController.dictionaryOptionCount;
-        this._setMenuActionEnabled(bodyNode, 'moveUp', this._index > 0);
-        this._setMenuActionEnabled(bodyNode, 'moveDown', this._index < count - 1);
         this._setMenuActionEnabled(bodyNode, 'moveTo', count > 1);
     }
 
@@ -136,12 +134,6 @@ class DictionaryEntry {
                 break;
             case 'showDetails':
                 this._showDetails();
-                break;
-            case 'moveUp':
-                this._move(-1);
-                break;
-            case 'moveDown':
-                this._move(1);
                 break;
             case 'moveTo':
                 this._showMoveToModal();
