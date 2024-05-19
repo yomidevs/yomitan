@@ -248,8 +248,13 @@ const languageDescriptors = [
         textPreprocessors: capitalizationPreprocessors
     },
     {
+        iso: 'yue',
+        name: 'Cantonese',
+        exampleText: '讀'
+    },
+    {
         iso: 'zh',
-        name: 'Chinese',
+        name: 'Mandarin',
         exampleText: '读'
     }
 ];
