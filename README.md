@@ -39,10 +39,10 @@ Yomitan provides advanced features not available in other browser-based dictiona
 - Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 - Clean, modern code makes it easy for developers to [contribute](https://github.com/themoeway/yomitan/blob/master/CONTRIBUTING.md) new features.
 
-[![Term definitions](img/ss-chrome-terms-thumb.png)](img/ss-chrome-terms.png)
-[![Kanji information](img/ss-chrome-kanji-thumb.png)](img/ss-chrome-kanji.png)
-[![Dictionary options](img/ss-chrome-dictionaries-thumb.png)](img/ss-chrome-dictionaries.png)
-[![Anki options](img/ss-chrome-anki-thumb.png)](img/ss-chrome-anki.png)
+[![Term definitions](img/ss-terms-thumb.png)](img/ss-terms.png)
+[![Kanji information](img/ss-kanji-thumb.png)](img/ss-kanji.png)
+[![Dictionary options](img/ss-dictionaries-thumb.png)](img/ss-dictionaries.png)
+[![Anki options](img/ss-anki-thumb.png)](img/ss-anki.png)
 
 ## Helpful information<!-- omit from toc -->
 
