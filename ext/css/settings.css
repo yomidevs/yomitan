@@ -2264,6 +2264,7 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     flex-flow: row nowrap;
     align-items: center;
     margin-right: 0.5em;
+    overflow-wrap: anywhere;
 }
 .dictionary-title {
     color: inherit;
