@@ -447,11 +447,11 @@ export class Translator {
         const {language} = options;
         const info = this._textProcessors.get(language);
         if (typeof info === 'undefined') { throw new Error(`Unsupported language: ${language}`); }
-        const {textPreprocessors, preprocessorOptionsSpace, textPostprocessors, postprocessorOptionsSpace} = info;
+        const {textPreprocessors, textPostprocessors, postprocessorOptionsSpace} = info;
 
-        const preprocessorVariantSpace = new Map(preprocessorOptionsSpace);
-        preprocessorVariantSpace.set('textReplacements', this._getTextReplacementsVariants(options));
-        const preprocessorVariants = this._getArrayVariants(preprocessorVariantSpace);
+        // Const preprocessorVariantSpace = new Map(preprocessorOptionsSpace);
+        // preprocessorVariantSpace.set('textReplacements', this._getTextReplacementsVariants(options));
+        // Const preprocessorVariants = this._getArrayVariants(preprocessorVariantSpace);
         const postprocessorVariants = this._getArrayVariants(postprocessorOptionsSpace);
 
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
@@ -465,16 +465,18 @@ export class Translator {
             rawSource.length > 0;
             rawSource = this._getNextSubstring(options.searchResolution, rawSource)
         ) {
-            for (const preprocessorVariant of preprocessorVariants) {
-                let source = rawSource;
+            const textVariants = this._getTextVariants(rawSource, textPreprocessors, this._getTextReplacementsVariants(options), sourceCache);
+            // For (const preprocessorVariant of preprocessorVariants) {
+            //     let source = rawSource;
 
-                const textReplacements = /** @type {import('translation').FindTermsTextReplacement[] | null} */ (preprocessorVariant.get('textReplacements'));
-                if (textReplacements !== null) {
-                    source = this._applyTextReplacements(source, textReplacements);
-                }
+            //     const textReplacements = /** @type {import('translation').FindTermsTextReplacement[] | null} */ (preprocessorVariant.get('textReplacements'));
+            //     if (textReplacements !== null) {
+            //         source = this._applyTextReplacements(source, textReplacements);
+            //     }
 
-                source = this._applyTextProcessors(textPreprocessors, preprocessorVariant, source, sourceCache);
+            //     source = this._applyTextProcessors(textPreprocessors, preprocessorVariant, source, sourceCache);
 
+            for (const source of textVariants) {
                 if (used.has(source)) { continue; }
                 used.add(source);
                 for (const deinflection of this._multiLanguageTransformer.transform(language, source)) {
@@ -492,8 +494,37 @@ export class Translator {
                     }
                 }
             }
+            // }
         }
         return deinflections;
+    }
+
+    /**
+     * @param {string} text
+     * @param {import('language').TextProcessorWithId<unknown>[]} textProcessors
+     * @param {(import('translation').FindTermsTextReplacement[] | null)[]} textReplacements
+     * @param {import('translation-internal').TextCache} textCache
+     * @returns {string[]}
+     */
+    _getTextVariants(text, textProcessors, textReplacements, textCache) {
+        let variants = [text];
+        for (const textReplacement of textReplacements) {
+            if (textReplacement === null) { continue; }
+            variants.push(this._applyTextReplacements(text, textReplacement));
+        }
+        variants = [...new Set(variants)];
+        for (const {id, textProcessor: {process, options}} of textProcessors) {
+            variants = variants.flatMap((variant) => {
+                const result = [];
+                for (const option of options) {
+                    const processed = this._getProcessedText(textCache, variant, id, option, process);
+                    result.push(processed);
+                }
+                return result;
+            });
+            variants = [...new Set(variants)];
+        }
+        return variants;
     }
 
     /**
@@ -507,26 +538,39 @@ export class Translator {
         for (const {id, textProcessor: {process}} of textProcessors) {
             const setting = processorVariant.get(id);
 
-            let level1 = textCache.get(text);
-            if (!level1) {
-                level1 = new Map();
-                textCache.set(text, level1);
-            }
-
-            let level2 = level1.get(id);
-            if (!level2) {
-                level2 = new Map();
-                level1.set(id, level2);
-            }
-
-            if (!level2.has(setting)) {
-                text = process(text, setting);
-                level2.set(setting, text);
-            } else {
-                text = level2.get(setting) || '';
-            }
+            text = this._getProcessedText(textCache, text, id, setting, process);
         }
 
+        return text;
+    }
+
+    /**
+     * @param {import('translation-internal').TextCache} textCache
+     * @param {string} text
+     * @param {string} id
+     * @param {unknown} setting
+     * @param {import('language').TextProcessorFunction} process
+     * @returns {string}
+     */
+    _getProcessedText(textCache, text, id, setting, process) {
+        let level1 = textCache.get(text);
+        if (!level1) {
+            level1 = new Map();
+            textCache.set(text, level1);
+        }
+
+        let level2 = level1.get(id);
+        if (!level2) {
+            level2 = new Map();
+            level1.set(id, level2);
+        }
+
+        if (!level2.has(setting)) {
+            text = process(text, setting);
+            level2.set(setting, text);
+        } else {
+            text = level2.get(setting) || '';
+        }
         return text;
     }
 
