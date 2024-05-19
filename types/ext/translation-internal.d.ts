@@ -55,9 +55,7 @@ export type TextProcessorMap = Map<
     string,
     {
         textPreprocessors: Language.TextProcessorWithId<unknown>[];
-        preprocessorOptionsSpace: TextProcessorOptionsSpace;
         textPostprocessors: Language.TextProcessorWithId<unknown>[];
-        postprocessorOptionsSpace: TextProcessorOptionsSpace;
     }
 >;
 
