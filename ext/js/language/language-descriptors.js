@@ -254,7 +254,7 @@ const languageDescriptors = [
     },
     {
         iso: 'zh',
-        name: 'Mandarin',
+        name: 'Chinese',
         exampleText: '读'
     }
 ];
