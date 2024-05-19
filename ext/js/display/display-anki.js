@@ -378,8 +378,9 @@ export class DisplayAnki {
 
     /**
      * @param {HTMLButtonElement} button
+     * @param {number[]} noteIds
      */
-    _updateSaveButtonForDuplicateBehavior(button) {
+    _updateSaveButtonForDuplicateBehavior(button, noteIds) {
         const behavior = this._duplicateBehavior;
         if (behavior === 'prevent') {
             button.disabled = true;
@@ -393,6 +394,9 @@ export class DisplayAnki {
 
         if (behavior === 'overwrite') {
             button.dataset.overwrite = 'true';
+            if (!noteIds.some((id) => id !== INVALID_NOTE_ID)) {
+                button.disabled = true;
+            }
         } else {
             delete button.dataset.overwrite;
         }
@@ -431,7 +435,7 @@ export class DisplayAnki {
 
                     // If entry has noteIds, show the "add duplicate" button.
                     if (Array.isArray(noteIds) && noteIds.length > 0) {
-                        this._updateSaveButtonForDuplicateBehavior(button);
+                        this._updateSaveButtonForDuplicateBehavior(button, noteIds);
                     }
                 }
 
@@ -583,7 +587,7 @@ export class DisplayAnki {
                         allErrors.push(toError(e));
                     }
                 }
-                this._updateSaveButtonForDuplicateBehavior(button);
+                this._updateSaveButtonForDuplicateBehavior(button, [noteId]);
 
                 this._updateViewNoteButton(dictionaryEntryIndex, [noteId], true);
             }
