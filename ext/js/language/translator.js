@@ -1932,10 +1932,6 @@ export class Translator {
             i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
-            // Sort by definition count
-            i = v2.definitions.length - v1.definitions.length;
-            if (i !== 0) { return i; }
-
             // Sort by dictionary order
             i = v1.dictionaryIndex - v2.dictionaryIndex;
             if (i !== 0) { return i; }
@@ -1957,6 +1953,9 @@ export class Translator {
                 i = stringComparer.compare(term1, term2);
                 if (i !== 0) { return i; }
             }
+
+            // Sort by definition count
+            i = v2.definitions.length - v1.definitions.length;
             return i;
         };
         dictionaryEntries.sort(compareFunction);
