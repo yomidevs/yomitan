@@ -1932,6 +1932,18 @@ export class Translator {
             i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
+            // Sort by definition count
+            i = v2.definitions.length - v1.definitions.length;
+            if (i !== 0) { return i; }
+
+            // Sort by dictionary order
+            i = v1.dictionaryIndex - v2.dictionaryIndex;
+            if (i !== 0) { return i; }
+
+            // Sort by term score
+            i = v2.score - v1.score;
+            if (i !== 0) { return i; }
+
             // Sort by headword term text
             const headwords1 = v1.headwords;
             const headwords2 = v2.headwords;
@@ -1945,17 +1957,6 @@ export class Translator {
                 i = stringComparer.compare(term1, term2);
                 if (i !== 0) { return i; }
             }
-
-            // Sort by definition count
-            i = v2.definitions.length - v1.definitions.length;
-            if (i !== 0) { return i; }
-
-            // Sort by dictionary order
-            i = v1.dictionaryIndex - v2.dictionaryIndex;
-            if (i !== 0) { return i; }
-
-            // Sort by term score
-            i = v2.score - v1.score;
             return i;
         };
         dictionaryEntries.sort(compareFunction);
@@ -1979,6 +1980,14 @@ export class Translator {
             i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
+            // Sort by dictionary order
+            i = v1.dictionaryIndex - v2.dictionaryIndex;
+            if (i !== 0) { return i; }
+
+            // Sort by term score
+            i = v2.score - v1.score;
+            if (i !== 0) { return i; }
+
             // Sort by definition headword index
             const headwordIndices1 = v1.headwordIndices;
             const headwordIndices2 = v2.headwordIndices;
@@ -1989,14 +1998,6 @@ export class Translator {
                 i = headwordIndices1[j] - headwordIndices2[j];
                 if (i !== 0) { return i; }
             }
-
-            // Sort by dictionary order
-            i = v1.dictionaryIndex - v2.dictionaryIndex;
-            if (i !== 0) { return i; }
-
-            // Sort by term score
-            i = v2.score - v1.score;
-            if (i !== 0) { return i; }
 
             // Sort by original order
             i = v1.index - v2.index;
