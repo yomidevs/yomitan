@@ -172,6 +172,7 @@ export class DisplayGenerator {
         const dictionaryIndicesContainer = this._querySelector(node, '.kanji-dictionary-indices');
 
         this._setTextContent(glyphContainer, dictionaryEntry.character, this._language);
+        if (this._language === 'ja') { glyphContainer.style.fontFamily = 'kanji-stroke-orders, sans-serif'; }
         const groupedFrequencies = groupKanjiFrequencies(dictionaryEntry.frequencies);
 
         const dictionaryTag = this._createDictionaryTag(dictionaryEntry.dictionary);
