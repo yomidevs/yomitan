@@ -7,7 +7,7 @@
 
 :wave: **This project is a community fork of Yomichan** ([migration guide](./docs/yomichan-migration.md#migrating-from-yomichan)) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023. We have made a number of [foundational changes](#changes) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
 
-📢 **New contributers 🧑‍💻 [welcome](#contributing)!**
+📢 **New contributers 👨‍💻 [welcome](#contributing)!**
 
 📢 **Seeking language experts 🎓 to [add more languages](./docs/development/language-features.md) to Yomitan!**
 
@@ -91,16 +91,16 @@ To further enhance your Yomitan experience, it's worth [integrating with Anki](.
 
 Major changes:
 
-- Completed the Manifest V2 → V3 transition, [read why here](https://developer.chrome.com/blog/resuming-the-transition-to-mv3/)!
-- Switched to using ECMAScript modules and npm-sourced dependencies.
-- Implemented an end-to-end CI/CD pipeline.
-- Switched to standard testing frameworks, vitest and playwrights.
+- 💪 Completed the Manifest V2 → V3 transition, [read why here](https://developer.chrome.com/blog/resuming-the-transition-to-mv3/)!
+- ⚡ Switched to using ECMAScript modules and npm-sourced dependencies.
+- 🔧 Implemented an end-to-end CI/CD pipeline.
+- 🧪 Switched to standard testing frameworks, vitest and playwrights.
 
 In addition, we have made important bug fixes and minor enhancements:
 
-- Improved dictionary import speeds by 2x~10x.
-- Added functionality to import/export multiple dictionaries, enabling portability across devices.
-- And [more](https://github.com/themoeway/yomitan/pulls?q=is%3Apr+is%3Amerged+-label%3Aarea%2Fdependencies+-label%3Akind%2Fmeta).
+- ✨ Improved dictionary import speeds by 2x~10x.
+- 📚 Added functionality to import/export multiple dictionaries, enabling portability across devices.
+- 🕵️‍♂ And [more](https://github.com/themoeway/yomitan/pulls?q=is%3Apr+is%3Amerged+-label%3Aarea%2Fdependencies+-label%3Akind%2Fmeta).
 
 Since the owner requested forks be uniquely named, we have chosen a new name, _Yomitan_ (_-tan_ is an honorific used for anthropomorphic moe characters).
 
