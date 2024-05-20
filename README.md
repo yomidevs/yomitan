@@ -34,6 +34,7 @@ Yomitan provides advanced features not available in other browser-based dictiona
 
 ## Helpful information
 
+- [Migrating from Yomichan (legacy)](./docs/yomichan-migration.md#migrating-from-yomichan)
 - [Frequently asked questions](./docs/faq.md#frequently-asked-questions)
 - [Recommended and custom dictionary import guide](./docs/dictionaries.md#dictionaries)
 - [Anki integration and flashcards creation guide](./docs/anki-integration.md#anki-integration)
