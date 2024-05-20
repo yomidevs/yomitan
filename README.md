@@ -35,7 +35,7 @@ Yomitan provides advanced features not available in other browser-based dictiona
 ## Helpful information
 
 - [Frequently asked questions](./docs/faq.md#frequently-asked-questions)
-- [Recommended and custom dictionary importing guide](./docs/dictionaries.md#dictionaries)
+- [Recommended and custom dictionary import guide](./docs/dictionaries.md#dictionaries)
 - [Anki integration and flashcards creation guide](./docs/anki-integration.md#anki-integration)
 - [Keyboard shortcuts](./docs/keyboard-shortcuts.md)
 - [Advanced options, including MeCab](./docs/advanced-options.md#advanced-options)
