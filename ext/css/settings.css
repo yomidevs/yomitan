@@ -2240,6 +2240,9 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     place-items: center start;
     margin-top: 0.5em;
 }
+:root:not([data-advanced=true]) .dictionary-list {
+    grid-template-columns: auto auto 1fr auto auto auto;
+}
 .dictionary-list-index {
     margin-right: 0.5em;
 }
