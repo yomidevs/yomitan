@@ -1994,12 +1994,12 @@ export class Translator {
             i = v1.dictionaryIndex - v2.dictionaryIndex;
             if (i !== 0) { return i; }
 
-            // Sort by original order
-            i = v1.index - v2.index;
-            if (i !== 0) { return i; }
-
             // Sort by term score
             i = v2.score - v1.score;
+            if (i !== 0) { return i; }
+
+            // Sort by original order
+            i = v1.index - v2.index;
             return i;
         };
         definitions.sort(compareFunction);
