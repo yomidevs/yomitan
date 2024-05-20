@@ -107,7 +107,7 @@ Here are some ways you can help:
 * All the issues in ```area/bug``` older than 2 months need help reproducing. If anything interests you, please try to reproduce it and report your results. We can't easily tell if these issues are one-off, have since resolved, or are no longer relevant.
 * Dip your toes into contributing by looking at labels with [good-first-issue](https://github.com/themoeway/yomitan/issues?q=is%3Aopen+is%3Aissue+label%3Agood-first-issue).
 
-Information on how to setup, build and lint the codebase can be found [here](./CONTRIBUTING.md#setup).
+Information on how to setup and build the codebase can be found [here](./CONTRIBUTING.md#setup).
 
 If you want to add or improve support for a language, read the documentation on [language features](./docs/development/language-features.md).
 
