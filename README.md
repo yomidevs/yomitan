@@ -7,7 +7,7 @@
 
 :wave: **This project is a community fork of Yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023). We have made a number of [foundational changes](#major-updates) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
 
-**New contributers [welcome](#contributing)**!
+**New contributers [welcome](#contributing)!**
 
 ## What's Yomitan?
 
