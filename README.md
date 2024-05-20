@@ -84,7 +84,7 @@ To further enhance your Yomitan experience, it's worth [integrating with Anki](.
 
 ## Changes
 
-> While we have made some substantial changes, the majority of the extension's functionality is thanks to hard work of [FooSoft](https://foosoft.net/) and many other ***incredible*** open source contributors from 2016-2023.
+> While we have made some substantial changes, the majority of the extension's functionality is thanks to hard work of [FooSoft](https://foosoft.net/) and many other incredible open source contributors from 2016-2023.
 
 Major changes:
 
