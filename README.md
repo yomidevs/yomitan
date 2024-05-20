@@ -5,26 +5,27 @@
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
 [![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)
 
-:wave: **This project is a community fork of Yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023). We have made a number of [foundational changes](#changes) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
+:wave: **This project is a community fork of Yomichan** ([migration guide](./docs/yomichan-migration.md#migrating-from-yomichan) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/ by its owner on Feb 26 2023). We have made a number of [foundational changes](#changes) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
 
-📢 **New contributers [welcome](#contributing)!**
+📢 **New contributers 💻 [welcome](#contributing)!**
 
 📢 **Seeking language experts 🎓 to [add more languages](./docs/development/language-features.md) to Yomitan!**
 
-## What's Yomitan?
+## What is Yomitan?
 
-Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
-which would be otherwise too difficult to tackle. This extension is similar to [10ten Japanese Reader (formerly Rikaichamp)](https://addons.mozilla.org/en-US/firefox/addon/10ten-ja-reader/) for Firefox and [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp) for Chrome, but it stands apart in its goal of being an all-encompassing learning tool as opposed to a mere browser-based dictionary.
+Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to **read** texts which would otherwise be too difficult to tackle.
+
+This extension is similar to [10ten Japanese Reader (formerly Rikaichamp)](https://addons.mozilla.org/en-US/firefox/addon/10ten-ja-reader/) for Firefox and [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp) for Chrome, but it stands apart in feature-richness through its goal of being an all-encompassing learning tool instead of yet-another browser-based dictionary.
 
 Yomitan provides advanced features not available in other browser-based dictionaries:
 
-- Interactive popup definition window for displaying search results.
-- On-demand audio playback for select dictionary definitions.
-- Kanji stroke order diagrams are just a click away for most characters.
-- Custom search page for easily executing custom search queries.
-- Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomitan Import](https://github.com/themoeway/yomitan-import) tool.
-- Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
-- Clean, modern code makes it easy for developers to [contribute](https://github.com/themoeway/yomitan/blob/master/CONTRIBUTING.md) new features.
+- 📈 Interactive popup definition window for displaying search results.
+- 🔊 On-demand audio playback for select words.
+- ✍ Kanji stroke order diagrams are just a click away for most characters.
+- 📝 [Automatic note creation](./docs/anki-integration.md#anki-integration) for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
+- 🔍 Custom search page for easily executing custom search queries.
+- 📖 Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomitan Import](https://github.com/themoeway/yomitan-import) tool.
+- ✨ Clean, modern code makes it easy for developers to [contribute](#contributing) new features.
 
 [![Term definitions](img/ss-terms-thumb.png)](img/ss-terms.png)
 [![Kanji information](img/ss-kanji-thumb.png)](img/ss-kanji.png)
@@ -33,16 +34,13 @@ Yomitan provides advanced features not available in other browser-based dictiona
 
 ## Helpful information
 
-- [Migrating from Yomichan (legacy)](./docs/yomichan-migration.md#migrating-from-yomichan)
-- [Importing standardised and custom dictionaries](./docs/dictionaries.md#dictionaries)
-- [Anki integration and flashcards creation](./docs/anki-integration.md#anki-integration)
-- [Advanced options, including MeCab](./docs/advanced-options.md#advanced-options)
 - [Frequently asked questions](./docs/faq.md#frequently-asked-questions)
 - [Keyboard shortcuts](./docs/keyboard-shortcuts.md)
+- [Advanced options, including MeCab](./docs/advanced-options.md#advanced-options)
 
 ## Installation
 
-Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially introduced into the _testing_ version, and after some time spent ensuring that they are relatively bug free, they will be promoted to the _stable_ version. If you are technically savvy and don't mind submitting issues on GitHub, try the _testing_ version; otherwise, the _stable_ version will be your best bet.
+Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially introduced into the _testing_ version, and after some time spent ensuring that they are relatively bug free, they will be promoted to the _stable_ version. If you are technically savvy and don't mind [submitting issues]((#contributing) on GitHub, try the _testing_ version; otherwise, the _stable_ version will be your best bet.
 
 - **Google Chrome**
 
@@ -86,9 +84,11 @@ To further enhance your Yomitan experience, it's worth [integrating with Anki](.
 
 ## Changes
 
+> While we have made some substantial changes, the majority of the extension's functionality is thanks to hard work of [FooSoft](https://foosoft.net/) and many other ***incredible*** open source contributors from 2016-2023.
+
 Major changes:
 
-- Completed the Manifest V2 → V3 transition, [read why here!](https://developer.chrome.com/blog/resuming-the-transition-to-mv3/).
+- Completed the Manifest V2 → V3 transition, [read why here](https://developer.chrome.com/blog/resuming-the-transition-to-mv3/)!
 - Switched to using ECMAScript modules and npm-sourced dependencies.
 - Implemented an end-to-end CI/CD pipeline.
 - Switched to standard testing frameworks, vitest and playwrights.
@@ -99,7 +99,7 @@ In addition, we have made important bug fixes and minor enhancements:
 - Added functionality to import/export multiple dictionaries, enabling portability across devices.
 - And [more](https://github.com/themoeway/yomitan/pulls?q=is%3Apr+is%3Amerged+-label%3Aarea%2Fdependencies+-label%3Akind%2Fmeta).
 
-Since the owner requested forks be uniquely named, we have chosen a new name, _Yomitan_. (_-tan_ is an honorific used for anthropomorphic moe characters.) While we have made some substantial changes, the majority of the extension's functionality is thanks to hard work of foosoft and numerous other open source contributors from 2016-2023.
+Since the owner requested forks be uniquely named, we have chosen a new name, _Yomitan_ (_-tan_ is an honorific used for anthropomorphic moe characters).
 
 ## Contributing
 
