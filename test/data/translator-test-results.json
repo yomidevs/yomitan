@@ -8525,41 +8525,6 @@
             ]
           },
           {
-            "index": 1,
-            "headwordIndices": [
-              0
-            ],
-            "dictionary": "Test Dictionary 2",
-            "dictionaryIndex": 0,
-            "dictionaryPriority": 0,
-            "id": 8,
-            "score": 1,
-            "frequencyOrder": 0,
-            "sequences": [
-              4
-            ],
-            "isPrimary": true,
-            "tags": [
-              {
-                "name": "vt",
-                "category": "partOfSpeech",
-                "order": 0,
-                "score": 0,
-                "content": [
-                  "transitive verb"
-                ],
-                "dictionaries": [
-                  "Test Dictionary 2"
-                ],
-                "redundant": true
-              }
-            ],
-            "entries": [
-              "uchikomu definition 3",
-              "uchikomu definition 4"
-            ]
-          },
-          {
             "index": 2,
             "headwordIndices": [
               1
@@ -8592,6 +8557,41 @@
             "entries": [
               "buchikomu definition 1",
               "buchikomu definition 2"
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 8,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              4
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": true
+              }
+            ],
+            "entries": [
+              "uchikomu definition 3",
+              "uchikomu definition 4"
             ]
           },
           {
@@ -8987,41 +8987,6 @@
             ]
           },
           {
-            "index": 1,
-            "headwordIndices": [
-              0
-            ],
-            "dictionary": "Test Dictionary 2",
-            "dictionaryIndex": 0,
-            "dictionaryPriority": 0,
-            "id": 4,
-            "score": 1,
-            "frequencyOrder": 0,
-            "sequences": [
-              3
-            ],
-            "isPrimary": true,
-            "tags": [
-              {
-                "name": "vt",
-                "category": "partOfSpeech",
-                "order": 0,
-                "score": 0,
-                "content": [
-                  "transitive verb"
-                ],
-                "dictionaries": [
-                  "Test Dictionary 2"
-                ],
-                "redundant": true
-              }
-            ],
-            "entries": [
-              "utsu definition 3",
-              "utsu definition 4"
-            ]
-          },
-          {
             "index": 2,
             "headwordIndices": [
               1
@@ -9054,6 +9019,41 @@
             "entries": [
               "butsu definition 1",
               "butsu definition 2"
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              3
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": true
+              }
+            ],
+            "entries": [
+              "utsu definition 3",
+              "utsu definition 4"
             ]
           },
           {
@@ -15565,41 +15565,6 @@
             ]
           },
           {
-            "index": 1,
-            "headwordIndices": [
-              0
-            ],
-            "dictionary": "Test Dictionary 2",
-            "dictionaryIndex": 0,
-            "dictionaryPriority": 0,
-            "id": 8,
-            "score": 1,
-            "frequencyOrder": 0,
-            "sequences": [
-              4
-            ],
-            "isPrimary": true,
-            "tags": [
-              {
-                "name": "vt",
-                "category": "partOfSpeech",
-                "order": 0,
-                "score": 0,
-                "content": [
-                  "transitive verb"
-                ],
-                "dictionaries": [
-                  "Test Dictionary 2"
-                ],
-                "redundant": true
-              }
-            ],
-            "entries": [
-              "uchikomu definition 3",
-              "uchikomu definition 4"
-            ]
-          },
-          {
             "index": 2,
             "headwordIndices": [
               1
@@ -15632,6 +15597,41 @@
             "entries": [
               "buchikomu definition 1",
               "buchikomu definition 2"
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 8,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              4
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": true
+              }
+            ],
+            "entries": [
+              "uchikomu definition 3",
+              "uchikomu definition 4"
             ]
           },
           {
@@ -16027,41 +16027,6 @@
             ]
           },
           {
-            "index": 1,
-            "headwordIndices": [
-              0
-            ],
-            "dictionary": "Test Dictionary 2",
-            "dictionaryIndex": 0,
-            "dictionaryPriority": 0,
-            "id": 4,
-            "score": 1,
-            "frequencyOrder": 0,
-            "sequences": [
-              3
-            ],
-            "isPrimary": true,
-            "tags": [
-              {
-                "name": "vt",
-                "category": "partOfSpeech",
-                "order": 0,
-                "score": 0,
-                "content": [
-                  "transitive verb"
-                ],
-                "dictionaries": [
-                  "Test Dictionary 2"
-                ],
-                "redundant": true
-              }
-            ],
-            "entries": [
-              "utsu definition 3",
-              "utsu definition 4"
-            ]
-          },
-          {
             "index": 2,
             "headwordIndices": [
               1
@@ -16094,6 +16059,41 @@
             "entries": [
               "butsu definition 1",
               "butsu definition 2"
+            ]
+          },
+          {
+            "index": 1,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 4,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              3
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "vt",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "transitive verb"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": true
+              }
+            ],
+            "entries": [
+              "utsu definition 3",
+              "utsu definition 4"
             ]
           },
           {

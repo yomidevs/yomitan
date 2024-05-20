@@ -14596,28 +14596,6 @@
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
-                "uchikomu definition 3",
-                "uchikomu definition 4"
-              ],
-              "definitionTags": [
-                {
-                  "name": "vt",
-                  "category": "partOfSpeech",
-                  "notes": "transitive verb",
-                  "order": 0,
-                  "score": 0,
-                  "dictionary": "Test Dictionary 2",
-                  "redundant": true
-                }
-              ],
-              "only": [
-                "うちこむ"
-              ]
-            },
-            {
-              "sequence": 4,
-              "dictionary": "Test Dictionary 2",
-              "glossary": [
                 "buchikomu definition 1",
                 "buchikomu definition 2"
               ],
@@ -14634,6 +14612,28 @@
               ],
               "only": [
                 "ぶちこむ"
+              ]
+            },
+            {
+              "sequence": 4,
+              "dictionary": "Test Dictionary 2",
+              "glossary": [
+                "uchikomu definition 3",
+                "uchikomu definition 4"
+              ],
+              "definitionTags": [
+                {
+                  "name": "vt",
+                  "category": "partOfSpeech",
+                  "notes": "transitive verb",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": true
+                }
+              ],
+              "only": [
+                "うちこむ"
               ]
             },
             {
@@ -15311,28 +15311,6 @@
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
-                "utsu definition 3",
-                "utsu definition 4"
-              ],
-              "definitionTags": [
-                {
-                  "name": "vt",
-                  "category": "partOfSpeech",
-                  "notes": "transitive verb",
-                  "order": 0,
-                  "score": 0,
-                  "dictionary": "Test Dictionary 2",
-                  "redundant": true
-                }
-              ],
-              "only": [
-                "うつ"
-              ]
-            },
-            {
-              "sequence": 3,
-              "dictionary": "Test Dictionary 2",
-              "glossary": [
                 "butsu definition 1",
                 "butsu definition 2"
               ],
@@ -15349,6 +15327,28 @@
               ],
               "only": [
                 "ぶつ"
+              ]
+            },
+            {
+              "sequence": 3,
+              "dictionary": "Test Dictionary 2",
+              "glossary": [
+                "utsu definition 3",
+                "utsu definition 4"
+              ],
+              "definitionTags": [
+                {
+                  "name": "vt",
+                  "category": "partOfSpeech",
+                  "notes": "transitive verb",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": true
+                }
+              ],
+              "only": [
+                "うつ"
               ]
             },
             {
@@ -27864,28 +27864,6 @@
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
               "glossary": [
-                "uchikomu definition 3",
-                "uchikomu definition 4"
-              ],
-              "definitionTags": [
-                {
-                  "name": "vt",
-                  "category": "partOfSpeech",
-                  "notes": "transitive verb",
-                  "order": 0,
-                  "score": 0,
-                  "dictionary": "Test Dictionary 2",
-                  "redundant": true
-                }
-              ],
-              "only": [
-                "うちこむ"
-              ]
-            },
-            {
-              "sequence": 4,
-              "dictionary": "Test Dictionary 2",
-              "glossary": [
                 "buchikomu definition 1",
                 "buchikomu definition 2"
               ],
@@ -27902,6 +27880,28 @@
               ],
               "only": [
                 "ぶちこむ"
+              ]
+            },
+            {
+              "sequence": 4,
+              "dictionary": "Test Dictionary 2",
+              "glossary": [
+                "uchikomu definition 3",
+                "uchikomu definition 4"
+              ],
+              "definitionTags": [
+                {
+                  "name": "vt",
+                  "category": "partOfSpeech",
+                  "notes": "transitive verb",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": true
+                }
+              ],
+              "only": [
+                "うちこむ"
               ]
             },
             {
@@ -28579,28 +28579,6 @@
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
               "glossary": [
-                "utsu definition 3",
-                "utsu definition 4"
-              ],
-              "definitionTags": [
-                {
-                  "name": "vt",
-                  "category": "partOfSpeech",
-                  "notes": "transitive verb",
-                  "order": 0,
-                  "score": 0,
-                  "dictionary": "Test Dictionary 2",
-                  "redundant": true
-                }
-              ],
-              "only": [
-                "うつ"
-              ]
-            },
-            {
-              "sequence": 3,
-              "dictionary": "Test Dictionary 2",
-              "glossary": [
                 "butsu definition 1",
                 "butsu definition 2"
               ],
@@ -28617,6 +28595,28 @@
               ],
               "only": [
                 "ぶつ"
+              ]
+            },
+            {
+              "sequence": 3,
+              "dictionary": "Test Dictionary 2",
+              "glossary": [
+                "utsu definition 3",
+                "utsu definition 4"
+              ],
+              "definitionTags": [
+                {
+                  "name": "vt",
+                  "category": "partOfSpeech",
+                  "notes": "transitive verb",
+                  "order": 0,
+                  "score": 0,
+                  "dictionary": "Test Dictionary 2",
+                  "redundant": true
+                }
+              ],
+              "only": [
+                "うつ"
               ]
             },
             {
