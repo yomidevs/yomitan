@@ -111,9 +111,10 @@ Since the owner requested forks be uniquely named, we have chosen a new name, _Y
 Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the [issue tracker](https://github.com/themoeway/yomitan/issues), and read our [contributing guidelines](./CONTRIBUTING.md).
 
 Here are some ways anyone can help:
-* Try using the Yomitan dev build. Not only do you get the latest features, you can help uncover bugs and give feedback to developers early on.
-* Document any UI/UX friction in Github Issues. We're looking to make Yomitan more accessible to non-technical users.
-* All the issues in ```area/bug``` older than 2 months need help reproducing. If anything interests you, please try to reproduce it and report your results. We can't easily tell if these issues are one-off, have since resolved, or are no longer relevant.
+
+- Try using the Yomitan dev build. Not only do you get the latest features, you can help uncover bugs and give feedback to developers early on.
+- Document any UI/UX friction in Github Issues. We're looking to make Yomitan more accessible to non-technical users.
+- All the issues in `area/bug` older than 2 months need help reproducing. If anything interests you, please try to reproduce it and report your results. We can't easily tell if these issues are one-off, have since resolved, or are no longer relevant.
 
 > The current active maintainers of Yomitan spend a lot of their time debugging and triaging issues. When someone files a bug report, we need to assess the frequency and severity of the bug. It is extremely helpful if we get multiple reports of people who experience a bug or people who can contribute additional detail to an existing bug report.
 
@@ -121,9 +122,9 @@ If you're looking to code, please let us know what you plan on working on before
 
 Some contributions we always appreciate:
 
-* Well-written tests covering different functionalities. This includes [playwright tests](https://github.com/themoeway/yomitan/tree/master/test/playwright), [benchmark tests](https://github.com/themoeway/yomitan/tree/master/benches), and unit tests
-* Increasing our type coverage
-* More and better documentation!
+- Well-written tests covering different functionalities. This includes [playwright tests](https://github.com/themoeway/yomitan/tree/master/test/playwright), [benchmark tests](https://github.com/themoeway/yomitan/tree/master/benches), and unit tests
+- Increasing our type coverage
+- More and better documentation!
 
 Information on how to setup and build the codebase can be found [here](./CONTRIBUTING.md#setup).
 
