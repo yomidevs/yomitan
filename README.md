@@ -7,7 +7,7 @@
 
 :wave: **This project is a community fork of Yomichan** ([migration guide](./docs/yomichan-migration.md#migrating-from-yomichan) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/ by its owner on Feb 26 2023). We have made a number of [foundational changes](#changes) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
 
-📢 **New contributers 💻 [welcome](#contributing)!**
+📢 **New contributers 👨‍💻 [welcome](#contributing)!**
 
 📢 **Seeking language experts 🎓 to [add more languages](./docs/development/language-features.md) to Yomitan!**
 
@@ -15,13 +15,13 @@
 
 Yomitan turns your web browser into a tool for building Japanese language literacy by helping you to **read** texts which would otherwise be too difficult to tackle.
 
-This extension is similar to [10ten Japanese Reader (formerly Rikaichamp)](https://addons.mozilla.org/en-US/firefox/addon/10ten-ja-reader/) for Firefox and [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp) for Chrome, but it stands apart in feature-richness through its goal of being an all-encompassing learning tool instead of yet-another browser-based dictionary.
+This extension is similar to [10ten Japanese Reader (formerly Rikaichamp)](https://addons.mozilla.org/en-US/firefox/addon/10ten-ja-reader/) for Firefox and [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp) for Chrome.
 
 Yomitan provides advanced features not available in other browser-based dictionaries:
 
 - 📈 Interactive popup definition window for displaying search results.
-- 🔊 On-demand audio playback for select words.
-- ✍ Kanji stroke order diagrams are just a click away for most characters.
+- 🔊 Built-in audio playback for select Japanese words.
+- ✍ Kanji stroke order diagrams are just a click away for most kanji.
 - 📝 [Automatic note creation](./docs/anki-integration.md#anki-integration) for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 - 🔍 Custom search page for easily executing custom search queries.
 - 📖 Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomitan Import](https://github.com/themoeway/yomitan-import) tool.
