@@ -7,7 +7,9 @@
 
 :wave: **This project is a community fork of Yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023). We have made a number of [foundational changes](#major-updates) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
 
-**New contributers [welcome](#contributing)!**
+📢 **New contributers [welcome](#contributing)!**
+
+📢 **Seeking language experts 🎓 to [add more languages](./docs/development/language-features.md) to Yomitan!**
 
 ## What's Yomitan?
 
@@ -99,13 +101,24 @@ Since the owner requested forks be uniquely named, we have chosen a new name, _y
 
 ## Contributing
 
+🚀 **Dip your toes into contributing by looking at issues with the label [good-first-issue](https://github.com/themoeway/yomitan/issues?q=is%3Aopen+is%3Aissue+label%3Agood-first-issue).**
+
 Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the [issue tracker](https://github.com/themoeway/yomitan/issues), and read our [contributing guidelines](./CONTRIBUTING.md).
 
-Here are some ways you can help:
-* Document any UI/UX friction in Github Issues. We're looking to make Yomitan more accessible to non-technical users.
+Here are some ways anyone can help:
 * Try using the Yomitan dev build. Not only do you get the latest features, you can help uncover bugs and give feedback to developers early on.
+* Document any UI/UX friction in Github Issues. We're looking to make Yomitan more accessible to non-technical users.
 * All the issues in ```area/bug``` older than 2 months need help reproducing. If anything interests you, please try to reproduce it and report your results. We can't easily tell if these issues are one-off, have since resolved, or are no longer relevant.
-* Dip your toes into contributing by looking at labels with [good-first-issue](https://github.com/themoeway/yomitan/issues?q=is%3Aopen+is%3Aissue+label%3Agood-first-issue).
+
+> The current active maintainers of Yomitan spend a lot of their time debugging and triaging issues. When someone files a bug report, we need to assess the frequency and severity of the bug. It is extremely helpful if we get multiple reports of people who experience a bug or people who can contribute additional detail to an existing bug report.
+
+If you're looking to code, please let us know what you plan on working on before submitting a Pull Request. This gives the core maintainers an opportunity to provide feedback early on before you dive too deep. You can do this by opening a Github Issue with the proposal.
+
+Some contributions we always appreciate:
+
+* Well-written tests covering different functionalities. This includes [playwright tests](https://github.com/themoeway/yomitan/tree/master/test/playwright), [benchmark tests](https://github.com/themoeway/yomitan/tree/master/benches), and unit tests
+* Increasing our type coverage
+* More and better documentation!
 
 Information on how to setup and build the codebase can be found [here](./CONTRIBUTING.md#setup).
 
