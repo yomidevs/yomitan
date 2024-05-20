@@ -1952,6 +1952,10 @@ export class Translator {
 
             // Sort by dictionary order
             i = v1.dictionaryIndex - v2.dictionaryIndex;
+            if (i !== 0) { return i; }
+
+            // Sort by term score
+            i = v2.score - v1.score;
             return i;
         };
         dictionaryEntries.sort(compareFunction);
@@ -1992,6 +1996,10 @@ export class Translator {
 
             // Sort by original order
             i = v1.index - v2.index;
+            if (i !== 0) { return i; }
+
+            // Sort by term score
+            i = v2.score - v1.score;
             return i;
         };
         definitions.sort(compareFunction);
