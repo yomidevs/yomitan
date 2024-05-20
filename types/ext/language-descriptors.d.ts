@@ -114,6 +114,7 @@ type AllTextProcessors = {
             removeAlphabeticDiacritics: TextProcessor<boolean>;
         };
     };
+    lo: Record<string, never>;
     ja: {
         pre: {
             convertHalfWidthCharacters: TextProcessor<boolean>;

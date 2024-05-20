@@ -496,4 +496,8 @@ select.profile-select {
         width: 100%;
         padding-top: 37.7%;
     }
+    #extension-info {
+        max-width: 95vw;
+        overflow-wrap: break-word;
+    }
 }
