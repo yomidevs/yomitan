@@ -5,7 +5,7 @@
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
 [![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)
 
-:wave: **This project is a community fork of Yomichan** ([migration guide](./docs/yomichan-migration.md#migrating-from-yomichan)) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/ by its owner on Feb 26 2023). We have made a number of [foundational changes](#changes) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
+:wave: **This project is a community fork of Yomichan** ([migration guide](./docs/yomichan-migration.md#migrating-from-yomichan)) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023. We have made a number of [foundational changes](#changes) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
 
 📢 **New contributers 👨‍💻 [welcome](#contributing)!**
 
