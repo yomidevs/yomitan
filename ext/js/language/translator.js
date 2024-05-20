@@ -1932,10 +1932,6 @@ export class Translator {
             i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
-            // Sort by term score
-            i = v2.score - v1.score;
-            if (i !== 0) { return i; }
-
             // Sort by headword term text
             const headwords1 = v1.headwords;
             const headwords2 = v2.headwords;
@@ -1977,10 +1973,6 @@ export class Translator {
 
             // Sort by dictionary priority
             i = v2.dictionaryPriority - v1.dictionaryPriority;
-            if (i !== 0) { return i; }
-
-            // Sort by term score
-            i = v2.score - v1.score;
             if (i !== 0) { return i; }
 
             // Sort by definition headword index
