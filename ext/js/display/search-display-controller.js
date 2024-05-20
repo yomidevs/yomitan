@@ -183,6 +183,7 @@ export class SearchDisplayController {
         this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
         this._updateClipboardMonitorEnabled();
         this._updateWanakanaCheckbox(options);
+        this._queryInput.lang = options.general.language;
         await this._updateProfileSelect();
     }
 
