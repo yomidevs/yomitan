@@ -530,11 +530,12 @@ export class AnkiDeckGeneratorController {
 
     /** */
     async _updateExampleText() {
-        this._languageSummaries = await this._application.api.getLanguageSummaries();
+        const languageSummaries = await this._application.api.getLanguageSummaries();
         const options = await this._settingsController.getOptions();
-        const activeLanguage = /** @type {import('language').LanguageSummary} */ (this._languageSummaries.find(({iso}) => iso === options.general.language));
+        const activeLanguage = /** @type {import('language').LanguageSummary} */ (languageSummaries.find(({iso}) => iso === options.general.language));
         this._renderTextInput.lang = options.general.language;
         this._renderTextInput.value = activeLanguage.exampleText;
+        this._renderResult.lang = options.general.language;
     }
 
     /**
