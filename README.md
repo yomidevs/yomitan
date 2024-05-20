@@ -7,9 +7,9 @@
 
 :wave: **This project is a community fork of Yomichan** ([migration guide](./docs/yomichan-migration.md#migrating-from-yomichan)) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023. We have made a number of [foundational changes](#changes) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
 
-📢 **New contributers [welcome](#contributing)!**
+📢 **New contributers 🧑‍💻 [welcome](#contributing)!**
 
-📢 **Seeking language experts to [add more languages](./docs/development/language-features.md) to Yomitan!**
+📢 **Seeking language experts 🎓 to [add more languages](./docs/development/language-features.md) to Yomitan!**
 
 ## What is Yomitan?
 
@@ -126,7 +126,7 @@ Information on how to setup and build the codebase can be found [here](./CONTRIB
 
 If you want to add or improve support for a language, read the documentation on [language features](./docs/development/language-features.md).
 
-Feel free to join us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
+Feel free to join us on [TheMoeWay Discord 🐱](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
 
 ## Licenses
 
