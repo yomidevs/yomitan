@@ -5,7 +5,7 @@
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
 [![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)
 
-:wave: **This project is a community fork of Yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023). We have made a number of [foundational changes](#major-updates) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
+:wave: **This project is a community fork of Yomichan** (which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26 2023). We have made a number of [foundational changes](#changes) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
 
 📢 **New contributers [welcome](#contributing)!**
 
@@ -84,20 +84,22 @@ updates automatically.
 
 To further enhance your Yomitan experience, it's worth [integrating with Anki](./docs/anki-integration.md), a spaced-repetition flashcard program to help solidify the words you encounter.
 
-## Major Updates
+## Changes
+
+Major changes:
 
 - Completed the Manifest V2 → V3 transition, [read why here!](https://developer.chrome.com/blog/resuming-the-transition-to-mv3/).
 - Switched to using ECMAScript modules and npm-sourced dependencies.
 - Implemented an end-to-end CI/CD pipeline.
 - Switched to standard testing frameworks, vitest and playwrights.
 
-In addition, we are beginning to make important bug fixes and minor enhancements:
+In addition, we have made important bug fixes and minor enhancements:
 
-- Improve dictionary import speeds by 2x~10x.
-- Add functionality to import/export multiple dictionaries, enabling portability across devices.
+- Improved dictionary import speeds by 2x~10x.
+- Added functionality to import/export multiple dictionaries, enabling portability across devices.
 - And [more](https://github.com/themoeway/yomitan/pulls?q=is%3Apr+is%3Amerged+-label%3Aarea%2Fdependencies+-label%3Akind%2Fmeta).
 
-Since the owner requested forks be uniquely named, we have chosen a new name, _yomitan_. (_-tan_ is an honorific used for anthropomorphic moe characters.) While we've made some substantial changes, the majority of the extension's functionality is thanks to hard work of foosoft and numerous other open source contributors from 2016-2023.
+Since the owner requested forks be uniquely named, we have chosen a new name, _Yomitan_. (_-tan_ is an honorific used for anthropomorphic moe characters.) While we have made some substantial changes, the majority of the extension's functionality is thanks to hard work of foosoft and numerous other open source contributors from 2016-2023.
 
 ## Contributing
 
