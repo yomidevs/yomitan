@@ -21,7 +21,7 @@ Yomitan provides advanced features not available in other browser-based dictiona
 
 - 📈 Interactive popup definition window for displaying search results.
 - 🔊 Built-in audio playback for select Japanese words.
-- ✍ Kanji stroke order diagrams are just a click away for most kanji.
+- ✍ Kanji stroke order diagrams are generally just a click away.
 - 📝 [Automatic note creation](./docs/anki-integration.md#anki-integration) for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 - 🔍 Custom search page for easily executing custom search queries.
 - 📖 Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomitan Import](https://github.com/themoeway/yomitan-import) tool.
@@ -40,7 +40,7 @@ Yomitan provides advanced features not available in other browser-based dictiona
 
 ## Installation
 
-Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially introduced into the _testing_ version, and after some time spent ensuring that they are relatively bug free, they will be promoted to the _stable_ version. If you are technically savvy and don't mind [submitting issues]((#contributing) on GitHub, try the _testing_ version; otherwise, the _stable_ version will be your best bet.
+Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially introduced into the _testing_ version, and after some time spent ensuring that they are relatively bug free, they will be promoted to the _stable_ version. If you are technically savvy and don't mind [submitting issues](#contributing) on GitHub, try the _testing_ version; otherwise, the _stable_ version will be your best bet.
 
 - **Google Chrome**
 
