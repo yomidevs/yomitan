@@ -25,11 +25,14 @@ import {TemplateRendererProxy} from '../../templates/template-renderer-proxy.js'
 
 export class AnkiTemplatesController {
     /**
+     * @param {import('../../application.js').Application} application
      * @param {import('./settings-controller.js').SettingsController} settingsController
      * @param {import('./modal-controller.js').ModalController} modalController
      * @param {import('./anki-controller.js').AnkiController} ankiController
      */
-    constructor(settingsController, modalController, ankiController) {
+    constructor(application, settingsController, modalController, ankiController) {
+        /** @type {import('../../application.js').Application} */
+        this._application = application;
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {import('./modal-controller.js').ModalController} */
@@ -52,6 +55,8 @@ export class AnkiTemplatesController {
         this._renderTextInput = querySelectorNotNull(document, '#anki-card-templates-test-text-input');
         /** @type {HTMLElement} */
         this._renderResult = querySelectorNotNull(document, '#anki-card-templates-render-result');
+        /** @type {HTMLElement} */
+        this._mainSettingsEntry = querySelectorNotNull(document, '[data-modal-action="show,anki-card-templates"]');
         /** @type {?import('./modal.js').Modal} */
         this._fieldTemplateResetModal = null;
         /** @type {AnkiNoteBuilder} */
@@ -89,6 +94,9 @@ export class AnkiTemplatesController {
         const options = await this._settingsController.getOptions();
         const optionsContext = this._settingsController.getOptionsContext();
         this._onOptionsChanged({options, optionsContext});
+
+        void this._updateExampleText();
+        this._mainSettingsEntry.addEventListener('click', this._updateExampleText.bind(this), false);
     }
 
     // Private
@@ -171,6 +179,16 @@ export class AnkiTemplatesController {
         infoNode.hidden = true;
         this._cachedDictionaryEntryText = null;
         void this._validate(infoNode, field, 'term-kanji', true, false);
+    }
+
+    /** */
+    async _updateExampleText() {
+        const languageSummaries = await this._application.api.getLanguageSummaries();
+        const options = await this._settingsController.getOptions();
+        const activeLanguage = /** @type {import('language').LanguageSummary} */ (languageSummaries.find(({iso}) => iso === options.general.language));
+        this._renderTextInput.lang = options.general.language;
+        this._renderTextInput.value = activeLanguage.exampleText;
+        this._renderResult.lang = options.general.language;
     }
 
     /**
