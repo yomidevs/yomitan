@@ -173,6 +173,10 @@
     {{~#each definition.onyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
 {{/inline}}
 
+{{#*inline "onyomi-hiragana"}}
+    {{~#each definition.onyomi}}{{hiragana .}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+
 {{#*inline "reading"}}
     {{~#unless modeTermKana~}}
         {{~#if merge~}}
@@ -253,8 +257,6 @@
             {{~/each~}}
         {{~/each~}}
         {{~#if (op ">" pitchCount 1)~}}</ol>{{~/if~}}
-    {{~else~}}
-        No pitch accent data
     {{~/if~}}
 {{/inline}}
 

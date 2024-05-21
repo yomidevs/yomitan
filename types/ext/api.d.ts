@@ -169,6 +169,12 @@ type ApiSurface = {
         };
         return: Anki.NoteId | null;
     };
+    updateAnkiNote: {
+        params: {
+            noteWithId: Anki.NoteWithId;
+        };
+        return: null;
+    };
     getAnkiNoteInfo: {
         params: {
             notes: Anki.Note[];
