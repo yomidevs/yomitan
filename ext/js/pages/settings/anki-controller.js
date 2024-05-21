@@ -63,6 +63,10 @@ export class AnkiController {
         /** @type {HTMLElement} */
         this._ankiErrorInvalidResponseInfo = querySelectorNotNull(document, '#anki-error-invalid-response-info');
         /** @type {HTMLElement} */
+        this._duplicateBehaviorSelect = querySelectorNotNull(document, '[data-setting="anki.duplicateBehavior"]');
+        /** @type {HTMLElement} */
+        this._duplicateOverwriteWarning = querySelectorNotNull(document, '#anki-overwrite-warning');
+        /** @type {HTMLElement} */
         this._ankiCardPrimary = querySelectorNotNull(document, '#anki-card-primary');
         /** @type {?Error} */
         this._ankiError = null;
@@ -108,6 +112,8 @@ export class AnkiController {
 
         ankiApiKeyInput.addEventListener('focus', this._onApiKeyInputFocus.bind(this));
         ankiApiKeyInput.addEventListener('blur', this._onApiKeyInputBlur.bind(this));
+
+        this._duplicateBehaviorSelect.addEventListener('change', this._onDuplicateBehaviorSelectChange.bind(this));
 
         await this._updateOptions();
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -170,6 +176,8 @@ export class AnkiController {
 
         this._selectorObserver.disconnect();
         this._selectorObserver.observe(document.documentElement, true);
+
+        this._updateDuplicateOverwriteWarning(anki.duplicateBehavior);
 
         this._setupFieldMenus(dictionaries);
     }
@@ -237,6 +245,22 @@ export class AnkiController {
     _onApiKeyInputBlur(e) {
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
         element.type = 'password';
+    }
+
+    /**
+     * @param {Event} e
+     */
+    _onDuplicateBehaviorSelectChange(e) {
+        const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        const behavior = node.value;
+        this._updateDuplicateOverwriteWarning(behavior);
+    }
+
+    /**
+     * @param {string} behavior
+     */
+    _updateDuplicateOverwriteWarning(behavior) {
+        this._duplicateOverwriteWarning.hidden = behavior !== 'overwrite';
     }
 
     /**

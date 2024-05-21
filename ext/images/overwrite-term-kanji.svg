@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" version="1.1" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <linearGradient id="inner-fill" x1="-1.7198" x2="-1.7198" y1="3.5719" y2=".79375" gradientTransform="matrix(3.7795 0 0 3.7795 14.5 -6.308e-7)" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#6fb558" offset="0"/>
+   <stop stop-color="#a5db9b" offset="1"/>
+  </linearGradient>
+  <linearGradient id="outer-rim" x1="7.5406" x2="5.1594" y1="3.3073" y2=".92604" gradientTransform="matrix(3.7795 0 0 3.7795 -16 -6e-7)" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#34812c" offset="0"/>
+   <stop stop-color="#87b870" offset="1"/>
+  </linearGradient>
+  <radialGradient id="center-shadow" cx="2.1167" cy="2.1167" r=".66146" gradientTransform="matrix(4.5354 8.0301e-7 -8.0301e-7 4.5354 -1.6 -1.6)" gradientUnits="userSpaceOnUse">
+   <stop stop-opacity=".28986" offset="0"/>
+   <stop stop-opacity="0" offset="1"/>
+  </radialGradient>
+  <filter id="green-to-orange" x="-.083333" y="-.083333" width="1.1667" height="1.1667" color-interpolation-filters="sRGB">
+   <feColorMatrix result="color1" type="hueRotate" values="280"/>
+   <feColorMatrix result="color2" type="saturate" values="2"/>
+  </filter>
+ </defs>
+ <g filter="url(#green-to-orange)">
+  <circle cx="8" cy="8" r="6.5" fill="url(#inner-fill)"/>
+  <circle cx="8" cy="8" r="5.75" fill="none" stroke="#fff" stroke-opacity=".50196" stroke-width="1.5"/>
+  <circle cx="8" cy="8" r="6.5" fill="none" stroke="url(#outer-rim)"/>
+	<path
+      d="m10.309 8.2795 0.66159 0.082684c-0.18327 1.4812-1.4463 2.6278-2.9771 2.6278-0.94244 0-1.7834-0.43457-2.3334-1.1143l3.11e-5 1.1143h-0.66667v-2.3333h2.3333v0.66667l-1.2482 3.453e-4c0.42167 0.60433 1.1221 0.99971 1.9149 0.99971 1.1906 0 2.173-0.89179 2.3156-2.0439zm0.68445-3.2895v2.3333h-2.3333v-0.66666l1.2484-5.09e-5c-0.42165-0.60446-1.1222-0.99995-1.9151-0.99995-1.1907 0-2.173 0.8918-2.3156 2.0439l-0.66159-0.082684c0.18327-1.4813 1.4463-2.6279 2.9771-2.6279 0.94244 0 1.7834 0.43457 2.3334 1.1143l-2.9e-5 -1.1143z"
+      fill="#fff"
+      style="stroke:#ffffff;stroke-opacity:1;stroke-width:0.4;stroke-dasharray:none"
+   />
+	</g>
+</svg>

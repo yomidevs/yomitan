@@ -395,7 +395,7 @@ export type AnkiScreenshotFormat = 'png' | 'jpeg';
 
 export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
 
-export type AnkiDuplicateBehavior = 'prevent' | 'new';
+export type AnkiDuplicateBehavior = 'prevent' | 'overwrite' | 'new';
 
 export type AnkiDisplayTags = 'never' | 'always' | 'non-standard';
 
