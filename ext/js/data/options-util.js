@@ -543,7 +543,8 @@ export class OptionsUtil {
             this._updateVersion33,
             this._updateVersion34,
             this._updateVersion35,
-            this._updateVersion36
+            this._updateVersion36,
+            this._updateVersion37
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1293,6 +1294,14 @@ export class OptionsUtil {
      */
     async _updateVersion36(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v36.handlebars');
+    }
+
+    /**
+     *  - Removed `No pitch accent data` return from pitch handlebars when no data is found
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion37(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v37.handlebars');
     }
 
     /**
