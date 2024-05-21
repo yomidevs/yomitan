@@ -434,9 +434,9 @@ export class Translator {
      */
     _getAlgorithmDeinflections(text, options) {
         const {language} = options;
-        const info = this._textProcessors.get(language);
-        if (typeof info === 'undefined') { throw new Error(`Unsupported language: ${language}`); }
-        const {textPreprocessors, textPostprocessors} = info;
+        const procecssorsForLanguage = this._textProcessors.get(language);
+        if (typeof procecssorsForLanguage === 'undefined') { throw new Error(`Unsupported language: ${language}`); }
+        const {textPreprocessors, textPostprocessors} = procecssorsForLanguage;
 
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const deinflections = [];
