@@ -98,9 +98,9 @@ Major changes:
 
 In addition, we have made important bug fixes and minor enhancements:
 
-- ✨ Improved dictionary import speeds by 2x~10x.
+- ⚡ Improved dictionary import speeds by 2x~10x.
 - 📚 Added functionality to import/export multiple dictionaries, enabling portability across devices.
-- 🕵️‍♂ And [more](https://github.com/themoeway/yomitan/pulls?q=is%3Apr+is%3Amerged+-label%3Aarea%2Fdependencies+-label%3Akind%2Fmeta).
+- ✨ And [more](https://github.com/themoeway/yomitan/pulls?q=is%3Apr+is%3Amerged+-label%3Aarea%2Fdependencies+-label%3Akind%2Fmeta).
 
 Since the owner requested forks be uniquely named, we have chosen a new name, _Yomitan_ (_-tan_ is an honorific used for anthropomorphic moe characters).
 
