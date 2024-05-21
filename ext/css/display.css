@@ -1502,7 +1502,7 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     position: relative;
 }
 .kanji-glyph {
-    font-family: kanji-stroke-orders, sans-serif;
+    font-family: sans-serif;
     font-size: 8.5em;
     line-height: 1;
     padding: 0.01em;

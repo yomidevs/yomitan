@@ -66,11 +66,11 @@ export class SearchDisplayController {
         /** @type {boolean} */
         this._clipboardMonitorEnabled = false;
         /** @type {import('clipboard-monitor').ClipboardReaderLike} */
-        const clipboardReader = {
+        this.clipboardReaderLike = {
             getText: this._display.application.api.clipboardGet.bind(this._display.application.api)
         };
         /** @type {ClipboardMonitor} */
-        this._clipboardMonitor = new ClipboardMonitor(clipboardReader);
+        this._clipboardMonitor = new ClipboardMonitor(this.clipboardReaderLike);
         /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
             ['searchDisplayControllerGetMode', this._onMessageGetMode.bind(this)],
@@ -183,6 +183,7 @@ export class SearchDisplayController {
         this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
         this._updateClipboardMonitorEnabled();
         this._updateWanakanaCheckbox(options);
+        this._queryInput.lang = options.general.language;
         await this._updateProfileSelect();
     }
 
@@ -268,10 +269,9 @@ export class SearchDisplayController {
     }
 
     /** */
-    _onCopy() {
+    async _onCopy() {
         // Ignore copy from search page
-        const selection = window.getSelection();
-        this._clipboardMonitor.setPreviousText(selection !== null ? selection.toString().trim() : '');
+        this._clipboardMonitor.setPreviousText(document.hasFocus() ? await this.clipboardReaderLike.getText(false) : '');
     }
 
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */

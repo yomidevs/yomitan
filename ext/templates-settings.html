@@ -61,7 +61,9 @@
             <div class="badge info-badge badge-small-icon"><span class="icon" data-icon="checkmark"></span></div>
         </button>
     </div>
-    <input type="number" step="1" class="short-height dictionary-priority">
+    <input type="number" step="1" class="short-height dictionary-priority advanced-only">
+    <button type="button" class="icon-button" id="dictionary-move-up" data-menu-action="moveUp"><span class="icon-button-inner"><span class="icon" data-icon="up-chevron"></span></span></button>
+    <button type="button" class="icon-button" id="dictionary-move-down" data-menu-action="moveDown"><span class="icon-button-inner"><span class="icon" data-icon="down-chevron"></span></span></button>
     <button type="button" class="icon-button dictionary-menu-button" data-menu="dictionary-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
 </template>
 <template id="dictionary-details-entry-template"><div class="dictionary-details-entry">
@@ -84,8 +86,6 @@
 </template>
 <template id="dictionary-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
     <button type="button" class="popup-menu-item" data-menu-action="showDetails">Details&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveUp">Move up</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveDown">Move down</button>
     <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to&hellip;</button>
     <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
 </div></div></div></template>

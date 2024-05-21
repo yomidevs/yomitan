@@ -43,9 +43,17 @@ export class DictionaryImportController {
         /** @type {HTMLButtonElement} */
         this._purgeConfirmButton = querySelectorNotNull(document, '#dictionary-confirm-delete-all-button');
         /** @type {HTMLButtonElement} */
-        this._importFileButton = querySelectorNotNull(document, '#dictionary-import-file-button');
-        /** @type {HTMLInputElement} */
         this._importFileInput = querySelectorNotNull(document, '#dictionary-import-file-input');
+        /** @type {HTMLButtonElement} */
+        this._importFileDrop = querySelectorNotNull(document, '#dictionary-drop-file-zone');
+        /** @type {number} */
+        this._importFileDropItemCount = 0;
+        /** @type {HTMLInputElement} */
+        this._importButton = querySelectorNotNull(document, '#dictionary-import-button');
+        /** @type {HTMLInputElement} */
+        this._importURLButton = querySelectorNotNull(document, '#dictionary-import-url-button');
+        /** @type {HTMLInputElement} */
+        this._importURLText = querySelectorNotNull(document, '#dictionary-import-url-text');
         /** @type {?import('./modal.js').Modal} */
         this._purgeConfirmModal = null;
         /** @type {HTMLElement} */
@@ -65,19 +73,150 @@ export class DictionaryImportController {
 
     /** */
     prepare() {
+        this._importModal = this._modalController.getModal('dictionary-import');
         this._purgeConfirmModal = this._modalController.getModal('dictionary-confirm-delete-all');
 
         this._purgeButton.addEventListener('click', this._onPurgeButtonClick.bind(this), false);
         this._purgeConfirmButton.addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
-        this._importFileButton.addEventListener('click', this._onImportButtonClick.bind(this), false);
+        this._importButton.addEventListener('click', this._onImportButtonClick.bind(this), false);
+        this._importURLButton.addEventListener('click', this._onImportFromURL.bind(this), false);
         this._importFileInput.addEventListener('change', this._onImportFileChange.bind(this), false);
+
+        this._importFileDrop.addEventListener('click', this._onImportFileButtonClick.bind(this), false);
+        this._importFileDrop.addEventListener('dragenter', this._onFileDropEnter.bind(this), false);
+        this._importFileDrop.addEventListener('dragover', this._onFileDropOver.bind(this), false);
+        this._importFileDrop.addEventListener('dragleave', this._onFileDropLeave.bind(this), false);
+        this._importFileDrop.addEventListener('drop', this._onFileDrop.bind(this), false);
     }
 
     // Private
 
     /** */
-    _onImportButtonClick() {
+    _onImportFileButtonClick() {
         /** @type {HTMLInputElement} */ (this._importFileInput).click();
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    _onFileDropEnter(e) {
+        e.preventDefault();
+        if (!e.dataTransfer) { return; }
+        for (const item of e.dataTransfer.items) {
+            // Directories and files with no extension both show as ''
+            if (item.type === '' || item.type === 'application/zip') {
+                this._importFileDrop.classList.add('drag-over');
+                break;
+            }
+        }
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    _onFileDropOver(e) {
+        e.preventDefault();
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    _onFileDropLeave(e) {
+        e.preventDefault();
+        this._importFileDrop.classList.remove('drag-over');
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    async _onFileDrop(e) {
+        e.preventDefault();
+        this._importFileDrop.classList.remove('drag-over');
+        if (e.dataTransfer === null) { return; }
+        /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(false);
+        /** @type {File[]} */
+        const fileArray = [];
+        for (const fileEntry of await this._getAllFileEntries(e.dataTransfer.items)) {
+            if (!fileEntry) { return; }
+            try {
+                fileArray.push(await new Promise((resolve, reject) => { fileEntry.file(resolve, reject); }));
+            } catch (error) {
+                log.error(error);
+            }
+        }
+        void this._importDictionaries(fileArray);
+    }
+
+    /**
+     * @param {DataTransferItemList} dataTransferItemList
+     * @returns {Promise<FileSystemFileEntry[]>}
+     */
+    async _getAllFileEntries(dataTransferItemList) {
+        /** @type {(FileSystemFileEntry)[]} */
+        const fileEntries = [];
+        /** @type {(FileSystemEntry | null)[]} */
+        const entries = [];
+        for (let i = 0; i < dataTransferItemList.length; i++) {
+            entries.push(dataTransferItemList[i].webkitGetAsEntry());
+        }
+        this._importFileDropItemCount = entries.length - 1;
+        while (entries.length > 0) {
+            this._importFileDropItemCount += 1;
+            this._validateDirectoryItemCount();
+
+            /** @type {(FileSystemEntry | null) | undefined} */
+            const entry = entries.shift();
+            if (!entry) { continue; }
+            if (entry.isFile) {
+                if (entry.name.substring(entry.name.lastIndexOf('.'), entry.name.length) === '.zip') {
+                    // @ts-expect-error - ts does not recognize `if (entry.isFile)` as verifying `entry` is type `FileSystemFileEntry` and instanceof does not work
+                    fileEntries.push(entry);
+                }
+            } else if (entry.isDirectory) {
+                // @ts-expect-error - ts does not recognize `if (entry.isDirectory)` as verifying `entry` is type `FileSystemDirectoryEntry` and instanceof does not work
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                entries.push(...await this._readAllDirectoryEntries(entry.createReader()));
+            }
+        }
+        return fileEntries;
+    }
+
+    /**
+     * @param {FileSystemDirectoryReader} directoryReader
+     * @returns {Promise<(FileSystemEntry)[]>}
+     */
+    async _readAllDirectoryEntries(directoryReader) {
+        const entries = [];
+        /** @type {(FileSystemEntry)[]} */
+        let readEntries = await new Promise((resolve) => { directoryReader.readEntries(resolve); });
+        while (readEntries.length > 0) {
+            this._importFileDropItemCount += readEntries.length;
+            this._validateDirectoryItemCount();
+
+            entries.push(...readEntries);
+            readEntries = await new Promise((resolve) => { directoryReader.readEntries(resolve); });
+        }
+        return entries;
+    }
+
+    /**
+     * @throws
+     */
+    _validateDirectoryItemCount() {
+        if (this._importFileDropItemCount > 1000) {
+            this._importFileDropItemCount = 0;
+            const errorText = 'Directory upload item count too large';
+            this._showErrors([new Error(errorText)]);
+            throw new Error(errorText);
+        }
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    _onImportButtonClick(e) {
+        e.preventDefault();
+        /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(true);
     }
 
     /**
@@ -100,13 +239,34 @@ export class DictionaryImportController {
     /**
      * @param {Event} e
      */
-    _onImportFileChange(e) {
+    async _onImportFileChange(e) {
+        /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(false);
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const {files} = node;
         if (files === null) { return; }
         const files2 = [...files];
         node.value = '';
         void this._importDictionaries(files2);
+    }
+
+    /** */
+    async _onImportFromURL() {
+        const text = this._importURLText.value.trim();
+        if (!text) { return; }
+        const urls = text.split('\n');
+        const files = [];
+        for (const url of urls) {
+            try {
+                files.push(await fetch(url.trim())
+                    .then((res) => res.blob())
+                    .then((blob) => {
+                        return new File([blob], 'fileFromURL');
+                    }));
+            } catch (error) {
+                log.error(error);
+            }
+        }
+        void this._importDictionaries(files);
     }
 
     /** */

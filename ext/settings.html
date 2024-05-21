@@ -2396,7 +2396,9 @@
             <div class="dictionary-item-top"></div>
             <label class="dictionary-item-top toggle dictionary-item-enabled-toggle-container"><input type="checkbox" id="all-dictionaries-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             <div class="dictionary-item-top dictionary-item-title-container">All</div>
-            <div class="dictionary-item-top">Priority</div>
+            <div class="dictionary-item-top advanced-only">Priority</div>
+            <div class="dictionary-item-top dictionary-item-button-height"></div>
+            <div class="dictionary-item-top dictionary-item-button-height"></div>
             <div class="dictionary-item-top dictionary-item-button-height"></div>
         </div>
 
@@ -2413,7 +2415,31 @@
     <div class="modal-footer">
         <button type="button" class="low-emphasis danger dictionary-database-mutating-input" id="dictionary-delete-all-button">Delete All</button>
         <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-check-integrity">Check Integrity</button>
-        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-file-button">Import</button>
+        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-button">Import</button>
+        <button type="button" data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
+<div id="dictionary-import-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-medium">
+    <div class="modal-header"><div class="modal-title">Import Dictionaries</div></div>
+    <div class="modal-body">
+        <div id="dictionary-drop-file-zone">
+            <div id="dictionary-drag-drop-text">
+                <span class="icon" data-icon="book"></span>
+                <h1>Drag and drop dictionaries (.zip)</h1>
+                <h5>or click here to upload</h5>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" data-modal-action="hide" class="basic-only">Close</button>
+    </div>
+    <div class="modal-body advanced-only">
+        <p>Import dictionaries from URLs:</p>
+        <textarea type="text" id="dictionary-import-url-text"></textarea>
+    </div>
+    <div class="modal-footer advanced-only">
+        <button type="button" data-modal-action="hide" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-url-button">Import from URLs</button>
         <button type="button" data-modal-action="hide">Close</button>
     </div>
 </div></div>
