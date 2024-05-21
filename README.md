@@ -5,17 +5,15 @@
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
 [![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)
 
-:wave: **This project is a community fork of Yomichan** ([migration guide](./docs/yomichan-migration.md#migrating-from-yomichan)) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26, 2023. We have made a number of [foundational changes](#changes) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
+:wave: **Yomitan is [the successor](https://foosoft.net/posts/passing-the-torch-to-yomitan/) to Yomichan** ([migration guide](./docs/yomichan-migration.md#migrating-from-yomichan)) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26, 2023. We have made a number of [foundational changes](#changes) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
 
 📢 **New contributors [welcome](#contributing)!**
 
-📢 **Seeking language experts to [add more languages](./docs/development/language-features.md) to Yomitan!**
+📢 **Interested in adding a new language to Yomitan? See [here](./docs/development/language-features.md) for thorough documentation!**
 
 ## What is Yomitan?
 
 Yomitan turns your web browser into a tool for building Japanese language literacy by helping you **read** texts that would otherwise be too difficult to tackle.
-
-This extension is similar to [10ten Japanese Reader (formerly Rikaichamp)](https://addons.mozilla.org/en-US/firefox/addon/10ten-ja-reader/) for Firefox and [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp) for Chrome.
 
 Yomitan provides advanced features not available in other browser-based dictionaries:
 
@@ -89,7 +87,8 @@ To further enhance your Yomitan experience, it's worth [integrating with Anki](.
 
 Major changes:
 
-- 💪 Completed the Manifest V2 → V3 transition, [read why here](https://developer.chrome.com/blog/resuming-the-transition-to-mv3/)!
+- 🌐 Added multi-language support!
+- 💪 Completed the Manifest V2 → V3 transition, [read why here](https://developer.chrome.com/blog/resuming-the-transition-to-mv3/).
 - ⚡ Switched to using ECMAScript modules and npm-sourced dependencies.
 - 🔧 Implemented an end-to-end CI/CD pipeline.
 - 🧪 Switched to standard testing frameworks, vitest and playwrights.
