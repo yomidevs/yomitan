@@ -9,7 +9,7 @@
 
 📢 **New contributors [welcome](#contributing)!**
 
-📢 **Seeking language experts 🎓 to [add more languages](./docs/development/language-features.md) to Yomitan!**
+📢 **Seeking language experts to [add more languages](./docs/development/language-features.md) to Yomitan!**
 
 ## What is Yomitan?
 
