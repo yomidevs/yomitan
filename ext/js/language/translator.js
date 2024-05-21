@@ -1932,6 +1932,10 @@ export class Translator {
             i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
+            // Sort by dictionary order
+            i = v1.dictionaryIndex - v2.dictionaryIndex;
+            if (i !== 0) { return i; }
+
             // Sort by term score
             i = v2.score - v1.score;
             if (i !== 0) { return i; }
@@ -1952,10 +1956,6 @@ export class Translator {
 
             // Sort by definition count
             i = v2.definitions.length - v1.definitions.length;
-            if (i !== 0) { return i; }
-
-            // Sort by dictionary order
-            i = v1.dictionaryIndex - v2.dictionaryIndex;
             return i;
         };
         dictionaryEntries.sort(compareFunction);
@@ -1979,6 +1979,10 @@ export class Translator {
             i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
+            // Sort by dictionary order
+            i = v1.dictionaryIndex - v2.dictionaryIndex;
+            if (i !== 0) { return i; }
+
             // Sort by term score
             i = v2.score - v1.score;
             if (i !== 0) { return i; }
@@ -1993,10 +1997,6 @@ export class Translator {
                 i = headwordIndices1[j] - headwordIndices2[j];
                 if (i !== 0) { return i; }
             }
-
-            // Sort by dictionary order
-            i = v1.dictionaryIndex - v2.dictionaryIndex;
-            if (i !== 0) { return i; }
 
             // Sort by original order
             i = v1.index - v2.index;
