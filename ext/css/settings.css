@@ -2235,10 +2235,13 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 .dictionary-list {
     width: 100%;
     display: grid;
-    grid-template-columns: auto auto 1fr auto auto;
+    grid-template-columns: auto auto 1fr auto auto auto auto;
     grid-template-rows: auto;
     place-items: center start;
     margin-top: 0.5em;
+}
+:root:not([data-advanced=true]) .dictionary-list {
+    grid-template-columns: auto auto 1fr auto auto auto;
 }
 .dictionary-list-index {
     margin-right: 0.5em;
@@ -2264,6 +2267,7 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     flex-flow: row nowrap;
     align-items: center;
     margin-right: 0.5em;
+    overflow-wrap: anywhere;
 }
 .dictionary-title {
     color: inherit;
@@ -2334,6 +2338,10 @@ input[type=number].dictionary-priority {
     overflow: auto;
 }
 
+#dictionary-move-up>span.icon-button-inner,
+#dictionary-move-down>span.icon-button-inner {
+    width: 26px;
+}
 
 /* Secondary search dictionary settings */
 .secondary-search-dictionary-list {
