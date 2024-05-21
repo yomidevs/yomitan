@@ -83,6 +83,7 @@ export function getStandardFieldMarkers(type) {
                 'glossary',
                 'kunyomi',
                 'onyomi',
+                'onyomi-hiragana',
                 'screenshot',
                 'search-query',
                 'selection-text',
