@@ -20,7 +20,7 @@ This extension is similar to [10ten Japanese Reader (formerly Rikaichamp)](https
 Yomitan provides advanced features not available in other browser-based dictionaries:
 
 - 💬 Interactive popup definition window for displaying search results.
-- 🔊 Built-in audio playback for select Japanese words.
+- 🔊 Built-in native audio sources for Japanese words with the ability to add your own [custom audio sources](./docs/audio.md).
 - ✍️ Kanji stroke order diagrams are generally just a click away.
 - 📝 [Automatic note creation](./docs/anki-integration.md#anki-integration) for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 - 🔍 Custom search page for easily executing custom search queries.
