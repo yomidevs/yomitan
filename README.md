@@ -54,9 +54,7 @@ Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially 
   - [stable](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
   - [testing](https://github.com/themoeway/yomitan/releases) ※
 
-※ Unlike Chrome, Firefox does not allow extensions meant for testing to be hosted in the marketplace.
-You will have to download a desired version and side-load it yourself. You only need to do this once and will get
-updates automatically.
+※ Unlike Chrome, Firefox does not allow extensions meant for testing to be hosted in the marketplace. You will have to download the desired version and side-load it yourself. You only need to do this once, and you will get updates automatically.
 
 ## Basic Usage
 
@@ -69,17 +67,17 @@ updates automatically.
     - The <img src="ext/images/question-mark-circle.svg" width="16" height="16" alt="question mark symbol"> _question mark_ button will open the Information page.
     - The <img src="ext/images/profile.svg" width="16" height="16" alt="profile icon"> _profile_ button will appear when multiple profiles exist, allowing the current profile to be quickly changed.
 
-2.  Import the dictionaries you wish to use for term and kanji searches, head over to the [the dictionary docs](./docs/dictionaries.md) to get set up! If you do not have any dictionaries installed or enabled, Yomitan will warn you that it is not ready for use by displaying an orange exclamation mark over its icon. This exclamation mark will disappear once you have installed and enabled at least one dictionary.
+2.  Import the dictionaries you wish to use for term and kanji searches; head over to the [dictionary docs](./docs/dictionaries.md) to get set up! If you do not have any dictionaries installed or enabled, Yomitan will warn you that it is not ready for use by displaying an orange exclamation mark over its icon. This exclamation mark will disappear once you have installed and enabled at least one dictionary.
 
     <img src="resources/images/settings-dictionaries-popup.png" width="300" alt="custom dictionaries list">
 
-3.  Webpage text can be scanned by moving the cursor while holding a modifier key, which is <kbd>Shift</kbd> by default. If definitions are found for the text at the cursor position, a popup window containing term definitions will open. This window can be dismissed by clicking anywhere outside of it.
+4.  Webpage text can be scanned by moving the cursor while holding a modifier key, which is <kbd>Shift</kbd> by default. If definitions are found for the text at the cursor position, a popup window containing term definitions will open. This window can be dismissed by clicking anywhere outside of it.
 
     <img src="resources/images/search-popup-terms.png" width="300" alt="popup with search terms">
 
-4.  Click on the <img src="ext/images/play-audio.svg" width="16" height="16" alt="loudspeaker icon"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is not available, you will hear a short click instead. For more options, see [Audio Configuration](./docs/audio.md).
+5.  Click on the <img src="ext/images/play-audio.svg" width="16" height="16" alt="loudspeaker icon"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is not available, you will hear a short click instead. For more options, see [Audio Configuration](./docs/audio.md).
 
-5.  Click on individual kanji in the term definition results to view additional information about those characters, including stroke order diagrams, readings, meanings, as well as other useful data.
+6.  Click on individual kanji in the term definition results to view additional information about those characters, including stroke order diagrams, readings, meanings, and other useful data.
 
     <img src="resources/images/search-popup-kanji.png" width="300" alt="popup with kanji details">
 
