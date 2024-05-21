@@ -15,15 +15,15 @@
 
 Yomitan turns your web browser into a tool for building Japanese language literacy by helping you **read** texts that would otherwise be too difficult to tackle.
 
-Yomitan provides advanced features not available in other browser-based dictionaries:
+Yomitan provides powerful features not available in other browser-based dictionaries:
 
 - 💬 Interactive popup definition window for displaying search results.
 - 🔊 Built-in native audio sources for Japanese words with the ability to add your own [custom audio sources](./docs/audio.md).
 - ✍️ Kanji stroke order diagrams are just a click away.
-- 📝 [Automatic note creation](./docs/anki-integration.md#anki-integration) for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
+- 📝 [Automatic flashcard creation](./docs/anki-integration.md#anki-integration) for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 - 🔍 Custom search page for easily executing custom search queries.
 - 📖 Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomitan Import](https://github.com/themoeway/yomitan-import) tool.
-- ✨ Clean, modern code makes it easy for developers to [contribute](#contributing) new features.
+- ✨ Clean, modern code makes it easy for developers to [contribute](#contributing) new features and languages.
 
 [![Term definitions](img/ss-terms-thumb.png)](img/ss-terms.png)
 [![Kanji information](img/ss-kanji-thumb.png)](img/ss-kanji.png)
