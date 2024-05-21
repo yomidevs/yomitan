@@ -122,8 +122,8 @@ If you're looking to code, please let us know what you plan on working on before
 
 Some contributions we always appreciate:
 
-- Well-written tests covering different functionalities. This includes [playwright tests](https://github.com/themoeway/yomitan/tree/master/test/playwright), [benchmark tests](https://github.com/themoeway/yomitan/tree/master/benches), and unit tests
-- Increasing our type coverage
+- Well-written tests covering different functionalities. This includes [playwright tests](https://github.com/themoeway/yomitan/tree/master/test/playwright), [benchmark tests](https://github.com/themoeway/yomitan/tree/master/benches), and unit tests.
+- Increasing our type coverage.
 - More and better documentation!
 
 Information on how to setup and build the codebase can be found [here](./CONTRIBUTING.md#setup).
