@@ -123,6 +123,8 @@ export class AnkiController {
         for (const node of nodes) {
             node.addEventListener('settingChanged', onAnkiSettingChanged);
         }
+        const ankiCardFormatSettingsEntry = querySelectorNotNull(document, '[data-modal-action="show,anki-cards"]');
+        ankiCardFormatSettingsEntry.addEventListener('click', onAnkiSettingChanged);
     }
 
     /**
@@ -605,17 +607,6 @@ class AnkiCardController {
         this._fields = fields;
 
         this._ankiCardFieldsContainer = this._node.querySelector('.anki-card-fields');
-
-        /** @type {HTMLTextAreaElement} */
-        const mainSettingsEntry = querySelectorNotNull(document, '[data-modal-action="show,anki-cards"]');
-        mainSettingsEntry.addEventListener('click', (() => {
-            const updatedCardOptions = this._getCardOptions(ankiOptions, this._optionsType);
-            if (updatedCardOptions === null) { return; }
-            this._deckController.prepare(deckControllerSelect, updatedCardOptions.deck);
-            this._modelController.prepare(modelControllerSelect, updatedCardOptions.model);
-            this._fields = updatedCardOptions.fields;
-            void this.updateAnkiState();
-        }).bind(this), false);
 
         this._setupFields();
 
