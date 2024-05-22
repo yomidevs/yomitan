@@ -107,7 +107,7 @@ export class SortFrequencyDictionaryController {
         option.textContent = 'None';
         fragment.appendChild(option);
         for (const {title, counts} of dictionaries) {
-            if (counts.termMeta.freq > 0) {
+            if (counts && counts.termMeta && counts.termMeta.freq > 0) {
                 option = document.createElement('option');
                 option.value = title;
                 option.textContent = title;
