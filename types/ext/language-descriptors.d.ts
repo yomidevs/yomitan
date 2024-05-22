@@ -118,8 +118,8 @@ type AllTextProcessors = {
     ja: {
         pre: {
             convertHalfWidthCharacters: TextProcessor<boolean>;
-            convertNumericCharacters: TextProcessor<boolean>;
-            convertAlphabeticCharacters: TextProcessor<boolean>;
+            alphabeticToHiragana: TextProcessor<boolean>;
+            alphanumericWidthVariants: BidirectionalConversionPreprocessor;
             convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
             collapseEmphaticSequences: TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
         };

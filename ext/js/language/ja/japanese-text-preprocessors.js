@@ -19,10 +19,11 @@ import {basicTextProcessorOptions} from '../text-processors.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {
     collapseEmphaticSequences as collapseEmphaticSequencesFunction,
+    convertAlphanumericToFullWidth,
+    convertFullWidthAlphanumericToNormal,
     convertHalfWidthKanaToFullWidth,
     convertHiraganaToKatakana as convertHiraganaToKatakanaFunction,
-    convertKatakanaToHiragana as convertKatakanaToHiraganaFunction,
-    convertNumericToFullWidth
+    convertKatakanaToHiragana as convertKatakanaToHiraganaFunction
 } from './japanese.js';
 
 /** @type {import('language').TextProcessor<boolean>} */
@@ -33,20 +34,30 @@ export const convertHalfWidthCharacters = {
     process: (str, setting) => (setting ? convertHalfWidthKanaToFullWidth(str) : str)
 };
 
-/** @type {import('language').TextProcessor<boolean>} */
-export const convertNumericCharacters = {
-    name: 'Convert numeric characters to full width',
-    description: '1234 → １２３４',
-    options: basicTextProcessorOptions,
-    process: (str, setting) => (setting ? convertNumericToFullWidth(str) : str)
-};
 
 /** @type {import('language').TextProcessor<boolean>} */
-export const convertAlphabeticCharacters = {
+export const alphabeticToHiragana = {
     name: 'Convert alphabetic characters to hiragana',
     description: 'yomichan → よみちゃん',
     options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? convertAlphabeticToKana(str) : str)
+};
+
+/** @type {import('language').BidirectionalConversionPreprocessor} */
+export const alphanumericWidthVariants = {
+    name: 'Convert between alphabetic width variants',
+    description: 'ｙｏｍｉｔａｎ → yomitan and vice versa',
+    options: ['off', 'direct', 'inverse'],
+    process: (str, setting) => {
+        switch (setting) {
+            case 'off':
+                return str;
+            case 'direct':
+                return convertFullWidthAlphanumericToNormal(str);
+            case 'inverse':
+                return convertAlphanumericToFullWidth(str);
+        }
+    }
 };
 
 /** @type {import('language').BidirectionalConversionPreprocessor} */
