@@ -172,5 +172,6 @@ type AllTextProcessors = {
     vi: {
         pre: CapitalizationPreprocessors;
     };
+    yue: Record<string, never>;
     zh: Record<string, never>;
 };
