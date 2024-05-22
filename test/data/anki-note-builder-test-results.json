@@ -3902,10 +3902,10 @@
         "glossary-first-brief": "<div style=\"text-align: left;\">English definition</div>",
         "glossary-first-no-dictionary": "<div style=\"text-align: left;\"><i>(n)</i> English definition</div>",
         "part-of-speech": "Noun",
-        "pitch-accents": "No pitch accent data",
-        "pitch-accent-graphs": "No pitch accent data",
-        "pitch-accent-graphs-jj": "No pitch accent data",
-        "pitch-accent-positions": "No pitch accent data",
+        "pitch-accents": "",
+        "pitch-accent-graphs": "",
+        "pitch-accent-graphs-jj": "",
+        "pitch-accent-positions": "",
         "pitch-accent-categories": "",
         "phonetic-transcriptions": "",
         "reading": "English",
@@ -3920,7 +3920,7 @@
     ]
   },
   {
-    "name": "Test text preprocessors - alphabeticWidthVariants 1",
+    "name": "Test text preprocessors - alphabeticWidthVariants 2",
     "results": [
       {
         "audio": "",
@@ -3948,10 +3948,10 @@
         "glossary-first-brief": "<div style=\"text-align: left;\">ＵＳＢ definition</div>",
         "glossary-first-no-dictionary": "<div style=\"text-align: left;\"><i>(n)</i> ＵＳＢ definition</div>",
         "part-of-speech": "Noun",
-        "pitch-accents": "No pitch accent data",
-        "pitch-accent-graphs": "No pitch accent data",
-        "pitch-accent-graphs-jj": "No pitch accent data",
-        "pitch-accent-positions": "No pitch accent data",
+        "pitch-accents": "",
+        "pitch-accent-graphs": "",
+        "pitch-accent-graphs-jj": "",
+        "pitch-accent-positions": "",
         "pitch-accent-categories": "",
         "phonetic-transcriptions": "",
         "reading": "ユーエスビー",
