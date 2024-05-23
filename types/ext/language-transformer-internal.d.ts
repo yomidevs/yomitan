@@ -22,7 +22,7 @@ export type Transform = {
 };
 
 export type Rule = {
-    type: 'suffix' | 'prefix' | 'other';
+    type: 'suffix' | 'prefix' | 'wholeWord' | 'other';
     isInflected: RegExp;
     deinflect: (inflectedWord: string) => string;
     conditionsIn: number;
