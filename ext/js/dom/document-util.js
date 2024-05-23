@@ -153,7 +153,7 @@ export function getActiveModifiers(event) {
     // Chrome and Firefox (outside of a textarea or input) do report the modifier in both the event.{modifier} and the event.code
     // We must check if the modifier has already been added to not duplicate it
     if (event instanceof KeyboardEvent) {
-        if ((event.code === 'AltLeft' || event.code === 'AltRight' || (event.key === 'Alt')) && !modifiers.includes('alt')) { modifiers.push('alt'); }
+        if ((event.code === 'AltLeft' || event.code === 'AltRight' || event.key === 'Alt') && !modifiers.includes('alt')) { modifiers.push('alt'); }
         if ((event.code === 'ControlLeft' || event.code === 'ControlRight' || event.key === 'Control') && !modifiers.includes('ctrl')) { modifiers.push('ctrl'); }
         if ((event.code === 'MetaLeft' || event.code === 'MetaRight' || event.key === 'Meta') && !modifiers.includes('meta')) { modifiers.push('meta'); }
         if ((event.code === 'ShiftLeft' || event.code === 'ShiftRight' || event.key === 'Shift') && !modifiers.includes('shift')) { modifiers.push('shift'); }
