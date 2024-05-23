@@ -46,10 +46,25 @@ import {RequestBuilder} from './request-builder.js';
 import {injectStylesheet} from './script-manager.js';
 
 /**
+ * @enum {string}
+ * @readonly
+ */
+const Mode = {
+    ExistingOrNewTab: 'existingOrNewTab',
+    NewTab: 'newTab',
+    Popup: 'popup'
+};
+
+/**
  * This class controls the core logic of the extension, including API calls
  * and various forms of communication between browser tabs and external applications.
  */
 export class Backend {
+    /**
+     * Enum for mode
+     */
+    static Mode = Mode;
+
     /**
      * @param {import('../extension/web-extension.js').WebExtension} webExtension
      */
@@ -964,11 +979,11 @@ export class Backend {
     // Command handlers
 
     /**
-     * @param {undefined|{mode: 'existingOrNewTab'|'newTab'|'popup', query?: string}} params
+     * @param {undefined|{mode: Mode, query?: string}} params
      */
     async _onCommandOpenSearchPage(params) {
-        /** @type {'existingOrNewTab'|'newTab'|'popup'} */
-        let mode = 'existingOrNewTab';
+        /** @type {Mode} */
+        let mode = Mode.ExistingOrNewTab;
         let query = '';
         if (typeof params === 'object' && params !== null) {
             mode = this._normalizeOpenSettingsPageMode(params.mode, mode);
@@ -992,7 +1007,7 @@ export class Backend {
             const parsedUrl = new URL(url);
             const parsedBaseUrl = `${parsedUrl.origin}${parsedUrl.pathname}`;
             const parsedMode = parsedUrl.searchParams.get('mode');
-            return parsedBaseUrl === baseUrl && (parsedMode === mode || (!parsedMode && mode === 'existingOrNewTab'));
+            return parsedBaseUrl === baseUrl && (parsedMode === mode || (!parsedMode && mode === Mode.ExistingOrNewTab));
         };
 
         const openInTab = async () => {
@@ -1012,7 +1027,7 @@ export class Backend {
         };
 
         switch (mode) {
-            case 'existingOrNewTab':
+            case Mode.ExistingOrNewTab:
                 try {
                     if (await openInTab()) { return; }
                 } catch (e) {
@@ -1020,10 +1035,10 @@ export class Backend {
                 }
                 await this._createTab(queryUrl);
                 return;
-            case 'newTab':
+            case Mode.NewTab:
                 await this._createTab(queryUrl);
                 return;
-            case 'popup':
+            case Mode.Popup:
                 return;
         }
     }
@@ -1036,11 +1051,11 @@ export class Backend {
     }
 
     /**
-     * @param {undefined|{mode: 'existingOrNewTab'|'newTab'|'popup'}} params
+     * @param {undefined|{mode: Mode}} params
      */
     async _onCommandOpenSettingsPage(params) {
-        /** @type {'existingOrNewTab'|'newTab'|'popup'} */
-        let mode = 'existingOrNewTab';
+        /** @type {Mode} */
+        let mode = Mode.ExistingOrNewTab;
         if (typeof params === 'object' && params !== null) {
             mode = this._normalizeOpenSettingsPageMode(params.mode, mode);
         }
@@ -1185,7 +1200,7 @@ export class Backend {
                     {action: 'searchDisplayControllerGetMode'},
                     {frameId: 0}
                 );
-                return mode === 'popup';
+                return mode === Mode.Popup;
             } catch (e) {
                 return false;
             }
@@ -2546,7 +2561,7 @@ export class Backend {
     }
 
     /**
-     * @param {'existingOrNewTab'|'newTab'|'popup'} mode
+     * @param {Mode} mode
      */
     async _openSettingsPage(mode) {
         const manifest = chrome.runtime.getManifest();
@@ -2556,7 +2571,7 @@ export class Backend {
         if (typeof page === 'undefined') { throw new Error('Failed to find options_ui.page'); }
         const url = chrome.runtime.getURL(page);
         switch (mode) {
-            case 'existingOrNewTab':
+            case Mode.ExistingOrNewTab:
                 await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
                     chrome.runtime.openOptionsPage(() => {
                         const e = chrome.runtime.lastError;
@@ -2568,7 +2583,7 @@ export class Backend {
                     });
                 }));
                 break;
-            case 'newTab':
+            case Mode.NewTab:
                 await this._createTab(url);
                 break;
         }
@@ -2674,15 +2689,16 @@ export class Backend {
     }
 
     /**
-     * @param {unknown} mode
-     * @param {'existingOrNewTab'|'newTab'|'popup'} defaultValue
-     * @returns {'existingOrNewTab'|'newTab'|'popup'}
+     * Normalize the open settings page mode.
+     * @param {unknown} mode The input mode.
+     * @param {Mode} defaultValue The default mode.
+     * @returns {Mode} The normalized mode.
      */
     _normalizeOpenSettingsPageMode(mode, defaultValue) {
         switch (mode) {
-            case 'existingOrNewTab':
-            case 'newTab':
-            case 'popup':
+            case Mode.ExistingOrNewTab:
+            case Mode.NewTab:
+            case Mode.Popup:
                 return mode;
             default:
                 return defaultValue;
