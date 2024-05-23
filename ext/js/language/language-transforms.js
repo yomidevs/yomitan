@@ -54,18 +54,18 @@ export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsI
 }
 
 /**
- * @param {string} inflectedLiteral
- * @param {string} deinflectedLiteral
+ * @param {string} inflectedWord
+ * @param {string} deinflectedWord
  * @param {string[]} conditionsIn
  * @param {string[]} conditionsOut
  * @returns {import('language-transformer').Rule}
  */
-export function literalInflection(inflectedLiteral, deinflectedLiteral, conditionsIn, conditionsOut) {
-    const regex = new RegExp('^' + inflectedLiteral + '$');
+export function wholeWordInflection(inflectedWord, deinflectedWord, conditionsIn, conditionsOut) {
+    const regex = new RegExp('^' + inflectedWord + '$');
     return {
         type: 'literal',
         isInflected: regex,
-        deinflect: () => deinflectedLiteral,
+        deinflect: () => deinflectedWord,
         conditionsIn,
         conditionsOut
     };

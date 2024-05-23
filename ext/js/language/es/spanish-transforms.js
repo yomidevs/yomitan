@@ -15,24 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*
- * Copyright (C) 2024  Yomitan Authors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-import {literalInflection, suffixInflection} from '../language-transforms.js';
+import {suffixInflection, wholeWordInflection} from '../language-transforms.js';
 
 const ACCENTS = new Map([
     ['a', 'á'],
@@ -153,35 +136,35 @@ export const spanishTransforms = {
                 suffixInflection('pongo', 'poner', ['v'], ['v']),
                 suffixInflection('lgo', 'lir', ['v'], ['v']),
                 suffixInflection('lgo', 'ler', ['v'], ['v']),
-                literalInflection('quepo', 'caber', ['v'], ['v']),
-                literalInflection('doy', 'dar', ['v'], ['v']),
-                literalInflection('sé', 'saber', ['v'], ['v']),
-                literalInflection('veo', 'ver', ['v'], ['v']),
+                wholeWordInflection('quepo', 'caber', ['v'], ['v']),
+                wholeWordInflection('doy', 'dar', ['v'], ['v']),
+                wholeWordInflection('sé', 'saber', ['v'], ['v']),
+                wholeWordInflection('veo', 'ver', ['v'], ['v']),
                 // Ser, estar, ir, haber
-                literalInflection('soy', 'ser', ['v'], ['v']),
-                literalInflection('eres', 'ser', ['v'], ['v']),
-                literalInflection('es', 'ser', ['v'], ['v']),
-                literalInflection('somos', 'ser', ['v'], ['v']),
-                literalInflection('sois', 'ser', ['v'], ['v']),
-                literalInflection('son', 'ser', ['v'], ['v']),
-                literalInflection('estoy', 'estar', ['v'], ['v']),
-                literalInflection('estás', 'estar', ['v'], ['v']),
-                literalInflection('está', 'estar', ['v'], ['v']),
-                literalInflection('estamos', 'estar', ['v'], ['v']),
-                literalInflection('estáis', 'estar', ['v'], ['v']),
-                literalInflection('están', 'estar', ['v'], ['v']),
-                literalInflection('voy', 'ir', ['v'], ['v']),
-                literalInflection('vas', 'ir', ['v'], ['v']),
-                literalInflection('va', 'ir', ['v'], ['v']),
-                literalInflection('vamos', 'ir', ['v'], ['v']),
-                literalInflection('vais', 'ir', ['v'], ['v']),
-                literalInflection('van', 'ir', ['v'], ['v']),
-                literalInflection('he', 'haber', ['v'], ['v']),
-                literalInflection('has', 'haber', ['v'], ['v']),
-                literalInflection('ha', 'haber', ['v'], ['v']),
-                literalInflection('hemos', 'haber', ['v'], ['v']),
-                literalInflection('habéis', 'haber', ['v'], ['v']),
-                literalInflection('han', 'haber', ['v'], ['v'])
+                wholeWordInflection('soy', 'ser', ['v'], ['v']),
+                wholeWordInflection('eres', 'ser', ['v'], ['v']),
+                wholeWordInflection('es', 'ser', ['v'], ['v']),
+                wholeWordInflection('somos', 'ser', ['v'], ['v']),
+                wholeWordInflection('sois', 'ser', ['v'], ['v']),
+                wholeWordInflection('son', 'ser', ['v'], ['v']),
+                wholeWordInflection('estoy', 'estar', ['v'], ['v']),
+                wholeWordInflection('estás', 'estar', ['v'], ['v']),
+                wholeWordInflection('está', 'estar', ['v'], ['v']),
+                wholeWordInflection('estamos', 'estar', ['v'], ['v']),
+                wholeWordInflection('estáis', 'estar', ['v'], ['v']),
+                wholeWordInflection('están', 'estar', ['v'], ['v']),
+                wholeWordInflection('voy', 'ir', ['v'], ['v']),
+                wholeWordInflection('vas', 'ir', ['v'], ['v']),
+                wholeWordInflection('va', 'ir', ['v'], ['v']),
+                wholeWordInflection('vamos', 'ir', ['v'], ['v']),
+                wholeWordInflection('vais', 'ir', ['v'], ['v']),
+                wholeWordInflection('van', 'ir', ['v'], ['v']),
+                wholeWordInflection('he', 'haber', ['v'], ['v']),
+                wholeWordInflection('has', 'haber', ['v'], ['v']),
+                wholeWordInflection('ha', 'haber', ['v'], ['v']),
+                wholeWordInflection('hemos', 'haber', ['v'], ['v']),
+                wholeWordInflection('habéis', 'haber', ['v'], ['v']),
+                wholeWordInflection('han', 'haber', ['v'], ['v'])
             ]
         }
     ]
