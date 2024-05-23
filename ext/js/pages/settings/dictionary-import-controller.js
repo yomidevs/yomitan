@@ -102,9 +102,9 @@ export class DictionaryImportController {
      * @param {MouseEvent} e
      */
     async _onRecommendedImportClick(e) {
-        console.log(e);
         if (!(e instanceof PointerEvent)) { return; }
         if (!e.target || !(e.target instanceof HTMLButtonElement)) { return; }
+        e.target.disabled = true;
         /** @type {string} */
         const import_url = e.target.attributes[3].value;
         try {
@@ -117,7 +117,6 @@ export class DictionaryImportController {
         } catch (error) {
             log.error(error);
         }
-        e.target.disabled = true;
     }
 
     /** */
