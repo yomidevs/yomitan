@@ -69,6 +69,10 @@ export class DictionaryImportController {
                 'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.'
             ]
         ];
+        /** @type {string[]} */
+        this._recommendedDictionaryQueue = [];
+        /** @type {boolean} */
+        this._recommendedDictionaryActiveImport = false;
     }
 
     /** */
@@ -104,19 +108,31 @@ export class DictionaryImportController {
     async _onRecommendedImportClick(e) {
         if (!(e instanceof PointerEvent)) { return; }
         if (!e.target || !(e.target instanceof HTMLButtonElement)) { return; }
+
+        const import_url = e.target.attributes.getNamedItem('data-import-url');
+        if (!import_url) { return; }
+        this._recommendedDictionaryQueue.push(import_url.value);
+
         e.target.disabled = true;
-        /** @type {string} */
-        const import_url = e.target.attributes[3].value;
-        try {
-            const file = await fetch(import_url.trim())
-                .then((res) => res.blob())
-                .then((blob) => {
-                    return new File([blob], 'fileFromURL');
-                });
-            void this._importDictionaries([file]);
-        } catch (error) {
-            log.error(error);
+
+        if (this._recommendedDictionaryActiveImport) { return; }
+
+        while (this._recommendedDictionaryQueue.length > 0) {
+            this._recommendedDictionaryActiveImport = true;
+            try {
+                const url = this._recommendedDictionaryQueue.shift();
+                if (!url) { continue; }
+                const file = await fetch(url.trim())
+                    .then((res) => res.blob())
+                    .then((blob) => {
+                        return new File([blob], 'fileFromURL');
+                    });
+                await this._importDictionaries([file]);
+            } catch (error) {
+                log.error(error);
+            }
         }
+        this._recommendedDictionaryActiveImport = false;
     }
 
     /** */
