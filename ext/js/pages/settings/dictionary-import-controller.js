@@ -87,9 +87,38 @@ export class DictionaryImportController {
         this._importFileDrop.addEventListener('dragover', this._onFileDropOver.bind(this), false);
         this._importFileDrop.addEventListener('dragleave', this._onFileDropLeave.bind(this), false);
         this._importFileDrop.addEventListener('drop', this._onFileDrop.bind(this), false);
+
+        // Welcome page
+        /** @type {NodeListOf<HTMLElement>} */
+        const buttons = document.querySelectorAll('.action-button[data-action=import-recommended-dictionary]');
+        for (const button of buttons) {
+            button.addEventListener('click', this._onRecommendedImportClick.bind(this), false);
+        }
     }
 
     // Private
+
+    /**
+     * @param {MouseEvent} e
+     */
+    async _onRecommendedImportClick(e) {
+        console.log(e);
+        if (!(e instanceof PointerEvent)) { return; }
+        if (!e.target || !(e.target instanceof HTMLButtonElement)) { return; }
+        /** @type {string} */
+        const import_url = e.target.attributes[3].value;
+        try {
+            const file = await fetch(import_url.trim())
+                .then((res) => res.blob())
+                .then((blob) => {
+                    return new File([blob], 'fileFromURL');
+                });
+            void this._importDictionaries([file]);
+        } catch (error) {
+            log.error(error);
+        }
+        e.target.disabled = true;
+    }
 
     /** */
     _onImportFileButtonClick() {
@@ -303,6 +332,7 @@ export class DictionaryImportController {
         const statusFooter = this._statusFooter;
         const progressSelector = '.dictionary-import-progress';
         const progressContainers = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`#dictionaries-modal ${progressSelector}`));
+        const recommendedProgressContainers = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`#recommended-dictionaries-modal ${progressSelector}`));
         const progressBars = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-bar`));
         const infoLabels = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-info`));
         const statusLabels = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-status`));
@@ -315,7 +345,7 @@ export class DictionaryImportController {
             this._setModifying(true);
             this._hideErrors();
 
-            for (const progress of progressContainers) { progress.hidden = false; }
+            for (const progress of [...progressContainers, ...recommendedProgressContainers]) { progress.hidden = false; }
 
             const optionsFull = await this._settingsController.getOptionsFull();
             const importDetails = {
@@ -365,7 +395,7 @@ export class DictionaryImportController {
         } finally {
             this._showErrors(errors);
             prevention.end();
-            for (const progress of progressContainers) { progress.hidden = true; }
+            for (const progress of [...progressContainers, ...recommendedProgressContainers]) { progress.hidden = true; }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
             this._setModifying(false);
             this._triggerStorageChanged();
