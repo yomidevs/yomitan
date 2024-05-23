@@ -63,7 +63,7 @@ export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsI
 export function wholeWordInflection(inflectedWord, deinflectedWord, conditionsIn, conditionsOut) {
     const regex = new RegExp('^' + inflectedWord + '$');
     return {
-        type: 'literal',
+        type: 'wholeWord',
         isInflected: regex,
         deinflect: () => deinflectedWord,
         conditionsIn,
