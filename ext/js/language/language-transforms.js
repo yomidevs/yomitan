@@ -43,7 +43,7 @@ export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsI
  * @returns {import('language-transformer').Rule}
  */
 export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsIn, conditionsOut) {
-    const prefixRegExp = new RegExp('^' + inflectedPrefix + '$');
+    const prefixRegExp = new RegExp('^' + inflectedPrefix);
     return {
         type: 'prefix',
         isInflected: prefixRegExp,
