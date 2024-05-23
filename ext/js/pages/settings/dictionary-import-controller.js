@@ -17,6 +17,7 @@
  */
 
 import {ExtensionError} from '../../core/extension-error.js';
+import {readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {toError} from '../../core/to-error.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
@@ -93,11 +94,7 @@ export class DictionaryImportController {
         this._importFileDrop.addEventListener('drop', this._onFileDrop.bind(this), false);
 
         // Welcome page
-        /** @type {NodeListOf<HTMLElement>} */
-        const buttons = document.querySelectorAll('.action-button[data-action=import-recommended-dictionary]');
-        for (const button of buttons) {
-            button.addEventListener('click', this._onRecommendedImportClick.bind(this), false);
-        }
+        void this._renderRecommendedDictionaries('../../data/recommended-dictionaries.json');
     }
 
     // Private
@@ -133,6 +130,62 @@ export class DictionaryImportController {
             }
         }
         this._recommendedDictionaryActiveImport = false;
+    }
+
+    /**
+     * @param {string} url
+     */
+    async _renderRecommendedDictionaries(url) {
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'no-cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer'
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${url}: ${response.status}`);
+        }
+
+        const language = (await this._settingsController.getOptions()).general.language;
+        /** @type {import('dictionary-recommended.js').RecommendedDictionaries} */
+        const recommendedDictionaries = (await readResponseJson(response));
+
+        this._renderRecommendedDictionaryGroup(recommendedDictionaries[language].terms, document.querySelector('#recommended-term-dictionaries'));
+        this._renderRecommendedDictionaryGroup(recommendedDictionaries[language].kanji, document.querySelector('#recommended-kanji-dictionaries'));
+        this._renderRecommendedDictionaryGroup(recommendedDictionaries[language].frequency, document.querySelector('#recommended-frequency-dictionaries'));
+        this._renderRecommendedDictionaryGroup(recommendedDictionaries[language].grammar, document.querySelector('#recommended-grammar-dictionaries'));
+
+        /** @type {NodeListOf<HTMLElement>} */
+        const buttons = document.querySelectorAll('.action-button[data-action=import-recommended-dictionary]');
+        for (const button of buttons) {
+            button.addEventListener('click', this._onRecommendedImportClick.bind(this), false);
+        }
+    }
+
+    /**
+     *
+     * @param {import('dictionary-recommended.js').Dictionary[]} recommendedDictionaries
+     * @param {HTMLElement | null} dictionariesList
+     */
+    _renderRecommendedDictionaryGroup(recommendedDictionaries, dictionariesList) {
+        for (const dictionary of recommendedDictionaries) {
+            if (dictionariesList) {
+                dictionariesList.hidden = false;
+                const template = this._settingsController.instantiateTemplate('recommended-dictionaries-list-item');
+                const label = querySelectorNotNull(template, '.settings-item-label');
+                const button = querySelectorNotNull(template, '.action-button[data-action=import-recommended-dictionary]');
+
+                const urlAttribute = document.createAttribute('data-import-url');
+                urlAttribute.value = dictionary.url;
+                button.attributes.setNamedItem(urlAttribute);
+
+                label.textContent = dictionary.name;
+
+                dictionariesList.append(template);
+            }
+        }
     }
 
     /** */
