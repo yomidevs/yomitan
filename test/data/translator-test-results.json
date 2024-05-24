@@ -17211,7 +17211,169 @@
     ]
   },
   {
-    "name": "Test text preprocessors - convertAlphabeticCharacters",
+    "name": "Test text preprocessors - alphabeticWidthVariants 1",
+    "originalTextLength": 7,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 1,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxOriginalTextLength": 7,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "English",
+            "reading": "English",
+            "sources": [
+              {
+                "originalText": "Ｅｎｇｌｉｓｈ",
+                "transformedText": "English",
+                "deinflectedText": "English",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 27,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              19
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "English definition"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      }
+    ]
+  },
+  {
+    "name": "Test text preprocessors - alphabeticWidthVariants 2",
+    "originalTextLength": 3,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 1,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxOriginalTextLength": 3,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "ＵＳＢ",
+            "reading": "ユーエスビー",
+            "sources": [
+              {
+                "originalText": "USB",
+                "transformedText": "ＵＳＢ",
+                "deinflectedText": "ＵＳＢ",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 29,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              21
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "ＵＳＢ definition"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      }
+    ]
+  },
+  {
+    "name": "Test text preprocessors - alphabeticToHiragana",
     "originalTextLength": 4,
     "dictionaryEntries": [
       {
@@ -18656,11 +18818,11 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryPriority": 0,
-            "id": 29,
+            "id": 30,
             "score": 1,
             "frequencyOrder": 0,
             "sequences": [
-              21
+              22
             ],
             "isPrimary": true,
             "tags": [

@@ -561,17 +561,18 @@ export class TextScanner extends EventDispatcher {
      * @param {KeyboardEvent} e
      */
     _onKeyDown(e) {
-        if (this._lastMouseMove !== null && (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey)) {
+        const modifiers = getActiveModifiers(e);
+        if (this._lastMouseMove !== null && (modifiers.length > 0)) {
             if (this._inputtingText()) { return; }
             const syntheticMouseEvent = new MouseEvent(this._lastMouseMove.type, {
                 screenX: this._lastMouseMove.screenX,
                 screenY: this._lastMouseMove.screenY,
                 clientX: this._lastMouseMove.clientX,
                 clientY: this._lastMouseMove.clientY,
-                ctrlKey: e.ctrlKey,
-                shiftKey: e.shiftKey,
-                altKey: e.altKey,
-                metaKey: e.metaKey,
+                ctrlKey: modifiers.includes('ctrl'),
+                shiftKey: modifiers.includes('shift'),
+                altKey: modifiers.includes('alt'),
+                metaKey: modifiers.includes('meta'),
                 button: this._lastMouseMove.button,
                 buttons: this._lastMouseMove.buttons,
                 relatedTarget: this._lastMouseMove.relatedTarget
