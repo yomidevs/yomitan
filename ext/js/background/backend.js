@@ -2680,10 +2680,9 @@ export class Backend {
     }
 
     /**
-     * Normalize the open settings page mode.
-     * @param {unknown} mode The input mode.
-     * @param {import('backend').Mode} defaultValue The default mode.
-     * @returns {import('backend').Mode} The normalized mode.
+     * @param {unknown} mode
+     * @param {import('backend').Mode} defaultValue
+     * @returns {import('backend').Mode}
      */
     _normalizeOpenSettingsPageMode(mode, defaultValue) {
         switch (mode) {
