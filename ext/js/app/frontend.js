@@ -20,6 +20,7 @@ import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {log} from '../core/log.js';
 import {promiseAnimationFrame} from '../core/promise-animation-frame.js';
+import {setProfile} from '../data/profiles-util.js';
 import {addFullscreenChangeEventListener, getFullscreenElement} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceGenerator} from '../dom/text-source-generator.js';
@@ -121,8 +122,8 @@ export class Frontend {
             ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
             ['scanTextAtSelection', this._onActionScanTextAtSelection.bind(this)],
             ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)],
-            ['profilePrevious',   async () => { await this._setProfile(-1); }],
-            ['profileNext',       async () => { await this._setProfile(1); }]
+            ['profilePrevious',   async () => { await setProfile(-1, this._application); }],
+            ['profileNext',       async () => { await setProfile(1, this._application); }]
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -974,25 +975,5 @@ export class Frontend {
         const {GoogleDocsUtil} = await import('../accessibility/google-docs-util.js');
         const googleDocsUtil = new GoogleDocsUtil();
         this._textSourceGenerator.registerGetRangeFromPointHandler(googleDocsUtil.getRangeFromPoint.bind(googleDocsUtil));
-    }
-
-    /**
-     * @param {number} direction
-     */
-    async _setProfile(direction) {
-        const optionsFull = await this._application.api.optionsGetFull();
-
-        const profileCount = optionsFull.profiles.length;
-        const newProfile = (optionsFull.profileCurrent + direction + profileCount) % profileCount;
-
-        /** @type {import('settings-modifications').ScopedModificationSet} */
-        const modification = {
-            action: 'set',
-            path: 'profileCurrent',
-            value: newProfile,
-            scope: 'global',
-            optionsContext: null
-        };
-        await this._application.api.modifySettings([modification], 'search');
     }
 }

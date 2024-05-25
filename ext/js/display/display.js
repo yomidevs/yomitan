@@ -26,6 +26,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
+import {setProfile} from '../data/profiles-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ScrollElement} from '../dom/scroll-element.js';
@@ -196,8 +197,8 @@ export class Display extends EventDispatcher {
             ['firstEntry',        () => { this._focusEntry(0, 0, true); }],
             ['historyBackward',   () => { this._sourceTermView(); }],
             ['historyForward',    () => { this._nextTermView(); }],
-            ['profilePrevious',   async () => { await this._setProfile(-1); }],
-            ['profileNext',       async () => { await this._setProfile(1); }],
+            ['profilePrevious',   async () => { await setProfile(-1, this._application); }],
+            ['profileNext',       async () => { await setProfile(1, this._application); }],
             ['copyHostSelection', () => this._copyHostSelection()],
             ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
@@ -1997,26 +1998,6 @@ export class Display extends EventDispatcher {
         if (!Number.isFinite(count)) { count = 1; }
         count = Math.max(0, Math.floor(count));
         this._focusEntry(this._index + count * sign, 0, true);
-    }
-
-    /**
-     * @param {number} direction
-     */
-    async _setProfile(direction) {
-        const optionsFull = await this.application.api.optionsGetFull();
-
-        const profileCount = optionsFull.profiles.length;
-        const newProfile = (optionsFull.profileCurrent + direction + profileCount) % profileCount;
-
-        /** @type {import('settings-modifications').ScopedModificationSet} */
-        const modification = {
-            action: 'set',
-            path: 'profileCurrent',
-            value: newProfile,
-            scope: 'global',
-            optionsContext: null
-        };
-        await this.application.api.modifySettings([modification], 'search');
     }
 
     /** */
