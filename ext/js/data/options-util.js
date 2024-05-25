@@ -1306,7 +1306,7 @@ export class OptionsUtil {
     }
 
     /**
-     *  - Added dynamic handlebars for first dictionary entry only.
+     *  - Added support for web hotkey scope to profilePrevious and profileNext
      *  @type {import('options-util').UpdateFunction}
      */
     async _updateVersion38(options) {
