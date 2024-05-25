@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 const HIRAGANA_SMALL_TSU_CODE_POINT = 0x3063;
 const KATAKANA_SMALL_TSU_CODE_POINT = 0x30c3;
 const KATAKANA_SMALL_KA_CODE_POINT = 0x30f5;
@@ -523,16 +524,39 @@ export function convertHiraganaToKatakana(text) {
  * @param {string} text
  * @returns {string}
  */
-export function convertNumericToFullWidth(text) {
+export function convertAlphanumericToFullWidth(text) {
     let result = '';
     for (const char of text) {
         let c = /** @type {number} */ (char.codePointAt(0));
         if (c >= 0x30 && c <= 0x39) { // ['0', '9']
             c += 0xff10 - 0x30; // 0xff10 = '0' full width
-            result += String.fromCodePoint(c);
-        } else {
-            result += char;
+        } else if (c >= 0x41 && c <= 0x5a) { // ['A', 'Z']
+            c += 0xff21 - 0x41; // 0xff21 = 'A' full width
+        } else if (c >= 0x61 && c <= 0x7a) { // ['a', 'z']
+            c += 0xff41 - 0x61; // 0xff41 = 'a' full width
         }
+        result += String.fromCodePoint(c);
+    }
+    return result;
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+export function convertFullWidthAlphanumericToNormal(text) {
+    let result = '';
+    const length = text.length;
+    for (let i = 0; i < length; i++) {
+        let c = /** @type {number} */ (text[i].codePointAt(0));
+        if (c >= 0xff10 && c <= 0xff19) { // ['０', '９']
+            c -= 0xff10 - 0x30; // 0x30 = '0'
+        } else if (c >= 0xff21 && c <= 0xff3a) { // ['Ａ', 'Ｚ']
+            c -= 0xff21 - 0x41; // 0x41 = 'A'
+        } else if (c >= 0xff41 && c <= 0xff5a) { // ['ａ', 'ｚ']
+            c -= 0xff41 - 0x61; // 0x61 = 'a'
+        }
+        result += String.fromCodePoint(c);
     }
     return result;
 }

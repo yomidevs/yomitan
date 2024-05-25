@@ -88,6 +88,9 @@ export class TextScanner extends EventDispatcher {
         /** @type {?import('text-scanner').SelectionRestoreInfo} */
         this._selectionRestoreInfo = null;
 
+        /** @type {MouseEvent | null} */
+        this._lastMouseMove = null;
+
         /** @type {boolean} */
         this._deepContentScan = false;
         /** @type {boolean} */
@@ -546,11 +549,48 @@ export class TextScanner extends EventDispatcher {
      */
     _onMouseMove(e) {
         this._scanTimerClear();
+        this._lastMouseMove = e;
 
         const inputInfo = this._getMatchingInputGroupFromEvent('mouse', 'mouseMove', e);
         if (inputInfo === null) { return; }
 
         void this._searchAtFromMouseMove(e.clientX, e.clientY, inputInfo);
+    }
+
+    /**
+     * @param {KeyboardEvent} e
+     */
+    _onKeyDown(e) {
+        const modifiers = getActiveModifiers(e);
+        if (this._lastMouseMove !== null && (modifiers.length > 0)) {
+            if (this._inputtingText()) { return; }
+            const syntheticMouseEvent = new MouseEvent(this._lastMouseMove.type, {
+                screenX: this._lastMouseMove.screenX,
+                screenY: this._lastMouseMove.screenY,
+                clientX: this._lastMouseMove.clientX,
+                clientY: this._lastMouseMove.clientY,
+                ctrlKey: modifiers.includes('ctrl'),
+                shiftKey: modifiers.includes('shift'),
+                altKey: modifiers.includes('alt'),
+                metaKey: modifiers.includes('meta'),
+                button: this._lastMouseMove.button,
+                buttons: this._lastMouseMove.buttons,
+                relatedTarget: this._lastMouseMove.relatedTarget
+            });
+            this._onMouseMove(syntheticMouseEvent);
+        }
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    _inputtingText() {
+        const activeElement = document.activeElement;
+        if (activeElement && activeElement instanceof HTMLElement) {
+            if (activeElement.nodeName === 'INPUT' || activeElement.nodeName === 'TEXTAREA') { return true; }
+            if (activeElement.isContentEditable) { return true; }
+        }
+        return false;
     }
 
     /**
@@ -1050,7 +1090,7 @@ export class TextScanner extends EventDispatcher {
         } else if (this._arePointerEventsSupported()) {
             eventListenerInfos = this._getPointerEventListeners(capture);
         } else {
-            eventListenerInfos = this._getMouseEventListeners(capture);
+            eventListenerInfos = [...this._getMouseEventListeners(capture), ...this._getKeyboardEventListeners(capture)];
             if (this._touchInputEnabled) {
                 eventListenerInfos.push(...this._getTouchEventListeners(capture));
             }
@@ -1096,6 +1136,16 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'mouseover', this._onMouseOver.bind(this), capture],
             [this._node, 'mouseout', this._onMouseOut.bind(this), capture],
             [this._node, 'click', this._onClick.bind(this), capture]
+        ];
+    }
+
+    /**
+     * @param {boolean} capture
+     * @returns {import('event-listener-collection').AddEventListenerArgs[]}
+     */
+    _getKeyboardEventListeners(capture) {
+        return [
+            [this._node, 'keydown', this._onKeyDown.bind(this), capture]
         ];
     }
 

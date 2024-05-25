@@ -990,7 +990,7 @@
                                     },
                                     "duplicateBehavior": {
                                         "type": "string",
-                                        "enum": ["prevent", "new"],
+                                        "enum": ["prevent", "overwrite", "new"],
                                         "default": "prevent"
                                     },
                                     "fieldTemplates": {

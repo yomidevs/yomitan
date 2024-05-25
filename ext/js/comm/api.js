@@ -96,6 +96,14 @@ export class API {
     }
 
     /**
+     * @param {import('api').ApiParam<'updateAnkiNote', 'noteWithId'>} noteWithId
+     * @returns {Promise<import('api').ApiReturn<'updateAnkiNote'>>}
+     */
+    updateAnkiNote(noteWithId) {
+        return this._invoke('updateAnkiNote', {noteWithId});
+    }
+
+    /**
      * @param {import('api').ApiParam<'getAnkiNoteInfo', 'notes'>} notes
      * @param {import('api').ApiParam<'getAnkiNoteInfo', 'fetchAdditionalInfo'>} fetchAdditionalInfo
      * @returns {Promise<import('api').ApiReturn<'getAnkiNoteInfo'>>}

@@ -66,11 +66,11 @@ export class SearchDisplayController {
         /** @type {boolean} */
         this._clipboardMonitorEnabled = false;
         /** @type {import('clipboard-monitor').ClipboardReaderLike} */
-        const clipboardReader = {
+        this.clipboardReaderLike = {
             getText: this._display.application.api.clipboardGet.bind(this._display.application.api)
         };
         /** @type {ClipboardMonitor} */
-        this._clipboardMonitor = new ClipboardMonitor(clipboardReader);
+        this._clipboardMonitor = new ClipboardMonitor(this.clipboardReaderLike);
         /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
             ['searchDisplayControllerGetMode', this._onMessageGetMode.bind(this)],
@@ -154,16 +154,15 @@ export class SearchDisplayController {
      * @param {KeyboardEvent} e
      */
     _onKeyDown(e) {
-        const {activeElement} = document;
-        if (
-            activeElement !== this._queryInput &&
-            !this._isElementInput(activeElement) &&
-            (!e.ctrlKey || e.key === 'Backspace') &&
-            !e.metaKey &&
-            !e.altKey &&
-            (e.key.length === 1 || e.key === 'Backspace') &&
-            e.key !== ' '
-        ) {
+        const activeElement = document.activeElement;
+
+        const isInputField = this._isElementInput(activeElement);
+        const isAllowedKey = e.key.length === 1 || e.key === 'Backspace';
+        const isModifierKey = e.ctrlKey || e.metaKey || e.altKey;
+        const isSpaceKey = e.key === ' ';
+        const isCtrlBackspace = e.ctrlKey && e.key === 'Backspace';
+
+        if (!isInputField && (!isModifierKey || isCtrlBackspace) && isAllowedKey && !isSpaceKey) {
             this._queryInput.focus({preventScroll: true});
         }
     }
@@ -184,6 +183,7 @@ export class SearchDisplayController {
         this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
         this._updateClipboardMonitorEnabled();
         this._updateWanakanaCheckbox(options);
+        this._queryInput.lang = options.general.language;
         await this._updateProfileSelect();
     }
 
@@ -269,10 +269,9 @@ export class SearchDisplayController {
     }
 
     /** */
-    _onCopy() {
+    async _onCopy() {
         // Ignore copy from search page
-        const selection = window.getSelection();
-        this._clipboardMonitor.setPreviousText(selection !== null ? selection.toString().trim() : '');
+        this._clipboardMonitor.setPreviousText(document.hasFocus() ? await this.clipboardReaderLike.getText(false) : '');
     }
 
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */

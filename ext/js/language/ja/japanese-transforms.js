@@ -917,7 +917,14 @@ export const japaneseTransforms = {
         {
             name: '-ge',
             rules: [
-                suffixInflection('しげ', 'しい', [], ['adj-i'])
+                suffixInflection('げ', 'い', [], ['adj-i']),
+                suffixInflection('気', 'い', [], ['adj-i'])
+            ]
+        },
+        {
+            name: '-garu',
+            rules: [
+                suffixInflection('がる', 'い', ['v5'], ['adj-i'])
             ]
         },
         {

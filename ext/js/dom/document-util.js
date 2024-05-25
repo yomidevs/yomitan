@@ -147,6 +147,17 @@ export function getActiveModifiers(event) {
     if (event.ctrlKey) { modifiers.push('ctrl'); }
     if (event.metaKey) { modifiers.push('meta'); }
     if (event.shiftKey) { modifiers.push('shift'); }
+
+    // For KeyboardEvent, when modifiers are pressed on Firefox without any other keys, the keydown event does not always contain the last pressed modifier as event.{modifier}
+    // This occurs when the focus is in a textarea element, an input element, or when the raw keycode is not a modifier but the virtual keycode is (this often occurs due to OS level keyboard remapping)
+    // Chrome and Firefox (outside of textareas, inputs, and virtual keycodes) do report the modifier in both the event.{modifier} and the event.code
+    // We must check if the modifier has already been added to not duplicate it
+    if (event instanceof KeyboardEvent) {
+        if ((event.code === 'AltLeft' || event.code === 'AltRight' || event.key === 'Alt') && !modifiers.includes('alt')) { modifiers.push('alt'); }
+        if ((event.code === 'ControlLeft' || event.code === 'ControlRight' || event.key === 'Control') && !modifiers.includes('ctrl')) { modifiers.push('ctrl'); }
+        if ((event.code === 'MetaLeft' || event.code === 'MetaRight' || event.key === 'Meta') && !modifiers.includes('meta')) { modifiers.push('meta'); }
+        if ((event.code === 'ShiftLeft' || event.code === 'ShiftRight' || event.key === 'Shift') && !modifiers.includes('shift')) { modifiers.push('shift'); }
+    }
     return modifiers;
 }
 

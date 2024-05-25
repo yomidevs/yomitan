@@ -122,6 +122,8 @@ export class QueryParser extends EventDispatcher {
         if (selectedParserChanged && this._parseResults.length > 0) {
             this._renderParseResult();
         }
+
+        this._queryParser.lang = language;
     }
 
     /**

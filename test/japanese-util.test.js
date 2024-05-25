@@ -178,17 +178,17 @@ describe('Japanese utility functions', () => {
         });
     });
 
-    describe('convertNumericToFullWidth', () => {
+    describe('convertAlphanumericToFullWidth', () => {
         /** @type {[string: string, expected: string][]} */
         const data = [
             ['0123456789', '０１２３４５６７８９'],
-            ['abcdefghij', 'abcdefghij'],
+            ['abcdefghij', 'ａｂｃｄｅｆｇｈｉｊ'],
             ['カタカナ', 'カタカナ'],
             ['ひらがな', 'ひらがな']
         ];
 
         test.each(data)('%s -> %o', (string, expected) => {
-            expect(jp.convertNumericToFullWidth(string)).toStrictEqual(expected);
+            expect(jp.convertAlphanumericToFullWidth(string)).toStrictEqual(expected);
         });
     });
 

@@ -19,9 +19,18 @@ import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {germanTransforms} from './de/german-transforms.js';
 import {englishTransforms} from './en/english-transforms.js';
-import {collapseEmphaticSequences, convertAlphabeticCharacters, convertHalfWidthCharacters, convertHiraganaToKatakana, convertNumericCharacters} from './ja/japanese-text-preprocessors.js';
+import {spanishTransforms} from './es/spanish-transforms.js';
+import {
+    alphabeticToHiragana,
+    alphanumericWidthVariants,
+    collapseEmphaticSequences,
+    convertHalfWidthCharacters,
+    convertHiraganaToKatakana
+} from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
+import {disassembleHangul, reassembleHangul} from './ko/korean-text-processors.js';
+import {koreanTransforms} from './ko/korean-transforms.js';
 import {latinTransforms} from './la/latin-transforms.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {oldIrishTransforms} from './sga/old-irish-transforms.js';
@@ -70,7 +79,8 @@ const languageDescriptors = [
         iso: 'es',
         name: 'Spanish',
         exampleText: 'acabar de',
-        textPreprocessors: capitalizationPreprocessors
+        textPreprocessors: capitalizationPreprocessors,
+        languageTransforms: spanishTransforms
     },
     {
         iso: 'fa',
@@ -130,14 +140,19 @@ const languageDescriptors = [
         languageTransforms: latinTransforms
     },
     {
+        iso: 'lo',
+        name: 'Lao',
+        exampleText: 'ອ່ານ'
+    },
+    {
         iso: 'ja',
         name: 'Japanese',
         exampleText: '読め',
         isTextLookupWorthy: isStringPartiallyJapanese,
         textPreprocessors: {
             convertHalfWidthCharacters,
-            convertNumericCharacters,
-            convertAlphabeticCharacters,
+            alphabeticToHiragana,
+            alphanumericWidthVariants,
             convertHiraganaToKatakana,
             collapseEmphaticSequences
         },
@@ -147,6 +162,18 @@ const languageDescriptors = [
         iso: 'km',
         name: 'Khmer',
         exampleText: 'អាន'
+    },
+    {
+        iso: 'ko',
+        name: 'Korean',
+        exampleText: '읽어',
+        textPreprocessors: {
+            disassembleHangul
+        },
+        textPostprocessors: {
+            reassembleHangul
+        },
+        languageTransforms: koreanTransforms
     },
     {
         iso: 'nl',
@@ -227,6 +254,11 @@ const languageDescriptors = [
         name: 'Vietnamese',
         exampleText: 'đọc',
         textPreprocessors: capitalizationPreprocessors
+    },
+    {
+        iso: 'yue',
+        name: 'Cantonese',
+        exampleText: '讀'
     },
     {
         iso: 'zh',

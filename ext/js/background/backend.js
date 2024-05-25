@@ -28,7 +28,7 @@ import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
 import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
-import {invalidNoteId, isNoteDataValid} from '../data/anki-util.js';
+import {INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
@@ -153,6 +153,7 @@ export class Backend {
             ['getAnkiConnectVersion',        this._onApiGetAnkiConnectVersion.bind(this)],
             ['isAnkiConnected',              this._onApiIsAnkiConnected.bind(this)],
             ['addAnkiNote',                  this._onApiAddAnkiNote.bind(this)],
+            ['updateAnkiNote',               this._onApiUpdateAnkiNote.bind(this)],
             ['getAnkiNoteInfo',              this._onApiGetAnkiNoteInfo.bind(this)],
             ['injectAnkiNoteMedia',          this._onApiInjectAnkiNoteMedia.bind(this)],
             ['viewNotes',                    this._onApiViewNotes.bind(this)],
@@ -539,6 +540,11 @@ export class Backend {
         return await this._anki.addNote(note);
     }
 
+    /** @type {import('api').ApiHandler<'updateAnkiNote'>} */
+    async _onApiUpdateAnkiNote({noteWithId}) {
+        return await this._anki.updateNoteFields(noteWithId);
+    }
+
     /**
      * @param {import('anki').Note[]} notes
      * @returns {Promise<import('backend').CanAddResults>}
@@ -600,7 +606,7 @@ export class Backend {
             const valid = isNoteDataValid(note);
 
             if (isDuplicate && duplicateNoteIds[originalIndices.indexOf(i)].length === 0) {
-                duplicateNoteIds[originalIndices.indexOf(i)] = [invalidNoteId];
+                duplicateNoteIds[originalIndices.indexOf(i)] = [INVALID_NOTE_ID];
             }
 
             const noteIds = isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null;

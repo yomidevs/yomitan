@@ -418,6 +418,7 @@ export class Display extends EventDispatcher {
         this._setTheme(options);
         this._hotkeyHelpController.setOptions(options);
         this._displayGenerator.updateHotkeys();
+        this._displayGenerator.updateLanguage(options.general.language);
         this._hotkeyHelpController.setupNode(document.documentElement);
         this._elementOverflowController.setOptions(options);
 

@@ -543,7 +543,9 @@ export class OptionsUtil {
             this._updateVersion33,
             this._updateVersion34,
             this._updateVersion35,
-            this._updateVersion36
+            this._updateVersion36,
+            this._updateVersion37,
+            this._updateVersion38
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1287,11 +1289,27 @@ export class OptionsUtil {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v35.handlebars');
     }
 
-    /**
-     *  - Added dynamic handlebars for first dictionary entry only.
+     /**
+     *  - Added handlebars for onyomi reading in hiragana.
      *  @type {import('options-util').UpdateFunction}
      */
     async _updateVersion36(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v36.handlebars');
+    }
+
+    /**
+     *  - Removed `No pitch accent data` return from pitch handlebars when no data is found
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion37(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v37.handlebars');
+    }
+
+     /**
+     *  - Added dynamic handlebars for first dictionary entry only.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion38(options) {
         for (const profile of options.profiles) {
             for (const hotkey of profile.options.inputs.hotkeys) {
                 if (hotkey.action === 'profilePrevious' || hotkey.action === 'profileNext') {
@@ -1300,7 +1318,6 @@ export class OptionsUtil {
             }
         }
     }
-
 
     /**
      * @param {string} url
