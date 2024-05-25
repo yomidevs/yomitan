@@ -52,3 +52,21 @@ export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsI
         conditionsOut
     };
 }
+
+/**
+ * @param {string} inflectedWord
+ * @param {string} deinflectedWord
+ * @param {string[]} conditionsIn
+ * @param {string[]} conditionsOut
+ * @returns {import('language-transformer').Rule}
+ */
+export function wholeWordInflection(inflectedWord, deinflectedWord, conditionsIn, conditionsOut) {
+    const regex = new RegExp('^' + inflectedWord + '$');
+    return {
+        type: 'wholeWord',
+        isInflected: regex,
+        deinflect: () => deinflectedWord,
+        conditionsIn,
+        conditionsOut
+    };
+}
