@@ -1289,7 +1289,7 @@ export class OptionsUtil {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v35.handlebars');
     }
 
-     /**
+    /**
      *  - Added handlebars for onyomi reading in hiragana.
      *  @type {import('options-util').UpdateFunction}
      */
@@ -1305,7 +1305,7 @@ export class OptionsUtil {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v37.handlebars');
     }
 
-     /**
+    /**
      *  - Added dynamic handlebars for first dictionary entry only.
      *  @type {import('options-util').UpdateFunction}
      */
