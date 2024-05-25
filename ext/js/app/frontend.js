@@ -349,6 +349,7 @@ export class Frontend {
      */
     _onClosePopups() {
         this._clearSelection(true);
+        this._clearMousePosition();
     }
 
     /**
@@ -436,6 +437,11 @@ export class Frontend {
             this._isPointerOverPopup = false;
         }
         this._textScanner.clearSelection();
+    }
+
+    /** */
+    _clearMousePosition() {
+        this._textScanner.clearMousePosition();
     }
 
     /**
