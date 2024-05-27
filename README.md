@@ -32,12 +32,21 @@ Yomitan provides powerful features not available in other browser-based dictiona
 
 ## Helpful information
 
-- [Migrating from Yomichan (legacy)](./docs/yomichan-migration.md#migrating-from-yomichan)
-- [Frequently asked questions](./docs/faq.md#frequently-asked-questions)
-- [Recommended and custom dictionary import guide](./docs/dictionaries.md#dictionaries)
-- [Anki integration and flashcard creation guide](./docs/anki-integration.md#anki-integration)
-- [Keyboard shortcuts](./docs/keyboard-shortcuts.md)
-- [Advanced options, including MeCab](./docs/advanced-options.md#advanced-options)
+- ✨ [Migrating from Yomichan (legacy)](./docs/yomichan-migration.md)
+- Installation and Setup
+  - 📚 [Recommended Dictionaries](./docs/dictionaries.md#recommended-dictionaries)
+  - 🗂️ [Importing and exporting dictionaries](./docs/dictionaries.md#importing-a-dictionary-collection)
+- Anki Integration
+  - 📇 [Anki integration and flashcard creation guide](./docs/anki-integration.md)
+  - 🔧 [Anki handlebar templates](./docs/templates.md)
+- Advanced Features
+  - ⌨️ [Keyboard shortcuts](./docs/keyboard-shortcuts.md)
+  - 🔍 [Advanced options, including MeCab](./docs/advanced-options.md)
+  - 🔊 [Adding custom audio sources](./docs/audio.md)
+- Troubleshooting
+  - 🕷️ [Known browser bugs](./docs/browser-bugs.md)
+  - ❓ [Frequently asked questions](./docs/faq.md)
+- 🔒 [Browser Permissions](./docs/permissions.md)
 
 ## Installation
 
