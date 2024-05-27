@@ -364,6 +364,11 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /** */
+    clearMousePosition() {
+        this._lastMouseMove = null;
+    }
+
     /**
      * @returns {?import('text-source').TextSource}
      */
