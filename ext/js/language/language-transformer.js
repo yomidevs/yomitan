@@ -156,7 +156,7 @@ export class LanguageTransformer {
             const fullRule = this._transforms.find((transform) => transform.name === rule);
             if (typeof fullRule === 'undefined') { return {name: rule}; }
             const {name, description} = fullRule;
-            return {name, description};
+            return description ? {name, description} : {name};
         });
     }
 

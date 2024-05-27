@@ -544,7 +544,8 @@ export class OptionsUtil {
             this._updateVersion34,
             this._updateVersion35,
             this._updateVersion36,
-            this._updateVersion37
+            this._updateVersion37,
+            this._updateVersion38
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1302,6 +1303,14 @@ export class OptionsUtil {
      */
     async _updateVersion37(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v37.handlebars');
+    }
+
+    /**
+     *  - Updated `conjugation` handlebars for new inflection chain format.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion38(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v38.handlebars');
     }
 
     /**
