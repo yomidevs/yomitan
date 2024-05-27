@@ -51,7 +51,7 @@ export class LanguageTransformer {
         /** @type {import('language-transformer-internal').Transform[]} */
         const transforms2 = [];
         for (let i = 0, ii = transforms.length; i < ii; ++i) {
-            const {name, rules} = transforms[i];
+            const {name, description, rules} = transforms[i];
             /** @type {import('language-transformer-internal').Rule[]} */
             const rules2 = [];
             for (let j = 0, jj = rules.length; j < jj; ++j) {
@@ -70,7 +70,7 @@ export class LanguageTransformer {
             }
             const isInflectedTests = rules.map((rule) => rule.isInflected);
             const heuristic = new RegExp(isInflectedTests.map((regExp) => regExp.source).join('|'));
-            transforms2.push({name, rules: rules2, heuristic});
+            transforms2.push({name, description, rules: rules2, heuristic});
         }
 
         this._nextFlagIndex = nextFlagIndex;
