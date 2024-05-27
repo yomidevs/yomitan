@@ -148,6 +148,19 @@ export class LanguageTransformer {
     }
 
     /**
+     * @param {string[]} inflectionRules
+     * @returns {import('dictionary').InflectionRuleChain}
+     */
+    addInflectionRulesDescriptions(inflectionRules) {
+        return inflectionRules.map((rule) => {
+            const fullRule = this._transforms.find((transform) => transform.name === rule);
+            if (typeof fullRule === 'undefined') { return {name: rule}; }
+            const {name, description} = fullRule;
+            return {name, description};
+        });
+    }
+
+    /**
      * @param {string} text
      * @param {number} conditions
      * @param {import('language-transformer-internal').Trace} trace
