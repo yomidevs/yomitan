@@ -314,6 +314,9 @@ export class Backend {
      * @param {import('clipboard-monitor').EventArgument<'change'>} details
      */
     async _onClipboardTextChange({text}) {
+        // Only update if tab does not exist
+        if (await this._tabExists('/search.html')) { return; }
+
         const {
             general: {language},
             clipboard: {maximumSearchLength}
@@ -1197,6 +1200,16 @@ export class Backend {
             }
         };
         return /** @type {?import('backend').TabInfo} */ (await this._findTabs(1000, false, predicate, true));
+    }
+
+    /**
+     * @param {string} urlParam
+     * @returns {Promise<boolean>}
+     */
+    async _tabExists(urlParam) {
+        const baseUrl = chrome.runtime.getURL(urlParam);
+        const urlPredicate = (/** @type {?string} */ url) => url !== null && url.startsWith(baseUrl);
+        return await this._findSearchPopupTab(urlPredicate) !== null;
     }
 
     /**
