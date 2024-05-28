@@ -970,10 +970,10 @@ export class Backend {
     // Command handlers
 
     /**
-     * @param {undefined|{mode: 'existingOrNewTab'|'newTab'|'popup', query?: string}} params
+     * @param {undefined|{mode: import('backend').Mode, query?: string}} params
      */
     async _onCommandOpenSearchPage(params) {
-        /** @type {'existingOrNewTab'|'newTab'|'popup'} */
+        /** @type {import('backend').Mode} */
         let mode = 'existingOrNewTab';
         let query = '';
         if (typeof params === 'object' && params !== null) {
@@ -1042,10 +1042,10 @@ export class Backend {
     }
 
     /**
-     * @param {undefined|{mode: 'existingOrNewTab'|'newTab'|'popup'}} params
+     * @param {undefined|{mode: import('backend').Mode}} params
      */
     async _onCommandOpenSettingsPage(params) {
-        /** @type {'existingOrNewTab'|'newTab'|'popup'} */
+        /** @type {import('backend').Mode} */
         let mode = 'existingOrNewTab';
         if (typeof params === 'object' && params !== null) {
             mode = this._normalizeOpenSettingsPageMode(params.mode, mode);
@@ -2552,7 +2552,7 @@ export class Backend {
     }
 
     /**
-     * @param {'existingOrNewTab'|'newTab'|'popup'} mode
+     * @param {import('backend').Mode} mode
      */
     async _openSettingsPage(mode) {
         const manifest = chrome.runtime.getManifest();
@@ -2681,8 +2681,8 @@ export class Backend {
 
     /**
      * @param {unknown} mode
-     * @param {'existingOrNewTab'|'newTab'|'popup'} defaultValue
-     * @returns {'existingOrNewTab'|'newTab'|'popup'}
+     * @param {import('backend').Mode} defaultValue
+     * @returns {import('backend').Mode}
      */
     _normalizeOpenSettingsPageMode(mode, defaultValue) {
         switch (mode) {
