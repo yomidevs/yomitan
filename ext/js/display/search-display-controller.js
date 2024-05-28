@@ -66,11 +66,11 @@ export class SearchDisplayController {
         /** @type {boolean} */
         this._clipboardMonitorEnabled = false;
         /** @type {import('clipboard-monitor').ClipboardReaderLike} */
-        this.clipboardReaderLike = {
+        this._clipboardReaderLike = {
             getText: this._display.application.api.clipboardGet.bind(this._display.application.api)
         };
         /** @type {ClipboardMonitor} */
-        this._clipboardMonitor = new ClipboardMonitor(this.clipboardReaderLike);
+        this._clipboardMonitor = new ClipboardMonitor(this._clipboardReaderLike);
         /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
             ['searchDisplayControllerGetMode', this._onMessageGetMode.bind(this)],
@@ -271,7 +271,7 @@ export class SearchDisplayController {
     /** */
     async _onCopy() {
         // Ignore copy from search page
-        this._clipboardMonitor.setPreviousText(document.hasFocus() ? await this.clipboardReaderLike.getText(false) : '');
+        this._clipboardMonitor.setPreviousText(document.hasFocus() ? await this._clipboardReaderLike.getText(false) : '');
     }
 
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
