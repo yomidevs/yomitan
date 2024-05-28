@@ -3,8 +3,8 @@
         "{2d13e145-294e-4ead-9bce-b4644b203a00}": {
             "updates": [
                 {
-                    "version": "24.5.21.0",
-                    "update_link": "https://github.com/themoeway/yomitan/releases/download/24.5.21.0/yomitan-firefox-dev.xpi"
+                    "version": "24.5.28.0",
+                    "update_link": "https://github.com/themoeway/yomitan/releases/download/24.5.28.0/yomitan-firefox-dev.xpi"
                 }
             ]
         }
