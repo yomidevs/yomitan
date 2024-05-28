@@ -615,8 +615,7 @@ export class DictionaryImporter {
      */
     _convertTermBankEntryV1(entry, dictionary) {
         let [expression, reading, definitionTags, rules, score, ...glossary] = entry;
-        expression = this._normalizeTermOrReading(expression);
-        reading = this._normalizeTermOrReading(reading.length > 0 ? reading : expression);
+        reading = reading.length > 0 ? reading : expression;
         return {expression, reading, definitionTags, rules, score, glossary, dictionary};
     }
 
@@ -627,8 +626,7 @@ export class DictionaryImporter {
      */
     _convertTermBankEntryV3(entry, dictionary) {
         let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
-        expression = this._normalizeTermOrReading(expression);
-        reading = this._normalizeTermOrReading(reading.length > 0 ? reading : expression);
+        reading = reading.length > 0 ? reading : expression;
         return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, dictionary};
     }
 
@@ -781,20 +779,6 @@ export class DictionaryImporter {
             counts[key] = value;
         }
         return counts;
-    }
-
-    /**
-     * @param {string} text
-     * @returns {string}
-     */
-    _normalizeTermOrReading(text) {
-        // Note: this function should not perform String.normalize on the text,
-        // as it will normalize characters in an undesirable way.
-        // Thus, this function is currently a no-op.
-        // Example:
-        // - '\u9038'.normalize('NFC') => '\u9038' (逸)
-        // - '\ufa67'.normalize('NFC') => '\u9038' (逸 => 逸)
-        return text;
     }
 
     /**
