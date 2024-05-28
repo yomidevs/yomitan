@@ -498,7 +498,6 @@ export class SearchDisplayController {
      */
     _canEnableClipboardMonitor() {
         switch (this._searchPersistentStateController.mode) {
-            case 'popup':
             case 'action-popup':
                 return false;
             default:
