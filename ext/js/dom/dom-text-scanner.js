@@ -418,6 +418,7 @@ export class DOMTextScanner {
         switch (element.nodeName.toUpperCase()) {
             case 'HEAD':
             case 'RT':
+            case 'RB':
             case 'SCRIPT':
             case 'STYLE':
                 return {enterable: false, newlines: 0};
