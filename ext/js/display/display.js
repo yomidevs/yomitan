@@ -162,6 +162,8 @@ export class Display extends EventDispatcher {
         this._contentTextScanner = null;
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._tagNotification = null;
+        /** @type {?import('./display-notification.js').DisplayNotification} */
+        this._inflectionNotification = null;
         /** @type {HTMLElement} */
         this._footerNotificationContainer = querySelectorNotNull(document, '#content-footer');
         /** @type {OptionToggleHotkeyHandler} */
@@ -180,6 +182,8 @@ export class Display extends EventDispatcher {
         this._onDebugLogClickBind = this._onDebugLogClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
         this._onTagClickBind = this._onTagClick.bind(this);
+        /** @type {(event: MouseEvent) => void} */
+        this._onInflectionClickBind = this._onInflectionClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
         this._onMenuButtonClickBind = this._onMenuButtonClick.bind(this);
         /** @type {(event: import('popup-menu').MenuCloseEvent) => void} */
@@ -1026,6 +1030,14 @@ export class Display extends EventDispatcher {
     /**
      * @param {MouseEvent} e
      */
+    _onInflectionClick(e) {
+        const node = /** @type {HTMLElement} */ (e.currentTarget);
+        this._showInflectionNotification(node);
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
     _onMenuButtonClick(e) {
         const node = /** @type {HTMLElement} */ (e.currentTarget);
 
@@ -1083,6 +1095,21 @@ export class Display extends EventDispatcher {
         const content = this._displayGenerator.createTagFooterNotificationDetails(parent, dictionaryEntry);
         this._tagNotification.setContent(content);
         this._tagNotification.open();
+    }
+
+    /**
+     * @param {HTMLSpanElement} inflectionNode
+     */
+    _showInflectionNotification(inflectionNode) {
+        const description = inflectionNode.title;
+        if (!description || !(inflectionNode instanceof HTMLSpanElement)) { return; }
+
+        if (this._inflectionNotification === null) {
+            this._inflectionNotification = this.createNotification(true);
+        }
+
+        this._inflectionNotification.setContent(description);
+        this._inflectionNotification.open();
     }
 
     /**
@@ -1796,6 +1823,9 @@ export class Display extends EventDispatcher {
         eventListeners.addEventListener(entry, 'click', this._onEntryClickBind);
         for (const node of entry.querySelectorAll('.headword-kanji-link')) {
             eventListeners.addEventListener(node, 'click', this._onKanjiLookupBind);
+        }
+        for (const node of entry.querySelectorAll('.inflection[data-reason]')) {
+            eventListeners.addEventListener(node, 'click', this._onInflectionClickBind);
         }
         for (const node of entry.querySelectorAll('.tag-label')) {
             eventListeners.addEventListener(node, 'click', this._onTagClickBind);
