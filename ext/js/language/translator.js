@@ -210,7 +210,7 @@ export class Translator {
      * @param {string} text
      * @param {import('translation').FindTermsOptions} options
      * @param {TranslatorTagAggregator} tagAggregator
-     * @returns {Promise<{dictionaryEntries: import('translation-internal').TermDictionaryEntryInternal[], originalTextLength: number}>}
+     * @returns {Promise<{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}>}
      */
     async _findTermsInternal(text, options, tagAggregator) {
         const {removeNonJapaneseCharacters, enabledDictionaryMap} = options;
@@ -230,11 +230,11 @@ export class Translator {
      * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
      * @param {import('translation').TermEnabledDictionaryMap} enabledDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
-     * @returns {{dictionaryEntries: import('translation-internal').TermDictionaryEntryInternal[], originalTextLength: number}}
+     * @returns {{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}}
      */
     _getDictionaryEntries(deinflections, enabledDictionaryMap, tagAggregator) {
         let originalTextLength = 0;
-        /** @type {import('translation-internal').TermDictionaryEntryInternal[]} */
+        /** @type {import('translation-internal').TermDictionaryEntry[]} */
         const dictionaryEntries = [];
         const ids = new Set();
         for (const {databaseEntries, originalText, transformedText, deinflectedText, inflectionRuleChainCandidates} of deinflections) {
@@ -263,8 +263,8 @@ export class Translator {
     }
 
     /**
-     * @param {import('translation-internal').TermDictionaryEntryInternal} existingEntry
-     * @param {import('translation-internal').InflectionRuleChainCandidateInternal[]} inflectionRuleChainCandidates
+     * @param {import('translation-internal').TermDictionaryEntry} existingEntry
+     * @param {import('translation-internal').InflectionRuleChainCandidate[]} inflectionRuleChainCandidates
      */
     _mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates) {
         const existingChains = existingEntry.inflectionRuleChainCandidates;
@@ -467,7 +467,7 @@ export class Translator {
                     const {trace, conditions} = deinflection;
                     const postprocessedTextVariants = this._getTextVariants(deinflection.text, textPostprocessors, [null], sourceCache);
                     for (const transformedText of postprocessedTextVariants) {
-                        /** @type {import('translation-internal').InflectionRuleChainCandidateInternal} */
+                        /** @type {import('translation-internal').InflectionRuleChainCandidate} */
                         const inflectionRuleChainCandidate = {
                             source: 'algorithm',
                             inflectionRules: trace.map((frame) => frame.transform)
@@ -589,7 +589,7 @@ export class Translator {
      * @param {string} transformedText
      * @param {string} deinflectedText
      * @param {number} conditions
-     * @param {import('translation-internal').InflectionRuleChainCandidateInternal[]} inflectionRuleChainCandidates
+     * @param {import('translation-internal').InflectionRuleChainCandidate[]} inflectionRuleChainCandidates
      * @returns {import('translation-internal').DatabaseDeinflection}
      */
     _createDeinflection(originalText, transformedText, deinflectedText, conditions, inflectionRuleChainCandidates) {
@@ -599,10 +599,10 @@ export class Translator {
     // Term dictionary entry grouping
 
     /**
-     * @param {import('translation-internal').TermDictionaryEntryInternal[]} dictionaryEntries
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
      * @param {import('translation').FindTermsOptions} options
      * @param {TranslatorTagAggregator} tagAggregator
-     * @returns {Promise<import('translation-internal').TermDictionaryEntryInternal[]>}
+     * @returns {Promise<import('translation-internal').TermDictionaryEntry[]>}
      */
     async _getRelatedDictionaryEntries(dictionaryEntries, options, tagAggregator) {
         const {mainDictionary, enabledDictionaryMap} = options;
@@ -612,7 +612,7 @@ export class Translator {
         const groupedDictionaryEntries = [];
         /** @type {Map<number, import('translation-internal').DictionaryEntryGroup>} */
         const groupedDictionaryEntriesMap = new Map();
-        /** @type {Map<number, import('translation-internal').TermDictionaryEntryInternal>} */
+        /** @type {Map<number, import('translation-internal').TermDictionaryEntry>} */
         const ungroupedDictionaryEntriesMap = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
             const {definitions: [{id, dictionary, sequences: [sequence]}]} = dictionaryEntry;
@@ -655,7 +655,7 @@ export class Translator {
 
     /**
      * @param {import('translation-internal').DictionaryEntryGroup[]} groupedDictionaryEntries
-     * @param {Map<number, import('translation-internal').TermDictionaryEntryInternal>} ungroupedDictionaryEntriesMap
+     * @param {Map<number, import('translation-internal').TermDictionaryEntry>} ungroupedDictionaryEntriesMap
      * @param {import('translator').SequenceQuery[]} sequenceList
      * @param {import('translation').TermEnabledDictionaryMap} enabledDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
@@ -677,7 +677,7 @@ export class Translator {
 
     /**
      * @param {import('translation-internal').DictionaryEntryGroup[]} groupedDictionaryEntries
-     * @param {Map<number, import('translation-internal').TermDictionaryEntryInternal>} ungroupedDictionaryEntriesMap
+     * @param {Map<number, import('translation-internal').TermDictionaryEntry>} ungroupedDictionaryEntriesMap
      * @param {import('translation').TermEnabledDictionaryMap} enabledDictionaryMap
      * @param {import('translation').TermEnabledDictionaryMap} secondarySearchDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
@@ -745,12 +745,12 @@ export class Translator {
     }
 
     /**
-     * @param {Iterable<import('translation-internal').TermDictionaryEntryInternal>} dictionaryEntries
+     * @param {Iterable<import('translation-internal').TermDictionaryEntry>} dictionaryEntries
      * @param {TranslatorTagAggregator} tagAggregator
-     * @returns {import('translation-internal').TermDictionaryEntryInternal[]}
+     * @returns {import('translation-internal').TermDictionaryEntry[]}
      */
     _groupDictionaryEntriesByHeadword(dictionaryEntries, tagAggregator) {
-        /** @type {Map<string, import('translation-internal').TermDictionaryEntryInternal[]>} */
+        /** @type {Map<string, import('translation-internal').TermDictionaryEntry[]>} */
         const groups = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
             const {inflectionRuleChainCandidates, headwords: [{term, reading}]} = dictionaryEntry;
@@ -773,7 +773,7 @@ export class Translator {
     // Removing data
 
     /**
-     * @param {import('translation-internal').TermDictionaryEntryInternal[]} dictionaryEntries
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
      * @param {Set<string>} excludeDictionaryDefinitions
      */
     _removeExcludedDefinitions(dictionaryEntries, excludeDictionaryDefinitions) {
@@ -797,7 +797,7 @@ export class Translator {
     }
 
     /**
-     * @param {import('translation-internal').TermDictionaryEntryInternal} dictionaryEntry
+     * @param {import('translation-internal').TermDictionaryEntry} dictionaryEntry
      */
     _removeUnusedHeadwords(dictionaryEntry) {
         const {definitions, pronunciations, frequencies, headwords} = dictionaryEntry;
@@ -1083,7 +1083,7 @@ export class Translator {
     // Metadata
 
     /**
-     * @param {import('translation-internal').TermDictionaryEntryInternal[]} dictionaryEntries
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
      * @param {import('translation').TermEnabledDictionaryMap} enabledDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
      */
@@ -1555,7 +1555,7 @@ export class Translator {
 
     /**
      * @param {boolean} isPrimary
-     * @param {import('translation-internal').InflectionRuleChainCandidateInternal[]} inflectionRuleChainCandidates
+     * @param {import('translation-internal').InflectionRuleChainCandidate[]} inflectionRuleChainCandidates
      * @param {number} score
      * @param {number} dictionaryIndex
      * @param {number} dictionaryPriority
@@ -1563,7 +1563,7 @@ export class Translator {
      * @param {number} maxOriginalTextLength
      * @param {import('dictionary').TermHeadword[]} headwords
      * @param {import('dictionary').TermDefinition[]} definitions
-     * @returns {import('translation-internal').TermDictionaryEntryInternal}
+     * @returns {import('translation-internal').TermDictionaryEntry}
      */
     _createTermDictionaryEntry(isPrimary, inflectionRuleChainCandidates, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxOriginalTextLength, headwords, definitions) {
         return {
@@ -1588,11 +1588,11 @@ export class Translator {
      * @param {string} originalText
      * @param {string} transformedText
      * @param {string} deinflectedText
-     * @param {import('translation-internal').InflectionRuleChainCandidateInternal[]} inflectionRuleChainCandidates
+     * @param {import('translation-internal').InflectionRuleChainCandidate[]} inflectionRuleChainCandidates
      * @param {boolean} isPrimary
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
-     * @returns {import('translation-internal').TermDictionaryEntryInternal}
+     * @returns {import('translation-internal').TermDictionaryEntry}
      */
     _createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionRuleChainCandidates, isPrimary, enabledDictionaryMap, tagAggregator) {
         const {
@@ -1640,10 +1640,10 @@ export class Translator {
     }
 
     /**
-     * @param {import('translation-internal').TermDictionaryEntryInternal[]} dictionaryEntries
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
      * @param {boolean} checkDuplicateDefinitions
      * @param {TranslatorTagAggregator} tagAggregator
-     * @returns {import('translation-internal').TermDictionaryEntryInternal}
+     * @returns {import('translation-internal').TermDictionaryEntry}
      */
     _createGroupedDictionaryEntry(dictionaryEntries, checkDuplicateDefinitions, tagAggregator) {
         // Headwords are generated before sorting, so that the order of dictionaryEntries can be maintained
@@ -1876,13 +1876,13 @@ export class Translator {
     }
 
     /**
-     * @param {import('translation-internal').TermDictionaryEntryInternal[]} dictionaryEntries
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
      */
     _sortTermDictionaryEntries(dictionaryEntries) {
         const stringComparer = this._stringComparer;
         /**
-         * @param {import('translation-internal').TermDictionaryEntryInternal} v1
-         * @param {import('translation-internal').TermDictionaryEntryInternal} v2
+         * @param {import('translation-internal').TermDictionaryEntry} v1
+         * @param {import('translation-internal').TermDictionaryEntry} v2
          * @returns {number}
          */
         const compareFunction = (v1, v2) => {
@@ -1980,7 +1980,7 @@ export class Translator {
     }
 
     /**
-     * @param {import('translation-internal').TermDictionaryEntryInternal[]} dictionaryEntries
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
      */
     _sortTermDictionaryEntriesById(dictionaryEntries) {
         if (dictionaryEntries.length <= 1) { return; }
@@ -2045,7 +2045,7 @@ export class Translator {
     }
 
     /**
-     * @param {import('translation-internal').TermDictionaryEntryInternal[]} dictionaryEntries
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
      * @param {string} dictionary
      * @param {boolean} ascending
      */
@@ -2090,7 +2090,7 @@ export class Translator {
     }
 
     /**
-     * @param {import('translation-internal').InflectionRuleChainCandidateInternal[]} inflectionRuleChainCandidates
+     * @param {import('translation-internal').InflectionRuleChainCandidate[]} inflectionRuleChainCandidates
      * @returns {number}
      */
     _getShortestInflectionChainLength(inflectionRuleChainCandidates) {
@@ -2105,7 +2105,7 @@ export class Translator {
 
     /**
      * @param {string} language
-     * @param {import('translation-internal').TermDictionaryEntryInternal[]} dictionaryEntries
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
      * @returns {import('dictionary').TermDictionaryEntry[]}
      */
     _addInflectionRuleDescriptions(language, dictionaryEntries) {
