@@ -23,7 +23,7 @@ import {
     convertFullWidthAlphanumericToNormal,
     convertHalfWidthKanaToFullWidth,
     convertHiraganaToKatakana as convertHiraganaToKatakanaFunction,
-    convertKatakanaToHiragana as convertKatakanaToHiraganaFunction
+    convertKatakanaToHiragana as convertKatakanaToHiraganaFunction,
 } from './japanese.js';
 
 /** @type {import('language').TextProcessor<boolean>} */
@@ -31,7 +31,7 @@ export const convertHalfWidthCharacters = {
     name: 'Convert half width characters to full width',
     description: 'ﾖﾐﾁｬﾝ → ヨミチャン',
     options: basicTextProcessorOptions,
-    process: (str, setting) => (setting ? convertHalfWidthKanaToFullWidth(str) : str)
+    process: (str, setting) => (setting ? convertHalfWidthKanaToFullWidth(str) : str),
 };
 
 
@@ -40,7 +40,7 @@ export const alphabeticToHiragana = {
     name: 'Convert alphabetic characters to hiragana',
     description: 'yomichan → よみちゃん',
     options: basicTextProcessorOptions,
-    process: (str, setting) => (setting ? convertAlphabeticToKana(str) : str)
+    process: (str, setting) => (setting ? convertAlphabeticToKana(str) : str),
 };
 
 /** @type {import('language').BidirectionalConversionPreprocessor} */
@@ -57,7 +57,7 @@ export const alphanumericWidthVariants = {
             case 'inverse':
                 return convertAlphanumericToFullWidth(str);
         }
-    }
+    },
 };
 
 /** @type {import('language').BidirectionalConversionPreprocessor} */
@@ -74,7 +74,7 @@ export const convertHiraganaToKatakana = {
             case 'inverse':
                 return convertKatakanaToHiraganaFunction(str);
         }
-    }
+    },
 };
 
 /** @type {import('language').TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>} */
@@ -88,5 +88,5 @@ export const collapseEmphaticSequences = {
             str = collapseEmphaticSequencesFunction(str, collapseEmphaticFull);
         }
         return str;
-    }
+    },
 };

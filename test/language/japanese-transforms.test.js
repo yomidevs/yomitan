@@ -41,8 +41,8 @@ const tests = [
             {term: '愛しい', source: '愛しき',                 rule: 'adj-i', reasons: ['-ki']},
             {term: '愛しい', source: '愛しげ',                 rule: 'adj-i', reasons: ['-ge']},
             {term: '愛しい', source: '愛し気',                 rule: 'adj-i', reasons: ['-ge']},
-            {term: '愛しい', source: '愛しがる',                 rule: 'adj-i', reasons: ['-garu']}
-        ]
+            {term: '愛しい', source: '愛しがる',                 rule: 'adj-i', reasons: ['-garu']},
+        ],
     },
     {
         category: 'ichidan verbs',
@@ -96,8 +96,8 @@ const tests = [
             {term: '食べる', source: '食べておる',       rule: 'v1', reasons: ['-te', 'progressive or perfect']},
             {term: '食べる', source: '食べてる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
             {term: '食べる', source: '食べとる',         rule: 'v1', reasons: ['-te', 'progressive or perfect']},
-            {term: '食べる', source: '食べてしまう',     rule: 'v1', reasons: ['-te', '-shimau']}
-        ]
+            {term: '食べる', source: '食べてしまう',     rule: 'v1', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: '-u verbs',
@@ -151,8 +151,8 @@ const tests = [
             {term: '買う', source: '買っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '買う', source: '買ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '買う', source: '買っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-            {term: '買う', source: '買ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
-        ]
+            {term: '買う', source: '買ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: '-ku verbs',
@@ -206,8 +206,8 @@ const tests = [
             {term: '行く', source: '行っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '行く', source: '行ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '行く', source: '行っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-            {term: '行く', source: '行ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
-        ]
+            {term: '行く', source: '行ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: '-gu verbs',
@@ -260,8 +260,8 @@ const tests = [
             {term: '泳ぐ', source: '泳いでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '泳ぐ', source: '泳いでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '泳ぐ', source: '泳いでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-            {term: '泳ぐ', source: '泳いでしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
-        ]
+            {term: '泳ぐ', source: '泳いでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: '-su verbs',
@@ -315,8 +315,8 @@ const tests = [
             {term: '話す', source: '話しておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '話す', source: '話してる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '話す', source: '話しとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-            {term: '話す', source: '話してしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
-        ]
+            {term: '話す', source: '話してしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: '-tsu verbs',
@@ -370,8 +370,8 @@ const tests = [
             {term: '待つ', source: '待っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '待つ', source: '待ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '待つ', source: '待っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-            {term: '待つ', source: '待ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
-        ]
+            {term: '待つ', source: '待ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: '-nu verbs',
@@ -424,8 +424,8 @@ const tests = [
             {term: '死ぬ', source: '死んでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '死ぬ', source: '死んでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '死ぬ', source: '死んでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-            {term: '死ぬ', source: '死んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
-        ]
+            {term: '死ぬ', source: '死んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: '-bu verbs',
@@ -478,8 +478,8 @@ const tests = [
             {term: '遊ぶ', source: '遊んでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '遊ぶ', source: '遊んでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '遊ぶ', source: '遊んでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-            {term: '遊ぶ', source: '遊んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
-        ]
+            {term: '遊ぶ', source: '遊んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: '-mu verbs',
@@ -532,8 +532,8 @@ const tests = [
             {term: '飲む', source: '飲んでいる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '飲む', source: '飲んでおる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '飲む', source: '飲んでる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-            {term: '飲む', source: '飲んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
-        ]
+            {term: '飲む', source: '飲んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: 'godan verbs',
@@ -587,8 +587,8 @@ const tests = [
             {term: '作る', source: '作っておる',       rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '作る', source: '作ってる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '作る', source: '作っとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
-            {term: '作る', source: '作ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']}
-        ]
+            {term: '作る', source: '作ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: 'irregular verbs',
@@ -853,8 +853,8 @@ const tests = [
             {term: 'くる', source: 'きておる',       rule: 'vk', reasons: ['-te', 'progressive or perfect']},
             {term: 'くる', source: 'きてる',         rule: 'vk', reasons: ['-te', 'progressive or perfect']},
             {term: 'くる', source: 'きとる',         rule: 'vk', reasons: ['-te', 'progressive or perfect']},
-            {term: 'くる', source: 'きてしまう',     rule: 'vk', reasons: ['-te', '-shimau']}
-        ]
+            {term: 'くる', source: 'きてしまう',     rule: 'vk', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: '-zuru verbs',
@@ -915,8 +915,8 @@ const tests = [
             {term: '論ずる', source: '論じておる',       rule: 'vz', reasons: ['-te', 'progressive or perfect']},
             {term: '論ずる', source: '論じてる',         rule: 'vz', reasons: ['-te', 'progressive or perfect']},
             {term: '論ずる', source: '論じとる',         rule: 'vz', reasons: ['-te', 'progressive or perfect']},
-            {term: '論ずる', source: '論じてしまう',     rule: 'vz', reasons: ['-te', '-shimau']}
-        ]
+            {term: '論ずる', source: '論じてしまう',     rule: 'vz', reasons: ['-te', '-shimau']},
+        ],
     },
     {
         category: '-e verbs',
@@ -967,8 +967,8 @@ const tests = [
             {term: 'うまい',     source: 'うめぇ',     rule: 'adj-i', reasons: ['-e']},
             {term: 'でかい',     source: 'でけぇ',     rule: 'adj-i', reasons: ['-e']},
             {term: 'まずい',     source: 'まっぜぇ',   rule: 'adj-i', reasons: ['-e']},
-            {term: 'あかい',     source: 'あけぇ',     rule: 'adj-i', reasons: ['-e']}
-        ]
+            {term: 'あかい',     source: 'あけぇ',     rule: 'adj-i', reasons: ['-e']},
+        ],
     },
     {
         category: 'irregular verbs',
@@ -1008,8 +1008,8 @@ const tests = [
             {term: 'くる', source: 'くられない',     rule: 'vk', reasons: null},
             {term: 'くる', source: 'くられない',     rule: 'vk', reasons: null},
             {term: 'くる', source: 'くさせない',     rule: 'vk', reasons: null},
-            {term: 'くる', source: 'くさせられない', rule: 'vk', reasons: null}
-        ]
+            {term: 'くる', source: 'くさせられない', rule: 'vk', reasons: null},
+        ],
     },
     {
         category: 'uncommon irregular verbs',
@@ -1074,8 +1074,8 @@ const tests = [
             {term: '沿う', source: '沿うたり', rule: 'v5', reasons: ['-tari']},
             {term: '添う', source: '添うたり', rule: 'v5', reasons: ['-tari']},
             {term: '副う', source: '副うたり', rule: 'v5', reasons: ['-tari']},
-            {term: '厭う', source: '厭うたり', rule: 'v5', reasons: ['-tari']}
-        ]
+            {term: '厭う', source: '厭うたり', rule: 'v5', reasons: ['-tari']},
+        ],
     },
     {
         category: 'combinations',
@@ -1084,8 +1084,8 @@ const tests = [
             {term: '抱き抱える', source: '抱き抱えていなければ', rule: 'v1', reasons: ['-te', 'progressive or perfect', 'negative', '-ba']},
             {term: '抱きかかえる', source: '抱きかかえていなければ', rule: 'v1', reasons: ['-te', 'progressive or perfect', 'negative', '-ba']},
             {term: '打ち込む', source: '打ち込んでいませんでした', rule: 'v5', reasons: ['-te', 'progressive or perfect', 'polite', 'negative', 'past']},
-            {term: '食べる', source: '食べさせられたくなかった', rule: 'v1', reasons: ['causative', 'potential or passive', '-tai', 'negative', 'past']}
-        ]
+            {term: '食べる', source: '食べさせられたくなかった', rule: 'v1', reasons: ['causative', 'potential or passive', '-tai', 'negative', 'past']},
+        ],
     },
     {
         category: 'kawaii',
@@ -1093,15 +1093,15 @@ const tests = [
         tests: [
             {term: 'かわいい', source: 'かわいげ',   rule: 'adj-i', reasons: ['-ge']},
             {term: '可愛い',   source: '可愛げ',   rule: 'adj-i', reasons: ['-ge']},
-            {term: '可愛い',   source: '可愛気',   rule: 'adj-i', reasons: ['-ge']}
-        ]
+            {term: '可愛い',   source: '可愛気',   rule: 'adj-i', reasons: ['-ge']},
+        ],
     },
     {
         category: 'incorrect -te rule chain',
         valid: false,
         tests: [
-            {term: '食べる', source: '食べて', rule: null, reasons: ['-te', 'progressive or perfect', 'masu stem']}
-        ]
+            {term: '食べる', source: '食べて', rule: null, reasons: ['-te', 'progressive or perfect', 'masu stem']},
+        ],
     },
     // Kansai-ben
     {
@@ -1111,8 +1111,8 @@ const tests = [
             {term: '宜しい', source: '宜しゅう', rule: null, reasons: ['adv', 'kansai-ben']},
             {term: 'よろしい', source: 'よろしゅう', rule: null, reasons: ['adv', 'kansai-ben']},
             {term: '良い', source: '良う', rule: null, reasons: ['adv', 'kansai-ben']},
-            {term: 'よい', source: 'よう', rule: null, reasons: ['adv', 'kansai-ben']}
-        ]
+            {term: 'よい', source: 'よう', rule: null, reasons: ['adv', 'kansai-ben']},
+        ],
     },
     {
         category: '-te form of kansai-ben adjectives',
@@ -1121,8 +1121,8 @@ const tests = [
             {term: 'よろしい', source: 'よろしゅうて', rule: null, reasons: ['-te', 'kansai-ben']},
             {term: '宜しい', source: '宜しゅうて', rule: null, reasons: ['-te', 'kansai-ben']},
             {term: 'よい', source: 'ようて', rule: null, reasons: ['-te', 'kansai-ben']},
-            {term: '良い', source: '良うて', rule: null, reasons: ['-te', 'kansai-ben']}
-        ]
+            {term: '良い', source: '良うて', rule: null, reasons: ['-te', 'kansai-ben']},
+        ],
     },
     {
         category: 'Negative form of kansai-ben adjectives',
@@ -1131,16 +1131,16 @@ const tests = [
             {term: 'よろしい', source: 'よろしゅうない', rule: null, reasons: ['negative', 'kansai-ben']},
             {term: '宜しい', source: '宜しゅうない', rule: null, reasons: ['negative', 'kansai-ben']},
             {term: 'よい', source: 'ようない', rule: null, reasons: ['negative', 'kansai-ben']},
-            {term: '良い', source: '良うない', rule: null, reasons: ['negative', 'kansai-ben']}
-        ]
+            {term: '良い', source: '良うない', rule: null, reasons: ['negative', 'kansai-ben']},
+        ],
     },
     {
         category: 'Negative form of kansai-ben verbs',
         valid: true,
         tests: [
             {term: '食べる', source: '食べへん', rule: null, reasons: ['negative', 'kansai-ben']},
-            {term: '食べる', source: '食べへんかった', rule: null, reasons: ['negative', 'past', 'kansai-ben']}
-        ]
+            {term: '食べる', source: '食べへんかった', rule: null, reasons: ['negative', 'past', 'kansai-ben']},
+        ],
     },
     {
         category: '-te form of kansai-ben verbs',
@@ -1148,8 +1148,8 @@ const tests = [
         tests: [
             {term: '買う', source: '買うて', rule: null, reasons: ['-te', 'kansai-ben']},
             {term: 'かう', source: 'こうて', rule: null, reasons: ['-te', 'kansai-ben']},
-            {term: 'はう', source: 'ほうて', rule: null, reasons: ['-te', 'kansai-ben']}
-        ]
+            {term: 'はう', source: 'ほうて', rule: null, reasons: ['-te', 'kansai-ben']},
+        ],
     },
     {
         category: 'past form of kansai-ben terms',
@@ -1157,8 +1157,8 @@ const tests = [
         tests: [
             {term: '買う', source: '買うた', rule: null, reasons: ['past', 'kansai-ben']},
             {term: 'かう', source: 'こうた', rule: null, reasons: ['past', 'kansai-ben']},
-            {term: 'はう', source: 'ほうた', rule: null, reasons: ['past', 'kansai-ben']}
-        ]
+            {term: 'はう', source: 'ほうた', rule: null, reasons: ['past', 'kansai-ben']},
+        ],
     },
     {
         category: '-tara form of kansai-ben terms',
@@ -1166,9 +1166,9 @@ const tests = [
         tests: [
             {term: '買う', source: '買うたら', rule: null, reasons: ['-tara', 'kansai-ben']},
             {term: 'かう', source: 'こうたら', rule: null, reasons: ['-tara', 'kansai-ben']},
-            {term: 'はう', source: 'ほうたら', rule: null, reasons: ['-tara', 'kansai-ben']}
-        ]
-    }
+            {term: 'はう', source: 'ほうたら', rule: null, reasons: ['-tara', 'kansai-ben']},
+        ],
+    },
 ];
 /* eslint-enable @stylistic/no-multi-spaces */
 

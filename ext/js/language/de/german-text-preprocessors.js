@@ -30,5 +30,5 @@ export const eszettPreprocessor = {
             case 'inverse':
                 return str.replace(/SS/g, 'ẞ').replace(/ss/g, 'ß');
         }
-    }
+    },
 };

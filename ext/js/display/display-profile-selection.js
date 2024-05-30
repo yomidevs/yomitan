@@ -132,7 +132,7 @@ export class DisplayProfileSelection {
             path: 'profileCurrent',
             value: index,
             scope: 'global',
-            optionsContext: null
+            optionsContext: null,
         };
         await this._display.application.api.modifySettings([modification], this._source);
         this._setProfilePanelVisible(false);

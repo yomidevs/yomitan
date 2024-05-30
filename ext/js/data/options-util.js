@@ -82,7 +82,7 @@ export class OptionsUtil {
             profiles.push({
                 name: 'Default',
                 options: defaultProfileOptions,
-                conditionGroups: []
+                conditionGroups: [],
             });
         }
 
@@ -257,12 +257,12 @@ export class OptionsUtil {
                 const replacements = [
                     [
                         '{{#*inline "audio"}}{{/inline}}',
-                        '{{#*inline "audio"}}\n    {{~#if definition.audioFileName~}}\n        [sound:{{definition.audioFileName}}]\n    {{~/if~}}\n{{/inline}}'
+                        '{{#*inline "audio"}}\n    {{~#if definition.audioFileName~}}\n        [sound:{{definition.audioFileName}}]\n    {{~/if~}}\n{{/inline}}',
                     ],
                     [
                         '{{#*inline "tags"}}\n    {{~#each definition.definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each~}}\n{{/inline}}',
-                        '{{#*inline "tags"}}\n    {{~#mergeTags definition group merge}}{{this}}{{/mergeTags~}}\n{{/inline}}'
-                    ]
+                        '{{#*inline "tags"}}\n    {{~#mergeTags definition group merge}}{{this}}{{/mergeTags~}}\n{{/inline}}',
+                    ],
                 ];
 
                 for (const [pattern, replacement] of replacements) {
@@ -278,7 +278,7 @@ export class OptionsUtil {
                 }
 
                 options.anki.fieldTemplates = fieldTemplates;
-            }
+            },
         ];
     }
 
@@ -321,7 +321,7 @@ export class OptionsUtil {
                 showPitchAccentGraph: false,
                 showIframePopupsInRootFrame: false,
                 useSecurePopupFrameUrl: true,
-                usePopupShadowDom: true
+                usePopupShadowDom: true,
             },
 
             audio: {
@@ -330,7 +330,7 @@ export class OptionsUtil {
                 volume: 100,
                 autoPlay: false,
                 customSourceUrl: '',
-                textToSpeechVoice: ''
+                textToSpeechVoice: '',
             },
 
             scanning: {
@@ -348,7 +348,7 @@ export class OptionsUtil {
                 enableOnPopupExpressions: false,
                 enableOnSearchPage: true,
                 enableSearchTags: false,
-                layoutAwareScan: false
+                layoutAwareScan: false,
             },
 
             translation: {
@@ -357,7 +357,7 @@ export class OptionsUtil {
                 convertAlphabeticCharacters: 'false',
                 convertHiraganaToKatakana: 'false',
                 convertKatakanaToHiragana: 'variant',
-                collapseEmphaticSequences: 'false'
+                collapseEmphaticSequences: 'false',
             },
 
             dictionaries: {},
@@ -367,7 +367,7 @@ export class OptionsUtil {
                 enableMecabParser: false,
                 selectedParser: null,
                 termSpacing: true,
-                readingMode: 'hiragana'
+                readingMode: 'hiragana',
             },
 
             anki: {
@@ -379,8 +379,8 @@ export class OptionsUtil {
                 terms: {deck: '', model: '', fields: {}},
                 kanji: {deck: '', model: '', fields: {}},
                 duplicateScope: 'collection',
-                fieldTemplates: null
-            }
+                fieldTemplates: null,
+            },
         };
     }
 
@@ -544,7 +544,7 @@ export class OptionsUtil {
             this._updateVersion34,
             this._updateVersion35,
             this._updateVersion36,
-            this._updateVersion37
+            this._updateVersion37,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -560,8 +560,8 @@ export class OptionsUtil {
     _updateVersion1(options) {
         options.global = {
             database: {
-                prefixWildcardsSupported: false
-            }
+                prefixWildcardsSupported: false,
+            },
         };
     }
 
@@ -618,7 +618,7 @@ export class OptionsUtil {
             scanOnPenHover: true,
             scanOnPenPress: true,
             scanOnPenRelease: false,
-            preventTouchScrolling: true
+            preventTouchScrolling: true,
         });
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.general.usePopupWindow = false;
@@ -628,7 +628,7 @@ export class OptionsUtil {
                 onWebPages: false,
                 onPopupPages: false,
                 onSearchPages: false,
-                onSearchQuery: false
+                onSearchQuery: false,
             };
 
             const {modifier, middleMouse} = profileOptions.scanning;
@@ -651,21 +651,21 @@ export class OptionsUtil {
                 include: modifierInput,
                 exclude: 'mouse0',
                 types: {mouse: true, touch: false, pen: false},
-                options: createInputDefaultOptions()
+                options: createInputDefaultOptions(),
             });
             if (middleMouse) {
                 scanningInputs.push({
                     include: 'mouse2',
                     exclude: '',
                     types: {mouse: true, touch: false, pen: false},
-                    options: createInputDefaultOptions()
+                    options: createInputDefaultOptions(),
                 });
             }
             scanningInputs.push({
                 include: '',
                 exclude: '',
                 types: {mouse: false, touch: true, pen: true},
-                options: createInputDefaultOptions()
+                options: createInputDefaultOptions(),
             });
             profileOptions.scanning.inputs = scanningInputs;
         }
@@ -775,7 +775,7 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {
                 searchOriginal: true,
-                groups: []
+                groups: [],
             };
             profile.options.sentenceParsing = {
                 scanExtent: profile.options.anki.sentenceExt,
@@ -792,8 +792,8 @@ export class OptionsUtil {
                     {enabled: true, character1: '。', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
                     {enabled: true, character1: '！', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
                     {enabled: true, character1: '？', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                    {enabled: true, character1: '…', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true}
-                ]
+                    {enabled: true, character1: '…', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+                ],
             };
             delete profile.options.anki.sentenceExt;
             profile.options.general.popupActionBarLocation = 'top';
@@ -815,8 +815,8 @@ export class OptionsUtil {
                     {action: 'addNoteTermKana',   key: 'KeyR',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                     {action: 'playAudio',         key: 'KeyP',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                     {action: 'viewNote',          key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true}
-                ]
+                    {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true},
+                ],
             };
             /* eslint-enable @stylistic/no-multi-spaces */
             profile.options.anki.suspendNewCards = false;
@@ -828,14 +828,14 @@ export class OptionsUtil {
                 useLeft: false,
                 useTop: false,
                 windowType: 'popup',
-                windowState: 'normal'
+                windowState: 'normal',
             };
             profile.options.audio.customSourceType = 'audio';
             profile.options.clipboard = {
                 enableBackgroundMonitor: profile.options.general.enableClipboardPopups,
                 enableSearchPageMonitor: false,
                 autoSearchContent: true,
-                maximumSearchLength: profile.options.general.maximumClipboardSearchLength
+                maximumSearchLength: profile.options.general.maximumClipboardSearchLength,
             };
             delete profile.options.general.enableClipboardPopups;
             delete profile.options.general.enableClipboardMonitor;
@@ -974,7 +974,7 @@ export class OptionsUtil {
     _updateVersion14(options) {
         for (const profile of options.profiles) {
             profile.options.accessibility = {
-                forceGoogleDocsHtmlRendering: false
+                forceGoogleDocsHtmlRendering: false,
             };
         }
     }
@@ -1022,7 +1022,7 @@ export class OptionsUtil {
                     character1: character,
                     character2: null,
                     includeCharacterAtStart: false,
-                    includeCharacterAtEnd: true
+                    includeCharacterAtEnd: true,
                 });
             }
         }
@@ -1190,7 +1190,7 @@ export class OptionsUtil {
             'convertAlphabeticCharacters',
             'convertHiraganaToKatakana',
             'convertKatakanaToHiragana',
-            'collapseEmphaticSequences'
+            'collapseEmphaticSequences',
         ];
 
         for (const {options: profileOptions} of options.profiles) {
@@ -1259,7 +1259,7 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             profile.options.inputs.hotkeys.push(
                 {action: 'profilePrevious', key: 'Minus', modifiers: ['alt'], scopes: ['popup', 'search'], enabled: true},
-                {action: 'profileNext', key: 'Equal', modifiers: ['alt'], scopes: ['popup', 'search'], enabled: true}
+                {action: 'profileNext', key: 'Equal', modifiers: ['alt'], scopes: ['popup', 'search'], enabled: true},
             );
         }
     }

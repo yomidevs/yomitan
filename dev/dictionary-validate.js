@@ -99,7 +99,7 @@ export async function validateDictionary(mode, archiveData, schemas) {
         [/^term_meta_bank_(\d+)\.json$/, schemas.termMetaBankV3],
         [/^kanji_bank_(\d+)\.json$/, version === 1 ? schemas.kanjiBankV1 : schemas.kanjiBankV3],
         [/^kanji_meta_bank_(\d+)\.json$/, schemas.kanjiMetaBankV3],
-        [/^tag_bank_(\d+)\.json$/, schemas.tagBankV3]
+        [/^tag_bank_(\d+)\.json$/, schemas.tagBankV3],
     ];
 
     await validateDictionaryBanks(mode, entries, schemasDetails);
@@ -118,7 +118,7 @@ export function getSchemas() {
         tagBankV3: readSchema('../ext/data/schemas/dictionary-tag-bank-v3-schema.json'),
         termBankV1: readSchema('../ext/data/schemas/dictionary-term-bank-v1-schema.json'),
         termBankV3: readSchema('../ext/data/schemas/dictionary-term-bank-v3-schema.json'),
-        termMetaBankV3: readSchema('../ext/data/schemas/dictionary-term-meta-bank-v3-schema.json')
+        termMetaBankV3: readSchema('../ext/data/schemas/dictionary-term-meta-bank-v3-schema.json'),
     };
 }
 

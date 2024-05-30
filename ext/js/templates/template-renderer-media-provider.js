@@ -146,7 +146,7 @@ export class TemplateRendererMediaProvider {
         this._addRequirement({
             type: 'dictionaryMedia',
             dictionary,
-            path
+            path,
         });
         return null;
     }
@@ -170,7 +170,7 @@ export class TemplateRendererMediaProvider {
         this._addRequirement({
             type: 'textFurigana',
             text,
-            readingMode
+            readingMode,
         });
         return null;
     }

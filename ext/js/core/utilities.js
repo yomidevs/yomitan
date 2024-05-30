@@ -249,7 +249,7 @@ export function deferPromise() {
     return {
         promise,
         resolve: /** @type {(value: T) => void} */ (resolve),
-        reject: /** @type {(reason?: import('core').RejectionReason) => void} */ (reject)
+        reject: /** @type {(reason?: import('core').RejectionReason) => void} */ (reject),
     };
 }
 

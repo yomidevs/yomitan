@@ -355,8 +355,8 @@ export class JsonSchema {
                     schema: propertySchema,
                     stack: [
                         {schema: properties, path: 'properties'},
-                        {schema: propertySchema, path: property}
-                    ]
+                        {schema: propertySchema, path: property},
+                    ],
                 };
             }
         }
@@ -380,8 +380,8 @@ export class JsonSchema {
                     schema: itemSchema,
                     stack: [
                         {schema: prefixItems, path: 'prefixItems'},
-                        {schema: itemSchema, path: index}
-                    ]
+                        {schema: itemSchema, path: index},
+                    ],
                 };
             }
         }
@@ -395,15 +395,15 @@ export class JsonSchema {
                             schema: itemSchema,
                             stack: [
                                 {schema: items, path: 'items'},
-                                {schema: itemSchema, path: index}
-                            ]
+                                {schema: itemSchema, path: index},
+                            ],
                         };
                     }
                 }
             } else {
                 return {
                     schema: items,
-                    stack: [{schema: items, path: 'items'}]
+                    stack: [{schema: items, path: 'items'}],
                 };
             }
         }
@@ -517,7 +517,7 @@ export class JsonSchema {
                 const {schema: schema2, stack: stack2} = this._getReference(ref);
                 return {
                     schema: schema2,
-                    stack: [...stack, ...stack2]
+                    stack: [...stack, ...stack2],
                 };
             }
         }

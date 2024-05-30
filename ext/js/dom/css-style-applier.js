@@ -63,7 +63,7 @@ export class CssStyleApplier {
             }
             styleData.push({
                 selectors: selectors2,
-                styles: styles2
+                styles: styles2,
             });
         }
     }
@@ -112,7 +112,7 @@ export class CssStyleApplier {
             cache: 'default',
             credentials: 'omit',
             redirect: 'follow',
-            referrerPolicy: 'no-referrer'
+            referrerPolicy: 'no-referrer',
         });
         if (!response.ok) {
             throw new Error(`Failed to fetch ${url}: ${response.status}`);

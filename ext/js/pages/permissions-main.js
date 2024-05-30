@@ -108,7 +108,7 @@ await Application.main(true, async (application) => {
 
     const permissions = await Promise.all([
         isAllowedIncognitoAccess(),
-        isAllowedFileSchemeAccess()
+        isAllowedFileSchemeAccess(),
     ]);
 
     for (let i = 0, ii = permissions.length; i < ii; ++i) {

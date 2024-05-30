@@ -70,14 +70,14 @@ export class SettingsDisplayController {
         const moreSelectorObserver = new SelectorObserver({
             selector: '.more-toggle',
             onAdded: this._onMoreSetup.bind(this),
-            onRemoved: this._onMoreCleanup.bind(this)
+            onRemoved: this._onMoreCleanup.bind(this),
         });
         moreSelectorObserver.observe(document.documentElement, false);
 
         const menuSelectorObserver = new SelectorObserver({
             selector: '[data-menu]',
             onAdded: this._onMenuSetup.bind(this),
-            onRemoved: this._onMenuCleanup.bind(this)
+            onRemoved: this._onMenuCleanup.bind(this),
         });
         menuSelectorObserver.observe(document.documentElement, false);
 

@@ -168,7 +168,7 @@ export class ProfileController {
         await this._settingsController.modifyGlobalSettings([{
             action: 'set',
             path: `profiles[${destinationProfileIndex}].options`,
-            value: options
+            value: options,
         }]);
 
         await this._settingsController.refresh();
@@ -199,7 +199,7 @@ export class ProfileController {
             path: 'profiles',
             start: index,
             deleteCount: 0,
-            items: [newProfile]
+            items: [newProfile],
         }]);
 
         // Update profile index
@@ -224,14 +224,14 @@ export class ProfileController {
             path: 'profiles',
             start: profileIndex,
             deleteCount: 1,
-            items: []
+            items: [],
         }];
         if (profileCurrentNew >= profileIndex) {
             profileCurrentNew = Math.min(profileCurrentNew - 1, this._profiles.length - 1);
             modifications.push({
                 action: 'set',
                 path: 'profileCurrent',
-                value: profileCurrentNew
+                value: profileCurrentNew,
             });
         }
 
@@ -287,13 +287,13 @@ export class ProfileController {
         const modifications = [{
             action: 'swap',
             path1: `profiles[${index1}]`,
-            path2: `profiles[${index2}]`
+            path2: `profiles[${index2}]`,
         }];
         if (profileCurrentNew !== profileCurrent) {
             modifications.push({
                 action: 'set',
                 path: 'profileCurrent',
-                value: profileCurrentNew
+                value: profileCurrentNew,
             });
         }
 
@@ -534,7 +534,7 @@ export class ProfileController {
         return [
             /** @type {HTMLSelectElement} */ (this._profileActiveSelect),
             /** @type {HTMLSelectElement} */ (this._profileTargetSelect),
-            /** @type {HTMLSelectElement} */ (this._profileCopySourceSelect)
+            /** @type {HTMLSelectElement} */ (this._profileCopySourceSelect),
         ];
     }
 
