@@ -855,7 +855,7 @@ button.action-button:active {
 .inflection-source-icon[data-inflection-source='both']::after {
     content: '🧩📖';
 }
-.inflection[title]{
+.inflection[title] {
     cursor: pointer;
 }
 
