@@ -231,7 +231,7 @@ export class DisplayHistory extends EventDispatcher {
             next: null,
             previous,
             state,
-            content
+            content,
         };
         this._historyMap.set(entry.id, entry);
         return entry;

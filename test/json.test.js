@@ -49,7 +49,7 @@ function createAjv() {
     return new Ajv({
         meta: true,
         strictTuples: false,
-        allowUnionTypes: true
+        allowUnionTypes: true,
     });
 }
 
@@ -69,7 +69,7 @@ function createValidatorFunctionFromTypeScript(path, type, jsconfigType) {
         additionalProperties: false,
         minify: false,
         expose: 'none',
-        strictTuples: true
+        strictTuples: true,
     };
     const schema = createGenerator(config).createSchema(config.type);
     const ajv = createAjv();
@@ -105,7 +105,7 @@ describe.concurrent('JSON validation', () => {
         'playwright',
         'test-results',
         'dev/lib',
-        'test/playwright'
+        'test/playwright',
     ]);
 
     const existingJsonFiles = getAllFiles(rootDir, (path, isDirectory) => {

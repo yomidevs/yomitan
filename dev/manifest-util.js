@@ -99,7 +99,7 @@ export class ManifestUtil {
         const {stdout, stderr, status} = childProcess.spawnSync(command, args, {
             cwd: dirname,
             stdio: 'pipe',
-            shell: false
+            shell: false,
         });
         if (status !== 0) {
             const message = stderr.toString('utf8').trim();

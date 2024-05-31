@@ -25,7 +25,7 @@ import {
     mockAnkiRouteHandler,
     root,
     test,
-    writeToClipboardFromPage
+    writeToClipboardFromPage,
 } from './playwright-util.js';
 
 test.beforeEach(async ({context}) => {
@@ -71,7 +71,7 @@ test('anki add', async ({context, page, extensionId}) => {
     await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
         name: 'valid-dictionary1.zip',
         mimeType: 'application/x-zip',
-        buffer: Buffer.from(dictionary)
+        buffer: Buffer.from(dictionary),
     });
     await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 

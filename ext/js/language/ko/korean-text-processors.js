@@ -24,7 +24,7 @@ export const disassembleHangul = {
     options: [true], // Could probably also be set to [false, true], but this way it is always on
     process: (str) => {
         return Hangul.disassemble(str, false).join('');
-    }
+    },
 };
 
 /** @type {import('language').TextProcessor<boolean>} */
@@ -34,5 +34,5 @@ export const reassembleHangul = {
     options: [true], // Could probably also be set to [false, true], but this way it is always on
     process: (str) => {
         return Hangul.assemble(str);
-    }
+    },
 };

@@ -66,7 +66,7 @@ export class LanguageTransformer {
                     isInflected,
                     deinflect,
                     conditionsIn: conditionFlagsIn,
-                    conditionsOut: conditionFlagsOut
+                    conditionsOut: conditionFlagsOut,
                 });
             }
             const isInflectedTests = rules.map((rule) => rule.isInflected);
@@ -140,7 +140,7 @@ export class LanguageTransformer {
                     results.push(LanguageTransformer.createTransformedText(
                         deinflect(text),
                         rule.conditionsOut,
-                        this._extendTrace(trace, {transform: name, ruleIndex: j, text})
+                        this._extendTrace(trace, {transform: name, ruleIndex: j, text}),
                     ));
                 }
             }

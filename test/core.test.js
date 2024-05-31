@@ -32,7 +32,7 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 0,
                     expectedValue: 0,
                     expectedOverrideCount: 0,
-                    expectedEventOccurred: false
+                    expectedEventOccurred: false,
                 },
                 {
                     operation: 'set.defaultValue',
@@ -40,7 +40,7 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 1,
                     expectedValue: 1,
                     expectedOverrideCount: 0,
-                    expectedEventOccurred: true
+                    expectedEventOccurred: true,
                 },
                 {
                     operation: 'set.defaultValue',
@@ -48,7 +48,7 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 1,
                     expectedValue: 1,
                     expectedOverrideCount: 0,
-                    expectedEventOccurred: false
+                    expectedEventOccurred: false,
                 },
                 {
                     operation: 'set.defaultValue',
@@ -56,7 +56,7 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 0,
                     expectedValue: 0,
                     expectedOverrideCount: 0,
-                    expectedEventOccurred: true
+                    expectedEventOccurred: true,
                 },
                 {
                     operation: 'setOverride',
@@ -64,7 +64,7 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 0,
                     expectedValue: 8,
                     expectedOverrideCount: 1,
-                    expectedEventOccurred: true
+                    expectedEventOccurred: true,
                 },
                 {
                     operation: 'setOverride',
@@ -72,7 +72,7 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 0,
                     expectedValue: 8,
                     expectedOverrideCount: 2,
-                    expectedEventOccurred: false
+                    expectedEventOccurred: false,
                 },
                 {
                     operation: 'setOverride',
@@ -80,7 +80,7 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 0,
                     expectedValue: 32,
                     expectedOverrideCount: 3,
-                    expectedEventOccurred: true
+                    expectedEventOccurred: true,
                 },
                 {
                     operation: 'setOverride',
@@ -88,7 +88,7 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 0,
                     expectedValue: 32,
                     expectedOverrideCount: 4,
-                    expectedEventOccurred: false
+                    expectedEventOccurred: false,
                 },
                 {
                     operation: 'clearOverride',
@@ -96,7 +96,7 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 0,
                     expectedValue: 32,
                     expectedOverrideCount: 3,
-                    expectedEventOccurred: false
+                    expectedEventOccurred: false,
                 },
                 {
                     operation: 'clearOverride',
@@ -104,7 +104,7 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 0,
                     expectedValue: 32,
                     expectedOverrideCount: 2,
-                    expectedEventOccurred: false
+                    expectedEventOccurred: false,
                 },
                 {
                     operation: 'clearOverride',
@@ -112,7 +112,7 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 0,
                     expectedValue: 64,
                     expectedOverrideCount: 1,
-                    expectedEventOccurred: true
+                    expectedEventOccurred: true,
                 },
                 {
                     operation: 'clearOverride',
@@ -120,10 +120,10 @@ describe('DynamicProperty', () => {
                     expectedDefaultValue: 0,
                     expectedValue: 0,
                     expectedOverrideCount: 0,
-                    expectedEventOccurred: true
-                }
-            ]
-        }
+                    expectedEventOccurred: true,
+                },
+            ],
+        },
     ];
 
     describe.each(data)('Test DynamicProperty($initialValue)', ({initialValue, operations}) => {
@@ -156,110 +156,110 @@ describe('deepEqual', () => {
         {
             value1: 0,
             value2: 0,
-            expected: true
+            expected: true,
         },
         {
             value1: null,
             value2: null,
-            expected: true
+            expected: true,
         },
         {
             value1: 'test',
             value2: 'test',
-            expected: true
+            expected: true,
         },
         {
             value1: true,
             value2: true,
-            expected: true
+            expected: true,
         },
         {
             value1: 0,
             value2: 1,
-            expected: false
+            expected: false,
         },
         {
             value1: null,
             value2: false,
-            expected: false
+            expected: false,
         },
         {
             value1: 'test1',
             value2: 'test2',
-            expected: false
+            expected: false,
         },
         {
             value1: true,
             value2: false,
-            expected: false
-        }
+            expected: false,
+        },
     ];
     /** @type {import('test/core').DeepEqualTestData} */
     const simpleObjectTestsData = [
         {
             value1: {},
             value2: {},
-            expected: true
+            expected: true,
         },
         {
             value1: {},
             value2: [],
-            expected: false
+            expected: false,
         },
         {
             value1: [],
             value2: [],
-            expected: true
+            expected: true,
         },
         {
             value1: {},
             value2: null,
-            expected: false
-        }
+            expected: false,
+        },
     ];
     /** @type {import('test/core').DeepEqualTestData} */
     const complexObjectTestsData = [
         {
             value1: [1],
             value2: [],
-            expected: false
+            expected: false,
         },
         {
             value1: [1],
             value2: [1],
-            expected: true
+            expected: true,
         },
         {
             value1: [1],
             value2: [2],
-            expected: false
+            expected: false,
         },
 
         {
             value1: {},
             value2: {test: 1},
-            expected: false
+            expected: false,
         },
         {
             value1: {test: 1},
             value2: {test: 1},
-            expected: true
+            expected: true,
         },
         {
             value1: {test: 1},
             value2: {test: {test2: false}},
-            expected: false
+            expected: false,
         },
         {
             value1: {test: {test2: true}},
             value2: {test: {test2: false}},
-            expected: false
+            expected: false,
         },
         {
             value1: {test: {test2: [true]}},
             value2: {test: {test2: [true]}},
-            expected: true
-        }
+            expected: true,
+        },
     ];
     /** @type {import('test/core').DeepEqualTestData} */
     const recursiveTestsData = [
@@ -274,8 +274,8 @@ describe('deepEqual', () => {
                 x.x = x;
                 return x;
             })(),
-            expected: false
-        }
+            expected: false,
+        },
     ];
     describe('simple tests', () => {
         test.each(simpleTestsData)('deepEqual($value1, $value2) -> $expected', ({value1, value2, expected}) => {

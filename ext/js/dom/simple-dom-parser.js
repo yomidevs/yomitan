@@ -33,7 +33,7 @@ export class SimpleDOMParser {
         this._treeAdapter = this._parse5Lib.defaultTreeAdapter;
         /** @type {import('simple-dom-parser').Parse5Document} */
         this._document = this._parse5Lib.parse(content, {
-            treeAdapter: this._treeAdapter
+            treeAdapter: this._treeAdapter,
         });
         /** @type {RegExp} */
         this._patternHtmlWhitespace = /[\t\r\n\f ]+/g;

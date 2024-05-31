@@ -72,9 +72,9 @@ export class OffscreenProxy {
         this._creatingOffscreen = chrome.offscreen.createDocument({
             url: 'offscreen.html',
             reasons: [
-                /** @type {chrome.offscreen.Reason} */ ('CLIPBOARD')
+                /** @type {chrome.offscreen.Reason} */ ('CLIPBOARD'),
             ],
-            justification: 'Access to the clipboard'
+            justification: 'Access to the clipboard',
         });
         await this._creatingOffscreen;
         this._creatingOffscreen = null;
@@ -96,9 +96,9 @@ export class OffscreenProxy {
 
         const contexts = await chrome.runtime.getContexts({
             contextTypes: [
-                /** @type {chrome.runtime.ContextType} */ ('OFFSCREEN_DOCUMENT')
+                /** @type {chrome.runtime.ContextType} */ ('OFFSCREEN_DOCUMENT'),
             ],
-            documentUrls: [offscreenUrl]
+            documentUrls: [offscreenUrl],
         });
         return contexts.length > 0;
     }
@@ -199,7 +199,7 @@ export class TranslatorProxy {
         /** @type {import('offscreen').FindKanjiOptionsOffscreen} */
         const modifiedOptions = {
             ...options,
-            enabledDictionaryMap: enabledDictionaryMapList
+            enabledDictionaryMap: enabledDictionaryMapList,
         };
         return this._offscreen.sendMessagePromise({action: 'findKanjiOffscreen', params: {text, options: modifiedOptions}});
     }
@@ -222,7 +222,7 @@ export class TranslatorProxy {
             ...options,
             enabledDictionaryMap: enabledDictionaryMapList,
             excludeDictionaryDefinitions: excludeDictionaryDefinitionsList,
-            textReplacements: textReplacementsSerialized
+            textReplacements: textReplacementsSerialized,
         };
         return this._offscreen.sendMessagePromise({action: 'findTermsOffscreen', params: {mode, text, options: modifiedOptions}});
     }

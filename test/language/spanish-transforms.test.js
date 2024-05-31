@@ -34,15 +34,15 @@ const tests = [
             {term: 'sí', source: 'síes', rule: 'ns', reasons: ['plural']},
             {term: 'zigzag', source: 'zigzags', rule: 'ns', reasons: ['plural']},
             {term: 'luz', source: 'luces', rule: 'ns', reasons: ['plural']},
-            {term: 'canción', source: 'canciones', rule: 'ns', reasons: ['plural']}
-        ]
+            {term: 'canción', source: 'canciones', rule: 'ns', reasons: ['plural']},
+        ],
     },
     {
         category: 'feminine adjectives',
         valid: true,
         tests: [
-            {term: 'rojo', source: 'roja', rule: 'adj', reasons: ['feminine adjective']}
-        ]
+            {term: 'rojo', source: 'roja', rule: 'adj', reasons: ['feminine adjective']},
+        ],
     },
     {
         category: 'present indicative verbs',
@@ -90,9 +90,9 @@ const tests = [
             {term: 'ser', source: 'soy', rule: 'v', reasons: ['present indicative']},
             {term: 'estar', source: 'estoy', rule: 'v', reasons: ['present indicative']},
             {term: 'ir', source: 'voy', rule: 'v', reasons: ['present indicative']},
-            {term: 'haber', source: 'he', rule: 'v', reasons: ['present indicative']}
-        ]
-    }
+            {term: 'haber', source: 'he', rule: 'v', reasons: ['present indicative']},
+        ],
+    },
 ];
 
 const languageTransformer = new LanguageTransformer();

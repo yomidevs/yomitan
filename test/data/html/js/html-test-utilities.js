@@ -161,7 +161,7 @@ class HtmlTestUtilities {
         if (template !== null && templateContentContainer !== null) {
             const mode = (container instanceof HTMLElement ? container.dataset.shadowMode : void 0);
             const shadow = templateContentContainer.attachShadow({
-                mode: (mode === 'open' || mode === 'closed' ? mode : 'open')
+                mode: (mode === 'open' || mode === 'closed' ? mode : 'open'),
             });
 
             const containerStyles = document.querySelector('#container-styles');

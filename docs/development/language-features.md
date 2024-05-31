@@ -225,7 +225,7 @@ However, the only `conditionOut` of this rule, `n`, does not match any `conditio
 },
 ```
 
-Now the rules will chain together, as shown in the image. Chaining is can be very useful (for agglutinative languages it is indispensable), but may cause unexpected behavior. For example, `boss` will now display results for the word `bo` (e.g. the staff) with the `plural` rule applied twice, i.e. it can chain with itself because the `conditionsIn` and `conditionsOut` are the same. This leads us to the actual implementation of the `plural` rule in `english-transforms.js`:
+Now the rules will chain together, as shown in the image. Chaining can be very useful (for agglutinative languages it is indispensable), but may cause unexpected behavior. For example, `boss` will now display results for the word `bo` (e.g. the staff) with the `plural` rule applied twice, i.e. it can chain with itself because the `conditionsIn` and `conditionsOut` are the same. This leads us to the actual implementation of the `plural` rule in `english-transforms.js`:
 
 ```js
 conditions: {

@@ -26,120 +26,120 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '動詞'
-                }
+                    name: '動詞',
+                },
             ],
             isDictionaryForm: false,
-            subConditions: ['v1', 'v5', 'vk', 'vs', 'vz']
+            subConditions: ['v1', 'v5', 'vk', 'vs', 'vz'],
         },
         'v1': {
             name: 'Ichidan verb',
             i18n: [
                 {
                     language: 'ja',
-                    name: '一段動詞'
-                }
+                    name: '一段動詞',
+                },
             ],
             isDictionaryForm: true,
-            subConditions: ['v1d', 'v1p']
+            subConditions: ['v1d', 'v1p'],
         },
         'v1d': {
             name: 'Ichidan verb, dictionary form',
             i18n: [
                 {
                     language: 'ja',
-                    name: '一段動詞、辞書形'
-                }
+                    name: '一段動詞、辞書形',
+                },
             ],
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         'v1p': {
             name: 'Ichidan verb, progressive or perfect form',
             i18n: [
                 {
                     language: 'ja',
-                    name: '一段動詞、進行形または完了形'
-                }
+                    name: '一段動詞、進行形または完了形',
+                },
             ],
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         'v5': {
             name: 'Godan verb',
             i18n: [
                 {
                     language: 'ja',
-                    name: '五段動詞'
-                }
+                    name: '五段動詞',
+                },
             ],
-            isDictionaryForm: true
+            isDictionaryForm: true,
         },
         'vk': {
             name: 'Kuru verb',
             i18n: [
                 {
                     language: 'ja',
-                    name: '来る動詞'
-                }
+                    name: '来る動詞',
+                },
             ],
-            isDictionaryForm: true
+            isDictionaryForm: true,
         },
         'vs': {
             name: 'Suru verb',
             i18n: [
                 {
                     language: 'ja',
-                    name: 'する動詞'
-                }
+                    name: 'する動詞',
+                },
             ],
-            isDictionaryForm: true
+            isDictionaryForm: true,
         },
         'vz': {
             name: 'Zuru verb',
             i18n: [
                 {
                     language: 'ja',
-                    name: 'ずる動詞'
-                }
+                    name: 'ずる動詞',
+                },
             ],
-            isDictionaryForm: true
+            isDictionaryForm: true,
         },
         'adj-i': {
             name: 'Adjective with i ending',
             i18n: [
                 {
                     language: 'ja',
-                    name: '形容詞'
-                }
+                    name: '形容詞',
+                },
             ],
-            isDictionaryForm: true
+            isDictionaryForm: true,
         },
         '-te': {
             name: 'Intermediate -te endings for progressive or perfect tense',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         '-ba': {
             name: 'Intermediate -ba endings for conditional contraction',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         'adv': {
             name: 'Intermediate -ku endings for adverbs',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         'past': {
             name: '-ta past form ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         }
     },
-    transforms: {
-        '-ba': {
+    transforms: [
+        {
             name: '-ba',
             description: 'Conditional',
             i18n: [
                 {
                     language: 'ja',
                     name: 'ば',
-                    description: '仮定形'
-                }
+                    description: '仮定形',
+                },
             ],
             rules: [
                 suffixInflection('ければ', 'い', ['-ba'], ['adj-i']),
@@ -151,8 +151,8 @@ export const japaneseTransforms = {
                 suffixInflection('ねば', 'ぬ', ['-ba'], ['v5']),
                 suffixInflection('べば', 'ぶ', ['-ba'], ['v5']),
                 suffixInflection('めば', 'む', ['-ba'], ['v5']),
-                suffixInflection('れば', 'る', ['-ba'], ['v1', 'v5', 'vk', 'vs', 'vz'])
-            ]
+                suffixInflection('れば', 'る', ['-ba'], ['v1', 'v5', 'vk', 'vs', 'vz']),
+            ],
         },
         '-ya': {
             name: '-ya',
@@ -161,8 +161,8 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '～ゃ',
-                    description: '仮定形の縮約系'
-                }
+                    description: '仮定形の縮約系',
+                },
             ],
             rules: [
                 suffixInflection('けりゃ', 'ければ', [], ['-ba']),
@@ -175,8 +175,8 @@ export const japaneseTransforms = {
                 suffixInflection('にゃ', 'ねば', [], ['-ba']),
                 suffixInflection('びゃ', 'べば', [], ['-ba']),
                 suffixInflection('みゃ', 'めば', [], ['-ba']),
-                suffixInflection('りゃ', 'れば', [], ['-ba'])
-            ]
+                suffixInflection('りゃ', 'れば', [], ['-ba']),
+            ],
         },
         '-cha': {
             name: '-cha',
@@ -185,8 +185,8 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '～ちゃ',
-                    description: '「～テハ」の縮約系'
-                }
+                    description: '「～テハ」の縮約系',
+                },
             ],
             rules: [
                 suffixInflection('ちゃ', 'る', ['v5'], ['v1']),
@@ -205,8 +205,8 @@ export const japaneseTransforms = {
                 suffixInflection('為ちゃ', '為る', ['v5'], ['vs']),
                 suffixInflection('きちゃ', 'くる', ['v5'], ['vk']),
                 suffixInflection('来ちゃ', '来る', ['v5'], ['vk']),
-                suffixInflection('來ちゃ', '來る', ['v5'], ['vk'])
-            ]
+                suffixInflection('來ちゃ', '來る', ['v5'], ['vk']),
+            ],
         },
         '-chau': {
             name: '-chau',
@@ -227,8 +227,8 @@ export const japaneseTransforms = {
                 suffixInflection('為ちゃう', '為る', ['v5'], ['vs']),
                 suffixInflection('きちゃう', 'くる', ['v5'], ['vk']),
                 suffixInflection('来ちゃう', '来る', ['v5'], ['vk']),
-                suffixInflection('來ちゃう', '來る', ['v5'], ['vk'])
-            ]
+                suffixInflection('來ちゃう', '來る', ['v5'], ['vk']),
+            ],
         },
         '-chimau': {
             name: '-chimau',
@@ -249,15 +249,15 @@ export const japaneseTransforms = {
                 suffixInflection('為ちまう', '為る', ['v5'], ['vs']),
                 suffixInflection('きちまう', 'くる', ['v5'], ['vk']),
                 suffixInflection('来ちまう', '来る', ['v5'], ['vk']),
-                suffixInflection('來ちまう', '來る', ['v5'], ['vk'])
-            ]
+                suffixInflection('來ちまう', '來る', ['v5'], ['vk']),
+            ],
         },
         '-shimau': {
             name: '-shimau',
             rules: [
                 suffixInflection('てしまう', 'て', ['v5'], ['-te']),
-                suffixInflection('でしまう', 'で', ['v5'], ['-te'])
-            ]
+                suffixInflection('でしまう', 'で', ['v5'], ['-te']),
+            ],
         },
         '-nasai': {
             name: '-nasai',
@@ -277,8 +277,8 @@ export const japaneseTransforms = {
                 suffixInflection('為なさい', '為る', [], ['vs']),
                 suffixInflection('きなさい', 'くる', [], ['vk']),
                 suffixInflection('来なさい', '来る', [], ['vk']),
-                suffixInflection('來なさい', '來る', [], ['vk'])
-            ]
+                suffixInflection('來なさい', '來る', [], ['vk']),
+            ],
         },
         '-sou': {
             name: '-sou',
@@ -299,8 +299,8 @@ export const japaneseTransforms = {
                 suffixInflection('為そう', '為る', [], ['vs']),
                 suffixInflection('きそう', 'くる', [], ['vk']),
                 suffixInflection('来そう', '来る', [], ['vk']),
-                suffixInflection('來そう', '來る', [], ['vk'])
-            ]
+                suffixInflection('來そう', '來る', [], ['vk']),
+            ],
         },
         '-sugiru': {
             name: '-sugiru',
@@ -321,8 +321,8 @@ export const japaneseTransforms = {
                 suffixInflection('為すぎる', '為る', ['v1'], ['vs']),
                 suffixInflection('きすぎる', 'くる', ['v1'], ['vk']),
                 suffixInflection('来すぎる', '来る', ['v1'], ['vk']),
-                suffixInflection('來すぎる', '來る', ['v1'], ['vk'])
-            ]
+                suffixInflection('來すぎる', '來る', ['v1'], ['vk']),
+            ],
         },
         '-tai': {
             name: '-tai',
@@ -342,8 +342,8 @@ export const japaneseTransforms = {
                 suffixInflection('為たい', '為る', ['adj-i'], ['vs']),
                 suffixInflection('きたい', 'くる', ['adj-i'], ['vk']),
                 suffixInflection('来たい', '来る', ['adj-i'], ['vk']),
-                suffixInflection('來たい', '來る', ['adj-i'], ['vk'])
-            ]
+                suffixInflection('來たい', '來る', ['adj-i'], ['vk']),
+            ],
         },
         '-tara': {
             name: '-tara',
@@ -382,8 +382,8 @@ export const japaneseTransforms = {
                 suffixInflection('添うたら', '添う', [], ['v5']),
                 suffixInflection('副うたら', '副う', [], ['v5']),
                 suffixInflection('厭うたら', '厭う', [], ['v5']),
-                suffixInflection('のたもうたら', 'のたまう', [], ['v5'])
-            ]
+                suffixInflection('のたもうたら', 'のたまう', [], ['v5']),
+            ],
         },
         '-tari': {
             name: '-tari',
@@ -422,8 +422,8 @@ export const japaneseTransforms = {
                 suffixInflection('添うたり', '添う', [], ['v5']),
                 suffixInflection('副うたり', '副う', [], ['v5']),
                 suffixInflection('厭うたり', '厭う', [], ['v5']),
-                suffixInflection('のたもうたり', 'のたまう', [], ['v5'])
-            ]
+                suffixInflection('のたもうたり', 'のたまう', [], ['v5']),
+            ],
         },
         '-te': {
             name: '-te',
@@ -463,8 +463,8 @@ export const japaneseTransforms = {
                 suffixInflection('副うて', '副う', ['-te'], ['v5']),
                 suffixInflection('厭うて', '厭う', ['-te'], ['v5']),
                 suffixInflection('のたもうて', 'のたまう', ['-te'], ['v5']),
-                suffixInflection('まして', 'ます', [], ['v'])
-            ]
+                suffixInflection('まして', 'ます', [], ['v']),
+            ],
         },
         '-zu': {
             name: '-zu',
@@ -484,8 +484,8 @@ export const japaneseTransforms = {
                 suffixInflection('為ず', '為る', [], ['vs']),
                 suffixInflection('こず', 'くる', [], ['vk']),
                 suffixInflection('来ず', '来る', [], ['vk']),
-                suffixInflection('來ず', '來る', [], ['vk'])
-            ]
+                suffixInflection('來ず', '來る', [], ['vk']),
+            ],
         },
         '-nu': {
             name: '-nu',
@@ -505,8 +505,8 @@ export const japaneseTransforms = {
                 suffixInflection('為ぬ', '為る', [], ['vs']),
                 suffixInflection('こぬ', 'くる', [], ['vk']),
                 suffixInflection('来ぬ', '来る', [], ['vk']),
-                suffixInflection('來ぬ', '來る', [], ['vk'])
-            ]
+                suffixInflection('來ぬ', '來る', [], ['vk']),
+            ],
         },
         '-n': {
             name: '-n',
@@ -526,8 +526,8 @@ export const japaneseTransforms = {
                 suffixInflection('為ん', '為る', [], ['vs']),
                 suffixInflection('こん', 'くる', [], ['vk']),
                 suffixInflection('来ん', '来る', [], ['vk']),
-                suffixInflection('來ん', '來る', [], ['vk'])
-            ]
+                suffixInflection('來ん', '來る', [], ['vk']),
+            ],
         },
         '-mu': {
             name: '-mu',
@@ -547,8 +547,8 @@ export const japaneseTransforms = {
                 suffixInflection('為む', '為る', [], ['vs']),
                 suffixInflection('こむ', 'くる', [], ['vk']),
                 suffixInflection('来む', '来る', [], ['vk']),
-                suffixInflection('來む', '來る', [], ['vk'])
-            ]
+                suffixInflection('來む', '來る', [], ['vk']),
+            ],
         },
         '-zaru': {
             name: '-zaru',
@@ -568,8 +568,8 @@ export const japaneseTransforms = {
                 suffixInflection('為ざる', '為る', [], ['vs']),
                 suffixInflection('こざる', 'くる', [], ['vk']),
                 suffixInflection('来ざる', '来る', [], ['vk']),
-                suffixInflection('來ざる', '來る', [], ['vk'])
-            ]
+                suffixInflection('來ざる', '來る', [], ['vk']),
+            ],
         },
         '-neba': {
             name: '-neba',
@@ -589,14 +589,14 @@ export const japaneseTransforms = {
                 suffixInflection('為ねば', '為る', [], ['vs']),
                 suffixInflection('こねば', 'くる', [], ['vk']),
                 suffixInflection('来ねば', '来る', [], ['vk']),
-                suffixInflection('來ねば', '來る', [], ['vk'])
-            ]
+                suffixInflection('來ねば', '來る', [], ['vk']),
+            ],
         },
         'adv': {
             name: 'adv',
             rules: [
-                suffixInflection('く', 'い', ['adv'], ['adj-i'])
-            ]
+                suffixInflection('く', 'い', ['adv'], ['adj-i']),
+            ],
         },
         'causative': {
             name: 'causative',
@@ -619,8 +619,8 @@ export const japaneseTransforms = {
                 suffixInflection('為させる', '為る', ['v1'], ['vs']),
                 suffixInflection('こさせる', 'くる', ['v1'], ['vk']),
                 suffixInflection('来させる', '来る', ['v1'], ['vk']),
-                suffixInflection('來させる', '來る', ['v1'], ['vk'])
-            ]
+                suffixInflection('來させる', '來る', ['v1'], ['vk']),
+            ],
         },
         'imperative': {
             name: 'imperative',
@@ -644,14 +644,14 @@ export const japaneseTransforms = {
                 suffixInflection('為よ', '為る', [], ['vs']),
                 suffixInflection('こい', 'くる', [], ['vk']),
                 suffixInflection('来い', '来る', [], ['vk']),
-                suffixInflection('來い', '來る', [], ['vk'])
-            ]
+                suffixInflection('來い', '來る', [], ['vk']),
+            ],
         },
         'imperative negative': {
             name: 'imperative negative',
             rules: [
-                suffixInflection('な', '', [], ['v'])
-            ]
+                suffixInflection('な', '', [], ['v']),
+            ],
         },
         'masu': {
             name: 'masu stem',
@@ -690,8 +690,8 @@ export const japaneseTransforms = {
                 suffixInflection('き', 'くる', [], ['vk']),
                 suffixInflection('し', 'する', [], ['vs']),
                 suffixInflection('来', '来る', [], ['vk']),
-                suffixInflection('來', '來る', [], ['vk'])
-            ]
+                suffixInflection('來', '來る', [], ['vk']),
+            ],
         },
         'negative': {
             name: 'negative',
@@ -713,14 +713,14 @@ export const japaneseTransforms = {
                 suffixInflection('こない', 'くる', ['adj-i'], ['vk']),
                 suffixInflection('来ない', '来る', ['adj-i'], ['vk']),
                 suffixInflection('來ない', '來る', ['adj-i'], ['vk']),
-                suffixInflection('ません', 'ます', ['v'], ['v'])
-            ]
+                suffixInflection('ません', 'ます', ['v'], ['v']),
+            ],
         },
         'noun': {
             name: 'noun',
             rules: [
-                suffixInflection('さ', 'い', [], ['adj-i'])
-            ]
+                suffixInflection('さ', 'い', [], ['adj-i']),
+            ],
         },
         'passive': {
             name: 'passive',
@@ -740,8 +740,8 @@ export const japaneseTransforms = {
                 suffixInflection('為れる', '為る', ['v1'], ['vs']),
                 suffixInflection('こられる', 'くる', ['v1'], ['vk']),
                 suffixInflection('来られる', '来る', ['v1'], ['vk']),
-                suffixInflection('來られる', '來る', ['v1'], ['vk'])
-            ]
+                suffixInflection('來られる', '來る', ['v1'], ['vk']),
+            ],
         },
         'past': {
             name: 'past',
@@ -782,8 +782,8 @@ export const japaneseTransforms = {
                 suffixInflection('厭うた', '厭う', ['past'], ['v5']),
                 suffixInflection('のたもうた', 'のたまう', ['past'], ['v5']),
                 suffixInflection('ました', 'ます', ['past'], ['v']),
-                suffixInflection('ませんでした', 'ません', ['past'], ['v'])
-            ]
+                suffixInflection('ませんでした', 'ません', ['past'], ['v']),
+            ],
         },
         'polite': {
             name: 'polite',
@@ -804,8 +804,8 @@ export const japaneseTransforms = {
                 suffixInflection('きます', 'くる', ['vk'], ['vk']),
                 suffixInflection('来ます', '来る', ['vk'], ['vk']),
                 suffixInflection('來ます', '來る', ['vk'], ['vk']),
-                suffixInflection('くあります', 'い', ['v'], ['adj-i'])
-            ]
+                suffixInflection('くあります', 'い', ['v'], ['adj-i']),
+            ],
         },
         'potential': {
             name: 'potential',
@@ -823,8 +823,8 @@ export const japaneseTransforms = {
                 suffixInflection('出来る', 'する', ['v1'], ['vs']),
                 suffixInflection('これる', 'くる', ['v1'], ['vk']),
                 suffixInflection('来れる', '来る', ['v1'], ['vk']),
-                suffixInflection('來れる', '來る', ['v1'], ['vk'])
-            ]
+                suffixInflection('來れる', '來る', ['v1'], ['vk']),
+            ],
         },
         'potential or passive': {
             name: 'potential or passive',
@@ -836,8 +836,8 @@ export const japaneseTransforms = {
                 suffixInflection('為られる', '為る', ['v1'], ['vs']),
                 suffixInflection('こられる', 'くる', ['v1'], ['vk']),
                 suffixInflection('来られる', '来る', ['v1'], ['vk']),
-                suffixInflection('來られる', '來る', ['v1'], ['vk'])
-            ]
+                suffixInflection('來られる', '來る', ['v1'], ['vk']),
+            ],
         },
         'volitional': {
             name: 'volitional',
@@ -858,8 +858,8 @@ export const japaneseTransforms = {
                 suffixInflection('こよう', 'くる', [], ['vk']),
                 suffixInflection('来よう', '来る', [], ['vk']),
                 suffixInflection('來よう', '來る', [], ['vk']),
-                suffixInflection('ましょう', 'ます', [], ['v'])
-            ]
+                suffixInflection('ましょう', 'ます', [], ['v']),
+            ],
         },
         'causative passive': {
             name: 'causative passive',
@@ -871,8 +871,8 @@ export const japaneseTransforms = {
                 suffixInflection('ばされる', 'ぶ', ['v1'], ['v5']),
                 suffixInflection('まされる', 'む', ['v1'], ['v5']),
                 suffixInflection('らされる', 'る', ['v1'], ['v5']),
-                suffixInflection('わされる', 'う', ['v1'], ['v5'])
-            ]
+                suffixInflection('わされる', 'う', ['v1'], ['v5']),
+            ],
         },
         '-toku': {
             name: '-toku',
@@ -892,8 +892,8 @@ export const japaneseTransforms = {
                 suffixInflection('為とく', '為る', ['v5'], ['vs']),
                 suffixInflection('きとく', 'くる', ['v5'], ['vk']),
                 suffixInflection('来とく', '来る', ['v5'], ['vk']),
-                suffixInflection('來とく', '來る', ['v5'], ['vk'])
-            ]
+                suffixInflection('來とく', '來る', ['v5'], ['vk']),
+            ],
         },
         'progressive': {
             name: 'progressive or perfect',
@@ -905,27 +905,27 @@ export const japaneseTransforms = {
                 suffixInflection('でおる', 'で', ['v5'], ['-te']),
                 suffixInflection('でる', 'で', ['v1p'], ['-te']),
                 suffixInflection('とる', 'て', ['v5'], ['-te']),
-                suffixInflection('ないでいる', 'ない', ['v1'], ['adj-i'])
-            ]
+                suffixInflection('ないでいる', 'ない', ['v1'], ['adj-i']),
+            ],
         },
         '-ki': {
             name: '-ki',
             rules: [
-                suffixInflection('き', 'い', [], ['adj-i'])
-            ]
+                suffixInflection('き', 'い', [], ['adj-i']),
+            ],
         },
         '-ge': {
             name: '-ge',
             rules: [
                 suffixInflection('げ', 'い', [], ['adj-i']),
-                suffixInflection('気', 'い', [], ['adj-i'])
-            ]
+                suffixInflection('気', 'い', [], ['adj-i']),
+            ],
         },
         '-garu': {
             name: '-garu',
             rules: [
-                suffixInflection('がる', 'い', ['v5'], ['adj-i'])
-            ]
+                suffixInflection('がる', 'い', ['v5'], ['adj-i']),
+            ],
         },
         '-e': {
             name: '-e',
@@ -971,8 +971,8 @@ export const japaneseTransforms = {
                 suffixInflection('でぇ', 'どい', [], ['adj-i']),
                 suffixInflection('れぇ', 'れい', [], ['adj-i']),
                 suffixInflection('べぇ', 'ばい', [], ['adj-i']),
-                suffixInflection('てぇ', 'たい', [], ['adj-i'])
-            ]
+                suffixInflection('てぇ', 'たい', [], ['adj-i']),
+            ],
         },
         'slang': {
             name: 'slang',
@@ -986,8 +986,8 @@ export const japaneseTransforms = {
                 suffixInflection('神ってる', '神がかっている', [], ['v1p']),
                 suffixInflection('じわる', 'じわじわ来る', [], ['vk']),
                 suffixInflection('おさしみ', 'おやすみ', [], []),
-                suffixInflection('おやさい', 'おやすみ', [], [])
-            ]
+                suffixInflection('おやさい', 'おやすみ', [], []),
+            ],
         },
         'kansai-ben negative': {
             name: 'kansai-ben',
@@ -998,8 +998,8 @@ export const japaneseTransforms = {
                 suffixInflection('せえへん', 'しない', [], ['adj-i']),
                 suffixInflection('へんかった', 'なかった', ['past'], ['past']),
                 suffixInflection('ひんかった', 'なかった', ['past'], ['past']),
-                suffixInflection('うてへん', 'ってない', [], ['adj-i'])
-            ]
+                suffixInflection('うてへん', 'ってない', [], ['adj-i']),
+            ],
         },
         'kansai-ben -te': {
             name: 'kansai-ben',
@@ -1019,8 +1019,8 @@ export const japaneseTransforms = {
                 suffixInflection('もうて', 'まって', ['-te'], ['-te']),
                 suffixInflection('ろうて', 'らって', ['-te'], ['-te']),
                 suffixInflection('ようて', 'やって', ['-te'], ['-te']),
-                suffixInflection('ゆうて', 'いって', ['-te'], ['-te'])
-            ]
+                suffixInflection('ゆうて', 'いって', ['-te'], ['-te']),
+            ],
         },
         'kansai-ben past': {
             name: 'kansai-ben',
@@ -1040,8 +1040,8 @@ export const japaneseTransforms = {
                 suffixInflection('もうた', 'まった', ['past'], ['past']),
                 suffixInflection('ろうた', 'らった', ['past'], ['past']),
                 suffixInflection('ようた', 'やった', ['past'], ['past']),
-                suffixInflection('ゆうた', 'いった', ['past'], ['past'])
-            ]
+                suffixInflection('ゆうた', 'いった', ['past'], ['past']),
+            ],
         },
         'kansai-ben -tara': {
             name: 'kansai-ben',
@@ -1061,8 +1061,8 @@ export const japaneseTransforms = {
                 suffixInflection('もうたら', 'まったら', [], []),
                 suffixInflection('ろうたら', 'らったら', [], []),
                 suffixInflection('ようたら', 'やったら', [], []),
-                suffixInflection('ゆうたら', 'いったら', [], [])
-            ]
+                suffixInflection('ゆうたら', 'いったら', [], []),
+            ],
         },
         'kansai-ben -ku': {
             name: 'kansai-ben',
@@ -1078,8 +1078,8 @@ export const japaneseTransforms = {
                 suffixInflection('もう', 'まく', [], ['adv']),
                 suffixInflection('ろう', 'らく', [], ['adv']),
                 suffixInflection('よう', 'よく', [], ['adv']),
-                suffixInflection('しゅう', 'しく', [], ['adv'])
-            ]
+                suffixInflection('しゅう', 'しく', [], ['adv']),
+            ],
         },
         'kansai-ben adjective -te': {
             name: 'kansai-ben',
@@ -1095,8 +1095,8 @@ export const japaneseTransforms = {
                 suffixInflection('もうて', 'まくて', ['-te'], ['-te']),
                 suffixInflection('ろうて', 'らくて', ['-te'], ['-te']),
                 suffixInflection('ようて', 'よくて', ['-te'], ['-te']),
-                suffixInflection('しゅうて', 'しくて', ['-te'], ['-te'])
-            ]
+                suffixInflection('しゅうて', 'しくて', ['-te'], ['-te']),
+            ],
         },
         'kansai-ben adjective negative': {
             name: 'kansai-ben',
@@ -1112,8 +1112,8 @@ export const japaneseTransforms = {
                 suffixInflection('もうない', 'まくない', ['adj-i'], ['adj-i']),
                 suffixInflection('ろうない', 'らくない', ['adj-i'], ['adj-i']),
                 suffixInflection('ようない', 'よくない', ['adj-i'], ['adj-i']),
-                suffixInflection('しゅうない', 'しくない', ['adj-i'], ['adj-i'])
-            ]
-        }
-    }
+                suffixInflection('しゅうない', 'しくない', ['adj-i'], ['adj-i']),
+            ],
+        },
+    ],
 };

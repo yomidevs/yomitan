@@ -63,7 +63,7 @@ const CJK_IDEOGRAPH_RANGES = [
     CJK_UNIFIED_IDEOGRAPHS_EXTENSION_E_RANGE,
     CJK_UNIFIED_IDEOGRAPHS_EXTENSION_F_RANGE,
     CJK_COMPATIBILITY_IDEOGRAPHS_RANGE,
-    CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT_RANGE
+    CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT_RANGE,
 ];
 
 /**
@@ -90,7 +90,7 @@ const JAPANESE_RANGES = [
     [0xff1a, 0xff1f], // Fullwidth punctuation 2
     [0xff3b, 0xff3f], // Fullwidth punctuation 3
     [0xff5b, 0xff60], // Fullwidth punctuation 4
-    [0xffe0, 0xffee] // Currency markers
+    [0xffe0, 0xffee], // Currency markers
 ];
 
 const SMALL_KANA_SET = new Set('ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ');
@@ -151,7 +151,7 @@ const HALFWIDTH_KATAKANA_MAPPING = new Map([
     ['ﾚ', 'レ--'],
     ['ﾛ', 'ロ--'],
     ['ﾜ', 'ワ--'],
-    ['ﾝ', 'ン--']
+    ['ﾝ', 'ン--'],
 ]);
 
 const VOWEL_TO_KANA_MAPPING = new Map([
@@ -160,7 +160,7 @@ const VOWEL_TO_KANA_MAPPING = new Map([
     ['u', 'ぅうくぐすずっつづぬふぶぷむゅゆるゥウクグスズッツヅヌフブプムュユルヴ'],
     ['e', 'ぇえけげせぜてでねへべぺめれゑヶェエケゲセゼテデネヘベペメレヱヶヹ'],
     ['o', 'ぉおこごそぞとどのほぼぽもょよろをォオコゴソゾトドノホボポモョヨロヲヺ'],
-    ['', 'のノ']
+    ['', 'のノ'],
 ]);
 
 /** @type {Map<string, string>} */
@@ -255,7 +255,7 @@ function segmentizeFurigana(reading, readingNormalized, groups, groupsStart) {
                 reading.substring(textLength),
                 readingNormalized.substring(textLength),
                 groups,
-                groupsStart + 1
+                groupsStart + 1,
             );
             if (segments !== null) {
                 if (reading.startsWith(text)) {
@@ -274,7 +274,7 @@ function segmentizeFurigana(reading, readingNormalized, groups, groupsStart) {
                 reading.substring(i),
                 readingNormalized.substring(i),
                 groups,
-                groupsStart + 1
+                groupsStart + 1,
             );
             if (segments !== null) {
                 if (result !== null) {

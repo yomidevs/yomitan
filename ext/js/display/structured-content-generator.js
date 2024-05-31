@@ -74,7 +74,7 @@ export class StructuredContentGenerator {
             verticalAlign,
             border,
             borderRadius,
-            sizeUnits
+            sizeUnits,
         } = data;
 
         const hasPreferredWidth = (typeof preferredWidth === 'number');
@@ -144,7 +144,7 @@ export class StructuredContentGenerator {
                 path,
                 dictionary,
                 (url) => this._setImageData(node, image, imageBackground, url, false),
-                () => this._setImageData(node, image, imageBackground, null, true)
+                () => this._setImageData(node, image, imageBackground, null, true),
             );
         }
 
@@ -379,7 +379,7 @@ export class StructuredContentGenerator {
             wordBreak,
             whiteSpace,
             cursor,
-            listStyleType
+            listStyleType,
         } = contentStyle;
         if (typeof fontStyle === 'string') { style.fontStyle = fontStyle; }
         if (typeof fontWeight === 'string') { style.fontWeight = fontWeight; }

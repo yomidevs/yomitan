@@ -643,7 +643,7 @@ export class DisplayGenerator {
             score: 0,
             content: [],
             dictionaries: [],
-            redundant: false
+            redundant: false,
         };
     }
 

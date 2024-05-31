@@ -27,9 +27,9 @@ export const koreanTransforms = {
             i18n: [
                 {
                     language: 'ko',
-                    name: '동사 / 보조 동사'
-                }
-            ]
+                    name: '동사 / 보조 동사',
+                },
+            ],
         },
         adj: {
             name: 'Adjective or Auxiliary Adjective',
@@ -37,9 +37,9 @@ export const koreanTransforms = {
             i18n: [
                 {
                     language: 'ko',
-                    name: '형용사 / 보조 형용사'
-                }
-            ]
+                    name: '형용사 / 보조 형용사',
+                },
+            ],
         },
         ida: {
             name: 'Postpositional particle ida',
@@ -47,61 +47,61 @@ export const koreanTransforms = {
             i18n: [
                 {
                     language: 'ko',
-                    name: '조사 이다'
-                }
-            ]
+                    name: '조사 이다',
+                },
+            ],
         },
         p: {
             name: 'Intermediate past tense ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         f: {
             name: 'Intermediate future tense ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         eusi: {
             name: 'Intermediate formal ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         euob: {
             name: 'Intermediate formal ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         euo: {
             name: 'Intermediate formal ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         sao: {
             name: 'Intermediate formal ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         saob: {
             name: 'Intermediate formal ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         sab: {
             name: 'Intermediate formal ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         jaob: {
             name: 'Intermediate formal ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         jao: {
             name: 'Intermediate formal ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         jab: {
             name: 'Intermediate formal ending',
-            isDictionaryForm: false
+            isDictionaryForm: false,
         },
         do: {
             name: 'Intermediate ending',
-            isDictionaryForm: false
-        }
+            isDictionaryForm: false,
+        },
     },
-    transforms: {
-        '어간': {
+    transforms: [
+        {
             name: '어간',
             description: 'Stem',
             rules: [
@@ -137,218 +137,218 @@ export const koreanTransforms = {
                 suffixInflection('ㅣ', 'ㅣㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅠ', 'ㅠㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅜ', 'ㅜㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅡ', 'ㅡㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㅡ', 'ㅡㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '거나': {
             name: '-거나',
             rules: [
                 suffixInflection('ㄱㅓㄴㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅏ', '', [], ['p', 'f', 'euob', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄴㅏ', '', [], ['p', 'f', 'euob', 'eusi']),
+            ],
         },
         '거늘': {
             name: '-거늘',
             rules: [
                 suffixInflection('ㄱㅓㄴㅡㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅡㄹ', '', [], ['p', 'f', 'euob', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄴㅡㄹ', '', [], ['p', 'f', 'euob', 'eusi']),
+            ],
         },
         '거니': {
             name: '-거니',
             rules: [
                 suffixInflection('ㄱㅓㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅣ', '', [], ['p', 'f', 'euob', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄴㅣ', '', [], ['p', 'f', 'euob', 'eusi']),
+            ],
         },
         '거니와': {
             name: '-거니와',
             rules: [
                 suffixInflection('ㄱㅓㄴㅣㅇㅗㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅣㅇㅗㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄴㅣㅇㅗㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '거던': {
             name: '-거던',
             rules: [
                 suffixInflection('ㄱㅓㄷㅓㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄷㅓㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄷㅓㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '거드면': {
             name: '-거드면',
             rules: [
                 suffixInflection('ㄱㅓㄷㅡㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄷㅡㅁㅕㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄷㅡㅁㅕㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '거든': {
             name: '-거든',
             rules: [
                 suffixInflection('ㄱㅓㄷㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄷㅡㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄷㅡㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '거들랑': {
             name: '-거들랑',
             rules: [
                 suffixInflection('ㄱㅓㄷㅡㄹㄹㅏㅇ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄷㅡㄹㄹㅏㅇ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄷㅡㄹㄹㅏㅇ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '거라': {
             name: '-거라',
             rules: [
-                suffixInflection('ㄱㅓㄹㅏ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄱㅓㄹㅏ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '건': {
             name: '-건',
             rules: [
                 suffixInflection('ㄱㅓㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴ', '', [], ['p', 'f', 'euob', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄴ', '', [], ['p', 'f', 'euob', 'eusi']),
+            ],
         },
         '건대': {
             name: '-건대',
             rules: [
                 suffixInflection('ㄱㅓㄴㄷㅐ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄱㅓㄴㄷㅐ', '', [], ['p', 'eusi', 'jaob'])
-            ]
+                suffixInflection('ㄱㅓㄴㄷㅐ', '', [], ['p', 'eusi', 'jaob']),
+            ],
         },
         '건마는': {
             name: '-건마는',
             rules: [
                 suffixInflection('ㄱㅓㄴㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄴㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '건만': {
             name: '-건만',
             rules: [
                 suffixInflection('ㄱㅓㄴㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄴㅁㅏㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄴㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '걸랑': {
             name: '-걸랑',
             rules: [
                 suffixInflection('ㄱㅓㄹㄹㅏㅇ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㄹㄹㅏㅇ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㄹㄹㅏㅇ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '것다': {
             name: '-것다',
             rules: [
                 suffixInflection('ㄱㅓㅅㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㅅㄷㅏ', '', [], ['p', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㅅㄷㅏ', '', [], ['p', 'eusi']),
+            ],
         },
         '-것마는': {
             name: '-것마는',
             rules: [
                 suffixInflection('ㄱㅓㅅㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅓㅅㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅓㅅㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-게': {
             name: '-게',
             rules: [
                 suffixInflection('ㄱㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅔ', '', [], ['p', 'eusi'])
-            ]
+                suffixInflection('ㄱㅔ', '', [], ['p', 'eusi']),
+            ],
         },
         '-게끔': {
             name: '-게끔',
             rules: [
                 suffixInflection('ㄱㅔㄲㅡㅁ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄱㅔㄲㅡㅁ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄱㅔㄲㅡㅁ', '', [], ['eusi']),
+            ],
         },
         '-게나': {
             name: '-게나',
             rules: [
                 suffixInflection('ㄱㅔㄴㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄱㅔㄴㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄱㅔㄴㅏ', '', [], ['eusi']),
+            ],
         },
         '-게시리': {
             name: '-게시리',
             rules: [
                 suffixInflection('ㄱㅔㅅㅣㄹㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄱㅔㅅㅣㄹㅣ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄱㅔㅅㅣㄹㅣ', '', [], ['eusi']),
+            ],
         },
         '-겠': {
             name: '-겠',
             rules: [
                 suffixInflection('ㄱㅔㅆ', 'ㄷㅏ', ['f'], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅔㅆ', '', ['f'], ['p', 'eusi'])
-            ]
+                suffixInflection('ㄱㅔㅆ', '', ['f'], ['p', 'eusi']),
+            ],
         },
         '-고': {
             name: '-고',
             rules: [
                 suffixInflection('ㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅗ', '', [], ['p', 'f', 'eusi', 'saob', 'euob', 'euo', 'sab', 'jaob', 'jab'])
-            ]
+                suffixInflection('ㄱㅗ', '', [], ['p', 'f', 'eusi', 'saob', 'euob', 'euo', 'sab', 'jaob', 'jab']),
+            ],
         },
         '-고는 하다': {
             name: '-고는 하다',
             rules: [
                 suffixInflection('ㄱㅗㄴㅡㄴ ㅎㅏㄷㅏ', 'ㄷㅏ', ['v'], ['v']),
-                suffixInflection('ㄱㅗㄴㅡㄴ ㅎㅏㄷㅏ', '', ['v'], ['eusi'])
-            ]
+                suffixInflection('ㄱㅗㄴㅡㄴ ㅎㅏㄷㅏ', '', ['v'], ['eusi']),
+            ],
         },
         '-곤 하다': {
             name: '-곤 하다',
             rules: [
                 suffixInflection('ㄱㅗㄴ ㅎㅏㄷㅏ', 'ㄷㅏ', ['v'], ['v']),
-                suffixInflection('ㄱㅗㄴ ㅎㅏㄷㅏ', '', ['v'], ['eusi'])
-            ]
+                suffixInflection('ㄱㅗㄴ ㅎㅏㄷㅏ', '', ['v'], ['eusi']),
+            ],
         },
         '-고는': {
             name: '-고는',
             rules: [
                 suffixInflection('ㄱㅗㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄱㅗㄴㅡㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄱㅗㄴㅡㄴ', '', [], ['eusi']),
+            ],
         },
         '-곤': {
             name: '-곤',
             rules: [
                 suffixInflection('ㄱㅗㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄱㅗㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄱㅗㄴ', '', [], ['eusi']),
+            ],
         },
         '-고도': {
             name: '-고도',
             rules: [
                 suffixInflection('ㄱㅗㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅗㄷㅗ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄱㅗㄷㅗ', '', [], ['eusi']),
+            ],
         },
         '-고말고': {
             name: '-고말고',
             rules: [
                 suffixInflection('ㄱㅗㅁㅏㄹㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅗㅁㅏㄹㄱㅗ', '', [], ['p', 'eusi'])
-            ]
+                suffixInflection('ㄱㅗㅁㅏㄹㄱㅗ', '', [], ['p', 'eusi']),
+            ],
         },
         '-고서': {
             name: '-고서',
             rules: [
                 suffixInflection('ㄱㅗㅅㅓ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㄱㅗㅅㅓ', '', [], ['eusi']),
-                suffixInflection('ㅇㅏㄴㅣㄱㅗㅅㅓ', 'ㅇㅏㄴㅣㄷㅏ', [], ['adj'])
-            ]
+                suffixInflection('ㅇㅏㄴㅣㄱㅗㅅㅓ', 'ㅇㅏㄴㅣㄷㅏ', [], ['adj']),
+            ],
         },
         '-고야': {
             name: '-고야',
             rules: [
                 suffixInflection('ㄱㅗㅇㅑ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄱㅗㅇㅑ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄱㅗㅇㅑ', '', [], ['eusi']),
+            ],
         },
         '-고자': {
             name: '-고자',
@@ -356,8 +356,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄱㅗㅈㅏ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㄱㅗㅈㅏ', '', [], ['eusi']),
                 suffixInflection('ㅇㅣㅆㄱㅗㅈㅏ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄱㅗㅈㅏ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄱㅗㅈㅏ', '없다', [], []),
+            ],
         },
         '-고저': {
             name: '-고저',
@@ -365,118 +365,118 @@ export const koreanTransforms = {
                 suffixInflection('ㄱㅗㅈㅓ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㄱㅗㅈㅓ', '', [], ['eusi']),
                 suffixInflection('ㅇㅣㅆㄱㅗㅈㅓ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄱㅗㅈㅓ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄱㅗㅈㅓ', '없다', [], []),
+            ],
         },
         '-관데': {
             name: '-관데',
             rules: [
                 suffixInflection('ㄱㅗㅏㄴㄷㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅗㅏㄴㄷㅔ', '', [], ['p', 'eusi'])
-            ]
+                suffixInflection('ㄱㅗㅏㄴㄷㅔ', '', [], ['p', 'eusi']),
+            ],
         },
         '-구나': {
             name: '-구나',
             rules: [
                 suffixInflection('ㄱㅜㄴㅏ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㄱㅜㄴㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅜㄴㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-구려': {
             name: '-구려',
             rules: [
                 suffixInflection('ㄱㅜㄹㅕ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㄹㅕ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅜㄹㅕ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-구료': {
             name: '-구료',
             rules: [
                 suffixInflection('ㄱㅜㄹㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㄹㅛ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅜㄹㅛ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-구만': {
             name: '-구만',
             rules: [
                 suffixInflection('ㄱㅜㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㅁㅏㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅜㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-구먼': {
             name: '-구먼',
             rules: [
                 suffixInflection('ㄱㅜㅁㅓㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㅁㅓㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅜㅁㅓㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-구면': {
             name: '-구면',
             rules: [
                 suffixInflection('ㄱㅜㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㅁㅕㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅜㅁㅕㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-군': {
             name: '-군',
             rules: [
                 suffixInflection('ㄱㅜㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅜㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅜㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-기': {
             name: '-기',
             rules: [
                 suffixInflection('ㄱㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅣ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-기로': {
             name: '-기로',
             rules: [
-                suffixInflection('ㄱㅣㄹㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida'])
-            ]
+                suffixInflection('ㄱㅣㄹㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
+            ],
         },
         '-기로니': {
             name: '-기로니',
             rules: [
-                suffixInflection('ㄱㅣㄹㅗㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida'])
-            ]
+                suffixInflection('ㄱㅣㄹㅗㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
+            ],
         },
         '-기로서': {
             name: '-기로서',
             rules: [
                 suffixInflection('ㄱㅣㄹㅗㅅㅓ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㄹㅗㅅㅓ', '', [], ['p'])
-            ]
+                suffixInflection('ㄱㅣㄹㅗㅅㅓ', '', [], ['p']),
+            ],
         },
         '-기로서니': {
             name: '-기로서니',
             rules: [
                 suffixInflection('ㄱㅣㄹㅗㅅㅓㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㄹㅗㅅㅓㄴㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㄱㅣㄹㅗㅅㅓㄴㅣ', '', [], ['p']),
+            ],
         },
         '-기로선들': {
             name: '-기로선들',
             rules: [
                 suffixInflection('ㄱㅣㄹㅗㅅㅓㄴㄷㅡㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㄹㅗㅅㅓㄴㄷㅡㄹ', '', [], ['p'])
-            ]
+                suffixInflection('ㄱㅣㄹㅗㅅㅓㄴㄷㅡㄹ', '', [], ['p']),
+            ],
         },
         '-기에': {
             name: '-기에',
             rules: [
                 suffixInflection('ㄱㅣㅇㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㅇㅔ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄱㅣㅇㅔ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-길래': {
             name: '-길래',
             rules: [
                 suffixInflection('ㄱㅣㄹㄹㅐ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄱㅣㄹㄹㅐ', '', [], ['p', 'eusi'])
-            ]
+                suffixInflection('ㄱㅣㄹㄹㅐ', '', [], ['p', 'eusi']),
+            ],
         },
         ")ㄹ'": {
             name: '-(으)ㄹ',
@@ -489,8 +489,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ거': {
             name: '-(으)ㄹ거나',
@@ -503,8 +503,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄱㅓㄴㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄱㅓㄴㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄱㅓㄴㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄱㅓㄴㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㄹㄱㅓㄴㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)ㄹ걸': {
             name: '-(으)ㄹ걸',
@@ -517,8 +517,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄱㅓㄹ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄱㅓㄹ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄱㅓㄹ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄱㅓㄹ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄱㅓㄹ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ게': {
             name: '-(으)ㄹ게',
@@ -528,8 +528,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㄱㅔ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅜㄹㄱㅔ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㄹㄱㅔ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㄹㄱㅔ', 'ㄷㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄹㅇㅡㄹㄱㅔ', 'ㄷㄷㅏ', [], ['v']),
+            ],
         },
         '-(으)ㄹ 거야': {
             name: '-(으)ㄹ 거야',
@@ -540,8 +540,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹ ㄱㅓㅇㅑ', 'ㅂㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㄹ ㄱㅓㅇㅑ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹ ㄱㅓㅇㅑ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅇㅑ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅇㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-(으)ㄹ 거예요': {
             name: '-(으)ㄹ 거예요',
@@ -552,8 +552,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹ ㄱㅓㅇㅖㅇㅛ', 'ㅂㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㄹ ㄱㅓㅇㅖㅇㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹ ㄱㅓㅇㅖㅇㅛ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅇㅖㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅇㅖㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-(으)ㄹ 것이다': {
             name: '-(으)ㄹ 것이다',
@@ -564,8 +564,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅅㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-(으)ㄹ 것입니다': {
             name: '-(으)ㄹ 것입니다',
@@ -576,8 +576,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅅㅇㅣㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-(으)ㄹ 거다': {
             name: '-(으)ㄹ 거다',
@@ -588,8 +588,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹ ㄱㅓㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㄹ ㄱㅓㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹ ㄱㅓㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-(으)ㄹ 겁니다': {
             name: '-(으)ㄹ 겁니다',
@@ -600,8 +600,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㄹ ㄱㅓㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-(으)ㄹ께': {
             name: '-(으)ㄹ께',
@@ -612,8 +612,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹㄲㅔ', 'ㅂㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㄹㄲㅔ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄲㅔ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㄲㅔ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㄹㄲㅔ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-(으)나': {
             name: '-(으)나',
@@ -626,15 +626,15 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㄴㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㄴㅏ', '', [], ['p', 'f', 'eusi', 'sao'])
-            ]
+                suffixInflection('ㄴㅏ', '', [], ['p', 'f', 'eusi', 'sao']),
+            ],
         },
         '-나니': {
             name: '-나니',
             rules: [
                 suffixInflection('ㄴㅏㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅏㄴㅣ', '', [], ['p', 'f', 'eusi', 'sab', 'euob'])
-            ]
+                suffixInflection('ㄴㅏㄴㅣ', '', [], ['p', 'f', 'eusi', 'sab', 'euob']),
+            ],
         },
         '-(으)나마': {
             name: '-(으)나마',
@@ -647,29 +647,29 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅏㅁㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅏㅁㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㅏㅁㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅏㅁㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㄴㅏㅁㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-나이까': {
             name: '-나이까',
             rules: [
                 suffixInflection('ㄴㅏㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅏㅇㅣㄲㅏ', '', [], ['p', 'f', 'eusi', 'saob', 'euob'])
-            ]
+                suffixInflection('ㄴㅏㅇㅣㄲㅏ', '', [], ['p', 'f', 'eusi', 'saob', 'euob']),
+            ],
         },
         '-나이다': {
             name: '-나이다',
             rules: [
                 suffixInflection('ㄴㅏㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅏㅇㅣㄷㅏ', '', [], ['p', 'f', 'eusi', 'saob', 'jaob', 'jab', 'euob'])
-            ]
+                suffixInflection('ㄴㅏㅇㅣㄷㅏ', '', [], ['p', 'f', 'eusi', 'saob', 'jaob', 'jab', 'euob']),
+            ],
         },
         '-남': {
             name: '-남',
             rules: [
                 suffixInflection('ㄴㅏㅁ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅏㅁ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄴㅏㅁ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-(으)냐': {
             name: '-(으)냐',
@@ -682,8 +682,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅑ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㅑ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅡㄴㅑ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㅇㅡㄴㅑ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-(으)냐고': {
             name: '-(으)냐고',
@@ -696,54 +696,54 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅑㄱㅗ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅑㄱㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㅑㄱㅗ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅡㄴㅑㄱㅗ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㅇㅡㄴㅑㄱㅗ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-너라': {
             name: '-너라',
             rules: [
-                suffixInflection('ㄴㅓㄹㅏ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄴㅓㄹㅏ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-네': {
             name: '-네',
             rules: [
                 suffixInflection('ㄴㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
                 suffixInflection('ㄴㅔ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅔ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄴㅔ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-노니': {
             name: '-노니',
             rules: [
                 suffixInflection('ㄴㅗㄴㅣ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㄴㅣ', '', [], ['p', 'f', 'eusi', 'sab', 'euob'])
-            ]
+                suffixInflection('ㄴㅗㄴㅣ', '', [], ['p', 'f', 'eusi', 'sab', 'euob']),
+            ],
         },
         '-노라': {
             name: '-노라',
             rules: [
                 suffixInflection('ㄴㅗㄹㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅗㄹㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㄴㅗㄹㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-노라고': {
             name: '-노라고',
             rules: [
-                suffixInflection('ㄴㅗㄹㅏㄱㅗ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄴㅗㄹㅏㄱㅗ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-노라니': {
             name: '-노라니',
             rules: [
-                suffixInflection('ㄴㅗㄹㅏㄴㅣ', 'ㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄴㅗㄹㅏㄴㅣ', 'ㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-노라니까': {
             name: '-노라니까',
             rules: [
-                suffixInflection('ㄴㅗㄹㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄴㅗㄹㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-노라면': {
             name: '-노라면',
@@ -751,8 +751,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅗㄹㅏㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㅗㄹㅏㅁㅕㄴ', '', [], ['eusi']),
                 suffixInflection('ㅇㅣㅆㄴㅗㄹㅏㅁㅕㄴ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅗㄹㅏㅁㅕㄴ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅗㄹㅏㅁㅕㄴ', '없다', [], []),
+            ],
         },
         '-(으)뇨': {
             name: '-(으)뇨',
@@ -764,84 +764,84 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅛ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄴㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅛ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅛ', '', [], ['eusi']),
+            ],
         },
         '-누': {
             name: '-누',
             rules: [
                 suffixInflection('ㄴㅜ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅜ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㄴㅜ', '', [], ['p', 'f']),
+            ],
         },
         '-누나': {
             name: '-누나',
             rules: [
                 suffixInflection('ㄴㅜㄴㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅜㄴㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅜㄴㅏ', '', [], ['eusi']),
+            ],
         },
         '-누만': {
             name: '-누만',
             rules: [
                 suffixInflection('ㄴㅜㅁㅏㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅜㅁㅏㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅜㅁㅏㄴ', '', [], ['eusi']),
+            ],
         },
         '-누먼': {
             name: '-누먼',
             rules: [
                 suffixInflection('ㄴㅜㅁㅓㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅜㅁㅓㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅜㅁㅓㄴ', '', [], ['eusi']),
+            ],
         },
         '-느냐': {
             name: '-느냐',
             rules: [
                 suffixInflection('ㄴㅡㄴㅑ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅑ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄴㅡㄴㅑ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-느냐고': {
             name: '-느냐고',
             rules: [
                 suffixInflection('ㄴㅡㄴㅑㄱㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅑㄱㅗ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄴㅡㄴㅑㄱㅗ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-느뇨': {
             name: '-느뇨',
             rules: [
                 suffixInflection('ㄴㅡㄴㅛ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅛ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄴㅡㄴㅛ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-느니': {
             name: '-느니',
             rules: [
                 suffixInflection('ㄴㅡㄴㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㅡㄴㅣ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄴㅡㄴㅣ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-느니만': {
             name: '-느니만',
             rules: [
-                suffixInflection('ㄴㅡㄴㅣㅁㅏㄴ ㅁㅗㅅㅎㅏㄷㅏ', 'ㄷㅏ', ['v'], ['v', 'adj'])
-            ]
+                suffixInflection('ㄴㅡㄴㅣㅁㅏㄴ ㅁㅗㅅㅎㅏㄷㅏ', 'ㄷㅏ', ['v'], ['v', 'adj']),
+            ],
         },
         '-느라': {
             name: '-느라',
             rules: [
                 suffixInflection('ㄴㅡㄹㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄹㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅡㄹㅏ', '', [], ['eusi']),
+            ],
         },
         '-느라고': {
             name: '-느라고',
             rules: [
                 suffixInflection('ㄴㅡㄹㅏㄱㅗ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄹㅏㄱㅗ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅡㄹㅏㄱㅗ', '', [], ['eusi']),
+            ],
         },
         '-는': {
             name: '-는',
@@ -849,8 +849,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'ida']),
                 suffixInflection('ㄴㅡㄴ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㅡㄴ', '', [], ['eusi', 'f']),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴ', '없다', [], ['adj'])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴ', '없다', [], ['adj']),
+            ],
         },
         '-(으)ㄴ': {
             name: '-(으)ㄴ',
@@ -858,8 +858,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴ', '', [], ['eusi', 'f'])
-            ]
+                suffixInflection('ㄴ', '', [], ['eusi', 'f']),
+            ],
         },
         '-(으/느)ㄴ가': {
             name: '-(으/느)ㄴ가',
@@ -871,8 +871,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄴㄱㅏ', 'ㄹㄷㅏ', [], ['adj']),
                 suffixInflection('ㄴㄱㅏ', '', [], ['eusi']),
                 suffixInflection('ㄴㅡㄴㄱㅏ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅏ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅏ', '없다', [], []),
+            ],
         },
         '-(으/느)ㄴ감': {
             name: '-(으/느)ㄴ감',
@@ -884,8 +884,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄴㄱㅏㅁ', 'ㄹㄷㅏ', [], ['adj']),
                 suffixInflection('ㄴㄱㅏㅁ', '', [], ['eusi']),
                 suffixInflection('ㄴㅡㄴㄱㅏㅁ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅏㅁ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅏㅁ', '없다', [], []),
+            ],
         },
         '-(으/느)ㄴ걸': {
             name: '-(으/느)ㄴ걸',
@@ -897,8 +897,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄴㄱㅓㄹ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㄱㅓㄹ', '', [], ['eusi']),
                 suffixInflection('ㄴㅡㄴㄱㅓㄹ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅓㄹ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅓㄹ', '없다', [], []),
+            ],
         },
         '-(으/느)ㄴ고': {
             name: '-(으/느)ㄴ고',
@@ -910,57 +910,57 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄴㄱㅗ', 'ㄹㄷㅏ', [], ['adj']),
                 suffixInflection('ㄴㄱㅗ', '', [], ['eusi']),
                 suffixInflection('ㄴㅡㄴㄱㅗ', '', [], ['p', 'f', 'eusi']),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅗ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅗ', '없다', [], []),
+            ],
         },
         '-는구나': {
             name: '-는구나',
             rules: [
                 suffixInflection('ㄴㅡㄴㄱㅜㄴㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄴㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅡㄴㄱㅜㄴㅏ', '', [], ['eusi']),
+            ],
         },
         '-는구려': {
             name: '-는구려',
             rules: [
                 suffixInflection('ㄴㅡㄴㄱㅜㄹㅕ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄹㅕ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅡㄴㄱㅜㄹㅕ', '', [], ['eusi']),
+            ],
         },
         '-는구료': {
             name: '-는구료',
             rules: [
                 suffixInflection('ㄴㅡㄴㄱㅜㄹㅛ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄹㅛ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅡㄴㄱㅜㄹㅛ', '', [], ['eusi']),
+            ],
         },
         '-는구만': {
             name: '-는구만',
             rules: [
                 suffixInflection('ㄴㅡㄴㄱㅜㅁㅏㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅏㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅡㄴㄱㅜㅁㅏㄴ', '', [], ['eusi']),
+            ],
         },
         '-는구먼': {
             name: '-는구먼',
             rules: [
                 suffixInflection('ㄴㅡㄴㄱㅜㅁㅓㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅓㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅡㄴㄱㅜㅁㅓㄴ', '', [], ['eusi']),
+            ],
         },
         '-는구면': {
             name: '-는구면',
             rules: [
                 suffixInflection('ㄴㅡㄴㄱㅜㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㅁㅕㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅡㄴㄱㅜㅁㅕㄴ', '', [], ['eusi']),
+            ],
         },
         '-는군': {
             name: '-는군',
             rules: [
                 suffixInflection('ㄴㅡㄴㄱㅜㄴ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㅡㄴㄱㅜㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㅡㄴㄱㅜㄴ', '', [], ['eusi']),
+            ],
         },
         '-는궈니': {
             name: '-는궈니',
@@ -968,8 +968,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅡㄴㄱㅜㅓㄴㅣ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㅡㄴㄱㅜㅓㄴㅣ', '', [], ['p', 'f', 'eusi']),
                 suffixInflection('ㅇㅣㅆㄴㅡㄴㄱㅜㅓㄴㅣ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅜㅓㄴㅣ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅜㅓㄴㅣ', '없다', [], []),
+            ],
         },
         '-는과니': {
             name: '-는과니',
@@ -977,8 +977,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅡㄴㄱㅗㅏㄴㅣ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㅡㄴㄱㅗㅏㄴㅣ', '', [], ['p', 'f', 'eusi']),
                 suffixInflection('ㅇㅣㅆㄴㅡㄴㄱㅗㅏㄴㅣ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅗㅏㄴㅣ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄱㅗㅏㄴㅣ', '없다', [], []),
+            ],
         },
         '-(느': {
             name: '-(느)ㄴ다',
@@ -986,8 +986,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㅡㄴㄷㅏ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄴㄷㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㄷㅏ', '', [], ['eusi']),
+            ],
         },
         '-((느)ㄴ)다고': {
             name: '-((느)ㄴ)다고',
@@ -997,8 +997,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㄱㅗ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㄱㅗ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㄱㅗ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄱㅗ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄱㅗ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다나': {
             name: '-((느)ㄴ)다나',
@@ -1008,8 +1008,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㄴㅏ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㄴㅏ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㄴㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄴㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄴㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다네': {
             name: '-((느)ㄴ)다네',
@@ -1019,8 +1019,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㄴㅔ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㄴㅔ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㄴㅔ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄴㅔ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄴㅔ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다느니': {
             name: '-((느)ㄴ)다느니',
@@ -1030,8 +1030,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㄴㅡㄴㅣ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㄴㅡㄴㅣ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㄴㅡㄴㅣ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄴㅡㄴㅣ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄴㅡㄴㅣ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다니': {
             name: '-((느)ㄴ)다니',
@@ -1041,8 +1041,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㄴㅣ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㄴㅣ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㄴㅣ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㄴㅣ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄴㅣ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다니까': {
             name: '-((느)ㄴ)다니까',
@@ -1052,8 +1052,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㄴㅣㄲㅏ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄴㅣㄲㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄴㅣㄲㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다더라': {
             name: '-((느)ㄴ)다더라',
@@ -1063,8 +1063,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㄷㅓㄹㅏ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㄷㅓㄹㅏ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㄷㅓㄹㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄷㅓㄹㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄷㅓㄹㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다마는': {
             name: '-((느)ㄴ)다마는',
@@ -1074,8 +1074,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅁㅏㄴㅡㄴ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㅁㅏㄴㅡㄴ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다만': {
             name: '-((느)ㄴ)다만',
@@ -1085,8 +1085,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅁㅏㄴ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㅁㅏㄴ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅁㅏㄴ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁㅏㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다며': {
             name: '-((느)ㄴ)다며',
@@ -1096,8 +1096,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅁㅕ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㅁㅕ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅁㅕ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁㅕ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅁㅕ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다면': {
             name: '-((느)ㄴ)다면',
@@ -1107,8 +1107,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅁㅕㄴ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㅁㅕㄴ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅁㅕㄴ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁㅕㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅁㅕㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다면서': {
             name: '-((느)ㄴ)다면서',
@@ -1118,8 +1118,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅁㅕㄴㅅㅓ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㅁㅕㄴㅅㅓ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅁㅕㄴㅅㅓ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁㅕㄴㅅㅓ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅁㅕㄴㅅㅓ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다손': {
             name: '-((느)ㄴ)다손',
@@ -1129,8 +1129,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅅㅗㄴ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㅅㅗㄴ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅁㅕㄴㅅㅗㄴ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁㅕㄴㅅㅗㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅁㅕㄴㅅㅗㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다오': {
             name: '-((느)ㄴ)다오',
@@ -1140,8 +1140,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅇㅗ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㅇㅗ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅇㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㅇㅗ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅇㅗ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)다지': {
             name: '-((느)ㄴ)다지',
@@ -1151,8 +1151,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅈㅣ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㅈㅣ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅈㅣ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅈㅣ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅈㅣ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)단다': {
             name: '-((느)ㄴ)단다',
@@ -1162,8 +1162,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㄴㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㄴㄷㅏ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㄴㄷㅏ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㄴㄷㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄴㄷㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)담': {
             name: '-((느)ㄴ)담',
@@ -1173,8 +1173,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅁ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㅁ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅁ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㄷㅏㅁ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅁ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)답니까': {
             name: '-((느)ㄴ)답니까',
@@ -1184,8 +1184,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅂㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㅂㄴㅣㄲㅏ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㅂㄴㅣㄲㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅂㄴㅣㄲㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)답니다': {
             name: '-((느)ㄴ)답니다',
@@ -1195,8 +1195,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅂㄴㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅏㅂㄴㅣㄷㅏ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㅂㄴㅣㄷㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅂㄴㅣㄷㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)답시고': {
             name: '-((느)ㄴ)답시고',
@@ -1206,8 +1206,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅏㅂㅅㅣㄱㅗ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㅡㄴㄷㅏㅂㅅㅣㄱㅗ', '', [], ['eusi']),
                 suffixInflection('ㄷㅏㅂㅅㅣㄱㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㅂㅅㅣㄱㅗ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅂㅅㅣㄱㅗ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)대': {
             name: '-((느)ㄴ)대',
@@ -1217,8 +1217,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅐ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅐ', '', [], ['eusi']),
                 suffixInflection('ㄷㅐ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅐ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅐ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-((느)ㄴ)대요': {
             name: '-((느)ㄴ)대요',
@@ -1230,8 +1230,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄷㅐㅇㅛ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄷㅐㅇㅛ', '', [], ['p', 'f', 'eusi']),
                 suffixInflection('ㅇㅣㅆㄴㅡㄴㄷㅐㅇㅛ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄷㅐㅇㅛ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄷㅐㅇㅛ', '없다', [], []),
+            ],
         },
         '-((느)ㄴ)댄다': {
             name: '-((느)ㄴ)댄다',
@@ -1241,8 +1241,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅐㄴㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
                 suffixInflection('ㄴㄷㅐㄴㄷㅏ', '', [], ['eusi']),
                 suffixInflection('ㄷㅐㄴㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅐㄴㄷㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅐㄴㄷㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-(으/느)ㄴ데': {
             name: '-(으/느)ㄴ데',
@@ -1254,8 +1254,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅔ', '', [], ['eusi', 'sao']),
                 suffixInflection('ㄴㅡㄴㄷㅔ', '', [], ['p', 'f', 'eusi']),
                 suffixInflection('ㅇㅣㅆㄴㅡㄴㄷㅔ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄷㅔ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄷㅔ', '없다', [], []),
+            ],
         },
         '-(으/느)ㄴ뎁쇼': {
             name: '-(으/느)ㄴ뎁쇼',
@@ -1267,14 +1267,14 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅔㅂㅅㅛ', '', [], ['eusi']),
                 suffixInflection('ㄴㅡㄴㄷㅔㅂㅅㅛ', '', [], ['p', 'f', 'eusi']),
                 suffixInflection('ㅇㅣㅆㄴㅡㄴㄷㅔㅂㅅㅛ', '', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄷㅔㅂㅅㅛ', '', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㄷㅔㅂㅅㅛ', '', [], []),
+            ],
         },
         '-는도다': {
             name: '-는도다',
             rules: [
-                suffixInflection('ㄴㅡㄴㄷㅗㄷㅏ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄴㅡㄴㄷㅗㄷㅏ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-(으/느)ㄴ바': {
             name: '-(으/느)ㄴ바',
@@ -1287,8 +1287,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅡㄴㅂㅏ', '', [], ['p', 'f', 'eusi']),
                 suffixInflection('ㅇㅡㄴㅂㅏ', '', [], ['eusi']),
                 suffixInflection('ㅇㅣㅆㄴㅡㄴㅂㅏ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅂㅏ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅂㅏ', '없다', [], []),
+            ],
         },
         '-(으/느)ㄴ지': {
             name: '-(으/느)ㄴ지',
@@ -1300,8 +1300,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅈㅣ', '', [], ['eusi']),
                 suffixInflection('ㄴㅡㄴㅈㅣ', '', [], ['p', 'f', 'eusi']),
                 suffixInflection('ㅇㅣㅆㄴㅡㄴㅈㅣ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅈㅣ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅈㅣ', '없다', [], []),
+            ],
         },
         '-(으/느)ㄴ지고': {
             name: '-(으/느)ㄴ지고',
@@ -1313,8 +1313,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅈㅣㄱㅗ', '', [], ['eusi']),
                 suffixInflection('ㄴㅡㄴㅈㅣㄱㅗ', '', [], ['p', 'f', 'eusi']),
                 suffixInflection('ㅇㅣㅆㄴㅡㄴㅈㅣㄱㅗ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅈㅣㄱㅗ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅈㅣㄱㅗ', '없다', [], []),
+            ],
         },
         '-(으/느)ㄴ지라': {
             name: '-(으/느)ㄴ지라',
@@ -1326,8 +1326,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅈㅣㄹㅏ', '', [], ['eusi']),
                 suffixInflection('ㄴㅡㄴㅈㅣㄹㅏ', '', [], ['p', 'f', 'eusi']),
                 suffixInflection('ㅇㅣㅆㄴㅡㄴㅈㅣㄹㅏ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅈㅣㄹㅏ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄴㅡㄴㅈㅣㄹㅏ', '없다', [], []),
+            ],
         },
         '-(으)니': {
             name: '-(으)니',
@@ -1339,8 +1339,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄴㅣ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅡㄴㅣ', '', [], ['p', 'f', 'eusi', 'euo', 'sao', 'jao'])
-            ]
+                suffixInflection('ㅇㅡㄴㅣ', '', [], ['p', 'f', 'eusi', 'euo', 'sao', 'jao']),
+            ],
         },
         '-(으)니까': {
             name: '-(으)니까',
@@ -1353,8 +1353,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㄴㅣㄲㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)니까느루': {
             name: '-(으)니까느루',
@@ -1367,8 +1367,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅣㄲㅏㄴㅡㄹㅜ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅣㄲㅏㄴㅡㄹㅜ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㅣㄲㅏㄴㅡㄹㅜ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴㅡㄹㅜ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴㅡㄹㅜ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)니까는': {
             name: '-(으)니까는',
@@ -1381,8 +1381,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅣㄲㅏㄴㅡㄴ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅣㄲㅏㄴㅡㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㅣㄲㅏㄴㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴㅡㄴ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴㅡㄴ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)니깐': {
             name: '-(으)니깐',
@@ -1395,8 +1395,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅣㄲㅏㄴ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅣㄲㅏㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㅣㄲㅏㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㄴㅣㄲㅏㄴ', '', [], ['p', 'f']),
+            ],
         },
         '-(으/느)니라': {
             name: '-(으/느)니라',
@@ -1406,8 +1406,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅡㄴㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㄴㅣㄹㅏ', 'ㄷㅏ', [], ['adj']),
                 suffixInflection('ㄴㅣㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㄹㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㅇㅡㄴㅣㄹㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-(으/느)니만치': {
             name: '-(으/느)니만치',
@@ -1418,8 +1418,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅊㅣ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㅣㅁㅏㄴㅊㅣ', '', [], ['eusi']),
                 suffixInflection('ㄴㅡㄴㅣㅁㅏㄴㅊㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅊㅣ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅊㅣ', '', [], ['p', 'f']),
+            ],
         },
         '-(으/느)니만큼': {
             name: '-(으/느)니만큼',
@@ -1430,42 +1430,42 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㅣㅁㅏㄴㅋㅡㅁ', '', [], ['eusi']),
                 suffixInflection('ㄴㅡㄴㅣㅁㅏㄴㅋㅡㅁ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅋㅡㅁ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㄴㅣㅁㅏㄴㅋㅡㅁ', '', [], ['p', 'f']),
+            ],
         },
         '-다': {
             name: '-다',
             rules: [
-                suffixInflection('ㄷㅏ', '', [], ['p', 'f', 'eusi', 'ida'])
-            ]
+                suffixInflection('ㄷㅏ', '', [], ['p', 'f', 'eusi', 'ida']),
+            ],
         },
         '-다가': {
             name: '-다가',
             rules: [
                 suffixInflection('ㄷㅏㄱㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㄱㅏ', '', [], ['p', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄱㅏ', '', [], ['p', 'eusi']),
+            ],
         },
         '-다가는': {
             name: '-다가는',
             rules: [
                 suffixInflection('ㄷㅏㄱㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅏㄱㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄱㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-다간': {
             name: '-다간',
             rules: [
                 suffixInflection('ㄷㅏㄱㅏㄴ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅏㄱㅏㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄱㅏㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-다마다': {
             name: '-다마다',
             rules: [
                 suffixInflection('ㄷㅏㅁㅏㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅏㅁㅏㄷㅏ', '', [], ['p', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㅁㅏㄷㅏ', '', [], ['p', 'eusi']),
+            ],
         },
         '-다시피': {
             name: '-다시피',
@@ -1473,238 +1473,238 @@ export const koreanTransforms = {
                 suffixInflection('ㄷㅏㅅㅣㅍㅣ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄷㅏㅅㅣㅍㅣ', '', [], ['p', 'f']),
                 suffixInflection('ㅇㅣㅆㄷㅏㅅㅣㅍㅣ', '있다', [], []),
-                suffixInflection('ㅇㅓㅂㅅㄷㅏㅅㅣㅍㅣ', '없다', [], [])
-            ]
+                suffixInflection('ㅇㅓㅂㅅㄷㅏㅅㅣㅍㅣ', '없다', [], []),
+            ],
         },
         '-단': {
             name: '-단',
             rules: [
                 suffixInflection('ㄷㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅏㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅏㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더': {
             name: '-더',
             rules: [
                 suffixInflection('ㄷㅓ', 'ㄷㅏ', ['do'], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓ', '', ['do'], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓ', '', ['do'], ['p', 'f', 'eusi']),
+            ],
         },
         '-더구나': {
             name: '-더구나',
             rules: [
                 suffixInflection('ㄷㅓㄱㅜㄴㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㄴㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄱㅜㄴㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더구려': {
             name: '-더구려',
             rules: [
                 suffixInflection('ㄷㅓㄱㅜㄹㅕ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㄹㅕ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄱㅜㄹㅕ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더구료': {
             name: '-더구료',
             rules: [
                 suffixInflection('ㄷㅓㄱㅜㄹㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㄹㅛ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄱㅜㄹㅛ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더구만': {
             name: '-더구만',
             rules: [
                 suffixInflection('ㄷㅓㄱㅜㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㅁㅏㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄱㅜㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더구먼': {
             name: '-더구먼',
             rules: [
                 suffixInflection('ㄷㅓㄱㅜㅁㅓㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㅁㅓㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄱㅜㅁㅓㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더구면': {
             name: '-더구면',
             rules: [
                 suffixInflection('ㄷㅓㄱㅜㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㅁㅕㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄱㅜㅁㅕㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더군': {
             name: '-더군',
             rules: [
                 suffixInflection('ㄷㅓㄱㅜㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄱㅜㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄱㅜㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더냐': {
             name: '-더냐',
             rules: [
                 suffixInflection('ㄷㅓㄴㅑ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅑ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㅑ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더뇨': {
             name: '-더뇨',
             rules: [
                 suffixInflection('ㄷㅓㄴㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅛ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㅛ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더니': {
             name: '-더니',
             rules: [
                 suffixInflection('ㄷㅓㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣ', '', [], ['p', 'f', 'eusi', 'euob', 'euo', 'sab'])
-            ]
+                suffixInflection('ㄷㅓㄴㅣ', '', [], ['p', 'f', 'eusi', 'euob', 'euo', 'sab']),
+            ],
         },
         '-더니라': {
             name: '-더니라',
             rules: [
                 suffixInflection('ㄷㅓㄴㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣㄹㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㅣㄹㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더니마는': {
             name: '-더니마는',
             rules: [
                 suffixInflection('ㄷㅓㄴㅣㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㅣㅁㅏㄴㅡㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더니만': {
             name: '-더니만',
             rules: [
                 suffixInflection('ㄷㅓㄴㅣㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣㅁㅏㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㅣㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더니이까': {
             name: '-더니이까',
             rules: [
                 suffixInflection('ㄷㅓㄴㅣㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣㅇㅣㄲㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㅣㅇㅣㄲㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더니이다': {
             name: '-더니이다',
             rules: [
                 suffixInflection('ㄷㅓㄴㅣㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅣㅇㅣㄷㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㅣㅇㅣㄷㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더라도': {
             name: '-더라도',
             rules: [
                 suffixInflection('ㄷㅓㄹㅏㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄹㅏㄷㅗ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄹㅏㄷㅗ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더이까': {
             name: '-더이까',
             rules: [
                 suffixInflection('ㄷㅓㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㅇㅣㄲㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㅇㅣㄲㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-더이다': {
             name: '-더이다',
             rules: [
                 suffixInflection('ㄷㅓㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㅇㅣㄷㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㅇㅣㄷㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-던': {
             name: '-던',
             rules: [
                 suffixInflection('ㄷㅓㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-던가': {
             name: '-던가',
             rules: [
                 suffixInflection('ㄷㅓㄴㄱㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㄱㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㄱㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-던감': {
             name: '-던감',
             rules: [
                 suffixInflection('ㄷㅓㄴㄱㅏㅁ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㄱㅏㅁ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㄱㅏㅁ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-던걸': {
             name: '-던걸',
             rules: [
                 suffixInflection('ㄷㅓㄴㄱㅓㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㄱㅓㄹ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㄱㅓㄹ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-던고': {
             name: '-던고',
             rules: [
                 suffixInflection('ㄷㅓㄴㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㄱㅗ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㄱㅗ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-던데': {
             name: '-던데',
             rules: [
                 suffixInflection('ㄷㅓㄴㄷㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㄷㅔ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㄷㅔ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-던들': {
             name: '-던들',
             rules: [
-                suffixInflection('ㄷㅓㄴㄷㅡㄹ', '', [], ['p'])
-            ]
+                suffixInflection('ㄷㅓㄴㄷㅡㄹ', '', [], ['p']),
+            ],
         },
         '-던바': {
             name: '-던바',
             rules: [
                 suffixInflection('ㄷㅓㄴㅂㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅂㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㅂㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-던지': {
             name: '-던지',
             rules: [
                 suffixInflection('ㄷㅓㄴㅈㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅓㄴㅈㅣ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅓㄴㅈㅣ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-데': {
             name: '-데',
             rules: [
                 suffixInflection('ㄷㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅔ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅔ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-데요': {
             name: '-데요',
             rules: [
                 suffixInflection('ㄷㅔㅇㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅔㅇㅛ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅔㅇㅛ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-도다': {
             name: '-도다',
             rules: [
                 suffixInflection('ㄷㅗㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅗㄷㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅗㄷㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-도록': {
             name: '-도록',
             rules: [
                 suffixInflection('ㄷㅗㄹㅗㄱ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄷㅗㄹㅗㄱ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄷㅗㄹㅗㄱ', '', [], ['eusi']),
+            ],
         },
         '-(으)되': {
             name: '-(으)되',
@@ -1712,153 +1712,153 @@ export const koreanTransforms = {
                 suffixInflection('ㄷㅗㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
                 suffixInflection('ㅇㅡㄷㅗㅣ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄷㅗㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄷㅗㅣ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㄷㅗㅣ', '', [], ['p', 'f']),
+            ],
         },
         '-드구나': {
             name: '-드구나',
             rules: [
                 suffixInflection('ㄷㅡㄱㅜㄴㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄱㅜㄴㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄱㅜㄴㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-드구료': {
             name: '-드구료',
             rules: [
                 suffixInflection('ㄷㅡㄱㅜㄹㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄱㅜㄹㅛ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄱㅜㄹㅛ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-드구면': {
             name: '-드구면',
             rules: [
                 suffixInflection('ㄷㅡㄱㅜㅁㅕㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄱㅜㅁㅕㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄱㅜㅁㅕㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-드군': {
             name: '-드군',
             rules: [
                 suffixInflection('ㄷㅡㄱㅜㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄱㅜㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄱㅜㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-드냐': {
             name: '-드냐',
             rules: [
                 suffixInflection('ㄷㅡㄴㅑ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㅑ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄴㅑ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-드니': {
             name: '-드니',
             rules: [
                 suffixInflection('ㄷㅡㄴㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㅣ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄴㅣ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-드니라': {
             name: '-드니라',
             rules: [
                 suffixInflection('ㄷㅡㄴㅣㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㅣㄹㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄴㅣㄹㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-드라': {
             name: '-드라',
             rules: [
                 suffixInflection('ㄷㅡㄹㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄹㅏ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄹㅏ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-드라도': {
             name: '-드라도',
             rules: [
                 suffixInflection('ㄷㅡㄹㅏㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄹㅏㄷㅗ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄹㅏㄷㅗ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-드라면': {
             name: '-드라면',
             rules: [
-                suffixInflection('ㄷㅡㄹㅏㅁㅕㄴ', '', [], ['p'])
-            ]
+                suffixInflection('ㄷㅡㄹㅏㅁㅕㄴ', '', [], ['p']),
+            ],
         },
         '-드래도': {
             name: '-드래도',
             rules: [
                 suffixInflection('ㄷㅡㄹㅐㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄹㅐㄷㅗ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄹㅐㄷㅗ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-든': {
             name: '-든',
             rules: [
                 suffixInflection('ㄷㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴ', '', [], ['p', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄴ', '', [], ['p', 'eusi']),
+            ],
         },
         '-든가': {
             name: '-든가',
             rules: [
                 suffixInflection('ㄷㅡㄴㄱㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㄱㅏ', '', [], ['p', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄴㄱㅏ', '', [], ['p', 'eusi']),
+            ],
         },
         '-든걸': {
             name: '-든걸',
             rules: [
                 suffixInflection('ㄷㅡㄴㄱㅓㄹ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㄱㅓㄹ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄴㄱㅓㄹ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-든고': {
             name: '-든고',
             rules: [
                 suffixInflection('ㄷㅡㄴㄱㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㄱㅗ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄴㄱㅗ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-든데': {
             name: '-든데',
             rules: [
                 suffixInflection('ㄷㅡㄴㄷㅔ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㄷㅔ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄴㄷㅔ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-든들': {
             name: '-든들',
             rules: [
-                suffixInflection('ㄷㅡㄴㄷㅡㄹ', '', [], ['p'])
-            ]
+                suffixInflection('ㄷㅡㄴㄷㅡㄹ', '', [], ['p']),
+            ],
         },
         '-든지': {
             name: '-든지',
             rules: [
                 suffixInflection('ㄷㅡㄴㅈㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㄴㅈㅣ', '', [], ['p', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㄴㅈㅣ', '', [], ['p', 'eusi']),
+            ],
         },
         '-듯': {
             name: '-듯',
             rules: [
                 suffixInflection('ㄷㅡㅅ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㅅ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㅅ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-듯이': {
             name: '-듯이',
             rules: [
                 suffixInflection('ㄷㅡㅅㅇㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅡㅅㅇㅣ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅡㅅㅇㅣ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-디': {
             name: '-디',
             rules: [
                 suffixInflection('ㄷㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㄷㅣ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㄷㅣ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-(으)라': {
             name: '-(으)라',
@@ -1870,8 +1870,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)라고': {
             name: '-(으)라고',
@@ -1883,8 +1883,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㄱㅗ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㄱㅗ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㄱㅗ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄱㅗ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㄱㅗ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)라구': {
             name: '-(으)라구',
@@ -1896,8 +1896,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㄱㅜ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㄱㅜ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㄱㅜ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄱㅜ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㄱㅜ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)라나': {
             name: '-(으)라나',
@@ -1909,8 +1909,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㄴㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㄴㅏ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㅏ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㄴㅏ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)라네': {
             name: '-(으)라네',
@@ -1922,8 +1922,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㄴㅔ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㄴㅔ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㅔ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㅔ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㄴㅔ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)라느니': {
             name: '-(으)라느니',
@@ -1935,8 +1935,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㄴㅡㄴㅣ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㄴㅡㄴㅣ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㅡㄴㅣ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㅡㄴㅣ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㄴㅡㄴㅣ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)라니': {
             name: '-(으)라니',
@@ -1948,8 +1948,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㄴㅣ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㄴㅣ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㅣ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㅣ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㄴㅣ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)라니까': {
             name: '-(으)라니까',
@@ -1961,15 +1961,15 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㄴㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㅣㄲㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㅣㄲㅏ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㄴㅣㄲㅏ', '', [], ['eusi', 'do']),
+            ],
         },
         '-라도': {
             name: '-라도',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㄷㅗ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄷㅗ', 'ㄷㅏ', [], ['ida'])
-            ]
+                suffixInflection('ㄹㅏㄷㅗ', 'ㄷㅏ', [], ['ida']),
+            ],
         },
         '-(으)라며': {
             name: '-(으)라며',
@@ -1981,8 +1981,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㅁㅕ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㅁㅕ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅁㅕ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅁㅕ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㅁㅕ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)라면': {
             name: '-(으)라면',
@@ -1994,8 +1994,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㅁㅕㄴ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㅁㅕㄴ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅁㅕㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅁㅕㄴ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㅁㅕㄴ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)라면서': {
             name: '-(으)라면서',
@@ -2007,16 +2007,16 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㅁㅕㄴㅅㅓ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㅁㅕㄴㅅㅓ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅁㅕㄴㅅㅓ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅁㅕㄴㅅㅓ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㅁㅕㄴㅅㅓ', '', [], ['eusi', 'do']),
+            ],
         },
         '-라서': {
             name: '-라서',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅅㅓ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅏㅅㅓ', '다', [], ['ida']),
-                suffixInflection('ㄹㅏㅅㅓ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅏㅅㅓ', '', [], ['eusi']),
+            ],
         },
         '-(으)라손': {
             name: '-(으)라손',
@@ -2028,24 +2028,24 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㅅㅗㄴ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㅅㅗㄴ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅅㅗㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅅㅗㄴ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㅅㅗㄴ', '', [], ['eusi', 'do']),
+            ],
         },
         '-라야': {
             name: '-라야',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅇㅑ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅏㅇㅑ', '다', [], ['ida']),
-                suffixInflection('ㄹㅏㅇㅑ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅏㅇㅑ', '', [], ['eusi']),
+            ],
         },
         '-라야만': {
             name: '-라야만',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅇㅑㅁㅏㄴ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅏㅇㅑㅁㅏㄴ', '다', [], ['ida']),
-                suffixInflection('ㄹㅏㅇㅑㅁㅏㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅏㅇㅑㅁㅏㄴ', '', [], ['eusi']),
+            ],
         },
         '-(으)라오': {
             name: '-(으)라오',
@@ -2057,8 +2057,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㅇㅗ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㅇㅗ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅇㅗ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅇㅗ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㅇㅗ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)라지': {
             name: '-(으)라지',
@@ -2070,8 +2070,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㅈㅣ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㅈㅣ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅈㅣ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅈㅣ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㅈㅣ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)락': {
             name: '-(으)락',
@@ -2082,8 +2082,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹㅏㄱ', 'ㅂㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㄹㅏㄱ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅏㄱ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅏㄱ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㄹㅏㄱ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-(으)란': {
             name: '-(으)란',
@@ -2095,8 +2095,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㄴ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㄴ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㄴ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㄴ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)란다': {
             name: '-(으)란다',
@@ -2108,8 +2108,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㄴㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㄴㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㄴㄷㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㄴㄷㅏ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㄴㄷㅏ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)람': {
             name: '-(으)람',
@@ -2121,8 +2121,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㅁ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅁ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅁ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㅁ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)랍니까': {
             name: '-(으)랍니까',
@@ -2134,8 +2134,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㅂㄴㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㅂㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅂㄴㅣㄲㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅂㄴㅣㄲㅏ', '', [], ['eusi', 'do'])
-            ]
+                suffixInflection('ㄹㅏㅂㄴㅣㄲㅏ', '', [], ['eusi', 'do']),
+            ],
         },
         '-(으)랍니다': {
             name: '-(으)랍니다',
@@ -2147,16 +2147,16 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅏㅂㄴㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅏㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅂㄴㅣㄷㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅏㅂㄴㅣㄷㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅏㅂㄴㅣㄷㅏ', '', [], ['eusi']),
+            ],
         },
         '-랍시고': {
             name: '-랍시고',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅏㅂㅅㅣㄱㅗ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅏㅂㅅㅣㄱㅗ', '다', [], ['ida']),
-                suffixInflection('ㄹㅏㅂㅅㅣㄱㅗ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅏㅂㅅㅣㄱㅗ', '', [], ['eusi']),
+            ],
         },
         '-(으)래': {
             name: '-(으)래',
@@ -2168,8 +2168,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅐ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅐ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅐ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅐ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅐ', '', [], ['eusi']),
+            ],
         },
         '-(으)래요': {
             name: '-(으)래요',
@@ -2181,8 +2181,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅐㅇㅛ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅐㅇㅛ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅏㄴㅣㄹㅐㅇㅛ', '아니다', [], ['adj']),
-                suffixInflection('ㄹㅐㅇㅛ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅐㅇㅛ', '', [], ['eusi']),
+            ],
         },
         '-(으)랴': {
             name: '-(으)랴',
@@ -2193,8 +2193,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹㅑ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㄹㅑ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅑ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅑ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅑ', '', [], ['eusi']),
+            ],
         },
         '-(으)러': {
             name: '-(으)러',
@@ -2205,80 +2205,80 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹㅓ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㄹㅓ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅓ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅓ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅓ', '', [], ['eusi']),
+            ],
         },
         '-러니': {
             name: '-러니',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㅣ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅓㄴㅣ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㅣ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅓㄴㅣ', '', [], ['eusi']),
+            ],
         },
         '-러니라': {
             name: '-러니라',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㅣㄹㅏ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅓㄴㅣㄹㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㅣㄹㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅓㄴㅣㄹㅏ', '', [], ['eusi']),
+            ],
         },
         '-러니이까': {
             name: '-러니이까',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㅣㅇㅣㄲㅏ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅓㄴㅣㅇㅣㄲㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㅣㅇㅣㄲㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅓㄴㅣㅇㅣㄲㅏ', '', [], ['eusi']),
+            ],
         },
         '-러니이다': {
             name: '-러니이다',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㅣㅇㅣㄷㅏ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅓㄴㅣㅇㅣㄷㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㅣㅇㅣㄷㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅓㄴㅣㅇㅣㄷㅏ', '', [], ['eusi']),
+            ],
         },
         '-러라': {
             name: '-러라',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅓㄹㅏ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅓㄹㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄹㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅓㄹㅏ', '', [], ['eusi']),
+            ],
         },
         '-러이까': {
             name: '-러이까',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅓㅇㅣㄲㅏ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅓㅇㅣㄲㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㅇㅣㄲㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅓㅇㅣㄲㅏ', '', [], ['eusi']),
+            ],
         },
         '-러이다': {
             name: '-러이다',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅓㅇㅣㄷㅏ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅓㅇㅣㄷㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㅇㅣㄷㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅓㅇㅣㄷㅏ', '', [], ['eusi']),
+            ],
         },
         '-런가': {
             name: '-런가',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㄱㅏ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅓㄴㄱㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㄱㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅓㄴㄱㅏ', '', [], ['eusi']),
+            ],
         },
         '-런들': {
             name: '-런들',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅓㄴㄷㅡㄹ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅓㄴㄷㅡㄹ', '다', [], ['ida']),
-                suffixInflection('ㄹㅓㄴㄷㅡㄹ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅓㄴㄷㅡㄹ', '', [], ['eusi']),
+            ],
         },
         '-(으)려': {
             name: '-(으)려',
@@ -2290,8 +2290,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅕ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅕ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅕ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕ', '', [], ['p']),
+            ],
         },
         '-(으)려거든': {
             name: '-(으)려거든',
@@ -2303,8 +2303,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅕㄱㅓㄷㅡㄴ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅕㄱㅓㄷㅡㄴ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅕㄱㅓㄷㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄱㅓㄷㅡㄴ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㄱㅓㄷㅡㄴ', '', [], ['p']),
+            ],
         },
         '-(으)려고': {
             name: '-(으)려고',
@@ -2316,8 +2316,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅕㄱㅗ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄹㅕㄱㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅕㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄱㅗ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㄱㅗ', '', [], ['p']),
+            ],
         },
         '-(으)려나': {
             name: '-(으)려나',
@@ -2330,8 +2330,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅕㄴㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅕㄴㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅕㄴㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㄴㅏ', '', [], ['p']),
+            ],
         },
         '-(으)려니': {
             name: '-(으)려니',
@@ -2344,8 +2344,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅕㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅕㄴㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅕㄴㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㄴㅣ', '', [], ['p']),
+            ],
         },
         '-(으)려니와': {
             name: '-(으)려니와',
@@ -2358,8 +2358,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅕㄴㅣㅇㅗㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅕㄴㅣㅇㅗㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅕㄴㅣㅇㅗㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅣㅇㅗㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㄴㅣㅇㅗㅏ', '', [], ['p']),
+            ],
         },
         '-(으)려든': {
             name: '-(으)려든',
@@ -2371,8 +2371,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅕㄷㅡㄴ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅕㄷㅡㄴ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅕㄷㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄷㅡㄴ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㄷㅡㄴ', '', [], ['p']),
+            ],
         },
         '-(으)려마': {
             name: '-(으)려마',
@@ -2384,8 +2384,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅕㅁㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅕㅁㅏ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅕㅁㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㅁㅏ', '', [], ['p']),
+            ],
         },
         '-(으)려면': {
             name: '-(으)려면',
@@ -2398,8 +2398,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅕㅁㅕㄴ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅕㅁㅕㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅕㅁㅕㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅕㄴ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㅁㅕㄴ', '', [], ['p']),
+            ],
         },
         '-(으)려무나': {
             name: '-(으)려무나',
@@ -2411,8 +2411,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅕㅁㅜㄴㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅕㅁㅜㄴㅏ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅕㅁㅜㄴㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅁㅜㄴㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㅁㅜㄴㅏ', '', [], ['p']),
+            ],
         },
         '-(으)련': {
             name: '-(으)련',
@@ -2424,8 +2424,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅕㄴ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅕㄴ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅕㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㄴ', '', [], ['p']),
+            ],
         },
         '-(으)련마는': {
             name: '-(으)련마는',
@@ -2438,8 +2438,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅕㄴㅁㅏㄴㅡㄴ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅕㄴㅁㅏㄴㅡㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅕㄴㅁㅏㄴㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅁㅏㄴㅡㄴ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㄴㅁㅏㄴㅡㄴ', '', [], ['p']),
+            ],
         },
         '-(으)련만': {
             name: '-(으)련만',
@@ -2452,8 +2452,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅕㄴㅁㅏㄴ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅕㄴㅁㅏㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅕㄴㅁㅏㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㄴㅁㅏㄴ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㄴㅁㅏㄴ', '', [], ['p']),
+            ],
         },
         '-(으)렴': {
             name: '-(으)렴',
@@ -2465,8 +2465,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅕㅁ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅕㅁ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅕㅁ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅁ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㅁ', '', [], ['p']),
+            ],
         },
         '-(으)렵니까': {
             name: '-(으)렵니까',
@@ -2478,8 +2478,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄲㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅕㅂㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅕㅂㄴㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄲㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄲㅏ', '', [], ['p']),
+            ],
         },
         '-(으)렵니다': {
             name: '-(으)렵니다',
@@ -2491,8 +2491,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅕㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅕㅂㄴㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄷㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㅂㄴㅣㄷㅏ', '', [], ['p']),
+            ],
         },
         '-(으)렷다': {
             name: '-(으)렷다',
@@ -2505,120 +2505,120 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅕㅅㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅕㅅㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅕㅅㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅕㅅㄷㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅕㅅㄷㅏ', '', [], ['p']),
+            ],
         },
         '-로고': {
             name: '-로고',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅗ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄱㅗ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅗ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㄱㅗ', '', [], ['eusi']),
+            ],
         },
         '-로고나': {
             name: '-로고나',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅗㄴㅏ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄱㅗㄴㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅗㄴㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㄱㅗㄴㅏ', '', [], ['eusi']),
+            ],
         },
         '-로구나': {
             name: '-로구나',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㄴㅏ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄱㅜㄴㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㄴㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㄱㅜㄴㅏ', '', [], ['eusi']),
+            ],
         },
         '-로구려': {
             name: '-로구려',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㄹㅕ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄱㅜㄹㅕ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㄹㅕ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㄱㅜㄹㅕ', '', [], ['eusi']),
+            ],
         },
         '-로구료': {
             name: '-로구료',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㄹㅛ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄱㅜㄹㅛ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㄹㅛ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㄱㅜㄹㅛ', '', [], ['eusi']),
+            ],
         },
         '-로구만': {
             name: '-로구만',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㅁㅏㄴ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄱㅜㅁㅏㄴ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㅁㅏㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㄱㅜㅁㅏㄴ', '', [], ['eusi']),
+            ],
         },
         '-로구먼': {
             name: '-로구먼',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㅁㅓㄴ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄱㅜㅁㅓㄴ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㅁㅓㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㄱㅜㅁㅓㄴ', '', [], ['eusi']),
+            ],
         },
         '-로구면': {
             name: '-로구면',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㅁㅕㄴ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄱㅜㅁㅕㄴ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㅁㅕㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㄱㅜㅁㅕㄴ', '', [], ['eusi']),
+            ],
         },
         '-로군': {
             name: '-로군',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄱㅜㄴ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄱㅜㄴ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄱㅜㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㄱㅜㄴ', '', [], ['eusi']),
+            ],
         },
         '-로다': {
             name: '-로다',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄷㅏ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄷㅏ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄷㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㄷㅏ', '', [], ['eusi']),
+            ],
         },
         '-로되': {
             name: '-로되',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄷㅗㅣ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄷㅗㅣ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㄷㅗㅣ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㄷㅗㅣ', '', [], ['eusi']),
+            ],
         },
         '-로라': {
             name: '-로라',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㄹㅏ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㄹㅏ', '다', [], ['ida']),
-                suffixInflection('', '다', [], ['ida'])
-            ]
+                suffixInflection('', '다', [], ['ida']),
+            ],
         },
         '-로서니': {
             name: '-로서니',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㅅㅓㄴㅣ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㅅㅓㄴㅣ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㅅㅓㄴㅣ', '다', [], ['ida'])
-            ]
+                suffixInflection('ㄹㅗㅅㅓㄴㅣ', '다', [], ['ida']),
+            ],
         },
         '-로세': {
             name: '-로세',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㄹㅗㅅㅔ', '아니다', [], ['adj']),
                 suffixInflection('ㄹㅗㅅㅔ', '다', [], ['ida']),
-                suffixInflection('ㄹㅗㅅㅔ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅗㅅㅔ', '', [], ['eusi']),
+            ],
         },
         '-(으)리': {
             name: '-(으)리',
@@ -2631,8 +2631,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅣ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅣ', '', [], ['p']),
+            ],
         },
         '-(으)리까': {
             name: '-(으)리까',
@@ -2645,8 +2645,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅣㄲㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅣㄲㅏ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㄲㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅣㄲㅏ', '', [], ['p']),
+            ],
         },
         '-(으)리니': {
             name: '-(으)리니',
@@ -2659,8 +2659,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅣㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅣㄴㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅣㄴㅣ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㄴㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅣㄴㅣ', '', [], ['p']),
+            ],
         },
         '-(으)리니라': {
             name: '-(으)리니라',
@@ -2673,8 +2673,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅣㄴㅣㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅣㄴㅣㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅣㄴㅣㄹㅏ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㄴㅣㄹㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅣㄴㅣㄹㅏ', '', [], ['p']),
+            ],
         },
         '-(으)리다': {
             name: '-(으)리다',
@@ -2687,8 +2687,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅣㄷㅏ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㄷㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅣㄷㅏ', '', [], ['p']),
+            ],
         },
         '-(으)리라': {
             name: '-(으)리라',
@@ -2701,8 +2701,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅣㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅣㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅣㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅣㄹㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅣㄹㅏ', '', [], ['p']),
+            ],
         },
         '-(으)리로다': {
             name: '-(으)리로다',
@@ -2715,8 +2715,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅣㄹㅗㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅣㄹㅗㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅣㄹㅗㄷㅏ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㄹㅗㄷㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅣㄹㅗㄷㅏ', '', [], ['p']),
+            ],
         },
         '-(으)리만치': {
             name: '-(으)리만치',
@@ -2729,8 +2729,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅣㅁㅏㄴㅊㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅣㅁㅏㄴㅊㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅣㅁㅏㄴㅊㅣ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㅁㅏㄴㅊㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅣㅁㅏㄴㅊㅣ', '', [], ['p']),
+            ],
         },
         '-(으)리만큼': {
             name: '-(으)리만큼',
@@ -2743,8 +2743,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅣㅁㅏㄴㅋㅡㅁ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅣㅁㅏㄴㅋㅡㅁ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㅁㅏㄴㅋㅡㅁ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅣㅁㅏㄴㅋㅡㅁ', '', [], ['p']),
+            ],
         },
         '-(으)리오': {
             name: '-(으)리오',
@@ -2757,8 +2757,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅣㅇㅗ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅣㅇㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅣㅇㅗ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅣㅇㅗ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅣㅇㅗ', '', [], ['p']),
+            ],
         },
         '-(으)마': {
             name: '-(으)마',
@@ -2768,8 +2768,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅁㅏ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅜㅁㅏ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅁㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅁㅏ', 'ㄷㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄹㅇㅡㅁㅏ', 'ㄷㄷㅏ', [], ['v']),
+            ],
         },
         '-(으)매': {
             name: '-(으)매',
@@ -2782,8 +2782,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅁㅐ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㅁㅐ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅁㅐ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㅐ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅁㅐ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)며': {
             name: '-(으)며',
@@ -2796,8 +2796,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅁㅕ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅁㅕ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㅕ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅁㅕ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)면': {
             name: '-(으)면',
@@ -2810,8 +2810,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅁㅕㄴ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅁㅕㄴ', '', [], ['eusi', 'euo', 'jao']),
-                suffixInflection('ㅇㅡㅁㅕㄴ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅁㅕㄴ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)면서': {
             name: '-(으)면서',
@@ -2824,8 +2824,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅁㅕㄴㅅㅓ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅁㅕㄴㅅㅓ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㅕㄴㅅㅓ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅁㅕㄴㅅㅓ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)므로': {
             name: '-(으)므로',
@@ -2838,8 +2838,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅁㅡㄹㅗ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅁㅡㄹㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㅡㄹㅗ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅁㅡㄹㅗ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)사': {
             name: '-(으)사',
@@ -2850,106 +2850,106 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㅅㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㅅㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-사오': {
             name: '-사오-',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗ', 'ㄷㅏ', ['sao'], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗ', '', ['sao'], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗ', '', ['sao'], ['p', 'f']),
+            ],
         },
         '-사오니까': {
             name: '-사오니까',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㄴㅣㄲㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㄴㅣㄲㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-사오리까': {
             name: '-사오리까',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㄹㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㄲㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㄹㅣㄲㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-사오리다': {
             name: '-사오리다',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㄹㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㄹㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-사오리이까': {
             name: '-사오리이까',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㅇㅣㄲㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㄹㅣㅇㅣㄲㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-사오리이다': {
             name: '-사오리이다',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㄹㅣㅇㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㄹㅣㅇㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-사오이다': {
             name: '-사오이다',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅇㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㅇㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-사옵': {
             name: '-사옵-',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㅂ', 'ㄷㅏ', ['saob'], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅂ', '', ['saob'], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㅂ', '', ['saob'], ['p', 'f']),
+            ],
         },
         '-사옵니까': {
             name: '-사옵니까',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅂㄴㅣㄲㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㅂㄴㅣㄲㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-사옵니다': {
             name: '-사옵니다',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅂㄴㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㅂㄴㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-사옵디까': {
             name: '-사옵디까',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㅂㄷㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅂㄷㅣㄲㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㅂㄷㅣㄲㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-사옵디다': {
             name: '-사옵디다',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㅂㄷㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅂㄷㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㅂㄷㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-사와': {
             name: '-사와',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-사외다': {
             name: '-사외다',
             rules: [
                 suffixInflection('ㅅㅏㅇㅗㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅇㅗㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅇㅗㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)사이다': {
             name: '-(으)사이다',
@@ -2960,15 +2960,15 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㅅㅏㅇㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅡㅅㅏㅇㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅏㅇㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㅅㅏㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㅅㅏㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-삽': {
             name: '-삽-',
             rules: [
                 suffixInflection('ㅅㅏㅂ', 'ㄷㅏ', ['sab'], ['v', 'adj']),
-                suffixInflection('ㅅㅏㅂ', '', ['sab'], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅏㅂ', '', ['sab'], ['p', 'f']),
+            ],
         },
         '-(으)세': {
             name: '-(으)세',
@@ -2978,14 +2978,14 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㅅㅔ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅅㅔ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㅅㅔ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅅㅔ', 'ㄷㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄹㅇㅡㅅㅔ', 'ㄷㄷㅏ', [], ['v']),
+            ],
         },
         '-세나': {
             name: '-세나',
             rules: [
-                suffixInflection('ㅅㅔㄴㅏ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㅅㅔㄴㅏ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-(으)세요': {
             name: '-(으)세요',
@@ -2996,8 +2996,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅅㅔㅇㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅔㅇㅛ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㅅㅔㅇㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅅㅔㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㅅㅔㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-(으)셔요': {
             name: '-(으)셔요',
@@ -3008,22 +3008,22 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅅㅕㅇㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅕㅇㅛ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㅅㅕㅇㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅅㅕㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㅅㅕㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-소': {
             name: '-소',
             rules: [
                 suffixInflection('ㅅㅗ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅗ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅗ', '', [], ['p', 'f']),
+            ],
         },
         '-소다': {
             name: '-소다',
             rules: [
                 suffixInflection('ㅅㅗㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅗㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅗㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)소서': {
             name: '-(으)소서',
@@ -3034,29 +3034,29 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅅㅗㅅㅓ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅗㅅㅓ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㅅㅗㅅㅓ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅅㅗㅅㅓ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㅅㅗㅅㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-소이까': {
             name: '-소이까',
             rules: [
                 suffixInflection('ㅅㅗㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅅㅗㅇㅣㄲㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅗㅇㅣㄲㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-소이다': {
             name: '-소이다',
             rules: [
                 suffixInflection('ㅅㅗㅇㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅗㅇㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅗㅇㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-쇠다': {
             name: '-쇠다',
             rules: [
                 suffixInflection('ㅅㅗㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅗㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅅㅗㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-(스)ㅂ네': {
             name: '-(스)ㅂ네',
@@ -3065,8 +3065,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅂㄴㅔ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄴㅔ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄴㅔ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄴㅔ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅂㄴㅔ', '', [], ['eusi']),
+            ],
         },
         '-(스)ㅂ늰다': {
             name: '-(스)ㅂ늰다',
@@ -3075,8 +3075,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅂㄴㅡㅣㄴㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄴㅡㅣㄴㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄴㅡㅣㄴㄷㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄴㅡㅣㄴㄷㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅂㄴㅡㅣㄴㄷㅏ', '', [], ['eusi']),
+            ],
         },
         '-(스)ㅂ니까': {
             name: '-(스)ㅂ니까',
@@ -3085,8 +3085,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅂㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄴㅣㄲㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄴㅣㄲㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅂㄴㅣㄲㅏ', '', [], ['eusi']),
+            ],
         },
         '-(스)ㅂ니다': {
             name: '-(스)ㅂ니다',
@@ -3095,8 +3095,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅂㄴㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄴㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄴㅣㄷㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄴㅣㄷㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅂㄴㅣㄷㅏ', '', [], ['eusi']),
+            ],
         },
         '-(스)ㅂ디까': {
             name: '-(스)ㅂ디까',
@@ -3105,8 +3105,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅂㄷㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄷㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄷㅣㄲㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄷㅣㄲㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅂㄷㅣㄲㅏ', '', [], ['eusi']),
+            ],
         },
         '-(스)ㅂ디다': {
             name: '-(스)ㅂ디다',
@@ -3115,8 +3115,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅂㄷㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄷㅣㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄷㅣㄷㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄷㅣㄷㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅂㄷㅣㄷㅏ', '', [], ['eusi']),
+            ],
         },
         '-(스)ㅂ딘다': {
             name: '-(스)ㅂ딘다',
@@ -3125,8 +3125,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅂㄷㅣㄴㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄷㅣㄴㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㄷㅣㄴㄷㅏ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㄷㅣㄴㄷㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅂㄷㅣㄴㄷㅏ', '', [], ['eusi']),
+            ],
         },
         '-(스)ㅂ죠': {
             name: '-(스)ㅂ죠',
@@ -3135,8 +3135,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅂㅈㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㅈㅛ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㅈㅛ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㅈㅛ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅂㅈㅛ', '', [], ['eusi']),
+            ],
         },
         '-(스)ㅂ지요': {
             name: '-(스)ㅂ지요',
@@ -3145,8 +3145,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅂㅈㅣㅇㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㅈㅣㅇㅛ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅡㅂㅈㅣㅇㅛ', '', [], ['p', 'f']),
-                suffixInflection('ㅂㅈㅣㅇㅛ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅂㅈㅣㅇㅛ', '', [], ['eusi']),
+            ],
         },
         '-(으)시': {
             name: '-(으)시-',
@@ -3158,8 +3158,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅅㅣ', 'ㅎㄷㅏ', ['eusi'], ['adj']),
                 suffixInflection('ㅅㅣ', 'ㄹㄷㅏ', ['eusi'], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅅㅣ', 'ㄷㄷㅏ', ['eusi'], ['v', 'adj']),
-                suffixInflection('ㅅㅣ', '', ['eusi'], ['saob', 'euob', 'jaob'])
-            ]
+                suffixInflection('ㅅㅣ', '', ['eusi'], ['saob', 'euob', 'jaob']),
+            ],
         },
         '-(으)시압': {
             name: '-(으)시압',
@@ -3169,8 +3169,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅅㅣㅇㅏㅂ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅜㅅㅣㅇㅏㅂ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅅㅣㅇㅏㅂ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅅㅣㅇㅏㅂ', 'ㄷㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄹㅇㅡㅅㅣㅇㅏㅂ', 'ㄷㄷㅏ', [], ['v']),
+            ],
         },
         '-(으)시어요': {
             name: '-(으)시어요',
@@ -3181,8 +3181,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅅㅣㅇㅓㅇㅛ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅅㅣㅇㅓㅇㅛ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㅅㅣㅇㅓㅇㅛ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄹㅇㅡㅅㅣㅇㅓㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㅅㅣㅇㅓㅇㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
+            ],
         },
         '-(으)십사': {
             name: '-(으)십사',
@@ -3192,8 +3192,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅅㅣㅂㅅㅏ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅜㅅㅣㅂㅅㅏ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅅㅣㅂㅅㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅅㅣㅂㅅㅏ', 'ㄷㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄹㅇㅡㅅㅣㅂㅅㅏ', 'ㄷㄷㅏ', [], ['v']),
+            ],
         },
         '-(으)십시다': {
             name: '-(으)십시다',
@@ -3203,8 +3203,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅅㅣㅂㅅㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅜㅅㅣㅂㅅㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅅㅣㅂㅅㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅅㅣㅂㅅㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄹㅇㅡㅅㅣㅂㅅㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
+            ],
         },
         '-(으)십시오': {
             name: '-(으)십시오',
@@ -3214,8 +3214,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅅㅣㅂㅅㅣㅇㅗ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅜㅅㅣㅂㅅㅣㅇㅗ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅅㅣㅂㅅㅣㅇㅗ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅅㅣㅂㅅㅣㅇㅗ', 'ㄷㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄹㅇㅡㅅㅣㅂㅅㅣㅇㅗ', 'ㄷㄷㅏ', [], ['v']),
+            ],
         },
         '-아/어': {
             name: '-아/어',
@@ -3245,8 +3245,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅓ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅓ', '', [], ['p', 'f']),
+            ],
         },
         '-아/어다': {
             name: '-아/어다',
@@ -3276,8 +3276,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅓㄷㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅏㄷㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㄷㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅓㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-아/어다가': {
             name: '-아/어다가',
@@ -3310,8 +3310,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅓㄷㅏㄱㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅏㄷㅏㄱㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㄷㅏㄱㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅏㄱㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅓㄷㅏㄱㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-아/어도': {
             name: '-아/어도',
@@ -3344,8 +3344,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅓㄷㅗ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅏㄷㅗ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㄷㅗ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅗ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅓㄷㅗ', '', [], ['p', 'f']),
+            ],
         },
         '-아/어라': {
             name: '-아/어라',
@@ -3378,8 +3378,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅓㄹㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅏㄹㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㄹㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄹㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅓㄹㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-아/아서': {
             name: '-아/아서',
@@ -3412,8 +3412,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅓㅅㅓ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅏㅅㅓ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㅅㅓ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅅㅓ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅓㅅㅓ', '', [], ['p', 'f']),
+            ],
         },
         '-아/어야': {
             name: '-아/어야',
@@ -3446,8 +3446,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅓㅇㅑ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅏㅇㅑ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㅇㅑ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅓㅇㅑ', '', [], ['p', 'f']),
+            ],
         },
         '-아/어야겠': {
             name: '-아/어야겠',
@@ -3479,8 +3479,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅏㅇㅑㄱㅔㅆ', 'ㅡㄷㅏ', ['f'], ['v', 'adj']),
                 suffixInflection('ㅓㅇㅑㄱㅔㅆ', 'ㅡㄷㅏ', ['f'], ['v', 'adj']),
                 suffixInflection('ㅏㅇㅑㄱㅔㅆ', 'ㅡㄷㅏ', ['f'], ['v', 'adj']),
-                suffixInflection('ㅓㅇㅑㄱㅔㅆ', 'ㅡㄷㅏ', ['f'], ['v', 'adj'])
-            ]
+                suffixInflection('ㅓㅇㅑㄱㅔㅆ', 'ㅡㄷㅏ', ['f'], ['v', 'adj']),
+            ],
         },
         '-아/어야만': {
             name: '-아/어야만',
@@ -3513,8 +3513,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅓㅇㅑㅁㅏㄴ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅏㅇㅑㅁㅏㄴ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㅇㅑㅁㅏㄴ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑㅁㅏㄴ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅓㅇㅑㅁㅏㄴ', '', [], ['p', 'f']),
+            ],
         },
         '-아/어야지': {
             name: '-아/어야지',
@@ -3547,8 +3547,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅓㅇㅑㅈㅣ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅏㅇㅑㅈㅣ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㅇㅑㅈㅣ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅇㅑㅈㅣ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅓㅇㅑㅈㅣ', '', [], ['p', 'f']),
+            ],
         },
         '-아/어요': {
             name: '-아/어요',
@@ -3582,8 +3582,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅏㅇㅛ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㅇㅛ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅔㅇㅛ', 'ㄷㅏ', [], ['adj', 'ida']),
-                suffixInflection('ㅇㅓㅇㅛ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅓㅇㅛ', '', [], ['p', 'f']),
+            ],
         },
         '-아/어지이다': {
             name: '-아/어지이다',
@@ -3615,8 +3615,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅓㅈㅣㅇㅣㄷㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅏㅈㅣㅇㅣㄷㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㅈㅣㅇㅣㄷㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㅈㅣㅇㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅓㅈㅣㅇㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-았/었': {
             name: '-았/었',
@@ -3650,8 +3650,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅏㅆ', 'ㅡㄷㅏ', ['p'], ['v', 'adj']),
                 suffixInflection('ㅓㅆ', 'ㅡㄷㅏ', ['p'], ['v', 'adj']),
                 suffixInflection('ㅅㅕㅆ', 'ㅅㅣ', ['p'], ['eusi']),
-                suffixInflection('ㅅㅣㅇㅓㅆ', 'ㅅㅣ', ['p'], ['eusi'])
-            ]
+                suffixInflection('ㅅㅣㅇㅓㅆ', 'ㅅㅣ', ['p'], ['eusi']),
+            ],
         },
         '-았/었었': {
             name: '-았/었었',
@@ -3683,8 +3683,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅏㅆㅇㅓㅆ', 'ㅡㄷㅏ', ['p'], ['v', 'adj']),
                 suffixInflection('ㅓㅆㅇㅓㅆ', 'ㅡㄷㅏ', ['p'], ['v', 'adj']),
                 suffixInflection('ㅏㅆㅇㅓㅆ', 'ㅡㄷㅏ', ['p'], ['v', 'adj']),
-                suffixInflection('ㅓㅆㅇㅓㅆ', 'ㅡㄷㅏ', ['p'], ['v', 'adj'])
-            ]
+                suffixInflection('ㅓㅆㅇㅓㅆ', 'ㅡㄷㅏ', ['p'], ['v', 'adj']),
+            ],
         },
         '-았/었자': {
             name: '-았/었자',
@@ -3717,44 +3717,44 @@ export const koreanTransforms = {
                 suffixInflection('ㅓㅆㅈㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅏㅆㅈㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㅆㅈㅏ', 'ㅡㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅅㅕㅆㅈㅏ', 'ㅅㅣ', [], ['eusi'])
-            ]
+                suffixInflection('ㅅㅕㅆㅈㅏ', 'ㅅㅣ', [], ['eusi']),
+            ],
         },
         '-야': {
             name: '-야',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㅇㅑ', '아니다', [], ['adj']),
-                suffixInflection('ㅇㅣㅇㅑ', '이다', [], ['ida'])
-            ]
+                suffixInflection('ㅇㅣㅇㅑ', '이다', [], ['ida']),
+            ],
         },
         '-언마는': {
             name: '-언마는',
             rules: [
                 suffixInflection('ㅇㅓㄴㅁㅏㄴㅡㄴ', '아니다', [], ['adj']),
                 suffixInflection('ㅇㅓㄴㅁㅏㄴㅡㄴ', '이다', [], ['ida']),
-                suffixInflection('ㅇㅓㄴㅁㅏㄴㅡㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅇㅓㄴㅁㅏㄴㅡㄴ', '', [], ['eusi']),
+            ],
         },
         '-언만': {
             name: '-언만',
             rules: [
                 suffixInflection('ㅇㅓㄴㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅇㅓㄴㅁㅏㄴ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㅇㅓㄴㅁㅏㄴ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-언정': {
             name: '-언정',
             rules: [
                 suffixInflection('ㅇㅓㄴㅈㅓㅇ', '아니다', [], ['adj']),
                 suffixInflection('ㅇㅓㄴㅈㅓㅇ', '이다', [], ['ida']),
-                suffixInflection('ㅇㅓㄴㅈㅓㅇ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅇㅓㄴㅈㅓㅇ', '', [], ['eusi']),
+            ],
         },
         '-에라': {
             name: '-에라',
             rules: [
-                suffixInflection('ㅇㅔㄹㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅔㄹㅏ', '', [], ['p']),
+            ],
         },
         '-(으)오': {
             name: '-(으)오-',
@@ -3767,8 +3767,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗ', 'ㄹㄷㅏ', ['euo'], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗ', 'ㄷㄷㅏ', ['euo'], ['v', 'adj']),
                 suffixInflection('ㅇㅗ', '', ['euo'], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗ', '', ['euo'], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅗ', '', ['euo'], ['p', 'f']),
+            ],
         },
         '-(으)오니까': {
             name: '-(으)오니까',
@@ -3781,8 +3781,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅗㄴㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㄴㅣㄲㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅗㄴㅣㄲㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)오리이까': {
             name: '-(으)오리이까',
@@ -3794,8 +3794,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㄹㅣㅇㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㄹㅣㅇㅣㄲㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅇㅗㄹㅣㅇㅣㄲㅏ', '', [], ['eusi']),
+            ],
         },
         '-(으)오리이다': {
             name: '-(으)오리이다',
@@ -3807,16 +3807,16 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㄹㅣㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㄹㅣㅇㅣㄷㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅇㅗㄹㅣㅇㅣㄷㅏ', '', [], ['eusi']),
+            ],
         },
         '-오이까': {
             name: '-오이까',
             rules: [
                 suffixInflection('ㅇㅗㅇㅣㄲㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
                 suffixInflection('ㅇㅗㅇㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅗㅇㅣㄲㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅇㅗㅇㅣㄲㅏ', '', [], ['eusi']),
+            ],
         },
         '-(으)오이다': {
             name: '-(으)오이다',
@@ -3829,22 +3829,22 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㅇㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㅇㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅗㅇㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅇㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅗㅇㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-올습니다': {
             name: '-올습니다',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㅇㅗㄹㅅㅡㅂㄴㅣㄷㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㅇㅣㅇㅗㄹㅅㅡㅂㄴㅣㄷㅏ', '이다', [], ['ida'])
-            ]
+                suffixInflection('ㅇㅣㅇㅗㄹㅅㅡㅂㄴㅣㄷㅏ', '이다', [], ['ida']),
+            ],
         },
         '-올시다': {
             name: '-올시다',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㅇㅗㄹㅅㅣㄷㅏ', '아니다', [], ['adj']),
-                suffixInflection('ㅇㅣㅇㅗㄹㅅㅣㄷㅏ', '이다', [], ['ida'])
-            ]
+                suffixInflection('ㅇㅣㅇㅗㄹㅅㅣㄷㅏ', '이다', [], ['ida']),
+            ],
         },
         '-(으)옵': {
             name: '-(으)옵-',
@@ -3857,8 +3857,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㅂ', 'ㄹㄷㅏ', ['euob'], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㅂ', 'ㄷㄷㅏ', ['euob'], ['v', 'adj']),
                 suffixInflection('ㅇㅗㅂ', '', ['euob'], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂ', '', ['euob'], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅗㅂ', '', ['euob'], ['p', 'f']),
+            ],
         },
         '-(으)옵니까': {
             name: '-(으)옵니까',
@@ -3871,8 +3871,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㅂㄴㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㅂㄴㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅗㅂㄴㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄴㅣㄲㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅗㅂㄴㅣㄲㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)옵니다': {
             name: '-(으)옵니다',
@@ -3885,8 +3885,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㅂㄴㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㅂㄴㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅗㅂㄴㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄴㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅗㅂㄴㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)옵디까': {
             name: '-(으)옵디까',
@@ -3899,8 +3899,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㅂㄷㅣㄲㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㅂㄷㅣㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅗㅂㄷㅣㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄷㅣㄲㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅗㅂㄷㅣㄲㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)옵디다': {
             name: '-(으)옵디다',
@@ -3913,8 +3913,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㅂㄷㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㅂㄷㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅗㅂㄷㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂㄷㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅗㅂㄷㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)옵소서': {
             name: '-(으)옵소서',
@@ -3927,8 +3927,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㅂㅅㅗㅅㅓ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㅂㅅㅗㅅㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅗㅂㅅㅗㅅㅓ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅂㅅㅗㅅㅓ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅗㅂㅅㅗㅅㅓ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)와': {
             name: '-(으)와',
@@ -3941,8 +3941,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅗㅏ', '', [], ['eusi', 'euo', 'jao']),
-                suffixInflection('ㅇㅡㅇㅗㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅗㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)외다': {
             name: '-(으)외다',
@@ -3955,15 +3955,15 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅗㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅗㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅗㅣㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅗㅣㄷㅏ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅗㅣㄷㅏ', '', [], ['p', 'f']),
+            ],
         },
         '-요': {
             name: '-요',
             rules: [
                 suffixInflection('ㅇㅏㄴㅣㅇㅛ', '아니다', [], ['ida']),
-                suffixInflection('ㅇㅛ', 'ㄷㅏ', [], ['ida'])
-            ]
+                suffixInflection('ㅇㅛ', 'ㄷㅏ', [], ['ida']),
+            ],
         },
         '-(으)우': {
             name: '-(으)우',
@@ -3976,8 +3976,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㅇㅜ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅜ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅇㅜ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅇㅜ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)이': {
             name: '-(으)이',
@@ -3985,8 +3985,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅣ', 'ㄷㅏ', [], ['adj']),
                 suffixInflection('ㅇㅣ', 'ㄹㄷㅏ', [], ['adj']),
                 suffixInflection('ㅇㅡㅇㅣ', 'ㄷㅏ', [], ['adj']),
-                suffixInflection('ㅇㅡㅣ', 'ㄷㅏ', [], ['adj'])
-            ]
+                suffixInflection('ㅇㅡㅣ', 'ㄷㅏ', [], ['adj']),
+            ],
         },
         '-(으)ㄴ들': {
             name: '-(으)ㄴ들',
@@ -3998,8 +3998,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㄷㅡㄹ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄴㄷㅡㄹ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㄷㅡㄹ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴㄷㅡㄹ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄴㄷㅡㄹ', '', [], ['eusi']),
+            ],
         },
         '-(으)ㄴ즉': {
             name: '-(으)ㄴ즉',
@@ -4012,8 +4012,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅈㅡㄱ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅈㅡㄱ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㅈㅡㄱ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅈㅡㄱ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄴㅈㅡㄱ', '', [], ['p']),
+            ],
         },
         '-(으)ㄴ즉슨': {
             name: '-(으)ㄴ즉슨',
@@ -4026,8 +4026,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄴㅈㅡㄱㅅㅡㄴ', 'ㄹㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅡㄴㅈㅡㄱㅅㅡㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴㅈㅡㄱㅅㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄴㅈㅡㄱㅅㅡㄴ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄴㅈㅡㄱㅅㅡㄴ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ까': {
             name: '-(으)ㄹ까',
@@ -4040,8 +4040,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄲㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄲㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄲㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄲㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄲㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ깝쇼': {
             name: '-(으)ㄹ깝쇼',
@@ -4054,8 +4054,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄲㅏㅂㅅㅛ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄲㅏㅂㅅㅛ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄲㅏㅂㅅㅛ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄲㅏㅂㅅㅛ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄲㅏㅂㅅㅛ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ꼬': {
             name: '-(으)ㄹ꼬',
@@ -4068,8 +4068,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄲㅗ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄲㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄲㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄲㅗ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄲㅗ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ는지': {
             name: '-(으)ㄹ는지',
@@ -4082,8 +4082,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄴㅡㄴㅈㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄴㅡㄴㅈㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄴㅡㄴㅈㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄴㅡㄴㅈㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄴㅡㄴㅈㅣ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ데라니': {
             name: '-(으)ㄹ데라니',
@@ -4095,8 +4095,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㄷㅔㄹㅏㄴㅣ', 'ㅅㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㄷㅔㄹㅏㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄷㅔㄹㅏㄴㅣ', 'ㄷㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㄷㅔㄹㅏㄴㅣ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㄷㅔㄹㅏㄴㅣ', '', [], ['eusi']),
+            ],
         },
         '-(으)ㄹ라': {
             name: '-(으)ㄹ라',
@@ -4109,8 +4109,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄹㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ라고': {
             name: '-(으)ㄹ라고',
@@ -4123,8 +4123,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄹㅏㄱㅗ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅏㄱㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄹㅏㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅏㄱㅗ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄹㅏㄱㅗ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ라치면': {
             name: '-(으)ㄹ라치면',
@@ -4135,8 +4135,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹㄹㅏㅊㅣㅁㅕㄴ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㄹㄹㅏㅊㅣㅁㅕㄴ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅏㅊㅣㅁㅕㄴ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄹㅏㅊㅣㅁㅕㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㄹㅏㅊㅣㅁㅕㄴ', '', [], ['eusi']),
+            ],
         },
         '-(으)ㄹ락': {
             name: '-(으)ㄹ락',
@@ -4148,8 +4148,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', 'ㄷㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄹㅏㄱ ㅁㅏㄹㄹㅏㄱ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ래': {
             name: '-(으)ㄹ래',
@@ -4160,8 +4160,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹㄹㅐ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㄹㄹㅐ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅐ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄹㅐ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㄹㅐ', '', [], ['eusi']),
+            ],
         },
         '-(으)ㄹ러니': {
             name: '-(으)ㄹ러니',
@@ -4174,8 +4174,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄹㅓㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅓㄴㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄹㅓㄴㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄹㅓㄴㅣ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ러라': {
             name: '-(으)ㄹ러라',
@@ -4188,8 +4188,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄹㅓㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅓㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄹㅓㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄹㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄹㅓㄹㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ런가': {
             name: '-(으)ㄹ런가',
@@ -4202,8 +4202,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄹㅓㄴㄱㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅓㄴㄱㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄹㅓㄴㄱㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㄱㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄹㅓㄴㄱㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ런고': {
             name: '-(으)ㄹ런고',
@@ -4216,8 +4216,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄹㅓㄴㄱㅗ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅓㄴㄱㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄹㅓㄴㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㄱㅗ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄹㅓㄴㄱㅗ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ런지': {
             name: '-(으)ㄹ런지',
@@ -4230,8 +4230,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄹㅓㄴㅈㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅓㄴㅈㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄹㅓㄴㅈㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅓㄴㅈㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄹㅓㄴㅈㅣ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ레': {
             name: '-(으)ㄹ레',
@@ -4244,8 +4244,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄹㅔ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅔ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄹㅔ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅔ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄹㅔ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ레라': {
             name: '-(으)ㄹ레라',
@@ -4258,8 +4258,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㄹㅔㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅔㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㄹㅔㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㄹㅔㄹㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㄹㅔㄹㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ려고': {
             name: '-(으)ㄹ려고',
@@ -4270,8 +4270,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹㄹㅕㄱㅗ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㄹㄹㅕㄱㅗ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㄹㅕㄱㅗ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㄹㅕㄱㅗ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㄹㅕㄱㅗ', '', [], ['eusi']),
+            ],
         },
         '-(으)ㄹ망정': {
             name: '-(으)ㄹ망정',
@@ -4284,8 +4284,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅁㅏㅇㅈㅓㅇ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅁㅏㅇㅈㅓㅇ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅁㅏㅇㅈㅓㅇ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅁㅏㅇㅈㅓㅇ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅁㅏㅇㅈㅓㅇ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ밖에': {
             name: '-(으)ㄹ밖에',
@@ -4298,8 +4298,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅂㅏㄲㅇㅔ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅂㅏㄲㅇㅔ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅂㅏㄲㅇㅔ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅂㅏㄲㅇㅔ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅂㅏㄲㅇㅔ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ뿐더러': {
             name: '-(으)ㄹ뿐더러',
@@ -4312,8 +4312,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅃㅜㄴㄷㅓㄹㅓ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅃㅜㄴㄷㅓㄹㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅃㅜㄴㄷㅓㄹㅓ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅃㅜㄴㄷㅓㄹㅓ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅃㅜㄴㄷㅓㄹㅓ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ사': {
             name: '-(으)ㄹ사',
@@ -4324,8 +4324,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹㅅㅏ', 'ㅂㄷㅏ', [], ['adj']),
                 suffixInflection('ㅇㅡㄹㅅㅏ', 'ㅅㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅅㅏ', 'ㅎㄷㅏ', [], ['adj']),
-                suffixInflection('ㄹㅇㅡㄹㅅㅏ', 'ㄷㄷㅏ', [], ['adj'])
-            ]
+                suffixInflection('ㄹㅇㅡㄹㅅㅏ', 'ㄷㄷㅏ', [], ['adj']),
+            ],
         },
         '-(으)ㄹ새': {
             name: '-(으)ㄹ새',
@@ -4338,8 +4338,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅅㅐ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅅㅐ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅅㅐ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅐ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅅㅐ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ세': {
             name: '-(으)ㄹ세',
@@ -4352,8 +4352,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅅㅔ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅅㅔ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅅㅔ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅔ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅅㅔ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ세라': {
             name: '-(으)ㄹ세라',
@@ -4366,8 +4366,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅅㅔㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅅㅔㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅅㅔㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅔㄹㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅅㅔㄹㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ세말이지': {
             name: '-(으)ㄹ세말이지',
@@ -4380,8 +4380,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅅㅔㅁㅏㄹㅇㅣㅈㅣ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ소냐': {
             name: '-(으)ㄹ소냐',
@@ -4394,8 +4394,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅅㅗㄴㅑ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅅㅗㄴㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅅㅗㄴㅑ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅗㄴㅑ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅅㅗㄴㅑ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ손가': {
             name: '-(으)ㄹ손가',
@@ -4408,8 +4408,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅅㅗㄴㄱㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅅㅗㄴㄱㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅅㅗㄴㄱㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅗㄴㄱㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅅㅗㄴㄱㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ수록': {
             name: '-(으)ㄹ수록',
@@ -4422,8 +4422,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅅㅜㄹㅗㄱ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅅㅜㄹㅗㄱ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅅㅜㄹㅗㄱ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅜㄹㅗㄱ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅅㅜㄹㅗㄱ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ시': {
             name: '-(으)ㄹ시',
@@ -4436,8 +4436,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅅㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅅㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅅㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅅㅣ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ시고': {
             name: '-(으)ㄹ시고',
@@ -4450,8 +4450,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅅㅣㄱㅗ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅅㅣㄱㅗ', 'ㄷㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅅㅣㄱㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅅㅣㄱㅗ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅅㅣㄱㅗ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ싸록': {
             name: '-(으)ㄹ싸록',
@@ -4464,8 +4464,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅆㅏㄹㅗㄱ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅆㅏㄹㅗㄱ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅆㅏㄹㅗㄱ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅆㅏㄹㅗㄱ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅆㅏㄹㅗㄱ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ쏘냐': {
             name: '-(으)ㄹ쏘냐',
@@ -4478,8 +4478,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅆㅗㄴㅑ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅆㅗㄴㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅆㅗㄴㅑ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅆㅗㄴㅑ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅆㅗㄴㅑ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ쏜가': {
             name: '-(으)ㄹ쏜가',
@@ -4492,8 +4492,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅆㅗㄴㄱㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅆㅗㄴㄱㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅆㅗㄴㄱㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅆㅗㄴㄱㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅆㅗㄴㄱㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ이만큼': {
             name: '-(으)ㄹ이만큼',
@@ -4506,8 +4506,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅇㅣㅁㅏㄴㅋㅡㅁ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅇㅣㅁㅏㄴㅋㅡㅁ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅇㅣㅁㅏㄴㅋㅡㅁ', '', [], ['eusi', 'euo']),
-                suffixInflection('ㅇㅡㄹㅇㅣㅁㅏㄴㅋㅡㅁ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅇㅣㅁㅏㄴㅋㅡㅁ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ작시면': {
             name: '-(으)ㄹ작시면',
@@ -4518,8 +4518,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹㅈㅏㄱㅅㅣㅁㅕㄴ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㄹㅈㅏㄱㅅㅣㅁㅕㄴ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅏㄱㅅㅣㅁㅕㄴ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅈㅏㄱㅅㅣㅁㅕㄴ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅈㅏㄱㅅㅣㅁㅕㄴ', '', [], ['eusi']),
+            ],
         },
         '-(으)ㄹ지': {
             name: '-(으)ㄹ지',
@@ -4532,8 +4532,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ지나': {
             name: '-(으)ㄹ지나',
@@ -4546,8 +4546,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㄴㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㄴㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㄴㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ지니': {
             name: '-(으)ㄹ지니',
@@ -4560,8 +4560,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㄴㅣ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㅣ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㄴㅣ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅣ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㄴㅣ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ지니라': {
             name: '-(으)ㄹ지니라',
@@ -4574,8 +4574,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㄴㅣㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㅣㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㄴㅣㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅣㄹㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㄴㅣㄹㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ지라': {
             name: '-(으)ㄹ지라',
@@ -4588,8 +4588,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㄹㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㄹㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㄹㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㄹㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ지라도': {
             name: '-(으)ㄹ지라도',
@@ -4602,8 +4602,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㄹㅏㄷㅗ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㄹㅏㄷㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㄹㅏㄷㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅏㄷㅗ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㄹㅏㄷㅗ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ지로다': {
             name: '-(으)ㄹ지로다',
@@ -4616,8 +4616,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㄹㅗㄷㅏ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㄹㅗㄷㅏ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㄹㅗㄷㅏ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄹㅗㄷㅏ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㄹㅗㄷㅏ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ지며': {
             name: '-(으)ㄹ지며',
@@ -4630,8 +4630,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㅁㅕ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㅁㅕ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㅁㅕ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㅁㅕ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㅁㅕ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ지어다': {
             name: '-(으)ㄹ지어다',
@@ -4642,8 +4642,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㄹㅈㅣㅇㅓㄷㅏ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㄹㅈㅣㅇㅓㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㅇㅓㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅈㅣㅇㅓㄷㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㄹㅈㅣㅇㅓㄷㅏ', '', [], ['eusi']),
+            ],
         },
         '-(으)ㄹ지언정': {
             name: '-(으)ㄹ지언정',
@@ -4656,8 +4656,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㅇㅓㄴㅈㅓㅇ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㅇㅓㄴㅈㅓㅇ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㅇㅓㄴㅈㅓㅇ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㅇㅓㄴㅈㅓㅇ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㅇㅓㄴㅈㅓㅇ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ진대': {
             name: '-(으)ㄹ진대',
@@ -4670,8 +4670,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㄴㄷㅐ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㄷㅐ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㄴㄷㅐ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ진대는': {
             name: '-(으)ㄹ진대는',
@@ -4684,8 +4684,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㄴㄷㅐㄴㅡㄴ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㄷㅐㄴㅡㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㄴㄷㅐㄴㅡㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐㄴㅡㄴ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐㄴㅡㄴ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ진댄': {
             name: '-(으)ㄹ진댄',
@@ -4698,8 +4698,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㄴㄷㅐㄴ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㄷㅐㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㄴㄷㅐㄴ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐㄴ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㄴㄷㅐㄴ', '', [], ['p']),
+            ],
         },
         '-(으)ㄹ진저': {
             name: '-(으)ㄹ진저',
@@ -4712,8 +4712,8 @@ export const koreanTransforms = {
                 suffixInflection('ㄹㅈㅣㄴㅈㅓ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄹㅈㅣㄴㅈㅓ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄹㅈㅣㄴㅈㅓ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㄹㅈㅣㄴㅈㅓ', '', [], ['p'])
-            ]
+                suffixInflection('ㅇㅡㄹㅈㅣㄴㅈㅓ', '', [], ['p']),
+            ],
         },
         '-(으)ㅁ': {
             name: '-(으)ㅁ',
@@ -4726,8 +4726,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅁ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㅁ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅁ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅁ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)ㅁ세': {
             name: '-(으)ㅁ세',
@@ -4737,8 +4737,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅁㅅㅔ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅜㅁㅅㅔ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅁㅅㅔ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅁㅅㅔ', 'ㄷㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄹㅇㅡㅁㅅㅔ', 'ㄷㄷㅏ', [], ['v']),
+            ],
         },
         '-(으)ㅁ도': {
             name: '-(으)ㅁ도',
@@ -4751,8 +4751,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅁㄷㅗ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㅁㄷㅗ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅁㄷㅗ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㄷㅗ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅁㄷㅗ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)ㅁ에랴': {
             name: '-(으)ㅁ에랴',
@@ -4765,8 +4765,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅁㅇㅔㄹㅑ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㅁㅇㅔㄹㅑ', 'ㄷㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅁㅇㅔㄹㅑ', '', [], ['eusi']),
-                suffixInflection('ㅇㅡㅁㅇㅔㄹㅑ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅇㅡㅁㅇㅔㄹㅑ', '', [], ['p', 'f']),
+            ],
         },
         '-(으)ㅂ쇼': {
             name: '-(으)ㅂ쇼',
@@ -4776,8 +4776,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅂㅅㅛ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅜㅂㅅㅛ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅂㅅㅛ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅂㅅㅛ', 'ㄷㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄹㅇㅡㅂㅅㅛ', 'ㄷㄷㅏ', [], ['v']),
+            ],
         },
         '-(으)ㅂ시다 1': {
             name: '-(으)ㅂ시다',
@@ -4787,8 +4787,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅂㅅㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅜㅂㅅㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅂㅅㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅂㅅㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄹㅇㅡㅂㅅㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
+            ],
         },
         '-(으)ㅂ시다 2': {
             name: '-(으)ㅂ시다',
@@ -4799,8 +4799,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㅂㅅㅣㅅㅏ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅂㅅㅣㅅㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㅂㅅㅣㅅㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅂㅅㅣㅅㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅂㅅㅣㅅㅏ', '', [], ['eusi']),
+            ],
         },
         '-(으)ㅂ시오': {
             name: '-(으)ㅂ시오',
@@ -4810,135 +4810,135 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㅂㅅㅣㅇㅗ', 'ㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅜㅂㅅㅣㅇㅗ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅂㅅㅣㅇㅗ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅂㅅㅣㅇㅗ', 'ㄷㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㄹㅇㅡㅂㅅㅣㅇㅗ', 'ㄷㄷㅏ', [], ['v']),
+            ],
         },
         '-자': {
             name: '-자',
             rules: [
-                suffixInflection('ㅈㅏ', 'ㄷㅏ', [], ['v', 'ida'])
-            ]
+                suffixInflection('ㅈㅏ', 'ㄷㅏ', [], ['v', 'ida']),
+            ],
         },
         '-자고': {
             name: '-자고',
             rules: [
-                suffixInflection('ㅈㅏㄱㅗ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㅈㅏㄱㅗ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-자구': {
             name: '-자구',
             rules: [
-                suffixInflection('ㅈㅏㄱㅜ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㅈㅏㄱㅜ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-자꾸나': {
             name: '-자꾸나',
             rules: [
-                suffixInflection('ㅈㅏㄲㅜㄴㅏ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㅈㅏㄲㅜㄴㅏ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-자느니': {
             name: '-자느니',
             rules: [
-                suffixInflection('ㅈㅏㄴㅡㄴㅣ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㅈㅏㄴㅡㄴㅣ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-자니까': {
             name: '-자니까',
             rules: [
-                suffixInflection('ㅈㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㅈㅏㄴㅣㄲㅏ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-자마자': {
             name: '-자마자',
             rules: [
                 suffixInflection('ㅈㅏㅁㅏㅈㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅈㅏㅁㅏㅈㅏ', '', [], ['eusi'])
-            ]
+                suffixInflection('ㅈㅏㅁㅏㅈㅏ', '', [], ['eusi']),
+            ],
         },
         '-자며': {
             name: '-자며',
             rules: [
-                suffixInflection('ㅈㅏㅁㅕ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㅈㅏㅁㅕ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-자면': {
             name: '-자면',
             rules: [
-                suffixInflection('ㅈㅏㅁㅕㄴ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㅈㅏㅁㅕㄴ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-자면서': {
             name: '-자면서',
             rules: [
-                suffixInflection('ㅈㅏㅁㅕㄴㅅㅓ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㅈㅏㅁㅕㄴㅅㅓ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-자손': {
             name: '-자손',
             rules: [
-                suffixInflection('ㅈㅏㅅㅗㄴ', 'ㄷㅏ', [], ['v'])
-            ]
+                suffixInflection('ㅈㅏㅅㅗㄴ', 'ㄷㅏ', [], ['v']),
+            ],
         },
         '-자오': {
             name: '-자오-',
             rules: [
-                suffixInflection('ㅈㅏㅇㅗ', 'ㄷㅏ', ['jao'], ['v'])
-            ]
+                suffixInflection('ㅈㅏㅇㅗ', 'ㄷㅏ', ['jao'], ['v']),
+            ],
         },
         '-자옵': {
             name: '-자옵-',
             rules: [
-                suffixInflection('ㅈㅏㅇㅗㅂ', 'ㄷㅏ', ['jaob'], ['v'])
-            ]
+                suffixInflection('ㅈㅏㅇㅗㅂ', 'ㄷㅏ', ['jaob'], ['v']),
+            ],
         },
         '-잡': {
             name: '-잡-',
             rules: [
-                suffixInflection('ㅈㅏㅂ', 'ㄷㅏ', ['jab'], ['v'])
-            ]
+                suffixInflection('ㅈㅏㅂ', 'ㄷㅏ', ['jab'], ['v']),
+            ],
         },
         '-죠': {
             name: '-죠',
             rules: [
                 suffixInflection('ㅈㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅛ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㅈㅛ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-지': {
             name: '-지',
             rules: [
                 suffixInflection('ㅈㅣ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣ', '', [], ['p', 'f', 'eusi'])
-            ]
+                suffixInflection('ㅈㅣ', '', [], ['p', 'f', 'eusi']),
+            ],
         },
         '-지마는': {
             name: '-지마는',
             rules: [
                 suffixInflection('ㅈㅣㅁㅏㄴㅡㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣㅁㅏㄴㅡㄴ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅈㅣㅁㅏㄴㅡㄴ', '', [], ['p', 'f']),
+            ],
         },
         '-지만': {
             name: '-지만',
             rules: [
                 suffixInflection('ㅈㅣㅁㅏㄴ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣㅁㅏㄴ', '', [], ['p', 'f', 'euo', 'euob'])
-            ]
+                suffixInflection('ㅈㅣㅁㅏㄴ', '', [], ['p', 'f', 'euo', 'euob']),
+            ],
         },
         '-지만서도': {
             name: '-지만서도',
             rules: [
                 suffixInflection('ㅈㅣㅁㅏㄴㅅㅓㄷㅗ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣㅁㅏㄴㅅㅓㄷㅗ', '', [], ['p', 'f'])
-            ]
+                suffixInflection('ㅈㅣㅁㅏㄴㅅㅓㄷㅗ', '', [], ['p', 'f']),
+            ],
         },
         '-지요': {
             name: '-지요',
             rules: [
                 suffixInflection('ㅈㅣㅇㅛ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
-                suffixInflection('ㅈㅣㅇㅛ', '', [], ['p', 'f', 'eusi'])
-            ]
-        }
-    }
+                suffixInflection('ㅈㅣㅇㅛ', '', [], ['p', 'f', 'eusi']),
+            ],
+        },
+    ],
 };

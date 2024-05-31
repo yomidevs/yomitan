@@ -132,7 +132,7 @@ export class ScanInputsSimpleController {
      */
     _populateSelect(select, hasOther) {
         const modifierKeys = [
-            {value: 'none', name: 'No key'}
+            {value: 'none', name: 'No key'},
         ];
         for (const value of /** @type {import('input').ModifierKey[]} */ (['alt', 'ctrl', 'shift', 'meta'])) {
             const name = this._hotkeyUtil.getModifierDisplayValue(value);
@@ -182,7 +182,7 @@ export class ScanInputsSimpleController {
                 path: 'scanning.inputs',
                 start: insertionPosition,
                 deleteCount: 0,
-                items: [input]
+                items: [input],
             }]);
         } else {
             // Modify existing
@@ -192,7 +192,7 @@ export class ScanInputsSimpleController {
                 path: 'scanning.inputs',
                 start: index,
                 deleteCount: 1,
-                items: []
+                items: [],
             }]);
         }
     }
@@ -218,14 +218,14 @@ export class ScanInputsSimpleController {
                 path: 'scanning.inputs',
                 start: inputs.length,
                 deleteCount: 0,
-                items: [input]
+                items: [input],
             }]);
         } else {
             // Modify existing
             await this._modifyProfileSettings([{
                 action: 'set',
                 path: `scanning.inputs[${index}].include`,
-                value: value2
+                value: value2,
             }]);
         }
     }

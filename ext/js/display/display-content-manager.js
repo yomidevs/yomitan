@@ -174,7 +174,7 @@ export class DisplayContentManager {
             focus: false,
             params,
             state: null,
-            content: null
+            content: null,
         });
     }
 

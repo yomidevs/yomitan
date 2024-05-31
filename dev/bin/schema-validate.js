@@ -27,7 +27,7 @@ function main() {
     if (args.length < 2) {
         console.log([
             'Usage:',
-            '  node schema-validate [--ajv] <schema-file-name> <data-file-names>...'
+            '  node schema-validate [--ajv] <schema-file-name> <data-file-names>...',
         ].join('\n'));
         return;
     }

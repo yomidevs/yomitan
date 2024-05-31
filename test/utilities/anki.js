@@ -53,9 +53,9 @@ export function createTestAnkiNoteData(dictionaryEntry, mode) {
             sentence: {text: '', offset: 0},
             documentTitle: 'title',
             query: 'query',
-            fullQuery: 'fullQuery'
+            fullQuery: 'fullQuery',
         },
-        media: {}
+        media: {},
     };
     return createAnkiNoteData(marker, data);
 }
@@ -91,11 +91,11 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
             url: 'url:',
             sentence: {
                 text: `${clozePrefix}${source}${clozeSuffix}`,
-                offset: clozePrefix.length
+                offset: clozePrefix.length,
             },
             documentTitle: 'title',
             query: 'query',
-            fullQuery: 'fullQuery'
+            fullQuery: 'fullQuery',
         };
         /** @type {import('anki-note-builder').CreateNoteDetails} */
         const details = {
@@ -113,7 +113,7 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
             glossaryLayoutMode: 'default',
             compactTags: false,
             requirements: [],
-            mediaOptions: null
+            mediaOptions: null,
         };
         const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote(details);
         for (const error of errors) {

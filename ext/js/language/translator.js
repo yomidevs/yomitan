@@ -198,7 +198,7 @@ export class Translator {
                 hasReading,
                 frequency: frequencyValue,
                 displayValue,
-                displayValueParsed
+                displayValueParsed,
             });
         }
         return results;
@@ -366,7 +366,7 @@ export class Translator {
                         const inflectionRuleChainCandidates = algorithmChains.map(({inflectionRules: algInflections}) => {
                             return {
                                 source: /** @type {import('dictionary').InflectionSource} */ (algInflections.length === 0 ? 'dictionary' : 'both'),
-                                inflectionRules: [...algInflections, ...inflectionRules]
+                                inflectionRules: [...algInflections, ...inflectionRules],
                             };
                         });
 
@@ -470,7 +470,7 @@ export class Translator {
                         /** @type {import('translation-internal').InflectionRuleChainCandidate} */
                         const inflectionRuleChainCandidate = {
                             source: 'algorithm',
-                            inflectionRules: trace.map((frame) => frame.transform)
+                            inflectionRules: trace.map((frame) => frame.transform),
                         };
                         deinflections.push(this._createDeinflection(rawSource, source, transformedText, conditions, [inflectionRuleChainCandidate]));
                     }
@@ -621,7 +621,7 @@ export class Translator {
                 if (typeof group === 'undefined') {
                     group = {
                         ids: new Set(),
-                        dictionaryEntries: []
+                        dictionaryEntries: [],
                     };
                     sequenceList.push({query: sequence, dictionary});
                     groupedDictionaryEntries.push(group);
@@ -698,7 +698,7 @@ export class Translator {
                 let target = targetMap.get(key);
                 if (typeof target === 'undefined') {
                     target = {
-                        groups: []
+                        groups: [],
                     };
                     targetMap.set(key, target);
                     termList.push({term, reading});
@@ -1136,7 +1136,7 @@ export class Translator {
                                     hasReading,
                                     frequencyValue,
                                     displayValue,
-                                    displayValueParsed
+                                    displayValueParsed,
                                 ));
                             }
                         }
@@ -1159,7 +1159,7 @@ export class Translator {
                                     position,
                                     nasalPositions,
                                     devoicePositions,
-                                    tags: tags2
+                                    tags: tags2,
                                 });
                             }
                             for (const {pronunciations, headwordIndex} of targets) {
@@ -1169,7 +1169,7 @@ export class Translator {
                                     dictionary,
                                     dictionaryIndex,
                                     dictionaryPriority,
-                                    pitches
+                                    pitches,
                                 ));
                             }
                         }
@@ -1188,7 +1188,7 @@ export class Translator {
                             phoneticTranscriptions.push({
                                 type: 'phonetic-transcription',
                                 ipa,
-                                tags: tags2
+                                tags: tags2,
                             });
                         }
                         for (const {pronunciations, headwordIndex} of targets) {
@@ -1198,7 +1198,7 @@ export class Translator {
                                 dictionary,
                                 dictionaryIndex,
                                 dictionaryPriority,
-                                phoneticTranscriptions
+                                phoneticTranscriptions,
                             ));
                         }
                     }
@@ -1233,7 +1233,7 @@ export class Translator {
                             character,
                             frequency,
                             displayValue,
-                            displayValueParsed
+                            displayValueParsed,
                         ));
                     }
                     break;
@@ -1401,7 +1401,7 @@ export class Translator {
             order: (typeof order === 'number' ? order : 0),
             score: (typeof score === 'number' ? score : 0),
             dictionary,
-            value
+            value,
         };
     }
 
@@ -1439,7 +1439,7 @@ export class Translator {
             tags: [],
             stats,
             definitions,
-            frequencies: []
+            frequencies: [],
         };
     }
 
@@ -1463,7 +1463,7 @@ export class Translator {
             score: (typeof score === 'number' ? score : 0),
             content: (typeof notes === 'string' && notes.length > 0 ? [notes] : []),
             dictionaries: [dictionary],
-            redundant: false
+            redundant: false,
         };
     }
 
@@ -1520,7 +1520,7 @@ export class Translator {
             sequences,
             isPrimary,
             tags,
-            entries
+            entries,
         };
     }
 
@@ -1579,7 +1579,7 @@ export class Translator {
             headwords,
             definitions,
             pronunciations: [],
-            frequencies: []
+            frequencies: [],
         };
     }
 
@@ -1607,7 +1607,7 @@ export class Translator {
             dictionary,
             id,
             sequence: rawSequence,
-            rules
+            rules,
         } = databaseEntry;
         // Cast is safe because getDeinflections filters out deinflection definitions
         const contentDefinitions = /** @type {import('dictionary-data').TermGlossaryContent[]} */ (definitions);
@@ -1635,7 +1635,7 @@ export class Translator {
             sourceTermExactMatchCount,
             maxOriginalTextLength,
             [this._createTermHeadword(0, term, reading, [source], headwordTagGroups, rules)],
-            [this._createTermDefinition(0, [0], dictionary, dictionaryIndex, dictionaryPriority, id, score, [sequence], isPrimary, definitionTagGroups, contentDefinitions)]
+            [this._createTermDefinition(0, [0], dictionary, dictionaryIndex, dictionaryPriority, id, score, [sequence], isPrimary, definitionTagGroups, contentDefinitions)],
         );
     }
 
@@ -1712,7 +1712,7 @@ export class Translator {
             sourceTermExactMatchCount,
             maxOriginalTextLength,
             headwordsArray,
-            definitions
+            definitions,
         );
     }
 

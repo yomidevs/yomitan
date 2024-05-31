@@ -39,7 +39,7 @@ export class Offscreen {
         this._clipboardReader = new ClipboardReader(
             (typeof document === 'object' && document !== null ? document : null),
             '#clipboard-paste-target',
-            '#clipboard-rich-content-paste-target'
+            '#clipboard-rich-content-paste-target',
         );
 
 
@@ -57,7 +57,7 @@ export class Offscreen {
             ['findKanjiOffscreen',           this._findKanjiHandler.bind(this)],
             ['findTermsOffscreen',           this._findTermsHandler.bind(this)],
             ['getTermFrequenciesOffscreen',  this._getTermFrequenciesHandler.bind(this)],
-            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)]
+            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -120,7 +120,7 @@ export class Offscreen {
         /** @type {import('translation').FindKanjiOptions} */
         const modifiedOptions = {
             ...options,
-            enabledDictionaryMap: new Map(options.enabledDictionaryMap)
+            enabledDictionaryMap: new Map(options.enabledDictionaryMap),
         };
         return await this._translator.findKanji(text, modifiedOptions);
     }
@@ -147,7 +147,7 @@ export class Offscreen {
             ...options,
             enabledDictionaryMap,
             excludeDictionaryDefinitions,
-            textReplacements
+            textReplacements,
         };
         return this._translator.findTerms(mode, text, modifiedOptions);
     }

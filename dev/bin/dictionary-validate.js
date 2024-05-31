@@ -24,7 +24,7 @@ async function main() {
     if (dictionaryFileNames.length === 0) {
         console.log([
             'Usage:',
-            '  node dictionary-validate [--ajv] <dictionary-file-names>...'
+            '  node dictionary-validate [--ajv] <dictionary-file-names>...',
         ].join('\n'));
         return;
     }
