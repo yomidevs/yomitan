@@ -201,5 +201,5 @@ export const oldIrishTransforms = {
                 prefixInflection('s-s', 's', [], []),
             ],
         },
-    ],
+    },
 };

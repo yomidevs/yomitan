@@ -280,5 +280,5 @@ export const englishTransforms = {
                 prefixInflection('do not ', '', ['v'], ['v']),
             ],
         },
-    ],
+    },
 };

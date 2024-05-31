@@ -347,5 +347,5 @@ export const albanianTransforms = {
                 suffixInflection('je', '', [], ['v']),
             ],
         },
-    ],
+    },
 };

@@ -158,5 +158,5 @@ export const latinTransforms = {
                 suffixInflection('o', 'um', ['n2s'], ['n2s']),
             ],
         },
-    ],
+    },
 };

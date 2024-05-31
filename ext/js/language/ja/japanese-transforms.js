@@ -128,10 +128,10 @@ export const japaneseTransforms = {
         'past': {
             name: '-ta past form ending',
             isDictionaryForm: false,
-        }
+        },
     },
-    transforms: [
-        {
+    transforms: {
+        '-ba': {
             name: '-ba',
             description: 'Conditional',
             i18n: [
@@ -1115,5 +1115,5 @@ export const japaneseTransforms = {
                 suffixInflection('しゅうない', 'しくない', ['adj-i'], ['adj-i']),
             ],
         },
-    ],
+    },
 };

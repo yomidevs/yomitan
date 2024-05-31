@@ -102,5 +102,5 @@ export const germanTransforms = {
                 ...zuInfinitiveInflections,
             ],
         },
-    ],
+    },
 };

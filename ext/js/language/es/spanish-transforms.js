@@ -167,5 +167,5 @@ export const spanishTransforms = {
                 wholeWordInflection('han', 'haber', ['v'], ['v']),
             ],
         },
-    ],
+    },
 };

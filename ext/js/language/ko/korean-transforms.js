@@ -100,8 +100,8 @@ export const koreanTransforms = {
             isDictionaryForm: false,
         },
     },
-    transforms: [
-        {
+    transforms: {
+        '어간': {
             name: '어간',
             description: 'Stem',
             rules: [
@@ -4940,5 +4940,5 @@ export const koreanTransforms = {
                 suffixInflection('ㅈㅣㅇㅛ', '', [], ['p', 'f', 'eusi']),
             ],
         },
-    ],
+    },
 };
