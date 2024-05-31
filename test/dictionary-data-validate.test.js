@@ -42,7 +42,7 @@ describe('Dictionary validation', () => {
         {name: 'invalid-dictionary3', valid: false},
         {name: 'invalid-dictionary4', valid: false},
         {name: 'invalid-dictionary5', valid: false},
-        {name: 'invalid-dictionary6', valid: false}
+        {name: 'invalid-dictionary6', valid: false},
     ];
     const schemas = dictionaryValidate.getSchemas();
     describe.each(testCases)('Test dictionary $name', ({name, valid}) => {

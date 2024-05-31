@@ -94,7 +94,7 @@ export class DisplayAnki {
         /** @type {Map<import('dictionary').DictionaryEntryType, import('display-anki').CreateMode[]>} */
         this._dictionaryEntryTypeModeMap = new Map([
             ['kanji', ['kanji']],
-            ['term', ['term-kanji', 'term-kana']]
+            ['term', ['term-kanji', 'term-kana']],
         ]);
         /** @type {HTMLElement} */
         this._menuContainer = querySelectorNotNull(document, '#popup-menus');
@@ -118,7 +118,7 @@ export class DisplayAnki {
             ['addNoteKanji',      () => { this._hotkeySaveAnkiNoteForSelectedEntry('kanji'); }],
             ['addNoteTermKanji',  () => { this._hotkeySaveAnkiNoteForSelectedEntry('term-kanji'); }],
             ['addNoteTermKana',   () => { this._hotkeySaveAnkiNoteForSelectedEntry('term-kana'); }],
-            ['viewNotes',         this._viewNotesForSelectedEntry.bind(this)]
+            ['viewNotes',         this._viewNotesForSelectedEntry.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
@@ -146,7 +146,7 @@ export class DisplayAnki {
                 resultOutputMode: this._resultOutputMode,
                 glossaryLayoutMode: this._glossaryLayoutMode,
                 compactTags: this._compactTags,
-                marker: 'test'
+                marker: 'test',
             });
         } catch (e) {
             ankiNoteDataException = e;
@@ -179,7 +179,7 @@ export class DisplayAnki {
         return {
             ankiNoteData,
             ankiNoteDataException: toError(ankiNoteDataException),
-            ankiNotes
+            ankiNotes,
         };
     }
 
@@ -203,9 +203,9 @@ export class DisplayAnki {
                 terms,
                 noteGuiMode,
                 screenshot: {format, quality},
-                downloadTimeout
+                downloadTimeout,
             },
-            scanning: {length: scanLength}
+            scanning: {length: scanLength},
         } = options;
 
         this._checkForDuplicates = checkForDuplicates;
@@ -345,7 +345,7 @@ export class DisplayAnki {
             sentence,
             documentTitle,
             query,
-            fullQuery
+            fullQuery,
         };
     }
 
@@ -762,7 +762,7 @@ export class DisplayAnki {
         const results = [];
         for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
             results.push({
-                modeMap: new Map()
+                modeMap: new Map(),
             });
         }
 
@@ -828,14 +828,14 @@ export class DisplayAnki {
                 screenshot: {
                     format: this._screenshotFormat,
                     quality: this._screenshotQuality,
-                    contentOrigin
+                    contentOrigin,
                 },
                 textParsing: {
                     optionsContext,
-                    scanLength: this._scanLength
-                }
+                    scanLength: this._scanLength,
+                },
             },
-            requirements
+            requirements,
         });
         return {note, errors, requirements: outputRequirements};
     }

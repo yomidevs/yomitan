@@ -32,7 +32,7 @@ export function createAnkiNoteData(marker, {
     glossaryLayoutMode,
     compactTags,
     context,
-    media
+    media,
 }) {
     const definition = createCachedValue(getDefinition.bind(null, dictionaryEntry, context, resultOutputMode));
     const uniqueExpressions = createCachedValue(getUniqueExpressions.bind(null, dictionaryEntry));
@@ -50,7 +50,7 @@ export function createAnkiNoteData(marker, {
             clipboardText: void 0,
             selectionText: void 0,
             textFurigana: [],
-            dictionaryMedia: {}
+            dictionaryMedia: {},
         };
     }
     /** @type {import('anki-templates').NoteData} */
@@ -72,13 +72,13 @@ export function createAnkiNoteData(marker, {
         get phoneticTranscriptions() { return getCachedValue(phoneticTranscriptions); },
         get context() { return getCachedValue(context2); },
         media,
-        dictionaryEntry
+        dictionaryEntry,
     };
     Object.defineProperty(result, 'dictionaryEntry', {
         configurable: false,
         enumerable: false,
         writable: false,
-        value: dictionaryEntry
+        value: dictionaryEntry,
     });
     return result;
 }
@@ -165,8 +165,8 @@ function getPublicContext(context) {
         query,
         fullQuery,
         document: {
-            title: documentTitle
-        }
+            title: documentTitle,
+        },
     };
 }
 
@@ -255,7 +255,7 @@ function getPitches(dictionaryEntry) {
                     devoicePositions,
                     tags: convertPitchTags(tags),
                     exclusiveExpressions: exclusiveTerms,
-                    exclusiveReadings
+                    exclusiveReadings,
                 });
             }
             results.push({dictionary, pitches});
@@ -284,7 +284,7 @@ function getPhoneticTranscriptions(dictionaryEntry) {
                     ipa,
                     tags,
                     exclusiveExpressions: exclusiveTerms,
-                    exclusiveReadings
+                    exclusiveReadings,
                 });
             }
             results.push({dictionary, phoneticTranscriptions});
@@ -350,7 +350,7 @@ function getKanjiDefinition(dictionaryEntry, context) {
         get frequencyHarmonic() { return getCachedValue(frequencyHarmonic); },
         get frequencyAverage() { return getCachedValue(frequencyAverage); },
         url,
-        get cloze() { return getCachedValue(cloze); }
+        get cloze() { return getCachedValue(cloze); },
     };
 }
 
@@ -379,7 +379,7 @@ function convertKanjiStat({name, category, content, order, score, dictionary, va
         order,
         score,
         dictionary,
-        value
+        value,
     };
 }
 
@@ -396,10 +396,10 @@ function getKanjiFrequencies(dictionaryEntry) {
             dictionary,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority
+                priority: dictionaryPriority,
             },
             character,
-            frequency: displayValue !== null ? displayValue : frequency
+            frequency: displayValue !== null ? displayValue : frequency,
         });
     }
     return results;
@@ -453,7 +453,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode) {
         get dictionary() { return getCachedValue(dictionaryNames)[0]; },
         dictionaryOrder: {
             index: dictionaryIndex,
-            priority: dictionaryPriority
+            priority: dictionaryPriority,
         },
         get dictionaryNames() { return getCachedValue(dictionaryNames); },
         get expression() {
@@ -477,7 +477,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode) {
         sourceTermExactMatchCount,
         url,
         get cloze() { return getCachedValue(cloze); },
-        get furiganaSegments() { return getCachedValue(furiganaSegments); }
+        get furiganaSegments() { return getCachedValue(furiganaSegments); },
     };
 }
 
@@ -530,7 +530,7 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type) {
             dictionary,
             glossary: entries,
             definitionTags: definitionTags2,
-            only
+            only,
         });
     }
 
@@ -538,7 +538,7 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type) {
         uniqueTerms,
         uniqueReadings,
         definitionTags,
-        definitions: hasDefinitions ? definitions : void 0
+        definitions: hasDefinitions ? definitions : void 0,
     };
 }
 
@@ -557,12 +557,12 @@ function getTermFrequencies(dictionaryEntry) {
             dictionary,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority
+                priority: dictionaryPriority,
             },
             expression: term,
             reading,
             hasReading,
-            frequency: displayValue !== null ? displayValue : frequency
+            frequency: displayValue !== null ? displayValue : frequency,
         });
     }
     return results;
@@ -585,11 +585,11 @@ function getTermPitches(dictionaryEntry) {
             dictionary,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority
+                priority: dictionaryPriority,
             },
             expression: term,
             reading,
-            get pitches() { return getCachedValue(cachedPitches); }
+            get pitches() { return getCachedValue(cachedPitches); },
         });
     }
     return results;
@@ -605,7 +605,7 @@ function getTermPitchesInner(pitches) {
         const cachedTags = createCachedValue(convertTags.bind(null, tags));
         results.push({
             position,
-            get tags() { return getCachedValue(cachedTags); }
+            get tags() { return getCachedValue(cachedTags); },
         });
     }
     return results;
@@ -628,11 +628,11 @@ function getTermPhoneticTranscriptions(dictionaryEntry) {
             dictionary,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority
+                priority: dictionaryPriority,
             },
             expression: term,
             reading,
-            get phoneticTranscriptions() { return termPhoneticTranscriptions; }
+            get phoneticTranscriptions() { return termPhoneticTranscriptions; },
         });
     }
 
@@ -649,7 +649,7 @@ function getTermPhoneticTranscriptionsInner(phoneticTranscriptions) {
         const cachedTags = createCachedValue(convertTags.bind(null, tags));
         results.push({
             ipa,
-            get tags() { return getCachedValue(cachedTags); }
+            get tags() { return getCachedValue(cachedTags); },
         });
     }
     return results;
@@ -678,7 +678,7 @@ function getTermExpressions(dictionaryEntry) {
             get pitches() { return getCachedValue(pitches); },
             get furiganaSegments() { return getCachedValue(furiganaSegments); },
             get termFrequency() { return getCachedValue(termFrequency); },
-            wordClasses
+            wordClasses,
         };
         results.push(item);
     }
@@ -702,12 +702,12 @@ function getTermExpressionFrequencies(dictionaryEntry, i) {
             dictionary,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority
+                priority: dictionaryPriority,
             },
             expression: term,
             reading,
             hasReading,
-            frequency: displayValue !== null ? displayValue : frequency
+            frequency: displayValue !== null ? displayValue : frequency,
         });
     }
     return results;
@@ -732,11 +732,11 @@ function getTermExpressionPitches(dictionaryEntry, i) {
             dictionary,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority
+                priority: dictionaryPriority,
             },
             expression: term,
             reading,
-            get pitches() { return getCachedValue(cachedPitches); }
+            get pitches() { return getCachedValue(cachedPitches); },
         });
     }
     return results;
@@ -807,7 +807,7 @@ function convertTag({name, category, content, order, score, dictionaries, redund
         order,
         score,
         dictionary: (dictionaries.length > 0 ? dictionaries[0] : ''),
-        redundant
+        redundant,
     };
 }
 
@@ -835,7 +835,7 @@ function convertPitchTag({name, category, content, order, score, dictionaries, r
         score,
         content: [...content],
         dictionaries: [...dictionaries],
-        redundant
+        redundant,
     };
 }
 
@@ -881,7 +881,7 @@ function getCloze(dictionaryEntry, context) {
         prefix: text.substring(0, offset),
         body: text.substring(offset, offset + originalText.length),
         bodyKana: textSegments.join(''),
-        suffix: text.substring(offset + originalText.length)
+        suffix: text.substring(offset + originalText.length),
     };
 }
 

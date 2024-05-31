@@ -138,20 +138,6 @@ If you want to add or improve support for a language, read the documentation on 
 
 Feel free to join us on [TheMoeWay Discord 🐇](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
 
-## Licenses
-
-Required licensing notices for this project follow below:
-
-- **EDRDG License** \
-  This package uses the [EDICT](https://www.edrdg.org/jmdict/edict.html) and
-  [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) dictionary files. These files are the property of
-  the [Electronic Dictionary Research and Development Group](https://www.edrdg.org/), and are used in conformance with
-  the Group's [license](https://www.edrdg.org/edrdg/licence.html).
-
-- **Kanjium License** \
-  The pitch accent notation, verb particle data, phonetics, homonyms and other additions or modifications to EDICT,
-  KANJIDIC or KRADFILE were provided by Uros Ozvatic through his free database.
-
 ## Third-Party Libraries
 
 Yomitan uses several third-party libraries to function.

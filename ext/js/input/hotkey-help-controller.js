@@ -180,7 +180,7 @@ export class HotkeyHelpController {
             global,
             attributes: attributesArray,
             values,
-            defaultAttributeValues
+            defaultAttributeValues,
         };
     }
 

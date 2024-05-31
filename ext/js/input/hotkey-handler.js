@@ -52,7 +52,7 @@ export class HotkeyHandler extends EventDispatcher {
         this._isPrepared = true;
         this._updateEventHandlers();
         crossFrameApi.registerHandlers([
-            ['hotkeyHandlerForwardHotkey', this._onMessageForwardHotkey.bind(this)]
+            ['hotkeyHandlerForwardHotkey', this._onMessageForwardHotkey.bind(this)],
         ]);
     }
 
@@ -114,7 +114,7 @@ export class HotkeyHandler extends EventDispatcher {
                 key,
                 modifiers: [...modifiers],
                 scopes: [...scopes],
-                enabled
+                enabled,
             });
         }
         this._updateHotkeyRegistrations();

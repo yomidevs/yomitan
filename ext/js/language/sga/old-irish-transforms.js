@@ -32,7 +32,7 @@ function tryAlternateOrthography(notBeginning, originalOrthography, alternateOrt
         isInflected: orthographyRegExp,
         deinflect: (text) => text.replace(orthographyRegExp, alternateOrthography),
         conditionsIn,
-        conditionsOut
+        conditionsOut,
     };
 }
 
@@ -45,37 +45,37 @@ export const oldIrishTransforms = {
             name: 'nd for nn',
             description: 'nd for nn',
             rules: [
-                suffixInflection('nd', 'nn', [], [])
-            ]
+                suffixInflection('nd', 'nn', [], []),
+            ],
         },
         {
             name: 'cg for c',
             description: 'cg for c',
             rules: [
-                tryAlternateOrthography(false, 'cg', 'c', [], [])
-            ]
+                tryAlternateOrthography(false, 'cg', 'c', [], []),
+            ],
         },
         {
             name: 'td for t',
             description: 'td for t',
             rules: [
-                tryAlternateOrthography(false, 'td', 't', [], [])
-            ]
+                tryAlternateOrthography(false, 'td', 't', [], []),
+            ],
         },
         {
             name: 'pb for p',
             description: 'pb for p',
             rules: [
-                tryAlternateOrthography(false, 'pb', 'p', [], [])
-            ]
+                tryAlternateOrthography(false, 'pb', 'p', [], []),
+            ],
         },
         {
             name: 'ǽ/æ for é',
             description: 'ǽ/æ for é',
             rules: [
                 tryAlternateOrthography(false, 'ǽ', 'é', [], []),
-                tryAlternateOrthography(false, 'æ', 'é', [], [])
-            ]
+                tryAlternateOrthography(false, 'æ', 'é', [], []),
+            ],
         },
         {
             name: 'doubled vowel',
@@ -85,8 +85,8 @@ export const oldIrishTransforms = {
                 tryAlternateOrthography(true, 'ee', 'é', [], []),
                 tryAlternateOrthography(true, 'ii', 'í', [], []),
                 tryAlternateOrthography(true, 'oo', 'ó', [], []),
-                tryAlternateOrthography(true, 'uu', 'ú', [], [])
-            ]
+                tryAlternateOrthography(true, 'uu', 'ú', [], []),
+            ],
         },
         {
             name: 'doubled consonant',
@@ -102,8 +102,8 @@ export const oldIrishTransforms = {
                 tryAlternateOrthography(true, 'll', 'l', [], []),
                 tryAlternateOrthography(true, 'nn', 'n', [], []),
                 tryAlternateOrthography(true, 'mm', 'm', [], []),
-                tryAlternateOrthography(true, 'ss', 's', [], [])
-            ]
+                tryAlternateOrthography(true, 'ss', 's', [], []),
+            ],
         },
         {
             name: 'lenited',
@@ -111,8 +111,8 @@ export const oldIrishTransforms = {
             rules: [
                 tryAlternateOrthography(true, 'ch', 'c', [], []),
                 tryAlternateOrthography(true, 'ph', 'p', [], []),
-                tryAlternateOrthography(true, 'th', 't', [], [])
-            ]
+                tryAlternateOrthography(true, 'th', 't', [], []),
+            ],
         },
         {
             name: 'lenited (Middle Irish)',
@@ -120,8 +120,8 @@ export const oldIrishTransforms = {
             rules: [
                 tryAlternateOrthography(true, 'gh', 'g', [], []),
                 tryAlternateOrthography(true, 'bh', 'b', [], []),
-                tryAlternateOrthography(true, 'dh', 'd', [], [])
-            ]
+                tryAlternateOrthography(true, 'dh', 'd', [], []),
+            ],
         },
         {
             name: '[IM] nasalized',
@@ -131,8 +131,8 @@ export const oldIrishTransforms = {
                 prefixInflection('mb', 'b', [], []),
                 prefixInflection('nd', 'd', [], []),
                 prefixInflection('n-', '', [], []),
-                prefixInflection('m-', '', [], [])
-            ]
+                prefixInflection('m-', '', [], []),
+            ],
         },
         {
             name: '[IM] nasalized (Middle Irish)',
@@ -140,8 +140,8 @@ export const oldIrishTransforms = {
             rules: [
                 prefixInflection('gc', 'c', [], []),
                 prefixInflection('bp', 'p', [], []),
-                prefixInflection('dt', 'd', [], [])
-            ]
+                prefixInflection('dt', 'd', [], []),
+            ],
         },
         {
             name: '[IM] lenited',
@@ -149,8 +149,8 @@ export const oldIrishTransforms = {
             rules: [
                 prefixInflection('ch', 'c', [], []),
                 prefixInflection('ph', 'p', [], []),
-                prefixInflection('th', 't', [], [])
-            ]
+                prefixInflection('th', 't', [], []),
+            ],
         },
         {
             name: '[IM] lenited (Middle Irish)',
@@ -158,8 +158,8 @@ export const oldIrishTransforms = {
             rules: [
                 prefixInflection('gh', 'g', [], []),
                 prefixInflection('bh', 'b', [], []),
-                prefixInflection('dh', 'd', [], [])
-            ]
+                prefixInflection('dh', 'd', [], []),
+            ],
         },
         {
             name: '[IM] aspirated',
@@ -170,8 +170,8 @@ export const oldIrishTransforms = {
                 prefixInflection('hi', 'i', [], []),
                 prefixInflection('ho', 'o', [], []),
                 prefixInflection('hu', 'u', [], []),
-                prefixInflection('h-', '', [], [])
-            ]
+                prefixInflection('h-', '', [], []),
+            ],
         },
         {
             name: '[IM] geminated',
@@ -198,8 +198,8 @@ export const oldIrishTransforms = {
                 prefixInflection('l-l', 'l', [], []),
                 prefixInflection('n-n', 'n', [], []),
                 prefixInflection('m-m', 'm', [], []),
-                prefixInflection('s-s', 's', [], [])
-            ]
-        }
-    ]
+                prefixInflection('s-s', 's', [], []),
+            ],
+        },
+    ],
 };

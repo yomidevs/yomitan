@@ -63,7 +63,7 @@ export function getStandardFieldMarkers(type) {
                 'sentence',
                 'sentence-furigana',
                 'tags',
-                'url'
+                'url',
             ];
         case 'kanji':
             return [
@@ -91,7 +91,7 @@ export function getStandardFieldMarkers(type) {
                 'sentence-furigana',
                 'stroke-count',
                 'tags',
-                'url'
+                'url',
             ];
         default:
             throw new Error(`Unsupported type: ${type}`);

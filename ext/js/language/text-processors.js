@@ -23,7 +23,7 @@ export const decapitalize = {
     name: 'Decapitalize text',
     description: 'CAPITALIZED TEXT → capitalized text',
     options: basicTextProcessorOptions,
-    process: (str, setting) => (setting ? str.toLowerCase() : str)
+    process: (str, setting) => (setting ? str.toLowerCase() : str),
 };
 
 /** @type {import('language').TextProcessor<boolean>} */
@@ -31,7 +31,7 @@ export const capitalizeFirstLetter = {
     name: 'Capitalize first letter',
     description: 'lowercase text → Lowercase text',
     options: basicTextProcessorOptions,
-    process: (str, setting) => (setting ? str.charAt(0).toUpperCase() + str.slice(1) : str)
+    process: (str, setting) => (setting ? str.charAt(0).toUpperCase() + str.slice(1) : str),
 };
 
 /**
@@ -45,5 +45,5 @@ export const removeAlphabeticDiacritics = {
     name: 'Remove Alphabetic Diacritics',
     description: 'ἄήé -> αηe',
     options: basicTextProcessorOptions,
-    process: (str, setting) => (setting ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : str)
+    process: (str, setting) => (setting ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : str),
 };

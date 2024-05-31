@@ -75,7 +75,7 @@ export class Backend {
                 // eslint-disable-next-line no-undef
                 (typeof document === 'object' && document !== null ? document : null),
                 '#clipboard-paste-target',
-                '#clipboard-rich-content-paste-target'
+                '#clipboard-rich-content-paste-target',
             );
         } else {
             /** @type {?OffscreenProxy} */
@@ -185,7 +185,7 @@ export class Backend {
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
-            ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)]
+            ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -195,7 +195,7 @@ export class Backend {
             ['openInfoPage', this._onCommandOpenInfoPage.bind(this)],
             ['openSettingsPage', this._onCommandOpenSettingsPage.bind(this)],
             ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
-            ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)]
+            ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)],
         ]));
     }
 
@@ -214,7 +214,7 @@ export class Backend {
                 (error) => {
                     this._prepareError = true;
                     this._prepareCompleteReject(error);
-                }
+                },
             );
             void promise.finally(() => this._updateBadge());
             this._preparePromise = promise;
@@ -319,7 +319,7 @@ export class Backend {
 
         const {
             general: {language},
-            clipboard: {maximumSearchLength}
+            clipboard: {maximumSearchLength},
         } = this._getProfileOptions({current: true}, false);
         if (!isTextLookupWorthy(text, language)) { return; }
         if (text.length > maximumSearchLength) {
@@ -372,7 +372,7 @@ export class Backend {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     handler(...args);
                 },
-                () => {} // NOP
+                () => {}, // NOP
             );
         });
     }
@@ -385,7 +385,7 @@ export class Backend {
 
         this._prepareCompletePromise.then(
             () => { this._onMessage(message, sender, sendResponse); },
-            () => { sendResponse(); }
+            () => { sendResponse(); },
         );
         return true;
     }
@@ -499,7 +499,7 @@ export class Backend {
     async _onApiParseText({text, optionsContext, scanLength, useInternalParser, useMecabParser}) {
         const [internalResults, mecabResults] = await Promise.all([
             (useInternalParser ? this._textParseScanning(text, scanLength, optionsContext) : null),
-            (useMecabParser ? this._textParseMecab(text) : null)
+            (useMecabParser ? this._textParseMecab(text) : null),
         ]);
 
         /** @type {import('api').ParseTextResultItem[]} */
@@ -510,7 +510,7 @@ export class Backend {
                 id: 'scan',
                 source: 'scanning-parser',
                 dictionary: null,
-                content: internalResults
+                content: internalResults,
             });
         }
 
@@ -520,7 +520,7 @@ export class Backend {
                     id: `mecab-${dictionary}`,
                     source: 'mecab',
                     dictionary,
-                    content
+                    content,
                 });
             }
         }
@@ -619,7 +619,7 @@ export class Backend {
                 canAdd: valid,
                 valid,
                 noteIds: noteIds,
-                noteInfos: noteInfos
+                noteInfos: noteInfos,
             };
 
             results.push(info);
@@ -637,7 +637,7 @@ export class Backend {
             audioDetails,
             screenshotDetails,
             clipboardDetails,
-            dictionaryMediaDetails
+            dictionaryMediaDetails,
         );
     }
 
@@ -715,7 +715,7 @@ export class Backend {
         const frameId = sender.frameId;
         return {
             tabId: typeof tabId === 'number' ? tabId : null,
-            frameId: typeof frameId === 'number' ? frameId : null
+            frameId: typeof frameId === 'number' ? frameId : null,
         };
     }
 
@@ -928,13 +928,13 @@ export class Backend {
         const sourceDetails = {
             name: 'cross-frame-communication-port',
             otherTabId: targetTabId,
-            otherFrameId: targetFrameId
+            otherFrameId: targetFrameId,
         };
         /** @type {import('cross-frame-api').CrossFrameCommunicationPortDetails} */
         const targetDetails = {
             name: 'cross-frame-communication-port',
             otherTabId: sourceTabId,
-            otherFrameId: sourceFrameId
+            otherFrameId: sourceFrameId,
         };
         /** @type {?chrome.runtime.Port} */
         let sourcePort = chrome.tabs.connect(sourceTabId, {frameId: sourceFrameId, name: JSON.stringify(sourceDetails)});
@@ -1067,7 +1067,7 @@ export class Backend {
             path: 'general.enable',
             value: !options.general.enable,
             scope: 'profile',
-            optionsContext: {current: true}
+            optionsContext: {current: true},
         };
         await this._modifySettings([modification], 'backend');
     }
@@ -1172,7 +1172,7 @@ export class Backend {
         await this._sendMessageTabPromise(
             id,
             {action: 'searchDisplayControllerSetMode', params: {mode: 'popup'}},
-            {frameId: 0}
+            {frameId: 0},
         );
 
         this._searchPopupTabId = id;
@@ -1192,7 +1192,7 @@ export class Backend {
                 const mode = await this._sendMessageTabPromise(
                     id,
                     {action: 'searchDisplayControllerGetMode'},
-                    {frameId: 0}
+                    {frameId: 0},
                 );
                 return mode === 'popup';
             } catch (e) {
@@ -1226,7 +1226,7 @@ export class Backend {
             left: useLeft ? left : void 0,
             top: useTop ? top : void 0,
             type: windowType,
-            state: 'normal'
+            state: 'normal',
         };
     }
 
@@ -1245,7 +1245,7 @@ export class Backend {
                     } else {
                         resolve(/** @type {chrome.windows.Window} */ (result));
                     }
-                }
+                },
             );
         });
     }
@@ -1267,7 +1267,7 @@ export class Backend {
                     } else {
                         resolve(result);
                     }
-                }
+                },
             );
         });
     }
@@ -1282,7 +1282,7 @@ export class Backend {
         await this._sendMessageTabPromise(
             tabId,
             {action: 'searchDisplayControllerUpdateSearchQuery', params: {text, animate}},
-            {frameId: 0}
+            {frameId: 0},
         );
     }
 
@@ -1455,7 +1455,7 @@ export class Backend {
             const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
                 mode,
                 text.substring(i, i + scanLength),
-                findTermsOptions
+                findTermsOptions,
             );
             const codePoint = /** @type {number} */ (text.codePointAt(i));
             const character = String.fromCodePoint(codePoint);
@@ -1509,7 +1509,7 @@ export class Backend {
                     for (const {text: text2, reading: reading2} of distributeFuriganaInflected(
                         term.length > 0 ? term : source,
                         jpConvertKatakanaToHiragana(reading),
-                        source
+                        source,
                     )) {
                         termParts.push({text: text2, reading: reading2});
                     }
@@ -1721,7 +1721,7 @@ export class Backend {
             const response = await this._sendMessageTabPromise(
                 tabId,
                 {action: 'applicationGetUrl'},
-                {frameId: 0}
+                {frameId: 0},
             );
             const url = typeof response === 'object' && response !== null ? /** @type {import('core').SerializableObject} */ (response).url : void 0;
             if (typeof url === 'string') {
@@ -1799,7 +1799,7 @@ export class Backend {
             const checkTabPromises = tabs.map((tab) => checkTab(tab, add));
             await Promise.race([
                 Promise.all(checkTabPromises),
-                promiseTimeout(timeout)
+                promiseTimeout(timeout),
             ]);
             return results;
         } else {
@@ -1819,7 +1819,7 @@ export class Backend {
             await Promise.race([
                 promise,
                 Promise.all(checkTabPromises),
-                promiseTimeout(timeout)
+                promiseTimeout(timeout),
             ]);
             resolve();
             return result;
@@ -1919,7 +1919,7 @@ export class Backend {
                         cleanup();
                         resolve();
                     },
-                    () => {} // NOP
+                    () => {}, // NOP
                 );
 
             if (timeout !== null) {
@@ -2136,7 +2136,7 @@ export class Backend {
             clipboardText,
             audioFileName,
             dictionaryMedia,
-            errors: errors
+            errors: errors,
         };
     }
 
@@ -2161,7 +2161,7 @@ export class Backend {
                 preferredAudioIndex,
                 term,
                 reading,
-                idleTimeout
+                idleTimeout,
             ));
         } catch (e) {
             const error = this._getAudioDownloadError(e);
@@ -2269,7 +2269,7 @@ export class Backend {
                 fileName = this._generateAnkiNoteMediaFileName(
                     `yomitan_dictionary_media_${i + 1}`,
                     extension !== null ? extension : '',
-                    timestamp
+                    timestamp,
                 );
                 try {
                     fileName = await ankiConnect.storeMediaFile(fileName, content);
@@ -2443,8 +2443,8 @@ export class Backend {
             scanning: {alphanumeric},
             translation: {
                 textReplacements: textReplacementsOptions,
-                searchResolution
-            }
+                searchResolution,
+            },
         } = options;
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
         let excludeDictionaryDefinitions = null;
@@ -2454,7 +2454,7 @@ export class Backend {
                 priority: 0,
                 allowSecondarySearches: false,
                 partsOfSpeechFilter: true,
-                useDeinflections: true
+                useDeinflections: true,
             });
             excludeDictionaryDefinitions = new Set();
             excludeDictionaryDefinitions.add(mainDictionary);
@@ -2470,7 +2470,7 @@ export class Backend {
             textReplacements,
             enabledDictionaryMap,
             excludeDictionaryDefinitions,
-            language
+            language,
         };
     }
 
@@ -2483,7 +2483,7 @@ export class Backend {
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         return {
             enabledDictionaryMap,
-            removeNonJapaneseCharacters: !options.scanning.alphanumeric
+            removeNonJapaneseCharacters: !options.scanning.alphanumeric,
         };
     }
 
@@ -2501,7 +2501,7 @@ export class Backend {
                 priority,
                 allowSecondarySearches,
                 partsOfSpeechFilter,
-                useDeinflections
+                useDeinflections,
             });
         }
         return enabledDictionaryMap;
@@ -2545,7 +2545,7 @@ export class Backend {
         if (!result.openedWelcomePage) {
             await Promise.all([
                 this._openWelcomeGuidePage(),
-                chrome.storage.session.set({openedWelcomePage: true})
+                chrome.storage.session.set({openedWelcomePage: true}),
             ]);
         }
     }
@@ -2625,7 +2625,7 @@ export class Backend {
                     } else {
                         resolve(result);
                     }
-                }
+                },
             );
         });
     }

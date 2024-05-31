@@ -286,7 +286,7 @@ export class PopupWindow extends EventDispatcher {
                     this._popupTabId,
                     frameId,
                     'displayPopupMessage2',
-                    message
+                    message,
                 ));
             } catch (e) {
                 if (this._application.webExtension.unloaded) {
@@ -307,7 +307,7 @@ export class PopupWindow extends EventDispatcher {
             this._popupTabId,
             frameId,
             'displayPopupMessage2',
-            message
+            message,
         ));
     }
 }

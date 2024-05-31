@@ -199,7 +199,7 @@ export function addFullscreenChangeEventListener(onFullscreenChanged, eventListe
         'fullscreenchange',
         'MSFullscreenChange',
         'mozfullscreenchange',
-        'webkitfullscreenchange'
+        'webkitfullscreenchange',
     ];
     for (const eventName of fullscreenEventNames) {
         if (eventListenerCollection === null) {

@@ -30,7 +30,7 @@ export class TemplateRendererFrameApi {
         this._windowMessageHandlers = createApiMap([
             ['render', this._onRender.bind(this)],
             ['renderMulti', this._onRenderMulti.bind(this)],
-            ['getModifiedData', this._onGetModifiedData.bind(this)]
+            ['getModifiedData', this._onGetModifiedData.bind(this)],
         ]);
     }
 

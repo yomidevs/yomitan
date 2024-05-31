@@ -42,7 +42,7 @@ export class AudioDownloader {
             ['text-to-speech', this._getInfoTextToSpeech.bind(this)],
             ['text-to-speech-reading', this._getInfoTextToSpeechReading.bind(this)],
             ['custom', this._getInfoCustom.bind(this)],
-            ['custom-json', this._getInfoCustomJson.bind(this)]
+            ['custom-json', this._getInfoCustomJson.bind(this)],
         ]));
     }
 
@@ -134,7 +134,7 @@ export class AudioDownloader {
             post: 'dictionary_reference',
             match_type: 'exact',
             search_query: term,
-            vulgar: 'true'
+            vulgar: 'true',
         });
         const response = await this._requestBuilder.fetchAnonymous(fetchUrl, {
             method: 'POST',
@@ -144,9 +144,9 @@ export class AudioDownloader {
             redirect: 'follow',
             referrerPolicy: 'no-referrer',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: data
+            body: data,
         });
         const responseText = await response.text();
 
@@ -187,7 +187,7 @@ export class AudioDownloader {
             cache: 'default',
             credentials: 'omit',
             redirect: 'follow',
-            referrerPolicy: 'no-referrer'
+            referrerPolicy: 'no-referrer',
         });
         const responseText = await response.text();
 
@@ -265,7 +265,7 @@ export class AudioDownloader {
             cache: 'default',
             credentials: 'omit',
             redirect: 'follow',
-            referrerPolicy: 'no-referrer'
+            referrerPolicy: 'no-referrer',
         });
 
         if (!response.ok) {
@@ -351,7 +351,7 @@ export class AudioDownloader {
             credentials: 'omit',
             redirect: 'follow',
             referrerPolicy: 'no-referrer',
-            signal
+            signal,
         });
 
         if (!response.ok) {
@@ -434,7 +434,7 @@ export class AudioDownloader {
             cache: 'default',
             credentials: 'omit',
             redirect: 'follow',
-            referrerPolicy: 'no-referrer'
+            referrerPolicy: 'no-referrer',
         });
         return await readResponseJson(response);
     }

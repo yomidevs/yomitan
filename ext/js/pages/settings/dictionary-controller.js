@@ -216,7 +216,7 @@ class DictionaryEntry {
             ['Description', 'description'],
             ['Attribution', 'attribution'],
             ['Source Language', 'sourceLanguage'],
-            ['Target Language', 'targetLanguage']
+            ['Target Language', 'targetLanguage'],
         ];
 
         const dictionaryInfo = this._dictionaryInfo;
@@ -484,7 +484,7 @@ export class DictionaryController {
         await this._settingsController.modifyProfileSettings([{
             action: 'set',
             path: 'dictionaries',
-            value: dictionaries
+            value: dictionaries,
         }]);
 
         /** @type {import('settings-controller').EventArgument<'dictionarySettingsReordered'>} */
@@ -529,7 +529,7 @@ export class DictionaryController {
             allowSecondarySearches: false,
             definitionsCollapsible: 'not-collapsible',
             partsOfSpeechFilter: true,
-            useDeinflections: true
+            useDeinflections: true,
         };
     }
 
@@ -581,7 +581,7 @@ export class DictionaryController {
                 targets.push({
                     action: 'set',
                     path: `profiles[${i}].options.dictionaries`,
-                    value: dictionaryOptionsArray
+                    value: dictionaryOptionsArray,
                 });
             }
         }
@@ -938,7 +938,7 @@ export class DictionaryController {
                     path,
                     start: j,
                     deleteCount: 1,
-                    items: []
+                    items: [],
                 });
             }
         }
@@ -968,7 +968,7 @@ export class DictionaryController {
             targets.push({
                 action: 'set',
                 path: `dictionaries[${i}].enabled`,
-                value
+                value,
             });
         }
         await this._settingsController.modifyProfileSettings(targets);

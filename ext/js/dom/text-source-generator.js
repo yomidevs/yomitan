@@ -174,7 +174,7 @@ export class TextSourceGenerator {
         // Result
         return {
             text: text.substring(cursorStart, cursorEnd),
-            offset: startLength - cursorStart
+            offset: startLength - cursorStart,
         };
     }
 

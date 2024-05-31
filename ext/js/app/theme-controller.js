@@ -212,7 +212,7 @@ export class ThemeController {
             Number.parseInt(m[1], 10),
             Number.parseInt(m[2], 10),
             Number.parseInt(m[3], 10),
-            m4 ? Math.max(0, Math.min(1, Number.parseFloat(m4))) : 1
+            m4 ? Math.max(0, Math.min(1, Number.parseFloat(m4))) : 1,
         ];
     }
 }

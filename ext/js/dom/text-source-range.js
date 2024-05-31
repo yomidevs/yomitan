@@ -108,7 +108,7 @@ export class TextSourceRange {
             this._imposterSourceElement,
             this._cachedRects,
             this._cachedSourceRect,
-            this._disallowExpandSelection
+            this._disallowExpandSelection,
         );
     }
 
@@ -307,7 +307,7 @@ export class TextSourceRange {
         return offsetDOMRects(
             this._cachedRects,
             sourceRect.left - this._cachedSourceRect.left,
-            sourceRect.top - this._cachedSourceRect.top
+            sourceRect.top - this._cachedSourceRect.top,
         );
     }
 }

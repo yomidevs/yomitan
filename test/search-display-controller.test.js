@@ -66,7 +66,7 @@ describe('Keyboard Event Handling', () => {
     const validKeypressEvents = [
         new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: false, altKey: false}),
         new KeyboardEvent('keydown', {key: 'Backspace'}),
-        new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: true, metaKey: false, altKey: false})
+        new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: true, metaKey: false, altKey: false}),
     ];
 
     const invalidKeypressEvents = [
@@ -79,7 +79,7 @@ describe('Keyboard Event Handling', () => {
         new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: false, altKey: true}),
         new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: false, metaKey: true, altKey: false}),
         new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: false, metaKey: false, altKey: true}),
-        new KeyboardEvent('keydown', {key: 'ArrowDown'})
+        new KeyboardEvent('keydown', {key: 'ArrowDown'}),
     ];
 
     test('should test that onKeyDown function focuses input for valid keys', () => {

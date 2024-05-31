@@ -97,7 +97,7 @@ export class AudioController extends EventDispatcher {
             path: 'audio.sources',
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
     }
 
@@ -158,7 +158,7 @@ export class AudioController extends EventDispatcher {
             [...speechSynthesis.getVoices()].map((voice, index) => ({
                 voice,
                 isJapanese: this._languageTagIsJapanese(voice.lang),
-                index
+                index,
             })) :
             []
         );
@@ -221,7 +221,7 @@ export class AudioController extends EventDispatcher {
             'jpod101',
             'jpod101-alternate',
             'jisho',
-            'custom'
+            'custom',
         ];
         for (const type of typesAvailable) {
             if (!this._audioSourceEntries.some((entry) => entry.type === type)) {
@@ -243,7 +243,7 @@ export class AudioController extends EventDispatcher {
             path: 'audio.sources',
             start: index,
             deleteCount: 0,
-            items: [source]
+            items: [source],
         }]);
     }
 }
