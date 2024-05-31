@@ -50,16 +50,17 @@ export class LanguageTransformer {
 
         /** @type {import('language-transformer-internal').Transform[]} */
         const transforms2 = [];
-        for (let i = 0, ii = transforms.length; i < ii; ++i) {
-            const {name, description, rules} = transforms[i];
+
+        for (const [transformId, transform] of Object.entries(transforms)) {
+            const {name, description, rules} = transform;
             /** @type {import('language-transformer-internal').Rule[]} */
             const rules2 = [];
             for (let j = 0, jj = rules.length; j < jj; ++j) {
                 const {type, isInflected, deinflect, conditionsIn, conditionsOut} = rules[j];
                 const conditionFlagsIn = this._getConditionFlagsStrict(conditionFlagsMap, conditionsIn);
-                if (conditionFlagsIn === null) { throw new Error(`Invalid conditionsIn for transform[${i}].rules[${j}]`); }
+                if (conditionFlagsIn === null) { throw new Error(`Invalid conditionsIn for transform ${transformId}.rules[${j}]`); }
                 const conditionFlagsOut = this._getConditionFlagsStrict(conditionFlagsMap, conditionsOut);
-                if (conditionFlagsOut === null) { throw new Error(`Invalid conditionsOut for transform[${i}].rules[${j}]`); }
+                if (conditionFlagsOut === null) { throw new Error(`Invalid conditionsOut for transform ${transformId}.rules[${j}]`); }
                 rules2.push({
                     type,
                     isInflected,

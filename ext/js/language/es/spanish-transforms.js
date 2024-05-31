@@ -73,8 +73,8 @@ export const spanishTransforms = {
             isDictionaryForm: true
         }
     },
-    transforms: [
-        {
+    transforms: {
+        'plural': {
             name: 'plural',
             description: 'Plural form of a noun',
             rules: [
@@ -85,14 +85,14 @@ export const spanishTransforms = {
                 ...[...'aeiou'].map((v) => suffixInflection(`${v}nes`, `${addAccent(v)}n`, ['np'], ['ns'])) // 'canciones' -> canción
             ]
         },
-        {
+        'feminine adjective': {
             name: 'feminine adjective',
             description: 'feminine form of an adjective',
             rules: [
                 suffixInflection('a', 'o', ['adj'], ['adj'])
             ]
         },
-        {
+        'present indicative': {
             name: 'present indicative',
             description: 'Present indicative form of a verb',
             rules: [

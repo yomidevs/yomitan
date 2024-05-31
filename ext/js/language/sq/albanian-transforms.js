@@ -62,9 +62,9 @@ export const albanianTransforms = {
             isDictionaryForm: true
         }
     },
-    transforms: [
+    transforms: {
         // Nouns
-        {
+        'definite': {
             name: 'definite',
             description: 'Definite form of a noun',
             rules: [
@@ -85,14 +85,14 @@ export const albanianTransforms = {
                 suffixInflection('ja', 'e', [], ['n'])
             ]
         },
-        {
+        'singular definite accusative': {
             name: 'singular definite accusative',
             description: 'Singular definite accusative form of a noun',
             rules: [
                 suffixInflection('n', '', [], ['n'])
             ]
         },
-        {
+        'plural': {
             name: 'plural',
             description: 'Plural form of a noun',
             rules: [
@@ -101,7 +101,7 @@ export const albanianTransforms = {
             ]
         },
         // Verbs
-        {
+        'present indicative second-person singular': {
             name: 'present indicative second-person singular',
             description: 'Present indicative second-person singular form of a verb',
             rules: [
@@ -111,7 +111,7 @@ export const albanianTransforms = {
                 suffixInflection('hesh', 'hem', [], ['v'])
             ]
         },
-        {
+        'present indicative third-person singular': {
             name: 'present indicative third-person singular',
             description: 'Present indicative third-person singular form of a verb',
             rules: [
@@ -121,7 +121,7 @@ export const albanianTransforms = {
                 suffixInflection('het', 'hem', [], ['v'])
             ]
         },
-        {
+        'present indicative first-person plural': {
             name: 'present indicative first-person plural',
             description: 'Present indicative first-person plural form of a verb',
             rules: [
@@ -130,7 +130,7 @@ export const albanianTransforms = {
                 suffixInflection('hemi', 'hem', [], ['v'])
             ]
         },
-        {
+        'present indicative second-person plural': {
             name: 'present indicative second-person plural',
             description: 'Present indicative second-person plural form of a verb',
             rules: [
@@ -139,7 +139,7 @@ export const albanianTransforms = {
                 suffixInflection('heni', 'hem', [], ['v'])
             ]
         },
-        {
+        'present indicative third-person plural': {
             name: 'present indicative third-person plural',
             description: 'Present indicative third-person plural form of a verb',
             rules: [
@@ -148,7 +148,7 @@ export const albanianTransforms = {
                 suffixInflection('hen', 'hem', [], ['v'])
             ]
         },
-        {
+        'imperfect first-person singular indicative': {
             name: 'imperfect first-person singular indicative',
             description: 'Imperfect first-person singular indicative form of a verb',
             rules: [
@@ -157,7 +157,7 @@ export const albanianTransforms = {
                 suffixInflection('hesha', 'hem', [], ['v'])
             ]
         },
-        {
+        'imperfect second-person singular indicative': {
             name: 'imperfect second-person singular indicative',
             description: 'Imperfect second-person singular indicative form of a verb',
             rules: [
@@ -166,7 +166,7 @@ export const albanianTransforms = {
                 suffixInflection('heshe', 'hem', [], ['v'])
             ]
         },
-        {
+        'imperfect third-person singular indicative': {
             name: 'imperfect third-person singular indicative',
             description: 'Imperfect third-person singular indicative form of a verb',
             rules: [
@@ -175,7 +175,7 @@ export const albanianTransforms = {
                 suffixInflection('hej', 'hem', [], ['v'])
             ]
         },
-        {
+        'imperfect first-person plural indicative': {
             name: 'imperfect first-person plural indicative',
             description: 'Imperfect first-person plural indicative form of a verb',
             rules: [
@@ -184,7 +184,7 @@ export const albanianTransforms = {
                 suffixInflection('heshim', 'hem', [], ['v'])
             ]
         },
-        {
+        'imperfect second-person plural indicative': {
             name: 'imperfect second-person plural indicative',
             description: 'Imperfect second-person plural indicative form of a verb',
             rules: [
@@ -193,7 +193,7 @@ export const albanianTransforms = {
                 suffixInflection('heshit', 'hem', [], ['v'])
             ]
         },
-        {
+        'imperfect third-person plural indicative': {
             name: 'imperfect third-person plural indicative',
             description: 'Imperfect third-person plural indicative form of a verb',
             rules: [
@@ -202,7 +202,7 @@ export const albanianTransforms = {
                 suffixInflection('heshin', 'hem', [], ['v'])
             ]
         },
-        {
+        'aorist first-person singular indicative': {
             name: 'aorist first-person singular indicative',
             description: 'Aorist first-person singular indicative form of a verb',
             rules: [
@@ -211,7 +211,7 @@ export const albanianTransforms = {
                 conjugationIISuffixInflection('a', '', [], ['v'])
             ]
         },
-        {
+        'aorist second-person singular indicative': {
             name: 'aorist second-person singular indicative',
             description: 'Aorist second-person singular indicative form of a verb',
             rules: [
@@ -220,7 +220,7 @@ export const albanianTransforms = {
                 conjugationIISuffixInflection('e', '', [], ['v'])
             ]
         },
-        {
+        'aorist third-person singular indicative': {
             name: 'aorist third-person singular indicative',
             description: 'Aorist third-person singular indicative form of a verb',
             rules: [
@@ -231,7 +231,7 @@ export const albanianTransforms = {
                 suffixInflection('ye', 'ej', [], ['v'])
             ]
         },
-        {
+        'aorist first-person plural indicative': {
             name: 'aorist first-person plural indicative',
             description: 'Aorist first-person plural indicative form of a verb',
             rules: [
@@ -241,7 +241,7 @@ export const albanianTransforms = {
                 conjugationIISuffixInflection('ëm', '', [], ['v'])
             ]
         },
-        {
+        'aorist second-person plural indicative': {
             name: 'aorist second-person plural indicative',
             description: 'Aorist second-person plural indicative form of a verb',
             rules: [
@@ -251,7 +251,7 @@ export const albanianTransforms = {
                 conjugationIISuffixInflection('ët', '', [], ['v'])
             ]
         },
-        {
+        'aorist third-person plural indicative': {
             name: 'aorist third-person plural indicative',
             description: 'Aorist third-person plural indicative form of a verb',
             rules: [
@@ -261,7 +261,7 @@ export const albanianTransforms = {
                 conjugationIISuffixInflection('ën', '', [], ['v'])
             ]
         },
-        {
+        'imperative second-person singular present': {
             name: 'imperative second-person singular present',
             description: 'Imperative second-person singular present form of a verb',
             rules: [
@@ -269,7 +269,7 @@ export const albanianTransforms = {
                 suffixInflection('hu', 'hem', [], ['v'])
             ]
         },
-        {
+        'imperative second-person plural present': {
             name: 'imperative second-person plural present',
             description: 'Imperative second-person plural present form of a verb',
             rules: [
@@ -278,7 +278,7 @@ export const albanianTransforms = {
                 suffixInflection('huni', 'hem', [], ['v'])
             ]
         },
-        {
+        'participle': {
             name: 'participle',
             description: 'Participle form of a verb',
             rules: [
@@ -288,7 +288,7 @@ export const albanianTransforms = {
                 suffixInflection('yer', 'ej', [], ['v'])
             ]
         },
-        {
+        'mediopassive': {
             name: 'mediopassive',
             description: 'Mediopassive form of a verb',
             rules: [
@@ -296,49 +296,49 @@ export const albanianTransforms = {
                 suffixInflection('hem', 'j', ['v'], ['v'])
             ]
         },
-        {
+        'optative first-person singular present': {
             name: 'optative first-person singular present',
             description: 'Optative first-person singular present form of a verb',
             rules: [
                 suffixInflection('fsha', 'j', [], ['v'])
             ]
         },
-        {
+        'optative second-person singular present': {
             name: 'optative second-person singular present',
             description: 'Optative second-person singular present form of a verb',
             rules: [
                 suffixInflection('fsh', 'j', [], ['v'])
             ]
         },
-        {
+        'optative third-person singular present': {
             name: 'optative third-person singular present',
             description: 'Optative third-person singular present form of a verb',
             rules: [
                 suffixInflection('ftë', 'j', [], ['v'])
             ]
         },
-        {
+        'optative first-person plural present': {
             name: 'optative first-person plural present',
             description: 'Optative first-person plural present form of a verb',
             rules: [
                 suffixInflection('fshim', 'j', [], ['v'])
             ]
         },
-        {
+        'optative second-person plural present': {
             name: 'optative second-person plural present',
             description: 'Optative second-person plural present form of a verb',
             rules: [
                 suffixInflection('fshi', 'j', [], ['v'])
             ]
         },
-        {
+        'optative third-person plural present': {
             name: 'optative third-person plural present',
             description: 'Optative third-person plural present form of a verb',
             rules: [
                 suffixInflection('fshin', 'j', [], ['v'])
             ]
         },
-        {
+        'nominalization': {
             name: 'nominalization',
             description: 'Noun form of a verb',
             rules: [
@@ -347,5 +347,5 @@ export const albanianTransforms = {
                 suffixInflection('je', '', [], ['v'])
             ]
         }
-    ]
+    }
 };

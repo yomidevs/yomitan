@@ -64,8 +64,8 @@ export const germanTransforms = {
             isDictionaryForm: true
         }
     },
-    transforms: [
-        {
+    transforms: {
+        'nominalization': {
             name: 'nominalization',
             description: 'Noun formed from a verb',
             rules: [
@@ -73,7 +73,7 @@ export const germanTransforms = {
                 suffixInflection('lung', 'eln', [], [])
             ]
         },
-        {
+        '-bar': {
             name: '-bar',
             description: '-able adjective from a verb',
             rules: [
@@ -81,26 +81,26 @@ export const germanTransforms = {
                 suffixInflection('bar', 'n', [], ['v']) // Lieferbar
             ]
         },
-        {
+        'negative': {
             name: 'negative',
             description: 'Negation',
             rules: [
                 prefixInflection('un', '', [], ['adj'])
             ]
         },
-        {
+        'separated prefix': {
             name: 'separated prefix',
             description: 'Separable prefix',
             rules: [
                 ...separatedPrefixInflections
             ]
         },
-        {
+        'zu-infinitive': {
             name: 'zu-infinitive',
             description: 'zu-infinitive',
             rules: [
                 ...zuInfinitiveInflections
             ]
         }
-    ]
+    }
 };
