@@ -67,7 +67,7 @@ export class QueryParser extends EventDispatcher {
             searchTerms: true,
             searchKanji: false,
             searchOnClick: true,
-            textSourceGenerator
+            textSourceGenerator,
         });
         /** @type {?(import('../language/ja/japanese-wanakana.js'))} */
         this._japaneseWanakanaModule = null;
@@ -122,6 +122,8 @@ export class QueryParser extends EventDispatcher {
         if (selectedParserChanged && this._parseResults.length > 0) {
             this._renderParseResult();
         }
+
+        this._queryParser.lang = language;
     }
 
     /**
@@ -162,7 +164,7 @@ export class QueryParser extends EventDispatcher {
             inputInfo,
             textSource,
             optionsContext,
-            sentenceOffset: this._getSentenceOffset(textSource)
+            sentenceOffset: this._getSentenceOffset(textSource),
         });
     }
 
@@ -208,7 +210,7 @@ export class QueryParser extends EventDispatcher {
             path: 'parsing.selectedParser',
             value,
             scope: 'profile',
-            optionsContext
+            optionsContext,
         };
         void this._api.modifySettings([modification], 'search');
     }

@@ -254,3 +254,9 @@
     display: inline;
     color: var(--text-color-light3);
 }
+.gloss-sc-details {
+    padding-left: var(--list-padding1);
+}
+.gloss-sc-summary {
+    list-style-position: outside;
+}

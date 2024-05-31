@@ -65,6 +65,8 @@ export type Summary = {
     url?: string;
     description?: string;
     attribution?: string;
+    sourceLanguage?: string;
+    targetLanguage?: string;
     frequencyMode?: 'occurrence-based' | 'rank-based';
 };
 

@@ -122,7 +122,7 @@ export class BackupController {
             timeSeparator,
             date.getUTCMinutes().toString().padStart(2, '0'),
             timeSeparator,
-            date.getUTCSeconds().toString().padStart(2, '0')
+            date.getUTCSeconds().toString().padStart(2, '0'),
         ];
         return values.slice(0, resolution * 2 - 1).join('');
     }
@@ -152,7 +152,7 @@ export class BackupController {
             environment,
             userAgent: navigator.userAgent,
             permissions,
-            options: optionsFull
+            options: optionsFull,
         };
     }
 
@@ -285,7 +285,7 @@ export class BackupController {
                 e.preventDefault();
                 complete({
                     result: true,
-                    sanitize: element.dataset.importSanitize === 'true'
+                    sanitize: element.dataset.importSanitize === 'true',
                 });
                 modal.setVisible(false);
             };
@@ -574,12 +574,16 @@ export class BackupController {
      * @returns {Promise<Blob>}
      */
     async _exportDatabase(databaseName) {
-        const db = await new Dexie(databaseName).open();
+        const DexieConstructor = /** @type {import('dexie').DexieConstructor} */ (/** @type {unknown} */ (Dexie));
+        const db = new DexieConstructor(databaseName);
+        await db.open();
+        /** @type {unknown} */
+        // @ts-expect-error - The export function is declared as an extension which has no type information.
         const blob = await db.export({
-            progressCallback: this._databaseExportProgressCallback.bind(this)
+            progressCallback: this._databaseExportProgressCallback.bind(this),
         });
-        await db.close();
-        return blob;
+        db.close();
+        return /** @type {Blob} */ (blob);
     }
 
     /** */
@@ -640,7 +644,7 @@ export class BackupController {
     async _importDatabase(_databaseName, file) {
         await this._settingsController.application.api.purgeDatabase();
         await Dexie.import(file, {
-            progressCallback: this._databaseImportProgressCallback.bind(this)
+            progressCallback: this._databaseImportProgressCallback.bind(this),
         });
         void this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
         this._settingsController.application.triggerStorageChanged();

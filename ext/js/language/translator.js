@@ -17,10 +17,9 @@
  */
 
 import {applyTextReplacement} from '../general/regex-util.js';
-import {TextSourceMap} from '../general/text-source-map.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
-import {getAllLanguageTextPreprocessors} from './languages.js';
+import {getAllLanguageTextProcessors} from './languages.js';
 import {MultiLanguageTransformer} from './multi-language-transformer.js';
 
 /**
@@ -41,8 +40,8 @@ export class Translator {
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
         /** @type {RegExp} */
         this._numberRegex = /[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/;
-        /** @type {Map<string, {textPreprocessors: import('language').TextPreprocessorWithId<unknown>[], optionSpace: import('translation-internal').PreprocessorOptionsSpace}>} */
-        this._textPreprocessors = new Map();
+        /** @type {import('translation-internal').TextProcessorMap} */
+        this._textProcessors = new Map();
     }
 
     /**
@@ -50,13 +49,8 @@ export class Translator {
      */
     prepare() {
         this._multiLanguageTransformer.prepare();
-        for (const {iso, textPreprocessors} of getAllLanguageTextPreprocessors()) {
-            /** @type {Map<string, import('language').TextPreprocessorOptions<unknown>>} */
-            const optionSpace = new Map();
-            for (const {id, textPreprocessor} of textPreprocessors) {
-                optionSpace.set(id, textPreprocessor.options);
-            }
-            this._textPreprocessors.set(iso, {textPreprocessors, optionSpace});
+        for (const {iso, textPreprocessors = [], textPostprocessors = []} of getAllLanguageTextProcessors()) {
+            this._textProcessors.set(iso, {textPreprocessors, textPostprocessors});
         }
     }
 
@@ -202,7 +196,7 @@ export class Translator {
                 hasReading,
                 frequency: frequencyValue,
                 displayValue,
-                displayValueParsed
+                displayValueParsed,
             });
         }
         return results;
@@ -284,6 +278,7 @@ export class Translator {
             return false;
         }
 
+        /** @type {Map<string, number>} */
         const frequencyCounter = new Map();
 
         for (const element of array1) {
@@ -359,7 +354,7 @@ export class Translator {
                         const inflectionRuleChainCandidates = algorithmChains.map(({inflectionRules: algInflections}) => {
                             return {
                                 source: /** @type {import('dictionary').InflectionSource} */ (algInflections.length === 0 ? 'dictionary' : 'both'),
-                                inflectionRules: [...algInflections, ...inflectionRules]
+                                inflectionRules: [...algInflections, ...inflectionRules],
                             };
                         });
 
@@ -395,6 +390,7 @@ export class Translator {
      * @returns {Map<string, import('translation-internal').DatabaseDeinflection[]>}
      */
     _groupDeinflectionsByTerm(deinflections) {
+        /** @type {Map<string, import('translation-internal').DatabaseDeinflection[]>} */
         const result = new Map();
         for (const deinflection of deinflections) {
             const {deinflectedText} = deinflection;
@@ -428,7 +424,7 @@ export class Translator {
         }
     }
 
-    // Deinflections and text preprocessing
+    // Deinflections and text processing
 
     /**
      * @param {string} text
@@ -438,53 +434,34 @@ export class Translator {
      */
     _getAlgorithmDeinflections(text, options) {
         const {language} = options;
-        const info = this._textPreprocessors.get(language);
-        if (typeof info === 'undefined') { throw new Error(`Unsupported language: ${language}`); }
-        const {textPreprocessors, optionSpace: textPreprocessorOptionsSpace} = info;
-
-        /** @type {Map<string, import('language').TextPreprocessorOptions<unknown>>} */
-        const variantSpace = new Map();
-        variantSpace.set('textReplacements', this._getTextReplacementsVariants(options));
-        for (const [key, value] of textPreprocessorOptionsSpace) {
-            variantSpace.set(key, value);
-        }
+        const processorsForLanguage = this._textProcessors.get(language);
+        if (typeof processorsForLanguage === 'undefined') { throw new Error(`Unsupported language: ${language}`); }
+        const {textPreprocessors, textPostprocessors} = processorsForLanguage;
 
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const deinflections = [];
-        const used = new Set();
+        /** @type {import('translation-internal').TextCache} */
+        const sourceCache = new Map(); // For reusing text processors' outputs
 
-        for (const arrayVariant of this._generateArrayVariants(variantSpace)) {
-            const textReplacements = /** @type {import('translation').FindTermsTextReplacement[] | null} */ (arrayVariant.get('textReplacements'));
+        for (
+            let rawSource = text;
+            rawSource.length > 0;
+            rawSource = this._getNextSubstring(options.searchResolution, rawSource)
+        ) {
+            const preprocessedTextVariants = this._getTextVariants(rawSource, textPreprocessors, this._getTextReplacementsVariants(options), sourceCache);
 
-            let text2 = text;
-            const sourceMap = new TextSourceMap(text2);
-
-            if (textReplacements !== null) {
-                text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
-            }
-
-            for (const preprocessor of textPreprocessors.values()) {
-                const {id, textPreprocessor} = preprocessor;
-                const setting = arrayVariant.get(id);
-                text2 = textPreprocessor.process(text2, setting, sourceMap);
-            }
-
-            for (
-                let source = text2, i = text2.length;
-                i > 0;
-                i = this._getNextSubstringLength(options.searchResolution, i, source)
-            ) {
-                source = text2.substring(0, i);
-                if (used.has(source)) { break; }
-                used.add(source);
-                const rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
-                for (const {text: transformedText, conditions, trace} of this._multiLanguageTransformer.transform(language, source)) {
-                    /** @type {import('dictionary').InflectionRuleChainCandidate} */
-                    const inflectionRuleChainCandidate = {
-                        source: 'algorithm',
-                        inflectionRules: trace.map((frame) => frame.transform)
-                    };
-                    deinflections.push(this._createDeinflection(rawSource, source, transformedText, conditions, [inflectionRuleChainCandidate]));
+            for (const source of preprocessedTextVariants) {
+                for (const deinflection of this._multiLanguageTransformer.transform(language, source)) {
+                    const {trace, conditions} = deinflection;
+                    const postprocessedTextVariants = this._getTextVariants(deinflection.text, textPostprocessors, [null], sourceCache);
+                    for (const transformedText of postprocessedTextVariants) {
+                        /** @type {import('dictionary').InflectionRuleChainCandidate} */
+                        const inflectionRuleChainCandidate = {
+                            source: 'algorithm',
+                            inflectionRules: trace.map((frame) => frame.transform),
+                        };
+                        deinflections.push(this._createDeinflection(rawSource, source, transformedText, conditions, [inflectionRuleChainCandidate]));
+                    }
                 }
             }
         }
@@ -492,28 +469,82 @@ export class Translator {
     }
 
     /**
-     * @param {string} searchResolution
-     * @param {number} currentLength
-     * @param {string} source
-     * @returns {number}
+     * @param {string} text
+     * @param {import('language').TextProcessorWithId<unknown>[]} textProcessors
+     * @param {(import('translation').FindTermsTextReplacement[] | null)[]} textReplacements
+     * @param {import('translation-internal').TextCache} textCache
+     * @returns {Set<string>}
      */
-    _getNextSubstringLength(searchResolution, currentLength, source) {
-        return (
-            searchResolution === 'word' ?
-            source.search(/[^\p{Letter}][\p{Letter}\p{Number}]*$/u) :
-            currentLength - 1
-        );
+    _getTextVariants(text, textProcessors, textReplacements, textCache) {
+        let variants = new Set([text]);
+        for (const textReplacement of textReplacements) {
+            if (textReplacement === null) { continue; }
+            variants.add(this._applyTextReplacements(text, textReplacement));
+        }
+        for (const {id, textProcessor: {process, options}} of textProcessors) {
+            /** @type {Set<string>} */
+            const newVariants = new Set();
+            for (const variant of variants) {
+                for (const option of options) {
+                    const processed = this._getProcessedText(textCache, variant, id, option, process);
+                    newVariants.add(processed);
+                }
+            }
+            variants = newVariants;
+        }
+        return variants;
+    }
+
+    /**
+     * @param {import('translation-internal').TextCache} textCache
+     * @param {string} text
+     * @param {string} id
+     * @param {unknown} setting
+     * @param {import('language').TextProcessorFunction} process
+     * @returns {string}
+     */
+    _getProcessedText(textCache, text, id, setting, process) {
+        let level1 = textCache.get(text);
+        if (!level1) {
+            level1 = new Map();
+            textCache.set(text, level1);
+        }
+
+        let level2 = level1.get(id);
+        if (!level2) {
+            level2 = new Map();
+            level1.set(id, level2);
+        }
+
+        if (!level2.has(setting)) {
+            text = process(text, setting);
+            level2.set(setting, text);
+        } else {
+            text = level2.get(setting) || '';
+        }
+        return text;
+    }
+
+    /**
+     * @param {string} searchResolution
+     * @param {string} currentString
+     * @returns {string}
+     */
+    _getNextSubstring(searchResolution, currentString) {
+        const nextSubstringLength = searchResolution === 'word' ?
+            currentString.search(/[^\p{Letter}][\p{Letter}\p{Number}]*$/u) :
+            currentString.length - 1;
+        return currentString.substring(0, nextSubstringLength);
     }
 
     /**
      * @param {string} text
-     * @param {TextSourceMap} sourceMap
      * @param {import('translation').FindTermsTextReplacement[]} replacements
      * @returns {string}
      */
-    _applyTextReplacements(text, sourceMap, replacements) {
+    _applyTextReplacements(text, replacements) {
         for (const {pattern, replacement} of replacements) {
-            text = applyTextReplacement(text, sourceMap, pattern, replacement);
+            text = applyTextReplacement(text, pattern, replacement);
         }
         return text;
     }
@@ -578,7 +609,7 @@ export class Translator {
                 if (typeof group === 'undefined') {
                     group = {
                         ids: new Set(),
-                        dictionaryEntries: []
+                        dictionaryEntries: [],
                     };
                     sequenceList.push({query: sequence, dictionary});
                     groupedDictionaryEntries.push(group);
@@ -644,6 +675,7 @@ export class Translator {
         /** @type {import('dictionary-database').TermExactRequest[]} */
         const termList = [];
         const targetList = [];
+        /** @type {Map<string, {groups: import('translator').DictionaryEntryGroup[]}>} */
         const targetMap = new Map();
 
         for (const group of groupedDictionaryEntries) {
@@ -654,7 +686,7 @@ export class Translator {
                 let target = targetMap.get(key);
                 if (typeof target === 'undefined') {
                     target = {
-                        groups: []
+                        groups: [],
                     };
                     targetMap.set(key, target);
                     termList.push({term, reading});
@@ -1092,7 +1124,7 @@ export class Translator {
                                     hasReading,
                                     frequencyValue,
                                     displayValue,
-                                    displayValueParsed
+                                    displayValueParsed,
                                 ));
                             }
                         }
@@ -1115,7 +1147,7 @@ export class Translator {
                                     position,
                                     nasalPositions,
                                     devoicePositions,
-                                    tags: tags2
+                                    tags: tags2,
                                 });
                             }
                             for (const {pronunciations, headwordIndex} of targets) {
@@ -1125,7 +1157,7 @@ export class Translator {
                                     dictionary,
                                     dictionaryIndex,
                                     dictionaryPriority,
-                                    pitches
+                                    pitches,
                                 ));
                             }
                         }
@@ -1144,7 +1176,7 @@ export class Translator {
                             phoneticTranscriptions.push({
                                 type: 'phonetic-transcription',
                                 ipa,
-                                tags: tags2
+                                tags: tags2,
                             });
                         }
                         for (const {pronunciations, headwordIndex} of targets) {
@@ -1154,7 +1186,7 @@ export class Translator {
                                 dictionary,
                                 dictionaryIndex,
                                 dictionaryPriority,
-                                phoneticTranscriptions
+                                phoneticTranscriptions,
                             ));
                         }
                     }
@@ -1189,7 +1221,7 @@ export class Translator {
                             character,
                             frequency,
                             displayValue,
-                            displayValueParsed
+                            displayValueParsed,
                         ));
                     }
                     break;
@@ -1324,37 +1356,6 @@ export class Translator {
     }
 
     /**
-     * @param {Map<string, unknown[]>} arrayVariants
-     * @yields {Map<string, unknown>}
-     * @returns {Generator<Map<string, unknown>, void, void>}
-     */
-    *_generateArrayVariants(arrayVariants) {
-        const variantKeys = [...arrayVariants.keys()];
-        const entryVariantLengths = [];
-        for (const key of variantKeys) {
-            const entryVariants = /** @type {unknown[]} */ (arrayVariants.get(key));
-            entryVariantLengths.push(entryVariants.length);
-        }
-        const totalVariants = entryVariantLengths.reduce((acc, length) => acc * length, 1);
-
-        for (let variantIndex = 0; variantIndex < totalVariants; ++variantIndex) {
-            /** @type {Map<string, unknown>} */
-            const variant = new Map();
-            let remainingIndex = variantIndex;
-
-            for (let keyIndex = 0; keyIndex < variantKeys.length; ++keyIndex) {
-                const key = variantKeys[keyIndex];
-                const entryVariants = /** @type {unknown[]} */ (arrayVariants.get(key));
-                const entryIndex = remainingIndex % entryVariants.length;
-                variant.set(key, entryVariants[entryIndex]);
-                remainingIndex = Math.floor(remainingIndex / entryVariants.length);
-            }
-
-            yield variant;
-        }
-    }
-
-    /**
      * @param {unknown[]} array
      * @returns {string}
      */
@@ -1388,7 +1389,7 @@ export class Translator {
             order: (typeof order === 'number' ? order : 0),
             score: (typeof score === 'number' ? score : 0),
             dictionary,
-            value
+            value,
         };
     }
 
@@ -1426,7 +1427,7 @@ export class Translator {
             tags: [],
             stats,
             definitions,
-            frequencies: []
+            frequencies: [],
         };
     }
 
@@ -1450,7 +1451,7 @@ export class Translator {
             score: (typeof score === 'number' ? score : 0),
             content: (typeof notes === 'string' && notes.length > 0 ? [notes] : []),
             dictionaries: [dictionary],
-            redundant: false
+            redundant: false,
         };
     }
 
@@ -1507,7 +1508,7 @@ export class Translator {
             sequences,
             isPrimary,
             tags,
-            entries
+            entries,
         };
     }
 
@@ -1547,12 +1548,12 @@ export class Translator {
      * @param {number} dictionaryIndex
      * @param {number} dictionaryPriority
      * @param {number} sourceTermExactMatchCount
-     * @param {number} maxTransformedTextLength
+     * @param {number} maxOriginalTextLength
      * @param {import('dictionary').TermHeadword[]} headwords
      * @param {import('dictionary').TermDefinition[]} definitions
      * @returns {import('dictionary').TermDictionaryEntry}
      */
-    _createTermDictionaryEntry(isPrimary, inflectionRuleChainCandidates, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxTransformedTextLength, headwords, definitions) {
+    _createTermDictionaryEntry(isPrimary, inflectionRuleChainCandidates, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, maxOriginalTextLength, headwords, definitions) {
         return {
             type: 'term',
             isPrimary,
@@ -1562,11 +1563,11 @@ export class Translator {
             dictionaryIndex,
             dictionaryPriority,
             sourceTermExactMatchCount,
-            maxTransformedTextLength,
+            maxOriginalTextLength,
             headwords,
             definitions,
             pronunciations: [],
-            frequencies: []
+            frequencies: [],
         };
     }
 
@@ -1594,7 +1595,7 @@ export class Translator {
             dictionary,
             id,
             sequence: rawSequence,
-            rules
+            rules,
         } = databaseEntry;
         // Cast is safe because getDeinflections filters out deinflection definitions
         const contentDefinitions = /** @type {import('dictionary-data').TermGlossaryContent[]} */ (definitions);
@@ -1602,7 +1603,7 @@ export class Translator {
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const sourceTermExactMatchCount = (isPrimary && deinflectedText === term ? 1 : 0);
         const source = this._createSource(originalText, transformedText, deinflectedText, matchType, matchSource, isPrimary);
-        const maxTransformedTextLength = transformedText.length;
+        const maxOriginalTextLength = originalText.length;
         const hasSequence = (rawSequence >= 0);
         const sequence = hasSequence ? rawSequence : -1;
 
@@ -1620,9 +1621,9 @@ export class Translator {
             dictionaryIndex,
             dictionaryPriority,
             sourceTermExactMatchCount,
-            maxTransformedTextLength,
+            maxOriginalTextLength,
             [this._createTermHeadword(0, term, reading, [source], headwordTagGroups, rules)],
-            [this._createTermDefinition(0, [0], dictionary, dictionaryIndex, dictionaryPriority, id, score, [sequence], isPrimary, definitionTagGroups, contentDefinitions)]
+            [this._createTermDefinition(0, [0], dictionary, dictionaryIndex, dictionaryPriority, id, score, [sequence], isPrimary, definitionTagGroups, contentDefinitions)],
         );
     }
 
@@ -1651,7 +1652,7 @@ export class Translator {
         let score = Number.MIN_SAFE_INTEGER;
         let dictionaryIndex = Number.MAX_SAFE_INTEGER;
         let dictionaryPriority = Number.MIN_SAFE_INTEGER;
-        let maxTransformedTextLength = 0;
+        let maxOriginalTextLength = 0;
         let isPrimary = false;
         /** @type {import('dictionary').TermDefinition[]} */
         const definitions = [];
@@ -1665,7 +1666,7 @@ export class Translator {
             dictionaryPriority = Math.max(dictionaryPriority, dictionaryEntry.dictionaryPriority);
             if (dictionaryEntry.isPrimary) {
                 isPrimary = true;
-                maxTransformedTextLength = Math.max(maxTransformedTextLength, dictionaryEntry.maxTransformedTextLength);
+                maxOriginalTextLength = Math.max(maxOriginalTextLength, dictionaryEntry.maxOriginalTextLength);
                 const dictionaryEntryInflections = dictionaryEntry.inflectionRuleChainCandidates;
                 if (inflections === null || dictionaryEntryInflections.length < inflections.length) {
                     inflections = dictionaryEntryInflections;
@@ -1697,9 +1698,9 @@ export class Translator {
             dictionaryIndex,
             dictionaryPriority,
             sourceTermExactMatchCount,
-            maxTransformedTextLength,
+            maxOriginalTextLength,
             headwordsArray,
-            definitions
+            definitions,
         );
     }
 
@@ -1874,11 +1875,11 @@ export class Translator {
          */
         const compareFunction = (v1, v2) => {
             // Sort by length of source term
-            let i = v2.maxTransformedTextLength - v1.maxTransformedTextLength;
+            let i = v2.maxOriginalTextLength - v1.maxOriginalTextLength;
             if (i !== 0) { return i; }
 
             // Sort by the number of inflection reasons
-            i = v1.inflectionRuleChainCandidates.length - v2.inflectionRuleChainCandidates.length;
+            i = this._getShortestInflectionChainLength(v1.inflectionRuleChainCandidates) - this._getShortestInflectionChainLength(v2.inflectionRuleChainCandidates);
             if (i !== 0) { return i; }
 
             // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)
@@ -1891,6 +1892,10 @@ export class Translator {
 
             // Sort by dictionary priority
             i = v2.dictionaryPriority - v1.dictionaryPriority;
+            if (i !== 0) { return i; }
+
+            // Sort by dictionary order
+            i = v1.dictionaryIndex - v2.dictionaryIndex;
             if (i !== 0) { return i; }
 
             // Sort by term score
@@ -1913,10 +1918,6 @@ export class Translator {
 
             // Sort by definition count
             i = v2.definitions.length - v1.definitions.length;
-            if (i !== 0) { return i; }
-
-            // Sort by dictionary order
-            i = v1.dictionaryIndex - v2.dictionaryIndex;
             return i;
         };
         dictionaryEntries.sort(compareFunction);
@@ -1940,6 +1941,10 @@ export class Translator {
             i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
+            // Sort by dictionary order
+            i = v1.dictionaryIndex - v2.dictionaryIndex;
+            if (i !== 0) { return i; }
+
             // Sort by term score
             i = v2.score - v1.score;
             if (i !== 0) { return i; }
@@ -1954,10 +1959,6 @@ export class Translator {
                 i = headwordIndices1[j] - headwordIndices2[j];
                 if (i !== 0) { return i; }
             }
-
-            // Sort by dictionary order
-            i = v1.dictionaryIndex - v2.dictionaryIndex;
-            if (i !== 0) { return i; }
 
             // Sort by original order
             i = v1.index - v2.index;
@@ -2037,6 +2038,7 @@ export class Translator {
      * @param {boolean} ascending
      */
     _updateSortFrequencies(dictionaryEntries, dictionary, ascending) {
+        /** @type {Map<number, number>} */
         const frequencyMap = new Map();
         for (const dictionaryEntry of dictionaryEntries) {
             const {definitions, frequencies} = dictionaryEntry;
@@ -2073,6 +2075,19 @@ export class Translator {
             }
             frequencyMap.clear();
         }
+    }
+
+    /**
+     * @param {import('dictionary').InflectionRuleChainCandidate[]} inflectionRuleChainCandidates
+     * @returns {number}
+     */
+    _getShortestInflectionChainLength(inflectionRuleChainCandidates) {
+        if (inflectionRuleChainCandidates.length === 0) { return 0; }
+        let length = Number.MAX_SAFE_INTEGER;
+        for (const {inflectionRules} of inflectionRuleChainCandidates) {
+            length = Math.min(length, inflectionRules.length);
+        }
+        return length;
     }
 
     // Miscellaneous

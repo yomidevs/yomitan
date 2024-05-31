@@ -22773,7 +22773,7 @@
           "type": "term",
           "id": 1,
           "source": "打",
-          "rawSource": "打",
+          "rawSource": "打(う)",
           "sourceTerm": "打",
           "inflectionRuleChainCandidates": [
             {
@@ -23087,7 +23087,7 @@
           "type": "term",
           "id": 2,
           "source": "打",
-          "rawSource": "打",
+          "rawSource": "打(う)",
           "sourceTerm": "打",
           "inflectionRuleChainCandidates": [
             {
@@ -30533,7 +30533,235 @@
     ]
   },
   {
-    "name": "Test text preprocessors - convertAlphabeticCharacters",
+    "name": "Test text preprocessors - alphabeticWidthVariants 1",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 27,
+          "source": "English",
+          "rawSource": "Ｅｎｇｌｉｓｈ",
+          "sourceTerm": "English",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 19,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "English",
+          "reading": "English",
+          "expressions": [
+            {
+              "sourceTerm": "English",
+              "expression": "English",
+              "reading": "English",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "English",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "English definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "English",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "English"
+        ],
+        "uniqueReadings": [
+          "English"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text preprocessors - alphabeticWidthVariants 2",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 29,
+          "source": "ＵＳＢ",
+          "rawSource": "USB",
+          "sourceTerm": "ＵＳＢ",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 21,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "ＵＳＢ",
+          "reading": "ユーエスビー",
+          "expressions": [
+            {
+              "sourceTerm": "ＵＳＢ",
+              "expression": "ＵＳＢ",
+              "reading": "ユーエスビー",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "ＵＳＢ",
+                  "furigana": "ユーエスビー"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "ＵＳＢ definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "ＵＳＢ",
+              "furigana": "ユーエスビー"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "ＵＳＢ"
+        ],
+        "uniqueReadings": [
+          "ユーエスビー"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text preprocessors - alphabeticToHiragana",
     "noteDataList": [
       {
         "marker": "{marker}",
@@ -32926,6 +33154,236 @@
         ],
         "uniqueReadings": [
           "language"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test text postprocessing",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 30,
+          "source": "ㅁㅏㅅㅣㄱㅓㄴㅏ",
+          "rawSource": "마시거나",
+          "sourceTerm": "마시다",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": [
+                "-거나"
+              ]
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 22,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "마시다",
+          "reading": "마시다",
+          "expressions": [
+            {
+              "sourceTerm": "마시다",
+              "expression": "마시다",
+              "reading": "마시다",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "마시다",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "v"
+              ]
+            }
+          ],
+          "glossary": [
+            "masida definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "v",
+              "category": "default",
+              "notes": "",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "마시다",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "마시다"
+        ],
+        "uniqueReadings": [
+          "마시다"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Test search resolution - word",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 27,
+          "source": "English",
+          "rawSource": "english",
+          "sourceTerm": "English",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 19,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "English",
+          "reading": "English",
+          "expressions": [
+            {
+              "sourceTerm": "English",
+              "expression": "English",
+              "reading": "English",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "English",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "English definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "English",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "English"
+        ],
+        "uniqueReadings": [
+          "English"
         ],
         "pitches": [],
         "pitchCount": 0,

@@ -42,8 +42,9 @@ export class TextSourceRange {
      * @param {?DOMRect} cachedSourceRect A cached `DOMRect` representing the rect of the `imposterSourceElement`,
      *   which can be used after the imposter element is removed from the page.
      *   Must not be `null` if imposterElement is specified.
+     * @param {boolean} disallowExpandSelection
      */
-    constructor(range, rangeStartOffset, content, imposterElement, imposterSourceElement, cachedRects, cachedSourceRect) {
+    constructor(range, rangeStartOffset, content, imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, disallowExpandSelection) {
         /** @type {Range} */
         this._range = range;
         /** @type {number} */
@@ -58,6 +59,8 @@ export class TextSourceRange {
         this._cachedRects = cachedRects;
         /** @type {?DOMRect} */
         this._cachedSourceRect = cachedSourceRect;
+        /** @type {boolean} */
+        this._disallowExpandSelection = disallowExpandSelection;
     }
 
     /**
@@ -104,7 +107,8 @@ export class TextSourceRange {
             this._imposterElement,
             this._imposterSourceElement,
             this._cachedRects,
-            this._cachedSourceRect
+            this._cachedSourceRect,
+            this._disallowExpandSelection,
         );
     }
 
@@ -145,7 +149,8 @@ export class TextSourceRange {
         }
         const state = new DOMTextScanner(node, offset, !layoutAwareScan, layoutAwareScan).seek(length);
         this._range.setEnd(state.node, state.offset);
-        this._content = (fromEnd ? this._content + state.content : state.content);
+        const expandedContent = fromEnd ? this._content + state.content : state.content;
+        this._content = this._disallowExpandSelection ? expandedContent : this._content;
         return length - state.remainder;
     }
 
@@ -252,7 +257,16 @@ export class TextSourceRange {
      * @returns {TextSourceRange} A new instance of the class corresponding to the range.
      */
     static create(range) {
-        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null);
+        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, true);
+    }
+
+    /**
+     * Creates a new instance for a given range without expanding the search.
+     * @param {Range} range The source range.
+     * @returns {TextSourceRange} A new instance of the class corresponding to the range.
+     */
+    static createLazy(range) {
+        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, false);
     }
 
     /**
@@ -265,7 +279,7 @@ export class TextSourceRange {
     static createFromImposter(range, imposterElement, imposterSourceElement) {
         const cachedRects = convertMultipleRectZoomCoordinates(range.getClientRects(), range.startContainer);
         const cachedSourceRect = convertRectZoomCoordinates(imposterSourceElement.getBoundingClientRect(), imposterSourceElement);
-        return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect);
+        return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, true);
     }
 
     /**
@@ -293,7 +307,7 @@ export class TextSourceRange {
         return offsetDOMRects(
             this._cachedRects,
             sourceRect.left - this._cachedSourceRect.left,
-            sourceRect.top - this._cachedSourceRect.top
+            sourceRect.top - this._cachedSourceRect.top,
         );
     }
 }

@@ -49,4 +49,12 @@ export type DatabaseDeinflection = {
     databaseEntries: DictionaryDatabase.TermEntry[];
 };
 
-export type PreprocessorOptionsSpace = Map<string, Language.TextPreprocessorOptions<unknown>>;
+export type TextProcessorMap = Map<
+    string,
+    {
+        textPreprocessors: Language.TextProcessorWithId<unknown>[];
+        textPostprocessors: Language.TextProcessorWithId<unknown>[];
+    }
+>;
+
+export type TextCache = Map<string, Map<string, Map<unknown, string>>>;

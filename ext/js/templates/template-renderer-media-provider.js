@@ -81,6 +81,8 @@ export class TemplateRendererMediaProvider {
         let {value} = data;
         const {escape = true} = namedArgs;
         if (escape) {
+            // Handlebars is a custom version of the library without type information, so it's assumed to be "any".
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             value = Handlebars.Utils.escapeExpression(value);
         }
         return value;
@@ -144,7 +146,7 @@ export class TemplateRendererMediaProvider {
         this._addRequirement({
             type: 'dictionaryMedia',
             dictionary,
-            path
+            path,
         });
         return null;
     }
@@ -168,7 +170,7 @@ export class TemplateRendererMediaProvider {
         this._addRequirement({
             type: 'textFurigana',
             text,
-            readingMode
+            readingMode,
         });
         return null;
     }

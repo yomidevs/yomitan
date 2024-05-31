@@ -67,7 +67,7 @@ export class DictionaryWorkerHandler {
         const onProgress = (...args) => {
             self.postMessage({
                 action: 'progress',
-                params: {args}
+                params: {args},
             });
         };
         let response;
@@ -92,7 +92,7 @@ export class DictionaryWorkerHandler {
             const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
             return {
                 result,
-                errors: errors.map((error) => ExtensionError.serialize(error))
+                errors: errors.map((error) => ExtensionError.serialize(error)),
             };
         } finally {
             void dictionaryDatabase.close();

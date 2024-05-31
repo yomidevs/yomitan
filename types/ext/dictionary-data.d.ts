@@ -29,6 +29,8 @@ export type Index = {
     url?: string;
     description?: string;
     attribution?: string;
+    sourceLanguage?: string;
+    targetLanguage?: string;
     frequencyMode?: 'occurrence-based' | 'rank-based';
     tagMeta?: IndexTagMeta;
 };

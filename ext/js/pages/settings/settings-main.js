@@ -21,6 +21,7 @@ import {DocumentFocusController} from '../../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {ExtensionContentController} from '../common/extension-content-controller.js';
 import {AnkiController} from './anki-controller.js';
+import {AnkiDeckGeneratorController} from './anki-deck-generator-controller.js';
 import {AnkiTemplatesController} from './anki-templates-controller.js';
 import {AudioController} from './audio-controller.js';
 import {BackupController} from './backup-controller.js';
@@ -117,7 +118,10 @@ await Application.main(true, async (application) => {
     const ankiController = new AnkiController(settingsController);
     preparePromises.push(ankiController.prepare());
 
-    const ankiTemplatesController = new AnkiTemplatesController(settingsController, modalController, ankiController);
+    const ankiDeckGeneratorController = new AnkiDeckGeneratorController(application, settingsController, modalController, ankiController);
+    preparePromises.push(ankiDeckGeneratorController.prepare());
+
+    const ankiTemplatesController = new AnkiTemplatesController(application, settingsController, modalController, ankiController);
     preparePromises.push(ankiTemplatesController.prepare());
 
     const popupPreviewController = new PopupPreviewController(settingsController);

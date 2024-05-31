@@ -22,6 +22,8 @@ export type NoteId = number;
 
 export type CardId = number;
 
+export type NoteWithId = Note & {id: NoteId};
+
 export type Note = {
     fields: NoteFields;
     tags: string[];

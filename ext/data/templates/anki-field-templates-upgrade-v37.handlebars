@@ -1,0 +1,33 @@
+{{<<<<<<<}}
+{{#*inline "pitch-accent-list"}}
+    {{~#if (op ">" pitchCount 0)~}}
+        {{~#if (op ">" pitchCount 1)~}}<ol>{{~/if~}}
+        {{~#each pitches~}}
+            {{~#each pitches~}}
+                {{~#if (op ">" ../../pitchCount 1)~}}<li>{{~/if~}}
+                    {{~> pitch-accent-item-disambiguation~}}
+                    {{~> pitch-accent-item format=../../format~}}
+                {{~#if (op ">" ../../pitchCount 1)~}}</li>{{~/if~}}
+            {{~/each~}}
+        {{~/each~}}
+        {{~#if (op ">" pitchCount 1)~}}</ol>{{~/if~}}
+    {{~else~}}
+        No pitch accent data
+    {{~/if~}}
+{{/inline}}
+{{=======}}
+{{#*inline "pitch-accent-list"}}
+    {{~#if (op ">" pitchCount 0)~}}
+        {{~#if (op ">" pitchCount 1)~}}<ol>{{~/if~}}
+        {{~#each pitches~}}
+            {{~#each pitches~}}
+                {{~#if (op ">" ../../pitchCount 1)~}}<li>{{~/if~}}
+                    {{~> pitch-accent-item-disambiguation~}}
+                    {{~> pitch-accent-item format=../../format~}}
+                {{~#if (op ">" ../../pitchCount 1)~}}</li>{{~/if~}}
+            {{~/each~}}
+        {{~/each~}}
+        {{~#if (op ">" pitchCount 1)~}}</ol>{{~/if~}}
+    {{~/if~}}
+{{/inline}}
+{{>>>>>>>}}

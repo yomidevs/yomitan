@@ -115,7 +115,7 @@ describe('Database', () => {
 
         const title = testDictionaryIndex.title;
         const titles = new Map([
-            [title, {priority: 0, allowSecondarySearches: false}]
+            [title, {priority: 0, allowSecondarySearches: false}],
         ]);
 
         // Setup database
@@ -156,7 +156,7 @@ describe('Database', () => {
             {name: 'invalid-dictionary3'},
             {name: 'invalid-dictionary4'},
             {name: 'invalid-dictionary5'},
-            {name: 'invalid-dictionary6'}
+            {name: 'invalid-dictionary6'},
         ];
         describe.each(invalidDictionaries)('Invalid dictionary: $name', ({name}) => {
             test('Has invalid data', async ({expect}) => {
@@ -185,7 +185,7 @@ describe('Database', () => {
 
             const title = testDictionaryIndex.title;
             const titles = new Map([
-                [title, {priority: 0, allowSecondarySearches: false}]
+                [title, {priority: 0, allowSecondarySearches: false}],
             ]);
 
             // Setup database
@@ -198,7 +198,7 @@ describe('Database', () => {
             const {result: importDictionaryResult, errors: importDictionaryErrors} = await dictionaryImporter.importDictionary(
                 dictionaryDatabase,
                 testDictionarySource,
-                {prefixWildcardsSupported: true}
+                {prefixWildcardsSupported: true},
             );
 
             if (importDictionaryResult) {
@@ -309,7 +309,7 @@ describe('Database', () => {
         /** @type {{clearMethod: 'purge'|'delete'}[]} */
         const cleanupTestCases = [
             {clearMethod: 'purge'},
-            {clearMethod: 'delete'}
+            {clearMethod: 'delete'},
         ];
         describe.each(cleanupTestCases)('Testing cleanup method $clearMethod', ({clearMethod}) => {
             test('Import data and test', async ({expect}) => {
@@ -336,7 +336,7 @@ describe('Database', () => {
                             await dictionaryDatabase.deleteDictionary(
                                 testDictionaryIndex.title,
                                 1000,
-                                () => { progressEvent2 = true; }
+                                () => { progressEvent2 = true; },
                             );
                             expect(progressEvent2).toBe(true);
                         }
@@ -351,7 +351,7 @@ describe('Database', () => {
                 /** @type {import('dictionary-database').DictionaryCounts} */
                 const countsExpected = {
                     counts: [],
-                    total: {kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0}
+                    total: {kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0},
                 };
                 expect.soft(counts).toStrictEqual(countsExpected);
 

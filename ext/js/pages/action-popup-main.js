@@ -114,7 +114,15 @@ class DisplayController {
                         const result = customHandler(e);
                         if (typeof result !== 'undefined') { return; }
                     }
-                    void this._api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
+
+                    let mode = 'existingOrNewTab';
+                    if (e.ctrlKey) {
+                        mode = 'newTab';
+                    } else if (e.shiftKey) {
+                        mode = 'popup';
+                    }
+
+                    void this._api.commandExec(command, {mode: mode});
                     e.preventDefault();
                 };
                 /**
@@ -187,7 +195,7 @@ class DisplayController {
     _setupOptions({options}) {
         const extensionEnabled = options.general.enable;
         const onToggleChanged = () => this._api.commandExec('toggleTextScanning');
-        for (const toggle of /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('#enable-search,#enable-search2'))) {
+        for (const toggle of /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('.enable-search,.enable-search2'))) {
             toggle.checked = extensionEnabled;
             toggle.addEventListener('change', onToggleChanged, false);
         }
@@ -254,7 +262,7 @@ class DisplayController {
             path: 'profileCurrent',
             value,
             scope: 'global',
-            optionsContext: null
+            optionsContext: null,
         };
         await this._api.modifySettings([modification], 'action-popup');
     }

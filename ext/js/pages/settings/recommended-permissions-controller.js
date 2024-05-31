@@ -19,6 +19,7 @@
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {toError} from '../../core/to-error.js';
 import {getAllPermissions, setPermissionsGranted} from '../../data/permissions-util.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class RecommendedPermissionsController {
     /**
@@ -27,8 +28,10 @@ export class RecommendedPermissionsController {
     constructor(settingsController) {
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
-        /** @type {?NodeListOf<HTMLInputElement>} */
-        this._originToggleNodes = null;
+        /** @type {HTMLInputElement} */
+        this._originToggleNode = querySelectorNotNull(document, '#recommended-permissions-toggle');
+        /** @type {HTMLInputElement} */
+        this._optionalPermissionsToggleNode = querySelectorNotNull(document, '#optional-permissions-toggle');
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
         /** @type {?HTMLElement} */
@@ -37,11 +40,9 @@ export class RecommendedPermissionsController {
 
     /** */
     async prepare() {
-        this._originToggleNodes = document.querySelectorAll('.recommended-permissions-toggle');
         this._errorContainer = document.querySelector('#recommended-permissions-error');
-        for (const node of this._originToggleNodes) {
-            node.addEventListener('change', this._onOriginToggleChange.bind(this), false);
-        }
+        this._originToggleNode.addEventListener('change', this._onOriginToggleChange.bind(this), false);
+        this._optionalPermissionsToggleNode.addEventListener('change', this._onOptionalPermissionsToggleChange.bind(this), false);
 
         this._settingsController.on('permissionsChanged', this._onPermissionsChanged.bind(this));
         await this._updatePermissions();
@@ -55,12 +56,10 @@ export class RecommendedPermissionsController {
     _onPermissionsChanged({permissions}) {
         this._eventListeners.removeAllEventListeners();
         const originsSet = new Set(permissions.origins);
-        if (this._originToggleNodes !== null) {
-            for (const node of this._originToggleNodes) {
-                const {origin} = node.dataset;
-                node.checked = typeof origin === 'string' && originsSet.has(origin);
-            }
-        }
+        const {origin} = this._originToggleNode.dataset;
+        this._originToggleNode.checked = typeof origin === 'string' && originsSet.has(origin);
+
+        this._optionalPermissionsToggleNode.checked = Array.isArray(permissions.permissions) && permissions.permissions.includes('clipboardRead') && permissions.permissions.includes('nativeMessaging');
     }
 
     /**
@@ -76,10 +75,22 @@ export class RecommendedPermissionsController {
         void this._setOriginPermissionEnabled(origin, value);
     }
 
+    /**
+     * @param {Event} e
+     */
+    async _onOptionalPermissionsToggleChange(e) {
+        const node = /** @type {HTMLInputElement} */ (e.currentTarget);
+        const value = node.checked;
+        const permissions = ['clipboardRead', 'nativeMessaging'];
+        await setPermissionsGranted({permissions}, value);
+        await this._updatePermissions();
+    }
+
     /** */
     async _updatePermissions() {
         const permissions = await getAllPermissions();
         this._onPermissionsChanged({permissions});
+        void this._setWelcomePageText();
     }
 
     /**
@@ -97,8 +108,34 @@ export class RecommendedPermissionsController {
                 this._errorContainer.textContent = toError(e).message;
             }
         }
-        if (!added) { return false; }
         await this._updatePermissions();
-        return true;
+        return added;
+    }
+
+    /** */
+    async _setWelcomePageText() {
+        const permissions = await getAllPermissions();
+        const recommendedPermissions = permissions.origins?.includes('<all_urls>');
+        const optionalPermissions = permissions.permissions?.includes('clipboardRead') && permissions.permissions?.includes('nativeMessaging');
+        /** @type {HTMLElement | null} */
+        this._textIfFullEnabled = document.querySelector('#full-permissions-enabled');
+        /** @type {HTMLElement | null} */
+        this._textIfRecommendedEnabled = document.querySelector('#recommended-permissions-enabled');
+        /** @type {HTMLElement | null} */
+        this._textIfDisabled = document.querySelector('#permissions-disabled');
+
+        if (this._textIfFullEnabled && this._textIfRecommendedEnabled && this._textIfDisabled) {
+            this._textIfFullEnabled.hidden = true;
+            this._textIfRecommendedEnabled.hidden = true;
+            this._textIfDisabled.hidden = true;
+
+            if (optionalPermissions && recommendedPermissions) {
+                this._textIfFullEnabled.hidden = false;
+            } else if (recommendedPermissions) {
+                this._textIfRecommendedEnabled.hidden = false;
+            } else {
+                this._textIfDisabled.hidden = false;
+            }
+        }
     }
 }

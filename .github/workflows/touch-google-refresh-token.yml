@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: cd
     steps:
-      - uses: cardinalby/google-api-fetch-token-action@24c99245e2a2494cc4c4b1037203d319a184b15b # pin@v1.0.3
+      - uses: cardinalby/google-api-fetch-token-action@f455422472a558d48d939e77a65cdcec38e707b5 # pin@v1.0.4
         with:
           clientId: ${{ secrets.G_CLIENT_ID }}
           clientSecret: ${{ secrets.G_CLIENT_SECRET }}

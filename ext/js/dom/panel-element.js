@@ -96,7 +96,7 @@ export class PanelElement extends EventDispatcher {
             this._mutationObserver.observe(this._node, {
                 attributes: true,
                 attributeFilter: ['hidden'],
-                attributeOldValue: true
+                attributeOldValue: true,
             });
         }
         super.on(eventName, callback);

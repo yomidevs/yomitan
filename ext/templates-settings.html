@@ -61,7 +61,9 @@
             <div class="badge info-badge badge-small-icon"><span class="icon" data-icon="checkmark"></span></div>
         </button>
     </div>
-    <input type="number" step="1" class="short-height dictionary-priority">
+    <input type="number" step="1" class="short-height dictionary-priority advanced-only">
+    <button type="button" class="icon-button" id="dictionary-move-up" data-menu-action="moveUp"><span class="icon-button-inner"><span class="icon" data-icon="up-chevron"></span></span></button>
+    <button type="button" class="icon-button" id="dictionary-move-down" data-menu-action="moveDown"><span class="icon-button-inner"><span class="icon" data-icon="down-chevron"></span></span></button>
     <button type="button" class="icon-button dictionary-menu-button" data-menu="dictionary-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
 </template>
 <template id="dictionary-details-entry-template"><div class="dictionary-details-entry">
@@ -84,8 +86,6 @@
 </template>
 <template id="dictionary-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
     <button type="button" class="popup-menu-item" data-menu-action="showDetails">Details&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveUp">Move up</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveDown">Move down</button>
     <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to&hellip;</button>
     <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
 </div></div></div></template>
@@ -189,6 +189,10 @@
 
         <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-options"><span>Touch options:</span></div>
         <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-options">
+            <label class="scan-input-checkbox-item">
+                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchTap"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>Scan on touch tap</span>
+            </label>
             <label class="scan-input-checkbox-item">
                 <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchPress"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
                 <span>Scan on touch press</span>
@@ -359,6 +363,8 @@
             <option value="previousEntryDifferentDictionary">Go to previous dictionary</option>
             <option value="historyBackward">Navigate backward in history</option>
             <option value="historyForward">Navigate forward in history</option>
+            <option value="profilePrevious">Switch to previous profile</option>
+            <option value="profileNext">Switch to next profile</option>
             <option value="addNoteKanji">Add kanji note</option>
             <option value="addNoteTermKanji">Add term note</option>
             <option value="addNoteTermKana">Add term note (reading)</option>
@@ -367,6 +373,7 @@
             <option value="playAudioFromSource">Play audio from source</option>
             <option value="copyHostSelection">Copy host window selection</option>
             <option value="scanSelectedText">Scan selected text</option>
+            <option value="scanTextAtSelection">Scan text at selection</option>
             <option value="scanTextAtCaret">Scan text at caret</option>
             <option value="toggleOption">Toggle option</option>
         </select>

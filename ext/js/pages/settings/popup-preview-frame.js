@@ -65,7 +65,7 @@ export class PopupPreviewFrame {
             ['setCustomCss',           this._setCustomCss.bind(this)],
             ['setCustomOuterCss',      this._setCustomOuterCss.bind(this)],
             ['updateOptionsContext',   this._updateOptionsContext.bind(this)],
-            ['setLanguageExampleText', this._setLanguageExampleText.bind(this)]
+            ['setLanguageExampleText', this._setLanguageExampleText.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -103,7 +103,7 @@ export class PopupPreviewFrame {
             pageType: 'web',
             allowRootFramePopupProxy: false,
             childrenSupported: false,
-            hotkeyHandler: this._hotkeyHandler
+            hotkeyHandler: this._hotkeyHandler,
         });
         this._frontend.setOptionsContextOverride(this._optionsContext);
         await this._frontend.prepare();

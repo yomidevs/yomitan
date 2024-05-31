@@ -28,7 +28,7 @@ async function fetchAsset(url) {
         cache: 'default',
         credentials: 'omit',
         redirect: 'follow',
-        referrerPolicy: 'no-referrer'
+        referrerPolicy: 'no-referrer',
     });
     if (!response.ok) {
         throw new Error(`Failed to fetch ${url}: ${response.status}`);

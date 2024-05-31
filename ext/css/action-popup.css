@@ -35,6 +35,7 @@ body {
     font-family: 'Segoe UI', Tahoma, sans-serif;
     font-size: var(--font-size);
     width: max-content;
+    height: max-content;
 }
 
 h3 {
@@ -122,27 +123,25 @@ label {
     background-color: rgba(0, 0, 0, 0.1);
 }
 .link-group-icon {
-    width: 16px;
-    height: 16px;
+    width: 26px;
+    height: 26px;
     text-align: center;
     vertical-align: middle;
     display: inline-block;
     margin-right: 0.25em;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 .link-group-icon>input {
     margin: 0;
     padding: 0;
 }
-.link-group-icon[data-icon=chevron]::after {
-    content: '';
-    display: block;
-    width: 100%;
-    height: 100%;
-    background-image: url(/images/right-chevron.svg);
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: contain;
-}
+.link-group-icon[data-icon=chevron] { background-image: url(/images/right-chevron.svg); }
+.link-group-icon[data-icon=cog] { background-image: url(/images/cog.svg); }
+.link-group-icon[data-icon=key] { background-image: url(/images/key.svg); }
+.link-group-icon[data-icon=magnifying-glass] { background-image: url(/images/magnifying-glass.svg); }
+.link-group-icon[data-icon=question-mark-circle] { background-image: url(/images/question-mark-circle.svg); }
+
 .link-group-label {
     vertical-align: middle;
 }
@@ -172,7 +171,6 @@ label {
     border: 1px solid #245580;
     border-radius: 4px;
     display: inline-block;
-    padding: 6px 12px;
 }
 .toggle-group {
     position: absolute;
@@ -189,7 +187,9 @@ body[data-loaded=true] .toggle-group {
 .toggle-on,
 .toggle-off,
 .toggle-handle {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 6px 12px;
     font-size: var(--font-size);
     font-weight: normal;
@@ -463,4 +463,41 @@ select.profile-select {
     right: 0;
     bottom: 0;
     background-color: var(--warning-color);
+}
+
+/* Mobile overrides */
+
+/* Treat devices that can't hover as mobile devices */
+@media (hover: none) {
+    #full {
+        display: initial;
+    }
+    #mini {
+        display: none;
+    }
+    body {
+        min-width: 95%;
+        width: max-content;
+        font-size: calc(var(--font-size) * 2);
+        text-align: center;
+    }
+    h3 {
+        font-size: calc(var(--font-size) * 3.4);
+    }
+    .toggle-on, .toggle-off {
+        font-size: calc(var(--font-size) * 4);
+    }
+    .toggle-handle {
+        padding-left: 65px;
+        padding-right: 65px;
+        border-radius: 10px;
+    }
+    .toggle {
+        width: 100%;
+        padding-top: 37.7%;
+    }
+    #extension-info {
+        max-width: 95vw;
+        overflow-wrap: break-word;
+    }
 }

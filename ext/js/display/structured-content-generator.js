@@ -74,7 +74,7 @@ export class StructuredContentGenerator {
             verticalAlign,
             border,
             borderRadius,
-            sizeUnits
+            sizeUnits,
         } = data;
 
         const hasPreferredWidth = (typeof preferredWidth === 'number');
@@ -144,7 +144,7 @@ export class StructuredContentGenerator {
                 path,
                 dictionary,
                 (url) => this._setImageData(node, image, imageBackground, url, false),
-                () => this._setImageData(node, image, imageBackground, null, true)
+                () => this._setImageData(node, image, imageBackground, null, true),
             );
         }
 
@@ -275,6 +275,8 @@ export class StructuredContentGenerator {
             case 'ol':
             case 'ul':
             case 'li':
+            case 'details':
+            case 'summary':
                 return this._createStructuredContentElement(tag, content, dictionary, language, 'simple', true, true);
             case 'img':
                 return this.createDefinitionImage(content, dictionary);
@@ -377,7 +379,7 @@ export class StructuredContentGenerator {
             wordBreak,
             whiteSpace,
             cursor,
-            listStyleType
+            listStyleType,
         } = contentStyle;
         if (typeof fontStyle === 'string') { style.fontStyle = fontStyle; }
         if (typeof fontWeight === 'string') { style.fontWeight = fontWeight; }

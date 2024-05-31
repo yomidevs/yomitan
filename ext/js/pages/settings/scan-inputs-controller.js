@@ -72,7 +72,7 @@ export class ScanInputsController {
             path: 'scanning.inputs',
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
         return true;
     }
@@ -149,7 +149,7 @@ export class ScanInputsController {
             path: 'scanning.inputs',
             start: index,
             deleteCount: 0,
-            items: [scanningInput]
+            items: [scanningInput],
         }]);
 
         // Scroll to bottom
@@ -208,8 +208,9 @@ export class ScanInputsController {
                 showAdvanced: false,
                 searchTerms: true,
                 searchKanji: true,
-                scanOnTouchMove: true,
-                scanOnTouchPress: true,
+                scanOnTouchTap: true,
+                scanOnTouchMove: false,
+                scanOnTouchPress: false,
                 scanOnTouchRelease: false,
                 scanOnPenMove: true,
                 scanOnPenHover: true,
@@ -217,8 +218,8 @@ export class ScanInputsController {
                 scanOnPenPress: true,
                 scanOnPenRelease: false,
                 preventTouchScrolling: true,
-                preventPenScrolling: true
-            }
+                preventPenScrolling: true,
+            },
         };
     }
 }

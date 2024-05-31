@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {basicTextPreprocessorOptions} from '../language-util.js';
+import {basicTextProcessorOptions} from '../text-processors.js';
 
 const optionalDiacritics = [
     '\u0618', // Small Fatha
@@ -33,17 +33,17 @@ const optionalDiacritics = [
     '\u0654', // Hamza Above
     '\u0655', // Hamza Below
     '\u0656', // Subscript Alef
-    '\u0670' // Dagger Alef
+    '\u0670', // Dagger Alef
 ];
 
 const diacriticsRegex = new RegExp(`[${optionalDiacritics.join('')}]`, 'g');
 
-/** @type {import('language').TextPreprocessor<boolean>} */
+/** @type {import('language').TextProcessor<boolean>} */
 export const removeArabicScriptDiacritics = {
     name: 'Remove diacritics',
     description: 'وَلَدَ ⬅️ ولد',
-    options: basicTextPreprocessorOptions,
+    options: basicTextProcessorOptions,
     process: (text, setting) => {
         return setting ? text.replace(diacriticsRegex, '') : text;
-    }
+    },
 };

@@ -85,8 +85,13 @@ function createAbsoluteGetComputedStyle(window) {
     return (element, ...args) => {
         const style = getComputedStyleOld(element, ...args);
         return new Proxy(style, {
+            /**
+             * @param {CSSStyleDeclaration} target
+             * @param {string|symbol} property
+             * @returns {unknown}
+             */
             get: (target, property) => {
-                let result = /** @type {import('core').SafeAny} */ (target)[property];
+                let result = /** @type {Record<string|symbol, unknown>} */ (/** @type {unknown} */ (target))[property];
                 if (typeof result === 'string') {
                     /**
                      * @param {string} g0
@@ -100,7 +105,7 @@ function createAbsoluteGetComputedStyle(window) {
                     result = result.replace(/([-+]?\d(?:\.\d)?(?:[eE][-+]?\d+)?)em/g, replacer);
                 }
                 return result;
-            }
+            },
         });
     };
 }
@@ -133,8 +138,8 @@ describe('DOMTextScanner', () => {
                         node: expectedNodeSelector,
                         offset: expectedOffset,
                         content: expectedContent,
-                        remainder: expectedRemainder
-                    }
+                        remainder: expectedRemainder,
+                    },
                 } = testDataItem;
 
                 const node = querySelectorTextNode(testElement, nodeSelector);

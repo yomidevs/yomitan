@@ -421,6 +421,8 @@ export class DOMTextScanner {
             case 'SCRIPT':
             case 'STYLE':
                 return {enterable: false, newlines: 0};
+            case 'RB':
+                return {enterable: true, newlines: 0};
             case 'BR':
                 return {enterable: false, newlines: 1};
             case 'TEXTAREA':

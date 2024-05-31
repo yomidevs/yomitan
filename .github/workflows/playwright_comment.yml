@@ -16,7 +16,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Grab playwright-output from PR run
-        uses: dawidd6/action-download-artifact@71072fbb1229e1317f1a8de6b04206afb461bd67 # pin@v2
+        uses: dawidd6/action-download-artifact@09f2f74827fd3a8607589e5ad7f9398816f540fe # pin@v2
         continue-on-error: true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -24,7 +24,7 @@ jobs:
           name: playwright-output
 
       - name: Grab master-screenshots-outcome from PR run
-        uses: dawidd6/action-download-artifact@71072fbb1229e1317f1a8de6b04206afb461bd67 # pin@v2
+        uses: dawidd6/action-download-artifact@09f2f74827fd3a8607589e5ad7f9398816f540fe # pin@v2
         continue-on-error: true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -68,6 +68,7 @@ jobs:
             :heavy_check_mark: No visual differences introduced by this PR.
 
             <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
+          update-only: true
 
       - name: "[Comment] Warning: Visual differences introduced by this PR"
         uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
