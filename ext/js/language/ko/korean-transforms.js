@@ -862,8 +862,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄴ', 'ㅅㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㄴ', 'ㅎㄷㅏ', [], ['adj']),
                 suffixInflection('ㄹㅇㅡㄴ', 'ㄷㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㄴ', '', [], ['eusi', 'f'])
-            ]
+                suffixInflection('ㄴ', '', [], ['eusi', 'f']),
+            ],
         },
         {
             name: '-(으/느)ㄴ가',
