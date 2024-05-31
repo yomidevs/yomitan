@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isCodePointInRange, isCodePointInRanges} from '../language-util.js';
+import {CJK_IDEOGRAPH_RANGES, isCodePointInRange, isCodePointInRanges} from '../CJK-util.js';
 
 
 const HIRAGANA_SMALL_TSU_CODE_POINT = 0x3063;
@@ -24,53 +24,22 @@ const KATAKANA_SMALL_KA_CODE_POINT = 0x30f5;
 const KATAKANA_SMALL_KE_CODE_POINT = 0x30f6;
 const KANA_PROLONGED_SOUND_MARK_CODE_POINT = 0x30fc;
 
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const HIRAGANA_RANGE = [0x3040, 0x309f];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const KATAKANA_RANGE = [0x30a0, 0x30ff];
 
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const HIRAGANA_CONVERSION_RANGE = [0x3041, 0x3096];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const KATAKANA_CONVERSION_RANGE = [0x30a1, 0x30f6];
 
-/** @type {import('language-util').CodepointRange[]} */
+/** @type {import('CJK-util').CodepointRange[]} */
 const KANA_RANGES = [HIRAGANA_RANGE, KATAKANA_RANGE];
-
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_RANGE = [0x4e00, 0x9fff];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A_RANGE = [0x3400, 0x4dbf];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B_RANGE = [0x20000, 0x2a6df];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C_RANGE = [0x2a700, 0x2b73f];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D_RANGE = [0x2b740, 0x2b81f];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_E_RANGE = [0x2b820, 0x2ceaf];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_F_RANGE = [0x2ceb0, 0x2ebef];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_COMPATIBILITY_IDEOGRAPHS_RANGE = [0xf900, 0xfaff];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT_RANGE = [0x2f800, 0x2fa1f];
-/** @type {import('japanese-util').CodepointRange[]} */
-const CJK_IDEOGRAPH_RANGES = [
-    CJK_UNIFIED_IDEOGRAPHS_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_E_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_F_RANGE,
-    CJK_COMPATIBILITY_IDEOGRAPHS_RANGE,
-    CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT_RANGE,
-];
 
 /**
  * Japanese character ranges, roughly ordered in order of expected frequency.
- * @type {import('language-util').CodepointRange[]}
+ * @type {import('CJK-util').CodepointRange[]}
  */
 const JAPANESE_RANGES = [
     HIRAGANA_RANGE,

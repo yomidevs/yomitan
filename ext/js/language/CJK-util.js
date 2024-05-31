@@ -15,35 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @type {import('language').TextPreprocessorOptions<boolean>} */
-export const basicTextPreprocessorOptions = [false, true];
-
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_UNIFIED_IDEOGRAPHS_RANGE = [0x4e00, 0x9fff];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A_RANGE = [0x3400, 0x4dbf];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B_RANGE = [0x20000, 0x2a6df];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C_RANGE = [0x2a700, 0x2b73f];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D_RANGE = [0x2b740, 0x2b81f];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_E_RANGE = [0x2b820, 0x2ceaf];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_F_RANGE = [0x2ceb0, 0x2ebef];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_G_RANGE = [0x30000, 0x3134f];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_H_RANGE = [0x31350, 0x323af];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_I_RANGE = [0x2ebf0, 0x2ee5f];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_COMPATIBILITY_IDEOGRAPHS_RANGE = [0xf900, 0xfaff];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT_RANGE = [0x2f800, 0x2fa1f];
 
-/** @type {import('language-util').CodepointRange[]} */
+/** @type {import('CJK-util').CodepointRange[]} */
 export const CJK_IDEOGRAPH_RANGES = [
     CJK_UNIFIED_IDEOGRAPHS_RANGE,
     CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A_RANGE,
@@ -56,10 +53,10 @@ export const CJK_IDEOGRAPH_RANGES = [
     CJK_UNIFIED_IDEOGRAPHS_EXTENSION_H_RANGE,
     CJK_UNIFIED_IDEOGRAPHS_EXTENSION_I_RANGE,
     CJK_COMPATIBILITY_IDEOGRAPHS_RANGE,
-    CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT_RANGE
+    CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT_RANGE,
 ];
 
-/** @type {import('language-util').CodepointRange[]} */
+/** @type {import('CJK-util').CodepointRange[]} */
 export const FULLWIDTH_CHARACTER_RANGES = [
     [0xff10, 0xff19], // Fullwidth numbers
     [0xff21, 0xff3a], // Fullwidth upper case Latin letters
@@ -69,15 +66,15 @@ export const FULLWIDTH_CHARACTER_RANGES = [
     [0xff1a, 0xff1f], // Fullwidth punctuation 2
     [0xff3b, 0xff3f], // Fullwidth punctuation 3
     [0xff5b, 0xff60], // Fullwidth punctuation 4
-    [0xffe0, 0xffee] // Currency markers
+    [0xffe0, 0xffee], // Currency markers
 ];
 
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 export const CJK_PUNCTUATION_RANGE = [0x3000, 0x303f];
 
 /**
  * @param {number} codePoint
- * @param {import('language-util').CodepointRange} range
+ * @param {import('CJK-util').CodepointRange} range
  * @returns {boolean}
  */
 export function isCodePointInRange(codePoint, [min, max]) {
@@ -86,7 +83,7 @@ export function isCodePointInRange(codePoint, [min, max]) {
 
 /**
  * @param {number} codePoint
- * @param {import('language-util').CodepointRange[]} ranges
+ * @param {import('CJK-util').CodepointRange[]} ranges
  * @returns {boolean}
  */
 export function isCodePointInRanges(codePoint, ranges) {

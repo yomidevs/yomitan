@@ -15,23 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {CJK_IDEOGRAPH_RANGES, CJK_PUNCTUATION_RANGE, FULLWIDTH_CHARACTER_RANGES, isCodePointInRanges} from '../language-util.js';
+import {CJK_IDEOGRAPH_RANGES, CJK_PUNCTUATION_RANGE, FULLWIDTH_CHARACTER_RANGES, isCodePointInRanges} from '../CJK-util.js';
 
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const BOPOMOFO_RANGE = [0x3100, 0x312f];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const BOPOMOFO_EXTENDED_RANGE = [0x31a0, 0x31bf];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const IDEOGRAPHIC_SYMBOLS_AND_PUNCTUATION_RANGE = [0x16fe0, 0x16fff];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const SMALL_FORM_RANGE = [0xfe50, 0xfe6f];
-/** @type {import('language-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const VERTICAL_FORM_RANGE = [0xfe10, 0xfe1f];
 
 
 /**
  * Chinese character ranges, roughly ordered in order of expected frequency.
- * @type {import('language-util').CodepointRange[]}
+ * @type {import('CJK-util').CodepointRange[]}
  */
 const CHINESE_RANGES = [
     ...CJK_IDEOGRAPH_RANGES,
@@ -43,7 +43,7 @@ const CHINESE_RANGES = [
     BOPOMOFO_EXTENDED_RANGE,
     IDEOGRAPHIC_SYMBOLS_AND_PUNCTUATION_RANGE,
     SMALL_FORM_RANGE,
-    VERTICAL_FORM_RANGE
+    VERTICAL_FORM_RANGE,
 ];
 
 
