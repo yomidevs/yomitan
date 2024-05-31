@@ -40,7 +40,7 @@ export function getAllLanguageTextProcessors() {
         for (const [id, textPreprocessor] of Object.entries(textPreprocessors)) {
             textPreprocessorsArray.push({
                 id,
-                textProcessor: /** @type {import('language').TextProcessor<unknown>} */ (textPreprocessor)
+                textProcessor: /** @type {import('language').TextProcessor<unknown>} */ (textPreprocessor),
             });
         }
         /** @type {import('language').TextProcessorWithId<unknown>[]} */
@@ -48,7 +48,7 @@ export function getAllLanguageTextProcessors() {
         for (const [id, textPostprocessor] of Object.entries(textPostprocessors)) {
             textPostprocessorsArray.push({
                 id,
-                textProcessor: /** @type {import('language').TextProcessor<unknown>} */ (textPostprocessor)
+                textProcessor: /** @type {import('language').TextProcessor<unknown>} */ (textPostprocessor),
             });
         }
         results.push({iso, textPreprocessors: textPreprocessorsArray, textPostprocessors: textPostprocessorsArray});

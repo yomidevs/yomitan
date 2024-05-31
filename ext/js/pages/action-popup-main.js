@@ -262,7 +262,7 @@ class DisplayController {
             path: 'profileCurrent',
             value,
             scope: 'global',
-            optionsContext: null
+            optionsContext: null,
         };
         await this._api.modifySettings([modification], 'action-popup');
     }

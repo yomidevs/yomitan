@@ -28,13 +28,13 @@ function createTestObject() {
         value1: {
             value2: {},
             value3: [],
-            value4: null
+            value4: null,
         },
         value5: [
             {},
             [],
-            null
-        ]
+            null,
+        ],
     };
 }
 
@@ -51,7 +51,7 @@ describe('ObjectPropertyAccessor', () => {
             [['value5'], (object) => object.value5],
             [['value5', 0], (object) => object.value5[0]],
             [['value5', 1], (object) => object.value5[1]],
-            [['value5', 2], (object) => object.value5[2]]
+            [['value5', 2], (object) => object.value5[2]],
         ];
 
         for (const [pathArray, getExpected] of data) {
@@ -87,7 +87,7 @@ describe('ObjectPropertyAccessor', () => {
             [['value5', 2, 'invalid'], 'Invalid path: value5[2].invalid'],
             [['value5', 2, 0], 'Invalid path: value5[2][0]'],
             [['value5', 2, 0, 'invalid'], 'Invalid path: value5[2][0]'],
-            [['value5', 2.5], 'Invalid index']
+            [['value5', 2.5], 'Invalid index'],
         ];
 
         for (const [pathArray, message] of data) {
@@ -107,7 +107,7 @@ describe('ObjectPropertyAccessor', () => {
             ['value5', 0],
             ['value5', 1],
             ['value5', 2],
-            ['value5']
+            ['value5'],
         ];
 
         for (const pathArray of data) {
@@ -137,7 +137,7 @@ describe('ObjectPropertyAccessor', () => {
             [['value5', 2, 'invalid'], 'Invalid path: value5[2].invalid'],
             [['value5', 2, 0], 'Invalid path: value5[2][0]'],
             [['value5', 2, 0, 'invalid'], 'Invalid path: value5[2][0]'],
-            [['value5', 2.5], 'Invalid index']
+            [['value5', 2.5], 'Invalid index'],
         ];
 
         for (const [pathArray, message] of data) {
@@ -160,7 +160,7 @@ describe('ObjectPropertyAccessor', () => {
             [['value1', 'value3'], (object) => !hasOwn(object.value1, 'value3')],
             [['value1', 'value4'], (object) => !hasOwn(object.value1, 'value4')],
             [['value1'], (object) => !hasOwn(object, 'value1')],
-            [['value5'], (object) => !hasOwn(object, 'value5')]
+            [['value5'], (object) => !hasOwn(object, 'value5')],
         ];
 
         for (const [pathArray, validate] of data) {
@@ -189,7 +189,7 @@ describe('ObjectPropertyAccessor', () => {
             [['value5', 2.5], 'Invalid index'],
             [['value5', 0], 'Invalid type'],
             [['value5', 1], 'Invalid type'],
-            [['value5', 2], 'Invalid type']
+            [['value5', 2], 'Invalid type'],
         ];
 
         for (const [pathArray, message] of data) {
@@ -211,7 +211,7 @@ describe('ObjectPropertyAccessor', () => {
             [['value5', 0], true],
             [['value5', 1], true],
             [['value5', 2], true],
-            [['value5'], false]
+            [['value5'], false],
         ];
 
         for (const [pathArray1, compareValues1] of data) {
@@ -242,7 +242,7 @@ describe('ObjectPropertyAccessor', () => {
             [['0'], [], false, 'Invalid path 2'],
             [[], ['0'], false, 'Invalid path 1'],
             [[0], ['0'], false, 'Invalid path 1: [0]'],
-            [['0'], [0], false, 'Invalid path 2: [0]']
+            [['0'], [0], false, 'Invalid path 2: [0]'],
         ];
 
         for (const [pathArray1, pathArray2, checkRevert, message] of data) {
@@ -285,7 +285,7 @@ describe('ObjectPropertyAccessor', () => {
             [['part1', 'part2', '3'], 'part1.part2["3"]'],
             [['part1', 'part2', '3part'], 'part1.part2["3part"]'],
             [['part1', 'part2', '3part', 'part4'], 'part1.part2["3part"].part4'],
-            [['part1', 'part2', '3part', '4part'], 'part1.part2["3part"]["4part"]']
+            [['part1', 'part2', '3part', '4part'], 'part1.part2["3part"]["4part"]'],
         ];
 
         for (const [pathArray, expected] of data) {
@@ -297,7 +297,7 @@ describe('ObjectPropertyAccessor', () => {
         /** @type {[pathArray: unknown[], message: string][]} */
         const data = [
             [[1.5], 'Invalid index'],
-            [[null], 'Invalid type: object']
+            [[null], 'Invalid type: object'],
         ];
 
         for (const [pathArray, message] of data) {
@@ -323,7 +323,7 @@ describe('ObjectPropertyAccessor', () => {
             ['part1.part2["3part"].part4', ['part1', 'part2', '3part', 'part4']],
             ['part1.part2[\'3part\'].part4', ['part1', 'part2', '3part', 'part4']],
             ['part1.part2["3part"]["4part"]', ['part1', 'part2', '3part', '4part']],
-            ['part1.part2[\'3part\'][\'4part\']', ['part1', 'part2', '3part', '4part']]
+            ['part1.part2[\'3part\'][\'4part\']', ['part1', 'part2', '3part', '4part']],
         ];
 
         for (const [pathString, expected] of data) {
@@ -355,7 +355,7 @@ describe('ObjectPropertyAccessor', () => {
             ['part1[""', 'Path not terminated correctly'],
             ['part1[\'\'', 'Path not terminated correctly'],
             ['part1[0', 'Path not terminated correctly'],
-            ['part1[0].', 'Path not terminated correctly']
+            ['part1[0].', 'Path not terminated correctly'],
         ];
 
         for (const [pathString, message] of data) {
@@ -376,7 +376,7 @@ describe('ObjectPropertyAccessor', () => {
             [[0], null, false],
             ['string', 0, false],
             ['string', 'length', false],
-            ['string', null, false]
+            ['string', null, false],
         ];
 
         for (const [object, property, expected] of data) {
@@ -398,7 +398,7 @@ describe('ObjectPropertyAccessor', () => {
             [[0], null, false],
             ['string', 0, false],
             ['string', 'length', false],
-            ['string', null, false]
+            ['string', null, false],
         ];
 
         for (const [object, property, expected] of data) {

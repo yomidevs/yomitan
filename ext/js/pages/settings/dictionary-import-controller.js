@@ -62,12 +62,12 @@ export class DictionaryImportController {
         this._errorToStringOverrides = [
             [
                 'A mutation operation was attempted on a database that did not allow mutations.',
-                'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.'
+                'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.',
             ],
             [
                 'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
-                'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.'
-            ]
+                'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.',
+            ],
         ];
     }
 
@@ -319,7 +319,7 @@ export class DictionaryImportController {
 
             const optionsFull = await this._settingsController.getOptionsFull();
             const importDetails = {
-                prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported
+                prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
             };
 
             let statusPrefix = '';
@@ -355,7 +355,7 @@ export class DictionaryImportController {
                     stepIndex: -1,
                     stepCount: 6,
                     index: 0,
-                    count: 0
+                    count: 0,
                 });
                 if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
                 errors = [...errors, ...(await this._importDictionary(files[i], importDetails, onProgress) ?? [])];

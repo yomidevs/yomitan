@@ -85,7 +85,7 @@ export function groupTermFrequencies(dictionaryEntry) {
             frequencies.push({
                 term,
                 reading,
-                values: [...values.values()]
+                values: [...values.values()],
             });
         }
         results.push({dictionary, frequencies});
@@ -122,7 +122,7 @@ export function groupKanjiFrequencies(sourceFrequencies) {
         for (const {character, values} of map2.values()) {
             frequencies.push({
                 character,
-                values: [...values.values()]
+                values: [...values.values()],
             });
         }
         results.push({dictionary, frequencies});
@@ -159,7 +159,7 @@ export function getGroupedPronunciations(dictionaryEntry) {
                 groupedPronunciation = {
                     pronunciation,
                     terms: new Set(),
-                    reading
+                    reading,
                 };
                 dictionaryGroupedPronunciationList.push(groupedPronunciation);
             }
@@ -185,7 +185,7 @@ export function getGroupedPronunciations(dictionaryEntry) {
                 terms: [...terms],
                 reading,
                 exclusiveTerms,
-                exclusiveReadings
+                exclusiveReadings,
             });
         }
 

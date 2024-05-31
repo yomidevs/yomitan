@@ -59,8 +59,8 @@ describe('Ajv schema compilation', () => {
                 logger: {
                     log,
                     warn: log,
-                    error: log
-                }
+                    error: log,
+                },
             });
             standaloneCode(ajv);
             if (messages.length > 0) {

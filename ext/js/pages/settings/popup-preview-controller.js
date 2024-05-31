@@ -52,7 +52,7 @@ export class PopupPreviewController {
         languageSelect.addEventListener(
             /** @type {string} */ ('settingChanged'),
             /** @type {EventListener} */ (this._onLanguageSelectChanged.bind(this)),
-            false
+            false,
         );
 
 

@@ -105,7 +105,7 @@ function createAbsoluteGetComputedStyle(window) {
                     result = result.replace(/([-+]?\d(?:\.\d)?(?:[eE][-+]?\d+)?)em/g, replacer);
                 }
                 return result;
-            }
+            },
         });
     };
 }
@@ -138,8 +138,8 @@ describe('DOMTextScanner', () => {
                         node: expectedNodeSelector,
                         offset: expectedOffset,
                         content: expectedContent,
-                        remainder: expectedRemainder
-                    }
+                        remainder: expectedRemainder,
+                    },
                 } = testDataItem;
 
                 const node = querySelectorTextNode(testElement, nodeSelector);
