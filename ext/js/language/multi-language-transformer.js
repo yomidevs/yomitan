@@ -80,11 +80,11 @@ export class MultiLanguageTransformer {
      * @param {string[]} inflectionRules
      * @returns {import('dictionary').InflectionRuleChain}
      */
-    addInflectionRulesDescriptions(language, inflectionRules) {
+    getUserFacingInflectionRules(language, inflectionRules) {
         const languageTransformer = this._languageTransformers.get(language);
         if (typeof languageTransformer === 'undefined') {
             return inflectionRules.map((rule) => ({name: rule}));
         }
-        return languageTransformer.addInflectionRulesDescriptions(inflectionRules);
+        return languageTransformer.getUserFacingInflectionRules(inflectionRules);
     }
 }

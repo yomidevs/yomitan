@@ -16,6 +16,7 @@
  */
 
 export type Transform = {
+    id: string;
     name: string;
     rules: Rule[];
     heuristic: RegExp;

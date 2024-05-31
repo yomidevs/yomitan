@@ -258,7 +258,7 @@ export const englishTransforms = {
                 prefixInflection('un', '', ['adj', 'adv', 'v'], ['adj', 'adv', 'v']),
             ],
         },
-        'going': {
+        'going-to future': {
             name: 'going-to future',
             description: 'Going-to future tense of a verb',
             rules: [

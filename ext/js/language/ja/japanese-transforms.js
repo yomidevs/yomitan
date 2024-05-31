@@ -653,7 +653,7 @@ export const japaneseTransforms = {
                 suffixInflection('な', '', [], ['v']),
             ],
         },
-        'masu': {
+        'masu stem': {
             name: 'masu stem',
             rules: [
                 suffixInflection('い', 'いる', [], ['v1d']),
@@ -895,7 +895,7 @@ export const japaneseTransforms = {
                 suffixInflection('來とく', '來る', ['v5'], ['vk']),
             ],
         },
-        'progressive': {
+        'progressive or perfect': {
             name: 'progressive or perfect',
             rules: [
                 suffixInflection('ている', 'て', ['v1'], ['-te']),

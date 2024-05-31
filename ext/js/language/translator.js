@@ -2114,7 +2114,7 @@ export class Translator {
             const {inflectionRuleChainCandidates} = dictionaryEntry;
             const expandedChains = inflectionRuleChainCandidates.map(({source, inflectionRules}) => ({
                 source,
-                inflectionRules: this._multiLanguageTransformer.addInflectionRulesDescriptions(language, inflectionRules),
+                inflectionRules: this._multiLanguageTransformer.getUserFacingInflectionRules(language, inflectionRules),
             }));
             result.push({...dictionaryEntry, inflectionRuleChainCandidates: expandedChains});
         }

@@ -71,7 +71,7 @@ export class LanguageTransformer {
             }
             const isInflectedTests = rules.map((rule) => rule.isInflected);
             const heuristic = new RegExp(isInflectedTests.map((regExp) => regExp.source).join('|'));
-            transforms2.push({name, description, rules: rules2, heuristic});
+            transforms2.push({id: transformId, name, description, rules: rules2, heuristic});
         }
 
         this._nextFlagIndex = nextFlagIndex;
@@ -124,14 +124,14 @@ export class LanguageTransformer {
             for (const transform of this._transforms) {
                 if (!transform.heuristic.test(text)) { continue; }
 
-                const {name, rules} = transform;
+                const {id, rules} = transform;
                 for (let j = 0, jj = rules.length; j < jj; ++j) {
                     const rule = rules[j];
                     if (!LanguageTransformer.conditionsMatch(conditions, rule.conditionsIn)) { continue; }
                     const {isInflected, deinflect} = rule;
                     if (!isInflected.test(text)) { continue; }
 
-                    const isCycle = trace.some((frame) => frame.transform === name && frame.ruleIndex === j && frame.text === text);
+                    const isCycle = trace.some((frame) => frame.transform === id && frame.ruleIndex === j && frame.text === text);
                     if (isCycle) {
                         log.warn(new Error(`Cycle detected in transform[${name}] rule[${j}] for text: ${text}\nTrace: ${JSON.stringify(trace)}`));
                         continue;
@@ -140,7 +140,7 @@ export class LanguageTransformer {
                     results.push(LanguageTransformer.createTransformedText(
                         deinflect(text),
                         rule.conditionsOut,
-                        this._extendTrace(trace, {transform: name, ruleIndex: j, text}),
+                        this._extendTrace(trace, {transform: id, ruleIndex: j, text}),
                     ));
                 }
             }
@@ -152,9 +152,9 @@ export class LanguageTransformer {
      * @param {string[]} inflectionRules
      * @returns {import('dictionary').InflectionRuleChain}
      */
-    addInflectionRulesDescriptions(inflectionRules) {
+    getUserFacingInflectionRules(inflectionRules) {
         return inflectionRules.map((rule) => {
-            const fullRule = this._transforms.find((transform) => transform.name === rule);
+            const fullRule = this._transforms.find((transform) => transform.id === rule);
             if (typeof fullRule === 'undefined') { return {name: rule}; }
             const {name, description} = fullRule;
             return description ? {name, description} : {name};
