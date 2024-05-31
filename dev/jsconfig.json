@@ -30,6 +30,7 @@
             "japanese-util": ["../types/ext/japanese-util"],
             "language": ["../types/ext/language"],
             "language-descriptors": ["../types/ext/language-descriptors"],
+            "CJK-util": ["../types/ext/CJK-util"],
             "ext/json-schema": ["../types/ext/json-schema"],
             "language-transformer": ["../types/ext/language-transformer"],
             "language-transformer-internal": ["../types/ext/language-transformer-internal"],

@@ -36,6 +36,7 @@ import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js
 import {oldIrishTransforms} from './sga/old-irish-transforms.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
 import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-processors.js';
+import {isStringPartiallyChinese} from './zh/chinese.js';
 
 const capitalizationPreprocessors = {
     decapitalize,
@@ -264,6 +265,7 @@ const languageDescriptors = [
         iso: 'zh',
         name: 'Chinese',
         exampleText: '读',
+        isTextLookupWorthy: isStringPartiallyChinese,
     },
 ];
 

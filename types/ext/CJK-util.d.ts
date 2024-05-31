@@ -15,23 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type FuriganaGroup = {
-    isKana: boolean;
-    text: string;
-    textNormalized: string | null;
-};
-
-export type FuriganaSegment = {
-    text: string;
-    reading: string;
-};
-
-export type PitchCategory = (
-    'heiban' |
-    'kifuku' |
-    'atamadaka' |
-    'odaka' |
-    'nakadaka'
-);
-
-export type DiacriticType = 'dakuten' | 'handakuten';
+export type CodepointRange = [
+    minInclusive: number,
+    maxInclusive: number,
+];
