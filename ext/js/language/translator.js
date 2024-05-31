@@ -115,9 +115,9 @@ export class Translator {
             if (pronunciations.length > 1) { this._sortTermDictionaryEntrySimpleData(pronunciations); }
         }
 
-        const withRuleDescriptions = this._addInflectionRuleDescriptions(language, dictionaryEntries);
+        const withUserFacingInflections = this._addUserFacingInflections(language, dictionaryEntries);
 
-        return {dictionaryEntries: withRuleDescriptions, originalTextLength};
+        return {dictionaryEntries: withUserFacingInflections, originalTextLength};
     }
 
     /**
@@ -2108,7 +2108,7 @@ export class Translator {
      * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
      * @returns {import('dictionary').TermDictionaryEntry[]}
      */
-    _addInflectionRuleDescriptions(language, dictionaryEntries) {
+    _addUserFacingInflections(language, dictionaryEntries) {
         const result = [];
         for (const dictionaryEntry of dictionaryEntries) {
             const {inflectionRuleChainCandidates} = dictionaryEntry;
