@@ -12,11 +12,15 @@ Be aware that non-English dictionaries generally contain fewer entries than thei
 - [JMdict](https://github.com/themoeway/jmdict-yomitan#jmdict-for-yomitan-1) - There are daily automatically updated builds of JMdict for Yomitan available in this repository. It is available in multiple languages and formats, but we recommend installing the more modern Jitendex for English users.
 - [JMnedict](https://github.com/themoeway/jmdict-yomitan#jmnedict-for-yomitan) - Lists readings of person/place/organization names and other proper nouns.
 - [KANJIDIC](https://github.com/themoeway/jmdict-yomitan#kanjidic-for-yomitan) - An English dictionary listing readings, meanings, and other info about kanji characters.
+- [BCCWJ Frequency Dictionary](https://github.com/toasted-nutbread/yomichan-bccwj-frequency-dictionary) - A frequency dictionary based on the Balanced Corpus of Contemporary Written Japanese.
 
 #### Other Languages
 
 - [KTY](https://github.com/themoeway/kaikki-to-yomitan) - Wiktionaries in various languages converted to Yomitan format.
 - [KRDICT/STDICT](https://github.com/Lyroxide/yomitan-ko-dic/releases) - Korean dictionaries for Yomitan.
+- [words.hk for Yomitan](https://github.com/MarvNC/wordshk-yomitan) - A free Cantonese-English and Cantonese-Cantonese dictionary for Yomitan.
+- [CC-CEDICT for Yomitan](https://github.com/MarvNC/cc-cedict-yomitan) - A free Chinese-English dictionary for Yomitan.
+- [Wikipedia for Yomitan](https://github.com/MarvNC/wikipedia-yomitan) - All of Japanese and Chinese Wikipedia in Yomitan.
 
 #### EPWING Dictionaries
 
