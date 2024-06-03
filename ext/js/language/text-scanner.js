@@ -1619,7 +1619,7 @@ export class TextScanner extends EventDispatcher {
      */
     async _isTextLookupWorthy(text) {
         try {
-            return this._language !== null && await this._api.isTextLookupWorthy(text, this._language);
+            return this._language !== null && text.length > 0 && await this._api.isTextLookupWorthy(text, this._language);
         } catch (e) {
             return false;
         }
