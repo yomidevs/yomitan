@@ -34,6 +34,7 @@ import {koreanTransforms} from './ko/korean-transforms.js';
 import {latinTransforms} from './la/latin-transforms.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {oldIrishTransforms} from './sga/old-irish-transforms.js';
+import {removeSerboCroatianAccentMarks} from './sh/serbo-croatian-text-preprocessors.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
 import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-processors.js';
 import {isStringPartiallyChinese} from './zh/chinese.js';
@@ -224,7 +225,10 @@ const languageDescriptors = [
         iso: 'sh',
         name: 'Serbo-Croatian',
         exampleText: 'čitaše',
-        textPreprocessors: capitalizationPreprocessors,
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeSerboCroatianAccentMarks,
+        },
     },
     {
         iso: 'sq',

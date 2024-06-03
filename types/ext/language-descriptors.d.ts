@@ -157,7 +157,9 @@ type AllTextProcessors = {
         };
     };
     sh: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & {
+            removeSerboCroatianAccentMarks: TextProcessor<boolean>;
+        };
     };
     sq: {
         pre: CapitalizationPreprocessors;

@@ -660,6 +660,7 @@
                 "ext/js/language/multi-language-transformer.js",
                 "ext/js/language/ru/russian-text-preprocessors.js",
                 "ext/js/language/sga/old-irish-transforms.js",
+                "ext/js/language/sh/serbo-croatian-text-preprocessors.js",
                 "ext/js/language/sq/albanian-transforms.js",
                 "ext/js/language/text-processors.js",
                 "ext/js/language/translator.js",
