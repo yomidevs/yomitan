@@ -199,7 +199,6 @@ export class Application extends EventDispatcher {
         crossFrameApi.prepare();
         const application = new Application(api, crossFrameApi);
         application.prepare();
-        if (waitForDom) { await waitForDomContentLoaded(); }
         try {
             await mainFunction(application);
         } catch (error) {

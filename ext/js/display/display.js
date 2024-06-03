@@ -349,6 +349,9 @@ export class Display extends EventDispatcher {
         if (this._navigationNextButton !== null) {
             this._navigationNextButton.addEventListener('click', this._onNextTermView.bind(this), false);
         }
+        chrome.contextMenus.onClicked.addListener((info) => {
+            console.log(info);
+        });
     }
 
     /**

@@ -297,6 +297,11 @@ export class Backend {
 
             this._sendMessageAllTabsIgnoreResponse({action: 'applicationBackendReady'});
             this._sendMessageIgnoreResponse({action: 'applicationBackendReady'});
+            chrome.contextMenus.create({
+                id: 'yomitan_search',
+                title: 'Lookup in yomitan',
+                contexts: ['all'],
+            });
         } catch (e) {
             log.error(e);
             throw e;
