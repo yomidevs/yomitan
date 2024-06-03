@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {suffixInflection, prefixInflection} from '../language-transforms.js';
+import {prefixInflection, suffixInflection} from '../language-transforms.js';
 
 /**
  * @param {boolean} notBeginning
@@ -40,36 +40,36 @@ function tryAlternateOrthography(notBeginning, originalOrthography, alternateOrt
 export const oldIrishTransforms = {
     language: 'sga',
     conditions: {},
-    transforms: [
-        {
+    transforms: {
+        'nd for nn': {
             name: 'nd for nn',
             description: 'nd for nn',
             rules: [
                 suffixInflection('nd', 'nn', [], []),
             ],
         },
-        {
+        'cg for c': {
             name: 'cg for c',
             description: 'cg for c',
             rules: [
                 tryAlternateOrthography(false, 'cg', 'c', [], []),
             ],
         },
-        {
+        'td for t': {
             name: 'td for t',
             description: 'td for t',
             rules: [
                 tryAlternateOrthography(false, 'td', 't', [], []),
             ],
         },
-        {
+        'pb for p': {
             name: 'pb for p',
             description: 'pb for p',
             rules: [
                 tryAlternateOrthography(false, 'pb', 'p', [], []),
             ],
         },
-        {
+        'ǽ/æ for é': {
             name: 'ǽ/æ for é',
             description: 'ǽ/æ for é',
             rules: [
@@ -77,7 +77,7 @@ export const oldIrishTransforms = {
                 tryAlternateOrthography(false, 'æ', 'é', [], []),
             ],
         },
-        {
+        'doubled vowel': {
             name: 'doubled vowel',
             description: 'Doubled Vowel',
             rules: [
@@ -88,7 +88,7 @@ export const oldIrishTransforms = {
                 tryAlternateOrthography(true, 'uu', 'ú', [], []),
             ],
         },
-        {
+        'doubled consonant': {
             name: 'doubled consonant',
             description: 'Doubled Consonant',
             rules: [
@@ -105,7 +105,7 @@ export const oldIrishTransforms = {
                 tryAlternateOrthography(true, 'ss', 's', [], []),
             ],
         },
-        {
+        'lenited': {
             name: 'lenited',
             description: 'Non-Beginning Lenition',
             rules: [
@@ -114,7 +114,7 @@ export const oldIrishTransforms = {
                 tryAlternateOrthography(true, 'th', 't', [], []),
             ],
         },
-        {
+        'lenited (Middle Irish)': {
             name: 'lenited (Middle Irish)',
             description: 'Non-Beginning Lenition (Middle Irish)',
             rules: [
@@ -123,7 +123,7 @@ export const oldIrishTransforms = {
                 tryAlternateOrthography(true, 'dh', 'd', [], []),
             ],
         },
-        {
+        '[IM] nasalized': {
             name: '[IM] nasalized',
             description: 'Nasalized Word',
             rules: [
@@ -134,7 +134,7 @@ export const oldIrishTransforms = {
                 prefixInflection('m-', '', [], []),
             ],
         },
-        {
+        '[IM] nasalized (Middle Irish)': {
             name: '[IM] nasalized (Middle Irish)',
             description: 'Nasalized Word (Middle Irish)',
             rules: [
@@ -143,7 +143,7 @@ export const oldIrishTransforms = {
                 prefixInflection('dt', 'd', [], []),
             ],
         },
-        {
+        '[IM] lenited': {
             name: '[IM] lenited',
             description: 'Lenited Word',
             rules: [
@@ -152,7 +152,7 @@ export const oldIrishTransforms = {
                 prefixInflection('th', 't', [], []),
             ],
         },
-        {
+        '[IM] lenited (Middle Irish)': {
             name: '[IM] lenited (Middle Irish)',
             description: 'Lenited Word (Middle Irish)',
             rules: [
@@ -161,7 +161,7 @@ export const oldIrishTransforms = {
                 prefixInflection('dh', 'd', [], []),
             ],
         },
-        {
+        '[IM] aspirated': {
             name: '[IM] aspirated',
             description: 'Aspirated Word',
             rules: [
@@ -173,7 +173,7 @@ export const oldIrishTransforms = {
                 prefixInflection('h-', '', [], []),
             ],
         },
-        {
+        '[IM] geminated': {
             name: '[IM] geminated',
             description: 'Geminated Word',
             rules: [
@@ -201,5 +201,5 @@ export const oldIrishTransforms = {
                 prefixInflection('s-s', 's', [], []),
             ],
         },
-    ],
+    },
 };
