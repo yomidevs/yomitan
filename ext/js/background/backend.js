@@ -302,6 +302,17 @@ export class Backend {
                 title: 'Lookup in yomitan',
                 contexts: ['all'],
             });
+            chrome.contextMenus.onClicked.addListener((info) => {
+                if (info.selectionText) {
+                    this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText', params: {text: info.selectionText}});
+                }
+                console.log(info);
+            });
+
+            console.log(chrome.contextMenus);
+            console.log(chrome);
+            console.log(typeof chrome);
+            console.log(chrome.constructor.name);
         } catch (e) {
             log.error(e);
             throw e;

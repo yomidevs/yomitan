@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {text} from 'stream/consumers';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {log} from '../core/log.js';
@@ -115,6 +116,7 @@ export class Frontend {
             ['frontendRequestReadyBroadcast',   this._onMessageRequestFrontendReadyBroadcast.bind(this)],
             ['frontendSetAllVisibleOverride',   this._onApiSetAllVisibleOverride.bind(this)],
             ['frontendClearAllVisibleOverride', this._onApiClearAllVisibleOverride.bind(this)],
+            ['frontendScanSelectedText',        this._onApiScanSelectedText.bind(this)],
         ]);
 
         this._hotkeyHandler.registerActions([
@@ -258,6 +260,19 @@ export class Frontend {
      */
     _onActionScanSelectedText() {
         void this._scanSelectedText(false, true);
+    }
+
+    /**
+     * @returns {void}
+     */
+    _onApiScanSelectedText() {
+        const selObj = window.getSelection();
+        if (selObj === null) { return; }
+        const range = selObj.getRangeAt(0);
+        const textSource = TextSourceRange.create(range);
+        void this.setTextSource(textSource);
+        console.log('Frontend Scanning selected text:', text);
+        // Void this._scanSelectedText();
     }
 
     /**
