@@ -265,11 +265,7 @@ export class Frontend {
      * @returns {void}
      */
     _onApiScanSelectedText() {
-        const selObj = window.getSelection();
-        if (selObj === null) { return; }
-        const range = selObj.getRangeAt(0);
-        const textSource = TextSourceRange.create(range);
-        void this.setTextSource(textSource);
+        void this._scanSelectedText(false, true);
     }
 
     /**
