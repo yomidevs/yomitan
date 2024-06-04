@@ -304,15 +304,9 @@ export class Backend {
             });
             chrome.contextMenus.onClicked.addListener((info) => {
                 if (info.selectionText) {
-                    this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText', params: {text: info.selectionText}});
+                    this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
                 }
-                console.log(info);
             });
-
-            console.log(chrome.contextMenus);
-            console.log(chrome);
-            console.log(typeof chrome);
-            console.log(chrome.constructor.name);
         } catch (e) {
             log.error(e);
             throw e;

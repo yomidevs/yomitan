@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {text} from 'stream/consumers';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {log} from '../core/log.js';
@@ -271,8 +270,6 @@ export class Frontend {
         const range = selObj.getRangeAt(0);
         const textSource = TextSourceRange.create(range);
         void this.setTextSource(textSource);
-        console.log('Frontend Scanning selected text:', text);
-        // Void this._scanSelectedText();
     }
 
     /**
