@@ -442,7 +442,6 @@ export class TextScanner extends EventDispatcher {
      */
     async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false) {
         try {
-            console.log(textSource);
             const inputInfoDetail = inputInfo.detail;
             const selectionRestoreInfo = (
                 (typeof inputInfoDetail === 'object' && inputInfoDetail !== null && inputInfoDetail.restoreSelection) ?
@@ -475,7 +474,6 @@ export class TextScanner extends EventDispatcher {
             }
 
             if (dictionaryEntries !== null && sentence !== null) {
-                console.log('searchSuccess');
                 this._inputInfoCurrent = inputInfo;
                 this.setCurrentTextSource(textSource);
                 this._selectionRestoreInfo = selectionRestoreInfo;
@@ -490,7 +488,6 @@ export class TextScanner extends EventDispatcher {
                     detail,
                 });
             } else {
-                console.log('searchEmpty');
                 this._triggerSearchEmpty(inputInfo);
             }
         } catch (error) {
