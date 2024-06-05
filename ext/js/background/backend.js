@@ -427,16 +427,6 @@ export class Backend {
      * @param {chrome.runtime.InstalledDetails} event
      */
     _onInstalled({reason}) {
-        chrome.contextMenus.create({
-            id: 'yomitan_search',
-            title: 'Lookup in yomitan',
-            contexts: ['selection'],
-        });
-        chrome.contextMenus.onClicked.addListener((info) => {
-            if (info.selectionText) {
-                this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
-            }
-        });
         if (reason !== 'install') { return; }
         void this._requestPersistentStorage();
     }
@@ -1318,6 +1308,21 @@ export class Backend {
             this._clipboardMonitor.start();
         } else {
             this._clipboardMonitor.stop();
+        }
+
+        if (options.general.contextMenu) {
+            chrome.contextMenus.create({
+                id: 'yomitan_lookup',
+                title: 'Lookup in yomitan',
+                contexts: ['selection'],
+            });
+            chrome.contextMenus.onClicked.addListener((info) => {
+                if (info.selectionText) {
+                    this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
+                }
+            });
+        } else {
+            chrome.contextMenus.remove('yomitan_lookup', () => this._checkLastError(chrome.runtime.lastError));
         }
 
         void this._accessibilityController.update(this._getOptionsFull(false));
