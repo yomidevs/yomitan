@@ -411,7 +411,6 @@ export class Frontend {
                 this._showExtensionUnloaded(textSource);
             }
         } else {
-            console.log(textSource);
             log.error(error);
         }
     }
