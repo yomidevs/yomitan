@@ -154,5 +154,7 @@ function getKebabCase(str) {
  * @returns {string}
  */
 function escapeDictName(name) {
-    return name.replace(/'/g, '\\\'');
+    return name
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, '\\\'');
 }
