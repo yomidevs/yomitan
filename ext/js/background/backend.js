@@ -1310,10 +1310,10 @@ export class Backend {
             this._clipboardMonitor.stop();
         }
 
-        if (options.general.contextMenu) {
+        if (options.general.enableContextMenuScanSelected) {
             chrome.contextMenus.create({
                 id: 'yomitan_lookup',
-                title: 'Lookup in yomitan',
+                title: 'Lookup in Yomitan',
                 contexts: ['selection'],
             });
             chrome.contextMenus.onClicked.addListener((info) => {

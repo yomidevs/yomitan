@@ -119,7 +119,7 @@ export type GeneralOptions = {
     popupScaleRelativeToPageZoom: boolean;
     popupScaleRelativeToVisualViewport: boolean;
     showGuide: boolean;
-    contextMenu: boolean;
+    enableContextMenuScanSelected: boolean;
     compactTags: boolean;
     glossaryLayoutMode: GlossaryLayoutMode;
     mainDictionary: string;

@@ -259,7 +259,7 @@ function createProfileOptionsUpdatedTestData1() {
             popupScaleRelativeToPageZoom: false,
             popupScaleRelativeToVisualViewport: true,
             showGuide: true,
-            contextMenu: true,
+            enableContextMenuScanSelected: true,
             compactTags: false,
             glossaryLayoutMode: 'default',
             mainDictionary: '',

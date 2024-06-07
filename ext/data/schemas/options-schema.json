@@ -99,7 +99,7 @@
                                     "popupScaleRelativeToPageZoom",
                                     "popupScaleRelativeToVisualViewport",
                                     "showGuide",
-                                    "contextMenu",
+                                    "enableContextMenuScanSelected",
                                     "compactTags",
                                     "glossaryLayoutMode",
                                     "mainDictionary",
@@ -207,7 +207,7 @@
                                         "type": "boolean",
                                         "default": true
                                     },
-                                    "contextMenu": {
+                                    "enableContextMenuScanSelected": {
                                         "type": "boolean",
                                         "default": true
                                     },
