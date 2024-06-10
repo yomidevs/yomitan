@@ -316,6 +316,8 @@ const tests = [
             {term: '話す', source: '話してる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '話す', source: '話しとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '話す', source: '話してしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+
+            {term: '増す', source: '増せん',             rule: 'v5', reasons: ['potential', '-n']},
         ],
     },
     {
