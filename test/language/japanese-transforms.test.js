@@ -1097,10 +1097,12 @@ const tests = [
         ],
     },
     {
-        category: 'incorrect -te rule chain',
+        category: 'incorrect chains',
         valid: false,
         tests: [
             {term: '食べる', source: '食べて', rule: null, reasons: ['-te', 'progressive or perfect', 'masu stem']},
+
+            {term: 'なる', source: 'なりません', rule: null, reasons: ['polite', 'potential', '-n']},
         ],
     },
     // Kansai-ben
