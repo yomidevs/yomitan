@@ -316,6 +316,8 @@ const tests = [
             {term: '話す', source: '話してる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '話す', source: '話しとる',         rule: 'v5', reasons: ['-te', 'progressive or perfect']},
             {term: '話す', source: '話してしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+
+            {term: '増す', source: '増せん',             rule: 'v5', reasons: ['potential', '-n']},
         ],
     },
     {
@@ -1097,10 +1099,12 @@ const tests = [
         ],
     },
     {
-        category: 'incorrect -te rule chain',
+        category: 'incorrect chains',
         valid: false,
         tests: [
             {term: '食べる', source: '食べて', rule: null, reasons: ['-te', 'progressive or perfect', 'masu stem']},
+
+            {term: 'なる', source: 'なりません', rule: null, reasons: ['polite', 'potential', '-n']},
         ],
     },
     // Kansai-ben
