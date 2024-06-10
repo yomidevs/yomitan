@@ -1319,7 +1319,9 @@ export class OptionsUtil {
      *  @type {import('options-util').UpdateFunction}
      */
     async _updateVersion39(options) {
-        options.general.enableContextMenuScanSelected = true;
+        for (const profile of options.profiles) {
+            profile.options.general.enableContextMenuScanSelected = true;
+        }
     }
 
     /**
