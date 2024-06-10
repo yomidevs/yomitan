@@ -259,6 +259,7 @@ function createProfileOptionsUpdatedTestData1() {
             popupScaleRelativeToPageZoom: false,
             popupScaleRelativeToVisualViewport: true,
             showGuide: true,
+            enableContextMenuScanSelected: true,
             compactTags: false,
             glossaryLayoutMode: 'default',
             mainDictionary: '',
@@ -605,7 +606,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 38,
+        version: 39,
         global: {
             database: {
                 prefixWildcardsSupported: false,

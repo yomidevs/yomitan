@@ -115,6 +115,7 @@ export class Frontend {
             ['frontendRequestReadyBroadcast',   this._onMessageRequestFrontendReadyBroadcast.bind(this)],
             ['frontendSetAllVisibleOverride',   this._onApiSetAllVisibleOverride.bind(this)],
             ['frontendClearAllVisibleOverride', this._onApiClearAllVisibleOverride.bind(this)],
+            ['frontendScanSelectedText',        this._onApiScanSelectedText.bind(this)],
         ]);
 
         this._hotkeyHandler.registerActions([
@@ -258,6 +259,13 @@ export class Frontend {
      */
     _onActionScanSelectedText() {
         void this._scanSelectedText(false, true);
+    }
+
+    /**
+     * @returns {void}
+     */
+    _onApiScanSelectedText() {
+        void this._scanSelectedText(false, true, true);
     }
 
     /**
@@ -934,13 +942,14 @@ export class Frontend {
     /**
      * @param {boolean} allowEmptyRange
      * @param {boolean} disallowExpandSelection
+     * @param {boolean} showEmpty show empty popup if no results are found
      * @returns {Promise<boolean>}
      */
-    async _scanSelectedText(allowEmptyRange, disallowExpandSelection) {
+    async _scanSelectedText(allowEmptyRange, disallowExpandSelection, showEmpty = false) {
         const range = this._getFirstSelectionRange(allowEmptyRange);
         if (range === null) { return false; }
         const source = disallowExpandSelection ? TextSourceRange.createLazy(range) : TextSourceRange.create(range);
-        await this._textScanner.search(source, {focus: true, restoreSelection: true});
+        await this._textScanner.search(source, {focus: true, restoreSelection: true}, showEmpty);
         return true;
     }
 

@@ -411,10 +411,11 @@ export class TextScanner extends EventDispatcher {
     /**
      * @param {import('text-source').TextSource} textSource
      * @param {import('text-scanner').InputInfoDetail} [inputDetail]
+     * @param {boolean} showEmpty
      */
-    async search(textSource, inputDetail) {
+    async search(textSource, inputDetail, showEmpty = false) {
         const inputInfo = this._createInputInfo(null, 'script', 'script', true, [], [], inputDetail);
-        await this._search(textSource, this._searchTerms, this._searchKanji, inputInfo);
+        await this._search(textSource, this._searchTerms, this._searchKanji, inputInfo, showEmpty);
     }
 
     // Private
@@ -437,8 +438,9 @@ export class TextScanner extends EventDispatcher {
      * @param {boolean} searchTerms
      * @param {boolean} searchKanji
      * @param {import('text-scanner').InputInfo} inputInfo
+     * @param {boolean} showEmpty shows a "No results found" popup if no results are found
      */
-    async _search(textSource, searchTerms, searchKanji, inputInfo) {
+    async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false) {
         try {
             const inputInfoDetail = inputInfo.detail;
             const selectionRestoreInfo = (
@@ -465,7 +467,8 @@ export class TextScanner extends EventDispatcher {
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
-            } else if (textSource !== null && textSource instanceof TextSourceElement && await this._isTextLookupWorthy(textSource.fullContent)) {
+            } else if (showEmpty || (textSource !== null && textSource instanceof TextSourceElement && await this._isTextLookupWorthy(textSource.fullContent))) {
+                // Shows a "No results found" message
                 dictionaryEntries = [];
                 sentence = {text: '', offset: 0};
             }

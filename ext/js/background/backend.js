@@ -1310,6 +1310,21 @@ export class Backend {
             this._clipboardMonitor.stop();
         }
 
+        if (options.general.enableContextMenuScanSelected) {
+            chrome.contextMenus.create({
+                id: 'yomitan_lookup',
+                title: 'Lookup in Yomitan',
+                contexts: ['selection'],
+            });
+            chrome.contextMenus.onClicked.addListener((info) => {
+                if (info.selectionText) {
+                    this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
+                }
+            });
+        } else {
+            chrome.contextMenus.remove('yomitan_lookup', () => this._checkLastError(chrome.runtime.lastError));
+        }
+
         void this._accessibilityController.update(this._getOptionsFull(false));
 
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});

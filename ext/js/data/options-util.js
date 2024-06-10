@@ -546,6 +546,7 @@ export class OptionsUtil {
             this._updateVersion36,
             this._updateVersion37,
             this._updateVersion38,
+            this._updateVersion39,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1311,6 +1312,16 @@ export class OptionsUtil {
      */
     async _updateVersion38(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v38.handlebars');
+    }
+
+    /**
+     *  - Add new setting enableContextMenuScanSelected
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion39(options) {
+        for (const profile of options.profiles) {
+            profile.options.general.enableContextMenuScanSelected = true;
+        }
     }
 
     /**
