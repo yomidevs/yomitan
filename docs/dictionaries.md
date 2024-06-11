@@ -28,8 +28,6 @@ Yomitan supports dictionaries in the esoteric but popular [EPWING](https://ja.wi
 
 Unfortunately, as most of the dictionaries released in this format are proprietary, you will need to procure these dictionaries yourself and import them using [Yomitan Import](https://github.com/themoeway/yomitan-import). Check the project page for additional details.
 
-![Pocket EPWING dictionaries](../img/epwing-devices.jpg)
-
 ### Bulk Importing Dictionaries
 
 Yomitan also supports exporting and importing your entire collection of dictionaries.
