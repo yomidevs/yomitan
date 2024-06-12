@@ -22,7 +22,7 @@ import {LanguageTransformer} from '../ext/js/language/language-transformer.js';
 const languageTransformer = new LanguageTransformer();
 languageTransformer.addDescriptor(japaneseTransforms);
 
-describe('language transformer', () => {
+describe('japanese language transformer', () => {
     describe('basic tests', () => {
         const adjectiveInflections = [
             '愛しい',

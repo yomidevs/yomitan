@@ -93,6 +93,31 @@ const tests = [
             {term: 'haber', source: 'he', rule: 'v', reasons: ['present indicative']},
         ],
     },
+    {
+        category: 'preterite',
+        valid: true,
+        tests: [
+            {term: 'hablar', source: 'hablé', rule: 'v', reasons: ['preterite']},
+            {term: 'hablar', source: 'hablaste', rule: 'v', reasons: ['preterite']},
+            {term: 'hablar', source: 'habló', rule: 'v', reasons: ['preterite']},
+            {term: 'hablar', source: 'hablamos', rule: 'v', reasons: ['preterite']},
+            {term: 'hablar', source: 'hablasteis', rule: 'v', reasons: ['preterite']},
+            {term: 'hablar', source: 'hablaron', rule: 'v', reasons: ['preterite']},
+            {term: 'comer', source: 'comí', rule: 'v', reasons: ['preterite']},
+            {term: 'comer', source: 'comiste', rule: 'v', reasons: ['preterite']},
+            {term: 'comer', source: 'comió', rule: 'v', reasons: ['preterite']},
+            {term: 'comer', source: 'comimos', rule: 'v', reasons: ['preterite']},
+            {term: 'comer', source: 'comisteis', rule: 'v', reasons: ['preterite']},
+            {term: 'comer', source: 'comieron', rule: 'v', reasons: ['preterite']},
+            {term: 'vivir', source: 'viví', rule: 'v', reasons: ['preterite']},
+            {term: 'vivir', source: 'viviste', rule: 'v', reasons: ['preterite']},
+            {term: 'vivir', source: 'vivió', rule: 'v', reasons: ['preterite']},
+            {term: 'vivir', source: 'vivimos', rule: 'v', reasons: ['preterite']},
+            {term: 'vivir', source: 'vivisteis', rule: 'v', reasons: ['preterite']},
+            {term: 'vivir', source: 'vivieron', rule: 'v', reasons: ['preterite']},
+            {term: 'tener', source: 'tuve', rule: 'v', reasons: ['preterite']},
+        ],
+    },
 ];
 
 const languageTransformer = new LanguageTransformer();
