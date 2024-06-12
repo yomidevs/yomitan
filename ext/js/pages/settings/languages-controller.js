@@ -30,7 +30,7 @@ export class LanguagesController {
     /** */
     async prepare() {
         const languages = await this._settingsController.application.api.getLanguageSummaries();
-        languages.sort((a, b) => a.iso.localeCompare(b.iso, 'en'));
+        languages.sort((a, b) => a.name.localeCompare(b.name, 'en'));
         this._fillSelect(languages);
     }
 
