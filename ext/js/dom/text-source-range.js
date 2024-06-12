@@ -279,7 +279,7 @@ export class TextSourceRange {
     static createFromImposter(range, imposterElement, imposterSourceElement) {
         const cachedRects = convertMultipleRectZoomCoordinates(range.getClientRects(), range.startContainer);
         const cachedSourceRect = convertRectZoomCoordinates(imposterSourceElement.getBoundingClientRect(), imposterSourceElement);
-        return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, true);
+        return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, false);
     }
 
     /**
