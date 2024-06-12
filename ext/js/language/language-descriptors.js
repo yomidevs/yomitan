@@ -80,7 +80,7 @@ const languageDescriptors = [
     {
         iso: 'es',
         name: 'Spanish',
-        exampleText: 'acabar de',
+        exampleText: 'leer',
         textPreprocessors: capitalizationPreprocessors,
         languageTransforms: spanishTransforms,
     },
