@@ -143,7 +143,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     ro: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & {
+            removeAlphabeticDiacritics: TextProcessor<boolean>;
+        };
     };
     ru: {
         pre: CapitalizationPreprocessors & {

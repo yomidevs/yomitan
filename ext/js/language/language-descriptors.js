@@ -199,7 +199,10 @@ const languageDescriptors = [
         iso: 'ro',
         name: 'Romanian',
         exampleText: 'citit',
-        textPreprocessors: capitalizationPreprocessors,
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics,
+        },
     },
     {
         iso: 'ru',
