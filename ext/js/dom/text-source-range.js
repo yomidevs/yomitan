@@ -150,7 +150,7 @@ export class TextSourceRange {
         const state = new DOMTextScanner(node, offset, !layoutAwareScan, layoutAwareScan).seek(length);
         this._range.setEnd(state.node, state.offset);
         const expandedContent = fromEnd ? this._content + state.content : state.content;
-        this._content = this._disallowExpandSelection ? expandedContent : this._content;
+        this._content = this._disallowExpandSelection ? this._content : expandedContent;
         return length - state.remainder;
     }
 
@@ -257,7 +257,7 @@ export class TextSourceRange {
      * @returns {TextSourceRange} A new instance of the class corresponding to the range.
      */
     static create(range) {
-        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, true);
+        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, false);
     }
 
     /**
@@ -266,7 +266,7 @@ export class TextSourceRange {
      * @returns {TextSourceRange} A new instance of the class corresponding to the range.
      */
     static createLazy(range) {
-        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, false);
+        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, true);
     }
 
     /**
@@ -279,7 +279,7 @@ export class TextSourceRange {
     static createFromImposter(range, imposterElement, imposterSourceElement) {
         const cachedRects = convertMultipleRectZoomCoordinates(range.getClientRects(), range.startContainer);
         const cachedSourceRect = convertRectZoomCoordinates(imposterSourceElement.getBoundingClientRect(), imposterSourceElement);
-        return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, true);
+        return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, false);
     }
 
     /**
