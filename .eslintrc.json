@@ -658,6 +658,7 @@
                 "ext/js/language/language-transforms.js",
                 "ext/js/language/languages.js",
                 "ext/js/language/multi-language-transformer.js",
+                "ext/js/language/ro/romanian-text-preprocessors.js",
                 "ext/js/language/ru/russian-text-preprocessors.js",
                 "ext/js/language/sga/old-irish-transforms.js",
                 "ext/js/language/sh/serbo-croatian-text-preprocessors.js",

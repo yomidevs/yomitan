@@ -32,6 +32,7 @@ import {isStringPartiallyJapanese} from './ja/japanese.js';
 import {disassembleHangul, reassembleHangul} from './ko/korean-text-processors.js';
 import {koreanTransforms} from './ko/korean-transforms.js';
 import {latinTransforms} from './la/latin-transforms.js';
+import {removeRomanianDiacritics} from './ro/romanian-text-preprocessors.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {oldIrishTransforms} from './sga/old-irish-transforms.js';
 import {removeSerboCroatianAccentMarks} from './sh/serbo-croatian-text-preprocessors.js';
@@ -199,7 +200,10 @@ const languageDescriptors = [
         iso: 'ro',
         name: 'Romanian',
         exampleText: 'citit',
-        textPreprocessors: capitalizationPreprocessors,
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeRomanianDiacritics,
+        },
     },
     {
         iso: 'ru',
