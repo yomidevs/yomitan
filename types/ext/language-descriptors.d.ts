@@ -144,7 +144,7 @@ type AllTextProcessors = {
     };
     ro: {
         pre: CapitalizationPreprocessors & {
-            removeRomanianDiacritics: TextProcessor<boolean>;
+            removeAlphabeticDiacritics: TextProcessor<boolean>;
         };
     };
     ru: {
