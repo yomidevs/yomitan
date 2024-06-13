@@ -40,27 +40,35 @@ export type TextDeinflectionOptionsArrays = [
     emphatic: [collapseEmphatic: boolean, collapseEmphaticFull: boolean][],
 ];
 
+export type TermDictionaryEntry = Omit<Dictionary.TermDictionaryEntry, 'inflectionRuleChainCandidates'> & {
+    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
+};
+
+export type InflectionRuleChainCandidate = {
+    source: Dictionary.InflectionSource;
+    inflectionRules: string[];
+};
+
 export type DatabaseDeinflection = {
     originalText: string;
     transformedText: string;
     deinflectedText: string;
     conditions: number;
-    inflectionRuleChainCandidates: Dictionary.InflectionRuleChainCandidate[];
+    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
     databaseEntries: DictionaryDatabase.TermEntry[];
 };
 
-export type TextProcessorOptionsSpace = Map<string, Language.TextProcessorOptions<unknown>>;
+export type DictionaryEntryGroup = {
+    ids: Set<number>;
+    dictionaryEntries: TermDictionaryEntry[];
+};
 
 export type TextProcessorMap = Map<
     string,
     {
         textPreprocessors: Language.TextProcessorWithId<unknown>[];
-        preprocessorOptionsSpace: TextProcessorOptionsSpace;
         textPostprocessors: Language.TextProcessorWithId<unknown>[];
-        postprocessorOptionsSpace: TextProcessorOptionsSpace;
     }
 >;
-
-export type TextProcessorVariant = Map<string, unknown>;
 
 export type TextCache = Map<string, Map<string, Map<unknown, string>>>;

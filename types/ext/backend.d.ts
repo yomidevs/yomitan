@@ -37,3 +37,5 @@ export type CanAddResults = {
     canAddArray: {note: import('anki').Note, isDuplicate: boolean}[];
     cannotAddArray: import('anki').Note[];
 };
+
+export type Mode = 'existingOrNewTab' | 'newTab' | 'popup';

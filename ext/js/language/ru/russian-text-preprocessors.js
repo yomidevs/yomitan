@@ -24,7 +24,7 @@ export const removeRussianDiacritics = {
     options: basicTextProcessorOptions,
     process: (str, setting) => {
         return setting ? str.replace(/\u0301/g, '') : str;
-    }
+    },
 };
 
 /** @type {import('language').TextProcessor<boolean>} */
@@ -34,5 +34,5 @@ export const yoToE = {
     options: basicTextProcessorOptions,
     process: (str, setting) => {
         return setting ? str.replace(/ё/g, 'е').replace(/Ё/g, 'Е') : str;
-    }
+    },
 };

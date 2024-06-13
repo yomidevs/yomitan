@@ -69,7 +69,7 @@ export class FrameClient {
         return {
             token: /** @type {string} */ (this._token),
             secret: /** @type {string} */ (this._secret),
-            data
+            data,
         };
     }
 

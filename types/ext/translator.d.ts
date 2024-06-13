@@ -63,11 +63,6 @@ export type TagTargetItem = {
     targets: Dictionary.Tag[][];
 };
 
-export type DictionaryEntryGroup = {
-    ids: Set<number>;
-    dictionaryEntries: Dictionary.TermDictionaryEntry[];
-};
-
 export type SequenceQuery = {
     query: number;
     dictionary: string;

@@ -46,6 +46,10 @@ class DictionaryEntry {
         /** @type {HTMLInputElement} */
         this._priorityInput = querySelectorNotNull(fragment, '.dictionary-priority');
         /** @type {HTMLButtonElement} */
+        this._upButton = querySelectorNotNull(fragment, '#dictionary-move-up');
+        /** @type {HTMLButtonElement} */
+        this._downButton = querySelectorNotNull(fragment, '#dictionary-move-down');
+        /** @type {HTMLButtonElement} */
         this._menuButton = querySelectorNotNull(fragment, '.dictionary-menu-button');
         /** @type {HTMLButtonElement} */
         this._outdatedButton = querySelectorNotNull(fragment, '.dictionary-outdated-button');
@@ -77,6 +81,8 @@ class DictionaryEntry {
         this._eventListeners.addEventListener(this._enabledCheckbox, 'settingChanged', this._onEnabledChanged.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
+        this._eventListeners.addEventListener(this._upButton, 'click', (() => { this._move(-1); }).bind(this), false);
+        this._eventListeners.addEventListener(this._downButton, 'click', (() => { this._move(1); }).bind(this), false);
         this._eventListeners.addEventListener(this._outdatedButton, 'click', this._onOutdatedButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButton, 'click', this._onIntegrityButtonClick.bind(this), false);
     }
@@ -115,8 +121,6 @@ class DictionaryEntry {
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
         const count = this._dictionaryController.dictionaryOptionCount;
-        this._setMenuActionEnabled(bodyNode, 'moveUp', this._index > 0);
-        this._setMenuActionEnabled(bodyNode, 'moveDown', this._index < count - 1);
         this._setMenuActionEnabled(bodyNode, 'moveTo', count > 1);
     }
 
@@ -130,12 +134,6 @@ class DictionaryEntry {
                 break;
             case 'showDetails':
                 this._showDetails();
-                break;
-            case 'moveUp':
-                this._move(-1);
-                break;
-            case 'moveDown':
-                this._move(1);
                 break;
             case 'moveTo':
                 this._showMoveToModal();
@@ -218,7 +216,7 @@ class DictionaryEntry {
             ['Description', 'description'],
             ['Attribution', 'attribution'],
             ['Source Language', 'sourceLanguage'],
-            ['Target Language', 'targetLanguage']
+            ['Target Language', 'targetLanguage'],
         ];
 
         const dictionaryInfo = this._dictionaryInfo;
@@ -486,7 +484,7 @@ export class DictionaryController {
         await this._settingsController.modifyProfileSettings([{
             action: 'set',
             path: 'dictionaries',
-            value: dictionaries
+            value: dictionaries,
         }]);
 
         /** @type {import('settings-controller').EventArgument<'dictionarySettingsReordered'>} */
@@ -531,7 +529,7 @@ export class DictionaryController {
             allowSecondarySearches: false,
             definitionsCollapsible: 'not-collapsible',
             partsOfSpeechFilter: true,
-            useDeinflections: true
+            useDeinflections: true,
         };
     }
 
@@ -583,7 +581,7 @@ export class DictionaryController {
                 targets.push({
                     action: 'set',
                     path: `profiles[${i}].options.dictionaries`,
-                    value: dictionaryOptionsArray
+                    value: dictionaryOptionsArray,
                 });
             }
         }
@@ -940,7 +938,7 @@ export class DictionaryController {
                     path,
                     start: j,
                     deleteCount: 1,
-                    items: []
+                    items: [],
                 });
             }
         }
@@ -970,7 +968,7 @@ export class DictionaryController {
             targets.push({
                 action: 'set',
                 path: `dictionaries[${i}].enabled`,
-                value
+                value,
             });
         }
         await this._settingsController.modifyProfileSettings(targets);

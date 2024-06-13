@@ -427,11 +427,11 @@ export class AnkiDeckGeneratorController {
             url: window.location.href,
             sentence: {
                 text: sentenceText,
-                offset: 0
+                offset: 0,
             },
             documentTitle: document.title,
             query: sentenceText,
-            fullQuery: sentenceText
+            fullQuery: sentenceText,
         };
         const template = this._getAnkiTemplate(options);
         const deckOptionsFields = options.anki.terms.fields;
@@ -460,7 +460,7 @@ export class AnkiDeckGeneratorController {
             mediaOptions: mediaOptions,
             requirements: requirements,
             duplicateScope: options.anki.duplicateScope,
-            duplicateScopeCheckAllModels: options.anki.duplicateScopeCheckAllModels
+            duplicateScopeCheckAllModels: options.anki.duplicateScopeCheckAllModels,
         }));
         return note;
     }
@@ -476,7 +476,7 @@ export class AnkiDeckGeneratorController {
 
         return {
             dictionaryEntry: /** @type {import('dictionary').TermDictionaryEntry} */ (dictionaryEntries[0]),
-            text: text
+            text: text,
         };
     }
 
@@ -530,11 +530,12 @@ export class AnkiDeckGeneratorController {
 
     /** */
     async _updateExampleText() {
-        this._languageSummaries = await this._application.api.getLanguageSummaries();
+        const languageSummaries = await this._application.api.getLanguageSummaries();
         const options = await this._settingsController.getOptions();
-        const activeLanguage = /** @type {import('language').LanguageSummary} */ (this._languageSummaries.find(({iso}) => iso === options.general.language));
+        const activeLanguage = /** @type {import('language').LanguageSummary} */ (languageSummaries.find(({iso}) => iso === options.general.language));
         this._renderTextInput.lang = options.general.language;
         this._renderTextInput.value = activeLanguage.exampleText;
+        this._renderResult.lang = options.general.language;
     }
 
     /**

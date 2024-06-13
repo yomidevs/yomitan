@@ -43,7 +43,7 @@ export class AnkiController {
             ignoreSelector: null,
             onAdded: this._createCardController.bind(this),
             onRemoved: this._removeCardController.bind(this),
-            isStale: this._isCardControllerStale.bind(this)
+            isStale: this._isCardControllerStale.bind(this),
         });
         /** @type {Intl.Collator} */
         this._stringComparer = new Intl.Collator(); // Locale does not matter
@@ -62,6 +62,10 @@ export class AnkiController {
         this._ankiErrorMessageDetailsToggle = querySelectorNotNull(document, '#anki-error-message-details-toggle');
         /** @type {HTMLElement} */
         this._ankiErrorInvalidResponseInfo = querySelectorNotNull(document, '#anki-error-invalid-response-info');
+        /** @type {HTMLElement} */
+        this._duplicateBehaviorSelect = querySelectorNotNull(document, '[data-setting="anki.duplicateBehavior"]');
+        /** @type {HTMLElement} */
+        this._duplicateOverwriteWarning = querySelectorNotNull(document, '#anki-overwrite-warning');
         /** @type {HTMLElement} */
         this._ankiCardPrimary = querySelectorNotNull(document, '#anki-card-primary');
         /** @type {?Error} */
@@ -91,7 +95,7 @@ export class AnkiController {
             this._ankiEnableCheckbox.addEventListener(
                 /** @type {string} */ ('settingChanged'),
                 /** @type {EventListener} */ (this._onAnkiEnableChanged.bind(this)),
-                false
+                false,
             );
         }
         for (const input of ankiCardPrimaryTypeRadios) {
@@ -109,6 +113,8 @@ export class AnkiController {
         ankiApiKeyInput.addEventListener('focus', this._onApiKeyInputFocus.bind(this));
         ankiApiKeyInput.addEventListener('blur', this._onApiKeyInputBlur.bind(this));
 
+        this._duplicateBehaviorSelect.addEventListener('change', this._onDuplicateBehaviorSelectChange.bind(this));
+
         await this._updateOptions();
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
@@ -117,6 +123,8 @@ export class AnkiController {
         for (const node of nodes) {
             node.addEventListener('settingChanged', onAnkiSettingChanged);
         }
+        const ankiCardFormatSettingsEntry = querySelectorNotNull(document, '[data-modal-action="show,anki-cards"]');
+        ankiCardFormatSettingsEntry.addEventListener('click', onAnkiSettingChanged);
     }
 
     /**
@@ -170,6 +178,8 @@ export class AnkiController {
 
         this._selectorObserver.disconnect();
         this._selectorObserver.observe(document.documentElement, true);
+
+        this._updateDuplicateOverwriteWarning(anki.duplicateBehavior);
 
         this._setupFieldMenus(dictionaries);
     }
@@ -240,6 +250,22 @@ export class AnkiController {
     }
 
     /**
+     * @param {Event} e
+     */
+    _onDuplicateBehaviorSelectChange(e) {
+        const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        const behavior = node.value;
+        this._updateDuplicateOverwriteWarning(behavior);
+    }
+
+    /**
+     * @param {string} behavior
+     */
+    _updateDuplicateOverwriteWarning(behavior) {
+        this._duplicateOverwriteWarning.hidden = behavior !== 'overwrite';
+    }
+
+    /**
      * @param {string} ankiCardType
      * @param {string} [ankiCardMenu]
      */
@@ -288,7 +314,7 @@ export class AnkiController {
         const fieldMenuTargets = [
             [['term'], 'anki-card-terms-field-menu'],
             [['kanji'], 'anki-card-kanji-field-menu'],
-            [['term', 'kanji'], 'anki-card-all-field-menu']
+            [['term', 'kanji'], 'anki-card-all-field-menu'],
         ];
         const {templates} = this._settingsController;
         for (const [types, templateName] of fieldMenuTargets) {
@@ -337,10 +363,10 @@ export class AnkiController {
         this._setAnkiStatusChanging();
         const [
             [deckNames, getDeckNamesError],
-            [modelNames, getModelNamesError]
+            [modelNames, getModelNamesError],
         ] = await Promise.all([
             this._getDeckNames(),
-            this._getModelNames()
+            this._getModelNames(),
         ]);
 
         if (getDeckNamesError !== null) {
@@ -455,7 +481,7 @@ export class AnkiController {
             '"よむ" deck:current',
             '"よむ"',
             'deck:current',
-            ''
+            '',
         ];
 
         let noteId = null;
@@ -581,17 +607,6 @@ class AnkiCardController {
         this._fields = fields;
 
         this._ankiCardFieldsContainer = this._node.querySelector('.anki-card-fields');
-
-        /** @type {HTMLTextAreaElement} */
-        const mainSettingsEntry = querySelectorNotNull(document, '[data-modal-action="show,anki-cards"]');
-        mainSettingsEntry.addEventListener('click', (() => {
-            const updatedCardOptions = this._getCardOptions(ankiOptions, this._optionsType);
-            if (updatedCardOptions === null) { return; }
-            this._deckController.prepare(deckControllerSelect, updatedCardOptions.deck);
-            this._modelController.prepare(modelControllerSelect, updatedCardOptions.model);
-            this._fields = updatedCardOptions.fields;
-            void this.updateAnkiState();
-        }).bind(this), false);
 
         this._setupFields();
 
@@ -849,7 +864,7 @@ class AnkiCardController {
         await this._settingsController.modifyProfileSettings([{
             action: 'set',
             path: ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'deck']),
-            value
+            value,
         }]);
     }
 
@@ -894,13 +909,13 @@ class AnkiCardController {
             {
                 action: 'set',
                 path: ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'model']),
-                value
+                value,
             },
             {
                 action: 'set',
                 path: ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields']),
-                value: fields
-            }
+                value: fields,
+            },
         ];
 
         this._modelController.value = value;
@@ -996,7 +1011,7 @@ class AnkiCardController {
             ['glossary', ['definition', 'meaning']],
             ['audio', ['sound']],
             ['dictionary', ['dict']],
-            ['pitch-accents', ['pitch']]
+            ['pitch-accents', ['pitch']],
         ]);
 
         const hyphenPattern = /-/g;

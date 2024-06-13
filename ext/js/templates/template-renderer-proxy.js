@@ -179,7 +179,7 @@ export class TemplateRendererProxy {
                 cancel: () => {
                     cleanup();
                     reject(new Error('Terminated'));
-                }
+                },
             };
 
             const cleanup = () => {

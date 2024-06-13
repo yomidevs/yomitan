@@ -80,7 +80,7 @@ export function invokeApiMapHandler(map, name, params, extraParams, callback, ha
         if (promiseOrResult instanceof Promise) {
             /** @type {Promise<unknown>} */ (promiseOrResult).then(
                 (result) => { callback({result}); },
-                (error) => { callback({error: ExtensionError.serialize(error)}); }
+                (error) => { callback({error: ExtensionError.serialize(error)}); },
             );
             return true;
         } else {

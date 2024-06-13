@@ -55,11 +55,11 @@ async function createZip(directory, excludeFiles, outputFileName, sevenZipExes, 
                         'a',
                         outputFileName,
                         '.',
-                        ...excludeArguments
+                        ...excludeArguments,
                     ],
                     {
-                        cwd: directory
-                    }
+                        cwd: directory,
+                    },
                 );
                 return;
             } catch (e) {
@@ -85,7 +85,7 @@ async function createJSZip(directory, excludeFiles, outputFileName, onUpdate, dr
         zip.file(
             fileName.replace(/\\/g, '/'),
             fs.readFileSync(path.join(directory, fileName), {encoding: null, flag: 'r'}),
-            {}
+            {},
         );
     }
 
@@ -96,7 +96,7 @@ async function createJSZip(directory, excludeFiles, outputFileName, onUpdate, dr
     const data = await zip.generateAsync({
         type: 'nodebuffer',
         compression: 'DEFLATE',
-        compressionOptions: {level: 9}
+        compressionOptions: {level: 9},
     }, onUpdate);
     process.stdout.write('\n');
 
@@ -223,27 +223,27 @@ export async function main() {
     const parseArgsConfigOptions = {
         all: {
             type: 'boolean',
-            default: false
+            default: false,
         },
         default: {
             type: 'boolean',
-            default: false
+            default: false,
         },
         manifest: {
-            type: 'string'
+            type: 'string',
         },
         dryRun: {
             type: 'boolean',
-            default: false
+            default: false,
         },
         dryRunBuildZip: {
             type: 'boolean',
-            default: false
+            default: false,
         },
         version: {
             type: 'string',
-            default: '0.0.0.0'
-        }
+            default: '0.0.0.0',
+        },
     };
 
     const argv = process.argv.slice(2);

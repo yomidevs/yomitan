@@ -119,6 +119,7 @@ export type GeneralOptions = {
     popupScaleRelativeToPageZoom: boolean;
     popupScaleRelativeToVisualViewport: boolean;
     showGuide: boolean;
+    enableContextMenuScanSelected: boolean;
     compactTags: boolean;
     glossaryLayoutMode: GlossaryLayoutMode;
     mainDictionary: string;
@@ -231,7 +232,7 @@ export type ScanningPreventMiddleMouseOptions = {
 export type TranslationOptions = {
     convertHalfWidthCharacters: TranslationConvertType;
     convertNumericCharacters: TranslationConvertType;
-    convertAlphabeticCharacters: TranslationConvertType;
+    alphabeticToHiragana: TranslationConvertType;
     convertHiraganaToKatakana: TranslationConvertType;
     convertKatakanaToHiragana: TranslationConvertType;
     collapseEmphaticSequences: TranslationCollapseEmphaticSequences;
@@ -395,7 +396,7 @@ export type AnkiScreenshotFormat = 'png' | 'jpeg';
 
 export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
 
-export type AnkiDuplicateBehavior = 'prevent' | 'new';
+export type AnkiDuplicateBehavior = 'prevent' | 'overwrite' | 'new';
 
 export type AnkiDisplayTags = 'never' | 'always' | 'non-standard';
 

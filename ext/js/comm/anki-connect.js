@@ -144,6 +144,21 @@ export class AnkiConnect {
     }
 
     /**
+     * @param {import('anki').Note} noteWithId
+     * @returns {Promise<null>}
+     */
+    async updateNoteFields(noteWithId) {
+        if (!this._enabled) { return null; }
+        await this._checkVersion();
+        const result = await this._invoke('updateNoteFields', {note: noteWithId});
+        if (result !== null) {
+            throw this._createUnexpectedResultError('null', result);
+        }
+        return result;
+    }
+
+
+    /**
      * @param {import('anki').Note[]} notes
      * @returns {Promise<boolean[]>}
      */
@@ -352,7 +367,7 @@ export class AnkiConnect {
         const resultActions2 = /** @type {string[]} */ (this._normalizeArray(resultActions, -1, 'string', ', field scopes'));
         return {
             scopes: resultScopes2,
-            actions: resultActions2
+            actions: resultActions2,
         };
     }
 
@@ -420,11 +435,11 @@ export class AnkiConnect {
                 cache: 'default',
                 credentials: 'omit',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 redirect: 'follow',
                 referrerPolicy: 'no-referrer',
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
             });
         } catch (e) {
             const error = new ExtensionError('Anki connection failure');
@@ -639,7 +654,7 @@ export class AnkiConnect {
                 tags: tags2,
                 fields: fields2,
                 modelName,
-                cards: cards2
+                cards: cards2,
             };
             result2.push(item2);
         }

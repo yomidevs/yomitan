@@ -369,7 +369,33 @@
             ]
         },
         {
-            "name": "Test text preprocessors - convertAlphabeticCharacters",
+            "name": "Test text preprocessors - alphabeticWidthVariants 1",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "Ｅｎｇｌｉｓｈ",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
+        },
+        {
+            "name": "Test text preprocessors - alphabeticWidthVariants 2",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "USB",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
+        },
+        {
+            "name": "Test text preprocessors - alphabeticToHiragana",
             "func": "findTerms",
             "mode": "split",
             "text": "utsu",

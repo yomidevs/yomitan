@@ -66,7 +66,7 @@ export class SentenceTerminationCharactersController {
             path: 'sentenceParsing.terminationCharacters',
             start: terminationCharacters.length,
             deleteCount: 0,
-            items: [terminationCharacterEntry]
+            items: [terminationCharacterEntry],
         }]);
 
         await this._updateOptions();
@@ -87,7 +87,7 @@ export class SentenceTerminationCharactersController {
             path: 'sentenceParsing.terminationCharacters',
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
 
         await this._updateOptions();
@@ -153,7 +153,7 @@ export class SentenceTerminationCharactersController {
             character1: '"',
             character2: '"',
             includeCharacterAtStart: false,
-            includeCharacterAtEnd: false
+            includeCharacterAtEnd: false,
         };
         await this.addEntry(newEntry);
     }

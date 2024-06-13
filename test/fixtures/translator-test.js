@@ -49,7 +49,7 @@ export async function createTranslatorContext(dictionaryDirectory, dictionaryNam
     const {errors} = await dictionaryImporter.importDictionary(
         dictionaryDatabase,
         testDictionaryData,
-        {prefixWildcardsSupported: true}
+        {prefixWildcardsSupported: true},
     );
 
     expect(errors.length).toEqual(0);
@@ -75,7 +75,7 @@ export async function createTranslatorTest(htmlFilePath, dictionaryDirectory, di
     const result = test.extend({
         window: async ({window}, use) => { await use(window); },
         // eslint-disable-next-line no-empty-pattern
-        translator: async ({}, use) => { await use(translator); }
+        translator: async ({}, use) => { await use(translator); },
     });
     return result;
 }

@@ -50,7 +50,7 @@ describe('Dictionary data', () => {
         data,
         expected1: expectedResults1[i],
         expected2: expectedResults2[i],
-        expected3: expectedResults3[i]
+        expected3: expectedResults3[i],
     }));
     describe.each(testCases)('Test %#: $data.name', ({data, expected1, expected2, expected3}) => {
         test('Test', async ({window, translator, expect}) => {

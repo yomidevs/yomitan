@@ -28,8 +28,8 @@ export const chrome = {
     runtime: {
         getURL: (path) => {
             return pathToFileURL(join(extDir, path.replace(/^\//, ''))).href;
-        }
-    }
+        },
+    },
 };
 
 /** @type {import('test/mocks').FetchMock} */
@@ -47,6 +47,6 @@ export async function fetch(url) {
         status: 200,
         statusText: 'OK',
         text: async () => content.toString('utf8'),
-        json: async () => parseJson(content.toString('utf8'))
+        json: async () => parseJson(content.toString('utf8')),
     };
 }

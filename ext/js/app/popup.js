@@ -424,7 +424,7 @@ export class Popup extends EventDispatcher {
                     if (injectPromise !== this._injectPromise) { return; }
                     this._injectPromiseComplete = true;
                 },
-                () => {}
+                () => {},
             );
         }
         return injectPromise;
@@ -489,7 +489,7 @@ export class Popup extends EventDispatcher {
             parentFrameId: this._frameId,
             childrenSupported: this._childrenSupported,
             scale: this._contentScale,
-            optionsContext: this._optionsContext
+            optionsContext: this._optionsContext,
         };
         await this._invokeSafe('displayConfigure', configureParams);
     }
@@ -699,7 +699,7 @@ export class Popup extends EventDispatcher {
         return /** @type {import('display').DirectApiReturn<TName>} */ (await this._application.crossFrame.invoke(
             this._frameClient.frameId,
             'displayPopupMessage1',
-            /** @type {import('display').DirectApiFrameClientMessageAny} */ (wrappedMessage)
+            /** @type {import('display').DirectApiFrameClientMessageAny} */ (wrappedMessage),
         ));
     }
 
@@ -837,7 +837,7 @@ export class Popup extends EventDispatcher {
             frameWidth,
             viewport.left,
             viewport.right,
-            true
+            true,
         );
         const [top, height, below] = this._getConstrainedPositionBinary(
             sourceRect.top - verticalOffset,
@@ -845,7 +845,7 @@ export class Popup extends EventDispatcher {
             frameHeight,
             viewport.top,
             viewport.bottom,
-            preferBelow
+            preferBelow,
         );
         return {left, top, width, height, after, below};
     }
@@ -868,7 +868,7 @@ export class Popup extends EventDispatcher {
             frameWidth,
             viewport.left,
             viewport.right,
-            preferRight
+            preferRight,
         );
         const [top, height, below] = this._getConstrainedPosition(
             sourceRect.bottom - verticalOffset,
@@ -876,7 +876,7 @@ export class Popup extends EventDispatcher {
             frameHeight,
             viewport.top,
             viewport.bottom,
-            true
+            true,
         );
         return {left, top, width, height, after, below};
     }
@@ -984,7 +984,7 @@ export class Popup extends EventDispatcher {
                     left,
                     top,
                     right: left + width,
-                    bottom: top + height
+                    bottom: top + height,
                 };
             } else {
                 const scale = visualViewport.scale;
@@ -992,7 +992,7 @@ export class Popup extends EventDispatcher {
                     left: 0,
                     top: 0,
                     right: Math.max(left + width, width * scale),
-                    bottom: Math.max(top + height, height * scale)
+                    bottom: Math.max(top + height, height * scale),
                 };
             }
         }
@@ -1001,7 +1001,7 @@ export class Popup extends EventDispatcher {
             left: 0,
             top: 0,
             right: window.innerWidth,
-            bottom: window.innerHeight
+            bottom: window.innerHeight,
         };
     }
 
@@ -1121,7 +1121,7 @@ export class Popup extends EventDispatcher {
             left: rect.left * scale,
             top: rect.top * scale,
             right: rect.right * scale,
-            bottom: rect.bottom * scale
+            bottom: rect.bottom * scale,
         };
     }
 }

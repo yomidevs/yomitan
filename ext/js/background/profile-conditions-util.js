@@ -31,18 +31,18 @@ const descriptors = new Map([
                 ['lessThan', createSchemaPopupLevelLessThan.bind(this)],
                 ['greaterThan', createSchemaPopupLevelGreaterThan.bind(this)],
                 ['lessThanOrEqual', createSchemaPopupLevelLessThanOrEqual.bind(this)],
-                ['greaterThanOrEqual', createSchemaPopupLevelGreaterThanOrEqual.bind(this)]
-            ]))
-        }
+                ['greaterThanOrEqual', createSchemaPopupLevelGreaterThanOrEqual.bind(this)],
+            ])),
+        },
     ],
     [
         'url',
         {
             operators: new Map(/** @type {import('profile-conditions-util').OperatorMapArray} */ ([
                 ['matchDomain', createSchemaUrlMatchDomain.bind(this)],
-                ['matchRegExp', createSchemaUrlMatchRegExp.bind(this)]
-            ]))
-        }
+                ['matchRegExp', createSchemaUrlMatchRegExp.bind(this)],
+            ])),
+        },
     ],
     [
         'modifierKeys',
@@ -51,9 +51,9 @@ const descriptors = new Map([
                 ['are', createSchemaModifierKeysAre.bind(this)],
                 ['areNot', createSchemaModifierKeysAreNot.bind(this)],
                 ['include', createSchemaModifierKeysInclude.bind(this)],
-                ['notInclude', createSchemaModifierKeysNotInclude.bind(this)]
-            ]))
-        }
+                ['notInclude', createSchemaModifierKeysNotInclude.bind(this)],
+            ])),
+        },
     ],
     [
         'flags',
@@ -62,10 +62,10 @@ const descriptors = new Map([
                 ['are', createSchemaFlagsAre.bind(this)],
                 ['areNot', createSchemaFlagsAreNot.bind(this)],
                 ['include', createSchemaFlagsInclude.bind(this)],
-                ['notInclude', createSchemaFlagsNotInclude.bind(this)]
-            ]))
-        }
-    ]
+                ['notInclude', createSchemaFlagsNotInclude.bind(this)],
+            ])),
+        },
+    ],
 ]);
 
 /**
@@ -156,8 +156,8 @@ function createSchemaPopupLevelEqual(value) {
     return {
         required: ['depth'],
         properties: {
-            depth: {const: number}
-        }
+            depth: {const: number},
+        },
     };
 }
 
@@ -168,8 +168,8 @@ function createSchemaPopupLevelEqual(value) {
 function createSchemaPopupLevelNotEqual(value) {
     return {
         not: {
-            anyOf: [createSchemaPopupLevelEqual(value)]
-        }
+            anyOf: [createSchemaPopupLevelEqual(value)],
+        },
     };
 }
 
@@ -182,8 +182,8 @@ function createSchemaPopupLevelLessThan(value) {
     return {
         required: ['depth'],
         properties: {
-            depth: {type: 'number', exclusiveMaximum: number}
-        }
+            depth: {type: 'number', exclusiveMaximum: number},
+        },
     };
 }
 
@@ -196,8 +196,8 @@ function createSchemaPopupLevelGreaterThan(value) {
     return {
         required: ['depth'],
         properties: {
-            depth: {type: 'number', exclusiveMinimum: number}
-        }
+            depth: {type: 'number', exclusiveMinimum: number},
+        },
     };
 }
 
@@ -210,8 +210,8 @@ function createSchemaPopupLevelLessThanOrEqual(value) {
     return {
         required: ['depth'],
         properties: {
-            depth: {type: 'number', maximum: number}
-        }
+            depth: {type: 'number', maximum: number},
+        },
     };
 }
 
@@ -224,8 +224,8 @@ function createSchemaPopupLevelGreaterThanOrEqual(value) {
     return {
         required: ['depth'],
         properties: {
-            depth: {type: 'number', minimum: number}
-        }
+            depth: {type: 'number', minimum: number},
+        },
     };
 }
 
@@ -245,8 +245,8 @@ function createSchemaUrlMatchDomain(value) {
     return {
         required: ['domain'],
         properties: {
-            domain: {oneOf}
-        }
+            domain: {oneOf},
+        },
     };
 }
 
@@ -258,8 +258,8 @@ function createSchemaUrlMatchRegExp(value) {
     return {
         required: ['url'],
         properties: {
-            url: {type: 'string', pattern: value, patternFlags: 'i'}
-        }
+            url: {type: 'string', pattern: value, patternFlags: 'i'},
+        },
     };
 }
 
@@ -280,8 +280,8 @@ function createSchemaModifierKeysAre(value) {
 function createSchemaModifierKeysAreNot(value) {
     return {
         not: {
-            anyOf: [createSchemaArrayCheck('modifierKeys', value, true, false)]
-        }
+            anyOf: [createSchemaArrayCheck('modifierKeys', value, true, false)],
+        },
     };
 }
 
@@ -318,8 +318,8 @@ function createSchemaFlagsAre(value) {
 function createSchemaFlagsAreNot(value) {
     return {
         not: {
-            anyOf: [createSchemaArrayCheck('flags', value, true, false)]
-        }
+            anyOf: [createSchemaArrayCheck('flags', value, true, false)],
+        },
     };
 }
 
@@ -355,14 +355,14 @@ function createSchemaArrayCheck(key, value, exact, none) {
         if (item.length === 0) { continue; }
         containsList.push({
             contains: {
-                const: item
-            }
+                const: item,
+            },
         });
     }
     const containsListCount = containsList.length;
     /** @type {import('ext/json-schema').Schema} */
     const schema = {
-        type: 'array'
+        type: 'array',
     };
     if (exact) {
         schema.maxItems = containsListCount;
@@ -380,7 +380,7 @@ function createSchemaArrayCheck(key, value, exact, none) {
     return {
         required: [key],
         properties: {
-            [key]: schema
-        }
+            [key]: schema,
+        },
     };
 }

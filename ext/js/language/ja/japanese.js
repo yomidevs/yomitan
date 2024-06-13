@@ -15,59 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {CJK_IDEOGRAPH_RANGES, isCodePointInRange, isCodePointInRanges} from '../CJK-util.js';
+
+
 const HIRAGANA_SMALL_TSU_CODE_POINT = 0x3063;
 const KATAKANA_SMALL_TSU_CODE_POINT = 0x30c3;
 const KATAKANA_SMALL_KA_CODE_POINT = 0x30f5;
 const KATAKANA_SMALL_KE_CODE_POINT = 0x30f6;
 const KANA_PROLONGED_SOUND_MARK_CODE_POINT = 0x30fc;
 
-/** @type {import('japanese-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const HIRAGANA_RANGE = [0x3040, 0x309f];
-/** @type {import('japanese-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const KATAKANA_RANGE = [0x30a0, 0x30ff];
 
-/** @type {import('japanese-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const HIRAGANA_CONVERSION_RANGE = [0x3041, 0x3096];
-/** @type {import('japanese-util').CodepointRange} */
+/** @type {import('CJK-util').CodepointRange} */
 const KATAKANA_CONVERSION_RANGE = [0x30a1, 0x30f6];
 
-/** @type {import('japanese-util').CodepointRange[]} */
+/** @type {import('CJK-util').CodepointRange[]} */
 const KANA_RANGES = [HIRAGANA_RANGE, KATAKANA_RANGE];
-
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_RANGE = [0x4e00, 0x9fff];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A_RANGE = [0x3400, 0x4dbf];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B_RANGE = [0x20000, 0x2a6df];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C_RANGE = [0x2a700, 0x2b73f];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D_RANGE = [0x2b740, 0x2b81f];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_E_RANGE = [0x2b820, 0x2ceaf];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_UNIFIED_IDEOGRAPHS_EXTENSION_F_RANGE = [0x2ceb0, 0x2ebef];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_COMPATIBILITY_IDEOGRAPHS_RANGE = [0xf900, 0xfaff];
-/** @type {import('japanese-util').CodepointRange} */
-const CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT_RANGE = [0x2f800, 0x2fa1f];
-/** @type {import('japanese-util').CodepointRange[]} */
-const CJK_IDEOGRAPH_RANGES = [
-    CJK_UNIFIED_IDEOGRAPHS_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_E_RANGE,
-    CJK_UNIFIED_IDEOGRAPHS_EXTENSION_F_RANGE,
-    CJK_COMPATIBILITY_IDEOGRAPHS_RANGE,
-    CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT_RANGE
-];
 
 /**
  * Japanese character ranges, roughly ordered in order of expected frequency.
- * @type {import('japanese-util').CodepointRange[]}
+ * @type {import('CJK-util').CodepointRange[]}
  */
 const JAPANESE_RANGES = [
     HIRAGANA_RANGE,
@@ -89,7 +61,7 @@ const JAPANESE_RANGES = [
     [0xff1a, 0xff1f], // Fullwidth punctuation 2
     [0xff3b, 0xff3f], // Fullwidth punctuation 3
     [0xff5b, 0xff60], // Fullwidth punctuation 4
-    [0xffe0, 0xffee] // Currency markers
+    [0xffe0, 0xffee], // Currency markers
 ];
 
 const SMALL_KANA_SET = new Set('ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ');
@@ -150,7 +122,7 @@ const HALFWIDTH_KATAKANA_MAPPING = new Map([
     ['ﾚ', 'レ--'],
     ['ﾛ', 'ロ--'],
     ['ﾜ', 'ワ--'],
-    ['ﾝ', 'ン--']
+    ['ﾝ', 'ン--'],
 ]);
 
 const VOWEL_TO_KANA_MAPPING = new Map([
@@ -159,7 +131,7 @@ const VOWEL_TO_KANA_MAPPING = new Map([
     ['u', 'ぅうくぐすずっつづぬふぶぷむゅゆるゥウクグスズッツヅヌフブプムュユルヴ'],
     ['e', 'ぇえけげせぜてでねへべぺめれゑヶェエケゲセゼテデネヘベペメレヱヶヹ'],
     ['o', 'ぉおこごそぞとどのほぼぽもょよろをォオコゴソゾトドノホボポモョヨロヲヺ'],
-    ['', 'のノ']
+    ['', 'のノ'],
 ]);
 
 /** @type {Map<string, string>} */
@@ -181,30 +153,6 @@ for (let i = 0, ii = kana.length; i < ii; i += 3) {
     if (handakuten !== '-') {
         DIACRITIC_MAPPING.set(handakuten, {character, type: 'handakuten'});
     }
-}
-
-
-/**
- * @param {number} codePoint
- * @param {import('japanese-util').CodepointRange} range
- * @returns {boolean}
- */
-function isCodePointInRange(codePoint, [min, max]) {
-    return (codePoint >= min && codePoint <= max);
-}
-
-/**
- * @param {number} codePoint
- * @param {import('japanese-util').CodepointRange[]} ranges
- * @returns {boolean}
- */
-function isCodePointInRanges(codePoint, ranges) {
-    for (const [min, max] of ranges) {
-        if (codePoint >= min && codePoint <= max) {
-            return true;
-        }
-    }
-    return false;
 }
 
 /**
@@ -254,7 +202,7 @@ function segmentizeFurigana(reading, readingNormalized, groups, groupsStart) {
                 reading.substring(textLength),
                 readingNormalized.substring(textLength),
                 groups,
-                groupsStart + 1
+                groupsStart + 1,
             );
             if (segments !== null) {
                 if (reading.startsWith(text)) {
@@ -273,7 +221,7 @@ function segmentizeFurigana(reading, readingNormalized, groups, groupsStart) {
                 reading.substring(i),
                 readingNormalized.substring(i),
                 groups,
-                groupsStart + 1
+                groupsStart + 1,
             );
             if (segments !== null) {
                 if (result !== null) {
@@ -523,16 +471,39 @@ export function convertHiraganaToKatakana(text) {
  * @param {string} text
  * @returns {string}
  */
-export function convertNumericToFullWidth(text) {
+export function convertAlphanumericToFullWidth(text) {
     let result = '';
     for (const char of text) {
         let c = /** @type {number} */ (char.codePointAt(0));
         if (c >= 0x30 && c <= 0x39) { // ['0', '9']
             c += 0xff10 - 0x30; // 0xff10 = '0' full width
-            result += String.fromCodePoint(c);
-        } else {
-            result += char;
+        } else if (c >= 0x41 && c <= 0x5a) { // ['A', 'Z']
+            c += 0xff21 - 0x41; // 0xff21 = 'A' full width
+        } else if (c >= 0x61 && c <= 0x7a) { // ['a', 'z']
+            c += 0xff41 - 0x61; // 0xff41 = 'a' full width
         }
+        result += String.fromCodePoint(c);
+    }
+    return result;
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+export function convertFullWidthAlphanumericToNormal(text) {
+    let result = '';
+    const length = text.length;
+    for (let i = 0; i < length; i++) {
+        let c = /** @type {number} */ (text[i].codePointAt(0));
+        if (c >= 0xff10 && c <= 0xff19) { // ['０', '９']
+            c -= 0xff10 - 0x30; // 0x30 = '0'
+        } else if (c >= 0xff21 && c <= 0xff3a) { // ['Ａ', 'Ｚ']
+            c -= 0xff21 - 0x41; // 0x41 = 'A'
+        } else if (c >= 0xff41 && c <= 0xff5a) { // ['ａ', 'ｚ']
+            c -= 0xff41 - 0x61; // 0x61 = 'a'
+        }
+        result += String.fromCodePoint(c);
     }
     return result;
 }

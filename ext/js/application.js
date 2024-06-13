@@ -115,7 +115,7 @@ export class Application extends EventDispatcher {
             ['applicationGetUrl',          this._onMessageGetUrl.bind(this)],
             ['applicationOptionsUpdated',  this._onMessageOptionsUpdated.bind(this)],
             ['applicationDatabaseUpdated', this._onMessageDatabaseUpdated.bind(this)],
-            ['applicationZoomChanged',     this._onMessageZoomChanged.bind(this)]
+            ['applicationZoomChanged',     this._onMessageZoomChanged.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }

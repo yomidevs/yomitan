@@ -37,7 +37,7 @@ async function getDependencies(scriptPaths) {
         target: 'es2022',
         format: 'esm',
         write: false,
-        metafile: true
+        metafile: true,
     });
     const dependencies = Object.keys(v.metafile.inputs);
     const stringComparer = new Intl.Collator('en-US'); // Invariant locale
@@ -90,35 +90,35 @@ const targets = [
     {
         name: 'sandbox',
         paths: [
-            'ext/js/templates/template-renderer-frame-main.js'
+            'ext/js/templates/template-renderer-frame-main.js',
         ],
         /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
-            webextensions: false
-        }
+            webextensions: false,
+        },
     },
     {
         name: 'worker',
         paths: [
-            'ext/js/dictionary/dictionary-worker-main.js'
+            'ext/js/dictionary/dictionary-worker-main.js',
         ],
         /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
             browser: false,
-            worker: true
-        }
+            worker: true,
+        },
     },
     {
         name: 'serviceworker',
         paths: [
-            'ext/js/background/background-main.js'
+            'ext/js/background/background-main.js',
         ],
         /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
             browser: false,
-            serviceworker: true
-        }
-    }
+            serviceworker: true,
+        },
+    },
 ];
 
 describe('Eslint configuration', () => {
