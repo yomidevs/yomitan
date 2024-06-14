@@ -81,6 +81,7 @@
                                 "type": "object",
                                 "required": [
                                     "enable",
+                                    "language",
                                     "resultOutputMode",
                                     "debugInfo",
                                     "maxResults",
@@ -98,6 +99,7 @@
                                     "popupScaleRelativeToPageZoom",
                                     "popupScaleRelativeToVisualViewport",
                                     "showGuide",
+                                    "enableContextMenuScanSelected",
                                     "compactTags",
                                     "glossaryLayoutMode",
                                     "mainDictionary",
@@ -125,6 +127,10 @@
                                     "enable": {
                                         "type": "boolean",
                                         "default": true
+                                    },
+                                    "language": {
+                                        "type": "string",
+                                        "default": "ja"
                                     },
                                     "resultOutputMode": {
                                         "type": "string",
@@ -198,6 +204,10 @@
                                         "default": true
                                     },
                                     "showGuide": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "enableContextMenuScanSelected": {
                                         "type": "boolean",
                                         "default": true
                                     },
@@ -285,7 +295,7 @@
                                     },
                                     "termDisplayMode": {
                                         "type": "string",
-                                        "enum": ["ruby", "ruby-and-reading", "term-and-reading"],
+                                        "enum": ["ruby", "ruby-and-reading", "term-and-reading", "term-only"],
                                         "default": "ruby"
                                     },
                                     "sortFrequencyDictionary": {
@@ -458,8 +468,9 @@
                                                     "showAdvanced": false,
                                                     "searchTerms": true,
                                                     "searchKanji": true,
-                                                    "scanOnTouchMove": true,
-                                                    "scanOnTouchPress": true,
+                                                    "scanOnTouchTap": true,
+                                                    "scanOnTouchMove": false,
+                                                    "scanOnTouchPress": false,
                                                     "scanOnTouchRelease": false,
                                                     "scanOnPenMove": true,
                                                     "scanOnPenHover": true,
@@ -482,8 +493,9 @@
                                                     "showAdvanced": false,
                                                     "searchTerms": true,
                                                     "searchKanji": true,
-                                                    "scanOnTouchMove": true,
-                                                    "scanOnTouchPress": true,
+                                                    "scanOnTouchTap": true,
+                                                    "scanOnTouchMove": false,
+                                                    "scanOnTouchPress": false,
                                                     "scanOnTouchRelease": false,
                                                     "scanOnPenMove": true,
                                                     "scanOnPenHover": true,
@@ -540,6 +552,7 @@
                                                         "showAdvanced",
                                                         "searchTerms",
                                                         "searchKanji",
+                                                        "scanOnTouchTap",
                                                         "scanOnTouchMove",
                                                         "scanOnTouchPress",
                                                         "scanOnTouchRelease",
@@ -564,13 +577,17 @@
                                                             "type": "boolean",
                                                             "default": true
                                                         },
-                                                        "scanOnTouchMove": {
+                                                        "scanOnTouchTap": {
                                                             "type": "boolean",
                                                             "default": true
                                                         },
+                                                        "scanOnTouchMove": {
+                                                            "type": "boolean",
+                                                            "default": false
+                                                        },
                                                         "scanOnTouchPress": {
                                                             "type": "boolean",
-                                                            "default": true
+                                                            "default": false
                                                         },
                                                         "scanOnTouchRelease": {
                                                             "type": "boolean",
@@ -722,12 +739,6 @@
                             "translation": {
                                 "type": "object",
                                 "required": [
-                                    "convertHalfWidthCharacters",
-                                    "convertNumericCharacters",
-                                    "convertAlphabeticCharacters",
-                                    "convertHiraganaToKatakana",
-                                    "convertKatakanaToHiragana",
-                                    "collapseEmphaticSequences",
                                     "textReplacements",
                                     "searchResolution"
                                 ],
@@ -739,36 +750,6 @@
                                             "word"
                                         ],
                                         "default": "letter"
-                                    },
-                                    "convertHalfWidthCharacters": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertNumericCharacters": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertAlphabeticCharacters": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertHiraganaToKatakana": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "false"
-                                    },
-                                    "convertKatakanaToHiragana": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "variant"
-                                    },
-                                    "collapseEmphaticSequences": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "full"],
-                                        "default": "false"
                                     },
                                     "textReplacements": {
                                         "type": "object",
@@ -1012,6 +993,11 @@
                                         "type": "boolean",
                                         "default": true
                                     },
+                                    "duplicateBehavior": {
+                                        "type": "string",
+                                        "enum": ["prevent", "overwrite", "new"],
+                                        "default": "prevent"
+                                    },
                                     "fieldTemplates": {
                                         "type": ["string", "null"],
                                         "default": null
@@ -1173,8 +1159,8 @@
                                             }
                                         },
                                         "default": [
-                                            {"action": "close",             "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["popup"], "enabled": true},
-                                            {"action": "focusSearchBox",    "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["search"], "enabled": true},
+                                            {"action": "close",             "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["popup"],           "enabled": true},
+                                            {"action": "focusSearchBox",    "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["search"],          "enabled": true},
                                             {"action": "previousEntry",     "argument": "3", "key": "PageUp",    "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "nextEntry",         "argument": "3", "key": "PageDown",  "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "lastEntry",         "argument": "",  "key": "End",       "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
@@ -1183,12 +1169,14 @@
                                             {"action": "nextEntry",         "argument": "1", "key": "ArrowDown", "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "historyBackward",   "argument": "",  "key": "KeyB",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "historyForward",    "argument": "",  "key": "KeyF",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "profilePrevious",   "argument": "",  "key": "Minus",     "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "profileNext",       "argument": "",  "key": "Equal",     "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "addNoteKanji",      "argument": "",  "key": "KeyK",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "addNoteTermKanji",  "argument": "",  "key": "KeyE",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "addNoteTermKana",   "argument": "",  "key": "KeyR",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "playAudio",         "argument": "",  "key": "KeyP",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "viewNote",          "argument": "",  "key": "KeyV",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "copyHostSelection", "argument": "",  "key": "KeyC",      "modifiers": ["ctrl"], "scopes": ["popup"], "enabled": true}
+                                            {"action": "viewNotes",         "argument": "",  "key": "KeyV",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "copyHostSelection", "argument": "",  "key": "KeyC",      "modifiers": ["ctrl"], "scopes": ["popup"],           "enabled": true}
                                         ]
                                     }
                                 }

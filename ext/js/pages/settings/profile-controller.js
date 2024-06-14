@@ -98,7 +98,7 @@ export class ProfileController {
 
         this._profileConditionsUI.on('conditionGroupCountChanged', this._onConditionGroupCountChanged.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
-        this._onOptionsChanged();
+        void this._onOptionsChanged();
     }
 
     /**
@@ -168,7 +168,7 @@ export class ProfileController {
         await this._settingsController.modifyGlobalSettings([{
             action: 'set',
             path: `profiles[${destinationProfileIndex}].options`,
-            value: options
+            value: options,
         }]);
 
         await this._settingsController.refresh();
@@ -199,7 +199,7 @@ export class ProfileController {
             path: 'profiles',
             start: index,
             deleteCount: 0,
-            items: [newProfile]
+            items: [newProfile],
         }]);
 
         // Update profile index
@@ -224,14 +224,14 @@ export class ProfileController {
             path: 'profiles',
             start: profileIndex,
             deleteCount: 1,
-            items: []
+            items: [],
         }];
         if (profileCurrentNew >= profileIndex) {
             profileCurrentNew = Math.min(profileCurrentNew - 1, this._profiles.length - 1);
             modifications.push({
                 action: 'set',
                 path: 'profileCurrent',
-                value: profileCurrentNew
+                value: profileCurrentNew,
             });
         }
 
@@ -287,13 +287,13 @@ export class ProfileController {
         const modifications = [{
             action: 'swap',
             path1: `profiles[${index1}]`,
-            path2: `profiles[${index2}]`
+            path2: `profiles[${index2}]`,
         }];
         if (profileCurrentNew !== profileCurrent) {
             modifications.push({
                 action: 'set',
                 path: 'profileCurrent',
-                value: profileCurrentNew
+                value: profileCurrentNew,
             });
         }
 
@@ -376,7 +376,7 @@ export class ProfileController {
 
         this._profileConditionsUI.cleanup();
         this._profileConditionsIndex = profileIndex;
-        this._profileConditionsUI.prepare(profileIndex);
+        void this._profileConditionsUI.prepare(profileIndex);
         if (this._profileConditionsProfileName !== null) {
             this._profileConditionsProfileName.textContent = profile.name;
         }
@@ -403,7 +403,7 @@ export class ProfileController {
         this._profileConditionsUI.cleanup();
         const conditionsProfile = this._getProfile(this._profileConditionsIndex !== null ? this._profileConditionsIndex : settingsProfileIndex);
         if (conditionsProfile !== null) {
-            this._profileConditionsUI.prepare(settingsProfileIndex);
+            void this._profileConditionsUI.prepare(settingsProfileIndex);
         }
 
         // Udpate profile entries
@@ -425,7 +425,7 @@ export class ProfileController {
         const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
         const value = this._tryGetValidProfileIndex(element.value);
         if (value === null) { return; }
-        this.setDefaultProfile(value);
+        void this.setDefaultProfile(value);
     }
 
     /**
@@ -440,7 +440,7 @@ export class ProfileController {
 
     /** */
     _onAdd() {
-        this.duplicateProfile(this._settingsController.profileIndex);
+        void this.duplicateProfile(this._settingsController.profileIndex);
     }
 
     /** */
@@ -454,7 +454,7 @@ export class ProfileController {
         const validProfileIndex = this._tryGetValidProfileIndex(profileIndex);
         if (validProfileIndex === null) { return; }
 
-        this.deleteProfile(validProfileIndex);
+        void this.deleteProfile(validProfileIndex);
     }
 
     /** */
@@ -471,7 +471,7 @@ export class ProfileController {
         const sourceProfileIndex = this._tryGetValidProfileIndex(/** @type {HTMLSelectElement} */ (this._profileCopySourceSelect).value);
         if (sourceProfileIndex === null) { return; }
 
-        this.copyProfile(sourceProfileIndex, validDestinationProfileIndex);
+        void this.copyProfile(sourceProfileIndex, validDestinationProfileIndex);
     }
 
     /**
@@ -534,7 +534,7 @@ export class ProfileController {
         return [
             /** @type {HTMLSelectElement} */ (this._profileActiveSelect),
             /** @type {HTMLSelectElement} */ (this._profileTargetSelect),
-            /** @type {HTMLSelectElement} */ (this._profileCopySourceSelect)
+            /** @type {HTMLSelectElement} */ (this._profileCopySourceSelect),
         ];
     }
 
@@ -544,7 +544,7 @@ export class ProfileController {
      */
     _tryGetValidProfileIndex(stringValue) {
         if (typeof stringValue !== 'string') { return null; }
-        const intValue = parseInt(stringValue, 10);
+        const intValue = Number.parseInt(stringValue, 10);
         return (
             Number.isFinite(intValue) &&
             intValue >= 0 &&
@@ -573,7 +573,7 @@ export class ProfileController {
             suffix = match[5];
             if (typeof match[2] === 'string') {
                 space = match[3];
-                index = parseInt(match[4], 10) + 1;
+                index = Number.parseInt(match[4], 10) + 1;
             } else {
                 space = ' ';
                 index = 2;
@@ -738,7 +738,7 @@ class ProfileEntry {
     _onIsDefaultRadioChange(e) {
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
         if (!element.checked) { return; }
-        this._profileController.setDefaultProfile(this._index);
+        void this._profileController.setDefaultProfile(this._index);
     }
 
     /**
@@ -747,7 +747,7 @@ class ProfileEntry {
     _onNameInputInput(e) {
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
         const name = element.value;
-        this._profileController.setProfileName(this._index, name);
+        void this._profileController.setProfileName(this._index, name);
     }
 
     /** */
@@ -773,10 +773,10 @@ class ProfileEntry {
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'moveUp':
-                this._profileController.moveProfile(this._index, -1);
+                void this._profileController.moveProfile(this._index, -1);
                 break;
             case 'moveDown':
-                this._profileController.moveProfile(this._index, 1);
+                void this._profileController.moveProfile(this._index, 1);
                 break;
             case 'copyFrom':
                 this._profileController.openCopyProfileModal(this._index);
@@ -785,7 +785,7 @@ class ProfileEntry {
                 this._profileController.openProfileConditionsModal(this._index);
                 break;
             case 'duplicate':
-                this._profileController.duplicateProfile(this._index);
+                void this._profileController.duplicateProfile(this._index);
                 break;
             case 'delete':
                 this._profileController.openDeleteProfileModal(this._index);

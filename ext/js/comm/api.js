@@ -96,6 +96,14 @@ export class API {
     }
 
     /**
+     * @param {import('api').ApiParam<'updateAnkiNote', 'noteWithId'>} noteWithId
+     * @returns {Promise<import('api').ApiReturn<'updateAnkiNote'>>}
+     */
+    updateAnkiNote(noteWithId) {
+        return this._invoke('updateAnkiNote', {noteWithId});
+    }
+
+    /**
      * @param {import('api').ApiParam<'getAnkiNoteInfo', 'notes'>} notes
      * @param {import('api').ApiParam<'getAnkiNoteInfo', 'fetchAdditionalInfo'>} fetchAdditionalInfo
      * @returns {Promise<import('api').ApiReturn<'getAnkiNoteInfo'>>}
@@ -118,13 +126,13 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'noteView', 'noteId'>} noteId
-     * @param {import('api').ApiParam<'noteView', 'mode'>} mode
-     * @param {import('api').ApiParam<'noteView', 'allowFallback'>} allowFallback
-     * @returns {Promise<import('api').ApiReturn<'noteView'>>}
+     * @param {import('api').ApiParam<'viewNotes', 'noteIds'>} noteIds
+     * @param {import('api').ApiParam<'viewNotes', 'mode'>} mode
+     * @param {import('api').ApiParam<'viewNotes', 'allowFallback'>} allowFallback
+     * @returns {Promise<import('api').ApiReturn<'viewNotes'>>}
      */
-    noteView(noteId, mode, allowFallback) {
-        return this._invoke('noteView', {noteId, mode, allowFallback});
+    viewNotes(noteIds, mode, allowFallback) {
+        return this._invoke('viewNotes', {noteIds, mode, allowFallback});
     }
 
     /**
@@ -210,13 +218,6 @@ export class API {
     }
 
     /**
-     * @returns {Promise<import('api').ApiReturn<'getDisplayTemplatesHtml'>>}
-     */
-    getDisplayTemplatesHtml() {
-        return this._invoke('getDisplayTemplatesHtml', void 0);
-    }
-
-    /**
      * @returns {Promise<import('api').ApiReturn<'getZoom'>>}
      */
     getZoom() {
@@ -253,13 +254,13 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'log', 'error'>} error
-     * @param {import('api').ApiParam<'log', 'level'>} level
-     * @param {import('api').ApiParam<'log', 'context'>} context
-     * @returns {Promise<import('api').ApiReturn<'log'>>}
+     * @param {import('api').ApiParam<'logGenericErrorBackend', 'error'>} error
+     * @param {import('api').ApiParam<'logGenericErrorBackend', 'level'>} level
+     * @param {import('api').ApiParam<'logGenericErrorBackend', 'context'>} context
+     * @returns {Promise<import('api').ApiReturn<'logGenericErrorBackend'>>}
      */
-    log(error, level, context) {
-        return this._invoke('log', {error, level, context});
+    logGenericErrorBackend(error, level, context) {
+        return this._invoke('logGenericErrorBackend', {error, level, context});
     }
 
     /**
@@ -328,11 +329,12 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'textHasJapaneseCharacters', 'text'>} text
-     * @returns {Promise<import('api').ApiReturn<'textHasJapaneseCharacters'>>}
+     * @param {import('api').ApiParam<'isTextLookupWorthy', 'text'>} text
+     * @param {import('api').ApiParam<'isTextLookupWorthy', 'language'>} language
+     * @returns {Promise<import('api').ApiReturn<'isTextLookupWorthy'>>}
      */
-    textHasJapaneseCharacters(text) {
-        return this._invoke('textHasJapaneseCharacters', {text});
+    isTextLookupWorthy(text, language) {
+        return this._invoke('isTextLookupWorthy', {text, language});
     }
 
     /**
@@ -361,6 +363,13 @@ export class API {
         return this._invoke('openCrossFramePort', {targetTabId, targetFrameId});
     }
 
+    /**
+     * @returns {Promise<import('api').ApiReturn<'getLanguageSummaries'>>}
+     */
+    getLanguageSummaries() {
+        return this._invoke('getLanguageSummaries', void 0);
+    }
+
     // Utilities
 
     /**
@@ -386,7 +395,7 @@ export class API {
                             resolve(/** @type {import('api').ApiReturn<TAction>} */ (result));
                         }
                     } else {
-                        const message = response === null ? 'Unexpected null response' : `Unexpected response of type ${typeof response}`;
+                        const message = response === null ? 'Unexpected null response. You may need to refresh the page.' : `Unexpected response of type ${typeof response}. You may need to refresh the page.`;
                         reject(new Error(`${message} (${JSON.stringify(data)})`));
                     }
                 });

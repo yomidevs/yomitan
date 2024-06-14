@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../core/event-listener-collection.js';
-import {base64ToArrayBuffer} from '../data/sandbox/array-buffer-util.js';
+import {base64ToArrayBuffer} from '../data/array-buffer-util.js';
 
 /**
  * The content manager which is used when generating HTML display content.
@@ -49,7 +49,7 @@ export class DisplayContentManager {
      * @param {import('display-content-manager').OnUnloadCallback} onUnload The callback that is executed when the media should be unloaded.
      */
     loadMedia(path, dictionary, onLoad, onUnload) {
-        this._loadMedia(path, dictionary, onLoad, onUnload);
+        void this._loadMedia(path, dictionary, onLoad, onUnload);
     }
 
     /**
@@ -65,7 +65,7 @@ export class DisplayContentManager {
 
         for (const map of this._mediaCache.values()) {
             for (const result of map.values()) {
-                this._revokeUrl(result);
+                void this._revokeUrl(result);
             }
         }
         this._mediaCache.clear();
@@ -174,7 +174,7 @@ export class DisplayContentManager {
             focus: false,
             params,
             state: null,
-            content: null
+            content: null,
         });
     }
 

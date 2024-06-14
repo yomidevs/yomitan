@@ -17,7 +17,7 @@
  */
 
 import {parseJson} from '../core/json.js';
-import {isObject} from '../core/utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
 import {HotkeyUtil} from './hotkey-util.js';
 
 export class HotkeyHelpController {
@@ -67,9 +67,10 @@ export class HotkeyHelpController {
             const hotkey = (global ? this._globalActionHotkeys : this._localActionHotkeys).get(action);
             for (let i = 0, ii = attributes.length; i < ii; ++i) {
                 const attribute = attributes[i];
+                /** @type {unknown} */
                 let value;
                 if (typeof hotkey !== 'undefined') {
-                    value = /** @type {unknown} */ (multipleValues ? values[i] : values);
+                    value = multipleValues ? values[i] : values;
                     if (typeof value === 'string') {
                         value = value.replace(replacementPattern, hotkey);
                     }
@@ -89,11 +90,11 @@ export class HotkeyHelpController {
     // Private
 
     /**
-     * @param {Map<string, string>} commandMap
+     * @returns {Promise<chrome.commands.Command[]>}
      */
-    async _setupGlobalCommands(commandMap) {
-        const commands = await new Promise((resolve, reject) => {
-            if (!(isObject(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
+    _getAllCommands() {
+        return new Promise((resolve, reject) => {
+            if (!(isObjectNotArray(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
                 resolve([]);
                 return;
             }
@@ -107,10 +108,17 @@ export class HotkeyHelpController {
                 }
             });
         });
+    }
+
+    /**
+     * @param {Map<string, string>} commandMap
+     */
+    async _setupGlobalCommands(commandMap) {
+        const commands = await this._getAllCommands();
 
         commandMap.clear();
         for (const {name, shortcut} of commands) {
-            if (shortcut.length === 0) { continue; }
+            if (typeof name !== 'string' || typeof shortcut !== 'string' || shortcut.length === 0) { continue; }
             const {key, modifiers} = this._hotkeyUtil.convertCommandToInput(shortcut);
             commandMap.set(name, this._hotkeyUtil.getInputDisplayValue(key, modifiers));
         }
@@ -151,7 +159,8 @@ export class HotkeyHelpController {
         if (typeof hotkey !== 'string') { return null; }
         const data = /** @type {unknown} */ (parseJson(hotkey));
         if (!Array.isArray(data)) { return null; }
-        const [action, attributes, values] = /** @type {unknown[]} */ (data);
+        const dataArray = /** @type {unknown[]} */ (data);
+        const [action, attributes, values] = dataArray;
         if (typeof action !== 'string') { return null; }
         /** @type {string[]} */
         const attributesArray = [];
@@ -171,7 +180,39 @@ export class HotkeyHelpController {
             global,
             attributes: attributesArray,
             values,
-            defaultAttributeValues
+            defaultAttributeValues,
         };
+    }
+
+    /**
+     * @param {HTMLElement} node
+     * @returns {?string}
+     */
+    getHotkeyLabel(node) {
+        const {hotkey} = node.dataset;
+        if (typeof hotkey !== 'string') { return null; }
+
+        const data = /** @type {unknown} */ (parseJson(hotkey));
+        if (!Array.isArray(data)) { return null; }
+
+        const values = /** @type {unknown[]} */ (data)[2];
+        if (typeof values !== 'string') { return null; }
+
+        return values;
+    }
+
+    /**
+     * @param {HTMLElement} node
+     * @param {string} label
+     */
+    setHotkeyLabel(node, label) {
+        const {hotkey} = node.dataset;
+        if (typeof hotkey !== 'string') { return; }
+
+        const data = /** @type {unknown} */ (parseJson(hotkey));
+        if (!Array.isArray(data)) { return; }
+
+        data[2] = label;
+        node.dataset.hotkey = JSON.stringify(data);
     }
 }

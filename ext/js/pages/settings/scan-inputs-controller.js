@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {DocumentUtil} from '../../dom/document-util.js';
+import {normalizeModifier} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
@@ -51,7 +51,7 @@ export class ScanInputsController {
         this._settingsController.on('scanInputsChanged', this._onScanInputsChanged.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
-        this.refresh();
+        await this.refresh();
     }
 
     /**
@@ -67,12 +67,12 @@ export class ScanInputsController {
             this._entries[i].index = i;
         }
         this._updateCounts();
-        this._modifyProfileSettings([{
+        void this._modifyProfileSettings([{
             action: 'splice',
             path: 'scanning.inputs',
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
         return true;
     }
@@ -113,7 +113,7 @@ export class ScanInputsController {
      */
     _onScanInputsChanged({source}) {
         if (source === this) { return; }
-        this.refresh();
+        void this.refresh();
     }
 
     /**
@@ -144,12 +144,12 @@ export class ScanInputsController {
         const scanningInput = ScanInputsController.createDefaultMouseInput('', '');
         this._addOption(index, scanningInput);
         this._updateCounts();
-        this._modifyProfileSettings([{
+        void this._modifyProfileSettings([{
             action: 'splice',
             path: 'scanning.inputs',
             start: index,
             deleteCount: 0,
-            items: [scanningInput]
+            items: [scanningInput],
         }]);
 
         // Scroll to bottom
@@ -208,8 +208,9 @@ export class ScanInputsController {
                 showAdvanced: false,
                 searchTerms: true,
                 searchKanji: true,
-                scanOnTouchMove: true,
-                scanOnTouchPress: true,
+                scanOnTouchTap: true,
+                scanOnTouchMove: false,
+                scanOnTouchPress: false,
                 scanOnTouchRelease: false,
                 scanOnPenMove: true,
                 scanOnPenHover: true,
@@ -217,8 +218,8 @@ export class ScanInputsController {
                 scanOnPenPress: true,
                 scanOnPenRelease: false,
                 preventTouchScrolling: true,
-                preventPenScrolling: true
-            }
+                preventPenScrolling: true,
+            },
         };
     }
 }
@@ -315,7 +316,7 @@ class ScanInputField {
      */
     _onIncludeValueChange({modifiers}) {
         const modifiers2 = this._joinModifiers(modifiers);
-        this._parent.setProperty(this._index, 'include', modifiers2, true);
+        void this._parent.setProperty(this._index, 'include', modifiers2, true);
     }
 
     /**
@@ -323,7 +324,7 @@ class ScanInputField {
      */
     _onExcludeValueChange({modifiers}) {
         const modifiers2 = this._joinModifiers(modifiers);
-        this._parent.setProperty(this._index, 'exclude', modifiers2, true);
+        void this._parent.setProperty(this._index, 'exclude', modifiers2, true);
     }
 
     /**
@@ -406,7 +407,7 @@ class ScanInputField {
         if (this._node !== null) {
             this._node.dataset.showAdvanced = `${showAdvanced}`;
         }
-        this._parent.setProperty(this._index, 'options.showAdvanced', showAdvanced, false);
+        void this._parent.setProperty(this._index, 'options.showAdvanced', showAdvanced, false);
     }
 
     /**
@@ -417,7 +418,7 @@ class ScanInputField {
         /** @type {import('input').Modifier[]} */
         const results = [];
         for (const modifier of modifiersString.split(/[,;\s]+/)) {
-            const modifier2 = DocumentUtil.normalizeModifier(modifier.trim().toLowerCase());
+            const modifier2 = normalizeModifier(modifier.trim().toLowerCase());
             if (modifier2 === null) { continue; }
             results.push(modifier2);
         }

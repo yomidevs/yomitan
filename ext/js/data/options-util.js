@@ -18,9 +18,16 @@
 
 import {fetchJson, fetchText} from '../core/fetch-utilities.js';
 import {parseJson} from '../core/json.js';
-import {escapeRegExp, isObject} from '../core/utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
+import {escapeRegExp} from '../core/utilities.js';
 import {TemplatePatcher} from '../templates/template-patcher.js';
 import {JsonSchema} from './json-schema.js';
+
+// Some type safety rules are disabled for this file since it deals with upgrading an older format
+// of the options object to a newer format. SafeAny is used for much of this, since every single
+// legacy format does not contain type definitions.
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 export class OptionsUtil {
     constructor() {
@@ -65,7 +72,7 @@ export class OptionsUtil {
         // Remove invalid profiles
         const profiles = /** @type {unknown[]} */ (options.profiles);
         for (let i = profiles.length - 1; i >= 0; --i) {
-            if (!isObject(profiles[i])) {
+            if (!isObjectNotArray(profiles[i])) {
                 profiles.splice(i, 1);
             }
         }
@@ -75,7 +82,7 @@ export class OptionsUtil {
             profiles.push({
                 name: 'Default',
                 options: defaultProfileOptions,
-                conditionGroups: []
+                conditionGroups: [],
             });
         }
 
@@ -119,6 +126,9 @@ export class OptionsUtil {
                     }
                 });
             });
+            if (typeof optionsStr !== 'string') {
+                throw new Error('Invalid value for options');
+            }
             options = parseJson(optionsStr);
         } catch (e) {
             // NOP
@@ -247,12 +257,12 @@ export class OptionsUtil {
                 const replacements = [
                     [
                         '{{#*inline "audio"}}{{/inline}}',
-                        '{{#*inline "audio"}}\n    {{~#if definition.audioFileName~}}\n        [sound:{{definition.audioFileName}}]\n    {{~/if~}}\n{{/inline}}'
+                        '{{#*inline "audio"}}\n    {{~#if definition.audioFileName~}}\n        [sound:{{definition.audioFileName}}]\n    {{~/if~}}\n{{/inline}}',
                     ],
                     [
                         '{{#*inline "tags"}}\n    {{~#each definition.definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each~}}\n{{/inline}}',
-                        '{{#*inline "tags"}}\n    {{~#mergeTags definition group merge}}{{this}}{{/mergeTags~}}\n{{/inline}}'
-                    ]
+                        '{{#*inline "tags"}}\n    {{~#mergeTags definition group merge}}{{this}}{{/mergeTags~}}\n{{/inline}}',
+                    ],
                 ];
 
                 for (const [pattern, replacement] of replacements) {
@@ -268,7 +278,7 @@ export class OptionsUtil {
                 }
 
                 options.anki.fieldTemplates = fieldTemplates;
-            }
+            },
         ];
     }
 
@@ -311,7 +321,7 @@ export class OptionsUtil {
                 showPitchAccentGraph: false,
                 showIframePopupsInRootFrame: false,
                 useSecurePopupFrameUrl: true,
-                usePopupShadowDom: true
+                usePopupShadowDom: true,
             },
 
             audio: {
@@ -320,7 +330,7 @@ export class OptionsUtil {
                 volume: 100,
                 autoPlay: false,
                 customSourceUrl: '',
-                textToSpeechVoice: ''
+                textToSpeechVoice: '',
             },
 
             scanning: {
@@ -338,7 +348,7 @@ export class OptionsUtil {
                 enableOnPopupExpressions: false,
                 enableOnSearchPage: true,
                 enableSearchTags: false,
-                layoutAwareScan: false
+                layoutAwareScan: false,
             },
 
             translation: {
@@ -347,7 +357,7 @@ export class OptionsUtil {
                 convertAlphabeticCharacters: 'false',
                 convertHiraganaToKatakana: 'false',
                 convertKatakanaToHiragana: 'variant',
-                collapseEmphaticSequences: 'false'
+                collapseEmphaticSequences: 'false',
             },
 
             dictionaries: {},
@@ -357,7 +367,7 @@ export class OptionsUtil {
                 enableMecabParser: false,
                 selectedParser: null,
                 termSpacing: true,
-                readingMode: 'hiragana'
+                readingMode: 'hiragana',
             },
 
             anki: {
@@ -369,8 +379,8 @@ export class OptionsUtil {
                 terms: {deck: '', model: '', fields: {}},
                 kanji: {deck: '', model: '', fields: {}},
                 duplicateScope: 'collection',
-                fieldTemplates: null
-            }
+                fieldTemplates: null,
+            },
         };
     }
 
@@ -521,7 +531,22 @@ export class OptionsUtil {
             this._updateVersion21,
             this._updateVersion22,
             this._updateVersion23,
-            this._updateVersion24
+            this._updateVersion24,
+            this._updateVersion25,
+            this._updateVersion26,
+            this._updateVersion27,
+            this._updateVersion28,
+            this._updateVersion29,
+            this._updateVersion30,
+            this._updateVersion31,
+            this._updateVersion32,
+            this._updateVersion33,
+            this._updateVersion34,
+            this._updateVersion35,
+            this._updateVersion36,
+            this._updateVersion37,
+            this._updateVersion38,
+            this._updateVersion39,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -537,8 +562,8 @@ export class OptionsUtil {
     _updateVersion1(options) {
         options.global = {
             database: {
-                prefixWildcardsSupported: false
-            }
+                prefixWildcardsSupported: false,
+            },
         };
     }
 
@@ -591,11 +616,11 @@ export class OptionsUtil {
             showAdvanced: false,
             searchTerms: true,
             searchKanji: true,
-            scanOnTouchMove: true,
+            scanOnTouchMove: false,
             scanOnPenHover: true,
             scanOnPenPress: true,
             scanOnPenRelease: false,
-            preventTouchScrolling: true
+            preventTouchScrolling: true,
         });
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.general.usePopupWindow = false;
@@ -605,7 +630,7 @@ export class OptionsUtil {
                 onWebPages: false,
                 onPopupPages: false,
                 onSearchPages: false,
-                onSearchQuery: false
+                onSearchQuery: false,
             };
 
             const {modifier, middleMouse} = profileOptions.scanning;
@@ -628,21 +653,21 @@ export class OptionsUtil {
                 include: modifierInput,
                 exclude: 'mouse0',
                 types: {mouse: true, touch: false, pen: false},
-                options: createInputDefaultOptions()
+                options: createInputDefaultOptions(),
             });
             if (middleMouse) {
                 scanningInputs.push({
                     include: 'mouse2',
                     exclude: '',
                     types: {mouse: true, touch: false, pen: false},
-                    options: createInputDefaultOptions()
+                    options: createInputDefaultOptions(),
                 });
             }
             scanningInputs.push({
                 include: '',
                 exclude: '',
                 types: {mouse: false, touch: true, pen: true},
-                options: createInputDefaultOptions()
+                options: createInputDefaultOptions(),
             });
             profileOptions.scanning.inputs = scanningInputs;
         }
@@ -752,7 +777,7 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {
                 searchOriginal: true,
-                groups: []
+                groups: [],
             };
             profile.options.sentenceParsing = {
                 scanExtent: profile.options.anki.sentenceExt,
@@ -769,8 +794,8 @@ export class OptionsUtil {
                     {enabled: true, character1: '。', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
                     {enabled: true, character1: '！', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
                     {enabled: true, character1: '？', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                    {enabled: true, character1: '…', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true}
-                ]
+                    {enabled: true, character1: '…', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+                ],
             };
             delete profile.options.anki.sentenceExt;
             profile.options.general.popupActionBarLocation = 'top';
@@ -792,8 +817,8 @@ export class OptionsUtil {
                     {action: 'addNoteTermKana',   key: 'KeyR',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                     {action: 'playAudio',         key: 'KeyP',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                     {action: 'viewNote',          key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true}
-                ]
+                    {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true},
+                ],
             };
             /* eslint-enable @stylistic/no-multi-spaces */
             profile.options.anki.suspendNewCards = false;
@@ -805,14 +830,14 @@ export class OptionsUtil {
                 useLeft: false,
                 useTop: false,
                 windowType: 'popup',
-                windowState: 'normal'
+                windowState: 'normal',
             };
             profile.options.audio.customSourceType = 'audio';
             profile.options.clipboard = {
                 enableBackgroundMonitor: profile.options.general.enableClipboardPopups,
                 enableSearchPageMonitor: false,
                 autoSearchContent: true,
-                maximumSearchLength: profile.options.general.maximumClipboardSearchLength
+                maximumSearchLength: profile.options.general.maximumClipboardSearchLength,
             };
             delete profile.options.general.enableClipboardPopups;
             delete profile.options.general.enableClipboardMonitor;
@@ -951,7 +976,7 @@ export class OptionsUtil {
     _updateVersion14(options) {
         for (const profile of options.profiles) {
             profile.options.accessibility = {
-                forceGoogleDocsHtmlRendering: false
+                forceGoogleDocsHtmlRendering: false,
             };
         }
     }
@@ -999,7 +1024,7 @@ export class OptionsUtil {
                     character1: character,
                     character2: null,
                     includeCharacterAtStart: false,
-                    includeCharacterAtEnd: true
+                    includeCharacterAtEnd: true,
                 });
             }
         }
@@ -1092,10 +1117,10 @@ export class OptionsUtil {
             }
         }
 
-        if (customTemplates && isObject(chrome.storage)) {
-            chrome.storage.session.set({needsCustomTemplatesWarning: true});
+        if (customTemplates && isObjectNotArray(chrome.storage)) {
+            void chrome.storage.session.set({needsCustomTemplatesWarning: true});
             await this._createTab(chrome.runtime.getURL('/welcome.html'));
-            chrome.storage.session.set({openedWelcomePage: true});
+            void chrome.storage.session.set({openedWelcomePage: true});
         }
     }
 
@@ -1115,8 +1140,10 @@ export class OptionsUtil {
      */
     _updateVersion23(options) {
         for (const {options: profileOptions} of options.profiles) {
-            for (const dictionary of profileOptions.dictionaries) {
-                dictionary.partsOfSpeechFilter = true;
+            if (Array.isArray(profileOptions.dictionaries)) {
+                for (const dictionary of profileOptions.dictionaries) {
+                    dictionary.partsOfSpeechFilter = true;
+                }
             }
         }
     }
@@ -1129,9 +1156,171 @@ export class OptionsUtil {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v24.handlebars');
 
         for (const {options: profileOptions} of options.profiles) {
-            for (const dictionary of profileOptions.dictionaries) {
-                dictionary.useDeinflections = true;
+            if (Array.isArray(profileOptions.dictionaries)) {
+                for (const dictionary of profileOptions.dictionaries) {
+                    dictionary.useDeinflections = true;
+                }
             }
+        }
+    }
+
+    /**
+     * - Change 'viewNote' action to 'viewNotes'.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion25(options) {
+        for (const profile of options.profiles) {
+            if ('inputs' in profile.options && 'hotkeys' in profile.options.inputs) {
+                for (const hotkey of profile.options.inputs.hotkeys) {
+                    if (hotkey.action === 'viewNote') {
+                        hotkey.action = 'viewNotes';
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * - Added general.language.
+     * - Modularized text preprocessors.
+     * @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion26(options) {
+        const textPreprocessors = [
+            'convertHalfWidthCharacters',
+            'convertNumericCharacters',
+            'convertAlphabeticCharacters',
+            'convertHiraganaToKatakana',
+            'convertKatakanaToHiragana',
+            'collapseEmphaticSequences',
+        ];
+
+        for (const {options: profileOptions} of options.profiles) {
+            profileOptions.general.language = 'ja';
+
+            for (const preprocessor of textPreprocessors) {
+                delete profileOptions.translation[preprocessor];
+            }
+        }
+    }
+
+    /**
+     * - Updated handlebars.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion27(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v27.handlebars');
+    }
+
+    /**
+     *  - Removed whitespace in URL handlebars template.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion28(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v28.handlebars');
+    }
+
+    /**
+     *  - Added new handlebar for different pitch accent graph style.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion29(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v29.handlebars');
+    }
+
+    /**
+     *  - Added scanning.inputs[].options.scanOnTouchTap.
+     *  - Set touch settings to be more sensible.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion30(options) {
+        for (const profile of options.profiles) {
+            for (const input of profile.options.scanning.inputs) {
+                input.options.scanOnTouchTap = true;
+                input.options.scanOnTouchPress = false;
+                input.options.scanOnTouchRelease = false;
+            }
+        }
+    }
+
+    /**
+     *  - Added anki.duplicateBehavior
+     *  @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion31(options) {
+        for (const {options: profileOptions} of options.profiles) {
+            profileOptions.anki.duplicateBehavior = 'new';
+        }
+    }
+
+    /**
+     *  - Added profilePrevious and profileNext to hotkeys.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion32(options) {
+        for (const profile of options.profiles) {
+            profile.options.inputs.hotkeys.push(
+                {action: 'profilePrevious', key: 'Minus', modifiers: ['alt'], scopes: ['popup', 'search'], enabled: true},
+                {action: 'profileNext', key: 'Equal', modifiers: ['alt'], scopes: ['popup', 'search'], enabled: true},
+            );
+        }
+    }
+
+    /**
+     * - Updated handlebars to fix escaping when using `definition.cloze` or text-based `getMedia`.
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion33(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v33.handlebars');
+    }
+
+    /**
+     *  - Added dynamic handlebars for single dictionaries.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion34(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v34.handlebars');
+    }
+
+    /**
+     *  - Added dynamic handlebars for first dictionary entry only.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion35(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v35.handlebars');
+    }
+
+    /**
+     *  - Added handlebars for onyomi reading in hiragana.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion36(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v36.handlebars');
+    }
+
+    /**
+     *  - Removed `No pitch accent data` return from pitch handlebars when no data is found
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion37(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v37.handlebars');
+    }
+
+    /**
+     *  - Updated `conjugation` handlebars for new inflection chain format.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion38(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v38.handlebars');
+    }
+
+    /**
+     *  - Add new setting enableContextMenuScanSelected
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion39(options) {
+        for (const profile of options.profiles) {
+            profile.options.general.enableContextMenuScanSelected = true;
         }
     }
 
@@ -1152,3 +1341,6 @@ export class OptionsUtil {
         });
     }
 }
+
+/* eslint-enable @typescript-eslint/no-unsafe-assignment */
+/* eslint-enable @typescript-eslint/no-unsafe-argument */

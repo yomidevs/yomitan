@@ -45,7 +45,7 @@ export type ProgressData = {
 };
 
 export type ImportResult = {
-    result: Summary;
+    result: Summary | null;
     errors: Error[];
 };
 
@@ -65,6 +65,8 @@ export type Summary = {
     url?: string;
     description?: string;
     attribution?: string;
+    sourceLanguage?: string;
+    targetLanguage?: string;
     frequencyMode?: 'occurrence-based' | 'rank-based';
 };
 

@@ -17,7 +17,7 @@
  */
 
 import {ExtensionError} from '../../core/extension-error.js';
-import {log} from '../../core/logger.js';
+import {log} from '../../core/log.js';
 import {toError} from '../../core/to-error.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -43,9 +43,17 @@ export class DictionaryImportController {
         /** @type {HTMLButtonElement} */
         this._purgeConfirmButton = querySelectorNotNull(document, '#dictionary-confirm-delete-all-button');
         /** @type {HTMLButtonElement} */
-        this._importFileButton = querySelectorNotNull(document, '#dictionary-import-file-button');
-        /** @type {HTMLInputElement} */
         this._importFileInput = querySelectorNotNull(document, '#dictionary-import-file-input');
+        /** @type {HTMLButtonElement} */
+        this._importFileDrop = querySelectorNotNull(document, '#dictionary-drop-file-zone');
+        /** @type {number} */
+        this._importFileDropItemCount = 0;
+        /** @type {HTMLInputElement} */
+        this._importButton = querySelectorNotNull(document, '#dictionary-import-button');
+        /** @type {HTMLInputElement} */
+        this._importURLButton = querySelectorNotNull(document, '#dictionary-import-url-button');
+        /** @type {HTMLInputElement} */
+        this._importURLText = querySelectorNotNull(document, '#dictionary-import-url-text');
         /** @type {?import('./modal.js').Modal} */
         this._purgeConfirmModal = null;
         /** @type {HTMLElement} */
@@ -54,30 +62,161 @@ export class DictionaryImportController {
         this._errorToStringOverrides = [
             [
                 'A mutation operation was attempted on a database that did not allow mutations.',
-                'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.'
+                'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.',
             ],
             [
                 'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
-                'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.'
-            ]
+                'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.',
+            ],
         ];
     }
 
     /** */
-    async prepare() {
+    prepare() {
+        this._importModal = this._modalController.getModal('dictionary-import');
         this._purgeConfirmModal = this._modalController.getModal('dictionary-confirm-delete-all');
 
         this._purgeButton.addEventListener('click', this._onPurgeButtonClick.bind(this), false);
         this._purgeConfirmButton.addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
-        this._importFileButton.addEventListener('click', this._onImportButtonClick.bind(this), false);
+        this._importButton.addEventListener('click', this._onImportButtonClick.bind(this), false);
+        this._importURLButton.addEventListener('click', this._onImportFromURL.bind(this), false);
         this._importFileInput.addEventListener('change', this._onImportFileChange.bind(this), false);
+
+        this._importFileDrop.addEventListener('click', this._onImportFileButtonClick.bind(this), false);
+        this._importFileDrop.addEventListener('dragenter', this._onFileDropEnter.bind(this), false);
+        this._importFileDrop.addEventListener('dragover', this._onFileDropOver.bind(this), false);
+        this._importFileDrop.addEventListener('dragleave', this._onFileDropLeave.bind(this), false);
+        this._importFileDrop.addEventListener('drop', this._onFileDrop.bind(this), false);
     }
 
     // Private
 
     /** */
-    _onImportButtonClick() {
+    _onImportFileButtonClick() {
         /** @type {HTMLInputElement} */ (this._importFileInput).click();
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    _onFileDropEnter(e) {
+        e.preventDefault();
+        if (!e.dataTransfer) { return; }
+        for (const item of e.dataTransfer.items) {
+            // Directories and files with no extension both show as ''
+            if (item.type === '' || item.type === 'application/zip') {
+                this._importFileDrop.classList.add('drag-over');
+                break;
+            }
+        }
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    _onFileDropOver(e) {
+        e.preventDefault();
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    _onFileDropLeave(e) {
+        e.preventDefault();
+        this._importFileDrop.classList.remove('drag-over');
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    async _onFileDrop(e) {
+        e.preventDefault();
+        this._importFileDrop.classList.remove('drag-over');
+        if (e.dataTransfer === null) { return; }
+        /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(false);
+        /** @type {File[]} */
+        const fileArray = [];
+        for (const fileEntry of await this._getAllFileEntries(e.dataTransfer.items)) {
+            if (!fileEntry) { return; }
+            try {
+                fileArray.push(await new Promise((resolve, reject) => { fileEntry.file(resolve, reject); }));
+            } catch (error) {
+                log.error(error);
+            }
+        }
+        void this._importDictionaries(fileArray);
+    }
+
+    /**
+     * @param {DataTransferItemList} dataTransferItemList
+     * @returns {Promise<FileSystemFileEntry[]>}
+     */
+    async _getAllFileEntries(dataTransferItemList) {
+        /** @type {(FileSystemFileEntry)[]} */
+        const fileEntries = [];
+        /** @type {(FileSystemEntry | null)[]} */
+        const entries = [];
+        for (let i = 0; i < dataTransferItemList.length; i++) {
+            entries.push(dataTransferItemList[i].webkitGetAsEntry());
+        }
+        this._importFileDropItemCount = entries.length - 1;
+        while (entries.length > 0) {
+            this._importFileDropItemCount += 1;
+            this._validateDirectoryItemCount();
+
+            /** @type {(FileSystemEntry | null) | undefined} */
+            const entry = entries.shift();
+            if (!entry) { continue; }
+            if (entry.isFile) {
+                if (entry.name.substring(entry.name.lastIndexOf('.'), entry.name.length) === '.zip') {
+                    // @ts-expect-error - ts does not recognize `if (entry.isFile)` as verifying `entry` is type `FileSystemFileEntry` and instanceof does not work
+                    fileEntries.push(entry);
+                }
+            } else if (entry.isDirectory) {
+                // @ts-expect-error - ts does not recognize `if (entry.isDirectory)` as verifying `entry` is type `FileSystemDirectoryEntry` and instanceof does not work
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                entries.push(...await this._readAllDirectoryEntries(entry.createReader()));
+            }
+        }
+        return fileEntries;
+    }
+
+    /**
+     * @param {FileSystemDirectoryReader} directoryReader
+     * @returns {Promise<(FileSystemEntry)[]>}
+     */
+    async _readAllDirectoryEntries(directoryReader) {
+        const entries = [];
+        /** @type {(FileSystemEntry)[]} */
+        let readEntries = await new Promise((resolve) => { directoryReader.readEntries(resolve); });
+        while (readEntries.length > 0) {
+            this._importFileDropItemCount += readEntries.length;
+            this._validateDirectoryItemCount();
+
+            entries.push(...readEntries);
+            readEntries = await new Promise((resolve) => { directoryReader.readEntries(resolve); });
+        }
+        return entries;
+    }
+
+    /**
+     * @throws
+     */
+    _validateDirectoryItemCount() {
+        if (this._importFileDropItemCount > 1000) {
+            this._importFileDropItemCount = 0;
+            const errorText = 'Directory upload item count too large';
+            this._showErrors([new Error(errorText)]);
+            throw new Error(errorText);
+        }
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    _onImportButtonClick(e) {
+        e.preventDefault();
+        /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(true);
     }
 
     /**
@@ -94,19 +233,40 @@ export class DictionaryImportController {
     _onPurgeConfirmButtonClick(e) {
         e.preventDefault();
         /** @type {import('./modal.js').Modal} */ (this._purgeConfirmModal).setVisible(false);
-        this._purgeDatabase();
+        void this._purgeDatabase();
     }
 
     /**
      * @param {Event} e
      */
-    _onImportFileChange(e) {
+    async _onImportFileChange(e) {
+        /** @type {import('./modal.js').Modal} */ (this._importModal).setVisible(false);
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const {files} = node;
         if (files === null) { return; }
         const files2 = [...files];
         node.value = '';
-        this._importDictionaries(files2);
+        void this._importDictionaries(files2);
+    }
+
+    /** */
+    async _onImportFromURL() {
+        const text = this._importURLText.value.trim();
+        if (!text) { return; }
+        const urls = text.split('\n');
+        const files = [];
+        for (const url of urls) {
+            try {
+                files.push(await fetch(url.trim())
+                    .then((res) => res.blob())
+                    .then((blob) => {
+                        return new File([blob], 'fileFromURL');
+                    }));
+            } catch (error) {
+                log.error(error);
+            }
+        }
+        void this._importDictionaries(files);
     }
 
     /** */
@@ -149,6 +309,8 @@ export class DictionaryImportController {
 
         const prevention = this._preventPageExit();
 
+        /** @type {Error[]} */
+        let errors = [];
         try {
             this._setModifying(true);
             this._hideErrors();
@@ -157,7 +319,7 @@ export class DictionaryImportController {
 
             const optionsFull = await this._settingsController.getOptionsFull();
             const importDetails = {
-                prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported
+                prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
             };
 
             let statusPrefix = '';
@@ -172,7 +334,7 @@ export class DictionaryImportController {
                     for (const label of infoLabels) { label.textContent = labelText; }
                 }
 
-                const percent = count > 0 ? (index / count * 100.0) : 0.0;
+                const percent = count > 0 ? (index / count * 100) : 0;
                 const cssString = `${percent}%`;
                 const statusString = `${Math.floor(percent).toFixed(0)}%`;
                 for (const progressBar of progressBars) { progressBar.style.width = cssString; }
@@ -193,15 +355,15 @@ export class DictionaryImportController {
                     stepIndex: -1,
                     stepCount: 6,
                     index: 0,
-                    count: 0
+                    count: 0,
                 });
                 if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
-
-                await this._importDictionary(files[i], importDetails, onProgress);
+                errors = [...errors, ...(await this._importDictionary(files[i], importDetails, onProgress) ?? [])];
             }
-        } catch (err) {
-            this._showErrors([toError(err)]);
+        } catch (error) {
+            errors.push(toError(error));
         } finally {
+            this._showErrors(errors);
             prevention.end();
             for (const progress of progressContainers) { progress.hidden = true; }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
@@ -231,17 +393,24 @@ export class DictionaryImportController {
      * @param {File} file
      * @param {import('dictionary-importer').ImportDetails} importDetails
      * @param {import('dictionary-worker').ImportProgressCallback} onProgress
+     * @returns {Promise<Error[] | undefined>}
      */
     async _importDictionary(file, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
         const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
-        this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
+        if (!result) {
+            return errors;
+        }
+
         const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
 
+        await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
+
         if (errors.length > 0) {
-            const allErrors = [...errors, ...errors2];
-            allErrors.push(new Error(`Dictionary may not have been imported properly: ${allErrors.length} error${allErrors.length === 1 ? '' : 's'} reported.`));
-            this._showErrors(allErrors);
+            errors.push(new Error(`Dictionary may not have been imported properly: ${errors.length} error${errors.length === 1 ? '' : 's'} reported.`));
+            this._showErrors([...errors, ...errors2]);
+        } else if (errors2.length > 0) {
+            this._showErrors(errors2);
         }
     }
 
@@ -251,13 +420,26 @@ export class DictionaryImportController {
      * @returns {Promise<Error[]>}
      */
     async _addDictionarySettings(sequenced, title) {
-        const optionsFull = await this._settingsController.getOptionsFull();
+        let optionsFull;
+        // Workaround Firefox bug sometimes causing getOptionsFull to fail
+        for (let i = 0, success = false; (i < 10) && (success === false); i++) {
+            try {
+                optionsFull = await this._settingsController.getOptionsFull();
+                success = true;
+            } catch (error) {
+                log.error(error);
+            }
+        }
+        if (!optionsFull) { return [new Error('Failed to automatically set dictionary settings. A page refresh and manual enabling of the dictionary may be required.')]; }
+
+        const profileIndex = this._settingsController.profileIndex;
         /** @type {import('settings-modifications').Modification[]} */
         const targets = [];
         const profileCount = optionsFull.profiles.length;
         for (let i = 0; i < profileCount; ++i) {
             const {options} = optionsFull.profiles[i];
-            const value = DictionaryController.createDefaultDictionarySettings(title, true);
+            const enabled = profileIndex === i;
+            const value = DictionaryController.createDefaultDictionarySettings(title, enabled);
             const path1 = `profiles[${i}].options.dictionaries`;
             targets.push({action: 'push', path: path1, items: [value]});
 
@@ -297,6 +479,7 @@ export class DictionaryImportController {
      * @param {Error[]} errors
      */
     _showErrors(errors) {
+        /** @type {Map<string, number>} */
         const uniqueErrors = new Map();
         for (const error of errors) {
             log.error(error);

@@ -1,0 +1,21 @@
+{{<<<<<<<}}
+{{#*inline "sentence-furigana"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
+            {{getMedia "textFurigana" definition.cloze.sentence escape=false}}
+        {{~else~}}
+            {{definition.cloze.sentence}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+{{=======}}
+{{#*inline "sentence-furigana"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
+            {{{getMedia "textFurigana" definition.cloze.sentence escape=false}}}
+        {{~else~}}
+            {{{definition.cloze.sentence}}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+{{>>>>>>>}}

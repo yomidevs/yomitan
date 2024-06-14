@@ -37,7 +37,7 @@ async function getDependencies(scriptPaths) {
         target: 'es2022',
         format: 'esm',
         write: false,
-        metafile: true
+        metafile: true,
     });
     const dependencies = Object.keys(v.metafile.inputs);
     const stringComparer = new Intl.Collator('en-US'); // Invariant locale
@@ -55,8 +55,8 @@ function removeLibraryDependencies(dependencies) {
 }
 
 /**
- * @param {{[key: string]: boolean}|undefined} env1
- * @param {{[key: string]: boolean}} env2
+ * @param {import('test/eslint-config').MinimalEslintConfigEnv|undefined} env1
+ * @param {import('test/eslint-config').MinimalEslintConfigEnv} env2
  * @returns {boolean}
  */
 function envMatches(env1, env2) {
@@ -90,40 +90,40 @@ const targets = [
     {
         name: 'sandbox',
         paths: [
-            'ext/js/templates/sandbox/template-renderer-frame-main.js'
+            'ext/js/templates/template-renderer-frame-main.js',
         ],
-        /** @type {{[key: string]: boolean}} */
+        /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
-            webextensions: false
-        }
+            webextensions: false,
+        },
     },
     {
         name: 'worker',
         paths: [
-            'ext/js/dictionary/dictionary-worker-main.js'
+            'ext/js/dictionary/dictionary-worker-main.js',
         ],
-        /** @type {{[key: string]: boolean}} */
+        /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
             browser: false,
-            worker: true
-        }
+            worker: true,
+        },
     },
     {
         name: 'serviceworker',
         paths: [
-            'ext/js/background/background-main.js'
+            'ext/js/background/background-main.js',
         ],
-        /** @type {{[key: string]: boolean}} */
+        /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
             browser: false,
-            serviceworker: true
-        }
-    }
+            serviceworker: true,
+        },
+    },
 ];
 
 describe('Eslint configuration', () => {
     const eslintConfigPath = '.eslintrc.json';
-    /** @type {import('core').SafeAny} */
+    /** @type {import('test/eslint-config').MinimalEslintConfig} */
     const eslintConfig = parseJson(readFileSync(join(rootDir, eslintConfigPath), 'utf8'));
     describe.each(targets)('Environment is $name', ({name, paths, env}) => {
         test('Entry exists', async ({expect}) => {

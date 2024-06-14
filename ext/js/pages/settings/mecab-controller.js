@@ -46,7 +46,7 @@ export class MecabController {
      */
     _onTestButtonClick(e) {
         e.preventDefault();
-        this._testMecab();
+        void this._testMecab();
     }
 
     /** */

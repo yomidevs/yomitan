@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {readCodePointsBackward, readCodePointsForward} from '../data/sandbox/string-util.js';
+import {readCodePointsBackward, readCodePointsForward} from '../data/string-util.js';
 
 /**
  * A class used to scan text in a document.
@@ -421,6 +421,8 @@ export class DOMTextScanner {
             case 'SCRIPT':
             case 'STYLE':
                 return {enterable: false, newlines: 0};
+            case 'RB':
+                return {enterable: true, newlines: 0};
             case 'BR':
                 return {enterable: false, newlines: 1};
             case 'TEXTAREA':
@@ -488,8 +490,8 @@ export class DOMTextScanner {
     static isStyleVisible(style) {
         return !(
             style.visibility === 'hidden' ||
-            parseFloat(style.opacity) <= 0 ||
-            parseFloat(style.fontSize) <= 0 ||
+            Number.parseFloat(style.opacity) <= 0 ||
+            Number.parseFloat(style.fontSize) <= 0 ||
             (
                 !DOMTextScanner.isStyleSelectable(style) &&
                 (
@@ -551,10 +553,10 @@ export class DOMTextScanner {
             case 'block':
             case 'flex':
             case 'grid':
-            case 'list': // list-item
-            case 'table': // table, table-*
+            case 'list': // Also includes: list-item
+            case 'table': // Also includes: table, table-*
                 return true;
-            case 'ruby': // ruby-*
+            case 'ruby': // Also includes: ruby-*
                 return (pos >= 0);
             default:
                 return false;

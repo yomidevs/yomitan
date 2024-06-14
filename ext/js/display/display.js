@@ -23,7 +23,7 @@ import {DynamicProperty} from '../core/dynamic-property.js';
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
 import {PopupMenu} from '../dom/popup-menu.js';
@@ -46,20 +46,14 @@ import {QueryParser} from './query-parser.js';
 export class Display extends EventDispatcher {
     /**
      * @param {import('../application.js').Application} application
-     * @param {number|undefined} tabId
-     * @param {number|undefined} frameId
      * @param {import('display').DisplayPageType} pageType
      * @param {import('../dom/document-focus-controller.js').DocumentFocusController} documentFocusController
      * @param {import('../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
-    constructor(application, tabId, frameId, pageType, documentFocusController, hotkeyHandler) {
+    constructor(application, pageType, documentFocusController, hotkeyHandler) {
         super();
         /** @type {import('../application.js').Application} */
         this._application = application;
-        /** @type {number|undefined} */
-        this._tabId = tabId;
-        /** @type {number|undefined} */
-        this._frameId = frameId;
         /** @type {import('display').DisplayPageType} */
         this._pageType = pageType;
         /** @type {import('../dom/document-focus-controller.js').DocumentFocusController} */
@@ -89,16 +83,13 @@ export class Display extends EventDispatcher {
         /** @type {HotkeyHelpController} */
         this._hotkeyHelpController = new HotkeyHelpController();
         /** @type {DisplayGenerator} */
-        this._displayGenerator = new DisplayGenerator({
-            contentManager: this._contentManager,
-            hotkeyHelpController: this._hotkeyHelpController
-        });
+        this._displayGenerator = new DisplayGenerator(this._contentManager, this._hotkeyHelpController);
         /** @type {import('display').DirectApiMap} */
         this._directApiMap = new Map();
         /** @type {import('api-map').ApiMap<import('display').WindowApiSurface>} */ // import('display').WindowApiMap
         this._windowApiMap = new Map();
         /** @type {DisplayHistory} */
-        this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
+        this._history = new DisplayHistory(true, false);
         /** @type {boolean} */
         this._historyChangeIgnore = false;
         /** @type {boolean} */
@@ -132,11 +123,7 @@ export class Display extends EventDispatcher {
         /** @type {TextSourceGenerator} */
         this._textSourceGenerator = new TextSourceGenerator();
         /** @type {QueryParser} */
-        this._queryParser = new QueryParser({
-            api: application.api,
-            getSearchContext: this._getSearchContext.bind(this),
-            textSourceGenerator: this._textSourceGenerator
-        });
+        this._queryParser = new QueryParser(application.api, this._textSourceGenerator, this._getSearchContext.bind(this));
         /** @type {HTMLElement} */
         this._contentScrollElement = querySelectorNotNull(document, '#content-scroll');
         /** @type {HTMLElement} */
@@ -159,10 +146,10 @@ export class Display extends EventDispatcher {
         this._parentPopupId = null;
         /** @type {?number} */
         this._parentFrameId = null;
-        /** @type {number|undefined} */
-        this._contentOriginTabId = tabId;
-        /** @type {number|undefined} */
-        this._contentOriginFrameId = frameId;
+        /** @type {?number} */
+        this._contentOriginTabId = application.tabId;
+        /** @type {?number} */
+        this._contentOriginFrameId = application.frameId;
         /** @type {boolean} */
         this._childrenSupported = true;
         /** @type {?FrameEndpoint} */
@@ -175,6 +162,8 @@ export class Display extends EventDispatcher {
         this._contentTextScanner = null;
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._tagNotification = null;
+        /** @type {?import('./display-notification.js').DisplayNotification} */
+        this._inflectionNotification = null;
         /** @type {HTMLElement} */
         this._footerNotificationContainer = querySelectorNotNull(document, '#content-footer');
         /** @type {OptionToggleHotkeyHandler} */
@@ -194,6 +183,8 @@ export class Display extends EventDispatcher {
         /** @type {(event: MouseEvent) => void} */
         this._onTagClickBind = this._onTagClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
+        this._onInflectionClickBind = this._onInflectionClick.bind(this);
+        /** @type {(event: MouseEvent) => void} */
         this._onMenuButtonClickBind = this._onMenuButtonClick.bind(this);
         /** @type {(event: import('popup-menu').MenuCloseEvent) => void} */
         this._onMenuButtonMenuCloseBind = this._onMenuButtonMenuClose.bind(this);
@@ -209,9 +200,11 @@ export class Display extends EventDispatcher {
             ['firstEntry',        () => { this._focusEntry(0, 0, true); }],
             ['historyBackward',   () => { this._sourceTermView(); }],
             ['historyForward',    () => { this._nextTermView(); }],
+            ['profilePrevious',   async () => { await this._setProfile(-1); }],
+            ['profileNext',       async () => { await this._setProfile(1); }],
             ['copyHostSelection', () => this._copyHostSelection()],
             ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
-            ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
+            ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }],
         ]);
         this.registerDirectMessageHandlers([
             ['displaySetOptionsContext', this._onMessageSetOptionsContext.bind(this)],
@@ -219,10 +212,10 @@ export class Display extends EventDispatcher {
             ['displaySetCustomCss',      this._onMessageSetCustomCss.bind(this)],
             ['displaySetContentScale',   this._onMessageSetContentScale.bind(this)],
             ['displayConfigure',         this._onMessageConfigure.bind(this)],
-            ['displayVisibilityChanged', this._onMessageVisibilityChanged.bind(this)]
+            ['displayVisibilityChanged', this._onMessageVisibilityChanged.bind(this)],
         ]);
         this.registerWindowMessageHandlers([
-            ['displayExtensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
+            ['displayExtensionUnloaded', this._onMessageExtensionUnloaded.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -324,7 +317,7 @@ export class Display extends EventDispatcher {
 
         // Prepare
         await this._hotkeyHelpController.prepare(this._application.api);
-        await this._displayGenerator.prepare(this._application.api);
+        await this._displayGenerator.prepare();
         this._queryParser.prepare();
         this._history.prepare();
         this._optionToggleHotkeyHandler.prepare();
@@ -336,7 +329,7 @@ export class Display extends EventDispatcher {
         this._application.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         this._application.crossFrame.registerHandlers([
             ['displayPopupMessage1', this._onDisplayPopupMessage1.bind(this)],
-            ['displayPopupMessage2', this._onDisplayPopupMessage2.bind(this)]
+            ['displayPopupMessage2', this._onDisplayPopupMessage2.bind(this)],
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
 
@@ -364,13 +357,13 @@ export class Display extends EventDispatcher {
     getContentOrigin() {
         return {
             tabId: this._contentOriginTabId,
-            frameId: this._contentOriginFrameId
+            frameId: this._contentOriginFrameId,
         };
     }
 
     /** */
     initializeState() {
-        this._onStateChanged();
+        void this._onStateChanged();
         if (this._frameEndpoint !== null) {
             this._frameEndpoint.signal();
         }
@@ -429,6 +422,7 @@ export class Display extends EventDispatcher {
         this._setTheme(options);
         this._hotkeyHelpController.setOptions(options);
         this._displayGenerator.updateHotkeys();
+        this._displayGenerator.updateLanguage(options.general.language);
         this._hotkeyHelpController.setupNode(document.documentElement);
         this._elementOverflowController.setOptions(options);
 
@@ -438,6 +432,7 @@ export class Display extends EventDispatcher {
             readingMode: options.parsing.readingMode,
             useInternalParser: options.parsing.enableScanningParser,
             useMecabParser: options.parsing.enableMecabParser,
+            language: options.general.language,
             scanning: {
                 inputs: scanningOptions.inputs,
                 deepContentScan: scanningOptions.deepDomScan,
@@ -450,11 +445,11 @@ export class Display extends EventDispatcher {
                 layoutAwareScan: scanningOptions.layoutAwareScan,
                 preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery,
                 matchTypePrefix: false,
-                sentenceParsingOptions
-            }
+                sentenceParsingOptions,
+            },
         });
 
-        this._updateNestedFrontend(options);
+        void this._updateNestedFrontend(options);
         this._updateContentTextScanner(options);
 
         this.trigger('optionsUpdated', {options});
@@ -529,10 +524,10 @@ export class Display extends EventDispatcher {
     close() {
         switch (this._pageType) {
             case 'popup':
-                this.invokeContentOrigin('frontendClosePopup', void 0);
+                void this.invokeContentOrigin('frontendClosePopup', void 0);
                 break;
             case 'search':
-                this._closeTab();
+                void this._closeTab();
                 break;
         }
     }
@@ -562,7 +557,7 @@ export class Display extends EventDispatcher {
                 optionsContext: void 0,
                 url: window.location.href,
                 sentence: {text: query, offset: 0},
-                documentTitle: document.title
+                documentTitle: document.title,
             }
         );
         if (!hasState || updateOptionsContext) {
@@ -575,8 +570,8 @@ export class Display extends EventDispatcher {
             params: this._createSearchParams(type, query, false, this._queryOffset),
             state: newState,
             content: {
-                contentOrigin: this.getContentOrigin()
-            }
+                contentOrigin: this.getContentOrigin(),
+            },
         };
         this.setContent(details);
     }
@@ -588,10 +583,10 @@ export class Display extends EventDispatcher {
      * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     async invokeContentOrigin(action, params) {
-        if (this._contentOriginTabId === this._tabId && this._contentOriginFrameId === this._frameId) {
+        if (this._contentOriginTabId === this._application.tabId && this._contentOriginFrameId === this._application.frameId) {
             throw new Error('Content origin is same page');
         }
-        if (typeof this._contentOriginTabId !== 'number' || typeof this._contentOriginFrameId !== 'number') {
+        if (this._contentOriginTabId === null || this._contentOriginFrameId === null) {
             throw new Error('No content origin is assigned');
         }
         return await this._application.crossFrame.invokeTab(this._contentOriginTabId, this._contentOriginFrameId, action, params);
@@ -604,7 +599,8 @@ export class Display extends EventDispatcher {
      * @returns {Promise<import('cross-frame-api').ApiReturn<TName>>}
      */
     async invokeParentFrame(action, params) {
-        if (this._parentFrameId === null || this._parentFrameId === this._frameId) {
+        const {frameId} = this._application;
+        if (frameId === null || this._parentFrameId === null || this._parentFrameId === frameId) {
             throw new Error('Invalid parent frame');
         }
         return await this._application.crossFrame.invoke(this._parentFrameId, action, params);
@@ -619,7 +615,7 @@ export class Display extends EventDispatcher {
         if (node === null) { return -1; }
         const {index} = node.dataset;
         if (typeof index !== 'string') { return -1; }
-        const indexNumber = parseInt(index, 10);
+        const indexNumber = Number.parseInt(index, 10);
         return Number.isFinite(indexNumber) ? indexNumber : -1;
     }
 
@@ -664,7 +660,7 @@ export class Display extends EventDispatcher {
                 },
                 () => {
                     reject(new Error(`Invalid action: ${action}`));
-                }
+                },
             );
         });
     }
@@ -818,12 +814,12 @@ export class Display extends EventDispatcher {
             state: {
                 sentence,
                 optionsContext,
-                cause: 'queryParser'
+                cause: 'queryParser',
             },
             content: {
                 dictionaryEntries,
-                contentOrigin: this.getContentOrigin()
-            }
+                contentOrigin: this.getContentOrigin(),
+            },
         };
         this.setContent(details);
     }
@@ -832,6 +828,7 @@ export class Display extends EventDispatcher {
     _onExtensionUnloaded() {
         const type = 'unloaded';
         if (this._contentType === type) { return; }
+        const {tabId, frameId} = this._application;
         /** @type {import('display').ContentDetails} */
         const details = {
             focus: false,
@@ -839,11 +836,8 @@ export class Display extends EventDispatcher {
             params: {type},
             state: {},
             content: {
-                contentOrigin: {
-                    tabId: this._tabId,
-                    frameId: this._frameId
-                }
-            }
+                contentOrigin: {tabId, frameId},
+            },
         };
         this.setContent(details);
     }
@@ -921,12 +915,12 @@ export class Display extends EventDispatcher {
                     optionsContext,
                     url,
                     sentence,
-                    documentTitle
+                    documentTitle,
                 },
                 content: {
                     dictionaryEntries,
-                    contentOrigin: this.getContentOrigin()
-                }
+                    contentOrigin: this.getContentOrigin(),
+                },
             };
             this.setContent(details);
         } catch (error) {
@@ -971,7 +965,7 @@ export class Display extends EventDispatcher {
     _onDebugLogClick(e) {
         const link = /** @type {HTMLElement} */ (e.currentTarget);
         const index = this.getElementDictionaryEntryIndex(link);
-        this._logDictionaryEntryData(index);
+        void this._logDictionaryEntryData(index);
     }
 
     /**
@@ -1020,7 +1014,7 @@ export class Display extends EventDispatcher {
         const node = /** @type {HTMLElement} */ (e.currentTarget);
         const {index} = node.dataset;
         if (typeof index !== 'string') { return; }
-        const indexNumber = parseInt(index, 10);
+        const indexNumber = Number.parseInt(index, 10);
         if (!Number.isFinite(indexNumber)) { return; }
         this._entrySetCurrent(indexNumber);
     }
@@ -1031,6 +1025,14 @@ export class Display extends EventDispatcher {
     _onTagClick(e) {
         const node = /** @type {HTMLElement} */ (e.currentTarget);
         this._showTagNotification(node);
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    _onInflectionClick(e) {
+        const node = /** @type {HTMLElement} */ (e.currentTarget);
+        this._showInflectionNotification(node);
     }
 
     /**
@@ -1071,7 +1073,7 @@ export class Display extends EventDispatcher {
         const {action} = e.detail;
         switch (action) {
             case 'log-debug-info':
-                this._logDictionaryEntryData(this.getElementDictionaryEntryIndex(node));
+                void this._logDictionaryEntryData(this.getElementDictionaryEntryIndex(node));
                 break;
         }
     }
@@ -1093,6 +1095,21 @@ export class Display extends EventDispatcher {
         const content = this._displayGenerator.createTagFooterNotificationDetails(parent, dictionaryEntry);
         this._tagNotification.setContent(content);
         this._tagNotification.open();
+    }
+
+    /**
+     * @param {HTMLSpanElement} inflectionNode
+     */
+    _showInflectionNotification(inflectionNode) {
+        const description = inflectionNode.title;
+        if (!description || !(inflectionNode instanceof HTMLSpanElement)) { return; }
+
+        if (this._inflectionNotification === null) {
+            this._inflectionNotification = this.createNotification(true);
+        }
+
+        this._inflectionNotification.setContent(description);
+        this._inflectionNotification.open();
     }
 
     /**
@@ -1146,8 +1163,7 @@ export class Display extends EventDispatcher {
      */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
         if (isKanji) {
-            const dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
-            return dictionaryEntries;
+            return await this._application.api.kanjiFind(source, optionsContext);
         } else {
             /** @type {import('api').FindTermsDetails} */
             const findDetails = {};
@@ -1223,7 +1239,7 @@ export class Display extends EventDispatcher {
         const {contentOrigin} = content;
         if (typeof contentOrigin === 'object' && contentOrigin !== null) {
             const {tabId, frameId} = contentOrigin;
-            if (typeof tabId === 'number' && typeof frameId === 'number') {
+            if (tabId !== null && frameId !== null) {
                 this._contentOriginTabId = tabId;
                 this._contentOriginFrameId = frameId;
                 contentOriginValid = true;
@@ -1353,7 +1369,7 @@ export class Display extends EventDispatcher {
         const visible = this._isQueryParserVisible();
         this._queryParserContainer.hidden = !visible || text.length === 0;
         if (visible && this._queryParser.text !== text) {
-            this._setQueryParserText(text);
+            void this._setQueryParserText(text);
         }
     }
 
@@ -1555,11 +1571,11 @@ export class Display extends EventDispatcher {
      * @returns {boolean}
      */
     _relativeTermView(next) {
-        if (next) {
-            return this._history.hasNext() && this._history.forward();
-        } else {
-            return this._history.hasPrevious() && this._history.back();
-        }
+        return (
+            next ?
+            this._history.hasNext() && this._history.forward() :
+            this._history.hasPrevious() && this._history.back()
+        );
     }
 
     /**
@@ -1674,12 +1690,12 @@ export class Display extends EventDispatcher {
      * @param {import('settings').ProfileOptions} options
      */
     async _updateNestedFrontend(options) {
-        if (typeof this._frameId !== 'number') { return; }
+        const {tabId, frameId} = this._application;
+        if (tabId === null || frameId === null) { return; }
 
         const isSearchPage = (this._pageType === 'search');
         const isEnabled = (
             this._childrenSupported &&
-            typeof this._tabId === 'number' &&
             (
                 (isSearchPage) ?
                 (options.scanning.enableOnSearchPage) :
@@ -1708,39 +1724,31 @@ export class Display extends EventDispatcher {
 
     /** */
     async _setupNestedFrontend() {
-        if (typeof this._frameId !== 'number') {
-            throw new Error('No frameId assigned');
-        }
-
         const useProxyPopup = this._parentFrameId !== null;
         const parentPopupId = this._parentPopupId;
         const parentFrameId = this._parentFrameId;
 
         const [{PopupFactory}, {Frontend}] = await Promise.all([
             import('../app/popup-factory.js'),
-            import('../app/frontend.js')
+            import('../app/frontend.js'),
         ]);
 
-        const popupFactory = new PopupFactory(this._application, this._frameId);
+        const popupFactory = new PopupFactory(this._application);
         popupFactory.prepare();
 
-        /** @type {import('frontend').ConstructorDetails} */
-        const setupNestedPopupsOptions = {
+        const frontend = new Frontend({
             application: this._application,
             useProxyPopup,
             parentPopupId,
             parentFrameId,
             depth: this._depth + 1,
-            tabId: this._tabId,
-            frameId: this._frameId,
             popupFactory,
             pageType: this._pageType,
             allowRootFramePopupProxy: true,
             childrenSupported: this._childrenSupported,
-            hotkeyHandler: this._hotkeyHandler
-        };
-
-        const frontend = new Frontend(setupNestedPopupsOptions);
+            hotkeyHandler: this._hotkeyHandler,
+            canUseWindowPopup: true,
+        });
         this._frontend = frontend;
         await frontend.prepare();
     }
@@ -1752,7 +1760,7 @@ export class Display extends EventDispatcher {
         if (typeof this._contentOriginFrameId !== 'number') { return false; }
         const selection = window.getSelection();
         if (selection !== null && selection.toString().length > 0) { return false; }
-        this._copyHostSelectionSafe();
+        void this._copyHostSelectionSafe();
         return true;
     }
 
@@ -1816,6 +1824,9 @@ export class Display extends EventDispatcher {
         for (const node of entry.querySelectorAll('.headword-kanji-link')) {
             eventListeners.addEventListener(node, 'click', this._onKanjiLookupBind);
         }
+        for (const node of entry.querySelectorAll('.inflection[data-reason]')) {
+            eventListeners.addEventListener(node, 'click', this._onInflectionClickBind);
+        }
         for (const node of entry.querySelectorAll('.tag-label')) {
             eventListeners.addEventListener(node, 'click', this._onTagClickBind);
         }
@@ -1846,7 +1857,7 @@ export class Display extends EventDispatcher {
                 searchKanji: false,
                 searchOnClick: true,
                 searchOnClickOnly: true,
-                textSourceGenerator: this._textSourceGenerator
+                textSourceGenerator: this._textSourceGenerator,
             });
             this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
             this._contentTextScanner.excludeSelector = '.scan-disable,.scan-disable *';
@@ -1857,6 +1868,7 @@ export class Display extends EventDispatcher {
         }
 
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
+        this._contentTextScanner.language = options.general.language;
         this._contentTextScanner.setOptions({
             inputs: [{
                 include: 'mouse0',
@@ -1865,6 +1877,7 @@ export class Display extends EventDispatcher {
                 options: {
                     searchTerms: true,
                     searchKanji: true,
+                    scanOnTouchTap: true,
                     scanOnTouchMove: false,
                     scanOnTouchPress: false,
                     scanOnTouchRelease: false,
@@ -1874,8 +1887,8 @@ export class Display extends EventDispatcher {
                     scanOnPenPress: false,
                     scanOnPenRelease: false,
                     preventTouchScrolling: false,
-                    preventPenScrolling: false
-                }
+                    preventPenScrolling: false,
+                },
             }],
             deepContentScan: scanningOptions.deepDomScan,
             normalizeCssZoom: scanningOptions.normalizeCssZoom,
@@ -1886,7 +1899,7 @@ export class Display extends EventDispatcher {
             scanLength: scanningOptions.length,
             layoutAwareScan: scanningOptions.layoutAwareScan,
             preventMiddleMouse: false,
-            sentenceParsingOptions
+            sentenceParsingOptions,
         });
 
         this._contentTextScanner.setEnabled(true);
@@ -1911,19 +1924,19 @@ export class Display extends EventDispatcher {
             params: {
                 type,
                 query,
-                wildcards: 'off'
+                wildcards: 'off',
             },
             state: {
                 focusEntry: 0,
                 optionsContext: optionsContext !== null ? optionsContext : void 0,
                 url,
                 sentence: sentence !== null ? sentence : void 0,
-                documentTitle
+                documentTitle,
             },
             content: {
                 dictionaryEntries: dictionaryEntries !== null ? dictionaryEntries : void 0,
-                contentOrigin: this.getContentOrigin()
-            }
+                contentOrigin: this.getContentOrigin(),
+            },
         };
         /** @type {TextScanner} */ (this._contentTextScanner).clearSelection();
         this.setContent(details);
@@ -1945,8 +1958,8 @@ export class Display extends EventDispatcher {
         return {
             optionsContext: this.getOptionsContext(),
             detail: {
-                documentTitle: document.title
-            }
+                documentTitle: document.title,
+            },
         };
     }
 
@@ -1957,20 +1970,28 @@ export class Display extends EventDispatcher {
         this._hotkeyHandler.setHotkeys(this._pageType, options.inputs.hotkeys);
     }
 
-    /** */
-    async _closeTab() {
-        const tab = await new Promise((resolve, reject) => {
+    /**
+     * @returns {Promise<?chrome.tabs.Tab>}
+     */
+    _getCurrentTab() {
+        return new Promise((resolve, reject) => {
             chrome.tabs.getCurrent((result) => {
                 const e = chrome.runtime.lastError;
                 if (e) {
                     reject(new Error(e.message));
                 } else {
-                    resolve(result);
+                    resolve(typeof result !== 'undefined' ? result : null);
                 }
             });
         });
-        const tabId = tab.id;
-        await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
+    }
+
+    /**
+     * @param {number} tabId
+     * @returns {Promise<void>}
+     */
+    _removeTab(tabId) {
+        return new Promise((resolve, reject) => {
             chrome.tabs.remove(tabId, () => {
                 const e = chrome.runtime.lastError;
                 if (e) {
@@ -1979,7 +2000,16 @@ export class Display extends EventDispatcher {
                     resolve();
                 }
             });
-        }));
+        });
+    }
+
+    /** */
+    async _closeTab() {
+        const tab = await this._getCurrentTab();
+        if (tab === null) { return; }
+        const tabId = tab.id;
+        if (typeof tabId === 'undefined') { return; }
+        await this._removeTab(tabId);
     }
 
     /** */
@@ -1997,6 +2027,26 @@ export class Display extends EventDispatcher {
         if (!Number.isFinite(count)) { count = 1; }
         count = Math.max(0, Math.floor(count));
         this._focusEntry(this._index + count * sign, 0, true);
+    }
+
+    /**
+     * @param {number} direction
+     */
+    async _setProfile(direction) {
+        const optionsFull = await this.application.api.optionsGetFull();
+
+        const profileCount = optionsFull.profiles.length;
+        const newProfile = (optionsFull.profileCurrent + direction + profileCount) % profileCount;
+
+        /** @type {import('settings-modifications').ScopedModificationSet} */
+        const modification = {
+            action: 'set',
+            path: 'profileCurrent',
+            value: newProfile,
+            scope: 'global',
+            optionsContext: null,
+        };
+        await this.application.api.modifySettings([modification], 'search');
     }
 
     /** */
@@ -2034,8 +2084,7 @@ export class Display extends EventDispatcher {
             }
         }
 
-        // eslint-disable-next-line no-console
-        console.log(result);
+        log.log(result);
     }
 
     /** */

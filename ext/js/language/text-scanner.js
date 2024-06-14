@@ -18,9 +18,9 @@
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
 import {clone} from '../core/utilities.js';
-import {DocumentUtil} from '../dom/document-util.js';
+import {anyNodeMatchesSelector, everyNodeMatchesSelector, getActiveModifiers, getActiveModifiersAndButtons, isPointInSelection} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 
 /**
@@ -40,7 +40,7 @@ export class TextScanner extends EventDispatcher {
         searchKanji = false,
         searchOnClick = false,
         searchOnClickOnly = false,
-        textSourceGenerator
+        textSourceGenerator,
     }) {
         super();
         /** @type {import('../comm/api.js').API} */
@@ -70,6 +70,8 @@ export class TextScanner extends EventDispatcher {
         this._includeSelector = null;
         /** @type {?string} */
         this._excludeSelector = null;
+        /** @type {?string} */
+        this._language = null;
 
         /** @type {?import('text-scanner').InputInfo} */
         this._inputInfoCurrent = null;
@@ -85,6 +87,9 @@ export class TextScanner extends EventDispatcher {
         this._pendingLookup = false;
         /** @type {?import('text-scanner').SelectionRestoreInfo} */
         this._selectionRestoreInfo = null;
+
+        /** @type {MouseEvent | null} */
+        this._lastMouseMove = null;
 
         /** @type {boolean} */
         this._deepContentScan = false;
@@ -135,6 +140,8 @@ export class TextScanner extends EventDispatcher {
         /** @type {() => void} */
         this._preventNextClickScanTimerCallback = this._onPreventNextClickScanTimeout.bind(this);
 
+        /** @type {boolean} */
+        this._touchTapValid = false;
         /** @type {?number} */
         this._primaryTouchIdentifier = null;
         /** @type {boolean} */
@@ -187,6 +194,10 @@ export class TextScanner extends EventDispatcher {
     set excludeSelector(value) {
         this._excludeSelector = value;
     }
+
+    /** @type {?string} */
+    get language() { return this._language; }
+    set language(value) { this._language = value; }
 
     /** */
     prepare() {
@@ -242,7 +253,7 @@ export class TextScanner extends EventDispatcher {
         layoutAwareScan,
         preventMiddleMouse,
         sentenceParsingOptions,
-        matchTypePrefix
+        matchTypePrefix,
     }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map((input) => this._convertInput(input));
@@ -353,6 +364,11 @@ export class TextScanner extends EventDispatcher {
         }
     }
 
+    /** */
+    clearMousePosition() {
+        this._lastMouseMove = null;
+    }
+
     /**
      * @returns {?import('text-source').TextSource}
      */
@@ -395,10 +411,11 @@ export class TextScanner extends EventDispatcher {
     /**
      * @param {import('text-source').TextSource} textSource
      * @param {import('text-scanner').InputInfoDetail} [inputDetail]
+     * @param {boolean} showEmpty
      */
-    async search(textSource, inputDetail) {
+    async search(textSource, inputDetail, showEmpty = false) {
         const inputInfo = this._createInputInfo(null, 'script', 'script', true, [], [], inputDetail);
-        await this._search(textSource, this._searchTerms, this._searchKanji, inputInfo);
+        await this._search(textSource, this._searchTerms, this._searchKanji, inputInfo, showEmpty);
     }
 
     // Private
@@ -421,8 +438,9 @@ export class TextScanner extends EventDispatcher {
      * @param {boolean} searchTerms
      * @param {boolean} searchKanji
      * @param {import('text-scanner').InputInfo} inputInfo
+     * @param {boolean} showEmpty shows a "No results found" popup if no results are found
      */
-    async _search(textSource, searchTerms, searchKanji, inputInfo) {
+    async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false) {
         try {
             const inputInfoDetail = inputInfo.detail;
             const selectionRestoreInfo = (
@@ -449,7 +467,8 @@ export class TextScanner extends EventDispatcher {
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
-            } else if (textSource !== null && textSource instanceof TextSourceElement && await this._hasJapanese(textSource.fullContent)) {
+            } else if (showEmpty || (textSource !== null && textSource instanceof TextSourceElement && await this._isTextLookupWorthy(textSource.fullContent))) {
+                // Shows a "No results found" message
                 dictionaryEntries = [];
                 sentence = {text: '', offset: 0};
             }
@@ -466,7 +485,7 @@ export class TextScanner extends EventDispatcher {
                     inputInfo,
                     textSource,
                     optionsContext,
-                    detail
+                    detail,
                 });
             } else {
                 this._triggerSearchEmpty(inputInfo);
@@ -475,7 +494,7 @@ export class TextScanner extends EventDispatcher {
             this.trigger('searchError', {
                 error: error instanceof Error ? error : new Error(`A search error occurred: ${error}`),
                 textSource,
-                inputInfo
+                inputInfo,
             });
         }
     }
@@ -538,11 +557,48 @@ export class TextScanner extends EventDispatcher {
      */
     _onMouseMove(e) {
         this._scanTimerClear();
+        this._lastMouseMove = e;
 
         const inputInfo = this._getMatchingInputGroupFromEvent('mouse', 'mouseMove', e);
         if (inputInfo === null) { return; }
 
-        this._searchAtFromMouseMove(e.clientX, e.clientY, inputInfo);
+        void this._searchAtFromMouseMove(e.clientX, e.clientY, inputInfo);
+    }
+
+    /**
+     * @param {KeyboardEvent} e
+     */
+    _onKeyDown(e) {
+        const modifiers = getActiveModifiers(e);
+        if (this._lastMouseMove !== null && (modifiers.length > 0)) {
+            if (this._inputtingText()) { return; }
+            const syntheticMouseEvent = new MouseEvent(this._lastMouseMove.type, {
+                screenX: this._lastMouseMove.screenX,
+                screenY: this._lastMouseMove.screenY,
+                clientX: this._lastMouseMove.clientX,
+                clientY: this._lastMouseMove.clientY,
+                ctrlKey: modifiers.includes('ctrl'),
+                shiftKey: modifiers.includes('shift'),
+                altKey: modifiers.includes('alt'),
+                metaKey: modifiers.includes('meta'),
+                button: this._lastMouseMove.button,
+                buttons: this._lastMouseMove.buttons,
+                relatedTarget: this._lastMouseMove.relatedTarget,
+            });
+            this._onMouseMove(syntheticMouseEvent);
+        }
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    _inputtingText() {
+        const activeElement = document.activeElement;
+        if (activeElement && activeElement instanceof HTMLElement) {
+            if (activeElement.nodeName === 'INPUT' || activeElement.nodeName === 'TEXTAREA') { return true; }
+            if (activeElement.isContentEditable) { return true; }
+        }
+        return false;
     }
 
     /**
@@ -609,10 +665,10 @@ export class TextScanner extends EventDispatcher {
 
         if (preventNextClickScan) { return; }
 
-        const modifiers = DocumentUtil.getActiveModifiersAndButtons(e);
-        const modifierKeys = DocumentUtil.getActiveModifiers(e);
+        const modifiers = getActiveModifiersAndButtons(e);
+        const modifierKeys = getActiveModifiers(e);
         const inputInfo = this._createInputInfo(null, 'mouse', 'click', false, modifiers, modifierKeys);
-        this._searchAt(e.clientX, e.clientY, inputInfo);
+        void this._searchAt(e.clientX, e.clientY, inputInfo);
     }
 
     /** */
@@ -656,9 +712,10 @@ export class TextScanner extends EventDispatcher {
         this._preventNextContextMenu = false;
         this._preventNextMouseDown = false;
         this._preventNextClick = false;
+        this._touchTapValid = true;
 
         const selection = window.getSelection();
-        if (selection !== null && DocumentUtil.isPointInSelection(x, y, selection)) {
+        if (selection !== null && isPointInSelection(x, y, selection)) {
             return;
         }
 
@@ -669,7 +726,7 @@ export class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchStart', e);
         if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchPress)) { return; }
 
-        this._searchAtFromTouchStart(x, y, inputInfo);
+        void this._searchAtFromTouchStart(x, y, inputInfo);
     }
 
     /**
@@ -701,9 +758,10 @@ export class TextScanner extends EventDispatcher {
         if (!allowSearch) { return; }
 
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchEnd', e);
-        if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchRelease)) { return; }
-
-        this._searchAtFromTouchEnd(x, y, inputInfo);
+        if (inputInfo === null || inputInfo.input === null) { return; }
+        if (inputInfo.input.scanOnTouchRelease || (inputInfo.input.scanOnTouchTap && this._touchTapValid)) {
+            void this._searchAtFromTouchEnd(x, y, inputInfo);
+        }
     }
 
     /**
@@ -722,6 +780,8 @@ export class TextScanner extends EventDispatcher {
      * @param {TouchEvent} e
      */
     _onTouchMove(e) {
+        this._touchTapValid = false;
+
         if (this._primaryTouchIdentifier === null) { return; }
 
         if (!e.cancelable) {
@@ -739,7 +799,7 @@ export class TextScanner extends EventDispatcher {
 
         const {input} = inputInfo;
         if (input !== null && input.scanOnTouchMove) {
-            this._searchAt(primaryTouch.clientX, primaryTouch.clientY, inputInfo);
+            void this._searchAt(primaryTouch.clientX, primaryTouch.clientY, inputInfo);
         }
 
         e.preventDefault(); // Disable scroll
@@ -899,7 +959,7 @@ export class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchMove', e);
         if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchMove)) { return; }
 
-        this._searchAt(e.clientX, e.clientY, inputInfo);
+        void this._searchAt(e.clientX, e.clientY, inputInfo);
     }
 
     /**
@@ -942,7 +1002,7 @@ export class TextScanner extends EventDispatcher {
      */
     _onPenPointerOver(e) {
         this._penPointerState = 1;
-        this._searchAtFromPen(e, 'pointerOver', false);
+        void this._searchAtFromPen(e, 'pointerOver', false);
     }
 
     /**
@@ -950,7 +1010,7 @@ export class TextScanner extends EventDispatcher {
      */
     _onPenPointerDown(e) {
         this._penPointerState = 2;
-        this._searchAtFromPen(e, 'pointerDown', true);
+        void this._searchAtFromPen(e, 'pointerDown', true);
     }
 
     /**
@@ -958,7 +1018,7 @@ export class TextScanner extends EventDispatcher {
      */
     _onPenPointerMove(e) {
         if (this._penPointerState === 2 && (!this._preventScroll || !e.cancelable)) { return; }
-        this._searchAtFromPen(e, 'pointerMove', true);
+        void this._searchAtFromPen(e, 'pointerMove', true);
     }
 
     /**
@@ -967,7 +1027,7 @@ export class TextScanner extends EventDispatcher {
     _onPenPointerUp(e) {
         this._penPointerState = 3;
         this._preventScroll = false;
-        this._searchAtFromPen(e, 'pointerUp', false);
+        void this._searchAtFromPen(e, 'pointerUp', false);
     }
 
     /** */
@@ -1038,7 +1098,7 @@ export class TextScanner extends EventDispatcher {
         } else if (this._arePointerEventsSupported()) {
             eventListenerInfos = this._getPointerEventListeners(capture);
         } else {
-            eventListenerInfos = this._getMouseEventListeners(capture);
+            eventListenerInfos = [...this._getMouseEventListeners(capture), ...this._getKeyboardEventListeners(capture)];
             if (this._touchInputEnabled) {
                 eventListenerInfos.push(...this._getTouchEventListeners(capture));
             }
@@ -1069,7 +1129,7 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'touchmove', this._onTouchMovePreventScroll.bind(this), {passive: false, capture}],
             [this._node, 'mousedown', this._onMouseDown.bind(this), capture],
             [this._node, 'click', this._onClick.bind(this), capture],
-            [this._node, 'auxclick', this._onAuxClick.bind(this), capture]
+            [this._node, 'auxclick', this._onAuxClick.bind(this), capture],
         ];
     }
 
@@ -1083,7 +1143,17 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'mousemove', this._onMouseMove.bind(this), capture],
             [this._node, 'mouseover', this._onMouseOver.bind(this), capture],
             [this._node, 'mouseout', this._onMouseOut.bind(this), capture],
-            [this._node, 'click', this._onClick.bind(this), capture]
+            [this._node, 'click', this._onClick.bind(this), capture],
+        ];
+    }
+
+    /**
+     * @param {boolean} capture
+     * @returns {import('event-listener-collection').AddEventListenerArgs[]}
+     */
+    _getKeyboardEventListeners(capture) {
+        return [
+            [this._node, 'keydown', this._onKeyDown.bind(this), capture],
         ];
     }
 
@@ -1098,7 +1168,7 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'touchend', this._onTouchEnd.bind(this), capture],
             [this._node, 'touchcancel', this._onTouchCancel.bind(this), capture],
             [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false, capture}],
-            [this._node, 'contextmenu', this._onContextMenu.bind(this), capture]
+            [this._node, 'contextmenu', this._onContextMenu.bind(this), capture],
         ];
     }
 
@@ -1108,7 +1178,7 @@ export class TextScanner extends EventDispatcher {
      */
     _getMouseClickOnlyEventListeners(capture) {
         return [
-            [this._node, 'click', this._onClick.bind(this), capture]
+            [this._node, 'click', this._onClick.bind(this), capture],
         ];
     }
 
@@ -1120,7 +1190,7 @@ export class TextScanner extends EventDispatcher {
         const {documentElement} = document;
         /** @type {import('event-listener-collection').AddEventListenerArgs[]} */
         const entries = [
-            [document, 'selectionchange', this._onSelectionChange.bind(this)]
+            [document, 'selectionchange', this._onSelectionChange.bind(this)],
         ];
         if (documentElement !== null) {
             entries.push([documentElement, 'mousedown', this._onSearchClickMouseDown.bind(this), capture]);
@@ -1204,7 +1274,7 @@ export class TextScanner extends EventDispatcher {
             sentenceTerminateAtNewlines,
             sentenceTerminatorMap,
             sentenceForwardQuoteMap,
-            sentenceBackwardQuoteMap
+            sentenceBackwardQuoteMap,
         );
 
         return {dictionaryEntries, sentence, type: 'terms'};
@@ -1236,7 +1306,7 @@ export class TextScanner extends EventDispatcher {
             sentenceTerminateAtNewlines,
             sentenceTerminatorMap,
             sentenceForwardQuoteMap,
-            sentenceBackwardQuoteMap
+            sentenceBackwardQuoteMap,
         );
 
         return {dictionaryEntries, sentence, type: 'kanji'};
@@ -1268,7 +1338,7 @@ export class TextScanner extends EventDispatcher {
 
             const textSource = this._textSourceGenerator.getRangeFromPoint(x, y, {
                 deepContentScan: this._deepContentScan,
-                normalizeCssZoom: this._normalizeCssZoom
+                normalizeCssZoom: this._normalizeCssZoom,
             });
             if (textSource !== null) {
                 try {
@@ -1294,11 +1364,9 @@ export class TextScanner extends EventDispatcher {
     async _searchAtFromMouseMove(x, y, inputInfo) {
         if (this._pendingLookup) { return; }
 
-        if (inputInfo.passive) {
-            if (!await this._scanTimerWait()) {
-                // Aborted
-                return;
-            }
+        if (inputInfo.passive && !await this._scanTimerWait()) {
+            // Aborted
+            return;
         }
 
         await this._searchAt(x, y, inputInfo);
@@ -1395,8 +1463,8 @@ export class TextScanner extends EventDispatcher {
      * @returns {?import('text-scanner').InputInfo}
      */
     _getMatchingInputGroupFromEvent(pointerType, eventType, event) {
-        const modifiers = DocumentUtil.getActiveModifiersAndButtons(event);
-        const modifierKeys = DocumentUtil.getActiveModifiers(event);
+        const modifiers = getActiveModifiersAndButtons(event);
+        const modifierKeys = getActiveModifiers(event);
         return this._getMatchingInputGroup(pointerType, eventType, modifiers, modifierKeys);
     }
 
@@ -1473,13 +1541,14 @@ export class TextScanner extends EventDispatcher {
             scanOnTouchMove: this._getInputBoolean(options.scanOnTouchMove),
             scanOnTouchPress: this._getInputBoolean(options.scanOnTouchPress),
             scanOnTouchRelease: this._getInputBoolean(options.scanOnTouchRelease),
+            scanOnTouchTap: this._getInputBoolean(options.scanOnTouchTap),
             scanOnPenMove: this._getInputBoolean(options.scanOnPenMove),
             scanOnPenHover: this._getInputBoolean(options.scanOnPenHover),
             scanOnPenReleaseHover: this._getInputBoolean(options.scanOnPenReleaseHover),
             scanOnPenPress: this._getInputBoolean(options.scanOnPenPress),
             scanOnPenRelease: this._getInputBoolean(options.scanOnPenRelease),
             preventTouchScrolling: this._getInputBoolean(options.preventTouchScrolling),
-            preventPenScrolling: this._getInputBoolean(options.preventPenScrolling)
+            preventPenScrolling: this._getInputBoolean(options.preventPenScrolling),
         };
     }
 
@@ -1536,8 +1605,8 @@ export class TextScanner extends EventDispatcher {
         while (length > 0) {
             const nodes = textSource.getNodesInRange();
             if (
-                (includeSelector !== null && !DocumentUtil.everyNodeMatchesSelector(nodes, includeSelector)) ||
-                (excludeSelector !== null && DocumentUtil.anyNodeMatchesSelector(nodes, excludeSelector))
+                (includeSelector !== null && !everyNodeMatchesSelector(nodes, includeSelector)) ||
+                (excludeSelector !== null && anyNodeMatchesSelector(nodes, excludeSelector))
             ) {
                 --length;
                 textSource.setEndOffset(length, false, layoutAwareScan);
@@ -1551,9 +1620,9 @@ export class TextScanner extends EventDispatcher {
      * @param {string} text
      * @returns {Promise<boolean>}
      */
-    async _hasJapanese(text) {
+    async _isTextLookupWorthy(text) {
         try {
-            return await this._api.textHasJapaneseCharacters(text);
+            return this._language !== null && text.length > 0 && await this._api.isTextLookupWorthy(text, this._language);
         } catch (e) {
             return false;
         }

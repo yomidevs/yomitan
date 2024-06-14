@@ -41,8 +41,8 @@ async function buildLib(scriptPath) {
         outfile: path.join(extDir, 'lib', path.basename(scriptPath)),
         external: ['fs'],
         banner: {
-            js: '// @ts-nocheck'
-        }
+            js: '// @ts-nocheck',
+        },
     });
 }
 
@@ -52,7 +52,7 @@ async function buildLib(scriptPath) {
 export async function buildLibs() {
     const devLibPath = path.join(dirname, 'lib');
     const files = await fs.promises.readdir(devLibPath, {
-        withFileTypes: true
+        withFileTypes: true,
     });
     for (const f of files) {
         if (f.isFile()) {
@@ -64,13 +64,14 @@ export async function buildLibs() {
     const schemaFileNames = fs.readdirSync(schemaDir);
     const schemas = schemaFileNames.map((schemaFileName) => {
         /** @type {import('ajv').AnySchema} */
+        // eslint-disable-next-line sonarjs/prefer-immediate-return
         const result = parseJson(fs.readFileSync(path.join(schemaDir, schemaFileName), {encoding: 'utf8'}));
         return result;
     });
     const ajv = new Ajv({
         schemas,
         code: {source: true, esm: true},
-        allowUnionTypes: true
+        allowUnionTypes: true,
     });
     const moduleCode = standaloneCode(ajv);
 

@@ -17,16 +17,18 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
-import {generateId, isObject} from '../core/utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
+import {generateId} from '../core/utilities.js';
 
 /**
  * @augments EventDispatcher<import('display-history').Events>
  */
 export class DisplayHistory extends EventDispatcher {
     /**
-     * @param {{clearable?: boolean, useBrowserHistory?: boolean}} details
+     * @param {boolean} clearable
+     * @param {boolean} useBrowserHistory
      */
-    constructor({clearable = true, useBrowserHistory = false}) {
+    constructor(clearable, useBrowserHistory) {
         super();
         /** @type {boolean} */
         this._clearable = clearable;
@@ -35,10 +37,17 @@ export class DisplayHistory extends EventDispatcher {
         /** @type {Map<string, import('display-history').Entry>} */
         this._historyMap = new Map();
 
+        /** @type {unknown} */
         const historyState = history.state;
-        const {id, state} = isObject(historyState) ? historyState : {id: null, state: null};
+        const {id, state} = (
+            isObjectNotArray(historyState) ?
+            historyState :
+            {id: null, state: null}
+        );
+        /** @type {?import('display-history').EntryState} */
+        const stateObject = isObjectNotArray(state) ? state : null;
         /** @type {import('display-history').Entry} */
-        this._current = this._createHistoryEntry(id, location.href, state, null, null);
+        this._current = this._createHistoryEntry(id, location.href, stateObject, null, null);
     }
 
     /** @type {?import('display-history').EntryState} */
@@ -180,9 +189,10 @@ export class DisplayHistory extends EventDispatcher {
 
     /** */
     _updateStateFromHistory() {
+        /** @type {unknown} */
         let state = history.state;
         let id = null;
-        if (isObject(state)) {
+        if (isObjectNotArray(state)) {
             id = state.id;
             if (typeof id === 'string') {
                 const entry = this._historyMap.get(id);
@@ -200,7 +210,7 @@ export class DisplayHistory extends EventDispatcher {
 
         // Fallback
         this._current.id = (typeof id === 'string' ? id : this._generateId());
-        this._current.state = state;
+        this._current.state = /** @type {import('display-history').EntryState} */ (state);
         this._current.content = null;
         this._clear();
     }
@@ -221,7 +231,7 @@ export class DisplayHistory extends EventDispatcher {
             next: null,
             previous,
             state,
-            content
+            content,
         };
         this._historyMap.set(entry.id, entry);
         return entry;

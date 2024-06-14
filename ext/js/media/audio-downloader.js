@@ -19,17 +19,17 @@
 import {RequestBuilder} from '../background/request-builder.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {readResponseJson} from '../core/json.js';
+import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {JsonSchema} from '../data/json-schema.js';
-import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
 import {SimpleDOMParser} from '../dom/simple-dom-parser.js';
 import {isStringEntirelyKana} from '../language/ja/japanese.js';
 
 export class AudioDownloader {
     /**
-     * @param {{requestBuilder: RequestBuilder}} details
+     * @param {RequestBuilder} requestBuilder
      */
-    constructor({requestBuilder}) {
+    constructor(requestBuilder) {
         /** @type {RequestBuilder} */
         this._requestBuilder = requestBuilder;
         /** @type {?JsonSchema} */
@@ -42,7 +42,7 @@ export class AudioDownloader {
             ['text-to-speech', this._getInfoTextToSpeech.bind(this)],
             ['text-to-speech-reading', this._getInfoTextToSpeechReading.bind(this)],
             ['custom', this._getInfoCustom.bind(this)],
-            ['custom-json', this._getInfoCustomJson.bind(this)]
+            ['custom-json', this._getInfoCustomJson.bind(this)],
         ]));
     }
 
@@ -134,7 +134,7 @@ export class AudioDownloader {
             post: 'dictionary_reference',
             match_type: 'exact',
             search_query: term,
-            vulgar: 'true'
+            vulgar: 'true',
         });
         const response = await this._requestBuilder.fetchAnonymous(fetchUrl, {
             method: 'POST',
@@ -144,9 +144,9 @@ export class AudioDownloader {
             redirect: 'follow',
             referrerPolicy: 'no-referrer',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: data
+            body: data,
         });
         const responseText = await response.text();
 
@@ -187,7 +187,7 @@ export class AudioDownloader {
             cache: 'default',
             credentials: 'omit',
             redirect: 'follow',
-            referrerPolicy: 'no-referrer'
+            referrerPolicy: 'no-referrer',
         });
         const responseText = await response.text();
 
@@ -265,7 +265,7 @@ export class AudioDownloader {
             cache: 'default',
             credentials: 'omit',
             redirect: 'follow',
-            referrerPolicy: 'no-referrer'
+            referrerPolicy: 'no-referrer',
         });
 
         if (!response.ok) {
@@ -304,7 +304,17 @@ export class AudioDownloader {
             throw new Error('No custom URL defined');
         }
         const data = {term, reading};
-        return url.replace(/\{([^}]*)\}/g, (m0, m1) => (Object.prototype.hasOwnProperty.call(data, m1) ? `${data[/** @type {'term'|'reading'} */ (m1)]}` : m0));
+        /**
+         * @param {string} m0
+         * @param {string} m1
+         * @returns {string}
+         */
+        const replacer = (m0, m1) => (
+            Object.prototype.hasOwnProperty.call(data, m1) ?
+            `${data[/** @type {'term'|'reading'} */ (m1)]}` :
+            m0
+        );
+        return url.replace(/\{([^}]*)\}/g, replacer);
     }
 
     /**
@@ -341,7 +351,7 @@ export class AudioDownloader {
             credentials: 'omit',
             redirect: 'follow',
             referrerPolicy: 'no-referrer',
-            signal
+            signal,
         });
 
         if (!response.ok) {
@@ -424,7 +434,7 @@ export class AudioDownloader {
             cache: 'default',
             credentials: 'omit',
             redirect: 'follow',
-            referrerPolicy: 'no-referrer'
+            referrerPolicy: 'no-referrer',
         });
         return await readResponseJson(response);
     }

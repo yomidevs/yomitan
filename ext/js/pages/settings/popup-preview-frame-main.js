@@ -21,22 +21,14 @@ import {Application} from '../../application.js';
 import {HotkeyHandler} from '../../input/hotkey-handler.js';
 import {PopupPreviewFrame} from './popup-preview-frame.js';
 
-await Application.main(async (application) => {
-    const {tabId, frameId} = await application.api.frameInformationGet();
-    if (typeof tabId === 'undefined') {
-        throw new Error('Failed to get tabId');
-    }
-    if (typeof frameId === 'undefined') {
-        throw new Error('Failed to get frameId');
-    }
-
+await Application.main(true, async (application) => {
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 
-    const popupFactory = new PopupFactory(application, frameId);
+    const popupFactory = new PopupFactory(application);
     popupFactory.prepare();
 
-    const preview = new PopupPreviewFrame(application, tabId, frameId, popupFactory, hotkeyHandler);
+    const preview = new PopupPreviewFrame(application, popupFactory, hotkeyHandler);
     await preview.prepare();
 
     document.documentElement.dataset.loaded = 'true';

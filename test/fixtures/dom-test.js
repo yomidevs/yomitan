@@ -28,7 +28,10 @@ function prepareWindow(window) {
 
     // Define innerText setter as an alias for textContent setter
     Object.defineProperty(window.HTMLDivElement.prototype, 'innerText', {
-        set(value) { this.textContent = value; }
+        /** @returns {string} */
+        get() { return this.textContent; },
+        /** @param {string} value */
+        set(value) { this.textContent = value; },
     });
 
     // Placeholder for feature detection
@@ -48,7 +51,7 @@ export async function setupDomTest(htmlFilePath) {
     prepareWindow(window);
     return {
         window,
-        teardown: (global) => environment.teardown(global)
+        teardown: (global) => environment.teardown(global),
     };
 }
 
@@ -68,8 +71,8 @@ export function createDomTest(htmlFilePath) {
             try {
                 await use(window);
             } finally {
-                environment.teardown(global);
+                await environment.teardown(global);
             }
-        }
+        },
     });
 }

@@ -43,14 +43,14 @@ async function setupEnvironmentInfo(api) {
  * @returns {Promise<boolean>}
  */
 async function isAllowedIncognitoAccess() {
-    return await new Promise((resolve) => chrome.extension.isAllowedIncognitoAccess(resolve));
+    return await new Promise((resolve) => { chrome.extension.isAllowedIncognitoAccess(resolve); });
 }
 
 /**
  * @returns {Promise<boolean>}
  */
 async function isAllowedFileSchemeAccess() {
-    return await new Promise((resolve) => chrome.extension.isAllowedFileSchemeAccess(resolve));
+    return await new Promise((resolve) => { chrome.extension.isAllowedFileSchemeAccess(resolve); });
 }
 
 /**
@@ -86,7 +86,7 @@ function setupPermissionsToggles() {
     }
 }
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -95,18 +95,20 @@ await Application.main(async (application) => {
 
     setupPermissionsToggles();
 
-    setupEnvironmentInfo(application.api);
+    void setupEnvironmentInfo(application.api);
 
     /** @type {HTMLInputElement} */
     const permissionCheckbox1 = querySelectorNotNull(document, '#permission-checkbox-allow-in-private-windows');
     /** @type {HTMLInputElement} */
     const permissionCheckbox2 = querySelectorNotNull(document, '#permission-checkbox-allow-file-url-access');
     /** @type {HTMLInputElement[]} */
+    // This collection is actually used, not sure why this eslint-disable is needed.
+    // eslint-disable-next-line sonarjs/no-unused-collection
     const permissionsCheckboxes = [permissionCheckbox1, permissionCheckbox2];
 
     const permissions = await Promise.all([
         isAllowedIncognitoAccess(),
-        isAllowedFileSchemeAccess()
+        isAllowedFileSchemeAccess(),
     ]);
 
     for (let i = 0, ii = permissions.length; i < ii; ++i) {
@@ -120,13 +122,13 @@ await Application.main(async (application) => {
     await settingsController.prepare();
 
     const permissionsToggleController = new PermissionsToggleController(settingsController);
-    permissionsToggleController.prepare();
+    void permissionsToggleController.prepare();
 
     const permissionsOriginController = new PermissionsOriginController(settingsController);
-    permissionsOriginController.prepare();
+    void permissionsOriginController.prepare();
 
     const persistentStorageController = new PersistentStorageController(application);
-    persistentStorageController.prepare();
+    void persistentStorageController.prepare();
 
     await promiseTimeout(100);
 

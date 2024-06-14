@@ -101,6 +101,7 @@ export type ProfileOptions = {
 
 export type GeneralOptions = {
     enable: boolean;
+    language: string;
     resultOutputMode: ResultOutputMode;
     debugInfo: boolean;
     maxResults: number;
@@ -118,6 +119,7 @@ export type GeneralOptions = {
     popupScaleRelativeToPageZoom: boolean;
     popupScaleRelativeToVisualViewport: boolean;
     showGuide: boolean;
+    enableContextMenuScanSelected: boolean;
     compactTags: boolean;
     glossaryLayoutMode: GlossaryLayoutMode;
     mainDictionary: string;
@@ -210,6 +212,7 @@ export type ScanningInputOptions = {
     scanOnTouchMove: boolean;
     scanOnTouchPress: boolean;
     scanOnTouchRelease: boolean;
+    scanOnTouchTap: boolean;
     scanOnPenMove: boolean;
     scanOnPenHover: boolean;
     scanOnPenReleaseHover: boolean;
@@ -229,7 +232,7 @@ export type ScanningPreventMiddleMouseOptions = {
 export type TranslationOptions = {
     convertHalfWidthCharacters: TranslationConvertType;
     convertNumericCharacters: TranslationConvertType;
-    convertAlphabeticCharacters: TranslationConvertType;
+    alphabeticToHiragana: TranslationConvertType;
     convertHiraganaToKatakana: TranslationConvertType;
     convertKatakanaToHiragana: TranslationConvertType;
     collapseEmphaticSequences: TranslationCollapseEmphaticSequences;
@@ -279,6 +282,7 @@ export type AnkiOptions = {
     kanji: AnkiNoteOptions;
     duplicateScope: AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
+    duplicateBehavior: AnkiDuplicateBehavior;
     checkForDuplicates: boolean;
     fieldTemplates: string | null;
     suspendNewCards: boolean;
@@ -370,7 +374,7 @@ export type PopupActionBarLocation = 'left' | 'right' | 'top' | 'bottom';
 
 export type FrequencyDisplayMode = 'tags' | 'tags-grouped' | 'split-tags' | 'split-tags-grouped' | 'inline-list' | 'list';
 
-export type TermDisplayMode = 'ruby' | 'ruby-and-reading' | 'term-and-reading';
+export type TermDisplayMode = 'ruby' | 'ruby-and-reading' | 'term-and-reading' | 'term-only';
 
 export type SortFrequencyDictionaryOrder = 'ascending' | 'descending';
 
@@ -391,6 +395,8 @@ export type ParsingReadingMode = 'hiragana' | 'katakana' | 'romaji' | 'dictionar
 export type AnkiScreenshotFormat = 'png' | 'jpeg';
 
 export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
+
+export type AnkiDuplicateBehavior = 'prevent' | 'overwrite' | 'new';
 
 export type AnkiDisplayTags = 'never' | 'always' | 'non-standard';
 

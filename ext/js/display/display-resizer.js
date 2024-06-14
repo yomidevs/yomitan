@@ -87,7 +87,7 @@ export class DisplayResizer {
         } else {
             if (this._startSize === null) { return; }
             const {clientX: x, clientY: y} = e;
-            this._updateFrameSize(x, y);
+            void this._updateFrameSize(x, y);
         }
     }
 
@@ -115,7 +115,7 @@ export class DisplayResizer {
         const primaryTouch = this._getTouch(e.changedTouches, this._touchIdentifier);
         if (primaryTouch === null) { return; }
         const {clientX: x, clientY: y} = primaryTouch;
-        this._updateFrameSize(x, y);
+        void this._updateFrameSize(x, y);
     }
 
     /**
@@ -138,7 +138,7 @@ export class DisplayResizer {
             documentElement.dataset.isResizing = 'true';
         }
 
-        this._initializeFrameResize(token);
+        void this._initializeFrameResize(token);
     }
 
     /**
@@ -163,7 +163,7 @@ export class DisplayResizer {
             documentElement.dataset.isResizing = 'true';
         }
 
-        this._initializeFrameResize(token);
+        void this._initializeFrameResize(token);
     }
 
     /**

@@ -18,7 +18,7 @@
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
-import {DocumentUtil} from '../dom/document-util.js';
+import {getActiveModifiers, isInputElementFocused} from '../dom/document-util.js';
 
 /**
  * Class which handles hotkey events and actions.
@@ -32,7 +32,7 @@ export class HotkeyHandler extends EventDispatcher {
         super();
         /** @type {Map<string, (argument: unknown) => (boolean|void)>} */
         this._actions = new Map();
-        /** @type {Map<string, import('hotkey-handler').HotkeyHandlers>} */
+        /** @type {Map<(string | null), import('hotkey-handler').HotkeyHandlers>} */
         this._hotkeys = new Map();
         /** @type {Map<import('settings').InputsHotkeyScope, import('settings').InputsHotkeyOptions[]>} */
         this._hotkeyRegistrations = new Map();
@@ -52,7 +52,7 @@ export class HotkeyHandler extends EventDispatcher {
         this._isPrepared = true;
         this._updateEventHandlers();
         crossFrameApi.registerHandlers([
-            ['hotkeyHandlerForwardHotkey', this._onMessageForwardHotkey.bind(this)]
+            ['hotkeyHandlerForwardHotkey', this._onMessageForwardHotkey.bind(this)],
         ]);
     }
 
@@ -114,7 +114,7 @@ export class HotkeyHandler extends EventDispatcher {
                 key,
                 modifiers: [...modifiers],
                 scopes: [...scopes],
-                enabled
+                enabled,
             });
         }
         this._updateHotkeyRegistrations();
@@ -171,9 +171,13 @@ export class HotkeyHandler extends EventDispatcher {
      * @param {KeyboardEvent} event
      */
     _onKeyDown(event) {
-        const hotkeyInfo = this._hotkeys.get(event.code);
+        let hotkeyInfo = this._hotkeys.get(event.code);
+        const modifierKeycodes = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'];
+        if (modifierKeycodes.includes(event.code)) {
+            hotkeyInfo = this._hotkeys.get(null); // Hotkeys with only modifiers are stored as null
+        }
         if (typeof hotkeyInfo !== 'undefined') {
-            const eventModifiers = DocumentUtil.getActiveModifiers(event);
+            const eventModifiers = getActiveModifiers(event);
             if (this._invokeHandlers(eventModifiers, hotkeyInfo, event.key)) {
                 event.preventDefault();
                 return;
@@ -228,8 +232,7 @@ export class HotkeyHandler extends EventDispatcher {
         this._hotkeys.clear();
         for (const [scope, registrations] of this._hotkeyRegistrations.entries()) {
             for (const {action, argument, key, modifiers, scopes, enabled} of registrations) {
-                if (!(enabled && key !== null && action !== '' && scopes.includes(scope))) { continue; }
-
+                if (!(enabled && (key !== null || modifiers.length > 0) && action !== '' && scopes.includes(scope))) { continue; }
                 let hotkeyInfo = this._hotkeys.get(key);
                 if (typeof hotkeyInfo === 'undefined') {
                     hotkeyInfo = {handlers: []};
@@ -254,7 +257,7 @@ export class HotkeyHandler extends EventDispatcher {
      */
     _updateEventHandlers() {
         if (this._isPrepared && (this._hotkeys.size > 0 || this._hasEventListeners)) {
-            if (this._eventListeners.size !== 0) { return; }
+            if (this._eventListeners.size > 0) { return; }
             this._eventListeners.addEventListener(document, 'keydown', this._onKeyDown.bind(this), false);
         } else {
             this._eventListeners.removeAllEventListeners();
@@ -269,7 +272,7 @@ export class HotkeyHandler extends EventDispatcher {
     _isHotkeyPermitted(modifiers, key) {
         return !(
             (modifiers.length === 0 || (modifiers.length === 1 && modifiers[0] === 'shift')) &&
-            DocumentUtil.isInputElementFocused() &&
+            isInputElementFocused() &&
             this._isKeyCharacterInput(key)
         );
     }
@@ -279,6 +282,6 @@ export class HotkeyHandler extends EventDispatcher {
      * @returns {boolean}
      */
     _isKeyCharacterInput(key) {
-        return key.length === 1;
+        return key.length === 1 || key === 'Process';
     }
 }

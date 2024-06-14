@@ -18,7 +18,7 @@
 
 import {EventDispatcher} from '../../core/event-dispatcher.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {DocumentUtil} from '../../dom/document-util.js';
+import {getActiveButtons, getActiveModifiers} from '../../dom/document-util.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 
 /**
@@ -75,7 +75,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
         /** @type {import('event-listener-collection').AddEventListenerArgs[]} */
         const events = [
             [this._inputNode, 'keydown', this._onModifierKeyDown.bind(this), false],
-            [this._inputNode, 'keyup', this._onModifierKeyUp.bind(this), false]
+            [this._inputNode, 'keyup', this._onModifierKeyUp.bind(this), false],
         ];
         if (mouseModifiersSupported && this._mouseButton !== null) {
             events.push(
@@ -85,7 +85,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
                 [this._mouseButton, 'pointerout', this._onMouseButtonPointerOut.bind(this), false],
                 [this._mouseButton, 'pointercancel', this._onMouseButtonPointerCancel.bind(this), false],
                 [this._mouseButton, 'mouseup', this._onMouseButtonMouseUp.bind(this), false],
-                [this._mouseButton, 'contextmenu', this._onMouseButtonContextMenu.bind(this), false]
+                [this._mouseButton, 'contextmenu', this._onMouseButtonContextMenu.bind(this), false],
             );
         }
         for (const args of events) {
@@ -139,7 +139,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
      * @returns {Set<import('input').ModifierKey>}
      */
     _getModifierKeys(e) {
-        const modifiers = new Set(DocumentUtil.getActiveModifiers(e));
+        const modifiers = new Set(getActiveModifiers(e));
         // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey
         // https://askubuntu.com/questions/567731/why-is-shift-alt-being-mapped-to-meta
         // It works with mouse events on some platforms, so try to determine if metaKey is pressed.
@@ -216,7 +216,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
      */
     _onMouseButtonMouseDown(e) {
         e.preventDefault();
-        this._addModifiers(DocumentUtil.getActiveButtons(e));
+        this._addModifiers(getActiveButtons(e));
     }
 
     /**
@@ -236,7 +236,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
             return;
         }
         e.preventDefault();
-        this._addModifiers(DocumentUtil.getActiveButtons(e));
+        this._addModifiers(getActiveButtons(e));
     }
 
     /**

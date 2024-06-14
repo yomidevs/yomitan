@@ -34,7 +34,7 @@ function querySelectorTextNode(element, selector) {
     let textIndex = -1;
     const match = /::text$|::nth-text\((\d+)\)$/.exec(selector);
     if (match !== null) {
-        textIndex = (match[1] ? parseInt(match[1], 10) - 1 : 0);
+        textIndex = (match[1] ? Number.parseInt(match[1], 10) - 1 : 0);
         selector = selector.substring(0, selector.length - match[0].length);
     }
     const result = element.querySelector(selector);
@@ -67,13 +67,11 @@ function getComputedFontSizeInPixels(window, getComputedStyle, element) {
         if (element.nodeType === window.Node.ELEMENT_NODE) {
             const fontSize = getComputedStyle(/** @type {Element} */ (element)).fontSize;
             if (fontSize.endsWith('px')) {
-                const value = parseFloat(fontSize.substring(0, fontSize.length - 2));
-                return value;
+                return Number.parseFloat(fontSize.substring(0, fontSize.length - 2));
             }
         }
     }
-    const defaultFontSize = 14;
-    return defaultFontSize;
+    return 14; // Default font size
 }
 
 /**
@@ -87,16 +85,27 @@ function createAbsoluteGetComputedStyle(window) {
     return (element, ...args) => {
         const style = getComputedStyleOld(element, ...args);
         return new Proxy(style, {
+            /**
+             * @param {CSSStyleDeclaration} target
+             * @param {string|symbol} property
+             * @returns {unknown}
+             */
             get: (target, property) => {
-                let result = /** @type {import('core').SafeAny} */ (target)[property];
+                let result = /** @type {Record<string|symbol, unknown>} */ (/** @type {unknown} */ (target))[property];
                 if (typeof result === 'string') {
-                    result = result.replace(/([-+]?\d(?:\.\d)?(?:[eE][-+]?\d+)?)em/g, (g0, g1) => {
+                    /**
+                     * @param {string} g0
+                     * @param {string} g1
+                     * @returns {string}
+                     */
+                    const replacer = (g0, g1) => {
                         const fontSize = getComputedFontSizeInPixels(window, getComputedStyleOld, element);
-                        return `${parseFloat(g1) * fontSize}px`;
-                    });
+                        return `${Number.parseFloat(g1) * fontSize}px`;
+                    };
+                    result = result.replace(/([-+]?\d(?:\.\d)?(?:[eE][-+]?\d+)?)em/g, replacer);
                 }
                 return result;
-            }
+            },
         });
     };
 }
@@ -129,8 +138,8 @@ describe('DOMTextScanner', () => {
                         node: expectedNodeSelector,
                         offset: expectedOffset,
                         content: expectedContent,
-                        remainder: expectedRemainder
-                    }
+                        remainder: expectedRemainder,
+                    },
                 } = testDataItem;
 
                 const node = querySelectorTextNode(testElement, nodeSelector);

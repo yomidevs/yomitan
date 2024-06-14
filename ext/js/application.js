@@ -21,7 +21,7 @@ import {CrossFrameAPI} from './comm/cross-frame-api.js';
 import {createApiMap, invokeApiMapHandler} from './core/api-map.js';
 import {EventDispatcher} from './core/event-dispatcher.js';
 import {ExtensionError} from './core/extension-error.js';
-import {log} from './core/logger.js';
+import {log} from './core/log.js';
 import {deferPromise} from './core/utilities.js';
 import {WebExtension} from './extension/web-extension.js';
 
@@ -52,6 +52,41 @@ if (checkChromeNotAvailable()) {
 }
 
 /**
+ * @param {WebExtension} webExtension
+ */
+async function waitForBackendReady(webExtension) {
+    const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
+    /** @type {import('application').ApiMap} */
+    const apiMap = createApiMap([['applicationBackendReady', () => { resolve(); }]]);
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
+    const onMessage = ({action, params}, _sender, callback) => invokeApiMapHandler(apiMap, action, params, [], callback);
+    chrome.runtime.onMessage.addListener(onMessage);
+    try {
+        await webExtension.sendMessagePromise({action: 'requestBackendReadySignal'});
+        await promise;
+    } finally {
+        chrome.runtime.onMessage.removeListener(onMessage);
+    }
+}
+
+/**
+ * @returns {Promise<void>}
+ */
+function waitForDomContentLoaded() {
+    return new Promise((resolve) => {
+        if (document.readyState !== 'loading') {
+            resolve();
+            return;
+        }
+        const onDomContentLoaded = () => {
+            document.removeEventListener('DOMContentLoaded', onDomContentLoaded);
+            resolve();
+        };
+        document.addEventListener('DOMContentLoaded', onDomContentLoaded);
+    });
+}
+
+/**
  * The Yomitan class is a core component through which various APIs are handled and invoked.
  * @augments EventDispatcher<import('application').Events>
  */
@@ -63,19 +98,8 @@ export class Application extends EventDispatcher {
      */
     constructor(api, crossFrameApi) {
         super();
-
         /** @type {WebExtension} */
         this._webExtension = new WebExtension();
-
-        /** @type {string} */
-        this._extensionName = 'Yomitan';
-        try {
-            const manifest = chrome.runtime.getManifest();
-            this._extensionName = `${manifest.name} v${manifest.version}`;
-        } catch (e) {
-            // NOP
-        }
-
         /** @type {?boolean} */
         this._isBackground = null;
         /** @type {API} */
@@ -84,7 +108,6 @@ export class Application extends EventDispatcher {
         this._crossFrame = crossFrameApi;
         /** @type {boolean} */
         this._isReady = false;
-
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
@@ -92,7 +115,7 @@ export class Application extends EventDispatcher {
             ['applicationGetUrl',          this._onMessageGetUrl.bind(this)],
             ['applicationOptionsUpdated',  this._onMessageOptionsUpdated.bind(this)],
             ['applicationDatabaseUpdated', this._onMessageDatabaseUpdated.bind(this)],
-            ['applicationZoomChanged',     this._onMessageZoomChanged.bind(this)]
+            ['applicationZoomChanged',     this._onMessageZoomChanged.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -108,7 +131,6 @@ export class Application extends EventDispatcher {
      * @type {API}
      */
     get api() {
-        if (this._api === null) { throw new Error('Not prepared'); }
         return this._api;
     }
 
@@ -118,8 +140,21 @@ export class Application extends EventDispatcher {
      * @type {CrossFrameAPI}
      */
     get crossFrame() {
-        if (this._crossFrame === null) { throw new Error('Not prepared'); }
         return this._crossFrame;
+    }
+
+    /**
+     * @type {?number}
+     */
+    get tabId() {
+        return this._crossFrame.tabId;
+    }
+
+    /**
+     * @type {?number}
+     */
+    get frameId() {
+        return this._crossFrame.frameId;
     }
 
     /**
@@ -127,7 +162,7 @@ export class Application extends EventDispatcher {
      */
     prepare() {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-        log.on('log', this._onForwardLog.bind(this));
+        log.on('logGenericError', this._onLogGenericError.bind(this));
     }
 
     /**
@@ -137,7 +172,7 @@ export class Application extends EventDispatcher {
     ready() {
         if (this._isReady) { return; }
         this._isReady = true;
-        this._webExtension.sendMessagePromise({action: 'applicationReady'});
+        void this._webExtension.sendMessagePromise({action: 'applicationReady'});
     }
 
     /** */
@@ -151,41 +186,26 @@ export class Application extends EventDispatcher {
     }
 
     /**
+     * @param {boolean} waitForDom
      * @param {(application: Application) => (Promise<void>)} mainFunction
      */
-    static async main(mainFunction) {
+    static async main(waitForDom, mainFunction) {
         const webExtension = new WebExtension();
+        log.configure(webExtension.extensionName);
         const api = new API(webExtension);
-        await this.waitForBackendReady(webExtension);
-        const {tabId = null, frameId = null} = await api.frameInformationGet();
+        await waitForBackendReady(webExtension);
+        const {tabId, frameId} = await api.frameInformationGet();
         const crossFrameApi = new CrossFrameAPI(api, tabId, frameId);
         crossFrameApi.prepare();
         const application = new Application(api, crossFrameApi);
         application.prepare();
+        if (waitForDom) { await waitForDomContentLoaded(); }
         try {
             await mainFunction(application);
         } catch (error) {
             log.error(error);
         } finally {
             application.ready();
-        }
-    }
-
-    /**
-     * @param {WebExtension} webExtension
-     */
-    static async waitForBackendReady(webExtension) {
-        const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
-        /** @type {import('application').ApiMap} */
-        const apiMap = createApiMap([['applicationBackendReady', () => { resolve(); }]]);
-        /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
-        const onMessage = ({action, params}, _sender, callback) => invokeApiMapHandler(apiMap, action, params, [], callback);
-        chrome.runtime.onMessage.addListener(onMessage);
-        try {
-            await webExtension.sendMessagePromise({action: 'requestBackendReadySignal'});
-            await promise;
-        } finally {
-            chrome.runtime.onMessage.removeListener(onMessage);
         }
     }
 
@@ -231,12 +251,11 @@ export class Application extends EventDispatcher {
     }
 
     /**
-     * @param {{error: unknown, level: import('log').LogLevel, context?: import('log').LogContext}} params
+     * @param {import('log').Events['logGenericError']} params
      */
-    async _onForwardLog({error, level, context}) {
+    async _onLogGenericError({error, level, context}) {
         try {
-            const api = /** @type {API} */ (this._api);
-            await api.log(ExtensionError.serialize(error), level, context);
+            await this._api.logGenericErrorBackend(ExtensionError.serialize(error), level, context);
         } catch (e) {
             // NOP
         }

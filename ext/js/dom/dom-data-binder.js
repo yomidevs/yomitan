@@ -17,7 +17,7 @@
  */
 
 import {TaskAccumulator} from '../general/task-accumulator.js';
-import {DocumentUtil} from './document-util.js';
+import {convertElementValueToNumber} from './document-util.js';
 import {SelectorObserver} from './selector-observer.js';
 
 /**
@@ -25,9 +25,14 @@ import {SelectorObserver} from './selector-observer.js';
  */
 export class DOMDataBinder {
     /**
-     * @param {import('dom-data-binder').ConstructorDetails<T>} details
+     * @param {string} selector
+     * @param {import('dom-data-binder').CreateElementMetadataCallback<T>} createElementMetadata
+     * @param {import('dom-data-binder').CompareElementMetadataCallback<T>} compareElementMetadata
+     * @param {import('dom-data-binder').GetValuesCallback<T>} getValues
+     * @param {import('dom-data-binder').SetValuesCallback<T>} setValues
+     * @param {import('dom-data-binder').OnErrorCallback<T>|null} [onError]
      */
-    constructor({selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null}) {
+    constructor(selector, createElementMetadata, compareElementMetadata, getValues, setValues, onError = null) {
         /** @type {string} */
         this._selector = selector;
         /** @type {import('dom-data-binder').CreateElementMetadataCallback<T>} */
@@ -45,14 +50,14 @@ export class DOMDataBinder {
         /** @type {TaskAccumulator<import('dom-data-binder').ElementObserver<T>, import('dom-data-binder').AssignTaskValue>} */
         this._assignTasks = new TaskAccumulator(this._onBulkAssign.bind(this));
         /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */
-        this._selectorObserver = /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */ (new SelectorObserver({
+        this._selectorObserver = new SelectorObserver({
             selector,
             ignoreSelector: null,
             onAdded: this._createObserver.bind(this),
             onRemoved: this._removeObserver.bind(this),
             onChildrenUpdated: this._onObserverChildrenUpdated.bind(this),
-            isStale: this._isObserverStale.bind(this)
-        }));
+            isStale: this._isObserverStale.bind(this),
+        });
     }
 
     /**
@@ -100,7 +105,7 @@ export class DOMDataBinder {
 
         const args = targets.map(([observer]) => ({
             element: observer.element,
-            metadata: observer.metadata
+            metadata: observer.metadata,
         }));
         const responses = await this._getValues(args);
         this._applyValues(targets, responses, true);
@@ -118,7 +123,7 @@ export class DOMDataBinder {
             args.push({
                 element: observer.element,
                 metadata: observer.metadata,
-                value: task.data.value
+                value: task.data.value,
             });
             targets.push([observer, task]);
         }
@@ -133,7 +138,7 @@ export class DOMDataBinder {
         const value = this._getElementValue(observer.element);
         observer.value = value;
         observer.hasValue = true;
-        this._assignTasks.enqueue(observer, {value});
+        void this._assignTasks.enqueue(observer, {value});
     }
 
     /**
@@ -176,13 +181,13 @@ export class DOMDataBinder {
             value: null,
             hasValue: false,
             onChange: null,
-            metadata
+            metadata,
         };
         observer.onChange = this._onElementChange.bind(this, observer);
 
         element.addEventListener('change', observer.onChange, false);
 
-        this._updateTasks.enqueue(observer, {all: false});
+        void this._updateTasks.enqueue(observer, {all: false});
 
         return observer;
     }
@@ -264,7 +269,7 @@ export class DOMDataBinder {
             case 'text':
                 return `${/** @type {HTMLInputElement} */ (element).value}`;
             case 'number':
-                return DocumentUtil.convertElementValueToNumber(/** @type {HTMLInputElement} */ (element).value, /** @type {HTMLInputElement} */ (element));
+                return convertElementValueToNumber(/** @type {HTMLInputElement} */ (element).value, /** @type {HTMLInputElement} */ (element));
             case 'textarea':
                 return /** @type {HTMLTextAreaElement} */ (element).value;
             case 'select':

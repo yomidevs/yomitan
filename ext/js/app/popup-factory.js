@@ -29,15 +29,12 @@ export class PopupFactory {
     /**
      * Creates a new instance.
      * @param {import('../application.js').Application} application
-     * @param {number} frameId The frame ID of the host frame.
      */
-    constructor(application, frameId) {
+    constructor(application) {
         /** @type {import('../application.js').Application} */
         this._application = application;
-        /** @type {number} */
-        this._frameId = frameId;
         /** @type {FrameOffsetForwarder} */
-        this._frameOffsetForwarder = new FrameOffsetForwarder(application.crossFrame, frameId);
+        this._frameOffsetForwarder = new FrameOffsetForwarder(application.crossFrame);
         /** @type {Map<string, import('popup').PopupAny>} */
         this._popups = new Map();
         /** @type {Map<string, {popup: import('popup').PopupAny, token: string}[]>} */
@@ -65,7 +62,7 @@ export class PopupFactory {
             ['popupFactoryUpdateTheme',          this._onApiUpdateTheme.bind(this)],
             ['popupFactorySetCustomOuterCss',    this._onApiSetCustomOuterCss.bind(this)],
             ['popupFactoryGetFrameSize',         this._onApiGetFrameSize.bind(this)],
-            ['popupFactorySetFrameSize',         this._onApiSetFrameSize.bind(this)]
+            ['popupFactorySetFrameSize',         this._onApiSetFrameSize.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -81,7 +78,7 @@ export class PopupFactory {
         parentPopupId = null,
         depth = null,
         popupWindow = false,
-        childrenSupported = false
+        childrenSupported = false,
     }) {
         // Find by existing id
         if (id !== null) {
@@ -115,31 +112,34 @@ export class PopupFactory {
             depth = 0;
         }
 
+        const currentFrameId = this._application.frameId;
+        if (currentFrameId === null) { throw new Error('Cannot create popup: no frameId'); }
+
         if (popupWindow) {
             // New unique id
             if (id === null) {
                 id = generateId(16);
             }
-            const popup = new PopupWindow({
-                application: this._application,
+            const popup = new PopupWindow(
+                this._application,
                 id,
                 depth,
-                frameId: this._frameId
-            });
+                currentFrameId,
+            );
             this._popups.set(id, popup);
             return popup;
-        } else if (frameId === this._frameId) {
+        } else if (frameId === currentFrameId) {
             // New unique id
             if (id === null) {
                 id = generateId(16);
             }
-            const popup = new Popup({
-                application: this._application,
+            const popup = new Popup(
+                this._application,
                 id,
                 depth,
-                frameId: this._frameId,
-                childrenSupported
-            });
+                currentFrameId,
+                childrenSupported,
+            );
             if (parent !== null) {
                 if (parent.child !== null) {
                     throw new Error('Parent popup already has a child');
@@ -155,21 +155,20 @@ export class PopupFactory {
                 throw new Error('Invalid frameId');
             }
             const useFrameOffsetForwarder = (parentPopupId === null);
-            /** @type {{id: string, depth: number, frameId: number}} */
-            const info = await this._application.crossFrame.invoke(frameId, 'popupFactoryGetOrCreatePopup', /** @type {import('popup-factory').GetOrCreatePopupDetails} */ ({
+            const info = await this._application.crossFrame.invoke(frameId, 'popupFactoryGetOrCreatePopup', {
                 id,
                 parentPopupId,
                 frameId,
-                childrenSupported
-            }));
-            id = info.id;
-            const popup = new PopupProxy({
-                application: this._application,
-                id,
-                depth: info.depth,
-                frameId: info.frameId,
-                frameOffsetForwarder: useFrameOffsetForwarder ? this._frameOffsetForwarder : null
+                childrenSupported,
             });
+            id = info.id;
+            const popup = new PopupProxy(
+                this._application,
+                id,
+                info.depth,
+                info.frameId,
+                useFrameOffsetForwarder ? this._frameOffsetForwarder : null,
+            );
             this._popups.set(id, popup);
             return popup;
         }
@@ -250,7 +249,7 @@ export class PopupFactory {
         return {
             id: popup.id,
             depth: popup.depth,
-            frameId: popup.frameId
+            frameId: popup.frameId,
         };
     }
 
@@ -403,7 +402,7 @@ export class PopupFactory {
             const promise = popup.clearVisibleOverride(token)
                 .then(
                     (v) => v,
-                    () => false
+                    () => false,
                 );
             promises.push(promise);
         }

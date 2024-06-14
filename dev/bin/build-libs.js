@@ -18,4 +18,4 @@
 
 import {buildLibs} from '../build-libs.js';
 
-buildLibs();
+await buildLibs();

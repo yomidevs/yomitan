@@ -16,7 +16,7 @@
  */
 
 import {vi} from 'vitest';
-import {AnkiTemplateRenderer} from '../../ext/js/templates/sandbox/anki-template-renderer.js';
+import {AnkiTemplateRenderer} from '../../ext/js/templates/anki-template-renderer.js';
 import {fetch} from '../mocks/common.js';
 import {createDomTest} from './dom-test.js';
 
@@ -30,6 +30,7 @@ export async function createAnkiTemplateRendererTest() {
     const ankiTemplateRenderer = new AnkiTemplateRenderer();
     await ankiTemplateRenderer.prepare();
     /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, ankiTemplateRenderer: AnkiTemplateRenderer}>} */
+    // eslint-disable-next-line sonarjs/prefer-immediate-return
     const result = test.extend({
         window: async ({window}, use) => { await use(window); },
         ankiTemplateRenderer: async ({window}, use) => {
@@ -37,7 +38,7 @@ export async function createAnkiTemplateRendererTest() {
             // It is needed for DOM access for structured content.
             void window;
             await use(ankiTemplateRenderer);
-        }
+        },
     });
     return result;
 }

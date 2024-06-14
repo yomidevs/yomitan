@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isObject} from '../core/utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
 
 /** @type {RegExp} @readonly */
-const markerPattern = /\{([\w-]+)\}/g;
+const markerPattern = /\{([\p{Letter}\p{Number}_-]+)\}/gu;
 
 /**
  * Gets the root deck name of a full deck name. If the deck is a root deck,
@@ -65,7 +65,7 @@ export function getFieldMarkers(string) {
  * @returns {RegExp} A new `RegExp` instance.
  */
 export function cloneFieldMarkerPattern(global) {
-    return new RegExp(markerPattern.source, global ? 'g' : '');
+    return new RegExp(markerPattern.source, global ? 'gu' : 'u');
 }
 
 /**
@@ -74,7 +74,7 @@ export function cloneFieldMarkerPattern(global) {
  * @returns {boolean} `true` if the note is valid, `false` otherwise.
  */
 export function isNoteDataValid(note) {
-    if (!isObject(note)) { return false; }
+    if (!isObjectNotArray(note)) { return false; }
     const {fields, deckName, modelName} = note;
     return (
         typeof deckName === 'string' &&
@@ -82,3 +82,5 @@ export function isNoteDataValid(note) {
         Object.entries(fields).length > 0
     );
 }
+
+export const INVALID_NOTE_ID = -1;

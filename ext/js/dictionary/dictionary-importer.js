@@ -22,7 +22,7 @@ import {
     TextWriter as TextWriter0,
     Uint8ArrayReader as Uint8ArrayReader0,
     ZipReader as ZipReader0,
-    configure
+    configure,
 } from '../../lib/zip.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
@@ -69,8 +69,8 @@ export class DictionaryImporter {
         configure({
             workerScripts: {
                 deflate: ['../../lib/z-worker.js'],
-                inflate: ['../../lib/z-worker.js']
-            }
+                inflate: ['../../lib/z-worker.js'],
+            },
         });
 
         // Read archive
@@ -106,7 +106,10 @@ export class DictionaryImporter {
 
         // Verify database is not already imported
         if (await dictionaryDatabase.dictionaryExists(dictionaryTitle)) {
-            throw new Error('Dictionary is already imported');
+            return {
+                errors: [new Error(`Dictionary ${dictionaryTitle} is already imported, skipped it.`)],
+                result: null,
+            };
         }
 
         // Load schemas
@@ -120,7 +123,7 @@ export class DictionaryImporter {
             ['termMetaFiles', /^term_meta_bank_(\d+)\.json$/],
             ['kanjiFiles', /^kanji_bank_(\d+)\.json$/],
             ['kanjiMetaFiles', /^kanji_meta_bank_(\d+)\.json$/],
-            ['tagFiles', /^tag_bank_(\d+)\.json$/]
+            ['tagFiles', /^tag_bank_(\d+)\.json$/],
         ];
         const {termFiles, termMetaFiles, kanjiFiles, kanjiMetaFiles, tagFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
 
@@ -184,10 +187,10 @@ export class DictionaryImporter {
             kanji: {total: kanjiList.length},
             kanjiMeta: this._getMetaCounts(kanjiMetaList),
             tagMeta: {total: tagList.length},
-            media: {total: media.length}
+            media: {total: media.length},
         };
         const summary = this._createSummary(dictionaryTitle, version, index, {prefixWildcardsSupported, counts});
-        dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
+        await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
 
         // Add data
         /** @type {Error[]} */
@@ -235,7 +238,7 @@ export class DictionaryImporter {
             stepIndex: 0,
             stepCount: 6,
             index: 0,
-            count: 0
+            count: 0,
         };
     }
 
@@ -279,15 +282,17 @@ export class DictionaryImporter {
             version,
             importDate: Date.now(),
             prefixWildcardsSupported,
-            counts
+            counts,
         };
 
-        const {author, url, description, attribution, frequencyMode} = index;
+        const {author, url, description, attribution, frequencyMode, sourceLanguage, targetLanguage} = index;
         if (typeof author === 'string') { summary.author = author; }
         if (typeof url === 'string') { summary.url = url; }
         if (typeof description === 'string') { summary.description = description; }
         if (typeof attribution === 'string') { summary.attribution = attribution; }
         if (typeof frequencyMode === 'string') { summary.frequencyMode = frequencyMode; }
+        if (typeof sourceLanguage === 'string') { summary.sourceLanguage = sourceLanguage; }
+        if (typeof targetLanguage === 'string') { summary.targetLanguage = targetLanguage; }
 
         return summary;
     }
@@ -356,7 +361,7 @@ export class DictionaryImporter {
         /** @type {import('dictionary-data').TermGlossaryImage} */
         const target = {
             type: 'image',
-            path: '' // Will be populated during requirement resolution
+            path: '', // Will be populated during requirement resolution
         };
         requirements.push({type: 'image', target, source: data, entry});
         return target;
@@ -372,7 +377,7 @@ export class DictionaryImporter {
         const content = this._prepareStructuredContent(data.content, entry, requirements);
         return {
             type: 'structured-content',
-            content
+            content,
         };
     }
 
@@ -414,7 +419,7 @@ export class DictionaryImporter {
         /** @type {import('structured-content').ImageElement} */
         const target = {
             tag: 'img',
-            path: '' // Will be populated during requirement resolution
+            path: '', // Will be populated during requirement resolution
         };
         requirements.push({type: 'structured-content-image', target, source: content, entry});
         return target;
@@ -436,7 +441,7 @@ export class DictionaryImporter {
         }
 
         return {
-            media: [...media.values()]
+            media: [...media.values()],
         };
     }
 
@@ -451,7 +456,7 @@ export class DictionaryImporter {
                     context,
                     requirement.target,
                     requirement.source,
-                    requirement.entry
+                    requirement.entry,
                 );
                 break;
             case 'structured-content-image':
@@ -459,7 +464,7 @@ export class DictionaryImporter {
                     context,
                     requirement.target,
                     requirement.source,
-                    requirement.entry
+                    requirement.entry,
                 );
                 break;
             default:
@@ -490,7 +495,7 @@ export class DictionaryImporter {
             verticalAlign,
             border,
             borderRadius,
-            sizeUnits
+            sizeUnits,
         } = source;
         await this._createImageData(context, target, source, entry);
         if (typeof verticalAlign === 'string') { target.verticalAlign = verticalAlign; }
@@ -518,7 +523,7 @@ export class DictionaryImporter {
             appearance,
             background,
             collapsed,
-            collapsible
+            collapsible,
         } = source;
         const {width, height} = await this._getImageMedia(context, path, entry);
         target.path = path;
@@ -596,7 +601,7 @@ export class DictionaryImporter {
             mediaType,
             width,
             height,
-            content
+            content,
         };
         media.set(path, mediaData);
 
@@ -610,8 +615,7 @@ export class DictionaryImporter {
      */
     _convertTermBankEntryV1(entry, dictionary) {
         let [expression, reading, definitionTags, rules, score, ...glossary] = entry;
-        expression = this._normalizeTermOrReading(expression);
-        reading = this._normalizeTermOrReading(reading.length > 0 ? reading : expression);
+        reading = reading.length > 0 ? reading : expression;
         return {expression, reading, definitionTags, rules, score, glossary, dictionary};
     }
 
@@ -622,8 +626,7 @@ export class DictionaryImporter {
      */
     _convertTermBankEntryV3(entry, dictionary) {
         let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
-        expression = this._normalizeTermOrReading(expression);
-        reading = this._normalizeTermOrReading(reading.length > 0 ? reading : expression);
+        reading = reading.length > 0 ? reading : expression;
         return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, dictionary};
     }
 
@@ -734,7 +737,8 @@ export class DictionaryImporter {
         const results = [];
         for (const file of files) {
             const content = await this._getData(file, new TextWriter());
-            const entries = /** @type {unknown} */ (parseJson(content));
+            /** @type {unknown} */
+            const entries = parseJson(content);
 
             startIndex = progressData.index;
             this._progress();
@@ -748,8 +752,8 @@ export class DictionaryImporter {
             this._progress();
 
             if (Array.isArray(entries)) {
-                for (const entry of entries) {
-                    results.push(convertEntry(/** @type {TEntry} */ (entry), dictionaryTitle));
+                for (const entry of /** @type {TEntry[]} */ (entries)) {
+                    results.push(convertEntry(entry, dictionaryTitle));
                 }
             }
         }
@@ -775,20 +779,6 @@ export class DictionaryImporter {
             counts[key] = value;
         }
         return counts;
-    }
-
-    /**
-     * @param {string} text
-     * @returns {string}
-     */
-    _normalizeTermOrReading(text) {
-        // Note: this function should not perform String.normalize on the text,
-        // as it will normalize characters in an undesirable way.
-        // Thus, this function is currently a no-op.
-        // Example:
-        // - '\u9038'.normalize('NFC') => '\u9038' (逸)
-        // - '\ufa67'.normalize('NFC') => '\u9038' (逸 => 逸)
-        return text;
     }
 
     /**

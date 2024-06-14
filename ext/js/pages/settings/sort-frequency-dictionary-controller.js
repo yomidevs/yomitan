@@ -79,7 +79,7 @@ export class SortFrequencyDictionaryController {
     /** */
     _onSortFrequencyDictionarySelectChange() {
         const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
-        this._setSortFrequencyDictionaryValue(value !== '' ? value : null);
+        void this._setSortFrequencyDictionaryValue(value !== '' ? value : null);
     }
 
     /** */
@@ -87,14 +87,14 @@ export class SortFrequencyDictionaryController {
         const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionaryOrderSelect);
         const value2 = this._normalizeSortFrequencyDictionaryOrder(value);
         if (value2 === null) { return; }
-        this._setSortFrequencyDictionaryOrderValue(value2);
+        void this._setSortFrequencyDictionaryOrderValue(value2);
     }
 
     /** */
     _onSortFrequencyDictionaryOrderAutoButtonClick() {
         const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
         if (value === '') { return; }
-        this._autoUpdateOrder(value);
+        void this._autoUpdateOrder(value);
     }
 
     /**
@@ -107,11 +107,12 @@ export class SortFrequencyDictionaryController {
         option.textContent = 'None';
         fragment.appendChild(option);
         for (const {title, counts} of dictionaries) {
-            if (this._dictionaryHasNoFrequencies(counts)) { continue; }
-            option = document.createElement('option');
-            option.value = title;
-            option.textContent = title;
-            fragment.appendChild(option);
+            if (counts && counts.termMeta && counts.termMeta.freq > 0) {
+                option = document.createElement('option');
+                option.value = title;
+                option.textContent = title;
+                fragment.appendChild(option);
+            }
         }
         const select = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
         select.textContent = '';
@@ -158,7 +159,7 @@ export class SortFrequencyDictionaryController {
 
         const frequencies = await this._settingsController.application.api.getTermFrequencies(
             terms.map((term) => ({term, reading: null})),
-            [dictionary]
+            [dictionary],
         );
 
         /** @type {Map<string, {hasValue: boolean, minValue: number, maxValue: number}>} */
@@ -193,17 +194,6 @@ export class SortFrequencyDictionaryController {
             }
         }
         return Math.sign(result);
-    }
-
-    /**
-     * @param {import('dictionary-importer').SummaryCounts} counts
-     * @returns {boolean}
-     */
-    _dictionaryHasNoFrequencies(counts) {
-        if (typeof counts !== 'object' || counts === null) { return false; }
-        const {termMeta} = counts;
-        if (typeof termMeta !== 'object' || termMeta === null) { return false; }
-        return termMeta.freq <= 0;
     }
 
     /**

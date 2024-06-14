@@ -16,44 +16,48 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * This is a static class because this file is not imported as a module.
+ */
+// eslint-disable-next-line unicorn/no-static-only-class
 class HtmlTestUtilities {
     /**
      * @param {Element} element
      */
     static requestFullscreen(element) {
         if (element.requestFullscreen) {
-            element.requestFullscreen();
+            void element.requestFullscreen();
             // @ts-expect-error - Browser compatibility
         } else if (element.mozRequestFullScreen) {
             // @ts-expect-error - Browser compatibility
-            element.mozRequestFullScreen();
+            void element.mozRequestFullScreen();
             // @ts-expect-error - Browser compatibility
         } else if (element.webkitRequestFullscreen) {
             // @ts-expect-error - Browser compatibility
-            element.webkitRequestFullscreen();
+            void element.webkitRequestFullscreen();
             // @ts-expect-error - Browser compatibility
         } else if (element.msRequestFullscreen) {
             // @ts-expect-error - Browser compatibility
-            element.msRequestFullscreen();
+            void element.msRequestFullscreen();
         }
     }
 
     /** */
     static exitFullscreen() {
         if (document.exitFullscreen) {
-            document.exitFullscreen();
+            void document.exitFullscreen();
             // @ts-expect-error - Browser compatibility
         } else if (document.mozCancelFullScreen) {
             // @ts-expect-error - Browser compatibility
-            document.mozCancelFullScreen();
+            void document.mozCancelFullScreen();
             // @ts-expect-error - Browser compatibility
         } else if (document.webkitExitFullscreen) {
             // @ts-expect-error - Browser compatibility
-            document.webkitExitFullscreen();
+            void document.webkitExitFullscreen();
             // @ts-expect-error - Browser compatibility
         } else if (document.msExitFullscreen) {
             // @ts-expect-error - Browser compatibility
-            document.msExitFullscreen();
+            void document.msExitFullscreen();
         }
     }
 
@@ -157,7 +161,7 @@ class HtmlTestUtilities {
         if (template !== null && templateContentContainer !== null) {
             const mode = (container instanceof HTMLElement ? container.dataset.shadowMode : void 0);
             const shadow = templateContentContainer.attachShadow({
-                mode: (mode === 'open' || mode === 'closed' ? mode : 'open')
+                mode: (mode === 'open' || mode === 'closed' ? mode : 'open'),
             });
 
             const containerStyles = document.querySelector('#container-styles');

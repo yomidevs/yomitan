@@ -49,7 +49,7 @@ export class OptionToggleHotkeyHandler {
     /** */
     prepare() {
         this._display.hotkeyHandler.registerActions([
-            ['toggleOption', this._onHotkeyActionToggleOption.bind(this)]
+            ['toggleOption', this._onHotkeyActionToggleOption.bind(this)],
         ]);
     }
 
@@ -60,7 +60,7 @@ export class OptionToggleHotkeyHandler {
      */
     _onHotkeyActionToggleOption(argument) {
         if (typeof argument !== 'string') { return; }
-        this._toggleOption(argument);
+        void this._toggleOption(argument);
     }
 
     /**
@@ -74,7 +74,7 @@ export class OptionToggleHotkeyHandler {
             const getSettingsResponse = (await this._display.application.api.getSettings([{
                 scope: 'profile',
                 path,
-                optionsContext
+                optionsContext,
             }]))[0];
             const {error: getSettingsError} = getSettingsResponse;
             if (typeof getSettingsError !== 'undefined') {
@@ -94,7 +94,7 @@ export class OptionToggleHotkeyHandler {
                 action: 'set',
                 path,
                 value,
-                optionsContext
+                optionsContext,
             };
             const modifySettingsResponse = (await this._display.application.api.modifySettings([modification], this._source))[0];
             const {error: modifySettingsError} = modifySettingsResponse;

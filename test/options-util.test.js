@@ -69,7 +69,7 @@ function createProfileOptionsTestData1() {
             showPitchAccentGraph: false,
             showIframePopupsInRootFrame: false,
             useSecurePopupFrameUrl: true,
-            usePopupShadowDom: true
+            usePopupShadowDom: true,
         },
         audio: {
             enabled: true,
@@ -77,7 +77,7 @@ function createProfileOptionsTestData1() {
             volume: 100,
             autoPlay: false,
             customSourceUrl: 'http://localhost/audio.mp3?term={expression}&reading={reading}',
-            textToSpeechVoice: 'example-voice'
+            textToSpeechVoice: 'example-voice',
         },
         scanning: {
             middleMouse: true,
@@ -94,7 +94,7 @@ function createProfileOptionsTestData1() {
             enableOnPopupExpressions: false,
             enableOnSearchPage: true,
             enableSearchTags: false,
-            layoutAwareScan: false
+            layoutAwareScan: false,
         },
         translation: {
             convertHalfWidthCharacters: 'false',
@@ -102,21 +102,21 @@ function createProfileOptionsTestData1() {
             convertAlphabeticCharacters: 'false',
             convertHiraganaToKatakana: 'false',
             convertKatakanaToHiragana: 'variant',
-            collapseEmphaticSequences: 'false'
+            collapseEmphaticSequences: 'false',
         },
         dictionaries: {
             'Test Dictionary': {
                 priority: 0,
                 enabled: true,
-                allowSecondarySearches: false
-            }
+                allowSecondarySearches: false,
+            },
         },
         parsing: {
             enableScanningParser: true,
             enableMecabParser: false,
             selectedParser: null,
             termSpacing: true,
-            readingMode: 'hiragana'
+            readingMode: 'hiragana',
         },
         anki: {
             enable: false,
@@ -127,8 +127,8 @@ function createProfileOptionsTestData1() {
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
             duplicateScope: 'collection',
-            fieldTemplates: null
-        }
+            fieldTemplates: null,
+        },
     };
 }
 
@@ -147,48 +147,48 @@ function createOptionsTestData1() {
                             {
                                 type: 'popupLevel',
                                 operator: 'equal',
-                                value: 1
+                                value: 1,
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'notEqual',
-                                value: 0
+                                value: 0,
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'lessThan',
-                                value: 3
+                                value: 3,
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'greaterThan',
-                                value: 0
+                                value: 0,
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'lessThanOrEqual',
-                                value: 2
+                                value: 2,
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'greaterThanOrEqual',
-                                value: 1
-                            }
-                        ]
+                                value: 1,
+                            },
+                        ],
                     },
                     {
                         conditions: [
                             {
                                 type: 'url',
                                 operator: 'matchDomain',
-                                value: 'example.com'
+                                value: 'example.com',
                             },
                             {
                                 type: 'url',
                                 operator: 'matchRegExp',
-                                value: 'example\\.com'
-                            }
-                        ]
+                                value: 'example\\.com',
+                            },
+                        ],
                     },
                     {
                         conditions: [
@@ -197,39 +197,39 @@ function createOptionsTestData1() {
                                 operator: 'are',
                                 value: [
                                     'ctrl',
-                                    'shift'
-                                ]
+                                    'shift',
+                                ],
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'areNot',
                                 value: [
                                     'alt',
-                                    'shift'
-                                ]
+                                    'shift',
+                                ],
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'include',
-                                value: 'alt'
+                                value: 'alt',
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'notInclude',
-                                value: 'ctrl'
-                            }
-                        ]
-                    }
-                ]
-            }
+                                value: 'ctrl',
+                            },
+                        ],
+                    },
+                ],
+            },
         ],
         profileCurrent: 0,
         version: 2,
         global: {
             database: {
-                prefixWildcardsSupported: false
-            }
-        }
+                prefixWildcardsSupported: false,
+            },
+        },
     };
 }
 
@@ -241,6 +241,7 @@ function createProfileOptionsUpdatedTestData1() {
     return {
         general: {
             enable: true,
+            language: 'ja',
             resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,
@@ -258,6 +259,7 @@ function createProfileOptionsUpdatedTestData1() {
             popupScaleRelativeToPageZoom: false,
             popupScaleRelativeToVisualViewport: true,
             showGuide: true,
+            enableContextMenuScanSelected: true,
             compactTags: false,
             glossaryLayoutMode: 'default',
             mainDictionary: '',
@@ -279,7 +281,7 @@ function createProfileOptionsUpdatedTestData1() {
             frequencyDisplayMode: 'split-tags-grouped',
             termDisplayMode: 'ruby',
             sortFrequencyDictionary: null,
-            sortFrequencyDictionaryOrder: 'descending'
+            sortFrequencyDictionaryOrder: 'descending',
         },
         audio: {
             enabled: true,
@@ -287,21 +289,21 @@ function createProfileOptionsUpdatedTestData1() {
                 {
                     type: 'jpod101',
                     url: '',
-                    voice: ''
+                    voice: '',
                 },
                 {
                     type: 'text-to-speech',
                     url: '',
-                    voice: 'example-voice'
+                    voice: 'example-voice',
                 },
                 {
                     type: 'custom',
                     url: 'http://localhost/audio.mp3?term={term}&reading={reading}',
-                    voice: ''
-                }
+                    voice: '',
+                },
             ],
             volume: 100,
-            autoPlay: false
+            autoPlay: false,
         },
         scanning: {
             touchInputEnabled: true,
@@ -327,7 +329,7 @@ function createProfileOptionsUpdatedTestData1() {
                 onWebPages: false,
                 onPopupPages: false,
                 onSearchPages: false,
-                onSearchQuery: false
+                onSearchQuery: false,
             },
             inputs: [
                 {
@@ -336,14 +338,15 @@ function createProfileOptionsUpdatedTestData1() {
                     types: {
                         mouse: true,
                         touch: false,
-                        pen: false
+                        pen: false,
                     },
                     options: {
                         showAdvanced: false,
                         searchTerms: true,
                         searchKanji: true,
-                        scanOnTouchMove: true,
-                        scanOnTouchPress: true,
+                        scanOnTouchTap: true,
+                        scanOnTouchMove: false,
+                        scanOnTouchPress: false,
                         scanOnTouchRelease: false,
                         scanOnPenMove: true,
                         scanOnPenHover: true,
@@ -351,8 +354,8 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
                         preventTouchScrolling: true,
-                        preventPenScrolling: true
-                    }
+                        preventPenScrolling: true,
+                    },
                 },
                 {
                     include: 'mouse2',
@@ -360,14 +363,15 @@ function createProfileOptionsUpdatedTestData1() {
                     types: {
                         mouse: true,
                         touch: false,
-                        pen: false
+                        pen: false,
                     },
                     options: {
                         showAdvanced: false,
                         searchTerms: true,
                         searchKanji: true,
-                        scanOnTouchMove: true,
-                        scanOnTouchPress: true,
+                        scanOnTouchTap: true,
+                        scanOnTouchMove: false,
+                        scanOnTouchPress: false,
                         scanOnTouchRelease: false,
                         scanOnPenMove: true,
                         scanOnPenHover: true,
@@ -375,8 +379,8 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
                         preventTouchScrolling: true,
-                        preventPenScrolling: true
-                    }
+                        preventPenScrolling: true,
+                    },
                 },
                 {
                     include: '',
@@ -384,14 +388,15 @@ function createProfileOptionsUpdatedTestData1() {
                     types: {
                         mouse: false,
                         touch: true,
-                        pen: true
+                        pen: true,
                     },
                     options: {
                         showAdvanced: false,
                         searchTerms: true,
                         searchKanji: true,
-                        scanOnTouchMove: true,
-                        scanOnTouchPress: true,
+                        scanOnTouchTap: true,
+                        scanOnTouchMove: false,
+                        scanOnTouchPress: false,
                         scanOnTouchRelease: false,
                         scanOnPenMove: true,
                         scanOnPenHover: true,
@@ -399,23 +404,17 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
                         preventTouchScrolling: true,
-                        preventPenScrolling: true
-                    }
-                }
-            ]
+                        preventPenScrolling: true,
+                    },
+                },
+            ],
         },
         translation: {
-            convertHalfWidthCharacters: 'false',
-            convertNumericCharacters: 'false',
-            convertAlphabeticCharacters: 'false',
-            convertHiraganaToKatakana: 'false',
-            convertKatakanaToHiragana: 'variant',
-            collapseEmphaticSequences: 'false',
             searchResolution: 'letter',
             textReplacements: {
                 searchOriginal: true,
-                groups: []
-            }
+                groups: [],
+            },
         },
         dictionaries: [
             {
@@ -425,15 +424,15 @@ function createProfileOptionsUpdatedTestData1() {
                 allowSecondarySearches: false,
                 definitionsCollapsible: 'not-collapsible',
                 partsOfSpeechFilter: true,
-                useDeinflections: true
-            }
+                useDeinflections: true,
+            },
         ],
         parsing: {
             enableScanningParser: true,
             enableMecabParser: false,
             selectedParser: null,
             termSpacing: true,
-            readingMode: 'hiragana'
+            readingMode: 'hiragana',
         },
         anki: {
             enable: false,
@@ -442,6 +441,7 @@ function createProfileOptionsUpdatedTestData1() {
             screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
+            duplicateBehavior: 'new',
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
             displayTags: 'never',
@@ -450,7 +450,7 @@ function createProfileOptionsUpdatedTestData1() {
             suspendNewCards: false,
             noteGuiMode: 'browse',
             apiKey: '',
-            downloadTimeout: 0
+            downloadTimeout: 0,
         },
         sentenceParsing: {
             scanExtent: 200,
@@ -471,8 +471,8 @@ function createProfileOptionsUpdatedTestData1() {
                 {enabled: true, character1: '︒', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
                 {enabled: true, character1: '︕', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
                 {enabled: true, character1: '︖', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '︙', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true}
-            ]
+                {enabled: true, character1: '︙', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+            ],
         },
         inputs: {
             /* eslint-disable @stylistic/no-multi-spaces */
@@ -491,9 +491,11 @@ function createProfileOptionsUpdatedTestData1() {
                 {action: 'addNoteTermKanji',  argument: '',  key: 'KeyE',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'addNoteTermKana',   argument: '',  key: 'KeyR',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'playAudio',         argument: '',  key: 'KeyP',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'viewNote',          argument: '',  key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'copyHostSelection', argument: '',  key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true}
-            ]
+                {action: 'viewNotes',         argument: '',  key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'copyHostSelection', argument: '',  key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true},
+                {action: 'profilePrevious',   argument: '',  key: 'Minus',     modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'profileNext',       argument: '',  key: 'Equal',     modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+            ],
             /* eslint-enable @stylistic/no-multi-spaces */
         },
         popupWindow: {
@@ -504,17 +506,17 @@ function createProfileOptionsUpdatedTestData1() {
             useLeft: false,
             useTop: false,
             windowType: 'popup',
-            windowState: 'normal'
+            windowState: 'normal',
         },
         clipboard: {
             enableBackgroundMonitor: false,
             enableSearchPageMonitor: false,
             autoSearchContent: true,
-            maximumSearchLength: 1000
+            maximumSearchLength: 1000,
         },
         accessibility: {
-            forceGoogleDocsHtmlRendering: false
-        }
+            forceGoogleDocsHtmlRendering: false,
+        },
     };
 }
 
@@ -533,89 +535,102 @@ function createOptionsUpdatedTestData1() {
                             {
                                 type: 'popupLevel',
                                 operator: 'equal',
-                                value: '1'
+                                value: '1',
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'notEqual',
-                                value: '0'
+                                value: '0',
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'lessThan',
-                                value: '3'
+                                value: '3',
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'greaterThan',
-                                value: '0'
+                                value: '0',
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'lessThanOrEqual',
-                                value: '2'
+                                value: '2',
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'greaterThanOrEqual',
-                                value: '1'
-                            }
-                        ]
+                                value: '1',
+                            },
+                        ],
                     },
                     {
                         conditions: [
                             {
                                 type: 'url',
                                 operator: 'matchDomain',
-                                value: 'example.com'
+                                value: 'example.com',
                             },
                             {
                                 type: 'url',
                                 operator: 'matchRegExp',
-                                value: 'example\\.com'
-                            }
-                        ]
+                                value: 'example\\.com',
+                            },
+                        ],
                     },
                     {
                         conditions: [
                             {
                                 type: 'modifierKeys',
                                 operator: 'are',
-                                value: 'ctrl, shift'
+                                value: 'ctrl, shift',
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'areNot',
-                                value: 'alt, shift'
+                                value: 'alt, shift',
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'include',
-                                value: 'alt'
+                                value: 'alt',
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'notInclude',
-                                value: 'ctrl'
-                            }
-                        ]
-                    }
-                ]
-            }
+                                value: 'ctrl',
+                            },
+                        ],
+                    },
+                ],
+            },
         ],
         profileCurrent: 0,
-        version: 24,
+        version: 39,
         global: {
             database: {
-                prefixWildcardsSupported: false
-            }
-        }
+                prefixWildcardsSupported: false,
+            },
+        },
     };
 }
 
+/**
+ * @param {string} templates
+ * @returns {Map<string, string>}
+ */
+function getHandlebarsPartials(templates) {
+    const inlinePartialRegex = /{{~?#\*inline .*?"([^"]*)"~?}}.*?{{~?\/inline~?}}/gs;
+    const matches = templates.matchAll(inlinePartialRegex);
+    const partials = new Map();
+    for (const match of matches) {
+        const [template, name] = match;
+        partials.set(name, template);
+    }
+    return partials;
+}
 
-/** */
-async function testUpdate() {
+describe('OptionsUtil', () => {
     test('Update', async () => {
         const optionsUtil = new OptionsUtil();
         await optionsUtil.prepare();
@@ -625,10 +640,26 @@ async function testUpdate() {
         const optionsExpected = createOptionsUpdatedTestData1();
         expect(optionsUpdated).toStrictEqual(optionsExpected);
     });
-}
 
-/** */
-async function testDefault() {
+    test('CumulativeFieldTemplatesUpdates', async () => {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+
+        const options = /** @type {import('core').SafeAny} */ (createOptionsTestData1());
+
+        const oldAnkiFieldTemplates = fs.readFileSync(path.join(dirname, 'data', 'templates', 'old-default-anki-field-templates.handlebars'), {encoding: 'utf8'});
+        const defaultAnkiFieldTemplates = fs.readFileSync(path.join(dirname, '..', 'ext', 'data', 'templates', 'default-anki-field-templates.handlebars'), {encoding: 'utf8'});
+
+        options.profiles[0].options.anki.fieldTemplates = oldAnkiFieldTemplates;
+        const optionsUpdated = structuredClone(await optionsUtil.update(options));
+        const fieldTemplatesUpdated = optionsUpdated.profiles[0].options.anki.fieldTemplates || '';
+
+        const partialsUpdated = getHandlebarsPartials(fieldTemplatesUpdated);
+        const partialsExpected = getHandlebarsPartials(defaultAnkiFieldTemplates);
+
+        expect(partialsUpdated).toStrictEqual(partialsExpected);
+    });
+
     describe('Default', () => {
         /** @type {((options: import('options-util').IntermediateOptions) => void)[]} */
         const data = [
@@ -638,7 +669,7 @@ async function testDefault() {
             },
             (options) => {
                 options.profiles[0].options.audio.autoPlay = void 0;
-            }
+            },
         ];
 
         test.each(data)('default-test-%#', async (modify) => {
@@ -652,10 +683,7 @@ async function testDefault() {
             expect(structuredClone(optionsUpdated)).toStrictEqual(structuredClone(options));
         });
     });
-}
 
-/** */
-async function testFieldTemplatesUpdate() {
     describe('FieldTemplatesUpdate', () => {
         const templatePatcher = new TemplatePatcher();
         /**
@@ -663,19 +691,25 @@ async function testFieldTemplatesUpdate() {
          * @returns {string}
          */
         const loadDataFile = (fileName) => {
-            const content = fs.readFileSync(path.join(dirname, '..', 'ext', fileName), {encoding: 'utf8'});
+            const content = fs.readFileSync(fileName, {encoding: 'utf8'});
             return templatePatcher.parsePatch(content).addition;
         };
-        const updates = [
-            {version: 2, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v2.handlebars')},
-            {version: 4, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v4.handlebars')},
-            {version: 6, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v6.handlebars')},
-            {version: 8, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v8.handlebars')},
-            {version: 10, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v10.handlebars')},
-            {version: 12, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v12.handlebars')},
-            {version: 13, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v13.handlebars')},
-            {version: 21, changes: loadDataFile('data/templates/anki-field-templates-upgrade-v21.handlebars')}
-        ];
+
+        /** @type {import('options-util').TemplateFieldUpdate[]} */
+        const updates = [];
+        const fileNameRegex = /^anki-field-templates-upgrade-v(\d+)\.handlebars$/;
+        const templatesDirPath = path.join(dirname, '..', 'ext', 'data', 'templates');
+        const templatesDir = fs.readdirSync(templatesDirPath, {encoding: 'utf8'});
+        for (const fileName of templatesDir) {
+            const match = fileNameRegex.exec(fileName);
+            if (match !== null) {
+                updates.push({
+                    version: Number.parseInt(match[1], 10),
+                    changes: loadDataFile(path.join(templatesDirPath, match[0])),
+                });
+            }
+        }
+        updates.sort((a, b) => a.version - b.version);
         /**
          * @param {number} startVersion
          * @param {number} targetVersion
@@ -709,7 +743,7 @@ async function testFieldTemplatesUpdate() {
 {{/inline}}
 
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // Non-standard marker format
             {
@@ -728,7 +762,7 @@ async function testFieldTemplatesUpdate() {
 {{/inline}}
 
 {{~> (lookup . "marker2") ~}}
-<<<UPDATE-ADDITIONS>>>`.trimStart()
+<<<UPDATE-ADDITIONS>>>`.trimStart(),
             },
             // Empty test
             {
@@ -739,7 +773,7 @@ async function testFieldTemplatesUpdate() {
 
                 expected: `
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // Definition tags update
             {
@@ -812,9 +846,9 @@ async function testFieldTemplatesUpdate() {
 
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}
-`.trimStart()
+`.trimStart(),
             },
-            // glossary and glossary-brief update
+            // Glossary and glossary-brief update
             {
                 oldVersion: 7,
                 newVersion: 12,
@@ -952,7 +986,7 @@ async function testFieldTemplatesUpdate() {
 {{/inline}}
 
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // formatGlossary update
             {
@@ -983,7 +1017,7 @@ async function testFieldTemplatesUpdate() {
 {{/inline}}
 
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // hasMedia/getMedia update
             {
@@ -1036,7 +1070,7 @@ async function testFieldTemplatesUpdate() {
 {{/inline}}
 
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // hasMedia/getMedia update
             {
@@ -1204,9 +1238,9 @@ async function testFieldTemplatesUpdate() {
 {{! End Pitch Accents }}
 
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
-            // block helper update: furigana and furiganaPlain
+            // Block helper update: furigana and furiganaPlain
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1292,9 +1326,9 @@ async function testFieldTemplatesUpdate() {
     {{~/if~}}
 {{/inline}}
 
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
-            // block helper update: formatGlossary
+            // Block helper update: formatGlossary
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1366,9 +1400,9 @@ async function testFieldTemplatesUpdate() {
     {{~set "previousDictionary" dictionary~}}
 {{/inline}}
 
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
-            // block helper update: set and get
+            // Block helper update: set and get
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1468,9 +1502,9 @@ async function testFieldTemplatesUpdate() {
     {{~/scope~}}
 {{/inline}}
 
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
-            // block helper update: hasMedia and getMedia
+            // Block helper update: hasMedia and getMedia
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1550,9 +1584,9 @@ async function testFieldTemplatesUpdate() {
     {{~/if~}}
 {{/inline}}
 
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
-            // block helper update: pronunciation
+            // Block helper update: pronunciation
             {
                 oldVersion: 20,
                 newVersion: 21,
@@ -1568,8 +1602,192 @@ async function testFieldTemplatesUpdate() {
     {{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
 {{/inline}}
 
-{{~> (lookup . "marker") ~}}`.trimStart()
-            }
+{{~> (lookup . "marker") ~}}`.trimStart(),
+            },
+            {
+                oldVersion: 21,
+                newVersion: 24,
+                old: `
+{{#*inline "conjugation"}}
+    {{~#if definition.reasons~}}
+        {{~#each definition.reasons~}}
+            {{~#if (op ">" @index 0)}} « {{/if~}}
+            {{.}}
+        {{~/each~}}
+    {{~/if~}}
+{{/inline}}`.trimStart(),
+
+                expected: `
+{{#*inline "conjugation"}}
+    {{~#if (op ">" definition.inflectionRuleChainCandidates.length 0)~}}
+        {{~set "multiple" false~}}
+        {{~#if (op ">" definition.inflectionRuleChainCandidates.length 1)~}}
+            {{~set "multiple" true~}}
+        {{~/if~}}
+        {{~#if (get "multiple")~}}<ul>{{/if~}}
+            {{~#each definition.inflectionRuleChainCandidates~}}
+                {{~#if (op ">" inflectionRules.length 0)~}}
+                    {{~#if (get "multiple")~}}<li>{{/if~}}
+                    {{~#each inflectionRules~}}
+                        {{~#if (op ">" @index 0)}} « {{/if~}}
+                        {{.}}
+                    {{~/each~}}
+                    {{~#if (get "multiple")~}}</li>{{/if~}}
+                {{~/if~}}
+            {{~/each~}}
+        {{~#if (get "multiple")~}}</ul>{{/if~}}
+    {{~/if~}}
+{{/inline}}
+{{#*inline "cloze-body-kana"}}
+    {{~#if definition.cloze}}{{definition.cloze.bodyKana}}{{/if~}}
+{{/inline}}
+
+{{#*inline "phonetic-transcriptions"}}
+    {{~#if (op ">" definition.phoneticTranscriptions.length 0)~}}
+        <ul>
+            {{~#each definition.phoneticTranscriptions~}}
+                {{~#each phoneticTranscriptions~}}
+                    <li>
+                        {{~set "any" false~}}
+                        {{~#each tags~}}
+                            {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                            {{name}}
+                            {{~set "any" true~}}
+                        {{~/each~}}
+                        {{~#if (get "any")}})</i> {{/if~}}
+                        {{ipa~}}
+                    </li>
+                {{~/each~}}
+            {{~/each~}}
+        </ul>
+    {{~/if~}}
+{{/inline}}
+{{#*inline "frequency-harmonic-rank"}}
+    {{~#if (op "===" definition.frequencyHarmonic -1) ~}}
+        9999999
+    {{~else ~}}
+        {{definition.frequencyHarmonic}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-harmonic-occurrence"}}
+    {{~#if (op "===" definition.frequencyHarmonic -1) ~}}
+        0
+    {{~else ~}}
+        {{definition.frequencyHarmonic}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-average-rank"}}
+    {{~#if (op "===" definition.frequencyAverage -1) ~}}
+        9999999
+    {{~else ~}}
+        {{definition.frequencyAverage}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequency-average-occurrence"}}
+    {{~#if (op "===" definition.frequencyAverage -1) ~}}
+        0
+    {{~else ~}}
+        {{definition.frequencyAverage}}
+    {{~/if~}}
+{{/inline}}
+
+{{~#*inline "pitch-accent-categories"~}}
+    {{~#each (pitchCategories @root)~}}{{~.~}}{{~#unless @last~}},{{~/unless~}}{{~/each~}}
+{{~/inline~}}`.trimStart(),
+            },
+            {
+                oldVersion: 24,
+                newVersion: 27,
+                old: `
+{{#*inline "sentence-furigana"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
+            {{getMedia "textFurigana" definition.cloze.sentence escape=false}}
+        {{~else~}}
+            {{definition.cloze.sentence}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+`.trimStart(),
+
+                expected: `
+{{#*inline "sentence-furigana"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
+            {{{getMedia "textFurigana" definition.cloze.sentence escape=false}}}
+        {{~else~}}
+            {{{definition.cloze.sentence}}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+`.trimStart(),
+            },
+            {
+                oldVersion: 32,
+                newVersion: 33,
+                old: `
+{{#*inline "sentence"}}
+    {{~#if definition.cloze}}{{definition.cloze.sentence}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-prefix"}}
+    {{~#if definition.cloze}}{{definition.cloze.prefix}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body"}}
+    {{~#if definition.cloze}}{{definition.cloze.body}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body-kana"}}
+    {{~#if definition.cloze}}{{definition.cloze.bodyKana}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-suffix"}}
+    {{~#if definition.cloze}}{{definition.cloze.suffix}}{{/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
+{{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
+{{/inline}}
+`.trimStart(),
+
+                expected: `
+{{#*inline "sentence"}}
+    {{~#if definition.cloze}}{{{definition.cloze.sentence}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-prefix"}}
+    {{~#if definition.cloze}}{{{definition.cloze.prefix}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body"}}
+    {{~#if definition.cloze}}{{{definition.cloze.body}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body-kana"}}
+    {{~#if definition.cloze}}{{{definition.cloze.bodyKana}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-suffix"}}
+    {{~#if definition.cloze}}{{{definition.cloze.suffix}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{{getMedia "clipboardText"}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
+{{/inline}}
+`.trimStart(),
+            },
         ];
 
         const updatesPattern = /<<<UPDATE-ADDITIONS>>>/g;
@@ -1589,14 +1807,4 @@ async function testFieldTemplatesUpdate() {
             expect(fieldTemplatesActual).toStrictEqual(expected2);
         });
     });
-}
-
-
-/** */
-async function main() {
-    await testUpdate();
-    await testDefault();
-    await testFieldTemplatesUpdate();
-}
-
-await main();
+});

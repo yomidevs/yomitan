@@ -341,5 +341,9 @@
     ["のたまう", "のたまう", "v5", "v5", 1, ["notamau definition"], 15, ""],
     ["のたもうた", "のたもうた", "", "", 1, [["のたまう", ["past"]]], 16, ""],
     ["３９", "さんきゅう", "", "", 1, ["sankyuu definition"], 17, ""],
-    ["凄い", "すごい", "adj-i", "adj-i", 1, ["sugoi definition"], 18, ""]
+    ["凄い", "すごい", "adj-i", "adj-i", 1, ["sugoi definition"], 18, ""],
+    ["English", "", "n", "n", 1, ["English definition"], 19, ""],
+    ["language", "", "n", "n", 1, ["language definition"], 20, ""],
+    ["ＵＳＢ", "ユーエスビー", "n", "n", 1, ["ＵＳＢ definition"], 21, ""],
+    ["마시다", "", "v", "v", 1, ["masida definition"], 22, ""]
 ]

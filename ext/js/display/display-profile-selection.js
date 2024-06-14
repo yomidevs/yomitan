@@ -35,10 +35,7 @@ export class DisplayProfileSelection {
         /** @type {HTMLElement} */
         const profilePanelElement = querySelectorNotNull(document, '#profile-panel');
         /** @type {PanelElement} */
-        this._profilePanel = new PanelElement({
-            node: profilePanelElement,
-            closingAnimationDuration: 375 // Milliseconds; includes buffer
-        });
+        this._profilePanel = new PanelElement(profilePanelElement, 375); // Milliseconds; includes buffer
         /** @type {boolean} */
         this._profileListNeedsUpdate = false;
         /** @type {EventListenerCollection} */
@@ -63,7 +60,7 @@ export class DisplayProfileSelection {
         if (source === this._source) { return; }
         this._profileListNeedsUpdate = true;
         if (this._profilePanel.isVisible()) {
-            this._updateProfileList();
+            void this._updateProfileList();
         }
     }
 
@@ -84,7 +81,7 @@ export class DisplayProfileSelection {
         this._profileButton.classList.toggle('sidebar-button-highlight', visible);
         document.documentElement.dataset.profilePanelVisible = `${visible}`;
         if (visible && this._profileListNeedsUpdate) {
-            this._updateProfileList();
+            void this._updateProfileList();
         }
     }
 
@@ -121,7 +118,7 @@ export class DisplayProfileSelection {
     _onProfileRadioChange(index, e) {
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
         if (element.checked) {
-            this._setProfileCurrent(index);
+            void this._setProfileCurrent(index);
         }
     }
 
@@ -135,7 +132,7 @@ export class DisplayProfileSelection {
             path: 'profileCurrent',
             value: index,
             scope: 'global',
-            optionsContext: null
+            optionsContext: null,
         };
         await this._display.application.api.modifySettings([modification], this._source);
         this._setProfilePanelVisible(false);

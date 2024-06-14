@@ -18,9 +18,9 @@
 
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
 import {promiseAnimationFrame} from '../core/promise-animation-frame.js';
-import {DocumentUtil} from '../dom/document-util.js';
+import {addFullscreenChangeEventListener, getFullscreenElement} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 import {TextSourceGenerator} from '../dom/text-source-generator.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
@@ -39,15 +39,13 @@ export class Frontend {
         pageType,
         popupFactory,
         depth,
-        tabId,
-        frameId,
         parentPopupId,
         parentFrameId,
         useProxyPopup,
         canUseWindowPopup = true,
         allowRootFramePopupProxy,
         childrenSupported = true,
-        hotkeyHandler
+        hotkeyHandler,
     }) {
         /** @type {import('../application.js').Application} */
         this._application = application;
@@ -57,10 +55,6 @@ export class Frontend {
         this._popupFactory = popupFactory;
         /** @type {number} */
         this._depth = depth;
-        /** @type {number|undefined} */
-        this._tabId = tabId;
-        /** @type {number} */
-        this._frameId = frameId;
         /** @type {?string} */
         this._parentPopupId = parentPopupId;
         /** @type {?number} */
@@ -82,9 +76,9 @@ export class Frontend {
         /** @type {?import('settings').ProfileOptions} */
         this._options = null;
         /** @type {number} */
-        this._pageZoomFactor = 1.0;
+        this._pageZoomFactor = 1;
         /** @type {number} */
-        this._contentScale = 1.0;
+        this._contentScale = 1;
         /** @type {Promise<void>} */
         this._lastShowPromise = Promise.resolve();
         /** @type {TextSourceGenerator} */
@@ -98,7 +92,7 @@ export class Frontend {
             getSearchContext: this._getSearchContext.bind(this),
             searchTerms: true,
             searchKanji: true,
-            textSourceGenerator: this._textSourceGenerator
+            textSourceGenerator: this._textSourceGenerator,
         });
         /** @type {boolean} */
         this._textScannerHasBeenEnabled = false;
@@ -120,12 +114,14 @@ export class Frontend {
         this._runtimeApiMap = createApiMap([
             ['frontendRequestReadyBroadcast',   this._onMessageRequestFrontendReadyBroadcast.bind(this)],
             ['frontendSetAllVisibleOverride',   this._onApiSetAllVisibleOverride.bind(this)],
-            ['frontendClearAllVisibleOverride', this._onApiClearAllVisibleOverride.bind(this)]
+            ['frontendClearAllVisibleOverride', this._onApiClearAllVisibleOverride.bind(this)],
+            ['frontendScanSelectedText',        this._onApiScanSelectedText.bind(this)],
         ]);
 
         this._hotkeyHandler.registerActions([
             ['scanSelectedText', this._onActionScanSelectedText.bind(this)],
-            ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)]
+            ['scanTextAtSelection', this._onActionScanTextAtSelection.bind(this)],
+            ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -169,7 +165,7 @@ export class Frontend {
         this._textScanner.prepare();
 
         window.addEventListener('resize', this._onResize.bind(this), false);
-        DocumentUtil.addFullscreenChangeEventListener(this._updatePopup.bind(this));
+        addFullscreenChangeEventListener(this._updatePopup.bind(this));
 
         const {visualViewport} = window;
         if (typeof visualViewport !== 'undefined' && visualViewport !== null) {
@@ -193,7 +189,7 @@ export class Frontend {
             ['frontendCopySelection',    this._onApiCopySelection.bind(this)],
             ['frontendGetSelectionText', this._onApiGetSelectionText.bind(this)],
             ['frontendGetPopupInfo',     this._onApiGetPopupInfo.bind(this)],
-            ['frontendGetPageInfo',      this._onApiGetPageInfo.bind(this)]
+            ['frontendGetPageInfo',      this._onApiGetPageInfo.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -262,14 +258,28 @@ export class Frontend {
      * @returns {void}
      */
     _onActionScanSelectedText() {
-        this._scanSelectedText(false);
+        void this._scanSelectedText(false, true);
+    }
+
+    /**
+     * @returns {void}
+     */
+    _onApiScanSelectedText() {
+        void this._scanSelectedText(false, true, true);
+    }
+
+    /**
+     * @returns {void}
+     */
+    _onActionScanTextAtSelection() {
+        void this._scanSelectedText(false, false);
     }
 
     /**
      * @returns {void}
      */
     _onActionScanTextAtCaret() {
-        this._scanSelectedText(true);
+        void this._scanSelectedText(true, false);
     }
 
     // API message handlers
@@ -294,7 +304,7 @@ export class Frontend {
     /** @type {import('cross-frame-api').ApiHandler<'frontendGetPopupInfo'>} */
     _onApiGetPopupInfo() {
         return {
-            popupId: (this._popup !== null ? this._popup.id : null)
+            popupId: (this._popup !== null ? this._popup.id : null),
         };
     }
 
@@ -302,7 +312,7 @@ export class Frontend {
     _onApiGetPageInfo() {
         return {
             url: window.location.href,
-            documentTitle: document.title
+            documentTitle: document.title,
         };
     }
 
@@ -326,7 +336,7 @@ export class Frontend {
      * @returns {void}
      */
     _onResize() {
-        this._updatePopupPosition();
+        void this._updatePopupPosition();
     }
 
     /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
@@ -347,13 +357,14 @@ export class Frontend {
      */
     _onClosePopups() {
         this._clearSelection(true);
+        this._clearMousePosition();
     }
 
     /**
      * @returns {void}
      */
     _onVisualViewportScroll() {
-        this._updatePopupPosition();
+        void this._updatePopupPosition();
     }
 
     /**
@@ -429,11 +440,16 @@ export class Frontend {
     _clearSelection(passive) {
         this._stopClearSelectionDelayed();
         if (this._popup !== null) {
-            this._popup.clearAutoPlayTimer();
-            this._popup.hide(!passive);
+            void this._popup.clearAutoPlayTimer();
+            void this._popup.hide(!passive);
             this._isPointerOverPopup = false;
         }
         this._textScanner.clearSelection();
+    }
+
+    /** */
+    _clearMousePosition() {
+        this._textScanner.clearMousePosition();
     }
 
     /**
@@ -480,6 +496,7 @@ export class Frontend {
         await this._updatePopup();
 
         const preventMiddleMouse = this._getPreventMiddleMouseValueForPageType(scanningOptions.preventMiddleMouse);
+        this._textScanner.language = options.general.language;
         this._textScanner.setOptions({
             inputs: scanningOptions.inputs,
             deepContentScan: scanningOptions.deepDomScan,
@@ -492,7 +509,7 @@ export class Frontend {
             layoutAwareScan: scanningOptions.layoutAwareScan,
             matchTypePrefix: scanningOptions.matchTypePrefix,
             preventMiddleMouse,
-            sentenceParsingOptions
+            sentenceParsingOptions,
         });
         this._updateTextScannerEnabled();
 
@@ -529,7 +546,7 @@ export class Frontend {
         } else if (
             isIframe &&
             showIframePopupsInRootFrame &&
-            DocumentUtil.getFullscreenElement() === null &&
+            getFullscreenElement() === null &&
             this._allowRootFramePopupProxy
         ) {
             popupPromise = this._popupCache.get('iframe');
@@ -588,10 +605,15 @@ export class Frontend {
             return null;
         }
 
+        const {frameId} = this._application;
+        if (frameId === null) {
+            return null;
+        }
+
         return await this._popupFactory.getOrCreatePopup({
-            frameId: this._frameId,
+            frameId,
             depth: this._depth,
-            childrenSupported: this._childrenSupported
+            childrenSupported: this._childrenSupported,
         });
     }
 
@@ -603,7 +625,7 @@ export class Frontend {
             frameId: this._parentFrameId,
             depth: this._depth,
             parentPopupId: this._parentPopupId,
-            childrenSupported: this._childrenSupported
+            childrenSupported: this._childrenSupported,
         });
     }
 
@@ -627,11 +649,11 @@ export class Frontend {
         const popup = await this._popupFactory.getOrCreatePopup({
             frameId: targetFrameId,
             id: popupId,
-            childrenSupported: this._childrenSupported
+            childrenSupported: this._childrenSupported,
         });
         popup.on('offsetNotFound', () => {
             this._allowRootFramePopupProxy = false;
-            this._updatePopup();
+            void this._updatePopup();
         });
         return popup;
     }
@@ -643,7 +665,7 @@ export class Frontend {
         return await this._popupFactory.getOrCreatePopup({
             depth: this._depth,
             popupWindow: true,
-            childrenSupported: this._childrenSupported
+            childrenSupported: this._childrenSupported,
         });
     }
 
@@ -680,7 +702,7 @@ export class Frontend {
      * @param {import('text-source').TextSource} textSource
      */
     _showExtensionUnloaded(textSource) {
-        this._showPopupContent(textSource, null, null);
+        void this._showPopupContent(textSource, null, null);
     }
 
     /**
@@ -699,16 +721,14 @@ export class Frontend {
         const detailsState = {
             focusEntry: 0,
             optionsContext,
-            url
+            url,
         };
         if (sentence !== null) { detailsState.sentence = sentence; }
         if (documentTitle !== null) { detailsState.documentTitle = documentTitle; }
+        const {tabId, frameId} = this._application;
         /** @type {import('display').HistoryContent} */
         const detailsContent = {
-            contentOrigin: {
-                tabId: this._tabId,
-                frameId: this._frameId
-            }
+            contentOrigin: {tabId, frameId},
         };
         if (dictionaryEntries !== null) {
             detailsContent.dictionaryEntries = dictionaryEntries;
@@ -720,16 +740,16 @@ export class Frontend {
             params: {
                 type,
                 query,
-                wildcards: 'off'
+                wildcards: 'off',
             },
             state: detailsState,
-            content: detailsContent
+            content: detailsContent,
         };
         if (textSource instanceof TextSourceElement && textSource.fullContent !== query) {
             details.params.full = textSource.fullContent;
             details.params['full-visible'] = 'true';
         }
-        this._showPopupContent(textSource, optionsContext, details);
+        void this._showPopupContent(textSource, optionsContext, details);
     }
 
     /**
@@ -749,9 +769,9 @@ export class Frontend {
                 {
                     optionsContext,
                     sourceRects,
-                    writingMode: textSource.getWritingMode()
+                    writingMode: textSource.getWritingMode(),
                 },
-                details
+                details,
             ) :
             Promise.resolve()
         );
@@ -788,16 +808,16 @@ export class Frontend {
         }
         if (popupScaleRelativeToVisualViewport) {
             const {visualViewport} = window;
-            const visualViewportScale = (typeof visualViewport !== 'undefined' && visualViewport !== null ? visualViewport.scale : 1.0);
+            const visualViewportScale = (typeof visualViewport !== 'undefined' && visualViewport !== null ? visualViewport.scale : 1);
             contentScale /= visualViewportScale;
         }
         if (contentScale === this._contentScale) { return; }
 
         this._contentScale = contentScale;
         if (this._popup !== null) {
-            this._popup.setContentScale(this._contentScale);
+            void this._popup.setContentScale(this._contentScale);
         }
-        this._updatePopupPosition();
+        void this._updatePopupPosition();
     }
 
     /**
@@ -810,7 +830,7 @@ export class Frontend {
             this._popup !== null &&
             await this._popup.isVisible()
         ) {
-            this._showPopupContent(textSource, null, null);
+            void this._showPopupContent(textSource, null, null);
         }
     }
 
@@ -819,11 +839,11 @@ export class Frontend {
      */
     _signalFrontendReady(targetFrameId) {
         /** @type {import('application').ApiMessageNoFrameId<'frontendReady'>} */
-        const message = {action: 'frontendReady', params: {frameId: this._frameId}};
+        const message = {action: 'frontendReady', params: {frameId: this._application.frameId}};
         if (targetFrameId === null) {
-            this._application.api.broadcastTab(message);
+            void this._application.api.broadcastTab(message);
         } else {
-            this._application.api.sendMessageToFrame(targetFrameId, message);
+            void this._application.api.sendMessageToFrame(targetFrameId, message);
         }
     }
 
@@ -867,7 +887,7 @@ export class Frontend {
             }
 
             chrome.runtime.onMessage.addListener(onMessage);
-            this._application.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._frameId}});
+            void this._application.api.broadcastTab({action: 'frontendRequestReadyBroadcast', params: {frameId: this._application.frameId}});
         });
     }
 
@@ -915,19 +935,21 @@ export class Frontend {
 
         return {
             optionsContext,
-            detail: {documentTitle}
+            detail: {documentTitle},
         };
     }
 
     /**
      * @param {boolean} allowEmptyRange
+     * @param {boolean} disallowExpandSelection
+     * @param {boolean} showEmpty show empty popup if no results are found
      * @returns {Promise<boolean>}
      */
-    async _scanSelectedText(allowEmptyRange) {
+    async _scanSelectedText(allowEmptyRange, disallowExpandSelection, showEmpty = false) {
         const range = this._getFirstSelectionRange(allowEmptyRange);
         if (range === null) { return false; }
-        const source = TextSourceRange.create(range);
-        await this._textScanner.search(source, {focus: true, restoreSelection: true});
+        const source = disallowExpandSelection ? TextSourceRange.createLazy(range) : TextSourceRange.create(range);
+        await this._textScanner.search(source, {focus: true, restoreSelection: true}, showEmpty);
         return true;
     }
 
@@ -953,7 +975,7 @@ export class Frontend {
     _prepareSiteSpecific() {
         switch (location.hostname.toLowerCase()) {
             case 'docs.google.com':
-                this._prepareGoogleDocs();
+                void this._prepareGoogleDocs();
                 break;
         }
     }

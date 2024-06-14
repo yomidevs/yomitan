@@ -97,7 +97,7 @@ export class AudioController extends EventDispatcher {
             path: 'audio.sources',
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
     }
 
@@ -134,7 +134,7 @@ export class AudioController extends EventDispatcher {
 
     /** */
     _onAddAudioSource() {
-        this._addAudioSource();
+        void this._addAudioSource();
     }
 
     /** */
@@ -144,8 +144,8 @@ export class AudioController extends EventDispatcher {
             const text = input.value || '';
             const voiceUri = input.dataset.voice;
             const audio = this._audioSystem.createTextToSpeechAudio(text, typeof voiceUri === 'string' ? voiceUri : '');
-            audio.volume = 1.0;
-            audio.play();
+            audio.volume = 1;
+            void audio.play();
         } catch (e) {
             // NOP
         }
@@ -158,7 +158,7 @@ export class AudioController extends EventDispatcher {
             [...speechSynthesis.getVoices()].map((voice, index) => ({
                 voice,
                 isJapanese: this._languageTagIsJapanese(voice.lang),
-                index
+                index,
             })) :
             []
         );
@@ -221,7 +221,7 @@ export class AudioController extends EventDispatcher {
             'jpod101',
             'jpod101-alternate',
             'jisho',
-            'custom'
+            'custom',
         ];
         for (const type of typesAvailable) {
             if (!this._audioSourceEntries.some((entry) => entry.type === type)) {
@@ -243,7 +243,7 @@ export class AudioController extends EventDispatcher {
             path: 'audio.sources',
             start: index,
             deleteCount: 0,
-            items: [source]
+            items: [source],
         }]);
     }
 }
@@ -352,7 +352,7 @@ class AudioSourceEntry {
         const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
         const value = this._normalizeAudioSourceType(element.value);
         if (value === null) { return; }
-        this._setType(value);
+        void this._setType(value);
     }
 
     /**
@@ -360,7 +360,7 @@ class AudioSourceEntry {
      */
     _onUrlInputChange(e) {
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
-        this._setUrl(element.value);
+        void this._setUrl(element.value);
     }
 
     /**
@@ -368,7 +368,7 @@ class AudioSourceEntry {
      */
     _onVoiceSelectChange(e) {
         const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
-        this._setVoice(element.value);
+        void this._setVoice(element.value);
     }
 
     /**
@@ -403,7 +403,7 @@ class AudioSourceEntry {
                 this._showHelp(this._type);
                 break;
             case 'remove':
-                this._parent.removeSource(this);
+                void this._parent.removeSource(this);
                 break;
         }
     }

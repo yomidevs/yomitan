@@ -17,7 +17,7 @@
  */
 
 import {isContentScriptRegistered, registerContentScript, unregisterContentScript} from '../background/script-manager.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
 
 /**
  * This class controls the registration of accessibility handlers.
@@ -115,8 +115,8 @@ export class AccessibilityController {
             js: [
                 xray ?
                 'js/accessibility/google-docs-xray.js' :
-                'js/accessibility/google-docs.js'
-            ]
+                'js/accessibility/google-docs.js',
+            ],
         };
         if (!xray) { details.world = 'MAIN'; }
         return registerContentScript(id, details);

@@ -26,7 +26,7 @@ import readline from 'readline';
 import {parseArgs} from 'util';
 import {buildLibs} from '../build-libs.js';
 import {ManifestUtil} from '../manifest-util.js';
-import {getAllFiles, testMain} from '../util.js';
+import {getAllFiles} from '../util.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -55,11 +55,11 @@ async function createZip(directory, excludeFiles, outputFileName, sevenZipExes, 
                         'a',
                         outputFileName,
                         '.',
-                        ...excludeArguments
+                        ...excludeArguments,
                     ],
                     {
-                        cwd: directory
-                    }
+                        cwd: directory,
+                    },
                 );
                 return;
             } catch (e) {
@@ -85,7 +85,7 @@ async function createJSZip(directory, excludeFiles, outputFileName, onUpdate, dr
         zip.file(
             fileName.replace(/\\/g, '/'),
             fs.readFileSync(path.join(directory, fileName), {encoding: null, flag: 'r'}),
-            {}
+            {},
         );
     }
 
@@ -96,7 +96,7 @@ async function createJSZip(directory, excludeFiles, outputFileName, onUpdate, dr
     const data = await zip.generateAsync({
         type: 'nodebuffer',
         compression: 'DEFLATE',
-        compressionOptions: {level: 9}
+        compressionOptions: {level: 9},
     }, onUpdate);
     process.stdout.write('\n');
 
@@ -195,12 +195,10 @@ async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath,
                 await createZip(extDir, excludeFiles, fullFileName, sevenZipExes, onUpdate, dryRun);
             }
 
-            if (!dryRun) {
-                if (Array.isArray(fileCopies)) {
-                    for (const fileName2 of fileCopies) {
-                        const fileName2Safe = path.basename(fileName2);
-                        fs.copyFileSync(fullFileName, path.join(buildDir, fileName2Safe));
-                    }
+            if (!dryRun && Array.isArray(fileCopies)) {
+                for (const fileName2 of fileCopies) {
+                    const fileName2Safe = path.basename(fileName2);
+                    fs.copyFileSync(fullFileName, path.join(buildDir, fileName2Safe));
                 }
             }
         }
@@ -219,38 +217,37 @@ function ensureFilesExist(directory, files) {
     }
 }
 
-/**
- * @param {string[]} argv
- */
-export async function main(argv) {
+/** */
+export async function main() {
     /** @type {import('util').ParseArgsConfig['options']} */
     const parseArgsConfigOptions = {
         all: {
             type: 'boolean',
-            default: false
+            default: false,
         },
         default: {
             type: 'boolean',
-            default: false
+            default: false,
         },
         manifest: {
-            type: 'string'
+            type: 'string',
         },
         dryRun: {
             type: 'boolean',
-            default: false
+            default: false,
         },
         dryRunBuildZip: {
             type: 'boolean',
-            default: false
+            default: false,
         },
         version: {
             type: 'string',
-            default: '0.0.0.0'
-        }
+            default: '0.0.0.0',
+        },
     };
 
-    const {values: args} = parseArgs({args: argv, options: parseArgsConfigOptions});
+    const argv = process.argv.slice(2);
+    const {values: args, positionals: targets} = parseArgs({args: argv, options: parseArgsConfigOptions, allowPositionals: true});
 
     const dryRun = /** @type {boolean} */ (args.dryRun);
     const dryRunBuildZip = /** @type {boolean} */ (args.dryRunBuildZip);
@@ -268,7 +265,7 @@ export async function main(argv) {
         const variantNames = /** @type {string[]} */ ((
             argv.length === 0 || args.all ?
             manifestUtil.getVariants().filter(({buildable}) => buildable !== false).map(({name}) => name) :
-            []
+            targets
         ));
         await build(buildDir, extDir, manifestUtil, variantNames, manifestPath, dryRun, dryRunBuildZip, yomitanVersion);
     } finally {
@@ -282,4 +279,4 @@ export async function main(argv) {
     }
 }
 
-testMain(main, process.argv.slice(2));
+await main();

@@ -38,15 +38,6 @@ export type SetValuesDetails<T = unknown> = {
 
 export type OnErrorCallback<T = unknown> = (error: Error, stale: boolean, element: Element, metadata: T) => void;
 
-export type ConstructorDetails<T = unknown> = {
-    selector: string;
-    createElementMetadata: CreateElementMetadataCallback<T>;
-    compareElementMetadata: CompareElementMetadataCallback<T>;
-    getValues: GetValuesCallback<T>;
-    setValues: SetValuesCallback<T>;
-    onError?: OnErrorCallback<T> | null;
-};
-
 export type ElementObserver<T = unknown> = {
     element: Element;
     type: NormalizedElementType;

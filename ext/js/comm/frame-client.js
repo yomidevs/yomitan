@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {deferPromise, generateId, isObject} from '../core/utilities.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
+import {deferPromise, generateId} from '../core/utilities.js';
 
 export class FrameClient {
     constructor() {
@@ -68,7 +69,7 @@ export class FrameClient {
         return {
             token: /** @type {string} */ (this._token),
             secret: /** @type {string} */ (this._secret),
-            data
+            data,
         };
     }
 
@@ -82,6 +83,7 @@ export class FrameClient {
      */
     _connectInternal(frame, targetOrigin, hostFrameId, setupFrame, timeout) {
         return new Promise((resolve, reject) => {
+            /** @type {Map<string, string>} */
             const tokenMap = new Map();
             /** @type {?import('core').Timeout} */
             let timer = null;
@@ -112,7 +114,7 @@ export class FrameClient {
 
             /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
             const onMessage = (message) => {
-                onMessageInner(message);
+                void onMessageInner(message);
                 return false;
             };
 
@@ -121,9 +123,9 @@ export class FrameClient {
              */
             const onMessageInner = async (message) => {
                 try {
-                    if (!isObject(message)) { return; }
+                    if (!isObjectNotArray(message)) { return; }
                     const {action, params} = message;
-                    if (!isObject(params)) { return; }
+                    if (!isObjectNotArray(params)) { return; }
                     await frameLoadedPromise;
                     if (timer === null) { return; } // Done
 

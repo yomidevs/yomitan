@@ -26,6 +26,7 @@ import type * as DictionaryDatabase from './dictionary-database';
 import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
 import type * as Extension from './extension';
+import type * as Language from './language';
 import type * as Log from './log';
 import type * as Settings from './settings';
 import type * as SettingsModifications from './settings-modifications';
@@ -168,6 +169,12 @@ type ApiSurface = {
         };
         return: Anki.NoteId | null;
     };
+    updateAnkiNote: {
+        params: {
+            noteWithId: Anki.NoteWithId;
+        };
+        return: null;
+    };
     getAnkiNoteInfo: {
         params: {
             notes: Anki.Note[];
@@ -193,9 +200,9 @@ type ApiSurface = {
             errors: Core.SerializedError[];
         };
     };
-    noteView: {
+    viewNotes: {
         params: {
-            noteId: Anki.NoteId;
+            noteIds: Anki.NoteId[];
             mode: Settings.AnkiNoteGuiMode;
             allowFallback: boolean;
         };
@@ -260,10 +267,6 @@ type ApiSurface = {
         params: void;
         return: string;
     };
-    getDisplayTemplatesHtml: {
-        params: void;
-        return: string;
-    };
     getZoom: {
         params: void;
         return: {
@@ -288,7 +291,7 @@ type ApiSurface = {
         };
         return: DictionaryDatabase.MediaDataStringContent[];
     };
-    log: {
+    logGenericErrorBackend: {
         params: {
             error: Core.SerializedError;
             level: Log.LogLevel;
@@ -347,9 +350,10 @@ type ApiSurface = {
         params: void;
         return: true;
     };
-    textHasJapaneseCharacters: {
+    isTextLookupWorthy: {
         params: {
             text: string;
+            language: string;
         };
         return: boolean;
     };
@@ -379,6 +383,10 @@ type ApiSurface = {
     requestBackendReadySignal: {
         params: void;
         return: boolean;
+    };
+    getLanguageSummaries: {
+        params: void;
+        return: Language.LanguageSummary[];
     };
 };
 

@@ -17,9 +17,35 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {isObject} from '../core/utilities.js';
-import {base64ToArrayBuffer} from '../data/sandbox/array-buffer-util.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
+import {base64ToArrayBuffer} from '../data/array-buffer-util.js';
 
+/**
+ * This class is responsible for creating and communicating with an offscreen document.
+ * This offscreen document is used to solve two issues:
+ *
+ * - Provide clipboard access for the `ClipboardReader` class in the context of a MV3 extension.
+ *   The background service workers doesn't have access a webpage to read the clipboard from,
+ *   so it must be done in the offscreen page.
+ *
+ * - Provide a longer lifetime for the dictionary database. The background service worker can be
+ *   terminated by the web browser, which means that when it restarts, it has to go through its
+ *   initialization process again. This initialization process can take a non-trivial amount of
+ *   time, which is primarily caused by the startup of the IndexedDB database, especially when a
+ *   large amount of dictionary data is installed.
+ *
+ *   The offscreen document stays alive longer, potentially forever, which may be an artifact of
+ *   the clipboard access it requests in the `reasons` parameter. Therefore, this initialization
+ *   process should only take place once, or at the very least, less frequently than the service
+ *   worker.
+ *
+ *   The long lifetime of the offscreen document is not guaranteed by the spec, which could
+ *   result in this code functioning poorly in the future if a web browser vendor changes the
+ *   APIs or the implementation substantially, and this is even referenced on the Chrome
+ *   developer website.
+ * @see https://developer.chrome.com/blog/Offscreen-Documents-in-Manifest-v3
+ * @see https://developer.chrome.com/docs/extensions/reference/api/offscreen
+ */
 export class OffscreenProxy {
     /**
      * @param {import('../extension/web-extension.js').WebExtension} webExtension
@@ -46,9 +72,9 @@ export class OffscreenProxy {
         this._creatingOffscreen = chrome.offscreen.createDocument({
             url: 'offscreen.html',
             reasons: [
-                /** @type {chrome.offscreen.Reason} */ ('CLIPBOARD')
+                /** @type {chrome.offscreen.Reason} */ ('CLIPBOARD'),
             ],
-            justification: 'Access to the clipboard'
+            justification: 'Access to the clipboard',
         });
         await this._creatingOffscreen;
         this._creatingOffscreen = null;
@@ -59,9 +85,10 @@ export class OffscreenProxy {
      */
     async _hasOffscreenDocument() {
         const offscreenUrl = chrome.runtime.getURL('offscreen.html');
-        if (!chrome.runtime.getContexts) { // chrome version below 116
+        if (!chrome.runtime.getContexts) { // Chrome version below 116
             // Clients: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/clients
             // @ts-expect-error - Types not set up for service workers yet
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const matchedClients = await clients.matchAll();
             // @ts-expect-error - Types not set up for service workers yet
             return await matchedClients.some((client) => client.url === offscreenUrl);
@@ -69,9 +96,9 @@ export class OffscreenProxy {
 
         const contexts = await chrome.runtime.getContexts({
             contextTypes: [
-                /** @type {chrome.runtime.ContextType} */ ('OFFSCREEN_DOCUMENT')
+                /** @type {chrome.runtime.ContextType} */ ('OFFSCREEN_DOCUMENT'),
             ],
-            documentUrls: [offscreenUrl]
+            documentUrls: [offscreenUrl],
         });
         return contexts.length > 0;
     }
@@ -97,7 +124,7 @@ export class OffscreenProxy {
         if (typeof runtimeError !== 'undefined') {
             throw new Error(runtimeError.message);
         }
-        if (!isObject(response)) {
+        if (!isObjectNotArray(response)) {
             throw new Error('Offscreen document did not respond');
         }
         const responseError = response.error;
@@ -144,8 +171,7 @@ export class DictionaryDatabaseProxy {
      */
     async getMedia(targets) {
         const serializedMedia = /** @type {import('dictionary-database').Media<string>[]} */ (await this._offscreen.sendMessagePromise({action: 'databaseGetMediaOffscreen', params: {targets}}));
-        const media = serializedMedia.map((m) => ({...m, content: base64ToArrayBuffer(m.content)}));
-        return media;
+        return serializedMedia.map((m) => ({...m, content: base64ToArrayBuffer(m.content)}));
     }
 }
 
@@ -158,11 +184,9 @@ export class TranslatorProxy {
         this._offscreen = offscreen;
     }
 
-    /**
-     * @param {import('language-transformer').LanguageTransformDescriptor} descriptor
-     */
-    async prepare(descriptor) {
-        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen', params: {descriptor}});
+    /** */
+    async prepare() {
+        await this._offscreen.sendMessagePromise({action: 'translatorPrepareOffscreen'});
     }
 
     /**
@@ -175,7 +199,7 @@ export class TranslatorProxy {
         /** @type {import('offscreen').FindKanjiOptionsOffscreen} */
         const modifiedOptions = {
             ...options,
-            enabledDictionaryMap: enabledDictionaryMapList
+            enabledDictionaryMap: enabledDictionaryMapList,
         };
         return this._offscreen.sendMessagePromise({action: 'findKanjiOffscreen', params: {text, options: modifiedOptions}});
     }
@@ -198,7 +222,7 @@ export class TranslatorProxy {
             ...options,
             enabledDictionaryMap: enabledDictionaryMapList,
             excludeDictionaryDefinitions: excludeDictionaryDefinitionsList,
-            textReplacements: textReplacementsSerialized
+            textReplacements: textReplacementsSerialized,
         };
         return this._offscreen.sendMessagePromise({action: 'findTermsOffscreen', params: {mode, text, options: modifiedOptions}});
     }
@@ -234,7 +258,7 @@ export class ClipboardReaderProxy {
     set browser(value) {
         if (this._browser === value) { return; }
         this._browser = value;
-        this._offscreen.sendMessagePromise({action: 'clipboardSetBrowserOffscreen', params: {value}});
+        void this._offscreen.sendMessagePromise({action: 'clipboardSetBrowserOffscreen', params: {value}});
     }
 
     /**

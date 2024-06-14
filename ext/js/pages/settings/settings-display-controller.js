@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DocumentUtil} from '../../dom/document-util.js';
+import {isInputElementFocused} from '../../dom/document-util.js';
 import {PopupMenu} from '../../dom/popup-menu.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
@@ -70,14 +70,14 @@ export class SettingsDisplayController {
         const moreSelectorObserver = new SelectorObserver({
             selector: '.more-toggle',
             onAdded: this._onMoreSetup.bind(this),
-            onRemoved: this._onMoreCleanup.bind(this)
+            onRemoved: this._onMoreCleanup.bind(this),
         });
         moreSelectorObserver.observe(document.documentElement, false);
 
         const menuSelectorObserver = new SelectorObserver({
             selector: '[data-menu]',
             onAdded: this._onMenuSetup.bind(this),
-            onRemoved: this._onMenuCleanup.bind(this)
+            onRemoved: this._onMenuCleanup.bind(this),
         });
         menuSelectorObserver.observe(document.documentElement, false);
 
@@ -184,7 +184,7 @@ export class SettingsDisplayController {
     _onKeyDown(e) {
         switch (e.code) {
             case 'Escape':
-                if (!DocumentUtil.isInputElementFocused()) {
+                if (!isInputElementFocused()) {
                     this._closeTopMenuOrModal();
                     e.preventDefault();
                 }
@@ -290,7 +290,7 @@ export class SettingsDisplayController {
      */
     _getMoreContainer(link) {
         const v = link.dataset.parentDistance;
-        const distance = v ? parseInt(v, 10) : 1;
+        const distance = v ? Number.parseInt(v, 10) : 1;
         if (Number.isNaN(distance)) { return null; }
 
         /** @type {?Element} */
@@ -338,7 +338,7 @@ export class SettingsDisplayController {
 
         let indent = '\t';
         if (args.length > 1) {
-            const count = parseInt(args[1], 10);
+            const count = Number.parseInt(args[1], 10);
             indent = (Number.isFinite(count) && count >= 0 ? ' '.repeat(count) : args[1]);
         }
 

@@ -37,14 +37,14 @@ class DisplayController {
         const manifest = chrome.runtime.getManifest();
 
         this._showExtensionInfo(manifest);
-        this._setupEnvironment();
+        void this._setupEnvironment();
         this._setupButtonEvents('.action-open-search', 'openSearchPage', chrome.runtime.getURL('/search.html'), this._onSearchClick.bind(this));
         this._setupButtonEvents('.action-open-info', 'openInfoPage', chrome.runtime.getURL('/info.html'));
 
         const optionsFull = await this._api.optionsGetFull();
         this._optionsFull = optionsFull;
 
-        this._setupHotkeys();
+        void this._setupHotkeys();
 
         const optionsPageUrl = (
             typeof manifest.options_ui === 'object' &&
@@ -114,7 +114,15 @@ class DisplayController {
                         const result = customHandler(e);
                         if (typeof result !== 'undefined') { return; }
                     }
-                    this._api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
+
+                    let mode = 'existingOrNewTab';
+                    if (e.ctrlKey) {
+                        mode = 'newTab';
+                    } else if (e.shiftKey) {
+                        mode = 'popup';
+                    }
+
+                    void this._api.commandExec(command, {mode: mode});
                     e.preventDefault();
                 };
                 /**
@@ -122,7 +130,7 @@ class DisplayController {
                  */
                 const onAuxClick = (e) => {
                     if (e.button !== 1) { return; }
-                    this._api.commandExec(command, {mode: 'newTab'});
+                    void this._api.commandExec(command, {mode: 'newTab'});
                     e.preventDefault();
                 };
                 node.addEventListener('click', onClick, false);
@@ -187,12 +195,12 @@ class DisplayController {
     _setupOptions({options}) {
         const extensionEnabled = options.general.enable;
         const onToggleChanged = () => this._api.commandExec('toggleTextScanning');
-        for (const toggle of /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('#enable-search,#enable-search2'))) {
+        for (const toggle of /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('.enable-search,.enable-search2'))) {
             toggle.checked = extensionEnabled;
             toggle.addEventListener('change', onToggleChanged, false);
         }
-        this._updateDictionariesEnabledWarnings(options);
-        this._updatePermissionsWarnings(options);
+        void this._updateDictionariesEnabledWarnings(options);
+        void this._updatePermissionsWarnings(options);
     }
 
     /** */
@@ -238,9 +246,9 @@ class DisplayController {
      */
     _onProfileSelectChange(event) {
         const node = /** @type {HTMLInputElement} */ (event.currentTarget);
-        const value = parseInt(node.value, 10);
+        const value = Number.parseInt(node.value, 10);
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= /** @type {import('settings').Options} */ (this._optionsFull).profiles.length) {
-            this._setPrimaryProfileIndex(value);
+            void this._setPrimaryProfileIndex(value);
         }
     }
 
@@ -254,7 +262,7 @@ class DisplayController {
             path: 'profileCurrent',
             value,
             scope: 'global',
-            optionsContext: null
+            optionsContext: null,
         };
         await this._api.modifySettings([modification], 'action-popup');
     }
@@ -306,9 +314,9 @@ class DisplayController {
     }
 }
 
-await Application.main(async (application) => {
-    application.api.logIndicatorClear();
+await Application.main(true, async (application) => {
+    void application.api.logIndicatorClear();
 
     const displayController = new DisplayController(application.api);
-    displayController.prepare();
+    await displayController.prepare();
 });

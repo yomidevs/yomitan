@@ -121,7 +121,7 @@ export class ScrollElement {
         const t = this._easeInOutCubic((time - this._animationStartTime) / (this._animationEndTime - this._animationStartTime));
         this._scroll(
             this._lerp(this._animationStartX, this._animationEndX, t),
-            this._lerp(this._animationStartY, this._animationEndY, t)
+            this._lerp(this._animationStartY, this._animationEndY, t),
         );
 
         this._animationRequestId = window.requestAnimationFrame(this._requestAnimationFrameCallback);
@@ -133,10 +133,10 @@ export class ScrollElement {
      */
     _easeInOutCubic(t) {
         if (t < 0.5) {
-            return (4.0 * t * t * t);
+            return (4 * t * t * t);
         } else {
-            t = 1.0 - t;
-            return 1.0 - (4.0 * t * t * t);
+            t = 1 - t;
+            return 1 - (4 * t * t * t);
         }
     }
 

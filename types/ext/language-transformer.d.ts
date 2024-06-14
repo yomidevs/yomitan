@@ -18,7 +18,9 @@
 export type LanguageTransformDescriptor = {
     language: string;
     conditions: ConditionMapObject;
-    transforms: Transform[];
+    transforms: {
+        [name: string]: Transform;
+    };
 };
 
 export type ConditionMapObject = {
@@ -31,7 +33,7 @@ export type ConditionMapEntries = ConditionMapEntry[];
 
 export type Condition = {
     name: string;
-    partsOfSpeech: string[];
+    isDictionaryForm: boolean;
     i18n?: RuleI18n[];
     subConditions?: string[];
 };
@@ -55,8 +57,18 @@ export type TransformI18n = {
 };
 
 export type Rule = {
-    suffixIn: string;
-    suffixOut: string;
+    type: 'suffix' | 'prefix' | 'wholeWord' | 'other';
+    isInflected: RegExp;
+    deinflect: (inflectedWord: string) => string;
+    conditionsIn: string[];
+    conditionsOut: string[];
+};
+
+export type SuffixRule = {
+    type: 'suffix';
+    isInflected: RegExp;
+    deinflected: string;
+    deinflect: (inflectedWord: string) => string;
     conditionsIn: string[];
     conditionsOut: string[];
 };

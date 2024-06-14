@@ -23,6 +23,8 @@
         {"path": "test/data/dictionaries/invalid-dictionary6/index.json", "ignore": true},
         {"path": "test/jsconfig.json", "ignore": true},
         {"path": "test/data/vitest.write.config.json", "ignore": true},
+        {"path": "test/data/vitest.options.config.json", "ignore": true},
+        {"path": "test/data/vitest.json.config.json", "ignore": true},
         {"path": "benches/jsconfig.json", "ignore": true},
 
         {
@@ -89,11 +91,6 @@
             "path": "ext/data/schemas/options-schema.json",
             "typeFile": "types/test/json.d.ts",
             "type": "AjvSchema"
-        },
-        {
-            "path": "ext/data/language/japanese-transforms.json",
-            "typeFile": "types/ext/language-transformer.d.ts",
-            "type": "LanguageTransformDescriptor"
         },
         {
             "path": "test/data/translator-test-inputs.json",

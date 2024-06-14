@@ -18,7 +18,7 @@
 
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
-import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
+import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {Translator} from '../language/translator.js';
 
@@ -34,15 +34,13 @@ export class Offscreen {
         /** @type {DictionaryDatabase} */
         this._dictionaryDatabase = new DictionaryDatabase();
         /** @type {Translator} */
-        this._translator = new Translator({
-            database: this._dictionaryDatabase
-        });
+        this._translator = new Translator(this._dictionaryDatabase);
         /** @type {ClipboardReader} */
-        this._clipboardReader = new ClipboardReader({
-            document: (typeof document === 'object' && document !== null ? document : null),
-            pasteTargetSelector: '#clipboard-paste-target',
-            richContentPasteTargetSelector: '#clipboard-rich-content-paste-target'
-        });
+        this._clipboardReader = new ClipboardReader(
+            (typeof document === 'object' && document !== null ? document : null),
+            '#clipboard-paste-target',
+            '#clipboard-rich-content-paste-target',
+        );
 
 
         /* eslint-disable @stylistic/no-multi-spaces */
@@ -59,7 +57,7 @@ export class Offscreen {
             ['findKanjiOffscreen',           this._findKanjiHandler.bind(this)],
             ['findTermsOffscreen',           this._findTermsHandler.bind(this)],
             ['getTermFrequenciesOffscreen',  this._getTermFrequenciesHandler.bind(this)],
-            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)]
+            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -109,13 +107,12 @@ export class Offscreen {
     /** @type {import('offscreen').ApiHandler<'databaseGetMediaOffscreen'>} */
     async _getMediaHandler({targets}) {
         const media = await this._dictionaryDatabase.getMedia(targets);
-        const serializedMedia = media.map((m) => ({...m, content: arrayBufferToBase64(m.content)}));
-        return serializedMedia;
+        return media.map((m) => ({...m, content: arrayBufferToBase64(m.content)}));
     }
 
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */
-    _prepareTranslatorHandler({descriptor}) {
-        this._translator.prepare(descriptor);
+    _prepareTranslatorHandler() {
+        this._translator.prepare();
     }
 
     /** @type {import('offscreen').ApiHandler<'findKanjiOffscreen'>} */
@@ -123,7 +120,7 @@ export class Offscreen {
         /** @type {import('translation').FindKanjiOptions} */
         const modifiedOptions = {
             ...options,
-            enabledDictionaryMap: new Map(options.enabledDictionaryMap)
+            enabledDictionaryMap: new Map(options.enabledDictionaryMap),
         };
         return await this._translator.findKanji(text, modifiedOptions);
     }
@@ -150,7 +147,7 @@ export class Offscreen {
             ...options,
             enabledDictionaryMap,
             excludeDictionaryDefinitions,
-            textReplacements
+            textReplacements,
         };
         return this._translator.findTerms(mode, text, modifiedOptions);
     }

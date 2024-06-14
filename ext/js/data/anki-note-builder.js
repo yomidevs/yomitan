@@ -25,14 +25,14 @@ export class AnkiNoteBuilder {
     /**
      * Initiate an instance of AnkiNoteBuilder.
      * @param {import('anki-note-builder').MinimalApi} api
-     * @param {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} templateRenderer
+     * @param {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/template-renderer.js').TemplateRenderer} templateRenderer
      */
     constructor(api, templateRenderer) {
         /** @type {import('anki-note-builder').MinimalApi} */
         this._api = api;
         /** @type {RegExp} */
         this._markerPattern = cloneFieldMarkerPattern(true);
-        /** @type {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/sandbox/template-renderer.js').TemplateRenderer} */
+        /** @type {import('../templates/template-renderer-proxy.js').TemplateRendererProxy|import('../templates/template-renderer.js').TemplateRenderer} */
         this._templateRenderer = templateRenderer;
         /** @type {import('anki-note-builder').BatchedRequestGroup[]} */
         this._batchedRequests = [];
@@ -54,13 +54,12 @@ export class AnkiNoteBuilder {
         fields,
         tags = [],
         requirements = [],
-        checkForDuplicates = true,
         duplicateScope = 'collection',
         duplicateScopeCheckAllModels = false,
         resultOutputMode = 'split',
         glossaryLayoutMode = 'default',
         compactTags = false,
-        mediaOptions = null
+        mediaOptions = null,
     }) {
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
@@ -89,6 +88,7 @@ export class AnkiNoteBuilder {
         }
 
         const formattedFieldValues = await Promise.all(formattedFieldValuePromises);
+        /** @type {Map<string, import('anki-note-builder').Requirement>} */
         const uniqueRequirements = new Map();
         /** @type {import('anki').NoteFields} */
         const noteFields = {};
@@ -111,14 +111,14 @@ export class AnkiNoteBuilder {
             deckName,
             modelName,
             options: {
-                allowDuplicate: !checkForDuplicates,
+                allowDuplicate: true,
                 duplicateScope,
                 duplicateScopeOptions: {
                     deckName: duplicateScopeDeckName,
                     checkChildren: duplicateScopeCheckChildren,
-                    checkAllModels: duplicateScopeCheckAllModels
-                }
-            }
+                    checkAllModels: duplicateScopeCheckAllModels,
+                },
+            },
         };
         return {note, errors: allErrors, requirements: [...uniqueRequirements.values()]};
     }
@@ -134,7 +134,7 @@ export class AnkiNoteBuilder {
         resultOutputMode = 'split',
         glossaryLayoutMode = 'default',
         compactTags = false,
-        marker
+        marker,
     }) {
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0);
         return await this._templateRenderer.getModifiedData({marker, commonData}, 'ankiNote');
@@ -191,7 +191,7 @@ export class AnkiNoteBuilder {
             resultOutputMode,
             glossaryLayoutMode,
             compactTags,
-            media
+            media,
         };
     }
 
@@ -286,7 +286,7 @@ export class AnkiNoteBuilder {
     _runBatchedRequestsDelayed() {
         if (this._batchedRequestsQueued) { return; }
         this._batchedRequestsQueued = true;
-        Promise.resolve().then(() => {
+        void Promise.resolve().then(() => {
             this._batchedRequestsQueued = false;
             this._runBatchedRequests();
         });
@@ -314,7 +314,7 @@ export class AnkiNoteBuilder {
                 templateItems.push({
                     type: /** @type {import('anki-templates').RenderMode} */ ('ankiNote'),
                     commonData,
-                    datas
+                    datas,
                 });
             }
             items.push({template, templateItems});
@@ -322,7 +322,7 @@ export class AnkiNoteBuilder {
 
         this._batchedRequests.length = 0;
 
-        this._resolveBatchedRequests(items, allRequests);
+        void this._resolveBatchedRequests(items, allRequests);
     }
 
     /**
@@ -439,7 +439,7 @@ export class AnkiNoteBuilder {
             audioDetails,
             screenshotDetails,
             clipboardDetails,
-            dictionaryMediaDetails
+            dictionaryMediaDetails,
         );
         const {audioFileName, screenshotFileName, clipboardImageFileName, clipboardText, dictionaryMedia: dictionaryMediaArray, errors} = injectedMedia;
         const textFurigana = textFuriganaPromise !== null ? await textFuriganaPromise : [];
@@ -463,7 +463,7 @@ export class AnkiNoteBuilder {
             clipboardText: (typeof clipboardText === 'string' ? {value: clipboardText} : void 0),
             selectionText: (typeof selectionText === 'string' ? {value: selectionText} : void 0),
             textFurigana,
-            dictionaryMedia
+            dictionaryMedia,
         };
         return {media, errors};
     }

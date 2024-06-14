@@ -40,14 +40,16 @@ function ankiFieldMarkerMayUseClipboard(marker) {
  * @returns {Promise<boolean>}
  */
 export function hasPermissions(permissions) {
-    return new Promise((resolve, reject) => chrome.permissions.contains(permissions, (result) => {
-        const e = chrome.runtime.lastError;
-        if (e) {
-            reject(new Error(e.message));
-        } else {
-            resolve(result);
-        }
-    }));
+    return new Promise((resolve, reject) => {
+        chrome.permissions.contains(permissions, (result) => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
+            } else {
+                resolve(result);
+            }
+        });
+    });
 }
 
 /**
@@ -58,22 +60,26 @@ export function hasPermissions(permissions) {
 export function setPermissionsGranted(permissions, shouldHave) {
     return (
         shouldHave ?
-        new Promise((resolve, reject) => chrome.permissions.request(permissions, (result) => {
-            const e = chrome.runtime.lastError;
-            if (e) {
-                reject(new Error(e.message));
-            } else {
-                resolve(result);
-            }
-        })) :
-        new Promise((resolve, reject) => chrome.permissions.remove(permissions, (result) => {
-            const e = chrome.runtime.lastError;
-            if (e) {
-                reject(new Error(e.message));
-            } else {
-                resolve(!result);
-            }
-        }))
+        new Promise((resolve, reject) => {
+            chrome.permissions.request(permissions, (result) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(result);
+                }
+            });
+        }) :
+        new Promise((resolve, reject) => {
+            chrome.permissions.remove(permissions, (result) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(!result);
+                }
+            });
+        })
     );
 }
 
@@ -81,14 +87,16 @@ export function setPermissionsGranted(permissions, shouldHave) {
  * @returns {Promise<chrome.permissions.Permissions>}
  */
 export function getAllPermissions() {
-    return new Promise((resolve, reject) => chrome.permissions.getAll((result) => {
-        const e = chrome.runtime.lastError;
-        if (e) {
-            reject(new Error(e.message));
-        } else {
-            resolve(result);
-        }
-    }));
+    return new Promise((resolve, reject) => {
+        chrome.permissions.getAll((result) => {
+            const e = chrome.runtime.lastError;
+            if (e) {
+                reject(new Error(e.message));
+            } else {
+                resolve(result);
+            }
+        });
+    });
 }
 
 /**
@@ -113,10 +121,8 @@ export function getRequiredPermissionsForAnkiFieldValue(fieldValue) {
 export function hasRequiredPermissionsForOptions(permissions, options) {
     const permissionsSet = new Set(permissions.permissions);
 
-    if (!permissionsSet.has('nativeMessaging')) {
-        if (options.parsing.enableMecabParser) {
-            return false;
-        }
+    if (!permissionsSet.has('nativeMessaging') && options.parsing.enableMecabParser) {
+        return false;
     }
 
     if (!permissionsSet.has('clipboardRead')) {
@@ -125,7 +131,7 @@ export function hasRequiredPermissionsForOptions(permissions, options) {
         }
         const fieldsList = [
             options.anki.terms.fields,
-            options.anki.kanji.fields
+            options.anki.kanji.fields,
         ];
         for (const fields of fieldsList) {
             for (const fieldValue of Object.values(fields)) {

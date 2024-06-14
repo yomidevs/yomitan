@@ -108,14 +108,14 @@ async function showDictionaryInfo(api) {
     /** @type {HTMLElement} */
     const noneElement = querySelectorNotNull(document, '#installed-dictionaries-none');
 
-    noneElement.hidden = (dictionaryInfos.length !== 0);
+    noneElement.hidden = (dictionaryInfos.length > 0);
     /** @type {HTMLElement} */
     const container = querySelectorNotNull(document, '#installed-dictionaries');
     container.textContent = '';
     container.appendChild(fragment);
 }
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -148,8 +148,8 @@ await Application.main(async (application) => {
     languageElement.textContent = `${language}`;
     userAgentElement.textContent = userAgent;
 
-    showAnkiConnectInfo(application.api);
-    showDictionaryInfo(application.api);
+    void showAnkiConnectInfo(application.api);
+    void showDictionaryInfo(application.api);
 
     const settingsController = new SettingsController(application);
     await settingsController.prepare();

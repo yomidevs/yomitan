@@ -28,7 +28,7 @@ one of the following solutions should work for you:
 **Will you add support for online dictionaries?**
 
 Online dictionaries will not be implemented because it is not possible to support them in a robust way. In order to
-perform Japanese deinflection, Yomitan must execute dozens of database queries for every single word. Factoring in
+perform deinflection, Yomitan must execute dozens of database queries for every single word. Factoring in
 network latency and the fragility of web scraping, it would not be possible to maintain a good and consistent user
 experience.
 
@@ -48,11 +48,3 @@ the same as the time it originally took to import, which can be significant for 
 
 The vast majority of EPWING dictionaries are proprietary, so they are unfortunately not able to be included in
 this extension due to copyright reasons.
-
-**When are you going to add support for $MYLANGUAGE?**
-
-Developing Yomitan requires a decent understanding of Japanese sentence structure and grammar, and other languages
-are likely to have their own unique set of rules for syntax, grammar, inflection, and so on. Supporting additional
-languages would not only require many additional changes to the codebase, it would also incur significant maintenance
-overhead and knowledge demands for the developers. Therefore, suggestions and contributions for supporting
-new languages will be declined, allowing Yomitan's focus to remain Japanese-centric.

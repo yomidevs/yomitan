@@ -28,13 +28,10 @@ export class FrameAncestryHandler {
     /**
      * Creates a new instance.
      * @param {import('../comm/cross-frame-api.js').CrossFrameAPI} crossFrameApi
-     * @param {number} frameId The frame ID of the current frame the instance is instantiated in.
      */
-    constructor(crossFrameApi, frameId) {
+    constructor(crossFrameApi) {
         /** @type {import('../comm/cross-frame-api.js').CrossFrameAPI} */
         this._crossFrameApi = crossFrameApi;
-        /** @type {number} */
-        this._frameId = frameId;
         /** @type {boolean} */
         this._isPrepared = false;
         /** @type {string} */
@@ -48,21 +45,13 @@ export class FrameAncestryHandler {
     }
 
     /**
-     * Gets the frame ID that the instance is instantiated in.
-     * @type {number}
-     */
-    get frameId() {
-        return this._frameId;
-    }
-
-    /**
      * Initializes event event listening.
      */
     prepare() {
         if (this._isPrepared) { return; }
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
         this._crossFrameApi.registerHandlers([
-            ['frameAncestryHandlerRequestFrameInfoResponse', this._onFrameAncestryHandlerRequestFrameInfoResponse.bind(this)]
+            ['frameAncestryHandlerRequestFrameInfoResponse', this._onFrameAncestryHandlerRequestFrameInfoResponse.bind(this)],
         ]);
         this._isPrepared = true;
     }
@@ -116,8 +105,9 @@ export class FrameAncestryHandler {
      */
     _getFrameAncestryInfo(timeout = 5000) {
         return new Promise((resolve, reject) => {
+            const {frameId} = this._crossFrameApi;
             const targetWindow = window.parent;
-            if (window === targetWindow) {
+            if (frameId === null || window === targetWindow) {
                 resolve([]);
                 return;
             }
@@ -141,11 +131,10 @@ export class FrameAncestryHandler {
                 if (params.nonce !== nonce) { return null; }
 
                 // Add result
-                const {frameId, more} = params;
-                results.push(frameId);
+                results.push(params.frameId);
                 nonce = generateId(16);
 
-                if (!more) {
+                if (!params.more) {
                     // Cleanup
                     cleanup();
 
@@ -167,7 +156,6 @@ export class FrameAncestryHandler {
             // Start
             this._addResponseHandler(uniqueId, onMessage);
             resetTimeout();
-            const frameId = this._frameId;
             this._requestFrameInfo(targetWindow, frameId, frameId, uniqueId, nonce);
         });
     }
@@ -188,7 +176,7 @@ export class FrameAncestryHandler {
         const {params} = /** @type {import('core').SerializableObject} */ (data);
         if (typeof params !== 'object' || params === null) { return; }
 
-        this._onRequestFrameInfo(/** @type {import('core').SerializableObject} */ (params), source);
+        void this._onRequestFrameInfo(/** @type {import('core').SerializableObject} */ (params), source);
     }
 
     /**
@@ -208,7 +196,9 @@ export class FrameAncestryHandler {
                 return;
             }
 
-            const frameId = this._frameId;
+            const {frameId} = this._crossFrameApi;
+            if (frameId === null) { return; }
+
             const {parent} = window;
             const more = (window !== parent);
 
@@ -244,7 +234,7 @@ export class FrameAncestryHandler {
     _requestFrameInfo(targetWindow, originFrameId, childFrameId, uniqueId, nonce) {
         targetWindow.postMessage({
             action: this._requestMessageId,
-            params: {originFrameId, childFrameId, uniqueId, nonce}
+            params: {originFrameId, childFrameId, uniqueId, nonce},
         }, '*');
     }
 
@@ -298,6 +288,7 @@ export class FrameAncestryHandler {
                 }
 
                 /** @type {?ShadowRoot|undefined} */
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const shadowRoot = (
                     element.shadowRoot ||
                     // @ts-expect-error - openOrClosedShadowRoot is available to Firefox 63+ for WebExtensions

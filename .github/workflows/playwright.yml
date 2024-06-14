@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install CJK fonts
-        uses: awalsh128/cache-apt-pkgs-action@44c33b32f808cdddd5ac0366d70595ed63661ed8 # v1.3.1
+        uses: awalsh128/cache-apt-pkgs-action@a6c3917cc929dd0345bfb2d3feaf9101823370ad # v1.4.2
         with:
           packages: fonts-ipafont-mincho
           execute_install_scripts: true
@@ -52,7 +52,7 @@ jobs:
           path: dictionaries
 
       - name: Grab latest screenshots from master branch
-        uses: dawidd6/action-download-artifact@e7466d1a7587ed14867642c2ca74b5bcc1e19a2d # pin@v2
+        uses: dawidd6/action-download-artifact@09f2f74827fd3a8607589e5ad7f9398816f540fe # pin@v2
         continue-on-error: true
         id: master-screenshots
         with:

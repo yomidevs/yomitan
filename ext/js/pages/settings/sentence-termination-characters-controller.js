@@ -66,7 +66,7 @@ export class SentenceTerminationCharactersController {
             path: 'sentenceParsing.terminationCharacters',
             start: terminationCharacters.length,
             deleteCount: 0,
-            items: [terminationCharacterEntry]
+            items: [terminationCharacterEntry],
         }]);
 
         await this._updateOptions();
@@ -87,7 +87,7 @@ export class SentenceTerminationCharactersController {
             path: 'sentenceParsing.terminationCharacters',
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
 
         await this._updateOptions();
@@ -125,8 +125,9 @@ export class SentenceTerminationCharactersController {
             entry.prepare();
         }
 
-        /** @type {HTMLElement} */ (this._listTable).hidden = (terminationCharacters.length === 0);
-        /** @type {HTMLElement} */ (this._emptyIndicator).hidden = (terminationCharacters.length !== 0);
+        const empty = terminationCharacters.length === 0;
+        /** @type {HTMLElement} */ (this._listTable).hidden = empty;
+        /** @type {HTMLElement} */ (this._emptyIndicator).hidden = !empty;
     }
 
     /**
@@ -134,7 +135,7 @@ export class SentenceTerminationCharactersController {
      */
     _onAddClick(e) {
         e.preventDefault();
-        this._addNewEntry();
+        void this._addNewEntry();
     }
 
     /**
@@ -142,7 +143,7 @@ export class SentenceTerminationCharactersController {
      */
     _onResetClick(e) {
         e.preventDefault();
-        this._reset();
+        void this._reset();
     }
 
     /** */
@@ -152,7 +153,7 @@ export class SentenceTerminationCharactersController {
             character1: '"',
             character2: '"',
             includeCharacterAtStart: false,
-            includeCharacterAtEnd: false
+            includeCharacterAtEnd: false,
         };
         await this.addEntry(newEntry);
     }
@@ -257,7 +258,7 @@ class SentenceTerminationCharacterEntry {
      */
     _onTypeSelectChange(e) {
         const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
-        this._setHasCharacter2(element.value === 'quote');
+        void this._setHasCharacter2(element.value === 'quote');
     }
 
     /**
@@ -271,7 +272,7 @@ class SentenceTerminationCharacterEntry {
         }
 
         const value = node.value.substring(0, 1);
-        this._setCharacterValue(node, characterNumber, value);
+        void this._setCharacterValue(node, characterNumber, value);
     }
 
     /**
@@ -280,14 +281,14 @@ class SentenceTerminationCharacterEntry {
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'delete':
-                this._delete();
+                void this._delete();
                 break;
         }
     }
 
     /** */
     async _delete() {
-        this._parent.deleteEntry(this._index);
+        void this._parent.deleteEntry(this._index);
     }
 
     /**

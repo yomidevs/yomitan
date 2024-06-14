@@ -232,9 +232,9 @@ export type TermDictionaryEntry = {
      */
     sourceTermExactMatchCount: number;
     /**
-     * The maximum length of the transformed text for all primary sources.
+     * The maximum length of the original text for all primary sources.
      */
-    maxTransformedTextLength: number;
+    maxOriginalTextLength: number;
     /**
      * Headwords for the entry.
      */
@@ -258,7 +258,12 @@ export type InflectionRuleChainCandidate = {
     inflectionRules: InflectionRuleChain;
 };
 
-export type InflectionRuleChain = string[];
+export type InflectionRuleChain = InflectionRule[];
+
+export type InflectionRule = {
+    name: string;
+    description?: string;
+};
 
 export type InflectionSource = 'algorithm' | 'dictionary' | 'both';
 

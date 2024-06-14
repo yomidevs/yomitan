@@ -101,12 +101,26 @@
     <div style="text-align: left;">
     {{~#scope~}}
         {{~#if (op "===" definition.type "term")~}}
-            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+            {{~#unless (op "&&" selectedDictionary (op "!=" selectedDictionary definition.dictionary))~}}
+                {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+            {{~/unless~}}
         {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
             {{~#if (op ">" definition.definitions.length 1)~}}
-                <ol>{{~#each definition.definitions~}}<li>{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}</li>{{~/each~}}</ol>
+                <ol>
+                    {{~#each definition.definitions~}}
+                        {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                            <li>
+                                {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                            </li>
+                        {{~/unless~}}
+                    {{~/each~}}
+                </ol>
             {{~else~}}
-                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/each~}}
+                {{~#each definition.definitions~}}
+                    {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                        {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                    {{~/unless~}}
+                {{~/each~}}
             {{~/if~}}
         {{~else if (op "===" definition.type "kanji")~}}
             {{~#if (op ">" definition.glossary.length 1)~}}
@@ -127,12 +141,40 @@
     {{~> glossary brief=true ~}}
 {{/inline}}
 
+{{~#*inline "glossary-first"~}}
+    <div style="text-align: left;">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                {{~#with definition.definitions.[0]~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/with~}}
+            {{~else~}}
+                {{~#with definition.definitions.[0]~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/with~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+
+{{#*inline "glossary-first-no-dictionary"}}
+    {{~> glossary-first noDictionaryTag=true ~}}
+{{/inline}}
+
+{{#*inline "glossary-first-brief"}}
+    {{~> glossary-first brief=true ~}}
+{{/inline}}
+
 {{#*inline "kunyomi"}}
     {{~#each definition.kunyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
 {{/inline}}
 
 {{#*inline "onyomi"}}
     {{~#each definition.onyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+
+{{#*inline "onyomi-hiragana"}}
+    {{~#each definition.onyomi}}{{hiragana .}}{{#unless @last}}, {{/unless}}{{/each~}}
 {{/inline}}
 
 {{#*inline "reading"}}
@@ -149,32 +191,32 @@
 {{/inline}}
 
 {{#*inline "sentence"}}
-    {{~#if definition.cloze}}{{definition.cloze.sentence}}{{/if~}}
+    {{~#if definition.cloze}}{{{definition.cloze.sentence}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "cloze-prefix"}}
-    {{~#if definition.cloze}}{{definition.cloze.prefix}}{{/if~}}
+    {{~#if definition.cloze}}{{{definition.cloze.prefix}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "cloze-body"}}
-    {{~#if definition.cloze}}{{definition.cloze.body}}{{/if~}}
+    {{~#if definition.cloze}}{{{definition.cloze.body}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "cloze-body-kana"}}
-    {{~#if definition.cloze}}{{definition.cloze.bodyKana}}{{/if~}}
+    {{~#if definition.cloze}}{{{definition.cloze.bodyKana}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "cloze-suffix"}}
-    {{~#if definition.cloze}}{{definition.cloze.suffix}}{{/if~}}
+    {{~#if definition.cloze}}{{{definition.cloze.suffix}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "tags"}}
     {{~#mergeTags definition group merge}}{{this}}{{/mergeTags~}}
 {{/inline}}
 
-{{#*inline "url"}}
+{{~#*inline "url"~}}
     <a href="{{definition.url}}">{{definition.url}}</a>
-{{/inline}}
+{{~/inline~}}
 
 {{#*inline "screenshot"}}
     {{~#if (hasMedia "screenshot")~}}
@@ -215,8 +257,6 @@
             {{~/each~}}
         {{~/each~}}
         {{~#if (op ">" pitchCount 1)~}}</ol>{{~/if~}}
-    {{~else~}}
-        No pitch accent data
     {{~/if~}}
 {{/inline}}
 
@@ -226,6 +266,10 @@
 
 {{#*inline "pitch-accent-graphs"}}
     {{~> pitch-accent-list format='graph'~}}
+{{/inline}}
+
+{{#*inline "pitch-accent-graphs-jj"}}
+    {{~> pitch-accent-list format='graph-jj'~}}
 {{/inline}}
 
 {{#*inline "pitch-accent-positions"}}
@@ -265,7 +309,7 @@
 {{/inline}}
 
 {{#*inline "clipboard-text"}}
-    {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
+    {{~#if (hasMedia "clipboardText")}}{{{getMedia "clipboardText"}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "conjugation"}}
@@ -280,7 +324,7 @@
                     {{~#if (get "multiple")~}}<li>{{/if~}}
                     {{~#each inflectionRules~}}
                         {{~#if (op ">" @index 0)}} « {{/if~}}
-                        {{.}}
+                        {{name}}
                     {{~/each~}}
                     {{~#if (get "multiple")~}}</li>{{/if~}}
                 {{~/if~}}
@@ -389,15 +433,15 @@
 {{/inline}}
 
 {{#*inline "selection-text"}}
-    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
+    {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "sentence-furigana"}}
     {{~#if definition.cloze~}}
         {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
-            {{getMedia "textFurigana" definition.cloze.sentence escape=false}}
+            {{{getMedia "textFurigana" definition.cloze.sentence escape=false}}}
         {{~else~}}
-            {{definition.cloze.sentence}}
+            {{{definition.cloze.sentence}}}
         {{~/if~}}
     {{~/if~}}
 {{/inline}}

@@ -16,9 +16,9 @@
  */
 
 import {AnkiNoteBuilder} from '../../ext/js/data/anki-note-builder.js';
+import {createAnkiNoteData} from '../../ext/js/data/anki-note-data-creator.js';
 import {getStandardFieldMarkers} from '../../ext/js/data/anki-template-util.js';
-import {createAnkiNoteData} from '../../ext/js/data/sandbox/anki-note-data-creator.js';
-import {AnkiTemplateRenderer} from '../../ext/js/templates/sandbox/anki-template-renderer.js';
+import {AnkiTemplateRenderer} from '../../ext/js/templates/anki-template-renderer.js';
 
 /**
  * @param {import('dictionary').DictionaryEntryType} type
@@ -53,9 +53,9 @@ export function createTestAnkiNoteData(dictionaryEntry, mode) {
             sentence: {text: '', offset: 0},
             documentTitle: 'title',
             query: 'query',
-            fullQuery: 'fullQuery'
+            fullQuery: 'fullQuery',
         },
-        media: {}
+        media: {},
     };
     return createAnkiNoteData(marker, data);
 }
@@ -91,11 +91,11 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
             url: 'url:',
             sentence: {
                 text: `${clozePrefix}${source}${clozeSuffix}`,
-                offset: clozePrefix.length
+                offset: clozePrefix.length,
             },
             documentTitle: 'title',
             query: 'query',
-            fullQuery: 'fullQuery'
+            fullQuery: 'fullQuery',
         };
         /** @type {import('anki-note-builder').CreateNoteDetails} */
         const details = {
@@ -107,14 +107,13 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
             modelName: 'modelName',
             fields: createTestFields(dictionaryEntry.type),
             tags: ['yomitan'],
-            checkForDuplicates: true,
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
             resultOutputMode: mode,
             glossaryLayoutMode: 'default',
             compactTags: false,
             requirements: [],
-            mediaOptions: null
+            mediaOptions: null,
         };
         const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote(details);
         for (const error of errors) {

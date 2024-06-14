@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {log} from '../../core/logger.js';
+import {log} from '../../core/log.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
@@ -45,6 +45,10 @@ class DictionaryEntry {
         this._enabledCheckbox = querySelectorNotNull(fragment, '.dictionary-enabled');
         /** @type {HTMLInputElement} */
         this._priorityInput = querySelectorNotNull(fragment, '.dictionary-priority');
+        /** @type {HTMLButtonElement} */
+        this._upButton = querySelectorNotNull(fragment, '#dictionary-move-up');
+        /** @type {HTMLButtonElement} */
+        this._downButton = querySelectorNotNull(fragment, '#dictionary-move-down');
         /** @type {HTMLButtonElement} */
         this._menuButton = querySelectorNotNull(fragment, '.dictionary-menu-button');
         /** @type {HTMLButtonElement} */
@@ -77,6 +81,8 @@ class DictionaryEntry {
         this._eventListeners.addEventListener(this._enabledCheckbox, 'settingChanged', this._onEnabledChanged.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
+        this._eventListeners.addEventListener(this._upButton, 'click', (() => { this._move(-1); }).bind(this), false);
+        this._eventListeners.addEventListener(this._downButton, 'click', (() => { this._move(1); }).bind(this), false);
         this._eventListeners.addEventListener(this._outdatedButton, 'click', this._onOutdatedButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButton, 'click', this._onIntegrityButtonClick.bind(this), false);
     }
@@ -115,8 +121,6 @@ class DictionaryEntry {
     _onMenuOpen(e) {
         const bodyNode = e.detail.menu.bodyNode;
         const count = this._dictionaryController.dictionaryOptionCount;
-        this._setMenuActionEnabled(bodyNode, 'moveUp', this._index > 0);
-        this._setMenuActionEnabled(bodyNode, 'moveDown', this._index < count - 1);
         this._setMenuActionEnabled(bodyNode, 'moveTo', count > 1);
     }
 
@@ -131,12 +135,6 @@ class DictionaryEntry {
             case 'showDetails':
                 this._showDetails();
                 break;
-            case 'moveUp':
-                this._move(-1);
-                break;
-            case 'moveDown':
-                this._move(1);
-                break;
             case 'moveTo':
                 this._showMoveToModal();
                 break;
@@ -149,7 +147,7 @@ class DictionaryEntry {
     _onEnabledChanged(e) {
         const {detail: {value}} = e;
         this._titleContainer.dataset.enabled = `${value}`;
-        this._dictionaryController.updateDictionariesEnabled();
+        void this._dictionaryController.updateDictionariesEnabled();
     }
 
     /** */
@@ -211,12 +209,14 @@ class DictionaryEntry {
      * @returns {boolean}
      */
     _setupDetails(detailsTable) {
-        /** @type {[label: string, key: 'author'|'url'|'description'|'attribution'][]} */
+        /** @type {[label: string, key: 'author'|'url'|'description'|'attribution'|'sourceLanguage'|'targetLanguage'][]} */
         const targets = [
             ['Author', 'author'],
             ['URL', 'url'],
             ['Description', 'description'],
-            ['Attribution', 'attribution']
+            ['Attribution', 'attribution'],
+            ['Source Language', 'sourceLanguage'],
+            ['Target Language', 'targetLanguage'],
         ];
 
         const dictionaryInfo = this._dictionaryInfo;
@@ -255,7 +255,7 @@ class DictionaryEntry {
      * @param {number} offset
      */
     _move(offset) {
-        this._dictionaryController.moveDictionaryOptions(this._index, this._index + offset);
+        void this._dictionaryController.moveDictionaryOptions(this._index, this._index + offset);
     }
 
     /**
@@ -484,7 +484,7 @@ export class DictionaryController {
         await this._settingsController.modifyProfileSettings([{
             action: 'set',
             path: 'dictionaries',
-            value: dictionaries
+            value: dictionaries,
         }]);
 
         /** @type {import('settings-controller').EventArgument<'dictionarySettingsReordered'>} */
@@ -529,7 +529,7 @@ export class DictionaryController {
             allowSecondarySearches: false,
             definitionsCollapsible: 'not-collapsible',
             partsOfSpeechFilter: true,
-            useDeinflections: true
+            useDeinflections: true,
         };
     }
 
@@ -548,6 +548,7 @@ export class DictionaryController {
             optionsFull = await settingsController.getOptionsFull();
         }
 
+        /** @type {Set<string>} */
         const installedDictionaries = new Set();
         for (const {title} of dictionaries) {
             installedDictionaries.add(title);
@@ -558,7 +559,7 @@ export class DictionaryController {
         const {profiles} = optionsFull;
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
             let modified = false;
-            const missingDictionaries = new Set([...installedDictionaries]);
+            const missingDictionaries = new Set(installedDictionaries);
             const dictionaryOptionsArray = profiles[i].options.dictionaries;
             for (let j = dictionaryOptionsArray.length - 1; j >= 0; --j) {
                 const {name} = dictionaryOptionsArray[j];
@@ -580,7 +581,7 @@ export class DictionaryController {
                 targets.push({
                     action: 'set',
                     path: `profiles[${i}].options.dictionaries`,
-                    value: dictionaryOptionsArray
+                    value: dictionaryOptionsArray,
                 });
             }
         }
@@ -598,7 +599,7 @@ export class DictionaryController {
     _onOptionsChanged({options}) {
         this._updateDictionariesEnabledWarnings(options);
         if (this._dictionaries !== null) {
-            this._updateEntries();
+            void this._updateEntries();
         }
     }
 
@@ -620,7 +621,7 @@ export class DictionaryController {
         const allCheckbox = /** @type {HTMLInputElement} */ (this._allCheckbox);
         const value = allCheckbox.checked;
         allCheckbox.checked = !value;
-        this._setAllDictionariesEnabled(value);
+        void this._setAllDictionariesEnabled(value);
     }
 
     /** */
@@ -718,7 +719,7 @@ export class DictionaryController {
         if (typeof title !== 'string') { return; }
         delete modal.node.dataset.dictionaryTitle;
 
-        this._deleteDictionary(title);
+        void this._deleteDictionary(title);
     }
 
     /**
@@ -726,7 +727,7 @@ export class DictionaryController {
      */
     _onCheckIntegrityButtonClick(e) {
         e.preventDefault();
-        this._checkIntegrity();
+        void this._checkIntegrity();
     }
 
     /** */
@@ -743,7 +744,7 @@ export class DictionaryController {
 
         if (!Number.isFinite(target) || !Number.isFinite(indexNumber) || indexNumber === target) { return; }
 
-        this.moveDictionaryOptions(indexNumber, target);
+        void this.moveDictionaryOptions(indexNumber, target);
     }
 
     /**
@@ -871,8 +872,8 @@ export class DictionaryController {
             const onProgress = ({processed, count, storeCount, storesProcesed}) => {
                 const percent = (
                     (count > 0 && storesProcesed > 0) ?
-                    (processed / count) * (storesProcesed / storeCount) * 100.0 :
-                    0.0
+                    (processed / count) * (storesProcesed / storeCount) * 100 :
+                    0
                 );
                 const cssString = `${percent}%`;
                 const statusString = `${percent.toFixed(0)}%`;
@@ -916,7 +917,7 @@ export class DictionaryController {
      */
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
         await new DictionaryWorker().deleteDictionary(dictionaryTitle, onProgress);
-        this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'delete');
+        void this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'delete');
     }
 
     /**
@@ -937,7 +938,7 @@ export class DictionaryController {
                     path,
                     start: j,
                     deleteCount: 1,
-                    items: []
+                    items: [],
                 });
             }
         }
@@ -967,7 +968,7 @@ export class DictionaryController {
             targets.push({
                 action: 'set',
                 path: `dictionaries[${i}].enabled`,
-                value
+                value,
             });
         }
         await this._settingsController.modifyProfileSettings(targets);

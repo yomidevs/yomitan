@@ -17,18 +17,19 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {isObject} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
-import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji, isStringPartiallyJapanese} from '../language/ja/japanese.js';
-import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './sandbox/pronunciation-generator.js';
-import {StructuredContentGenerator} from './sandbox/structured-content-generator.js';
+import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji} from '../language/ja/japanese.js';
+import {getLanguageFromText} from '../language/text-utilities.js';
+import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './pronunciation-generator.js';
+import {StructuredContentGenerator} from './structured-content-generator.js';
 
 export class DisplayGenerator {
     /**
-     * @param {import('display').DisplayGeneratorConstructorDetails} details
+     * @param {import('./display-content-manager.js').DisplayContentManager} contentManager
+     * @param {?import('../input/hotkey-help-controller.js').HotkeyHelpController} hotkeyHelpController
      */
-    constructor({contentManager, hotkeyHelpController = null}) {
+    constructor(contentManager, hotkeyHelpController) {
         /** @type {import('./display-content-manager.js').DisplayContentManager} */
         this._contentManager = contentManager;
         /** @type {?import('../input/hotkey-help-controller.js').HotkeyHelpController} */
@@ -37,15 +38,21 @@ export class DisplayGenerator {
         this._templates = new HtmlTemplateCollection();
         /** @type {StructuredContentGenerator} */
         this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
+        /** @type {string} */
+        this._language = 'ja';
+    }
+
+    /** */
+    async prepare() {
+        await this._templates.loadFromFiles(['/templates-display.html']);
+        this.updateHotkeys();
     }
 
     /**
-     * @param {import('../comm/api.js').API} api
+     * @param {string} language
      */
-    async prepare(api) {
-        const html = await api.getDisplayTemplatesHtml();
-        this._templates.load(html);
-        this.updateHotkeys();
+    updateLanguage(language) {
+        this._language = language;
     }
 
     /** */
@@ -164,7 +171,8 @@ export class DisplayGenerator {
         const codepointsContainer = this._querySelector(node, '.kanji-codepoints');
         const dictionaryIndicesContainer = this._querySelector(node, '.kanji-dictionary-indices');
 
-        this._setTextContent(glyphContainer, dictionaryEntry.character, 'ja');
+        this._setTextContent(glyphContainer, dictionaryEntry.character, this._language);
+        if (this._language === 'ja') { glyphContainer.style.fontFamily = 'kanji-stroke-orders, sans-serif'; }
         const groupedFrequencies = groupKanjiFrequencies(dictionaryEntry.frequencies);
 
         const dictionaryTag = this._createDictionaryTag(dictionaryEntry.dictionary);
@@ -258,7 +266,7 @@ export class DisplayGenerator {
             if (error instanceof DocumentFragment || error instanceof Node) {
                 div.appendChild(error);
             } else {
-                let message = isObject(error) && typeof error.message === 'string' ? error.message : `${error}`;
+                let message = error.message;
                 let link = null;
                 if (error instanceof ExtensionError && error.data !== null && typeof error.data === 'object') {
                     const {referenceUrl} = /** @type {import('core').UnknownObject} */ (error.data);
@@ -393,14 +401,16 @@ export class DisplayGenerator {
     }
 
     /**
-     * @param {string} inflection
+     * @param {import('dictionary').InflectionRule} inflection
      * @returns {DocumentFragment}
      */
     _createTermInflection(inflection) {
+        const {name, description} = inflection;
         const fragment = this._templates.instantiateFragment('inflection');
         const node = this._querySelector(fragment, '.inflection');
-        this._setTextContent(node, inflection);
-        node.dataset.reason = inflection;
+        this._setTextContent(node, name);
+        if (description) { node.title = description; }
+        node.dataset.reason = name;
         return fragment;
     }
 
@@ -510,7 +520,7 @@ export class DisplayGenerator {
     _createTermDisambiguation(disambiguation) {
         const node = this._instantiate('definition-disambiguation');
         node.dataset.term = disambiguation;
-        this._setTextContent(node, disambiguation, 'ja');
+        this._setTextContent(node, disambiguation, this._language);
         return node;
     }
 
@@ -521,7 +531,7 @@ export class DisplayGenerator {
     _createKanjiLink(character) {
         const node = document.createElement('a');
         node.className = 'headword-kanji-link';
-        this._setTextContent(node, character, 'ja');
+        this._setTextContent(node, character, this._language);
         return node;
     }
 
@@ -542,7 +552,7 @@ export class DisplayGenerator {
      */
     _createKanjiReading(reading) {
         const node = this._instantiate('kanji-reading');
-        this._setTextContent(node, reading, 'ja');
+        this._setTextContent(node, reading, this._language);
         return node;
     }
 
@@ -633,7 +643,7 @@ export class DisplayGenerator {
             score: 0,
             content: [],
             dictionaries: [],
-            redundant: false
+            redundant: false,
         };
     }
 
@@ -745,7 +755,7 @@ export class DisplayGenerator {
 
         n = this._querySelector(node, '.pronunciation-text-container');
 
-        n.lang = 'ja';
+        n.lang = this._language;
         n.appendChild(createPronunciationText(morae, position, nasalPositions, devoicePositions));
 
         n = this._querySelector(node, '.pronunciation-graph-container');
@@ -764,14 +774,14 @@ export class DisplayGenerator {
         for (const term of exclusiveTerms) {
             const node = this._instantiate(templateName);
             node.dataset.type = 'term';
-            this._setTextContent(node, term, 'ja');
+            this._setTextContent(node, term, this._language);
             container.appendChild(node);
         }
 
         for (const exclusiveReading of exclusiveReadings) {
             const node = this._instantiate(templateName);
             node.dataset.type = 'reading';
-            this._setTextContent(node, exclusiveReading, 'ja');
+            this._setTextContent(node, exclusiveReading, this._language);
             container.appendChild(node);
         }
 
@@ -828,8 +838,8 @@ export class DisplayGenerator {
         const frequencyValueList = this._querySelector(node, '.frequency-value-list');
 
         this._setTextContent(tagLabel, dictionary);
-        this._setTextContent(disambiguationTerm, term, 'ja');
-        this._setTextContent(disambiguationReading, (reading !== null ? reading : ''), 'ja');
+        this._setTextContent(disambiguationTerm, term, this._language);
+        this._setTextContent(disambiguationReading, (reading !== null ? reading : ''), this._language);
         this._populateFrequencyValueList(frequencyValueList, values);
 
         node.dataset.term = term;
@@ -894,7 +904,7 @@ export class DisplayGenerator {
                     node2.title = frequencyString;
                 }
             }
-            this._setTextContent(node2, text, 'ja');
+            this._setTextContent(node2, text, this._language);
             node.appendChild(node2);
 
             fullFrequency += text;
@@ -963,7 +973,7 @@ export class DisplayGenerator {
      * @param {(element: HTMLElement, text: string) => void} addText
      */
     _appendFurigana(container, term, reading, addText) {
-        container.lang = 'ja';
+        container.lang = this._language;
         const segments = distributeFurigana(term, reading);
         for (const {text, reading: furigana} of segments) {
             if (furigana) {
@@ -993,12 +1003,7 @@ export class DisplayGenerator {
      * @param {string} [language]
      */
     _setTextContent(node, value, language) {
-        if (typeof language === 'string') {
-            node.lang = language;
-        } else if (isStringPartiallyJapanese(value)) {
-            node.lang = 'ja';
-        }
-
+        this._setElementLanguage(node, language, value);
         node.textContent = value;
     }
 
@@ -1010,11 +1015,7 @@ export class DisplayGenerator {
     _setMultilineTextContent(node, value, language) {
         // This can't just call _setTextContent because the lack of <br> elements will
         // cause the text to not copy correctly.
-        if (typeof language === 'string') {
-            node.lang = language;
-        } else if (isStringPartiallyJapanese(value)) {
-            node.lang = 'ja';
-        }
+        this._setElementLanguage(node, language, value);
 
         let start = 0;
         while (true) {
@@ -1027,6 +1028,22 @@ export class DisplayGenerator {
 
         if (start < value.length) {
             node.appendChild(document.createTextNode(start === 0 ? value : value.substring(start)));
+        }
+    }
+
+    /**
+     * @param {HTMLElement} element
+     * @param {string|undefined} language
+     * @param {string} content
+     */
+    _setElementLanguage(element, language, content) {
+        if (typeof language === 'string') {
+            element.lang = language;
+        } else {
+            const language2 = getLanguageFromText(content);
+            if (language2 !== null) {
+                element.lang = language2;
+            }
         }
     }
 

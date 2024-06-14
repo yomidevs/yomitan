@@ -117,14 +117,14 @@ export class ObjectPropertyAccessor {
         /** @type {import('core').SerializableObject} */ (target1)[key1] = value2;
         try {
             /** @type {import('core').SerializableObject} */ (target2)[key2] = value1;
-        } catch (e) {
+        } catch (error) {
             // Revert
             try {
                 /** @type {import('core').SerializableObject} */ (target1)[key1] = value1;
-            } catch (e2) {
+            } catch (error2) {
                 // NOP
             }
-            throw e;
+            throw error;
         }
     }
 
