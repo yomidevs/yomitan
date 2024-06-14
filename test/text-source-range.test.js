@@ -31,7 +31,7 @@ describe('TextSourceRange', () => {
     const {window, teardown} = textSourceRangeTestEnv;
     afterAll(() => teardown(global));
 
-    test('lazy TextSourceRange', () => {
+    test('lazy', () => {
         const {document} = window;
         const testElement /** @type {NodeListOf<HTMLElement>} */ = document.getElementById('text-source-range-lazy');
         if (testElement === null) {
@@ -54,7 +54,7 @@ describe('TextSourceRange', () => {
         expect(count).toEqual(1);
     });
 
-    test('standard TextSourceRange', () => {
+    test('standard', () => {
         const {document} = window;
         const testElement /** @type {NodeListOf<HTMLElement>} */ = document.getElementById('text-source-range');
         if (testElement === null) {
@@ -67,7 +67,7 @@ describe('TextSourceRange', () => {
 
         const source = TextSourceRange.create(range);
         const startLength = source.setStartOffset(15, false);
-        const endLength = source.setEndOffset(1, true, false);
+        const endLength = source.setEndOffset(15, true, false);
 
         const text = source.text();
         const textLength = text.length;
