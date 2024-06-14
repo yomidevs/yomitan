@@ -138,6 +138,7 @@ export class TextSourceRange {
      * @returns {number} The actual number of codepoints that were read.
      */
     setEndOffset(length, fromEnd, layoutAwareScan) {
+        if (this._disallowExpandSelection) { return 0; }
         let node;
         let offset;
         if (fromEnd) {
@@ -150,9 +151,10 @@ export class TextSourceRange {
         const state = new DOMTextScanner(node, offset, !layoutAwareScan, layoutAwareScan).seek(length);
         this._range.setEnd(state.node, state.offset);
         const expandedContent = fromEnd ? this._content + state.content : state.content;
-        this._content = this._disallowExpandSelection ? this._content : expandedContent;
+        this._content = expandedContent;
         return length - state.remainder;
     }
+
 
     /**
      * Moves the start offset of the text by a set amount of unicode codepoints.
@@ -162,6 +164,7 @@ export class TextSourceRange {
      * @returns {number} The actual number of codepoints that were read.
      */
     setStartOffset(length, layoutAwareScan) {
+        if (this._disallowExpandSelection) { return 0; }
         const state = new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan).seek(-length);
         this._range.setStart(state.node, state.offset);
         this._rangeStartOffset = this._range.startOffset;
