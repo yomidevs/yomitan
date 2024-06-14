@@ -1315,7 +1315,7 @@ export class Backend {
                 id: 'yomitan_lookup',
                 title: 'Lookup in Yomitan',
                 contexts: ['selection'],
-            });
+            }, () => this._checkLastError(chrome.runtime.lastError));
             chrome.contextMenus.onClicked.addListener((info) => {
                 if (info.selectionText) {
                     this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
