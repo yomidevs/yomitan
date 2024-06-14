@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {isStringPartiallyJapanese} from './ja/japanese.js';
+import {languageDescriptorMap} from './language-descriptors.js';
 
 /**
  * Returns the language that the string might be by using some heuristic checks.
@@ -24,6 +24,8 @@ import {isStringPartiallyJapanese} from './ja/japanese.js';
  * @returns {?string}
  */
 export function getLanguageFromText(text) {
-    if (isStringPartiallyJapanese(text)) { return 'ja'; }
+    for (const languageDescriptor of languageDescriptorMap.values()) {
+        if (typeof languageDescriptor.isTextLookupWorthy !== 'undefined' && languageDescriptor.isTextLookupWorthy(text)) { return languageDescriptor.iso; }
+    }
     return null;
 }
