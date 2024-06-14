@@ -38,7 +38,7 @@ describe('CacheMap', () => {
             {
                 maxSize: 1,
                 expectedSize: 0,
-                calls: []
+                calls: [],
             },
             {
                 maxSize: 10,
@@ -48,8 +48,8 @@ describe('CacheMap', () => {
                     {func: 'has', args: ['a1-b-c'],     returnValue: false},
                     {func: 'set', args: ['a1-b-c', 32], returnValue: void 0},
                     {func: 'get', args: ['a1-b-c'],     returnValue: 32},
-                    {func: 'has', args: ['a1-b-c'],     returnValue: true}
-                ]
+                    {func: 'has', args: ['a1-b-c'],     returnValue: true},
+                ],
             },
             {
                 maxSize: 10,
@@ -60,8 +60,8 @@ describe('CacheMap', () => {
                     {func: 'set', args: ['a1-b-c', 64], returnValue: void 0},
                     {func: 'get', args: ['a1-b-c'],     returnValue: 64},
                     {func: 'set', args: ['a2-b-c', 96], returnValue: void 0},
-                    {func: 'get', args: ['a2-b-c'],     returnValue: 96}
-                ]
+                    {func: 'get', args: ['a2-b-c'],     returnValue: 96},
+                ],
             },
             {
                 maxSize: 2,
@@ -81,9 +81,9 @@ describe('CacheMap', () => {
                     {func: 'set', args: ['a3-b-c', 3], returnValue: void 0},
                     {func: 'has', args: ['a1-b-c'],    returnValue: false},
                     {func: 'has', args: ['a2-b-c'],    returnValue: true},
-                    {func: 'has', args: ['a3-b-c'],    returnValue: true}
-                ]
-            }
+                    {func: 'has', args: ['a3-b-c'],    returnValue: true},
+                ],
+            },
         ];
         /* eslint-enable @stylistic/no-multi-spaces */
 

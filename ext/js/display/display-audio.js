@@ -60,7 +60,7 @@ export class DisplayAudio {
             ['text-to-speech', 'Text-to-speech'],
             ['text-to-speech-reading', 'Text-to-speech (Kana reading)'],
             ['custom', 'Custom URL'],
-            ['custom-json', 'Custom URL (JSON)']
+            ['custom-json', 'Custom URL (JSON)'],
         ]);
         /** @type {(event: MouseEvent) => void} */
         this._onAudioPlayButtonClickBind = this._onAudioPlayButtonClick.bind(this);
@@ -85,10 +85,10 @@ export class DisplayAudio {
         /* eslint-disable @stylistic/no-multi-spaces */
         this._display.hotkeyHandler.registerActions([
             ['playAudio',           this._onHotkeyActionPlayAudio.bind(this)],
-            ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)]
+            ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)],
         ]);
         this._display.registerDirectMessageHandlers([
-            ['displayAudioClearAutoPlayTimer', this._onMessageClearAutoPlayTimer.bind(this)]
+            ['displayAudioClearAutoPlayTimer', this._onMessageClearAutoPlayTimer.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
@@ -172,7 +172,7 @@ export class DisplayAudio {
         const requiredAudioSources = new Set([
             'jpod101',
             'jpod101-alternate',
-            'jisho'
+            'jisho',
         ]);
         /** @type {Map<string, import('display-audio').AudioSource[]>} */
         const nameMap = new Map();
@@ -297,7 +297,7 @@ export class DisplayAudio {
             downloadable,
             name,
             nameIndex,
-            nameUnique: (nameIndex === 0)
+            nameUnique: (nameIndex === 0),
         };
 
         entries.push(source);
@@ -369,7 +369,7 @@ export class DisplayAudio {
         if (typeof cacheEntry === 'undefined' && create) {
             cacheEntry = {
                 sourceMap: new Map(),
-                primaryCardAudio: null
+                primaryCardAudio: null,
             };
             this._cache.set(key, cacheEntry);
         }
@@ -389,7 +389,7 @@ export class DisplayAudio {
                 if (indexNumber >= 0 && indexNumber < this._audioSources.length) {
                     return {
                         source: this._audioSources[indexNumber],
-                        subIndex: typeof subIndex === 'string' ? Number.parseInt(subIndex, 10) : null
+                        subIndex: typeof subIndex === 'string' ? Number.parseInt(subIndex, 10) : null,
                     };
                 }
             }
@@ -617,7 +617,7 @@ export class DisplayAudio {
         const result = {
             audio: null,
             index: -1,
-            cacheUpdated: false
+            cacheUpdated: false,
         };
         for (let i = start; i < end; ++i) {
             const item = infoList[i];

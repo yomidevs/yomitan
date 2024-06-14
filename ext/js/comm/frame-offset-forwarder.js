@@ -35,7 +35,7 @@ export class FrameOffsetForwarder {
     prepare() {
         this._frameAncestryHandler.prepare();
         this._crossFrameApi.registerHandlers([
-            ['frameOffsetForwarderGetChildFrameRect', this._onMessageGetChildFrameRect.bind(this)]
+            ['frameOffsetForwarderGetChildFrameRect', this._onMessageGetChildFrameRect.bind(this)],
         ]);
     }
 

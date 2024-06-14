@@ -57,7 +57,7 @@ export class DictionaryWorkerMediaLoader {
             // This is executed in a Worker context, so the self needs to be force cast
             /** @type {Worker} */ (/** @type {unknown} */ (self)).postMessage({
                 action: 'getImageDetails',
-                params: {id, content, mediaType}
+                params: {id, content, mediaType},
             }, [content]);
         });
     }

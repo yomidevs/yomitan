@@ -105,6 +105,10 @@ export type ApiSurface = {
         };
         return: void;
     };
+    frontendScanSelectedText: {
+        params: void;
+        return: void;
+    };
     frameEndpointReady: {
         params: FrameEndpointReadyDetails;
         return: void;

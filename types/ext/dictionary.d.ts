@@ -258,7 +258,12 @@ export type InflectionRuleChainCandidate = {
     inflectionRules: InflectionRuleChain;
 };
 
-export type InflectionRuleChain = string[];
+export type InflectionRuleChain = InflectionRule[];
+
+export type InflectionRule = {
+    name: string;
+    description?: string;
+};
 
 export type InflectionSource = 'algorithm' | 'dictionary' | 'both';
 

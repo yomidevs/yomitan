@@ -66,16 +66,16 @@ export class SearchDisplayController {
         /** @type {boolean} */
         this._clipboardMonitorEnabled = false;
         /** @type {import('clipboard-monitor').ClipboardReaderLike} */
-        this.clipboardReaderLike = {
-            getText: this._display.application.api.clipboardGet.bind(this._display.application.api)
+        this._clipboardReaderLike = {
+            getText: this._display.application.api.clipboardGet.bind(this._display.application.api),
         };
         /** @type {ClipboardMonitor} */
-        this._clipboardMonitor = new ClipboardMonitor(this.clipboardReaderLike);
+        this._clipboardMonitor = new ClipboardMonitor(this._clipboardReaderLike);
         /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
             ['searchDisplayControllerGetMode', this._onMessageGetMode.bind(this)],
             ['searchDisplayControllerSetMode', this._onMessageSetMode.bind(this)],
-            ['searchDisplayControllerUpdateSearchQuery', this._onExternalSearchUpdate.bind(this)]
+            ['searchDisplayControllerUpdateSearchQuery', this._onExternalSearchUpdate.bind(this)],
         ]);
     }
 
@@ -92,7 +92,7 @@ export class SearchDisplayController {
         this._display.on('contentUpdateStart', this._onContentUpdateStart.bind(this));
 
         this._display.hotkeyHandler.registerActions([
-            ['focusSearchBox', this._onActionFocusSearchBox.bind(this)]
+            ['focusSearchBox', this._onActionFocusSearchBox.bind(this)],
         ]);
 
         this._updateClipboardMonitorEnabled();
@@ -271,7 +271,7 @@ export class SearchDisplayController {
     /** */
     async _onCopy() {
         // Ignore copy from search page
-        this._clipboardMonitor.setPreviousText(document.hasFocus() ? await this.clipboardReaderLike.getText(false) : '');
+        this._clipboardMonitor.setPreviousText(document.hasFocus() ? await this._clipboardReaderLike.getText(false) : '');
     }
 
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
@@ -317,7 +317,7 @@ export class SearchDisplayController {
             path: 'general.enableWanakana',
             value,
             scope: 'profile',
-            optionsContext: this._display.getOptionsContext()
+            optionsContext: this._display.getOptionsContext(),
         };
         void this._display.application.api.modifySettings([modification], 'search');
     }
@@ -358,7 +358,7 @@ export class SearchDisplayController {
             path: 'profileCurrent',
             value,
             scope: 'global',
-            optionsContext: null
+            optionsContext: null,
         };
         await this._display.application.api.modifySettings([modification], 'search');
     }
@@ -477,7 +477,7 @@ export class SearchDisplayController {
             path: 'clipboard.enableSearchPageMonitor',
             value,
             scope: 'profile',
-            optionsContext: this._display.getOptionsContext()
+            optionsContext: this._display.getOptionsContext(),
         };
         await this._display.application.api.modifySettings([modification], 'search');
     }
@@ -498,7 +498,6 @@ export class SearchDisplayController {
      */
     _canEnableClipboardMonitor() {
         switch (this._searchPersistentStateController.mode) {
-            case 'popup':
             case 'action-popup':
                 return false;
             default:
@@ -517,7 +516,7 @@ export class SearchDisplayController {
                 (granted) => {
                     const e = chrome.runtime.lastError;
                     resolve(!e && granted);
-                }
+                },
             );
         });
     }
@@ -544,20 +543,20 @@ export class SearchDisplayController {
             focus: false,
             historyMode,
             params: {
-                query
+                query,
             },
             state: {
                 focusEntry: 0,
                 optionsContext,
                 url,
                 sentence: {text: query, offset: 0},
-                documentTitle
+                documentTitle,
             },
             content: {
                 dictionaryEntries: void 0,
                 animate,
-                contentOrigin: {tabId, frameId}
-            }
+                contentOrigin: {tabId, frameId},
+            },
         };
         if (!lookup) { details.params.lookup = 'false'; }
         this._display.setContent(details);

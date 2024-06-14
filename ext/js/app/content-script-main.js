@@ -39,7 +39,7 @@ await Application.main(false, async (application) => {
         canUseWindowPopup: true,
         allowRootFramePopupProxy: true,
         childrenSupported: true,
-        hotkeyHandler
+        hotkeyHandler,
     });
     await frontend.prepare();
 });

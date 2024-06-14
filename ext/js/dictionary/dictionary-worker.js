@@ -37,7 +37,7 @@ export class DictionaryWorker {
             {details, archiveContent},
             [archiveContent],
             onProgress,
-            this._formatImportDictionaryResult.bind(this)
+            this._formatImportDictionaryResult.bind(this),
         );
     }
 
@@ -82,7 +82,7 @@ export class DictionaryWorker {
                 reject,
                 onMessage: null,
                 onProgress,
-                formatResult
+                formatResult,
             };
             // Ugly typecast below due to not being able to explicitly state the template types
             /** @type {(event: MessageEvent<import('dictionary-worker').MessageData<TResponseRaw>>) => void} */
@@ -200,7 +200,7 @@ export class DictionaryWorker {
         const {result, errors} = response;
         return {
             result,
-            errors: errors.map((error) => ExtensionError.deserialize(error))
+            errors: errors.map((error) => ExtensionError.deserialize(error)),
         };
     }
 }

@@ -85,7 +85,7 @@ export class AnkiTemplatesController {
             menuButton.addEventListener(
                 /** @type {string} */ ('menuClose'),
                 /** @type {EventListener} */ (this._onFieldMenuClose.bind(this)),
-                false
+                false,
             );
         }
 
@@ -231,7 +231,7 @@ export class AnkiTemplatesController {
         }
         return {
             dictionaryEntry: /** @type {import('dictionary').TermDictionaryEntry} */ (this._cachedDictionaryEntryValue),
-            text: this._cachedDictionaryEntryText
+            text: this._cachedDictionaryEntryText,
         };
     }
 
@@ -257,11 +257,11 @@ export class AnkiTemplatesController {
                     url: window.location.href,
                     sentence: {
                         text: sentenceText,
-                        offset: 0
+                        offset: 0,
                     },
                     documentTitle: document.title,
                     query: sentenceText,
-                    fullQuery: sentenceText
+                    fullQuery: sentenceText,
                 };
                 const template = this._getAnkiTemplate(options);
                 const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
@@ -273,11 +273,11 @@ export class AnkiTemplatesController {
                     deckName: '',
                     modelName: '',
                     fields: [
-                        ['field', field]
+                        ['field', field],
                     ],
                     resultOutputMode,
                     glossaryLayoutMode,
-                    compactTags
+                    compactTags,
                 }));
                 result = note.fields.field;
                 allErrors.push(...errors);

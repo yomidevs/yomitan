@@ -62,7 +62,7 @@ export class GoogleDocsUtil {
             const style = document.createElement('style');
             style.textContent = [
                 '.kix-canvas-tile-content{pointer-events:none!important;}',
-                '.kix-canvas-tile-content svg>g>rect{pointer-events:all!important;}'
+                '.kix-canvas-tile-content svg>g>rect{pointer-events:all!important;}',
             ].join('\n');
             const parent = document.head || document.documentElement;
             if (parent !== null) {

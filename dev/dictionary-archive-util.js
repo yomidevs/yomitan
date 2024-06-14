@@ -32,7 +32,7 @@ export async function createDictionaryArchiveData(dictionaryDirectory, dictionar
     // Level 0 compression used since decompression in the node environment is not supported.
     // See dev/lib/zip.js for more details.
     const zipWriter = new ZipWriter(zipFileWriter, {
-        level: 0
+        level: 0,
     });
     for (const fileName of fileNames) {
         if (/\.json$/.test(fileName)) {

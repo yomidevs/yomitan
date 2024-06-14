@@ -159,7 +159,7 @@ export class SortFrequencyDictionaryController {
 
         const frequencies = await this._settingsController.application.api.getTermFrequencies(
             terms.map((term) => ({term, reading: null})),
-            [dictionary]
+            [dictionary],
         );
 
         /** @type {Map<string, {hasValue: boolean, minValue: number, maxValue: number}>} */

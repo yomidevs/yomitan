@@ -33,7 +33,7 @@ const optionalDiacritics = [
     '\u0654', // Hamza Above
     '\u0655', // Hamza Below
     '\u0656', // Subscript Alef
-    '\u0670' // Dagger Alef
+    '\u0670', // Dagger Alef
 ];
 
 const diacriticsRegex = new RegExp(`[${optionalDiacritics.join('')}]`, 'g');
@@ -45,5 +45,5 @@ export const removeArabicScriptDiacritics = {
     options: basicTextProcessorOptions,
     process: (text, setting) => {
         return setting ? text.replace(diacriticsRegex, '') : text;
-    }
+    },
 };

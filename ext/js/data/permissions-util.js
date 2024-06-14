@@ -131,7 +131,7 @@ export function hasRequiredPermissionsForOptions(permissions, options) {
         }
         const fieldsList = [
             options.anki.terms.fields,
-            options.anki.kanji.fields
+            options.anki.kanji.fields,
         ];
         for (const fields of fieldsList) {
             for (const fieldValue of Object.values(fields)) {

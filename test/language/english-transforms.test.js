@@ -37,8 +37,8 @@ const tests = [
             {term: 'slip', source: 'slippy',  rule: 'ns', reasons: ['-y']},
             {term: 'star', source: 'starry',  rule: 'ns', reasons: ['-y']},
             {term: 'gas', source: 'gassy',  rule: 'ns', reasons: ['-y']},
-            {term: 'wit', source: 'witty',  rule: 'ns', reasons: ['-y']}
-        ]
+            {term: 'wit', source: 'witty',  rule: 'ns', reasons: ['-y']},
+        ],
     },
     {
         category: 'verbs',
@@ -95,8 +95,8 @@ const tests = [
             {term: 'slip', source: 'slippy',  rule: 'v', reasons: ['-y']},
             {term: 'blur', source: 'blurry',  rule: 'v', reasons: ['-y']},
             {term: 'chat', source: 'chatty',  rule: 'v', reasons: ['-y']},
-            {term: 'learn', source: 'unlearn',  rule: 'v', reasons: ['un-']}
-        ]
+            {term: 'learn', source: 'unlearn',  rule: 'v', reasons: ['un-']},
+        ],
     },
     {
         category: 'phrasal verbs',
@@ -106,15 +106,15 @@ const tests = [
             {term: 'look up', source: 'looking up',  rule: 'v_phr', reasons: ['ing']},
             {term: 'look up', source: 'looked up',  rule: 'v_phr', reasons: ['past']},
             {term: 'look up', source: 'looks up',  rule: 'v_phr', reasons: ['3rd pers. sing. pres']},
-            {term: 'look up', source: 'looked something up',  rule: 'v_phr', reasons: ['past', 'interposed object']}
-        ]
+            {term: 'look up', source: 'looked something up',  rule: 'v_phr', reasons: ['past', 'interposed object']},
+        ],
     },
     {
         category: 'adverbs',
         valid: true,
         tests: [
-            {term: 'interestingly', source: 'uninterestingly',  rule: 'adj', reasons: ['un-']}
-        ]
+            {term: 'interestingly', source: 'uninterestingly',  rule: 'adj', reasons: ['un-']},
+        ],
     },
     {
         category: 'adjectives',
@@ -141,9 +141,9 @@ const tests = [
             {term: 'hot', source: 'hottest',  rule: 'adj', reasons: ['superlative']},
             {term: 'quick', source: 'quickly',  rule: 'adj', reasons: ['adverb']},
             {term: 'happy', source: 'happily',  rule: 'adj', reasons: ['adverb']},
-            {term: 'humble', source: 'humbly',  rule: 'adj', reasons: ['adverb']}
-        ]
-    }
+            {term: 'humble', source: 'humbly',  rule: 'adj', reasons: ['adverb']},
+        ],
+    },
 ];
 /* eslint-enable @stylistic/no-multi-spaces */
 

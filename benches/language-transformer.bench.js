@@ -37,7 +37,7 @@ describe('language transformer', () => {
             '愛しかった',
             '愛しくありません',
             '愛しくありませんでした',
-            '愛しき'
+            '愛しき',
         ];
 
         const verbInflections = [
@@ -80,14 +80,14 @@ describe('language transformer', () => {
             '食べておる',
             '食べてる',
             '食べとる',
-            '食べてしまう'
+            '食べてしまう',
         ];
 
         const inflectionCombinations = [
             '抱き抱えていなければ',
             '抱きかかえていなければ',
             '打ち込んでいませんでした',
-            '食べさせられたくなかった'
+            '食べさせられたくなかった',
         ];
 
         const kuruInflections = [
@@ -133,7 +133,7 @@ describe('language transformer', () => {
             'きておる',
             'きてる',
             'きとる',
-            'きてしまう'
+            'きてしまう',
         ];
 
         const suruInflections = [
@@ -184,7 +184,7 @@ describe('language transformer', () => {
             'しておる',
             'してる',
             'しとる',
-            'してしまう'
+            'してしまう',
         ];
 
         const kansaibenInflections = [
@@ -195,7 +195,7 @@ describe('language transformer', () => {
             '買わへんかった',
             '買うて',
             '買うた',
-            '買うたら'
+            '買うたら',
         ];
 
         const basicTransformations = [...adjectiveInflections, ...verbInflections, ...inflectionCombinations];

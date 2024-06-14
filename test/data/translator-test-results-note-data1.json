@@ -4579,7 +4579,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -4895,7 +4897,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -5211,7 +5215,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -5527,7 +5533,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -9718,7 +9726,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -10034,7 +10044,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -11199,7 +11211,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -11515,7 +11529,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -12899,7 +12915,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -13246,7 +13264,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -15003,7 +15023,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -16209,11 +16231,21 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "-te",
-                "progressive or perfect",
-                "polite",
-                "negative",
-                "past"
+                {
+                  "name": "-te"
+                },
+                {
+                  "name": "progressive or perfect"
+                },
+                {
+                  "name": "polite"
+                },
+                {
+                  "name": "negative"
+                },
+                {
+                  "name": "past"
+                }
               ]
             }
           ],
@@ -16637,11 +16669,21 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "-te",
-                "progressive or perfect",
-                "polite",
-                "negative",
-                "past"
+                {
+                  "name": "-te"
+                },
+                {
+                  "name": "progressive or perfect"
+                },
+                {
+                  "name": "polite"
+                },
+                {
+                  "name": "negative"
+                },
+                {
+                  "name": "past"
+                }
               ]
             }
           ],
@@ -17065,11 +17107,21 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "-te",
-                "progressive or perfect",
-                "polite",
-                "negative",
-                "past"
+                {
+                  "name": "-te"
+                },
+                {
+                  "name": "progressive or perfect"
+                },
+                {
+                  "name": "polite"
+                },
+                {
+                  "name": "negative"
+                },
+                {
+                  "name": "past"
+                }
               ]
             }
           ],
@@ -17493,11 +17545,21 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "-te",
-                "progressive or perfect",
-                "polite",
-                "negative",
-                "past"
+                {
+                  "name": "-te"
+                },
+                {
+                  "name": "progressive or perfect"
+                },
+                {
+                  "name": "polite"
+                },
+                {
+                  "name": "negative"
+                },
+                {
+                  "name": "past"
+                }
               ]
             }
           ],
@@ -17921,7 +17983,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -18237,7 +18301,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -18553,7 +18619,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -18869,7 +18937,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -21515,7 +21585,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -21831,7 +21903,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -22147,7 +22221,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -22463,7 +22539,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -25109,7 +25187,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -25425,7 +25505,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -25741,7 +25823,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -26057,7 +26141,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -27015,7 +27101,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -27337,8 +27425,12 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "polite",
-                "past"
+                {
+                  "name": "polite"
+                },
+                {
+                  "name": "past"
+                }
               ]
             }
           ],
@@ -28271,7 +28363,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "masu stem"
+                {
+                  "name": "masu stem"
+                }
               ]
             }
           ],
@@ -30322,14 +30416,21 @@
             {
               "source": "both",
               "inflectionRules": [
-                "past"
+                {
+                  "name": "past"
+                }
               ]
             },
             {
               "source": "algorithm",
               "inflectionRules": [
-                "past",
-                "kansai-ben"
+                {
+                  "name": "past"
+                },
+                {
+                  "name": "kansai-ben",
+                  "description": "past form of kansai-ben terms"
+                }
               ]
             }
           ],
@@ -32831,8 +32932,13 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "adv",
-                "kansai-ben"
+                {
+                  "name": "adv"
+                },
+                {
+                  "name": "kansai-ben",
+                  "description": "-ku stem of kansai-ben adjectives"
+                }
               ]
             }
           ],
@@ -33184,7 +33290,9 @@
             {
               "source": "algorithm",
               "inflectionRules": [
-                "-거나"
+                {
+                  "name": "-거나"
+                }
               ]
             }
           ],

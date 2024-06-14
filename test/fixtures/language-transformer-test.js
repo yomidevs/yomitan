@@ -48,7 +48,7 @@ function hasTermReasons(languageTransformer, source, expectedTerm, expectedCondi
             return {
                 has: true,
                 reasons: trace.map((frame) => frame.transform),
-                rules: conditions
+                rules: conditions,
             };
         }
     }

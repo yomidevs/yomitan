@@ -43,7 +43,7 @@ export class AnkiController {
             ignoreSelector: null,
             onAdded: this._createCardController.bind(this),
             onRemoved: this._removeCardController.bind(this),
-            isStale: this._isCardControllerStale.bind(this)
+            isStale: this._isCardControllerStale.bind(this),
         });
         /** @type {Intl.Collator} */
         this._stringComparer = new Intl.Collator(); // Locale does not matter
@@ -95,7 +95,7 @@ export class AnkiController {
             this._ankiEnableCheckbox.addEventListener(
                 /** @type {string} */ ('settingChanged'),
                 /** @type {EventListener} */ (this._onAnkiEnableChanged.bind(this)),
-                false
+                false,
             );
         }
         for (const input of ankiCardPrimaryTypeRadios) {
@@ -314,7 +314,7 @@ export class AnkiController {
         const fieldMenuTargets = [
             [['term'], 'anki-card-terms-field-menu'],
             [['kanji'], 'anki-card-kanji-field-menu'],
-            [['term', 'kanji'], 'anki-card-all-field-menu']
+            [['term', 'kanji'], 'anki-card-all-field-menu'],
         ];
         const {templates} = this._settingsController;
         for (const [types, templateName] of fieldMenuTargets) {
@@ -363,10 +363,10 @@ export class AnkiController {
         this._setAnkiStatusChanging();
         const [
             [deckNames, getDeckNamesError],
-            [modelNames, getModelNamesError]
+            [modelNames, getModelNamesError],
         ] = await Promise.all([
             this._getDeckNames(),
-            this._getModelNames()
+            this._getModelNames(),
         ]);
 
         if (getDeckNamesError !== null) {
@@ -481,7 +481,7 @@ export class AnkiController {
             '"よむ" deck:current',
             '"よむ"',
             'deck:current',
-            ''
+            '',
         ];
 
         let noteId = null;
@@ -864,7 +864,7 @@ class AnkiCardController {
         await this._settingsController.modifyProfileSettings([{
             action: 'set',
             path: ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'deck']),
-            value
+            value,
         }]);
     }
 
@@ -909,13 +909,13 @@ class AnkiCardController {
             {
                 action: 'set',
                 path: ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'model']),
-                value
+                value,
             },
             {
                 action: 'set',
                 path: ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields']),
-                value: fields
-            }
+                value: fields,
+            },
         ];
 
         this._modelController.value = value;
@@ -1011,7 +1011,7 @@ class AnkiCardController {
             ['glossary', ['definition', 'meaning']],
             ['audio', ['sound']],
             ['dictionary', ['dict']],
-            ['pitch-accents', ['pitch']]
+            ['pitch-accents', ['pitch']],
         ]);
 
         const hyphenPattern = /-/g;

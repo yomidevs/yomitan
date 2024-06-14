@@ -47,7 +47,7 @@ export class Environment {
 
         return {
             browser,
-            platform: {os}
+            platform: {os},
         };
     }
 
