@@ -21,7 +21,7 @@ import {bench, describe} from 'vitest';
 describe('Canary', () => {
     bench('Loop 1 through 100,000', async () => {
         let sum = 0;
-        for (let i = 0; i < 10000; i++) {
+        for (let i = 0; i < 100_000; i++) {
             sum += i;
         }
         console.debug(sum);
