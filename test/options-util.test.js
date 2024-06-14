@@ -494,8 +494,8 @@ function createProfileOptionsUpdatedTestData1() {
                 {action: 'viewNotes',         argument: '',  key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'copyHostSelection', argument: '',  key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true},
                 {action: 'profilePrevious',   argument: '',  key: 'Minus',     modifiers: ['alt'],  scopes: ['popup', 'search', 'web'], enabled: true},
-                {action: 'profileNext',       argument: '',  key: 'Equal',     modifiers: ['alt'],  scopes: ['popup', 'search', 'web'], enabled: true}
-            ]
+                {action: 'profileNext',       argument: '',  key: 'Equal',     modifiers: ['alt'],  scopes: ['popup', 'search', 'web'], enabled: true},
+            ],
             /* eslint-enable @stylistic/no-multi-spaces */
         },
         popupWindow: {

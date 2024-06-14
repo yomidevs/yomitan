@@ -124,7 +124,7 @@ export class Frontend {
             ['scanTextAtSelection', this._onActionScanTextAtSelection.bind(this)],
             ['scanTextAtCaret',  this._onActionScanTextAtCaret.bind(this)],
             ['profilePrevious',   async () => { await setProfile(-1, this._application); }],
-            ['profileNext',       async () => { await setProfile(1, this._application); }]
+            ['profileNext',       async () => { await setProfile(1, this._application); }],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }

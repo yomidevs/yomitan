@@ -1325,7 +1325,7 @@ export class OptionsUtil {
         }
     }
 
-     /**
+    /**
      *  - Added support for web hotkey scope to profilePrevious and profileNext
      *  @type {import('options-util').UpdateFunction}
      */

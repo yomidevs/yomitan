@@ -31,7 +31,7 @@ export async function setProfile(direction, application) {
         path: 'profileCurrent',
         value: newProfile,
         scope: 'global',
-        optionsContext: null
+        optionsContext: null,
     };
     await application.api.modifySettings([modification], 'search');
 }
