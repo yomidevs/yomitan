@@ -151,11 +151,7 @@ export class TextSourceRange {
         const state = new DOMTextScanner(node, offset, !layoutAwareScan, layoutAwareScan).seek(length);
         this._range.setEnd(state.node, state.offset);
         const expandedContent = fromEnd ? this._content + state.content : state.content;
-<<<<<<< HEAD
-        this._content = this._disallowExpandSelection ? this._content : expandedContent;
-=======
         this._content = expandedContent;
->>>>>>> 5e47324bb (Don't move offset when disallowExpandSelection is true)
         return length - state.remainder;
     }
 
