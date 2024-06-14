@@ -43,15 +43,6 @@
     ],
     "rules": {
         "accessor-pairs": "error",
-        "capitalized-comments": [
-            "error",
-            "always",
-            {
-                "ignorePattern": "case|[a-z]+[A-Z0-9]|[a-z]+\\.\\w",
-                "ignoreInlineComments": true,
-                "ignoreConsecutiveComments": true
-            }
-        ],
         "curly": ["error", "all"],
         "default-case-last": "error",
         "dot-notation": "error",
