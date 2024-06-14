@@ -547,6 +547,7 @@ export class OptionsUtil {
             this._updateVersion37,
             this._updateVersion38,
             this._updateVersion39,
+            this._updateVersion40,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1321,6 +1322,20 @@ export class OptionsUtil {
     async _updateVersion39(options) {
         for (const profile of options.profiles) {
             profile.options.general.enableContextMenuScanSelected = true;
+        }
+    }
+
+    /**
+     *  - Added support for web hotkey scope to profilePrevious and profileNext
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion40(options) {
+        for (const profile of options.profiles) {
+            for (const hotkey of profile.options.inputs.hotkeys) {
+                if (hotkey.action === 'profilePrevious' || hotkey.action === 'profileNext') {
+                    hotkey.scopes = ['popup', 'search', 'web'];
+                }
+            }
         }
     }
 
