@@ -15,15 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {bench, describe} from 'vitest';
+/**
+ * @param {number} direction
+ * @param {import('../application.js').Application} application
+ */
+export async function setProfile(direction, application) {
+    const optionsFull = await application.api.optionsGetFull();
 
+    const profileCount = optionsFull.profiles.length;
+    const newProfile = (optionsFull.profileCurrent + direction + profileCount) % profileCount;
 
-describe('Canary', () => {
-    bench('Loop 1 through 100,000', async () => {
-        let sum = 0;
-        for (let i = 0; i < 100_000; i++) {
-            sum += i;
-        }
-        console.debug(sum);
-    });
-});
+    /** @type {import('settings-modifications').ScopedModificationSet} */
+    const modification = {
+        action: 'set',
+        path: 'profileCurrent',
+        value: newProfile,
+        scope: 'global',
+        optionsContext: null,
+    };
+    await application.api.modifySettings([modification], 'search');
+}
