@@ -260,19 +260,16 @@ export class Translator {
                     if (transformedText.length < existingTransformedLength) {
                         continue;
                     }
-
                     if (transformedText.length > existingTransformedLength) {
                         dictionaryEntries.splice(existingIndex, 1, this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator));
-                        continue;
+                    } else {
+                        this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
                     }
-
-                    this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
-                    continue;
+                } else {
+                    const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator);
+                    dictionaryEntries.push(dictionaryEntry);
+                    ids.add(id);
                 }
-
-                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator);
-                dictionaryEntries.push(dictionaryEntry);
-                ids.add(id);
             }
         }
         return {dictionaryEntries, originalTextLength};
