@@ -148,7 +148,9 @@ export const japaneseTransforms = {
     transforms: {
         '-ba': {
             name: '-ba',
-            description: 'Conditional',
+            description: '1. Conditional form; shows that the previous stated condition\'s establishment is the condition for the latter stated condition to occur.\n' +
+            '2. Shows a trigger for a latter stated perception or judgment.\n' +
+            'Usage: Attach ば to the hypothetical/realis form (kateikei/izenkei) of verbs and i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -171,7 +173,7 @@ export const japaneseTransforms = {
         },
         '-ya': {
             name: '-ya',
-            description: 'Conditional (Contraction)',
+            description: 'Contraction of -ba.',
             i18n: [
                 {
                     language: 'ja',
@@ -195,12 +197,17 @@ export const japaneseTransforms = {
         },
         '-cha': {
             name: '-cha',
-            description: 'Contraction of -teha',
+            description: 'Contraction of ～ては.\n' +
+            '1. Explains how something always happens under the condition that it marks.\n' +
+            '2. Expresses the repetition (of a series of) actions.\n' +
+            '3. Indicates a hypothetical situation in which the speaker gives a (negative) evaluation about the other party\'s intentions.\n' +
+            '4. Used in "Must Not" patterns like ～てはいけない.\n' +
+            'Usage: Attach は after the te-form of verbs, contract ては into ちゃ.',
             i18n: [
                 {
                     language: 'ja',
                     name: '～ちゃ',
-                    description: '「～テハ」の縮約系',
+                    description: '「～ては」の縮約系',
                 },
             ],
             rules: [
@@ -225,12 +232,16 @@ export const japaneseTransforms = {
         },
         '-chau': {
             name: '-chau',
-            description: 'Contraction of -shimau',
+            description: 'Contraction of -shimau.\n' +
+            '1. Shows a sense of regret/surprise when you did have volition in doing something, but it turned out to be bad to do.\n' +
+            '2. Shows perfective/punctual achievement. This shows that an action has been completed.\n' +
+            '3. Shows unintentional action–“accidentally”.' +
+            'Usage: Attach しまう after the te-form of verbs, contract てしまう into ちゃう.',
             i18n: [
                 {
                     language: 'ja',
                     name: '～ちゃう',
-                    description: '「～テシマウ」のややくだけた口頭語的表現',
+                    description: '「～てしまう」のややくだけた口頭語的表現',
                 },
             ],
             rules: [
@@ -255,12 +266,16 @@ export const japaneseTransforms = {
         },
         '-chimau': {
             name: '-chimau',
-            description: 'Contraction of -shimau',
+            description: 'Contraction of -shimau.\n' +
+            '1. Shows a sense of regret/surprise when you did have volition in doing something, but it turned out to be bad to do.\n' +
+            '2. Shows perfective/punctual achievement. This shows that an action has been completed.\n' +
+            '3. Shows unintentional action–“accidentally”.' +
+            'Usage: Attach しまう after the te-form of verbs, contract てしまう into ちまう.',
             i18n: [
                 {
                     language: 'ja',
                     name: '～ちまう',
-                    description: '「～テシマウ」の音変化',
+                    description: '「～てしまう」の音変化',
                 },
             ],
             rules: [
@@ -285,7 +300,10 @@ export const japaneseTransforms = {
         },
         '-shimau': {
             name: '-shimau',
-            description: 'do the whole thing; ended up',
+            description: '1. Shows a sense of regret/surprise when you did have volition in doing something, but it turned out to be bad to do.\n' +
+            '2. Shows perfective/punctual achievement. This shows that an action has been completed.\n' +
+            '3. Shows unintentional action–“accidentally”.' +
+            'Usage: Attach しまう after the te-form of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -300,7 +318,8 @@ export const japaneseTransforms = {
         },
         '-nasai': {
             name: '-nasai',
-            description: 'Polite imperative suffix',
+            description: 'Polite imperative suffix.\n' +
+            'Usage: Attach なさい after the continuative form (renyoukei) of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -329,7 +348,8 @@ export const japaneseTransforms = {
         },
         '-sou': {
             name: '-sou',
-            description: 'appearing that; looking like',
+            description: 'Appearing that; looking like.\n' +
+            'Usage: Attach そう to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -359,11 +379,12 @@ export const japaneseTransforms = {
         },
         '-sugiru': {
             name: '-sugiru',
-            description: 'to be too ...',
+            description: 'Shows something "is too..." or someone is doing something "too much".\n' +
+            'Usage: Attach すぎる to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
             i18n: [
                 {
                     language: 'ja',
-                    name: '～すぎる・～過ぎる',
+                    name: '～すぎる',
                     description: '程度や限度を超える',
                 },
             ],
@@ -389,7 +410,9 @@ export const japaneseTransforms = {
         },
         '-tai': {
             name: '-tai',
-            description: 'want',
+            description: '1. Expresses the feeling of desire or hope.\n' +
+            '2. Used in ...たいと思います, an indirect way of saying what the speaker intends to do.\n' +
+            'Usage: Attach たい to the continuative form (renyoukei) of verbs. たい itself conjugates as i-adjective.',
             i18n: [
                 {
                     language: 'ja',
@@ -418,7 +441,9 @@ export const japaneseTransforms = {
         },
         '-tara': {
             name: '-tara',
-            description: 'if; when; after',
+            description: '1. Denotes the latter stated event is a continuation of the previous stated event.\n' +
+            '2. Assumes that a matter has been completed or concluded.\n' +
+            'Usage: Attach たら to the continuative form (renyoukei) after euphonic change form of verbs and i-adjectives',
             i18n: [
                 {
                     language: 'ja',
@@ -466,7 +491,9 @@ export const japaneseTransforms = {
         },
         '-tari': {
             name: '-tari',
-            description: '-ing and -ing',
+            description: '1. Shows two actions occurring back and forth (when used with two verbs).\n' +
+            '2. Shows examples of actions and states (when used with multiple verbs and adjectives).\n' +
+            'Usage: Attach たり to the continuative form (renyoukei) after euphonic change form of verbs and i-adjectives',
             i18n: [
                 {
                     language: 'ja',
@@ -514,7 +541,9 @@ export const japaneseTransforms = {
         },
         '-te': {
             name: '-te',
-            description: '-te form',
+            description: 'te-form.\n' +
+            'It has a myriad of meanings. Primarily, it is a conjunctive particle that connects two clauses together.\n' +
+            'Usage: Attach て to the continuative form (renyoukei) after euphonic change form of verbs and i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -563,7 +592,9 @@ export const japaneseTransforms = {
         },
         '-zu': {
             name: '-zu',
-            description: 'not doing',
+            description: '1. Negative form of verbs.\n' +
+            '2. Continuative form (renyoukei) of the particle ぬ (nu).\n' +
+            'Usage: Attach ず to the irrealis form (mizenkei) of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -592,7 +623,8 @@ export const japaneseTransforms = {
         },
         '-nu': {
             name: '-nu',
-            description: 'negative',
+            description: 'Negative form of verbs.\n' +
+            'Usage: Attach ぬ to the irrealis form (mizenkei) of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -621,7 +653,8 @@ export const japaneseTransforms = {
         },
         '-n': {
             name: '-n',
-            description: 'Contraction of negative',
+            description: 'Negative form of verbs; a sound change of ぬ.\n' +
+            'Usage: Attach ん to the irrealis form (mizenkei) of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -650,7 +683,10 @@ export const japaneseTransforms = {
         },
         '-mu': {
             name: '-mu',
-            description: 'probably',
+            description: 'Archaic.\n' +
+            '1. Shows an inference of a certain matter.\n' +
+            '2. Shows speaker\'s intention.\n' +
+            'Usage: Attach む to the irrealis form (mizenkei) of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -679,7 +715,8 @@ export const japaneseTransforms = {
         },
         '-zaru': {
             name: '-zaru',
-            description: 'not; un-',
+            description: 'Negative form of verbs.\n' +
+            'Usage: Attach ざる to the irrealis form (mizenkei) of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -708,7 +745,9 @@ export const japaneseTransforms = {
         },
         '-neba': {
             name: '-neba',
-            description: 'if not ...; unless ...',
+            description: '1. Shows a hypothetical negation; if not ...\n' +
+            '2. Shows a must. Used with or without ならぬ.\n' +
+            'Usage: Attach ねば to the irrealis form (mizenkei) of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -737,7 +776,7 @@ export const japaneseTransforms = {
         },
         'adverb': {
             name: 'adverb',
-            description: 'Adverb form of i-adjectives',
+            description: '-ku form (renyoukei) of i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -749,9 +788,12 @@ export const japaneseTransforms = {
                 suffixInflection('く', 'い', ['adv'], ['adj-i']),
             ],
         },
-        'causative': {
-            name: 'causative',
-            description: 'to make (someone) do',
+        'causative form': {
+            name: 'causative form',
+            description: 'Describes the intention to make someone do something.\n' +
+            'Usage: Attach させる to the irrealis form (mizenkei) of ichidan verbs and くる.\n' +
+            'Attach せる to the irrealis form (mizenkei) of godan verbs and する.\n' +
+            'It itself conjugates as an ichidan verb.',
             i18n: [
                 {
                     language: 'ja',
@@ -779,11 +821,32 @@ export const japaneseTransforms = {
                 suffixInflection('こさせる', 'くる', ['v1'], ['vk']),
                 suffixInflection('来させる', '来る', ['v1'], ['vk']),
                 suffixInflection('來させる', '來る', ['v1'], ['vk']),
+                suffixInflection('さす', 'る', ['v5'], ['v1']),
+                suffixInflection('かす', 'く', ['v5'], ['v5']),
+                suffixInflection('がす', 'ぐ', ['v5'], ['v5']),
+                suffixInflection('さす', 'す', ['v5'], ['v5']),
+                suffixInflection('たす', 'つ', ['v5'], ['v5']),
+                suffixInflection('なす', 'ぬ', ['v5'], ['v5']),
+                suffixInflection('ばす', 'ぶ', ['v5'], ['v5']),
+                suffixInflection('ます', 'む', ['v5'], ['v5']),
+                suffixInflection('らす', 'る', ['v5'], ['v5']),
+                suffixInflection('わす', 'う', ['v5'], ['v5']),
+                suffixInflection('じさす', 'ずる', ['v5'], ['vz']),
+                suffixInflection('ぜさす', 'ずる', ['v5'], ['vz']),
+                suffixInflection('さす', 'する', ['v5'], ['vs']),
+                suffixInflection('為す', '為る', ['v5'], ['vs']),
+                suffixInflection('せさす', 'する', ['v5'], ['vs']),
+                suffixInflection('為さす', '為る', ['v5'], ['vs']),
+                suffixInflection('こさす', 'くる', ['v5'], ['vk']),
+                suffixInflection('来さす', '来る', ['v5'], ['vk']),
+                suffixInflection('來さす', '來る', ['v5'], ['vk']),
             ],
         },
-        'imperative': {
-            name: 'imperative',
-            description: 'to give orders',
+        'imperative form': {
+            name: 'imperative form',
+            description: '1. To give orders.\n' +
+            '2. (As あれ) Represents the fact that it will never change no matter the circumstances.\n' +
+            '3. Express a feeling of hope.',
             i18n: [
                 {
                     language: 'ja',
@@ -814,23 +877,10 @@ export const japaneseTransforms = {
                 suffixInflection('來い', '來る', [], ['vk']),
             ],
         },
-        'imperative negative': {
-            name: 'imperative negative',
-            description: 'do not',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～な',
-                    description: '相手にそうするのを禁止することを表わす。',
-                },
-            ],
-            rules: [
-                suffixInflection('な', '', [], ['v']),
-            ],
-        },
-        'masu stem': {
-            name: 'masu stem',
-            description: 'Conjunctive; Continuative base',
+        'continuative form': {
+            name: 'continuative form',
+            description: 'Used to indicate actions that are (being) carried out.\n' +
+            'Usually refers to the stem after conjugating with -masu.',
             i18n: [
                 {
                     language: 'ja',
@@ -876,9 +926,11 @@ export const japaneseTransforms = {
                 suffixInflection('來', '來る', [], ['vk']),
             ],
         },
-        'negative': {
-            name: 'negative',
-            description: 'not',
+        '-nai': {
+            name: '-nai',
+            description: '1. Negative form of verbs.\n' +
+            '2. Expresses a feeling of solicitation to the other party.\n' +
+            'Usage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective.',
             i18n: [
                 {
                     language: 'ja',
@@ -907,9 +959,10 @@ export const japaneseTransforms = {
                 suffixInflection('ません', 'ます', ['v'], ['v']),
             ],
         },
-        'noun': {
-            name: 'noun',
-            description: 'nominalizing suffix indicating degree or condition',
+        '-sa': {
+            name: '-sa',
+            description: 'Nominalizing suffix of i-adjectives indicating nature, state, mind or degree.\n' +
+            'Usage: Attach さ to the stem of i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -921,12 +974,15 @@ export const japaneseTransforms = {
                 suffixInflection('さ', 'い', [], ['adj-i']),
             ],
         },
-        'passive': {
-            name: 'passive',
+        'passive form': {
+            name: 'passive form',
+            description: '1. Indicates an action received from an action performer.\n' +
+            '2. Expresses respect for the subject of action performer.\n' +
+            'Usage: Attach れる to the irrealis form (mizenkei) of godan verbs.',
             i18n: [
                 {
                     language: 'ja',
-                    name: '受身・尊敬',
+                    name: '受身形',
                 },
             ],
             rules: [
@@ -948,12 +1004,19 @@ export const japaneseTransforms = {
                 suffixInflection('來られる', '來る', ['v1'], ['vk']),
             ],
         },
-        'past': {
-            name: 'past',
+        '-ta': {
+            name: '-ta',
+            description: '1. Indicates a reality that has happened in the past.\n' +
+            '2. Indicates the completion of an action.\n' +
+            '3. Indicates the confirmation of a matter.\n' +
+            '4. Indicates the speaker\'s confidence that the action will definitely be fulfilled.\n' +
+            '5. Indicates the events that occur before the main clause are represented as relative past.\n' +
+            '6. Indicates a mild imperative/command.\n' +
+            'Usage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
-                    name: '過去形',
+                    name: '～た・かった形',
                 },
             ],
             rules: [
@@ -996,8 +1059,10 @@ export const japaneseTransforms = {
                 suffixInflection('ませんでした', 'ません', ['past'], ['v']),
             ],
         },
-        'polite': {
-            name: 'polite',
+        '-masu': {
+            name: '-masu',
+            description: 'Polite conjugation of verbs and adjectives.\n' +
+            'Usage: Attach ます to the continuative form (renyoukei) of verbs, くあります to the stem of i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -1024,8 +1089,10 @@ export const japaneseTransforms = {
                 suffixInflection('くあります', 'い', ['v'], ['adj-i']),
             ],
         },
-        'potential': {
-            name: 'potential',
+        'potential form': {
+            name: 'potential form',
+            description: 'Indicates a state of being (naturally) capable of doing an action.\n' +
+            'Usage: Attach れる to the continuative form (renyoukei) of ichidan verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -1049,8 +1116,12 @@ export const japaneseTransforms = {
                 suffixInflection('來れる', '來る', ['v1'], ['vk']),
             ],
         },
-        'potential or passive': {
-            name: 'potential or passive',
+        'potential or passive form': {
+            name: 'potential or passive form',
+            description: '1. Indicates an action received from an action performer.\n' +
+            '2. Expresses respect for the subject of action performer.\n' +
+            '3. Indicates a state of being (naturally) capable of doing an action.\n' +
+            'Usage: Attach られる to the irrealis form (mizenkei) of ichidan verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -1068,13 +1139,19 @@ export const japaneseTransforms = {
                 suffixInflection('來られる', '來る', ['v1'], ['vk']),
             ],
         },
-        'volitional': {
-            name: 'volitional',
-            description: 'express speaker\'s will or intention',
+        '-you': {
+            name: '-you',
+            description: '1. Expresses speaker\'s will or intention; volitional form.\n' +
+            '2. Expresses an invitation to the other party.\n' +
+            '3. (Used in …ようとする) Indicates being on the verge of initiating an action or transforming a state.\n' +
+            '4. Indicates an inference of a matter.\n' +
+            'Usage: Attach よう to the irrealis form (mizenkei) of ichidan verbs.\n' +
+            'Attach う to the irrealis form (mizenkei) of godan verbs after -o euphonic change form.\n' +
+            'Attach かろう to the stem of i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
-                    name: '意志形',
+                    name: '～う形',
                     description: '主体の意志を表わす',
                 },
             ],
@@ -1096,14 +1173,18 @@ export const japaneseTransforms = {
                 suffixInflection('来よう', '来る', [], ['vk']),
                 suffixInflection('來よう', '來る', [], ['vk']),
                 suffixInflection('ましょう', 'ます', [], ['v']),
+                suffixInflection('かろう', 'い', [], ['adj-i']),
             ],
         },
-        'causative passive': {
-            name: 'causative passive',
+        'causative-passive form': {
+            name: 'causative-passive form',
+            description: 'Contraction of the passive of the causative form of verbs.\n' +
+            'Someone was made to do something by someone else.\n' +
+            'Usage: ～せられる becomes ~される (only for godan verbs)',
             i18n: [
                 {
                     language: 'ja',
-                    name: '使役形＋受身',
+                    name: '使役受け身形',
                 },
             ],
             rules: [
@@ -1119,7 +1200,9 @@ export const japaneseTransforms = {
         },
         '-toku': {
             name: '-toku',
-            description: 'Contraction of -teoku',
+            description: 'Contraction of -teoku.\n' +
+            'To do certain things in advance in preparation (or in anticipation) of latter needs.\n' +
+            'Usage: Attach おく to the te-form of verbs, then contract ておく into とく.',
             i18n: [
                 {
                     language: 'ja',
@@ -1146,8 +1229,13 @@ export const japaneseTransforms = {
                 suffixInflection('來とく', '來る', ['v5'], ['vk']),
             ],
         },
-        'progressive or perfect': {
-            name: 'progressive or perfect',
+        '-teiru': {
+            name: '-teiru',
+            description: '1. Indicates an action continues or progresses to a point in time.\n' +
+            '2. Indicates an action is completed and remains as is.\n' +
+            '3. Indicates a state or condition that can be taken to be the result of undergoing some change.\n' +
+            'Usage: Attach いる to the te-form of verbs. い can be dropped in speech.\n' +
+            '(Slang) Attach おる to the te-form of verbs. Contracts to とる・でる in speech.',
             i18n: [
                 {
                     language: 'ja',
@@ -1167,7 +1255,7 @@ export const japaneseTransforms = {
         },
         '-ki': {
             name: '-ki',
-            description: 'Attributive form (archaic)',
+            description: 'Attributive form (rentaikei) of i-adjectives. An archaic form that remains in modern Japanese.',
             i18n: [
                 {
                     language: 'ja',
@@ -1181,7 +1269,8 @@ export const japaneseTransforms = {
         },
         '-ge': {
             name: '-ge',
-            description: 'show signs of; look',
+            description: 'Describes a person\'s appearance. Shows feelings of the person.\n' +
+            'Usage: Attach げ or 気 to the stem of i-adjectives',
             i18n: [
                 {
                     language: 'ja',
@@ -1196,7 +1285,9 @@ export const japaneseTransforms = {
         },
         '-garu': {
             name: '-garu',
-            description: 'to show signs of being',
+            description: '1. Shows subject’s feelings contrast with what is thought/known about them.\n' +
+            '2. Indicates subject\'s behavior (stands out).\n' +
+            'Usage: Attach がる to the stem of i-adjectives. It itself conjugates as a godan verb.',
             i18n: [
                 {
                     language: 'ja',
@@ -1210,7 +1301,10 @@ export const japaneseTransforms = {
         },
         '-e': {
             name: '-e',
-            description: '-ai -> -ee',
+            description: 'Slang. A sound change of i-adjectives.\n' +
+            'ai：やばい → やべぇ\n' +
+            'ui：さむい → さみぃ/さめぇ\n' +
+            'oi：すごい → すげぇ',
             i18n: [
                 {
                     language: 'ja',
