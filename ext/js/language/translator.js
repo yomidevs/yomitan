@@ -243,14 +243,30 @@ export class Translator {
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
                 if (ids.has(id)) {
-                    const existingEntry = dictionaryEntries.find((entry) => {
-                        return entry.definitions.some((definition) => definition.id === id);
-                    });
-
-                    if (existingEntry && transformedText.length >= existingEntry.headwords[0].sources[0].transformedText.length) {
-                        this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
+                    let existingIndex = null;
+                    let existingEntry = null;
+                    for (const [index, entry] of dictionaryEntries.entries()) {
+                        if (entry.definitions.some((definition) => definition.id === id)) {
+                            existingIndex = index;
+                            existingEntry = entry;
+                            break;
+                        }
+                    }
+                    if (!existingEntry || existingIndex === null) {
+                        continue;
                     }
 
+                    const existingTransformedLength = existingEntry.headwords[0].sources[0].transformedText.length;
+                    if (transformedText.length < existingTransformedLength) {
+                        continue;
+                    }
+
+                    if (transformedText.length > existingTransformedLength) {
+                        dictionaryEntries.splice(existingIndex, 1, this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator));
+                        continue;
+                    }
+
+                    this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
                     continue;
                 }
 
