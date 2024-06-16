@@ -243,18 +243,11 @@ export class Translator {
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
                 if (ids.has(id)) {
-                    let existingIndex = null;
-                    let existingEntry = null;
-                    for (const [index, entry] of dictionaryEntries.entries()) {
-                        if (entry.definitions.some((definition) => definition.id === id)) {
-                            existingIndex = index;
-                            existingEntry = entry;
-                            break;
-                        }
-                    }
-                    if (!existingEntry || existingIndex === null) {
+                    const existingEntryInfo = this._findExistingEntry(dictionaryEntries, id);
+                    if (!existingEntryInfo) {
                         continue;
                     }
+                    const {existingEntry, existingIndex} = existingEntryInfo;
 
                     const existingTransformedLength = existingEntry.headwords[0].sources[0].transformedText.length;
                     if (transformedText.length < existingTransformedLength) {
@@ -273,6 +266,24 @@ export class Translator {
             }
         }
         return {dictionaryEntries, originalTextLength};
+    }
+
+    /**
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
+     * @param {number} id
+     * @returns {{existingEntry: import('translation-internal').TermDictionaryEntry, existingIndex: number} | null}
+     */
+    _findExistingEntry(dictionaryEntries, id) {
+        let existingIndex = null;
+        let existingEntry = null;
+        for (const [index, entry] of dictionaryEntries.entries()) {
+            if (entry.definitions.some((definition) => definition.id === id)) {
+                existingIndex = index;
+                existingEntry = entry;
+                return {existingEntry, existingIndex};
+            }
+        }
+        return null;
     }
 
     /**
