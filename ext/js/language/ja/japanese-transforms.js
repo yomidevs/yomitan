@@ -652,7 +652,8 @@ export const japaneseTransforms = {
         },
         '-n': {
             name: '-n',
-            description: 'Negative form of verbs; a sound change of ぬ.\n' +
+            description: '1. Negative form of verbs; a sound change of ぬ.\n' +
+            '2. (As …んばかり) Shows an action or condition is on the verge of occurring, or an excessive/extreme degree.\n' +
             'Usage: Attach ん to the irrealis form (mizenkei) of verbs.',
             i18n: [
                 {
@@ -912,11 +913,11 @@ export const japaneseTransforms = {
                 suffixInflection('來', '來る', [], ['vk']),
             ],
         },
-        '-nai': {
-            name: '-nai',
+        'negative': {
+            name: 'negative',
             description: '1. Negative form of verbs.\n' +
             '2. Expresses a feeling of solicitation to the other party.\n' +
-            'Usage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective.',
+            'Usage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません.',
             i18n: [
                 {
                     language: 'ja',
