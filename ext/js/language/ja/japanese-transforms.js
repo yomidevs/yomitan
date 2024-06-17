@@ -17,6 +17,13 @@
 
 import {suffixInflection} from '../language-transforms.js';
 
+const shimauEnglishDescription = '1. Shows a sense of regret/surprise when you did have volition in doing something, but it turned out to be bad to do.\n' +
+'2. Shows perfective/punctual achievement. This shows that an action has been completed.\n' +
+'3. Shows unintentional action–“accidentally”.\n';
+
+const passiveEnglishDescription = '1. Indicates an action received from an action performer.\n' +
+'2. Expresses respect for the subject of action performer.\n';
+
 /** @type {import('language-transformer').LanguageTransformDescriptor} */
 export const japaneseTransforms = {
     language: 'ja',
@@ -232,10 +239,7 @@ export const japaneseTransforms = {
         },
         '-chau': {
             name: '-chau',
-            description: 'Contraction of -shimau.\n' +
-            '1. Shows a sense of regret/surprise when you did have volition in doing something, but it turned out to be bad to do.\n' +
-            '2. Shows perfective/punctual achievement. This shows that an action has been completed.\n' +
-            '3. Shows unintentional action–“accidentally”.' +
+            description: 'Contraction of -shimau.\n' + shimauEnglishDescription +
             'Usage: Attach しまう after the te-form of verbs, contract てしまう into ちゃう.',
             i18n: [
                 {
@@ -266,10 +270,7 @@ export const japaneseTransforms = {
         },
         '-chimau': {
             name: '-chimau',
-            description: 'Contraction of -shimau.\n' +
-            '1. Shows a sense of regret/surprise when you did have volition in doing something, but it turned out to be bad to do.\n' +
-            '2. Shows perfective/punctual achievement. This shows that an action has been completed.\n' +
-            '3. Shows unintentional action–“accidentally”.' +
+            description: 'Contraction of -shimau.\n' + shimauEnglishDescription +
             'Usage: Attach しまう after the te-form of verbs, contract てしまう into ちまう.',
             i18n: [
                 {
@@ -300,9 +301,7 @@ export const japaneseTransforms = {
         },
         '-shimau': {
             name: '-shimau',
-            description: '1. Shows a sense of regret/surprise when you did have volition in doing something, but it turned out to be bad to do.\n' +
-            '2. Shows perfective/punctual achievement. This shows that an action has been completed.\n' +
-            '3. Shows unintentional action–“accidentally”.' +
+            description: shimauEnglishDescription +
             'Usage: Attach しまう after the te-form of verbs.',
             i18n: [
                 {
@@ -982,8 +981,7 @@ export const japaneseTransforms = {
         },
         'passive form': {
             name: 'passive form',
-            description: '1. Indicates an action received from an action performer.\n' +
-            '2. Expresses respect for the subject of action performer.\n' +
+            description: passiveEnglishDescription +
             'Usage: Attach れる to the irrealis form (mizenkei) of godan verbs.',
             i18n: [
                 {
@@ -1068,7 +1066,7 @@ export const japaneseTransforms = {
         '-masu': {
             name: '-masu',
             description: 'Polite conjugation of verbs and adjectives.\n' +
-            'Usage: Attach ます to the continuative form (renyoukei) of verbs, くあります to the stem of i-adjectives.',
+            'Usage: Attach ます to the continuative form (renyoukei) of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -1098,7 +1096,9 @@ export const japaneseTransforms = {
         'potential form': {
             name: 'potential form',
             description: 'Indicates a state of being (naturally) capable of doing an action.\n' +
-            'Usage: Attach れる to the continuative form (renyoukei) of ichidan verbs.',
+            'Usage: Attach (ら)れる to the irrealis form (mizenkei) of ichidan verbs.\n' +
+            'Attach る to the imperative form (meireikei) of godan verbs.\n' +
+            'する becomes できる, くる becomes こ(ら)れる',
             i18n: [
                 {
                     language: 'ja',
@@ -1124,10 +1124,10 @@ export const japaneseTransforms = {
         },
         'potential or passive form': {
             name: 'potential or passive form',
-            description: '1. Indicates an action received from an action performer.\n' +
-            '2. Expresses respect for the subject of action performer.\n' +
+            description: passiveEnglishDescription +
             '3. Indicates a state of being (naturally) capable of doing an action.\n' +
-            'Usage: Attach られる to the irrealis form (mizenkei) of ichidan verbs.',
+            'Usage: Attach られる to the irrealis form (mizenkei) of ichidan verbs.\n' +
+            'する becomes せられる, くる becomes こられる',
             i18n: [
                 {
                     language: 'ja',
@@ -1153,7 +1153,7 @@ export const japaneseTransforms = {
             '4. Indicates an inference of a matter.\n' +
             'Usage: Attach よう to the irrealis form (mizenkei) of ichidan verbs.\n' +
             'Attach う to the irrealis form (mizenkei) of godan verbs after -o euphonic change form.\n' +
-            'Attach かろう to the stem of i-adjectives.',
+            'Attach かろう to the stem of i-adjectives (4th meaning only).',
             i18n: [
                 {
                     language: 'ja',
