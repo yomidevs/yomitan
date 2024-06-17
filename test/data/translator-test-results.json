@@ -9648,8 +9648,8 @@
                 "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
               },
               {
-                "name": "-nai",
-                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective."
+                "name": "negative",
+                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません."
               },
               {
                 "name": "-ta",
@@ -9863,8 +9863,8 @@
                 "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
               },
               {
-                "name": "-nai",
-                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective."
+                "name": "negative",
+                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません."
               },
               {
                 "name": "-ta",
@@ -10078,8 +10078,8 @@
                 "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
               },
               {
-                "name": "-nai",
-                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective."
+                "name": "negative",
+                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません."
               },
               {
                 "name": "-ta",
@@ -10293,8 +10293,8 @@
                 "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
               },
               {
-                "name": "-nai",
-                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective."
+                "name": "negative",
+                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません."
               },
               {
                 "name": "-ta",
