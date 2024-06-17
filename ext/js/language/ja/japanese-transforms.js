@@ -442,7 +442,7 @@ export const japaneseTransforms = {
             name: '-tara',
             description: '1. Denotes the latter stated event is a continuation of the previous stated event.\n' +
             '2. Assumes that a matter has been completed or concluded.\n' +
-            'Usage: Attach たら to the continuative form (renyoukei) after euphonic change form of verbs and i-adjectives',
+            'Usage: Attach たら to the continuative form (renyoukei) of verbs after euphonic change form, かったら to the stem of i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -492,7 +492,7 @@ export const japaneseTransforms = {
             name: '-tari',
             description: '1. Shows two actions occurring back and forth (when used with two verbs).\n' +
             '2. Shows examples of actions and states (when used with multiple verbs and adjectives).\n' +
-            'Usage: Attach たり to the continuative form (renyoukei) after euphonic change form of verbs and i-adjectives',
+            'Usage: Attach たり to the continuative form (renyoukei) of verbs after euphonic change form, かったり to the stem of i-adjectives',
             i18n: [
                 {
                     language: 'ja',
@@ -542,7 +542,7 @@ export const japaneseTransforms = {
             name: '-te',
             description: 'te-form.\n' +
             'It has a myriad of meanings. Primarily, it is a conjunctive particle that connects two clauses together.\n' +
-            'Usage: Attach て to the continuative form (renyoukei) after euphonic change form of verbs and i-adjectives.',
+            'Usage: Attach て to the continuative form (renyoukei) of verbs after euphonic change form, くて to the stem of i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
