@@ -787,8 +787,8 @@ export const japaneseTransforms = {
                 suffixInflection('く', 'い', ['adv'], ['adj-i']),
             ],
         },
-        'causative form': {
-            name: 'causative form',
+        'causative': {
+            name: 'causative',
             description: 'Describes the intention to make someone do something.\n' +
             'Usage: Attach させる to the irrealis form (mizenkei) of ichidan verbs and くる.\n' +
             'Attach せる to the irrealis form (mizenkei) of godan verbs and する.\n' +
@@ -841,8 +841,8 @@ export const japaneseTransforms = {
                 suffixInflection('來さす', '來る', ['v5'], ['vk']),
             ],
         },
-        'imperative form': {
-            name: 'imperative form',
+        'imperative': {
+            name: 'imperative',
             description: '1. To give orders.\n' +
             '2. (As あれ) Represents the fact that it will never change no matter the circumstances.\n' +
             '3. Express a feeling of hope.',
@@ -882,8 +882,8 @@ export const japaneseTransforms = {
                 suffixInflection('な', '', [], ['v']),
             ],
         },
-        'continuative form': {
-            name: 'continuative form',
+        'continuative': {
+            name: 'continuative',
             description: 'Used to indicate actions that are (being) carried out.\n' +
             'Refers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu.',
             i18n: [
@@ -979,8 +979,8 @@ export const japaneseTransforms = {
                 suffixInflection('さ', 'い', [], ['adj-i']),
             ],
         },
-        'passive form': {
-            name: 'passive form',
+        'passive': {
+            name: 'passive',
             description: passiveEnglishDescription +
             'Usage: Attach れる to the irrealis form (mizenkei) of godan verbs.',
             i18n: [
@@ -1093,8 +1093,8 @@ export const japaneseTransforms = {
                 suffixInflection('くあります', 'い', ['v'], ['adj-i']),
             ],
         },
-        'potential form': {
-            name: 'potential form',
+        'potential': {
+            name: 'potential',
             description: 'Indicates a state of being (naturally) capable of doing an action.\n' +
             'Usage: Attach (ら)れる to the irrealis form (mizenkei) of ichidan verbs.\n' +
             'Attach る to the imperative form (meireikei) of godan verbs.\n' +
@@ -1122,8 +1122,8 @@ export const japaneseTransforms = {
                 suffixInflection('來れる', '來る', ['v1'], ['vk']),
             ],
         },
-        'potential or passive form': {
-            name: 'potential or passive form',
+        'potential or passive': {
+            name: 'potential or passive',
             description: passiveEnglishDescription +
             '3. Indicates a state of being (naturally) capable of doing an action.\n' +
             'Usage: Attach られる to the irrealis form (mizenkei) of ichidan verbs.\n' +
@@ -1182,8 +1182,8 @@ export const japaneseTransforms = {
                 suffixInflection('かろう', 'い', [], ['adj-i']),
             ],
         },
-        'causative-passive form': {
-            name: 'causative-passive form',
+        'causative-passive': {
+            name: 'causative-passive',
             description: 'Contraction of the passive of the causative form of verbs.\n' +
             'Someone was made to do something by someone else.\n' +
             'Usage: ～せられる becomes ~される (only for godan verbs)',
