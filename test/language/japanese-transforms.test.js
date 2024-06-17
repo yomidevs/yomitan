@@ -32,7 +32,7 @@ const tests = [
             {term: '愛しい', source: '愛しかったら',           rule: 'adj-i', reasons: ['-tara']},
             {term: '愛しい', source: '愛しかったり',           rule: 'adj-i', reasons: ['-tari']},
             {term: '愛しい', source: '愛しくて',               rule: 'adj-i', reasons: ['-te']},
-            {term: '愛しい', source: '愛しく',                 rule: 'adj-i', reasons: ['adverb']},
+            {term: '愛しい', source: '愛しく',                 rule: 'adj-i', reasons: ['-ku']},
             {term: '愛しい', source: '愛しくない',             rule: 'adj-i', reasons: ['-nai']},
             {term: '愛しい', source: '愛しさ',                 rule: 'adj-i', reasons: ['-sa']},
             {term: '愛しい', source: '愛しかった',             rule: 'adj-i', reasons: ['-ta']},
@@ -1112,10 +1112,10 @@ const tests = [
         category: '-ku stem of kansai-ben adjectives',
         valid: true,
         tests: [
-            {term: '宜しい', source: '宜しゅう', rule: null, reasons: ['adverb', 'kansai-ben -ku']},
-            {term: 'よろしい', source: 'よろしゅう', rule: null, reasons: ['adverb', 'kansai-ben -ku']},
-            {term: '良い', source: '良う', rule: null, reasons: ['adverb', 'kansai-ben -ku']},
-            {term: 'よい', source: 'よう', rule: null, reasons: ['adverb', 'kansai-ben -ku']},
+            {term: '宜しい', source: '宜しゅう', rule: null, reasons: ['-ku', 'kansai-ben -ku']},
+            {term: 'よろしい', source: 'よろしゅう', rule: null, reasons: ['-ku', 'kansai-ben -ku']},
+            {term: '良い', source: '良う', rule: null, reasons: ['-ku', 'kansai-ben -ku']},
+            {term: 'よい', source: 'よう', rule: null, reasons: ['-ku', 'kansai-ben -ku']},
         ],
     },
     {

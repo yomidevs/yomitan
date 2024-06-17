@@ -18705,8 +18705,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "adverb",
-                "description": "-ku form (renyoukei) of i-adjectives."
+                "name": "-ku",
+                "description": "Adverbial form of i-adjectives.\n"
               },
               {
                 "name": "kansai-ben",

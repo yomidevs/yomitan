@@ -773,9 +773,9 @@ export const japaneseTransforms = {
                 suffixInflection('來ねば', '來る', [], ['vk']),
             ],
         },
-        'adverb': {
-            name: 'adverb',
-            description: '-ku form (renyoukei) of i-adjectives.',
+        '-ku': {
+            name: '-ku',
+            description: 'Adverbial form of i-adjectives.\n',
             i18n: [
                 {
                     language: 'ja',
