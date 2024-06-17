@@ -886,12 +886,12 @@ export const japaneseTransforms = {
         'continuative form': {
             name: 'continuative form',
             description: 'Used to indicate actions that are (being) carried out.\n' +
-            'Usually refers to the stem after conjugating with -masu.',
+            'Refers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu.',
             i18n: [
                 {
                     language: 'ja',
                     name: '連用形',
-                    description: '〔動詞などで〕「ます」 「た」 「て」などに続く。例、「バスを降りて歩きます」 「人が多かった」の「降り」 「歩き」 「多かっ」。',
+                    description: '〔動詞などで〕「ます」などに続く。例、「バスを降りて歩きます」の「降り」「歩き」。',
                 },
             ],
             rules: [
