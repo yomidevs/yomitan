@@ -877,6 +877,12 @@ export const japaneseTransforms = {
                 suffixInflection('來い', '來る', [], ['vk']),
             ],
         },
+        'imperative negative': {
+            name: 'imperative negative',
+            rules: [
+                suffixInflection('な', '', [], ['v']),
+            ],
+        },
         'continuative form': {
             name: 'continuative form',
             description: 'Used to indicate actions that are (being) carried out.\n' +

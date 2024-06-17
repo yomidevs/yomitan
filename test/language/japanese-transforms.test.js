@@ -67,6 +67,7 @@ const tests = [
             {term: '食べる', source: '食べられない',     rule: 'v1', reasons: ['potential or passive form', '-nai']},
             {term: '食べる', source: '食べさせない',     rule: 'v1', reasons: ['causative form', '-nai']},
             {term: '食べる', source: '食べさせられない', rule: 'v1', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '食べる', source: '食べるな',         rule: 'v1', reasons: ['imperative negative']},
             {term: '食べる', source: '食べまして',        rule: 'v1', reasons: ['-masu', '-te']},
 
             {term: '食べる', source: '食べれば',         rule: 'v1', reasons: ['-ba']},
@@ -121,6 +122,7 @@ const tests = [
             {term: '買う', source: '買われない',       rule: 'v5', reasons: ['passive form', '-nai']},
             {term: '買う', source: '買わせない',       rule: 'v5', reasons: ['causative form', '-nai']},
             {term: '買う', source: '買わせられない',   rule: 'v5', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '買う', source: '買うな',           rule: 'v5', reasons: ['imperative negative']},
             {term: '買う', source: '買いまして',     rule: 'v5', reasons: ['-masu', '-te']},
 
             {term: '買う', source: '買えば',           rule: 'v5', reasons: ['-ba']},
@@ -175,6 +177,7 @@ const tests = [
             {term: '行く', source: '行かれない',       rule: 'v5', reasons: ['passive form', '-nai']},
             {term: '行く', source: '行かせない',       rule: 'v5', reasons: ['causative form', '-nai']},
             {term: '行く', source: '行かせられない',   rule: 'v5', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '行く', source: '行くな',           rule: 'v5', reasons: ['imperative negative']},
             {term: '行く', source: '行きまして',     rule: 'v5', reasons: ['-masu', '-te']},
 
             {term: '行く', source: '行けば',           rule: 'v5', reasons: ['-ba']},
@@ -229,6 +232,7 @@ const tests = [
             {term: '泳ぐ', source: '泳がれない',       rule: 'v5', reasons: ['passive form', '-nai']},
             {term: '泳ぐ', source: '泳がせない',       rule: 'v5', reasons: ['causative form', '-nai']},
             {term: '泳ぐ', source: '泳がせられない',   rule: 'v5', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '泳ぐ', source: '泳ぐな',           rule: 'v5', reasons: ['imperative negative']},
             {term: '泳ぐ', source: '泳ぎまして',     rule: 'v5', reasons: ['-masu', '-te']},
 
             {term: '泳ぐ', source: '泳げば',           rule: 'v5', reasons: ['-ba']},
@@ -282,6 +286,7 @@ const tests = [
             {term: '話す', source: '話されない',       rule: 'v5', reasons: ['passive form', '-nai']},
             {term: '話す', source: '話させない',       rule: 'v5', reasons: ['causative form', '-nai']},
             {term: '話す', source: '話させられない',   rule: 'v5', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '話す', source: '話すな',           rule: 'v5', reasons: ['imperative negative']},
             {term: '話す', source: '話しまして',     rule: 'v5', reasons: ['-masu', '-te']},
 
             {term: '話す', source: '話せば',           rule: 'v5', reasons: ['-ba']},
@@ -338,6 +343,7 @@ const tests = [
             {term: '待つ', source: '待たれない',       rule: 'v5', reasons: ['passive form', '-nai']},
             {term: '待つ', source: '待たせない',       rule: 'v5', reasons: ['causative form', '-nai']},
             {term: '待つ', source: '待たせられない',   rule: 'v5', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '待つ', source: '待つな',           rule: 'v5', reasons: ['imperative negative']},
             {term: '待つ', source: '待ちまして',     rule: 'v5', reasons: ['-masu', '-te']},
 
             {term: '待つ', source: '待てば',           rule: 'v5', reasons: ['-ba']},
@@ -392,6 +398,7 @@ const tests = [
             {term: '死ぬ', source: '死なれない',       rule: 'v5', reasons: ['passive form', '-nai']},
             {term: '死ぬ', source: '死なせない',       rule: 'v5', reasons: ['causative form', '-nai']},
             {term: '死ぬ', source: '死なせられない',   rule: 'v5', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '死ぬ', source: '死ぬな',           rule: 'v5', reasons: ['imperative negative']},
             {term: '死ぬ', source: '死にまして',     rule: 'v5', reasons: ['-masu', '-te']},
 
             {term: '死ぬ', source: '死ねば',           rule: 'v5', reasons: ['-ba']},
@@ -445,6 +452,7 @@ const tests = [
             {term: '遊ぶ', source: '遊ばれない',       rule: 'v5', reasons: ['passive form', '-nai']},
             {term: '遊ぶ', source: '遊ばせない',       rule: 'v5', reasons: ['causative form', '-nai']},
             {term: '遊ぶ', source: '遊ばせられない',   rule: 'v5', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '遊ぶ', source: '遊ぶな',           rule: 'v5', reasons: ['imperative negative']},
             {term: '遊ぶ', source: '遊びまして',     rule: 'v5', reasons: ['-masu', '-te']},
 
             {term: '遊ぶ', source: '遊べば',           rule: 'v5', reasons: ['-ba']},
@@ -498,6 +506,7 @@ const tests = [
             {term: '飲む', source: '飲まれない',       rule: 'v5', reasons: ['passive form', '-nai']},
             {term: '飲む', source: '飲ませない',       rule: 'v5', reasons: ['causative form', '-nai']},
             {term: '飲む', source: '飲ませられない',   rule: 'v5', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '飲む', source: '飲むな',           rule: 'v5', reasons: ['imperative negative']},
             {term: '飲む', source: '飲みまして',     rule: 'v5', reasons: ['-masu', '-te']},
 
             {term: '飲む', source: '飲めば',           rule: 'v5', reasons: ['-ba']},
@@ -551,6 +560,7 @@ const tests = [
             {term: '作る', source: '作られない',       rule: 'v5', reasons: ['passive form', '-nai']},
             {term: '作る', source: '作らせない',       rule: 'v5', reasons: ['causative form', '-nai']},
             {term: '作る', source: '作らせられない',   rule: 'v5', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '作る', source: '作るな',           rule: 'v5', reasons: ['imperative negative']},
             {term: '作る', source: '作りまして',     rule: 'v5', reasons: ['-masu', '-te']},
 
             {term: '作る', source: '作れば',           rule: 'v5', reasons: ['-ba']},
@@ -609,6 +619,7 @@ const tests = [
             {term: '為る', source: '為させない',     rule: 'vs', reasons: ['causative form', '-nai']},
             {term: '為る', source: '為せられない',   rule: 'vs', reasons: ['causative form', 'potential or passive form', '-nai']},
             {term: '為る', source: '為させられない', rule: 'vs', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '為る', source: '為るな',         rule: 'vs', reasons: ['imperative negative']},
             {term: '為る', source: '為まして',     rule: 'vs', reasons: ['-masu', '-te']},
 
             {term: '為る', source: '為れば',         rule: 'vs', reasons: ['-ba']},
@@ -664,6 +675,7 @@ const tests = [
             {term: 'する', source: 'せさせない',     rule: 'vs', reasons: ['causative form', '-nai']},
             {term: 'する', source: 'させられない',   rule: 'vs', reasons: ['causative form', 'potential or passive form', '-nai']},
             {term: 'する', source: 'せさせられない', rule: 'vs', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: 'する', source: 'するな',         rule: 'vs', reasons: ['imperative negative']},
             {term: 'する', source: 'しまして',     rule: 'vs', reasons: ['-masu', '-te']},
 
             {term: 'する', source: 'すれば',         rule: 'vs', reasons: ['-ba']},
@@ -714,6 +726,7 @@ const tests = [
             {term: '来る', source: '来られない',     rule: 'vk', reasons: ['potential or passive form', '-nai']},
             {term: '来る', source: '来させない',     rule: 'vk', reasons: ['causative form', '-nai']},
             {term: '来る', source: '来させられない', rule: 'vk', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '来る', source: '来るな',         rule: 'vk', reasons: ['imperative negative']},
             {term: '来る', source: '来まして',     rule: 'vk', reasons: ['-masu', '-te']},
 
             {term: '来る', source: '来れば',         rule: 'vk', reasons: ['-ba']},
@@ -763,6 +776,7 @@ const tests = [
             {term: '來る', source: '來られない',     rule: 'vk', reasons: ['potential or passive form', '-nai']},
             {term: '來る', source: '來させない',     rule: 'vk', reasons: ['causative form', '-nai']},
             {term: '來る', source: '來させられない', rule: 'vk', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '來る', source: '來るな',         rule: 'vk', reasons: ['imperative negative']},
             {term: '來る', source: '來まして',     rule: 'vk', reasons: ['-masu', '-te']},
 
             {term: '來る', source: '來れば',         rule: 'vk', reasons: ['-ba']},
@@ -812,6 +826,7 @@ const tests = [
             {term: 'くる', source: 'こられない',     rule: 'vk', reasons: ['potential or passive form', '-nai']},
             {term: 'くる', source: 'こさせない',     rule: 'vk', reasons: ['causative form', '-nai']},
             {term: 'くる', source: 'こさせられない', rule: 'vk', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: 'くる', source: 'くるな',         rule: 'vk', reasons: ['imperative negative']},
             {term: 'くる', source: 'きまして',     rule: 'vk', reasons: ['-masu', '-te']},
 
             {term: 'くる', source: 'くれば',         rule: 'vk', reasons: ['-ba']},
@@ -873,6 +888,7 @@ const tests = [
             {term: '論ずる', source: '論ぜさせない',     rule: 'vz', reasons: ['causative form', '-nai']},
             {term: '論ずる', source: '論じさせられない', rule: 'vz', reasons: ['causative form', 'potential or passive form', '-nai']},
             {term: '論ずる', source: '論ぜさせられない', rule: 'vz', reasons: ['causative form', 'potential or passive form', '-nai']},
+            {term: '論ずる', source: '論ずるな',         rule: 'vz', reasons: ['imperative negative']},
             {term: '論ずる', source: '論じまして',     rule: 'vz', reasons: ['-masu', '-te']},
 
             {term: '論ずる', source: '論ずれば',         rule: 'vz', reasons: ['-ba']},
