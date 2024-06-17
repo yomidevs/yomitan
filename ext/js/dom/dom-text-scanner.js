@@ -37,6 +37,8 @@ export class DOMTextScanner {
         if (resetOffset) { node = ruby; }
 
         /** @type {Node} */
+        this._initialNode = node;
+        /** @type {Node} */
         this._node = node;
         /** @type {number} */
         this._offset = offset;
@@ -129,10 +131,15 @@ export class DOMTextScanner {
                 }
             } else if (nodeType === ELEMENT_NODE) {
                 lastNode = node;
+                const initialNodeAtBeginningOfNodeGoingBackwards = node === this._initialNode && this._offset === 0 && !forward;
+                const initialNodeAtEndOfNodeGoingForwards = node === this._initialNode && this._offset === node.childNodes.length && forward;
                 this._offset = 0;
                 ({enterable, newlines} = DOMTextScanner.getElementSeekInfo(/** @type {Element} */ (node)));
                 if (newlines > this._newlines && generateLayoutContent) {
                     this._newlines = newlines;
+                }
+                if (initialNodeAtBeginningOfNodeGoingBackwards || initialNodeAtEndOfNodeGoingForwards) {
+                    enterable = false;
                 }
             }
 
