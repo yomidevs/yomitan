@@ -1145,8 +1145,8 @@ export const japaneseTransforms = {
                 suffixInflection('來られる', '來る', ['v1'], ['vk']),
             ],
         },
-        '-you': {
-            name: '-you',
+        'volitional': {
+            name: 'volitional',
             description: '1. Expresses speaker\'s will or intention; volitional form.\n' +
             '2. Expresses an invitation to the other party.\n' +
             '3. (Used in …ようとする) Indicates being on the verge of initiating an action or transforming a state.\n' +

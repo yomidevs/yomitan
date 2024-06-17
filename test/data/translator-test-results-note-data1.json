@@ -4580,8 +4580,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -4899,8 +4899,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -5218,8 +5218,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -5537,8 +5537,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -9731,8 +9731,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -10050,8 +10050,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -11218,8 +11218,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -11537,8 +11537,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -12924,8 +12924,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -13274,8 +13274,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -15034,8 +15034,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -16252,7 +16252,7 @@
                 },
                 {
                   "name": "-masu",
-                  "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs, くあります to the stem of i-adjectives."
+                  "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
                 },
                 {
                   "name": "-nai",
@@ -16695,7 +16695,7 @@
                 },
                 {
                   "name": "-masu",
-                  "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs, くあります to the stem of i-adjectives."
+                  "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
                 },
                 {
                   "name": "-nai",
@@ -17138,7 +17138,7 @@
                 },
                 {
                   "name": "-masu",
-                  "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs, くあります to the stem of i-adjectives."
+                  "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
                 },
                 {
                   "name": "-nai",
@@ -17581,7 +17581,7 @@
                 },
                 {
                   "name": "-masu",
-                  "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs, くあります to the stem of i-adjectives."
+                  "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
                 },
                 {
                   "name": "-nai",
@@ -18015,8 +18015,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -18334,8 +18334,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -18653,8 +18653,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -18972,8 +18972,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -21621,8 +21621,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -21940,8 +21940,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -22259,8 +22259,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -22578,8 +22578,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -25227,8 +25227,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -25546,8 +25546,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -25865,8 +25865,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -26184,8 +26184,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -27145,8 +27145,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
@@ -27471,7 +27471,7 @@
               "inflectionRules": [
                 {
                   "name": "-masu",
-                  "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs, くあります to the stem of i-adjectives."
+                  "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
                 },
                 {
                   "name": "-ta",
@@ -28410,8 +28410,8 @@
               "source": "algorithm",
               "inflectionRules": [
                 {
-                  "name": "continuative form",
-                  "description": "Used to indicate actions that are (being) carried out.\nUsually refers to the stem after conjugating with -masu."
+                  "name": "continuative",
+                  "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
                 }
               ]
             }
