@@ -76,6 +76,11 @@
     --modal-padding-vertical: 0.625em;
     --modal-padding-vertical-half: calc(var(--modal-padding-vertical) * 0.5);
     --modal-button-spacing: 0.625em;
+
+    --scrollbar-thumb-color: #c1c1c1;
+    --scrollbar-track-color: #f1f1f1;
+    --scrollbar-inverse-thumb-color: #444444;
+    --scrollbar-inverse-track-color: #2f2f2f;
 }
 :root:not([data-loaded=true]) {
     --animation-duration: 0s;
@@ -83,6 +88,34 @@
 :root[data-theme=dark] {
     --separator-color1: #333333;
     --separator-color2: #222222;
+
+    --scrollbar-thumb-color: #444444;
+    --scrollbar-track-color: #2f2f2f;
+    --scrollbar-inverse-thumb-color: #c1c1c1;
+    --scrollbar-inverse-track-color: #f1f1f1;
+}
+
+/* Scrollbars */
+:root:not([data-theme=light]) .scrollbar {
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar {
+    width: auto;
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-button {
+    height: 0;
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-thumb-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track-piece {
+    background-color: var(--scrollbar-track-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-corner {
+    background-color: var(--scrollbar-track-color);
 }
 
 
