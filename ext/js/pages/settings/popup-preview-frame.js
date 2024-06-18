@@ -77,7 +77,6 @@ export class PopupPreviewFrame {
     async prepare() {
         window.addEventListener('message', this._onMessage.bind(this), false);
 
-        this._themeController.siteTheme = 'light';
         this._themeController.prepare();
 
         // Setup events
@@ -141,6 +140,7 @@ export class PopupPreviewFrame {
         options.general.popupVerticalTextPosition = 'before';
         options.scanning.selectText = false;
         this._themeController.theme = options.general.popupTheme;
+        this._themeController.siteOverride = true;
         this._themeController.updateTheme();
         return options;
     }

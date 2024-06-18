@@ -387,14 +387,14 @@ export class Frontend {
     /**
      * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
-    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo: {eventType, detail: inputInfoDetail}, textSource, optionsContext, detail}) {
+    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo: {eventType, detail: inputInfoDetail}, textSource, optionsContext, detail, pageTheme}) {
         this._stopClearSelectionDelayed();
         let focus = (eventType === 'mouseMove');
         if (typeof inputInfoDetail === 'object' && inputInfoDetail !== null) {
             const focus2 = inputInfoDetail.focus;
             if (typeof focus2 === 'boolean') { focus = focus2; }
         }
-        this._showContent(textSource, focus, dictionaryEntries, type, sentence, detail !== null ? detail.documentTitle : null, optionsContext);
+        this._showContent(textSource, focus, dictionaryEntries, type, sentence, detail !== null ? detail.documentTitle : null, optionsContext, pageTheme);
     }
 
     /** */
@@ -716,8 +716,9 @@ export class Frontend {
      * @param {?import('display').HistoryStateSentence} sentence
      * @param {?string} documentTitle
      * @param {import('settings').OptionsContext} optionsContext
+     * @param {'dark' | 'light'} pageTheme
      */
-    _showContent(textSource, focus, dictionaryEntries, type, sentence, documentTitle, optionsContext) {
+    _showContent(textSource, focus, dictionaryEntries, type, sentence, documentTitle, optionsContext, pageTheme) {
         const query = textSource.text();
         const {url} = optionsContext;
         /** @type {import('display').HistoryState} */
@@ -725,6 +726,7 @@ export class Frontend {
             focusEntry: 0,
             optionsContext,
             url,
+            pageTheme,
         };
         if (sentence !== null) { detailsState.sentence = sentence; }
         if (documentTitle !== null) { detailsState.documentTitle = documentTitle; }

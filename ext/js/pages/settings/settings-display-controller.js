@@ -46,7 +46,6 @@ export class SettingsDisplayController {
 
     /** */
     prepare() {
-        this._themeController.siteTheme = 'light';
         this._themeController.prepare();
         void this._updateTheme();
 
@@ -102,6 +101,7 @@ export class SettingsDisplayController {
     async _updateTheme() {
         const options = await this._settingsController.getOptions();
         this._themeController.theme = options.general.popupTheme;
+        this._themeController.siteOverride = true;
         this._themeController.updateTheme();
     }
 

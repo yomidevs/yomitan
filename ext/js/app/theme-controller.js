@@ -27,14 +27,16 @@ export class ThemeController {
     constructor(element) {
         /** @type {?HTMLElement} */
         this._element = element;
-        /** @type {'light'|'dark'|'browser'} */
-        this._theme = 'light';
         /** @type {'light'|'dark'|'browser'|'site'} */
-        this._outerTheme = 'light';
+        this._theme = 'site';
+        /** @type {'light'|'dark'|'browser'|'site'} */
+        this._outerTheme = 'site';
         /** @type {?('dark'|'light')} */
         this._siteTheme = null;
         /** @type {'dark'|'light'} */
         this._browserTheme = 'light';
+        /** @type {boolean} */
+        this.siteOverride = false;
     }
 
     /**
@@ -55,7 +57,7 @@ export class ThemeController {
 
     /**
      * Gets the main theme for the content.
-     * @type {'light'|'dark'|'browser'}
+     * @type {'light'|'dark'|'browser'|'site'}
      */
     get theme() {
         return this._theme;
@@ -63,7 +65,7 @@ export class ThemeController {
 
     /**
      * Sets the main theme for the content.
-     * @param {'light'|'dark'|'browser'} value The theme value to assign.
+     * @param {'light'|'dark'|'browser'|'site'} value The theme value to assign.
      */
     set theme(value) {
         this._theme = value;
@@ -171,7 +173,7 @@ export class ThemeController {
      */
     _resolveThemeValue(theme, computedSiteTheme) {
         switch (theme) {
-            case 'site': return computedSiteTheme;
+            case 'site': return this.siteOverride ? this._browserTheme : computedSiteTheme;
             case 'browser': return this._browserTheme;
             default: return theme;
         }
