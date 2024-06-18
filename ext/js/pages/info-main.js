@@ -157,6 +157,7 @@ await Application.main(true, async (application) => {
 
     /** @type {ThemeController} */
     const themeController = new ThemeController(document.documentElement);
+    themeController.prepare();
     const optionsFull = await application.api.optionsGetFull();
     const {profiles, profileCurrent} = optionsFull;
     const primaryProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
