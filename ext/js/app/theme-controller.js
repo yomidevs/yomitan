@@ -171,7 +171,7 @@ export class ThemeController {
      */
     _resolveThemeValue(theme, computedSiteTheme) {
         switch (theme) {
-            case 'auto': return computedSiteTheme;
+            case 'site': return computedSiteTheme;
             case 'browser': return this._browserTheme;
             default: return theme;
         }
