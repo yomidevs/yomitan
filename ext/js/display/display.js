@@ -1148,11 +1148,28 @@ export class Display extends EventDispatcher {
      */
     _setTheme(options) {
         const {general} = options;
-        const {popupTheme} = general;
+        const {popupTheme, popupOuterTheme} = general;
         this._themeController.theme = popupTheme;
-        this._themeController.outerTheme = general.popupOuterTheme;
+        this._themeController.outerTheme = popupOuterTheme;
         this._themeController.updateTheme();
-        this.setCustomCss(general.customPopupCss);
+        const customCss = this._getCustomCss(options);
+        this.setCustomCss(customCss);
+    }
+
+    /**
+     * @param {import('settings').ProfileOptions} options
+     * @returns {string}
+     */
+    _getCustomCss(options) {
+        const {general: {customPopupCss}, dictionaries} = options;
+        let customCss = customPopupCss;
+        for (const dictionary of dictionaries) {
+            if (dictionary.enabled) {
+                customCss += '\n' + dictionary.styles;
+            }
+        }
+        this.setCustomCss(customCss);
+        return customCss;
     }
 
     /**
