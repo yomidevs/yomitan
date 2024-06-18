@@ -80,9 +80,6 @@ await Application.main(true, async (application) => {
     const settingsController = new SettingsController(application);
     await settingsController.prepare();
 
-    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    settingsDisplayController.prepare();
-
     const genericSettingController = new GenericSettingController(settingsController);
     preparePromises.push(setupGenericSettingsController(genericSettingController));
 
@@ -94,6 +91,9 @@ await Application.main(true, async (application) => {
 
     const languagesController = new LanguagesController(settingsController);
     preparePromises.push(languagesController.prepare());
+
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    settingsDisplayController.prepare();
 
     await Promise.all(preparePromises);
 

@@ -91,9 +91,6 @@ await Application.main(true, async (application) => {
     const settingsController = new SettingsController(application);
     await settingsController.prepare();
 
-    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    settingsDisplayController.prepare();
-
     const persistentStorageController = new PersistentStorageController(application);
     preparePromises.push(persistentStorageController.prepare());
 
@@ -171,6 +168,9 @@ await Application.main(true, async (application) => {
 
     const sortFrequencyDictionaryController = new SortFrequencyDictionaryController(settingsController);
     preparePromises.push(sortFrequencyDictionaryController.prepare());
+
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    settingsDisplayController.prepare();
 
     await Promise.all(preparePromises);
 
