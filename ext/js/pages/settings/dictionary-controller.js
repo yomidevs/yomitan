@@ -519,7 +519,7 @@ export class DictionaryController {
     /**
      * @param {string} name
      * @param {boolean} enabled
-     * @param {string|undefined} styles
+     * @param {string} styles
      * @returns {import('settings').DictionaryOptions}
      */
     static createDefaultDictionarySettings(name, enabled, styles) {

@@ -190,15 +190,15 @@ export class DictionaryImporter {
             media: {total: media.length},
         };
 
-        /** @type {import('dictionary-importer').SummaryDetails} */
-        const summaryDetails = {prefixWildcardsSupported, counts};
-
         const stylesFileName = 'styles.css';
         const stylesFile = fileMap.get(stylesFileName);
+        let styles = '';
         if (typeof stylesFile !== 'undefined') {
-            const stylesContent = await this._getData(stylesFile, new TextWriter());
-            summaryDetails.styles = stylesContent;
+            styles = await this._getData(stylesFile, new TextWriter());
         }
+
+        /** @type {import('dictionary-importer').SummaryDetails} */
+        const summaryDetails = {prefixWildcardsSupported, counts, styles};
 
         const summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
         await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);

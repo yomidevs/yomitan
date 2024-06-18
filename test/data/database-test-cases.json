@@ -3,6 +3,7 @@
     "title": "Test Dictionary",
     "revision": "test",
     "sequenced": true,
+    "styles": "",
     "version": 3,
     "importDate": 0,
     "prefixWildcardsSupported": true,
