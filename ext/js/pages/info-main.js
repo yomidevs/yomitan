@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ThemeController} from '../app/theme-controller.js';
 import {Application} from '../application.js';
 import {promiseTimeout} from '../core/utilities.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
@@ -153,6 +154,16 @@ await Application.main(true, async (application) => {
 
     const settingsController = new SettingsController(application);
     await settingsController.prepare();
+
+    /** @type {ThemeController} */
+    const themeController = new ThemeController(document.documentElement);
+    const optionsFull = await application.api.optionsGetFull();
+    const {profiles, profileCurrent} = optionsFull;
+    const primaryProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
+    if (primaryProfile !== null) {
+        themeController.theme = primaryProfile.options.general.popupTheme;
+        themeController.updateTheme();
+    }
 
     const backupController = new BackupController(settingsController, null);
     await backupController.prepare();
