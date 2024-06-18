@@ -42,6 +42,8 @@ export class SettingsDisplayController {
         this._onMenuButtonClickBind = this._onMenuButtonClick.bind(this);
         /** @type {ThemeController} */
         this._themeController = new ThemeController(document.documentElement);
+        /** @type {HTMLSelectElement | null}*/
+        this._themeDropdown = document.querySelector('[data-setting="general.popupTheme"]');
     }
 
     /** */
@@ -91,16 +93,17 @@ export class SettingsDisplayController {
         window.addEventListener('popstate', this._onPopState.bind(this), false);
         this._updateScrollTarget();
 
-        const themeDropdown = document.querySelector('[data-setting="general.popupTheme"]');
-        if (themeDropdown) {
-            themeDropdown.addEventListener('change', this._updateTheme.bind(this), false);
+        if (this._themeDropdown) {
+            this._themeDropdown.addEventListener('change', this._updateTheme.bind(this), false);
         }
     }
 
     /** */
     async _updateTheme() {
-        const options = await this._settingsController.getOptions();
-        this._themeController.theme = options.general.popupTheme;
+        const theme = this._themeDropdown?.value;
+        if (theme === 'site' || theme === 'light' || theme === 'dark' || theme === 'browser') {
+            this._themeController.theme = theme;
+        }
         this._themeController.siteOverride = true;
         this._themeController.updateTheme();
     }
