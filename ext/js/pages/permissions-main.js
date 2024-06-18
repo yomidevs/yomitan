@@ -130,10 +130,10 @@ await Application.main(true, async (application) => {
     const persistentStorageController = new PersistentStorageController(application);
     void persistentStorageController.prepare();
 
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    settingsDisplayController.prepare();
+
     await promiseTimeout(100);
 
     document.documentElement.dataset.loaded = 'true';
-
-    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    settingsDisplayController.prepare();
 });

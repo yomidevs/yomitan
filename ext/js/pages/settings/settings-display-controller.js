@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ThemeController} from '../../app/theme-controller.js';
 import {isInputElementFocused} from '../../dom/document-util.js';
 import {PopupMenu} from '../../dom/popup-menu.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -39,10 +40,16 @@ export class SettingsDisplayController {
         this._onMoreToggleClickBind = this._onMoreToggleClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
         this._onMenuButtonClickBind = this._onMenuButtonClick.bind(this);
+        /** @type {ThemeController} */
+        this._themeController = new ThemeController(document.documentElement);
     }
 
     /** */
     prepare() {
+        this._themeController.siteTheme = 'light';
+        this._themeController.prepare();
+        void this._updateTheme();
+
         const onFabButtonClick = this._onFabButtonClick.bind(this);
         for (const fabButton of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.fab-button'))) {
             fabButton.addEventListener('click', onFabButtonClick, false);
@@ -84,6 +91,18 @@ export class SettingsDisplayController {
         window.addEventListener('keydown', this._onKeyDown.bind(this), false);
         window.addEventListener('popstate', this._onPopState.bind(this), false);
         this._updateScrollTarget();
+
+        const themeDropdown = document.querySelector('[data-setting="general.popupTheme"]');
+        if (themeDropdown) {
+            themeDropdown.addEventListener('change', this._updateTheme.bind(this), false);
+        }
+    }
+
+    /** */
+    async _updateTheme() {
+        const options = await this._settingsController.getOptions();
+        this._themeController.theme = options.general.popupTheme;
+        this._themeController.updateTheme();
     }
 
     // Private

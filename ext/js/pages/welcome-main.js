@@ -92,10 +92,10 @@ await Application.main(true, async (application) => {
     const languagesController = new LanguagesController(settingsController);
     preparePromises.push(languagesController.prepare());
 
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    settingsDisplayController.prepare();
+
     await Promise.all(preparePromises);
 
     document.documentElement.dataset.loaded = 'true';
-
-    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    settingsDisplayController.prepare();
 });

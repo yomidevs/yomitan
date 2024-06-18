@@ -24,18 +24,23 @@
     --line-height: calc(var(--line-height-no-units) / var(--font-size-no-units));
 
     --animation-duration: 0s;
+
+    --example-text-color: #333333;
 }
 :root[data-loaded=true] {
     --animation-duration: 0.25s;
 }
 
+:root[data-theme=dark] {
+    --example-text-color: #d4d4d4;
+}
+
+
 html {
     transition: background-color var(--animation-duration) linear 0s, color var(--animation-duration) linear 0s;
     background-color: rgba(255, 255, 255, 0);
-    color: #333333;
 }
 html.dark {
-    color: #d4d4d4;
     background-color: #1e1e1e;
 }
 html,
@@ -92,7 +97,7 @@ body {
     margin: 0;
     padding: 0;
     outline: none;
-    color: inherit;
+    color: var(--example-text-color);
     background-color: transparent;
     white-space: pre;
     transition: background-color var(--animation-duration) linear 0s, border-color var(--animation-duration) linear 0s;
