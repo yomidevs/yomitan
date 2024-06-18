@@ -38,37 +38,37 @@ function addAccent(char) {
 export const spanishTransforms = {
     language: 'es',
     conditions: {
-        v: {
+        'v': {
             name: 'Verb',
             isDictionaryForm: true,
             subConditions: ['v_ar', 'v_er', 'v_ir'],
         },
-        v_ar: {
+        'v_ar': {
             name: '-ar verb',
-            isDictionaryForm: true,
+            isDictionaryForm: false,
         },
-        v_er: {
+        'v_er': {
             name: '-er verb',
-            isDictionaryForm: true,
+            isDictionaryForm: false,
         },
-        v_ir: {
+        'v_ir': {
             name: '-ir verb',
-            isDictionaryForm: true,
+            isDictionaryForm: false,
         },
-        n: {
+        'n': {
             name: 'Noun',
             isDictionaryForm: true,
-            subConditions: ['ns', 'np'],
+            subConditions: ['n fem', 'n masc'],
         },
-        np: {
-            name: 'Noun plural',
+        'n fem': {
+            name: 'Noun feminine',
             isDictionaryForm: true,
         },
-        ns: {
-            name: 'Noun singular',
+        'n masc': {
+            name: 'Noun masculine',
             isDictionaryForm: true,
         },
-        adj: {
+        'adj': {
             name: 'Adjective',
             isDictionaryForm: true,
         },
@@ -78,11 +78,11 @@ export const spanishTransforms = {
             name: 'plural',
             description: 'Plural form of a noun',
             rules: [
-                suffixInflection('s', '', ['np'], ['ns']),
-                suffixInflection('es', '', ['np'], ['ns']),
-                suffixInflection('ces', 'z', ['np'], ['ns']), // 'lápices' -> lápiz
-                ...[...'aeiou'].map((v) => suffixInflection(`${v}ses`, `${addAccent(v)}s`, ['np'], ['ns'])), // 'autobuses' -> autobús
-                ...[...'aeiou'].map((v) => suffixInflection(`${v}nes`, `${addAccent(v)}n`, ['np'], ['ns'])), // 'canciones' -> canción
+                suffixInflection('s', '', ['n'], ['n']),
+                suffixInflection('es', '', ['n'], ['n']),
+                suffixInflection('ces', 'z', ['n'], ['n']), // 'lápices' -> lápiz
+                ...[...'aeiou'].map((v) => suffixInflection(`${v}ses`, `${addAccent(v)}s`, ['n'], ['n'])), // 'autobuses' -> autobús
+                ...[...'aeiou'].map((v) => suffixInflection(`${v}nes`, `${addAccent(v)}n`, ['n'], ['n'])), // 'canciones' -> canción
             ],
         },
         'feminine adjective': {

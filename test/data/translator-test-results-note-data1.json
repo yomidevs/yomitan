@@ -1,7 +1,117 @@
 [
   {
     "name": "Basic spanish test",
-    "noteDataList": []
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 31,
+          "source": "cosa",
+          "rawSource": "cosa",
+          "sourceTerm": "cosa",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 23,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "cosa",
+          "reading": "cosa",
+          "expressions": [
+            {
+              "sourceTerm": "cosa",
+              "expression": "cosa",
+              "reading": "cosa",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "cosa",
+                  "furigana": ""
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "cosa definition"
+          ],
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "cosa",
+              "furigana": ""
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "cosa"
+        ],
+        "uniqueReadings": [
+          "cosa"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
   },
   {
     "name": "Basic kanji test 1",

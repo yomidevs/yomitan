@@ -1,8 +1,84 @@
 [
   {
     "name": "Basic spanish test",
-    "originalTextLength": 0,
-    "dictionaryEntries": []
+    "originalTextLength": 4,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 1,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxOriginalTextLength": 4,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "cosa",
+            "reading": "cosa",
+            "sources": [
+              {
+                "originalText": "cosa",
+                "transformedText": "cosa",
+                "deinflectedText": "cosa",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 31,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              23
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "cosa definition"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      }
+    ]
   },
   {
     "name": "Basic kanji test 1",

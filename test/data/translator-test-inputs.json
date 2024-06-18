@@ -44,8 +44,15 @@
             "name": "Basic spanish test",
             "func": "findTerms",
             "mode": "split",
-            "text": "cosa",
-            "options": "default"
+            "text": "cosas",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "language": "es",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
         },
         {
             "name": "Basic kanji test 1",
