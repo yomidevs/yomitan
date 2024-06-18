@@ -121,6 +121,9 @@ await Application.main(true, async (application) => {
     const settingsController = new SettingsController(application);
     await settingsController.prepare();
 
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    settingsDisplayController.prepare();
+
     const permissionsToggleController = new PermissionsToggleController(settingsController);
     void permissionsToggleController.prepare();
 
@@ -133,7 +136,4 @@ await Application.main(true, async (application) => {
     await promiseTimeout(100);
 
     document.documentElement.dataset.loaded = 'true';
-
-    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    settingsDisplayController.prepare();
 });
