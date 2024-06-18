@@ -356,8 +356,12 @@ export class DictionaryImporter {
      * @returns {string}
      */
     _addScopeToCss(css, dictionaryTitle) {
+        const escapedTitle = dictionaryTitle
+            .replace('\\', '\\\\')
+            .replace('"', '\\"');
+
         const regex = /([^\r\n,{}]+)(\s*[,{])/g;
-        const replacement = `li[data-dictionary="${dictionaryTitle}"] $1$2`;
+        const replacement = `li[data-dictionary="${escapedTitle}"] $1$2`;
         return css.replace(regex, replacement);
     }
 
