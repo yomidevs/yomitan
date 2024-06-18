@@ -1163,9 +1163,9 @@ export class Display extends EventDispatcher {
     _getCustomCss(options) {
         const {general: {customPopupCss}, dictionaries} = options;
         let customCss = customPopupCss;
-        for (const dictionary of dictionaries) {
-            if (dictionary.enabled) {
-                customCss += '\n' + dictionary.styles;
+        for (const {enabled, styles = ''} of dictionaries) {
+            if (enabled) {
+                customCss += '\n' + styles;
             }
         }
         this.setCustomCss(customCss);

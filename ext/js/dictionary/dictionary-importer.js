@@ -195,6 +195,14 @@ export class DictionaryImporter {
         let styles = '';
         if (typeof stylesFile !== 'undefined') {
             styles = await this._getData(stylesFile, new TextWriter());
+            const cssErrors = this._validateCss(styles);
+            if (cssErrors.length > 0) {
+                return {
+                    errors: cssErrors,
+                    result: null,
+                };
+            }
+            styles = this._addScopeToCss(styles, dictionaryTitle);
         }
 
         /** @type {import('dictionary-importer').SummaryDetails} */
@@ -340,6 +348,25 @@ export class DictionaryImporter {
         const tagBank = 'dictionaryTagBankV3';
 
         return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
+    }
+
+    /**
+     * @param {string} css
+     * @param {string} dictionaryTitle
+     * @returns {string}
+     */
+    _addScopeToCss(css, dictionaryTitle) {
+        const regex = /([^\r\n,{}]+)(\s*{)/g;
+        const replacement = `li[data-dictionary="${dictionaryTitle}"] $1$2`;
+        return css.replace(regex, replacement);
+    }
+
+    /**
+     * @param {string} css
+     * @returns {Error[]}
+     */
+    _validateCss(css) {
+        return css ? [] : [new Error('No styles found')];
     }
 
     /**
