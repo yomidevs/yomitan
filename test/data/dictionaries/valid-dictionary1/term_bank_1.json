@@ -345,5 +345,6 @@
     ["English", "", "n", "n", 1, ["English definition"], 19, ""],
     ["language", "", "n", "n", 1, ["language definition"], 20, ""],
     ["ＵＳＢ", "ユーエスビー", "n", "n", 1, ["ＵＳＢ definition"], 21, ""],
-    ["마시다", "", "v", "v", 1, ["masida definition"], 22, ""]
+    ["마시다", "", "v", "v", 1, ["masida definition"], 22, ""],
+    ["cosa", "", "ns", "ns", 1, ["cosa definition"], 23, ""]
 ]

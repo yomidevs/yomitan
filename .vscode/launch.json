@@ -8,7 +8,7 @@
                 "run",
                 "test:unit",
                 "--",
-                // "test/text-source-range.test.js" // Replace and uncomment this line to run a single test file
+                "test/dictionary-data.test.js" // Replace and uncomment this line to run a single test file
             ],
             "runtimeExecutable": "npm",
             "skipFiles": [

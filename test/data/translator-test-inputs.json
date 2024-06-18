@@ -41,6 +41,13 @@
     },
     "tests": [
         {
+            "name": "Basic spanish test",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "cosa",
+            "options": "default"
+        },
+        {
             "name": "Basic kanji test 1",
             "func": "findKanji",
             "text": "打",
