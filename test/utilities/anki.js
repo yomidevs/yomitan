@@ -56,6 +56,7 @@ export function createTestAnkiNoteData(dictionaryEntry, mode) {
             fullQuery: 'fullQuery',
         },
         media: {},
+        dictionaryStylesMap: new Map(),
     };
     return createAnkiNoteData(marker, data);
 }
@@ -114,6 +115,7 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
             compactTags: false,
             requirements: [],
             mediaOptions: null,
+            dictionaryStylesMap: new Map(),
         };
         const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote(details);
         for (const error of errors) {

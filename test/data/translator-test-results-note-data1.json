@@ -492,6 +492,8 @@
             "da definition 1",
             "da definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -806,6 +808,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "abbr",
@@ -1134,6 +1138,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -1448,6 +1454,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -1762,6 +1770,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -2076,6 +2086,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -2390,6 +2402,8 @@
             "da definition 1",
             "da definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -2704,6 +2718,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "abbr",
@@ -3062,6 +3078,8 @@
             "uchikomu definition 1",
             "uchikomu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -3484,6 +3502,8 @@
             "buchikomu definition 1",
             "buchikomu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -3906,6 +3926,8 @@
             "uchikomu definition 3",
             "uchikomu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -4328,6 +4350,8 @@
             "buchikomu definition 3",
             "buchikomu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -4725,6 +4749,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -5044,6 +5070,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -5363,6 +5391,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -5682,6 +5712,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -5996,6 +6028,8 @@
             "da definition 1",
             "da definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -6310,6 +6344,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "abbr",
@@ -6564,6 +6600,8 @@
               "pixelated": true
             }
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -6800,6 +6838,8 @@
             "da definition 1",
             "da definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -7119,6 +7159,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "abbr",
@@ -7442,6 +7484,8 @@
             "da definition 1",
             "da definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -7761,6 +7805,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -8075,6 +8121,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -8394,6 +8442,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -8708,6 +8758,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -9057,6 +9109,8 @@
             "uchikomu definition 1",
             "uchikomu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -9479,6 +9533,8 @@
             "uchikomu definition 3",
             "uchikomu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -9876,6 +9932,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -10195,6 +10253,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -10544,6 +10604,8 @@
             "buchikomu definition 1",
             "buchikomu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -10966,6 +11028,8 @@
             "buchikomu definition 3",
             "buchikomu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -11363,6 +11427,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -11682,6 +11748,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -11927,6 +11995,8 @@
               "pixelated": true
             }
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -12241,6 +12311,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "uchikomu definition 1",
                 "uchikomu definition 2"
@@ -12260,6 +12332,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "uchikomu definition 3",
                 "uchikomu definition 4"
@@ -12686,6 +12760,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "buchikomu definition 1",
                 "buchikomu definition 2"
@@ -12705,6 +12781,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "buchikomu definition 3",
                 "buchikomu definition 4"
@@ -13106,6 +13184,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "utsu definition 1",
                 "utsu definition 2"
@@ -13125,6 +13205,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "utsu definition 3",
                 "utsu definition 4"
@@ -13456,6 +13538,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "butsu definition 1",
                 "butsu definition 2"
@@ -13475,6 +13559,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "butsu definition 3",
                 "butsu definition 4"
@@ -13774,6 +13860,8 @@
             {
               "sequence": 1,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "da definition 1",
                 "da definition 2"
@@ -14086,6 +14174,8 @@
             {
               "sequence": 2,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "daasu definition 1",
                 "daasu definition 2"
@@ -14603,6 +14693,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "uchikomu definition 1",
                 "uchikomu definition 2"
@@ -14625,6 +14717,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "buchikomu definition 1",
                 "buchikomu definition 2"
@@ -14647,6 +14741,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "uchikomu definition 3",
                 "uchikomu definition 4"
@@ -14669,6 +14765,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "buchikomu definition 3",
                 "buchikomu definition 4"
@@ -15321,6 +15419,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "utsu definition 1",
                 "utsu definition 2"
@@ -15343,6 +15443,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "butsu definition 1",
                 "butsu definition 2"
@@ -15365,6 +15467,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "utsu definition 3",
                 "utsu definition 4"
@@ -15387,6 +15491,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "butsu definition 3",
                 "butsu definition 4"
@@ -15760,6 +15866,8 @@
             {
               "sequence": 1,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "da definition 1",
                 "da definition 2"
@@ -16065,6 +16173,8 @@
             {
               "sequence": 2,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "daasu definition 1",
                 "daasu definition 2"
@@ -16434,6 +16544,8 @@
             "uchikomu definition 1",
             "uchikomu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -16877,6 +16989,8 @@
             "buchikomu definition 1",
             "buchikomu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -17320,6 +17434,8 @@
             "uchikomu definition 3",
             "uchikomu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -17763,6 +17879,8 @@
             "buchikomu definition 3",
             "buchikomu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -18160,6 +18278,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -18479,6 +18599,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -18798,6 +18920,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -19117,6 +19241,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -19431,6 +19557,8 @@
             "da definition 1",
             "da definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -19745,6 +19873,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "abbr",
@@ -20103,6 +20233,8 @@
             "uchikomu definition 1",
             "uchikomu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -20525,6 +20657,8 @@
             "buchikomu definition 1",
             "buchikomu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -20947,6 +21081,8 @@
             "uchikomu definition 3",
             "uchikomu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -21369,6 +21505,8 @@
             "buchikomu definition 3",
             "buchikomu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -21766,6 +21904,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -22085,6 +22225,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -22404,6 +22546,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -22723,6 +22867,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -23037,6 +23183,8 @@
             "da definition 1",
             "da definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -23351,6 +23499,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "abbr",
@@ -23709,6 +23859,8 @@
             "uchikomu definition 1",
             "uchikomu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -24131,6 +24283,8 @@
             "buchikomu definition 1",
             "buchikomu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -24553,6 +24707,8 @@
             "uchikomu definition 3",
             "uchikomu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -24975,6 +25131,8 @@
             "buchikomu definition 3",
             "buchikomu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -25372,6 +25530,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -25691,6 +25851,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -26010,6 +26172,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -26329,6 +26493,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -26643,6 +26809,8 @@
             "da definition 1",
             "da definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -26957,6 +27125,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "abbr",
@@ -27210,6 +27380,8 @@
           "glossary": [
             "to read"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -27370,6 +27542,8 @@
           "glossary": [
             "strong point"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -27539,6 +27713,8 @@
           "glossary": [
             "to read"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -27979,6 +28155,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "uchikomu definition 1",
                 "uchikomu definition 2"
@@ -28001,6 +28179,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "buchikomu definition 1",
                 "buchikomu definition 2"
@@ -28023,6 +28203,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "uchikomu definition 3",
                 "uchikomu definition 4"
@@ -28045,6 +28227,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "buchikomu definition 3",
                 "buchikomu definition 4"
@@ -28697,6 +28881,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "utsu definition 1",
                 "utsu definition 2"
@@ -28719,6 +28905,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "butsu definition 1",
                 "butsu definition 2"
@@ -28741,6 +28929,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "utsu definition 3",
                 "utsu definition 4"
@@ -28763,6 +28953,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "styles": "",
+              "stylesScoped": "",
               "glossary": [
                 "butsu definition 3",
                 "butsu definition 4"
@@ -29097,6 +29289,8 @@
           "glossary": [
             "otemae definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -29391,6 +29585,8 @@
           "glossary": [
             "bangou definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -29579,6 +29775,8 @@
           "glossary": [
             "chuugoshi definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -29767,6 +29965,8 @@
           "glossary": [
             "shogyouu definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -29955,6 +30155,8 @@
           "glossary": [
             "dobokukouji definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -30140,6 +30342,8 @@
           "glossary": [
             "suki definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "adj-na",
@@ -30368,6 +30572,8 @@
               "content": "kouzou definition 3 (構造)"
             }
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -30527,6 +30733,8 @@
           "glossary": [
             "notamau definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "v5",
@@ -30639,6 +30847,8 @@
           "glossary": [
             "sankyuu definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [],
           "termTags": [],
           "frequencies": [],
@@ -30743,6 +30953,8 @@
           "glossary": [
             "English definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -30857,6 +31069,8 @@
           "glossary": [
             "ＵＳＢ definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -31074,6 +31288,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -31388,6 +31604,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -31707,6 +31925,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -32021,6 +32241,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -32257,6 +32479,8 @@
             "text definition 1",
             "text definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -32493,6 +32717,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -32807,6 +33033,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "vt",
@@ -33040,6 +33268,8 @@
           "glossary": [
             "sugoi definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "adj-i",
@@ -33158,6 +33388,8 @@
           "glossary": [
             "English definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -33272,6 +33504,8 @@
           "glossary": [
             "language definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",
@@ -33390,6 +33624,8 @@
           "glossary": [
             "masida definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "v",
@@ -33504,6 +33740,8 @@
           "glossary": [
             "English definition"
           ],
+          "styles": "",
+          "stylesScoped": "",
           "definitionTags": [
             {
               "name": "n",

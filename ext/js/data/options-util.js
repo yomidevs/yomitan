@@ -548,6 +548,7 @@ export class OptionsUtil {
             this._updateVersion38,
             this._updateVersion39,
             this._updateVersion40,
+            this._updateVersion41,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1337,6 +1338,14 @@ export class OptionsUtil {
                 }
             }
         }
+    }
+
+    /**
+     *  - Updated `glossary` handlebars to support dictionary css.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion41(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v41.handlebars');
     }
 
     /**
