@@ -130,9 +130,10 @@ export class ThemeController {
     updateTheme() {
         if (this._element === null) { return; }
         const computedSiteTheme = this._siteTheme !== null ? this._siteTheme : this.computeSiteTheme();
+        const invertedComputedSiteTheme = computedSiteTheme === 'dark' ? 'light' : 'dark';
         const data = this._element.dataset;
         data.theme = this._resolveThemeValue(this._theme, computedSiteTheme);
-        data.outerTheme = this._resolveThemeValue(this._outerTheme, computedSiteTheme);
+        data.outerTheme = this._resolveThemeValue(this._outerTheme, invertedComputedSiteTheme);
         data.siteTheme = computedSiteTheme;
         data.browserTheme = this._browserTheme;
         data.themeRaw = this._theme;
