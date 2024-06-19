@@ -470,8 +470,8 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
         },
         get expressions() { return getCachedValue(expressions); },
         get glossary() { return getCachedValue(glossary); },
-        get styles() { return getCachedValue(styleInfo)?.styles; },
-        get stylesScoped() { return getCachedValue(styleInfo)?.stylesScoped; },
+        get glossaryScopedStyles() { return getCachedValue(styleInfo)?.glossaryScopedStyles; },
+        get dictScopedStyles() { return getCachedValue(styleInfo)?.dictScopedStyles; },
         get definitionTags() { return type === 'term' ? getCachedValue(commonInfo).definitionTags : void 0; },
         get termTags() { return getCachedValue(termTags); },
         get definitions() { return getCachedValue(commonInfo).definitions; },
@@ -526,11 +526,11 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
     const definitionTags = [];
     for (const {tags, headwordIndices, entries, dictionary, sequences} of dictionaryEntry.definitions) {
         const dictionaryStyles = dictionaryStylesMap.get(dictionary);
-        let styles = '';
-        let stylesScoped = '';
+        let glossaryScopedStyles = '';
+        let dictScopedStyles = '';
         if (dictionaryStyles) {
-            styles = dictionaryStyles;
-            stylesScoped = addScopeToCss(dictionaryStyles, dictionary);
+            glossaryScopedStyles = addGlossaryScopeToCss(dictionaryStyles);
+            dictScopedStyles = addGlossaryScopeToCss(addDictionaryScopeToCss(dictionaryStyles, dictionary));
         }
         const definitionTags2 = [];
         for (const tag of tags) {
@@ -542,8 +542,8 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
         definitions.push({
             sequence: sequences[0],
             dictionary,
-            styles,
-            stylesScoped,
+            glossaryScopedStyles,
+            dictScopedStyles,
             glossary: entries,
             definitionTags: definitionTags2,
             only,
@@ -560,16 +560,33 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
 
 /**
  * @param {string} css
+ * @returns {string}
+ */
+function addGlossaryScopeToCss(css) {
+    return addScopeToCss(css, '.yomitan-glossary');
+}
+
+/**
+ * @param {string} css
  * @param {string} dictionaryTitle
  * @returns {string}
  */
-function addScopeToCss(css, dictionaryTitle) {
+function addDictionaryScopeToCss(css, dictionaryTitle) {
     const escapedTitle = dictionaryTitle
         .replace(/\\/g, '\\\\')
         .replace(/"/g, '\\"');
 
+    return addScopeToCss(css, `[data-dictionary="${escapedTitle}"]`);
+}
+
+/**
+ * @param {string} css
+ * @param {string} scopeSelector
+ * @returns {string}
+ */
+function addScopeToCss(css, scopeSelector) {
     const regex = /([^\r\n,{}]+)(\s*[,{])/g;
-    const replacement = `[data-dictionary="${escapedTitle}"] $1$2`;
+    const replacement = `${scopeSelector} $1$2`;
     return css.replace(regex, replacement);
 }
 
@@ -803,22 +820,22 @@ function getTermGlossaryArray(dictionaryEntry, type) {
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
  * @param {import('anki-templates').TermDictionaryEntryType} type
  * @param {Map<string, string>} dictionaryStylesMap
- * @returns {{styles: string, stylesScoped: string}|undefined}
+ * @returns {{glossaryScopedStyles: string, dictScopedStyles: string}|undefined}
  */
 function getTermStyles(dictionaryEntry, type, dictionaryStylesMap) {
     if (type !== 'term') {
         return void 0;
     }
-    let styles = '';
-    let stylesScoped = '';
+    let glossaryScopedStyles = '';
+    let dictScopedStyles = '';
     for (const {dictionary} of dictionaryEntry.definitions) {
         const dictionaryStyles = dictionaryStylesMap.get(dictionary);
         if (dictionaryStyles) {
-            styles += dictionaryStyles;
-            stylesScoped += addScopeToCss(dictionaryStyles, dictionary);
+            glossaryScopedStyles += addGlossaryScopeToCss(dictionaryStyles);
+            dictScopedStyles += addGlossaryScopeToCss(addDictionaryScopeToCss(dictionaryStyles, dictionary));
         }
     }
-    return {styles, stylesScoped};
+    return {glossaryScopedStyles, dictScopedStyles};
 }
 
 /**

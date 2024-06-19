@@ -98,14 +98,14 @@
 {{/inline}}
 
 {{~#*inline "glossary"~}}
-    <div style="text-align: left;">
+    <div style="text-align: left;" class="yomitan-glossary">
     {{~#scope~}}
         {{~#if (op "===" definition.type "term")~}}
             {{~#unless (op "&&" selectedDictionary (op "!=" selectedDictionary definition.dictionary))~}}
                 {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
-                {{~#if definition.styles~}}
+                {{~#if definition.glossaryScopedStyles~}}
                     <style>
-                        {{{definition.styles}}}
+                        {{{definition.glossaryScopedStyles}}}
                     </style>
                 {{~/if~}}
             {{~/unless~}}
@@ -117,9 +117,9 @@
                             <li data-dictionary="{{dictionary}}">
                                 {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
                             </li>
-                            {{~#if stylesScoped~}}
+                            {{~#if dictScopedStyles~}}
                                 <style>
-                                    {{{stylesScoped}}}
+                                    {{{dictScopedStyles}}}
                                 </style>
                             {{~/if~}}
                         {{~/unless~}}
@@ -129,9 +129,9 @@
                 {{~#each definition.definitions~}}
                     {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
                         {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
-                        {{~#if styles~}}
+                        {{~#if glossaryScopedStyles~}}
                             <style>
-                                {{{styles}}}
+                                {{{glossaryScopedStyles}}}
                             </style>
                         {{/if}}
                     {{~/unless~}}
