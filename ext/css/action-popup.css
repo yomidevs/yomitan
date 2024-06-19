@@ -28,19 +28,6 @@
     --warning-color: #96751c;
     --warning-color-light: #edc75e;
 
-    --nav-button-background-image: linear-gradient(#464646, #444444);
-    --nav-button-border-color: #333333;
-    --nav-button-background-image-focus: linear-gradient(#171717, #2f2f2f);
-    --nav-button-border-color-focus: #555555;
-    --nav-button-background-image-active-focus: linear-gradient(#373737, #1f1f1f);
-    --nav-button-border-color-active-focus: #7f7f7f;
-    --nav-button-icon-bg: #fbfbfb;
-    --background-color: #1e1e1e;
-    --text-color: #cccccc;
-    --svg-filter: invert(100%);
-}
-
-:root[data-theme=light] {
     --nav-button-background-image: linear-gradient(#f8f8f8, #e0e0e0);
     --nav-button-border-color: #cccccc;
     --nav-button-background-image-focus: linear-gradient(#e8e8e8, #d0d0d0);
@@ -51,6 +38,19 @@
     --background-color: #f8f9fa;
     --text-color: #333333;
     --svg-filter: 0;
+}
+
+:root[data-theme=dark] {
+    --nav-button-background-image: linear-gradient(#464646, #444444);
+    --nav-button-border-color: #333333;
+    --nav-button-background-image-focus: linear-gradient(#171717, #2f2f2f);
+    --nav-button-border-color-focus: #555555;
+    --nav-button-background-image-active-focus: linear-gradient(#373737, #1f1f1f);
+    --nav-button-border-color-active-focus: #7f7f7f;
+    --nav-button-icon-bg: #fbfbfb;
+    --background-color: #1e1e1e;
+    --text-color: #cccccc;
+    --svg-filter: invert(100%);
 }
 
 body {

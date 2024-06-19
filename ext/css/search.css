@@ -25,15 +25,14 @@
     --content-width-search: 700;
     --content-width: calc(1em * var(--content-width-search) / var(--font-size-no-units));
 
-    --background-color: #1e1e1e;
-    --separator-color1: #333333;
+    --background-color: #ffffff;
+    --separator-color1: #cccccc;
 }
 :root:not([data-loaded=true]) {
     --animation-duration: 0s;
 }
-:root[data-theme=light] {
-    --separator-color1: #cccccc;
-    --background-color: #ffffff;
+:root[data-theme=dark] {
+    --separator-color1: #333333;
 }
 
 /* Common styles */

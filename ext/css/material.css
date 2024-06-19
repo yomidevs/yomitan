@@ -67,65 +67,6 @@
         opacity var(--animation-duration2) ease-in-out,
         visibility var(--animation-duration2) ease-in-out;
 
-    --text-color: #d4d4d4;
-    --text-color-light1: #aaaaaa;
-    --text-color-light2: #999999;
-    --text-color-light3: #888888;
-    --text-color-light4: #777777;
-    --background-color: #1e1e1e;
-    --background-color-light: #0a0a0a;
-    --background-color-dark1: #333333;
-
-    --shadow-color: rgba(105, 105, 105, 0.185);
-    --shadow-color-off: rgba(255, 255, 255, 0);
-    --shadow-color-light: rgba(255, 255, 255, 0.085);
-
-    --accent-color: #4a91ed;
-    --accent-color-light: #1a73e8;
-    --accent-color-lighter: #135dbe;
-    --accent-color-lightest: #0e4690;
-    --accent-color-transparent0: rgb(78, 172, 253, 0);
-    --accent-color-transparent5: rgb(78, 172, 253, 0.05);
-    --accent-color-transparent25: rgb(78, 172, 253, 0.25);
-
-    --danger-color: #dd6755;
-    --danger-color-light: #c83c28;
-    --danger-color-lighter: #9e301f;
-    --danger-color-lightest: #732317;
-    --danger-color-transparent0: rgba(221, 103, 85, 0);
-    --danger-color-transparent5: rgba(221, 103, 85, 0.05);
-    --danger-color-transparent25: rgba(221, 103, 85, 0.25);
-
-    --success-color: #75cf54;
-
-    --disabled-color: #444444;
-    --disabled-color-light: #585858;
-    --disabled-color-lighter: #777777;
-
-    --input-background-color: #2f2f2f;
-    --input-background-color-dark: #383838;
-    --input-background-color-darker: #484848;
-    --input-outline-color: var(--text-color);
-
-    --button-default-text-color: #000000;
-    --button-default-border-color: #333333;
-    --button-default-icon-color: #cccccc;
-    --button-default-icon-color-light: #999999;
-
-    --checkbox-checked-color: var(--accent-color);
-    --checkbox-unchecked-color: #999999;
-    --checkbox-check-color: var(--background-color-light);
-    --checkbox-disabled-color: var(--disabled-color);
-
-    --toggle-track-color: #cccccc;
-    --toggle-knob-color: #ffffff;
-
-    --selectable-indicator-color: rgba(100, 100, 100, 0.25);
-
-    --menu-item-hover-color: #333333;
-    --menu-item-active-color: #444444;
-}
-:root[data-theme=light] {
     --text-color: #222222;
     --text-color-light1: #555555;
     --text-color-light2: #666666;
@@ -184,6 +125,62 @@
 
     --menu-item-hover-color: #bbbbbb;
     --menu-item-active-color: #aaaaaa;
+}
+:root[data-theme=dark] {
+    --text-color: #d4d4d4;
+    --text-color-light1: #aaaaaa;
+    --text-color-light2: #999999;
+    --text-color-light3: #888888;
+    --text-color-light4: #777777;
+    --background-color: #1e1e1e;
+    --background-color-light: #0a0a0a;
+    --background-color-dark1: #333333;
+
+    --shadow-color: rgba(105, 105, 105, 0.185);
+    --shadow-color-off: rgba(255, 255, 255, 0);
+    --shadow-color-light: rgba(255, 255, 255, 0.085);
+
+    --accent-color: #4a91ed;
+    --accent-color-light: #1a73e8;
+    --accent-color-lighter: #135dbe;
+    --accent-color-lightest: #0e4690;
+    --accent-color-transparent0: rgb(78, 172, 253, 0);
+    --accent-color-transparent5: rgb(78, 172, 253, 0.05);
+    --accent-color-transparent25: rgb(78, 172, 253, 0.25);
+
+    --danger-color: #dd6755;
+    --danger-color-light: #c83c28;
+    --danger-color-lighter: #9e301f;
+    --danger-color-lightest: #732317;
+    --danger-color-transparent0: rgba(221, 103, 85, 0);
+    --danger-color-transparent5: rgba(221, 103, 85, 0.05);
+    --danger-color-transparent25: rgba(221, 103, 85, 0.25);
+
+    --success-color: #75cf54;
+
+    --disabled-color: #444444;
+    --disabled-color-light: #585858;
+    --disabled-color-lighter: #777777;
+
+    --input-background-color: #2f2f2f;
+    --input-background-color-dark: #383838;
+    --input-background-color-darker: #484848;
+    --input-outline-color: var(--text-color);
+
+    --button-default-text-color: #000000;
+    --button-default-border-color: #333333;
+    --button-default-icon-color: #cccccc;
+    --button-default-icon-color-light: #999999;
+
+    --checkbox-unchecked-color: #999999;
+
+    --toggle-track-color: #cccccc;
+    --toggle-knob-color: #ffffff;
+
+    --selectable-indicator-color: rgba(100, 100, 100, 0.25);
+
+    --menu-item-hover-color: #333333;
+    --menu-item-active-color: #444444;
 }
 
 

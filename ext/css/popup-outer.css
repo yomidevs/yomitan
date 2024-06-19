@@ -19,21 +19,21 @@
 iframe.yomitan-popup {
     all: initial;
     font-size: 1px;
-    background-color: #1e1e1e;
-    border: 1em solid #666666;
-    box-shadow: 0 0 10em rgba(255, 255, 255, 0.5);
+    background-color: #ffffff;
+    border: 1em solid #999999;
+    box-shadow: 0 0 10em rgba(0, 0, 0, 0.5);
     position: fixed;
     resize: none;
     visibility: hidden;
     z-index: 2147483647;
     box-sizing: border-box;
 }
-iframe.yomitan-popup[data-theme=light] {
-    background-color: #ffffff;
-    border-color: #999999;
+iframe.yomitan-popup[data-theme=dark] {
+    background-color: #1e1e1e;
+    border-color: #666666;
 }
 iframe.yomitan-popup[data-outer-theme=dark] {
-    box-shadow: 0 0 10em rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10em rgba(255, 255, 255, 0.5);
 }
 iframe.yomitan-popup[data-popup-display-mode=full-width] {
     border-left: none;

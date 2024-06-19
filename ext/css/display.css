@@ -106,80 +106,6 @@
     --collapsible-definition-test-offset: 0.2em;
 
     /* Colors */
-    --background-color: #1e1e1e;
-    --gloss-image-background-color: #2f2f2f;
-    --link-color: var(--accent-color);
-
-    --text-color: #d4d4d4;
-    --reason-text-color: var(--text-color-light3);
-
-    --headword-text-color: var(--text-color);
-    --headword-text-color-popular: var(--accent-color);
-    --headword-text-color-rare: var(--text-color-light4);
-    --headword-furigana-text-color: var(--headword-text-color);
-    --headword-furigana-text-color-popular: var(--headword-text-color-popular);
-    --headword-furigana-text-color-rare: var(--headword-text-color-rare);
-    --headword-reading-text-color: var(--headword-furigana-text-color);
-    --headword-reading-text-color-popular: var(--headword-furigana-text-color-popular);
-    --headword-reading-text-color-rare: var(--headword-furigana-text-color-rare);
-    --headword-kanji-text-color: var(--headword-text-color);
-    --headword-kanji-text-color-popular: var(--headword-text-color-popular);
-    --headword-kanji-text-color-rare: var(--headword-text-color-rare);
-    --headword-kanji-border-color: var(--dark-border-color);
-    --headword-kanji-border-color-popular: var(--headword-kanji-border-color);
-    --headword-kanji-border-color-rare: var(--headword-kanji-border-color);
-
-    --light-border-color: #2f2f2f;
-    --medium-border-color: #3f3f3f;
-    --dark-border-color: #888888;
-
-    --tag-text-color: #f1f1f1;
-    --tag-border-color: transparent;
-    --tag-default-background-color: #69696e;
-    --tag-name-background-color: #992a67;
-    --tag-expression-background-color: #b07f39;
-    --tag-popular-background-color: #025caa;
-    --tag-frequent-background-color: #4490a7;
-    --tag-archaism-background-color: #b04340;
-    --tag-dictionary-background-color: #9057ad;
-    --tag-frequency-background-color: #489148;
-    --tag-part-of-speech-background-color: #565656;
-    --tag-search-background-color: #69696e;
-    --tag-pronunciation-dictionary-background-color: #6640be;
-
-    --sidebar-background-color: #282828;
-
-    --sidebar-button-background-color: transparent;
-    --sidebar-button-background-color-hover: #3a3a3a;
-    --sidebar-button-background-color-active: #5a5a5a;
-    --sidebar-button-danger-background-color: transparent;
-    --sidebar-button-danger-background-color-hover: #dd2222;
-    --sidebar-button-danger-background-color-active: #bb2222;
-    --sidebar-button-icon-color: #cccccc;
-    --sidebar-button-disabled-icon-color: #777777;
-    --sidebar-button-danger-icon-color: #ffffff;
-
-    --scrollbar-thumb-color: #444444;
-    --scrollbar-track-color: #2f2f2f;
-    --scrollbar-inverse-thumb-color: #c1c1c1;
-    --scrollbar-inverse-track-color: #f1f1f1;
-
-    --progress-bar-track-color: #3a3a3a;
-    --progress-bar-indicator-color: var(--accent-color);
-    --entry-current-indicator-color: var(--accent-color);
-
-    --notification-text-color: #2f2f2f;
-    --notification-background-color: #e1e1e1;
-    --notification-background-color-light: #bbbbbb;
-    --notification-background-color-lighter: #aaaaaa;
-    --notification-shadow-color: rgba(255, 255, 255, 0.25);
-
-    --action-button-hover-color: #282828;
-    --action-button-active-color: #444444;
-}
-
-:root[data-theme=light] {
-    /* Colors */
     --background-color: #ffffff;
     --gloss-image-background-color: #eeeeee;
     --link-color: var(--accent-color);
@@ -250,6 +176,74 @@
 
     --action-button-hover-color: #dddddd;
     --action-button-active-color: #c1c1c1;
+}
+:root[data-theme=dark] {
+    /* Colors */
+    --background-color: #1e1e1e;
+    --gloss-image-background-color: #2f2f2f;
+    --link-color: var(--accent-color);
+
+    --text-color: #d4d4d4;
+    --reason-text-color: var(--text-color-light3);
+
+    --headword-text-color: var(--text-color);
+    --headword-text-color-popular: var(--accent-color);
+    --headword-text-color-rare: var(--text-color-light4);
+    --headword-furigana-text-color: var(--headword-text-color);
+    --headword-furigana-text-color-popular: var(--headword-text-color-popular);
+    --headword-furigana-text-color-rare: var(--headword-text-color-rare);
+    --headword-reading-text-color: var(--headword-furigana-text-color);
+    --headword-reading-text-color-popular: var(--headword-furigana-text-color-popular);
+    --headword-reading-text-color-rare: var(--headword-furigana-text-color-rare);
+    --headword-kanji-border-color: var(--dark-border-color);
+
+    --light-border-color: #2f2f2f;
+    --medium-border-color: #3f3f3f;
+    --dark-border-color: #888888;
+
+    --tag-text-color: #f1f1f1;
+    --tag-border-color: transparent;
+    --tag-default-background-color: #69696e;
+    --tag-name-background-color: #992a67;
+    --tag-expression-background-color: #b07f39;
+    --tag-popular-background-color: #025caa;
+    --tag-frequent-background-color: #4490a7;
+    --tag-archaism-background-color: #b04340;
+    --tag-dictionary-background-color: #9057ad;
+    --tag-frequency-background-color: #489148;
+    --tag-part-of-speech-background-color: #565656;
+    --tag-search-background-color: #69696e;
+    --tag-pronunciation-dictionary-background-color: #6640be;
+
+    --sidebar-background-color: #282828;
+
+    --sidebar-button-background-color: transparent;
+    --sidebar-button-background-color-hover: #3a3a3a;
+    --sidebar-button-background-color-active: #5a5a5a;
+    --sidebar-button-danger-background-color: transparent;
+    --sidebar-button-danger-background-color-hover: #dd2222;
+    --sidebar-button-danger-background-color-active: #bb2222;
+    --sidebar-button-icon-color: #cccccc;
+    --sidebar-button-disabled-icon-color: #777777;
+    --sidebar-button-danger-icon-color: #ffffff;
+
+    --scrollbar-thumb-color: #444444;
+    --scrollbar-track-color: #2f2f2f;
+    --scrollbar-inverse-thumb-color: #c1c1c1;
+    --scrollbar-inverse-track-color: #f1f1f1;
+
+    --progress-bar-track-color: #3a3a3a;
+    --progress-bar-indicator-color: var(--accent-color);
+    --entry-current-indicator-color: var(--accent-color);
+
+    --notification-text-color: #2f2f2f;
+    --notification-background-color: #e1e1e1;
+    --notification-background-color-light: #bbbbbb;
+    --notification-background-color-lighter: #aaaaaa;
+    --notification-shadow-color: rgba(255, 255, 255, 0.25);
+
+    --action-button-hover-color: #282828;
+    --action-button-active-color: #444444;
 }
 
 

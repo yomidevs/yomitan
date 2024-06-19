@@ -25,16 +25,16 @@
 
     --animation-duration: 0s;
 
-    --example-text-color: #d4d4d4;
-    --background-color: #1e1e1e;
+    --example-text-color: #333333;
+    --background-color: #f8f9fa;
 }
 :root[data-loaded=true] {
     --animation-duration: 0.25s;
 }
 
-:root[data-theme=light] {
-    --example-text-color: #333333;
-    --background-color: #f8f9fa;
+:root[data-theme=dark] {
+    --example-text-color: #d4d4d4;
+    --background-color: #1e1e1e;
 }
 
 
