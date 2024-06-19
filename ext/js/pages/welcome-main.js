@@ -93,7 +93,9 @@ await Application.main(true, async (application) => {
     preparePromises.push(languagesController.prepare());
 
     const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    settingsDisplayController.prepare();
+    await settingsDisplayController.prepare();
+
+    document.body.hidden = false;
 
     await Promise.all(preparePromises);
 

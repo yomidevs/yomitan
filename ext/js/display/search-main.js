@@ -53,5 +53,6 @@ await Application.main(true, async (application) => {
 
     display.initializeState();
 
+    document.body.hidden = false;
     document.documentElement.dataset.loaded = 'true';
 });

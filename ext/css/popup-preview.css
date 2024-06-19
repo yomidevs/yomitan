@@ -39,8 +39,14 @@
 
 
 html {
-    transition: background-color var(--animation-duration) linear 0s, color var(--animation-duration) linear 0s;
+    /* This delay and animation prevents flickering when rendering the popup preview */
+    opacity: 0;
+    animation: fadein 0.5s forwards;
+    animation-delay: 1s;
     background-color: var(--background-color);
+}
+@keyframes fadein {
+    from { opacity: 0; } to { opacity: 1; }
 }
 html.dark {
     background-color: var(--background-color);

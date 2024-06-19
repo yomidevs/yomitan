@@ -170,6 +170,8 @@ await Application.main(true, async (application) => {
     const backupController = new BackupController(settingsController, null);
     await backupController.prepare();
 
+    document.body.hidden = false;
+
     await promiseTimeout(100);
 
     document.documentElement.dataset.loaded = 'true';

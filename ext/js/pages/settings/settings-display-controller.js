@@ -47,9 +47,9 @@ export class SettingsDisplayController {
     }
 
     /** */
-    prepare() {
+    async prepare() {
         this._themeController.prepare();
-        void this._setTheme();
+        await this._setTheme();
 
         const onFabButtonClick = this._onFabButtonClick.bind(this);
         for (const fabButton of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.fab-button'))) {

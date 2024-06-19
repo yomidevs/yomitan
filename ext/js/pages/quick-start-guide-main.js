@@ -33,4 +33,5 @@ await Application.main(true, async (application) => {
         themeController.siteOverride = true;
         themeController.updateTheme();
     }
+    document.body.hidden = false;
 });
