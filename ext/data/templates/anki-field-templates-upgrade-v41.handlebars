@@ -42,9 +42,7 @@
             {{~#unless (op "&&" selectedDictionary (op "!=" selectedDictionary definition.dictionary))~}}
                 {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
                 {{~#if definition.glossaryScopedStyles~}}
-                    <style>
-                        {{{definition.glossaryScopedStyles}}}
-                    </style>
+                    <style>{{{definition.glossaryScopedStyles}}}</style>
                 {{~/if~}}
             {{~/unless~}}
         {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
@@ -56,9 +54,7 @@
                                 {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
                             </li>
                             {{~#if dictScopedStyles~}}
-                                <style>
-                                    {{{dictScopedStyles}}}
-                                </style>
+                                <style>{{{dictScopedStyles}}}</style>
                             {{~/if~}}
                         {{~/unless~}}
                     {{~/each~}}
@@ -68,9 +64,7 @@
                     {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
                         {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
                         {{~#if glossaryScopedStyles~}}
-                            <style>
-                                {{{glossaryScopedStyles}}}
-                            </style>
+                            <style>{{{glossaryScopedStyles}}}</style>
                         {{/if}}
                     {{~/unless~}}
                 {{~/each~}}
