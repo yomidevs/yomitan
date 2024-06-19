@@ -87,6 +87,17 @@ function setupPermissionsToggles() {
 }
 
 await Application.main(true, async (application) => {
+    const modalController = new ModalController();
+    modalController.prepare();
+
+    const settingsController = new SettingsController(application);
+    await settingsController.prepare();
+
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    await settingsDisplayController.prepare();
+
+    document.body.hidden = false;
+
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -115,12 +126,6 @@ await Application.main(true, async (application) => {
         permissionsCheckboxes[i].checked = permissions[i];
     }
 
-    const modalController = new ModalController();
-    modalController.prepare();
-
-    const settingsController = new SettingsController(application);
-    await settingsController.prepare();
-
     const permissionsToggleController = new PermissionsToggleController(settingsController);
     void permissionsToggleController.prepare();
 
@@ -129,9 +134,6 @@ await Application.main(true, async (application) => {
 
     const persistentStorageController = new PersistentStorageController(application);
     void persistentStorageController.prepare();
-
-    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    settingsDisplayController.prepare();
 
     await promiseTimeout(100);
 

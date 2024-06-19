@@ -1152,16 +1152,24 @@ export class Display extends EventDispatcher {
     _setTheme(options) {
         const {general} = options;
         const {popupTheme} = general;
+        /** @type {string} */
+        let pageType = this._pageType;
         try {
             // eslint-disable-next-line no-underscore-dangle
-            const pageTheme = this._history._current.state?.pageTheme;
+            const historyState = this._history._current.state;
+
+            const pageTheme = historyState?.pageTheme;
             this._themeController.siteTheme = pageTheme ?? null;
+
+            if (historyState?.url?.includes('popup-preview.html')) {
+                pageType = 'popupPreview';
+            }
         } catch (e) {
             log.error(e);
         }
         this._themeController.theme = popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;
-        this._themeController.siteOverride = this._pageType === 'search';
+        this._themeController.siteOverride = pageType === 'search' || pageType === 'popupPreview';
         this._themeController.updateTheme();
         this.setCustomCss(general.customPopupCss);
     }

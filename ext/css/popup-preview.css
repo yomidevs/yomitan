@@ -26,7 +26,7 @@
     --animation-duration: 0s;
 
     --example-text-color: #333333;
-    --background-color: #f8f9fa;
+    --background-color: rgba(0, 0, 0, 0);
 }
 :root[data-loaded=true] {
     --animation-duration: 0.25s;
@@ -34,12 +34,11 @@
 
 :root[data-theme=dark] {
     --example-text-color: #d4d4d4;
-    --background-color: #1e1e1e;
+    --background-color: rgba(0, 0, 0, 0);
 }
 
 
 html {
-    transition: background-color var(--animation-duration) linear 0s, color var(--animation-duration) linear 0s;
     background-color: var(--background-color);
 }
 html.dark {

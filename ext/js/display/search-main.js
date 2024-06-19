@@ -51,6 +51,8 @@ await Application.main(true, async (application) => {
     const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
     await searchDisplayController.prepare();
 
+    document.body.hidden = false;
+
     display.initializeState();
 
     document.documentElement.dataset.loaded = 'true';
