@@ -202,7 +202,6 @@ export class DictionaryImporter {
                     result: null,
                 };
             }
-            styles = this._addScopeToCss(styles, dictionaryTitle);
         }
 
         /** @type {import('dictionary-importer').SummaryDetails} */
@@ -348,21 +347,6 @@ export class DictionaryImporter {
         const tagBank = 'dictionaryTagBankV3';
 
         return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
-    }
-
-    /**
-     * @param {string} css
-     * @param {string} dictionaryTitle
-     * @returns {string}
-     */
-    _addScopeToCss(css, dictionaryTitle) {
-        const escapedTitle = dictionaryTitle
-            .replace(/\\/g, '\\\\')
-            .replace(/"/g, '\\"');
-
-        const regex = /([^\r\n,{}]+)(\s*[,{])/g;
-        const replacement = `li[data-dictionary="${escapedTitle}"] $1$2`;
-        return css.replace(regex, replacement);
     }
 
     /**

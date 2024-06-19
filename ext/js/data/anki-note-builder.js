@@ -60,6 +60,7 @@ export class AnkiNoteBuilder {
         glossaryLayoutMode = 'default',
         compactTags = false,
         mediaOptions = null,
+        dictionaryStylesMap,
     }) {
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
@@ -80,7 +81,7 @@ export class AnkiNoteBuilder {
             }
         }
 
-        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media);
+        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template);
@@ -135,8 +136,9 @@ export class AnkiNoteBuilder {
         glossaryLayoutMode = 'default',
         compactTags = false,
         marker,
+        dictionaryStylesMap,
     }) {
-        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0);
+        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0, dictionaryStylesMap);
         return await this._templateRenderer.getModifiedData({marker, commonData}, 'ankiNote');
     }
 
@@ -181,9 +183,10 @@ export class AnkiNoteBuilder {
      * @param {import('settings').GlossaryLayoutMode} glossaryLayoutMode
      * @param {boolean} compactTags
      * @param {import('anki-templates').Media|undefined} media
+     * @param {Map<string, string>} dictionaryStylesMap
      * @returns {import('anki-note-builder').CommonData}
      */
-    _createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media) {
+    _createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap) {
         return {
             dictionaryEntry,
             mode,
@@ -192,6 +195,7 @@ export class AnkiNoteBuilder {
             glossaryLayoutMode,
             compactTags,
             media,
+            dictionaryStylesMap,
         };
     }
 

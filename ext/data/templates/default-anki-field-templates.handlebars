@@ -103,15 +103,25 @@
         {{~#if (op "===" definition.type "term")~}}
             {{~#unless (op "&&" selectedDictionary (op "!=" selectedDictionary definition.dictionary))~}}
                 {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+                {{~#if definition.styles~}}
+                    <style>
+                        {{{definition.styles}}}
+                    </style>
+                {{~/if~}}
             {{~/unless~}}
         {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
             {{~#if (op ">" definition.definitions.length 1)~}}
                 <ol>
                     {{~#each definition.definitions~}}
                         {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
-                            <li>
+                            <li data-dictionary="{{dictionary}}">
                                 {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
                             </li>
+                            {{~#if stylesScoped~}}
+                                <style>
+                                    {{{stylesScoped}}}
+                                </style>
+                            {{~/if~}}
                         {{~/unless~}}
                     {{~/each~}}
                 </ol>
@@ -119,6 +129,11 @@
                 {{~#each definition.definitions~}}
                     {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
                         {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                        {{~#if styles~}}
+                            <style>
+                                {{{styles}}}
+                            </style>
+                        {{/if}}
                     {{~/unless~}}
                 {{~/each~}}
             {{~/if~}}

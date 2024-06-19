@@ -1163,13 +1163,28 @@ export class Display extends EventDispatcher {
     _getCustomCss(options) {
         const {general: {customPopupCss}, dictionaries} = options;
         let customCss = customPopupCss;
-        for (const {enabled, styles = ''} of dictionaries) {
+        for (const {name, enabled, styles = ''} of dictionaries) {
             if (enabled) {
-                customCss += '\n' + styles;
+                customCss += '\n' + this._addScopeToCss(styles, name);
             }
         }
         this.setCustomCss(customCss);
         return customCss;
+    }
+
+    /**
+     * @param {string} css
+     * @param {string} dictionaryTitle
+     * @returns {string}
+     */
+    _addScopeToCss(css, dictionaryTitle) {
+        const escapedTitle = dictionaryTitle
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"');
+
+        const regex = /([^\r\n,{}]+)(\s*[,{])/g;
+        const replacement = `[data-dictionary="${escapedTitle}"] $1$2`;
+        return css.replace(regex, replacement);
     }
 
     /**
