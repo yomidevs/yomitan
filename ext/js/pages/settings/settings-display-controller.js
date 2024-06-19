@@ -49,7 +49,7 @@ export class SettingsDisplayController {
     /** */
     prepare() {
         this._themeController.prepare();
-        void this._updateTheme();
+        void this._setTheme();
 
         const onFabButtonClick = this._onFabButtonClick.bind(this);
         for (const fabButton of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.fab-button'))) {
@@ -96,6 +96,13 @@ export class SettingsDisplayController {
         if (this._themeDropdown) {
             this._themeDropdown.addEventListener('change', this._updateTheme.bind(this), false);
         }
+    }
+
+    /** */
+    async _setTheme() {
+        this._themeController.theme = (await this._settingsController.getOptions()).general.popupTheme;
+        this._themeController.siteOverride = true;
+        this._themeController.updateTheme();
     }
 
     /** */
