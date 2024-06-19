@@ -304,7 +304,6 @@ export class Display extends EventDispatcher {
     /** */
     async prepare() {
         // Theme
-        this._themeController.siteTheme = 'light';
         this._themeController.prepare();
 
         // State setup
@@ -487,6 +486,10 @@ export class Display extends EventDispatcher {
                 this._updateHistoryState();
                 this._history.pushState(state, content, url);
                 break;
+        }
+
+        if (this._options) {
+            this._setTheme(this._options);
         }
     }
 
@@ -1149,8 +1152,16 @@ export class Display extends EventDispatcher {
     _setTheme(options) {
         const {general} = options;
         const {popupTheme} = general;
+        try {
+            // eslint-disable-next-line no-underscore-dangle
+            const pageTheme = this._history._current.state?.pageTheme;
+            this._themeController.siteTheme = pageTheme ?? null;
+        } catch (e) {
+            log.error(e);
+        }
         this._themeController.theme = popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;
+        this._themeController.siteOverride = this._pageType === 'search';
         this._themeController.updateTheme();
         this.setCustomCss(general.customPopupCss);
     }
@@ -1933,6 +1944,7 @@ export class Display extends EventDispatcher {
                 url,
                 sentence: sentence !== null ? sentence : void 0,
                 documentTitle,
+                pageTheme: 'light',
             },
             content: {
                 dictionaryEntries: dictionaryEntries !== null ? dictionaryEntries : void 0,

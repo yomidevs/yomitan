@@ -95,6 +95,8 @@ export type HistoryState = {
     url?: string;
     /** The originating document title of the content. */
     documentTitle?: string;
+    /** Computed theme of the page */
+    pageTheme?: 'dark' | 'light';
 };
 
 /**
