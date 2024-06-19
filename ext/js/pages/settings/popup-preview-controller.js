@@ -112,3 +112,11 @@ export class PopupPreviewController {
         this._frame.contentWindow.postMessage({action, params}, this._targetOrigin);
     }
 }
+
+/**
+ * @param {string | undefined} url
+ * @returns {boolean}
+ */
+export function checkPopupPreviewURL(url) {
+    return !!(url && url.includes('popup-preview.html') && !['http:', 'https:', 'ws:', 'wss:', 'ftp:', 'data:', 'file:'].includes(new URL(url).protocol));
+}
