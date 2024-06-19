@@ -91,6 +91,14 @@ await Application.main(true, async (application) => {
     const settingsController = new SettingsController(application);
     await settingsController.prepare();
 
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    await settingsDisplayController.prepare();
+
+    document.body.hidden = false;
+
+    const popupPreviewController = new PopupPreviewController(settingsController);
+    popupPreviewController.prepare();
+
     const persistentStorageController = new PersistentStorageController(application);
     preparePromises.push(persistentStorageController.prepare());
 
@@ -123,9 +131,6 @@ await Application.main(true, async (application) => {
 
     const ankiTemplatesController = new AnkiTemplatesController(application, settingsController, modalController, ankiController);
     preparePromises.push(ankiTemplatesController.prepare());
-
-    const popupPreviewController = new PopupPreviewController(settingsController);
-    popupPreviewController.prepare();
 
     const scanInputsController = new ScanInputsController(settingsController);
     preparePromises.push(scanInputsController.prepare());
@@ -169,10 +174,6 @@ await Application.main(true, async (application) => {
     const sortFrequencyDictionaryController = new SortFrequencyDictionaryController(settingsController);
     preparePromises.push(sortFrequencyDictionaryController.prepare());
 
-    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    await settingsDisplayController.prepare();
-
-    document.body.hidden = false;
 
     await Promise.all(preparePromises);
 

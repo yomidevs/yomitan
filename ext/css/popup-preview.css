@@ -42,7 +42,7 @@ html {
     /* This delay and animation prevents flickering when rendering the popup preview */
     opacity: 0;
     animation: fadein 0.5s forwards;
-    animation-delay: 1s;
+    animation-delay: 0.25s;
     background-color: var(--background-color);
 }
 @keyframes fadein {
