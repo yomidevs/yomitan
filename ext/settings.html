@@ -16,12 +16,12 @@
     <link rel="stylesheet" type="text/css" href="/css/display-pronunciation.css">
     <script src="/js/pages/settings/settings-main.js" type="module"></script>
 </head>
-<body>
+<body hidden>
 
 <!-- Main content -->
-<div class="content-outer"><div class="content">
+<div class="content-outer"><div class="content scrollbar">
 <div class="content-left">
-    <div class="sidebar"><div class="sidebar-inner">
+    <div class="sidebar"><div class="sidebar-inner scrollbar">
         <div class="sidebar-body">
             <a href="#!profile"          class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="profile"></span></span><span class="outline-item-label">Profile</span></a>
             <a href="#!dictionaries"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-enabled-warning" hidden><div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div></span></span><span class="outline-item-label">Dictionaries</span></a>
@@ -673,13 +673,14 @@
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Theme</div>
-                <div class="settings-item-description">Adjust the style of the popup.</div>
+                <div class="settings-item-description">Adjust the style of Yomitan.</div>
             </div>
             <div class="settings-item-right">
                 <div class="settings-item-group">
                     <div class="settings-item-group-item">
                         <div class="settings-item-group-item-label">Body</div>
                         <select data-setting="general.popupTheme" class="short-width short-height">
+                            <option value="site">Auto</option>
                             <option value="light">Light</option>
                             <option value="dark">Dark</option>
                             <option value="browser">Browser</option>

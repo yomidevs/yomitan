@@ -18,6 +18,7 @@
 
 import * as wanakana from '../../../lib/wanakana.js';
 import {Frontend} from '../../app/frontend.js';
+import {ThemeController} from '../../app/theme-controller.js';
 import {createApiMap, invokeApiMapHandler} from '../../core/api-map.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {TextSourceRange} from '../../dom/text-source-range.js';
@@ -57,6 +58,8 @@ export class PopupPreviewFrame {
         this._languageSummaries = [];
         /** @type {boolean} */
         this._wanakanaBound = false;
+        /** @type {ThemeController} */
+        this._themeController = new ThemeController(document.documentElement);
 
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('popup-preview-frame').ApiMap} */
@@ -74,10 +77,9 @@ export class PopupPreviewFrame {
     async prepare() {
         window.addEventListener('message', this._onMessage.bind(this), false);
 
+        this._themeController.prepare();
+
         // Setup events
-        /** @type {HTMLInputElement} */
-        const darkThemeCheckbox = querySelectorNotNull(document, '#theme-dark-checkbox');
-        darkThemeCheckbox.addEventListener('change', this._onThemeDarkCheckboxChanged.bind(this), false);
         this._exampleText.addEventListener('click', this._onExampleTextClick.bind(this), false);
         this._exampleTextInput.addEventListener('blur', this._onExampleTextInputBlur.bind(this), false);
         this._exampleTextInput.addEventListener('input', this._onExampleTextInputInput.bind(this), false);
@@ -137,6 +139,9 @@ export class PopupPreviewFrame {
         options.general.popupHorizontalTextPosition = 'below';
         options.general.popupVerticalTextPosition = 'before';
         options.scanning.selectText = false;
+        this._themeController.theme = options.general.popupTheme;
+        this._themeController.siteOverride = true;
+        this._themeController.updateTheme();
         return options;
     }
 
@@ -163,23 +168,6 @@ export class PopupPreviewFrame {
         const {action, params} = event.data;
         const callback = () => {}; // NOP
         invokeApiMapHandler(this._windowMessageHandlers, action, params, [], callback);
-    }
-
-    /**
-     * @param {Event} e
-     */
-    _onThemeDarkCheckboxChanged(e) {
-        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
-        document.documentElement.classList.toggle('dark', element.checked);
-        if (this._themeChangeTimeout !== null) {
-            clearTimeout(this._themeChangeTimeout);
-        }
-        this._themeChangeTimeout = setTimeout(() => {
-            this._themeChangeTimeout = null;
-            const popup = /** @type {Frontend} */ (this._frontend).popup;
-            if (popup === null) { return; }
-            void popup.updateTheme();
-        }, 300);
     }
 
     /** */

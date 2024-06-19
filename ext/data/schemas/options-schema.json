@@ -225,13 +225,13 @@
                                     },
                                     "popupTheme": {
                                         "type": "string",
-                                        "enum": ["light", "dark", "browser"],
-                                        "default": "light"
+                                        "enum": ["light", "dark", "browser", "site"],
+                                        "default": "site"
                                     },
                                     "popupOuterTheme": {
                                         "type": "string",
                                         "enum": ["light", "dark", "browser", "site"],
-                                        "default": "light"
+                                        "default": "site"
                                     },
                                     "customPopupCss": {
                                         "type": "string",

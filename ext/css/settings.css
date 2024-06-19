@@ -76,6 +76,15 @@
     --modal-padding-vertical: 0.625em;
     --modal-padding-vertical-half: calc(var(--modal-padding-vertical) * 0.5);
     --modal-button-spacing: 0.625em;
+
+    --scrollbar-thumb-color: #c1c1c1;
+    --scrollbar-track-color: #f1f1f1;
+    --scrollbar-inverse-thumb-color: #444444;
+    --scrollbar-inverse-track-color: #2f2f2f;
+
+    --dictionary-import-border-color: #cccccc;
+    --dictionary-import-border-color-hover: #bfd1ff;
+    --dictionary-import-hover-background-color: rgba(28, 116, 233, 0.05);
 }
 :root:not([data-loaded=true]) {
     --animation-duration: 0s;
@@ -83,6 +92,38 @@
 :root[data-theme=dark] {
     --separator-color1: #333333;
     --separator-color2: #222222;
+
+    --scrollbar-thumb-color: #444444;
+    --scrollbar-track-color: #2f2f2f;
+    --scrollbar-inverse-thumb-color: #c1c1c1;
+    --scrollbar-inverse-track-color: #f1f1f1;
+
+    --dictionary-import-border-color: #333333;
+    --dictionary-import-border-color-hover: #1c74e9;
+    --dictionary-import-hover-background-color: rgba(191, 209, 255, 0.05);
+}
+
+/* Scrollbars */
+:root:not([data-theme=light]) .scrollbar {
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar {
+    width: auto;
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-button {
+    height: 0;
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-thumb-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track-piece {
+    background-color: var(--scrollbar-track-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-corner {
+    background-color: var(--scrollbar-track-color);
 }
 
 
@@ -2377,7 +2418,7 @@ input[type=number].dictionary-priority {
 
 #dictionary-drop-file-zone {
     transition: background-color var(--animation-duration) ease-in-out, border var(--animation-duration) ease-in-out;
-    border: 2px dashed rgb(204, 204, 204);
+    border: 2px dashed var(--dictionary-import-border-color);
     border-radius: 5px;
     flex: auto;
     min-height: 20em;
@@ -2390,13 +2431,13 @@ input[type=number].dictionary-priority {
 }
 
 #dictionary-drop-file-zone:hover {
-    background-color: rgba(28, 116, 233, 0.05);
+    background-color: var(--dictionary-import-hover-background-color);
     border: 2px dashed var(--accent-color);
 }
 
 #dictionary-drop-file-zone.drag-over {
     border: 2px solid var(--accent-color);
-    background-color: rgb(191, 209, 255);
+    background-color: var(--dictionary-import-border-color-hover);
 }
 
 #dictionary-drag-drop-text {

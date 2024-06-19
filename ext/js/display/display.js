@@ -304,7 +304,6 @@ export class Display extends EventDispatcher {
     /** */
     async prepare() {
         // Theme
-        this._themeController.siteTheme = 'light';
         this._themeController.prepare();
 
         // State setup
@@ -487,6 +486,10 @@ export class Display extends EventDispatcher {
                 this._updateHistoryState();
                 this._history.pushState(state, content, url);
                 break;
+        }
+
+        if (this._options) {
+            this._setTheme(this._options);
         }
     }
 
@@ -1149,8 +1152,24 @@ export class Display extends EventDispatcher {
     _setTheme(options) {
         const {general} = options;
         const {popupTheme, popupOuterTheme} = general;
+        /** @type {string} */
+        let pageType = this._pageType;
+        try {
+            // eslint-disable-next-line no-underscore-dangle
+            const historyState = this._history._current.state;
+
+            const pageTheme = historyState?.pageTheme;
+            this._themeController.siteTheme = pageTheme ?? null;
+
+            if (historyState?.url?.includes('popup-preview.html')) {
+                pageType = 'popupPreview';
+            }
+        } catch (e) {
+            log.error(e);
+        }
         this._themeController.theme = popupTheme;
         this._themeController.outerTheme = popupOuterTheme;
+        this._themeController.siteOverride = pageType === 'search' || pageType === 'popupPreview';
         this._themeController.updateTheme();
         const customCss = this._getCustomCss(options);
         this.setCustomCss(customCss);
@@ -1965,6 +1984,7 @@ export class Display extends EventDispatcher {
                 url,
                 sentence: sentence !== null ? sentence : void 0,
                 documentTitle,
+                pageTheme: 'light',
             },
             content: {
                 dictionaryEntries: dictionaryEntries !== null ? dictionaryEntries : void 0,

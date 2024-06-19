@@ -122,6 +122,7 @@ export type Events = {
         textSource: TextSource.TextSource;
         optionsContext: Settings.OptionsContext;
         detail: SearchResultDetail;
+        pageTheme: 'dark' | 'light';
     };
     searchEmpty: {
         inputInfo: InputInfo;

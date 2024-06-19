@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ThemeController} from '../app/theme-controller.js';
 import {Application} from '../application.js';
 import {getAllPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
@@ -30,10 +31,14 @@ class DisplayController {
         this._api = api;
         /** @type {?import('settings').Options} */
         this._optionsFull = null;
+        /** @type {ThemeController} */
+        this._themeController = new ThemeController(document.documentElement);
     }
 
     /** */
     async prepare() {
+        this._themeController.prepare();
+
         const manifest = chrome.runtime.getManifest();
 
         this._showExtensionInfo(manifest);
@@ -201,6 +206,10 @@ class DisplayController {
         }
         void this._updateDictionariesEnabledWarnings(options);
         void this._updatePermissionsWarnings(options);
+
+        this._themeController.theme = options.general.popupTheme;
+        this._themeController.siteOverride = true;
+        this._themeController.updateTheme();
     }
 
     /** */
@@ -319,4 +328,6 @@ await Application.main(true, async (application) => {
 
     const displayController = new DisplayController(application.api);
     await displayController.prepare();
+
+    document.body.hidden = false;
 });
