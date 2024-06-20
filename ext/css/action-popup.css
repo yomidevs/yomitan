@@ -208,6 +208,12 @@ label {
 body[data-loaded=true] .toggle-group {
     transition: transform 0.35s;
 }
+body[data-loaded=true] #loading {
+    display: none;
+}
+body:not([data-loaded=true]) #action-popups {
+    display: none;
+}
 
 .toggle-on,
 .toggle-off,
