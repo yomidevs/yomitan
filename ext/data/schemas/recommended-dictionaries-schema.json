@@ -1,5 +1,5 @@
 {
-    "$id": "recommended-dictionaries",
+    "$id": "recommendedDictionaries",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "description": "Contains data for recommended dictionaries on welcome page.",
     "type": "object",
