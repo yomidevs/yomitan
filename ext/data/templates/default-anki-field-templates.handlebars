@@ -127,7 +127,7 @@
                         {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
                         {{~#if glossaryScopedStyles~}}
                             <style>{{{glossaryScopedStyles}}}</style>
-                        {{/if}}
+                        {{~/if~}}
                     {{~/unless~}}
                 {{~/each~}}
             {{~/if~}}
@@ -151,15 +151,28 @@
 {{/inline}}
 
 {{~#*inline "glossary-first"~}}
-    <div style="text-align: left;">
+    <div style="text-align: left;" class="yomitan-glossary">
     {{~#scope~}}
         {{~#if (op "===" definition.type "term")~}}
             {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+            {{~#if definition.glossaryScopedStyles~}}
+                <style>{{{definition.glossaryScopedStyles}}}</style>
+            {{~/if~}}
         {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
             {{~#if (op ">" definition.definitions.length 1)~}}
-                {{~#with definition.definitions.[0]~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/with~}}
+                {{~#with definition.definitions.[0]~}}
+                    {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                    {{~#if glossaryScopedStyles~}}
+                        <style>{{{glossaryScopedStyles}}}</style>
+                    {{~/if~}}
+                {{~/with~}}
             {{~else~}}
-                {{~#with definition.definitions.[0]~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/with~}}
+                {{~#with definition.definitions.[0]~}}
+                    {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                    {{~#if glossaryScopedStyles~}}
+                        <style>{{{glossaryScopedStyles}}}</style>
+                    {{~/if~}}
+                {{~/with~}}
             {{~/if~}}
         {{~/if~}}
     {{~/scope~}}

@@ -65,7 +65,7 @@
                         {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
                         {{~#if glossaryScopedStyles~}}
                             <style>{{{glossaryScopedStyles}}}</style>
-                        {{/if}}
+                        {{~/if~}}
                     {{~/unless~}}
                 {{~/each~}}
             {{~/if~}}
@@ -74,6 +74,53 @@
                 <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
             {{~else~}}
                 {{~#each definition.glossary~}}{{.}}{{~/each~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#*inline "glossary-first"~}}
+    <div style="text-align: left;">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                {{~#with definition.definitions.[0]~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/with~}}
+            {{~else~}}
+                {{~#with definition.definitions.[0]~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/with~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+{{=======}}
+{{~#*inline "glossary-first"~}}
+    <div style="text-align: left;" class="yomitan-glossary">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+            {{~#if definition.glossaryScopedStyles~}}
+                <style>{{{definition.glossaryScopedStyles}}}</style>
+            {{~/if~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                {{~#with definition.definitions.[0]~}}
+                    {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                    {{~#if glossaryScopedStyles~}}
+                        <style>{{{glossaryScopedStyles}}}</style>
+                    {{~/if~}}
+                {{~/with~}}
+            {{~else~}}
+                {{~#with definition.definitions.[0]~}}
+                    {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                    {{~#if glossaryScopedStyles~}}
+                        <style>{{{glossaryScopedStyles}}}</style>
+                    {{~/if~}}
+                {{~/with~}}
             {{~/if~}}
         {{~/if~}}
     {{~/scope~}}
