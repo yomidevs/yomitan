@@ -395,7 +395,7 @@ export class API {
                             resolve(/** @type {import('api').ApiReturn<TAction>} */ (result));
                         }
                     } else {
-                        const message = response === null ? 'Unexpected null response' : `Unexpected response of type ${typeof response}`;
+                        const message = response === null ? 'Unexpected null response. You may need to refresh the page.' : `Unexpected response of type ${typeof response}. You may need to refresh the page.`;
                         reject(new Error(`${message} (${JSON.stringify(data)})`));
                     }
                 });

@@ -56,7 +56,7 @@ export class DOMDataBinder {
             onAdded: this._createObserver.bind(this),
             onRemoved: this._removeObserver.bind(this),
             onChildrenUpdated: this._onObserverChildrenUpdated.bind(this),
-            isStale: this._isObserverStale.bind(this)
+            isStale: this._isObserverStale.bind(this),
         });
     }
 
@@ -105,7 +105,7 @@ export class DOMDataBinder {
 
         const args = targets.map(([observer]) => ({
             element: observer.element,
-            metadata: observer.metadata
+            metadata: observer.metadata,
         }));
         const responses = await this._getValues(args);
         this._applyValues(targets, responses, true);
@@ -123,7 +123,7 @@ export class DOMDataBinder {
             args.push({
                 element: observer.element,
                 metadata: observer.metadata,
-                value: task.data.value
+                value: task.data.value,
             });
             targets.push([observer, task]);
         }
@@ -181,7 +181,7 @@ export class DOMDataBinder {
             value: null,
             hasValue: false,
             onChange: null,
-            metadata
+            metadata,
         };
         observer.onChange = this._onElementChange.bind(this, observer);
 

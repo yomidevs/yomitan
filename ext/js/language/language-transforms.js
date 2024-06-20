@@ -31,7 +31,7 @@ export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsI
         deinflected: deinflectedSuffix,
         deinflect: (text) => text.slice(0, -inflectedSuffix.length) + deinflectedSuffix,
         conditionsIn,
-        conditionsOut
+        conditionsOut,
     };
 }
 
@@ -49,6 +49,24 @@ export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsI
         isInflected: prefixRegExp,
         deinflect: (text) => deinflectedPrefix + text.slice(inflectedPrefix.length),
         conditionsIn,
-        conditionsOut
+        conditionsOut,
+    };
+}
+
+/**
+ * @param {string} inflectedWord
+ * @param {string} deinflectedWord
+ * @param {string[]} conditionsIn
+ * @param {string[]} conditionsOut
+ * @returns {import('language-transformer').Rule}
+ */
+export function wholeWordInflection(inflectedWord, deinflectedWord, conditionsIn, conditionsOut) {
+    const regex = new RegExp('^' + inflectedWord + '$');
+    return {
+        type: 'wholeWord',
+        isInflected: regex,
+        deinflect: () => deinflectedWord,
+        conditionsIn,
+        conditionsOut,
     };
 }

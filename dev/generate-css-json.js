@@ -31,13 +31,13 @@ export function getTargets() {
         {
             cssFilePath: path.join(dirname, '..', 'ext/css/structured-content.css'),
             overridesCssFilePath: path.join(dirname, 'data/structured-content-overrides.css'),
-            outputPath: path.join(dirname, '..', 'ext/data/structured-content-style.json')
+            outputPath: path.join(dirname, '..', 'ext/data/structured-content-style.json'),
         },
         {
             cssFilePath: path.join(dirname, '..', 'ext/css/display-pronunciation.css'),
             overridesCssFilePath: path.join(dirname, 'data/display-pronunciation-overrides.css'),
-            outputPath: path.join(dirname, '..', 'ext/data/pronunciation-style.json')
-        }
+            outputPath: path.join(dirname, '..', 'ext/data/pronunciation-style.json'),
+        },
     ];
 }
 

@@ -31,7 +31,7 @@ function prepareWindow(window) {
         /** @returns {string} */
         get() { return this.textContent; },
         /** @param {string} value */
-        set(value) { this.textContent = value; }
+        set(value) { this.textContent = value; },
     });
 
     // Placeholder for feature detection
@@ -51,7 +51,7 @@ export async function setupDomTest(htmlFilePath) {
     prepareWindow(window);
     return {
         window,
-        teardown: (global) => environment.teardown(global)
+        teardown: (global) => environment.teardown(global),
     };
 }
 
@@ -73,6 +73,6 @@ export function createDomTest(htmlFilePath) {
             } finally {
                 await environment.teardown(global);
             }
-        }
+        },
     });
 }

@@ -32,7 +32,7 @@ export function injectStylesheet(type, content, tabId, frameId, allFrames) {
         /** @type {chrome.scripting.InjectionTarget} */
         const target = {
             tabId,
-            allFrames
+            allFrames,
         };
         /** @type {chrome.scripting.CSSInjection} */
         const details = (
@@ -124,7 +124,7 @@ function createContentScriptRegistrationOptions(details, id) {
     /** @type {chrome.scripting.RegisteredContentScript} */
     const options = {
         id: id,
-        persistAcrossSessions: true
+        persistAcrossSessions: true,
     };
     if (Array.isArray(css)) {
         options.css = [...css];

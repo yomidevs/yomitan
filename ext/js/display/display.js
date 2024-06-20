@@ -26,6 +26,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
+import {setProfile} from '../data/profiles-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ScrollElement} from '../dom/scroll-element.js';
@@ -162,6 +163,8 @@ export class Display extends EventDispatcher {
         this._contentTextScanner = null;
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._tagNotification = null;
+        /** @type {?import('./display-notification.js').DisplayNotification} */
+        this._inflectionNotification = null;
         /** @type {HTMLElement} */
         this._footerNotificationContainer = querySelectorNotNull(document, '#content-footer');
         /** @type {OptionToggleHotkeyHandler} */
@@ -181,6 +184,8 @@ export class Display extends EventDispatcher {
         /** @type {(event: MouseEvent) => void} */
         this._onTagClickBind = this._onTagClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
+        this._onInflectionClickBind = this._onInflectionClick.bind(this);
+        /** @type {(event: MouseEvent) => void} */
         this._onMenuButtonClickBind = this._onMenuButtonClick.bind(this);
         /** @type {(event: import('popup-menu').MenuCloseEvent) => void} */
         this._onMenuButtonMenuCloseBind = this._onMenuButtonMenuClose.bind(this);
@@ -196,11 +201,11 @@ export class Display extends EventDispatcher {
             ['firstEntry',        () => { this._focusEntry(0, 0, true); }],
             ['historyBackward',   () => { this._sourceTermView(); }],
             ['historyForward',    () => { this._nextTermView(); }],
-            ['profilePrevious',   async () => { await this._setProfile(-1); }],
-            ['profileNext',       async () => { await this._setProfile(1); }],
+            ['profilePrevious',   async () => { await setProfile(-1, this._application); }],
+            ['profileNext',       async () => { await setProfile(1, this._application); }],
             ['copyHostSelection', () => this._copyHostSelection()],
             ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
-            ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
+            ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }],
         ]);
         this.registerDirectMessageHandlers([
             ['displaySetOptionsContext', this._onMessageSetOptionsContext.bind(this)],
@@ -208,10 +213,10 @@ export class Display extends EventDispatcher {
             ['displaySetCustomCss',      this._onMessageSetCustomCss.bind(this)],
             ['displaySetContentScale',   this._onMessageSetContentScale.bind(this)],
             ['displayConfigure',         this._onMessageConfigure.bind(this)],
-            ['displayVisibilityChanged', this._onMessageVisibilityChanged.bind(this)]
+            ['displayVisibilityChanged', this._onMessageVisibilityChanged.bind(this)],
         ]);
         this.registerWindowMessageHandlers([
-            ['displayExtensionUnloaded', this._onMessageExtensionUnloaded.bind(this)]
+            ['displayExtensionUnloaded', this._onMessageExtensionUnloaded.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -299,7 +304,6 @@ export class Display extends EventDispatcher {
     /** */
     async prepare() {
         // Theme
-        this._themeController.siteTheme = 'light';
         this._themeController.prepare();
 
         // State setup
@@ -325,7 +329,7 @@ export class Display extends EventDispatcher {
         this._application.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         this._application.crossFrame.registerHandlers([
             ['displayPopupMessage1', this._onDisplayPopupMessage1.bind(this)],
-            ['displayPopupMessage2', this._onDisplayPopupMessage2.bind(this)]
+            ['displayPopupMessage2', this._onDisplayPopupMessage2.bind(this)],
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
 
@@ -353,7 +357,7 @@ export class Display extends EventDispatcher {
     getContentOrigin() {
         return {
             tabId: this._contentOriginTabId,
-            frameId: this._contentOriginFrameId
+            frameId: this._contentOriginFrameId,
         };
     }
 
@@ -441,8 +445,8 @@ export class Display extends EventDispatcher {
                 layoutAwareScan: scanningOptions.layoutAwareScan,
                 preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery,
                 matchTypePrefix: false,
-                sentenceParsingOptions
-            }
+                sentenceParsingOptions,
+            },
         });
 
         void this._updateNestedFrontend(options);
@@ -482,6 +486,10 @@ export class Display extends EventDispatcher {
                 this._updateHistoryState();
                 this._history.pushState(state, content, url);
                 break;
+        }
+
+        if (this._options) {
+            this._setTheme(this._options);
         }
     }
 
@@ -553,7 +561,7 @@ export class Display extends EventDispatcher {
                 optionsContext: void 0,
                 url: window.location.href,
                 sentence: {text: query, offset: 0},
-                documentTitle: document.title
+                documentTitle: document.title,
             }
         );
         if (!hasState || updateOptionsContext) {
@@ -566,8 +574,8 @@ export class Display extends EventDispatcher {
             params: this._createSearchParams(type, query, false, this._queryOffset),
             state: newState,
             content: {
-                contentOrigin: this.getContentOrigin()
-            }
+                contentOrigin: this.getContentOrigin(),
+            },
         };
         this.setContent(details);
     }
@@ -656,7 +664,7 @@ export class Display extends EventDispatcher {
                 },
                 () => {
                     reject(new Error(`Invalid action: ${action}`));
-                }
+                },
             );
         });
     }
@@ -810,12 +818,12 @@ export class Display extends EventDispatcher {
             state: {
                 sentence,
                 optionsContext,
-                cause: 'queryParser'
+                cause: 'queryParser',
             },
             content: {
                 dictionaryEntries,
-                contentOrigin: this.getContentOrigin()
-            }
+                contentOrigin: this.getContentOrigin(),
+            },
         };
         this.setContent(details);
     }
@@ -832,8 +840,8 @@ export class Display extends EventDispatcher {
             params: {type},
             state: {},
             content: {
-                contentOrigin: {tabId, frameId}
-            }
+                contentOrigin: {tabId, frameId},
+            },
         };
         this.setContent(details);
     }
@@ -911,12 +919,12 @@ export class Display extends EventDispatcher {
                     optionsContext,
                     url,
                     sentence,
-                    documentTitle
+                    documentTitle,
                 },
                 content: {
                     dictionaryEntries,
-                    contentOrigin: this.getContentOrigin()
-                }
+                    contentOrigin: this.getContentOrigin(),
+                },
             };
             this.setContent(details);
         } catch (error) {
@@ -1026,6 +1034,14 @@ export class Display extends EventDispatcher {
     /**
      * @param {MouseEvent} e
      */
+    _onInflectionClick(e) {
+        const node = /** @type {HTMLElement} */ (e.currentTarget);
+        this._showInflectionNotification(node);
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
     _onMenuButtonClick(e) {
         const node = /** @type {HTMLElement} */ (e.currentTarget);
 
@@ -1086,6 +1102,21 @@ export class Display extends EventDispatcher {
     }
 
     /**
+     * @param {HTMLSpanElement} inflectionNode
+     */
+    _showInflectionNotification(inflectionNode) {
+        const description = inflectionNode.title;
+        if (!description || !(inflectionNode instanceof HTMLSpanElement)) { return; }
+
+        if (this._inflectionNotification === null) {
+            this._inflectionNotification = this.createNotification(true);
+        }
+
+        this._inflectionNotification.setContent(description);
+        this._inflectionNotification.open();
+    }
+
+    /**
      * @param {boolean} animate
      */
     _hideTagNotification(animate) {
@@ -1121,8 +1152,24 @@ export class Display extends EventDispatcher {
     _setTheme(options) {
         const {general} = options;
         const {popupTheme} = general;
+        /** @type {string} */
+        let pageType = this._pageType;
+        try {
+            // eslint-disable-next-line no-underscore-dangle
+            const historyState = this._history._current.state;
+
+            const pageTheme = historyState?.pageTheme;
+            this._themeController.siteTheme = pageTheme ?? null;
+
+            if (historyState?.url?.includes('popup-preview.html')) {
+                pageType = 'popupPreview';
+            }
+        } catch (e) {
+            log.error(e);
+        }
         this._themeController.theme = popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;
+        this._themeController.siteOverride = pageType === 'search' || pageType === 'popupPreview';
         this._themeController.updateTheme();
         this.setCustomCss(general.customPopupCss);
     }
@@ -1703,7 +1750,7 @@ export class Display extends EventDispatcher {
 
         const [{PopupFactory}, {Frontend}] = await Promise.all([
             import('../app/popup-factory.js'),
-            import('../app/frontend.js')
+            import('../app/frontend.js'),
         ]);
 
         const popupFactory = new PopupFactory(this._application);
@@ -1720,7 +1767,7 @@ export class Display extends EventDispatcher {
             allowRootFramePopupProxy: true,
             childrenSupported: this._childrenSupported,
             hotkeyHandler: this._hotkeyHandler,
-            canUseWindowPopup: true
+            canUseWindowPopup: true,
         });
         this._frontend = frontend;
         await frontend.prepare();
@@ -1797,6 +1844,9 @@ export class Display extends EventDispatcher {
         for (const node of entry.querySelectorAll('.headword-kanji-link')) {
             eventListeners.addEventListener(node, 'click', this._onKanjiLookupBind);
         }
+        for (const node of entry.querySelectorAll('.inflection[data-reason]')) {
+            eventListeners.addEventListener(node, 'click', this._onInflectionClickBind);
+        }
         for (const node of entry.querySelectorAll('.tag-label')) {
             eventListeners.addEventListener(node, 'click', this._onTagClickBind);
         }
@@ -1827,7 +1877,7 @@ export class Display extends EventDispatcher {
                 searchKanji: false,
                 searchOnClick: true,
                 searchOnClickOnly: true,
-                textSourceGenerator: this._textSourceGenerator
+                textSourceGenerator: this._textSourceGenerator,
             });
             this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
             this._contentTextScanner.excludeSelector = '.scan-disable,.scan-disable *';
@@ -1857,8 +1907,8 @@ export class Display extends EventDispatcher {
                     scanOnPenPress: false,
                     scanOnPenRelease: false,
                     preventTouchScrolling: false,
-                    preventPenScrolling: false
-                }
+                    preventPenScrolling: false,
+                },
             }],
             deepContentScan: scanningOptions.deepDomScan,
             normalizeCssZoom: scanningOptions.normalizeCssZoom,
@@ -1869,7 +1919,7 @@ export class Display extends EventDispatcher {
             scanLength: scanningOptions.length,
             layoutAwareScan: scanningOptions.layoutAwareScan,
             preventMiddleMouse: false,
-            sentenceParsingOptions
+            sentenceParsingOptions,
         });
 
         this._contentTextScanner.setEnabled(true);
@@ -1894,19 +1944,20 @@ export class Display extends EventDispatcher {
             params: {
                 type,
                 query,
-                wildcards: 'off'
+                wildcards: 'off',
             },
             state: {
                 focusEntry: 0,
                 optionsContext: optionsContext !== null ? optionsContext : void 0,
                 url,
                 sentence: sentence !== null ? sentence : void 0,
-                documentTitle
+                documentTitle,
+                pageTheme: 'light',
             },
             content: {
                 dictionaryEntries: dictionaryEntries !== null ? dictionaryEntries : void 0,
-                contentOrigin: this.getContentOrigin()
-            }
+                contentOrigin: this.getContentOrigin(),
+            },
         };
         /** @type {TextScanner} */ (this._contentTextScanner).clearSelection();
         this.setContent(details);
@@ -1928,8 +1979,8 @@ export class Display extends EventDispatcher {
         return {
             optionsContext: this.getOptionsContext(),
             detail: {
-                documentTitle: document.title
-            }
+                documentTitle: document.title,
+            },
         };
     }
 
@@ -1997,26 +2048,6 @@ export class Display extends EventDispatcher {
         if (!Number.isFinite(count)) { count = 1; }
         count = Math.max(0, Math.floor(count));
         this._focusEntry(this._index + count * sign, 0, true);
-    }
-
-    /**
-     * @param {number} direction
-     */
-    async _setProfile(direction) {
-        const optionsFull = await this.application.api.optionsGetFull();
-
-        const profileCount = optionsFull.profiles.length;
-        const newProfile = (optionsFull.profileCurrent + direction + profileCount) % profileCount;
-
-        /** @type {import('settings-modifications').ScopedModificationSet} */
-        const modification = {
-            action: 'set',
-            path: 'profileCurrent',
-            value: newProfile,
-            scope: 'global',
-            optionsContext: null
-        };
-        await this.application.api.modifySettings([modification], 'search');
     }
 
     /** */

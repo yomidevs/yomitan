@@ -401,14 +401,16 @@ export class DisplayGenerator {
     }
 
     /**
-     * @param {string} inflection
+     * @param {import('dictionary').InflectionRule} inflection
      * @returns {DocumentFragment}
      */
     _createTermInflection(inflection) {
+        const {name, description} = inflection;
         const fragment = this._templates.instantiateFragment('inflection');
         const node = this._querySelector(fragment, '.inflection');
-        this._setTextContent(node, inflection);
-        node.dataset.reason = inflection;
+        this._setTextContent(node, name);
+        if (description) { node.title = description; }
+        node.dataset.reason = name;
         return fragment;
     }
 
@@ -641,7 +643,7 @@ export class DisplayGenerator {
             score: 0,
             content: [],
             dictionaries: [],
-            redundant: false
+            redundant: false,
         };
     }
 

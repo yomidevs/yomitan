@@ -74,4 +74,17 @@ export class MultiLanguageTransformer {
         if (typeof languageTransformer === 'undefined') { return [LanguageTransformer.createTransformedText(sourceText, 0, [])]; }
         return languageTransformer.transform(sourceText);
     }
+
+    /**
+     * @param {string} language
+     * @param {string[]} inflectionRules
+     * @returns {import('dictionary').InflectionRuleChain}
+     */
+    getUserFacingInflectionRules(language, inflectionRules) {
+        const languageTransformer = this._languageTransformers.get(language);
+        if (typeof languageTransformer === 'undefined') {
+            return inflectionRules.map((rule) => ({name: rule}));
+        }
+        return languageTransformer.getUserFacingInflectionRules(inflectionRules);
+    }
 }

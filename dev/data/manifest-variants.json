@@ -64,7 +64,8 @@
             "unlimitedStorage",
             "declarativeNetRequest",
             "scripting",
-            "offscreen"
+            "offscreen",
+            "contextMenus"
         ],
         "optional_permissions": [
             "clipboardRead",

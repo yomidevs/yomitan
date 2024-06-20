@@ -40,13 +40,27 @@ export type TextDeinflectionOptionsArrays = [
     emphatic: [collapseEmphatic: boolean, collapseEmphaticFull: boolean][],
 ];
 
+export type TermDictionaryEntry = Omit<Dictionary.TermDictionaryEntry, 'inflectionRuleChainCandidates'> & {
+    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
+};
+
+export type InflectionRuleChainCandidate = {
+    source: Dictionary.InflectionSource;
+    inflectionRules: string[];
+};
+
 export type DatabaseDeinflection = {
     originalText: string;
     transformedText: string;
     deinflectedText: string;
     conditions: number;
-    inflectionRuleChainCandidates: Dictionary.InflectionRuleChainCandidate[];
+    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
     databaseEntries: DictionaryDatabase.TermEntry[];
+};
+
+export type DictionaryEntryGroup = {
+    ids: Set<number>;
+    dictionaryEntries: TermDictionaryEntry[];
 };
 
 export type TextProcessorMap = Map<

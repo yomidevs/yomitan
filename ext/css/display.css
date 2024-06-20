@@ -855,6 +855,9 @@ button.action-button:active {
 .inflection-source-icon[data-inflection-source='both']::after {
     content: '🧩📖';
 }
+.inflection[title] {
+    cursor: pointer;
+}
 
 
 /* Headwords */
@@ -1709,6 +1712,7 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 .footer-notification-body {
     flex: 1 1 auto;
     padding: 0.5em 0.75em;
+    white-space: pre-line;
 }
 .footer-notification-close-button-container {
     align-self: stretch;

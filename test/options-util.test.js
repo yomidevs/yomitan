@@ -69,7 +69,7 @@ function createProfileOptionsTestData1() {
             showPitchAccentGraph: false,
             showIframePopupsInRootFrame: false,
             useSecurePopupFrameUrl: true,
-            usePopupShadowDom: true
+            usePopupShadowDom: true,
         },
         audio: {
             enabled: true,
@@ -77,7 +77,7 @@ function createProfileOptionsTestData1() {
             volume: 100,
             autoPlay: false,
             customSourceUrl: 'http://localhost/audio.mp3?term={expression}&reading={reading}',
-            textToSpeechVoice: 'example-voice'
+            textToSpeechVoice: 'example-voice',
         },
         scanning: {
             middleMouse: true,
@@ -94,7 +94,7 @@ function createProfileOptionsTestData1() {
             enableOnPopupExpressions: false,
             enableOnSearchPage: true,
             enableSearchTags: false,
-            layoutAwareScan: false
+            layoutAwareScan: false,
         },
         translation: {
             convertHalfWidthCharacters: 'false',
@@ -102,21 +102,21 @@ function createProfileOptionsTestData1() {
             convertAlphabeticCharacters: 'false',
             convertHiraganaToKatakana: 'false',
             convertKatakanaToHiragana: 'variant',
-            collapseEmphaticSequences: 'false'
+            collapseEmphaticSequences: 'false',
         },
         dictionaries: {
             'Test Dictionary': {
                 priority: 0,
                 enabled: true,
-                allowSecondarySearches: false
-            }
+                allowSecondarySearches: false,
+            },
         },
         parsing: {
             enableScanningParser: true,
             enableMecabParser: false,
             selectedParser: null,
             termSpacing: true,
-            readingMode: 'hiragana'
+            readingMode: 'hiragana',
         },
         anki: {
             enable: false,
@@ -127,8 +127,8 @@ function createProfileOptionsTestData1() {
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
             duplicateScope: 'collection',
-            fieldTemplates: null
-        }
+            fieldTemplates: null,
+        },
     };
 }
 
@@ -147,48 +147,48 @@ function createOptionsTestData1() {
                             {
                                 type: 'popupLevel',
                                 operator: 'equal',
-                                value: 1
+                                value: 1,
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'notEqual',
-                                value: 0
+                                value: 0,
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'lessThan',
-                                value: 3
+                                value: 3,
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'greaterThan',
-                                value: 0
+                                value: 0,
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'lessThanOrEqual',
-                                value: 2
+                                value: 2,
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'greaterThanOrEqual',
-                                value: 1
-                            }
-                        ]
+                                value: 1,
+                            },
+                        ],
                     },
                     {
                         conditions: [
                             {
                                 type: 'url',
                                 operator: 'matchDomain',
-                                value: 'example.com'
+                                value: 'example.com',
                             },
                             {
                                 type: 'url',
                                 operator: 'matchRegExp',
-                                value: 'example\\.com'
-                            }
-                        ]
+                                value: 'example\\.com',
+                            },
+                        ],
                     },
                     {
                         conditions: [
@@ -197,39 +197,39 @@ function createOptionsTestData1() {
                                 operator: 'are',
                                 value: [
                                     'ctrl',
-                                    'shift'
-                                ]
+                                    'shift',
+                                ],
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'areNot',
                                 value: [
                                     'alt',
-                                    'shift'
-                                ]
+                                    'shift',
+                                ],
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'include',
-                                value: 'alt'
+                                value: 'alt',
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'notInclude',
-                                value: 'ctrl'
-                            }
-                        ]
-                    }
-                ]
-            }
+                                value: 'ctrl',
+                            },
+                        ],
+                    },
+                ],
+            },
         ],
         profileCurrent: 0,
         version: 2,
         global: {
             database: {
-                prefixWildcardsSupported: false
-            }
-        }
+                prefixWildcardsSupported: false,
+            },
+        },
     };
 }
 
@@ -259,6 +259,7 @@ function createProfileOptionsUpdatedTestData1() {
             popupScaleRelativeToPageZoom: false,
             popupScaleRelativeToVisualViewport: true,
             showGuide: true,
+            enableContextMenuScanSelected: true,
             compactTags: false,
             glossaryLayoutMode: 'default',
             mainDictionary: '',
@@ -280,7 +281,7 @@ function createProfileOptionsUpdatedTestData1() {
             frequencyDisplayMode: 'split-tags-grouped',
             termDisplayMode: 'ruby',
             sortFrequencyDictionary: null,
-            sortFrequencyDictionaryOrder: 'descending'
+            sortFrequencyDictionaryOrder: 'descending',
         },
         audio: {
             enabled: true,
@@ -288,21 +289,21 @@ function createProfileOptionsUpdatedTestData1() {
                 {
                     type: 'jpod101',
                     url: '',
-                    voice: ''
+                    voice: '',
                 },
                 {
                     type: 'text-to-speech',
                     url: '',
-                    voice: 'example-voice'
+                    voice: 'example-voice',
                 },
                 {
                     type: 'custom',
                     url: 'http://localhost/audio.mp3?term={term}&reading={reading}',
-                    voice: ''
-                }
+                    voice: '',
+                },
             ],
             volume: 100,
-            autoPlay: false
+            autoPlay: false,
         },
         scanning: {
             touchInputEnabled: true,
@@ -328,7 +329,7 @@ function createProfileOptionsUpdatedTestData1() {
                 onWebPages: false,
                 onPopupPages: false,
                 onSearchPages: false,
-                onSearchQuery: false
+                onSearchQuery: false,
             },
             inputs: [
                 {
@@ -337,7 +338,7 @@ function createProfileOptionsUpdatedTestData1() {
                     types: {
                         mouse: true,
                         touch: false,
-                        pen: false
+                        pen: false,
                     },
                     options: {
                         showAdvanced: false,
@@ -353,8 +354,8 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
                         preventTouchScrolling: true,
-                        preventPenScrolling: true
-                    }
+                        preventPenScrolling: true,
+                    },
                 },
                 {
                     include: 'mouse2',
@@ -362,7 +363,7 @@ function createProfileOptionsUpdatedTestData1() {
                     types: {
                         mouse: true,
                         touch: false,
-                        pen: false
+                        pen: false,
                     },
                     options: {
                         showAdvanced: false,
@@ -378,8 +379,8 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
                         preventTouchScrolling: true,
-                        preventPenScrolling: true
-                    }
+                        preventPenScrolling: true,
+                    },
                 },
                 {
                     include: '',
@@ -387,7 +388,7 @@ function createProfileOptionsUpdatedTestData1() {
                     types: {
                         mouse: false,
                         touch: true,
-                        pen: true
+                        pen: true,
                     },
                     options: {
                         showAdvanced: false,
@@ -403,17 +404,17 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
                         preventTouchScrolling: true,
-                        preventPenScrolling: true
-                    }
-                }
-            ]
+                        preventPenScrolling: true,
+                    },
+                },
+            ],
         },
         translation: {
             searchResolution: 'letter',
             textReplacements: {
                 searchOriginal: true,
-                groups: []
-            }
+                groups: [],
+            },
         },
         dictionaries: [
             {
@@ -423,15 +424,15 @@ function createProfileOptionsUpdatedTestData1() {
                 allowSecondarySearches: false,
                 definitionsCollapsible: 'not-collapsible',
                 partsOfSpeechFilter: true,
-                useDeinflections: true
-            }
+                useDeinflections: true,
+            },
         ],
         parsing: {
             enableScanningParser: true,
             enableMecabParser: false,
             selectedParser: null,
             termSpacing: true,
-            readingMode: 'hiragana'
+            readingMode: 'hiragana',
         },
         anki: {
             enable: false,
@@ -449,7 +450,7 @@ function createProfileOptionsUpdatedTestData1() {
             suspendNewCards: false,
             noteGuiMode: 'browse',
             apiKey: '',
-            downloadTimeout: 0
+            downloadTimeout: 0,
         },
         sentenceParsing: {
             scanExtent: 200,
@@ -470,8 +471,8 @@ function createProfileOptionsUpdatedTestData1() {
                 {enabled: true, character1: '︒', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
                 {enabled: true, character1: '︕', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
                 {enabled: true, character1: '︖', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '︙', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true}
-            ]
+                {enabled: true, character1: '︙', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+            ],
         },
         inputs: {
             /* eslint-disable @stylistic/no-multi-spaces */
@@ -492,9 +493,9 @@ function createProfileOptionsUpdatedTestData1() {
                 {action: 'playAudio',         argument: '',  key: 'KeyP',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'viewNotes',         argument: '',  key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'copyHostSelection', argument: '',  key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true},
-                {action: 'profilePrevious',   argument: '',  key: 'Minus',     modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'profileNext',       argument: '',  key: 'Equal',     modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true}
-            ]
+                {action: 'profilePrevious',   argument: '',  key: 'Minus',     modifiers: ['alt'],  scopes: ['popup', 'search', 'web'], enabled: true},
+                {action: 'profileNext',       argument: '',  key: 'Equal',     modifiers: ['alt'],  scopes: ['popup', 'search', 'web'], enabled: true},
+            ],
             /* eslint-enable @stylistic/no-multi-spaces */
         },
         popupWindow: {
@@ -505,17 +506,17 @@ function createProfileOptionsUpdatedTestData1() {
             useLeft: false,
             useTop: false,
             windowType: 'popup',
-            windowState: 'normal'
+            windowState: 'normal',
         },
         clipboard: {
             enableBackgroundMonitor: false,
             enableSearchPageMonitor: false,
             autoSearchContent: true,
-            maximumSearchLength: 1000
+            maximumSearchLength: 1000,
         },
         accessibility: {
-            forceGoogleDocsHtmlRendering: false
-        }
+            forceGoogleDocsHtmlRendering: false,
+        },
     };
 }
 
@@ -534,83 +535,83 @@ function createOptionsUpdatedTestData1() {
                             {
                                 type: 'popupLevel',
                                 operator: 'equal',
-                                value: '1'
+                                value: '1',
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'notEqual',
-                                value: '0'
+                                value: '0',
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'lessThan',
-                                value: '3'
+                                value: '3',
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'greaterThan',
-                                value: '0'
+                                value: '0',
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'lessThanOrEqual',
-                                value: '2'
+                                value: '2',
                             },
                             {
                                 type: 'popupLevel',
                                 operator: 'greaterThanOrEqual',
-                                value: '1'
-                            }
-                        ]
+                                value: '1',
+                            },
+                        ],
                     },
                     {
                         conditions: [
                             {
                                 type: 'url',
                                 operator: 'matchDomain',
-                                value: 'example.com'
+                                value: 'example.com',
                             },
                             {
                                 type: 'url',
                                 operator: 'matchRegExp',
-                                value: 'example\\.com'
-                            }
-                        ]
+                                value: 'example\\.com',
+                            },
+                        ],
                     },
                     {
                         conditions: [
                             {
                                 type: 'modifierKeys',
                                 operator: 'are',
-                                value: 'ctrl, shift'
+                                value: 'ctrl, shift',
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'areNot',
-                                value: 'alt, shift'
+                                value: 'alt, shift',
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'include',
-                                value: 'alt'
+                                value: 'alt',
                             },
                             {
                                 type: 'modifierKeys',
                                 operator: 'notInclude',
-                                value: 'ctrl'
-                            }
-                        ]
-                    }
-                ]
-            }
+                                value: 'ctrl',
+                            },
+                        ],
+                    },
+                ],
+            },
         ],
         profileCurrent: 0,
-        version: 37,
+        version: 40,
         global: {
             database: {
-                prefixWildcardsSupported: false
-            }
-        }
+                prefixWildcardsSupported: false,
+            },
+        },
     };
 }
 
@@ -668,7 +669,7 @@ describe('OptionsUtil', () => {
             },
             (options) => {
                 options.profiles[0].options.audio.autoPlay = void 0;
-            }
+            },
         ];
 
         test.each(data)('default-test-%#', async (modify) => {
@@ -704,7 +705,7 @@ describe('OptionsUtil', () => {
             if (match !== null) {
                 updates.push({
                     version: Number.parseInt(match[1], 10),
-                    changes: loadDataFile(path.join(templatesDirPath, match[0]))
+                    changes: loadDataFile(path.join(templatesDirPath, match[0])),
                 });
             }
         }
@@ -742,7 +743,7 @@ describe('OptionsUtil', () => {
 {{/inline}}
 
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // Non-standard marker format
             {
@@ -761,7 +762,7 @@ describe('OptionsUtil', () => {
 {{/inline}}
 
 {{~> (lookup . "marker2") ~}}
-<<<UPDATE-ADDITIONS>>>`.trimStart()
+<<<UPDATE-ADDITIONS>>>`.trimStart(),
             },
             // Empty test
             {
@@ -772,7 +773,7 @@ describe('OptionsUtil', () => {
 
                 expected: `
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // Definition tags update
             {
@@ -845,7 +846,7 @@ describe('OptionsUtil', () => {
 
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}
-`.trimStart()
+`.trimStart(),
             },
             // Glossary and glossary-brief update
             {
@@ -985,7 +986,7 @@ describe('OptionsUtil', () => {
 {{/inline}}
 
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // formatGlossary update
             {
@@ -1016,7 +1017,7 @@ describe('OptionsUtil', () => {
 {{/inline}}
 
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // hasMedia/getMedia update
             {
@@ -1069,7 +1070,7 @@ describe('OptionsUtil', () => {
 {{/inline}}
 
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // hasMedia/getMedia update
             {
@@ -1237,7 +1238,7 @@ describe('OptionsUtil', () => {
 {{! End Pitch Accents }}
 
 <<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // Block helper update: furigana and furiganaPlain
             {
@@ -1325,7 +1326,7 @@ describe('OptionsUtil', () => {
     {{~/if~}}
 {{/inline}}
 
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // Block helper update: formatGlossary
             {
@@ -1399,7 +1400,7 @@ describe('OptionsUtil', () => {
     {{~set "previousDictionary" dictionary~}}
 {{/inline}}
 
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // Block helper update: set and get
             {
@@ -1501,7 +1502,7 @@ describe('OptionsUtil', () => {
     {{~/scope~}}
 {{/inline}}
 
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // Block helper update: hasMedia and getMedia
             {
@@ -1583,7 +1584,7 @@ describe('OptionsUtil', () => {
     {{~/if~}}
 {{/inline}}
 
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             // Block helper update: pronunciation
             {
@@ -1601,7 +1602,7 @@ describe('OptionsUtil', () => {
     {{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
 {{/inline}}
 
-{{~> (lookup . "marker") ~}}`.trimStart()
+{{~> (lookup . "marker") ~}}`.trimStart(),
             },
             {
                 oldVersion: 21,
@@ -1695,7 +1696,7 @@ describe('OptionsUtil', () => {
 
 {{~#*inline "pitch-accent-categories"~}}
     {{~#each (pitchCategories @root)~}}{{~.~}}{{~#unless @last~}},{{~/unless~}}{{~/each~}}
-{{~/inline~}}`.trimStart()
+{{~/inline~}}`.trimStart(),
             },
             {
                 oldVersion: 24,
@@ -1722,7 +1723,7 @@ describe('OptionsUtil', () => {
         {{~/if~}}
     {{~/if~}}
 {{/inline}}
-`.trimStart()
+`.trimStart(),
             },
             {
                 oldVersion: 32,
@@ -1785,8 +1786,8 @@ describe('OptionsUtil', () => {
 {{#*inline "selection-text"}}
     {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
 {{/inline}}
-`.trimStart()
-            }
+`.trimStart(),
+            },
         ];
 
         const updatesPattern = /<<<UPDATE-ADDITIONS>>>/g;

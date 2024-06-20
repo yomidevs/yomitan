@@ -67,7 +67,7 @@ export class QueryParser extends EventDispatcher {
             searchTerms: true,
             searchKanji: false,
             searchOnClick: true,
-            textSourceGenerator
+            textSourceGenerator,
         });
         /** @type {?(import('../language/ja/japanese-wanakana.js'))} */
         this._japaneseWanakanaModule = null;
@@ -155,7 +155,7 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
-    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext}) {
+    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext, pageTheme}) {
         this.trigger('searched', {
             textScanner: this._textScanner,
             type,
@@ -164,7 +164,8 @@ export class QueryParser extends EventDispatcher {
             inputInfo,
             textSource,
             optionsContext,
-            sentenceOffset: this._getSentenceOffset(textSource)
+            sentenceOffset: this._getSentenceOffset(textSource),
+            pageTheme: pageTheme,
         });
     }
 
@@ -210,7 +211,7 @@ export class QueryParser extends EventDispatcher {
             path: 'parsing.selectedParser',
             value,
             scope: 'profile',
-            optionsContext
+            optionsContext,
         };
         void this._api.modifySettings([modification], 'search');
     }

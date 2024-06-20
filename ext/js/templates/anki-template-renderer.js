@@ -96,20 +96,20 @@ export class AnkiTemplateRenderer {
             ['getMedia',         this._getMedia.bind(this)],
             ['pronunciation',    this._pronunciation.bind(this)],
             ['hiragana',         this._hiragana.bind(this)],
-            ['katakana',         this._katakana.bind(this)]
+            ['katakana',         this._katakana.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
         this._templateRenderer.registerDataType('ankiNote', {
             modifier: ({marker, commonData}) => createAnkiNoteData(marker, commonData),
-            composeData: ({marker}, commonData) => ({marker, commonData})
+            composeData: ({marker}, commonData) => ({marker, commonData}),
         });
         this._templateRenderer.setRenderCallbacks(
             this._onRenderSetup.bind(this),
-            this._onRenderCleanup.bind(this)
+            this._onRenderCleanup.bind(this),
         );
         await Promise.all([
             this._structuredContentStyleApplier.prepare(),
-            this._pronunciationStyleApplier.prepare()
+            this._pronunciationStyleApplier.prepare(),
         ]);
     }
 
@@ -201,7 +201,7 @@ export class AnkiTemplateRenderer {
         }
         return {
             expression: typeof expression === 'string' ? expression : '',
-            reading: typeof reading === 'string' ? reading : ''
+            reading: typeof reading === 'string' ? reading : '',
         };
     }
 

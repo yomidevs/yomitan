@@ -68,67 +68,67 @@ export class DictionaryDatabase {
                     stores: {
                         terms: {
                             primaryKey: {keyPath: 'id', autoIncrement: true},
-                            indices: ['dictionary', 'expression', 'reading']
+                            indices: ['dictionary', 'expression', 'reading'],
                         },
                         kanji: {
                             primaryKey: {autoIncrement: true},
-                            indices: ['dictionary', 'character']
+                            indices: ['dictionary', 'character'],
                         },
                         tagMeta: {
                             primaryKey: {autoIncrement: true},
-                            indices: ['dictionary']
+                            indices: ['dictionary'],
                         },
                         dictionaries: {
                             primaryKey: {autoIncrement: true},
-                            indices: ['title', 'version']
-                        }
-                    }
+                            indices: ['title', 'version'],
+                        },
+                    },
                 }),
                 {
                     version: 30,
                     stores: {
                         termMeta: {
                             primaryKey: {autoIncrement: true},
-                            indices: ['dictionary', 'expression']
+                            indices: ['dictionary', 'expression'],
                         },
                         kanjiMeta: {
                             primaryKey: {autoIncrement: true},
-                            indices: ['dictionary', 'character']
+                            indices: ['dictionary', 'character'],
                         },
                         tagMeta: {
                             primaryKey: {autoIncrement: true},
-                            indices: ['dictionary', 'name']
-                        }
-                    }
+                            indices: ['dictionary', 'name'],
+                        },
+                    },
                 },
                 {
                     version: 40,
                     stores: {
                         terms: {
                             primaryKey: {keyPath: 'id', autoIncrement: true},
-                            indices: ['dictionary', 'expression', 'reading', 'sequence']
-                        }
-                    }
+                            indices: ['dictionary', 'expression', 'reading', 'sequence'],
+                        },
+                    },
                 },
                 {
                     version: 50,
                     stores: {
                         terms: {
                             primaryKey: {keyPath: 'id', autoIncrement: true},
-                            indices: ['dictionary', 'expression', 'reading', 'sequence', 'expressionReverse', 'readingReverse']
-                        }
-                    }
+                            indices: ['dictionary', 'expression', 'reading', 'sequence', 'expressionReverse', 'readingReverse'],
+                        },
+                    },
                 },
                 {
                     version: 60,
                     stores: {
                         media: {
                             primaryKey: {keyPath: 'id', autoIncrement: true},
-                            indices: ['dictionary', 'path']
-                        }
-                    }
-                }
-            ])
+                            indices: ['dictionary', 'path'],
+                        },
+                    },
+                },
+            ]),
         );
     }
 
@@ -179,11 +179,11 @@ export class DictionaryDatabase {
                 ['terms', 'dictionary'],
                 ['termMeta', 'dictionary'],
                 ['tagMeta', 'dictionary'],
-                ['media', 'dictionary']
+                ['media', 'dictionary'],
             ],
             [
-                ['dictionaries', 'title']
-            ]
+                ['dictionaries', 'title'],
+            ],
         ];
 
         let storeCount = 0;
@@ -196,7 +196,7 @@ export class DictionaryDatabase {
             count: 0,
             processed: 0,
             storeCount,
-            storesProcesed: 0
+            storesProcesed: 0,
         };
 
         /**
@@ -370,7 +370,7 @@ export class DictionaryDatabase {
                 ['terms', 'dictionary'],
                 ['termMeta', 'dictionary'],
                 ['tagMeta', 'dictionary'],
-                ['media', 'dictionary']
+                ['media', 'dictionary'],
             ];
             const objectStoreNames = targets.map(([objectStoreName]) => objectStoreName);
             const transaction = this._db.transaction(objectStoreNames, 'readonly');
@@ -596,7 +596,7 @@ export class DictionaryDatabase {
             score: row.score,
             dictionary: row.dictionary,
             id: row.id,
-            sequence: typeof sequence === 'number' ? sequence : -1
+            sequence: typeof sequence === 'number' ? sequence : -1,
         };
     }
 
@@ -615,7 +615,7 @@ export class DictionaryDatabase {
             tags: this._splitField(row.tags),
             definitions: row.meanings,
             stats: typeof stats === 'object' && stats !== null ? stats : {},
-            dictionary: row.dictionary
+            dictionary: row.dictionary,
         };
     }
 

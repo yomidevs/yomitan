@@ -27,7 +27,7 @@ describe('Japanese utility functions', () => {
             ['力方', true],
             ['\u53f1\u{20b9f}', true],
             ['かたカタ々kata、。？,.?', false],
-            ['逸逸', true]
+            ['逸逸', true],
         ];
 
         test.each(data)('%s -> %o', (characters, expected) => {
@@ -44,7 +44,7 @@ describe('Japanese utility functions', () => {
         const data = [
             ['かたカタ', true],
             ['力方々kata、。？,.?', false],
-            ['\u53f1\u{20b9f}', false]
+            ['\u53f1\u{20b9f}', false],
         ];
 
         test.each(data)('%s -> %o', (characters, expected) => {
@@ -62,7 +62,7 @@ describe('Japanese utility functions', () => {
             ['かたカタ力方々、。？', true],
             ['\u53f1\u{20b9f}', true],
             ['kata,.?', false],
-            ['逸逸', true]
+            ['逸逸', true],
         ];
 
         test.each(data)('%s -> %o', (characters, expected) => {
@@ -87,7 +87,7 @@ describe('Japanese utility functions', () => {
             ['kata,.?', false],
             ['かたカタ力方々、。？invalid', false],
             ['\u53f1\u{20b9f}invalid', false],
-            ['kata,.?かた', false]
+            ['kata,.?かた', false],
         ];
 
         test.each(data)('%s -> %o', (string, expected) => {
@@ -109,7 +109,7 @@ describe('Japanese utility functions', () => {
             ['かたカタ力方々、。？invalid', true],
             ['\u53f1\u{20b9f}invalid', true],
             ['kata,.?かた', true],
-            ['逸逸', true]
+            ['逸逸', true],
         ];
 
         test.each(data)('%s -> %o', (string, expected) => {
@@ -130,7 +130,7 @@ describe('Japanese utility functions', () => {
             ['katakana', 'katakana'],
             ['hiragana', 'hiragana'],
             ['カーナー', 'かあなあ'],
-            ['カーナー', 'かーなー', true]
+            ['カーナー', 'かーなー', true],
         ];
 
         for (const [string, expected, keepProlongedSoundMarks = false] of data) {
@@ -151,7 +151,7 @@ describe('Japanese utility functions', () => {
             ['ヒラガナひらがな', 'ヒラガナヒラガナ'],
             ['chikaraちからチカラ力', 'chikaraチカラチカラ力'],
             ['katakana', 'katakana'],
-            ['hiragana', 'hiragana']
+            ['hiragana', 'hiragana'],
         ];
 
         test.each(data)('%s -> %o', (string, expected) => {
@@ -170,7 +170,7 @@ describe('Japanese utility functions', () => {
             ['ヒラガナひらがな', 'hiraganahiragana'],
             ['chikaraちからチカラ力', 'chikarachikarachikara力'],
             ['katakana', 'katakana'],
-            ['hiragana', 'hiragana']
+            ['hiragana', 'hiragana'],
         ];
 
         test.each(data)('%s -> %o', (string, expected) => {
@@ -184,7 +184,7 @@ describe('Japanese utility functions', () => {
             ['0123456789', '０１２３４５６７８９'],
             ['abcdefghij', 'ａｂｃｄｅｆｇｈｉｊ'],
             ['カタカナ', 'カタカナ'],
-            ['ひらがな', 'ひらがな']
+            ['ひらがな', 'ひらがな'],
         ];
 
         test.each(data)('%s -> %o', (string, expected) => {
@@ -202,7 +202,7 @@ describe('Japanese utility functions', () => {
             ['ｶｷ', 'カキ'],
             ['ｶﾞｷ', 'ガキ'],
             ['ﾆﾎﾝ', 'ニホン'],
-            ['ﾆｯﾎﾟﾝ', 'ニッポン']
+            ['ﾆｯﾎﾟﾝ', 'ニッポン'],
         ];
 
         for (const [string, expected] of data) {
@@ -224,7 +224,7 @@ describe('Japanese utility functions', () => {
             ['カタカナ', 'カタカナ'],
             ['ひらがな', 'ひらがな'],
             ['chikara', 'ちから'],
-            ['CHIKARA', 'ちから']
+            ['CHIKARA', 'ちから'],
         ];
 
         for (const [string, expected] of data) {
@@ -246,37 +246,37 @@ describe('Japanese utility functions', () => {
                     {text: '有', reading: 'あ'},
                     {text: 'り', reading: ''},
                     {text: '難', reading: 'がと'},
-                    {text: 'う', reading: ''}
-                ]
+                    {text: 'う', reading: ''},
+                ],
             ],
             [
                 ['方々', 'かたがた'],
                 [
-                    {text: '方々', reading: 'かたがた'}
-                ]
+                    {text: '方々', reading: 'かたがた'},
+                ],
             ],
             [
                 ['お祝い', 'おいわい'],
                 [
                     {text: 'お', reading: ''},
                     {text: '祝', reading: 'いわ'},
-                    {text: 'い', reading: ''}
-                ]
+                    {text: 'い', reading: ''},
+                ],
             ],
             [
                 ['美味しい', 'おいしい'],
                 [
                     {text: '美味', reading: 'おい'},
-                    {text: 'しい', reading: ''}
-                ]
+                    {text: 'しい', reading: ''},
+                ],
             ],
             [
                 ['食べ物', 'たべもの'],
                 [
                     {text: '食', reading: 'た'},
                     {text: 'べ', reading: ''},
-                    {text: '物', reading: 'もの'}
-                ]
+                    {text: '物', reading: 'もの'},
+                ],
             ],
             [
                 ['試し切り', 'ためしぎり'],
@@ -284,53 +284,53 @@ describe('Japanese utility functions', () => {
                     {text: '試', reading: 'ため'},
                     {text: 'し', reading: ''},
                     {text: '切', reading: 'ぎ'},
-                    {text: 'り', reading: ''}
-                ]
+                    {text: 'り', reading: ''},
+                ],
             ],
             // Ambiguous
             [
                 ['飼い犬', 'かいいぬ'],
                 [
-                    {text: '飼い犬', reading: 'かいいぬ'}
-                ]
+                    {text: '飼い犬', reading: 'かいいぬ'},
+                ],
             ],
             [
                 ['長い間', 'ながいあいだ'],
                 [
-                    {text: '長い間', reading: 'ながいあいだ'}
-                ]
+                    {text: '長い間', reading: 'ながいあいだ'},
+                ],
             ],
             // Same/empty reading
             [
                 ['飼い犬', ''],
                 [
-                    {text: '飼い犬', reading: ''}
-                ]
+                    {text: '飼い犬', reading: ''},
+                ],
             ],
             [
                 ['かいいぬ', 'かいいぬ'],
                 [
-                    {text: 'かいいぬ', reading: ''}
-                ]
+                    {text: 'かいいぬ', reading: ''},
+                ],
             ],
             [
                 ['かいぬ', 'かいぬ'],
                 [
-                    {text: 'かいぬ', reading: ''}
-                ]
+                    {text: 'かいぬ', reading: ''},
+                ],
             ],
             // Misc
             [
                 ['月', 'か'],
                 [
-                    {text: '月', reading: 'か'}
-                ]
+                    {text: '月', reading: 'か'},
+                ],
             ],
             [
                 ['月', 'カ'],
                 [
-                    {text: '月', reading: 'カ'}
-                ]
+                    {text: '月', reading: 'カ'},
+                ],
             ],
             // Mismatched kana readings
             [
@@ -339,125 +339,125 @@ describe('Japanese utility functions', () => {
                     {text: '有', reading: 'ア'},
                     {text: 'り', reading: 'リ'},
                     {text: '難', reading: 'ガト'},
-                    {text: 'う', reading: 'ウ'}
-                ]
+                    {text: 'う', reading: 'ウ'},
+                ],
             ],
             [
                 ['ありがとう', 'アリガトウ'],
                 [
-                    {text: 'ありがとう', reading: 'アリガトウ'}
-                ]
+                    {text: 'ありがとう', reading: 'アリガトウ'},
+                ],
             ],
             // Mismatched kana readings (real examples)
             [
                 ['カ月', 'かげつ'],
                 [
                     {text: 'カ', reading: 'か'},
-                    {text: '月', reading: 'げつ'}
-                ]
+                    {text: '月', reading: 'げつ'},
+                ],
             ],
             [
                 ['序ノ口', 'じょのくち'],
                 [
                     {text: '序', reading: 'じょ'},
                     {text: 'ノ', reading: 'の'},
-                    {text: '口', reading: 'くち'}
-                ]
+                    {text: '口', reading: 'くち'},
+                ],
             ],
             [
                 ['スズメの涙', 'すずめのなみだ'],
                 [
                     {text: 'スズメ', reading: 'すずめ'},
                     {text: 'の', reading: ''},
-                    {text: '涙', reading: 'なみだ'}
-                ]
+                    {text: '涙', reading: 'なみだ'},
+                ],
             ],
             [
                 ['二カ所', 'にかしょ'],
                 [
                     {text: '二', reading: 'に'},
                     {text: 'カ', reading: 'か'},
-                    {text: '所', reading: 'しょ'}
-                ]
+                    {text: '所', reading: 'しょ'},
+                ],
             ],
             [
                 ['八ツ橋', 'やつはし'],
                 [
                     {text: '八', reading: 'や'},
                     {text: 'ツ', reading: 'つ'},
-                    {text: '橋', reading: 'はし'}
-                ]
+                    {text: '橋', reading: 'はし'},
+                ],
             ],
             [
                 ['八ツ橋', 'やつはし'],
                 [
                     {text: '八', reading: 'や'},
                     {text: 'ツ', reading: 'つ'},
-                    {text: '橋', reading: 'はし'}
-                ]
+                    {text: '橋', reading: 'はし'},
+                ],
             ],
             [
                 ['一カ月', 'いっかげつ'],
                 [
                     {text: '一', reading: 'いっ'},
                     {text: 'カ', reading: 'か'},
-                    {text: '月', reading: 'げつ'}
-                ]
+                    {text: '月', reading: 'げつ'},
+                ],
             ],
             [
                 ['一カ所', 'いっかしょ'],
                 [
                     {text: '一', reading: 'いっ'},
                     {text: 'カ', reading: 'か'},
-                    {text: '所', reading: 'しょ'}
-                ]
+                    {text: '所', reading: 'しょ'},
+                ],
             ],
             [
                 ['カ所', 'かしょ'],
                 [
                     {text: 'カ', reading: 'か'},
-                    {text: '所', reading: 'しょ'}
-                ]
+                    {text: '所', reading: 'しょ'},
+                ],
             ],
             [
                 ['数カ月', 'すうかげつ'],
                 [
                     {text: '数', reading: 'すう'},
                     {text: 'カ', reading: 'か'},
-                    {text: '月', reading: 'げつ'}
-                ]
+                    {text: '月', reading: 'げつ'},
+                ],
             ],
             [
                 ['くノ一', 'くのいち'],
                 [
                     {text: 'く', reading: ''},
                     {text: 'ノ', reading: 'の'},
-                    {text: '一', reading: 'いち'}
-                ]
+                    {text: '一', reading: 'いち'},
+                ],
             ],
             [
                 ['くノ一', 'くのいち'],
                 [
                     {text: 'く', reading: ''},
                     {text: 'ノ', reading: 'の'},
-                    {text: '一', reading: 'いち'}
-                ]
+                    {text: '一', reading: 'いち'},
+                ],
             ],
             [
                 ['数カ国', 'すうかこく'],
                 [
                     {text: '数', reading: 'すう'},
                     {text: 'カ', reading: 'か'},
-                    {text: '国', reading: 'こく'}
-                ]
+                    {text: '国', reading: 'こく'},
+                ],
             ],
             [
                 ['数カ所', 'すうかしょ'],
                 [
                     {text: '数', reading: 'すう'},
                     {text: 'カ', reading: 'か'},
-                    {text: '所', reading: 'しょ'}
-                ]
+                    {text: '所', reading: 'しょ'},
+                ],
             ],
             [
                 ['壇ノ浦の戦い', 'だんのうらのたたかい'],
@@ -467,8 +467,8 @@ describe('Japanese utility functions', () => {
                     {text: '浦', reading: 'うら'},
                     {text: 'の', reading: ''},
                     {text: '戦', reading: 'たたか'},
-                    {text: 'い', reading: ''}
-                ]
+                    {text: 'い', reading: ''},
+                ],
             ],
             [
                 ['壇ノ浦の戦', 'だんのうらのたたかい'],
@@ -477,38 +477,38 @@ describe('Japanese utility functions', () => {
                     {text: 'ノ', reading: 'の'},
                     {text: '浦', reading: 'うら'},
                     {text: 'の', reading: ''},
-                    {text: '戦', reading: 'たたかい'}
-                ]
+                    {text: '戦', reading: 'たたかい'},
+                ],
             ],
             [
                 ['序ノ口格', 'じょのくちかく'],
                 [
                     {text: '序', reading: 'じょ'},
                     {text: 'ノ', reading: 'の'},
-                    {text: '口格', reading: 'くちかく'}
-                ]
+                    {text: '口格', reading: 'くちかく'},
+                ],
             ],
             [
                 ['二カ国語', 'にかこくご'],
                 [
                     {text: '二', reading: 'に'},
                     {text: 'カ', reading: 'か'},
-                    {text: '国語', reading: 'こくご'}
-                ]
+                    {text: '国語', reading: 'こくご'},
+                ],
             ],
             [
                 ['カ国', 'かこく'],
                 [
                     {text: 'カ', reading: 'か'},
-                    {text: '国', reading: 'こく'}
-                ]
+                    {text: '国', reading: 'こく'},
+                ],
             ],
             [
                 ['カ国語', 'かこくご'],
                 [
                     {text: 'カ', reading: 'か'},
-                    {text: '国語', reading: 'こくご'}
-                ]
+                    {text: '国語', reading: 'こくご'},
+                ],
             ],
             [
                 ['壇ノ浦の合戦', 'だんのうらのかっせん'],
@@ -517,46 +517,46 @@ describe('Japanese utility functions', () => {
                     {text: 'ノ', reading: 'の'},
                     {text: '浦', reading: 'うら'},
                     {text: 'の', reading: ''},
-                    {text: '合戦', reading: 'かっせん'}
-                ]
+                    {text: '合戦', reading: 'かっせん'},
+                ],
             ],
             [
                 ['一タ偏', 'いちたへん'],
                 [
                     {text: '一', reading: 'いち'},
                     {text: 'タ', reading: 'た'},
-                    {text: '偏', reading: 'へん'}
-                ]
+                    {text: '偏', reading: 'へん'},
+                ],
             ],
             [
                 ['ル又', 'るまた'],
                 [
                     {text: 'ル', reading: 'る'},
-                    {text: '又', reading: 'また'}
-                ]
+                    {text: '又', reading: 'また'},
+                ],
             ],
             [
                 ['ノ木偏', 'のぎへん'],
                 [
                     {text: 'ノ', reading: 'の'},
-                    {text: '木偏', reading: 'ぎへん'}
-                ]
+                    {text: '木偏', reading: 'ぎへん'},
+                ],
             ],
             [
                 ['一ノ貝', 'いちのかい'],
                 [
                     {text: '一', reading: 'いち'},
                     {text: 'ノ', reading: 'の'},
-                    {text: '貝', reading: 'かい'}
-                ]
+                    {text: '貝', reading: 'かい'},
+                ],
             ],
             [
                 ['虎ノ門事件', 'とらのもんじけん'],
                 [
                     {text: '虎', reading: 'とら'},
                     {text: 'ノ', reading: 'の'},
-                    {text: '門事件', reading: 'もんじけん'}
-                ]
+                    {text: '門事件', reading: 'もんじけん'},
+                ],
             ],
             [
                 ['教育ニ関スル勅語', 'きょういくにかんするちょくご'],
@@ -565,96 +565,96 @@ describe('Japanese utility functions', () => {
                     {text: 'ニ', reading: 'に'},
                     {text: '関', reading: 'かん'},
                     {text: 'スル', reading: 'する'},
-                    {text: '勅語', reading: 'ちょくご'}
-                ]
+                    {text: '勅語', reading: 'ちょくご'},
+                ],
             ],
             [
                 ['二カ年', 'にかねん'],
                 [
                     {text: '二', reading: 'に'},
                     {text: 'カ', reading: 'か'},
-                    {text: '年', reading: 'ねん'}
-                ]
+                    {text: '年', reading: 'ねん'},
+                ],
             ],
             [
                 ['三カ年', 'さんかねん'],
                 [
                     {text: '三', reading: 'さん'},
                     {text: 'カ', reading: 'か'},
-                    {text: '年', reading: 'ねん'}
-                ]
+                    {text: '年', reading: 'ねん'},
+                ],
             ],
             [
                 ['四カ年', 'よんかねん'],
                 [
                     {text: '四', reading: 'よん'},
                     {text: 'カ', reading: 'か'},
-                    {text: '年', reading: 'ねん'}
-                ]
+                    {text: '年', reading: 'ねん'},
+                ],
             ],
             [
                 ['五カ年', 'ごかねん'],
                 [
                     {text: '五', reading: 'ご'},
                     {text: 'カ', reading: 'か'},
-                    {text: '年', reading: 'ねん'}
-                ]
+                    {text: '年', reading: 'ねん'},
+                ],
             ],
             [
                 ['六カ年', 'ろっかねん'],
                 [
                     {text: '六', reading: 'ろっ'},
                     {text: 'カ', reading: 'か'},
-                    {text: '年', reading: 'ねん'}
-                ]
+                    {text: '年', reading: 'ねん'},
+                ],
             ],
             [
                 ['七カ年', 'ななかねん'],
                 [
                     {text: '七', reading: 'なな'},
                     {text: 'カ', reading: 'か'},
-                    {text: '年', reading: 'ねん'}
-                ]
+                    {text: '年', reading: 'ねん'},
+                ],
             ],
             [
                 ['八カ年', 'はちかねん'],
                 [
                     {text: '八', reading: 'はち'},
                     {text: 'カ', reading: 'か'},
-                    {text: '年', reading: 'ねん'}
-                ]
+                    {text: '年', reading: 'ねん'},
+                ],
             ],
             [
                 ['九カ年', 'きゅうかねん'],
                 [
                     {text: '九', reading: 'きゅう'},
                     {text: 'カ', reading: 'か'},
-                    {text: '年', reading: 'ねん'}
-                ]
+                    {text: '年', reading: 'ねん'},
+                ],
             ],
             [
                 ['十カ年', 'じゅうかねん'],
                 [
                     {text: '十', reading: 'じゅう'},
                     {text: 'カ', reading: 'か'},
-                    {text: '年', reading: 'ねん'}
-                ]
+                    {text: '年', reading: 'ねん'},
+                ],
             ],
             [
                 ['鏡ノ間', 'かがみのま'],
                 [
                     {text: '鏡', reading: 'かがみ'},
                     {text: 'ノ', reading: 'の'},
-                    {text: '間', reading: 'ま'}
-                ]
+                    {text: '間', reading: 'ま'},
+                ],
             ],
             [
                 ['鏡ノ間', 'かがみのま'],
                 [
                     {text: '鏡', reading: 'かがみ'},
                     {text: 'ノ', reading: 'の'},
-                    {text: '間', reading: 'ま'}
-                ]
+                    {text: '間', reading: 'ま'},
+                ],
             ],
             [
                 ['ページ違反', 'ぺーじいはん'],
@@ -662,39 +662,39 @@ describe('Japanese utility functions', () => {
                     {text: 'ペ', reading: 'ぺ'},
                     {text: 'ー', reading: ''},
                     {text: 'ジ', reading: 'じ'},
-                    {text: '違反', reading: 'いはん'}
-                ]
+                    {text: '違反', reading: 'いはん'},
+                ],
             ],
             // Mismatched kana
             [
                 ['サボる', 'サボル'],
                 [
                     {text: 'サボ', reading: ''},
-                    {text: 'る', reading: 'ル'}
-                ]
+                    {text: 'る', reading: 'ル'},
+                ],
             ],
             // Reading starts with term, but has remainder characters
             [
                 ['シック', 'シック・ビルしょうこうぐん'],
                 [
-                    {text: 'シック', reading: 'シック・ビルしょうこうぐん'}
-                ]
+                    {text: 'シック', reading: 'シック・ビルしょうこうぐん'},
+                ],
             ],
             // Kanji distribution tests
             [
                 ['逸らす', 'そらす'],
                 [
                     {text: '逸', reading: 'そ'},
-                    {text: 'らす', reading: ''}
-                ]
+                    {text: 'らす', reading: ''},
+                ],
             ],
             [
                 ['逸らす', 'そらす'],
                 [
                     {text: '逸', reading: 'そ'},
-                    {text: 'らす', reading: ''}
-                ]
-            ]
+                    {text: 'らす', reading: ''},
+                ],
+            ],
         ];
 
         test.each(data)('%o -> %o', (input, expected) => {
@@ -711,41 +711,41 @@ describe('Japanese utility functions', () => {
                 ['美味しい', 'おいしい', '美味しかた'],
                 [
                     {text: '美味', reading: 'おい'},
-                    {text: 'しかた', reading: ''}
-                ]
+                    {text: 'しかた', reading: ''},
+                ],
             ],
             [
                 ['食べる', 'たべる', '食べた'],
                 [
                     {text: '食', reading: 'た'},
-                    {text: 'べた', reading: ''}
-                ]
+                    {text: 'べた', reading: ''},
+                ],
             ],
             [
                 ['迄に', 'までに', 'までに'],
                 [
-                    {text: 'までに', reading: ''}
-                ]
+                    {text: 'までに', reading: ''},
+                ],
             ],
             [
                 ['行う', 'おこなう', 'おこなわなかった'],
                 [
-                    {text: 'おこなわなかった', reading: ''}
-                ]
+                    {text: 'おこなわなかった', reading: ''},
+                ],
             ],
             [
                 ['いい', 'いい', 'イイ'],
                 [
-                    {text: 'イイ', reading: ''}
-                ]
+                    {text: 'イイ', reading: ''},
+                ],
             ],
             [
                 ['否か', 'いなか', '否カ'],
                 [
                     {text: '否', reading: 'いな'},
-                    {text: 'カ', reading: 'か'}
-                ]
-            ]
+                    {text: 'カ', reading: 'か'},
+                ],
+            ],
         ];
 
         test.each(data)('%o -> %o', (input, expected) => {
@@ -794,7 +794,7 @@ describe('Japanese utility functions', () => {
             [['っっ', false], 'っ'],
             [['っっ', true], ''],
             [['っっっ', false], 'っ'],
-            [['っっっ', true], '']
+            [['っっっ', true], ''],
         ];
 
         test.each(data)('%o -> %o', (input, output) => {
@@ -833,7 +833,7 @@ describe('Japanese utility functions', () => {
             [[0, 4], false],
             [[1, 4], true],
             [[2, 4], true],
-            [[3, 4], true]
+            [[3, 4], true],
         ];
 
         test.each(data)('%o -> %o', (input, expected) => {
@@ -854,7 +854,7 @@ describe('Japanese utility functions', () => {
             ['ちゃんと', ['ちゃ', 'ん', 'と']],
             ['とうきょう', ['と', 'う', 'きょ', 'う']],
             ['ぎゅう', ['ぎゅ', 'う']],
-            ['ディスコ', ['ディ', 'ス', 'コ']]
+            ['ディスコ', ['ディ', 'ス', 'コ']],
         ];
 
         test.each(data)('%s -> %o', (text, expected) => {

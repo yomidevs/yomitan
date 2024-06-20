@@ -94,7 +94,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
                 responseTimeout,
                 action,
                 ack: false,
-                timer: null
+                timer: null,
             };
             this._activeInvocations.set(id, invocation);
 
@@ -248,7 +248,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
             params,
             [],
             (data) => this._sendResult(id, data),
-            () => this._sendError(id, new Error(`Unknown action: ${action}`))
+            () => this._sendError(id, new Error(`Unknown action: ${action}`)),
         );
     }
 

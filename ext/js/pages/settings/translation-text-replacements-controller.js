@@ -56,14 +56,14 @@ export class TranslationTextReplacementsController {
                 path: 'translation.textReplacements.groups',
                 start: 0,
                 deleteCount: 0,
-                items: [[newEntry]]
+                items: [[newEntry]],
             } :
             {
                 action: 'splice',
                 path: 'translation.textReplacements.groups[0]',
                 start: groups[0].length,
                 deleteCount: 0,
-                items: [newEntry]
+                items: [newEntry],
             }
         );
 
@@ -91,14 +91,14 @@ export class TranslationTextReplacementsController {
                 path: 'translation.textReplacements.groups[0]',
                 start: index,
                 deleteCount: 1,
-                items: []
+                items: [],
             } :
             {
                 action: 'splice',
                 path: 'translation.textReplacements.groups',
                 start: 0,
                 deleteCount: group0.length,
-                items: []
+                items: [],
             }
         );
 

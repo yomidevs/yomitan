@@ -36,7 +36,7 @@ export class GenericSettingController {
             this._createElementMetadata.bind(this),
             this._compareElementMetadata.bind(this),
             this._getValues.bind(this),
-            this._setValues.bind(this)
+            this._setValues.bind(this),
         );
         /** @type {Map<import('generic-setting-controller').TransformType, import('generic-setting-controller').TransformFunction>} */
         this._transforms = new Map(/** @type {[key: import('generic-setting-controller').TransformType, value: import('generic-setting-controller').TransformFunction][]} */ ([
@@ -47,7 +47,7 @@ export class GenericSettingController {
             ['toNumber', this._toNumber.bind(this)],
             ['toBoolean', this._toBoolean.bind(this)],
             ['toString', this._toString.bind(this)],
-            ['conditionalConvert', this._conditionalConvert.bind(this)]
+            ['conditionalConvert', this._conditionalConvert.bind(this)],
         ]));
     }
 
@@ -82,7 +82,7 @@ export class GenericSettingController {
             path,
             scope: scope2 !== null ? scope2 : this._defaultScope,
             transforms: this._getTransformDataArray(transformRaw),
-            transformRaw
+            transformRaw,
         };
     }
 
@@ -112,7 +112,7 @@ export class GenericSettingController {
             const target = {
                 path,
                 scope: typeof scope === 'string' ? scope : defaultScope,
-                optionsContext: null
+                optionsContext: null,
             };
             settingsTargets.push(target);
         }
@@ -135,7 +135,7 @@ export class GenericSettingController {
                 scope: typeof scope === 'string' ? scope : defaultScope,
                 action: 'set',
                 value: transformedValue,
-                optionsContext: null
+                optionsContext: null,
             };
             settingsTargets.push(target);
         }

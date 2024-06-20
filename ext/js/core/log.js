@@ -73,7 +73,7 @@ class Logger extends EventDispatcher {
      */
     logGenericError(error, level, context) {
         if (typeof context === 'undefined') {
-            context = {url: location.href};
+            context = typeof location === 'undefined' ? {url: 'unknown'} : {url: location.href};
         }
 
         let errorString;

@@ -99,6 +99,7 @@
                                     "popupScaleRelativeToPageZoom",
                                     "popupScaleRelativeToVisualViewport",
                                     "showGuide",
+                                    "enableContextMenuScanSelected",
                                     "compactTags",
                                     "glossaryLayoutMode",
                                     "mainDictionary",
@@ -206,6 +207,10 @@
                                         "type": "boolean",
                                         "default": true
                                     },
+                                    "enableContextMenuScanSelected": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
                                     "compactTags": {
                                         "type": "boolean",
                                         "default": false
@@ -220,13 +225,13 @@
                                     },
                                     "popupTheme": {
                                         "type": "string",
-                                        "enum": ["light", "dark", "browser"],
-                                        "default": "light"
+                                        "enum": ["light", "dark", "browser", "site"],
+                                        "default": "site"
                                     },
                                     "popupOuterTheme": {
                                         "type": "string",
                                         "enum": ["light", "dark", "browser", "site"],
-                                        "default": "light"
+                                        "default": "site"
                                     },
                                     "customPopupCss": {
                                         "type": "string",
@@ -1164,8 +1169,8 @@
                                             {"action": "nextEntry",         "argument": "1", "key": "ArrowDown", "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "historyBackward",   "argument": "",  "key": "KeyB",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "historyForward",    "argument": "",  "key": "KeyF",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "profilePrevious",   "argument": "",  "key": "Minus",     "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "profileNext",       "argument": "",  "key": "Equal",     "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "profilePrevious",   "argument": "",  "key": "Minus",     "modifiers": ["alt"],  "scopes": ["popup", "search", "web"], "enabled": true},
+                                            {"action": "profileNext",       "argument": "",  "key": "Equal",     "modifiers": ["alt"],  "scopes": ["popup", "search", "web"], "enabled": true},
                                             {"action": "addNoteKanji",      "argument": "",  "key": "KeyK",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "addNoteTermKanji",  "argument": "",  "key": "KeyE",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "addNoteTermKana",   "argument": "",  "key": "KeyR",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},

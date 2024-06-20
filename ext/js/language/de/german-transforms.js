@@ -36,7 +36,7 @@ function separatedPrefix(prefix, conditionsIn, conditionsOut) {
             return term.replace(regex, '$1 ' + prefix);
         },
         conditionsIn,
-        conditionsOut
+        conditionsOut,
     };
 }
 
@@ -53,54 +53,54 @@ export const germanTransforms = {
     conditions: {
         v: {
             name: 'Verb',
-            isDictionaryForm: true
+            isDictionaryForm: true,
         },
         n: {
             name: 'Noun',
-            isDictionaryForm: true
+            isDictionaryForm: true,
         },
         adj: {
             name: 'Adjective',
-            isDictionaryForm: true
-        }
+            isDictionaryForm: true,
+        },
     },
-    transforms: [
-        {
+    transforms: {
+        'nominalization': {
             name: 'nominalization',
             description: 'Noun formed from a verb',
             rules: [
                 suffixInflection('ung', 'en', [], []),
-                suffixInflection('lung', 'eln', [], [])
-            ]
+                suffixInflection('lung', 'eln', [], []),
+            ],
         },
-        {
+        '-bar': {
             name: '-bar',
             description: '-able adjective from a verb',
             rules: [
                 suffixInflection('bar', 'en', [], ['v']),
-                suffixInflection('bar', 'n', [], ['v']) // Lieferbar
-            ]
+                suffixInflection('bar', 'n', [], ['v']), // Lieferbar
+            ],
         },
-        {
+        'negative': {
             name: 'negative',
             description: 'Negation',
             rules: [
-                prefixInflection('un', '', [], ['adj'])
-            ]
+                prefixInflection('un', '', [], ['adj']),
+            ],
         },
-        {
+        'separated prefix': {
             name: 'separated prefix',
             description: 'Separable prefix',
             rules: [
-                ...separatedPrefixInflections
-            ]
+                ...separatedPrefixInflections,
+            ],
         },
-        {
+        'zu-infinitive': {
             name: 'zu-infinitive',
             description: 'zu-infinitive',
             rules: [
-                ...zuInfinitiveInflections
-            ]
-        }
-    ]
+                ...zuInfinitiveInflections,
+            ],
+        },
+    },
 };

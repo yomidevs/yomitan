@@ -324,7 +324,7 @@
                     {{~#if (get "multiple")~}}<li>{{/if~}}
                     {{~#each inflectionRules~}}
                         {{~#if (op ">" @index 0)}} « {{/if~}}
-                        {{.}}
+                        {{name}}
                     {{~/each~}}
                     {{~#if (get "multiple")~}}</li>{{/if~}}
                 {{~/if~}}

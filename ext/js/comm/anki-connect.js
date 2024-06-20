@@ -367,7 +367,7 @@ export class AnkiConnect {
         const resultActions2 = /** @type {string[]} */ (this._normalizeArray(resultActions, -1, 'string', ', field scopes'));
         return {
             scopes: resultScopes2,
-            actions: resultActions2
+            actions: resultActions2,
         };
     }
 
@@ -435,11 +435,11 @@ export class AnkiConnect {
                 cache: 'default',
                 credentials: 'omit',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 redirect: 'follow',
                 referrerPolicy: 'no-referrer',
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
             });
         } catch (e) {
             const error = new ExtensionError('Anki connection failure');
@@ -654,7 +654,7 @@ export class AnkiConnect {
                 tags: tags2,
                 fields: fields2,
                 modelName,
-                cards: cards2
+                cards: cards2,
             };
             result2.push(item2);
         }

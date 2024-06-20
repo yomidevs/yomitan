@@ -31,7 +31,7 @@ class JsonSchemaAjv {
         const ajv = new Ajv({
             meta: false,
             strictTuples: false,
-            allowUnionTypes: true
+            allowUnionTypes: true,
         });
         const metaSchemaPath = fileURLToPath(import.meta.resolve('ajv/dist/refs/json-schema-draft-07.json'));
         /** @type {import('ajv').AnySchemaObject} */

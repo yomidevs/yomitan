@@ -25,12 +25,12 @@ export default defineConfig({
             ...configDefaults.exclude,
             'dev/lib/**',
             'test/playwright/**',
-            'test/json.test.js'
+            'test/json.test.js',
         ],
         poolOptions: {
             threads: {
-                useAtomics: true
-            }
-        }
-    }
+                useAtomics: true,
+            },
+        },
+    },
 });

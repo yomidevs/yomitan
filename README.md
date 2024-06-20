@@ -32,12 +32,21 @@ Yomitan provides powerful features not available in other browser-based dictiona
 
 ## Helpful information
 
-- [Migrating from Yomichan (legacy)](./docs/yomichan-migration.md#migrating-from-yomichan)
-- [Frequently asked questions](./docs/faq.md#frequently-asked-questions)
-- [Recommended and custom dictionary import guide](./docs/dictionaries.md#dictionaries)
-- [Anki integration and flashcard creation guide](./docs/anki-integration.md#anki-integration)
-- [Keyboard shortcuts](./docs/keyboard-shortcuts.md)
-- [Advanced options, including MeCab](./docs/advanced-options.md#advanced-options)
+- ✨ [Migrating from Yomichan (legacy)](./docs/yomichan-migration.md)
+- Installation and Setup
+  - 📚 [Recommended Dictionaries](./docs/dictionaries.md#recommended-dictionaries)
+  - 🗂️ [Importing and exporting dictionaries](./docs/dictionaries.md#importing-a-dictionary-collection)
+- Anki Integration
+  - 📇 [Anki integration and flashcard creation guide](./docs/anki-integration.md)
+  - 🔧 [Anki handlebar templates](./docs/templates.md)
+- Advanced Features
+  - ⌨️ [Keyboard shortcuts](./docs/keyboard-shortcuts.md)
+  - 🔍 [Advanced options, including MeCab](./docs/advanced-options.md)
+  - 🔊 [Adding custom audio sources](./docs/audio.md)
+- Troubleshooting
+  - 🕷️ [Known browser bugs](./docs/browser-bugs.md)
+  - ❓ [Frequently asked questions](./docs/faq.md)
+- 🔒 [Browser Permissions](./docs/permissions.md)
 
 ## Installation
 
@@ -128,20 +137,6 @@ Information on how to setup and build the codebase can be found [here](./CONTRIB
 If you want to add or improve support for a language, read the documentation on [language features](./docs/development/language-features.md).
 
 Feel free to join us on [TheMoeWay Discord 🐇](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
-
-## Licenses
-
-Required licensing notices for this project follow below:
-
-- **EDRDG License** \
-  This package uses the [EDICT](https://www.edrdg.org/jmdict/edict.html) and
-  [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) dictionary files. These files are the property of
-  the [Electronic Dictionary Research and Development Group](https://www.edrdg.org/), and are used in conformance with
-  the Group's [license](https://www.edrdg.org/edrdg/licence.html).
-
-- **Kanjium License** \
-  The pitch accent notation, verb particle data, phonetics, homonyms and other additions or modifications to EDICT,
-  KANJIDIC or KRADFILE were provided by Uros Ozvatic through his free database.
 
 ## Third-Party Libraries
 

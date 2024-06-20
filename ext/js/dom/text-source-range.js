@@ -108,7 +108,7 @@ export class TextSourceRange {
             this._imposterSourceElement,
             this._cachedRects,
             this._cachedSourceRect,
-            this._disallowExpandSelection
+            this._disallowExpandSelection,
         );
     }
 
@@ -138,6 +138,7 @@ export class TextSourceRange {
      * @returns {number} The actual number of codepoints that were read.
      */
     setEndOffset(length, fromEnd, layoutAwareScan) {
+        if (this._disallowExpandSelection) { return 0; }
         let node;
         let offset;
         if (fromEnd) {
@@ -150,9 +151,10 @@ export class TextSourceRange {
         const state = new DOMTextScanner(node, offset, !layoutAwareScan, layoutAwareScan).seek(length);
         this._range.setEnd(state.node, state.offset);
         const expandedContent = fromEnd ? this._content + state.content : state.content;
-        this._content = this._disallowExpandSelection ? expandedContent : this._content;
+        this._content = expandedContent;
         return length - state.remainder;
     }
+
 
     /**
      * Moves the start offset of the text by a set amount of unicode codepoints.
@@ -162,6 +164,7 @@ export class TextSourceRange {
      * @returns {number} The actual number of codepoints that were read.
      */
     setStartOffset(length, layoutAwareScan) {
+        if (this._disallowExpandSelection) { return 0; }
         const state = new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan).seek(-length);
         this._range.setStart(state.node, state.offset);
         this._rangeStartOffset = this._range.startOffset;
@@ -257,7 +260,7 @@ export class TextSourceRange {
      * @returns {TextSourceRange} A new instance of the class corresponding to the range.
      */
     static create(range) {
-        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, true);
+        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, false);
     }
 
     /**
@@ -266,7 +269,7 @@ export class TextSourceRange {
      * @returns {TextSourceRange} A new instance of the class corresponding to the range.
      */
     static createLazy(range) {
-        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, false);
+        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, true);
     }
 
     /**
@@ -279,7 +282,7 @@ export class TextSourceRange {
     static createFromImposter(range, imposterElement, imposterSourceElement) {
         const cachedRects = convertMultipleRectZoomCoordinates(range.getClientRects(), range.startContainer);
         const cachedSourceRect = convertRectZoomCoordinates(imposterSourceElement.getBoundingClientRect(), imposterSourceElement);
-        return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, true);
+        return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, false);
     }
 
     /**
@@ -307,7 +310,7 @@ export class TextSourceRange {
         return offsetDOMRects(
             this._cachedRects,
             sourceRect.left - this._cachedSourceRect.left,
-            sourceRect.top - this._cachedSourceRect.top
+            sourceRect.top - this._cachedSourceRect.top,
         );
     }
 }

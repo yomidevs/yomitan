@@ -63,7 +63,7 @@ export function getStandardFieldMarkers(type) {
                 'sentence',
                 'sentence-furigana',
                 'tags',
-                'url'
+                'url',
             ];
         case 'kanji':
             return [
@@ -91,7 +91,7 @@ export function getStandardFieldMarkers(type) {
                 'sentence-furigana',
                 'stroke-count',
                 'tags',
-                'url'
+                'url',
             ];
         default:
             throw new Error(`Unsupported type: ${type}`);
@@ -108,15 +108,15 @@ export function getDynamicTemplates(options) {
         if (!dictionary.enabled) { continue; }
         dynamicTemplates += `
 {{#*inline "single-glossary-${getKebabCase(dictionary.name)}"}}
-    {{~> glossary selectedDictionary='${dictionary.name}'}}
+    {{~> glossary selectedDictionary='${escapeDictName(dictionary.name)}'}}
 {{/inline}}
 
 {{#*inline "single-glossary-${getKebabCase(dictionary.name)}-no-dictionary"}}
-    {{~> glossary selectedDictionary='${dictionary.name}' noDictionaryTag=true}}
+    {{~> glossary selectedDictionary='${escapeDictName(dictionary.name)}' noDictionaryTag=true}}
 {{/inline}}
 
 {{#*inline "single-glossary-${getKebabCase(dictionary.name)}-brief"}}
-    {{~> glossary selectedDictionary='${dictionary.name}' brief=true}}
+    {{~> glossary selectedDictionary='${escapeDictName(dictionary.name)}' brief=true}}
 {{/inline}}
 `;
     }
@@ -147,4 +147,14 @@ function getKebabCase(str) {
         .replace(/--+/g, '-')
         .replace(/^-|-$/g, '')
         .toLowerCase();
+}
+
+/**
+ * @param {string} name
+ * @returns {string}
+ */
+function escapeDictName(name) {
+    return name
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, '\\\'');
 }

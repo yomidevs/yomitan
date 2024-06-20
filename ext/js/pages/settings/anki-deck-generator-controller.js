@@ -427,11 +427,11 @@ export class AnkiDeckGeneratorController {
             url: window.location.href,
             sentence: {
                 text: sentenceText,
-                offset: 0
+                offset: 0,
             },
             documentTitle: document.title,
             query: sentenceText,
-            fullQuery: sentenceText
+            fullQuery: sentenceText,
         };
         const template = this._getAnkiTemplate(options);
         const deckOptionsFields = options.anki.terms.fields;
@@ -460,7 +460,7 @@ export class AnkiDeckGeneratorController {
             mediaOptions: mediaOptions,
             requirements: requirements,
             duplicateScope: options.anki.duplicateScope,
-            duplicateScopeCheckAllModels: options.anki.duplicateScopeCheckAllModels
+            duplicateScopeCheckAllModels: options.anki.duplicateScopeCheckAllModels,
         }));
         return note;
     }
@@ -476,7 +476,7 @@ export class AnkiDeckGeneratorController {
 
         return {
             dictionaryEntry: /** @type {import('dictionary').TermDictionaryEntry} */ (dictionaryEntries[0]),
-            text: text
+            text: text,
         };
     }
 

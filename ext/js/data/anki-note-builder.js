@@ -59,7 +59,7 @@ export class AnkiNoteBuilder {
         resultOutputMode = 'split',
         glossaryLayoutMode = 'default',
         compactTags = false,
-        mediaOptions = null
+        mediaOptions = null,
     }) {
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
@@ -116,9 +116,9 @@ export class AnkiNoteBuilder {
                 duplicateScopeOptions: {
                     deckName: duplicateScopeDeckName,
                     checkChildren: duplicateScopeCheckChildren,
-                    checkAllModels: duplicateScopeCheckAllModels
-                }
-            }
+                    checkAllModels: duplicateScopeCheckAllModels,
+                },
+            },
         };
         return {note, errors: allErrors, requirements: [...uniqueRequirements.values()]};
     }
@@ -134,7 +134,7 @@ export class AnkiNoteBuilder {
         resultOutputMode = 'split',
         glossaryLayoutMode = 'default',
         compactTags = false,
-        marker
+        marker,
     }) {
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0);
         return await this._templateRenderer.getModifiedData({marker, commonData}, 'ankiNote');
@@ -191,7 +191,7 @@ export class AnkiNoteBuilder {
             resultOutputMode,
             glossaryLayoutMode,
             compactTags,
-            media
+            media,
         };
     }
 
@@ -314,7 +314,7 @@ export class AnkiNoteBuilder {
                 templateItems.push({
                     type: /** @type {import('anki-templates').RenderMode} */ ('ankiNote'),
                     commonData,
-                    datas
+                    datas,
                 });
             }
             items.push({template, templateItems});
@@ -439,7 +439,7 @@ export class AnkiNoteBuilder {
             audioDetails,
             screenshotDetails,
             clipboardDetails,
-            dictionaryMediaDetails
+            dictionaryMediaDetails,
         );
         const {audioFileName, screenshotFileName, clipboardImageFileName, clipboardText, dictionaryMedia: dictionaryMediaArray, errors} = injectedMedia;
         const textFurigana = textFuriganaPromise !== null ? await textFuriganaPromise : [];
@@ -463,7 +463,7 @@ export class AnkiNoteBuilder {
             clipboardText: (typeof clipboardText === 'string' ? {value: clipboardText} : void 0),
             selectionText: (typeof selectionText === 'string' ? {value: selectionText} : void 0),
             textFurigana,
-            dictionaryMedia
+            dictionaryMedia,
         };
         return {media, errors};
     }
