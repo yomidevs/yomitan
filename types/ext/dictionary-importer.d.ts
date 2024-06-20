@@ -61,6 +61,7 @@ export type Summary = {
     importDate: number;
     prefixWildcardsSupported: boolean;
     counts: SummaryCounts;
+    styles: string;
     author?: string;
     url?: string;
     description?: string;
@@ -68,6 +69,12 @@ export type Summary = {
     sourceLanguage?: string;
     targetLanguage?: string;
     frequencyMode?: 'occurrence-based' | 'rank-based';
+};
+
+export type SummaryDetails = {
+    prefixWildcardsSupported: boolean;
+    counts: SummaryCounts;
+    styles: string;
 };
 
 export type SummaryCounts = {

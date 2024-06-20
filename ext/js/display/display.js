@@ -1152,7 +1152,7 @@ export class Display extends EventDispatcher {
      */
     _setTheme(options) {
         const {general} = options;
-        const {popupTheme} = general;
+        const {popupTheme, popupOuterTheme} = general;
         /** @type {string} */
         let pageType = this._pageType;
         try {
@@ -1169,10 +1169,42 @@ export class Display extends EventDispatcher {
             log.error(e);
         }
         this._themeController.theme = popupTheme;
-        this._themeController.outerTheme = general.popupOuterTheme;
+        this._themeController.outerTheme = popupOuterTheme;
         this._themeController.siteOverride = pageType === 'search' || pageType === 'popupPreview';
         this._themeController.updateTheme();
-        this.setCustomCss(general.customPopupCss);
+        const customCss = this._getCustomCss(options);
+        this.setCustomCss(customCss);
+    }
+
+    /**
+     * @param {import('settings').ProfileOptions} options
+     * @returns {string}
+     */
+    _getCustomCss(options) {
+        const {general: {customPopupCss}, dictionaries} = options;
+        let customCss = customPopupCss;
+        for (const {name, enabled, styles = ''} of dictionaries) {
+            if (enabled) {
+                customCss += '\n' + this._addScopeToCss(styles, name);
+            }
+        }
+        this.setCustomCss(customCss);
+        return customCss;
+    }
+
+    /**
+     * @param {string} css
+     * @param {string} dictionaryTitle
+     * @returns {string}
+     */
+    _addScopeToCss(css, dictionaryTitle) {
+        const escapedTitle = dictionaryTitle
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"');
+
+        const regex = /([^\r\n,{}]+)(\s*[,{])/g;
+        const replacement = `[data-dictionary="${escapedTitle}"] $1$2`;
+        return css.replace(regex, replacement);
     }
 
     /**

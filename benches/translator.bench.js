@@ -25,7 +25,7 @@ import {createFindKanjiOptions, createFindTermsOptions} from '../test/utilities/
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';
-const translator = await createTranslatorContext(path.join(dirname, '..', 'test', 'data/dictionaries/valid-dictionary1'), dictionaryName);
+const {translator} = await createTranslatorContext(path.join(dirname, '..', 'test', 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
 describe('Translator', () => {
     const testInputsFilePath = path.join(dirname, '..', 'test', 'data/translator-test-inputs.json');

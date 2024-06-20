@@ -41,6 +41,7 @@ export type CreateNoteDetails = {
     glossaryLayoutMode: Settings.GlossaryLayoutMode;
     compactTags: boolean;
     mediaOptions: MediaOptions | null;
+    dictionaryStylesMap: Map<string, string>;
 };
 
 export type Field = [
@@ -62,6 +63,7 @@ export type GetRenderingDataDetails = {
     glossaryLayoutMode?: Settings.GlossaryLayoutMode;
     compactTags?: boolean;
     marker: string;
+    dictionaryStylesMap: Map<string, string>;
 };
 
 export type CommonData = AnkiTemplatesInternal.CreateDetails;
