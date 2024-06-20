@@ -189,6 +189,8 @@
         },
         {
             "path": "ext/data/recommended-dictionaries.json",
+            "typeFile": "types/ext/dictionary-recommended.d.ts",
+            "type": "RecommendedDictionaries",
             "schema": "ext/data/schemas/recommended-dictionaries-schema.json"
         }
     ]

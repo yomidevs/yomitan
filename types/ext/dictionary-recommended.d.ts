@@ -30,3 +30,8 @@ export type Dictionary = {
     name: string;
     url: string;
 };
+
+export type RecommendedDictionariesTest = {
+    type: 'recommendedDictionaries';
+    recommendedDictionaries: RecommendedDictionaries;
+};
