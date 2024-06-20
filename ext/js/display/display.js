@@ -33,6 +33,7 @@ import {ScrollElement} from '../dom/scroll-element.js';
 import {TextSourceGenerator} from '../dom/text-source-generator.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {TextScanner} from '../language/text-scanner.js';
+import {checkPopupPreviewURL} from '../pages/settings/popup-preview-controller.js';
 import {DisplayContentManager} from './display-content-manager.js';
 import {DisplayGenerator} from './display-generator.js';
 import {DisplayHistory} from './display-history.js';
@@ -1161,7 +1162,7 @@ export class Display extends EventDispatcher {
             const pageTheme = historyState?.pageTheme;
             this._themeController.siteTheme = pageTheme ?? null;
 
-            if (historyState?.url?.includes('popup-preview.html')) {
+            if (checkPopupPreviewURL(historyState?.url)) {
                 pageType = 'popupPreview';
             }
         } catch (e) {
