@@ -492,8 +492,8 @@
             "da definition 1",
             "da definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -808,8 +808,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "abbr",
@@ -1138,8 +1138,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -1454,8 +1454,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -1770,8 +1770,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -2086,8 +2086,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -2402,8 +2402,8 @@
             "da definition 1",
             "da definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -2718,8 +2718,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "abbr",
@@ -3078,8 +3078,8 @@
             "uchikomu definition 1",
             "uchikomu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -3502,8 +3502,8 @@
             "buchikomu definition 1",
             "buchikomu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -3926,8 +3926,8 @@
             "uchikomu definition 3",
             "uchikomu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -4350,8 +4350,8 @@
             "buchikomu definition 3",
             "buchikomu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -4749,8 +4749,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -5070,8 +5070,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -5391,8 +5391,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -5712,8 +5712,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -6028,8 +6028,8 @@
             "da definition 1",
             "da definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -6344,8 +6344,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "abbr",
@@ -6600,8 +6600,8 @@
               "pixelated": true
             }
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -6838,8 +6838,8 @@
             "da definition 1",
             "da definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -7159,8 +7159,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "abbr",
@@ -7484,8 +7484,8 @@
             "da definition 1",
             "da definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -7805,8 +7805,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -8121,8 +8121,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -8442,8 +8442,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -8758,8 +8758,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -9109,8 +9109,8 @@
             "uchikomu definition 1",
             "uchikomu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -9533,8 +9533,8 @@
             "uchikomu definition 3",
             "uchikomu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -9932,8 +9932,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -10253,8 +10253,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -10604,8 +10604,8 @@
             "buchikomu definition 1",
             "buchikomu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -11028,8 +11028,8 @@
             "buchikomu definition 3",
             "buchikomu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -11427,8 +11427,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -11748,8 +11748,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -11995,8 +11995,8 @@
               "pixelated": true
             }
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -12311,8 +12311,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "uchikomu definition 1",
                 "uchikomu definition 2"
@@ -12332,8 +12332,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "uchikomu definition 3",
                 "uchikomu definition 4"
@@ -12760,8 +12760,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "buchikomu definition 1",
                 "buchikomu definition 2"
@@ -12781,8 +12781,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "buchikomu definition 3",
                 "buchikomu definition 4"
@@ -13184,8 +13184,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "utsu definition 1",
                 "utsu definition 2"
@@ -13205,8 +13205,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "utsu definition 3",
                 "utsu definition 4"
@@ -13538,8 +13538,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "butsu definition 1",
                 "butsu definition 2"
@@ -13559,8 +13559,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "butsu definition 3",
                 "butsu definition 4"
@@ -13860,8 +13860,8 @@
             {
               "sequence": 1,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "da definition 1",
                 "da definition 2"
@@ -14174,8 +14174,8 @@
             {
               "sequence": 2,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "daasu definition 1",
                 "daasu definition 2"
@@ -14693,8 +14693,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "uchikomu definition 1",
                 "uchikomu definition 2"
@@ -14717,8 +14717,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "buchikomu definition 1",
                 "buchikomu definition 2"
@@ -14741,8 +14741,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "uchikomu definition 3",
                 "uchikomu definition 4"
@@ -14765,8 +14765,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "buchikomu definition 3",
                 "buchikomu definition 4"
@@ -15419,8 +15419,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "utsu definition 1",
                 "utsu definition 2"
@@ -15443,8 +15443,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "butsu definition 1",
                 "butsu definition 2"
@@ -15467,8 +15467,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "utsu definition 3",
                 "utsu definition 4"
@@ -15491,8 +15491,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "butsu definition 3",
                 "butsu definition 4"
@@ -15866,8 +15866,8 @@
             {
               "sequence": 1,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "da definition 1",
                 "da definition 2"
@@ -16173,8 +16173,8 @@
             {
               "sequence": 2,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "daasu definition 1",
                 "daasu definition 2"
@@ -16544,8 +16544,8 @@
             "uchikomu definition 1",
             "uchikomu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -16989,8 +16989,8 @@
             "buchikomu definition 1",
             "buchikomu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -17434,8 +17434,8 @@
             "uchikomu definition 3",
             "uchikomu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -17879,8 +17879,8 @@
             "buchikomu definition 3",
             "buchikomu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -18278,8 +18278,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -18599,8 +18599,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -18920,8 +18920,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -19241,8 +19241,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -19557,8 +19557,8 @@
             "da definition 1",
             "da definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -19873,8 +19873,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "abbr",
@@ -20233,8 +20233,8 @@
             "uchikomu definition 1",
             "uchikomu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -20657,8 +20657,8 @@
             "buchikomu definition 1",
             "buchikomu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -21081,8 +21081,8 @@
             "uchikomu definition 3",
             "uchikomu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -21505,8 +21505,8 @@
             "buchikomu definition 3",
             "buchikomu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -21904,8 +21904,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -22225,8 +22225,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -22546,8 +22546,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -22867,8 +22867,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -23183,8 +23183,8 @@
             "da definition 1",
             "da definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -23499,8 +23499,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "abbr",
@@ -23859,8 +23859,8 @@
             "uchikomu definition 1",
             "uchikomu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -24283,8 +24283,8 @@
             "buchikomu definition 1",
             "buchikomu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -24707,8 +24707,8 @@
             "uchikomu definition 3",
             "uchikomu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -25131,8 +25131,8 @@
             "buchikomu definition 3",
             "buchikomu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -25530,8 +25530,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -25851,8 +25851,8 @@
             "butsu definition 1",
             "butsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -26172,8 +26172,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -26493,8 +26493,8 @@
             "butsu definition 3",
             "butsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -26809,8 +26809,8 @@
             "da definition 1",
             "da definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -27125,8 +27125,8 @@
             "daasu definition 1",
             "daasu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "abbr",
@@ -27380,8 +27380,8 @@
           "glossary": [
             "to read"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -27542,8 +27542,8 @@
           "glossary": [
             "strong point"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -27713,8 +27713,8 @@
           "glossary": [
             "to read"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -28155,8 +28155,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "uchikomu definition 1",
                 "uchikomu definition 2"
@@ -28179,8 +28179,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "buchikomu definition 1",
                 "buchikomu definition 2"
@@ -28203,8 +28203,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "uchikomu definition 3",
                 "uchikomu definition 4"
@@ -28227,8 +28227,8 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "buchikomu definition 3",
                 "buchikomu definition 4"
@@ -28881,8 +28881,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "utsu definition 1",
                 "utsu definition 2"
@@ -28905,8 +28905,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "butsu definition 1",
                 "butsu definition 2"
@@ -28929,8 +28929,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "utsu definition 3",
                 "utsu definition 4"
@@ -28953,8 +28953,8 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
-              "glossaryScopedStyles": "",
-              "dictScopedStyles": "",
+              "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+              "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
                 "butsu definition 3",
                 "butsu definition 4"
@@ -29289,8 +29289,8 @@
           "glossary": [
             "otemae definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -29585,8 +29585,8 @@
           "glossary": [
             "bangou definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -29775,8 +29775,8 @@
           "glossary": [
             "chuugoshi definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -29965,8 +29965,8 @@
           "glossary": [
             "shogyouu definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -30155,8 +30155,8 @@
           "glossary": [
             "dobokukouji definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -30342,8 +30342,8 @@
           "glossary": [
             "suki definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "adj-na",
@@ -30572,8 +30572,8 @@
               "content": "kouzou definition 3 (構造)"
             }
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -30733,8 +30733,8 @@
           "glossary": [
             "notamau definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "v5",
@@ -30847,8 +30847,8 @@
           "glossary": [
             "sankyuu definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [],
           "termTags": [],
           "frequencies": [],
@@ -30953,8 +30953,8 @@
           "glossary": [
             "English definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -31069,8 +31069,8 @@
           "glossary": [
             "ＵＳＢ definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -31288,8 +31288,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -31604,8 +31604,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -31925,8 +31925,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -32241,8 +32241,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -32479,8 +32479,8 @@
             "text definition 1",
             "text definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -32717,8 +32717,8 @@
             "utsu definition 1",
             "utsu definition 2"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -33033,8 +33033,8 @@
             "utsu definition 3",
             "utsu definition 4"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "vt",
@@ -33268,8 +33268,8 @@
           "glossary": [
             "sugoi definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "adj-i",
@@ -33388,8 +33388,8 @@
           "glossary": [
             "English definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -33504,8 +33504,8 @@
           "glossary": [
             "language definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",
@@ -33624,8 +33624,8 @@
           "glossary": [
             "masida definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "v",
@@ -33740,8 +33740,8 @@
           "glossary": [
             "English definition"
           ],
-          "glossaryScopedStyles": "",
-          "dictScopedStyles": "",
+          "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
           "definitionTags": [
             {
               "name": "n",

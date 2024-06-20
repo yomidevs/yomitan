@@ -53,7 +53,7 @@ describe('Dictionary data', () => {
         expected3: expectedResults3[i],
     }));
     describe.each(testCases)('Test %#: $data.name', ({data, expected1, expected2, expected3}) => {
-        test('Test', async ({window, translator, expect}) => {
+        test('Test', async ({window, translator, styles, expect}) => {
             // The window property needs to be referenced for it to be initialized.
             // It is needed for DOM access for structured content.
             void window;
@@ -63,8 +63,8 @@ describe('Dictionary data', () => {
                         const {mode, text} = data;
                         const options = createFindTermsOptions(dictionaryName, optionsPresets, data.options);
                         const {dictionaryEntries, originalTextLength} = await translator.findTerms(mode, text, options);
-                        const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, mode, template, expect) : null;
-                        const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, mode)) : null;
+                        const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, mode, template, expect, styles) : null;
+                        const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, mode, styles)) : null;
                         expect.soft(originalTextLength).toStrictEqual(expected1.originalTextLength);
                         expect.soft(dictionaryEntries).toStrictEqual(expected1.dictionaryEntries);
                         expect.soft(noteDataList).toEqual(expected2.noteDataList);
