@@ -14,8 +14,49 @@ td {
     padding: 3px;
 }
 
-th {
-    background-color: #ffffff;
+/* Light mode */
+@media (prefers-color-scheme: light) {
+    body {
+        background-color: #f8f9fa;
+        color: #000000;
+    }
+    th {
+        background-color: #ffffff;
+    }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #0a0a0a;
+        color: #ffffff;
+    }
+    th {
+        background-color: #1e1e1e;
+    }
+
+    /* Scrollbars */
+    :root {
+        scrollbar-color: #444444 #2f2f2f;
+    }
+    :root::-webkit-scrollbar {
+        width: auto;
+    }
+    :root::-webkit-scrollbar-button {
+        height: 0;
+    }
+    :root::-webkit-scrollbar-thumb {
+        background-color: #444444;
+    }
+    :root::-webkit-scrollbar-track {
+        background-color: #444444;
+    }
+    :root::-webkit-scrollbar-track-piece {
+        background-color: #2f2f2f;
+    }
+    :root::-webkit-scrollbar-corner {
+        background-color: #2f2f2f;
+    }
 }
 
 </style>
