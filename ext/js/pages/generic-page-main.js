@@ -16,11 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ThemeController} from '../app/theme-controller.js';
+import {Application} from '../application.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {ExtensionContentController} from './common/extension-content-controller.js';
+import {SettingsController} from './settings/settings-controller.js';
 
-/** Entry point. */
-function main() {
+await Application.main(true, async (application) => {
+    const settingsController = new SettingsController(application);
+    await settingsController.prepare();
+    /** @type {ThemeController} */
+    const themeController = new ThemeController(document.documentElement);
+    themeController.prepare();
+    const optionsFull = await application.api.optionsGetFull();
+    const {profiles, profileCurrent} = optionsFull;
+    const primaryProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
+    if (primaryProfile !== null) {
+        themeController.theme = primaryProfile.options.general.popupTheme;
+        themeController.siteOverride = true;
+        themeController.updateTheme();
+    }
+    document.body.hidden = false;
+
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -28,6 +45,4 @@ function main() {
     extensionContentController.prepare();
 
     document.documentElement.dataset.loaded = 'true';
-}
-
-main();
+});
