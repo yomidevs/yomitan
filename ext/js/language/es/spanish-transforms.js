@@ -38,37 +38,28 @@ function addAccent(char) {
 export const spanishTransforms = {
     language: 'es',
     conditions: {
-        'v': {
+        n: {
+            name: 'Noun',
+            isDictionaryForm: true,
+        },
+        v: {
             name: 'Verb',
             isDictionaryForm: true,
             subConditions: ['v_ar', 'v_er', 'v_ir'],
         },
-        'v_ar': {
+        v_ar: {
             name: '-ar verb',
             isDictionaryForm: false,
         },
-        'v_er': {
+        v_er: {
             name: '-er verb',
             isDictionaryForm: false,
         },
-        'v_ir': {
+        v_ir: {
             name: '-ir verb',
             isDictionaryForm: false,
         },
-        'n': {
-            name: 'Noun',
-            isDictionaryForm: true,
-            subConditions: ['n fem', 'n masc'],
-        },
-        'n fem': {
-            name: 'Noun feminine',
-            isDictionaryForm: true,
-        },
-        'n masc': {
-            name: 'Noun masculine',
-            isDictionaryForm: true,
-        },
-        'adj': {
+        adj: {
             name: 'Adjective',
             isDictionaryForm: true,
         },
@@ -97,26 +88,26 @@ export const spanishTransforms = {
             description: 'Present indicative form of a verb',
             rules: [
                 // -ar verbs
-                suffixInflection('o', 'ar', ['v'], ['v']),
-                suffixInflection('as', 'ar', ['v'], ['v']),
-                suffixInflection('a', 'ar', ['v'], ['v']),
-                suffixInflection('amos', 'ar', ['v'], ['v']),
-                suffixInflection('áis', 'ar', ['v'], ['v']),
-                suffixInflection('an', 'ar', ['v'], ['v']),
+                suffixInflection('o', 'ar', ['v'], ['v_ar']),
+                suffixInflection('as', 'ar', ['v'], ['v_ar']),
+                suffixInflection('a', 'ar', ['v'], ['v_ar']),
+                suffixInflection('amos', 'ar', ['v'], ['v_ar']),
+                suffixInflection('áis', 'ar', ['v'], ['v_ar']),
+                suffixInflection('an', 'ar', ['v'], ['v_ar']),
                 // -er verbs
-                suffixInflection('o', 'er', ['v'], ['v']),
-                suffixInflection('es', 'er', ['v'], ['v']),
-                suffixInflection('e', 'er', ['v'], ['v']),
-                suffixInflection('emos', 'er', ['v'], ['v']),
-                suffixInflection('éis', 'er', ['v'], ['v']),
-                suffixInflection('en', 'er', ['v'], ['v']),
+                suffixInflection('o', 'er', ['v'], ['v_er']),
+                suffixInflection('es', 'er', ['v'], ['v_er']),
+                suffixInflection('e', 'er', ['v'], ['v_er']),
+                suffixInflection('emos', 'er', ['v'], ['v_er']),
+                suffixInflection('éis', 'er', ['v'], ['v_er']),
+                suffixInflection('en', 'er', ['v'], ['v_er']),
                 // -ir verbs
-                suffixInflection('o', 'ir', ['v'], ['v']),
-                suffixInflection('es', 'ir', ['v'], ['v']),
-                suffixInflection('e', 'ir', ['v'], ['v']),
-                suffixInflection('imos', 'ir', ['v'], ['v']),
-                suffixInflection('ís', 'ir', ['v'], ['v']),
-                suffixInflection('en', 'ir', ['v'], ['v']),
+                suffixInflection('o', 'ir', ['v'], ['v_ir']),
+                suffixInflection('es', 'ir', ['v'], ['v_ir']),
+                suffixInflection('e', 'ir', ['v'], ['v_ir']),
+                suffixInflection('imos', 'ir', ['v'], ['v_ir']),
+                suffixInflection('ís', 'ir', ['v'], ['v_ir']),
+                suffixInflection('en', 'ir', ['v'], ['v_ir']),
                 // -tener verbs
                 suffixInflection('tengo', 'tener', ['v'], ['v']),
                 suffixInflection('tienes', 'tener', ['v'], ['v']),

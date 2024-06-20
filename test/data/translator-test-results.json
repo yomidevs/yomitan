@@ -1,86 +1,5 @@
 [
   {
-    "name": "Basic spanish test",
-    "originalTextLength": 4,
-    "dictionaryEntries": [
-      {
-        "type": "term",
-        "isPrimary": true,
-        "inflectionRuleChainCandidates": [
-          {
-            "source": "algorithm",
-            "inflectionRules": []
-          }
-        ],
-        "score": 1,
-        "frequencyOrder": 0,
-        "dictionaryIndex": 0,
-        "dictionaryPriority": 0,
-        "sourceTermExactMatchCount": 1,
-        "maxOriginalTextLength": 4,
-        "headwords": [
-          {
-            "index": 0,
-            "term": "cosa",
-            "reading": "cosa",
-            "sources": [
-              {
-                "originalText": "cosa",
-                "transformedText": "cosa",
-                "deinflectedText": "cosa",
-                "matchType": "exact",
-                "matchSource": "term",
-                "isPrimary": true
-              }
-            ],
-            "tags": [],
-            "wordClasses": [
-              "n"
-            ]
-          }
-        ],
-        "definitions": [
-          {
-            "index": 0,
-            "headwordIndices": [
-              0
-            ],
-            "dictionary": "Test Dictionary 2",
-            "dictionaryIndex": 0,
-            "dictionaryPriority": 0,
-            "id": 31,
-            "score": 1,
-            "frequencyOrder": 0,
-            "sequences": [
-              23
-            ],
-            "isPrimary": true,
-            "tags": [
-              {
-                "name": "n",
-                "category": "partOfSpeech",
-                "order": 0,
-                "score": 0,
-                "content": [
-                  "noun"
-                ],
-                "dictionaries": [
-                  "Test Dictionary 2"
-                ],
-                "redundant": false
-              }
-            ],
-            "entries": [
-              "cosa definition"
-            ]
-          }
-        ],
-        "pronunciations": [],
-        "frequencies": []
-      }
-    ]
-  },
-  {
     "name": "Basic kanji test 1",
     "dictionaryEntries": [
       {
@@ -19180,6 +19099,103 @@
             ],
             "entries": [
               "English definition"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      }
+    ]
+  },
+  {
+    "name": "Basic spanish test",
+    "originalTextLength": 5,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "both",
+            "inflectionRules": [
+              {
+                "name": "plural",
+                "description": "Plural form of a noun"
+              }
+            ]
+          }
+        ],
+        "score": 0,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "maxOriginalTextLength": 5,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "cosa",
+            "reading": "cosa",
+            "sources": [
+              {
+                "originalText": "cosas",
+                "transformedText": "cosas",
+                "deinflectedText": "cosa",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryPriority": 0,
+            "id": 31,
+            "score": 0,
+            "frequencyOrder": 0,
+            "sequences": [
+              0
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "fem",
+                "category": "default",
+                "order": 0,
+                "score": 0,
+                "content": [],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              },
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "thing (object, concept)"
             ]
           }
         ],

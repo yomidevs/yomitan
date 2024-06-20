@@ -41,20 +41,6 @@
     },
     "tests": [
         {
-            "name": "Basic spanish test",
-            "func": "findTerms",
-            "mode": "split",
-            "text": "cosas",
-            "options": [
-                "default",
-                {
-                    "type": "terms",
-                    "language": "es",
-                    "removeNonJapaneseCharacters": false
-                }
-            ]
-        },
-        {
             "name": "Basic kanji test 1",
             "func": "findKanji",
             "text": "打",
@@ -523,6 +509,20 @@
                     "language": "en",
                     "removeNonJapaneseCharacters": false,
                     "searchResolution": "word"
+                }
+            ]
+        },
+        {
+            "name": "Basic spanish test",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "cosas",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "language": "es",
+                    "removeNonJapaneseCharacters": false
                 }
             ]
         }

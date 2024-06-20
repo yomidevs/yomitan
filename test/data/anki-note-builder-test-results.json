@@ -1,51 +1,5 @@
 [
   {
-    "name": "Basic spanish test",
-    "results": [
-      {
-        "audio": "",
-        "clipboard-image": "",
-        "clipboard-text": "",
-        "cloze-body": "cosa",
-        "cloze-body-kana": "cosa",
-        "cloze-prefix": "cloze-prefix",
-        "cloze-suffix": "cloze-suffix",
-        "conjugation": "",
-        "dictionary": "Test Dictionary 2",
-        "document-title": "title",
-        "expression": "cosa",
-        "frequencies": "",
-        "frequency-harmonic-rank": "9999999",
-        "frequency-harmonic-occurrence": "0",
-        "frequency-average-rank": "9999999",
-        "frequency-average-occurrence": "0",
-        "furigana": "cosa",
-        "furigana-plain": "cosa",
-        "glossary": "<div style=\"text-align: left;\"><i>(n, Test Dictionary 2)</i> cosa definition</div>",
-        "glossary-brief": "<div style=\"text-align: left;\">cosa definition</div>",
-        "glossary-no-dictionary": "<div style=\"text-align: left;\"><i>(n)</i> cosa definition</div>",
-        "glossary-first": "<div style=\"text-align: left;\"><i>(n, Test Dictionary 2)</i> cosa definition</div>",
-        "glossary-first-brief": "<div style=\"text-align: left;\">cosa definition</div>",
-        "glossary-first-no-dictionary": "<div style=\"text-align: left;\"><i>(n)</i> cosa definition</div>",
-        "part-of-speech": "Noun",
-        "pitch-accents": "",
-        "pitch-accent-graphs": "",
-        "pitch-accent-graphs-jj": "",
-        "pitch-accent-positions": "",
-        "pitch-accent-categories": "",
-        "phonetic-transcriptions": "",
-        "reading": "cosa",
-        "screenshot": "",
-        "search-query": "fullQuery",
-        "selection-text": "",
-        "sentence": "cloze-prefixcosacloze-suffix",
-        "sentence-furigana": "cloze-prefixcosacloze-suffix",
-        "tags": "n",
-        "url": "<a href=\"url:\">url:</a>"
-      }
-    ]
-  },
-  {
     "name": "Basic kanji test 1",
     "results": [
       {
@@ -4544,6 +4498,52 @@
         "sentence": "cloze-prefixenglishcloze-suffix",
         "sentence-furigana": "cloze-prefixenglishcloze-suffix",
         "tags": "n",
+        "url": "<a href=\"url:\">url:</a>"
+      }
+    ]
+  },
+  {
+    "name": "Basic spanish test",
+    "results": [
+      {
+        "audio": "",
+        "clipboard-image": "",
+        "clipboard-text": "",
+        "cloze-body": "cosas",
+        "cloze-body-kana": "cosas",
+        "cloze-prefix": "cloze-prefix",
+        "cloze-suffix": "cloze-suffix",
+        "conjugation": "plural",
+        "dictionary": "Test Dictionary 2",
+        "document-title": "title",
+        "expression": "cosa",
+        "frequencies": "",
+        "frequency-harmonic-rank": "9999999",
+        "frequency-harmonic-occurrence": "0",
+        "frequency-average-rank": "9999999",
+        "frequency-average-occurrence": "0",
+        "furigana": "cosa",
+        "furigana-plain": "cosa",
+        "glossary": "<div style=\"text-align: left;\"><i>(fem, n, Test Dictionary 2)</i> thing (object, concept)</div>",
+        "glossary-brief": "<div style=\"text-align: left;\">thing (object, concept)</div>",
+        "glossary-no-dictionary": "<div style=\"text-align: left;\"><i>(fem, n)</i> thing (object, concept)</div>",
+        "glossary-first": "<div style=\"text-align: left;\"><i>(fem, n, Test Dictionary 2)</i> thing (object, concept)</div>",
+        "glossary-first-brief": "<div style=\"text-align: left;\">thing (object, concept)</div>",
+        "glossary-first-no-dictionary": "<div style=\"text-align: left;\"><i>(fem, n)</i> thing (object, concept)</div>",
+        "part-of-speech": "Noun",
+        "pitch-accents": "",
+        "pitch-accent-graphs": "",
+        "pitch-accent-graphs-jj": "",
+        "pitch-accent-positions": "",
+        "pitch-accent-categories": "",
+        "phonetic-transcriptions": "",
+        "reading": "cosa",
+        "screenshot": "",
+        "search-query": "fullQuery",
+        "selection-text": "",
+        "sentence": "cloze-prefixcosascloze-suffix",
+        "sentence-furigana": "cloze-prefixcosascloze-suffix",
+        "tags": "fem, n",
         "url": "<a href=\"url:\">url:</a>"
       }
     ]
