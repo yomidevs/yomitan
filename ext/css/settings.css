@@ -104,25 +104,32 @@
 }
 
 /* Scrollbars */
-:root:not([data-theme=light]) .scrollbar {
+:root:not([data-theme=light]) .scrollbar,
+:root:not([data-theme=light]) .modal-body {
     scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar {
     width: auto;
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-button {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-button,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-button {
     height: 0;
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-thumb {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-thumb,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb-color);
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-track {
     background-color: var(--scrollbar-thumb-color);
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track-piece {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track-piece,
+:root:not([data-theme=light]) .modal-::-webkit-scrollbar-track-piece {
     background-color: var(--scrollbar-track-color);
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-corner {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-corner,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-corner {
     background-color: var(--scrollbar-track-color);
 }
 
