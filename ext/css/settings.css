@@ -2655,3 +2655,11 @@ input[type=number].dictionary-priority {
         width: 36px;
     }
 }
+
+/* Dark mode before themes are applied
+   DO NOT use this for normal theming */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-loaded=true]) {
+        background-color: #1e1e1e;
+    }
+}
