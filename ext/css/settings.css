@@ -2638,3 +2638,13 @@ input[type=number].dictionary-priority {
         box-shadow: var(--shadow-right);
     }
 }
+
+/* Mobile overrides */
+
+/* Treat devices that can't hover as mobile devices */
+@media (hover: none) {
+    #dictionary-move-up>span.icon-button-inner,
+    #dictionary-move-down>span.icon-button-inner {
+        width: 36px;
+    }
+}
