@@ -131,7 +131,7 @@ describe('spanish language transformer', () => {
         ];
 
         const basicTransformations = [...nounInflections, ...verbPresentInflections, ...verbPreteriteInflections];
-        bench(`transformations (n=${basicTransformations.length})`, () => {
+        bench(`spanish transformations (n=${basicTransformations.length})`, () => {
             for (const transform of basicTransformations) {
                 languageTransformer.transform(transform);
             }

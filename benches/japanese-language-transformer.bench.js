@@ -199,14 +199,14 @@ describe('japanese language transformer', () => {
         ];
 
         const basicTransformations = [...adjectiveInflections, ...verbInflections, ...inflectionCombinations];
-        bench(`transformations (n=${basicTransformations.length})`, () => {
+        bench(`japanese transformations (n=${basicTransformations.length})`, () => {
             for (const transform of basicTransformations) {
                 languageTransformer.transform(transform);
             }
         });
 
         const transformationsFull = [...basicTransformations, ...kuruInflections, ...suruInflections, ...kansaibenInflections];
-        bench(`transformations-full (n=${transformationsFull.length})`, () => {
+        bench(`japanese transformations-full (n=${transformationsFull.length})`, () => {
             for (const transform of transformationsFull) {
                 languageTransformer.transform(transform);
             }
