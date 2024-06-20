@@ -10,6 +10,7 @@
                 "terms": {
                     "type": "array",
                     "items": {
+                        "type": "object",
                         "required": [
                             "name",
                             "url"
@@ -29,6 +30,7 @@
                 "kanji": {
                     "type": "array",
                     "items": {
+                        "type": "object",
                         "required": [
                             "name",
                             "url"
@@ -48,6 +50,7 @@
                 "frequency": {
                     "type": "array",
                     "items": {
+                        "type": "object",
                         "required": [
                             "name",
                             "url"
@@ -67,6 +70,7 @@
                 "grammar": {
                     "type": "array",
                     "items": {
+                        "type": "object",
                         "required": [
                             "name",
                             "url"
