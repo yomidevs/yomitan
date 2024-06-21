@@ -33,9 +33,10 @@ Yomitan provides powerful features not available in other browser-based dictiona
 ## Helpful information
 
 - ✨ [Migrating from Yomichan (legacy)](./docs/yomichan-migration.md)
-- Installation and Setup
+- Dictionaries
   - 📚 [Recommended Dictionaries](./docs/dictionaries.md#recommended-dictionaries)
   - 🗂️ [Importing and exporting dictionaries](./docs/dictionaries.md#importing-a-dictionary-collection)
+  - 🛠️ [Making Yomitan Dictionaries](./docs/making-yomitan-dictionaries.md)
 - Anki Integration
   - 📇 [Anki integration and flashcard creation guide](./docs/anki-integration.md)
   - 🔧 [Anki handlebar templates](./docs/templates.md)
