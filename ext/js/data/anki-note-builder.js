@@ -60,7 +60,7 @@ export class AnkiNoteBuilder {
         glossaryLayoutMode = 'default',
         compactTags = false,
         mediaOptions = null,
-        dictionaryStylesMap,
+        dictionaryStylesMap = new Map(),
     }) {
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
