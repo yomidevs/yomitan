@@ -175,7 +175,7 @@ type AllTextProcessors = {
     };
     vi: {
         pre: CapitalizationPreprocessors & {
-            normalizeDiacritics: TextProcessor<'old' | 'new'>;
+            normalizeDiacritics: TextProcessor<'old' | 'new' | 'off'>;
         };
     };
     yue: Record<string, never>;
