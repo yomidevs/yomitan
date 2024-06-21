@@ -23,48 +23,52 @@
 <div class="content-outer">
     <div class="content">
         <div class="content-scroll scrollbar" id="content-scroll">
+            <div class="search-header-wrapper">
+                <div class="search-header">
+                    <div id="intro">
+                        <h1>Yomitan Search</h1>
+                    </div>
+
+                    <div class="scan-disable">
+                        <div class="search-options">
+                            <div class="search-option" id="search-option-profile-select">
+                                <span class="profile-select-container"><select class="profile-select" id="profile-select">
+                                    <optgroup label="Primary Profile" id="profile-select-option-group"></optgroup>
+                                </select></span>
+                            </div>
+                            <label class="search-option" id="search-option-clipboard-monitor-container">
+                                <label class="toggle"><input type="checkbox" id="clipboard-monitor-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                                <span class="search-option-label">Clipboard monitor</span>
+                            </label>
+                            <label class="search-option" id="search-option-wanakana">
+                                <label class="toggle"><input type="checkbox" id="wanakana-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                                <span class="search-option-label">Automatic kana conversion</span>
+                            </label>
+                            <div class="search-option" id="query-parser-mode-container" hidden>
+                                <span class="search-option-pre-label">Parser:</span>
+                                <select id="query-parser-mode-select"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="search-header-wrapper sticky-header">
+                <div class="search-header">
+                    <div class="search-textbox-container">
+                        <textarea id="search-textbox" class="scrollbar" placeholder="Input a term, expression, sentence, or block of text" autocomplete="off" lang="ja" autofocus></textarea>
+                        <button type="button" id="search-back-button" class="search-button" hidden><span class="icon" data-icon="left-chevron"></span></button>
+                        <button type="button" id="search-button" class="search-button"><span class="icon" data-icon="magnifying-glass"></span></button>
+                    </div>
+                    <div class="scan-disable scrollbar" id="query-parser-container" hidden>
+                        <div id="query-parser-content" lang="ja"></div>
+                    </div>
+                </div>
+            </div>
             <div class="content-body" id="content-body">
                 <div class="top-progress-bar-container"><div class="progress-bar-indeterminant" id="progress-indicator" hidden></div></div>
                 <div class="content-body-inner">
 
                     <span tabindex="-1" id="content-scroll-focus"></span>
-
-                    <div class="search-header">
-                        <div id="intro">
-                            <h1>Yomitan Search</h1>
-                        </div>
-
-                        <div class="scan-disable">
-                            <div class="search-options">
-                                <div class="search-option" id="search-option-profile-select">
-                                    <span class="profile-select-container"><select class="profile-select" id="profile-select">
-                                        <optgroup label="Primary Profile" id="profile-select-option-group"></optgroup>
-                                    </select></span>
-                                </div>
-                                <label class="search-option" id="search-option-clipboard-monitor-container">
-                                    <label class="toggle"><input type="checkbox" id="clipboard-monitor-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                                    <span class="search-option-label">Clipboard monitor</span>
-                                </label>
-                                <label class="search-option" id="search-option-wanakana">
-                                    <label class="toggle"><input type="checkbox" id="wanakana-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                                    <span class="search-option-label">Automatic kana conversion</span>
-                                </label>
-                                <div class="search-option" id="query-parser-mode-container" hidden>
-                                    <span class="search-option-pre-label">Parser:</span>
-                                    <select id="query-parser-mode-select"></select>
-                                </div>
-                            </div>
-                            <div class="search-textbox-container">
-                                <textarea id="search-textbox" class="scrollbar" placeholder="Input a term, expression, sentence, or block of text" autocomplete="off" lang="ja" autofocus></textarea>
-                                <button type="button" id="search-back-button" class="search-button" hidden><span class="icon" data-icon="left-chevron"></span></button>
-                                <button type="button" id="search-button" class="search-button"><span class="icon" data-icon="magnifying-glass"></span></button>
-                            </div>
-                        </div>
-
-                        <div class="scan-disable scrollbar" id="query-parser-container" hidden>
-                            <div id="query-parser-content" lang="ja"></div>
-                        </div>
-                    </div>
 
                     <div id="dictionary-entries"></div>
 

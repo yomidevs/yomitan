@@ -575,10 +575,24 @@ button.sidebar-button.sidebar-button-highlight {
 
 
 /* Search page */
+.search-header-wrapper {
+    background-color: var(--background-color);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.sticky-header {
+    position: sticky;
+    top: 0px;
+    z-index: 1000;
+    padding-top: 10px;
+}
 .search-header {
+    width: var(--content-width);
     display: flex;
     flex-flow: column nowrap;
     max-height: 100vh;
+    padding: var(--main-content-vertical-padding) var(--main-content-horizontal-padding);
 }
 #query-parser-container {
     overflow-y: auto;

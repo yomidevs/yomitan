@@ -131,7 +131,7 @@ h1 {
 .search-options {
     display: flex;
     flex-flow: row wrap;
-    margin: 0.5em 0;
+    margin: 0.5em 0 0 0;
     align-items: center;
 }
 .search-option {
