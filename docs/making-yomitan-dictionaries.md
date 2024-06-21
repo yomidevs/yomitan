@@ -2,8 +2,6 @@
 
 This document provides an overview on how to create your own Yomitan dictionary.
 
-- [Prerequisites](#prerequisites)
-- [General Process](#general-process)
 - [Tools](#tools)
 - [Read the Schemas](#read-the-schemas)
 - [Packaging A Dictionary](#packaging-a-dictionary)
@@ -11,17 +9,6 @@ This document provides an overview on how to create your own Yomitan dictionary.
 - [Schema Validation](#schema-validation)
 - [Conjugation](#conjugation)
 - [Tag Categories](#tag-categories)
-
-## Prerequisites
-
-A basic familiarity with JSON and some coding experience in a language of your choice is required.
-
-## General Process
-
-1. Acquire data (from a website, app, dump, etc.)
-2. Parse the data to make sense of it
-3. Format the data into JSON files that comply with the Yomitan dictionary schema
-4. Export the data into a zip file with the relevant JSON files
 
 ## Tools
 
