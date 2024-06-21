@@ -21,6 +21,15 @@ const COMBINING_CIRCUMFLEX_ACCENT = '\u0302'; // Â
 const COMBINING_HORN = '\u031B'; // Ơ
 const DIACRITICS = `${COMBINING_BREVE}${COMBINING_CIRCUMFLEX_ACCENT}${COMBINING_HORN}`;
 
+// eslint-disable-next-line no-misleading-character-class
+const re1 = new RegExp(`${TONE}([aeiouy${DIACRITICS}]+)`, 'i');
+const re2 = new RegExp(`(?<=[${DIACRITICS}])(.)${TONE}`, 'i');
+const re3 = new RegExp(`(?<=[ae])([iouy])${TONE}`, 'i');
+const re4 = new RegExp(`(?<=[oy])([iuy])${TONE}`, 'i');
+const re5 = new RegExp(`(?<!q)(u)([aeiou])${TONE}`, 'i');
+const re6 = new RegExp(`(?<!g)(i)([aeiouy])${TONE}`, 'i');
+const re7 = new RegExp(`(?<!q)([ou])([aeoy])${TONE}(?!\\w)`, 'i');
+
 /**
  * This function is adapted from https://github.com/enricobarzetti/viet_text_tools/blob/master/viet_text_tools/__init__.py
  * @type {import('language').TextProcessor<'old'|'new'>}
@@ -32,17 +41,16 @@ export const normalizeDiacritics = {
     process: (str, setting) => {
         let result = str.normalize('NFD');
         // Put the tone on the second vowel
-        // eslint-disable-next-line no-misleading-character-class
-        result = result.replace(new RegExp(`${TONE}([aeiouy${DIACRITICS}]+)`, 'i'), '$2$1');
+        result = result.replace(re1, '$2$1');
         // Put the tone on the vowel with a diacritic
-        result = result.replace(new RegExp(`(?<=[${DIACRITICS}])(.)${TONE}`, 'i'), '$2$1');
+        result = result.replace(re2, '$2$1');
         // For vowels that are not oa, oe, uy put the tone on the penultimate vowel
-        result = result.replace(new RegExp(`(?<=[ae])([iouy])${TONE}`, 'i'), '$2$1');
-        result = result.replace(new RegExp(`(?<=[oy])([iuy])${TONE}`, 'i'), '$2$1');
-        result = result.replace(new RegExp(`(?<!q)(u)([aeiou])${TONE}`, 'i'), '$1$3$2');
-        result = result.replace(new RegExp(`(?<!g)(i)([aeiouy])${TONE}`, 'i'), '$1$3$2');
+        result = result.replace(re3, '$2$1');
+        result = result.replace(re4, '$2$1');
+        result = result.replace(re5, '$1$3$2');
+        result = result.replace(re6, '$1$3$2');
 
-        if (setting === 'old') { result = result.replace(new RegExp(`(?<!q)([ou])([aeoy])${TONE}(?!\\w)`, 'i'), '$1$3$2'); }
+        if (setting === 'old') { result = result.replace(re7, '$1$3$2'); }
         return result.normalize('NFC');
     },
 };
