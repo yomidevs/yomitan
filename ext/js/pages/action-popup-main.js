@@ -19,7 +19,6 @@
 import {ThemeController} from '../app/theme-controller.js';
 import {Application} from '../application.js';
 import {getAllPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
-import {querySelectorNotNull} from '../dom/query-selector.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 
 class DisplayController {
@@ -67,9 +66,11 @@ class DisplayController {
             this._setupOptions(primaryProfile);
         }
 
-        /** @type {HTMLElement} */
-        const profileSelect = querySelectorNotNull(document, '.action-select-profile');
-        profileSelect.hidden = (profiles.length <= 1);
+        /** @type {NodeListOf<HTMLElement>} */
+        const profileSelect = document.querySelectorAll('.action-select-profile');
+        for (let i = 0; i < profileSelect.length; i++) {
+            profileSelect[i].hidden = (profiles.length <= 1);
+        }
 
         this._updateProfileSelect(profiles, profileCurrent);
 
@@ -231,23 +232,25 @@ class DisplayController {
      * @param {number} profileCurrent
      */
     _updateProfileSelect(profiles, profileCurrent) {
-        /** @type {HTMLSelectElement} */
-        const select = querySelectorNotNull(document, '#profile-select');
-        /** @type {HTMLElement} */
-        const optionGroup = querySelectorNotNull(document, '#profile-select-option-group');
-        const fragment = document.createDocumentFragment();
-        for (let i = 0, ii = profiles.length; i < ii; ++i) {
-            const {name} = profiles[i];
-            const option = document.createElement('option');
-            option.textContent = name;
-            option.value = `${i}`;
-            fragment.appendChild(option);
-        }
-        optionGroup.textContent = '';
-        optionGroup.appendChild(fragment);
-        select.value = `${profileCurrent}`;
+        /** @type {NodeListOf<HTMLSelectElement>} */
+        const selects = document.querySelectorAll('.profile-select');
+        /** @type {NodeListOf<HTMLElement>} */
+        const optionGroups = document.querySelectorAll('.profile-select-option-group');
+        for (let i = 0; i < Math.min(selects.length, optionGroups.length); i++) {
+            const fragment = document.createDocumentFragment();
+            for (let j = 0, jj = profiles.length; j < jj; ++j) {
+                const {name} = profiles[j];
+                const option = document.createElement('option');
+                option.textContent = name;
+                option.value = `${j}`;
+                fragment.appendChild(option);
+            }
+            optionGroups[i].textContent = '';
+            optionGroups[i].appendChild(fragment);
+            selects[i].value = `${profileCurrent}`;
 
-        select.addEventListener('change', this._onProfileSelectChange.bind(this), false);
+            selects[i].addEventListener('change', this._onProfileSelectChange.bind(this), false);
+        }
     }
 
     /**
