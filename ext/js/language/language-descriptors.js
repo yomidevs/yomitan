@@ -36,6 +36,7 @@ import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js
 import {oldIrishTransforms} from './sga/old-irish-transforms.js';
 import {removeSerboCroatianAccentMarks} from './sh/serbo-croatian-text-preprocessors.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
+import {normalizeDiacritics} from './vi/viet-text-preprocessors.js';
 import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-processors.js';
 import {isStringPartiallyChinese} from './zh/chinese.js';
 
@@ -261,7 +262,10 @@ const languageDescriptors = [
         iso: 'vi',
         name: 'Vietnamese',
         exampleText: 'đọc',
-        textPreprocessors: capitalizationPreprocessors,
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            normalizeDiacritics,
+        },
     },
     {
         iso: 'yue',
