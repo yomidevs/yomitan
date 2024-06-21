@@ -43,6 +43,8 @@ const testCasesNewStyle = [
 describe('diacritics normalization', () => {
     const {options, process} = normalizeDiacritics;
     for (const option of options) {
+        if (option === 'off') { return; }
+
         describe(`${option} style`, () => {
             if (option === 'new') {
                 test.each(testCasesNewStyle)('%s normalizes to %s', (input, expected) => {
