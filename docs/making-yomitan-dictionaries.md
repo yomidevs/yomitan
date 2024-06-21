@@ -33,7 +33,7 @@ A basic familiarity with JSON and some coding experience in a language of your c
 
 Familiarity with the [Yomitan schemas](https://github.com/themoeway/yomitan/tree/master/ext/data/schemas) is essential. These schemas define the structure of Yomitan dictionaries. Helpful resources for interpreting JSON schemas include [codebeautify](https://codebeautify.org/jsonviewer/), [json-schema-viewer](https://json-schema-viewer.vercel.app/), and [jsonhero](https://jsonhero.io/).
 
-Below is a list of Yomichan dictionary schemas, their expected filenames, and their usage:
+Below is a list of Yomitan dictionary schemas, their expected filenames, and their usage:
 
 | Schema                                                                                                                                                     | Expected Filename                | Usage                                                                                  |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------- |
