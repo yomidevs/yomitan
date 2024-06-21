@@ -278,6 +278,7 @@ export class AnkiTemplatesController {
                     resultOutputMode,
                     glossaryLayoutMode,
                     compactTags,
+                    dictionaryStylesMap: new Map(),
                 }));
                 result = note.fields.field;
                 allErrors.push(...errors);
