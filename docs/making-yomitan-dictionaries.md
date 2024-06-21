@@ -85,7 +85,7 @@ For VSCode validation, use the following settings JSON:
 
 ## Conjugation
 
-For Yomichan to conjugate Japanese terms, they need the appropriate part of speech tag. The part of speech labels are documented on the [official JMDict page](http://www.edrdg.org/jmdictdb/cgi-bin/edhelp.py?svc=jmdict&sid=#kw_pos). An [npm package](https://www.npmjs.com/package/yomichan-dict-reader) can help with extracting conjugations from JMDict, as demonstrated in the [JP-Mongolian dictionary](https://github.com/MarvNC/yomichan-dictionaries/blob/master/mongolian/scrape.js).
+For Yomitan to conjugate Japanese terms, they need the appropriate part of speech tag. The part of speech labels are documented on the [official JMDict page](http://www.edrdg.org/jmdictdb/cgi-bin/edhelp.py?svc=jmdict&sid=#kw_pos). An [npm package](https://www.npmjs.com/package/yomichan-dict-reader) can help with extracting conjugations from JMDict, as demonstrated in the [JP-Mongolian dictionary](https://github.com/MarvNC/yomichan-dictionaries/blob/master/mongolian/scrape.js).
 
 ## Tag Categories
 
