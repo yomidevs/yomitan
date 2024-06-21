@@ -445,6 +445,7 @@ export class AnkiDeckGeneratorController {
         const idleTimeout = (Number.isFinite(options.anki.downloadTimeout) && options.anki.downloadTimeout > 0 ? options.anki.downloadTimeout : null);
         const mediaOptions = addMedia ? {audio: {sources: options.audio.sources, preferredAudioIndex: null, idleTimeout: idleTimeout}} : null;
         const requirements = addMedia ? [...this._getDictionaryEntryMedia(dictionaryEntry), {type: 'audio'}] : [];
+        const dictionaryStylesMap = this._getDictionaryStylesMap(options.dictionaries);
         const {note} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
             dictionaryEntry,
             mode,
@@ -461,6 +462,7 @@ export class AnkiDeckGeneratorController {
             requirements: requirements,
             duplicateScope: options.anki.duplicateScope,
             duplicateScopeCheckAllModels: options.anki.duplicateScopeCheckAllModels,
+            dictionaryStylesMap: dictionaryStylesMap,
         }));
         return note;
     }
@@ -494,6 +496,22 @@ export class AnkiDeckGeneratorController {
             }
         }
         return media;
+    }
+
+    /**
+     *
+     * @param {import('settings').DictionariesOptions} dictionaries
+     * @returns {Map<string, string>}
+     */
+    _getDictionaryStylesMap(dictionaries) {
+        const styleMap = new Map();
+        for (const dictionary of dictionaries) {
+            const {name, styles} = dictionary;
+            if (typeof styles === 'string') {
+                styleMap.set(name, styles);
+            }
+        }
+        return styleMap;
     }
 
     /**
