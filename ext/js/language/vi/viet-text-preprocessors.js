@@ -39,7 +39,7 @@ export const normalizeDiacritics = {
     description: 'Normalize diacritics and their placements (in either the old style or new style). NFC normalization is used.',
     options: ['old', 'new', 'off'],
     process: (str, setting) => {
-        if (setting === 'off') return str;
+        if (setting === 'off') { return str; }
 
         let result = str.normalize('NFD');
         // Put the tone on the second vowel
