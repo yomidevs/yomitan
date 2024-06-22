@@ -24,7 +24,7 @@ Be aware that non-English dictionaries generally contain fewer entries than thei
 
 #### EPWING Dictionaries
 
-Yomitan supports dictionaries in the esoteric but popular [EPWING](https://ja.wikipedia.org/wiki/EPWING) format. They were often utilized in portable electronic dictionaries similar to the ones pictured below. These dictionaries are often sought after by language learners for their correctness and excellent coverage of the Japanese language.
+Yomitan supports dictionaries in the esoteric but popular [EPWING](https://ja.wikipedia.org/wiki/EPWING) format. They were often utilized in portable electronic dictionaries. These dictionaries are often sought after by language learners for their correctness and excellent coverage of the Japanese language.
 
 Unfortunately, as most of the dictionaries released in this format are proprietary, you will need to procure these dictionaries yourself and import them using [Yomitan Import](https://github.com/themoeway/yomitan-import). Check the project page for additional details.
 
