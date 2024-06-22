@@ -63,7 +63,7 @@ h1 {
     display: flex;
     flex-flow: row nowrap;
     width: 100%;
-    align-items: stretch;
+    align-items: center;
     margin: 0;
     padding: 0;
     border: 0;
@@ -92,6 +92,9 @@ h1 {
     flex: 0 0 auto;
     position: relative;
     width: 2.5em;
+    height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
+    min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
+    max-height: calc(var(--textarea-line-height) * 10 + var(--textarea-padding) * 2);
     background-color: var(--input-background-color);
     border: 0;
     padding: 0;
