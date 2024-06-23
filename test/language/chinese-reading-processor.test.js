@@ -16,7 +16,7 @@
  */
 
 import {describe, expect, test} from 'vitest';
-import {normalizePinyin} from '../../ext/js/language/zh/chinese-reading-processors.js';
+import {normalizePinyin} from '../../ext/js/language/zh/chinese-reading-processor.js';
 
 const tests = [
     ['rìwén', 'rìwén'],
