@@ -27,7 +27,7 @@ const tests = [
 ];
 
 describe('Normalize Pinyin', () => {
-    test.each(tests)('meow', (a, b) => {
+    test.each(tests)('%s should normalize to %s', (a, b) => {
         expect(normalizePinyin(a)).toStrictEqual(b);
     });
 });
