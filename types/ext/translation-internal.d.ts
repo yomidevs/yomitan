@@ -71,4 +71,9 @@ export type TextProcessorMap = Map<
     }
 >;
 
+export type ReadingProcessorMap = Map<
+    string,
+    Language.ReadingProcessor
+>;
+
 export type TextCache = Map<string, Map<string, Map<unknown, string>>>;

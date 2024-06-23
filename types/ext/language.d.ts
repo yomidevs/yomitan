@@ -33,6 +33,8 @@ export type TextProcessor<T = unknown> = {
     process: TextProcessorFunction<T>;
 };
 
+export type ReadingProcessor = (str: string) => string;
+
 export type BidirectionalPreprocessorOptions = 'off' | 'direct' | 'inverse';
 
 export type BidirectionalConversionPreprocessor = TextProcessor<BidirectionalPreprocessorOptions>;
@@ -41,6 +43,11 @@ export type LanguageAndProcessors = {
     iso: string;
     textPreprocessors?: TextProcessorWithId<unknown>[];
     textPostprocessors?: TextProcessorWithId<unknown>[];
+};
+
+export type LanguageAndReadingProcessor = {
+    iso: string;
+    readingProcessor: ReadingProcessor;
 };
 
 export type LanguageAndTransforms = {
