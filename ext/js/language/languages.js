@@ -29,13 +29,13 @@ export function getLanguageSummaries() {
 }
 
 /**
- * @returns {import('language').LanguageAndReadingProcessor[]}
+ * @returns {import('language').LanguageAndReadingNormalizer[]}
  */
-export function getAllLanguageReadingProcessors() {
+export function getAllLanguageReadingNormalizers() {
     const results = [];
-    for (const {iso, readingProcessor} of languageDescriptorMap.values()) {
-        if (typeof readingProcessor === 'undefined') { continue; }
-        results.push({iso, readingProcessor});
+    for (const {iso, readingNormalizer} of languageDescriptorMap.values()) {
+        if (typeof readingNormalizer === 'undefined') { continue; }
+        results.push({iso, readingNormalizer});
     }
     return results;
 }

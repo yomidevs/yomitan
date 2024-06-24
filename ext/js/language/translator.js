@@ -19,7 +19,7 @@
 import {applyTextReplacement} from '../general/regex-util.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
-import {getAllLanguageTextProcessors, getAllLanguageReadingProcessors} from './languages.js';
+import {getAllLanguageTextProcessors, getAllLanguageReadingNormalizers} from './languages.js';
 import {MultiLanguageTransformer} from './multi-language-transformer.js';
 
 /**
@@ -42,8 +42,8 @@ export class Translator {
         this._numberRegex = /[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/;
         /** @type {import('translation-internal').TextProcessorMap} */
         this._textProcessors = new Map();
-        /** @type {import('translation-internal').ReadingProcessorMap} */
-        this._readingProcessors = new Map();
+        /** @type {import('translation-internal').ReadingNormalizerMap} */
+        this._readingNormalizers = new Map();
     }
 
     /**
@@ -54,8 +54,8 @@ export class Translator {
         for (const {iso, textPreprocessors = [], textPostprocessors = []} of getAllLanguageTextProcessors()) {
             this._textProcessors.set(iso, {textPreprocessors, textPostprocessors});
         }
-        for (const {iso, readingProcessor} of getAllLanguageReadingProcessors()) {
-            this._readingProcessors.set(iso, readingProcessor);
+        for (const {iso, readingNormalizer} of getAllLanguageReadingNormalizers()) {
+            this._readingNormalizers.set(iso, readingNormalizer);
         }
     }
 
@@ -696,14 +696,14 @@ export class Translator {
         /** @type {Map<string, {groups: import('translation-internal').DictionaryEntryGroup[]}>} */
         const targetMap = new Map();
 
-        const readingProcessor = this._readingProcessors.get(language);
+        const readingNormalizer = this._readingNormalizers.get(language);
 
         for (const group of groupedDictionaryEntries) {
             const {dictionaryEntries} = group;
             for (const dictionaryEntry of dictionaryEntries) {
                 const {term, reading} = dictionaryEntry.headwords[0];
-                const processedReading = typeof readingProcessor === 'undefined' ? reading : readingProcessor(reading);
-                const key = this._createMapKey([term, processedReading]);
+                const normalizedReading = typeof readingNormalizer === 'undefined' ? reading : readingNormalizer(reading);
+                const key = this._createMapKey([term, normalizedReading]);
                 let target = targetMap.get(key);
                 if (typeof target === 'undefined') {
                     target = {
@@ -720,8 +720,8 @@ export class Translator {
         // Group unsequenced dictionary entries with sequenced entries that have a matching [term, reading].
         for (const [id, dictionaryEntry] of ungroupedDictionaryEntriesMap.entries()) {
             const {term, reading} = dictionaryEntry.headwords[0];
-            const processedReading = typeof readingProcessor === 'undefined' ? reading : readingProcessor(reading);
-            const key = this._createMapKey([term, processedReading]);
+            const normalizedReading = typeof readingNormalizer === 'undefined' ? reading : readingNormalizer(reading);
+            const key = this._createMapKey([term, normalizedReading]);
             const target = targetMap.get(key);
             if (typeof target === 'undefined') { continue; }
 
@@ -763,11 +763,11 @@ export class Translator {
     _groupDictionaryEntriesByHeadword(language, dictionaryEntries, tagAggregator) {
         /** @type {Map<string, import('translation-internal').TermDictionaryEntry[]>} */
         const groups = new Map();
-        const readingProcessor = this._readingProcessors.get(language);
+        const readingNormalizer = this._readingNormalizers.get(language);
         for (const dictionaryEntry of dictionaryEntries) {
             const {inflectionRuleChainCandidates, headwords: [{term, reading}]} = dictionaryEntry;
-            const processedReading = typeof readingProcessor === 'undefined' ? reading : readingProcessor(reading);
-            const key = this._createMapKey([term, processedReading, ...inflectionRuleChainCandidates]);
+            const normalizedReading = typeof readingNormalizer === 'undefined' ? reading : readingNormalizer(reading);
+            const key = this._createMapKey([term, normalizedReading, ...inflectionRuleChainCandidates]);
             let groupDictionaryEntries = groups.get(key);
             if (typeof groupDictionaryEntries === 'undefined') {
                 groupDictionaryEntries = [];
@@ -1788,9 +1788,9 @@ export class Translator {
         /** @type {number[]} */
         const headwordIndexMap = [];
         for (const {term, reading, sources, tags, wordClasses} of headwords) {
-            const readingProcessor = this._readingProcessors.get(language);
-            const processedReading = typeof readingProcessor === 'undefined' ? reading : readingProcessor(reading);
-            const key = this._createMapKey([term, processedReading]);
+            const readingNormalizer = this._readingNormalizers.get(language);
+            const normalizedReading = typeof readingNormalizer === 'undefined' ? reading : readingNormalizer(reading);
+            const key = this._createMapKey([term, normalizedReading]);
             let headword = headwordsMap.get(key);
             if (typeof headword === 'undefined') {
                 headword = this._createTermHeadword(headwordsMap.size, term, reading, [], [], []);
