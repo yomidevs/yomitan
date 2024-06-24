@@ -52,3 +52,29 @@ export type CustomAudioListSource = {
     url: string;
     name?: string;
 };
+
+export type LinguaLibreLookupResults = {
+    query: {
+        search: LinguaLibreLookupResult[];
+    };
+};
+
+export type LinguaLibreFileResults = {
+    query: {
+        pages: Record<string, LinguaLibreFileResult>;
+    };
+};
+
+export type LinguaLibreLookupResult = {
+    title: string;
+};
+
+export type LinguaLibreFileResult = {
+    title: string;
+    imageinfo: LinguaLibreFileResultImageInfo[];
+};
+
+export type LinguaLibreFileResultImageInfo = {
+    url: string;
+    user: string;
+};

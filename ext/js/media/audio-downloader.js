@@ -25,6 +25,16 @@ import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
 import {SimpleDOMParser} from '../dom/simple-dom-parser.js';
 import {isStringEntirelyKana} from '../language/ja/japanese.js';
 
+/** @type {RequestInit} */
+const DEFAULT_REQUEST_INIT_PARAMS = {
+    method: 'GET',
+    mode: 'cors',
+    cache: 'default',
+    credentials: 'omit',
+    redirect: 'follow',
+    referrerPolicy: 'no-referrer',
+};
+
 export class AudioDownloader {
     /**
      * @param {RequestBuilder} requestBuilder
@@ -39,6 +49,7 @@ export class AudioDownloader {
             ['jpod101', this._getInfoJpod101.bind(this)],
             ['jpod101-alternate', this._getInfoJpod101Alternate.bind(this)],
             ['jisho', this._getInfoJisho.bind(this)],
+            ['lingua-libre', this._getInfoLinguaLibre.bind(this)],
             ['text-to-speech', this._getInfoTextToSpeech.bind(this)],
             ['text-to-speech-reading', this._getInfoTextToSpeechReading.bind(this)],
             ['custom', this._getInfoCustom.bind(this)],
@@ -137,12 +148,8 @@ export class AudioDownloader {
             vulgar: 'true',
         });
         const response = await this._requestBuilder.fetchAnonymous(fetchUrl, {
+            ...DEFAULT_REQUEST_INIT_PARAMS,
             method: 'POST',
-            mode: 'cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
@@ -181,14 +188,7 @@ export class AudioDownloader {
     /** @type {import('audio-downloader').GetInfoHandler} */
     async _getInfoJisho(term, reading) {
         const fetchUrl = `https://jisho.org/search/${term}`;
-        const response = await this._requestBuilder.fetchAnonymous(fetchUrl, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer',
-        });
+        const response = await this._requestBuilder.fetchAnonymous(fetchUrl, DEFAULT_REQUEST_INIT_PARAMS);
         const responseText = await response.text();
 
         const dom = this._createSimpleDOMParser(responseText);
@@ -209,6 +209,41 @@ export class AudioDownloader {
         }
 
         throw new Error('Failed to find audio URL');
+    }
+
+    /** @type {import('audio-downloader').GetInfoHandler} */
+    async _getInfoLinguaLibre(term) {
+        /** @type {import('audio-downloader').Info1[]} */
+        const infoList = [];
+        const searchString = `-${term}.wav`;
+        const fetchUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&list=search&srsearch=\\${searchString}&srnamespace=6&origin=*`;
+
+        const response = await this._requestBuilder.fetchAnonymous(fetchUrl, DEFAULT_REQUEST_INIT_PARAMS);
+
+        /** @type {import('audio-downloader').LinguaLibreLookupResults} */
+        const responseJson = await readResponseJson(response);
+
+        const results = responseJson.query.search;
+        if (results.length === 0) {
+            return infoList;
+        }
+        for (const {title} of results) {
+            if (!title.endsWith('.wav')) {
+                continue;
+            }
+            const fileInfoURL = `https://commons.wikimedia.org/w/api.php?action=query&format=json&titles=${title}&prop=imageinfo&iiprop=user|url&origin=*`;
+            const response2 = await this._requestBuilder.fetchAnonymous(fileInfoURL, DEFAULT_REQUEST_INIT_PARAMS);
+            /** @type {import('audio-downloader').LinguaLibreFileResults} */
+            const responseJson2 = await readResponseJson(response2);
+            const results2 = responseJson2.query.pages;
+            for (const page of Object.values(results2)) {
+                const fileUrl = page.imageinfo[0].url;
+                const fileUser = page.imageinfo[0].user;
+
+                infoList.push({type: 'url', url: fileUrl, name: fileUser});
+            }
+        }
+        return infoList;
     }
 
     /** @type {import('audio-downloader').GetInfoHandler} */
@@ -259,14 +294,7 @@ export class AudioDownloader {
         }
         url = this._getCustomUrl(term, reading, url);
 
-        const response = await this._requestBuilder.fetchAnonymous(url, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer',
-        });
+        const response = await this._requestBuilder.fetchAnonymous(url, DEFAULT_REQUEST_INIT_PARAMS);
 
         if (!response.ok) {
             throw new Error(`Invalid response: ${response.status}`);
@@ -345,12 +373,7 @@ export class AudioDownloader {
         }
 
         const response = await this._requestBuilder.fetchAnonymous(url, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer',
+            ...DEFAULT_REQUEST_INIT_PARAMS,
             signal,
         });
 
@@ -429,12 +452,8 @@ export class AudioDownloader {
     async _getCustomAudioListSchema() {
         const url = chrome.runtime.getURL('/data/schemas/custom-audio-list-schema.json');
         const response = await fetch(url, {
-            method: 'GET',
+            ...DEFAULT_REQUEST_INIT_PARAMS,
             mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer',
         });
         return await readResponseJson(response);
     }
