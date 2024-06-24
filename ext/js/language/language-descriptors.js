@@ -38,7 +38,7 @@ import {removeSerboCroatianAccentMarks} from './sh/serbo-croatian-text-preproces
 import {albanianTransforms} from './sq/albanian-transforms.js';
 import {normalizeDiacritics} from './vi/viet-text-preprocessors.js';
 import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-processors.js';
-import {isStringPartiallyChinese} from './zh/chinese.js';
+import {normalizePinyin, isStringPartiallyChinese} from './zh/chinese.js';
 
 const capitalizationPreprocessors = {
     decapitalize,
@@ -277,6 +277,7 @@ const languageDescriptors = [
         name: 'Chinese',
         exampleText: '读',
         isTextLookupWorthy: isStringPartiallyChinese,
+        readingNormalizer: normalizePinyin,
     },
 ];
 

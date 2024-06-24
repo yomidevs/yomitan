@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {TextProcessor, BidirectionalConversionPreprocessor} from './language';
+import type {TextProcessor, ReadingNormalizer, BidirectionalConversionPreprocessor} from './language';
 import type {LanguageTransformDescriptor} from './language-transformer';
 import type {SafeAny} from './core';
 
@@ -36,6 +36,7 @@ type LanguageDescriptor<
      * If no value is provided, `true` is assumed for all inputs.
      */
     isTextLookupWorthy?: IsTextLookupWorthyFunction;
+    readingNormalizer?: ReadingNormalizer;
     textPreprocessors?: TTextPreprocessorDescriptor;
     textPostprocessors?: TTextPostprocessorDescriptor;
     languageTransforms?: LanguageTransformDescriptor;

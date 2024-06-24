@@ -29,6 +29,18 @@ export function getLanguageSummaries() {
 }
 
 /**
+ * @returns {import('language').LanguageAndReadingNormalizer[]}
+ */
+export function getAllLanguageReadingNormalizers() {
+    const results = [];
+    for (const {iso, readingNormalizer} of languageDescriptorMap.values()) {
+        if (typeof readingNormalizer === 'undefined') { continue; }
+        results.push({iso, readingNormalizer});
+    }
+    return results;
+}
+
+/**
  * @returns {import('language').LanguageAndProcessors[]}
  * @throws {Error}
  */
