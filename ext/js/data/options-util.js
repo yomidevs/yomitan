@@ -547,6 +547,8 @@ export class OptionsUtil {
             this._updateVersion37,
             this._updateVersion38,
             this._updateVersion39,
+            this._updateVersion40,
+            this._updateVersion41,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1322,6 +1324,28 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             profile.options.general.enableContextMenuScanSelected = true;
         }
+    }
+
+    /**
+     *  - Added support for web hotkey scope to profilePrevious and profileNext
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion40(options) {
+        for (const profile of options.profiles) {
+            for (const hotkey of profile.options.inputs.hotkeys) {
+                if (hotkey.action === 'profilePrevious' || hotkey.action === 'profileNext') {
+                    hotkey.scopes = ['popup', 'search', 'web'];
+                }
+            }
+        }
+    }
+
+    /**
+     *  - Updated `glossary` handlebars to support dictionary css.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion41(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v41.handlebars');
     }
 
     /**

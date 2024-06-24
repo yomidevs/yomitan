@@ -24,6 +24,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {deepEqual} from '../core/utilities.js';
 import {addFullscreenChangeEventListener, computeZoomScale, convertRectZoomCoordinates, getFullscreenElement} from '../dom/document-util.js';
 import {loadStyle} from '../dom/style-util.js';
+import {checkPopupPreviewURL} from '../pages/settings/popup-preview-controller.js';
 import {ThemeController} from './theme-controller.js';
 
 /**
@@ -1014,6 +1015,10 @@ export class Popup extends EventDispatcher {
         const {general} = options;
         this._themeController.theme = general.popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;
+        this._themeController.siteOverride = checkPopupPreviewURL(optionsContext.url);
+        if (this._themeController.outerTheme === 'site' && this._themeController.siteOverride && ['dark', 'light'].includes(this._themeController.theme)) {
+            this._themeController.outerTheme = this._themeController.theme;
+        }
         this._initialWidth = general.popupWidth;
         this._initialHeight = general.popupHeight;
         this._horizontalOffset = general.popupHorizontalOffset;

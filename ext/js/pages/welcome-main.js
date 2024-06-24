@@ -58,6 +58,17 @@ async function checkNeedsCustomTemplatesWarning() {
 }
 
 await Application.main(true, async (application) => {
+    const modalController = new ModalController();
+    modalController.prepare();
+
+    const settingsController = new SettingsController(application);
+    await settingsController.prepare();
+
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    await settingsDisplayController.prepare();
+
+    document.body.hidden = false;
+
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -74,12 +85,6 @@ await Application.main(true, async (application) => {
 
     const preparePromises = [];
 
-    const modalController = new ModalController();
-    modalController.prepare();
-
-    const settingsController = new SettingsController(application);
-    await settingsController.prepare();
-
     const genericSettingController = new GenericSettingController(settingsController);
     preparePromises.push(setupGenericSettingsController(genericSettingController));
 
@@ -95,7 +100,4 @@ await Application.main(true, async (application) => {
     await Promise.all(preparePromises);
 
     document.documentElement.dataset.loaded = 'true';
-
-    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    settingsDisplayController.prepare();
 });

@@ -155,7 +155,7 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
-    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext}) {
+    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext, pageTheme}) {
         this.trigger('searched', {
             textScanner: this._textScanner,
             type,
@@ -165,6 +165,7 @@ export class QueryParser extends EventDispatcher {
             textSource,
             optionsContext,
             sentenceOffset: this._getSentenceOffset(textSource),
+            pageTheme: pageTheme,
         });
     }
 

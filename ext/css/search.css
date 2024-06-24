@@ -63,7 +63,7 @@ h1 {
     display: flex;
     flex-flow: row nowrap;
     width: 100%;
-    align-items: stretch;
+    align-items: center;
     margin: 0;
     padding: 0;
     border: 0;
@@ -92,6 +92,9 @@ h1 {
     flex: 0 0 auto;
     position: relative;
     width: 2.5em;
+    height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
+    min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
+    max-height: calc(var(--textarea-line-height) * 10 + var(--textarea-padding) * 2);
     background-color: var(--input-background-color);
     border: 0;
     padding: 0;
@@ -131,7 +134,7 @@ h1 {
 .search-options {
     display: flex;
     flex-flow: row wrap;
-    margin: 0.5em 0;
+    margin: 0.5em 0 0 0;
     align-items: center;
 }
 .search-option {
@@ -176,4 +179,12 @@ h1 {
 :root[data-search-mode=action-popup] body {
     width: 640px;
     height: 480px;
+}
+
+/* Dark mode before themes are applied
+   DO NOT use this for normal theming */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-loaded=true]) {
+        background-color: #1e1e1e;
+    }
 }

@@ -91,6 +91,8 @@ export class DisplayAnki {
         this._noteTags = [];
         /** @type {Map<import('display-anki').CreateMode, import('settings').AnkiNoteOptions>} */
         this._modeOptions = new Map();
+        /** @type {import('settings').DictionariesOptions} */
+        this._dictionaries = [];
         /** @type {Map<import('dictionary').DictionaryEntryType, import('display-anki').CreateMode[]>} */
         this._dictionaryEntryTypeModeMap = new Map([
             ['kanji', ['kanji']],
@@ -147,6 +149,7 @@ export class DisplayAnki {
                 glossaryLayoutMode: this._glossaryLayoutMode,
                 compactTags: this._compactTags,
                 marker: 'test',
+                dictionaryStylesMap: this._ankiNoteBuilder.getDictionaryStylesMap(this._dictionaries),
             });
         } catch (e) {
             ankiNoteDataException = e;
@@ -191,6 +194,7 @@ export class DisplayAnki {
     _onOptionsUpdated({options}) {
         const {
             general: {resultOutputMode, glossaryLayoutMode, compactTags},
+            dictionaries,
             anki: {
                 tags,
                 duplicateScope,
@@ -227,6 +231,7 @@ export class DisplayAnki {
         this._modeOptions.set('kanji', kanji);
         this._modeOptions.set('term-kanji', terms);
         this._modeOptions.set('term-kana', terms);
+        this._dictionaries = dictionaries;
 
         void this._updateAnkiFieldTemplates(options);
     }
@@ -808,6 +813,7 @@ export class DisplayAnki {
         const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntry);
         const audioDetails = this._getAnkiNoteMediaAudioDetails(details);
         const optionsContext = this._display.getOptionsContext();
+        const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(this._dictionaries);
 
         const {note, errors, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({
             dictionaryEntry,
@@ -836,6 +842,7 @@ export class DisplayAnki {
                 },
             },
             requirements,
+            dictionaryStylesMap,
         });
         return {note, errors, requirements: outputRequirements};
     }

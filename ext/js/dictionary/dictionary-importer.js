@@ -189,7 +189,25 @@ export class DictionaryImporter {
             tagMeta: {total: tagList.length},
             media: {total: media.length},
         };
-        const summary = this._createSummary(dictionaryTitle, version, index, {prefixWildcardsSupported, counts});
+
+        const stylesFileName = 'styles.css';
+        const stylesFile = fileMap.get(stylesFileName);
+        let styles = '';
+        if (typeof stylesFile !== 'undefined') {
+            styles = await this._getData(stylesFile, new TextWriter());
+            const cssErrors = this._validateCss(styles);
+            if (cssErrors.length > 0) {
+                return {
+                    errors: cssErrors,
+                    result: null,
+                };
+            }
+        }
+
+        /** @type {import('dictionary-importer').SummaryDetails} */
+        const summaryDetails = {prefixWildcardsSupported, counts, styles};
+
+        const summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
         await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
 
         // Add data
@@ -267,13 +285,12 @@ export class DictionaryImporter {
      * @param {string} dictionaryTitle
      * @param {number} version
      * @param {import('dictionary-data').Index} index
-     * @param {{prefixWildcardsSupported: boolean, counts: import('dictionary-importer').SummaryCounts}} details
+     * @param {import('dictionary-importer').SummaryDetails} details
      * @returns {import('dictionary-importer').Summary}
      */
     _createSummary(dictionaryTitle, version, index, details) {
         const indexSequenced = index.sequenced;
-        const {prefixWildcardsSupported, counts} = details;
-
+        const {prefixWildcardsSupported, counts, styles} = details;
         /** @type {import('dictionary-importer').Summary} */
         const summary = {
             title: dictionaryTitle,
@@ -283,6 +300,7 @@ export class DictionaryImporter {
             importDate: Date.now(),
             prefixWildcardsSupported,
             counts,
+            styles,
         };
 
         const {author, url, description, attribution, frequencyMode, sourceLanguage, targetLanguage} = index;
@@ -329,6 +347,14 @@ export class DictionaryImporter {
         const tagBank = 'dictionaryTagBankV3';
 
         return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
+    }
+
+    /**
+     * @param {string} css
+     * @returns {Error[]}
+     */
+    _validateCss(css) {
+        return css ? [] : [new Error('No styles found')];
     }
 
     /**

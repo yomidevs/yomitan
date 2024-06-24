@@ -248,23 +248,47 @@ export class Translator {
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
                 if (ids.has(id)) {
-                    const existingEntry = dictionaryEntries.find((entry) => {
-                        return entry.definitions.some((definition) => definition.id === id);
-                    });
+                    const existingEntryInfo = this._findExistingEntry(dictionaryEntries, id);
+                    if (!existingEntryInfo) {
+                        continue;
+                    }
+                    const {existingEntry, existingIndex} = existingEntryInfo;
 
-                    if (existingEntry && transformedText.length >= existingEntry.headwords[0].sources[0].transformedText.length) {
+                    const existingTransformedLength = existingEntry.headwords[0].sources[0].transformedText.length;
+                    if (transformedText.length < existingTransformedLength) {
+                        continue;
+                    }
+                    if (transformedText.length > existingTransformedLength) {
+                        dictionaryEntries.splice(existingIndex, 1, this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator));
+                    } else {
                         this._mergeInflectionRuleChains(existingEntry, inflectionRuleChainCandidates);
                     }
-
-                    continue;
+                } else {
+                    const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator);
+                    dictionaryEntries.push(dictionaryEntry);
+                    ids.add(id);
                 }
-
-                const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator);
-                dictionaryEntries.push(dictionaryEntry);
-                ids.add(id);
             }
         }
         return {dictionaryEntries, originalTextLength};
+    }
+
+    /**
+     * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
+     * @param {number} id
+     * @returns {{existingEntry: import('translation-internal').TermDictionaryEntry, existingIndex: number} | null}
+     */
+    _findExistingEntry(dictionaryEntries, id) {
+        let existingIndex = null;
+        let existingEntry = null;
+        for (const [index, entry] of dictionaryEntries.entries()) {
+            if (entry.definitions.some((definition) => definition.id === id)) {
+                existingIndex = index;
+                existingEntry = entry;
+                return {existingEntry, existingIndex};
+            }
+        }
+        return null;
     }
 
     /**
