@@ -27,6 +27,10 @@
 
     --background-color: #ffffff;
     --separator-color1: #cccccc;
+
+    --search-textbox-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
+    --search-textbox-min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
+    --search-textbox-max-height: calc(var(--textarea-line-height) * 10 + var(--textarea-padding) * 2);
 }
 :root:not([data-loaded=true]) {
     --animation-duration: 0s;
@@ -79,9 +83,9 @@ h1 {
     border: 0;
     outline: none;
     width: 100%;
-    height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
-    min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
-    max-height: calc(var(--textarea-line-height) * 10 + var(--textarea-padding) * 2);
+    height: var(--search-textbox-height);
+    min-height: var(--search-textbox-min-height);
+    max-height: var(--search-textbox-max-height);
     resize: none;
     font-size: var(--font-size);
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -92,9 +96,9 @@ h1 {
     flex: 0 0 auto;
     position: relative;
     width: 2.5em;
-    height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
-    min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
-    max-height: calc(var(--textarea-line-height) * 10 + var(--textarea-padding) * 2);
+    height: var(--search-textbox-height);
+    min-height: var(--search-textbox-min-height);
+    max-height: var(--search-textbox-max-height);
     background-color: var(--input-background-color);
     border: 0;
     padding: 0;
