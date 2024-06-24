@@ -82,7 +82,7 @@ h1 {
     height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
     min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
     max-height: calc(var(--textarea-line-height) * 10 + var(--textarea-padding) * 2);
-    resize: vertical;
+    resize: none;
     font-size: var(--font-size);
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     white-space: pre-wrap;
