@@ -236,7 +236,7 @@ export class SearchDisplayController {
 
     /** */
     _onSearchInput() {
-        this._updateSearchHeight(false);
+        this._updateSearchHeight(true);
     }
 
     /**
