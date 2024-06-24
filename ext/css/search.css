@@ -30,7 +30,7 @@
 
     --search-textbox-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
     --search-textbox-min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
-    --search-textbox-max-height: calc(var(--textarea-line-height) * 10 + var(--textarea-padding) * 2);
+    --search-textbox-max-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
 }
 :root:not([data-loaded=true]) {
     --animation-duration: 0s;
