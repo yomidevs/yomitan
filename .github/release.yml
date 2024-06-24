@@ -6,7 +6,7 @@ changelog:
     - title: Breaking Changes
       labels:
         - kind/breaking-change
-    - title: Enhancement
+    - title: Enhancements
       labels:
         - kind/enhancement
     - title: Bug Fixes
