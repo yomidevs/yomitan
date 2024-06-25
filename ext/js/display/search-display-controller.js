@@ -236,7 +236,7 @@ export class SearchDisplayController {
 
     /** */
     _onSearchInput() {
-        this._updateSearchHeight(false);
+        this._updateSearchHeight(true);
     }
 
     /**
@@ -566,14 +566,20 @@ export class SearchDisplayController {
      * @param {boolean} shrink
      */
     _updateSearchHeight(shrink) {
-        const node = this._queryInput;
+        const searchTextbox = this._queryInput;
+        const searchItems = [this._queryInput, this._searchButton, this._searchBackButton];
+
         if (shrink) {
-            node.style.height = '0';
+            for (const searchButton of searchItems) {
+                searchButton.style.height = '0';
+            }
         }
-        const {scrollHeight} = node;
-        const currentHeight = node.getBoundingClientRect().height;
+        const {scrollHeight} = searchTextbox;
+        const currentHeight = searchTextbox.getBoundingClientRect().height;
         if (shrink || scrollHeight >= currentHeight - 1) {
-            node.style.height = `${scrollHeight}px`;
+            for (const searchButton of searchItems) {
+                searchButton.style.height = `${scrollHeight}px`;
+            }
         }
     }
 

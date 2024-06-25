@@ -149,7 +149,7 @@ export class DisplayAnki {
                 glossaryLayoutMode: this._glossaryLayoutMode,
                 compactTags: this._compactTags,
                 marker: 'test',
-                dictionaryStylesMap: this._getDictionaryStylesMap(),
+                dictionaryStylesMap: this._ankiNoteBuilder.getDictionaryStylesMap(this._dictionaries),
             });
         } catch (e) {
             ankiNoteDataException = e;
@@ -813,7 +813,7 @@ export class DisplayAnki {
         const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntry);
         const audioDetails = this._getAnkiNoteMediaAudioDetails(details);
         const optionsContext = this._display.getOptionsContext();
-        const dictionaryStylesMap = this._getDictionaryStylesMap();
+        const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(this._dictionaries);
 
         const {note, errors, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({
             dictionaryEntry,
@@ -845,20 +845,6 @@ export class DisplayAnki {
             dictionaryStylesMap,
         });
         return {note, errors, requirements: outputRequirements};
-    }
-
-    /**
-     * @returns {Map<string, string>}
-     */
-    _getDictionaryStylesMap() {
-        const styleMap = new Map();
-        for (const dictionary of this._dictionaries) {
-            const {name, styles} = dictionary;
-            if (typeof styles === 'string') {
-                styleMap.set(name, styles);
-            }
-        }
-        return styleMap;
     }
 
     /**

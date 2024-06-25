@@ -97,7 +97,7 @@ export class Display extends EventDispatcher {
         /** @type {boolean} */
         this._historyHasChanged = false;
         /** @type {?Element} */
-        this._navigationHeader = document.querySelector('#navigation-header');
+        this._aboveStickyHeader = document.querySelector('#above-sticky-header');
         /** @type {import('display').PageType} */
         this._contentType = 'clear';
         /** @type {string} */
@@ -1516,8 +1516,8 @@ export class Display extends EventDispatcher {
         }
         let target = (index === 0 && definitionIndex <= 0) || node === null ? 0 : this._getElementTop(node);
 
-        if (this._navigationHeader !== null) {
-            target -= this._navigationHeader.getBoundingClientRect().height;
+        if (this._aboveStickyHeader !== null && target !== 0) {
+            target += this._aboveStickyHeader.getBoundingClientRect().height;
         }
 
         this._windowScroll.stop();

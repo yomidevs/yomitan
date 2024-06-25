@@ -60,7 +60,7 @@ export class AnkiNoteBuilder {
         glossaryLayoutMode = 'default',
         compactTags = false,
         mediaOptions = null,
-        dictionaryStylesMap,
+        dictionaryStylesMap = new Map(),
     }) {
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
@@ -171,6 +171,21 @@ export class AnkiNoteBuilder {
 
         const {term, reading} = headwords[Math.max(0, bestIndex)];
         return {type, term, reading};
+    }
+
+    /**
+     * @param {import('settings').DictionariesOptions} dictionaries
+     * @returns {Map<string, string>}
+     */
+    getDictionaryStylesMap(dictionaries) {
+        const styleMap = new Map();
+        for (const dictionary of dictionaries) {
+            const {name, styles} = dictionary;
+            if (typeof styles === 'string') {
+                styleMap.set(name, styles);
+            }
+        }
+        return styleMap;
     }
 
     // Private
