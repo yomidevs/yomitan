@@ -702,14 +702,6 @@ function disassemble(str) {
     return Hangul.disassemble(str, false).join('');
 }
 
-for (const testCase of tests) {
-    for (const test of testCase.tests) {
-        test.term = disassemble(test.term);
-        test.source = disassemble(test.source);
-    }
-}
-
-
 const languageTransformer = new LanguageTransformer();
 languageTransformer.addDescriptor(koreanTransforms);
-testLanguageTransformer(languageTransformer, tests);
+testLanguageTransformer(languageTransformer, tests, disassemble);
