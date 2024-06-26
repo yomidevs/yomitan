@@ -1226,7 +1226,7 @@ export class Display extends EventDispatcher {
         termDictionaryEntries = (await this._application.api.termsFind(source, this._getFindDetails(source, wildcardsEnabled), optionsContext)).dictionaryEntries;
         if (termDictionaryEntries.length > 0) { return termDictionaryEntries; }
 
-        return kanjiDictionaryEntries;
+        return kanjiDictionaryEntries.length > 0 ? kanjiDictionaryEntries : await this._application.api.kanjiFind(source, optionsContext);
     }
 
     /**
