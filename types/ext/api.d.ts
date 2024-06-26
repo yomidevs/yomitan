@@ -389,12 +389,6 @@ type ApiSurface = {
         params: void;
         return: Language.LanguageSummary[];
     };
-    getLanguageSummary: {
-        params: {
-            iso: string;
-        };
-        return: Language.LanguageSummary;
-    };
 };
 
 type ApiExtraArgs = [sender: chrome.runtime.MessageSender];

@@ -365,14 +365,6 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'getLanguageSummary', 'iso'>} iso
-     * @returns {Promise<import('api').ApiReturn<'getLanguageSummary'>>}
-     */
-    getLanguageSummary(iso) {
-        return this._invoke('getLanguageSummary', {iso});
-    }
-
-    /**
      * @returns {Promise<import('api').ApiReturn<'getLanguageSummaries'>>}
      */
     getLanguageSummaries() {
