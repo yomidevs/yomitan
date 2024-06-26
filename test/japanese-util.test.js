@@ -17,7 +17,6 @@
  */
 
 import {describe, expect, test} from 'vitest';
-import {normalizeCombiningCharacters} from '../ext/js/language/ja/japanese-text-preprocessors.js';
 import * as jpw from '../ext/js/language/ja/japanese-wanakana.js';
 import * as jp from '../ext/js/language/ja/japanese.js';
 
@@ -1041,9 +1040,8 @@ const textCasesMisc = [
 ];
 
 describe('combining dakuten/handakuten normalization', () => {
-    const {process} = normalizeCombiningCharacters;
     const testCases = [...testCasesDakuten, ...testCasesHandakuten, ...testCasesIgnored, ...textCasesMisc];
     test.each(testCases)('%s normalizes to %s', (input, expected) => {
-        expect(process(input, true)).toStrictEqual(expected);
+        expect(jp.normalizeCombiningCharacters(input)).toStrictEqual(expected);
     });
 });
