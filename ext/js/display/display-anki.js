@@ -197,7 +197,6 @@ export class DisplayAnki {
                 resultOutputMode,
                 glossaryLayoutMode,
                 compactTags,
-                language,
             },
             dictionaries,
             anki: {
@@ -222,7 +221,6 @@ export class DisplayAnki {
         this._compactTags = compactTags;
         this._resultOutputMode = resultOutputMode;
         this._glossaryLayoutMode = glossaryLayoutMode;
-        this._language = language;
         this._displayTags = displayTags;
         this._duplicateScope = duplicateScope;
         this._duplicateScopeCheckAllModels = duplicateScopeCheckAllModels;
