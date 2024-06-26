@@ -565,7 +565,7 @@ export function getKanaDiacriticInfo(character) {
  * @returns {boolean}
  */
 function dakutenAllowed(codePoint) {
-    // To reduce processing time some characters which shouldn't have dakuten but are highly unlikely to have a combining character attatched are included
+    // To reduce processing time some characters which shouldn't have dakuten but are highly unlikely to have a combining character attached are included
     // かがきぎくぐけげこごさざしじすずせぜそぞただちぢっつづてでとはばぱひびぴふぶぷへべぺほ
     // カガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトハバパヒビピフブプヘベペホ
     return ((codePoint >= 0x304B && codePoint <= 0x3068) ||
@@ -579,7 +579,7 @@ function dakutenAllowed(codePoint) {
  * @returns {boolean}
  */
 function handakutenAllowed(codePoint) {
-    // To reduce processing time some characters which shouldn't have handakuten but are highly unlikely to have a combining character attatched are included
+    // To reduce processing time some characters which shouldn't have handakuten but are highly unlikely to have a combining character attached are included
     // はばぱひびぴふぶぷへべぺほ
     // ハバパヒビピフブプヘベペホ
     return ((codePoint >= 0x306F && codePoint <= 0x307B) ||
