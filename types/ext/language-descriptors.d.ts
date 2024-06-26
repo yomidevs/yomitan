@@ -121,6 +121,7 @@ type AllTextProcessors = {
         pre: {
             convertHalfWidthCharacters: TextProcessor<boolean>;
             alphabeticToHiragana: TextProcessor<boolean>;
+            normalizeCombiningCharacters: TextProcessor<boolean>;
             alphanumericWidthVariants: BidirectionalConversionPreprocessor;
             convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
             collapseEmphaticSequences: TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;

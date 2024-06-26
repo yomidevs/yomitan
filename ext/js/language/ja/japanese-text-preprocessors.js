@@ -24,6 +24,7 @@ import {
     convertHalfWidthKanaToFullWidth,
     convertHiraganaToKatakana as convertHiraganaToKatakanaFunction,
     convertKatakanaToHiragana as convertKatakanaToHiraganaFunction,
+    normalizeCombiningCharacters as normalizeCombiningCharactersFunction,
 } from './japanese.js';
 
 /** @type {import('language').TextProcessor<boolean>} */
@@ -89,4 +90,12 @@ export const collapseEmphaticSequences = {
         }
         return str;
     },
+};
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const normalizeCombiningCharacters = {
+    name: 'Normalize combining characters',
+    description: 'ド → ド (U+30C8 U+3099 → U+30C9)',
+    options: basicTextProcessorOptions,
+    process: (str, setting) => (setting ? normalizeCombiningCharactersFunction(str) : str),
 };

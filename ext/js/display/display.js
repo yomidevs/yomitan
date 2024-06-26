@@ -1229,28 +1229,45 @@ export class Display extends EventDispatcher {
      * @returns {Promise<import('dictionary').DictionaryEntry[]>}
      */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
+        /** @type {import('dictionary').DictionaryEntry[]} */
+        let dictionaryEntries = [];
+        const {findDetails, source: source2} = this._getFindDetails(source, wildcardsEnabled);
         if (isKanji) {
-            return await this._application.api.kanjiFind(source, optionsContext);
-        } else {
-            /** @type {import('api').FindTermsDetails} */
-            const findDetails = {};
-            if (wildcardsEnabled) {
-                const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
-                if (match !== null) {
-                    if (match[1]) {
-                        findDetails.matchType = 'suffix';
-                        findDetails.deinflect = false;
-                    } else if (match[3]) {
-                        findDetails.matchType = 'prefix';
-                        findDetails.deinflect = false;
-                    }
-                    source = match[2];
-                }
-            }
+            dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
+            if (dictionaryEntries.length > 0) { return dictionaryEntries; }
 
-            const {dictionaryEntries} = await this._application.api.termsFind(source, findDetails, optionsContext);
-            return dictionaryEntries;
+            dictionaryEntries = (await this._application.api.termsFind(source2, findDetails, optionsContext)).dictionaryEntries;
+        } else {
+            dictionaryEntries = (await this._application.api.termsFind(source2, findDetails, optionsContext)).dictionaryEntries;
+            if (dictionaryEntries.length > 0) { return dictionaryEntries; }
+
+            dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
         }
+        return dictionaryEntries;
+    }
+
+    /**
+     * @param {string} source
+     * @param {boolean} wildcardsEnabled
+     * @returns {{findDetails: import('api').FindTermsDetails, source: string}}
+     */
+    _getFindDetails(source, wildcardsEnabled) {
+        /** @type {import('api').FindTermsDetails} */
+        const findDetails = {};
+        if (wildcardsEnabled) {
+            const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
+            if (match !== null) {
+                if (match[1]) {
+                    findDetails.matchType = 'suffix';
+                    findDetails.deinflect = false;
+                } else if (match[3]) {
+                    findDetails.matchType = 'prefix';
+                    findDetails.deinflect = false;
+                }
+                source = match[2];
+            }
+        }
+        return {findDetails, source};
     }
 
     /**

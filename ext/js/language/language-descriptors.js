@@ -26,6 +26,7 @@ import {
     collapseEmphaticSequences,
     convertHalfWidthCharacters,
     convertHiraganaToKatakana,
+    normalizeCombiningCharacters,
 } from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
@@ -170,6 +171,7 @@ const languageDescriptors = [
         textPreprocessors: {
             convertHalfWidthCharacters,
             alphabeticToHiragana,
+            normalizeCombiningCharacters,
             alphanumericWidthVariants,
             convertHiraganaToKatakana,
             collapseEmphaticSequences,
