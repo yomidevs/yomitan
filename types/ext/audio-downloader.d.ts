@@ -16,11 +16,13 @@
  */
 
 import type * as Audio from './audio';
+import type * as Language from './language';
 
 export type GetInfoHandler = (
     term: string,
     reading: string,
     details?: Audio.AudioSourceInfo,
+    languageSummary?: Language.LanguageSummary,
 ) => Promise<Info[]>;
 
 export type Info = Info1 | Info2;
@@ -53,13 +55,13 @@ export type CustomAudioListSource = {
     name?: string;
 };
 
-export type LinguaLibreLookupResults = {
+export type LinguaLibreLookupResponse = {
     query: {
         search: LinguaLibreLookupResult[];
     };
 };
 
-export type LinguaLibreFileResults = {
+export type LinguaLibreFileResponse = {
     query: {
         pages: Record<string, LinguaLibreFileResult>;
     };

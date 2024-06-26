@@ -192,6 +192,8 @@ export class Display extends EventDispatcher {
         this._onMenuButtonMenuCloseBind = this._onMenuButtonMenuClose.bind(this);
         /** @type {ThemeController} */
         this._themeController = new ThemeController(document.documentElement);
+        /** @type {import('language').LanguageSummary[]} */
+        this._languageSummaries = [];
 
         /* eslint-disable @stylistic/no-multi-spaces */
         this._hotkeyHandler.registerActions([
@@ -316,6 +318,8 @@ export class Display extends EventDispatcher {
             documentElement.dataset.browser = browser;
         }
 
+        this._languageSummaries = await this._application.api.getLanguageSummaries();
+
         // Prepare
         await this._hotkeyHelpController.prepare(this._application.api);
         await this._displayGenerator.prepare();
@@ -395,6 +399,16 @@ export class Display extends EventDispatcher {
      */
     getOptions() {
         return this._options;
+    }
+
+    /**
+     * @returns {import('language').LanguageSummary}
+     * @throws {Error}
+     */
+    getLanguageSummary() {
+        if (this._options === null) { throw new Error('Options is null'); }
+        const language = this._options.general.language;
+        return /** @type {import('language').LanguageSummary} */ (this._languageSummaries.find(({iso}) => iso === language));
     }
 
     /**

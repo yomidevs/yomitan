@@ -428,8 +428,8 @@ export class AnkiNoteBuilder {
         if (injectAudio && dictionaryEntryDetails.type !== 'kanji') {
             const audioOptions = mediaOptions.audio;
             if (typeof audioOptions === 'object' && audioOptions !== null) {
-                const {sources, preferredAudioIndex, idleTimeout} = audioOptions;
-                audioDetails = {sources, preferredAudioIndex, idleTimeout};
+                const {sources, preferredAudioIndex, idleTimeout, languageSummary} = audioOptions;
+                audioDetails = {sources, preferredAudioIndex, idleTimeout, languageSummary};
             }
         }
         if (injectScreenshot) {

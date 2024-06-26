@@ -219,6 +219,7 @@ type ApiSurface = {
             source: Audio.AudioSourceInfo;
             term: string;
             reading: string;
+            languageSummary: Language.LanguageSummary;
         };
         return: AudioDownloader.Info[];
     };
@@ -387,6 +388,12 @@ type ApiSurface = {
     getLanguageSummaries: {
         params: void;
         return: Language.LanguageSummary[];
+    };
+    getLanguageSummary: {
+        params: {
+            iso: string;
+        };
+        return: Language.LanguageSummary;
     };
 };
 

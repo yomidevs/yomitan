@@ -61,13 +61,14 @@ export class AudioDownloader {
      * @param {import('audio').AudioSourceInfo} source
      * @param {string} term
      * @param {string} reading
+     * @param {import('language').LanguageSummary} languageSummary
      * @returns {Promise<import('audio-downloader').Info[]>}
      */
-    async getTermAudioInfoList(source, term, reading) {
+    async getTermAudioInfoList(source, term, reading, languageSummary) {
         const handler = this._getInfoHandlers.get(source.type);
         if (typeof handler === 'function') {
             try {
-                return await handler(term, reading, source);
+                return await handler(term, reading, source, languageSummary);
             } catch (e) {
                 // NOP
             }
@@ -81,12 +82,13 @@ export class AudioDownloader {
      * @param {string} term
      * @param {string} reading
      * @param {?number} idleTimeout
+     * @param {import('language').LanguageSummary} languageSummary
      * @returns {Promise<import('audio-downloader').AudioBinaryBase64>}
      */
-    async downloadTermAudio(sources, preferredAudioIndex, term, reading, idleTimeout) {
+    async downloadTermAudio(sources, preferredAudioIndex, term, reading, idleTimeout, languageSummary) {
         const errors = [];
         for (const source of sources) {
-            let infoList = await this.getTermAudioInfoList(source, term, reading);
+            let infoList = await this.getTermAudioInfoList(source, term, reading, languageSummary);
             if (typeof preferredAudioIndex === 'number') {
                 infoList = (preferredAudioIndex >= 0 && preferredAudioIndex < infoList.length ? [infoList[preferredAudioIndex]] : []);
             }
@@ -212,34 +214,39 @@ export class AudioDownloader {
     }
 
     /** @type {import('audio-downloader').GetInfoHandler} */
-    async _getInfoLinguaLibre(term) {
+    async _getInfoLinguaLibre(term, _reading, _details, languageSummary) {
+        if (typeof languageSummary !== 'object' || languageSummary === null) {
+            throw new Error('Invalid arguments');
+        }
         /** @type {import('audio-downloader').Info1[]} */
         const infoList = [];
+        const {iso639_3} = languageSummary;
+        const searchCategory = `incategory:"Lingua_Libre_pronunciation-${iso639_3}"`;
         const searchString = `-${term}.wav`;
-        const fetchUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&list=search&srsearch=\\${searchString}&srnamespace=6&origin=*`;
+        const fetchUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&list=search&srsearch=intitle:/${searchString}/i+${searchCategory}&srnamespace=6&origin=*`;
 
         const response = await this._requestBuilder.fetchAnonymous(fetchUrl, DEFAULT_REQUEST_INIT_PARAMS);
 
-        /** @type {import('audio-downloader').LinguaLibreLookupResults} */
-        const responseJson = await readResponseJson(response);
+        /** @type {import('audio-downloader').LinguaLibreLookupResponse} */
+        const lookupResponse = await readResponseJson(response);
 
-        const results = responseJson.query.search;
-        if (results.length === 0) {
+        const lookupResults = lookupResponse.query.search;
+        if (lookupResults.length === 0) {
             return infoList;
         }
-        for (const {title} of results) {
-            if (!title.endsWith('.wav')) {
-                continue;
-            }
+        for (const {title} of lookupResults) {
             const fileInfoURL = `https://commons.wikimedia.org/w/api.php?action=query&format=json&titles=${title}&prop=imageinfo&iiprop=user|url&origin=*`;
             const response2 = await this._requestBuilder.fetchAnonymous(fileInfoURL, DEFAULT_REQUEST_INIT_PARAMS);
-            /** @type {import('audio-downloader').LinguaLibreFileResults} */
-            const responseJson2 = await readResponseJson(response2);
-            const results2 = responseJson2.query.pages;
-            for (const page of Object.values(results2)) {
+            /** @type {import('audio-downloader').LinguaLibreFileResponse} */
+            const fileResponse = await readResponseJson(response2);
+            const fileResults = fileResponse.query.pages;
+            for (const page of Object.values(fileResults)) {
                 const fileUrl = page.imageinfo[0].url;
                 const fileUser = page.imageinfo[0].user;
-
+                const validFilenameTest = new RegExp(`^File:LL-Q\\d+\\s+\\(${iso639_3}\\)-(\\w+ \\()?${fileUser}\\)?-${term}\\.wav$`, 'i');
+                if (!validFilenameTest.test(title)) {
+                    continue;
+                }
                 infoList.push({type: 'url', url: fileUrl, name: fileUser});
             }
         }

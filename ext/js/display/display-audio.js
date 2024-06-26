@@ -678,7 +678,8 @@ export class DisplayAudio {
      */
     async _getTermAudioInfoList(source, term, reading) {
         const sourceData = this._getSourceData(source);
-        const infoList = await this._display.application.api.getTermAudioInfoList(sourceData, term, reading);
+        const languageSummary = this._display.getLanguageSummary();
+        const infoList = await this._display.application.api.getTermAudioInfoList(sourceData, term, reading, languageSummary);
         return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
     }
 

@@ -193,7 +193,12 @@ export class DisplayAnki {
      */
     _onOptionsUpdated({options}) {
         const {
-            general: {resultOutputMode, glossaryLayoutMode, compactTags},
+            general: {
+                resultOutputMode,
+                glossaryLayoutMode,
+                compactTags,
+                language,
+            },
             dictionaries,
             anki: {
                 tags,
@@ -217,6 +222,7 @@ export class DisplayAnki {
         this._compactTags = compactTags;
         this._resultOutputMode = resultOutputMode;
         this._glossaryLayoutMode = glossaryLayoutMode;
+        this._language = language;
         this._displayTags = displayTags;
         this._duplicateScope = duplicateScope;
         this._duplicateScopeCheckAllModels = duplicateScopeCheckAllModels;
@@ -883,7 +889,13 @@ export class DisplayAnki {
     _getAnkiNoteMediaAudioDetails(details) {
         if (details.type !== 'term') { return null; }
         const {sources, preferredAudioIndex} = this._displayAudio.getAnkiNoteMediaAudioDetails(details.term, details.reading);
-        return {sources, preferredAudioIndex, idleTimeout: this._audioDownloadIdleTimeout};
+        const languageSummary = this._display.getLanguageSummary();
+        return {
+            sources,
+            preferredAudioIndex,
+            idleTimeout: this._audioDownloadIdleTimeout,
+            languageSummary,
+        };
     }
 
     // View note functions

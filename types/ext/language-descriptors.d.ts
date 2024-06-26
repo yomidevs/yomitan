@@ -27,6 +27,7 @@ type LanguageDescriptor<
     TTextPostprocessorDescriptor extends TextProcessorDescriptor = Record<string, never>,
 > = {
     iso: TIso;
+    iso639_3: string;
     name: string;
     exampleText: string;
     /**
