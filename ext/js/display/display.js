@@ -1212,9 +1212,10 @@ export class Display extends EventDispatcher {
      * @param {string} source
      * @param {boolean} wildcardsEnabled
      * @param {import('settings').OptionsContext} optionsContext
+     * @param {boolean} [isRetry=false]
      * @returns {Promise<import('dictionary').DictionaryEntry[]>}
      */
-    async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
+    async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext, isRetry = false) {
         if (isKanji) {
             return await this._application.api.kanjiFind(source, optionsContext);
         } else {
@@ -1235,7 +1236,12 @@ export class Display extends EventDispatcher {
             }
 
             const {dictionaryEntries} = await this._application.api.termsFind(source, findDetails, optionsContext);
-            return dictionaryEntries;
+            // If no results found then retry with kanji search
+            if (dictionaryEntries && dictionaryEntries.length > 0) {
+                return dictionaryEntries;
+            } else {
+                return isRetry ? [] : await this._findDictionaryEntries(true, source, wildcardsEnabled, optionsContext, true);
+            }
         }
     }
 
