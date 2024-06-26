@@ -1230,7 +1230,6 @@ export class Display extends EventDispatcher {
         if (!kanjiDictionaryEntries) {
             kanjiDictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
         }
-
         return kanjiDictionaryEntries;
     }
 
