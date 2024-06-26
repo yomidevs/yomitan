@@ -1223,7 +1223,9 @@ export class Display extends EventDispatcher {
             kanjiDictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
             if (kanjiDictionaryEntries.length > 0) { return kanjiDictionaryEntries; }
         }
-        termDictionaryEntries = (await this._application.api.termsFind(source, this._getFindDetails(source, wildcardsEnabled), optionsContext)).dictionaryEntries;
+        const findDetails = this._getFindDetails(source, wildcardsEnabled);
+        source = findDetails.source ?? source;
+        termDictionaryEntries = (await this._application.api.termsFind(source, findDetails, optionsContext)).dictionaryEntries;
         if (termDictionaryEntries.length > 0) { return termDictionaryEntries; }
 
         return kanjiDictionaryEntries.length > 0 ? kanjiDictionaryEntries : await this._application.api.kanjiFind(source, optionsContext);
@@ -1247,7 +1249,7 @@ export class Display extends EventDispatcher {
                     findDetails.matchType = 'prefix';
                     findDetails.deinflect = false;
                 }
-                source = match[2];
+                findDetails.source = match[2];
             }
         }
         return findDetails;
