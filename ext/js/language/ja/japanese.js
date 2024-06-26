@@ -560,6 +560,65 @@ export function getKanaDiacriticInfo(character) {
     return typeof info !== 'undefined' ? {character: info.character, type: info.type} : null;
 }
 
+/**
+ * @param {number} codePoint
+ * @returns {boolean}
+ */
+function dakutenAllowed(codePoint) {
+    // To reduce processing time some characters which shouldn't have dakuten but are highly unlikely to have a combining character attached are included
+    // かがきぎくぐけげこごさざしじすずせぜそぞただちぢっつづてでとはばぱひびぴふぶぷへべぺほ
+    // カガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトハバパヒビピフブプヘベペホ
+    return ((codePoint >= 0x304B && codePoint <= 0x3068) ||
+    (codePoint >= 0x306F && codePoint <= 0x307B) ||
+    (codePoint >= 0x30AB && codePoint <= 0x30C8) ||
+    (codePoint >= 0x30CF && codePoint <= 0x30DB));
+}
+
+/**
+ * @param {number} codePoint
+ * @returns {boolean}
+ */
+function handakutenAllowed(codePoint) {
+    // To reduce processing time some characters which shouldn't have handakuten but are highly unlikely to have a combining character attached are included
+    // はばぱひびぴふぶぷへべぺほ
+    // ハバパヒビピフブプヘベペホ
+    return ((codePoint >= 0x306F && codePoint <= 0x307B) ||
+    (codePoint >= 0x30CF && codePoint <= 0x30DB));
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+export function normalizeCombiningCharacters(text) {
+    let result = '';
+    let i = text.length - 1;
+    // Ignoring the first character is intentional, it cannot combine with anything
+    while (i > 0) {
+        if (text[i] === '\u3099') {
+            const dakutenCombinee = text[i - 1].codePointAt(0);
+            if (dakutenCombinee && dakutenAllowed(dakutenCombinee)) {
+                result = String.fromCodePoint(dakutenCombinee + 1) + result;
+                i -= 2;
+                continue;
+            }
+        } else if (text[i] === '\u309A') {
+            const handakutenCombinee = text[i - 1].codePointAt(0);
+            if (handakutenCombinee && handakutenAllowed(handakutenCombinee)) {
+                result = String.fromCodePoint(handakutenCombinee + 2) + result;
+                i -= 2;
+                continue;
+            }
+        }
+        result = text[i] + result;
+        i--;
+    }
+    // i === -1 when first two characters are combined
+    if (i === 0) {
+        result = text[0] + result;
+    }
+    return result;
+}
 
 // Furigana distribution
 
