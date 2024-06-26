@@ -1215,28 +1215,42 @@ export class Display extends EventDispatcher {
      * @returns {Promise<import('dictionary').DictionaryEntry[]>}
      */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
+        /** @type {import('dictionary').DictionaryEntry[]} */
+        let termDictionaryEntries = [];
+        /** @type {import('dictionary').DictionaryEntry[]} */
+        let kanjiDictionaryEntries = [];
         if (isKanji) {
-            return await this._application.api.kanjiFind(source, optionsContext);
-        } else {
-            /** @type {import('api').FindTermsDetails} */
-            const findDetails = {};
-            if (wildcardsEnabled) {
-                const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
-                if (match !== null) {
-                    if (match[1]) {
-                        findDetails.matchType = 'suffix';
-                        findDetails.deinflect = false;
-                    } else if (match[3]) {
-                        findDetails.matchType = 'prefix';
-                        findDetails.deinflect = false;
-                    }
-                    source = match[2];
-                }
-            }
-
-            const {dictionaryEntries} = await this._application.api.termsFind(source, findDetails, optionsContext);
-            return dictionaryEntries;
+            kanjiDictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
+            if (kanjiDictionaryEntries.length > 0) { return kanjiDictionaryEntries; }
         }
+        termDictionaryEntries = (await this._application.api.termsFind(source, this._getFindDetails(source, wildcardsEnabled), optionsContext)).dictionaryEntries;
+        if (termDictionaryEntries.length > 0) { return termDictionaryEntries; }
+
+        return kanjiDictionaryEntries;
+    }
+
+    /**
+     * @param {string} source
+     * @param {boolean} wildcardsEnabled
+     * @returns {import('api').FindTermsDetails}
+     */
+    _getFindDetails(source, wildcardsEnabled) {
+        /** @type {import('api').FindTermsDetails} */
+        const findDetails = {};
+        if (wildcardsEnabled) {
+            const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
+            if (match !== null) {
+                if (match[1]) {
+                    findDetails.matchType = 'suffix';
+                    findDetails.deinflect = false;
+                } else if (match[3]) {
+                    findDetails.matchType = 'prefix';
+                    findDetails.deinflect = false;
+                }
+                source = match[2];
+            }
+        }
+        return findDetails;
     }
 
     /**
@@ -1282,14 +1296,7 @@ export class Display extends EventDispatcher {
 
         let {dictionaryEntries} = content;
         if (!Array.isArray(dictionaryEntries)) {
-            dictionaryEntries = [];
-            if (lookup && query.length > 0) {
-                dictionaryEntries = await this._findDictionaryEntries(type === 'kanji', query, wildcardsEnabled, optionsContext);
-                if (dictionaryEntries.length === 0) {
-                    // reverse lookup on no results as fallback (terms -> kanji, kanji -> terms)
-                    dictionaryEntries = await this._findDictionaryEntries(type !== 'kanji', query, wildcardsEnabled, optionsContext);
-                }
-            }
+            dictionaryEntries = lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, wildcardsEnabled, optionsContext) : [];
             if (this._setContentToken !== token) { return; }
             content.dictionaryEntries = dictionaryEntries;
             changeHistory = true;
