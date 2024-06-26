@@ -613,7 +613,10 @@ export function normalizeCombiningCharacters(text) {
         result = text[i] + result;
         i--;
     }
-    result = text[0] + result; // Add previously ignored first character
+    // i === -1 when first two characters are combined
+    if (i === 0) {
+        result = text[0] + result;
+    }
     return result;
 }
 
