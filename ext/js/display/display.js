@@ -1215,10 +1215,10 @@ export class Display extends EventDispatcher {
      * @returns {Promise<import('dictionary').DictionaryEntry[]>}
      */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
-        /** @type {import('dictionary').DictionaryEntry[]} */
-        let termDictionaryEntries = [];
-        /** @type {import('dictionary').DictionaryEntry[]} */
-        let kanjiDictionaryEntries = [];
+        /** @type {import('dictionary').DictionaryEntry[]?} */
+        let termDictionaryEntries = null;
+        /** @type {import('dictionary').DictionaryEntry[]?} */
+        let kanjiDictionaryEntries = null;
         if (isKanji) {
             kanjiDictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
             if (kanjiDictionaryEntries.length > 0) { return kanjiDictionaryEntries; }
@@ -1227,7 +1227,11 @@ export class Display extends EventDispatcher {
         termDictionaryEntries = (await this._application.api.termsFind(findDetails.source ?? source, findDetails, optionsContext)).dictionaryEntries;
         if (termDictionaryEntries.length > 0) { return termDictionaryEntries; }
 
-        return await this._application.api.kanjiFind(source, optionsContext);
+        if (!kanjiDictionaryEntries) {
+            kanjiDictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
+        }
+
+        return kanjiDictionaryEntries;
     }
 
     /**
