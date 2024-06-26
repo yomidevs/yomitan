@@ -67,6 +67,7 @@ const JAPANESE_RANGES = [
 const SMALL_KANA_SET = new Set('ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ');
 
 const HALFWIDTH_KATAKANA_MAPPING = new Map([
+    ['･', '・--'],
     ['ｦ', 'ヲヺ-'],
     ['ｧ', 'ァ--'],
     ['ｨ', 'ィ--'],
