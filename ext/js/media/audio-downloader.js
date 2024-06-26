@@ -218,8 +218,6 @@ export class AudioDownloader {
         if (typeof languageSummary !== 'object' || languageSummary === null) {
             throw new Error('Invalid arguments');
         }
-        /** @type {import('audio-downloader').Info1[]} */
-        const infoList = [];
         const {iso639_3} = languageSummary;
         const searchCategory = `incategory:"Lingua_Libre_pronunciation-${iso639_3}"`;
         const searchString = `-${term}.wav`;
@@ -231,26 +229,26 @@ export class AudioDownloader {
         const lookupResponse = await readResponseJson(response);
 
         const lookupResults = lookupResponse.query.search;
-        if (lookupResults.length === 0) {
-            return infoList;
-        }
-        for (const {title} of lookupResults) {
+
+        const fetchFileInfos = lookupResults.map(async ({title}) => {
             const fileInfoURL = `https://commons.wikimedia.org/w/api.php?action=query&format=json&titles=${title}&prop=imageinfo&iiprop=user|url&origin=*`;
             const response2 = await this._requestBuilder.fetchAnonymous(fileInfoURL, DEFAULT_REQUEST_INIT_PARAMS);
             /** @type {import('audio-downloader').LinguaLibreFileResponse} */
             const fileResponse = await readResponseJson(response2);
             const fileResults = fileResponse.query.pages;
+            const results = [];
             for (const page of Object.values(fileResults)) {
                 const fileUrl = page.imageinfo[0].url;
                 const fileUser = page.imageinfo[0].user;
                 const validFilenameTest = new RegExp(`^File:LL-Q\\d+\\s+\\(${iso639_3}\\)-(\\w+ \\()?${fileUser}\\)?-${term}\\.wav$`, 'i');
-                if (!validFilenameTest.test(title)) {
-                    continue;
+                if (validFilenameTest.test(title)) {
+                    results.push({type: 'url', url: fileUrl, name: fileUser});
                 }
-                infoList.push({type: 'url', url: fileUrl, name: fileUser});
             }
-        }
-        return infoList;
+            return /** @type {import('audio-downloader').Info1[]} */ (results);
+        });
+
+        return (await Promise.all(fetchFileInfos)).flat();
     }
 
     /** @type {import('audio-downloader').GetInfoHandler} */
