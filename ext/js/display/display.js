@@ -1282,7 +1282,14 @@ export class Display extends EventDispatcher {
 
         let {dictionaryEntries} = content;
         if (!Array.isArray(dictionaryEntries)) {
-            dictionaryEntries = lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, wildcardsEnabled, optionsContext) : [];
+            dictionaryEntries = [];
+            if (lookup && query.length > 0) {
+                dictionaryEntries = await this._findDictionaryEntries(type === 'kanji', query, wildcardsEnabled, optionsContext);
+                if (dictionaryEntries.length === 0) {
+                    // reverse lookup on no results as fallback (terms -> kanji, kanji -> terms)
+                    dictionaryEntries = await this._findDictionaryEntries(type !== 'kanji', query, wildcardsEnabled, optionsContext);
+                }
+            }
             if (this._setContentToken !== token) { return; }
             content.dictionaryEntries = dictionaryEntries;
             changeHistory = true;
