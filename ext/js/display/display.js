@@ -1215,19 +1215,18 @@ export class Display extends EventDispatcher {
      * @returns {Promise<import('dictionary').DictionaryEntry[]>}
      */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
-        /** @type {import('dictionary').DictionaryEntry[]?} */
-        let dictionaryEntries = null;
+        /** @type {import('dictionary').DictionaryEntry[]} */
+        let dictionaryEntries = [];
+        const {findDetails, source: source2} = this._getFindDetails(source, wildcardsEnabled);
         if (isKanji) {
             dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
-        } else {
-            const {findDetails, source: source2} = this._getFindDetails(source, wildcardsEnabled);
-            dictionaryEntries = (await this._application.api.termsFind(source2, findDetails, optionsContext)).dictionaryEntries;
-        }
-        if (dictionaryEntries.length > 0) { return dictionaryEntries; }
-        if (isKanji) {
-            const {findDetails, source: source2} = this._getFindDetails(source, wildcardsEnabled);
+            if (dictionaryEntries.length > 0) { return dictionaryEntries; }
+
             dictionaryEntries = (await this._application.api.termsFind(source2, findDetails, optionsContext)).dictionaryEntries;
         } else {
+            dictionaryEntries = (await this._application.api.termsFind(source2, findDetails, optionsContext)).dictionaryEntries;
+            if (dictionaryEntries.length > 0) { return dictionaryEntries; }
+
             dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
         }
         return dictionaryEntries;
