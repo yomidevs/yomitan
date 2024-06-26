@@ -592,8 +592,7 @@ function handakutenAllowed(codePoint) {
  */
 export function normalizeCombiningCharacters(text) {
     let result = '';
-    const textLength = text.length;
-    let i = textLength - 1;
+    let i = text.length - 1;
     // Ignoring the first character is intentional, it cannot combine with anything
     while (i > 0) {
         if (text[i] === '\u3099') {
@@ -614,7 +613,7 @@ export function normalizeCombiningCharacters(text) {
         result = text[i] + result;
         i--;
     }
-    result = text[0] + result;
+    result = text[0] + result; // Add previously ignored first character
     return result;
 }
 
