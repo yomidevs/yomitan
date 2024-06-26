@@ -1216,27 +1216,27 @@ export class Display extends EventDispatcher {
      */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
         /** @type {import('dictionary').DictionaryEntry[]?} */
-        let termDictionaryEntries = null;
-        /** @type {import('dictionary').DictionaryEntry[]?} */
-        let kanjiDictionaryEntries = null;
+        let dictionaryEntries = null;
         if (isKanji) {
-            kanjiDictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
-            if (kanjiDictionaryEntries.length > 0) { return kanjiDictionaryEntries; }
+            dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
+        } else {
+            const {findDetails, source: source2} = this._getFindDetails(source, wildcardsEnabled);
+            dictionaryEntries = (await this._application.api.termsFind(source2, findDetails, optionsContext)).dictionaryEntries;
         }
-        const findDetails = this._getFindDetails(source, wildcardsEnabled);
-        termDictionaryEntries = (await this._application.api.termsFind(findDetails.source ?? source, findDetails, optionsContext)).dictionaryEntries;
-        if (termDictionaryEntries.length > 0) { return termDictionaryEntries; }
-
-        if (!kanjiDictionaryEntries) {
-            kanjiDictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
+        if (dictionaryEntries.length > 0) { return dictionaryEntries; }
+        if (isKanji) {
+            const {findDetails, source: source2} = this._getFindDetails(source, wildcardsEnabled);
+            dictionaryEntries = (await this._application.api.termsFind(source2, findDetails, optionsContext)).dictionaryEntries;
+        } else {
+            dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
         }
-        return kanjiDictionaryEntries;
+        return dictionaryEntries;
     }
 
     /**
      * @param {string} source
      * @param {boolean} wildcardsEnabled
-     * @returns {import('api').FindTermsDetails}
+     * @returns {{findDetails: import('api').FindTermsDetails, source: string}}
      */
     _getFindDetails(source, wildcardsEnabled) {
         /** @type {import('api').FindTermsDetails} */
@@ -1251,10 +1251,10 @@ export class Display extends EventDispatcher {
                     findDetails.matchType = 'prefix';
                     findDetails.deinflect = false;
                 }
-                findDetails.source = match[2];
+                source = match[2];
             }
         }
-        return findDetails;
+        return {findDetails, source};
     }
 
     /**
