@@ -26,6 +26,7 @@ import {
     collapseEmphaticSequences,
     convertHalfWidthCharacters,
     convertHiraganaToKatakana,
+    normalizeCombiningCharacters,
 } from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
@@ -36,9 +37,9 @@ import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js
 import {oldIrishTransforms} from './sga/old-irish-transforms.js';
 import {removeSerboCroatianAccentMarks} from './sh/serbo-croatian-text-preprocessors.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
-import {normalizeDiacritics} from './vi/viet-text-preprocessors.js';
 import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-processors.js';
-import {normalizePinyin, isStringPartiallyChinese} from './zh/chinese.js';
+import {normalizeDiacritics} from './vi/viet-text-preprocessors.js';
+import {isStringPartiallyChinese, normalizePinyin} from './zh/chinese.js';
 
 const capitalizationPreprocessors = {
     decapitalize,
@@ -155,6 +156,7 @@ const languageDescriptors = [
         textPreprocessors: {
             convertHalfWidthCharacters,
             alphabeticToHiragana,
+            normalizeCombiningCharacters,
             alphanumericWidthVariants,
             convertHiraganaToKatakana,
             collapseEmphaticSequences,
