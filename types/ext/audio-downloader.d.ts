@@ -55,28 +55,28 @@ export type CustomAudioListSource = {
     name?: string;
 };
 
-export type LinguaLibreLookupResponse = {
+export type WikimediaCommonsLookupResponse = {
     query: {
-        search: LinguaLibreLookupResult[];
+        search: WikimediaCommonsLookupResult[];
     };
 };
 
-export type LinguaLibreFileResponse = {
+export type WikimediaCommonsFileResponse = {
     query: {
-        pages: Record<string, LinguaLibreFileResult>;
+        pages: Record<string, WikimediaCommonsFileResult>;
     };
 };
 
-export type LinguaLibreLookupResult = {
+export type WikimediaCommonsLookupResult = {
     title: string;
 };
 
-export type LinguaLibreFileResult = {
+export type WikimediaCommonsFileResult = {
     title: string;
-    imageinfo: LinguaLibreFileResultImageInfo[];
+    imageinfo: WikimediaCommonsFileResultImageInfo[];
 };
 
-export type LinguaLibreFileResultImageInfo = {
+export type WikimediaCommonsFileResultImageInfo = {
     url: string;
     user: string;
 };
