@@ -113,6 +113,7 @@ export function getFileExtensionFromAudioMediaType(mediaType) {
             return '.mp4';
         case 'audio/ogg':
         case 'audio/vorbis':
+        case 'application/ogg':
             return '.ogg';
         case 'audio/vnd.wav':
         case 'audio/wave':
