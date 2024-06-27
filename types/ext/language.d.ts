@@ -63,5 +63,6 @@ export type TextProcessorWithId<T = unknown> = {
 export type LanguageSummary = {
     name: string;
     iso: string;
+    iso639_3: string;
     exampleText: string;
 };

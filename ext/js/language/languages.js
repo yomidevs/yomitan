@@ -22,8 +22,8 @@ import {languageDescriptorMap} from './language-descriptors.js';
  */
 export function getLanguageSummaries() {
     const results = [];
-    for (const {name, iso, exampleText} of languageDescriptorMap.values()) {
-        results.push({name, iso, exampleText});
+    for (const {name, iso, iso639_3, exampleText} of languageDescriptorMap.values()) {
+        results.push({name, iso, iso639_3, exampleText});
     }
     return results;
 }

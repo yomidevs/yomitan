@@ -147,10 +147,11 @@ export class API {
      * @param {import('api').ApiParam<'getTermAudioInfoList', 'source'>} source
      * @param {import('api').ApiParam<'getTermAudioInfoList', 'term'>} term
      * @param {import('api').ApiParam<'getTermAudioInfoList', 'reading'>} reading
+     * @param {import('api').ApiParam<'getTermAudioInfoList', 'languageSummary'>} languageSummary
      * @returns {Promise<import('api').ApiReturn<'getTermAudioInfoList'>>}
      */
-    getTermAudioInfoList(source, term, reading) {
-        return this._invoke('getTermAudioInfoList', {source, term, reading});
+    getTermAudioInfoList(source, term, reading, languageSummary) {
+        return this._invoke('getTermAudioInfoList', {source, term, reading, languageSummary});
     }
 
     /**

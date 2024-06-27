@@ -50,6 +50,7 @@ const capitalizationPreprocessors = {
 const languageDescriptors = [
     {
         iso: 'ar',
+        iso639_3: 'ara',
         name: 'Arabic',
         exampleText: 'قَرَأَ',
         textPreprocessors: {
@@ -58,6 +59,7 @@ const languageDescriptors = [
     },
     {
         iso: 'de',
+        iso639_3: 'deu',
         name: 'German',
         exampleText: 'gelesen',
         textPreprocessors: {
@@ -68,12 +70,14 @@ const languageDescriptors = [
     },
     {
         iso: 'el',
+        iso639_3: 'ell',
         name: 'Greek',
         exampleText: 'διαβάζω',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'en',
+        iso639_3: 'eng',
         name: 'English',
         exampleText: 'read',
         textPreprocessors: capitalizationPreprocessors,
@@ -81,6 +85,7 @@ const languageDescriptors = [
     },
     {
         iso: 'es',
+        iso639_3: 'spa',
         name: 'Spanish',
         exampleText: 'leer',
         textPreprocessors: capitalizationPreprocessors,
@@ -88,6 +93,7 @@ const languageDescriptors = [
     },
     {
         iso: 'fa',
+        iso639_3: 'fas',
         name: 'Persian',
         exampleText: 'خواندن',
         textPreprocessors: {
@@ -96,18 +102,21 @@ const languageDescriptors = [
     },
     {
         iso: 'fi',
+        iso639_3: 'fin',
         name: 'Finnish',
         exampleText: 'lukea',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'fr',
+        iso639_3: 'fra',
         name: 'French',
         exampleText: 'lire',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'grc',
+        iso639_3: 'grc',
         name: 'Ancient Greek',
         exampleText: 'γράφω',
         textPreprocessors: {
@@ -117,24 +126,28 @@ const languageDescriptors = [
     },
     {
         iso: 'hu',
+        iso639_3: 'hun',
         name: 'Hungarian',
         exampleText: 'olvasni',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'id',
+        iso639_3: 'ind',
         name: 'Indonesian',
         exampleText: 'membaca',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'it',
+        iso639_3: 'ita',
         name: 'Italian',
         exampleText: 'leggere',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'la',
+        iso639_3: 'lat',
         name: 'Latin',
         exampleText: 'legere',
         textPreprocessors: {
@@ -145,11 +158,13 @@ const languageDescriptors = [
     },
     {
         iso: 'lo',
+        iso639_3: 'lao',
         name: 'Lao',
         exampleText: 'ອ່ານ',
     },
     {
         iso: 'ja',
+        iso639_3: 'jpn',
         name: 'Japanese',
         exampleText: '読め',
         isTextLookupWorthy: isStringPartiallyJapanese,
@@ -165,11 +180,13 @@ const languageDescriptors = [
     },
     {
         iso: 'km',
+        iso639_3: 'khm',
         name: 'Khmer',
         exampleText: 'អាន',
     },
     {
         iso: 'ko',
+        iso639_3: 'kor',
         name: 'Korean',
         exampleText: '읽어',
         textPreprocessors: {
@@ -182,24 +199,28 @@ const languageDescriptors = [
     },
     {
         iso: 'nl',
+        iso639_3: 'nld',
         name: 'Dutch',
         exampleText: 'lezen',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'pl',
+        iso639_3: 'pol',
         name: 'Polish',
         exampleText: 'czytacie',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'pt',
+        iso639_3: 'por',
         name: 'Portuguese',
         exampleText: 'ler',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'ro',
+        iso639_3: 'ron',
         name: 'Romanian',
         exampleText: 'citit',
         textPreprocessors: {
@@ -209,6 +230,7 @@ const languageDescriptors = [
     },
     {
         iso: 'ru',
+        iso639_3: 'rus',
         name: 'Russian',
         exampleText: 'читать',
         textPreprocessors: {
@@ -219,6 +241,7 @@ const languageDescriptors = [
     },
     {
         iso: 'sga',
+        iso639_3: 'sga',
         name: 'Old Irish',
         exampleText: 'légaid',
         textPreprocessors: {
@@ -229,6 +252,7 @@ const languageDescriptors = [
     },
     {
         iso: 'sh',
+        iso639_3: 'hbs',
         name: 'Serbo-Croatian',
         exampleText: 'čitaše',
         textPreprocessors: {
@@ -238,6 +262,7 @@ const languageDescriptors = [
     },
     {
         iso: 'sq',
+        iso639_3: 'sqi',
         name: 'Albanian',
         exampleText: 'ndihmojme',
         textPreprocessors: capitalizationPreprocessors,
@@ -245,23 +270,27 @@ const languageDescriptors = [
     },
     {
         iso: 'sv',
+        iso639_3: 'swe',
         name: 'Swedish',
         exampleText: 'läsa',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'th',
+        iso639_3: 'tha',
         name: 'Thai',
         exampleText: 'อ่าน',
     },
     {
         iso: 'tr',
+        iso639_3: 'tur',
         name: 'Turkish',
         exampleText: 'okuyor',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'vi',
+        iso639_3: 'vie',
         name: 'Vietnamese',
         exampleText: 'đọc',
         textPreprocessors: {
@@ -271,11 +300,13 @@ const languageDescriptors = [
     },
     {
         iso: 'yue',
+        iso639_3: 'yue',
         name: 'Cantonese',
         exampleText: '讀',
     },
     {
         iso: 'zh',
+        iso639_3: 'zho',
         name: 'Chinese',
         exampleText: '读',
         isTextLookupWorthy: isStringPartiallyChinese,

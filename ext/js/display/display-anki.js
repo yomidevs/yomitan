@@ -193,7 +193,11 @@ export class DisplayAnki {
      */
     _onOptionsUpdated({options}) {
         const {
-            general: {resultOutputMode, glossaryLayoutMode, compactTags},
+            general: {
+                resultOutputMode,
+                glossaryLayoutMode,
+                compactTags,
+            },
             dictionaries,
             anki: {
                 tags,
@@ -883,7 +887,13 @@ export class DisplayAnki {
     _getAnkiNoteMediaAudioDetails(details) {
         if (details.type !== 'term') { return null; }
         const {sources, preferredAudioIndex} = this._displayAudio.getAnkiNoteMediaAudioDetails(details.term, details.reading);
-        return {sources, preferredAudioIndex, idleTimeout: this._audioDownloadIdleTimeout};
+        const languageSummary = this._display.getLanguageSummary();
+        return {
+            sources,
+            preferredAudioIndex,
+            idleTimeout: this._audioDownloadIdleTimeout,
+            languageSummary,
+        };
     }
 
     // View note functions
