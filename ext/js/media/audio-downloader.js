@@ -56,6 +56,8 @@ export class AudioDownloader {
             ['custom', this._getInfoCustom.bind(this)],
             ['custom-json', this._getInfoCustomJson.bind(this)],
         ]));
+        /** @type {Intl.DisplayNames} */
+        this._regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
     }
 
     /**
@@ -243,7 +245,7 @@ export class AudioDownloader {
             throw new Error('Invalid arguments');
         }
         const {iso} = languageSummary;
-        const searchString = `${iso}-${term}[0123456789]*.ogg`;
+        const searchString = `${iso}(-[a-zA-Z]{2})?-${term}[0123456789]*.ogg`;
         const fetchUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&list=search&srsearch=intitle:/${searchString}/i&srnamespace=6&origin=*`;
 
         /**
@@ -251,19 +253,35 @@ export class AudioDownloader {
          * @returns {boolean}
          */
         const validateFilename = (filename) => {
-            const validFilenameTest = new RegExp(`^File:${iso}-${term}\\d*\\.ogg$`, 'i');
+            const validFilenameTest = new RegExp(`^File:${iso}(-\\w\\w)?-${term}\\d*\\.ogg$`, 'i');
             return validFilenameTest.test(filename);
         };
 
-        return await this.getInfoWikimediaCommons(fetchUrl, validateFilename);
+        /**
+         * @param {string} filename
+         * @param {string} fileUser
+         * @returns {string}
+         */
+        const displayName = (filename, fileUser) => {
+            const match = filename.match(new RegExp(`^File:${iso}(-\\w\\w)-${term}`, 'i'));
+            if (match === null) {
+                return fileUser;
+            }
+            const region = match[1].substring(1).toUpperCase();
+            const regionName = this._regionNames.of(region);
+            return `(${regionName}) ${fileUser}`;
+        };
+
+        return await this.getInfoWikimediaCommons(fetchUrl, validateFilename, displayName);
     }
 
     /**
      * @param {string} fetchUrl
      * @param {(filename: string, fileUser: string) => boolean} validateFilename
+     * @param {(filename: string, fileUser: string) => string} [displayName]
      * @returns {Promise<import('audio-downloader').Info1[]>}
      */
-    async getInfoWikimediaCommons(fetchUrl, validateFilename) {
+    async getInfoWikimediaCommons(fetchUrl, validateFilename, displayName = (_filename, fileUser) => fileUser) {
         const response = await this._requestBuilder.fetchAnonymous(fetchUrl, DEFAULT_REQUEST_INIT_PARAMS);
 
         /** @type {import('audio-downloader').WikimediaCommonsLookupResponse} */
@@ -281,7 +299,7 @@ export class AudioDownloader {
                 const fileUrl = page.imageinfo[0].url;
                 const fileUser = page.imageinfo[0].user;
                 if (validateFilename(title, fileUser)) {
-                    results.push({type: 'url', url: fileUrl, name: fileUser});
+                    results.push({type: 'url', url: fileUrl, name: displayName(title, fileUser)});
                 }
             }
             return /** @type {import('audio-downloader').Info1[]} */ (results);
