@@ -318,7 +318,7 @@ Now, we may want to verify that `boss` really does not deinflect to `bo`. You ca
 
 Here, by setting `valid` to `false`, we are telling the test function to fail this test case if only `boss` deinflects to `bo` with the `ns` condition under a double `plural` rule.
 
-You can also optionally pass a `preprocess` helper function to `testLanguageTransformer`. Confer the language transforms test files for its specific use case.
+You can also optionally pass a `preprocess` helper function to `testLanguageTransformer`. Refer to the language transforms test files for its specific use case.
 
 ### Text Postprocessors
 
