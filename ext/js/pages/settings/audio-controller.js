@@ -47,6 +47,8 @@ export class AudioController extends EventDispatcher {
         this._voiceTestTextInput = querySelectorNotNull(document, '#text-to-speech-voice-test-text');
         /** @type {import('audio-controller').VoiceInfo[]} */
         this._voices = [];
+        /** @type {string} */
+        this._language = 'ja';
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
@@ -121,12 +123,18 @@ export class AudioController extends EventDispatcher {
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
+        const {
+            general: {language},
+            audio: {sources},
+        } = options;
+
+        this._language = language;
+
         for (const entry of this._audioSourceEntries) {
             entry.cleanup();
         }
         this._audioSourceEntries = [];
 
-        const {sources} = options.audio;
         for (let i = 0, ii = sources.length; i < ii; ++i) {
             this._createAudioSourceEntry(i, sources[i]);
         }
@@ -216,21 +224,29 @@ export class AudioController extends EventDispatcher {
      * @returns {import('settings').AudioSourceType}
      */
     _getUnusedAudioSourceType() {
-        /** @type {import('settings').AudioSourceType[]} */
-        const typesAvailable = [
-            'jpod101',
-            'jpod101-alternate',
-            'jisho',
-            'lingua-libre',
-            'wiktionary',
-            'custom',
-        ];
+        const typesAvailable = this._getAvailableAudioSourceTypes();
         for (const type of typesAvailable) {
             if (!this._audioSourceEntries.some((entry) => entry.type === type)) {
                 return type;
             }
         }
         return typesAvailable[0];
+    }
+
+    /**
+     * @returns {import('settings').AudioSourceType[]}
+     */
+    _getAvailableAudioSourceTypes() {
+        /** @type {import('settings').AudioSourceType[]} */
+        const typesAvailable = [
+            'lingua-libre',
+            'wiktionary',
+            'custom',
+        ];
+        if (this._language === 'ja') {
+            typesAvailable.unshift('jpod101', 'jpod101-alternate', 'jisho');
+        }
+        return typesAvailable;
     }
 
     /** */

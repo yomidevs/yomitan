@@ -419,13 +419,7 @@
                                                 }
                                             }
                                         },
-                                        "default": [
-                                            {
-                                                "type": "jpod101",
-                                                "url": "",
-                                                "voice": ""
-                                            }
-                                        ]
+                                        "default": []
                                     }
                                 }
                             },
