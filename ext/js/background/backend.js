@@ -676,8 +676,8 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'getTermAudioInfoList'>} */
-    async _onApiGetTermAudioInfoList({source, term, reading}) {
-        return await this._audioDownloader.getTermAudioInfoList(source, term, reading);
+    async _onApiGetTermAudioInfoList({source, term, reading, languageSummary}) {
+        return await this._audioDownloader.getTermAudioInfoList(source, term, reading, languageSummary);
     }
 
     /** @type {import('api').ApiHandler<'sendMessageToFrame'>} */
@@ -1310,19 +1310,23 @@ export class Backend {
             this._clipboardMonitor.stop();
         }
 
-        if (options.general.enableContextMenuScanSelected) {
-            chrome.contextMenus.create({
-                id: 'yomitan_lookup',
-                title: 'Lookup in Yomitan',
-                contexts: ['selection'],
-            }, () => this._checkLastError(chrome.runtime.lastError));
-            chrome.contextMenus.onClicked.addListener((info) => {
-                if (info.selectionText) {
-                    this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
-                }
-            });
-        } else {
-            chrome.contextMenus.remove('yomitan_lookup', () => this._checkLastError(chrome.runtime.lastError));
+        try {
+            if (options.general.enableContextMenuScanSelected) {
+                chrome.contextMenus.create({
+                    id: 'yomitan_lookup',
+                    title: 'Lookup in Yomitan',
+                    contexts: ['selection'],
+                }, () => this._checkLastError(chrome.runtime.lastError));
+                chrome.contextMenus.onClicked.addListener((info) => {
+                    if (info.selectionText) {
+                        this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
+                    }
+                });
+            } else {
+                chrome.contextMenus.remove('yomitan_lookup', () => this._checkLastError(chrome.runtime.lastError));
+            }
+        } catch (e) {
+            log.error(e);
         }
 
         void this._accessibilityController.update(this._getOptionsFull(false));
@@ -2167,7 +2171,7 @@ export class Backend {
         const {term, reading} = definitionDetails;
         if (term.length === 0 && reading.length === 0) { return null; }
 
-        const {sources, preferredAudioIndex, idleTimeout} = details;
+        const {sources, preferredAudioIndex, idleTimeout, languageSummary} = details;
         let data;
         let contentType;
         try {
@@ -2177,6 +2181,7 @@ export class Backend {
                 term,
                 reading,
                 idleTimeout,
+                languageSummary,
             ));
         } catch (e) {
             const error = this._getAudioDownloadError(e);

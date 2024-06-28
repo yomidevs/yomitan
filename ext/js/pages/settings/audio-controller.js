@@ -221,6 +221,7 @@ export class AudioController extends EventDispatcher {
             'jpod101',
             'jpod101-alternate',
             'jisho',
+            'lingua-libre',
             'custom',
         ];
         for (const type of typesAvailable) {
@@ -488,6 +489,7 @@ class AudioSourceEntry {
             case 'jpod101':
             case 'jpod101-alternate':
             case 'jisho':
+            case 'lingua-libre':
             case 'text-to-speech':
             case 'text-to-speech-reading':
             case 'custom':

@@ -188,6 +188,8 @@ export type TermDictionaryEntry = {
     readonly reading: string | string[];
     readonly expressions: TermHeadword[];
     readonly glossary?: DictionaryData.TermGlossary[];
+    readonly glossaryScopedStyles?: string;
+    readonly dictScopedStyles?: string;
     readonly definitionTags?: Tag[];
     readonly termTags?: Tag[];
     readonly definitions?: TermDefinition[];
@@ -228,6 +230,8 @@ export type TermDefinition = {
     dictionary: string;
     glossary: DictionaryData.TermGlossary[];
     definitionTags: Tag[];
+    glossaryScopedStyles: string;
+    dictScopedStyles: string;
     only?: string[];
 };
 

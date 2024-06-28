@@ -57,6 +57,7 @@ export class DisplayAudio {
             ['jpod101', 'JapanesePod101'],
             ['jpod101-alternate', 'JapanesePod101 (Alternate)'],
             ['jisho', 'Jisho.org'],
+            ['lingua-libre', 'Lingua Libre'],
             ['text-to-speech', 'Text-to-speech'],
             ['text-to-speech-reading', 'Text-to-speech (Kana reading)'],
             ['custom', 'Custom URL'],
@@ -677,7 +678,8 @@ export class DisplayAudio {
      */
     async _getTermAudioInfoList(source, term, reading) {
         const sourceData = this._getSourceData(source);
-        const infoList = await this._display.application.api.getTermAudioInfoList(sourceData, term, reading);
+        const languageSummary = this._display.getLanguageSummary();
+        const infoList = await this._display.application.api.getTermAudioInfoList(sourceData, term, reading, languageSummary);
         return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
     }
 

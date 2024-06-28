@@ -26,12 +26,14 @@ import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
+import {setProfile} from '../data/profiles-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {ScrollElement} from '../dom/scroll-element.js';
 import {TextSourceGenerator} from '../dom/text-source-generator.js';
 import {HotkeyHelpController} from '../input/hotkey-help-controller.js';
 import {TextScanner} from '../language/text-scanner.js';
+import {checkPopupPreviewURL} from '../pages/settings/popup-preview-controller.js';
 import {DisplayContentManager} from './display-content-manager.js';
 import {DisplayGenerator} from './display-generator.js';
 import {DisplayHistory} from './display-history.js';
@@ -95,7 +97,7 @@ export class Display extends EventDispatcher {
         /** @type {boolean} */
         this._historyHasChanged = false;
         /** @type {?Element} */
-        this._navigationHeader = document.querySelector('#navigation-header');
+        this._aboveStickyHeader = document.querySelector('#above-sticky-header');
         /** @type {import('display').PageType} */
         this._contentType = 'clear';
         /** @type {string} */
@@ -190,6 +192,8 @@ export class Display extends EventDispatcher {
         this._onMenuButtonMenuCloseBind = this._onMenuButtonMenuClose.bind(this);
         /** @type {ThemeController} */
         this._themeController = new ThemeController(document.documentElement);
+        /** @type {import('language').LanguageSummary[]} */
+        this._languageSummaries = [];
 
         /* eslint-disable @stylistic/no-multi-spaces */
         this._hotkeyHandler.registerActions([
@@ -200,8 +204,8 @@ export class Display extends EventDispatcher {
             ['firstEntry',        () => { this._focusEntry(0, 0, true); }],
             ['historyBackward',   () => { this._sourceTermView(); }],
             ['historyForward',    () => { this._nextTermView(); }],
-            ['profilePrevious',   async () => { await this._setProfile(-1); }],
-            ['profileNext',       async () => { await this._setProfile(1); }],
+            ['profilePrevious',   async () => { await setProfile(-1, this._application); }],
+            ['profileNext',       async () => { await setProfile(1, this._application); }],
             ['copyHostSelection', () => this._copyHostSelection()],
             ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }],
@@ -303,7 +307,6 @@ export class Display extends EventDispatcher {
     /** */
     async prepare() {
         // Theme
-        this._themeController.siteTheme = 'light';
         this._themeController.prepare();
 
         // State setup
@@ -314,6 +317,8 @@ export class Display extends EventDispatcher {
         if (documentElement !== null) {
             documentElement.dataset.browser = browser;
         }
+
+        this._languageSummaries = await this._application.api.getLanguageSummaries();
 
         // Prepare
         await this._hotkeyHelpController.prepare(this._application.api);
@@ -394,6 +399,16 @@ export class Display extends EventDispatcher {
      */
     getOptions() {
         return this._options;
+    }
+
+    /**
+     * @returns {import('language').LanguageSummary}
+     * @throws {Error}
+     */
+    getLanguageSummary() {
+        if (this._options === null) { throw new Error('Options is null'); }
+        const language = this._options.general.language;
+        return /** @type {import('language').LanguageSummary} */ (this._languageSummaries.find(({iso}) => iso === language));
     }
 
     /**
@@ -486,6 +501,10 @@ export class Display extends EventDispatcher {
                 this._updateHistoryState();
                 this._history.pushState(state, content, url);
                 break;
+        }
+
+        if (this._options) {
+            this._setTheme(this._options);
         }
     }
 
@@ -1147,11 +1166,59 @@ export class Display extends EventDispatcher {
      */
     _setTheme(options) {
         const {general} = options;
-        const {popupTheme} = general;
+        const {popupTheme, popupOuterTheme} = general;
+        /** @type {string} */
+        let pageType = this._pageType;
+        try {
+            // eslint-disable-next-line no-underscore-dangle
+            const historyState = this._history._current.state;
+
+            const pageTheme = historyState?.pageTheme;
+            this._themeController.siteTheme = pageTheme ?? null;
+
+            if (checkPopupPreviewURL(historyState?.url)) {
+                pageType = 'popupPreview';
+            }
+        } catch (e) {
+            log.error(e);
+        }
         this._themeController.theme = popupTheme;
-        this._themeController.outerTheme = general.popupOuterTheme;
+        this._themeController.outerTheme = popupOuterTheme;
+        this._themeController.siteOverride = pageType === 'search' || pageType === 'popupPreview';
         this._themeController.updateTheme();
-        this.setCustomCss(general.customPopupCss);
+        const customCss = this._getCustomCss(options);
+        this.setCustomCss(customCss);
+    }
+
+    /**
+     * @param {import('settings').ProfileOptions} options
+     * @returns {string}
+     */
+    _getCustomCss(options) {
+        const {general: {customPopupCss}, dictionaries} = options;
+        let customCss = customPopupCss;
+        for (const {name, enabled, styles = ''} of dictionaries) {
+            if (enabled) {
+                customCss += '\n' + this._addScopeToCss(styles, name);
+            }
+        }
+        this.setCustomCss(customCss);
+        return customCss;
+    }
+
+    /**
+     * @param {string} css
+     * @param {string} dictionaryTitle
+     * @returns {string}
+     */
+    _addScopeToCss(css, dictionaryTitle) {
+        const escapedTitle = dictionaryTitle
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"');
+
+        const regex = /([^\r\n,{}]+)(\s*[,{])/g;
+        const replacement = `[data-dictionary="${escapedTitle}"] $1$2`;
+        return css.replace(regex, replacement);
     }
 
     /**
@@ -1162,28 +1229,45 @@ export class Display extends EventDispatcher {
      * @returns {Promise<import('dictionary').DictionaryEntry[]>}
      */
     async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
+        /** @type {import('dictionary').DictionaryEntry[]} */
+        let dictionaryEntries = [];
+        const {findDetails, source: source2} = this._getFindDetails(source, wildcardsEnabled);
         if (isKanji) {
-            return await this._application.api.kanjiFind(source, optionsContext);
-        } else {
-            /** @type {import('api').FindTermsDetails} */
-            const findDetails = {};
-            if (wildcardsEnabled) {
-                const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
-                if (match !== null) {
-                    if (match[1]) {
-                        findDetails.matchType = 'suffix';
-                        findDetails.deinflect = false;
-                    } else if (match[3]) {
-                        findDetails.matchType = 'prefix';
-                        findDetails.deinflect = false;
-                    }
-                    source = match[2];
-                }
-            }
+            dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
+            if (dictionaryEntries.length > 0) { return dictionaryEntries; }
 
-            const {dictionaryEntries} = await this._application.api.termsFind(source, findDetails, optionsContext);
-            return dictionaryEntries;
+            dictionaryEntries = (await this._application.api.termsFind(source2, findDetails, optionsContext)).dictionaryEntries;
+        } else {
+            dictionaryEntries = (await this._application.api.termsFind(source2, findDetails, optionsContext)).dictionaryEntries;
+            if (dictionaryEntries.length > 0) { return dictionaryEntries; }
+
+            dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
         }
+        return dictionaryEntries;
+    }
+
+    /**
+     * @param {string} source
+     * @param {boolean} wildcardsEnabled
+     * @returns {{findDetails: import('api').FindTermsDetails, source: string}}
+     */
+    _getFindDetails(source, wildcardsEnabled) {
+        /** @type {import('api').FindTermsDetails} */
+        const findDetails = {};
+        if (wildcardsEnabled) {
+            const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
+            if (match !== null) {
+                if (match[1]) {
+                    findDetails.matchType = 'suffix';
+                    findDetails.deinflect = false;
+                } else if (match[3]) {
+                    findDetails.matchType = 'prefix';
+                    findDetails.deinflect = false;
+                }
+                source = match[2];
+            }
+        }
+        return {findDetails, source};
     }
 
     /**
@@ -1463,8 +1547,8 @@ export class Display extends EventDispatcher {
         }
         let target = (index === 0 && definitionIndex <= 0) || node === null ? 0 : this._getElementTop(node);
 
-        if (this._navigationHeader !== null) {
-            target -= this._navigationHeader.getBoundingClientRect().height;
+        if (this._aboveStickyHeader !== null && target !== 0) {
+            target += this._aboveStickyHeader.getBoundingClientRect().height;
         }
 
         this._windowScroll.stop();
@@ -1932,6 +2016,7 @@ export class Display extends EventDispatcher {
                 url,
                 sentence: sentence !== null ? sentence : void 0,
                 documentTitle,
+                pageTheme: 'light',
             },
             content: {
                 dictionaryEntries: dictionaryEntries !== null ? dictionaryEntries : void 0,
@@ -2027,26 +2112,6 @@ export class Display extends EventDispatcher {
         if (!Number.isFinite(count)) { count = 1; }
         count = Math.max(0, Math.floor(count));
         this._focusEntry(this._index + count * sign, 0, true);
-    }
-
-    /**
-     * @param {number} direction
-     */
-    async _setProfile(direction) {
-        const optionsFull = await this.application.api.optionsGetFull();
-
-        const profileCount = optionsFull.profiles.length;
-        const newProfile = (optionsFull.profileCurrent + direction + profileCount) % profileCount;
-
-        /** @type {import('settings-modifications').ScopedModificationSet} */
-        const modification = {
-            action: 'set',
-            path: 'profileCurrent',
-            value: newProfile,
-            scope: 'global',
-            optionsContext: null,
-        };
-        await this.application.api.modifySettings([modification], 'search');
     }
 
     /** */

@@ -402,7 +402,7 @@ export class DictionaryImportController {
             return errors;
         }
 
-        const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
+        const errors2 = await this._addDictionarySettings(result);
 
         await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
 
@@ -415,11 +415,11 @@ export class DictionaryImportController {
     }
 
     /**
-     * @param {boolean} sequenced
-     * @param {string} title
+     * @param {import('dictionary-importer').Summary} summary
      * @returns {Promise<Error[]>}
      */
-    async _addDictionarySettings(sequenced, title) {
+    async _addDictionarySettings(summary) {
+        const {title, sequenced, styles} = summary;
         let optionsFull;
         // Workaround Firefox bug sometimes causing getOptionsFull to fail
         for (let i = 0, success = false; (i < 10) && (success === false); i++) {
@@ -439,7 +439,7 @@ export class DictionaryImportController {
         for (let i = 0; i < profileCount; ++i) {
             const {options} = optionsFull.profiles[i];
             const enabled = profileIndex === i;
-            const value = DictionaryController.createDefaultDictionarySettings(title, enabled);
+            const value = DictionaryController.createDefaultDictionarySettings(title, enabled, styles);
             const path1 = `profiles[${i}].options.dictionaries`;
             targets.push({action: 'push', path: path1, items: [value]});
 

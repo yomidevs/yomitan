@@ -2462,7 +2462,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -2636,7 +2637,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -2810,7 +2812,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -2984,7 +2987,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -5240,7 +5244,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -5414,7 +5419,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -5982,7 +5988,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -6156,7 +6163,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -6712,7 +6720,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -6778,7 +6787,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -6844,7 +6854,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -6910,7 +6921,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -7590,7 +7602,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -7812,7 +7825,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -8849,7 +8863,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -9621,19 +9636,24 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "-te"
+                "name": "-te",
+                "description": "te-form.\nIt has a myriad of meanings. Primarily, it is a conjunctive particle that connects two clauses together.\nUsage: Attach て to the continuative form (renyoukei) of verbs after euphonic change form, くて to the stem of i-adjectives."
               },
               {
-                "name": "progressive or perfect"
+                "name": "-teiru",
+                "description": "1. Indicates an action continues or progresses to a point in time.\n2. Indicates an action is completed and remains as is.\n3. Indicates a state or condition that can be taken to be the result of undergoing some change.\nUsage: Attach いる to the te-form of verbs. い can be dropped in speech.\n(Slang) Attach おる to the te-form of verbs. Contracts to とる・でる in speech."
               },
               {
-                "name": "polite"
+                "name": "-masu",
+                "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
               },
               {
-                "name": "negative"
+                "name": "negative",
+                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません."
               },
               {
-                "name": "past"
+                "name": "-ta",
+                "description": "1. Indicates a reality that has happened in the past.\n2. Indicates the completion of an action.\n3. Indicates the confirmation of a matter.\n4. Indicates the speaker's confidence that the action will definitely be fulfilled.\n5. Indicates the events that occur before the main clause are represented as relative past.\n6. Indicates a mild imperative/command.\nUsage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives."
               }
             ]
           }
@@ -9831,19 +9851,24 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "-te"
+                "name": "-te",
+                "description": "te-form.\nIt has a myriad of meanings. Primarily, it is a conjunctive particle that connects two clauses together.\nUsage: Attach て to the continuative form (renyoukei) of verbs after euphonic change form, くて to the stem of i-adjectives."
               },
               {
-                "name": "progressive or perfect"
+                "name": "-teiru",
+                "description": "1. Indicates an action continues or progresses to a point in time.\n2. Indicates an action is completed and remains as is.\n3. Indicates a state or condition that can be taken to be the result of undergoing some change.\nUsage: Attach いる to the te-form of verbs. い can be dropped in speech.\n(Slang) Attach おる to the te-form of verbs. Contracts to とる・でる in speech."
               },
               {
-                "name": "polite"
+                "name": "-masu",
+                "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
               },
               {
-                "name": "negative"
+                "name": "negative",
+                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません."
               },
               {
-                "name": "past"
+                "name": "-ta",
+                "description": "1. Indicates a reality that has happened in the past.\n2. Indicates the completion of an action.\n3. Indicates the confirmation of a matter.\n4. Indicates the speaker's confidence that the action will definitely be fulfilled.\n5. Indicates the events that occur before the main clause are represented as relative past.\n6. Indicates a mild imperative/command.\nUsage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives."
               }
             ]
           }
@@ -10041,19 +10066,24 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "-te"
+                "name": "-te",
+                "description": "te-form.\nIt has a myriad of meanings. Primarily, it is a conjunctive particle that connects two clauses together.\nUsage: Attach て to the continuative form (renyoukei) of verbs after euphonic change form, くて to the stem of i-adjectives."
               },
               {
-                "name": "progressive or perfect"
+                "name": "-teiru",
+                "description": "1. Indicates an action continues or progresses to a point in time.\n2. Indicates an action is completed and remains as is.\n3. Indicates a state or condition that can be taken to be the result of undergoing some change.\nUsage: Attach いる to the te-form of verbs. い can be dropped in speech.\n(Slang) Attach おる to the te-form of verbs. Contracts to とる・でる in speech."
               },
               {
-                "name": "polite"
+                "name": "-masu",
+                "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
               },
               {
-                "name": "negative"
+                "name": "negative",
+                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません."
               },
               {
-                "name": "past"
+                "name": "-ta",
+                "description": "1. Indicates a reality that has happened in the past.\n2. Indicates the completion of an action.\n3. Indicates the confirmation of a matter.\n4. Indicates the speaker's confidence that the action will definitely be fulfilled.\n5. Indicates the events that occur before the main clause are represented as relative past.\n6. Indicates a mild imperative/command.\nUsage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives."
               }
             ]
           }
@@ -10251,19 +10281,24 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "-te"
+                "name": "-te",
+                "description": "te-form.\nIt has a myriad of meanings. Primarily, it is a conjunctive particle that connects two clauses together.\nUsage: Attach て to the continuative form (renyoukei) of verbs after euphonic change form, くて to the stem of i-adjectives."
               },
               {
-                "name": "progressive or perfect"
+                "name": "-teiru",
+                "description": "1. Indicates an action continues or progresses to a point in time.\n2. Indicates an action is completed and remains as is.\n3. Indicates a state or condition that can be taken to be the result of undergoing some change.\nUsage: Attach いる to the te-form of verbs. い can be dropped in speech.\n(Slang) Attach おる to the te-form of verbs. Contracts to とる・でる in speech."
               },
               {
-                "name": "polite"
+                "name": "-masu",
+                "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
               },
               {
-                "name": "negative"
+                "name": "negative",
+                "description": "1. Negative form of verbs.\n2. Expresses a feeling of solicitation to the other party.\nUsage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません."
               },
               {
-                "name": "past"
+                "name": "-ta",
+                "description": "1. Indicates a reality that has happened in the past.\n2. Indicates the completion of an action.\n3. Indicates the confirmation of a matter.\n4. Indicates the speaker's confidence that the action will definitely be fulfilled.\n5. Indicates the events that occur before the main clause are represented as relative past.\n6. Indicates a mild imperative/command.\nUsage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives."
               }
             ]
           }
@@ -10461,7 +10496,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -10635,7 +10671,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -10809,7 +10846,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -10983,7 +11021,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -12288,7 +12327,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -12462,7 +12502,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -12636,7 +12677,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -12810,7 +12852,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -14115,7 +14158,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -14289,7 +14333,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -14463,7 +14508,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -14637,7 +14683,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -15166,7 +15213,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -15386,10 +15434,12 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "polite"
+                "name": "-masu",
+                "description": "Polite conjugation of verbs and adjectives.\nUsage: Attach ます to the continuative form (renyoukei) of verbs."
               },
               {
-                "name": "past"
+                "name": "-ta",
+                "description": "1. Indicates a reality that has happened in the past.\n2. Indicates the completion of an action.\n3. Indicates the confirmation of a matter.\n4. Indicates the speaker's confidence that the action will definitely be fulfilled.\n5. Indicates the events that occur before the main clause are represented as relative past.\n6. Indicates a mild imperative/command.\nUsage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives."
               }
             ]
           }
@@ -15961,7 +16011,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "masu stem"
+                "name": "continuative",
+                "description": "Used to indicate actions that are (being) carried out.\nRefers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu."
               }
             ]
           }
@@ -17168,10 +17219,11 @@
         "isPrimary": true,
         "inflectionRuleChainCandidates": [
           {
-            "source": "both",
+            "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "past"
+                "name": "-ta",
+                "description": "1. Indicates a reality that has happened in the past.\n2. Indicates the completion of an action.\n3. Indicates the confirmation of a matter.\n4. Indicates the speaker's confidence that the action will definitely be fulfilled.\n5. Indicates the events that occur before the main clause are represented as relative past.\n6. Indicates a mild imperative/command.\nUsage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives."
               }
             ]
           },
@@ -17179,11 +17231,20 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "past"
+                "name": "-ta",
+                "description": "1. Indicates a reality that has happened in the past.\n2. Indicates the completion of an action.\n3. Indicates the confirmation of a matter.\n4. Indicates the speaker's confidence that the action will definitely be fulfilled.\n5. Indicates the events that occur before the main clause are represented as relative past.\n6. Indicates a mild imperative/command.\nUsage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives."
               },
               {
                 "name": "kansai-ben",
                 "description": "past form of kansai-ben terms"
+              }
+            ]
+          },
+          {
+            "source": "dictionary",
+            "inflectionRules": [
+              {
+                "name": "past"
               }
             ]
           }
@@ -18644,7 +18705,8 @@
             "source": "algorithm",
             "inflectionRules": [
               {
-                "name": "adv"
+                "name": "-ku",
+                "description": "Adverbial form of i-adjectives.\n"
               },
               {
                 "name": "kansai-ben",

@@ -263,6 +263,7 @@ export type DictionaryOptions = {
     definitionsCollapsible: DictionaryDefinitionsCollapsible;
     partsOfSpeechFilter: boolean;
     useDeinflections: boolean;
+    styles?: string;
 };
 
 export type ParsingOptions = {
@@ -382,7 +383,7 @@ export type PopupWindowType = 'normal' | 'popup';
 
 export type PopupWindowState = 'normal' | 'maximized' | 'fullscreen';
 
-export type AudioSourceType = 'jpod101' | 'jpod101-alternate' | 'jisho' | 'text-to-speech' | 'text-to-speech-reading' | 'custom' | 'custom-json';
+export type AudioSourceType = 'jpod101' | 'jpod101-alternate' | 'jisho' | 'lingua-libre' | 'text-to-speech' | 'text-to-speech-reading' | 'custom' | 'custom-json';
 
 export type TranslationConvertType = 'false' | 'true' | 'variant';
 

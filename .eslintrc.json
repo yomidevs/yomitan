@@ -43,15 +43,6 @@
     ],
     "rules": {
         "accessor-pairs": "error",
-        "capitalized-comments": [
-            "error",
-            "always",
-            {
-                "ignorePattern": "case|[a-z]+[A-Z0-9]|[a-z]+\\.\\w",
-                "ignoreInlineComments": true,
-                "ignoreConsecutiveComments": true
-            }
-        ],
         "curly": ["error", "all"],
         "default-case-last": "error",
         "dot-notation": "error",
@@ -662,6 +653,7 @@
                 "ext/js/language/sga/old-irish-transforms.js",
                 "ext/js/language/sh/serbo-croatian-text-preprocessors.js",
                 "ext/js/language/sq/albanian-transforms.js",
+                "ext/js/language/vi/viet-text-preprocessors.js",
                 "ext/js/language/text-processors.js",
                 "ext/js/language/translator.js",
                 "ext/js/language/zh/chinese.js",

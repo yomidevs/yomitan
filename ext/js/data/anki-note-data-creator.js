@@ -33,8 +33,9 @@ export function createAnkiNoteData(marker, {
     compactTags,
     context,
     media,
+    dictionaryStylesMap,
 }) {
-    const definition = createCachedValue(getDefinition.bind(null, dictionaryEntry, context, resultOutputMode));
+    const definition = createCachedValue(getDefinition.bind(null, dictionaryEntry, context, resultOutputMode, dictionaryStylesMap));
     const uniqueExpressions = createCachedValue(getUniqueExpressions.bind(null, dictionaryEntry));
     const uniqueReadings = createCachedValue(getUniqueReadings.bind(null, dictionaryEntry));
     const context2 = createCachedValue(getPublicContext.bind(null, context));
@@ -306,12 +307,13 @@ function getPitchCount(cachedPitches) {
  * @param {import('dictionary').DictionaryEntry} dictionaryEntry
  * @param {import('anki-templates-internal').Context} context
  * @param {import('settings').ResultOutputMode} resultOutputMode
+ * @param {Map<string, string>} dictionaryStylesMap
  * @returns {import('anki-templates').DictionaryEntry}
  */
-function getDefinition(dictionaryEntry, context, resultOutputMode) {
+function getDefinition(dictionaryEntry, context, resultOutputMode, dictionaryStylesMap) {
     switch (dictionaryEntry.type) {
         case 'term':
-            return getTermDefinition(dictionaryEntry, context, resultOutputMode);
+            return getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionaryStylesMap);
         case 'kanji':
             return getKanjiDefinition(dictionaryEntry, context);
         default:
@@ -409,9 +411,10 @@ function getKanjiFrequencies(dictionaryEntry) {
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
  * @param {import('anki-templates-internal').Context} context
  * @param {import('settings').ResultOutputMode} resultOutputMode
+ * @param {Map<string, string>} dictionaryStylesMap
  * @returns {import('anki-templates').TermDictionaryEntry}
  */
-function getTermDefinition(dictionaryEntry, context, resultOutputMode) {
+function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionaryStylesMap) {
     /** @type {import('anki-templates').TermDictionaryEntryType} */
     let type = 'term';
     switch (resultOutputMode) {
@@ -427,7 +430,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode) {
     const primarySource = getPrimarySource(dictionaryEntry);
 
     const dictionaryNames = createCachedValue(getTermDictionaryNames.bind(null, dictionaryEntry));
-    const commonInfo = createCachedValue(getTermDictionaryEntryCommonInfo.bind(null, dictionaryEntry, type));
+    const commonInfo = createCachedValue(getTermDictionaryEntryCommonInfo.bind(null, dictionaryEntry, type, dictionaryStylesMap));
     const termTags = createCachedValue(getTermTags.bind(null, dictionaryEntry, type));
     const expressions = createCachedValue(getTermExpressions.bind(null, dictionaryEntry));
     const frequencies = createCachedValue(getTermFrequencies.bind(null, dictionaryEntry));
@@ -436,6 +439,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode) {
     const pitches = createCachedValue(getTermPitches.bind(null, dictionaryEntry));
     const phoneticTranscriptions = createCachedValue(getTermPhoneticTranscriptions.bind(null, dictionaryEntry));
     const glossary = createCachedValue(getTermGlossaryArray.bind(null, dictionaryEntry, type));
+    const styleInfo = createCachedValue(getTermStyles.bind(null, dictionaryEntry, type, dictionaryStylesMap));
     const cloze = createCachedValue(getCloze.bind(null, dictionaryEntry, context));
     const furiganaSegments = createCachedValue(getTermFuriganaSegments.bind(null, dictionaryEntry, type));
     const sequence = createCachedValue(getTermDictionaryEntrySequence.bind(null, dictionaryEntry));
@@ -466,6 +470,8 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode) {
         },
         get expressions() { return getCachedValue(expressions); },
         get glossary() { return getCachedValue(glossary); },
+        get glossaryScopedStyles() { return getCachedValue(styleInfo)?.glossaryScopedStyles; },
+        get dictScopedStyles() { return getCachedValue(styleInfo)?.dictScopedStyles; },
         get definitionTags() { return type === 'term' ? getCachedValue(commonInfo).definitionTags : void 0; },
         get termTags() { return getCachedValue(termTags); },
         get definitions() { return getCachedValue(commonInfo).definitions; },
@@ -496,9 +502,10 @@ function getTermDictionaryNames(dictionaryEntry) {
 /**
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
  * @param {import('anki-templates').TermDictionaryEntryType} type
+ * @param {Map<string, string>} dictionaryStylesMap
  * @returns {import('anki-templates').TermDictionaryEntryCommonInfo}
  */
-function getTermDictionaryEntryCommonInfo(dictionaryEntry, type) {
+function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStylesMap) {
     const merged = (type === 'termMerged');
     const hasDefinitions = (type !== 'term');
 
@@ -518,6 +525,13 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type) {
     /** @type {import('anki-templates').Tag[]} */
     const definitionTags = [];
     for (const {tags, headwordIndices, entries, dictionary, sequences} of dictionaryEntry.definitions) {
+        const dictionaryStyles = dictionaryStylesMap.get(dictionary);
+        let glossaryScopedStyles = '';
+        let dictScopedStyles = '';
+        if (dictionaryStyles) {
+            glossaryScopedStyles = addGlossaryScopeToCss(dictionaryStyles);
+            dictScopedStyles = addGlossaryScopeToCss(addDictionaryScopeToCss(dictionaryStyles, dictionary));
+        }
         const definitionTags2 = [];
         for (const tag of tags) {
             definitionTags.push(convertTag(tag));
@@ -528,6 +542,8 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type) {
         definitions.push({
             sequence: sequences[0],
             dictionary,
+            glossaryScopedStyles,
+            dictScopedStyles,
             glossary: entries,
             definitionTags: definitionTags2,
             only,
@@ -541,6 +557,39 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type) {
         definitions: hasDefinitions ? definitions : void 0,
     };
 }
+
+/**
+ * @param {string} css
+ * @returns {string}
+ */
+function addGlossaryScopeToCss(css) {
+    return addScopeToCss(css, '.yomitan-glossary');
+}
+
+/**
+ * @param {string} css
+ * @param {string} dictionaryTitle
+ * @returns {string}
+ */
+function addDictionaryScopeToCss(css, dictionaryTitle) {
+    const escapedTitle = dictionaryTitle
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"');
+
+    return addScopeToCss(css, `[data-dictionary="${escapedTitle}"]`);
+}
+
+/**
+ * @param {string} css
+ * @param {string} scopeSelector
+ * @returns {string}
+ */
+function addScopeToCss(css, scopeSelector) {
+    const regex = /([^\r\n,{}]+)(\s*[,{])/g;
+    const replacement = `${scopeSelector} $1$2`;
+    return css.replace(regex, replacement);
+}
+
 
 /**
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
@@ -765,6 +814,28 @@ function getTermGlossaryArray(dictionaryEntry, type) {
         return results;
     }
     return void 0;
+}
+
+/**
+ * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+ * @param {import('anki-templates').TermDictionaryEntryType} type
+ * @param {Map<string, string>} dictionaryStylesMap
+ * @returns {{glossaryScopedStyles: string, dictScopedStyles: string}|undefined}
+ */
+function getTermStyles(dictionaryEntry, type, dictionaryStylesMap) {
+    if (type !== 'term') {
+        return void 0;
+    }
+    let glossaryScopedStyles = '';
+    let dictScopedStyles = '';
+    for (const {dictionary} of dictionaryEntry.definitions) {
+        const dictionaryStyles = dictionaryStylesMap.get(dictionary);
+        if (dictionaryStyles) {
+            glossaryScopedStyles += addGlossaryScopeToCss(dictionaryStyles);
+            dictScopedStyles += addGlossaryScopeToCss(addDictionaryScopeToCss(dictionaryStyles, dictionary));
+        }
+    }
+    return {glossaryScopedStyles, dictScopedStyles};
 }
 
 /**

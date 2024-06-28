@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ThemeController} from '../app/theme-controller.js';
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {log} from '../core/log.js';
@@ -478,6 +479,11 @@ export class TextScanner extends EventDispatcher {
                 this.setCurrentTextSource(textSource);
                 this._selectionRestoreInfo = selectionRestoreInfo;
 
+                /** @type {ThemeController} */
+                this._themeController = new ThemeController(document.documentElement);
+                this._themeController.prepare();
+                const pageTheme = this._themeController.computeSiteTheme();
+
                 this.trigger('searchSuccess', {
                     type,
                     dictionaryEntries,
@@ -486,6 +492,7 @@ export class TextScanner extends EventDispatcher {
                     textSource,
                     optionsContext,
                     detail,
+                    pageTheme,
                 });
             } else {
                 this._triggerSearchEmpty(inputInfo);

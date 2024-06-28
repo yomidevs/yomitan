@@ -12,13 +12,14 @@ If your language is not already available in the Language dropdown, here is how 
 // language-descriptors.js
 {
     iso: 'nl',
+    iso639_3: 'nld',
     name: 'Dutch',
     exampleText: 'lezen',
     textPreprocessors: capitalizationPreprocessors
 }
 ```
 
-1. Look up the ISO 639-1 code for your language. If it is a rarer language it might not have a ISO-639-1 code - if that's the case, use ISO 639-3.
+1. Look up the ISO 639-1 and ISO 639-3 codes for your language. If it is a rarer language it might not have a ISO-639-1 code - if that's the case, use ISO 639-3 for both `iso` and `iso639_3`.
 2. Place your language in the `languageDescriptors` array in `language-descriptors.js`. The languages are sorted alphabetically by ISO code.
 3. The example text is usually some form of the verb "to read" in your language, but it can be any example you feel is good. This will be shown in the preview popup on the settings page.
 4. If your language uses the Latin or Cyrillic script, or another script with capitalization, you will want to use the `capitalizationPreprocessors`. We'll cover this part in more detail a bit later. The `textPreprocessors` field can also be left out.

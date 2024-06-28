@@ -16,12 +16,12 @@
     <link rel="stylesheet" type="text/css" href="/css/display-pronunciation.css">
     <script src="/js/pages/settings/settings-main.js" type="module"></script>
 </head>
-<body>
+<body hidden>
 
 <!-- Main content -->
-<div class="content-outer"><div class="content">
+<div class="content-outer"><div class="content scrollbar">
 <div class="content-left">
-    <div class="sidebar"><div class="sidebar-inner">
+    <div class="sidebar"><div class="sidebar-inner scrollbar">
         <div class="sidebar-body">
             <a href="#!profile"          class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="profile"></span></span><span class="outline-item-label">Profile</span></a>
             <a href="#!dictionaries"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-enabled-warning" hidden><div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div></span></span><span class="outline-item-label">Dictionaries</span></a>
@@ -673,13 +673,14 @@
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Theme</div>
-                <div class="settings-item-description">Adjust the style of the popup.</div>
+                <div class="settings-item-description">Adjust the style of Yomitan.</div>
             </div>
             <div class="settings-item-right">
                 <div class="settings-item-group">
                     <div class="settings-item-group-item">
                         <div class="settings-item-group-item-label">Body</div>
                         <select data-setting="general.popupTheme" class="short-width short-height">
+                            <option value="site">Auto</option>
                             <option value="light">Light</option>
                             <option value="dark">Dark</option>
                             <option value="browser">Browser</option>
@@ -2701,29 +2702,32 @@
 
 
 <!-- Custom CSS modal -->
-<div id="custom-css-modal" class="modal modal-left" tabindex="-1" role="dialog" hidden><div class="modal-content-container1">
-    <div class="modal-content-container2 modal-content-dimmer"><div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title">Custom CSS</div>
-            <div class="modal-header-button-container">
-                <div class="modal-header-button-group">
-                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+<div id="custom-css-modal" class="modal modal-left" tabindex="-1" role="dialog" hidden>
+    <div class="modal-content-container">
+        <div class="modal-content-dimmer"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Custom CSS</div>
+                <div class="modal-header-button-container">
+                    <div class="modal-header-button-group">
+                        <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                        <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                    </div>
                 </div>
             </div>
+
+            <div class="modal-body custom-popup-css-container">
+                <div class="custom-popup-css-header">Popup CSS</div>
+                <textarea class="no-wrap" autocomplete="off" spellcheck="false" id="custom-popup-css" data-setting="general.customPopupCss" data-tab-action="indent,4"></textarea>
+                <div class="custom-popup-css-header margin-above">Popup outer CSS</div>
+                <textarea class="no-wrap" autocomplete="off" spellcheck="false" id="custom-popup-outer-css" data-setting="general.customPopupOuterCss" data-tab-action="indent,4"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-modal-action="hide">Close</button>
+            </div>
         </div>
-        <div class="modal-body custom-popup-css-container">
-            <div class="custom-popup-css-header">Popup CSS</div>
-            <textarea class="no-wrap" autocomplete="off" spellcheck="false" id="custom-popup-css" data-setting="general.customPopupCss" data-tab-action="indent,4"></textarea>
-            <div class="custom-popup-css-header margin-above">Popup outer CSS</div>
-            <textarea class="no-wrap" autocomplete="off" spellcheck="false" id="custom-popup-outer-css" data-setting="general.customPopupOuterCss" data-tab-action="indent,4"></textarea>
-        </div>
-        <div class="modal-footer">
-            <button type="button" data-modal-action="hide">Close</button>
-        </div>
-    </div></div>
-    <div class="modal-content-container1-fade"></div>
-</div></div>
+    </div>
+</div>
 
 
 <!-- Audio sources modal -->

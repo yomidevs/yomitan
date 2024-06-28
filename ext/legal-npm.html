@@ -1,0 +1,65 @@
+<html>
+<body>
+<style>
+body {
+    font: 16px/1.5 monospace;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 3px;
+}
+
+/* Light mode */
+@media (prefers-color-scheme: light) {
+    body {
+        background-color: #f8f9fa;
+        color: #000000;
+    }
+    th {
+        background-color: #ffffff;
+    }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #0a0a0a;
+        color: #ffffff;
+    }
+    th {
+        background-color: #1e1e1e;
+    }
+
+    /* Scrollbars */
+    :root {
+        scrollbar-color: #444444 #2f2f2f;
+    }
+    :root::-webkit-scrollbar {
+        width: auto;
+    }
+    :root::-webkit-scrollbar-button {
+        height: 0;
+    }
+    :root::-webkit-scrollbar-thumb {
+        background-color: #444444;
+    }
+    :root::-webkit-scrollbar-track {
+        background-color: #444444;
+    }
+    :root::-webkit-scrollbar-track-piece {
+        background-color: #2f2f2f;
+    }
+    :root::-webkit-scrollbar-corner {
+        background-color: #2f2f2f;
+    }
+}
+
+</style>
+<table><thead><tr><th class="string">name</th><th class="string">installed version</th><th class="string">license type</th><th class="string">link</th></tr></thead><tbody><tr><td class="string">@zip.js/zip.js</td><td class="string">2.7.45</td><td class="string">BSD-3-Clause</td><td class="string">git+https://github.com/gildas-lormeau/zip.js.git</td></tr><tr><td class="string">dexie</td><td class="string">3.2.5</td><td class="string">Apache-2.0</td><td class="string">git+https://github.com/dfahlander/Dexie.js.git</td></tr><tr><td class="string">dexie-export-import</td><td class="string">4.1.2</td><td class="string">Apache-2.0</td><td class="string">git+https://github.com/dexie/Dexie.js.git</td></tr><tr><td class="string">hangul-js</td><td class="string">0.2.6</td><td class="string">MIT</td><td class="string">git://github.com/e-/Hangul.js.git</td></tr><tr><td class="string">parse5</td><td class="string">7.1.2</td><td class="string">MIT</td><td class="string">git://github.com/inikulin/parse5.git</td></tr><tr><td class="string">wanakana</td><td class="string">5.3.1</td><td class="string">MIT</td><td class="string">git+ssh://git@github.com/WaniKani/WanaKana.git</td></tr><tr><td class="string">yomitan-handlebars</td><td class="string">1.0.0</td><td class="string">MIT</td><td class="string">n/a</td></tr></tbody></table>
+</body>
+</html>

@@ -219,6 +219,7 @@ type ApiSurface = {
             source: Audio.AudioSourceInfo;
             term: string;
             reading: string;
+            languageSummary: Language.LanguageSummary;
         };
         return: AudioDownloader.Info[];
     };

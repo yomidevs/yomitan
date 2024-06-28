@@ -575,10 +575,24 @@ button.sidebar-button.sidebar-button-highlight {
 
 
 /* Search page */
+.search-header-wrapper {
+    background-color: var(--background-color);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.sticky-header {
+    position: sticky;
+    top: 0px;
+    z-index: 1000;
+    padding-top: 10px;
+}
 .search-header {
+    width: var(--content-width);
     display: flex;
     flex-flow: column nowrap;
     max-height: 100vh;
+    padding: var(--main-content-vertical-padding) var(--main-content-horizontal-padding);
 }
 #query-parser-container {
     overflow-y: auto;
@@ -591,6 +605,7 @@ button.sidebar-button.sidebar-button-highlight {
     margin-top: 0.5em;
     font-size: var(--query-parser-font-size);
     white-space: pre-wrap;
+    max-height: calc(var(--query-parser-font-size) * 2);
 }
 #query-parser-content[data-term-spacing=true] .query-parser-term {
     margin-right: 0.2em;
@@ -1712,6 +1727,7 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 .footer-notification-body {
     flex: 1 1 auto;
     padding: 0.5em 0.75em;
+    white-space: pre-line;
 }
 .footer-notification-close-button-container {
     align-self: stretch;
