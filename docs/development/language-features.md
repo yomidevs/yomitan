@@ -302,7 +302,7 @@ The part we want to examine is the `test` array. The other things are common acr
 
 You can check that all the tests pass by running `npm run test:unit`.
 
-> This command runs all Yomitan unit test files. To only run a single test file, you can instead opt for `npx vitest <file-name>`
+> This command runs all Yomitan unit test files. To only run a single test file, you can instead opt for `npx vitest <file-name>`.
 
 Now, we want to verify that `boss` really does not deinflect to `bo`. You can add to the `tests` array:
 
