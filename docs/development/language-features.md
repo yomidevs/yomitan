@@ -133,7 +133,7 @@ Deinflection is the process of converting a word to its base or dictionary form.
 
 These grammatical rules are located in files such as `english-transforms.js`.
 
-> Not all the grammatical rules of a language can or need to be implemented in the transforms file. Even a little bit goes a long way, and you can always add more rules later. For every couple rules you add, write some tests in the respective file (see the [writing tests section below](#writing-deinflection-tests)). This will help you verify that your rules are correct, and make sure nothing is accidentally broken along the way.
+> Not all the grammatical rules of a language can or need to be implemented in the transforms file. Even a little bit goes a long way, and you can always add more rules later. For every couple rules you add, write some tests in the respective file ([see the writing tests section below](#writing-deinflection-tests)). This will help you verify that your rules are correct, and make sure nothing is accidentally broken along the way.
 
 Transforms files should export a `LanguageTransformDescriptor`, which is then imported in `language-descriptors.js`.
 
