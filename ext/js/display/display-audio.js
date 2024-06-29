@@ -58,6 +58,7 @@ export class DisplayAudio {
             ['jpod101-alternate', 'JapanesePod101 (Alternate)'],
             ['jisho', 'Jisho.org'],
             ['lingua-libre', 'Lingua Libre'],
+            ['wiktionary', 'Wiktionary'],
             ['text-to-speech', 'Text-to-speech'],
             ['text-to-speech-reading', 'Text-to-speech (Kana reading)'],
             ['custom', 'Custom URL'],
