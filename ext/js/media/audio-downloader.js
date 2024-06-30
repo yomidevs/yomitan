@@ -90,7 +90,8 @@ export class AudioDownloader {
      */
     async downloadTermAudio(sources, preferredAudioIndex, term, reading, idleTimeout, languageSummary) {
         const errors = [];
-        for (const source of sources) {
+        const requiredAudioSources = this._getRequiredAudioSources(languageSummary.iso, sources);
+        for (const source of [...sources, ...requiredAudioSources]) {
             let infoList = await this.getTermAudioInfoList(source, term, reading, languageSummary);
             if (typeof preferredAudioIndex === 'number') {
                 infoList = (preferredAudioIndex >= 0 && preferredAudioIndex < infoList.length ? [infoList[preferredAudioIndex]] : []);
@@ -114,6 +115,31 @@ export class AudioDownloader {
     }
 
     // Private
+
+    /**
+     * @param {string} language
+     * @param {import('audio').AudioSourceInfo[]} sources
+     * @returns {import('audio').AudioSourceInfo[]}
+     */
+    _getRequiredAudioSources(language, sources) {
+        /** @type {Set<import('settings').AudioSourceType>} */
+        const requiredSources = language === 'ja' ?
+            new Set([
+                'jpod101',
+                'jpod101-alternate',
+                'jisho',
+            ]) :
+            new Set([
+                'lingua-libre',
+                'wiktionary',
+            ]);
+
+        for (const {type} of sources) {
+            requiredSources.delete(type);
+        }
+
+        return [...requiredSources].map((type) => ({type, url: '', voice: ''}));
+    }
 
     /**
      * @param {string} url
