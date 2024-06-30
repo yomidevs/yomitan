@@ -2,7 +2,7 @@
 
 ## Default audio sources
 
-After looking up a term, you can click on the <img src="../ext/images/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term's pronunciation. When searching for audio, multiple audio sources are checked in order until the first source with audio for the term is found. If no audio is found, you will hear a short click instead. Right-clicking the <img src="../ext/images/play-audio.svg" alt="" width="16" height="16"> button allows choosing the source manually.
+After looking up a term, you can click on the <img src="../ext/images/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term's pronunciation. When searching for audio, multiple audio sources are checked until the first source with audio for the term is found. If no audio is found, you will hear a short click instead. Right-clicking the <img src="../ext/images/play-audio.svg" alt="" width="16" height="16"> button allows choosing the source manually.
 
 #### Japanese
 
