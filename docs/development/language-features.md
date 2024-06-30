@@ -198,7 +198,7 @@ transforms: [
 ],
 ```
 
-Now, only dictionary entries marked with the same "n" condition will be eligible for matching the `plural` rule. The verb "read" should be marked as "v" in the dictionary, and will no longer be matched by the `plural` rule. The entries in the dictionary need to be marked with the exact same conditions defined in the `conditions` object. The `isDictionaryForm` field can be set to `false`, to allow some conditions to be sued only in between rules, and not in the dictionary. In most cases however, it will be set to `true`.
+Now, only dictionary entries marked with the same "n" condition will be eligible for matching the `plural` rule. The verb "read" should be marked as "v" in the dictionary, and will no longer be matched by the `plural` rule. The entries in the dictionary need to be marked with the exact same conditions defined in the `conditions` object. The `isDictionaryForm` field can be set to `false`, to allow some conditions to be used only in between rules, and not in the dictionary. In most cases however, it will be set to `true`.
 
 <img align="right" src="../../img/deinflection-example-chain.png">
 
