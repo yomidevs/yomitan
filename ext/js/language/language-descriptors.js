@@ -198,6 +198,13 @@ const languageDescriptors = [
         languageTransforms: koreanTransforms,
     },
     {
+        iso: 'mn',
+        iso639_3: 'mon',
+        name: 'Mongolian',
+        exampleText: 'унших',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'nl',
         iso639_3: 'nld',
         name: 'Dutch',

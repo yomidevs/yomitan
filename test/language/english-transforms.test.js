@@ -28,6 +28,7 @@ const tests = [
         tests: [
             {term: 'cat', source: 'cats',  rule: 'ns', reasons: ['plural']},
             {term: 'cat', source: 'cat\'s',  rule: 'ns', reasons: ['possessive']},
+            {term: 'cat', source: 'cats\'',  rule: 'ns', reasons: ['plural', 'possessive']},
             {term: 'cats', source: 'cats\'',  rule: 'ns', reasons: ['possessive']},
             {term: 'dirt', source: 'dirty',  rule: 'ns', reasons: ['-y']},
             {term: 'haze', source: 'hazy',  rule: 'ns', reasons: ['-y']},
@@ -142,6 +143,13 @@ const tests = [
             {term: 'quick', source: 'quickly',  rule: 'adj', reasons: ['adverb']},
             {term: 'happy', source: 'happily',  rule: 'adj', reasons: ['adverb']},
             {term: 'humble', source: 'humbly',  rule: 'adj', reasons: ['adverb']},
+        ],
+    },
+    {
+        category: 'invalid deinflections',
+        valid: false,
+        tests: [
+            {term: 'boss', source: 'bo', rule: 'ns', reasons: ['plural', 'plural']},
         ],
     },
 ];
