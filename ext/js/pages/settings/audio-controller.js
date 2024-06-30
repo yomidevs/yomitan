@@ -238,15 +238,18 @@ export class AudioController extends EventDispatcher {
      */
     _getAvailableAudioSourceTypes() {
         /** @type {import('settings').AudioSourceType[]} */
-        const typesAvailable = [
+        const generalAudioSources = [
             'lingua-libre',
             'wiktionary',
+            'text-to-speech',
             'custom',
         ];
         if (this._language === 'ja') {
-            typesAvailable.unshift('jpod101', 'jpod101-alternate', 'jisho');
+            /** @type {import('settings').AudioSourceType[]} */
+            const japaneseAudioSources = ['jpod101', 'jpod101-alternate', 'jisho'];
+            return [...japaneseAudioSources, ...generalAudioSources];
         }
-        return typesAvailable;
+        return generalAudioSources;
     }
 
     /** */
