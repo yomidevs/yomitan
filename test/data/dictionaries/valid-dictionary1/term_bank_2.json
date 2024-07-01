@@ -854,6 +854,30 @@
                                         },
                                         "content": [
                                             {
+                                                "tag": "span",
+                                                "data": {
+                                                    "name": "外字"
+                                                },
+                                                "content": {
+                                                    "tag": "span",
+                                                    "style": {
+                                                        "verticalAlign": "text-bottom"
+                                                    },
+                                                    "content": {
+                                                        "tag": "img",
+                                                        "height": 1.0,
+                                                        "width": 1.0,
+                                                        "sizeUnits": "em",
+                                                        "appearance": "monochrome",
+                                                        "title": "抛",
+                                                        "collapsible": false,
+                                                        "collapsed": false,
+                                                        "background": false,
+                                                        "path": "62cb.svg"
+                                                    }
+                                                }
+                                            },
+                                            {
                                                 "tag": "rt",
                                                 "data": {
                                                     "name": "表外字マーク"
