@@ -20,7 +20,7 @@ jobs:
     outputs:
       hashes: ${{ steps.hash.outputs.hashes }}
     steps:
-      - uses: robinraju/release-downloader@c39a3b234af58f0cf85888573d361fb6fa281534 # pin@v1.10
+      - uses: robinraju/release-downloader@a96f54c1b5f5e09e47d9504526e96febd949d4c2 # pin@v1.11
         with:
           tag: ${{ github.ref_name }}
           fileName: "*"
