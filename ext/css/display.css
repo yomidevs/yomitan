@@ -168,11 +168,11 @@
     --progress-bar-indicator-color: var(--accent-color);
     --entry-current-indicator-color: var(--accent-color);
 
-    --notification-text-color: #ffffff;
-    --notification-background-color: #333333;
-    --notification-background-color-light: #555555;
-    --notification-background-color-lighter: #666666;
-    --notification-shadow-color: rgba(0, 0, 0, 0.5);
+    --notification-text-color: #2f2f2f;
+    --notification-background-color: #f1f1f1;
+    --notification-background-color-light: #e1e1e1;
+    --notification-background-color-lighter: #bbbbbb;
+    --notification-shadow-color: rgba(255, 255, 255, 0.25);
 
     --action-button-hover-color: #dddddd;
     --action-button-active-color: #c1c1c1;
@@ -236,11 +236,11 @@
     --progress-bar-indicator-color: var(--accent-color);
     --entry-current-indicator-color: var(--accent-color);
 
-    --notification-text-color: #2f2f2f;
-    --notification-background-color: #e1e1e1;
-    --notification-background-color-light: #bbbbbb;
-    --notification-background-color-lighter: #aaaaaa;
-    --notification-shadow-color: rgba(255, 255, 255, 0.25);
+    --notification-text-color: #ffffff;
+    --notification-background-color: #333333;
+    --notification-background-color-light: #555555;
+    --notification-background-color-lighter: #666666;
+    --notification-shadow-color: rgba(0, 0, 0, 0.5);
 
     --action-button-hover-color: #282828;
     --action-button-active-color: #444444;
