@@ -90,6 +90,15 @@ test('anki add', async ({context, page, extensionId}) => {
     await page.locator('#anki-cards-modal > div > div.modal-footer > button:nth-child(2)').click();
     await writeToClipboardFromPage(page, '読むの例文');
 
+    // Test structured content
+    await page.goto(`chrome-extension://${extensionId}/search.html`);
+    await expect(async () => {
+        await page.locator('#search-textbox').clear();
+        await page.locator('#search-textbox').fill('ほうき');
+        await expect(page.locator('#search-textbox')).toHaveValue('ほうき');
+    }).toPass({timeout: 5000});
+    await page.locator('#search-textbox').press('Enter');
+
     // Add to anki deck
     await page.goto(`chrome-extension://${extensionId}/search.html`);
     await expect(async () => {

@@ -737,5 +737,402 @@
         ],
         1099490,
         ""
+    ],
+    [
+        "放棄",
+        "ほうき",
+        "",
+        "",
+        0,
+        [
+            {
+                "type": "structured-content",
+                "content": [
+                    {
+                        "tag": "span",
+                        "data": {
+                            "class": "pri",
+                            "name": "見出部"
+                        },
+                        "content": [
+                            {
+                                "tag": "span",
+                                "style": {
+                                    "fontSize": "0.6em",
+                                    "verticalAlign": "super"
+                                },
+                                "data": {
+                                    "class": "外字"
+                                },
+                                "content": "＊"
+                            },
+                            {
+                                "tag": "span",
+                                "style": {
+                                    "fontWeight": "bold"
+                                },
+                                "data": {
+                                    "name": "見出仮名"
+                                },
+                                "content": [
+                                    "ほ",
+                                    {
+                                        "tag": "ruby",
+                                        "data": {
+                                            "name": "表音式"
+                                        },
+                                        "content": [
+                                            "う",
+                                            {
+                                                "tag": "rt",
+                                                "data": {
+                                                    "name": "表音表記"
+                                                },
+                                                "content": "オ"
+                                            }
+                                        ]
+                                    },
+                                    "き"
+                                ]
+                            },
+                            {
+                                "tag": "span",
+                                "style": {
+                                    "fontSize": "0.7em",
+                                    "verticalAlign": "super"
+                                },
+                                "data": {
+                                    "name": "アクセント"
+                                },
+                                "content": {
+                                    "tag": "span",
+                                    "data": {
+                                        "name": "accent1"
+                                    },
+                                    "content": "①"
+                                }
+                            },
+                            {
+                                "tag": "span",
+                                "style": {
+                                    "fontWeight": "normal",
+                                    "fontSize": "0.6em"
+                                },
+                                "data": {
+                                    "name": "歴史仮名"
+                                },
+                                "content": "(ハウ─)"
+                            },
+                            "【",
+                            {
+                                "tag": "span",
+                                "data": {
+                                    "name": "標準表記"
+                                },
+                                "content": [
+                                    {
+                                        "tag": "span",
+                                        "data": {
+                                            "name": "教育漢字"
+                                        },
+                                        "content": "放"
+                                    },
+                                    "棄"
+                                ]
+                            },
+                            "・",
+                            {
+                                "tag": "span",
+                                "data": {
+                                    "name": "標準表記"
+                                },
+                                "content": [
+                                    {
+                                        "tag": "ruby",
+                                        "data": {
+                                            "name": "表外字"
+                                        },
+                                        "content": [
+                                            {
+                                                "tag": "span",
+                                                "data": {
+                                                    "name": "外字"
+                                                },
+                                                "content": {
+                                                    "tag": "span",
+                                                    "style": {
+                                                        "verticalAlign": "text-bottom"
+                                                    },
+                                                    "content": {
+                                                        "tag": "img",
+                                                        "height": 1.0,
+                                                        "width": 1.0,
+                                                        "sizeUnits": "em",
+                                                        "appearance": "monochrome",
+                                                        "title": "抛",
+                                                        "collapsible": false,
+                                                        "collapsed": false,
+                                                        "background": false,
+                                                        "path": "62cb.svg"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "tag": "rt",
+                                                "data": {
+                                                    "name": "表外字マーク"
+                                                },
+                                                "content": {
+                                                    "tag": "span",
+                                                    "style": {
+                                                        "fontSize": "2em"
+                                                    },
+                                                    "content": "︿"
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "棄"
+                                ]
+                            },
+                            "】"
+                        ]
+                    },
+                    {
+                        "tag": "div",
+                        "data": {
+                            "name": "解説部"
+                        },
+                        "content": {
+                            "tag": "div",
+                            "data": {
+                                "name": "大語義"
+                            },
+                            "content": [
+                                {
+                                    "tag": "span",
+                                    "data": {
+                                        "name": "見出要素"
+                                    },
+                                    "content": [
+                                        {
+                                            "tag": "span",
+                                            "style": {
+                                                "fontSize": "0.7em"
+                                            },
+                                            "data": {
+                                                "name": "品詞用法"
+                                            },
+                                            "content": [
+                                                "━する",
+                                                {
+                                                    "tag": "span",
+                                                    "style": {
+                                                        "fontSize": "1.43em"
+                                                    },
+                                                    "data": {
+                                                        "name": "品詞G"
+                                                    },
+                                                    "content": [
+                                                        "（",
+                                                        {
+                                                            "tag": "span",
+                                                            "data": {
+                                                                "name": "品詞M"
+                                                            },
+                                                            "content": "他"
+                                                        },
+                                                        {
+                                                            "tag": "span",
+                                                            "data": {
+                                                                "name": "品詞M"
+                                                            },
+                                                            "content": "サ"
+                                                        },
+                                                        "）"
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "tag": "span",
+                                            "data": {
+                                                "name": "red"
+                                            },
+                                            "content": {
+                                                "tag": "span",
+                                                "data": {
+                                                    "name": "基本構文型"
+                                                },
+                                                "content": [
+                                                    "〈なに",
+                                                    {
+                                                        "tag": "span",
+                                                        "style": {
+                                                            "fontWeight": "bold"
+                                                        },
+                                                        "data": {
+                                                            "name": "基本構文em"
+                                                        },
+                                                        "content": "ヲ"
+                                                    },
+                                                    {
+                                                        "tag": "span",
+                                                        "data": {
+                                                            "name": "見出語省略"
+                                                        },
+                                                        "content": "━"
+                                                    },
+                                                    "する〉"
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "tag": "div",
+                                    "data": {
+                                        "name": "語義"
+                                    },
+                                    "content": [
+                                        {
+                                            "tag": "span",
+                                            "data": {
+                                                "name": "語釈"
+                                            },
+                                            "content": "自分（たち）が断行しなければならないところのものを、自分（たち）の意志で行使しないでおくこと。"
+                                        },
+                                        {
+                                            "tag": "div",
+                                            "data": {
+                                                "name": "用例G"
+                                            },
+                                            "content": [
+                                                {
+                                                    "tag": "div",
+                                                    "data": {
+                                                        "name": "用例"
+                                                    },
+                                                    "content": [
+                                                        "「",
+                                                        {
+                                                            "tag": "span",
+                                                            "data": {
+                                                                "name": "言換"
+                                                            },
+                                                            "content": [
+                                                                {
+                                                                    "tag": "span",
+                                                                    "style": {
+                                                                        "fontSize": "0.5em"
+                                                                    },
+                                                                    "data": {
+                                                                        "name": "言換M"
+                                                                    },
+                                                                    "content": "△"
+                                                                },
+                                                                "権利（義務）"
+                                                            ]
+                                                        },
+                                                        "を",
+                                                        {
+                                                            "tag": "span",
+                                                            "data": {
+                                                                "name": "見出語省略"
+                                                            },
+                                                            "content": "━"
+                                                        },
+                                                        "する」"
+                                                    ]
+                                                },
+                                                {
+                                                    "tag": "div",
+                                                    "data": {
+                                                        "name": "用例"
+                                                    },
+                                                    "content": [
+                                                        "「責任を",
+                                                        {
+                                                            "tag": "span",
+                                                            "data": {
+                                                                "name": "見出語省略"
+                                                            },
+                                                            "content": "━"
+                                                        },
+                                                        "する〔",
+                                                        {
+                                                            "tag": "span",
+                                                            "data": {
+                                                                "name": "同意語M"
+                                                            },
+                                                            "content": "="
+                                                        },
+                                                        "自分には責任が無いものとして、のほほんとした態度を取る〕」"
+                                                    ]
+                                                },
+                                                {
+                                                    "tag": "div",
+                                                    "data": {
+                                                        "name": "用例"
+                                                    },
+                                                    "content": [
+                                                        "「",
+                                                        {
+                                                            "tag": "span",
+                                                            "data": {
+                                                                "name": "見出語省略"
+                                                            },
+                                                            "content": "━"
+                                                        },
+                                                        "試合",
+                                                        {
+                                                            "tag": "span",
+                                                            "style": {
+                                                                "fontSize": "0.65em",
+                                                                "verticalAlign": "super"
+                                                            },
+                                                            "data": {
+                                                                "name": "ルビG"
+                                                            },
+                                                            "content": {
+                                                                "tag": "span",
+                                                                "data": {
+                                                                    "name": "ルビ"
+                                                                },
+                                                                "content": "(ジアイ)"
+                                                            }
+                                                        },
+                                                        {
+                                                            "tag": "span",
+                                                            "style": {
+                                                                "fontSize": "0.7em",
+                                                                "verticalAlign": "super"
+                                                            },
+                                                            "data": {
+                                                                "name": "アクセント"
+                                                            },
+                                                            "content": {
+                                                                "tag": "span",
+                                                                "data": {
+                                                                    "name": "accent4"
+                                                                },
+                                                                "content": "④"
+                                                            }
+                                                        },
+                                                        "」"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ],
+        5395800000,
+        ""
     ]
 ]

@@ -38,7 +38,8 @@ test('visual', async ({page, extensionId}) => {
     await expect.soft(page).toHaveScreenshot('settings-fresh.png', {mask: [storage_locator]});
 
     // Load in jmdict_english.zip
-    await page.locator('input[id="dictionary-import-file-input"]').setInputFiles(path.join(root, 'dictionaries/jmdict_english.zip'));
+    const fileInput = page.locator('input[id="dictionary-import-file-input"]');
+    await fileInput.setInputFiles(path.join(root, 'dictionaries/jmdict_english.zip'));
     await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 
     // Take a screenshot of the settings page with jmdict loaded
