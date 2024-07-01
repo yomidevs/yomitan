@@ -99,6 +99,7 @@ test('anki add', async ({context, page, extensionId}) => {
     }).toPass({timeout: 5000});
     await page.locator('#search-textbox').press('Enter');
     await page.waitForTimeout(3000);
+    await expect(page.locator('#search-textbox')).toHaveValue('wrong');
 
     // Add to anki deck
     await page.goto(`chrome-extension://${extensionId}/search.html`);
