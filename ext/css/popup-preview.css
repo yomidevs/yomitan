@@ -137,6 +137,7 @@ body {
     transition: opacity var(--animation-duration) linear 0s, visibility 0s linear var(--animation-duration);
 }
 .placeholder-info.placeholder-info-visible {
+    color: var(--example-text-color);
     visibility: visible;
     opacity: 1;
     transition: opacity var(--animation-duration) linear 0s, visibility 0s linear 0s;
