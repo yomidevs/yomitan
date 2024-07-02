@@ -449,6 +449,11 @@ export class TextScanner extends EventDispatcher {
      */
     async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false) {
         try {
+            const isAltText = textSource instanceof TextSourceElement;
+            if (isAltText && !this._scanAltText) {
+                return;
+            }
+
             const inputInfoDetail = inputInfo.detail;
             const selectionRestoreInfo = (
                 (typeof inputInfoDetail === 'object' && inputInfoDetail !== null && inputInfoDetail.restoreSelection) ?
@@ -474,7 +479,7 @@ export class TextScanner extends EventDispatcher {
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
-            } else if (showEmpty || (textSource !== null && textSource instanceof TextSourceElement && await this._isTextLookupWorthy(textSource.fullContent))) {
+            } else if (showEmpty || (textSource !== null && isAltText && await this._isTextLookupWorthy(textSource.fullContent))) {
                 // Shows a "No results found" message
                 dictionaryEntries = [];
                 sentence = {text: '', offset: 0};
