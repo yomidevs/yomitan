@@ -41,6 +41,7 @@ export type Options = {
     preventMiddleMouse?: boolean;
     matchTypePrefix?: boolean;
     sentenceParsingOptions?: SentenceParsingOptions;
+    scanAltText?: boolean;
 };
 
 export type InputOptionsOuter = {

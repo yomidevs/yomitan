@@ -349,6 +349,7 @@ export class OptionsUtil {
                 enableOnSearchPage: true,
                 enableSearchTags: false,
                 layoutAwareScan: false,
+                scanAltText: true,
             },
 
             translation: {

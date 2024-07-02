@@ -461,6 +461,7 @@ export class Display extends EventDispatcher {
                 preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery,
                 matchTypePrefix: false,
                 sentenceParsingOptions,
+                scanAltText: scanningOptions.scanAltText,
             },
         });
 
@@ -1984,6 +1985,7 @@ export class Display extends EventDispatcher {
             layoutAwareScan: scanningOptions.layoutAwareScan,
             preventMiddleMouse: false,
             sentenceParsingOptions,
+            scanAltText: scanningOptions.scanAltText,
         });
 
         this._contentTextScanner.setEnabled(true);

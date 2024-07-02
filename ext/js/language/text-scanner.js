@@ -124,6 +124,8 @@ export class TextScanner extends EventDispatcher {
         this._sentenceBackwardQuoteMap = new Map();
         /** @type {import('text-scanner').InputConfig[]} */
         this._inputs = [];
+        /** @type {boolean} */
+        this._scanAltText = true;
 
         /** @type {boolean} */
         this._enabled = false;
@@ -255,6 +257,7 @@ export class TextScanner extends EventDispatcher {
         preventMiddleMouse,
         sentenceParsingOptions,
         matchTypePrefix,
+        scanAltText,
     }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map((input) => this._convertInput(input));
@@ -288,6 +291,9 @@ export class TextScanner extends EventDispatcher {
         }
         if (typeof matchTypePrefix === 'boolean') {
             this._matchTypePrefix = matchTypePrefix;
+        }
+        if (typeof scanAltText === 'boolean') {
+            this._scanAltText = scanAltText;
         }
         if (typeof sentenceParsingOptions === 'object' && sentenceParsingOptions !== null) {
             const {scanExtent, terminationCharacterMode, terminationCharacters} = sentenceParsingOptions;
