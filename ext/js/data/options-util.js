@@ -550,6 +550,7 @@ export class OptionsUtil {
             this._updateVersion39,
             this._updateVersion40,
             this._updateVersion41,
+            this._updateVersion42,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1347,6 +1348,17 @@ export class OptionsUtil {
      */
     async _updateVersion41(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v41.handlebars');
+    }
+
+    /**
+     * - Added scanning.scanAltText
+     * @type {import('options-util').UpdateFunction}
+     * @param {import('settings').Options} options
+     */
+    async _updateVersion42(options) {
+        for (const profile of options.profiles) {
+            profile.options.scanning.scanAltText = true;
+        }
     }
 
     /**
