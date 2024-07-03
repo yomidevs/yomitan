@@ -70,6 +70,7 @@ class DictionaryEntry {
 
     /** */
     prepare() {
+        //
         const index = this._index;
         const {title, revision, version} = this._dictionaryInfo;
 
