@@ -1353,7 +1353,6 @@ export class OptionsUtil {
     /**
      * - Added scanning.scanAltText
      * @type {import('options-util').UpdateFunction}
-     * @param {import('settings').Options} options
      */
     async _updateVersion42(options) {
         for (const profile of options.profiles) {
