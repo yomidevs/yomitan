@@ -124,6 +124,8 @@ export class TextScanner extends EventDispatcher {
         this._sentenceBackwardQuoteMap = new Map();
         /** @type {import('text-scanner').InputConfig[]} */
         this._inputs = [];
+        /** @type {boolean} */
+        this._scanAltText = true;
 
         /** @type {boolean} */
         this._enabled = false;
@@ -255,6 +257,7 @@ export class TextScanner extends EventDispatcher {
         preventMiddleMouse,
         sentenceParsingOptions,
         matchTypePrefix,
+        scanAltText,
     }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map((input) => this._convertInput(input));
@@ -288,6 +291,9 @@ export class TextScanner extends EventDispatcher {
         }
         if (typeof matchTypePrefix === 'boolean') {
             this._matchTypePrefix = matchTypePrefix;
+        }
+        if (typeof scanAltText === 'boolean') {
+            this._scanAltText = scanAltText;
         }
         if (typeof sentenceParsingOptions === 'object' && sentenceParsingOptions !== null) {
             const {scanExtent, terminationCharacterMode, terminationCharacters} = sentenceParsingOptions;
@@ -443,6 +449,11 @@ export class TextScanner extends EventDispatcher {
      */
     async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false) {
         try {
+            const isAltText = textSource instanceof TextSourceElement;
+            if (isAltText && !this._scanAltText) {
+                return;
+            }
+
             const inputInfoDetail = inputInfo.detail;
             const selectionRestoreInfo = (
                 (typeof inputInfoDetail === 'object' && inputInfoDetail !== null && inputInfoDetail.restoreSelection) ?
@@ -468,7 +479,7 @@ export class TextScanner extends EventDispatcher {
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
-            } else if (showEmpty || (textSource !== null && textSource instanceof TextSourceElement && await this._isTextLookupWorthy(textSource.fullContent))) {
+            } else if (showEmpty || (textSource !== null && isAltText && await this._isTextLookupWorthy(textSource.fullContent))) {
                 // Shows a "No results found" message
                 dictionaryEntries = [];
                 sentence = {text: '', offset: 0};
