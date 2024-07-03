@@ -437,6 +437,7 @@
                                     "hideDelay",
                                     "length",
                                     "deepDomScan",
+                                    "scanAltText",
                                     "popupNestingMaxDepth",
                                     "enablePopupSearch",
                                     "enableOnPopupExpressions",
@@ -687,6 +688,10 @@
                                     "deepDomScan": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "scanAltText": {
+                                        "type": "boolean",
+                                        "default": true
                                     },
                                     "popupNestingMaxDepth": {
                                         "type": "integer",
