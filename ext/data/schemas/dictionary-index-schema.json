@@ -21,7 +21,7 @@
         },
         "revision": {
             "type": "string",
-            "description": "Revision of the dictionary. This value is only used for displaying information."
+            "description": "Revision of the dictionary. This value is displayed, and used to check for dictionary updates."
         },
         "sequenced": {
             "type": "boolean",
@@ -42,9 +42,22 @@
             "type": "string",
             "description": "Creator of the dictionary."
         },
+        "isUpdatable": {
+            "type": "boolean",
+            "const": true,
+            "description": "Whether this dictionary contains links to its latest version."
+        },
+        "indexUrl": {
+            "type": "string",
+            "description": "URL for the index file of the latest revision of the dictionary, used to check for updates."
+        },
+        "downloadUrl": {
+            "type": "string",
+            "description": "URL for the download of the latest revision of the dictionary."
+        },
         "url": {
             "type": "string",
-            "description": "URL for the source of the dictionary."
+            "description": "URL for the source of the dictionary, displayed in the dictionary details."
         },
         "description": {
             "type": "string",
@@ -101,5 +114,8 @@
         {
             "required": ["version"]
         }
-    ]
+    ],
+    "dependencies": {
+        "isUpdatable": ["indexUrl", "downloadUrl"]
+    }
 }
