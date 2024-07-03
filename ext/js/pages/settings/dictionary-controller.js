@@ -58,7 +58,7 @@ class DictionaryEntry {
         /** @type {HTMLElement} */
         this._titleNode = querySelectorNotNull(fragment, '.dictionary-title');
         /** @type {HTMLElement} */
-        this._versionNode = querySelectorNotNull(fragment, '.dictionary-version');
+        this._versionNode = querySelectorNotNull(fragment, '.dictionary-revision');
         /** @type {HTMLElement} */
         this._titleContainer = querySelectorNotNull(fragment, '.dictionary-item-title-container');
     }
@@ -171,7 +171,7 @@ class DictionaryEntry {
         /** @type {HTMLElement} */
         const titleElement = querySelectorNotNull(modal.node, '.dictionary-title');
         /** @type {HTMLElement} */
-        const versionElement = querySelectorNotNull(modal.node, '.dictionary-version');
+        const versionElement = querySelectorNotNull(modal.node, '.dictionary-revision');
         /** @type {HTMLElement} */
         const outdateElement = querySelectorNotNull(modal.node, '.dictionary-outdated-notification');
         /** @type {HTMLElement} */

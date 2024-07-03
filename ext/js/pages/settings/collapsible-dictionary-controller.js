@@ -153,7 +153,7 @@ export class CollapsibleDictionaryController {
         nameNode.textContent = dictionary;
 
         /** @type {HTMLElement} */
-        const versionNode = querySelectorNotNull(node, '.dictionary-version');
+        const versionNode = querySelectorNotNull(node, '.dictionary-revision');
         versionNode.textContent = version;
 
         return querySelectorNotNull(node, '.definitions-collapsible');
