@@ -49,11 +49,13 @@
         },
         "indexUrl": {
             "type": "string",
-            "description": "URL for the index file of the latest revision of the dictionary, used to check for updates."
+            "description": "URL for the index file of the latest revision of the dictionary, used to check for updates.",
+            "format": "uri"
         },
         "downloadUrl": {
             "type": "string",
-            "description": "URL for the download of the latest revision of the dictionary."
+            "description": "URL for the download of the latest revision of the dictionary.",
+            "format": "uri"
         },
         "url": {
             "type": "string",

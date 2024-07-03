@@ -287,6 +287,7 @@ export class DictionaryImporter {
      * @param {import('dictionary-data').Index} index
      * @param {import('dictionary-importer').SummaryDetails} details
      * @returns {import('dictionary-importer').Summary}
+     * @throws {Error}
      */
     _createSummary(dictionaryTitle, version, index, details) {
         const indexSequenced = index.sequenced;
@@ -303,7 +304,7 @@ export class DictionaryImporter {
             styles,
         };
 
-        const {author, url, description, attribution, frequencyMode, sourceLanguage, targetLanguage} = index;
+        const {author, url, description, attribution, frequencyMode, isUpdatable, sourceLanguage, targetLanguage} = index;
         if (typeof author === 'string') { summary.author = author; }
         if (typeof url === 'string') { summary.url = url; }
         if (typeof description === 'string') { summary.description = description; }
@@ -311,7 +312,13 @@ export class DictionaryImporter {
         if (typeof frequencyMode === 'string') { summary.frequencyMode = frequencyMode; }
         if (typeof sourceLanguage === 'string') { summary.sourceLanguage = sourceLanguage; }
         if (typeof targetLanguage === 'string') { summary.targetLanguage = targetLanguage; }
-
+        if (typeof isUpdatable === 'boolean') {
+            const {indexUrl, downloadUrl} = index;
+            if (!isUpdatable || typeof indexUrl !== 'string' || typeof downloadUrl !== 'string') {
+                throw new Error('Invalid index data for updatable dictionary'); // schema should prevent this
+            }
+            summary.isUpdatable = isUpdatable;
+        }
         return summary;
     }
 
