@@ -1,7 +1,7 @@
 {
     "ja": {
         "terms": [
-            {"name": "Jitendex 2024-05-20", "url": "https://github.com/stephenmk/stephenmk.github.io/releases/download/v4.7-5/jitendex-yomitan-2024-05-20.zip"}
+            {"name": "Jitendex", "url": "https://github.com/stephenmk/stephenmk.github.io/releases/download/v4.7-5/jitendex-yomitan.zip"}
         ],
         "kanji": [
             {"name": "Kanjidic English", "url": "https://github.com/themoeway/jmdict-yomitan/releases/latest/download/KANJIDIC_english.zip"}
