@@ -168,11 +168,11 @@
     --progress-bar-indicator-color: var(--accent-color);
     --entry-current-indicator-color: var(--accent-color);
 
-    --notification-text-color: #ffffff;
-    --notification-background-color: #333333;
-    --notification-background-color-light: #555555;
-    --notification-background-color-lighter: #666666;
-    --notification-shadow-color: rgba(0, 0, 0, 0.5);
+    --notification-text-color: #2f2f2f;
+    --notification-background-color: #f1f1f1;
+    --notification-background-color-light: #e1e1e1;
+    --notification-background-color-lighter: #bbbbbb;
+    --notification-shadow-color: rgba(255, 255, 255, 0.25);
 
     --action-button-hover-color: #dddddd;
     --action-button-active-color: #c1c1c1;
@@ -236,11 +236,11 @@
     --progress-bar-indicator-color: var(--accent-color);
     --entry-current-indicator-color: var(--accent-color);
 
-    --notification-text-color: #2f2f2f;
-    --notification-background-color: #e1e1e1;
-    --notification-background-color-light: #bbbbbb;
-    --notification-background-color-lighter: #aaaaaa;
-    --notification-shadow-color: rgba(255, 255, 255, 0.25);
+    --notification-text-color: #ffffff;
+    --notification-background-color: #333333;
+    --notification-background-color-light: #555555;
+    --notification-background-color-lighter: #666666;
+    --notification-shadow-color: rgba(0, 0, 0, 0.5);
 
     --action-button-hover-color: #282828;
     --action-button-active-color: #444444;
@@ -384,6 +384,7 @@ a:has(rt) {
     overflow-y: scroll;
     align-items: stretch;
     justify-content: flex-start;
+    overscroll-behavior: contain;
 }
 .content-body {
     flex: 1 1 auto;
@@ -575,10 +576,24 @@ button.sidebar-button.sidebar-button-highlight {
 
 
 /* Search page */
+.search-header-wrapper {
+    background-color: var(--background-color);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.sticky-header {
+    position: sticky;
+    top: 0px;
+    z-index: 1000;
+    padding-top: 10px;
+}
 .search-header {
+    width: var(--content-width);
     display: flex;
     flex-flow: column nowrap;
     max-height: 100vh;
+    padding: var(--main-content-vertical-padding) var(--main-content-horizontal-padding);
 }
 #query-parser-container {
     overflow-y: auto;
@@ -591,6 +606,7 @@ button.sidebar-button.sidebar-button-highlight {
     margin-top: 0.5em;
     font-size: var(--query-parser-font-size);
     white-space: pre-wrap;
+    max-height: calc(var(--query-parser-font-size) * 2);
 }
 #query-parser-content[data-term-spacing=true] .query-parser-term {
     margin-right: 0.2em;

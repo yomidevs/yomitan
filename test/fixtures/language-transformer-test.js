@@ -58,12 +58,14 @@ function hasTermReasons(languageTransformer, source, expectedTerm, expectedCondi
 /**
  * @param {LanguageTransformer} languageTransformer
  * @param {import('test/language-transformer-test').LanguageTransformerTestCategory[]} data
+ * @param {(input: string) => string} [preprocess] An optional function for if the input to the transformer needs to be preprocessed.
  */
-export function testLanguageTransformer(languageTransformer, data) {
+export function testLanguageTransformer(languageTransformer, data, preprocess) {
+    if (typeof preprocess === 'undefined') { preprocess = (input) => input; }
     describe('deinflections', () => {
         describe.each(data)('$category', ({valid, tests}) => {
             for (const {source, term, rule, reasons} of tests) {
-                const {has} = hasTermReasons(languageTransformer, source, term, rule, reasons);
+                const {has} = hasTermReasons(languageTransformer, preprocess(source), preprocess(term), rule, reasons);
                 let message = `${source} ${valid ? 'has' : 'does not have'} term candidate ${JSON.stringify(term)}`;
                 if (rule !== null) {
                     message += ` with rule ${JSON.stringify(rule)}`;

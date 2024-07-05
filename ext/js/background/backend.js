@@ -676,8 +676,8 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'getTermAudioInfoList'>} */
-    async _onApiGetTermAudioInfoList({source, term, reading}) {
-        return await this._audioDownloader.getTermAudioInfoList(source, term, reading);
+    async _onApiGetTermAudioInfoList({source, term, reading, languageSummary}) {
+        return await this._audioDownloader.getTermAudioInfoList(source, term, reading, languageSummary);
     }
 
     /** @type {import('api').ApiHandler<'sendMessageToFrame'>} */
@@ -2171,7 +2171,7 @@ export class Backend {
         const {term, reading} = definitionDetails;
         if (term.length === 0 && reading.length === 0) { return null; }
 
-        const {sources, preferredAudioIndex, idleTimeout} = details;
+        const {sources, preferredAudioIndex, idleTimeout, languageSummary} = details;
         let data;
         let contentType;
         try {
@@ -2181,6 +2181,7 @@ export class Backend {
                 term,
                 reading,
                 idleTimeout,
+                languageSummary,
             ));
         } catch (e) {
             const error = this._getAudioDownloadError(e);

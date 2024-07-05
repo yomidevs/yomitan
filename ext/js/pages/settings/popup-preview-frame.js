@@ -296,5 +296,7 @@ export class PopupPreviewFrame {
         }
 
         this._setInfoVisible(!this._popupShown);
+
+        this._themeController.updateTheme();
     }
 }

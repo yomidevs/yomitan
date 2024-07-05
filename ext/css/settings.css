@@ -85,6 +85,10 @@
     --dictionary-import-border-color: #cccccc;
     --dictionary-import-border-color-hover: #bfd1ff;
     --dictionary-import-hover-background-color: rgba(28, 116, 233, 0.05);
+
+    --custom-css-dim-size: 73.5%;
+    --custom-css-dim-fade-length: 3.5%;
+    --custom-css-modal-background: linear-gradient(90deg, var(--dim-background-color) calc(100% - var(--custom-css-dim-fade-length)), rgba(0, 0, 0, 0));
 }
 :root:not([data-loaded=true]) {
     --animation-duration: 0s;
@@ -104,25 +108,32 @@
 }
 
 /* Scrollbars */
-:root:not([data-theme=light]) .scrollbar {
+:root:not([data-theme=light]) .scrollbar,
+:root:not([data-theme=light]) .modal-body {
     scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar {
     width: auto;
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-button {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-button,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-button {
     height: 0;
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-thumb {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-thumb,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb-color);
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-track {
     background-color: var(--scrollbar-thumb-color);
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track-piece {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track-piece,
+:root:not([data-theme=light]) .modal-::-webkit-scrollbar-track-piece {
     background-color: var(--scrollbar-track-color);
 }
-:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-corner {
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-corner,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-corner {
     background-color: var(--scrollbar-track-color);
 }
 
@@ -905,26 +916,8 @@ select.short-height {
     background-color: transparent;
     pointer-events: none;
 }
-.modal.modal-left::after {
-    content: '';
-    display: block;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    visibility: hidden;
-}
-.modal-content-container1 {
-    flex: 1 1 auto;
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr minmax(auto, var(--content-width)) 1fr;
-    grid-template-rows: auto;
-    align-items: stretch;
-}
-.modal-content-container2 {
-    grid-area: 1/1/2/3;
-    background-color: var(--dim-background-color);
-    pointer-events: auto;
+.modal-content-container {
+    pointer-events: none;
     width: 100%;
     height: 100%;
     display: flex;
@@ -932,20 +925,18 @@ select.short-height {
     justify-content: center;
     align-items: center;
 }
-.modal-content-container1-fade {
-    display: block;
-    position: relative;
-    grid-area: 1/3/2/4;
+
+.modal-content-container>.modal-content,
+.modal-content-container>.modal-content-dimmer {
+    pointer-events: auto;
 }
-.modal-content-container1-fade::after {
-    content: '';
-    display: block;
+
+.modal-content-container>.modal-content-dimmer {
+    background: var(--custom-css-modal-background);
+    width: var(--custom-css-dim-size);
+    height: 100%;
+    margin-right: calc(100% - var(--custom-css-dim-size));
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 64px;
-    background: transparent linear-gradient(to right, var(--dim-background-color), transparent) repeat-y;
 }
 
 .modal-header-button-container {
@@ -2636,5 +2627,27 @@ input[type=number].dictionary-priority {
 @media (max-width: 700px) {
     .sidebar-inner {
         box-shadow: var(--shadow-right);
+    }
+    :root {
+        --custom-css-dim-size: 100%;
+        --custom-css-modal-background: var(--dim-background-color);
+    }
+}
+
+/* Mobile overrides */
+
+/* Treat devices that can't hover as mobile devices */
+@media (hover: none) {
+    #dictionary-move-up>span.icon-button-inner,
+    #dictionary-move-down>span.icon-button-inner {
+        width: 36px;
+    }
+}
+
+/* Dark mode before themes are applied
+   DO NOT use this for normal theming */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-loaded=true]) {
+        background-color: #1e1e1e;
     }
 }

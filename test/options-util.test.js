@@ -95,6 +95,7 @@ function createProfileOptionsTestData1() {
             enableOnSearchPage: true,
             enableSearchTags: false,
             layoutAwareScan: false,
+            scanAltText: true,
         },
         translation: {
             convertHalfWidthCharacters: 'false',
@@ -325,6 +326,7 @@ function createProfileOptionsUpdatedTestData1() {
             hidePopupOnCursorExit: false,
             hidePopupOnCursorExitDelay: 0,
             normalizeCssZoom: true,
+            scanAltText: true,
             preventMiddleMouse: {
                 onWebPages: false,
                 onPopupPages: false,
@@ -606,7 +608,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 40,
+        version: 42,
         global: {
             database: {
                 prefixWildcardsSupported: false,

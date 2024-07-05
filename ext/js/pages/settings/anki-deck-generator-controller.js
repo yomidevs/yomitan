@@ -445,6 +445,7 @@ export class AnkiDeckGeneratorController {
         const idleTimeout = (Number.isFinite(options.anki.downloadTimeout) && options.anki.downloadTimeout > 0 ? options.anki.downloadTimeout : null);
         const mediaOptions = addMedia ? {audio: {sources: options.audio.sources, preferredAudioIndex: null, idleTimeout: idleTimeout}} : null;
         const requirements = addMedia ? [...this._getDictionaryEntryMedia(dictionaryEntry), {type: 'audio'}] : [];
+        const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(options.dictionaries);
         const {note} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
             dictionaryEntry,
             mode,
@@ -461,6 +462,7 @@ export class AnkiDeckGeneratorController {
             requirements: requirements,
             duplicateScope: options.anki.duplicateScope,
             duplicateScopeCheckAllModels: options.anki.duplicateScopeCheckAllModels,
+            dictionaryStylesMap: dictionaryStylesMap,
         }));
         return note;
     }
@@ -546,7 +548,7 @@ export class AnkiDeckGeneratorController {
         let tsv = '';
         for (const key in noteFields) {
             if (Object.prototype.hasOwnProperty.call(noteFields, key)) {
-                tsv += noteFields[key].replaceAll('\t', '&nbsp;&nbsp;&nbsp;') + '\t';
+                tsv += noteFields[key].replaceAll('\t', '&nbsp;&nbsp;&nbsp;').replaceAll('\n', '') + '\t';
             }
         }
         return tsv;

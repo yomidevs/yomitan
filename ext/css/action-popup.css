@@ -166,6 +166,7 @@ label {
 .link-group-icon[data-icon=key] { background-image: url(/images/key.svg); filter: var(--svg-filter); }
 .link-group-icon[data-icon=magnifying-glass] { background-image: url(/images/magnifying-glass.svg); filter: var(--svg-filter); }
 .link-group-icon[data-icon=question-mark-circle] { background-image: url(/images/question-mark-circle.svg); filter: var(--svg-filter); }
+.link-group-icon[data-icon=profile] { background-image: url(/images/profile.svg); filter: var(--svg-filter); }
 
 .link-group-label {
     vertical-align: middle;
@@ -530,5 +531,14 @@ select.profile-select {
     #extension-info {
         max-width: 95vw;
         overflow-wrap: break-word;
+    }
+}
+
+/* Dark mode before themes are applied
+   DO NOT use this for normal theming */
+@media (prefers-color-scheme: dark) {
+    body:not([data-loaded=true]) {
+        color: #cccccc;
+        background-color: #1e1e1e;
     }
 }

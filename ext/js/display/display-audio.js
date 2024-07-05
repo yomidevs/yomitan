@@ -57,6 +57,8 @@ export class DisplayAudio {
             ['jpod101', 'JapanesePod101'],
             ['jpod101-alternate', 'JapanesePod101 (Alternate)'],
             ['jisho', 'Jisho.org'],
+            ['lingua-libre', 'Lingua Libre'],
+            ['wiktionary', 'Wiktionary'],
             ['text-to-speech', 'Text-to-speech'],
             ['text-to-speech-reading', 'Text-to-speech (Kana reading)'],
             ['custom', 'Custom URL'],
@@ -164,16 +166,15 @@ export class DisplayAudio {
      * @param {import('display').EventArgument<'optionsUpdated'>} details
      */
     _onOptionsUpdated({options}) {
-        const {enabled, autoPlay, volume, sources} = options.audio;
+        const {
+            general: {language},
+            audio: {enabled, autoPlay, volume, sources},
+        } = options;
         this._autoPlay = enabled && autoPlay;
         this._playbackVolume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume / 100)) : 1;
 
         /** @type {Set<import('settings').AudioSourceType>} */
-        const requiredAudioSources = new Set([
-            'jpod101',
-            'jpod101-alternate',
-            'jisho',
-        ]);
+        const requiredAudioSources = this._getRequiredAudioSources(language);
         /** @type {Map<string, import('display-audio').AudioSource[]>} */
         const nameMap = new Map();
         this._audioSources.length = 0;
@@ -186,9 +187,26 @@ export class DisplayAudio {
         }
 
         const data = document.documentElement.dataset;
-        data.audioEnabled = `${enabled && sources.length > 0}`;
+        data.audioEnabled = enabled.toString();
 
         this._cache.clear();
+    }
+
+    /**
+     * @param {string} language
+     * @returns {Set<import('settings').AudioSourceType>}
+     */
+    _getRequiredAudioSources(language) {
+        return language === 'ja' ?
+            new Set([
+                'jpod101',
+                'jpod101-alternate',
+                'jisho',
+            ]) :
+            new Set([
+                'lingua-libre',
+                'wiktionary',
+            ]);
     }
 
     /** */
@@ -677,7 +695,8 @@ export class DisplayAudio {
      */
     async _getTermAudioInfoList(source, term, reading) {
         const sourceData = this._getSourceData(source);
-        const infoList = await this._display.application.api.getTermAudioInfoList(sourceData, term, reading);
+        const languageSummary = this._display.getLanguageSummary();
+        const infoList = await this._display.application.api.getTermAudioInfoList(sourceData, term, reading, languageSummary);
         return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
     }
 

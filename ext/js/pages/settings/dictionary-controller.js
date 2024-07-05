@@ -519,9 +519,10 @@ export class DictionaryController {
     /**
      * @param {string} name
      * @param {boolean} enabled
+     * @param {string} styles
      * @returns {import('settings').DictionaryOptions}
      */
-    static createDefaultDictionarySettings(name, enabled) {
+    static createDefaultDictionarySettings(name, enabled, styles) {
         return {
             name,
             priority: 0,
@@ -530,6 +531,7 @@ export class DictionaryController {
             definitionsCollapsible: 'not-collapsible',
             partsOfSpeechFilter: true,
             useDeinflections: true,
+            styles: styles ?? '',
         };
     }
 
@@ -572,7 +574,7 @@ export class DictionaryController {
             }
 
             for (const name of missingDictionaries) {
-                const value = DictionaryController.createDefaultDictionarySettings(name, newDictionariesEnabled);
+                const value = DictionaryController.createDefaultDictionarySettings(name, newDictionariesEnabled, '');
                 dictionaryOptionsArray.push(value);
                 modified = true;
             }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {TextProcessor, BidirectionalConversionPreprocessor} from './language';
+import type {TextProcessor, ReadingNormalizer, BidirectionalConversionPreprocessor} from './language';
 import type {LanguageTransformDescriptor} from './language-transformer';
 import type {SafeAny} from './core';
 
@@ -27,6 +27,7 @@ type LanguageDescriptor<
     TTextPostprocessorDescriptor extends TextProcessorDescriptor = Record<string, never>,
 > = {
     iso: TIso;
+    iso639_3: string;
     name: string;
     exampleText: string;
     /**
@@ -36,6 +37,7 @@ type LanguageDescriptor<
      * If no value is provided, `true` is assumed for all inputs.
      */
     isTextLookupWorthy?: IsTextLookupWorthyFunction;
+    readingNormalizer?: ReadingNormalizer;
     textPreprocessors?: TTextPreprocessorDescriptor;
     textPostprocessors?: TTextPostprocessorDescriptor;
     languageTransforms?: LanguageTransformDescriptor;
@@ -119,6 +121,7 @@ type AllTextProcessors = {
         pre: {
             convertHalfWidthCharacters: TextProcessor<boolean>;
             alphabeticToHiragana: TextProcessor<boolean>;
+            normalizeCombiningCharacters: TextProcessor<boolean>;
             alphanumericWidthVariants: BidirectionalConversionPreprocessor;
             convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
             collapseEmphaticSequences: TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
@@ -133,6 +136,9 @@ type AllTextProcessors = {
         };
     };
     km: Record<string, never>;
+    mn: {
+        pre: CapitalizationPreprocessors;
+    };
     nl: {
         pre: CapitalizationPreprocessors;
     };
@@ -174,7 +180,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     vi: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & {
+            normalizeDiacritics: TextProcessor<'old' | 'new' | 'off'>;
+        };
     };
     yue: Record<string, never>;
     zh: Record<string, never>;

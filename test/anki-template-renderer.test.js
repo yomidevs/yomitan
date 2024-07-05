@@ -51,6 +51,7 @@ describe('AnkiTemplateRenderer', () => {
                 },
             },
             media: void 0,
+            dictionaryStylesMap: new Map(),
         },
     };
     const testCases = [

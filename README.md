@@ -18,7 +18,7 @@ Yomitan turns your web browser into a tool for building Japanese language litera
 Yomitan provides powerful features not available in other browser-based dictionaries:
 
 - 💬 Interactive popup definition window for displaying search results.
-- 🔊 Built-in native audio sources for Japanese words with the ability to add your own [custom audio sources](./docs/audio.md).
+- 🔊 Built-in native pronunciation audio with the ability to add your own [custom audio sources](./docs/audio.md).
 - ✍️ Kanji stroke order diagrams are just a click away.
 - 📝 [Automatic flashcard creation](./docs/anki-integration.md#anki-integration) for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 - 🔍 Custom search page for easily executing custom search queries.
@@ -33,9 +33,10 @@ Yomitan provides powerful features not available in other browser-based dictiona
 ## Helpful information
 
 - ✨ [Migrating from Yomichan (legacy)](./docs/yomichan-migration.md)
-- Installation and Setup
+- Dictionaries
   - 📚 [Recommended Dictionaries](./docs/dictionaries.md#recommended-dictionaries)
   - 🗂️ [Importing and exporting dictionaries](./docs/dictionaries.md#importing-a-dictionary-collection)
+  - 🛠️ [Making Yomitan Dictionaries](./docs/making-yomitan-dictionaries.md)
 - Anki Integration
   - 📇 [Anki integration and flashcard creation guide](./docs/anki-integration.md)
   - 🔧 [Anki handlebar templates](./docs/templates.md)

@@ -400,6 +400,8 @@
                                                         "jpod101",
                                                         "jpod101-alternate",
                                                         "jisho",
+                                                        "lingua-libre",
+                                                        "wiktionary",
                                                         "text-to-speech",
                                                         "text-to-speech-reading",
                                                         "custom",
@@ -417,13 +419,7 @@
                                                 }
                                             }
                                         },
-                                        "default": [
-                                            {
-                                                "type": "jpod101",
-                                                "url": "",
-                                                "voice": ""
-                                            }
-                                        ]
+                                        "default": []
                                     }
                                 }
                             },
@@ -441,6 +437,7 @@
                                     "hideDelay",
                                     "length",
                                     "deepDomScan",
+                                    "scanAltText",
                                     "popupNestingMaxDepth",
                                     "enablePopupSearch",
                                     "enableOnPopupExpressions",
@@ -691,6 +688,10 @@
                                     "deepDomScan": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "scanAltText": {
+                                        "type": "boolean",
+                                        "default": true
                                     },
                                     "popupNestingMaxDepth": {
                                         "type": "integer",
