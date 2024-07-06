@@ -122,12 +122,12 @@ class DictionaryEntry {
     }
 
     /**
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      */
     async checkForUpdate() {
         this._updatesAvailable.hidden = true;
         const {isUpdatable, indexUrl, revision} = this._dictionaryInfo;
-        if (!isUpdatable || !indexUrl) { return; }
+        if (!isUpdatable || !indexUrl) { return false; }
         const response = await fetch(indexUrl);
 
         /** @type {unknown} */
@@ -140,10 +140,11 @@ class DictionaryEntry {
         const validIndex = /** @type {import('dictionary-data').Index} */ (index);
 
         if (!this._compareRevisions(revision, validIndex.revision)) {
-            return;
+            return false;
         }
 
         this._updatesAvailable.hidden = false;
+        return true;
     }
 
     // Private
@@ -900,7 +901,10 @@ export class DictionaryController {
             this._setButtonsEnabled(false);
 
             const updateChecks = this._dictionaryEntries.map((entry) => entry.checkForUpdate());
-            await Promise.all(updateChecks);
+            const updateCount = (await Promise.all(updateChecks)).reduce((sum, value) => (sum + (value ? 1 : 0)), 0);
+            if (this._checkUpdatesButton !== null) {
+                this._checkUpdatesButton.textContent = updateCount ? `${updateCount} updates` : 'No updates';
+            }
         } finally {
             this._setButtonsEnabled(true);
             this._checkingUpdates = false;
