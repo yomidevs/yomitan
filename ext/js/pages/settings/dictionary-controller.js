@@ -156,8 +156,7 @@ class DictionaryEntry {
      */
     _compareRevisions(current, latest) {
         const simpleVersionTest = /^(\d+.)*\d+$/;
-        const isSimpleVersion = simpleVersionTest.test(current) && simpleVersionTest.test(latest);
-        if (!isSimpleVersion) {
+        if (!simpleVersionTest.test(current) || !simpleVersionTest.test(latest)) {
             return current < latest;
         }
 
