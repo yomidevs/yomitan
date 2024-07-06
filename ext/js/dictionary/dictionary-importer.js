@@ -314,12 +314,31 @@ export class DictionaryImporter {
         if (typeof targetLanguage === 'string') { summary.targetLanguage = targetLanguage; }
         if (typeof isUpdatable === 'boolean') {
             const {indexUrl, downloadUrl} = index;
-            if (!isUpdatable || typeof indexUrl !== 'string' || typeof downloadUrl !== 'string') {
-                throw new Error('Invalid index data for updatable dictionary'); // schema should prevent this
+            if (!isUpdatable || !this._validateUrl(indexUrl) || !this._validateUrl(downloadUrl)) {
+                throw new Error('Invalid index data for updatable dictionary');
             }
             summary.isUpdatable = isUpdatable;
         }
         return summary;
+    }
+
+    /**
+     * @param {string|undefined} string
+     * @returns {boolean}
+     */
+    _validateUrl(string) {
+        if (typeof string !== 'string') {
+            return false;
+        }
+
+        let url;
+        try {
+            url = new URL(string);
+        } catch (_) {
+            return false;
+        }
+
+        return url.protocol === 'http:' || url.protocol === 'https:';
     }
 
     /**
