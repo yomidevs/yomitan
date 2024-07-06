@@ -87,7 +87,7 @@ function createPhrasalVerbInflection(inflected, deinflected) {
         deinflect: (term) => {
             return term.replace(new RegExp(`(?<=)${inflected}(?= (?:${phrasalVerbWordDisjunction}))`), deinflected);
         },
-        conditionsIn: ['v_phr'],
+        conditionsIn: ['v'],
         conditionsOut: ['v_phr'],
     };
 }
@@ -109,18 +109,10 @@ function createPhrasalVerbInflectionsFromSuffixInflections(sourceRules) {
 export const englishTransforms = {
     language: 'en',
     conditions: {
-        v_any: {
-            name: 'Verb',
-            isDictionaryForm: false,
-            subConditions: ['v', 'v_irr', 'v_phr'],
-        },
         v: {
-            name: 'Regular verb',
+            name: 'Verb',
             isDictionaryForm: true,
-        },
-        v_irr: {
-            name: 'Irregular verb',
-            isDictionaryForm: true,
+            subConditions: ['v_phr'],
         },
         v_phr: {
             name: 'Phrasal verb',
