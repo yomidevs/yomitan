@@ -19,7 +19,7 @@
 import {applyTextReplacement} from '../general/regex-util.js';
 import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
-import {getAllLanguageTextProcessors, getAllLanguageReadingNormalizers} from './languages.js';
+import {getAllLanguageReadingNormalizers, getAllLanguageTextProcessors} from './languages.js';
 import {MultiLanguageTransformer} from './multi-language-transformer.js';
 
 /**
@@ -219,7 +219,7 @@ export class Translator {
      */
     async _findTermsInternal(text, options, tagAggregator) {
         const {removeNonJapaneseCharacters, enabledDictionaryMap} = options;
-        if (removeNonJapaneseCharacters) {
+        if (removeNonJapaneseCharacters && options.language === 'ja') {
             text = this._getJapaneseOnlyText(text);
         }
         if (text.length === 0) {
