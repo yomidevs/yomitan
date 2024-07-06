@@ -16,10 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import * as ajvSchemas0 from '../../../lib/validate-schemas.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
+import {readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
+
+const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
 
 class DictionaryEntry {
     /**
@@ -55,6 +59,8 @@ class DictionaryEntry {
         this._outdatedButton = querySelectorNotNull(fragment, '.dictionary-outdated-button');
         /** @type {HTMLButtonElement} */
         this._integrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button');
+        /** @type {HTMLButtonElement} */
+        this._updatesAvailable = querySelectorNotNull(fragment, '.dictionary-update-available');
         /** @type {HTMLElement} */
         this._titleNode = querySelectorNotNull(fragment, '.dictionary-title');
         /** @type {HTMLElement} */
@@ -114,7 +120,59 @@ class DictionaryEntry {
         this._enabledCheckbox.checked = value;
     }
 
+    /**
+     * @returns {Promise<void>}
+     */
+    async checkForUpdate() {
+        this._updatesAvailable.hidden = true;
+        const {isUpdatable, indexUrl, revision} = this._dictionaryInfo;
+        if (!isUpdatable || !indexUrl) { return; }
+        const response = await fetch(indexUrl);
+
+        /** @type {unknown} */
+        const index = await readResponseJson(response);
+
+        if (!ajvSchemas.dictionaryIndex(index)) {
+            throw new Error('Invalid dictionary index');
+        }
+
+        const validIndex = /** @type {import('dictionary-data').Index} */ (index);
+
+        if (!this._compareRevisions(revision, validIndex.revision)) {
+            return;
+        }
+
+        this._updatesAvailable.hidden = false;
+    }
+
     // Private
+
+    /**
+     * @param {string} current
+     * @param {string} latest
+     * @returns {boolean}
+     */
+    _compareRevisions(current, latest) {
+        const isSimpleVersion = /^(\d+.)*\d+$/.test(current) && /^(\d+.)*\d+$/.test(latest);
+        if (!isSimpleVersion) {
+            return current < latest;
+        }
+
+        const currentParts = current.split('.').map((part) => Number.parseInt(part, 10));
+        const latestParts = latest.split('.').map((part) => Number.parseInt(part, 10));
+
+        if (currentParts.length !== latestParts.length) {
+            return current < latest;
+        }
+
+        for (let i = 0; i < currentParts.length; i++) {
+            if (currentParts[i] !== latestParts[i]) {
+                return currentParts[i] < latestParts[i];
+            }
+        }
+
+        return false;
+    }
 
     /**
      * @param {import('popup-menu').MenuOpenEvent} e
@@ -394,7 +452,11 @@ export class DictionaryController {
         /** @type {?import('core').TokenObject} */
         this._databaseStateToken = null;
         /** @type {boolean} */
+        this._checkingUpdates = false;
+        /** @type {boolean} */
         this._checkingIntegrity = false;
+        /** @type {?HTMLButtonElement} */
+        this._checkUpdatesButton = document.querySelector('#dictionary-check-updates');
         /** @type {?HTMLButtonElement} */
         this._checkIntegrityButton = document.querySelector('#dictionary-check-integrity');
         /** @type {HTMLElement} */
@@ -442,6 +504,9 @@ export class DictionaryController {
         this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
         dictionaryDeleteButton.addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
         dictionaryMoveButton.addEventListener('click', this._onDictionaryMoveButtonClick.bind(this), false);
+        if (this._checkUpdatesButton !== null) {
+            this._checkUpdatesButton.addEventListener('click', this._onCheckUpdatesButtonClick.bind(this), false);
+        }
         if (this._checkIntegrityButton !== null) {
             this._checkIntegrityButton.addEventListener('click', this._onCheckIntegrityButtonClick.bind(this), false);
         }
@@ -733,6 +798,14 @@ export class DictionaryController {
         void this._checkIntegrity();
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
+    _onCheckUpdatesButtonClick(e) {
+        e.preventDefault();
+        void this._checkForUpdates();
+    }
+
     /** */
     _onDictionaryMoveButtonClick() {
         const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('dictionary-move-location'));
@@ -777,8 +850,23 @@ export class DictionaryController {
     }
 
     /** */
+    async _checkForUpdates() {
+        if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isDeleting) { return; }
+        try {
+            this._checkingUpdates = true;
+            this._setButtonsEnabled(false);
+
+            const updateChecks = this._dictionaryEntries.map((entry) => entry.checkForUpdate());
+            await Promise.all(updateChecks);
+        } finally {
+            this._setButtonsEnabled(true);
+            this._checkingUpdates = false;
+        }
+    }
+
+    /** */
     async _checkIntegrity() {
-        if (this._dictionaries === null || this._checkingIntegrity || this._isDeleting) { return; }
+        if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isDeleting) { return; }
 
         try {
             this._checkingIntegrity = true;

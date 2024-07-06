@@ -318,6 +318,8 @@ export class DictionaryImporter {
                 throw new Error('Invalid index data for updatable dictionary');
             }
             summary.isUpdatable = isUpdatable;
+            summary.indexUrl = indexUrl;
+            summary.downloadUrl = downloadUrl;
         }
         return summary;
     }
