@@ -1039,7 +1039,16 @@ export class DictionaryController {
      * @param {string} dictionaryTitle
      */
     async _updateDictionary(dictionaryTitle) {
-        console.log('Updating dictionary:', dictionaryTitle);
+        if (this._checkingIntegrity || this._checkingUpdates || this._isDeleting || this._dictionaries === null) { return; }
+
+        const dictionaryInfo = this._dictionaries.find((entry) => entry.title === dictionaryTitle);
+        if (typeof dictionaryInfo === 'undefined') { throw new Error('Dictionary not found'); }
+        const {downloadUrl} = dictionaryInfo;
+        if (typeof downloadUrl !== 'string') { throw new Error('Attempted to update dictionary without download URL'); }
+
+        await this._deleteDictionary(dictionaryTitle);
+
+        this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl});
     }
 
     /**

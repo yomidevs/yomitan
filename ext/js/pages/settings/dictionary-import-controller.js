@@ -87,9 +87,18 @@ export class DictionaryImportController {
         this._importFileDrop.addEventListener('dragover', this._onFileDropOver.bind(this), false);
         this._importFileDrop.addEventListener('dragleave', this._onFileDropLeave.bind(this), false);
         this._importFileDrop.addEventListener('drop', this._onFileDrop.bind(this), false);
+
+        this._settingsController.on('importDictionaryFromUrl', this._onEventImportDictionaryFromUrl.bind(this));
     }
 
     // Private
+
+    /**
+     * @param {import('settings-controller').EventArgument<'importDictionaryFromUrl'>} details
+     */
+    _onEventImportDictionaryFromUrl({url}) {
+        void this.importFilesFromURLs(url);
+    }
 
     /** */
     _onImportFileButtonClick() {
@@ -253,6 +262,13 @@ export class DictionaryImportController {
     async _onImportFromURL() {
         const text = this._importURLText.value.trim();
         if (!text) { return; }
+        await this.importFilesFromURLs(text);
+    }
+
+    /**
+     * @param {string} text
+     */
+    async importFilesFromURLs(text) {
         const urls = text.split('\n');
         const files = [];
         for (const url of urls) {
@@ -309,6 +325,11 @@ export class DictionaryImportController {
 
         const prevention = this._preventPageExit();
 
+        const optionsFull = await this._settingsController.getOptionsFull();
+        const importDetails = {
+            prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
+        };
+
         /** @type {Error[]} */
         let errors = [];
         try {
@@ -316,11 +337,6 @@ export class DictionaryImportController {
             this._hideErrors();
 
             for (const progress of progressContainers) { progress.hidden = false; }
-
-            const optionsFull = await this._settingsController.getOptionsFull();
-            const importDetails = {
-                prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
-            };
 
             let statusPrefix = '';
             /** @type {import('dictionary-importer.js').ImportStep} */
