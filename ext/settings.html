@@ -2488,6 +2488,27 @@
     </div>
 </div></div>
 
+<div id="dictionary-confirm-update-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+    <div class="modal-header"><div class="modal-title">Confirm Dictionary Update</div></div>
+    <div class="modal-body">
+        <p>Are you sure you want to update the dictionary:</p>
+        <p><strong id="dictionary-confirm-update-name"></strong>?</p>
+        <p class="warning-text">
+            Updating a dictionary involves:
+            <ul>
+                <li>Deleting the installed version</li>
+                <li>Downloading the latest version </li>
+                <li>Importing the latest version</li>
+            </ul>
+            Especially for large dictionaries, this process can take a while, and downloading will use your network.
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+        <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-update-button">Update</button>
+    </div>
+</div></div>
+
 <div id="secondary-search-dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
     <div class="modal-header">
         <div class="modal-title">Secondary Search Dictionaries</div>

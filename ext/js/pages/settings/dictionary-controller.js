@@ -92,6 +92,7 @@ class DictionaryEntry {
         this._eventListeners.addEventListener(this._downButton, 'click', (() => { this._move(1); }).bind(this), false);
         this._eventListeners.addEventListener(this._outdatedButton, 'click', this._onOutdatedButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButton, 'click', this._onIntegrityButtonClick.bind(this), false);
+        this._eventListeners.addEventListener(this._updatesAvailable, 'click', this._onUpdateButtonClick.bind(this), false);
     }
 
     /** */
@@ -212,6 +213,11 @@ class DictionaryEntry {
     /** */
     _onOutdatedButtonClick() {
         this._showDetails();
+    }
+
+    /** */
+    _onUpdateButtonClick() {
+        this._dictionaryController.updateDictionary(this.dictionaryTitle);
     }
 
     /** */
@@ -471,6 +477,8 @@ export class DictionaryController {
         this._noDictionariesEnabledWarnings = null;
         /** @type {?import('./modal.js').Modal} */
         this._deleteDictionaryModal = null;
+        /** @type {?import('./modal.js').Modal} */
+        this._updateDictionaryModal = null;
         /** @type {HTMLInputElement} */
         this._allCheckbox = querySelectorNotNull(document, '#all-dictionaries-enabled');
         /** @type {?DictionaryExtraInfo} */
@@ -494,8 +502,12 @@ export class DictionaryController {
         this._noDictionariesInstalledWarnings = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.no-dictionaries-installed-warning'));
         this._noDictionariesEnabledWarnings = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.no-dictionaries-enabled-warning'));
         this._deleteDictionaryModal = this._modalController.getModal('dictionary-confirm-delete');
+        this._updateDictionaryModal = this._modalController.getModal('dictionary-confirm-update');
         /** @type {HTMLButtonElement} */
         const dictionaryDeleteButton = querySelectorNotNull(document, '#dictionary-confirm-delete-button');
+        /** @type {HTMLButtonElement} */
+        const dictionaryUpdateButton = querySelectorNotNull(document, '#dictionary-confirm-update-button');
+
         /** @type {HTMLButtonElement} */
         const dictionaryMoveButton = querySelectorNotNull(document, '#dictionary-move-button');
 
@@ -503,6 +515,8 @@ export class DictionaryController {
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
         dictionaryDeleteButton.addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
+        dictionaryUpdateButton.addEventListener('click', this._onDictionaryConfirmUpdate.bind(this), false);
+
         dictionaryMoveButton.addEventListener('click', this._onDictionaryMoveButtonClick.bind(this), false);
         if (this._checkUpdatesButton !== null) {
             this._checkUpdatesButton.addEventListener('click', this._onCheckUpdatesButtonClick.bind(this), false);
@@ -525,6 +539,19 @@ export class DictionaryController {
         modal.node.dataset.dictionaryTitle = dictionaryTitle;
         /** @type {Element} */
         const nameElement = querySelectorNotNull(modal.node, '#dictionary-confirm-delete-name');
+        nameElement.textContent = dictionaryTitle;
+        modal.setVisible(true);
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     */
+    updateDictionary(dictionaryTitle) {
+        const modal = this._updateDictionaryModal;
+        if (modal === null) { return; }
+        modal.node.dataset.dictionaryTitle = dictionaryTitle;
+        /** @type {Element} */
+        const nameElement = querySelectorNotNull(modal.node, '#dictionary-confirm-update-name');
         nameElement.textContent = dictionaryTitle;
         modal.setVisible(true);
     }
@@ -793,6 +820,22 @@ export class DictionaryController {
     /**
      * @param {MouseEvent} e
      */
+    _onDictionaryConfirmUpdate(e) {
+        e.preventDefault();
+
+        const modal = /** @type {import('./modal.js').Modal} */ (this._updateDictionaryModal);
+        modal.setVisible(false);
+
+        const title = modal.node.dataset.dictionaryTitle;
+        if (typeof title !== 'string') { return; }
+        delete modal.node.dataset.dictionaryTitle;
+
+        void this._updateDictionary(title);
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
     _onCheckIntegrityButtonClick(e) {
         e.preventDefault();
         void this._checkIntegrity();
@@ -990,6 +1033,13 @@ export class DictionaryController {
             this._isDeleting = false;
             this._triggerStorageChanged();
         }
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     */
+    async _updateDictionary(dictionaryTitle) {
+        console.log('Updating dictionary:', dictionaryTitle);
     }
 
     /**
