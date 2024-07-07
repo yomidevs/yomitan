@@ -31,6 +31,10 @@ Below is a list of Yomitan dictionary schemas, their expected filenames, and the
 | [`dictionary-term-bank-v3-schema.json`](https://github.com/themoeway/yomitan/tree/master/ext/data/schemas/dictionary-term-bank-v3-schema.json)             | `term_bank_${number}.json`       | Stores dictionary readings, definitions, etc.                                          |
 | [`dictionary-term-meta-bank-v3-schema.json`](https://github.com/themoeway/yomitan/tree/master/ext/data/schemas/dictionary-term-meta-bank-v3-schema.json)   | `term_meta_bank_${number}.json`  | Stores meta information about terms, such as frequency data and pitch accent data.     |
 
+## Adding Custom CSS
+
+You can add custom CSS to a dictionary simply by adding a `styles.css` file to the root of the dictionary zip archive. This file will be loaded by Yomitan and applied to the dictionary viewer with the styles scoped to the dictionary. For example, observe the `styles.css` file in the [official test dictionary](\test\data\dictionaries\valid-dictionary1).
+
 ## Packaging A Dictionary
 
 A dictionary can contain various types of information within the zip file. After creating an `index.json` and the relevant data files, zip them with all data `.json` files in the root directory of the zip, not in subfolders. Use the highest compression level possible to reduce the size.
