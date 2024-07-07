@@ -13,7 +13,7 @@
 
 ## What is Yomitan?
 
-Yomitan turns your web browser into a tool for building Japanese language literacy by helping you **read** texts that would otherwise be too difficult to tackle.
+Yomitan turns your web browser into a tool for building language literacy by helping you **read** texts that would otherwise be too difficult to tackle in [many languages](#multilanguage-support).
 
 Yomitan provides powerful features not available in other browser-based dictionaries:
 
@@ -48,6 +48,10 @@ Yomitan provides powerful features not available in other browser-based dictiona
   - 🕷️ [Known browser bugs](./docs/browser-bugs.md)
   - ❓ [Frequently asked questions](./docs/faq.md)
 - 🔒 [Browser Permissions](./docs/permissions.md)
+
+## Multilanguage Support
+
+Yomitan was originally developed for Japanese language learning, but it now supports multiple languages. For more information, see the [Supported Languages](./docs/supported-languages.md) file.
 
 ## Installation
 
