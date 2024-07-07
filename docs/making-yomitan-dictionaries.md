@@ -33,7 +33,7 @@ Below is a list of Yomitan dictionary schemas, their expected filenames, and the
 
 ## Adding Custom CSS
 
-You can add custom CSS to a dictionary simply by adding a `styles.css` file to the root of the dictionary zip archive. This file will be loaded by Yomitan and applied to the dictionary viewer with the styles scoped to the dictionary. For example, observe the `styles.css` file in the [official test dictionary](\test\data\dictionaries\valid-dictionary1).
+You can add custom CSS to a dictionary simply by adding a `styles.css` file to the root of the dictionary zip archive. This file will be loaded by Yomitan and applied to the dictionary viewer with the styles scoped to the dictionary. For example, observe the `styles.css` file in the [official test dictionary](https://github.com/themoeway/yomitan/tree/master/test/data/dictionaries/valid-dictionary1).
 
 ## Packaging A Dictionary
 
