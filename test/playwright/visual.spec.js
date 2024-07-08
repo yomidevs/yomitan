@@ -48,9 +48,10 @@ test('visual', async ({page, extensionId}) => {
     // Wait for the advanced settings to be visible
     await page.locator('input#advanced-checkbox').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
 
+    // TODO: Remove
     // Scroll to the bottom of the page
     // document.querySelector('.footer-padding').scrollIntoView()
-    await page.locator('.footer-padding').evaluate((/** @type {HTMLElement} */ element) => element.scrollIntoView());
+    // await page.locator('.footer-padding').evaluate((/** @type {HTMLElement} */ element) => element.scrollIntoView());
 
     // Get page height by getting the footer and adding height and y position
 
