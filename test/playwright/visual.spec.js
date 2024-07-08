@@ -53,6 +53,8 @@ test('visual', async ({page, extensionId}) => {
         return body.scrollHeight;
     });
 
+    console.log(`Page height: ${pageHeight}`);
+
     // Set the viewport to match the full page size
     await page.setViewportSize({width: 1280, height: pageHeight});
 
