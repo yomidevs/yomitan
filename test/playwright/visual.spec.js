@@ -38,7 +38,8 @@ test('visual', async ({page, extensionId}) => {
     await expect.soft(page).toHaveScreenshot('settings-fresh.png', {mask: [storage_locator]});
 
     // Enable advanced settings
-    await page.locator('input#advanced-checkbox').check();
+    // Wait for the advanced settings to be visible
+    await page.locator('input#advanced-checkbox').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
 
     // Wait for any animations or changes to complete
     await page.waitForTimeout(500);
