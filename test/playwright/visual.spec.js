@@ -48,21 +48,21 @@ test('visual', async ({page, extensionId}) => {
     // Wait for the advanced settings to be visible
     await page.locator('input#advanced-checkbox').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
 
-    // Get the full height of the page
-    const pageHeight = await page.locator('body').evaluate((/** @type {HTMLBodyElement} */ body) => {
-        return body.scrollHeight;
-    });
+    // Scroll to the bottom of the page
+    // document.querySelector('.footer-padding').scrollIntoView()
+    await page.locator('.footer-padding').evaluate((/** @type {HTMLElement} */ element) => element.scrollIntoView());
 
-    console.log(`Page height: ${pageHeight}`);
-
-    // Set the viewport to match the full page size
-    await page.setViewportSize({width: 1280, height: pageHeight});
+    // TODO: remove below
+    // eslint-disable-next-line no-undef
+    const pageHeight = await page.evaluate(() => document.body.scrollHeight);
+    console.log('Page height: ' + pageHeight);
 
     // Wait for any animations or changes to complete
     await page.waitForTimeout(500);
 
     // Take a full page screenshot of the settings page with advanced settings enabled
     await expect.soft(page).toHaveScreenshot('settings-fresh-full-advanced.png', {
+        fullPage: true,
         mask: [storage_locator],
     });
 
