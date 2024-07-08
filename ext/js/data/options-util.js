@@ -1373,7 +1373,7 @@ export class OptionsUtil {
     async _updateVersion43(options) {
         for (const profile of options.profiles) {
             profile.options.general.fontFamily = 'sans-serif';
-            profile.options.general.fontSize = '14';
+            profile.options.general.fontSize = 14;
             profile.options.general.lineHeight = '1.5';
         }
     }
