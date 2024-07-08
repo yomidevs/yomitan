@@ -54,7 +54,7 @@ test('visual', async ({page, extensionId}) => {
 
     // Get page height by getting the footer and adding height and y position
 
-    const footer = /** @type {import('@playwright/test').ElementHandle<HTMLElement>} */ (await page.locator('.footer…-padding').elementHandle());
+    const footer = /** @type {import('@playwright/test').ElementHandle<HTMLElement>} */ (await page.locator('.footer-padding').elementHandle());
     expect(footer).not.toBe(null);
     const boundingBox = /** @type {NonNullable<Awaited<ReturnType<import('@playwright/test').ElementHandle<HTMLElement>['boundingBox']>>>} */ (await footer.boundingBox());
     expect(boundingBox).not.toBe(null);
