@@ -37,6 +37,13 @@ test('visual', async ({page, extensionId}) => {
     // Take a simple screenshot of the settings page
     await expect.soft(page).toHaveScreenshot('settings-fresh.png', {mask: [storage_locator]});
 
+    // Load in jmdict_english.zip
+    await page.locator('input[id="dictionary-import-file-input"]').setInputFiles(path.join(root, 'dictionaries/jmdict_english.zip'));
+    await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
+
+    // Take a screenshot of the settings page with jmdict loaded
+    await expect.soft(page).toHaveScreenshot('settings-jmdict-loaded.png', {mask: [storage_locator]});
+
     // Enable advanced settings
     // Wait for the advanced settings to be visible
     await page.locator('input#advanced-checkbox').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
@@ -49,13 +56,6 @@ test('visual', async ({page, extensionId}) => {
         fullPage: true,
         mask: [storage_locator],
     });
-
-    // Load in jmdict_english.zip
-    await page.locator('input[id="dictionary-import-file-input"]').setInputFiles(path.join(root, 'dictionaries/jmdict_english.zip'));
-    await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
-
-    // Take a screenshot of the settings page with jmdict loaded
-    await expect.soft(page).toHaveScreenshot('settings-jmdict-loaded.png', {mask: [storage_locator]});
 
     /**
      * @param {number} doc_number
