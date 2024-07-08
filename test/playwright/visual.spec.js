@@ -50,7 +50,7 @@ test('visual', async ({page, extensionId}) => {
 
     // Scroll to the bottom of the page
     // document.querySelector('.footer-padding').scrollIntoView()
-    await page.locator('.footer…-padding').evaluate((/** @type {HTMLElement} */ element) => element.scrollIntoView());
+    await page.locator('.footer-padding').evaluate((/** @type {HTMLElement} */ element) => element.scrollIntoView());
 
     // Get page height by getting the footer and adding height and y position
 
@@ -59,6 +59,7 @@ test('visual', async ({page, extensionId}) => {
     const boundingBox = /** @type {NonNullable<Awaited<ReturnType<import('@playwright/test').ElementHandle<HTMLElement>['boundingBox']>>>} */ (await footer.boundingBox());
     expect(boundingBox).not.toBe(null);
     const pageHeight = Math.ceil(boundingBox.y + boundingBox.height);
+    // TODO: remove log
     console.log('Page height:', pageHeight);
 
     await page.setViewportSize({width: 1280, height: pageHeight});
