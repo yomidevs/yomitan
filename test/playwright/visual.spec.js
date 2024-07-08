@@ -48,20 +48,12 @@ test('visual', async ({page, extensionId}) => {
     // Wait for the advanced settings to be visible
     await page.locator('input#advanced-checkbox').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
 
-    // TODO: Remove
-    // Scroll to the bottom of the page
-    // document.querySelector('.footer-padding').scrollIntoView()
-    // await page.locator('.footer-padding').evaluate((/** @type {HTMLElement} */ element) => element.scrollIntoView());
-
-    // Get page height by getting the footer and adding height and y position
-
+    // Get page height by getting the footer and adding height and y position as other methods of calculation don't work for some reason
     const footer = /** @type {import('@playwright/test').ElementHandle<HTMLElement>} */ (await page.locator('.footer-padding').elementHandle());
     expect(footer).not.toBe(null);
     const boundingBox = /** @type {NonNullable<Awaited<ReturnType<import('@playwright/test').ElementHandle<HTMLElement>['boundingBox']>>>} */ (await footer.boundingBox());
     expect(boundingBox).not.toBe(null);
     const pageHeight = Math.ceil(boundingBox.y + boundingBox.height);
-    // TODO: remove log
-    console.log('Page height:', pageHeight);
 
     await page.setViewportSize({width: 1280, height: pageHeight});
 
