@@ -48,6 +48,14 @@ test('visual', async ({page, extensionId}) => {
     // Wait for the advanced settings to be visible
     await page.locator('input#advanced-checkbox').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
 
+    // Get the full height of the page
+    const pageHeight = await page.locator('body').evaluate((/** @type {HTMLBodyElement} */ body) => {
+        return body.scrollHeight;
+    });
+
+    // Set the viewport to match the full page size
+    await page.setViewportSize({width: 1280, height: pageHeight});
+
     // Wait for any animations or changes to complete
     await page.waitForTimeout(500);
 
