@@ -533,8 +533,8 @@ export class Display extends EventDispatcher {
      */
     setFontOptions(fontFamily, fontSize, lineHeight) {
         document.documentElement.style.setProperty('--font-family', fontFamily);
-        document.documentElement.style.setProperty('--font-size-no-units', `${fontSize}`);
-        document.documentElement.style.setProperty('--line-height', lineHeight);
+        document.documentElement.style.setProperty('font-size', `${fontSize}px`);
+        document.documentElement.style.setProperty('line-height', lineHeight);
     }
 
     /**
