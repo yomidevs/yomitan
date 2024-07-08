@@ -527,6 +527,17 @@ export class Display extends EventDispatcher {
     }
 
     /**
+     * @param {string} fontFamily
+     * @param {number} fontSize
+     * @param {string} lineHeight
+     */
+    setFontOptions(fontFamily, fontSize, lineHeight) {
+        document.documentElement.style.setProperty('--font-family', fontFamily);
+        document.documentElement.style.setProperty('--font-size-no-units', `${fontSize}`);
+        document.documentElement.style.setProperty('--line-height', lineHeight);
+    }
+
+    /**
      * @param {import('display').DirectApiMapInit} handlers
      */
     registerDirectMessageHandlers(handlers) {
@@ -1167,7 +1178,7 @@ export class Display extends EventDispatcher {
      */
     _setTheme(options) {
         const {general} = options;
-        const {popupTheme, popupOuterTheme} = general;
+        const {popupTheme, popupOuterTheme, fontFamily, fontSize, lineHeight} = general;
         /** @type {string} */
         let pageType = this._pageType;
         try {
@@ -1189,6 +1200,7 @@ export class Display extends EventDispatcher {
         this._themeController.updateTheme();
         const customCss = this._getCustomCss(options);
         this.setCustomCss(customCss);
+        this.setFontOptions(fontFamily, fontSize, lineHeight);
     }
 
     /**

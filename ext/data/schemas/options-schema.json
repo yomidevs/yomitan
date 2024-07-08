@@ -137,6 +137,18 @@
                                         "enum": ["group", "merge", "split"],
                                         "default": "group"
                                     },
+                                    "fontFamily": {
+                                        "type": "string",
+                                        "default": "sans-serif"
+                                    },
+                                    "fontSize": {
+                                        "type": "number",
+                                        "default": 14
+                                    },
+                                    "lineHeight": {
+                                        "type": "string",
+                                        "default": "1.5"
+                                    },
                                     "debugInfo": {
                                         "type": "boolean",
                                         "default": false

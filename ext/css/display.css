@@ -18,6 +18,8 @@
 
 /* Variables */
 :root {
+    /* Fonts */
+    --font-family: 'sans-serif';
     /* Strings */
     --compact-list-separator: ' | ';
 
@@ -248,6 +250,9 @@
 
 
 /* Fonts */
+* {
+    font-family: var(--font-family);
+}
 @font-face {
     font-family: kanji-stroke-orders;
     src: url('/data/fonts/kanji-stroke-orders.ttf');
