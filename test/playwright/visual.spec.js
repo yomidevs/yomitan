@@ -61,7 +61,6 @@ test('visual', async ({page, extensionId}) => {
 
     // Take a full page screenshot of the settings page with advanced settings enabled
     await expect.soft(page).toHaveScreenshot('settings-fresh-full-advanced.png', {
-        fullPage: true,
         mask: [storage_locator],
     });
 
