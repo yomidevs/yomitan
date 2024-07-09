@@ -1931,7 +1931,7 @@ export class Translator {
             let i = v2.maxOriginalTextLength - v1.maxOriginalTextLength;
             if (i !== 0) { return i; }
 
-            // Sort by the number of inflection reasons
+            // Sort by length of the shortest inflection chain
             i = this._getShortestInflectionChainLength(v1.inflectionRuleChainCandidates) - this._getShortestInflectionChainLength(v2.inflectionRuleChainCandidates);
             if (i !== 0) { return i; }
 
