@@ -551,6 +551,7 @@ export class OptionsUtil {
             this._updateVersion40,
             this._updateVersion41,
             this._updateVersion42,
+            this._updateVersion43,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1357,6 +1358,16 @@ export class OptionsUtil {
     async _updateVersion42(options) {
         for (const profile of options.profiles) {
             profile.options.scanning.scanAltText = true;
+        }
+    }
+
+    /**
+     * - Added option for sticky search header.
+     * @type {import('options-util').UpdateFunction}
+     */
+    _updateVersion43(options) {
+        for (const profile of options.profiles) {
+            profile.options.general.stickySearchHeader = false;
         }
     }
 

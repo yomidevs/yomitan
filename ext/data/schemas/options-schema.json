@@ -121,7 +121,8 @@
                                     "frequencyDisplayMode",
                                     "termDisplayMode",
                                     "sortFrequencyDictionary",
-                                    "sortFrequencyDictionaryOrder"
+                                    "sortFrequencyDictionaryOrder",
+                                    "stickySearchHeader"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -306,6 +307,10 @@
                                         "type": "string",
                                         "enum": ["ascending", "descending"],
                                         "default": "descending"
+                                    },
+                                    "stickySearchHeader": {
+                                        "type": "boolean",
+                                        "default": false
                                     }
                                 }
                             },
