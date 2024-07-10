@@ -53,6 +53,8 @@ await Application.main(true, async (application) => {
 
     document.body.hidden = false;
 
+    documentFocusController.focusElement();
+
     display.initializeState();
 
     document.documentElement.dataset.loaded = 'true';

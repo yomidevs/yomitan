@@ -41,9 +41,7 @@ export class DocumentFocusController {
     prepare() {
         window.addEventListener('focus', this._onWindowFocus.bind(this), false);
         this._updateFocusedElement(false);
-        if (this._autofocusElement !== null && document.activeElement !== this._autofocusElement) {
-            this._autofocusElement.focus({preventScroll: true});
-        }
+        this.focusElement();
     }
 
     /**
@@ -54,6 +52,13 @@ export class DocumentFocusController {
         if (document.activeElement !== element) { return; }
         element.blur();
         this._updateFocusedElement(false);
+    }
+
+    /** */
+    focusElement() {
+        if (this._autofocusElement !== null && document.activeElement !== this._autofocusElement) {
+            this._autofocusElement.focus({preventScroll: true});
+        }
     }
 
     // Private
