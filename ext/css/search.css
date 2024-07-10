@@ -32,7 +32,7 @@
     --search-textbox-min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
     --search-textbox-max-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
 
-    --outline-item-icon-size: 32px;
+    --cog-icon-size: 26px;
 }
 :root:not([data-loaded=true]) {
     --animation-duration: 0s;
@@ -140,8 +140,8 @@ h1 {
 #search-settings-button>.icon {
     display: block;
     background-color: var(--button-default-icon-color);
-    width: var(--outline-item-icon-size);
-    height: var(--outline-item-icon-size);
+    width: var(--cog-icon-size);
+    height: var(--cog-icon-size);
     transition: 0.125s filter ease-in-out;
 }
 #search-settings-button>.icon:hover {
