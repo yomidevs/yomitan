@@ -244,8 +244,8 @@ export class SearchDisplayController {
      */
     _onSearchKeydown(e) {
         if (e.isComposing) { return; }
-        const {code} = e;
-        if (!((code === 'Enter' || code === 'NumpadEnter') && !e.shiftKey)) { return; }
+        const {code, key} = e;
+        if (!((code === 'Enter' || key === 'Enter' || code === 'NumpadEnter') && !e.shiftKey)) { return; }
 
         // Search
         const element = /** @type {HTMLElement} */ (e.currentTarget);
