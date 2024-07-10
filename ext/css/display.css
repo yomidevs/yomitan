@@ -18,6 +18,8 @@
 
 /* Variables */
 :root {
+    /* Fonts */
+    --font-family: 'sans-serif';
     /* Strings */
     --compact-list-separator: ' | ';
 
@@ -248,6 +250,9 @@
 
 
 /* Fonts */
+* {
+    font-family: var(--font-family);
+}
 @font-face {
     font-family: kanji-stroke-orders;
     src: url('/data/fonts/kanji-stroke-orders.ttf');
@@ -586,7 +591,12 @@ button.sidebar-button.sidebar-button-highlight {
     position: sticky;
     top: 0px;
     z-index: 1000;
+}
+#sticky-search-header {
     padding-top: 10px;
+}
+.sticky-header #query-parser-content {
+    max-height: calc(var(--query-parser-font-size) * 2);
 }
 .search-header {
     width: var(--content-width);
@@ -606,7 +616,6 @@ button.sidebar-button.sidebar-button-highlight {
     margin-top: 0.5em;
     font-size: var(--query-parser-font-size);
     white-space: pre-wrap;
-    max-height: calc(var(--query-parser-font-size) * 2);
 }
 #query-parser-content[data-term-spacing=true] .query-parser-term {
     margin-right: 0.2em;

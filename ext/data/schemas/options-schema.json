@@ -121,7 +121,8 @@
                                     "frequencyDisplayMode",
                                     "termDisplayMode",
                                     "sortFrequencyDictionary",
-                                    "sortFrequencyDictionaryOrder"
+                                    "sortFrequencyDictionaryOrder",
+                                    "stickySearchHeader"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -136,6 +137,18 @@
                                         "type": "string",
                                         "enum": ["group", "merge", "split"],
                                         "default": "group"
+                                    },
+                                    "fontFamily": {
+                                        "type": "string",
+                                        "default": "sans-serif"
+                                    },
+                                    "fontSize": {
+                                        "type": "number",
+                                        "default": 14
+                                    },
+                                    "lineHeight": {
+                                        "type": "string",
+                                        "default": "1.5"
                                     },
                                     "debugInfo": {
                                         "type": "boolean",
@@ -306,6 +319,10 @@
                                         "type": "string",
                                         "enum": ["ascending", "descending"],
                                         "default": "descending"
+                                    },
+                                    "stickySearchHeader": {
+                                        "type": "boolean",
+                                        "default": false
                                     }
                                 }
                             },

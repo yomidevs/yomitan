@@ -246,6 +246,9 @@ function createProfileOptionsUpdatedTestData1() {
             resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,
+            fontFamily: 'sans-serif',
+            fontSize: 14,
+            lineHeight: '1.5',
             showAdvanced: false,
             popupDisplayMode: 'default',
             popupWidth: 400,
@@ -283,6 +286,7 @@ function createProfileOptionsUpdatedTestData1() {
             termDisplayMode: 'ruby',
             sortFrequencyDictionary: null,
             sortFrequencyDictionaryOrder: 'descending',
+            stickySearchHeader: false,
         },
         audio: {
             enabled: true,
@@ -608,7 +612,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 42,
+        version: 44,
         global: {
             database: {
                 prefixWildcardsSupported: false,

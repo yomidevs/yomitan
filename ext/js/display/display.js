@@ -98,6 +98,8 @@ export class Display extends EventDispatcher {
         this._historyHasChanged = false;
         /** @type {?Element} */
         this._aboveStickyHeader = document.querySelector('#above-sticky-header');
+        /** @type {?Element} */
+        this._searchHeader = document.querySelector('#sticky-search-header');
         /** @type {import('display').PageType} */
         this._contentType = 'clear';
         /** @type {string} */
@@ -435,6 +437,7 @@ export class Display extends EventDispatcher {
         this._updateHotkeys(options);
         this._updateDocumentOptions(options);
         this._setTheme(options);
+        this._setStickyHeader(options);
         this._hotkeyHelpController.setOptions(options);
         this._displayGenerator.updateHotkeys();
         this._displayGenerator.updateLanguage(options.general.language);
@@ -524,6 +527,19 @@ export class Display extends EventDispatcher {
         if (this._styleNode.parentNode !== parent) {
             parent.appendChild(this._styleNode);
         }
+    }
+
+    /**
+     * @param {string} fontFamily
+     * @param {number} fontSize
+     * @param {string} lineHeight
+     */
+    setFontOptions(fontFamily, fontSize, lineHeight) {
+        document.documentElement.style.setProperty('--font-family', fontFamily);
+        // Setting these directly rather than using the existing CSS variables
+        // minimizes problems and ensures everything scales correctly
+        document.documentElement.style.fontSize = `${fontSize}px`;
+        document.documentElement.style.lineHeight = lineHeight;
     }
 
     /**
@@ -1167,7 +1183,7 @@ export class Display extends EventDispatcher {
      */
     _setTheme(options) {
         const {general} = options;
-        const {popupTheme, popupOuterTheme} = general;
+        const {popupTheme, popupOuterTheme, fontFamily, fontSize, lineHeight} = general;
         /** @type {string} */
         let pageType = this._pageType;
         try {
@@ -1189,6 +1205,7 @@ export class Display extends EventDispatcher {
         this._themeController.updateTheme();
         const customCss = this._getCustomCss(options);
         this.setCustomCss(customCss);
+        this.setFontOptions(fontFamily, fontSize, lineHeight);
     }
 
     /**
@@ -1548,8 +1565,13 @@ export class Display extends EventDispatcher {
         }
         let target = (index === 0 && definitionIndex <= 0) || node === null ? 0 : this._getElementTop(node);
 
-        if (this._aboveStickyHeader !== null && target !== 0) {
-            target += this._aboveStickyHeader.getBoundingClientRect().height;
+        if (target !== 0) {
+            if (this._aboveStickyHeader !== null) {
+                target += this._aboveStickyHeader.getBoundingClientRect().height;
+            }
+            if (!this._options?.general.stickySearchHeader && this._searchHeader) {
+                target += this._searchHeader.getBoundingClientRect().height;
+            }
         }
 
         this._windowScroll.stop();
@@ -2176,5 +2198,14 @@ export class Display extends EventDispatcher {
     /** */
     _triggerContentUpdateComplete() {
         this.trigger('contentUpdateComplete', {type: this._contentType});
+    }
+
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
+    _setStickyHeader(options) {
+        if (this._searchHeader && options) {
+            this._searchHeader.classList.toggle('sticky-header', options.general.stickySearchHeader);
+        }
     }
 }

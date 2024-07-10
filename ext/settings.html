@@ -31,7 +31,7 @@
             <a href="#!appearance"       class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="palette"></span></span><span class="outline-item-label">Appearance</span></a>
             <a href="#!result-display"   class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="monitor"></span></span><span class="outline-item-label">Result Display</span></a>
             <a href="#!popup-size"       class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup-size"></span></span><span class="outline-item-label">Position &amp; Size</span></a>
-            <a href="#!window"           class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="window"></span></span><span class="outline-item-label">Window</span></a>
+            <a href="#!window"           class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="window"></span></span><span class="outline-item-label">Search Window</span></a>
             <a href="#!audio"            class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="speaker"></span></span><span class="outline-item-label">Audio</span></a>
             <a href="#!text-parsing"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="text-parsing"></span></span><span class="outline-item-label">Text Parsing</span></a>
             <a href="#!translation"      class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="translation"></span></span><span class="outline-item-label">Translation</span></a>
@@ -735,6 +735,59 @@
                 </div>
             </div>
         </div>
+        <div class="settings-item">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Font family</div>
+                    <div class="settings-item-description">
+                        Change the font family used in Yomitan.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <div class="settings-item-group">
+                        <input type="text" class="font-family-input" spellcheck="false" autocomplete="off" data-setting="general.fontFamily">
+                    </div>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <div>
+                    The font family can be changed to any font installed on your system.<br>
+                    You can input things such as <code>sans-serif</code>, <code>serif</code>, or <code>monospace</code>.<br>
+                    If you want to specify one or multiple specific fonts, you can type them in manually separated by commas,
+                    for example <pre><code>"Noto Sans JP", "Meiryo", sans-serif</code></pre>
+                </div>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Font size</div>
+                    <div class="settings-item-description">Change the font size used in popups, in pixels.</div>
+                </div>
+                <div class="settings-item-right">
+                    <div class="settings-item-group">
+                        <input type="number" class="short-width short-height" data-setting="general.fontSize" min="1">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Line height</div>
+                    <div class="settings-item-description">Change the space between lines of text in popups. This will usually be a decimal number between 1 and 2.</div>
+                </div>
+                <div class="settings-item-right">
+                    <div class="settings-item-group">
+                        <input type="text" class="short-width short-height" data-setting="general.lineHeight">
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Compact glossaries</div>
@@ -1202,13 +1255,24 @@
         </div></div>
     </div>
 
-    <!-- Window -->
+    <!-- Search Window -->
     <div class="heading-container advanced-only">
         <div class="heading-container-icon"><span class="icon" data-icon="window"></span></div>
-        <div class="heading-container-left"><h2 id="window"><a href="#!window">Window</a></h2></div>
+        <div class="heading-container-left"><h2 id="window"><a href="#!window">Search Window</a></h2></div>
         <div class="heading-container-right"><a tabindex="0" class="heading-link-light" id="test-window-open-link">Open&hellip;</a></div>
     </div>
     <div class="settings-group advanced-only">
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Sticky search header</div>
+                    <div class="settings-item-description">Search header stays on the page when scrolling down.</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.stickySearchHeader"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+        </div>
         <div class="settings-item">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
