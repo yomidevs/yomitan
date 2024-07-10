@@ -142,10 +142,11 @@ h1 {
     background-color: var(--button-default-icon-color);
     width: var(--cog-icon-size);
     height: var(--cog-icon-size);
-    transition: 0.125s filter ease-in-out;
+    transition: var(--animation-duration) filter ease-in-out;
 }
-#search-settings-button>.icon:hover {
-    filter: invert(0.25);
+#search-settings-button>.icon:hover,
+#search-settings-button>.icon:focus {
+    filter: invert(0.5);
 }
 #search-settings-button {
     margin-right: 0;
