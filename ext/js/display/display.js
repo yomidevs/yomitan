@@ -530,6 +530,19 @@ export class Display extends EventDispatcher {
     }
 
     /**
+     * @param {string} fontFamily
+     * @param {number} fontSize
+     * @param {string} lineHeight
+     */
+    setFontOptions(fontFamily, fontSize, lineHeight) {
+        document.documentElement.style.setProperty('--font-family', fontFamily);
+        // Setting these directly rather than using the existing CSS variables
+        // minimizes problems and ensures everything scales correctly
+        document.documentElement.style.fontSize = `${fontSize}px`;
+        document.documentElement.style.lineHeight = lineHeight;
+    }
+
+    /**
      * @param {import('display').DirectApiMapInit} handlers
      */
     registerDirectMessageHandlers(handlers) {
@@ -1170,7 +1183,7 @@ export class Display extends EventDispatcher {
      */
     _setTheme(options) {
         const {general} = options;
-        const {popupTheme, popupOuterTheme} = general;
+        const {popupTheme, popupOuterTheme, fontFamily, fontSize, lineHeight} = general;
         /** @type {string} */
         let pageType = this._pageType;
         try {
@@ -1192,6 +1205,7 @@ export class Display extends EventDispatcher {
         this._themeController.updateTheme();
         const customCss = this._getCustomCss(options);
         this.setCustomCss(customCss);
+        this.setFontOptions(fontFamily, fontSize, lineHeight);
     }
 
     /**

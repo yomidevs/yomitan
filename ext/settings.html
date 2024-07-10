@@ -735,6 +735,59 @@
                 </div>
             </div>
         </div>
+        <div class="settings-item">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Font family</div>
+                    <div class="settings-item-description">
+                        Change the font family used in Yomitan.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <div class="settings-item-group">
+                        <input type="text" class="font-family-input" spellcheck="false" autocomplete="off" data-setting="general.fontFamily">
+                    </div>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <div>
+                    The font family can be changed to any font installed on your system.<br>
+                    You can input things such as <code>sans-serif</code>, <code>serif</code>, or <code>monospace</code>.<br>
+                    If you want to specify one or multiple specific fonts, you can type them in manually separated by commas,
+                    for example <pre><code>"Noto Sans JP", "Meiryo", sans-serif</code></pre>
+                </div>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Font size</div>
+                    <div class="settings-item-description">Change the font size used in popups, in pixels.</div>
+                </div>
+                <div class="settings-item-right">
+                    <div class="settings-item-group">
+                        <input type="number" class="short-width short-height" data-setting="general.fontSize" min="1">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Line height</div>
+                    <div class="settings-item-description">Change the space between lines of text in popups. This will usually be a decimal number between 1 and 2.</div>
+                </div>
+                <div class="settings-item-right">
+                    <div class="settings-item-group">
+                        <input type="text" class="short-width short-height" data-setting="general.lineHeight">
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Compact glossaries</div>

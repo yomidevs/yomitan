@@ -293,6 +293,9 @@ export class OptionsUtil {
                 resultOutputMode: 'group',
                 debugInfo: false,
                 maxResults: 32,
+                fontFamily: 'sans-serif',
+                fontSize: 14,
+                lineHeight: '1.5',
                 showAdvanced: false,
                 popupDisplayMode: 'default',
                 popupWidth: 400,
@@ -552,6 +555,7 @@ export class OptionsUtil {
             this._updateVersion41,
             this._updateVersion42,
             this._updateVersion43,
+            this._updateVersion44,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1368,6 +1372,20 @@ export class OptionsUtil {
     _updateVersion43(options) {
         for (const profile of options.profiles) {
             profile.options.general.stickySearchHeader = false;
+        }
+    }
+
+    /**
+     * - Added general.fontFamily
+     * - Added general.fontSize
+     * - Added general.lineHeight
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion44(options) {
+        for (const profile of options.profiles) {
+            profile.options.general.fontFamily = 'sans-serif';
+            profile.options.general.fontSize = 14;
+            profile.options.general.lineHeight = '1.5';
         }
     }
 
