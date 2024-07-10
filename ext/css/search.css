@@ -147,11 +147,20 @@ h1 {
 #search-settings-button>.icon:hover {
     filter: invert(0.25);
 }
+#search-settings-button {
+    margin-right: 0;
+}
+.search-options-left {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+}
 .search-options {
     display: flex;
     flex-flow: row wrap;
     margin: 0.5em 0 0 0;
     align-items: center;
+    justify-content: space-between;
 }
 .search-option {
     flex: 0 1 auto;
