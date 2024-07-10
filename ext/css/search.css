@@ -142,7 +142,10 @@ h1 {
     background-color: var(--button-default-icon-color);
     width: var(--outline-item-icon-size);
     height: var(--outline-item-icon-size);
+    transition: 0.125s filter ease-in-out;
 }
+#search-settings-button>.icon:hover {
+    filter: invert(0.25);
 }
 .search-options {
     display: flex;
