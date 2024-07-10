@@ -286,6 +286,7 @@ function createProfileOptionsUpdatedTestData1() {
             termDisplayMode: 'ruby',
             sortFrequencyDictionary: null,
             sortFrequencyDictionaryOrder: 'descending',
+            stickySearchHeader: false,
         },
         audio: {
             enabled: true,
@@ -611,7 +612,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 43,
+        version: 44,
         global: {
             database: {
                 prefixWildcardsSupported: false,
