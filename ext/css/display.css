@@ -586,6 +586,8 @@ button.sidebar-button.sidebar-button-highlight {
     position: sticky;
     top: 0px;
     z-index: 1000;
+}
+#sticky-search-header {
     padding-top: 10px;
 }
 .sticky-header #query-parser-content {
