@@ -41,7 +41,6 @@ export class DocumentFocusController {
     prepare() {
         window.addEventListener('focus', this._onWindowFocus.bind(this), false);
         this._updateFocusedElement(false);
-        this.focusElement();
     }
 
     /**
