@@ -16,6 +16,7 @@
     <link rel="stylesheet" type="text/css" href="/css/display-pronunciation.css">
     <link rel="stylesheet" type="text/css" href="/css/structured-content.css">
     <link rel="stylesheet" type="text/css" href="/css/search.css">
+    <link rel="stylesheet" type="text/css" href="/css/search-settings.css">
     <script src="/js/display/search-main.js" type="module"></script>
 </head>
 <body hidden>
@@ -33,6 +34,7 @@
 
                         <div class="scan-disable">
                             <div class="search-options">
+                                <div class="search-option search-settings-button" data-modal-action="show,search-settings"><span class="icon" data-icon="cog"></span></div>
                                 <div class="search-option" id="search-option-profile-select">
                                     <span class="profile-select-container"><select class="profile-select" id="profile-select">
                                         <optgroup label="Primary Profile" id="profile-select-option-group"></optgroup>
@@ -41,10 +43,6 @@
                                 <label class="search-option" id="search-option-clipboard-monitor-container">
                                     <label class="toggle"><input type="checkbox" id="clipboard-monitor-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
                                     <span class="search-option-label">Clipboard monitor</span>
-                                </label>
-                                <label class="search-option" id="search-option-wanakana">
-                                    <label class="toggle"><input type="checkbox" id="wanakana-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                                    <span class="search-option-label">Automatic kana conversion</span>
                                 </label>
                                 <div class="search-option" id="query-parser-mode-container" hidden>
                                     <span class="search-option-pre-label">Parser:</span>
@@ -85,9 +83,47 @@
         </div>
         <div class="content-footer-container1"><div class="content-footer-container2"><div class="content-footer" id="content-footer"></div><div class="scrollbar-spacer scrollbar"></div></div></div>
     </div>
+
 </div>
 
 <div id="popup-menus"></div>
+
+<!-- Search settings modal -->
+<div id="search-settings-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+    <div class="modal-header">
+        <div class="modal-title">Search Settings</div>
+    </div>
+    <div class="modal-body">
+        <div class="settings-item" id="search-option-wanakana"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">
+                    Automatic kana conversion
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" id="wanakana-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+
+
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">
+                    Sticky search header
+                </div>
+                <div class="settings-item-description">
+                    Search header stays on the page when scrolling down.
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" id="sticky-header-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" data-modal-action="hide">Close</button>
+    </div>
+</div></div>
 
 </body>
 </html>

@@ -31,6 +31,8 @@
     --search-textbox-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
     --search-textbox-min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
     --search-textbox-max-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
+
+    --outline-item-icon-size: 32px;
 }
 :root:not([data-loaded=true]) {
     --animation-duration: 0s;
@@ -135,6 +137,12 @@ h1 {
 }
 
 /* Search options */
+.search-settings-button>.icon {
+    display: block;
+    background-color: var(--button-default-icon-color);
+    width: var(--outline-item-icon-size);
+    height: var(--outline-item-icon-size);
+}
 .search-options {
     display: flex;
     flex-flow: row wrap;
