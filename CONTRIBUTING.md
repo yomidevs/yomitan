@@ -57,15 +57,18 @@ Several command line arguments are available for these scripts:
 
 If no arguments are specified, the command is equivalent to `build.bat --all`.
 
-### Loading unpacked build into chrome
+### Loading unpacked build into Chrome
 
-After building, you can load the compiled data into Chrome
+After building, you can load the compiled extension into Chrome
 
 - Navigate to [extensions settings](chrome://extensions/)
-- Select "Load Unpacked"
+- Turn on the toggle on the top right that says "Developer Mode"
+- Click "Load Unpacked" on the top left
 - Select the `ext` folder.
 
 Immediately you should see the "Welcome" page!
+
+Note: Yomitan may or may not update when you make and save new code changes locally. It depends on what file you've changed. Yomitan runs as collection of two programs. There is the background process called the "service worker" and there is the frontend called the "content_script". The frontend will reload on save, but to update the backend you need to click on the update icon next to the extension in `chrome://extensions/`. If you make changes to the manifest you will need to rerun `npm run build` to regenerate the manifest file.
 
 ### Build Tools
 
