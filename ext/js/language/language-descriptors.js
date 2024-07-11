@@ -289,6 +289,13 @@ const languageDescriptors = [
         exampleText: 'อ่าน',
     },
     {
+        iso: 'tl',
+        iso639_3: 'tgl',
+        name: 'Tagalog',
+        exampleText: 'basahin',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'tr',
         iso639_3: 'tur',
         name: 'Turkish',
