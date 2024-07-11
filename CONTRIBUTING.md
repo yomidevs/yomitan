@@ -62,8 +62,7 @@ If no arguments are specified, the command is equivalent to `build.bat --all`.
 After building, you can load the compiled data into Chrome
 
 - Navigate to [extensions settings](chrome://extensions/)
-- Select "Load Unpacked"\
-  <img src="https://i.imgur.com/ydNTyg6.png" alt="load unpacked" height="212px" width="396px">
+- Select "Load Unpacked"
 - Select the `ext` folder.
 
 Immediately you should see the "Welcome" page!
