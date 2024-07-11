@@ -373,14 +373,14 @@ export class SearchDisplayController {
         const value = Number.parseInt(node.value, 10);
         const optionsFull = await this._display.application.api.optionsGetFull();
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= optionsFull.profiles.length) {
-            await this._setPrimaryProfileIndex(value);
+            await this._setDefaultProfileIndex(value);
         }
     }
 
     /**
      * @param {number} value
      */
-    async _setPrimaryProfileIndex(value) {
+    async _setDefaultProfileIndex(value) {
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',
