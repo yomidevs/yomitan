@@ -57,6 +57,16 @@ Several command line arguments are available for these scripts:
 
 If no arguments are specified, the command is equivalent to `build.bat --all`.
 
+### Loading unpacked build into chrome
+
+After building, you can load the compiled data into Chrome
+
+- Navigate to [extensions settings](chrome://extensions/)
+- Select "Load Unpacked" ![load unpacked](https://i.imgur.com/ydNTyg6.png)
+- Select the `ext` folder.
+
+Immediately you should see the "Welcome" page!
+
 ### Build Tools
 
 The build process can use the [7-zip](https://www.7-zip.org/) archiving tool to create the packed zip builds
