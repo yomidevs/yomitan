@@ -57,11 +57,11 @@ Several command line arguments are available for these scripts:
 
 If no arguments are specified, the command is equivalent to `build.bat --all`.
 
-### Loading unpacked build into Chrome
+### Loading an unpacked build into Chromium browsers
 
-After building, you can load the compiled extension into Chrome
+After building, you can load the compiled extension into Chromium browsers.
 
-- Navigate to [extensions settings](chrome://extensions/)
+- Navigate to the [extensions page](chrome://extensions/)
 - Turn on the toggle on the top right that says "Developer Mode"
 - Click "Load Unpacked" on the top left
 - Select the `ext` folder.
