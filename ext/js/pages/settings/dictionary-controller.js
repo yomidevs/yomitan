@@ -155,7 +155,7 @@ class DictionaryEntry {
      * @returns {boolean}
      */
     _compareRevisions(current, latest) {
-        const simpleVersionTest = /^(\d+\.)*\d+$/;
+        const simpleVersionTest = /^(\d+\.)*\d+$/; // dot-separated integers, so 4.7 or 24.1.1.1 are ok, 1.0.0-alpha is not
         if (!simpleVersionTest.test(current) || !simpleVersionTest.test(latest)) {
             return current < latest;
         }
