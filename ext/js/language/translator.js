@@ -563,11 +563,7 @@ export class Translator {
 
                     // Ignore if applying the textProcessor doesn't change the source
                     if (processed === variant) {
-                        if (typeof existingCandidates === 'undefined') {
-                            newVariantsMap.set(processed, currentPreprocessorRuleChainCandidates);
-                        } else {
-                            newVariantsMap.set(processed, [...existingCandidates, ...currentPreprocessorRuleChainCandidates]);
-                        }
+                        newVariantsMap.set(processed, currentPreprocessorRuleChainCandidates);
                     } else if (typeof existingCandidates === 'undefined') {
                         newVariantsMap.set(processed, currentPreprocessorRuleChainCandidates.map((candidate) => [...candidate, name]));
                     } else {
