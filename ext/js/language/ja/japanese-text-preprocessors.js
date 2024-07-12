@@ -24,7 +24,7 @@ import {
     convertHalfWidthKanaToFullWidth,
     convertHiraganaToKatakana as convertHiraganaToKatakanaFunction,
     convertKatakanaToHiragana as convertKatakanaToHiraganaFunction,
-    normalizeCombiningCharacters as normalizeCombiningCharactersFunction
+    normalizeCombiningCharacters as normalizeCombiningCharactersFunction,
 } from './japanese.js';
 
 /** @type {import('language').TextProcessor<boolean>} */

@@ -754,7 +754,7 @@ export function collapseEmphaticSequences(text, fullCollapse) {
         const c = char.codePointAt(0) ?? -1;
         if (isEmphaticCodePoint(c)) {
             // Prevent match trailing emphatic
-            if (i === text.length - 1){
+            if (i === text.length - 1) {
                 result += char;
                 continue;
             }
