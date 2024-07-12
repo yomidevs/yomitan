@@ -567,9 +567,9 @@ export class Translator {
                             newVariantsMap.set(processed, existingCandidates);
                         }
                     } else if (typeof existingCandidates === 'undefined') {
-                        newVariantsMap.set(processed, currentPreprocessorRuleChainCandidates.map((candidate) => [...candidate, name]));
+                        newVariantsMap.set(processed, currentPreprocessorRuleChainCandidates.map((candidate) => [...candidate, id]));
                     } else {
-                        newVariantsMap.set(processed, [...existingCandidates, ...currentPreprocessorRuleChainCandidates.map((candidate) => [...candidate, name])]);
+                        newVariantsMap.set(processed, [...existingCandidates, ...currentPreprocessorRuleChainCandidates.map((candidate) => [...candidate, id])]);
                     }
                 }
             }
