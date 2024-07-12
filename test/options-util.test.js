@@ -612,7 +612,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 44,
+        version: 45,
         global: {
             database: {
                 prefixWildcardsSupported: false,
@@ -1541,10 +1541,6 @@ describe('OptionsUtil', () => {
     {{~#if (hasMedia "selectionText")}}{{#getMedia "selectionText"}}{{/getMedia}}{{/if~}}
 {{/inline}}
 
-{{#*inline "popup-selection-text"}}
-    {{~#if (hasMedia "selectionText")}}{{#getMedia "selectionText"}}{{/getMedia}}{{/if~}}
-{{/inline}}
-
 {{#*inline "sentence-furigana"}}
     {{~#if definition.cloze~}}
         {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
@@ -1581,10 +1577,6 @@ describe('OptionsUtil', () => {
 {{/inline}}
 
 {{#*inline "selection-text"}}
-    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
-{{/inline}}
-
-{{#*inline "popup-selection-text"}}
     {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
 {{/inline}}
 
@@ -1770,10 +1762,6 @@ describe('OptionsUtil', () => {
 {{#*inline "selection-text"}}
     {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
 {{/inline}}
-
-{{#*inline "popup-selection-text"}}
-    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
-{{/inline}}
 `.trimStart(),
 
                 expected: `
@@ -1802,10 +1790,6 @@ describe('OptionsUtil', () => {
 {{/inline}}
 
 {{#*inline "selection-text"}}
-    {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
-{{/inline}}
-
-{{#*inline "popup-selection-text"}}
     {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
 {{/inline}}
 `.trimStart(),

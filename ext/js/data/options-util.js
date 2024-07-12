@@ -556,6 +556,7 @@ export class OptionsUtil {
             this._updateVersion42,
             this._updateVersion43,
             this._updateVersion44,
+            this._updateVersion45,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1386,6 +1387,21 @@ export class OptionsUtil {
             profile.options.general.fontFamily = 'sans-serif';
             profile.options.general.fontSize = 14;
             profile.options.general.lineHeight = '1.5';
+        }
+    }
+
+    /**
+     * - Rename `selection-text` to `popup-selection-text`
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion45(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v45.handlebars');
+        for (const profile of options.profiles) {
+            const fields = profile.options.anki.terms.fields;
+            for (const key in fields) {
+                const regex = new RegExp('{selection-text}', 'g');
+                fields[key] = fields[key].replace(regex, '{popup-selection-text}');
+            }
         }
     }
 

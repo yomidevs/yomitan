@@ -21,7 +21,7 @@ import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {ExtensionError} from '../../core/extension-error.js';
 import {log} from '../../core/log.js';
 import {toError} from '../../core/to-error.js';
-import {getDeprecatedFieldMarkers, getDynamicFieldMarkers, getStandardFieldMarkers} from '../../data/anki-template-util.js';
+import {getDynamicFieldMarkers, getStandardFieldMarkers} from '../../data/anki-template-util.js';
 import {stringContainsAnyFieldMarker} from '../../data/anki-util.js';
 import {getRequiredPermissionsForAnkiFieldValue, hasPermissions, setPermissionsGranted} from '../../data/permissions-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -341,7 +341,6 @@ export class AnkiController {
             if (types.includes('term')) {
                 markers.push(...getDynamicFieldMarkers(dictionaries));
             }
-            markers = markers.filter((marker) => !getDeprecatedFieldMarkers().includes(marker));
             markers = [...new Set(markers.sort())];
 
             const fragment = document.createDocumentFragment();
