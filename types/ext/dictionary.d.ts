@@ -208,6 +208,10 @@ export type TermDictionaryEntry = {
      */
     isPrimary: boolean;
     /**
+     * Ways that a looked-up word might be transformed into this term.
+     */
+    textProcessorRuleChainCandidates: textProcessorRuleChainCandidate[];
+    /**
      * Ways that a looked-up word might be an inflected form of this term.
      */
     inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
@@ -257,6 +261,8 @@ export type InflectionRuleChainCandidate = {
     source: InflectionSource;
     inflectionRules: InflectionRuleChain;
 };
+
+type textProcessorRuleChainCandidate = string[];
 
 export type InflectionRuleChain = InflectionRule[];
 
