@@ -125,12 +125,20 @@ function createProfileOptionsTestData1() {
             tags: ['yomitan'],
             sentenceExt: 200,
             screenshot: {format: 'png', quality: 92},
-            terms: {deck: '', model: '', fields: {
-                "Expression": "{selection-text}",
-            }},
-            kanji: {deck: '', model: '', fields: {
-                "Expression": "{selection-text}",
-            }},
+            terms: {
+                deck: '',
+                model: '',
+                fields: {
+                    expression: '{selection-text}',
+                },
+            },
+            kanji: {
+                deck: '',
+                model: '',
+                fields: {
+                    expression: '{selection-text}',
+                },
+            },
             duplicateScope: 'collection',
             fieldTemplates: null,
         },
@@ -449,12 +457,20 @@ function createProfileOptionsUpdatedTestData1() {
             server: 'http://127.0.0.1:8765',
             tags: ['yomitan'],
             screenshot: {format: 'png', quality: 92},
-            terms: {deck: '', model: '', fields: {
-                "Expression": "{popup-selection-text}",
-            }},
-            kanji: {deck: '', model: '', fields: {
-                "Expression": "{popup-selection-text}",
-            }},
+            terms: {
+                deck: '',
+                model: '',
+                fields: {
+                    expression: '{popup-selection-text}',
+                },
+            },
+            kanji: {
+                deck: '',
+                model: '',
+                fields: {
+                    expression: '{popup-selection-text}',
+                },
+            },
             duplicateBehavior: 'new',
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
