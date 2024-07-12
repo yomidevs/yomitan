@@ -542,8 +542,6 @@ export class Translator {
      * @returns {import('translation-internal').VariantAndTextProcessorRuleChainCandidatesMap}
      */
     _getTextVariants(text, textProcessors, textReplacements, textCache) {
-        // let variants = new Set([text]);
-
         /** @type {import('translation-internal').VariantAndTextProcessorRuleChainCandidatesMap} */
         let variantsMap = new Map([
             [text, [[]]],
