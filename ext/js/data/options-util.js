@@ -1391,7 +1391,7 @@ export class OptionsUtil {
     }
 
     /**
-     * - Rename `selection-text` to `popup-selection-text`
+     * - Renamed `selection-text` to `popup-selection-text`
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion45(options) {
