@@ -127,8 +127,8 @@ class DictionaryEntry {
      */
     async checkForUpdate() {
         this._updatesAvailable.hidden = true;
-        const {isUpdatable, indexUrl, revision} = this._dictionaryInfo;
-        if (!isUpdatable || !indexUrl) { return false; }
+        const {isUpdatable, indexUrl, revision: currentRevision, downloadUrl: currentDownloadUrl} = this._dictionaryInfo;
+        if (!isUpdatable || !indexUrl || !currentDownloadUrl) { return false; }
         const response = await fetch(indexUrl);
 
         /** @type {unknown} */
@@ -139,11 +139,15 @@ class DictionaryEntry {
         }
 
         const validIndex = /** @type {import('dictionary-data').Index} */ (index);
+        const {revision: latestRevision, downloadUrl: latestDownloadUrl} = validIndex;
 
-        if (!compareRevisions(revision, validIndex.revision)) {
+        if (!compareRevisions(currentRevision, latestRevision)) {
             return false;
         }
 
+        const downloadUrl = latestDownloadUrl ?? currentDownloadUrl;
+
+        this._updatesAvailable.dataset.downloadUrl = downloadUrl;
         this._updatesAvailable.hidden = false;
         return true;
     }
@@ -192,7 +196,8 @@ class DictionaryEntry {
 
     /** */
     _onUpdateButtonClick() {
-        this._dictionaryController.updateDictionary(this.dictionaryTitle);
+        const downloadUrl = this._updatesAvailable.dataset.downloadUrl;
+        this._dictionaryController.updateDictionary(this.dictionaryTitle, downloadUrl);
     }
 
     /** */
@@ -520,10 +525,12 @@ export class DictionaryController {
 
     /**
      * @param {string} dictionaryTitle
+     * @param {string|undefined} downloadUrl
      */
-    updateDictionary(dictionaryTitle) {
+    updateDictionary(dictionaryTitle, downloadUrl) {
         const modal = this._updateDictionaryModal;
         if (modal === null) { return; }
+        modal.node.dataset.downloadUrl = downloadUrl;
         modal.node.dataset.dictionaryTitle = dictionaryTitle;
         /** @type {Element} */
         const nameElement = querySelectorNotNull(modal.node, '#dictionary-confirm-update-name');
@@ -802,10 +809,11 @@ export class DictionaryController {
         modal.setVisible(false);
 
         const title = modal.node.dataset.dictionaryTitle;
+        const downloadUrl = modal.node.dataset.downloadUrl;
         if (typeof title !== 'string') { return; }
         delete modal.node.dataset.dictionaryTitle;
 
-        void this._updateDictionary(title);
+        void this._updateDictionary(title, downloadUrl);
     }
 
     /**
@@ -1015,13 +1023,14 @@ export class DictionaryController {
 
     /**
      * @param {string} dictionaryTitle
+     * @param {string|undefined} downloadUrl
      */
-    async _updateDictionary(dictionaryTitle) {
+    async _updateDictionary(dictionaryTitle, downloadUrl) {
         if (this._checkingIntegrity || this._checkingUpdates || this._isDeleting || this._dictionaries === null) { return; }
 
         const dictionaryInfo = this._dictionaries.find((entry) => entry.title === dictionaryTitle);
         if (typeof dictionaryInfo === 'undefined') { throw new Error('Dictionary not found'); }
-        const {downloadUrl} = dictionaryInfo;
+        downloadUrl = downloadUrl ?? dictionaryInfo.downloadUrl;
         if (typeof downloadUrl !== 'string') { throw new Error('Attempted to update dictionary without download URL'); }
 
         await this._deleteDictionary(dictionaryTitle);
