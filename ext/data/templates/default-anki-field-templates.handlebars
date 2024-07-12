@@ -458,6 +458,10 @@
     {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
 {{/inline}}
 
+{{#*inline "popup-selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
+{{/inline}}
+
 {{#*inline "sentence-furigana"}}
     {{~#if definition.cloze~}}
         {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
