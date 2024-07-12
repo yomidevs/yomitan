@@ -730,6 +730,18 @@ export function distributeFuriganaInflected(term, reading, source) {
 // Miscellaneous
 
 /**
+ * @param {number} codePoint
+ * @returns {boolean}
+ */
+export function isEmphaticCodePoint(codePoint) {
+    return (
+        codePoint === HIRAGANA_SMALL_TSU_CODE_POINT ||
+        codePoint === KATAKANA_SMALL_TSU_CODE_POINT ||
+        codePoint === KANA_PROLONGED_SOUND_MARK_CODE_POINT
+    );
+}
+
+/**
  * @param {string} text
  * @param {boolean} fullCollapse
  * @returns {string}
@@ -737,13 +749,16 @@ export function distributeFuriganaInflected(term, reading, source) {
 export function collapseEmphaticSequences(text, fullCollapse) {
     let result = '';
     let collapseCodePoint = -1;
-    for (const char of text) {
-        const c = char.codePointAt(0);
-        if (
-            c === HIRAGANA_SMALL_TSU_CODE_POINT ||
-            c === KATAKANA_SMALL_TSU_CODE_POINT ||
-            c === KANA_PROLONGED_SOUND_MARK_CODE_POINT
-        ) {
+    for (let i = 0; i < text.length; ++i) {
+        const char = text[i];
+        const c = char.codePointAt(0) ?? -1;
+        if (isEmphaticCodePoint(c)) {
+            // Prevent match trailing emphatic
+            if (i === text.length - 1){
+                result += char;
+                continue;
+            }
+
             if (collapseCodePoint !== c) {
                 collapseCodePoint = c;
                 if (!fullCollapse) {

@@ -24,7 +24,7 @@ import {
     convertHalfWidthKanaToFullWidth,
     convertHiraganaToKatakana as convertHiraganaToKatakanaFunction,
     convertKatakanaToHiragana as convertKatakanaToHiraganaFunction,
-    normalizeCombiningCharacters as normalizeCombiningCharactersFunction,
+    normalizeCombiningCharacters as normalizeCombiningCharactersFunction
 } from './japanese.js';
 
 /** @type {import('language').TextProcessor<boolean>} */
@@ -85,9 +85,12 @@ export const collapseEmphaticSequences = {
     options: [[false, false], [true, false], [true, true]],
     process: (str, setting) => {
         const [collapseEmphatic, collapseEmphaticFull] = setting;
+        const before = str;
         if (collapseEmphatic) {
             str = collapseEmphaticSequencesFunction(str, collapseEmphaticFull);
         }
+        const after = str;
+        console.log(before, '->', after);
         return str;
     },
 };
