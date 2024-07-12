@@ -20,6 +20,7 @@ import * as ajvSchemas0 from '../../../lib/validate-schemas.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
+import {compareRevisions} from '../../dictionary/dictionary-data-util.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
@@ -139,7 +140,7 @@ class DictionaryEntry {
 
         const validIndex = /** @type {import('dictionary-data').Index} */ (index);
 
-        if (!this._compareRevisions(revision, validIndex.revision)) {
+        if (!compareRevisions(revision, validIndex.revision)) {
             return false;
         }
 
@@ -148,33 +149,6 @@ class DictionaryEntry {
     }
 
     // Private
-
-    /**
-     * @param {string} current
-     * @param {string} latest
-     * @returns {boolean}
-     */
-    _compareRevisions(current, latest) {
-        const simpleVersionTest = /^(\d+\.)*\d+$/; // dot-separated integers, so 4.7 or 24.1.1.1 are ok, 1.0.0-alpha is not
-        if (!simpleVersionTest.test(current) || !simpleVersionTest.test(latest)) {
-            return current < latest;
-        }
-
-        const currentParts = current.split('.').map((part) => Number.parseInt(part, 10));
-        const latestParts = latest.split('.').map((part) => Number.parseInt(part, 10));
-
-        if (currentParts.length !== latestParts.length) {
-            return current < latest;
-        }
-
-        for (let i = 0; i < currentParts.length; i++) {
-            if (currentParts[i] !== latestParts[i]) {
-                return currentParts[i] < latestParts[i];
-            }
-        }
-
-        return false;
-    }
 
     /**
      * @param {import('popup-menu').MenuOpenEvent} e
