@@ -1398,7 +1398,7 @@ export class OptionsUtil {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v45.handlebars');
         for (const profile of options.profiles) {
             const fields = profile.options.anki.terms.fields;
-            for (const key in fields) {
+            for (const key of Object.keys(fields)) {
                 const regex = new RegExp('{selection-text}', 'g');
                 fields[key] = fields[key].replace(regex, '{popup-selection-text}');
             }
