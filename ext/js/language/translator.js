@@ -1991,12 +1991,12 @@ export class Translator {
             let i = v2.maxOriginalTextLength - v1.maxOriginalTextLength;
             if (i !== 0) { return i; }
 
-            // Sort by length of the shortest inflection chain
-            i = this._getShortestInflectionChainLength(v1.inflectionRuleChainCandidates) - this._getShortestInflectionChainLength(v2.inflectionRuleChainCandidates);
-            if (i !== 0) { return i; }
-
             // Sort by length of the shortest text processing chain
             i = this._getShortestTextProcessingChainLength(v1.textProcessorRuleChainCandidates) - this._getShortestTextProcessingChainLength(v2.textProcessorRuleChainCandidates);
+            if (i !== 0) { return i; }
+
+            // Sort by length of the shortest inflection chain
+            i = this._getShortestInflectionChainLength(v1.inflectionRuleChainCandidates) - this._getShortestInflectionChainLength(v2.inflectionRuleChainCandidates);
             if (i !== 0) { return i; }
 
             // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)
