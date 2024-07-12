@@ -59,6 +59,7 @@ export function getStandardFieldMarkers(type) {
                 'reading',
                 'screenshot',
                 'search-query',
+                'selection-text',
                 'popup-selection-text',
                 'sentence',
                 'sentence-furigana',
@@ -86,6 +87,7 @@ export function getStandardFieldMarkers(type) {
                 'onyomi-hiragana',
                 'screenshot',
                 'search-query',
+                'selection-text',
                 'popup-selection-text',
                 'sentence',
                 'sentence-furigana',
@@ -96,6 +98,13 @@ export function getStandardFieldMarkers(type) {
         default:
             throw new Error(`Unsupported type: ${type}`);
     }
+}
+
+/**
+ * @returns {string[]}
+ */
+export function getDeprecatedFieldMarkers() {
+    return ['selection-text'];
 }
 
 /**
