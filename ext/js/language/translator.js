@@ -549,7 +549,7 @@ export class Translator {
 
         for (const [id, textReplacement] of textReplacements.entries()) {
             if (textReplacement === null) { continue; }
-            variantsMap.set(this._applyTextReplacements(text, textReplacement), [[id.toString()]]);
+            variantsMap.set(this._applyTextReplacements(text, textReplacement), [['Text Replacement' + ' ' + id]]);
         }
         for (const {id, textProcessor: {process, options}} of textProcessors) {
             /** @type {import('translation-internal').VariantAndTextProcessorRuleChainCandidatesMap} */

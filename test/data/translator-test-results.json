@@ -4050,7 +4050,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Convert hiragana to katakana"
+            "convertHiraganaToKatakana"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -11744,7 +11744,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -11941,7 +11943,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -12138,7 +12142,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -12335,7 +12341,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -12532,7 +12540,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -12710,7 +12720,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -12888,7 +12900,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -13066,7 +13080,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -13244,7 +13260,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -13415,7 +13433,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -13605,7 +13625,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -13802,7 +13824,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -13999,7 +14023,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -14196,7 +14222,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -14393,7 +14421,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -14571,7 +14601,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -14749,7 +14781,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -14927,7 +14961,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -15105,7 +15141,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -15276,7 +15314,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -15466,7 +15506,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -15582,7 +15624,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -15693,7 +15737,9 @@
         "type": "term",
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
-          []
+          [
+            "Text Replacement 1"
+          ]
         ],
         "inflectionRuleChainCandidates": [
           {
@@ -17620,7 +17666,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Convert between alphabetic width variants"
+            "alphanumericWidthVariants"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -17690,7 +17736,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Convert between alphabetic width variants"
+            "alphanumericWidthVariants"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -17776,7 +17822,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Convert between alphabetic width variants"
+            "alphanumericWidthVariants"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -17862,7 +17908,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Convert alphabetic characters to hiragana"
+            "alphabeticToHiragana"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -18037,7 +18083,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Convert alphabetic characters to hiragana"
+            "alphabeticToHiragana"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -18218,7 +18264,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Convert hiragana to katakana"
+            "convertHiraganaToKatakana"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -18393,7 +18439,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Convert hiragana to katakana"
+            "convertHiraganaToKatakana"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -18574,7 +18620,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Convert hiragana to katakana"
+            "convertHiraganaToKatakana"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -18688,8 +18734,8 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Convert half width characters to full width",
-            "Convert hiragana to katakana"
+            "convertHalfWidthCharacters",
+            "convertHiraganaToKatakana"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -18864,8 +18910,8 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Convert half width characters to full width",
-            "Convert hiragana to katakana"
+            "convertHalfWidthCharacters",
+            "convertHiraganaToKatakana"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -19046,11 +19092,11 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Collapse emphatic character sequences"
+            "collapseEmphaticSequences"
           ],
           [
-            "Convert hiragana to katakana",
-            "Collapse emphatic character sequences"
+            "convertHiraganaToKatakana",
+            "collapseEmphaticSequences"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -19147,7 +19193,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Capitalize first letter"
+            "capitalizeFirstLetter"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -19233,7 +19279,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Decapitalize text"
+            "decapitalize"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -19319,8 +19365,8 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Disassemble Hangul",
-            "Reassemble Hangul"
+            "disassembleHangul",
+            "reassembleHangul"
           ]
         ],
         "inflectionRuleChainCandidates": [
@@ -19408,7 +19454,7 @@
         "isPrimary": true,
         "textProcessorRuleChainCandidates": [
           [
-            "Capitalize first letter"
+            "capitalizeFirstLetter"
           ]
         ],
         "inflectionRuleChainCandidates": [
