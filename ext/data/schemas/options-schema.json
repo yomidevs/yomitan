@@ -122,7 +122,10 @@
                                     "termDisplayMode",
                                     "sortFrequencyDictionary",
                                     "sortFrequencyDictionaryOrder",
-                                    "stickySearchHeader"
+                                    "stickySearchHeader",
+                                    "fontFamily",
+                                    "fontSize",
+                                    "lineHeight"
                                 ],
                                 "properties": {
                                     "enable": {
