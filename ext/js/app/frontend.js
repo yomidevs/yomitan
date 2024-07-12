@@ -190,7 +190,7 @@ export class Frontend {
         this._application.crossFrame.registerHandlers([
             ['frontendClosePopup',       this._onApiClosePopup.bind(this)],
             ['frontendCopySelection',    this._onApiCopySelection.bind(this)],
-            ['frontendGetSelectionText', this._onApiGetSelectionText.bind(this)],
+            ['frontendGetPopupSelectionText', this._onApiGetPopupSelectionText.bind(this)],
             ['frontendGetPopupInfo',     this._onApiGetPopupInfo.bind(this)],
             ['frontendGetPageInfo',      this._onApiGetPageInfo.bind(this)],
         ]);
@@ -298,8 +298,8 @@ export class Frontend {
         document.execCommand('copy');
     }
 
-    /** @type {import('cross-frame-api').ApiHandler<'frontendGetSelectionText'>} */
-    _onApiGetSelectionText() {
+    /** @type {import('cross-frame-api').ApiHandler<'frontendGetPopupSelectionText'>} */
+    _onApiGetPopupSelectionText() {
         const selection = document.getSelection();
         return selection !== null ? selection.toString() : '';
     }

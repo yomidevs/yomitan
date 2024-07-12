@@ -1889,7 +1889,7 @@ export class Display extends EventDispatcher {
                     /** @type {string} */
                     let text;
                     try {
-                        text = await this.invokeContentOrigin('frontendGetSelectionText', void 0);
+                        text = await this.invokeContentOrigin('frontendGetPopupSelectionText', void 0);
                     } catch (e) {
                         break;
                     }

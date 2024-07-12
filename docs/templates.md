@@ -773,7 +773,7 @@ These functions are used together in order to request media and other types of o
 - <code>"screenshot"</code>
 - <code>"clipboardImage"</code>
 - <code>"clipboardText"</code>
-- <code>"selectionText"</code>
+- <code>"popupSelectionText"</code>
 - <code>"textFurigana" <i>japaneseText</i> <i>readingMode="default|hiragana|katakana"</i></code>
 - <code>"dictionaryMedia" <i>fileName</i> <i>dictionary="Dictionary Name"</i></code>
 </details>
@@ -790,7 +790,7 @@ These functions are used together in order to request media and other types of o
 
   {{#if (hasMedia "clipboardText")}}The clipboard text is: {{getMedia "clipboardText"}}{{/if}}
 
-  {{#if (hasMedia "selectionText")}}The selection text is: {{getMedia "selectionText"}}{{/if}}
+  {{#if (hasMedia "popupSelectionText")}}The popup selection text is: {{getMedia "popupSelectionText"}}{{/if}}
 
   {{#if (hasMedia "textFurigana" "日本語")}}This is an example of text with generated furigana: {{getMedia "textFurigana" "日本語" escape=false}}{{/if}}
 
