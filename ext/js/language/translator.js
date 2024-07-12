@@ -551,7 +551,7 @@ export class Translator {
             if (textReplacement === null) { continue; }
             variantsMap.set(this._applyTextReplacements(text, textReplacement), [[]]);
         }
-        for (const {id, textProcessor: {name, process, options}} of textProcessors) {
+        for (const {id, textProcessor: {process, options}} of textProcessors) {
             /** @type {import('translation-internal').VariantAndTextProcessorRuleChainCandidatesMap} */
             const newVariantsMap = new Map();
             for (const [variant, currentPreprocessorRuleChainCandidates] of variantsMap) {
