@@ -1396,11 +1396,16 @@ export class OptionsUtil {
      */
     async _updateVersion45(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v45.handlebars');
+        const oldMarkerRegex = new RegExp('{selection-text}', 'g');
+        const newMarker = '{popup-selection-text}';
         for (const profile of options.profiles) {
-            const fields = profile.options.anki.terms.fields;
-            for (const key of Object.keys(fields)) {
-                const regex = new RegExp('{selection-text}', 'g');
-                fields[key] = fields[key].replace(regex, '{popup-selection-text}');
+            const termsFields = profile.options.anki.terms.fields;
+            for (const key of Object.keys(termsFields)) {
+                termsFields[key] = termsFields[key].replace(oldMarkerRegex, newMarker);
+            }
+            const kanjiFields = profile.options.anki.kanji.fields;
+            for (const key of Object.keys(kanjiFields)) {
+                kanjiFields[key] = kanjiFields[key].replace(oldMarkerRegex, newMarker);
             }
         }
     }

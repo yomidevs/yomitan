@@ -125,8 +125,12 @@ function createProfileOptionsTestData1() {
             tags: ['yomitan'],
             sentenceExt: 200,
             screenshot: {format: 'png', quality: 92},
-            terms: {deck: '', model: '', fields: {}},
-            kanji: {deck: '', model: '', fields: {}},
+            terms: {deck: '', model: '', fields: {
+                "Expression": "{selection-text}",
+            }},
+            kanji: {deck: '', model: '', fields: {
+                "Expression": "{selection-text}",
+            }},
             duplicateScope: 'collection',
             fieldTemplates: null,
         },
@@ -445,8 +449,12 @@ function createProfileOptionsUpdatedTestData1() {
             server: 'http://127.0.0.1:8765',
             tags: ['yomitan'],
             screenshot: {format: 'png', quality: 92},
-            terms: {deck: '', model: '', fields: {}},
-            kanji: {deck: '', model: '', fields: {}},
+            terms: {deck: '', model: '', fields: {
+                "Expression": "{popup-selection-text}",
+            }},
+            kanji: {deck: '', model: '', fields: {
+                "Expression": "{popup-selection-text}",
+            }},
             duplicateBehavior: 'new',
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
@@ -1790,6 +1798,21 @@ describe('OptionsUtil', () => {
 {{/inline}}
 
 {{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
+{{/inline}}
+`.trimStart(),
+            },
+            {
+                oldVersion: 44,
+                newVersion: 45,
+                old: `
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
+{{/inline}}
+`.trimStart(),
+
+                expected: `
+{{#*inline "popup-selection-text"}}
     {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
 {{/inline}}
 `.trimStart(),
