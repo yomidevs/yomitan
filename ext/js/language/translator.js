@@ -547,9 +547,9 @@ export class Translator {
             [text, [[]]],
         ]);
 
-        for (const textReplacement of textReplacements) {
+        for (const [id, textReplacement] of textReplacements.entries()) {
             if (textReplacement === null) { continue; }
-            variantsMap.set(this._applyTextReplacements(text, textReplacement), [[]]);
+            variantsMap.set(this._applyTextReplacements(text, textReplacement), [[id.toString()]]);
         }
         for (const {id, textProcessor: {process, options}} of textProcessors) {
             /** @type {import('translation-internal').VariantAndTextProcessorRuleChainCandidatesMap} */
