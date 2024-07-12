@@ -1829,7 +1829,7 @@ describe('OptionsUtil', () => {
 
                 expected: `
 {{#*inline "popup-selection-text"}}
-    {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
+    {{~#if (hasMedia "popupSelectionText")}}{{{getMedia "popupSelectionText"}}}{{/if~}}
 {{/inline}}
 `.trimStart(),
             },

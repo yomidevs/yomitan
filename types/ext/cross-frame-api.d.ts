@@ -97,7 +97,7 @@ type ApiSurface = {
         params: void;
         return: void;
     };
-    frontendGetSelectionText: {
+    frontendGetPopupSelectionText: {
         params: void;
         return: string;
     };

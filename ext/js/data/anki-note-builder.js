@@ -389,7 +389,7 @@ export class AnkiNoteBuilder {
         let injectScreenshot = false;
         let injectClipboardImage = false;
         let injectClipboardText = false;
-        let injectSelectionText = false;
+        let injectPopupSelectionText = false;
         /** @type {import('anki-note-builder').TextFuriganaDetails[]} */
         const textFuriganaDetails = [];
         /** @type {import('api').InjectAnkiNoteMediaDictionaryMediaDetails[]} */
@@ -401,7 +401,7 @@ export class AnkiNoteBuilder {
                 case 'screenshot': injectScreenshot = true; break;
                 case 'clipboardImage': injectClipboardImage = true; break;
                 case 'clipboardText': injectClipboardText = true; break;
-                case 'selectionText': injectSelectionText = true; break;
+                case 'popupSelectionText': injectPopupSelectionText = true; break;
                 case 'textFurigana':
                     {
                         const {text, readingMode} = requirement;
@@ -451,7 +451,7 @@ export class AnkiNoteBuilder {
         }
 
         // Inject media
-        const selectionText = injectSelectionText ? this._getSelectionText() : null;
+        const popupSelectionText = injectPopupSelectionText ? this._getPopupSelectionText() : null;
         const injectedMedia = await this._api.injectAnkiNoteMedia(
             timestamp,
             dictionaryEntryDetails,
@@ -480,7 +480,7 @@ export class AnkiNoteBuilder {
             screenshot: (typeof screenshotFileName === 'string' ? {value: screenshotFileName} : void 0),
             clipboardImage: (typeof clipboardImageFileName === 'string' ? {value: clipboardImageFileName} : void 0),
             clipboardText: (typeof clipboardText === 'string' ? {value: clipboardText} : void 0),
-            selectionText: (typeof selectionText === 'string' ? {value: selectionText} : void 0),
+            popupSelectionText: (typeof popupSelectionText === 'string' ? {value: popupSelectionText} : void 0),
             textFurigana,
             dictionaryMedia,
         };
@@ -490,7 +490,7 @@ export class AnkiNoteBuilder {
     /**
      * @returns {string}
      */
-    _getSelectionText() {
+    _getPopupSelectionText() {
         const selection = document.getSelection();
         return selection !== null ? selection.toString() : '';
     }
