@@ -112,6 +112,7 @@ export function isPointInRect(x, y, rect) {
 export function isPointInAnyRect(x, y, rects) {
     // Always return true for Firefox due to inconsistencies with Range.getClientRects() implementation from unclear W3C spec
     // https://drafts.csswg.org/cssom-view/#dom-range-getclientrects
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=816238
     // Firefox returns only the first level nodes, Chromium returns every text node
     if (typeof browser !== 'undefined') {
         return true;
