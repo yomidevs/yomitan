@@ -101,7 +101,7 @@ export class TemplateRendererMediaProvider {
             case 'screenshot': return this._getSimpleMediaData(media, 'screenshot');
             case 'clipboardImage': return this._getSimpleMediaData(media, 'clipboardImage');
             case 'clipboardText': return this._getSimpleMediaData(media, 'clipboardText');
-            case 'selectionText': return this._getSimpleMediaData(media, 'selectionText');
+            case 'popupSelectionText': return this._getSimpleMediaData(media, 'popupSelectionText');
             case 'textFurigana': return this._getTextFurigana(media, args[1], namedArgs);
             case 'dictionaryMedia': return this._getDictionaryMedia(media, args[1], namedArgs);
             default: return null;
