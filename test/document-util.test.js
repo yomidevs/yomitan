@@ -187,7 +187,7 @@ describe('Document utility tests', () => {
                     const source = textSourceGenerator.getRangeFromPoint(0, 0, {
                         deepContentScan: false,
                         normalizeCssZoom: true,
-                        language: 'ja',
+                        language: null,
                     });
                     switch (resultType) {
                         case 'TextSourceRange':
