@@ -650,6 +650,7 @@ export class TextScanner extends EventDispatcher {
     /** */
     _onMouseOut() {
         this._scanTimerClear();
+        this.clearMousePosition();
     }
 
     /**
