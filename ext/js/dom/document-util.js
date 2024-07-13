@@ -110,6 +110,12 @@ export function isPointInRect(x, y, rect) {
  * @returns {boolean} `true` if the point is inside any of the rects, `false` otherwise.
  */
 export function isPointInAnyRect(x, y, rects) {
+    // Always return true for Firefox due to inconsistencies with Range.getClientRects() implementation from unclear W3C spec
+    // https://drafts.csswg.org/cssom-view/#dom-range-getclientrects
+    // Firefox returns only the first level nodes, Chromium returns every text node
+    if (typeof browser !== 'undefined') {
+        return true;
+    }
     for (const rect of rects) {
         if (isPointInRect(x, y, rect)) {
             return true;
