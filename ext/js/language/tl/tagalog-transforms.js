@@ -124,10 +124,6 @@ export const tagalogTransforms = {
             isDictionaryForm: true,
             subConditions: ['num'],
         },
-        v: {
-            name: 'Verb',
-            isDictionaryForm: true,
-        },
         adj: {
             name: 'Adjective',
             isDictionaryForm: true,
@@ -174,23 +170,23 @@ export const tagalogTransforms = {
         'ma-': {
             name: 'ma-',
             rules: [
-                prefixInflection('ma', '', [], ['n']),
-                prefixInflection('mar', 'd', [], ['n']),
+                prefixInflection('ma', '', [], ['n', 'adj']),
+                prefixInflection('mar', 'd', [], ['n', 'adj']),
             ],
         },
         'pang-': {
             name: 'pang-',
             rules: [
-                prefixInflection('pang', '', [], ['n']),
-                ...[...'dlrst'].map((v) => prefixInflection(`pan${v}`, `${v}`, [], ['n'])),
-                ...[...'bp'].map((v) => prefixInflection(`pam${v}`, `${v}`, [], ['n'])),
+                prefixInflection('pang', '', [], ['n', 'adj']),
+                ...[...'dlrst'].map((v) => prefixInflection(`pan${v}`, `${v}`, [], ['n', 'adj'])),
+                ...[...'bp'].map((v) => prefixInflection(`pam${v}`, `${v}`, [], ['n', 'adj'])),
             ],
         },
         'ka-': {
             name: 'ka-',
             rules: [
-                prefixInflection('ka', '', [], ['n']),
-                prefixInflection('kar', 'd', [], ['n']),
+                prefixInflection('ka', '', [], ['n', 'adj']),
+                prefixInflection('kar', 'd', [], ['n', 'adj']),
             ],
         },
         'kaka-': {
@@ -237,15 +233,15 @@ export const tagalogTransforms = {
         'magka-': {
             name: 'magka-',
             rules: [
-                prefixInflection('magka', '', [], ['n']),
-                prefixInflection('magkar', 'd', [], ['n']),
+                prefixInflection('magka', '', [], ['n', 'adj']),
+                prefixInflection('magkar', 'd', [], ['n', 'adj']),
             ],
         },
         'magkaka-': {
             name: 'magkaka-',
             rules: [
-                prefixInflection('magkaka', '', [], ['n']),
-                prefixInflection('magkakar', 'd', [], ['n']),
+                prefixInflection('magkaka', '', [], ['n', 'adj']),
+                prefixInflection('magkakar', 'd', [], ['n', 'adj']),
             ],
         },
         'mang- + rep1': {
@@ -259,8 +255,8 @@ export const tagalogTransforms = {
         'pa-': {
             name: 'pa-',
             rules: [
-                prefixInflection('pa', '', [], ['n']),
-                prefixInflection('par', 'd', [], ['n']),
+                prefixInflection('pa', '', [], ['n', 'adj']),
+                prefixInflection('par', 'd', [], ['n', 'adj']),
             ],
         },
         'pa-...-an': {
@@ -477,8 +473,8 @@ export const tagalogTransforms = {
         'maka-': {
             name: 'maka-',
             rules: [
-                prefixInflection('maka', '', [], ['n']),
-                prefixInflection('makar', 'd', [], ['n']),
+                prefixInflection('maka', '', [], ['n', 'adj']),
+                prefixInflection('makar', 'd', [], ['n', 'adj']),
             ],
         },
         'maki-': {
@@ -640,57 +636,57 @@ export const tagalogTransforms = {
         'ma-...-in': {
             name: 'ma-...-in',
             rules: [
-                sandwichInflection('ma', '', 'in', '', [], ['n']),
-                sandwichInflection('mar', 'd', 'in', '', [], ['n']),
-                sandwichInflection('ma', '', 'rin', 'd', [], ['n']),
-                sandwichInflection('mar', 'd', 'rin', 'd', [], ['n']),
-                ...[...'aeiou'].map((v) => sandwichInflection('ma', '', `${v}hin`, `${v}`, [], ['n'])),
-                ...[...'aeiou'].map((v) => sandwichInflection('mar', 'd', `${v}hin`, `${v}`, [], ['n'])),
-                ...[...'aeiou'].map((v) => sandwichInflection('ma', '', `${v}nin`, `${v}`, [], ['n'])),
-                ...[...'aeiou'].map((v) => sandwichInflection('mar', 'd', `${v}nin`, `${v}`, [], ['n'])),
-                sandwichInflection('ma', '', 'uhin', 'o', [], ['n']),
-                sandwichInflection('mar', 'd', 'uhin', 'o', [], ['n']),
-                sandwichInflection('ma', '', 'unin', 'o', [], ['n']),
-                sandwichInflection('mar', 'd', 'unin', 'o', [], ['n']),
-                sandwichInflectionWithOtoUSoundChange('ma', '', 'in', '', [], ['n']),
-                sandwichInflectionWithOtoUSoundChange('mar', 'd', 'in', '', [], ['n']),
-                sandwichInflectionWithOtoUSoundChange('ma', '', 'rin', 'd', [], ['n']),
-                sandwichInflectionWithOtoUSoundChange('mar', 'd', 'rin', 'd', [], ['n']),
+                sandwichInflection('ma', '', 'in', '', [], ['n', 'adj']),
+                sandwichInflection('mar', 'd', 'in', '', [], ['n', 'adj']),
+                sandwichInflection('ma', '', 'rin', 'd', [], ['n', 'adj']),
+                sandwichInflection('mar', 'd', 'rin', 'd', [], ['n', 'adj']),
+                ...[...'aeiou'].map((v) => sandwichInflection('ma', '', `${v}hin`, `${v}`, [], ['n', 'adj'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('mar', 'd', `${v}hin`, `${v}`, [], ['n', 'adj'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('ma', '', `${v}nin`, `${v}`, [], ['n', 'adj'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('mar', 'd', `${v}nin`, `${v}`, [], ['n', 'adj'])),
+                sandwichInflection('ma', '', 'uhin', 'o', [], ['n', 'adj']),
+                sandwichInflection('mar', 'd', 'uhin', 'o', [], ['n', 'adj']),
+                sandwichInflection('ma', '', 'unin', 'o', [], ['n', 'adj']),
+                sandwichInflection('mar', 'd', 'unin', 'o', [], ['n', 'adj']),
+                sandwichInflectionWithOtoUSoundChange('ma', '', 'in', '', [], ['n', 'adj']),
+                sandwichInflectionWithOtoUSoundChange('mar', 'd', 'in', '', [], ['n', 'adj']),
+                sandwichInflectionWithOtoUSoundChange('ma', '', 'rin', 'd', [], ['n', 'adj']),
+                sandwichInflectionWithOtoUSoundChange('mar', 'd', 'rin', 'd', [], ['n', 'adj']),
             ],
         },
         'mapag-': {
             name: 'mapag-',
             rules: [
-                prefixInflection('mapag', '', [], ['n']),
+                prefixInflection('mapag', '', [], ['n', 'adj']),
             ],
         },
         'naka-': {
             name: 'naka-',
             rules: [
-                prefixInflection('naka', '', [], ['n']),
-                prefixInflection('nakar', 'd', [], ['n']),
+                prefixInflection('naka', '', [], ['n', 'adj']),
+                prefixInflection('nakar', 'd', [], ['n', 'adj']),
             ],
         },
         'nakaka-': {
             name: 'nakaka-',
             rules: [
-                prefixInflection('nakaka', '', [], ['n']),
-                prefixInflection('nakakar', 'd', [], ['n']),
+                prefixInflection('nakaka', '', [], ['n', 'adj']),
+                prefixInflection('nakakar', 'd', [], ['n', 'adj']),
             ],
         },
         'nakakapang-': {
             name: 'nakakapang-',
             rules: [
-                prefixInflection('nakakapang', '', [], ['n']),
-                ...[...'dlrst'].map((v) => prefixInflection(`nakakapan${v}`, `${v}`, [], ['n'])),
-                ...[...'bp'].map((v) => prefixInflection(`nakakapam${v}`, `${v}`, [], ['n'])),
+                prefixInflection('nakakapang', '', [], ['n', 'adj']),
+                ...[...'dlrst'].map((v) => prefixInflection(`nakakapan${v}`, `${v}`, [], ['n', 'adj'])),
+                ...[...'bp'].map((v) => prefixInflection(`nakakapam${v}`, `${v}`, [], ['n', 'adj'])),
             ],
         },
         'pala-': {
             name: 'pala-',
             rules: [
-                prefixInflection('pala', '', [], ['n']),
-                prefixInflection('palar', 'd', [], ['n']),
+                prefixInflection('pala', '', [], ['n', 'adj']),
+                prefixInflection('palar', 'd', [], ['n', 'adj']),
             ],
         },
     },
