@@ -48,6 +48,7 @@ Yomitan provides powerful features not available in other browser-based dictiona
   - 🕷️ [Known browser bugs](./docs/browser-bugs.md)
   - ❓ [Frequently asked questions](./docs/faq.md)
 - 🔒 [Browser Permissions](./docs/permissions.md)
+- 🌎 [Supported Languages](./docs/supported-languages.md)
 
 ## Installation
 
