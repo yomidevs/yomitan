@@ -148,14 +148,14 @@ export const tagalogTransforms = {
         '-an': {
             name: '-an',
             rules: [
-                suffixInflection('an', '', [], ['n', 'v']),
-                suffixInflection('ran', 'd', [], ['n', 'v']),
-                suffixInflectionWithOtoUSoundChange('an', '', [], ['n', 'v']),
-                suffixInflectionWithOtoUSoundChange('ran', 'd', [], ['n', 'v']),
-                ...[...'aeiou'].map((v) => suffixInflection(`${v}han`, `${v}`, [], ['n', 'v'])), //  murahan
-                ...[...'aeiou'].map((v) => suffixInflection(`${v}nan`, `${v}`, [], ['n', 'v'])), //  tawanan
-                suffixInflection('uhan', 'o', [], ['n', 'v']),
-                suffixInflection('unan', 'o', [], ['n', 'v']),
+                suffixInflection('an', '', [], ['n']),
+                suffixInflection('ran', 'd', [], ['n']),
+                suffixInflectionWithOtoUSoundChange('an', '', [], ['n']),
+                suffixInflectionWithOtoUSoundChange('ran', 'd', [], ['n']),
+                ...[...'aeiou'].map((v) => suffixInflection(`${v}han`, `${v}`, [], ['n'])), //  murahan
+                ...[...'aeiou'].map((v) => suffixInflection(`${v}nan`, `${v}`, [], ['n'])), //  tawanan
+                suffixInflection('uhan', 'o', [], ['n']),
+                suffixInflection('unan', 'o', [], ['n']),
             ],
         },
         '-in': {
@@ -174,8 +174,8 @@ export const tagalogTransforms = {
         'ma-': {
             name: 'ma-',
             rules: [
-                prefixInflection('ma', '', [], []),
-                prefixInflection('mar', 'd', [], []),
+                prefixInflection('ma', '', [], ['n']),
+                prefixInflection('mar', 'd', [], ['n']),
             ],
         },
         'pang-': {
@@ -206,16 +206,16 @@ export const tagalogTransforms = {
             rules: [
                 sandwichInflection('ka', '', 'an', '', [], ['n']),
                 sandwichInflection('kar', 'd', 'an', '', [], ['n']),
-                sandwichInflection('ka', '', 'an', '', [], ['n']),
+                sandwichInflection('ka', '', 'ran', 'd', [], ['n']),
                 sandwichInflection('kar', 'd', 'ran', 'd', [], ['n']),
                 ...[...'aeiou'].map((v) => sandwichInflection('ka', '', `${v}han`, `${v}`, [], ['n'])), //  murahan
                 ...[...'aeiou'].map((v) => sandwichInflection('kar', 'd', `${v}han`, `${v}`, [], ['n'])), //  murahan
                 ...[...'aeiou'].map((v) => sandwichInflection('ka', '', `${v}nan`, `${v}`, [], ['n'])), //  murahan
                 ...[...'aeiou'].map((v) => sandwichInflection('kar', 'd', `${v}nan`, `${v}`, [], ['n'])), //  tawanan
-                sandwichInflection('ka', '', 'uhan', 'o', [], ['n', 'v']),
-                sandwichInflection('kar', 'd', 'uhan', 'o', [], ['n', 'v']),
-                sandwichInflection('ka', '', 'unan', 'o', [], ['n', 'v']),
-                sandwichInflection('kar', 'd', 'unan', 'o', [], ['n', 'v']),
+                sandwichInflection('ka', '', 'uhan', 'o', [], ['n']),
+                sandwichInflection('kar', 'd', 'uhan', 'o', [], ['n']),
+                sandwichInflection('ka', '', 'unan', 'o', [], ['n']),
+                sandwichInflection('kar', 'd', 'unan', 'o', [], ['n']),
                 sandwichInflectionWithOtoUSoundChange('ka', '', 'an', '', [], ['n']),
                 sandwichInflectionWithOtoUSoundChange('kar', 'd', 'an', '', [], ['n']),
                 sandwichInflectionWithOtoUSoundChange('ka', '', 'ran', 'd', [], ['n']),
@@ -268,16 +268,18 @@ export const tagalogTransforms = {
             rules: [
                 sandwichInflection('pa', '', 'an', '', [], ['n']),
                 sandwichInflection('par', 'd', 'an', '', [], ['n']),
-                sandwichInflection('pa', '', 'an', '', [], ['n']),
+                sandwichInflection('pa', '', 'ran', 'd', [], ['n']),
                 sandwichInflection('par', 'd', 'ran', 'd', [], ['n']),
                 ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}han`, `${v}`, [], ['n'])), //  murahan
                 ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}han`, `${v}`, [], ['n'])), //  murahan
                 ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}nan`, `${v}`, [], ['n'])), //  murahan
                 ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}nan`, `${v}`, [], ['n'])), //  tawanan
-                sandwichInflection('pa', '', 'uhan', 'o', [], ['n', 'v']),
-                sandwichInflection('par', 'd', 'uhan', 'o', [], ['n', 'v']),
-                sandwichInflection('pa', '', 'unan', 'o', [], ['n', 'v']),
-                sandwichInflection('par', 'd', 'unan', 'o', [], ['n', 'v']),
+                sandwichInflection('pa', '', 'uhan', 'o', [], ['n']),
+                sandwichInflection('par', 'd', 'uhan', 'o', [], ['n']),
+                sandwichInflection('pa', '', 'unan', 'o', [], ['n']),
+                sandwichInflection('par', 'd', 'unan', 'o', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('pa', '', 'an', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('par', 'd', 'an', '', [], ['n']),
                 sandwichInflectionWithOtoUSoundChange('pa', '', 'ran', 'd', [], ['n']),
                 sandwichInflectionWithOtoUSoundChange('par', 'd', 'ran', 'd', [], ['n']),
             ],
@@ -349,6 +351,346 @@ export const tagalogTransforms = {
                 prefixInflection('tagapang', '', [], ['n']),
                 ...[...'dlrst'].map((v) => prefixInflection(`tagapan${v}`, `${v}`, [], ['n'])),
                 ...[...'bp'].map((v) => prefixInflection(`tagapam${v}`, `${v}`, [], ['n'])),
+            ],
+        },
+        'i-': {
+            name: 'i-',
+            rules: [
+                prefixInflection('i', '', [], ['n']),
+            ],
+        },
+        'ika-': {
+            name: 'ika-',
+            rules: [
+                prefixInflection('ika', '', [], ['n']),
+            ],
+        },
+        'ipa-': {
+            name: 'ipa-',
+            rules: [
+                prefixInflection('ika', '', [], ['n']),
+            ],
+        },
+        'ipag-': {
+            name: 'ipag-',
+            rules: [
+                prefixInflection('ipag', '', [], ['n']),
+            ],
+        },
+        'ipag- + rep1': {
+            name: 'ipag- + rep1',
+            rules: [
+                prefixInflectionWithRep1('ipag', '', [], ['n']),
+            ],
+        },
+        'ipang-': {
+            name: 'ipang-',
+            rules: [
+                prefixInflection('ipang', '', [], ['n']),
+                ...[...'dlrst'].map((v) => prefixInflection(`ipan${v}`, `${v}`, [], ['n'])),
+                ...[...'bp'].map((v) => prefixInflection(`ipam${v}`, `${v}`, [], ['n'])),
+            ],
+        },
+        'ma-...-an': {
+            name: 'ma-...-an',
+            rules: [
+                sandwichInflection('ma', '', 'an', '', [], ['n']),
+                sandwichInflection('mar', 'd', 'an', '', [], ['n']),
+                sandwichInflection('ma', '', 'ran', 'd', [], ['n']),
+                sandwichInflection('mar', 'd', 'ran', 'd', [], ['n']),
+                ...[...'aeiou'].map((v) => sandwichInflection('ma', '', `${v}han`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('mar', 'd', `${v}han`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('ma', '', `${v}nan`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('mar', 'd', `${v}nan`, `${v}`, [], ['n'])),
+                sandwichInflection('ma', '', 'uhan', 'o', [], ['n']),
+                sandwichInflection('mar', 'd', 'uhan', 'o', [], ['n']),
+                sandwichInflection('ma', '', 'unan', 'o', [], ['n']),
+                sandwichInflection('mar', 'd', 'unan', 'o', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('ma', '', 'an', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('mar', 'd', 'an', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('ma', '', 'ran', 'd', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('mar', 'd', 'ran', 'd', [], ['n']),
+            ],
+        },
+        'mag-...-an': {
+            name: 'mag-...-an',
+            rules: [
+                sandwichInflection('mag', '', 'an', '', [], ['n']),
+                sandwichInflection('mag', '', 'ran', 'd', [], ['n']),
+                ...[...'aeiou'].map((v) => sandwichInflection('mag', '', `${v}han`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('mag', '', `${v}nan`, `${v}`, [], ['n'])),
+                sandwichInflection('mag', '', 'uhan', 'o', [], ['n']),
+                sandwichInflection('mag', '', 'unan', 'o', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('mag', '', 'an', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('mag', '', 'ran', 'd', [], ['n']),
+            ],
+        },
+        'magkanda-': {
+            name: 'magkanda-',
+            rules: [
+                prefixInflection('magkanda', '', [], ['n']),
+                prefixInflection('magkandar', 'd', [], ['n']),
+            ],
+        },
+        'magma-': {
+            name: 'magma-',
+            rules: [
+                prefixInflection('magma', '', [], ['n']),
+                prefixInflection('magmar', 'd', [], ['n']),
+            ],
+        },
+        'magpa-': {
+            name: 'magpa-',
+            rules: [
+                prefixInflection('magpa', '', [], ['n']),
+                prefixInflection('magpar', 'd', [], ['n']),
+            ],
+        },
+        'magpaka-': {
+            name: 'magpaka-',
+            rules: [
+                prefixInflection('magpaka', '', [], ['n']),
+                prefixInflection('magpakar', 'd', [], ['n']),
+            ],
+        },
+        'magsi-': {
+            name: 'magsi-',
+            rules: [
+                prefixInflection('magsi', '', [], ['n']),
+                prefixInflection('magsipag', '', [], ['n']),
+            ],
+        },
+        'makapang-': {
+            name: 'makapang-',
+            rules: [
+                prefixInflection('makapang', '', [], ['n']),
+                ...[...'dlrst'].map((v) => prefixInflection(`makapan${v}`, `${v}`, [], ['n'])),
+                ...[...'bp'].map((v) => prefixInflection(`makapam${v}`, `${v}`, [], ['n'])),
+            ],
+        },
+        'makapag-': {
+            name: 'makapag-',
+            rules: [
+                prefixInflection('makapag', '', [], ['n']),
+            ],
+        },
+        'maka-': {
+            name: 'maka-',
+            rules: [
+                prefixInflection('maka', '', [], ['n']),
+                prefixInflection('makar', 'd', [], ['n']),
+            ],
+        },
+        'maki-': {
+            name: 'maki-',
+            rules: [
+                prefixInflection('maki', '', [], ['n']),
+                prefixInflection('makir', 'd', [], ['n']),
+            ],
+        },
+        'makipag-': {
+            name: 'makipag-',
+            rules: [
+                prefixInflection('makipag', '', [], ['n']),
+            ],
+        },
+        'makipag-...-an': {
+            name: 'makipag-...-an',
+            rules: [
+                sandwichInflection('makipag', '', 'an', '', [], ['n']),
+                sandwichInflection('makipag', '', 'ran', 'd', [], ['n']),
+                ...[...'aeiou'].map((v) => sandwichInflection('makipag', '', `${v}han`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('makipag', '', `${v}nan`, `${v}`, [], ['n'])),
+                sandwichInflection('makipag', '', 'uhan', 'o', [], ['n']),
+                sandwichInflection('makipag', '', 'unan', 'o', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('makipag', '', 'an', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('makipag', '', 'ran', 'd', [], ['n']),
+            ],
+        },
+        'mang-': {
+            name: 'mang-',
+            rules: [
+                prefixInflection('mang', '', [], ['n']),
+                ...[...'dlrst'].map((v) => prefixInflection(`man${v}`, `${v}`, [], ['n'])),
+                ...[...'bp'].map((v) => prefixInflection(`mam${v}`, `${v}`, [], ['n'])),
+            ],
+        },
+        'mapa-': {
+            name: 'mapa-',
+            rules: [
+                prefixInflection('mapa', '', [], ['n']),
+                prefixInflection('mapar', 'd', [], ['n']),
+            ],
+        },
+        'pa-...-in': {
+            name: 'pa-...-in',
+            rules: [
+                sandwichInflection('pa', '', 'in', '', [], ['n']),
+                sandwichInflection('par', 'd', 'in', '', [], ['n']),
+                sandwichInflection('pa', '', 'rin', 'd', [], ['n']),
+                sandwichInflection('par', 'd', 'rin', 'd', [], ['n']),
+                ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}hin`, `${v}`, [], ['n'])), //  murahan
+                ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}hin`, `${v}`, [], ['n'])), //  murahan
+                ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}nin`, `${v}`, [], ['n'])), //  murahan
+                ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}nin`, `${v}`, [], ['n'])), //  tawanan
+                sandwichInflection('pa', '', 'uhin', 'o', [], ['n']),
+                sandwichInflection('par', 'd', 'uhin', 'o', [], ['n']),
+                sandwichInflection('pa', '', 'unin', 'o', [], ['n']),
+                sandwichInflection('par', 'd', 'unin', 'o', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('pa', '', 'in', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('par', 'd', 'in', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('pa', '', 'rin', 'd', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('par', 'd', 'rin', 'd', [], ['n']),
+            ],
+        },
+        'pag-...-an': {
+            name: 'pag-...-an',
+            rules: [
+                sandwichInflection('pag', '', 'an', '', [], ['n']),
+                sandwichInflection('pag', '', 'ran', 'd', [], ['n']),
+                ...[...'aeiou'].map((v) => sandwichInflection('pag', '', `${v}han`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('pag', '', `${v}nan`, `${v}`, [], ['n'])),
+                sandwichInflection('pag', '', 'uhan', 'o', [], ['n']),
+                sandwichInflection('pag', '', 'unan', 'o', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('pag', '', 'an', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('pag', '', 'ran', 'd', [], ['n']),
+            ],
+        },
+        'pang-...-an': {
+            name: 'pang-...-an',
+            rules: [
+                sandwichInflection('pang', '', 'an', '', [], ['n']),
+                sandwichInflection('pang', '', 'ran', 'd', [], ['n']),
+                ...[...'aeiou'].map((v) => sandwichInflection('pang', '', `${v}han`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('pang', '', `${v}nan`, `${v}`, [], ['n'])),
+                sandwichInflection('pang', '', 'uhan', 'o', [], ['n']),
+                sandwichInflection('pang', '', 'unan', 'o', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('pang', '', 'an', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('pang', '', 'ran', 'd', [], ['n']),
+
+                ...[...'dlrst'].flatMap((v) => [
+                    sandwichInflection(`pan${v}`, `${v}`, 'an', '', [], ['n']),
+                    sandwichInflection(`pan${v}`, `${v}`, 'ran', 'd', [], ['n']),
+                    ...[...'aeiou'].map((k) => sandwichInflection(`pan${v}`, `${v}`, `${k}han`, `${k}`, [], ['n'])),
+                    ...[...'aeiou'].map((k) => sandwichInflection(`pan${v}`, `${v}`, `${k}nan`, `${k}`, [], ['n'])),
+                    sandwichInflection(`pan${v}`, '', 'uhan', 'o', [], ['n']),
+                    sandwichInflection(`pan${v}`, '', 'unan', 'o', [], ['n']),
+                    sandwichInflectionWithOtoUSoundChange(`pan${v}`, `${v}`, 'an', '', [], ['n']),
+                    sandwichInflectionWithOtoUSoundChange(`pan${v}`, `${v}`, 'ran', 'd', [], ['n']),
+                ]),
+                ...[...'bp'].flatMap((v) => [
+                    sandwichInflection(`pam${v}`, `${v}`, 'an', '', [], ['n']),
+                    sandwichInflection(`pam${v}`, `${v}`, 'ran', 'd', [], ['n']),
+                    ...[...'aeiou'].map((k) => sandwichInflection(`pam${v}`, `${v}`, `${k}han`, `${k}`, [], ['n'])),
+                    ...[...'aeiou'].map((k) => sandwichInflection(`pam${v}`, `${v}`, `${k}nan`, `${k}`, [], ['n'])),
+                    sandwichInflection(`pam${v}`, '', 'uhan', 'o', [], ['n']),
+                    sandwichInflection(`pam${v}`, '', 'unan', 'o', [], ['n']),
+                    sandwichInflectionWithOtoUSoundChange(`pam${v}`, `${v}`, 'an', '', [], ['n']),
+                    sandwichInflectionWithOtoUSoundChange(`pam${v}`, `${v}`, 'ran', 'd', [], ['n']),
+                ]),
+            ],
+        },
+        'pag-...-in': {
+            name: 'pag-...-in',
+            rules: [
+                sandwichInflection('pag', '', 'in', '', [], ['n']),
+                sandwichInflection('pag', '', 'rin', 'd', [], ['n']),
+                ...[...'aeiou'].map((v) => sandwichInflection('pag', '', `${v}hin`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('pag', '', `${v}nin`, `${v}`, [], ['n'])),
+                sandwichInflection('pag', '', 'uhin', 'o', [], ['n']),
+                sandwichInflection('pag', '', 'unin', 'o', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('pag', '', 'in', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('pag', '', 'rin', 'd', [], ['n']),
+            ],
+        },
+        'papang-...-in': {
+            name: 'papang-...-in',
+            rules: [
+                sandwichInflection('papang', '', 'in', '', [], ['n']),
+                sandwichInflection('papang', '', 'rin', 'd', [], ['n']),
+                ...[...'aeiou'].map((v) => sandwichInflection('papang', '', `${v}hin`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('papang', '', `${v}nin`, `${v}`, [], ['n'])),
+                sandwichInflection('papang', '', 'uhin', 'o', [], ['n']),
+                sandwichInflection('papang', '', 'unin', 'o', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('papang', '', 'in', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('papang', '', 'rin', 'd', [], ['n']),
+
+                ...[...'dlrst'].flatMap((v) => [
+                    sandwichInflection(`papan${v}`, `${v}`, 'in', '', [], ['n']),
+                    sandwichInflection(`papan${v}`, `${v}`, 'rin', 'd', [], ['n']),
+                    ...[...'aeiou'].map((k) => sandwichInflection(`papan${v}`, `${v}`, `${k}hin`, `${k}`, [], ['n'])),
+                    ...[...'aeiou'].map((k) => sandwichInflection(`papan${v}`, `${v}`, `${k}nin`, `${k}`, [], ['n'])),
+                    sandwichInflection(`papan${v}`, '', 'uhin', 'o', [], ['n']),
+                    sandwichInflection(`papan${v}`, '', 'unin', 'o', [], ['n']),
+                    sandwichInflectionWithOtoUSoundChange(`papan${v}`, `${v}`, 'in', '', [], ['n']),
+                    sandwichInflectionWithOtoUSoundChange(`papan${v}`, `${v}`, 'rin', 'd', [], ['n']),
+                ]),
+                ...[...'bp'].flatMap((v) => [
+                    sandwichInflection(`papam${v}`, `${v}`, 'in', '', [], ['n']),
+                    sandwichInflection(`papam${v}`, `${v}`, 'rin', 'd', [], ['n']),
+                    ...[...'aeiou'].map((k) => sandwichInflection(`papam${v}`, `${v}`, `${k}hin`, `${k}`, [], ['n'])),
+                    ...[...'aeiou'].map((k) => sandwichInflection(`papam${v}`, `${v}`, `${k}nin`, `${k}`, [], ['n'])),
+                    sandwichInflection(`papam${v}`, '', 'uhin', 'o', [], ['n']),
+                    sandwichInflection(`papam${v}`, '', 'unin', 'o', [], ['n']),
+                    sandwichInflectionWithOtoUSoundChange(`papam${v}`, `${v}`, 'in', '', [], ['n']),
+                    sandwichInflectionWithOtoUSoundChange(`papam${v}`, `${v}`, 'rin', 'd', [], ['n']),
+                ]),
+            ],
+        },
+        'ma-...-in': {
+            name: 'ma-...-in',
+            rules: [
+                sandwichInflection('ma', '', 'in', '', [], ['n']),
+                sandwichInflection('mar', 'd', 'in', '', [], ['n']),
+                sandwichInflection('ma', '', 'rin', 'd', [], ['n']),
+                sandwichInflection('mar', 'd', 'rin', 'd', [], ['n']),
+                ...[...'aeiou'].map((v) => sandwichInflection('ma', '', `${v}hin`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('mar', 'd', `${v}hin`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('ma', '', `${v}nin`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('mar', 'd', `${v}nin`, `${v}`, [], ['n'])),
+                sandwichInflection('ma', '', 'uhin', 'o', [], ['n']),
+                sandwichInflection('mar', 'd', 'uhin', 'o', [], ['n']),
+                sandwichInflection('ma', '', 'unin', 'o', [], ['n']),
+                sandwichInflection('mar', 'd', 'unin', 'o', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('ma', '', 'in', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('mar', 'd', 'in', '', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('ma', '', 'rin', 'd', [], ['n']),
+                sandwichInflectionWithOtoUSoundChange('mar', 'd', 'rin', 'd', [], ['n']),
+            ],
+        },
+        'mapag-': {
+            name: 'mapag-',
+            rules: [
+                prefixInflection('mapag', '', [], ['n']),
+            ],
+        },
+        'naka-': {
+            name: 'naka-',
+            rules: [
+                prefixInflection('naka', '', [], ['n']),
+                prefixInflection('nakar', 'd', [], ['n']),
+            ],
+        },
+        'nakaka-': {
+            name: 'nakaka-',
+            rules: [
+                prefixInflection('nakaka', '', [], ['n']),
+                prefixInflection('nakakar', 'd', [], ['n']),
+            ],
+        },
+        'nakakapang-': {
+            name: 'nakakapang-',
+            rules: [
+                prefixInflection('nakakapang', '', [], ['n']),
+                ...[...'dlrst'].map((v) => prefixInflection(`nakakapan${v}`, `${v}`, [], ['n'])),
+                ...[...'bp'].map((v) => prefixInflection(`nakakapam${v}`, `${v}`, [], ['n'])),
+            ],
+        },
+        'pala-': {
+            name: 'pala-',
+            rules: [
+                prefixInflection('pala', '', [], ['n']),
+                prefixInflection('palar', 'd', [], ['n']),
             ],
         },
     },
