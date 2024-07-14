@@ -148,8 +148,8 @@ export const tagalogTransforms = {
                 suffixInflection('ran', 'd', [], ['n']),
                 suffixInflectionWithOtoUSoundChange('an', '', [], ['n']),
                 suffixInflectionWithOtoUSoundChange('ran', 'd', [], ['n']),
-                ...[...'aeiou'].map((v) => suffixInflection(`${v}han`, `${v}`, [], ['n'])), //  murahan
-                ...[...'aeiou'].map((v) => suffixInflection(`${v}nan`, `${v}`, [], ['n'])), //  tawanan
+                ...[...'aeiou'].map((v) => suffixInflection(`${v}han`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => suffixInflection(`${v}nan`, `${v}`, [], ['n'])),
                 suffixInflection('uhan', 'o', [], ['n']),
                 suffixInflection('unan', 'o', [], ['n']),
             ],
@@ -161,8 +161,8 @@ export const tagalogTransforms = {
                 suffixInflection('rin', 'd', [], ['n']),
                 suffixInflectionWithOtoUSoundChange('in', '', [], ['n']),
                 suffixInflectionWithOtoUSoundChange('rin', 'd', [], ['n']),
-                ...[...'aeiou'].map((v) => suffixInflection(`${v}hin`, `${v}`, [], ['n'])), //  katihin
-                ...[...'aeiou'].map((v) => suffixInflection(`${v}nin`, `${v}`, [], ['n'])), //  talunin
+                ...[...'aeiou'].map((v) => suffixInflection(`${v}hin`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => suffixInflection(`${v}nin`, `${v}`, [], ['n'])),
                 suffixInflection('uhin', 'o', [], ['n']),
                 suffixInflection('unin', 'o', [], ['n']),
             ],
@@ -204,10 +204,10 @@ export const tagalogTransforms = {
                 sandwichInflection('kar', 'd', 'an', '', [], ['n']),
                 sandwichInflection('ka', '', 'ran', 'd', [], ['n']),
                 sandwichInflection('kar', 'd', 'ran', 'd', [], ['n']),
-                ...[...'aeiou'].map((v) => sandwichInflection('ka', '', `${v}han`, `${v}`, [], ['n'])), //  murahan
-                ...[...'aeiou'].map((v) => sandwichInflection('kar', 'd', `${v}han`, `${v}`, [], ['n'])), //  murahan
-                ...[...'aeiou'].map((v) => sandwichInflection('ka', '', `${v}nan`, `${v}`, [], ['n'])), //  murahan
-                ...[...'aeiou'].map((v) => sandwichInflection('kar', 'd', `${v}nan`, `${v}`, [], ['n'])), //  tawanan
+                ...[...'aeiou'].map((v) => sandwichInflection('ka', '', `${v}han`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('kar', 'd', `${v}han`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('ka', '', `${v}nan`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('kar', 'd', `${v}nan`, `${v}`, [], ['n'])),
                 sandwichInflection('ka', '', 'uhan', 'o', [], ['n']),
                 sandwichInflection('kar', 'd', 'uhan', 'o', [], ['n']),
                 sandwichInflection('ka', '', 'unan', 'o', [], ['n']),
@@ -266,10 +266,10 @@ export const tagalogTransforms = {
                 sandwichInflection('par', 'd', 'an', '', [], ['n']),
                 sandwichInflection('pa', '', 'ran', 'd', [], ['n']),
                 sandwichInflection('par', 'd', 'ran', 'd', [], ['n']),
-                ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}han`, `${v}`, [], ['n'])), //  murahan
-                ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}han`, `${v}`, [], ['n'])), //  murahan
-                ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}nan`, `${v}`, [], ['n'])), //  murahan
-                ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}nan`, `${v}`, [], ['n'])), //  tawanan
+                ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}han`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}han`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}nan`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}nan`, `${v}`, [], ['n'])),
                 sandwichInflection('pa', '', 'uhan', 'o', [], ['n']),
                 sandwichInflection('par', 'd', 'uhan', 'o', [], ['n']),
                 sandwichInflection('pa', '', 'unan', 'o', [], ['n']),
@@ -525,10 +525,10 @@ export const tagalogTransforms = {
                 sandwichInflection('par', 'd', 'in', '', [], ['n']),
                 sandwichInflection('pa', '', 'rin', 'd', [], ['n']),
                 sandwichInflection('par', 'd', 'rin', 'd', [], ['n']),
-                ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}hin`, `${v}`, [], ['n'])), //  murahan
-                ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}hin`, `${v}`, [], ['n'])), //  murahan
-                ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}nin`, `${v}`, [], ['n'])), //  murahan
-                ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}nin`, `${v}`, [], ['n'])), //  tawanan
+                ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}hin`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}hin`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('pa', '', `${v}nin`, `${v}`, [], ['n'])),
+                ...[...'aeiou'].map((v) => sandwichInflection('par', 'd', `${v}nin`, `${v}`, [], ['n'])),
                 sandwichInflection('pa', '', 'uhin', 'o', [], ['n']),
                 sandwichInflection('par', 'd', 'uhin', 'o', [], ['n']),
                 sandwichInflection('pa', '', 'unin', 'o', [], ['n']),
