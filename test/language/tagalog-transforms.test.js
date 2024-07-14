@@ -1,14 +1,53 @@
-import {LanguageTransformer} from "../../ext/js/language/language-transformer.js";
-import {tagalogTransforms} from "../../ext/js/language/tl/tagalog-transforms.js";
+/*
+ * Copyright (C) 2024  Yomitan Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-const consonants = 'bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ';
-const VOWELS = 'aeiou';
-const inflectedSuffix = 'in';
-const regex = new RegExp(`^(${'pan'})([${consonants}]*[${VOWELS}][${consonants}]*)(\\2)`);
+import {testLanguageTransformer} from '../fixtures/language-transformer-test.js';
+import {LanguageTransformer} from '../../ext/js/language/language-transformer.js';
+import {tagalogTransforms} from '../../ext/js/language/tl/tagalog-transforms.js';
+
+
+const tests = [
+    {
+        category: 'prefixes',
+        valid: true,
+        tests: [
+            {term: 'luto', source: 'tagaluto', rule: 'n', reasons: ['taga-']},
+            {term: 'sigaw', source: 'kasisigaw', rule: 'n', reasons: ['kaka-']},
+            {term: 'isip', source: 'kaiisip', rule: 'n', reasons: ['kaka-']},
+            {term: 'gamot', source: 'manggagamot', rule: 'n', reasons: ['mang- + rep1']},
+            {term: 'pareho', source: 'kapareho', rule: 'adj', reasons: ['ka-']},
+        ],
+    },
+    {
+        category: 'sandwich',
+        valid: true,
+        tests: [
+            {term: 'sira', source: 'masiraan', rule: 'n', reasons: ['ma-...-an']},
+        ],
+    },
+    {
+        category: 'suffix',
+        valid: true,
+        tests: [
+            {term: 'kain', source: 'kainin', rule: 'n', reasons: ['-in']},
+        ],
+    },
+];
 
 const languageTransformer = new LanguageTransformer();
 languageTransformer.addDescriptor(tagalogTransforms);
-
-console.log(regex.test('panganganak'))
-console.log('panganganak'.replace(regex, ``))
-console.log(JSON.stringify(languageTransformer.transform('panganganak'), null, 2));
+testLanguageTransformer(languageTransformer, tests);
