@@ -1296,6 +1296,7 @@ export class Display extends EventDispatcher {
     async _setContentTermsOrKanji(type, urlSearchParams, token) {
         const lookup = (urlSearchParams.get('lookup') !== 'false');
         const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
+        const hasEnabledDictionaries = this._options ? this._options.dictionaries.some(({enabled}) => enabled) : false;
 
         // Set query
         let query = urlSearchParams.get('query');
@@ -1331,7 +1332,7 @@ export class Display extends EventDispatcher {
 
         let {dictionaryEntries} = content;
         if (!Array.isArray(dictionaryEntries)) {
-            dictionaryEntries = lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, wildcardsEnabled, optionsContext) : [];
+            dictionaryEntries = hasEnabledDictionaries && lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, wildcardsEnabled, optionsContext) : [];
             if (this._setContentToken !== token) { return; }
             content.dictionaryEntries = dictionaryEntries;
             changeHistory = true;
@@ -1367,7 +1368,8 @@ export class Display extends EventDispatcher {
         this._dictionaryEntries = dictionaryEntries;
 
         this._updateNavigationAuto();
-        this._setNoContentVisible(dictionaryEntries.length === 0 && lookup);
+        this._setNoContentVisible(hasEnabledDictionaries && dictionaryEntries.length === 0 && lookup);
+        this._setNoDictionariesVisible(!hasEnabledDictionaries);
 
         const container = this._container;
         container.textContent = '';
@@ -1424,6 +1426,7 @@ export class Display extends EventDispatcher {
 
         this._updateNavigation(false, false);
         this._setNoContentVisible(false);
+        this._setNoDictionariesVisible(false);
         this._setQuery('', '', 0);
 
         this._triggerContentUpdateStart();
@@ -1449,6 +1452,18 @@ export class Display extends EventDispatcher {
 
         if (noResults !== null) {
             noResults.hidden = !visible;
+        }
+    }
+
+    /**
+     * @param {boolean} visible
+     */
+    _setNoDictionariesVisible(visible) {
+        /** @type {?HTMLElement} */
+        const noDictionaries = document.querySelector('#no-dictionaries');
+
+        if (noDictionaries !== null) {
+            noDictionaries.hidden = !visible;
         }
     }
 
