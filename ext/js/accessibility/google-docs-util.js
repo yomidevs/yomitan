@@ -137,7 +137,7 @@ export class GoogleDocsUtil {
             const mid = Math.floor((start + end) / 2);
             range.setStart(textNode, mid);
             range.setEnd(textNode, end);
-            if (isPointInAnyRect(x, y, range.getClientRects())) {
+            if (isPointInAnyRect(x, y, range.getClientRects(), null)) {
                 start = mid;
             } else {
                 end = mid;

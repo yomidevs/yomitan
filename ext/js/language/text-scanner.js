@@ -732,8 +732,9 @@ export class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
         this._touchTapValid = true;
 
+        const languageNotNull = this._language !== null ? this._language : '';
         const selection = window.getSelection();
-        if (selection !== null && isPointInSelection(x, y, selection)) {
+        if (selection !== null && isPointInSelection(x, y, selection, languageNotNull)) {
             return;
         }
 
@@ -1357,6 +1358,7 @@ export class TextScanner extends EventDispatcher {
             const textSource = this._textSourceGenerator.getRangeFromPoint(x, y, {
                 deepContentScan: this._deepContentScan,
                 normalizeCssZoom: this._normalizeCssZoom,
+                language: this._language,
             });
             if (textSource !== null) {
                 try {
