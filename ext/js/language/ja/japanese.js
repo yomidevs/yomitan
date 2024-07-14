@@ -756,14 +756,16 @@ export function collapseEmphaticSequences(text, fullCollapse) {
         --right;
     }
     // Whole string is emphatic
-    if (left > right) return text;
+    if (left > right) {
+        return text;
+    }
 
     const leadingEmphatics = text.substring(0, left);
     const trailingEmphatics = text.substring(right + 1);
     let middle = '';
     let currentCollapsedCodePoint = -1;
 
-    for (let i = left ; i <= right; ++i) {
+    for (let i = left; i <= right; ++i) {
         const char = text[i];
         const codePoint = char.codePointAt(0) ?? -1;
         if (isEmphaticCodePoint(codePoint)) {
