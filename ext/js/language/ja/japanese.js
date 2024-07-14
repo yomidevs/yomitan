@@ -730,7 +730,7 @@ export function distributeFuriganaInflected(term, reading, source) {
 // Miscellaneous
 
 /**
- * @param {number | undefined} codePoint
+ * @param {number} codePoint
  * @returns {boolean}
  */
 export function isEmphaticCodePoint(codePoint) {
@@ -748,11 +748,11 @@ export function isEmphaticCodePoint(codePoint) {
  */
 export function collapseEmphaticSequences(text, fullCollapse) {
     let left = 0;
-    while (left < text.length && isEmphaticCodePoint(text.codePointAt(left))) {
+    while (left < text.length && isEmphaticCodePoint(/** @type {number} */ (text.codePointAt(left)))) {
         ++left;
     }
     let right = text.length - 1;
-    while (right >= 0 && isEmphaticCodePoint(text.codePointAt(right))) {
+    while (right >= 0 && isEmphaticCodePoint(/** @type {number} */ (text.codePointAt(right)))) {
         --right;
     }
     // Whole string is emphatic
@@ -767,7 +767,7 @@ export function collapseEmphaticSequences(text, fullCollapse) {
 
     for (let i = left; i <= right; ++i) {
         const char = text[i];
-        const codePoint = char.codePointAt(0) ?? -1;
+        const codePoint = /** @type {number} */ (char.codePointAt(0));
         if (isEmphaticCodePoint(codePoint)) {
             if (currentCollapsedCodePoint !== codePoint) {
                 currentCollapsedCodePoint = codePoint;
