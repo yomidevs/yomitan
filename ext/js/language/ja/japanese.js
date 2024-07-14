@@ -730,7 +730,7 @@ export function distributeFuriganaInflected(term, reading, source) {
 // Miscellaneous
 
 /**
- * @param {number} codePoint
+ * @param {number | undefined} codePoint
  * @returns {boolean}
  */
 export function isEmphaticCodePoint(codePoint) {
@@ -747,29 +747,38 @@ export function isEmphaticCodePoint(codePoint) {
  * @returns {string}
  */
 export function collapseEmphaticSequences(text, fullCollapse) {
-    let result = '';
-    let collapseCodePoint = -1;
-    for (let i = 0; i < text.length; ++i) {
-        const char = text[i];
-        const c = char.codePointAt(0) ?? -1;
-        if (isEmphaticCodePoint(c)) {
-            // Prevent match trailing emphatic
-            if (i === text.length - 1) {
-                result += char;
-                continue;
-            }
+    let left = 0;
+    while (left < text.length && isEmphaticCodePoint(text.codePointAt(left))) {
+        ++left;
+    }
+    let right = text.length - 1;
+    while (right >= 0 && isEmphaticCodePoint(text.codePointAt(right))) {
+        --right;
+    }
+    // Whole string is emphatic
+    if (left > right) return text;
 
-            if (collapseCodePoint !== c) {
-                collapseCodePoint = c;
+    const leadingEmphatics = text.substring(0, left);
+    const trailingEmphatics = text.substring(right + 1);
+    let middle = '';
+    let currentCollapsedCodePoint = -1;
+
+    for (let i = left ; i <= right; ++i) {
+        const char = text[i];
+        const codePoint = char.codePointAt(0) ?? -1;
+        if (isEmphaticCodePoint(codePoint)) {
+            if (currentCollapsedCodePoint !== codePoint) {
+                currentCollapsedCodePoint = codePoint;
                 if (!fullCollapse) {
-                    result += char;
+                    middle += char;
                     continue;
                 }
             }
         } else {
-            collapseCodePoint = -1;
-            result += char;
+            currentCollapsedCodePoint = -1;
+            middle += char;
         }
     }
-    return result;
+
+    return leadingEmphatics + middle + trailingEmphatics;
 }
