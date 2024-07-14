@@ -19,7 +19,7 @@ Scripts can be executed by running `npm run <name>`.
   Runs most of the tests that are used more frequently in the typical development process.
 
 - `test:static-analysis`
-  Runs all of the static analysis tests.
+  Runs all of the static analysis tests (excluding JSON).
 
 - `test:js`
   Runs [eslint](https://eslint.org/) on all of the JavaScript and TypeScript files in the project.

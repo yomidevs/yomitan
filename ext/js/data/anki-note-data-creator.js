@@ -49,7 +49,7 @@ export function createAnkiNoteData(marker, {
             screenshot: void 0,
             clipboardImage: void 0,
             clipboardText: void 0,
-            selectionText: void 0,
+            popupSelectionText: void 0,
             textFurigana: [],
             dictionaryMedia: {},
         };

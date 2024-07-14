@@ -24,6 +24,7 @@ const tests = [
     ['Wéi jī Bǎi kē', 'wéijībǎikē'],
     ['wán:zhěng', 'wánzhěng'],
     ['fān・yì', 'fānyì'],
+    ['fān//yì', 'fānyì'],
 ];
 
 describe('Normalize Pinyin', () => {

@@ -294,7 +294,10 @@ const languageDescriptors = [
         iso639_3: 'tgl',
         name: 'Tagalog',
         exampleText: 'basahin',
-        textPreprocessors: capitalizationPreprocessors,
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics,
+        },
         languageTransforms: tagalogTransforms,
     },
     {
