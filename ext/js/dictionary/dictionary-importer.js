@@ -74,35 +74,11 @@ export class DictionaryImporter {
         });
 
         // Read archive
-        const zipFileReader = new Uint8ArrayReader(new Uint8Array(archiveContent));
-        const zipReader = new ZipReader(zipFileReader);
-        const zipEntries = await zipReader.getEntries();
-        /** @type {import('dictionary-importer').ArchiveFileMap} */
-        const fileMap = new Map();
-        for (const entry of zipEntries) {
-            fileMap.set(entry.filename, entry);
-        }
-        // Read and validate index
-        const indexFileName = 'index.json';
-        const indexFile = fileMap.get(indexFileName);
-        if (typeof indexFile === 'undefined') {
-            throw new Error('No dictionary index found in archive');
-        }
-        const indexFile2 = /** @type {import('@zip.js/zip.js').Entry} */ (indexFile);
-
-        const indexContent = await this._getData(indexFile2, new TextWriter());
-        const index = /** @type {import('dictionary-data').Index} */ (parseJson(indexContent));
-
-        if (!ajvSchemas.dictionaryIndex(index)) {
-            throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, indexFileName);
-        }
+        const fileMap = await this._getFilesFromArchive(archiveContent);
+        const index = await this._readAndValidateIndex(fileMap);
 
         const dictionaryTitle = index.title;
-        const version = typeof index.format === 'number' ? index.format : index.version;
-
-        if (typeof version !== 'number' || !dictionaryTitle || !index.revision) {
-            throw new Error('Unrecognized dictionary format');
-        }
+        const version = /** @type {import('dictionary-data').IndexVersion} */ (index.version);
 
         // Verify database is not already imported
         if (await dictionaryDatabase.dictionaryExists(dictionaryTitle)) {
@@ -249,12 +225,59 @@ export class DictionaryImporter {
     }
 
     /**
+     * @param {ArrayBuffer} archiveContent
+     * @returns {Promise<import('dictionary-importer').ArchiveFileMap>}
+     */
+    async _getFilesFromArchive(archiveContent) {
+        const zipFileReader = new Uint8ArrayReader(new Uint8Array(archiveContent));
+        const zipReader = new ZipReader(zipFileReader);
+        const zipEntries = await zipReader.getEntries();
+        /** @type {import('dictionary-importer').ArchiveFileMap} */
+        const fileMap = new Map();
+        for (const entry of zipEntries) {
+            fileMap.set(entry.filename, entry);
+        }
+        return fileMap;
+    }
+
+    /**
+     * @param {import('dictionary-importer').ArchiveFileMap} fileMap
+     * @returns {Promise<import('dictionary-data').Index>}
+     * @throws {Error}
+     */
+    async _readAndValidateIndex(fileMap) {
+        const indexFileName = 'index.json';
+        const indexFile = fileMap.get(indexFileName);
+        if (typeof indexFile === 'undefined') {
+            throw new Error('No dictionary index found in archive');
+        }
+        const indexFile2 = /** @type {import('@zip.js/zip.js').Entry} */ (indexFile);
+
+        const indexContent = await this._getData(indexFile2, new TextWriter());
+        const index = /** @type {unknown} */ (parseJson(indexContent));
+
+        if (!ajvSchemas.dictionaryIndex(index)) {
+            throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, indexFileName);
+        }
+
+        const validIndex = /** @type {import('dictionary-data').Index} */ (index);
+
+        const version = typeof validIndex.format === 'number' ? validIndex.format : validIndex.version;
+        validIndex.version = version;
+
+        const {title, revision} = validIndex;
+        if (typeof version !== 'number' || !title || !revision) {
+            throw new Error('Unrecognized dictionary format');
+        }
+
+        return validIndex;
+    }
+
+    /**
      * @returns {import('dictionary-importer').ProgressData}
      */
     _createProgressData() {
         return {
-            stepIndex: 0,
-            stepCount: 6,
             index: 0,
             count: 0,
         };
@@ -263,22 +286,23 @@ export class DictionaryImporter {
     /** */
     _progressReset() {
         this._progressData = this._createProgressData();
-        this._progress();
+        this._progress(true);
     }
 
     /**
      * @param {number} count
      */
     _progressNextStep(count) {
-        ++this._progressData.stepIndex;
         this._progressData.index = 0;
         this._progressData.count = count;
-        this._progress();
+        this._progress(true);
     }
 
-    /** */
-    _progress() {
-        this._onProgress(this._progressData);
+    /**
+     * @param {boolean} nextStep
+     */
+    _progress(nextStep = false) {
+        this._onProgress({...this._progressData, nextStep});
     }
 
     /**

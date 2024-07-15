@@ -49,8 +49,7 @@ async function createTestDictionaryArchiveData(dictionary, dictionaryName) {
 function createDictionaryImporter(expect, onProgress) {
     const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
     return new DictionaryImporter(dictionaryImporterMediaLoader, (...args) => {
-        const {stepIndex, stepCount, index, count} = args[0];
-        expect.soft(stepIndex < stepCount).toBe(true);
+        const {index, count} = args[0];
         expect.soft(index <= count).toBe(true);
         if (typeof onProgress === 'function') {
             onProgress(...args);

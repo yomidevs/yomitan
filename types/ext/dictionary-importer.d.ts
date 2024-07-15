@@ -23,25 +23,18 @@ import type * as StructuredContent from './structured-content';
 
 export type OnProgressCallback = (data: ProgressData) => void;
 
-/**
- * An enum representing the import step.
- * - `-2` `-1` - Dictionary import is uninitialized.
- * - `0` - Load dictionary archive and validate index step.
- * - `1` - Load schemas and get archive files step.
- * - `2` - Load and validate dictionary data step.
- * - `3` - Format dictionary data and extended data support step.
- * - `4` - Resolve async requirements and import media step.
- * - `5` - Add dictionary descriptor and import data step.
- */
-export type ImportStep = -2 | -1 | 0 | 1 | 2 | 3 | 4 | 5;
+export type ImportProgressTracker = {
+    onProgress: OnProgressCallback;
+};
 
-export type ImportStepCount = 6;
+export type ImportStepInfo = {label: string, callback?: () => void};
+
+export type ImportSteps = Map<number, ImportStepInfo>; // negative indexes are not shown in the progress bar
 
 export type ProgressData = {
-    stepIndex: ImportStep;
-    stepCount: ImportStepCount;
     index: number;
     count: number;
+    nextStep?: boolean;
 };
 
 export type ImportResult = {
