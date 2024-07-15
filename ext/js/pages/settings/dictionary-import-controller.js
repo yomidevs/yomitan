@@ -282,10 +282,41 @@ export class DictionaryImportController {
     async *_generateFilesFromUrls(urls, onProgress) {
         for (const url of urls) {
             onProgress({nextStep: true, index: 0, count: 0});
+
             try {
-                const blob = await fetch(url.trim())
-                    .then((res) => res.blob());
-                yield new File([blob], 'fileFromURL');
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', url.trim(), true);
+                xhr.responseType = 'blob';
+
+                xhr.onprogress = (event) => {
+                    if (event.lengthComputable) {
+                        onProgress({nextStep: false, index: event.loaded, count: event.total});
+                    }
+                };
+
+                xhr.onerror = () => {
+                    log.error(`Error fetching URL: ${url}`);
+                };
+
+                /** @type {Promise<File>} */
+                const blobPromise = new Promise((resolve, reject) => {
+                    xhr.onload = () => {
+                        if (xhr.status === 200) {
+                            if (xhr.response instanceof Blob) {
+                                resolve(new File([xhr.response], 'fileFromURL'));
+                            } else {
+                                reject(new Error(`Failed to fetch blob from ${url}`));
+                            }
+                        } else {
+                            reject(new Error(`Failed to fetch the URL: ${url}`));
+                        }
+                    };
+                });
+
+                xhr.send();
+
+                const file = await blobPromise;
+                yield file;
             } catch (error) {
                 log.error(error);
             }
