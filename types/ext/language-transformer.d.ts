@@ -25,7 +25,7 @@ export type ConditionMapObject<TCondition extends string> = {
     [type in TCondition]: Condition;
 };
 
-export type TransformMapObject<TCondition extends string> = {
+export type TransformMapObject<TCondition> = {
     [name: string]: Transform<TCondition>;
 };
 
@@ -45,7 +45,7 @@ export type RuleI18n = {
     name: string;
 };
 
-export type Transform<TCondition extends string> = {
+export type Transform<TCondition> = {
     name: string;
     description?: string;
     i18n?: TransformI18n[];
@@ -58,7 +58,7 @@ export type TransformI18n = {
     description?: string;
 };
 
-export type Rule<TCondition extends string> = {
+export type Rule<TCondition> = {
     type: 'suffix' | 'prefix' | 'wholeWord' | 'other';
     isInflected: RegExp;
     deinflect: (inflectedWord: string) => string;
@@ -66,7 +66,7 @@ export type Rule<TCondition extends string> = {
     conditionsOut: TCondition[];
 };
 
-export type SuffixRule<TCondition extends string> = {
+export type SuffixRule<TCondition> = {
     type: 'suffix';
     isInflected: RegExp;
     deinflected: string;
