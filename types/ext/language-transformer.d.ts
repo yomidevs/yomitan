@@ -74,17 +74,3 @@ export type SuffixRule<TCondition extends string> = {
     conditionsIn: TCondition[];
     conditionsOut: TCondition[];
 };
-
-export type InflectionBase<TCondition extends string> = (
-    inflected: string,
-    deinflected: string,
-    conditionsIn: TCondition[],
-    conditionsOut: TCondition[]
-) => Rule<TCondition>;
-
-export type SuffixInflectionBase<TCondition extends string> = (
-    inflected: string,
-    deinflected: string,
-    conditionsIn: TCondition[],
-    conditionsOut: TCondition[]
-) => SuffixRule<TCondition>;
