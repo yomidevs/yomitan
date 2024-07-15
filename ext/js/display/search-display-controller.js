@@ -47,6 +47,8 @@ export class SearchDisplayController {
         this._clipboardMonitorEnableCheckbox = querySelectorNotNull(document, '#clipboard-monitor-enable');
         /** @type {HTMLInputElement} */
         this._wanakanaEnableCheckbox = querySelectorNotNull(document, '#wanakana-enable');
+        /** @type {HTMLInputElement} */
+        this._stickyHeaderEnableCheckbox = querySelectorNotNull(document, '#sticky-header-enable');
         /** @type {HTMLSelectElement} */
         this._profileSelect = querySelectorNotNull(document, '#profile-select');
         /** @type {HTMLElement} */
@@ -107,6 +109,7 @@ export class SearchDisplayController {
         window.addEventListener('copy', this._onCopy.bind(this));
         this._clipboardMonitor.on('change', this._onClipboardMonitorChange.bind(this));
         this._clipboardMonitorEnableCheckbox.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
+        this._stickyHeaderEnableCheckbox.addEventListener('change', this._onStickyHeaderEnableChange.bind(this));
         this._display.hotkeyHandler.on('keydownNonHotkey', this._onKeyDown.bind(this));
 
         const displayOptions = this._display.getOptions();
@@ -182,7 +185,7 @@ export class SearchDisplayController {
     async _onDisplayOptionsUpdated({options}) {
         this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
         this._updateClipboardMonitorEnabled();
-        this._updateWanakanaCheckbox(options);
+        this._updateSearchSettings(options);
         this._queryInput.lang = options.general.language;
         await this._updateProfileSelect();
     }
@@ -190,12 +193,13 @@ export class SearchDisplayController {
     /**
      * @param {import('settings').ProfileOptions} options
      */
-    _updateWanakanaCheckbox(options) {
-        const {language, enableWanakana} = options.general;
+    _updateSearchSettings(options) {
+        const {language, enableWanakana, stickySearchHeader} = options.general;
         const wanakanaEnabled = language === 'ja' && enableWanakana;
         this._wanakanaEnableCheckbox.checked = wanakanaEnabled;
         this._wanakanaSearchOption.style.display = language === 'ja' ? '' : 'none';
         this._setWanakanaEnabled(wanakanaEnabled);
+        this._setStickyHeaderEnabled(stickySearchHeader);
     }
 
     /**
@@ -244,8 +248,8 @@ export class SearchDisplayController {
      */
     _onSearchKeydown(e) {
         if (e.isComposing) { return; }
-        const {code} = e;
-        if (!((code === 'Enter' || code === 'NumpadEnter') && !e.shiftKey)) { return; }
+        const {code, key} = e;
+        if (!((code === 'Enter' || key === 'Enter' || code === 'NumpadEnter') && !e.shiftKey)) { return; }
 
         // Search
         const element = /** @type {HTMLElement} */ (e.currentTarget);
@@ -331,6 +335,31 @@ export class SearchDisplayController {
         void this._setClipboardMonitorEnabled(enabled);
     }
 
+    /**
+     * @param {Event} e
+     */
+    _onStickyHeaderEnableChange(e) {
+        const element = /** @type {HTMLInputElement} */ (e.target);
+        const value = element.checked;
+        this._setStickyHeaderEnabled(value);
+        /** @type {import('settings-modifications').ScopedModificationSet} */
+        const modification = {
+            action: 'set',
+            path: 'general.stickySearchHeader',
+            value,
+            scope: 'profile',
+            optionsContext: this._display.getOptionsContext(),
+        };
+        void this._display.application.api.modifySettings([modification], 'search');
+    }
+
+    /**
+     * @param {boolean} stickySearchHeaderEnabled
+     */
+    _setStickyHeaderEnabled(stickySearchHeaderEnabled) {
+        this._stickyHeaderEnableCheckbox.checked = stickySearchHeaderEnabled;
+    }
+
     /** */
     _onModeChange() {
         this._updateClipboardMonitorEnabled();
@@ -344,14 +373,14 @@ export class SearchDisplayController {
         const value = Number.parseInt(node.value, 10);
         const optionsFull = await this._display.application.api.optionsGetFull();
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= optionsFull.profiles.length) {
-            await this._setPrimaryProfileIndex(value);
+            await this._setDefaultProfileIndex(value);
         }
     }
 
     /**
      * @param {number} value
      */
-    async _setPrimaryProfileIndex(value) {
+    async _setDefaultProfileIndex(value) {
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',

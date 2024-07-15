@@ -730,31 +730,57 @@ export function distributeFuriganaInflected(term, reading, source) {
 // Miscellaneous
 
 /**
+ * @param {number} codePoint
+ * @returns {boolean}
+ */
+export function isEmphaticCodePoint(codePoint) {
+    return (
+        codePoint === HIRAGANA_SMALL_TSU_CODE_POINT ||
+        codePoint === KATAKANA_SMALL_TSU_CODE_POINT ||
+        codePoint === KANA_PROLONGED_SOUND_MARK_CODE_POINT
+    );
+}
+
+/**
  * @param {string} text
  * @param {boolean} fullCollapse
  * @returns {string}
  */
 export function collapseEmphaticSequences(text, fullCollapse) {
-    let result = '';
-    let collapseCodePoint = -1;
-    for (const char of text) {
-        const c = char.codePointAt(0);
-        if (
-            c === HIRAGANA_SMALL_TSU_CODE_POINT ||
-            c === KATAKANA_SMALL_TSU_CODE_POINT ||
-            c === KANA_PROLONGED_SOUND_MARK_CODE_POINT
-        ) {
-            if (collapseCodePoint !== c) {
-                collapseCodePoint = c;
+    let left = 0;
+    while (left < text.length && isEmphaticCodePoint(/** @type {number} */ (text.codePointAt(left)))) {
+        ++left;
+    }
+    let right = text.length - 1;
+    while (right >= 0 && isEmphaticCodePoint(/** @type {number} */ (text.codePointAt(right)))) {
+        --right;
+    }
+    // Whole string is emphatic
+    if (left > right) {
+        return text;
+    }
+
+    const leadingEmphatics = text.substring(0, left);
+    const trailingEmphatics = text.substring(right + 1);
+    let middle = '';
+    let currentCollapsedCodePoint = -1;
+
+    for (let i = left; i <= right; ++i) {
+        const char = text[i];
+        const codePoint = /** @type {number} */ (char.codePointAt(0));
+        if (isEmphaticCodePoint(codePoint)) {
+            if (currentCollapsedCodePoint !== codePoint) {
+                currentCollapsedCodePoint = codePoint;
                 if (!fullCollapse) {
-                    result += char;
+                    middle += char;
                     continue;
                 }
             }
         } else {
-            collapseCodePoint = -1;
-            result += char;
+            currentCollapsedCodePoint = -1;
+            middle += char;
         }
     }
-    return result;
+
+    return leadingEmphatics + middle + trailingEmphatics;
 }

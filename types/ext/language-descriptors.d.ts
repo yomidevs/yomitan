@@ -176,6 +176,11 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     th: Record<string, never>;
+    tl: {
+        pre: CapitalizationPreprocessors & {
+            removeAlphabeticDiacritics: TextProcessor<boolean>;
+        };
+    };
     tr: {
         pre: CapitalizationPreprocessors;
     };

@@ -104,6 +104,8 @@ const tests = [
         valid: true,
         tests: [
             {term: 'look up', source: 'look something up',  rule: 'v_phr', reasons: ['interposed object']},
+            {term: 'look up', source: 'look it up',  rule: 'v_phr', reasons: ['interposed object']},
+            {term: 'look up', source: 'look one up',  rule: 'v_phr', reasons: ['interposed object']},
             {term: 'look up', source: 'looking up',  rule: 'v_phr', reasons: ['ing']},
             {term: 'look up', source: 'looked up',  rule: 'v_phr', reasons: ['past']},
             {term: 'look up', source: 'looks up',  rule: 'v_phr', reasons: ['3rd pers. sing. pres']},
