@@ -410,37 +410,33 @@ export class DictionaryImportController {
      * @returns {import('dictionary-importer').ImportSteps}
      */
     _getFileImportSteps() {
-        /** @type {import('dictionary-importer').ImportSteps} */
-        const steps = new Map();
-        steps // typescript has trouble with the type if the map is created in one line
-            .set(-2, {label: '', callback: this._triggerStorageChanged.bind(this)})
-            .set(-1, {label: 'Loading dictionary'})
-            .set(0, {label: 'Loading dictionary'})
-            .set(1, {label: 'Loading schemas'})
-            .set(2, {label: 'Validating data'})
-            .set(3, {label: 'Formatting data'})
-            .set(4, {label: 'Importing media'})
-            .set(5, {label: 'Importing data', callback: this._triggerStorageChanged.bind(this)});
-        return steps;
+        return [
+            {label: '', callback: this._triggerStorageChanged.bind(this)},
+            {label: 'Loading dictionary'},
+            {label: 'Loading dictionary'},
+            {label: 'Loading schemas'},
+            {label: 'Validating data'},
+            {label: 'Formatting data'},
+            {label: 'Importing media'},
+            {label: 'Importing data', callback: this._triggerStorageChanged.bind(this)},
+        ];
     }
 
     /**
      * @returns {import('dictionary-importer').ImportSteps}
      */
     _getUrlImportSteps() {
-        /** @type {import('dictionary-importer').ImportSteps} */
-        const steps = new Map();
-        steps // typescript has trouble with the type if the map is created in one line
-            .set(-2, {label: '', callback: this._triggerStorageChanged.bind(this)})
-            .set(-1, {label: 'Downloading dictionary'})
-            .set(0, {label: 'Downloading dictionary'})
-            .set(1, {label: 'Loading dictionary'})
-            .set(2, {label: 'Loading schemas'})
-            .set(3, {label: 'Validating data'})
-            .set(4, {label: 'Formatting data'})
-            .set(5, {label: 'Importing media'})
-            .set(6, {label: 'Importing data', callback: this._triggerStorageChanged.bind(this)});
-        return steps;
+        return [
+            {label: '', callback: this._triggerStorageChanged.bind(this)},
+            {label: 'Downloading dictionary'},
+            {label: 'Downloading dictionary'},
+            {label: 'Loading dictionary'},
+            {label: 'Loading schemas'},
+            {label: 'Validating data'},
+            {label: 'Formatting data'},
+            {label: 'Importing media'},
+            {label: 'Importing data', callback: this._triggerStorageChanged.bind(this)},
+        ];
     }
 
     /**
@@ -663,7 +659,7 @@ export class ImportProgressTracker {
         this._dictionaryCount = dictionaryCount;
 
         /** @type {number} */
-        this._stepIndex = Math.min(...steps.keys());
+        this._stepIndex = 0;
         /** @type {number} */
         this._dictionaryIndex = 0;
 
@@ -680,17 +676,17 @@ export class ImportProgressTracker {
 
     /** @type {string} */
     get statusPrefix() {
-        return `Importing dictionary${this._dictionaryCount > 1 ? ` (${this._dictionaryIndex + 1} of ${this._dictionaryCount})` : ''}`;
+        return `Importing dictionary${this._dictionaryCount > 1 ? ` (${this._dictionaryIndex} of ${this._dictionaryCount})` : ''}`;
     }
 
-    /** @type {import('dictionary-importer').ImportStepInfo} */
+    /** @type {import('dictionary-importer').ImportStep} */
     get currentStep() {
-        return this._steps.get(this._stepIndex) ?? {label: ''};
+        return this._steps[this._stepIndex];
     }
 
     /** @type {number} */
-    get lastStep() {
-        return Math.max(...this._steps.keys());
+    get stepCount() {
+        return this._steps.length;
     }
 
     /** @type {import('dictionary-worker').ImportProgressCallback} */
@@ -699,7 +695,7 @@ export class ImportProgressTracker {
         if (nextStep) {
             this._stepIndex++;
         }
-        const labelText = `${this.statusPrefix} - Step ${this._stepIndex + 1} of ${this.lastStep + 1}: ${this.currentStep.label}...`;
+        const labelText = `${this.statusPrefix} - Step ${this._stepIndex + 1} of ${this.stepCount}: ${this.currentStep.label}...`;
         for (const label of this._infoLabels) { label.textContent = labelText; }
 
         const percent = count > 0 ? (index / count * 100) : 0;
@@ -719,7 +715,7 @@ export class ImportProgressTracker {
      */
     onNextDictionary() {
         this._dictionaryIndex += 1;
-        this._stepIndex = Math.min(...this._steps.keys());
+        this._stepIndex = 0;
         this.onProgress({
             nextStep: true,
             index: 0,

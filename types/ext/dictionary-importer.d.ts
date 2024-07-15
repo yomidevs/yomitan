@@ -27,9 +27,9 @@ export type ImportProgressTracker = {
     onProgress: OnProgressCallback;
 };
 
-export type ImportStepInfo = {label: string, callback?: () => void};
+export type ImportStep = {label: string, callback?: () => void};
 
-export type ImportSteps = Map<number, ImportStepInfo>; // negative indexes are not shown in the progress bar
+export type ImportSteps = ImportStep[];
 
 export type ProgressData = {
     index: number;
