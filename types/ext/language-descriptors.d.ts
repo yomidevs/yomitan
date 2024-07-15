@@ -40,7 +40,7 @@ type LanguageDescriptor<
     readingNormalizer?: ReadingNormalizer;
     textPreprocessors?: TTextPreprocessorDescriptor;
     textPostprocessors?: TTextPostprocessorDescriptor;
-    languageTransforms?: LanguageTransformDescriptor;
+    languageTransforms?: LanguageTransformDescriptor<SafeAny>;
 };
 
 type TextProcessorDescriptor = {

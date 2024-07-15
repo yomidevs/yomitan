@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {SafeAny} from 'core.js';
 import type {LanguageTransformDescriptor} from './language-transformer.js';
 
 export type TextProcessorOptions<T = unknown> = T[];
@@ -52,7 +53,7 @@ export type LanguageAndReadingNormalizer = {
 
 export type LanguageAndTransforms = {
     iso: string;
-    languageTransforms: LanguageTransformDescriptor;
+    languageTransforms: LanguageTransformDescriptor<SafeAny>;
 };
 
 export type TextProcessorWithId<T = unknown> = {
