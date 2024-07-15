@@ -23,10 +23,6 @@ import type * as StructuredContent from './structured-content';
 
 export type OnProgressCallback = (data: ProgressData) => void;
 
-export type ImportProgressTracker = {
-    onProgress: OnProgressCallback;
-};
-
 export type ImportStep = {label: string, callback?: () => void};
 
 export type ImportSteps = ImportStep[];
