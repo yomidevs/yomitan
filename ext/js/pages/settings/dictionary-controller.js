@@ -514,6 +514,7 @@ export class DictionaryController {
     async updateDictionariesEnabled() {
         const options = await this._settingsController.getOptions();
         this._updateDictionariesEnabledWarnings(options);
+        this._settingsController.trigger("optionsContextChanged", {})
     }
 
     /**
