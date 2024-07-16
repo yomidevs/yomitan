@@ -147,7 +147,9 @@ class DictionaryEntry {
     _onEnabledChanged(e) {
         const {detail: {value}} = e;
         this._titleContainer.dataset.enabled = `${value}`;
-        void this._dictionaryController.updateDictionariesEnabled();
+        if (value)  {
+            void this._dictionaryController.updateDictionariesEnabled();
+        }
     }
 
     /** */
@@ -514,7 +516,7 @@ export class DictionaryController {
     async updateDictionariesEnabled() {
         const options = await this._settingsController.getOptions();
         this._updateDictionariesEnabledWarnings(options);
-        this._settingsController.trigger("optionsContextChanged", {})
+        this._settingsController.trigger("dictionaryEnabled", {});
     }
 
     /**
