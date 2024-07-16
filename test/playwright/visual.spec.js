@@ -56,7 +56,7 @@ test('visual', async ({page, extensionId}) => {
     await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (2 installed, 2 enabled)', {timeout: 5 * 60 * 1000});
 
     // Delete the jmdict_sweedish dictionary
-    await page.locator('button.dictionary-menu-button').click();
+    await page.locator('button.dictionary-menu-button').nth(1).click();
     await page.locator('button.popup-menu-item[data-menu-action="delete"]').click();
     await page.locator('#dictionaries-modal button[data-modal-action="hide"]').getByText('Close').click();
     await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
