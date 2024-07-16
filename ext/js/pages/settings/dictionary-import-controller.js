@@ -94,7 +94,10 @@ export class DictionaryImportController {
         this._importFileDrop.addEventListener('drop', this._onFileDrop.bind(this), false);
 
         // Welcome page
-        void this._renderRecommendedDictionaries('../../data/recommended-dictionaries.json');
+        const recommendedDictionaryButton = document.querySelector('[data-modal-action="show,recommended-dictionaries"]');
+        if (recommendedDictionaryButton) {
+            recommendedDictionaryButton.addEventListener('click', this._renderRecommendedDictionaries.bind(this), false);
+        }
     }
 
     // Private
@@ -132,10 +135,9 @@ export class DictionaryImportController {
         this._recommendedDictionaryActiveImport = false;
     }
 
-    /**
-     * @param {string} url
-     */
-    async _renderRecommendedDictionaries(url) {
+    /** */
+    async _renderRecommendedDictionaries() {
+        const url = '../../data/recommended-dictionaries.json';
         const response = await fetch(url, {
             method: 'GET',
             mode: 'no-cors',
