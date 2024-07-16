@@ -162,6 +162,13 @@ export class DictionaryImportController {
         /** @type {import('dictionary-recommended.js').RecommendedDictionaries} */
         const recommendedDictionaries = (await readResponseJson(response));
 
+        if (!(language in recommendedDictionaries)) {
+            for (const {element} of recommendedDictionaryCategories) {
+                element.hidden = true;
+            }
+            return;
+        }
+
         for (const {property, element} of recommendedDictionaryCategories) {
             this._renderRecommendedDictionaryGroup(recommendedDictionaries[language][property], element);
         }
