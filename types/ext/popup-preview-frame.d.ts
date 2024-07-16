@@ -55,6 +55,10 @@ export type ApiSurface = {
         };
         return: void;
     };
+    updateSearch: {
+        params: Record<string, never>;
+        return: void;
+    };
 };
 
 export type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;

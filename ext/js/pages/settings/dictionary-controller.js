@@ -692,6 +692,9 @@ export class DictionaryController {
         }
 
         const hasEnabledDictionary = (enabledDictionaryCountValid > 0);
+        if (hasEnabledDictionary) {
+            this._settingsController.trigger('dictionaryEnabled', {});
+        }
         for (const node of /** @type {NodeListOf<HTMLElement>} */ (this._noDictionariesEnabledWarnings)) {
             node.hidden = hasEnabledDictionary;
         }
