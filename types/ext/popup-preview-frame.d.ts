@@ -55,7 +55,7 @@ export type ApiSurface = {
         };
         return: void;
     };
-    updateSearch:{
+    updateSearch: {
         params: Record<string, never>;
         return: void;
     };

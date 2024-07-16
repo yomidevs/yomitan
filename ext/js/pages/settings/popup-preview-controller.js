@@ -89,8 +89,8 @@ export class PopupPreviewController {
 
     /** */
     _onDictionaryEnabled() {
-        this._invoke('updateSearch', {})
-    };
+        this._invoke('updateSearch', {});
+    }
 
     /**
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
