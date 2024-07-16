@@ -147,9 +147,7 @@ class DictionaryEntry {
     _onEnabledChanged(e) {
         const {detail: {value}} = e;
         this._titleContainer.dataset.enabled = `${value}`;
-        if (value)  {
-            void this._dictionaryController.updateDictionariesEnabled();
-        }
+        void this._dictionaryController.updateDictionariesEnabled();
     }
 
     /** */
@@ -516,7 +514,6 @@ export class DictionaryController {
     async updateDictionariesEnabled() {
         const options = await this._settingsController.getOptions();
         this._updateDictionariesEnabledWarnings(options);
-        this._settingsController.trigger("dictionaryEnabled", {});
     }
 
     /**
@@ -695,6 +692,9 @@ export class DictionaryController {
         }
 
         const hasEnabledDictionary = (enabledDictionaryCountValid > 0);
+        if (hasEnabledDictionary) {
+            this._settingsController.trigger("dictionaryEnabled", {});
+        }
         for (const node of /** @type {NodeListOf<HTMLElement>} */ (this._noDictionariesEnabledWarnings)) {
             node.hidden = hasEnabledDictionary;
         }
