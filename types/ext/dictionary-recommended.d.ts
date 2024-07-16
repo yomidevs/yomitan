@@ -35,3 +35,8 @@ export type RecommendedDictionariesTest = {
     type: 'recommendedDictionaries';
     recommendedDictionaries: RecommendedDictionaries;
 };
+
+export type RecommendedDictionaryElementMap = {
+    property: 'terms' | 'kanji' | 'frequency' | 'grammar';
+    element: HTMLElement;
+};

@@ -150,14 +150,21 @@ export class DictionaryImportController {
             throw new Error(`Failed to fetch ${url}: ${response.status}`);
         }
 
+        /** @type {import('dictionary-recommended.js').RecommendedDictionaryElementMap[]} */
+        const recommendedDictionaryCategories = [
+            {property: 'terms', element: querySelectorNotNull(document, '#recommended-term-dictionaries')},
+            {property: 'kanji', element: querySelectorNotNull(document, '#recommended-kanji-dictionaries')},
+            {property: 'frequency', element: querySelectorNotNull(document, '#recommended-frequency-dictionaries')},
+            {property: 'grammar', element: querySelectorNotNull(document, '#recommended-grammar-dictionaries')},
+        ];
+
         const language = (await this._settingsController.getOptions()).general.language;
         /** @type {import('dictionary-recommended.js').RecommendedDictionaries} */
         const recommendedDictionaries = (await readResponseJson(response));
 
-        this._renderRecommendedDictionaryGroup(recommendedDictionaries[language].terms, document.querySelector('#recommended-term-dictionaries'));
-        this._renderRecommendedDictionaryGroup(recommendedDictionaries[language].kanji, document.querySelector('#recommended-kanji-dictionaries'));
-        this._renderRecommendedDictionaryGroup(recommendedDictionaries[language].frequency, document.querySelector('#recommended-frequency-dictionaries'));
-        this._renderRecommendedDictionaryGroup(recommendedDictionaries[language].grammar, document.querySelector('#recommended-grammar-dictionaries'));
+        for (const {property, element} of recommendedDictionaryCategories) {
+            this._renderRecommendedDictionaryGroup(recommendedDictionaries[language][property], element);
+        }
 
         /** @type {NodeListOf<HTMLElement>} */
         const buttons = document.querySelectorAll('.action-button[data-action=import-recommended-dictionary]');
