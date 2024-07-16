@@ -55,7 +55,7 @@ test('visual', async ({page, extensionId}) => {
     await page.locator('button[id="dictionary-import-url-button"]').click();
     await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (2 installed, 2 enabled)', {timeout: 5 * 60 * 1000});
 
-    // Delete the jmdict_sweedish dictionary
+    // Delete the jmdict_swedish dictionary
     await page.locator('button.dictionary-menu-button').nth(1).click();
     await page.locator('button.popup-menu-item[data-menu-action="delete"]').click();
     await page.locator('#dictionary-confirm-delete-button').click();
