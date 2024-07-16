@@ -50,9 +50,11 @@ test('visual', async ({page, extensionId}) => {
 
     await page.locator('.settings-item[data-modal-action="show,dictionaries"]').click();
     await page.locator('button[id="dictionary-import-button"]').click();
-    await page.locator('textarea[id="dictionary-import-url-text"]').fill('https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_german.zip');
+    await page.locator('textarea[id="dictionary-import-url-text"]').fill('https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_swedish.zip');
     await page.locator('button[id="dictionary-import-url-button"]').click();
     await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (2 installed, 2 enabled)', {timeout: 5 * 60 * 1000});
+    await page.locator('#dictionary-import-modal button[data-modal-action="hide"]').click();
+    await page.locator('#dictionaries-modal button[data-modal-action="hide"]').click();
 
     // Get page height by getting the footer and adding height and y position as other methods of calculation don't work for some reason
     const footer = /** @type {import('@playwright/test').ElementHandle<HTMLElement>} */ (await page.locator('.footer-padding').elementHandle());
