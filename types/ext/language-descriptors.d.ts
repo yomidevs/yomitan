@@ -62,6 +62,10 @@ type CapitalizationPreprocessors = {
     decapitalize: TextProcessor<boolean>;
 };
 
+type AlphabeticDiacriticsProcessor = {
+    removeAlphabeticDiacritics: TextProcessor<boolean>;
+};
+
 /**
  * This is a mapping of the iso tag to all of the text processors for that language.
  * Any new language should be added to this object.
@@ -98,9 +102,7 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     grc: {
-        pre: CapitalizationPreprocessors & {
-            removeAlphabeticDiacritics: TextProcessor<boolean>;
-        };
+        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
     hu: {
         pre: CapitalizationPreprocessors;
@@ -109,12 +111,10 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     it: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
     la: {
-        pre: CapitalizationPreprocessors & {
-            removeAlphabeticDiacritics: TextProcessor<boolean>;
-        };
+        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
     lo: Record<string, never>;
     ja: {
@@ -149,9 +149,7 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     ro: {
-        pre: CapitalizationPreprocessors & {
-            removeAlphabeticDiacritics: TextProcessor<boolean>;
-        };
+        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
     ru: {
         pre: CapitalizationPreprocessors & {
@@ -160,9 +158,7 @@ type AllTextProcessors = {
         };
     };
     sga: {
-        pre: CapitalizationPreprocessors & {
-            removeAlphabeticDiacritics: TextProcessor<boolean>;
-        };
+        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
     sh: {
         pre: CapitalizationPreprocessors & {
@@ -177,9 +173,7 @@ type AllTextProcessors = {
     };
     th: Record<string, never>;
     tl: {
-        pre: CapitalizationPreprocessors & {
-            removeAlphabeticDiacritics: TextProcessor<boolean>;
-        };
+        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
     tr: {
         pre: CapitalizationPreprocessors;

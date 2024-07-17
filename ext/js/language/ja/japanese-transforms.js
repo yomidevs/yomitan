@@ -24,134 +24,136 @@ const shimauEnglishDescription = '1. Shows a sense of regret/surprise when you d
 const passiveEnglishDescription = '1. Indicates an action received from an action performer.\n' +
 '2. Expresses respect for the subject of action performer.\n';
 
-/** @type {import('language-transformer').LanguageTransformDescriptor} */
+const conditions = {
+    'v': {
+        name: 'Verb',
+        i18n: [
+            {
+                language: 'ja',
+                name: '動詞',
+            },
+        ],
+        isDictionaryForm: false,
+        subConditions: ['v1', 'v5', 'vk', 'vs', 'vz'],
+    },
+    'v1': {
+        name: 'Ichidan verb',
+        i18n: [
+            {
+                language: 'ja',
+                name: '一段動詞',
+            },
+        ],
+        isDictionaryForm: true,
+        subConditions: ['v1d', 'v1p'],
+    },
+    'v1d': {
+        name: 'Ichidan verb, dictionary form',
+        i18n: [
+            {
+                language: 'ja',
+                name: '一段動詞、辞書形',
+            },
+        ],
+        isDictionaryForm: false,
+    },
+    'v1p': {
+        name: 'Ichidan verb, progressive or perfect form',
+        i18n: [
+            {
+                language: 'ja',
+                name: '一段動詞、進行形または完了形',
+            },
+        ],
+        isDictionaryForm: false,
+    },
+    'v5': {
+        name: 'Godan verb',
+        i18n: [
+            {
+                language: 'ja',
+                name: '五段動詞',
+            },
+        ],
+        isDictionaryForm: true,
+        subConditions: ['v5d', 'v5m'],
+    },
+    'v5d': {
+        name: 'Godan verb, dictionary form',
+        i18n: [
+            {
+                language: 'ja',
+                name: '五段動詞、辞書形',
+            },
+        ],
+        isDictionaryForm: false,
+    },
+    'v5m': {
+        name: 'Godan verb, polite (masu) form',
+        isDictionaryForm: false,
+    },
+    'vk': {
+        name: 'Kuru verb',
+        i18n: [
+            {
+                language: 'ja',
+                name: '来る動詞',
+            },
+        ],
+        isDictionaryForm: true,
+    },
+    'vs': {
+        name: 'Suru verb',
+        i18n: [
+            {
+                language: 'ja',
+                name: 'する動詞',
+            },
+        ],
+        isDictionaryForm: true,
+    },
+    'vz': {
+        name: 'Zuru verb',
+        i18n: [
+            {
+                language: 'ja',
+                name: 'ずる動詞',
+            },
+        ],
+        isDictionaryForm: true,
+    },
+    'adj-i': {
+        name: 'Adjective with i ending',
+        i18n: [
+            {
+                language: 'ja',
+                name: '形容詞',
+            },
+        ],
+        isDictionaryForm: true,
+    },
+    '-te': {
+        name: 'Intermediate -te endings for progressive or perfect tense',
+        isDictionaryForm: false,
+    },
+    '-ba': {
+        name: 'Intermediate -ba endings for conditional contraction',
+        isDictionaryForm: false,
+    },
+    'adv': {
+        name: 'Intermediate -ku endings for adverbs',
+        isDictionaryForm: false,
+    },
+    'past': {
+        name: '-ta past form ending',
+        isDictionaryForm: false,
+    },
+};
+
+/** @type {import('language-transformer').LanguageTransformDescriptor<keyof typeof conditions>} */
 export const japaneseTransforms = {
     language: 'ja',
-    conditions: {
-        'v': {
-            name: 'Verb',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '動詞',
-                },
-            ],
-            isDictionaryForm: false,
-            subConditions: ['v1', 'v5', 'vk', 'vs', 'vz'],
-        },
-        'v1': {
-            name: 'Ichidan verb',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '一段動詞',
-                },
-            ],
-            isDictionaryForm: true,
-            subConditions: ['v1d', 'v1p'],
-        },
-        'v1d': {
-            name: 'Ichidan verb, dictionary form',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '一段動詞、辞書形',
-                },
-            ],
-            isDictionaryForm: false,
-        },
-        'v1p': {
-            name: 'Ichidan verb, progressive or perfect form',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '一段動詞、進行形または完了形',
-                },
-            ],
-            isDictionaryForm: false,
-        },
-        'v5': {
-            name: 'Godan verb',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '五段動詞',
-                },
-            ],
-            isDictionaryForm: true,
-            subConditions: ['v5d', 'v5m'],
-        },
-        'v5d': {
-            name: 'Godan verb, dictionary form',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '五段動詞、辞書形',
-                },
-            ],
-            isDictionaryForm: false,
-        },
-        'v5m': {
-            name: 'Godan verb, polite (masu) form',
-            isDictionaryForm: false,
-        },
-        'vk': {
-            name: 'Kuru verb',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '来る動詞',
-                },
-            ],
-            isDictionaryForm: true,
-        },
-        'vs': {
-            name: 'Suru verb',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: 'する動詞',
-                },
-            ],
-            isDictionaryForm: true,
-        },
-        'vz': {
-            name: 'Zuru verb',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: 'ずる動詞',
-                },
-            ],
-            isDictionaryForm: true,
-        },
-        'adj-i': {
-            name: 'Adjective with i ending',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '形容詞',
-                },
-            ],
-            isDictionaryForm: true,
-        },
-        '-te': {
-            name: 'Intermediate -te endings for progressive or perfect tense',
-            isDictionaryForm: false,
-        },
-        '-ba': {
-            name: 'Intermediate -ba endings for conditional contraction',
-            isDictionaryForm: false,
-        },
-        'adv': {
-            name: 'Intermediate -ku endings for adverbs',
-            isDictionaryForm: false,
-        },
-        'past': {
-            name: '-ta past form ending',
-            isDictionaryForm: false,
-        },
-    },
+    conditions,
     transforms: {
         '-ba': {
             name: '-ba',

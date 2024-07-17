@@ -258,7 +258,7 @@ function createProfileOptionsUpdatedTestData1() {
             resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,
-            fontFamily: 'sans-serif',
+            fontFamily: '',
             fontSize: 14,
             lineHeight: '1.5',
             showAdvanced: false,
@@ -636,7 +636,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 45,
+        version: 46,
         global: {
             database: {
                 prefixWildcardsSupported: false,

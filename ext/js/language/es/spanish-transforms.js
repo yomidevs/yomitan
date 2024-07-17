@@ -34,45 +34,47 @@ function addAccent(char) {
     return ACCENTS.get(char) || char;
 }
 
-/** @type {import('language-transformer').LanguageTransformDescriptor} */
+const conditions = {
+    n: {
+        name: 'Noun',
+        isDictionaryForm: true,
+        subConditions: ['ns', 'np'],
+    },
+    np: {
+        name: 'Noun plural',
+        isDictionaryForm: false,
+    },
+    ns: {
+        name: 'Noun singular',
+        isDictionaryForm: false,
+    },
+    v: {
+        name: 'Verb',
+        isDictionaryForm: true,
+        subConditions: ['v_ar', 'v_er', 'v_ir'],
+    },
+    v_ar: {
+        name: '-ar verb',
+        isDictionaryForm: false,
+    },
+    v_er: {
+        name: '-er verb',
+        isDictionaryForm: false,
+    },
+    v_ir: {
+        name: '-ir verb',
+        isDictionaryForm: false,
+    },
+    adj: {
+        name: 'Adjective',
+        isDictionaryForm: true,
+    },
+};
+
+/** @type {import('language-transformer').LanguageTransformDescriptor<keyof typeof conditions>} */
 export const spanishTransforms = {
     language: 'es',
-    conditions: {
-        n: {
-            name: 'Noun',
-            isDictionaryForm: true,
-            subConditions: ['ns', 'np'],
-        },
-        np: {
-            name: 'Noun plural',
-            isDictionaryForm: false,
-        },
-        ns: {
-            name: 'Noun singular',
-            isDictionaryForm: false,
-        },
-        v: {
-            name: 'Verb',
-            isDictionaryForm: true,
-            subConditions: ['v_ar', 'v_er', 'v_ir'],
-        },
-        v_ar: {
-            name: '-ar verb',
-            isDictionaryForm: false,
-        },
-        v_er: {
-            name: '-er verb',
-            isDictionaryForm: false,
-        },
-        v_ir: {
-            name: '-ir verb',
-            isDictionaryForm: false,
-        },
-        adj: {
-            name: 'Adjective',
-            isDictionaryForm: true,
-        },
-    },
+    conditions,
     transforms: {
         'plural': {
             name: 'plural',

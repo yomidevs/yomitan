@@ -17,89 +17,91 @@
 
 import {suffixInflection} from '../language-transforms.js';
 
-/** @type {import('language-transformer').LanguageTransformDescriptor} */
+const conditions = {
+    v: {
+        name: 'Verb or Auxiliary Verb',
+        isDictionaryForm: true,
+        i18n: [
+            {
+                language: 'ko',
+                name: '동사 / 보조 동사',
+            },
+        ],
+    },
+    adj: {
+        name: 'Adjective or Auxiliary Adjective',
+        isDictionaryForm: true,
+        i18n: [
+            {
+                language: 'ko',
+                name: '형용사 / 보조 형용사',
+            },
+        ],
+    },
+    ida: {
+        name: 'Postpositional particle ida',
+        isDictionaryForm: true,
+        i18n: [
+            {
+                language: 'ko',
+                name: '조사 이다',
+            },
+        ],
+    },
+    p: {
+        name: 'Intermediate past tense ending',
+        isDictionaryForm: false,
+    },
+    f: {
+        name: 'Intermediate future tense ending',
+        isDictionaryForm: false,
+    },
+    eusi: {
+        name: 'Intermediate formal ending',
+        isDictionaryForm: false,
+    },
+    euob: {
+        name: 'Intermediate formal ending',
+        isDictionaryForm: false,
+    },
+    euo: {
+        name: 'Intermediate formal ending',
+        isDictionaryForm: false,
+    },
+    sao: {
+        name: 'Intermediate formal ending',
+        isDictionaryForm: false,
+    },
+    saob: {
+        name: 'Intermediate formal ending',
+        isDictionaryForm: false,
+    },
+    sab: {
+        name: 'Intermediate formal ending',
+        isDictionaryForm: false,
+    },
+    jaob: {
+        name: 'Intermediate formal ending',
+        isDictionaryForm: false,
+    },
+    jao: {
+        name: 'Intermediate formal ending',
+        isDictionaryForm: false,
+    },
+    jab: {
+        name: 'Intermediate formal ending',
+        isDictionaryForm: false,
+    },
+    do: {
+        name: 'Intermediate ending',
+        isDictionaryForm: false,
+    },
+};
+
+/** @type {import('language-transformer').LanguageTransformDescriptor<keyof typeof conditions>} */
 export const koreanTransforms = {
     language: 'ko',
-    conditions: {
-        v: {
-            name: 'Verb or Auxiliary Verb',
-            isDictionaryForm: true,
-            i18n: [
-                {
-                    language: 'ko',
-                    name: '동사 / 보조 동사',
-                },
-            ],
-        },
-        adj: {
-            name: 'Adjective or Auxiliary Adjective',
-            isDictionaryForm: true,
-            i18n: [
-                {
-                    language: 'ko',
-                    name: '형용사 / 보조 형용사',
-                },
-            ],
-        },
-        ida: {
-            name: 'Postpositional particle ida',
-            isDictionaryForm: true,
-            i18n: [
-                {
-                    language: 'ko',
-                    name: '조사 이다',
-                },
-            ],
-        },
-        p: {
-            name: 'Intermediate past tense ending',
-            isDictionaryForm: false,
-        },
-        f: {
-            name: 'Intermediate future tense ending',
-            isDictionaryForm: false,
-        },
-        eusi: {
-            name: 'Intermediate formal ending',
-            isDictionaryForm: false,
-        },
-        euob: {
-            name: 'Intermediate formal ending',
-            isDictionaryForm: false,
-        },
-        euo: {
-            name: 'Intermediate formal ending',
-            isDictionaryForm: false,
-        },
-        sao: {
-            name: 'Intermediate formal ending',
-            isDictionaryForm: false,
-        },
-        saob: {
-            name: 'Intermediate formal ending',
-            isDictionaryForm: false,
-        },
-        sab: {
-            name: 'Intermediate formal ending',
-            isDictionaryForm: false,
-        },
-        jaob: {
-            name: 'Intermediate formal ending',
-            isDictionaryForm: false,
-        },
-        jao: {
-            name: 'Intermediate formal ending',
-            isDictionaryForm: false,
-        },
-        jab: {
-            name: 'Intermediate formal ending',
-            isDictionaryForm: false,
-        },
-        do: {
-            name: 'Intermediate ending',
-            isDictionaryForm: false,
-        },
-    },
+    conditions,
     transforms: {
         '어간': {
             name: '어간',
