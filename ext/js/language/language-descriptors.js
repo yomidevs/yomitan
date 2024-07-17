@@ -143,7 +143,10 @@ const languageDescriptors = [
         iso639_3: 'ita',
         name: 'Italian',
         exampleText: 'leggere',
-        textPreprocessors: capitalizationPreprocessors,
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics,
+        },
     },
     {
         iso: 'la',
