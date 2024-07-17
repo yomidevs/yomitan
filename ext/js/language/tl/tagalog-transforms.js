@@ -687,8 +687,7 @@ export const tagalogTransforms = {
         'naka- + rep1': {
             name: 'naka- + rep1',
             rules: [
-                prefixInflectionWithRep1('nakaka', '', [], ['n', 'adj']),
-                prefixInflectionWithRep1('nakakar', 'd', [], ['n', 'adj']),
+                prefixInflectionWithRep1('naka', '', [], ['n', 'adj']),
             ],
         },
         'nakapang- + rep1': {

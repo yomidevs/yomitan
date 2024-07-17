@@ -30,6 +30,8 @@ const tests = [
             {term: 'isip', source: 'kaiisip', rule: 'n', reasons: ['kaka-']},
             {term: 'gamot', source: 'manggagamot', rule: 'n', reasons: ['mang- + rep1']},
             {term: 'pareho', source: 'kapareho', rule: 'adj', reasons: ['ka-']},
+            {term: 'hina', source: 'nakapanghihina', rule: 'n', reasons: ['nakapang- + rep1']},
+            {term: 'tulong', source: 'nakatutulong', rule: 'n', reasons: ['naka- + rep1']},
         ],
     },
     {
