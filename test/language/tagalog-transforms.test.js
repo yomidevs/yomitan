@@ -46,6 +46,7 @@ const tests = [
         valid: true,
         tests: [
             {term: 'kain', source: 'kainin', rule: 'n', reasons: ['-in']},
+            {term: 'ako', source: 'akong', rule: 'n', reasons: ['-ng']},
         ],
     },
 ];

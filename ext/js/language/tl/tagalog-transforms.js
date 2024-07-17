@@ -705,5 +705,11 @@ export const tagalogTransforms = {
                 prefixInflection('palar', 'd', [], ['n', 'adj']),
             ],
         },
+        '-ng': {
+            name: 'ng',
+            rules: [
+                suffixInflection('ng', '', [], []),
+            ],
+        },
     },
 };
