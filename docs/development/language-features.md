@@ -370,6 +370,8 @@ The passed type value should be the union type of all conditions in our transfor
 // english-transforms.js
 import { suffixInflection } from "../language-transforms.js";
 
+/** @typedef {keyof typeof conditions} Condition */
+
 const conditions = {
   n: {
     name: "Noun",
