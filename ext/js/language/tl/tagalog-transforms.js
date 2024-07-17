@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {prefixInflection, suffixInflection} from '../language-transforms.js';
+import {prefixInflection, suffixInflection, wholeWordInflection} from '../language-transforms.js';
 
 const CONSONANTS = 'bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ';
 const VOWELS = 'aeiou';
@@ -359,6 +359,8 @@ export const tagalogTransforms = {
             name: 'ika-',
             rules: [
                 prefixInflection('ika', '', [], ['n']),
+                wholeWordInflection('ikalawa', 'dalawa', [], ['num']),
+                wholeWordInflection('ikatlo', 'tatlo', [], ['num']),
             ],
         },
         'ipa-': {
@@ -680,6 +682,21 @@ export const tagalogTransforms = {
                 prefixInflection('nakakapang', '', [], ['n', 'adj']),
                 ...[...'dlrst'].map((v) => prefixInflection(`nakakapan${v}`, `${v}`, [], ['n', 'adj'])),
                 ...[...'bp'].map((v) => prefixInflection(`nakakapam${v}`, `${v}`, [], ['n', 'adj'])),
+            ],
+        },
+        'naka- + rep1': {
+            name: 'naka- + rep1',
+            rules: [
+                prefixInflectionWithRep1('nakaka', '', [], ['n', 'adj']),
+                prefixInflectionWithRep1('nakakar', 'd', [], ['n', 'adj']),
+            ],
+        },
+        'nakapang- + rep1': {
+            name: 'nakapang- + rep1',
+            rules: [
+                prefixInflectionWithRep1('nakapang', '', [], ['n', 'adj']),
+                prefixInflectionWithRep1('nakapan', '', [], ['n', 'adj'], 'dlrst'),
+                prefixInflectionWithRep1('nakapam', '', [], ['n', 'adj'], 'bp'),
             ],
         },
         'pala-': {
