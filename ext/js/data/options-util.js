@@ -293,7 +293,7 @@ export class OptionsUtil {
                 resultOutputMode: 'group',
                 debugInfo: false,
                 maxResults: 32,
-                fontFamily: 'sans-serif',
+                fontFamily: '',
                 fontSize: 14,
                 lineHeight: '1.5',
                 showAdvanced: false,
@@ -557,6 +557,7 @@ export class OptionsUtil {
             this._updateVersion43,
             this._updateVersion44,
             this._updateVersion45,
+            this._updateVersion46,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1406,6 +1407,18 @@ export class OptionsUtil {
             const kanjiFields = profile.options.anki.kanji.fields;
             for (const key of Object.keys(kanjiFields)) {
                 kanjiFields[key] = kanjiFields[key].replace(oldMarkerRegex, newMarker);
+            }
+        }
+    }
+
+    /**
+     * - Set default font to empty
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion46(options) {
+        for (const profile of options.profiles) {
+            if (profile.options.general.fontFamily === 'sans-serif') {
+                profile.options.general.fontFamily = '';
             }
         }
     }
