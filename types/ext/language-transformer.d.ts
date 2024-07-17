@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type LanguageTransformDescriptor<TCondition extends string> = {
+export type LanguageTransformDescriptor<TCondition extends string = string> = {
     language: string;
     conditions: ConditionMapObject<TCondition>;
     transforms: TransformMapObject<TCondition>;
@@ -58,7 +58,7 @@ export type TransformI18n = {
     description?: string;
 };
 
-export type Rule<TCondition> = {
+export type Rule<TCondition = string> = {
     type: 'suffix' | 'prefix' | 'wholeWord' | 'other';
     isInflected: RegExp;
     deinflect: (inflectedWord: string) => string;
@@ -66,7 +66,7 @@ export type Rule<TCondition> = {
     conditionsOut: TCondition[];
 };
 
-export type SuffixRule<TCondition> = {
+export type SuffixRule<TCondition = string> = {
     type: 'suffix';
     isInflected: RegExp;
     deinflected: string;

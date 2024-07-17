@@ -52,7 +52,7 @@ export type LanguageAndReadingNormalizer = {
 
 export type LanguageAndTransforms = {
     iso: string;
-    languageTransforms: LanguageTransformDescriptor<string>;
+    languageTransforms: LanguageTransformDescriptor;
 };
 
 export type TextProcessorWithId<T = unknown> = {

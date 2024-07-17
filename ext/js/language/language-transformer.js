@@ -40,7 +40,7 @@ export class LanguageTransformer {
     /**
      * Note: this function does not currently combine properly with previous descriptors,
      * they are treated as completely separate collections. This should eventually be changed.
-     * @param {import('language-transformer').LanguageTransformDescriptor<string>} descriptor
+     * @param {import('language-transformer').LanguageTransformDescriptor} descriptor
      * @throws {Error}
      */
     addDescriptor(descriptor) {

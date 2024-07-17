@@ -76,12 +76,12 @@ class DeinflectionNode {
 class RuleNode {
     /**
      * @param {string} groupName
-     * @param {import('language-transformer').SuffixRule<string>} rule
+     * @param {import('language-transformer').SuffixRule} rule
      */
     constructor(groupName, rule) {
         /** @type {string} */
         this.groupName = groupName;
-        /** @type {import('language-transformer').SuffixRule<string>} */
+        /** @type {import('language-transformer').SuffixRule} */
         this.rule = rule;
     }
 }
@@ -112,7 +112,7 @@ describe.each(languagesWithTransforms)('Cycles Test $iso', ({languageTransforms}
         for (const [groupName, reasonInfo] of Object.entries(languageTransforms.transforms)) {
             for (const rule of reasonInfo.rules) {
                 if (rule.type === 'suffix') {
-                    ruleNodes.push(new RuleNode(groupName, /** @type {import('language-transformer').SuffixRule<string>}*/ (rule)));
+                    ruleNodes.push(new RuleNode(groupName, /** @type {import('language-transformer').SuffixRule}*/ (rule)));
                 }
             }
         }
