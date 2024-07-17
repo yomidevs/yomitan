@@ -139,18 +139,26 @@ Transforms files should export a `LanguageTransformDescriptor`, which is then im
 
 ```js
 // from language-transformer.d.ts
-export type LanguageTransformDescriptor = {
+export type LanguageTransformDescriptor<TCondition extends string = string> = {
     language: string;
-    conditions: ConditionMapObject;
-    transforms: {
-        [name: string]: Transform;
-    };
+    conditions: ConditionMapObject<TCondition>;
+    transforms: TransformMapObject<TCondition>;
 };
+
+export type ConditionMapObject<TCondition extends string> = {
+    [type in TCondition]: Condition;
+};
+
+export type TransformMapObject<TCondition> = {
+    [name: string]: Transform<TCondition>;
+};
+
 ```
 
 - `language` is the ISO code of the language
 - `conditions` are an object containing parts of speech and grammatical forms that are used to check which deinflections make sense. They are referenced by the deinflection rules.
 - `transforms` are the actual deinflection rules
+- `TCondition` is an optional generic parameter that can be passed to `LanguageTransformDescriptor`. You can learn more about it at the end of this section.
 
 Let's try and write a bit of deinflection for English, from scratch.
 
@@ -319,6 +327,78 @@ Now, we may want to verify that `boss` really does not deinflect to `bo`. You ca
 Here, by setting `valid` to `false`, we are telling the test function to fail this test case if only `boss` deinflects to `bo` with the `ns` condition under a double `plural` rule.
 
 You can also optionally pass a `preprocess` helper function to `testLanguageTransformer`. Refer to the language transforms test files for its specific use case.
+
+#### Opting in autocompletion
+
+If you want additional type-checking and autocompletion when writing your deinflection rules, you can add them with just a few extra lines of code. Due to the limitations of TypeScript and JSDoc annotations, we will have to perform some type magic in our transformations file, but you don't need to understand what they mean in detail.
+
+Your `english-transforms.js` file should look like this:
+
+```js
+// english-transforms.js
+import { suffixInflection } from "../language-transforms.js";
+
+/** @type {import('language-transformer').LanguageTransformDescriptor} */
+export const englishTransforms = {
+  language: "en",
+  conditions: {
+    n: {
+      name: "Noun",
+      isDictionaryForm: true,
+      subConditions: ["np", "ns"],
+    },
+    np: {
+      name: "Noun plural",
+      isDictionaryForm: true,
+    },
+    ns: {
+      name: "Noun singular",
+      isDictionaryForm: true,
+    },
+  },
+  transforms: {
+    // omitted
+  },
+};
+```
+
+To gain type-safety, we have to pass an additional `TCondition` type parameter to `LanguageTransformDescriptor`. (You can revisit its definition [at the top of this section](#deinflection-rules-aka-language-transforms))
+
+The passed type value should be the union type of all conditions in our transforms. To find this value, we first need to move the `conditions` object outside of `englishTransforms` and extract its type by adding a `/** @typedef {keyof typeof conditions} Condition */` comment at the start of the file. Then, you just need to pass it to the `LanguageTransformDescriptor` type declaration like so:
+
+```js
+// english-transforms.js
+import { suffixInflection } from "../language-transforms.js";
+
+/** @typedef {keyof typeof conditions} Condition */
+
+const conditions = {
+  n: {
+    name: "Noun",
+    isDictionaryForm: true,
+    subConditions: ["np", "ns"],
+  },
+  np: {
+    name: "Noun plural",
+    isDictionaryForm: true,
+  },
+  ns: {
+    name: "Noun singular",
+    isDictionaryForm: true,
+  },
+};
+
+/** @type {import('language-transformer').LanguageTransformDescriptor<Condition>} */
+export const englishTransforms = {
+  language: "en",
+  conditions,
+  transforms: {
+    // omitted
+  },
+};
+```
+
+Now you should be able to check for types whenever writing a deinflection rule.
 
 ### Text Postprocessors
 
