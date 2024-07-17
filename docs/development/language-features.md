@@ -396,9 +396,9 @@ export const englishTransforms = {
     // omitted
   },
 };
+```
 
 Now you should be able to check for types whenever writing a deinflection rule.
-```
 
 ### Text Postprocessors
 
