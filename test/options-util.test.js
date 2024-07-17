@@ -258,7 +258,7 @@ function createProfileOptionsUpdatedTestData1() {
             resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,
-            fontFamily: 'sans-serif',
+            fontFamily: '',
             fontSize: 14,
             lineHeight: '1.5',
             showAdvanced: false,
