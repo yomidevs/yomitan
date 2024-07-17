@@ -293,7 +293,7 @@ export class OptionsUtil {
                 resultOutputMode: 'group',
                 debugInfo: false,
                 maxResults: 32,
-                fontFamily: 'sans-serif',
+                fontFamily: '',
                 fontSize: 14,
                 lineHeight: '1.5',
                 showAdvanced: false,
@@ -1384,7 +1384,7 @@ export class OptionsUtil {
      */
     async _updateVersion44(options) {
         for (const profile of options.profiles) {
-            profile.options.general.fontFamily = 'sans-serif';
+            profile.options.general.fontFamily = '';
             profile.options.general.fontSize = 14;
             profile.options.general.lineHeight = '1.5';
         }
