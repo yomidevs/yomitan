@@ -294,10 +294,6 @@ export class DictionaryImportController {
                     }
                 };
 
-                xhr.onerror = () => {
-                    log.error(`Error fetching URL: ${url}`);
-                };
-
                 /** @type {Promise<File>} */
                 const blobPromise = new Promise((resolve, reject) => {
                     xhr.onload = () => {
@@ -310,6 +306,10 @@ export class DictionaryImportController {
                         } else {
                             reject(new Error(`Failed to fetch the URL: ${url}`));
                         }
+                    };
+
+                    xhr.onerror = () => {
+                        reject(new Error(`Error fetching URL: ${url}`));
                     };
                 });
 
@@ -411,14 +411,14 @@ export class DictionaryImportController {
      */
     _getFileImportSteps() {
         return [
-            {label: '', callback: this._triggerStorageChanged.bind(this)},
-            {label: 'Loading dictionary'},
-            {label: 'Loading dictionary'},
-            {label: 'Loading schemas'},
-            {label: 'Validating data'},
-            {label: 'Formatting data'},
-            {label: 'Importing media'},
-            {label: 'Importing data', callback: this._triggerStorageChanged.bind(this)},
+            {label: '', callback: this._triggerStorageChanged.bind(this)}, // Dictionary import is uninitialized
+            {label: 'Initializing import'}, // Dictionary import is uninitialized
+            {label: 'Loading dictionary'}, // Load dictionary archive and validate index
+            {label: 'Loading schemas'}, // Load schemas and get archive files
+            {label: 'Validating data'}, // Load and validate dictionary data
+            {label: 'Formatting data'}, // Format dictionary data and extended data support
+            {label: 'Importing media'}, // Resolve async requirements and import media
+            {label: 'Importing data', callback: this._triggerStorageChanged.bind(this)}, // Add dictionary descriptor and import data
         ];
     }
 
@@ -426,17 +426,9 @@ export class DictionaryImportController {
      * @returns {import('dictionary-importer').ImportSteps}
      */
     _getUrlImportSteps() {
-        return [
-            {label: '', callback: this._triggerStorageChanged.bind(this)},
-            {label: 'Downloading dictionary'},
-            {label: 'Downloading dictionary'},
-            {label: 'Loading dictionary'},
-            {label: 'Loading schemas'},
-            {label: 'Validating data'},
-            {label: 'Formatting data'},
-            {label: 'Importing media'},
-            {label: 'Importing data', callback: this._triggerStorageChanged.bind(this)},
-        ];
+        const urlImportSteps = this._getFileImportSteps();
+        urlImportSteps.splice(2, 0, {label: 'Downloading dictionary'});
+        return urlImportSteps;
     }
 
     /**
