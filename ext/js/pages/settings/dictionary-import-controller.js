@@ -147,7 +147,6 @@ export class DictionaryImportController {
         const importProgressTracker = new ImportProgressTracker(this._getFileImportSteps(), fileArray.length);
         void this._importDictionaries(
             this._arrayToAsyncGenerator(fileArray),
-            fileArray.length,
             importProgressTracker,
         );
     }
@@ -253,7 +252,6 @@ export class DictionaryImportController {
         node.value = '';
         void this._importDictionaries(
             this._arrayToAsyncGenerator(files2),
-            files2.length,
             new ImportProgressTracker(this._getFileImportSteps(), files2.length),
         );
     }
@@ -268,7 +266,6 @@ export class DictionaryImportController {
         const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
         void this._importDictionaries(
             this._generateFilesFromUrls(urls, onProgress),
-            urls.length,
             importProgressTracker,
         );
     }
@@ -350,10 +347,9 @@ export class DictionaryImportController {
 
     /**
      * @param {AsyncGenerator<File, void, void>} dictionaries
-     * @param {number} dictionaryCount
      * @param {ImportProgressTracker} importProgressTracker
      */
-    async _importDictionaries(dictionaries, dictionaryCount, importProgressTracker) {
+    async _importDictionaries(dictionaries, importProgressTracker) {
         if (this._modifying) { return; }
 
         const statusFooter = this._statusFooter;
@@ -377,12 +373,12 @@ export class DictionaryImportController {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
             };
 
-            for (let i = 0; i < dictionaryCount; ++i) {
+            for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
                 importProgressTracker.onNextDictionary();
                 if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
                 const file = (await dictionaries.next()).value;
                 if (!file || !(file instanceof File)) {
-                    errors.push(new Error(`Failed to read file ${i + 1} of ${dictionaryCount}.`));
+                    errors.push(new Error(`Failed to read file ${i + 1} of ${importProgressTracker.dictionaryCount}.`));
                     continue;
                 }
                 errors = [
@@ -679,6 +675,11 @@ export class ImportProgressTracker {
     /** @type {number} */
     get stepCount() {
         return this._steps.length;
+    }
+
+    /** @type {number} */
+    get dictionaryCount() {
+        return this._dictionaryCount;
     }
 
     /** @type {import('dictionary-worker').ImportProgressCallback} */
