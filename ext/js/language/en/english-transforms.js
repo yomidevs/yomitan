@@ -17,12 +17,14 @@
 
 import {prefixInflection, suffixInflection} from '../language-transforms.js';
 
+/** @typedef {keyof typeof conditions} Condition */
+
 /**
  * @param {string} consonants
  * @param {string} suffix
- * @param {string[]} conditionsIn
- * @param {string[]} conditionsOut
- * @returns {import('language-transformer').SuffixRule[]}
+ * @param {Condition[]} conditionsIn
+ * @param {Condition[]} conditionsOut
+ * @returns {import('language-transformer').SuffixRule<Condition>[]}
  */
 function doubledConsonantInflection(consonants, suffix, conditionsIn, conditionsOut) {
     const inflections = [];
@@ -64,7 +66,9 @@ const phrasalVerbPrepositions = ['aback', 'about', 'above', 'across', 'after', '
 const particlesDisjunction = phrasalVerbParticles.join('|');
 const phrasalVerbWordSet = new Set([...phrasalVerbParticles, ...phrasalVerbPrepositions]);
 const phrasalVerbWordDisjunction = [...phrasalVerbWordSet].join('|');
-/** @type {import('language-transformer').Rule} */
+/**
+ * @type {import('language-transformer').Rule<Condition>}
+ */
 const phrasalVerbInterposedObjectRule = {
     type: 'other',
     isInflected: new RegExp(`^\\w* (?:(?!\\b(${phrasalVerbWordDisjunction})\\b).)+ (?:${particlesDisjunction})`),
@@ -78,7 +82,7 @@ const phrasalVerbInterposedObjectRule = {
 /**
  * @param {string} inflected
  * @param {string} deinflected
- * @returns {import('language-transformer').Rule}
+ * @returns {import('language-transformer').Rule<Condition>}
  */
 function createPhrasalVerbInflection(inflected, deinflected) {
     return {
@@ -93,8 +97,8 @@ function createPhrasalVerbInflection(inflected, deinflected) {
 }
 
 /**
- * @param {import('language-transformer').SuffixRule[]} sourceRules
- * @returns {import('language-transformer').Rule[]}
+ * @param {import('language-transformer').SuffixRule<Condition>[]} sourceRules
+ * @returns {import('language-transformer').Rule<Condition>[]}
  */
 function createPhrasalVerbInflectionsFromSuffixInflections(sourceRules) {
     return sourceRules.flatMap(({isInflected, deinflected}) => {
@@ -105,41 +109,43 @@ function createPhrasalVerbInflectionsFromSuffixInflections(sourceRules) {
     });
 }
 
-/** @type {import('language-transformer').LanguageTransformDescriptor} */
+const conditions = {
+    v: {
+        name: 'Verb',
+        isDictionaryForm: true,
+        subConditions: ['v_phr'],
+    },
+    v_phr: {
+        name: 'Phrasal verb',
+        isDictionaryForm: true,
+    },
+    n: {
+        name: 'Noun',
+        isDictionaryForm: true,
+        subConditions: ['np', 'ns'],
+    },
+    np: {
+        name: 'Noun plural',
+        isDictionaryForm: true,
+    },
+    ns: {
+        name: 'Noun singular',
+        isDictionaryForm: true,
+    },
+    adj: {
+        name: 'Adjective',
+        isDictionaryForm: true,
+    },
+    adv: {
+        name: 'Adverb',
+        isDictionaryForm: true,
+    },
+};
+
+/** @type {import('language-transformer').LanguageTransformDescriptor<Condition>} */
 export const englishTransforms = {
     language: 'en',
-    conditions: {
-        v: {
-            name: 'Verb',
-            isDictionaryForm: true,
-            subConditions: ['v_phr'],
-        },
-        v_phr: {
-            name: 'Phrasal verb',
-            isDictionaryForm: true,
-        },
-        n: {
-            name: 'Noun',
-            isDictionaryForm: true,
-            subConditions: ['np', 'ns'],
-        },
-        np: {
-            name: 'Noun plural',
-            isDictionaryForm: true,
-        },
-        ns: {
-            name: 'Noun singular',
-            isDictionaryForm: true,
-        },
-        adj: {
-            name: 'Adjective',
-            isDictionaryForm: true,
-        },
-        adv: {
-            name: 'Adverb',
-            isDictionaryForm: true,
-        },
-    },
+    conditions,
     transforms: {
         'plural': {
             name: 'plural',

@@ -48,6 +48,20 @@ test('visual', async ({page, extensionId}) => {
     // Wait for the advanced settings to be visible
     await page.locator('input#advanced-checkbox').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
 
+    // Import jmdict_swedish.zip from a URL
+    await page.locator('.settings-item[data-modal-action="show,dictionaries"]').click();
+    await page.locator('button[id="dictionary-import-button"]').click();
+    await page.locator('textarea[id="dictionary-import-url-text"]').fill('https://github.com/themoeway/yomitan/raw/dictionaries/jmdict_swedish.zip');
+    await page.locator('button[id="dictionary-import-url-button"]').click();
+    await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (2 installed, 2 enabled)', {timeout: 5 * 60 * 1000});
+
+    // Delete the jmdict_swedish dictionary
+    await page.locator('button.dictionary-menu-button').nth(1).click();
+    await page.locator('button.popup-menu-item[data-menu-action="delete"]').click();
+    await page.locator('#dictionary-confirm-delete-button').click();
+    await page.locator('#dictionaries-modal button[data-modal-action="hide"]').getByText('Close').click();
+    await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
+
     // Get page height by getting the footer and adding height and y position as other methods of calculation don't work for some reason
     const footer = /** @type {import('@playwright/test').ElementHandle<HTMLElement>} */ (await page.locator('.footer-padding').elementHandle());
     expect(footer).not.toBe(null);

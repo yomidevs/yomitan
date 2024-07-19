@@ -17,14 +17,16 @@
 
 import {prefixInflection, suffixInflection} from '../language-transforms.js';
 
+/** @typedef {keyof typeof conditions} Condition */
+
 // https://www.dartmouth.edu/~deutsch/Grammatik/Wortbildung/Separables.html
 const separablePrefixes = ['ab', 'an', 'auf', 'aus', 'auseinander', 'bei', 'da', 'dabei', 'dar', 'daran', 'dazwischen', 'durch', 'ein', 'empor', 'entgegen', 'entlang', 'entzwei', 'fehl', 'fern', 'fest', 'fort', 'frei', 'gegenüber', 'gleich', 'heim', 'her', 'herab', 'heran', 'herauf', 'heraus', 'herbei', 'herein', 'herüber', 'herum', 'herunter', 'hervor', 'hin', 'hinab', 'hinauf', 'hinaus', 'hinein', 'hinterher', 'hinunter', 'hinweg', 'hinzu', 'hoch', 'los', 'mit', 'nach', 'nebenher', 'nieder', 'statt', 'um', 'vor', 'voran', 'voraus', 'vorbei', 'vorüber', 'vorweg', 'weg', 'weiter', 'wieder', 'zu', 'zurecht', 'zurück', 'zusammen'];
 
 /**
  * @param {string} prefix
- * @param {string[]} conditionsIn
- * @param {string[]} conditionsOut
- * @returns {import('language-transformer').Rule}
+ * @param {Condition[]} conditionsIn
+ * @param {Condition[]} conditionsOut
+ * @returns {import('language-transformer').Rule<Condition>}
  */
 function separatedPrefix(prefix, conditionsIn, conditionsOut) {
     const germanLetters = 'a-zA-ZäöüßÄÖÜẞ';
@@ -48,22 +50,24 @@ const zuInfinitiveInflections = separablePrefixes.map((prefix) => {
     return prefixInflection(prefix + 'zu', prefix, [], ['v']);
 });
 
+const conditions = {
+    v: {
+        name: 'Verb',
+        isDictionaryForm: true,
+    },
+    n: {
+        name: 'Noun',
+        isDictionaryForm: true,
+    },
+    adj: {
+        name: 'Adjective',
+        isDictionaryForm: true,
+    },
+};
+
 export const germanTransforms = {
     language: 'de',
-    conditions: {
-        v: {
-            name: 'Verb',
-            isDictionaryForm: true,
-        },
-        n: {
-            name: 'Noun',
-            isDictionaryForm: true,
-        },
-        adj: {
-            name: 'Adjective',
-            isDictionaryForm: true,
-        },
-    },
+    conditions,
     transforms: {
         'nominalization': {
             name: 'nominalization',

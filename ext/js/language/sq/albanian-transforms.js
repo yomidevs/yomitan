@@ -17,12 +17,14 @@
 
 import {suffixInflection} from '../language-transforms.js';
 
+/** @typedef {keyof typeof conditions} Condition */
+
 /**
  * @param {string} inflectedSuffix
  * @param {string} deinflectedSuffix
- * @param {string[]} conditionsIn
- * @param {string[]} conditionsOut
- * @returns {import('language-transformer').Rule}
+ * @param {Condition[]} conditionsIn
+ * @param {Condition[]} conditionsOut
+ * @returns {import('language-transformer').Rule<Condition>}
  */
 function conjugationIISuffixInflection(inflectedSuffix, deinflectedSuffix, conditionsIn, conditionsOut) {
     return {
@@ -32,36 +34,38 @@ function conjugationIISuffixInflection(inflectedSuffix, deinflectedSuffix, condi
     };
 }
 
-/** @type {import('language-transformer').LanguageTransformDescriptor} */
+const conditions = {
+    v: {
+        name: 'Verb',
+        isDictionaryForm: true,
+    },
+    n: {
+        name: 'Noun',
+        isDictionaryForm: true,
+        subConditions: ['np', 'ns'],
+    },
+    np: {
+        name: 'Noun plural',
+        isDictionaryForm: true,
+    },
+    ns: {
+        name: 'Noun singular',
+        isDictionaryForm: true,
+    },
+    adj: {
+        name: 'Adjective',
+        isDictionaryForm: true,
+    },
+    adv: {
+        name: 'Adverb',
+        isDictionaryForm: true,
+    },
+};
+
+/** @type {import('language-transformer').LanguageTransformDescriptor<Condition>} */
 export const albanianTransforms = {
     language: 'sq',
-    conditions: {
-        v: {
-            name: 'Verb',
-            isDictionaryForm: true,
-        },
-        n: {
-            name: 'Noun',
-            isDictionaryForm: true,
-            subConditions: ['np', 'ns'],
-        },
-        np: {
-            name: 'Noun plural',
-            isDictionaryForm: true,
-        },
-        ns: {
-            name: 'Noun singular',
-            isDictionaryForm: true,
-        },
-        adj: {
-            name: 'Adjective',
-            isDictionaryForm: true,
-        },
-        adv: {
-            name: 'Adverb',
-            isDictionaryForm: true,
-        },
-    },
+    conditions,
     transforms: {
         // Nouns
         'definite': {

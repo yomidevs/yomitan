@@ -48,6 +48,7 @@ export class PopupPreviewController {
         this._frame.addEventListener('load', this._onFrameLoad.bind(this), false);
         this._settingsController.on('optionsContextChanged', this._onOptionsContextChange.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+        this._settingsController.on('dictionaryEnabled', this._onOptionsContextChange.bind(this));
         const languageSelect = querySelectorNotNull(document, '#language-select');
         languageSelect.addEventListener(
             /** @type {string} */ ('settingChanged'),
@@ -84,6 +85,11 @@ export class PopupPreviewController {
     _onOptionsContextChange() {
         const optionsContext = this._settingsController.getOptionsContext();
         this._invoke('updateOptionsContext', {optionsContext});
+    }
+
+    /** */
+    _onDictionaryEnabled() {
+        this._invoke('updateSearch', {});
     }
 
     /**

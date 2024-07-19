@@ -42,6 +42,7 @@ export type Events = {
     importDictionaryFromUrl: {
         url: string;
     };
+    dictionaryEnabled: Record<string, never>;
     scanInputsChanged: {
         source: ScanInputsController | ScanInputsSimpleController;
     };

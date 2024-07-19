@@ -69,6 +69,7 @@ export class PopupPreviewFrame {
             ['setCustomOuterCss',      this._setCustomOuterCss.bind(this)],
             ['updateOptionsContext',   this._updateOptionsContext.bind(this)],
             ['setLanguageExampleText', this._setLanguageExampleText.bind(this)],
+            ['updateSearch',           this._updateSearch.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
