@@ -144,7 +144,11 @@ export class DictionaryImportController {
                 log.error(error);
             }
         }
-        void this._importDictionaries(fileArray);
+        const importProgressTracker = new ImportProgressTracker(this._getFileImportSteps(), fileArray.length);
+        void this._importDictionaries(
+            this._arrayToAsyncGenerator(fileArray),
+            importProgressTracker,
+        );
     }
 
     /**
@@ -246,7 +250,10 @@ export class DictionaryImportController {
         if (files === null) { return; }
         const files2 = [...files];
         node.value = '';
-        void this._importDictionaries(files2);
+        void this._importDictionaries(
+            this._arrayToAsyncGenerator(files2),
+            new ImportProgressTracker(this._getFileImportSteps(), files2.length),
+        );
     }
 
     /** */
@@ -254,19 +261,63 @@ export class DictionaryImportController {
         const text = this._importURLText.value.trim();
         if (!text) { return; }
         const urls = text.split('\n');
-        const files = [];
+
+        const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), urls.length);
+        const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
+        void this._importDictionaries(
+            this._generateFilesFromUrls(urls, onProgress),
+            importProgressTracker,
+        );
+    }
+
+    /**
+     * @param {string[]} urls
+     * @param {import('dictionary-worker').ImportProgressCallback} onProgress
+     * @yields {Promise<File>}
+     * @returns {AsyncGenerator<File, void, void>}
+     */
+    async *_generateFilesFromUrls(urls, onProgress) {
         for (const url of urls) {
+            onProgress({nextStep: true, index: 0, count: 0});
+
             try {
-                files.push(await fetch(url.trim())
-                    .then((res) => res.blob())
-                    .then((blob) => {
-                        return new File([blob], 'fileFromURL');
-                    }));
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', url.trim(), true);
+                xhr.responseType = 'blob';
+
+                xhr.onprogress = (event) => {
+                    if (event.lengthComputable) {
+                        onProgress({nextStep: false, index: event.loaded, count: event.total});
+                    }
+                };
+
+                /** @type {Promise<File>} */
+                const blobPromise = new Promise((resolve, reject) => {
+                    xhr.onload = () => {
+                        if (xhr.status === 200) {
+                            if (xhr.response instanceof Blob) {
+                                resolve(new File([xhr.response], 'fileFromURL'));
+                            } else {
+                                reject(new Error(`Failed to fetch blob from ${url}`));
+                            }
+                        } else {
+                            reject(new Error(`Failed to fetch the URL: ${url}`));
+                        }
+                    };
+
+                    xhr.onerror = () => {
+                        reject(new Error(`Error fetching URL: ${url}`));
+                    };
+                });
+
+                xhr.send();
+
+                const file = await blobPromise;
+                yield file;
             } catch (error) {
                 log.error(error);
             }
         }
-        void this._importDictionaries(files);
     }
 
     /** */
@@ -295,19 +346,19 @@ export class DictionaryImportController {
     }
 
     /**
-     * @param {File[]} files
+     * @param {AsyncGenerator<File, void, void>} dictionaries
+     * @param {ImportProgressTracker} importProgressTracker
      */
-    async _importDictionaries(files) {
+    async _importDictionaries(dictionaries, importProgressTracker) {
         if (this._modifying) { return; }
 
         const statusFooter = this._statusFooter;
         const progressSelector = '.dictionary-import-progress';
         const progressContainers = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`#dictionaries-modal ${progressSelector}`));
-        const progressBars = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-bar`));
-        const infoLabels = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-info`));
-        const statusLabels = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-status`));
 
         const prevention = this._preventPageExit();
+
+        const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
 
         /** @type {Error[]} */
         let errors = [];
@@ -322,43 +373,22 @@ export class DictionaryImportController {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
             };
 
-            let statusPrefix = '';
-            /** @type {import('dictionary-importer.js').ImportStep} */
-            let stepIndex = -2;
-            /** @type {import('dictionary-worker').ImportProgressCallback} */
-            const onProgress = (data) => {
-                const {stepIndex: stepIndex2, index, count} = data;
-                if (stepIndex !== stepIndex2) {
-                    stepIndex = stepIndex2;
-                    const labelText = `${statusPrefix} - Step ${stepIndex2 + 1} of ${data.stepCount}: ${this._getImportLabel(stepIndex2)}...`;
-                    for (const label of infoLabels) { label.textContent = labelText; }
-                }
-
-                const percent = count > 0 ? (index / count * 100) : 0;
-                const cssString = `${percent}%`;
-                const statusString = `${Math.floor(percent).toFixed(0)}%`;
-                for (const progressBar of progressBars) { progressBar.style.width = cssString; }
-                for (const label of statusLabels) { label.textContent = statusString; }
-
-                switch (stepIndex2) {
-                    case -2:
-                    case 5:
-                        this._triggerStorageChanged();
-                        break;
-                }
-            };
-
-            const fileCount = files.length;
-            for (let i = 0; i < fileCount; ++i) {
-                statusPrefix = `Importing dictionary${fileCount > 1 ? ` (${i + 1} of ${fileCount})` : ''}`;
-                onProgress({
-                    stepIndex: -1,
-                    stepCount: 6,
-                    index: 0,
-                    count: 0,
-                });
+            for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
+                importProgressTracker.onNextDictionary();
                 if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
-                errors = [...errors, ...(await this._importDictionary(files[i], importDetails, onProgress) ?? [])];
+                const file = (await dictionaries.next()).value;
+                if (!file || !(file instanceof File)) {
+                    errors.push(new Error(`Failed to read file ${i + 1} of ${importProgressTracker.dictionaryCount}.`));
+                    continue;
+                }
+                errors = [
+                    ...errors,
+                    ...(await this._importDictionaryFromZip(
+                        file,
+                        importDetails,
+                        onProgress,
+                    ) ?? []),
+                ];
             }
         } catch (error) {
             errors.push(toError(error));
@@ -373,19 +403,39 @@ export class DictionaryImportController {
     }
 
     /**
-     * @param {import('dictionary-importer').ImportStep} stepIndex
-     * @returns {string}
+     * @returns {import('dictionary-importer').ImportSteps}
      */
-    _getImportLabel(stepIndex) {
-        switch (stepIndex) {
-            case -2: return '';
-            case -1:
-            case 0: return 'Loading dictionary';
-            case 1: return 'Loading schemas';
-            case 2: return 'Validating data';
-            case 3: return 'Formatting data';
-            case 4: return 'Importing media';
-            case 5: return 'Importing data';
+    _getFileImportSteps() {
+        return [
+            {label: '', callback: this._triggerStorageChanged.bind(this)}, // Dictionary import is uninitialized
+            {label: 'Initializing import'}, // Dictionary import is uninitialized
+            {label: 'Loading dictionary'}, // Load dictionary archive and validate index
+            {label: 'Loading schemas'}, // Load schemas and get archive files
+            {label: 'Validating data'}, // Load and validate dictionary data
+            {label: 'Formatting data'}, // Format dictionary data and extended data support
+            {label: 'Importing media'}, // Resolve async requirements and import media
+            {label: 'Importing data', callback: this._triggerStorageChanged.bind(this)}, // Add dictionary descriptor and import data
+        ];
+    }
+
+    /**
+     * @returns {import('dictionary-importer').ImportSteps}
+     */
+    _getUrlImportSteps() {
+        const urlImportSteps = this._getFileImportSteps();
+        urlImportSteps.splice(2, 0, {label: 'Downloading dictionary'});
+        return urlImportSteps;
+    }
+
+    /**
+     * @template T
+     * @param {T[]} arr
+     * @yields {Promise<T>}
+     * @returns {AsyncGenerator<T, void, void>}
+     */
+    async *_arrayToAsyncGenerator(arr) {
+        for (const item of arr) {
+            yield item;
         }
     }
 
@@ -395,7 +445,7 @@ export class DictionaryImportController {
      * @param {import('dictionary-worker').ImportProgressCallback} onProgress
      * @returns {Promise<Error[] | undefined>}
      */
-    async _importDictionary(file, importDetails, onProgress) {
+    async _importDictionaryFromZip(file, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
         const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
         if (!result) {
@@ -582,5 +632,87 @@ export class DictionaryImportController {
     /** */
     _triggerStorageChanged() {
         this._settingsController.application.triggerStorageChanged();
+    }
+}
+
+export class ImportProgressTracker {
+    /**
+     * @param {import('dictionary-importer').ImportSteps} steps
+     * @param {number} dictionaryCount
+     */
+    constructor(steps, dictionaryCount) {
+        /** @type {import('dictionary-importer').ImportSteps} */
+        this._steps = steps;
+        /** @type {number} */
+        this._dictionaryCount = dictionaryCount;
+
+        /** @type {number} */
+        this._stepIndex = 0;
+        /** @type {number} */
+        this._dictionaryIndex = 0;
+
+        const progressSelector = '.dictionary-import-progress';
+        /** @type {NodeListOf<HTMLElement>} */
+        this._progressBars = (document.querySelectorAll(`${progressSelector} .progress-bar`));
+        /** @type {NodeListOf<HTMLElement>} */
+        this._infoLabels = (document.querySelectorAll(`${progressSelector} .progress-info`));
+        /** @type {NodeListOf<HTMLElement>} */
+        this._statusLabels = (document.querySelectorAll(`${progressSelector} .progress-status`));
+
+        this.onProgress({nextStep: false, index: 0, count: 0});
+    }
+
+    /** @type {string} */
+    get statusPrefix() {
+        return `Importing dictionary${this._dictionaryCount > 1 ? ` (${this._dictionaryIndex} of ${this._dictionaryCount})` : ''}`;
+    }
+
+    /** @type {import('dictionary-importer').ImportStep} */
+    get currentStep() {
+        return this._steps[this._stepIndex];
+    }
+
+    /** @type {number} */
+    get stepCount() {
+        return this._steps.length;
+    }
+
+    /** @type {number} */
+    get dictionaryCount() {
+        return this._dictionaryCount;
+    }
+
+    /** @type {import('dictionary-worker').ImportProgressCallback} */
+    onProgress(data) {
+        const {nextStep, index, count} = data;
+        if (nextStep) {
+            this._stepIndex++;
+        }
+        const labelText = `${this.statusPrefix} - Step ${this._stepIndex + 1} of ${this.stepCount}: ${this.currentStep.label}...`;
+        for (const label of this._infoLabels) { label.textContent = labelText; }
+
+        const percent = count > 0 ? (index / count * 100) : 0;
+        const cssString = `${percent}%`;
+        const statusString = `${Math.floor(percent).toFixed(0)}%`;
+        for (const progressBar of this._progressBars) { progressBar.style.width = cssString; }
+        for (const label of this._statusLabels) { label.textContent = statusString; }
+
+        const callback = this.currentStep?.callback;
+        if (typeof callback === 'function') {
+            callback();
+        }
+    }
+
+    /**
+     *
+     */
+    onNextDictionary() {
+        this._dictionaryIndex += 1;
+        this._stepIndex = 0;
+        this.onProgress({
+            nextStep: true,
+            index: 0,
+            count: 0,
+        });
     }
 }
