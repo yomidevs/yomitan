@@ -888,7 +888,7 @@ export class DictionaryController {
             const updateChecks = this._dictionaryEntries.map((entry) => entry.checkForUpdate());
             const updateCount = (await Promise.all(updateChecks)).reduce((sum, value) => (sum + (value ? 1 : 0)), 0);
             if (this._checkUpdatesButton !== null) {
-                this._checkUpdatesButton.textContent = updateCount ? `${updateCount} updates` : 'No updates';
+                this._checkUpdatesButton.textContent = updateCount ? `${updateCount} update${updateCount > 1 ? 's' : ''}` : 'No updates';
             }
         } finally {
             this._setButtonsEnabled(true);
