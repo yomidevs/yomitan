@@ -361,6 +361,7 @@ export const tagalogTransforms = {
             name: 'ika-',
             rules: [
                 prefixInflection('ika', '', [], ['n']),
+                prefixInflection('ikar', 'd', [], ['n']),
                 wholeWordInflection('ikalawa', 'dalawa', [], ['num']),
                 wholeWordInflection('ikatlo', 'tatlo', [], ['num']),
             ],
