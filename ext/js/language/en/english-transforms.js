@@ -278,13 +278,13 @@ export const englishTransforms = {
                 prefixInflection('do not ', '', ['v'], ['v']),
             ],
         },
-          '-able': {
+        '-able': {
             name: '-able',
             description: 'Adjective formed from a verb',
             rules: [
                 suffixInflection('able', '', ['v'], ['adj']),
                 suffixInflection('able', 'e', ['v'], ['adj']),
-                suffixInflection('iable', 'y', ['v'], ['adj']), 
+                suffixInflection('iable', 'y', ['v'], ['adj']),
                 ...doubledConsonantInflection('bdgklmnprstz', 'able', ['v'], ['adj']),
             ],
         },
