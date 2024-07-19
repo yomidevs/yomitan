@@ -49,6 +49,16 @@ const tests = [
             {term: 'ako', source: 'akong', rule: 'n', reasons: ['-ng']},
         ],
     },
+    {
+        category: 'irregulars',
+        valid: true,
+        tests: [
+            {term: 'dawa', source: 'ikalawa', rule: 'num', reasons: ['ika-']},
+            {term: 'dawa', source: 'pangalawa', rule: 'num', reasons: ['pang-']},
+            {term: 'tatlo', source: 'ikatlo', rule: 'num', reasons: ['ika-']},
+            {term: 'tatlo', source: 'pangatlo', rule: 'num', reasons: ['pang-']},
+        ]
+    }
 ];
 
 const languageTransformer = new LanguageTransformer();
