@@ -57,8 +57,8 @@ const tests = [
             {term: 'dawa', source: 'pangalawa', rule: 'num', reasons: ['pang-']},
             {term: 'tatlo', source: 'ikatlo', rule: 'num', reasons: ['ika-']},
             {term: 'tatlo', source: 'pangatlo', rule: 'num', reasons: ['pang-']},
-        ]
-    }
+        ],
+    },
 ];
 
 const languageTransformer = new LanguageTransformer();
