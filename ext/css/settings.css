@@ -2324,6 +2324,7 @@ input[type=number].dictionary-priority {
     margin-right: 0.5em;
 }
 .dictionary-outdated-button,
+.dictionary-update-available,
 .dictionary-integrity-button {
     --button-content-color: transparent;
     --button-border-color: transparent;

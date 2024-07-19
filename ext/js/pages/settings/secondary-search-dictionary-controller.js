@@ -86,7 +86,7 @@ export class SecondarySearchDictionaryController {
             nameNode.textContent = name;
 
             /** @type {HTMLElement} */
-            const versionNode = querySelectorNotNull(node, '.dictionary-version');
+            const versionNode = querySelectorNotNull(node, '.dictionary-revision');
             versionNode.textContent = `rev.${dictionaryInfo.revision}`;
 
             /** @type {HTMLElement} */

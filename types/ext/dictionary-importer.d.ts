@@ -51,6 +51,9 @@ export type Summary = {
     prefixWildcardsSupported: boolean;
     counts: SummaryCounts;
     styles: string;
+    isUpdatable?: boolean;
+    indexUrl?: string;
+    downloadUrl?: string;
     author?: string;
     url?: string;
     description?: string;

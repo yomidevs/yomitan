@@ -25,6 +25,9 @@ export type Index = {
     title: string;
     revision: string;
     sequenced?: boolean;
+    isUpdatable?: true;
+    indexUrl?: string;
+    downloadUrl?: string;
     author?: string;
     url?: string;
     description?: string;

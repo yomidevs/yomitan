@@ -311,6 +311,7 @@ export class DictionaryImporter {
      * @param {import('dictionary-data').Index} index
      * @param {import('dictionary-importer').SummaryDetails} details
      * @returns {import('dictionary-importer').Summary}
+     * @throws {Error}
      */
     _createSummary(dictionaryTitle, version, index, details) {
         const indexSequenced = index.sequenced;
@@ -327,7 +328,7 @@ export class DictionaryImporter {
             styles,
         };
 
-        const {author, url, description, attribution, frequencyMode, sourceLanguage, targetLanguage} = index;
+        const {author, url, description, attribution, frequencyMode, isUpdatable, sourceLanguage, targetLanguage} = index;
         if (typeof author === 'string') { summary.author = author; }
         if (typeof url === 'string') { summary.url = url; }
         if (typeof description === 'string') { summary.description = description; }
@@ -335,8 +336,35 @@ export class DictionaryImporter {
         if (typeof frequencyMode === 'string') { summary.frequencyMode = frequencyMode; }
         if (typeof sourceLanguage === 'string') { summary.sourceLanguage = sourceLanguage; }
         if (typeof targetLanguage === 'string') { summary.targetLanguage = targetLanguage; }
-
+        if (typeof isUpdatable === 'boolean') {
+            const {indexUrl, downloadUrl} = index;
+            if (!isUpdatable || !this._validateUrl(indexUrl) || !this._validateUrl(downloadUrl)) {
+                throw new Error('Invalid index data for updatable dictionary');
+            }
+            summary.isUpdatable = isUpdatable;
+            summary.indexUrl = indexUrl;
+            summary.downloadUrl = downloadUrl;
+        }
         return summary;
+    }
+
+    /**
+     * @param {string|undefined} string
+     * @returns {boolean}
+     */
+    _validateUrl(string) {
+        if (typeof string !== 'string') {
+            return false;
+        }
+
+        let url;
+        try {
+            url = new URL(string);
+        } catch (_) {
+            return false;
+        }
+
+        return url.protocol === 'http:' || url.protocol === 'https:';
     }
 
     /**
