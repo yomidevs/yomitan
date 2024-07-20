@@ -409,6 +409,37 @@ export const japaneseTransforms = {
                 suffixInflection('來すぎる', '來る', ['v1'], ['vk']),
             ],
         },
+        '-sugiru-kanji': {
+            name: '-sugiru',
+            description: 'Shows something "is too..." or someone is doing something "too much".\n' +
+            'Usage: Attach 過ぎる to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～過ぎる',
+                    description: '程度や限度を超える',
+                },
+            ],
+            rules: [
+                suffixInflection('過ぎる', 'い', ['v1'], ['adj-i']),
+                suffixInflection('過ぎる', 'る', ['v1'], ['v1']),
+                suffixInflection('い過ぎる', 'う', ['v1'], ['v5']),
+                suffixInflection('き過ぎる', 'く', ['v1'], ['v5']),
+                suffixInflection('ぎ過ぎる', 'ぐ', ['v1'], ['v5']),
+                suffixInflection('し過ぎる', 'す', ['v1'], ['v5']),
+                suffixInflection('ち過ぎる', 'つ', ['v1'], ['v5']),
+                suffixInflection('に過ぎる', 'ぬ', ['v1'], ['v5']),
+                suffixInflection('び過ぎる', 'ぶ', ['v1'], ['v5']),
+                suffixInflection('み過ぎる', 'む', ['v1'], ['v5']),
+                suffixInflection('り過ぎる', 'る', ['v1'], ['v5']),
+                suffixInflection('じ過ぎる', 'ずる', ['v1'], ['vz']),
+                suffixInflection('し過ぎる', 'する', ['v1'], ['vs']),
+                suffixInflection('為過ぎる', '為る', ['v1'], ['vs']),
+                suffixInflection('き過ぎる', 'くる', ['v1'], ['vk']),
+                suffixInflection('来過ぎる', '来る', ['v1'], ['vk']),
+                suffixInflection('來過ぎる', '來る', ['v1'], ['vk']),
+            ],
+        },
         '-tai': {
             name: '-tai',
             description: '1. Expresses the feeling of desire or hope.\n' +
