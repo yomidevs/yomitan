@@ -245,57 +245,16 @@ class DictionaryEntry {
         useDeinflectionsToggle.dataset.setting = `dictionaries[${this._index}].useDeinflections`;
 
         this._setupDetails(detailsTableElement);
-        // this._setupStats(detailsTableElement);
 
         modal.setVisible(true);
     }
-
-    // /**
-    //  * @param {Element} detailsTable
-    //  * @returns {boolean}
-    //  */
-    // _setupStats(detailsTable) {
-    //     const targets = {
-    //         terms: 'Term Count',
-    //         kanji: 'Kanji Count',
-    //         kanjiMeta: 'Kanji Meta Count',
-    //         tagMeta: 'Tag Count',
-    //         media: 'Media Count',
-    //     };
-
-    //     const {counts} = this._dictionaryInfo;
-    //     const statsTable = this._dictionaryController.instantiateTemplate('dictionary-stats-table');
-    //     const tableHead = querySelectorNotNull(statsTable, 'thead');
-    //     const tableRow = querySelectorNotNull(statsTable, '.dictionary-stats-table-row');
-    //     let any = false;
-
-    //     for (const [key, label] of /** @type {([keyof typeof targets, string])[]} */ (Object.entries(targets))) {
-    //         const count = counts[key].total;
-    //         if (count === 0) { continue; }
-
-    //         const header = document.createElement('th');
-    //         header.textContent = label;
-    //         tableHead.appendChild(header);
-    //         const cell = document.createElement('td');
-    //         cell.dataset.type = key;
-    //         cell.textContent = `${count}`;
-    //         tableRow.appendChild(cell);
-
-    //         any = true;
-    //     }
-
-    //     if (any) {
-    //         detailsTable.appendChild(document.createElement('hr'));
-    //         detailsTable.appendChild(statsTable);
-    //     }
-    //     return any;
-    // }
 
     /**
      * @param {Element} detailsTable
      * @returns {boolean}
      */
     _setupDetails(detailsTable) {
+        /** @type {Partial<Record<keyof (typeof this._dictionaryInfo & typeof this._dictionaryInfo.counts), string>>} */
         const targets = {
             author: 'Author',
             url: 'URL',
@@ -313,11 +272,11 @@ class DictionaryEntry {
         const dictionaryInfo = {...this._dictionaryInfo, ...this._dictionaryInfo.counts};
         const fragment = document.createDocumentFragment();
         let any = false;
-        for (const [key, label] of /** @type {([keyof typeof targets, string])[]} */ (Object.entries(targets))) {
+        for (const [key, label] of /** @type {([keyof (typeof this._dictionaryInfo & typeof this._dictionaryInfo.counts), string])[]} */ (Object.entries(targets))) {
             const info = dictionaryInfo[key];
             const displayText = ((_info) => {
                 if (typeof _info === 'string') { return _info; }
-                if (typeof _info?.total === 'number') {
+                if (_info && typeof _info === 'object' && 'total' in _info) {
                     return _info.total ? `${_info.total}` : false;
                 }
                 return false;
