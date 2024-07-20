@@ -152,6 +152,23 @@ const tests = [
         valid: false,
         tests: [
             {term: 'boss', source: 'bo', rule: 'ns', reasons: ['plural', 'plural']},
+            {term: 'sta', source: 'stable', rule: 'adj', reasons: ['-able']},
+        ],
+    },
+
+    {
+        category: '-able',
+        valid: true,
+        tests: [
+            {term: 'forget', source: 'unforgettable', rule: 'adj', reasons: ['un-', '-able']},
+            {term: 'forget', source: 'forgettable', rule: 'adj', reasons: ['-able']},
+            {term: 'like', source: 'likeable', rule: 'adj', reasons: ['-able']},
+            {term: 'do', source: 'doable', rule: 'adj', reasons: ['-able']},
+            {term: 'desire', source: 'desirable', rule: 'adj', reasons: ['-able']},
+            {term: 'rely', source: 'reliable', rule: 'adj', reasons: ['-able']},
+            {term: 'move', source: 'movable', rule: 'adj', reasons: ['-able']},
+            {term: 'adore', source: 'adorable', rule: 'adj', reasons: ['-able']},
+            {term: 'carry', source: 'carriable', rule: 'adj', reasons: ['-able']},
         ],
     },
 ];
