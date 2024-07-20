@@ -245,31 +245,84 @@ class DictionaryEntry {
         useDeinflectionsToggle.dataset.setting = `dictionaries[${this._index}].useDeinflections`;
 
         this._setupDetails(detailsTableElement);
+        // this._setupStats(detailsTableElement);
 
         modal.setVisible(true);
     }
+
+    // /**
+    //  * @param {Element} detailsTable
+    //  * @returns {boolean}
+    //  */
+    // _setupStats(detailsTable) {
+    //     const targets = {
+    //         terms: 'Term Count',
+    //         kanji: 'Kanji Count',
+    //         kanjiMeta: 'Kanji Meta Count',
+    //         tagMeta: 'Tag Count',
+    //         media: 'Media Count',
+    //     };
+
+    //     const {counts} = this._dictionaryInfo;
+    //     const statsTable = this._dictionaryController.instantiateTemplate('dictionary-stats-table');
+    //     const tableHead = querySelectorNotNull(statsTable, 'thead');
+    //     const tableRow = querySelectorNotNull(statsTable, '.dictionary-stats-table-row');
+    //     let any = false;
+
+    //     for (const [key, label] of /** @type {([keyof typeof targets, string])[]} */ (Object.entries(targets))) {
+    //         const count = counts[key].total;
+    //         if (count === 0) { continue; }
+
+    //         const header = document.createElement('th');
+    //         header.textContent = label;
+    //         tableHead.appendChild(header);
+    //         const cell = document.createElement('td');
+    //         cell.dataset.type = key;
+    //         cell.textContent = `${count}`;
+    //         tableRow.appendChild(cell);
+
+    //         any = true;
+    //     }
+
+    //     if (any) {
+    //         detailsTable.appendChild(document.createElement('hr'));
+    //         detailsTable.appendChild(statsTable);
+    //     }
+    //     return any;
+    // }
 
     /**
      * @param {Element} detailsTable
      * @returns {boolean}
      */
     _setupDetails(detailsTable) {
-        /** @type {[label: string, key: 'author'|'url'|'description'|'attribution'|'sourceLanguage'|'targetLanguage'][]} */
-        const targets = [
-            ['Author', 'author'],
-            ['URL', 'url'],
-            ['Description', 'description'],
-            ['Attribution', 'attribution'],
-            ['Source Language', 'sourceLanguage'],
-            ['Target Language', 'targetLanguage'],
-        ];
+        const targets = {
+            author: 'Author',
+            url: 'URL',
+            description: 'Description',
+            attribution: 'Attribution',
+            sourceLanguage: 'Source Language',
+            targetLanguage: 'Target Language',
+            terms: 'Term Count',
+            kanji: 'Kanji Count',
+            kanjiMeta: 'Kanji Meta Count',
+            tagMeta: 'Tag Count',
+            media: 'Media Count',
+        };
 
-        const dictionaryInfo = this._dictionaryInfo;
+        const dictionaryInfo = {...this._dictionaryInfo, ...this._dictionaryInfo.counts};
         const fragment = document.createDocumentFragment();
         let any = false;
-        for (const [label, key] of targets) {
+        for (const [key, label] of /** @type {([keyof typeof targets, string])[]} */ (Object.entries(targets))) {
             const info = dictionaryInfo[key];
-            if (typeof info !== 'string') { continue; }
+            const displayText = ((_info) => {
+                if (typeof _info === 'string') { return _info; }
+                if (typeof _info?.total === 'number') {
+                    return _info.total ? `${_info.total}` : false;
+                }
+                return false;
+            })(info);
+            if (!displayText) { continue; }
 
             const details = /** @type {HTMLElement} */ (this._dictionaryController.instantiateTemplate('dictionary-details-entry'));
             details.dataset.type = key;
@@ -280,7 +333,7 @@ class DictionaryEntry {
             const infoElement = querySelectorNotNull(details, '.dictionary-details-entry-info');
 
             labelElement.textContent = `${label}:`;
-            infoElement.textContent = info;
+            infoElement.textContent = displayText;
             fragment.appendChild(details);
 
             any = true;
