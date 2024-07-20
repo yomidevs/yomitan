@@ -53,8 +53,8 @@ const tests = [
         category: 'irregulars',
         valid: true,
         tests: [
-            {term: 'dawa', source: 'ikalawa', rule: 'num', reasons: ['ika-']},
-            {term: 'dawa', source: 'pangalawa', rule: 'num', reasons: ['pang-']},
+            {term: 'dalawa', source: 'ikalawa', rule: 'num', reasons: ['ika-']},
+            {term: 'dalawa', source: 'pangalawa', rule: 'num', reasons: ['pang-']},
             {term: 'tatlo', source: 'ikatlo', rule: 'num', reasons: ['ika-']},
             {term: 'tatlo', source: 'pangatlo', rule: 'num', reasons: ['pang-']},
         ],

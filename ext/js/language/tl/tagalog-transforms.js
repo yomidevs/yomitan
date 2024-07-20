@@ -180,8 +180,8 @@ export const tagalogTransforms = {
                 prefixInflection('pang', '', [], ['n', 'adj']),
                 ...[...'dlrst'].map((v) => prefixInflection(`pan${v}`, `${v}`, [], ['n', 'adj'])),
                 ...[...'bp'].map((v) => prefixInflection(`pam${v}`, `${v}`, [], ['n', 'adj'])),
-                wholeWordInflection('pangalawa', 'dawa', [], ['num']),
-                wholeWordInflection('pangatlo', 'dawa', [], ['num']),
+                wholeWordInflection('pangalawa', 'dalawa', [], ['num']),
+                wholeWordInflection('pangatlo', 'tatlo', [], ['num']),
             ],
         },
         'ka-': {
