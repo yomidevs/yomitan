@@ -644,6 +644,9 @@ a.heading-link-light {
 :root:not([data-advanced=false]) .basic-only {
     display: none;
 }
+:root:not([data-language=ja]) .japanese-only {
+    display: none;
+}
 .settings-item.settings-item-button,
 a.settings-item.settings-item-button {
     cursor: pointer;

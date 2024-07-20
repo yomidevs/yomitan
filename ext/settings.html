@@ -137,7 +137,13 @@
                     </div>
                 </div>
                 <div class="settings-item-right">
-                    <select id="language-select" data-setting="general.language"></select>
+                    <select id="language-select" data-setting="general.language"
+                    data-transform='{
+                        "type": "setAttribute",
+                        "selector": ":root",
+                        "attribute": "data-language"
+                    }'
+                    ></select>
                 </div>
             </div></div>
             <div class="settings-item"><div class="settings-item-inner">
@@ -389,9 +395,10 @@
                 <label class="toggle"><input type="checkbox" data-setting="scanning.selectText"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
+        <div class="settings-item japanese-only"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Search text with non-Japanese characters</div>
+                <div class="settings-item-description">Only applies when language is set to Japanese.</div>
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" data-setting="scanning.alphanumeric"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
