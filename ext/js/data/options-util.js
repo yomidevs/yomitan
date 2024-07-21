@@ -558,6 +558,7 @@ export class OptionsUtil {
             this._updateVersion44,
             this._updateVersion45,
             this._updateVersion46,
+            this._updateVersion47,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1420,6 +1421,16 @@ export class OptionsUtil {
             if (profile.options.general.fontFamily === 'sans-serif') {
                 profile.options.general.fontFamily = '';
             }
+        }
+    }
+
+    /**
+     * - Added scanning.scanWithoutMousemove
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion47(options) {
+        for (const profile of options.profiles) {
+            profile.options.scanning.scanWithoutMousemove = true;
         }
     }
 

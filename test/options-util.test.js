@@ -349,6 +349,7 @@ function createProfileOptionsUpdatedTestData1() {
                 onSearchPages: false,
                 onSearchQuery: false,
             },
+            scanWithoutMousemove: true,
             inputs: [
                 {
                     include: 'shift',
@@ -636,7 +637,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 46,
+        version: 47,
         global: {
             database: {
                 prefixWildcardsSupported: false,
