@@ -1452,6 +1452,9 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 :root[data-frequency-display-mode=list] .frequency-group-item[data-count='1'] .frequency-item {
     display: inline;
 }
+:root[data-show-frequency-disambiguation=false] .frequency-disambiguation {
+    display: none;
+}
 
 
 /* Pitch accent styles */

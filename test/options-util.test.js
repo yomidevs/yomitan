@@ -299,6 +299,7 @@ function createProfileOptionsUpdatedTestData1() {
             sortFrequencyDictionary: null,
             sortFrequencyDictionaryOrder: 'descending',
             stickySearchHeader: false,
+            showFrequencyDisambiguation: true,
         },
         audio: {
             enabled: true,
@@ -636,7 +637,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 46,
+        version: 47,
         global: {
             database: {
                 prefixWildcardsSupported: false,

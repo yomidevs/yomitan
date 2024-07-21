@@ -1176,6 +1176,7 @@ export class Display extends EventDispatcher {
         data.popupCurrentIndicatorMode = `${options.general.popupCurrentIndicatorMode}`;
         data.popupActionBarVisibility = `${options.general.popupActionBarVisibility}`;
         data.popupActionBarLocation = `${options.general.popupActionBarLocation}`;
+        data.showFrequencyDisambiguation = `${options.general.showFrequencyDisambiguation}`;
     }
 
     /**

@@ -125,7 +125,8 @@
                                     "stickySearchHeader",
                                     "fontFamily",
                                     "fontSize",
-                                    "lineHeight"
+                                    "lineHeight",
+                                    "showFrequencyDisambiguation"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -326,7 +327,12 @@
                                     "stickySearchHeader": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "showFrequencyDisambiguation": {
+                                        "type": "boolean",
+                                        "default": true
                                     }
+
                                 }
                             },
                             "popupWindow": {

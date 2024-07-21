@@ -146,6 +146,8 @@ export type GeneralOptions = {
     sortFrequencyDictionary: string | null;
     sortFrequencyDictionaryOrder: SortFrequencyDictionaryOrder;
     stickySearchHeader: boolean;
+    showFrequencyDisambiguation: boolean;
+
 };
 
 export type PopupWindowOptions = {
