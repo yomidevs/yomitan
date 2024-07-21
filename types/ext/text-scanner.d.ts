@@ -42,6 +42,7 @@ export type Options = {
     matchTypePrefix?: boolean;
     sentenceParsingOptions?: SentenceParsingOptions;
     scanAltText?: boolean;
+    scanWithoutMousemove?: boolean;
 };
 
 export type InputOptionsOuter = {

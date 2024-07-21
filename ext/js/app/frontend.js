@@ -514,6 +514,7 @@ export class Frontend {
             preventMiddleMouse,
             sentenceParsingOptions,
             scanAltText: scanningOptions.scanAltText,
+            scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
         });
         this._updateTextScannerEnabled();
 
