@@ -467,7 +467,8 @@
                                     "matchTypePrefix",
                                     "hidePopupOnCursorExit",
                                     "hidePopupOnCursorExitDelay",
-                                    "normalizeCssZoom"
+                                    "normalizeCssZoom",
+                                    "scanWithoutMousemove"
                                 ],
                                 "properties": {
                                     "inputs": {
@@ -752,6 +753,10 @@
                                         "default": 0
                                     },
                                     "normalizeCssZoom": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "scanWithoutMousemove": {
                                         "type": "boolean",
                                         "default": true
                                     }

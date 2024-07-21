@@ -195,6 +195,7 @@ export type ScanningOptions = {
     hidePopupOnCursorExitDelay: number;
     normalizeCssZoom: boolean;
     scanAltText: boolean;
+    scanWithoutMousemove: boolean;
 };
 
 export type ScanningInput = {

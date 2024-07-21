@@ -465,6 +465,7 @@ export class Display extends EventDispatcher {
                 matchTypePrefix: false,
                 sentenceParsingOptions,
                 scanAltText: scanningOptions.scanAltText,
+                scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
             },
         });
 
