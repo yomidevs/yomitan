@@ -948,6 +948,7 @@ const tests = [
             {term: 'ない',       source: 'ねえ',       rule: 'adj-i', reasons: ['-e']},
             {term: 'できる',     source: 'できねえ',   rule: 'v1',    reasons: ['negative', '-e']},
             {term: 'しんじる',   source: 'しんじねえ', rule: 'v1',    reasons: ['negative', '-e']},
+            {term: 'わかる',     source: 'わかんねえ', rule: 'v5',    reasons: ['negative', '-e']},
             {term: 'さむい',     source: 'さめえ',     rule: 'adj-i', reasons: ['-e']},
             {term: 'さむい',     source: 'さみい',     rule: 'adj-i', reasons: ['-e']},
             {term: 'あつい',     source: 'あちぇえ',   rule: 'adj-i', reasons: ['-e']},
