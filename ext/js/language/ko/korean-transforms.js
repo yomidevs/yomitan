@@ -4855,13 +4855,13 @@ export const koreanTransforms = {
         '-(으)ㅂ시다': {
             name: '-(으)ㅂ시다',
             rules: [
-                suffixInflection('ㅂㅅㅣㅅㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅂㅅㅣㅅㅏ', 'ㄹㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅂㅅㅣㅅㅏ', 'ㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅜㅂㅅㅣㅅㅏ', 'ㅂㄷㅏ', [], ['v']),
-                suffixInflection('ㅇㅡㅂㅅㅣㅅㅏ', 'ㅅㄷㅏ', [], ['v']),
-                suffixInflection('ㄹㅇㅡㅂㅅㅣㅅㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅂㅅㅣㅅㅏ', '', [], ['eusi']),
+                suffixInflection('ㅂㅅㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
+                suffixInflection('ㅂㅅㅣㄷㅏ', 'ㄹㄷㅏ', [], ['v']),
+                suffixInflection('ㅇㅡㅂㅅㅣㄷㅏ', 'ㄷㅏ', [], ['v']),
+                suffixInflection('ㅇㅜㅂㅅㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v']),
+                suffixInflection('ㅇㅡㅂㅅㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
+                suffixInflection('ㄹㅇㅡㅂㅅㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
+                suffixInflection('ㅂㅅㅣㄷㅏ', '', [], ['eusi']),
             ],
         },
         '-(으)ㅂ시오': {
