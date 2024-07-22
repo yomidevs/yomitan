@@ -1376,6 +1376,9 @@ export const japaneseTransforms = {
                 suffixInflection('れぇ', 'れい', [], ['adj-i']),
                 suffixInflection('べぇ', 'ばい', [], ['adj-i']),
                 suffixInflection('てぇ', 'たい', [], ['adj-i']),
+
+                suffixInflection('んねえ', 'らない', [], ['adj-i']),
+                suffixInflection('んねぇ', 'らない', [], ['adj-i']),
             ],
         },
         'slang': {
