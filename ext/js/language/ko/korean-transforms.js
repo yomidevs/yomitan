@@ -4861,7 +4861,6 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅜㅂㅅㅣㄷㅏ', 'ㅂㄷㅏ', [], ['v']),
                 suffixInflection('ㅇㅡㅂㅅㅣㄷㅏ', 'ㅅㄷㅏ', [], ['v']),
                 suffixInflection('ㄹㅇㅡㅂㅅㅣㄷㅏ', 'ㄷㄷㅏ', [], ['v']),
-                suffixInflection('ㅂㅅㅣㄷㅏ', '', [], ['eusi']),
             ],
         },
         '-(으)ㅂ시오': {
