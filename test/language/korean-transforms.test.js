@@ -690,6 +690,13 @@ const tests = [
             {term: '돕다', source: '돕자',     rule: 'v', reasons: ['-자']},
         ],
     },
+    {
+        category: 'invalid deinflections',
+        valid: false,
+        tests: [
+            {term: '보다', source: '보십시다',     rule: 'v', reasons: ['-(으)시', '-(으)ㅂ시다']},
+        ],
+    },
 ];
 /* eslint-enable @stylistic/no-multi-spaces */
 
