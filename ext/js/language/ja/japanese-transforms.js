@@ -148,6 +148,18 @@ const conditions = {
         name: '-ta past form ending',
         isDictionaryForm: false,
     },
+    '-na': {
+        name: 'Intermediate -na ending (imperative negative)',
+        isDictionaryForm: false,
+    },
+    '-nasai': {
+        name: 'Intermediate -nasai ending (polite imperative)',
+        isDictionaryForm: false,
+    },
+    '-ya': {
+        name: 'Intermediate -ya ending (conditional contraction)',
+        isDictionaryForm: false,
+    },
 };
 
 /** @type {import('language-transformer').LanguageTransformDescriptor<keyof typeof conditions>} */
@@ -191,17 +203,17 @@ export const japaneseTransforms = {
                 },
             ],
             rules: [
-                suffixInflection('けりゃ', 'ければ', [], ['-ba']),
-                suffixInflection('きゃ', 'ければ', [], ['-ba']),
-                suffixInflection('や', 'えば', [], ['-ba']),
-                suffixInflection('きゃ', 'けば', [], ['-ba']),
-                suffixInflection('ぎゃ', 'げば', [], ['-ba']),
-                suffixInflection('しゃ', 'せば', [], ['-ba']),
-                suffixInflection('ちゃ', 'てば', [], ['-ba']),
-                suffixInflection('にゃ', 'ねば', [], ['-ba']),
-                suffixInflection('びゃ', 'べば', [], ['-ba']),
-                suffixInflection('みゃ', 'めば', [], ['-ba']),
-                suffixInflection('りゃ', 'れば', [], ['-ba']),
+                suffixInflection('けりゃ', 'ければ', ['-ya'], ['-ba']),
+                suffixInflection('きゃ', 'ければ', ['-ya'], ['-ba']),
+                suffixInflection('や', 'えば', ['-ya'], ['-ba']),
+                suffixInflection('きゃ', 'けば', ['-ya'], ['-ba']),
+                suffixInflection('ぎゃ', 'げば', ['-ya'], ['-ba']),
+                suffixInflection('しゃ', 'せば', ['-ya'], ['-ba']),
+                suffixInflection('ちゃ', 'てば', ['-ya'], ['-ba']),
+                suffixInflection('にゃ', 'ねば', ['-ya'], ['-ba']),
+                suffixInflection('びゃ', 'べば', ['-ya'], ['-ba']),
+                suffixInflection('みゃ', 'めば', ['-ya'], ['-ba']),
+                suffixInflection('りゃ', 'れば', ['-ya'], ['-ba']),
             ],
         },
         '-cha': {
@@ -329,22 +341,22 @@ export const japaneseTransforms = {
                 },
             ],
             rules: [
-                suffixInflection('なさい', 'る', [], ['v1']),
-                suffixInflection('いなさい', 'う', [], ['v5']),
-                suffixInflection('きなさい', 'く', [], ['v5']),
-                suffixInflection('ぎなさい', 'ぐ', [], ['v5']),
-                suffixInflection('しなさい', 'す', [], ['v5']),
-                suffixInflection('ちなさい', 'つ', [], ['v5']),
-                suffixInflection('になさい', 'ぬ', [], ['v5']),
-                suffixInflection('びなさい', 'ぶ', [], ['v5']),
-                suffixInflection('みなさい', 'む', [], ['v5']),
-                suffixInflection('りなさい', 'る', [], ['v5']),
-                suffixInflection('じなさい', 'ずる', [], ['vz']),
-                suffixInflection('しなさい', 'する', [], ['vs']),
-                suffixInflection('為なさい', '為る', [], ['vs']),
-                suffixInflection('きなさい', 'くる', [], ['vk']),
-                suffixInflection('来なさい', '来る', [], ['vk']),
-                suffixInflection('來なさい', '來る', [], ['vk']),
+                suffixInflection('なさい', 'る', ['-nasai'], ['v1']),
+                suffixInflection('いなさい', 'う', ['-nasai'], ['v5']),
+                suffixInflection('きなさい', 'く', ['-nasai'], ['v5']),
+                suffixInflection('ぎなさい', 'ぐ', ['-nasai'], ['v5']),
+                suffixInflection('しなさい', 'す', ['-nasai'], ['v5']),
+                suffixInflection('ちなさい', 'つ', ['-nasai'], ['v5']),
+                suffixInflection('になさい', 'ぬ', ['-nasai'], ['v5']),
+                suffixInflection('びなさい', 'ぶ', ['-nasai'], ['v5']),
+                suffixInflection('みなさい', 'む', ['-nasai'], ['v5']),
+                suffixInflection('りなさい', 'る', ['-nasai'], ['v5']),
+                suffixInflection('じなさい', 'ずる', ['-nasai'], ['vz']),
+                suffixInflection('しなさい', 'する', ['-nasai'], ['vs']),
+                suffixInflection('為なさい', '為る', ['-nasai'], ['vs']),
+                suffixInflection('きなさい', 'くる', ['-nasai'], ['vk']),
+                suffixInflection('来なさい', '来る', ['-nasai'], ['vk']),
+                suffixInflection('來なさい', '來る', ['-nasai'], ['vk']),
             ],
         },
         '-sou': {
@@ -894,7 +906,7 @@ export const japaneseTransforms = {
         'imperative negative': {
             name: 'imperative negative',
             rules: [
-                suffixInflection('な', '', [], ['v']),
+                suffixInflection('な', '', ['-na'], ['v']),
             ],
         },
         'continuative': {
@@ -1376,9 +1388,6 @@ export const japaneseTransforms = {
                 suffixInflection('れぇ', 'れい', [], ['adj-i']),
                 suffixInflection('べぇ', 'ばい', [], ['adj-i']),
                 suffixInflection('てぇ', 'たい', [], ['adj-i']),
-
-                suffixInflection('んねえ', 'らない', [], ['adj-i']),
-                suffixInflection('んねぇ', 'らない', [], ['adj-i']),
             ],
         },
         'slang': {
@@ -1394,6 +1403,19 @@ export const japaneseTransforms = {
                 suffixInflection('じわる', 'じわじわ来る', [], ['vk']),
                 suffixInflection('おさしみ', 'おやすみ', [], []),
                 suffixInflection('おやさい', 'おやすみ', [], []),
+
+            ],
+        },
+        'n-slang': {
+            name: 'n-slang',
+            description: 'Slang sound change of r-column syllables to n (when before an n-sound, usually の or な)',
+            rules: [
+                suffixInflection('んな', 'るな', [], ['-na']),
+                suffixInflection('んなさい', 'りなさい', [], ['-nasai']),
+                suffixInflection('らんない', 'られない', ['adj-i'], ['adj-i']),
+                suffixInflection('んない', 'らない', ['adj-i'], ['adj-i']),
+                suffixInflection('んなきゃ', 'らなきゃ', [], ['-ya']),
+                suffixInflection('んなきゃ', 'れなきゃ', [], ['-ya']),
             ],
         },
         'kansai-ben negative': {
