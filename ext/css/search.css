@@ -49,7 +49,6 @@ body {
     background-color: var(--background-color);
     margin: 0;
     padding: 0;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     color: var(--text-color);
     height: 100%;
     overflow: hidden;
