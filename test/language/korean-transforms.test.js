@@ -708,7 +708,7 @@ const tests = [
             {term: '이다', source: '여야',     rule: 'ida', reasons: ['-아/어야']},
             {term: '이다', source: '여야겠',     rule: 'ida', reasons: ['-아/어야겠']},
             {term: '이다', source: '여야만',     rule: 'ida', reasons: ['-아/어야만']},
-            {term: '이다', source: '여야만',     rule: 'ida', reasons: ['-아/어야지']},
+            {term: '이다', source: '여야지',     rule: 'ida', reasons: ['-아/어야지']},
             {term: '이다', source: '여요',     rule: 'ida', reasons: ['-아/어요']},
         ],
     },

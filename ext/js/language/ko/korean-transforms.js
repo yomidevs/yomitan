@@ -3444,8 +3444,8 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅓㄹㅏ', '', [], ['p', 'f']),
             ],
         },
-        '-아/아서': {
-            name: '-아/아서',
+        '-아/어서': {
+            name: '-아/어서',
             rules: [
                 suffixInflection('ㅏㅅㅓ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅓㅅㅓ', 'ㄷㅏ', [], ['v', 'adj']),
@@ -3796,8 +3796,8 @@ export const koreanTransforms = {
         '-야': {
             name: '-야',
             rules: [
-                suffixInflection('ㅇㅏㄴㅣㅇㅑ', '아니다', [], ['adj']),
-                suffixInflection('ㅇㅣㅇㅑ', '이다', [], ['ida']),
+                suffixInflection('ㅇㅏㄴㅣㅇㅑ', 'ㅇㅏㄴㅣㄷㅏ', [], ['adj']),
+                suffixInflection('ㅇㅣㅇㅑ', 'ㅇㅣㄷㅏ', [], ['ida']),
             ],
         },
         '-언마는': {
