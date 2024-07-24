@@ -494,7 +494,7 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅡㄹ', '', [], ['p']),
             ],
         },
-        '-(으)ㄹ거': {
+        '-(으)ㄹ거나': {
             name: '-(으)ㄹ거나',
             rules: [
                 suffixInflection('ㄹㄱㅓㄴㅏ', 'ㄷㅏ', [], ['v', 'adj']),
