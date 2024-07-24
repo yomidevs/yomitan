@@ -948,7 +948,6 @@ const tests = [
             {term: 'ない',       source: 'ねえ',       rule: 'adj-i', reasons: ['-e']},
             {term: 'できる',     source: 'できねえ',   rule: 'v1',    reasons: ['negative', '-e']},
             {term: 'しんじる',   source: 'しんじねえ', rule: 'v1',    reasons: ['negative', '-e']},
-            {term: 'わかる',     source: 'わかんねえ', rule: 'v5',    reasons: ['negative', '-e']},
             {term: 'さむい',     source: 'さめえ',     rule: 'adj-i', reasons: ['-e']},
             {term: 'さむい',     source: 'さみい',     rule: 'adj-i', reasons: ['-e']},
             {term: 'あつい',     source: 'あちぇえ',   rule: 'adj-i', reasons: ['-e']},
@@ -988,6 +987,18 @@ const tests = [
             {term: 'でかい',     source: 'でけぇ',     rule: 'adj-i', reasons: ['-e']},
             {term: 'まずい',     source: 'まっぜぇ',   rule: 'adj-i', reasons: ['-e']},
             {term: 'あかい',     source: 'あけぇ',     rule: 'adj-i', reasons: ['-e']},
+        ],
+    },
+    {
+        category: 'n-slang',
+        valid: true,
+        tests: [
+            {term: 'わかる', source: 'わかんねえ', rule: 'v5', reasons: ['negative', 'n-slang', '-e']},
+            {term: 'する', source: 'すんな', rule: 'vs', reasons: ['imperative negative', 'n-slang']},
+            {term: 'やる', source: 'やんなさい', rule: 'v5', reasons: ['-nasai', 'n-slang']},
+            {term: '食べる', source: '食べらんない', rule: 'v1', reasons: ['potential or passive', 'negative', 'n-slang']},
+            {term: 'やる', source: 'やんなきゃ', rule: 'v5', reasons: ['negative', 'n-slang', '-ba', '-ya']},
+            {term: 'くれる', source: 'くんなきゃ', rule: 'v1', reasons: ['negative', '-ba', '-ya', 'n-slang']},
         ],
     },
     {
