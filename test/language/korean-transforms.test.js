@@ -691,10 +691,40 @@ const tests = [
         ],
     },
     {
+        category: '이다',
+        valid: true,
+        tests: [
+            {term: '이다', source: '이야',     rule: 'ida', reasons: ['-야']},
+
+
+            {term: '이다', source: '이어서',     rule: 'ida', reasons: ['-아/어서']},
+            {term: '이다', source: '이어야',     rule: 'ida', reasons: ['-아/어야']},
+            {term: '이다', source: '이어야겠',     rule: 'ida', reasons: ['-아/어야겠']},
+            {term: '이다', source: '이어야만',     rule: 'ida', reasons: ['-아/어야만']},
+            {term: '이다', source: '이어야지',     rule: 'ida', reasons: ['-아/어야지']},
+            {term: '이다', source: '이어요',     rule: 'ida', reasons: ['-아/어요']},
+
+            {term: '이다', source: '여서',     rule: 'ida', reasons: ['-아/어서']},
+            {term: '이다', source: '여야',     rule: 'ida', reasons: ['-아/어야']},
+            {term: '이다', source: '여야겠',     rule: 'ida', reasons: ['-아/어야겠']},
+            {term: '이다', source: '여야만',     rule: 'ida', reasons: ['-아/어야만']},
+            {term: '이다', source: '여야만',     rule: 'ida', reasons: ['-아/어야지']},
+            {term: '이다', source: '여요',     rule: 'ida', reasons: ['-아/어요']},
+        ],
+    },
+    {
         category: 'invalid deinflections',
         valid: false,
         tests: [
             {term: '보다', source: '보십시다',     rule: 'v', reasons: ['-(으)시', '-(으)ㅂ시다']},
+
+            // ida
+            {term: '이다', source: '이서',     rule: 'ida', reasons: ['아/어서']},
+            {term: '이다', source: '이야',     rule: 'ida', reasons: ['아/어야']},
+            {term: '이다', source: '이야겠',     rule: 'ida', reasons: ['아/어야겠']},
+            {term: '이다', source: '이야만',     rule: 'ida', reasons: ['아/어야만']},
+            {term: '이다', source: '이야지',     rule: 'ida', reasons: ['아/어야지']},
+            {term: '이다', source: '이요',     rule: 'ida', reasons: ['아/어요']},
         ],
     },
 ];
