@@ -1436,7 +1436,7 @@ export class OptionsUtil {
     }
 
     /**
-     * - Added scanning.scanWithoutMousemove
+     * - Added dictionary alias
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion48(options) {

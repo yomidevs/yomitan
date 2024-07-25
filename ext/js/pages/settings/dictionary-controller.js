@@ -187,7 +187,9 @@ class DictionaryEntry {
 
     /** */
     _onAliasInput() {
-        if (this._aliasNode.textContent === '') this._aliasNode.textContent = this.dictionaryTitle;
+        if (this._aliasNode.textContent === '') {
+            this._aliasNode.textContent = this.dictionaryTitle;
+        }
         this._aliasHiddenNode.value = `${this._aliasNode.textContent}`;
         this._aliasHiddenNode.dispatchEvent(new Event('change'));
     }

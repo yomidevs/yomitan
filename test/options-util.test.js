@@ -639,7 +639,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 47,
+        version: 48,
         global: {
             database: {
                 prefixWildcardsSupported: false,
