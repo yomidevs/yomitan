@@ -382,7 +382,6 @@ a:has(rt) {
     overflow-y: scroll;
     align-items: stretch;
     justify-content: flex-start;
-    overscroll-behavior: contain;
 }
 .content-body {
     flex: 1 1 auto;
@@ -416,6 +415,9 @@ a:has(rt) {
 .content-footer {
     width: var(--content-width);
     max-width: 100%;
+}
+.contain-overscroll {
+    overscroll-behavior: contain;
 }
 
 
