@@ -1458,9 +1458,8 @@ export class Translator {
      * @param {import('translation').TermEnabledDictionaryMap|import('translation').KanjiEnabledDictionaryMap} enabledDictionaryMap
      * @returns {string}
     */
-   _getDictionaryAlias(dictionary, enabledDictionaryMap) {
+    _getDictionaryAlias(dictionary, enabledDictionaryMap) {
         const info = enabledDictionaryMap.get(dictionary);
-        console.log(enabledDictionaryMap)
         return typeof info !== 'undefined' ? info.alias : dictionary;
     }
 
