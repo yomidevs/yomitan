@@ -7,6 +7,7 @@
                     "${title}",
                     {
                         "index": 0,
+                        "alias": "",
                         "priority": 0
                     }
                 ]
@@ -30,7 +31,7 @@
                     "${title}",
                     {
                         "index": 0,
-                        "alias": "${title}",
+                        "alias": "",
                         "priority": 0,
                         "allowSecondarySearches": false,
                         "partsOfSpeechFilter": true,
