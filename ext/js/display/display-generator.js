@@ -176,7 +176,9 @@ export class DisplayGenerator {
         if (this._language === 'ja') { glyphContainer.style.fontFamily = 'kanji-stroke-orders, sans-serif'; }
         const groupedFrequencies = groupKanjiFrequencies(dictionaryEntry.frequencies);
 
-        const dictionaryTag = this._createDictionaryTag(dictionaryEntry.dictionary);
+        const dictionaryTag = this._createDictionaryTag('');
+        dictionaryTag.name = dictionaryEntry.dictionaryAlias;
+        dictionaryTag.content = [dictionaryEntry.dictionary];
 
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, true);
         this._appendMultiple(tagContainer, this._createTag.bind(this), [...dictionaryEntry.tags, dictionaryTag]);

@@ -154,7 +154,7 @@ export class Translator {
         const tagAggregator = new TranslatorTagAggregator();
         for (const {character, onyomi, kunyomi, tags, definitions, stats, dictionary} of databaseEntries) {
             const expandedStats = await this._expandKanjiStats(stats, dictionary);
-            const dictionaryEntry = this._createKanjiDictionaryEntry(character, dictionary, onyomi, kunyomi, expandedStats, definitions);
+            const dictionaryEntry = this._createKanjiDictionaryEntry(character, dictionary, "blank", onyomi, kunyomi, expandedStats, definitions);
             dictionaryEntries.push(dictionaryEntry);
             tagAggregator.addTags(dictionaryEntry.tags, dictionary, tags);
         }
@@ -1457,7 +1457,7 @@ export class Translator {
      * @param {string} dictionary
      * @param {import('translation').TermEnabledDictionaryMap|import('translation').KanjiEnabledDictionaryMap} enabledDictionaryMap
      * @returns {string}
-    */
+     */
     _getDictionaryAlias(dictionary, enabledDictionaryMap) {
         const info = enabledDictionaryMap.get(dictionary);
         return typeof info !== 'undefined' ? info.alias : dictionary;
@@ -1520,17 +1520,19 @@ export class Translator {
     /**
      * @param {string} character
      * @param {string} dictionary
+     * @param {string} dictionaryAlias
      * @param {string[]} onyomi
      * @param {string[]} kunyomi
      * @param {import('dictionary').KanjiStatGroups} stats
      * @param {string[]} definitions
      * @returns {import('dictionary').KanjiDictionaryEntry}
      */
-    _createKanjiDictionaryEntry(character, dictionary, onyomi, kunyomi, stats, definitions) {
+    _createKanjiDictionaryEntry(character, dictionary, dictionaryAlias, onyomi, kunyomi, stats, definitions) {
         return {
             type: 'kanji',
             character,
             dictionary,
+            dictionaryAlias,
             onyomi,
             kunyomi,
             tags: [],
@@ -1774,7 +1776,7 @@ export class Translator {
         let score = Number.MIN_SAFE_INTEGER;
         let dictionaryIndex = Number.MAX_SAFE_INTEGER;
         let dictionaryPriority = Number.MIN_SAFE_INTEGER;
-        const dictionaryAlias = dictionaryEntries[0]?.dictionaryAlias;
+        const dictionaryAlias = dictionaryEntries[0]?.dictionaryAlias; // wrong
         let maxOriginalTextLength = 0;
         let isPrimary = false;
         /** @type {import('dictionary').TermDefinition[]} */

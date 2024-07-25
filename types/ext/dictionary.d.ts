@@ -83,6 +83,10 @@ export type KanjiDictionaryEntry = {
      */
     dictionary: string;
     /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
+    /**
      * Onyomi readings for the kanji character.
      */
     onyomi: string[];
