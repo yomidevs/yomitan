@@ -141,7 +141,8 @@ export class DisplayGenerator {
             } else {
                 dictionaryTag.redundant = false;
                 dictionaryTag.dictionaries.push(dictionary);
-                dictionaryTag.name = dictionary;
+                dictionaryTag.name = dictionaryEntry.dictionaryAlias;
+                dictionaryTag.content = [dictionary];
             }
 
             const node2 = this._createTermDefinition(definition, dictionaryTag, headwords, uniqueTerms, uniqueReadings);
