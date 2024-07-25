@@ -63,7 +63,9 @@ class DictionaryEntry {
         /** @type {HTMLButtonElement} */
         this._updatesAvailable = querySelectorNotNull(fragment, '.dictionary-update-available');
         /** @type {HTMLElement} */
-        this._titleNode = querySelectorNotNull(fragment, '.dictionary-title');
+        this._aliasNode = querySelectorNotNull(fragment, '.dictionary-alias');
+        /** @type {HTMLInputElement} */
+        this._aliasHiddenNode = querySelectorNotNull(fragment, '.dictionary-alias-hidden');
         /** @type {HTMLElement} */
         this._versionNode = querySelectorNotNull(fragment, '.dictionary-revision');
         /** @type {HTMLElement} */
@@ -79,9 +81,12 @@ class DictionaryEntry {
     prepare() {
         //
         const index = this._index;
-        const {title, revision, version} = this._dictionaryInfo;
+        const {revision, version} = this._dictionaryInfo;
 
-        this._titleNode.textContent = title;
+        this._aliasHiddenNode.dataset.setting = `dictionaries[${index}].alias`;
+        this._eventListeners.addEventListener(this._aliasNode, 'input', this._onAliasInput.bind(this), false);
+        this._eventListeners.addEventListener(this._aliasHiddenNode, 'settingChanged', this._onAliasInitialized.bind(this), false);
+
         this._versionNode.textContent = `rev.${revision}`;
         this._outdatedButton.hidden = (version >= 3);
         this._priorityInput.dataset.setting = `dictionaries[${index}].priority`;
@@ -178,6 +183,21 @@ class DictionaryEntry {
                 this._showMoveToModal();
                 break;
         }
+    }
+
+    /** */
+    _onAliasInput() {
+        if (this._aliasNode.textContent === '') this._aliasNode.textContent = this.dictionaryTitle;
+        this._aliasHiddenNode.value = `${this._aliasNode.textContent}`;
+        this._aliasHiddenNode.dispatchEvent(new Event('change'));
+    }
+
+    /**
+     * @param {import('dom-data-binder').SettingChangedEvent} e
+     */
+    _onAliasInitialized(e) {
+        const {detail: {value}} = e;
+        this._aliasNode.textContent = value === '' ? this.dictionaryTitle : `${value}`;
     }
 
     /**
@@ -600,6 +620,7 @@ export class DictionaryController {
     static createDefaultDictionarySettings(name, enabled, styles) {
         return {
             name,
+            alias: name,
             priority: 0,
             enabled,
             allowSecondarySearches: false,

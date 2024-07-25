@@ -107,6 +107,7 @@ function createProfileOptionsTestData1() {
         },
         dictionaries: {
             'Test Dictionary': {
+                alias: 'Test Dictionary',
                 priority: 0,
                 enabled: true,
                 allowSecondarySearches: false,
@@ -438,6 +439,7 @@ function createProfileOptionsUpdatedTestData1() {
         dictionaries: [
             {
                 name: 'Test Dictionary',
+                alias: 'Test Dictionary',
                 priority: 0,
                 enabled: true,
                 allowSecondarySearches: false,

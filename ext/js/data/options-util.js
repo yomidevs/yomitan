@@ -559,6 +559,7 @@ export class OptionsUtil {
             this._updateVersion45,
             this._updateVersion46,
             this._updateVersion47,
+            this._updateVersion48,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1431,6 +1432,20 @@ export class OptionsUtil {
     async _updateVersion47(options) {
         for (const profile of options.profiles) {
             profile.options.scanning.scanWithoutMousemove = true;
+        }
+    }
+
+    /**
+     * - Added scanning.scanWithoutMousemove
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion48(options) {
+        for (const {options: profileOptions} of options.profiles) {
+            if (Array.isArray(profileOptions.dictionaries)) {
+                for (const dictionary of profileOptions.dictionaries) {
+                    dictionary.alias = dictionary.name;
+                }
+            }
         }
     }
 

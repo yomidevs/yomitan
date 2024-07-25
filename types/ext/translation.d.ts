@@ -141,6 +141,10 @@ export type FindTermDictionary = {
      */
     index: number;
     /**
+     * The alias of the dictionary
+     */
+    alias: string;
+    /**
      * The priority of the dictionary
      */
     priority: number;

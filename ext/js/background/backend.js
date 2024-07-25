@@ -2471,6 +2471,7 @@ export class Backend {
         if (mode === 'merge' && !enabledDictionaryMap.has(mainDictionary)) {
             enabledDictionaryMap.set(mainDictionary, {
                 index: enabledDictionaryMap.size,
+                alias: mainDictionary,
                 priority: 0,
                 allowSecondarySearches: false,
                 partsOfSpeechFilter: true,
@@ -2518,6 +2519,7 @@ export class Backend {
             const {name, priority, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
             enabledDictionaryMap.set(name, {
                 index: enabledDictionaryMap.size,
+                alias: name,
                 priority,
                 allowSecondarySearches,
                 partsOfSpeechFilter,

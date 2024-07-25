@@ -30,6 +30,7 @@
                     "${title}",
                     {
                         "index": 0,
+                        "alias": "${title}",
                         "priority": 0,
                         "allowSecondarySearches": false,
                         "partsOfSpeechFilter": true,

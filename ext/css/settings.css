@@ -2322,6 +2322,9 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 .dictionary-item[data-enabled=false] .dictionary-title {
     color: var(--text-color-light2);
 }
+input[type=text].dictionary-alias-hidden {
+    display: none;
+}
 input[type=number].dictionary-priority {
     margin-top: 0;
     margin-right: 0.5em;
