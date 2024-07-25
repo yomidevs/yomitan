@@ -254,22 +254,34 @@ class DictionaryEntry {
      * @returns {boolean}
      */
     _setupDetails(detailsTable) {
-        /** @type {[label: string, key: 'author'|'url'|'description'|'attribution'|'sourceLanguage'|'targetLanguage'][]} */
-        const targets = [
-            ['Author', 'author'],
-            ['URL', 'url'],
-            ['Description', 'description'],
-            ['Attribution', 'attribution'],
-            ['Source Language', 'sourceLanguage'],
-            ['Target Language', 'targetLanguage'],
-        ];
+        /** @type {Partial<Record<keyof (typeof this._dictionaryInfo & typeof this._dictionaryInfo.counts), string>>} */
+        const targets = {
+            author: 'Author',
+            url: 'URL',
+            description: 'Description',
+            attribution: 'Attribution',
+            sourceLanguage: 'Source Language',
+            targetLanguage: 'Target Language',
+            terms: 'Term Count',
+            kanji: 'Kanji Count',
+            kanjiMeta: 'Kanji Meta Count',
+            tagMeta: 'Tag Count',
+            media: 'Media Count',
+        };
 
-        const dictionaryInfo = this._dictionaryInfo;
+        const dictionaryInfo = {...this._dictionaryInfo, ...this._dictionaryInfo.counts};
         const fragment = document.createDocumentFragment();
         let any = false;
-        for (const [label, key] of targets) {
+        for (const [key, label] of /** @type {([keyof (typeof this._dictionaryInfo & typeof this._dictionaryInfo.counts), string])[]} */ (Object.entries(targets))) {
             const info = dictionaryInfo[key];
-            if (typeof info !== 'string') { continue; }
+            const displayText = ((_info) => {
+                if (typeof _info === 'string') { return _info; }
+                if (_info && typeof _info === 'object' && 'total' in _info) {
+                    return _info.total ? `${_info.total}` : false;
+                }
+                return false;
+            })(info);
+            if (!displayText) { continue; }
 
             const details = /** @type {HTMLElement} */ (this._dictionaryController.instantiateTemplate('dictionary-details-entry'));
             details.dataset.type = key;
@@ -280,7 +292,7 @@ class DictionaryEntry {
             const infoElement = querySelectorNotNull(details, '.dictionary-details-entry-info');
 
             labelElement.textContent = `${label}:`;
-            infoElement.textContent = info;
+            infoElement.textContent = displayText;
             fragment.appendChild(details);
 
             any = true;
