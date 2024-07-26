@@ -213,7 +213,7 @@ export class DOMDataBinder {
             return;
         }
         if (this._isElementContentEditable(element)) {
-            this._setElementValue(element, element.textContent ?? '');
+            this._setElementValue(element, element.textContent);
             return;
         }
         this._setElementValue(element, observer.value);
