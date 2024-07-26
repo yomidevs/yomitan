@@ -6,6 +6,7 @@
         "type": "kanji",
         "character": "打",
         "dictionary": "Test Dictionary 2",
+        "dictionaryAlias": "",
         "onyomi": [
           "ダ",
           "ダアス"
@@ -150,6 +151,7 @@
         "type": "kanji",
         "character": "込",
         "dictionary": "Test Dictionary 2",
+        "dictionaryAlias": "",
         "onyomi": [],
         "kunyomi": [
           "-こ.む",
