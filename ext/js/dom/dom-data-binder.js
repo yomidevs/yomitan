@@ -175,7 +175,7 @@ export class DOMDataBinder {
         const metadata = this._createElementMetadata(element);
         if (typeof metadata === 'undefined') { return void 0; }
         const type = this._getNormalizedElementType(element);
-        const eventType = this._getEventType(element);
+        const eventType = this._getElementEventType(element);
         /** @type {import('dom-data-binder').ElementObserver<T>} */
         const observer = {
             element,
@@ -290,8 +290,8 @@ export class DOMDataBinder {
      * @param {Element} element
      * @returns {import('dom-data-binder').EventType}
      */
-    _getEventType(element) {
-        if (this._isContentEditable(element)) {
+    _getElementEventType(element) {
+        if (this._isElementContentEditable(element)) {
             return 'focusout';
         }
         return 'change';
@@ -302,7 +302,7 @@ export class DOMDataBinder {
      * @returns {import('dom-data-binder').NormalizedElementType}
      */
     _getNormalizedElementType(element) {
-        if (this._isContentEditable(element)) {
+        if (this._isElementContentEditable(element)) {
             return 'contenteditable';
         }
         switch (element.nodeName.toUpperCase()) {
@@ -331,7 +331,7 @@ export class DOMDataBinder {
      * @param {Element} element
      * @returns {boolean}
      */
-    _isContentEditable(element) {
+    _isElementContentEditable(element) {
         return element instanceof HTMLElement && element.isContentEditable;
     }
 }
