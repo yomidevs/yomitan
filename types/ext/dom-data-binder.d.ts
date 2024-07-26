@@ -43,6 +43,7 @@ export type ElementObserver<T = unknown> = {
     type: NormalizedElementType;
     value: unknown;
     hasValue: boolean;
+    eventType: string;
     onChange: null | (() => void);
     metadata: T;
 };
@@ -54,6 +55,8 @@ export type SettingChangedEventData = {
 export type SettingChangedEvent = CustomEvent<SettingChangedEventData>;
 
 export type NormalizedElementType = 'textarea' | 'select' | 'text' | 'checkbox' | 'number' | 'contenteditable' | null;
+
+export type EventType = 'change' | 'focusout'
 
 export type UpdateTaskValue = {all: boolean};
 

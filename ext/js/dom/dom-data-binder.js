@@ -175,18 +175,18 @@ export class DOMDataBinder {
         const metadata = this._createElementMetadata(element);
         if (typeof metadata === 'undefined') { return void 0; }
         const type = this._getNormalizedElementType(element);
+        const eventType = this._getEventType(element);
         /** @type {import('dom-data-binder').ElementObserver<T>} */
         const observer = {
             element,
             type,
             value: null,
             hasValue: false,
+            eventType,
             onChange: null,
             metadata,
         };
         observer.onChange = this._onElementChange.bind(this, observer);
-
-        const eventType = type === 'contenteditable' ? 'focusout' : 'change';
         element.addEventListener(eventType, observer.onChange, false);
 
         void this._updateTasks.enqueue(observer, {all: false});
@@ -200,7 +200,7 @@ export class DOMDataBinder {
      */
     _removeObserver(element, observer) {
         if (observer.onChange === null) { return; }
-        element.removeEventListener('change', observer.onChange, false);
+        element.removeEventListener(observer.eventType, observer.onChange, false);
         observer.onChange = null;
     }
 
@@ -285,12 +285,24 @@ export class DOMDataBinder {
         return null;
     }
 
+
+    /**
+     * @param {Element} element
+     * @returns {import('dom-data-binder').EventType}
+     */
+    _getEventType(element) {
+        if (this._isContentEditable(element)) {
+            return 'focusout';
+        }
+        return 'change';
+    }
+
     /**
      * @param {Element} element
      * @returns {import('dom-data-binder').NormalizedElementType}
      */
     _getNormalizedElementType(element) {
-        if (element instanceof HTMLElement && element.isContentEditable) {
+        if (this._isContentEditable(element)) {
             return 'contenteditable';
         }
         switch (element.nodeName.toUpperCase()) {
@@ -313,5 +325,13 @@ export class DOMDataBinder {
                 return 'select';
         }
         return null;
+    }
+
+    /**
+     * @param {Element} element
+     * @returns {boolean}
+     */
+    _isContentEditable(element) {
+        return element instanceof HTMLElement && element.isContentEditable;
     }
 }
