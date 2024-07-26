@@ -134,14 +134,14 @@ export class DisplayGenerator {
         const dictionaryTag = this._createDictionaryTag('');
         for (let i = 0, ii = definitions.length; i < ii; ++i) {
             const definition = definitions[i];
-            const {dictionary} = definition;
+            const {dictionary, dictionaryAlias} = definition;
 
             if (dictionaryTag.dictionaries.includes(dictionary)) {
                 dictionaryTag.redundant = true;
             } else {
                 dictionaryTag.redundant = false;
                 dictionaryTag.dictionaries.push(dictionary);
-                dictionaryTag.name = dictionaryEntry.dictionaryAlias;
+                dictionaryTag.name = dictionaryAlias;
                 dictionaryTag.content = [dictionary];
             }
 
