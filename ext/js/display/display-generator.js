@@ -799,22 +799,23 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createFrequencyGroup(details, kanji) {
-        const {dictionary, frequencies} = details;
+        const {dictionary, dictionaryAlias, frequencies} = details;
 
         const node = this._instantiate('frequency-group-item');
         const body = this._querySelector(node, '.tag-body-content');
 
         const tagLabel = this._querySelector(node, '.tag-label-content');
-        this._setTextContent(tagLabel, dictionary);
-        node.dataset.details = dictionary;
+        const tag = this._querySelector(node, '.tag');
+
+        this._setTextContent(tagLabel, dictionaryAlias);
 
         const ii = frequencies.length;
         for (let i = 0; i < ii; ++i) {
             const item = frequencies[i];
             const itemNode = (
                 kanji ?
-                this._createKanjiFrequency(/** @type {import('dictionary-data-util').KanjiFrequency} */ (item), dictionary) :
-                this._createTermFrequency(/** @type {import('dictionary-data-util').TermFrequency} */ (item), dictionary)
+                this._createKanjiFrequency(/** @type {import('dictionary-data-util').KanjiFrequency} */ (item), dictionary, dictionaryAlias) :
+                this._createTermFrequency(/** @type {import('dictionary-data-util').TermFrequency} */ (item), dictionary, dictionaryAlias)
             );
             itemNode.dataset.index = `${i}`;
             body.appendChild(itemNode);
@@ -823,24 +824,26 @@ export class DisplayGenerator {
         body.dataset.count = `${ii}`;
         node.dataset.count = `${ii}`;
         node.dataset.details = dictionary;
-
+        tag.dataset.details = dictionary;
         return node;
     }
 
     /**
      * @param {import('dictionary-data-util').TermFrequency} details
      * @param {string} dictionary
+     * @param {string} dictionaryAlias
      * @returns {HTMLElement}
      */
-    _createTermFrequency(details, dictionary) {
+    _createTermFrequency(details, dictionary, dictionaryAlias) {
         const {term, reading, values} = details;
         const node = this._instantiate('term-frequency-item');
         const tagLabel = this._querySelector(node, '.tag-label-content');
+        const tag = this._querySelector(node, '.tag');
         const disambiguationTerm = this._querySelector(node, '.frequency-disambiguation-term');
         const disambiguationReading = this._querySelector(node, '.frequency-disambiguation-reading');
         const frequencyValueList = this._querySelector(node, '.frequency-value-list');
 
-        this._setTextContent(tagLabel, dictionary);
+        this._setTextContent(tagLabel, dictionaryAlias);
         this._setTextContent(disambiguationTerm, term, this._language);
         this._setTextContent(disambiguationReading, (reading !== null ? reading : ''), this._language);
         this._populateFrequencyValueList(frequencyValueList, values);
@@ -853,27 +856,30 @@ export class DisplayGenerator {
         node.dataset.readingIsSame = `${reading === term}`;
         node.dataset.dictionary = dictionary;
         node.dataset.details = dictionary;
-
+        tag.dataset.details = dictionary;
         return node;
     }
 
     /**
      * @param {import('dictionary-data-util').KanjiFrequency} details
      * @param {string} dictionary
+     * @param {string} dictionaryAlias
      * @returns {HTMLElement}
      */
-    _createKanjiFrequency(details, dictionary) {
+    _createKanjiFrequency(details, dictionary, dictionaryAlias) {
         const {character, values} = details;
         const node = this._instantiate('kanji-frequency-item');
         const tagLabel = this._querySelector(node, '.tag-label-content');
+        const tag = this._querySelector(node, '.tag');
         const frequencyValueList = this._querySelector(node, '.frequency-value-list');
 
-        this._setTextContent(tagLabel, dictionary);
+        this._setTextContent(tagLabel, dictionaryAlias);
         this._populateFrequencyValueList(frequencyValueList, values);
 
         node.dataset.character = character;
         node.dataset.dictionary = dictionary;
         node.dataset.details = dictionary;
+        tag.dataset.details = dictionary;
 
         return node;
     }

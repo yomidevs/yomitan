@@ -29,6 +29,7 @@ describe('AnkiTemplateRenderer', () => {
                 type: 'kanji',
                 character: 'c',
                 dictionary: 'dictionary',
+                dictionaryAlias: 'dictionaryAlias',
                 onyomi: [],
                 kunyomi: [],
                 tags: [],

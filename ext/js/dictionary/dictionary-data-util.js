@@ -58,13 +58,16 @@ export function groupTermFrequencies(dictionaryEntry) {
 
     /** @type {import('dictionary-data-util').TermFrequenciesMap1} */
     const map1 = new Map();
-    for (const {headwordIndex, dictionary, hasReading, frequency, displayValue} of sourceFrequencies) {
+    /** @type {Map<string, string>} */
+    const aliasMap = new Map();
+    for (const {headwordIndex, dictionary, dictionaryAlias, hasReading, frequency, displayValue} of sourceFrequencies) {
         const {term, reading} = headwords[headwordIndex];
 
         let map2 = map1.get(dictionary);
         if (typeof map2 === 'undefined') {
             map2 = new Map();
             map1.set(dictionary, map2);
+            aliasMap.set(dictionary, dictionaryAlias);
         }
 
         const readingKey = hasReading ? reading : null;
@@ -81,6 +84,7 @@ export function groupTermFrequencies(dictionaryEntry) {
     const results = [];
     for (const [dictionary, map2] of map1.entries()) {
         const frequencies = [];
+        const dictionaryAlias = aliasMap.get(dictionary) ?? dictionary;
         for (const {term, reading, values} of map2.values()) {
             frequencies.push({
                 term,
@@ -88,7 +92,7 @@ export function groupTermFrequencies(dictionaryEntry) {
                 values: [...values.values()],
             });
         }
-        results.push({dictionary, frequencies});
+        results.push({dictionary, frequencies, dictionaryAlias});
     }
     return results;
 }
@@ -100,11 +104,14 @@ export function groupTermFrequencies(dictionaryEntry) {
 export function groupKanjiFrequencies(sourceFrequencies) {
     /** @type {import('dictionary-data-util').KanjiFrequenciesMap1} */
     const map1 = new Map();
-    for (const {dictionary, character, frequency, displayValue} of sourceFrequencies) {
+    /** @type {Map<string, string>} */
+    const aliasMap = new Map();
+    for (const {dictionary, dictionaryAlias, character, frequency, displayValue} of sourceFrequencies) {
         let map2 = map1.get(dictionary);
         if (typeof map2 === 'undefined') {
             map2 = new Map();
             map1.set(dictionary, map2);
+            aliasMap.set(dictionary, dictionaryAlias);
         }
 
         let frequencyData = map2.get(character);
@@ -119,13 +126,14 @@ export function groupKanjiFrequencies(sourceFrequencies) {
     const results = [];
     for (const [dictionary, map2] of map1.entries()) {
         const frequencies = [];
+        const dictionaryAlias = aliasMap.get(dictionary) ?? dictionary;
         for (const {character, values} of map2.values()) {
             frequencies.push({
                 character,
                 values: [...values.values()],
             });
         }
-        results.push({dictionary, frequencies});
+        results.push({dictionary, frequencies, dictionaryAlias});
     }
     return results;
 }
