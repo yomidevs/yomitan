@@ -56,7 +56,7 @@ export type SettingChangedEvent = CustomEvent<SettingChangedEventData>;
 
 export type NormalizedElementType = 'textarea' | 'select' | 'text' | 'checkbox' | 'number' | 'contenteditable' | null;
 
-export type EventType = 'change' | 'focusout'
+export type EventType = 'change' | 'blur'
 
 export type UpdateTaskValue = {all: boolean};
 

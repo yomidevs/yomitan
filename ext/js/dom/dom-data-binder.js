@@ -209,9 +209,14 @@ export class DOMDataBinder {
      * @param {import('dom-data-binder').ElementObserver<T>} observer
      */
     _onObserverChildrenUpdated(element, observer) {
-        if (observer.hasValue) {
-            this._setElementValue(element, observer.value);
+        if (!observer.hasValue) {
+            return;
         }
+        if (this._isElementContentEditable(element)) {
+            this._setElementValue(element, element.textContent ?? '');
+            return;
+        }
+        this._setElementValue(element, observer.value);
     }
 
     /**
@@ -292,7 +297,7 @@ export class DOMDataBinder {
      */
     _getElementEventType(element) {
         if (this._isElementContentEditable(element)) {
-            return 'focusout';
+            return 'blur';
         }
         return 'change';
     }

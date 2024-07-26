@@ -86,6 +86,7 @@ class DictionaryEntry {
         this._outdatedButton.hidden = (version >= 3);
         this._priorityInput.dataset.setting = `dictionaries[${index}].priority`;
         this._enabledCheckbox.dataset.setting = `dictionaries[${index}].enabled`;
+        this._eventListeners.addEventListener(this._aliasNode, 'blur', this._onAliasBlur.bind(this), false);
         this._eventListeners.addEventListener(this._enabledCheckbox, 'settingChanged', this._onEnabledChanged.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
@@ -177,6 +178,15 @@ class DictionaryEntry {
             case 'moveTo':
                 this._showMoveToModal();
                 break;
+        }
+    }
+
+    /**
+     *
+     */
+    _onAliasBlur() {
+        if (!this._aliasNode.textContent) {
+            this._aliasNode.textContent = this.dictionaryTitle;
         }
     }
 
