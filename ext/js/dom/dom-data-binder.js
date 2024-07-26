@@ -174,10 +174,11 @@ export class DOMDataBinder {
     _createObserver(element) {
         const metadata = this._createElementMetadata(element);
         if (typeof metadata === 'undefined') { return void 0; }
+        const type = this._getNormalizedElementType(element);
         /** @type {import('dom-data-binder').ElementObserver<T>} */
         const observer = {
             element,
-            type: this._getNormalizedElementType(element),
+            type,
             value: null,
             hasValue: false,
             onChange: null,
@@ -185,7 +186,8 @@ export class DOMDataBinder {
         };
         observer.onChange = this._onElementChange.bind(this, observer);
 
-        element.addEventListener('change', observer.onChange, false);
+        const eventType = type === 'contenteditable' ? 'focusout' : 'change';
+        element.addEventListener(eventType, observer.onChange, false);
 
         void this._updateTasks.enqueue(observer, {all: false});
 
@@ -239,6 +241,9 @@ export class DOMDataBinder {
             case 'select':
                 /** @type {HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement} */ (element).value = typeof value === 'string' ? value : `${value}`;
                 break;
+            case 'contenteditable':
+                element.textContent = typeof value === 'string' ? value : `${value}`;
+                break;
         }
 
         /** @type {number|string|boolean} */
@@ -274,6 +279,8 @@ export class DOMDataBinder {
                 return /** @type {HTMLTextAreaElement} */ (element).value;
             case 'select':
                 return /** @type {HTMLSelectElement} */ (element).value;
+            case 'contenteditable':
+                return element.textContent;
         }
         return null;
     }
@@ -283,6 +290,9 @@ export class DOMDataBinder {
      * @returns {import('dom-data-binder').NormalizedElementType}
      */
     _getNormalizedElementType(element) {
+        if (element instanceof HTMLElement && element.isContentEditable) {
+            return 'contenteditable';
+        }
         switch (element.nodeName.toUpperCase()) {
             case 'INPUT':
             {

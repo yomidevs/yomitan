@@ -53,7 +53,7 @@ export type SettingChangedEventData = {
 
 export type SettingChangedEvent = CustomEvent<SettingChangedEventData>;
 
-export type NormalizedElementType = 'textarea' | 'select' | 'text' | 'checkbox' | 'number' | null;
+export type NormalizedElementType = 'textarea' | 'select' | 'text' | 'checkbox' | 'number' | 'contenteditable' | null;
 
 export type UpdateTaskValue = {all: boolean};
 
