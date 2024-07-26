@@ -129,7 +129,6 @@ export type KanjiDictionaryEntry = {
     type: 'kanji';
     character: string;
     dictionary: string;
-    dictionaryAlias: string;
     onyomi: string[];
     kunyomi: string[];
     glossary: string[];
@@ -180,7 +179,6 @@ export type TermDictionaryEntry = {
     isPrimary?: boolean;
     readonly sequence: number;
     readonly dictionary: string;
-    readonly dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;

@@ -327,7 +327,7 @@ function getDefinition(dictionaryEntry, context, resultOutputMode, dictionarySty
  * @returns {import('anki-templates').KanjiDictionaryEntry}
  */
 function getKanjiDefinition(dictionaryEntry, context) {
-    const {character, dictionary, dictionaryAlias, onyomi, kunyomi, definitions} = dictionaryEntry;
+    const {character, dictionary, onyomi, kunyomi, definitions} = dictionaryEntry;
 
     let {url} = context;
     if (typeof url !== 'string') { url = ''; }
@@ -343,7 +343,6 @@ function getKanjiDefinition(dictionaryEntry, context) {
         type: 'kanji',
         character,
         dictionary,
-        dictionaryAlias,
         onyomi,
         kunyomi,
         glossary: definitions,
@@ -423,7 +422,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
         case 'merge': type = 'termMerged'; break;
     }
 
-    const {inflectionRuleChainCandidates, score, dictionaryIndex, dictionaryAlias, dictionaryPriority, sourceTermExactMatchCount, definitions} = dictionaryEntry;
+    const {inflectionRuleChainCandidates, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, definitions} = dictionaryEntry;
 
     let {url} = context;
     if (typeof url !== 'string') { url = ''; }
@@ -456,7 +455,6 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
         isPrimary: (type === 'term' ? dictionaryEntry.isPrimary : void 0),
         get sequence() { return getCachedValue(sequence); },
         get dictionary() { return getCachedValue(dictionaryNames)[0]; },
-        dictionaryAlias,
         dictionaryOrder: {
             index: dictionaryIndex,
             priority: dictionaryPriority,
