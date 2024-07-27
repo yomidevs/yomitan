@@ -469,6 +469,11 @@ export class TextScanner extends EventDispatcher {
                 return;
             }
 
+            if (true) {
+                // Set the offset of textSource to the start of the word
+                const {fullContent, startOffset} = textSource;
+            }
+
             const getSearchContextPromise = this._getSearchContext();
             const getSearchContextResult = getSearchContextPromise instanceof Promise ? await getSearchContextPromise : getSearchContextPromise;
             const {detail} = getSearchContextResult;
@@ -1284,6 +1289,7 @@ export class TextScanner extends EventDispatcher {
         const sentenceBackwardQuoteMap = this._sentenceBackwardQuoteMap;
         const layoutAwareScan = this._layoutAwareScan;
         const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
+        debugger;
         if (searchText.length === 0) { return null; }
 
         /** @type {import('api').FindTermsDetails} */
@@ -1367,6 +1373,7 @@ export class TextScanner extends EventDispatcher {
                 normalizeCssZoom: this._normalizeCssZoom,
                 language: this._language,
             });
+            console.log(textSource);
             if (textSource !== null) {
                 try {
                     await this._search(textSource, searchTerms, searchKanji, inputInfo);

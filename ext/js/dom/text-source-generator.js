@@ -35,6 +35,7 @@ export class TextSourceGenerator {
      * @returns {?import('text-source').TextSource}
      */
     getRangeFromPoint(x, y, options) {
+        // debugger;
         for (const handler of this._getRangeFromPointHandlers) {
             const result = handler(x, y, options);
             if (result !== null) { return result; }
@@ -531,19 +532,20 @@ export class TextSourceGenerator {
         let previousStyles = null;
         try {
             let i = 0;
-            let startContinerPre = null;
+            let startContainerPre = null;
             while (true) {
                 const range = this._caretRangeFromPoint(x, y);
+                debugger;
                 if (range === null) {
                     return null;
                 }
 
                 const startContainer = range.startContainer;
-                if (startContinerPre !== startContainer) {
+                if (startContainerPre !== startContainer) {
                     if (this._isPointInRange(x, y, range, normalizeCssZoom, language)) {
                         return range;
                     }
-                    startContinerPre = startContainer;
+                    startContainerPre = startContainer;
                 }
 
                 if (previousStyles === null) { previousStyles = new Map(); }
