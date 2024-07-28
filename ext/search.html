@@ -44,10 +44,6 @@
                                         <label class="toggle"><input type="checkbox" id="clipboard-monitor-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
                                         <span class="search-option-label">Clipboard monitor</span>
                                     </label>
-                                    <div class="search-option" id="query-parser-mode-container" hidden>
-                                        <span class="search-option-pre-label">Parser:</span>
-                                        <select id="query-parser-mode-select"></select>
-                                    </div>
                                 </div>
                                 <div class="search-option" id="search-settings-button" data-modal-action="show,search-settings"><span class="icon" data-icon="cog"></span></div>
                             </div>
@@ -102,6 +98,17 @@
         <div class="modal-title">Search Settings</div>
     </div>
     <div class="modal-body">
+        <div class="settings-item" id="query-parser-mode-container" hidden><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">
+                    Parser
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <select id="query-parser-mode-select"></select>
+            </div>
+        </div></div>
+
         <div class="settings-item" id="search-option-wanakana"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">
