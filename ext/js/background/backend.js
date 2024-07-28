@@ -2187,6 +2187,7 @@ export class Backend {
             const error = this._getAudioDownloadError(e);
             if (error !== null) { throw error; }
             // No audio
+            log.error(e);
             return null;
         }
 
