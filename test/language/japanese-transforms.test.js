@@ -205,7 +205,6 @@ const tests = [
             {term: '行く', source: '行かねば',           rule: 'v5', reasons: ['-neba']},
             {term: '行く', source: '行かにゃ',         rule: 'v5', reasons: ['-neba', '-ya']},
             {term: '行く', source: '行き',             rule: 'v5', reasons: ['continuative']},
-            {term: '行く', source: '行き',             rule: 'v5', reasons: ['continuative']},
             {term: '行く', source: '行きましょう',     rule: 'v5', reasons: ['-masu', 'volitional']},
             {term: '行く', source: '行こう',           rule: 'v5', reasons: ['volitional']},
             {term: '行く', source: '行かされる',       rule: 'v5', reasons: ['causative-passive']},
