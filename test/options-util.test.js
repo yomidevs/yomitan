@@ -262,6 +262,7 @@ function createProfileOptionsUpdatedTestData1() {
             fontSize: 14,
             lineHeight: '1.5',
             showAdvanced: false,
+            showDebug: false,
             popupDisplayMode: 'default',
             popupWidth: 400,
             popupHeight: 250,
@@ -637,7 +638,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 47,
+        version: 48,
         global: {
             database: {
                 prefixWildcardsSupported: false,
