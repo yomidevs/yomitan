@@ -158,10 +158,10 @@ export class DictionaryImportController {
 
         /** @type {import('dictionary-recommended.js').RecommendedDictionaryElementMap[]} */
         const recommendedDictionaryCategories = [
-            {property: 'terms', element: querySelectorNotNull(document, '#recommended-term-dictionaries')},
-            {property: 'kanji', element: querySelectorNotNull(document, '#recommended-kanji-dictionaries')},
-            {property: 'frequency', element: querySelectorNotNull(document, '#recommended-frequency-dictionaries')},
-            {property: 'grammar', element: querySelectorNotNull(document, '#recommended-grammar-dictionaries')},
+            {property: 'terms', element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-term-dictionaries'), '.recommended-dictionary-list')},
+            {property: 'kanji', element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-kanji-dictionaries'), '.recommended-dictionary-list')},
+            {property: 'frequency', element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-frequency-dictionaries'), '.recommended-dictionary-list')},
+            {property: 'grammar', element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-grammar-dictionaries'), '.recommended-dictionary-list')},
         ];
 
         const language = (await this._settingsController.getOptions()).general.language;
@@ -189,12 +189,16 @@ export class DictionaryImportController {
     /**
      *
      * @param {import('dictionary-recommended.js').Dictionary[]} recommendedDictionaries
-     * @param {HTMLElement | null} dictionariesList
+     * @param {HTMLElement} dictionariesList
      */
     _renderRecommendedDictionaryGroup(recommendedDictionaries, dictionariesList) {
+        const dictionariesListParent = dictionariesList.parentElement;
+        dictionariesList.innerHTML = '';
         for (const dictionary of recommendedDictionaries) {
             if (dictionariesList) {
-                dictionariesList.hidden = false;
+                if (dictionariesListParent) {
+                    dictionariesListParent.hidden = false;
+                }
                 const template = this._settingsController.instantiateTemplate('recommended-dictionaries-list-item');
                 const label = querySelectorNotNull(template, '.settings-item-label');
                 const button = querySelectorNotNull(template, '.action-button[data-action=import-recommended-dictionary]');
