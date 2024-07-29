@@ -129,7 +129,11 @@ export class DictionaryImportController {
                     .then((blob) => {
                         return new File([blob], 'fileFromURL');
                     });
-                await this._importDictionaries([file]);
+                const importProgressTracker = new ImportProgressTracker(this._getFileImportSteps(), 1);
+                void this._importDictionaries(
+                    this._arrayToAsyncGenerator([file]),
+                    importProgressTracker,
+                );
             } catch (error) {
                 log.error(error);
             }
