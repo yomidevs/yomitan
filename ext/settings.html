@@ -52,6 +52,15 @@
                     }'
                 ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </span><span class="outline-item-label">Advanced</span></label>
+            <label class="button outline-item advanced-only"><span class="outline-item-left">
+                <label class="toggle debug-toggle"><input id="debug-checkbox" type="checkbox" data-setting="general.showDebug"
+                    data-transform='{
+                        "type": "setAttribute",
+                        "selector": ":root",
+                        "attribute": "data-debug"
+                    }'
+                ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </span><span class="outline-item-label">Debug</span></label>
             <a href="/info.html" class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="question-mark"></span></span><span class="outline-item-label">About Yomitan</span></a>
         </div>
     </div></div>
@@ -852,7 +861,7 @@
                 <label class="toggle"><input type="checkbox" data-setting="scanning.enableSearchTags"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner">
+        <div class="settings-item debug-only"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Show debug information</div>
                 <div class="settings-item-description">A menu option to log debugging information will be shown in the search results.</div>
@@ -2512,7 +2521,7 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="low-emphasis danger dictionary-database-mutating-input" id="dictionary-delete-all-button">Delete All</button>
-        <button type="button" class="low-emphasis dictionary-database-mutating-input advanced-only" id="dictionary-check-integrity">Check Integrity</button>
+        <button type="button" class="low-emphasis dictionary-database-mutating-input debug-only" id="dictionary-check-integrity">Check Integrity</button>
         <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-check-updates">Check for Updates</button>
         <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-button">Import</button>
         <button type="button" data-modal-action="hide">Close</button>
