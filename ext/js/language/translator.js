@@ -1461,7 +1461,7 @@ export class Translator {
      */
     _getDictionaryAlias(dictionary, enabledDictionaryMap) {
         const info = enabledDictionaryMap.get(dictionary);
-        return typeof info !== 'undefined' ? info.alias : dictionary;
+        return info?.alias || dictionary;
     }
 
     /**
