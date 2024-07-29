@@ -7,7 +7,7 @@
                     "${title}",
                     {
                         "index": 0,
-                        "alias": "",
+                        "alias": "kanjiDictAlias",
                         "priority": 0
                     }
                 ]
@@ -31,7 +31,7 @@
                     "${title}",
                     {
                         "index": 0,
-                        "alias": "",
+                        "alias": "termsDictAlias",
                         "priority": 0,
                         "allowSecondarySearches": false,
                         "partsOfSpeechFilter": true,
