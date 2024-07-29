@@ -266,7 +266,8 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="low-emphasis danger dictionary-database-mutating-input" id="dictionary-delete-all-button">Delete All</button>
-        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-check-integrity" hidden>Check Integrity</button>
+        <button type="button" class="low-emphasis dictionary-database-mutating-input debug-only" id="dictionary-check-integrity">Check Integrity</button>
+        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-check-updates">Check for Updates</button>
         <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-button">Import</button>
         <button type="button" data-modal-action="hide">Close</button>
     </div>
@@ -318,6 +319,27 @@
     <div class="modal-footer">
         <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
         <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-delete-all-button">Delete</button>
+    </div>
+</div></div>
+
+<div id="dictionary-confirm-update-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+    <div class="modal-header"><div class="modal-title">Confirm Dictionary Update</div></div>
+    <div class="modal-body">
+        <p>Are you sure you want to update the dictionary:</p>
+        <p><strong id="dictionary-confirm-update-name"></strong>?</p>
+        <section>
+            Updating a dictionary involves:
+            <ul>
+                <li>Deleting the installed version</li>
+                <li>Downloading the latest version </li>
+                <li>Importing the latest version</li>
+            </ul>
+            <p class="warning-text">Especially for large dictionaries, this process can take a while, and downloading will use your network.</p>
+        </section>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+        <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-update-button">Update</button>
     </div>
 </div></div>
 
@@ -445,47 +467,6 @@
     <div class="modal-footer">
         <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
         <button type="button" data-modal-action="hide" id="dictionary-move-button">Move</button>
-    </div>
-</div></div>
-
-<div id="recommended-dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Recommended Dictionaries</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <div id="recommended-term-dictionaries" hidden>
-            <h1 class="modal-title">Term Dictionaries</h1>
-            <div class="recommended-dictionary-list"></div>
-        </div>
-        <div id="recommended-kanji-dictionaries" hidden>
-            <h1 class="modal-title">Kanji Dictionaries</h1>
-            <div class="recommended-dictionary-list"></div>
-        </div>
-        <div id="recommended-frequency-dictionaries" hidden>
-            <h1 class="modal-title">Frequency Dictionaries</h1>
-            <div class="recommended-dictionary-list"></div>
-        </div>
-        <div id="recommended-grammar-dictionaries" hidden>
-            <h1 class="modal-title">Grammar Dictionaries</h1>
-            <div class="recommended-dictionary-list"></div>
-        </div>
-    </div>
-    <div class="modal-body-addon dictionary-delete-progress" hidden>
-        <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
-        <div class="progress-bar-track"><div class="progress-bar danger"></div></div>
-    </div>
-    <div class="modal-body-addon dictionary-import-progress" hidden>
-        <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
-        <div class="progress-bar-track"><div class="progress-bar"></div></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
     </div>
 </div></div>
 
