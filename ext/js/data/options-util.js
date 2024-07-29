@@ -1436,11 +1436,21 @@ export class OptionsUtil {
     }
 
     /**
-     * - Added dictionary alias
+     * - Added general.showDebug
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion48(options) {
-        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v48.handlebars');
+        for (const profile of options.profiles) {
+            profile.options.general.showDebug = false;
+        }
+    }
+
+    /**
+     * - Added dictionary alias
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion49(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v49.handlebars');
         for (const {options: profileOptions} of options.profiles) {
             if (Array.isArray(profileOptions.dictionaries)) {
                 for (const dictionary of profileOptions.dictionaries) {

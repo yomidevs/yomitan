@@ -263,6 +263,7 @@ function createProfileOptionsUpdatedTestData1() {
             fontSize: 14,
             lineHeight: '1.5',
             showAdvanced: false,
+            showDebug: false,
             popupDisplayMode: 'default',
             popupWidth: 400,
             popupHeight: 250,
