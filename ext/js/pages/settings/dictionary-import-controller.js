@@ -94,7 +94,7 @@ export class DictionaryImportController {
         this._importFileDrop.addEventListener('drop', this._onFileDrop.bind(this), false);
 
         this._settingsController.on('importDictionaryFromUrl', this._onEventImportDictionaryFromUrl.bind(this));
-      
+
         // Welcome page
         const recommendedDictionaryButton = document.querySelector('[data-modal-action="show,recommended-dictionaries"]');
         if (recommendedDictionaryButton) {
@@ -205,7 +205,7 @@ export class DictionaryImportController {
             }
         }
     }
-  
+
     /**
      * @param {import('settings-controller').EventArgument<'importDictionaryFromUrl'>} details
      */
