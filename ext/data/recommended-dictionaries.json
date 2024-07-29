@@ -9,6 +9,7 @@
         "frequency": [
             {"name": "BCCWJ-LUW", "url": "https://github.com/toasted-nutbread/yomichan-bccwj-frequency-dictionary/releases/download/1.0.1/BCCWJ-LUW.zip"}
         ],
-        "grammar": []
+        "grammar": [],
+        "pronunciation": []
     }
 }

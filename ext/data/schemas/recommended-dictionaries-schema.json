@@ -86,6 +86,26 @@
                             }
                         }
                     }
+                },
+                "pronunciation": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "name",
+                            "url"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "url": {
+                                "type": "string",
+                                "minLength": 2
+                            }
+                        }
+                    }
                 }
             },
             "required": [

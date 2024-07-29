@@ -24,6 +24,7 @@ export type LanguageDictionaries = {
     kanji: Dictionary[];
     frequency: Dictionary[];
     grammar: Dictionary[];
+    pronunciation: Dictionary[];
 };
 
 export type Dictionary = {
@@ -37,6 +38,6 @@ export type RecommendedDictionariesTest = {
 };
 
 export type RecommendedDictionaryElementMap = {
-    property: 'terms' | 'kanji' | 'frequency' | 'grammar';
+    property: 'terms' | 'kanji' | 'frequency' | 'grammar' | 'pronunciation';
     element: HTMLElement;
 };
