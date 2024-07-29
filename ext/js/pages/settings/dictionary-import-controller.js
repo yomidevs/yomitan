@@ -171,7 +171,10 @@ export class DictionaryImportController {
 
         if (!(language in recommendedDictionaries)) {
             for (const {element} of recommendedDictionaryCategories) {
-                element.hidden = true;
+                const dictionaryCategoryParent = element.parentElement;
+                if (dictionaryCategoryParent) {
+                    dictionaryCategoryParent.hidden = true;
+                }
             }
             return;
         }
