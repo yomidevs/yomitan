@@ -17,12 +17,14 @@
 
 import {prefixInflection, suffixInflection} from '../language-transforms.js';
 
+/** @typedef {keyof typeof conditions} Condition */
+
 /**
  * @param {string} consonants
  * @param {string} suffix
- * @param {string[]} conditionsIn
- * @param {string[]} conditionsOut
- * @returns {import('language-transformer').SuffixRule[]}
+ * @param {Condition[]} conditionsIn
+ * @param {Condition[]} conditionsOut
+ * @returns {import('language-transformer').SuffixRule<Condition>[]}
  */
 function doubledConsonantInflection(consonants, suffix, conditionsIn, conditionsOut) {
     const inflections = [];
@@ -59,12 +61,14 @@ const thirdPersonSgPresentSuffixInflections = [
 ];
 
 const phrasalVerbParticles = ['aboard', 'about', 'above', 'across', 'ahead', 'alongside', 'apart', 'around', 'aside', 'astray', 'away', 'back', 'before', 'behind', 'below', 'beneath', 'besides', 'between', 'beyond', 'by', 'close', 'down', 'east', 'west', 'north', 'south', 'eastward', 'westward', 'northward', 'southward', 'forward', 'backward', 'backwards', 'forwards', 'home', 'in', 'inside', 'instead', 'near', 'off', 'on', 'opposite', 'out', 'outside', 'over', 'overhead', 'past', 'round', 'since', 'through', 'throughout', 'together', 'under', 'underneath', 'up', 'within', 'without'];
-const phrasalVerbPrepositions = ['aback', 'about', 'above', 'across', 'after', 'against', 'ahead', 'along', 'among', 'apart', 'around', 'as', 'aside', 'at', 'away', 'back', 'before', 'behind', 'below', 'between', 'beyond', 'by', 'down', 'even', 'for', 'forth', 'forward', 'from', 'in', 'into', 'it', 'of', 'off', 'on', 'one', 'onto', 'open', 'out', 'over', 'past', 'round', 'through', 'to', 'together', 'toward', 'towards', 'under', 'up', 'upon', 'way', 'with', 'without'];
+const phrasalVerbPrepositions = ['aback', 'about', 'above', 'across', 'after', 'against', 'ahead', 'along', 'among', 'apart', 'around', 'as', 'aside', 'at', 'away', 'back', 'before', 'behind', 'below', 'between', 'beyond', 'by', 'down', 'even', 'for', 'forth', 'forward', 'from', 'in', 'into', 'of', 'off', 'on', 'onto', 'open', 'out', 'over', 'past', 'round', 'through', 'to', 'together', 'toward', 'towards', 'under', 'up', 'upon', 'way', 'with', 'without'];
 
 const particlesDisjunction = phrasalVerbParticles.join('|');
 const phrasalVerbWordSet = new Set([...phrasalVerbParticles, ...phrasalVerbPrepositions]);
 const phrasalVerbWordDisjunction = [...phrasalVerbWordSet].join('|');
-/** @type {import('language-transformer').Rule} */
+/**
+ * @type {import('language-transformer').Rule<Condition>}
+ */
 const phrasalVerbInterposedObjectRule = {
     type: 'other',
     isInflected: new RegExp(`^\\w* (?:(?!\\b(${phrasalVerbWordDisjunction})\\b).)+ (?:${particlesDisjunction})`),
@@ -78,7 +82,7 @@ const phrasalVerbInterposedObjectRule = {
 /**
  * @param {string} inflected
  * @param {string} deinflected
- * @returns {import('language-transformer').Rule}
+ * @returns {import('language-transformer').Rule<Condition>}
  */
 function createPhrasalVerbInflection(inflected, deinflected) {
     return {
@@ -87,14 +91,14 @@ function createPhrasalVerbInflection(inflected, deinflected) {
         deinflect: (term) => {
             return term.replace(new RegExp(`(?<=)${inflected}(?= (?:${phrasalVerbWordDisjunction}))`), deinflected);
         },
-        conditionsIn: ['v_phr'],
+        conditionsIn: ['v'],
         conditionsOut: ['v_phr'],
     };
 }
 
 /**
- * @param {import('language-transformer').SuffixRule[]} sourceRules
- * @returns {import('language-transformer').Rule[]}
+ * @param {import('language-transformer').SuffixRule<Condition>[]} sourceRules
+ * @returns {import('language-transformer').Rule<Condition>[]}
  */
 function createPhrasalVerbInflectionsFromSuffixInflections(sourceRules) {
     return sourceRules.flatMap(({isInflected, deinflected}) => {
@@ -105,49 +109,43 @@ function createPhrasalVerbInflectionsFromSuffixInflections(sourceRules) {
     });
 }
 
-/** @type {import('language-transformer').LanguageTransformDescriptor} */
+const conditions = {
+    v: {
+        name: 'Verb',
+        isDictionaryForm: true,
+        subConditions: ['v_phr'],
+    },
+    v_phr: {
+        name: 'Phrasal verb',
+        isDictionaryForm: true,
+    },
+    n: {
+        name: 'Noun',
+        isDictionaryForm: true,
+        subConditions: ['np', 'ns'],
+    },
+    np: {
+        name: 'Noun plural',
+        isDictionaryForm: true,
+    },
+    ns: {
+        name: 'Noun singular',
+        isDictionaryForm: true,
+    },
+    adj: {
+        name: 'Adjective',
+        isDictionaryForm: true,
+    },
+    adv: {
+        name: 'Adverb',
+        isDictionaryForm: true,
+    },
+};
+
+/** @type {import('language-transformer').LanguageTransformDescriptor<Condition>} */
 export const englishTransforms = {
     language: 'en',
-    conditions: {
-        v_any: {
-            name: 'Verb',
-            isDictionaryForm: false,
-            subConditions: ['v', 'v_irr', 'v_phr'],
-        },
-        v: {
-            name: 'Regular verb',
-            isDictionaryForm: true,
-        },
-        v_irr: {
-            name: 'Irregular verb',
-            isDictionaryForm: true,
-        },
-        v_phr: {
-            name: 'Phrasal verb',
-            isDictionaryForm: true,
-        },
-        n: {
-            name: 'Noun',
-            isDictionaryForm: true,
-            subConditions: ['np', 'ns'],
-        },
-        np: {
-            name: 'Noun plural',
-            isDictionaryForm: true,
-        },
-        ns: {
-            name: 'Noun singular',
-            isDictionaryForm: true,
-        },
-        adj: {
-            name: 'Adjective',
-            isDictionaryForm: true,
-        },
-        adv: {
-            name: 'Adverb',
-            isDictionaryForm: true,
-        },
-    },
+    conditions,
     transforms: {
         'plural': {
             name: 'plural',
@@ -278,6 +276,16 @@ export const englishTransforms = {
             rules: [
                 prefixInflection('don\'t ', '', ['v'], ['v']),
                 prefixInflection('do not ', '', ['v'], ['v']),
+            ],
+        },
+        '-able': {
+            name: '-able',
+            description: 'Adjective formed from a verb',
+            rules: [
+                suffixInflection('able', '', ['v'], ['adj']),
+                suffixInflection('able', 'e', ['v'], ['adj']),
+                suffixInflection('iable', 'y', ['v'], ['adj']),
+                ...doubledConsonantInflection('bdgklmnprstz', 'able', ['v'], ['adj']),
             ],
         },
     },

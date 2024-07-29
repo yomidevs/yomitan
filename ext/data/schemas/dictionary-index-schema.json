@@ -5,7 +5,7 @@
         "isoLanguageCode": {
             "type": "string",
             "description": "ISO language code (ISO 639-1 where possible, ISO 639-3 otherwise).",
-            "pattern": "^(aa|ab|ae|af|ak|am|an|ar|as|av|ay|az|az|ba|be|bg|bh|bi|bm|bn|bo|br|bs|ca|ce|ch|co|cr|cs|cu|cv|cy|da|de|dv|dz|ee|el|en|eo|es|et|eu|fa|ff|fi|fj|fo|fr|fy|ga|gd|gl|gn|grc|gu|gv|ha|he|hi|ho|hr|ht|hu|hy|hz|ia|id|ie|ig|ii|ik|io|is|it|iu|ja|jv|ka|kg|ki|kj|kk|kl|km|kn|ko|kr|ks|ku|kv|kw|ky|la|lb|lg|li|ln|lo|lt|lu|lv|mg|mh|mi|mk|ml|mn|mr|ms|mt|my|na|nb|nd|ne|ng|nl|nn|no|nr|nv|ny|oc|oj|om|or|os|pa|pi|pl|ps|pt|qu|rm|rn|ro|ru|rw|sa|sc|sd|se|sg|sh|si|sk|sl|sm|sn|so|sq|sr|ss|st|su|sv|sw|ta|te|tg|th|ti|tk|tl|tn|to|tr|ts|tt|tw|ty|ug|uk|ur|uz|ve|vi|vo|wa|wo|xh|yi|yo|za|zh|zu)$"
+            "pattern": "^(aa|ab|ae|af|afb|ak|am|an|ar|as|av|ay|az|az|ba|be|bg|bh|bi|bm|bn|bo|br|bs|ca|ce|ch|co|cr|cs|cu|cv|cy|da|de|dv|dz|ee|el|en|eo|es|et|eu|fa|ff|fi|fj|fo|fr|fy|ga|gd|gl|gn|grc|gu|gv|ha|he|hi|ho|hr|ht|hu|hy|hz|ia|id|ie|ig|ii|ik|io|is|it|iu|ja|jv|ka|kg|ki|kj|kk|kl|km|kn|ko|kr|ks|ku|kv|kw|ky|la|lb|lg|li|ln|lo|lt|lu|lv|mg|mh|mi|mk|ml|mn|mr|ms|mt|my|na|nb|nd|ne|ng|nl|nn|no|nr|nv|ny|oc|oj|om|or|os|pa|pi|pl|ps|pt|qu|rm|rn|ro|ru|rw|sa|sc|sd|se|sg|sga|sh|si|sk|sl|sm|sn|so|sq|sr|ss|st|su|sv|sw|ta|te|tg|th|ti|tk|tl|tn|to|tr|ts|tt|tw|ty|ug|uk|ur|uz|ve|vi|vo|wa|wo|xh|yi|yo|yue|za|zh|zu)$"
         }
     },
     "type": "object",
@@ -21,7 +21,7 @@
         },
         "revision": {
             "type": "string",
-            "description": "Revision of the dictionary. This value is only used for displaying information."
+            "description": "Revision of the dictionary. This value is displayed, and used to check for dictionary updates."
         },
         "sequenced": {
             "type": "boolean",
@@ -42,9 +42,22 @@
             "type": "string",
             "description": "Creator of the dictionary."
         },
+        "isUpdatable": {
+            "type": "boolean",
+            "const": true,
+            "description": "Whether this dictionary contains links to its latest version."
+        },
+        "indexUrl": {
+            "type": "string",
+            "description": "URL for the index file of the latest revision of the dictionary, used to check for updates."
+        },
+        "downloadUrl": {
+            "type": "string",
+            "description": "URL for the download of the latest revision of the dictionary."
+        },
         "url": {
             "type": "string",
-            "description": "URL for the source of the dictionary."
+            "description": "URL for the source of the dictionary, displayed in the dictionary details."
         },
         "description": {
             "type": "string",
@@ -101,5 +114,8 @@
         {
             "required": ["version"]
         }
-    ]
+    ],
+    "dependencies": {
+        "isUpdatable": ["indexUrl", "downloadUrl"]
+    }
 }

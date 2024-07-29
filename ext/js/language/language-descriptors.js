@@ -38,6 +38,7 @@ import {oldIrishTransforms} from './sga/old-irish-transforms.js';
 import {removeSerboCroatianAccentMarks} from './sh/serbo-croatian-text-preprocessors.js';
 import {albanianTransforms} from './sq/albanian-transforms.js';
 import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-processors.js';
+import {tagalogTransforms} from './tl/tagalog-transforms.js';
 import {normalizeDiacritics} from './vi/viet-text-preprocessors.js';
 import {isStringPartiallyChinese, normalizePinyin} from './zh/chinese.js';
 
@@ -143,7 +144,10 @@ const languageDescriptors = [
         iso639_3: 'ita',
         name: 'Italian',
         exampleText: 'leggere',
-        textPreprocessors: capitalizationPreprocessors,
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics,
+        },
     },
     {
         iso: 'la',
@@ -287,6 +291,17 @@ const languageDescriptors = [
         iso639_3: 'tha',
         name: 'Thai',
         exampleText: 'อ่าน',
+    },
+    {
+        iso: 'tl',
+        iso639_3: 'tgl',
+        name: 'Tagalog',
+        exampleText: 'basahin',
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics,
+        },
+        languageTransforms: tagalogTransforms,
     },
     {
         iso: 'tr',

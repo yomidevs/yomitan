@@ -638,10 +638,16 @@ a.heading-link-light {
 .settings-item-children.settings-item-children-group .settings-item-children {
     padding-left: 0;
 }
+:root:not([data-debug=true]) .debug-only {
+    display: none;
+}
 :root:not([data-advanced=true]) .advanced-only {
     display: none;
 }
 :root:not([data-advanced=false]) .basic-only {
+    display: none;
+}
+:root:not([data-language=ja]) .japanese-only {
     display: none;
 }
 .settings-item.settings-item-button,
@@ -766,6 +772,22 @@ select.short-height {
     --accent-color-transparent25: var(--advanced-color-transparent25);
 }
 
+/* Debug settings */
+.settings-group.debug-only>.settings-item::after,
+.settings-item.debug-only::after {
+    content: '';
+    background-color: var(--danger-color-lighter);
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 0.25em;
+}
+.debug-toggle {
+    --accent-color: var(--danger-color);
+    --accent-color-lighter: var(--danger-color-lighter);
+    --accent-color-transparent25: var(--danger-color-transparent25);
+}
 
 /* Modal */
 .modal {
@@ -2324,6 +2346,7 @@ input[type=number].dictionary-priority {
     margin-right: 0.5em;
 }
 .dictionary-outdated-button,
+.dictionary-update-available,
 .dictionary-integrity-button {
     --button-content-color: transparent;
     --button-border-color: transparent;

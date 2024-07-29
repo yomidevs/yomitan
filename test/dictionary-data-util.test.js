@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,19 +17,19 @@
  */
 
 import {describe, expect, test} from 'vitest';
-import {normalizePinyin} from '../../ext/js/language/zh/chinese.js';
+import {compareRevisions} from '../ext/js/dictionary/dictionary-data-util.js';
 
-const tests = [
-    ['rìwén', 'rìwén'],
-    ['Rì wén', 'rìwén'],
-    ['Wéi jī Bǎi kē', 'wéijībǎikē'],
-    ['wán:zhěng', 'wánzhěng'],
-    ['fān・yì', 'fānyì'],
-    ['fān//yì', 'fānyì'],
-];
+describe('compareRevisions', () => {
+    /** @type {[current: string, latest: string, hasUpdate: boolean][]} */
+    const data = [
+        ['1', '2', true],
+        ['4.7', '4.8', true],
+        ['4.8', '4.8', false],
+        ['version1', 'version2', true],
+        ['version2', 'version100', false],
+    ];
 
-describe('Normalize Pinyin', () => {
-    test.each(tests)('%s should normalize to %s', (a, b) => {
-        expect(normalizePinyin(a)).toStrictEqual(b);
+    test.each(data)('compare revisions %s -> %s', (current, latest, hasUpdate) => {
+        expect(compareRevisions(current, latest)).toStrictEqual(hasUpdate);
     });
 });

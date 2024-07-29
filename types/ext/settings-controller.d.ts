@@ -39,6 +39,10 @@ export type Events = {
     dictionarySettingsReordered: {
         source: DictionaryController;
     };
+    importDictionaryFromUrl: {
+        url: string;
+    };
+    dictionaryEnabled: Record<string, never>;
     scanInputsChanged: {
         source: ScanInputsController | ScanInputsSimpleController;
     };

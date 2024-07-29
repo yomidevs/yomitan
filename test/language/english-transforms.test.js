@@ -104,6 +104,8 @@ const tests = [
         valid: true,
         tests: [
             {term: 'look up', source: 'look something up',  rule: 'v_phr', reasons: ['interposed object']},
+            {term: 'look up', source: 'look it up',  rule: 'v_phr', reasons: ['interposed object']},
+            {term: 'look up', source: 'look one up',  rule: 'v_phr', reasons: ['interposed object']},
             {term: 'look up', source: 'looking up',  rule: 'v_phr', reasons: ['ing']},
             {term: 'look up', source: 'looked up',  rule: 'v_phr', reasons: ['past']},
             {term: 'look up', source: 'looks up',  rule: 'v_phr', reasons: ['3rd pers. sing. pres']},
@@ -150,6 +152,23 @@ const tests = [
         valid: false,
         tests: [
             {term: 'boss', source: 'bo', rule: 'ns', reasons: ['plural', 'plural']},
+            {term: 'sta', source: 'stable', rule: 'adj', reasons: ['-able']},
+        ],
+    },
+
+    {
+        category: '-able',
+        valid: true,
+        tests: [
+            {term: 'forget', source: 'unforgettable', rule: 'adj', reasons: ['un-', '-able']},
+            {term: 'forget', source: 'forgettable', rule: 'adj', reasons: ['-able']},
+            {term: 'like', source: 'likeable', rule: 'adj', reasons: ['-able']},
+            {term: 'do', source: 'doable', rule: 'adj', reasons: ['-able']},
+            {term: 'desire', source: 'desirable', rule: 'adj', reasons: ['-able']},
+            {term: 'rely', source: 'reliable', rule: 'adj', reasons: ['-able']},
+            {term: 'move', source: 'movable', rule: 'adj', reasons: ['-able']},
+            {term: 'adore', source: 'adorable', rule: 'adj', reasons: ['-able']},
+            {term: 'carry', source: 'carriable', rule: 'adj', reasons: ['-able']},
         ],
     },
 ];

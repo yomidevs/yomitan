@@ -21,8 +21,6 @@
     /* Strings */
     --compact-list-separator: ' | ';
 
-    --disambiguation-prefix: '(';
-    --disambiguation-suffix: ' only)';
     --disambiguation-separator: ', ';
     --disambiguation-reading-separator: ':';
 
@@ -384,7 +382,6 @@ a:has(rt) {
     overflow-y: scroll;
     align-items: stretch;
     justify-content: flex-start;
-    overscroll-behavior: contain;
 }
 .content-body {
     flex: 1 1 auto;
@@ -418,6 +415,9 @@ a:has(rt) {
 .content-footer {
     width: var(--content-width);
     max-width: 100%;
+}
+.contain-overscroll {
+    overscroll-behavior: contain;
 }
 
 
@@ -586,7 +586,12 @@ button.sidebar-button.sidebar-button-highlight {
     position: sticky;
     top: 0px;
     z-index: 1000;
+}
+#sticky-search-header {
     padding-top: 10px;
+}
+.sticky-header #query-parser-content {
+    max-height: calc(var(--query-parser-font-size) * 2);
 }
 .search-header {
     width: var(--content-width);
@@ -606,7 +611,6 @@ button.sidebar-button.sidebar-button-highlight {
     margin-top: 0.5em;
     font-size: var(--query-parser-font-size);
     white-space: pre-wrap;
-    max-height: calc(var(--query-parser-font-size) * 2);
 }
 #query-parser-content[data-term-spacing=true] .query-parser-term {
     margin-right: 0.2em;
@@ -1163,12 +1167,6 @@ button.action-button:active {
 .definition-disambiguation-list[data-count='0'] {
     display: none;
 }
-.definition-disambiguation-list::before {
-    content: var(--disambiguation-prefix);
-}
-.definition-disambiguation-list::after {
-    content: var(--disambiguation-suffix);
-}
 .definition-disambiguation+.definition-disambiguation::before {
     content: var(--disambiguation-separator);
 }
@@ -1266,12 +1264,6 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 }
 .frequency-disambiguation-separator::before {
     content: var(--disambiguation-reading-separator);
-}
-.frequency-disambiguation::before {
-    content: var(--disambiguation-prefix);
-}
-.frequency-disambiguation::after {
-    content: var(--disambiguation-suffix);
 }
 .frequency-disambiguation-reading {
     display: inline;
@@ -1491,12 +1483,6 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 .pronunciation-disambiguation-list {
     color: var(--text-color-light3);
     padding-right: var(--disambiguation-space);
-}
-.pronunciation-disambiguation-list::before {
-    content: var(--disambiguation-prefix);
-}
-.pronunciation-disambiguation-list::after {
-    content: var(--disambiguation-suffix);
 }
 .pronunciation-disambiguation+.pronunciation-disambiguation::before {
     content: var(--disambiguation-separator);

@@ -258,6 +258,7 @@ export class TextScanner extends EventDispatcher {
         sentenceParsingOptions,
         matchTypePrefix,
         scanAltText,
+        scanWithoutMousemove,
     }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map((input) => this._convertInput(input));
@@ -294,6 +295,9 @@ export class TextScanner extends EventDispatcher {
         }
         if (typeof scanAltText === 'boolean') {
             this._scanAltText = scanAltText;
+        }
+        if (typeof scanWithoutMousemove === 'boolean') {
+            this._scanWithoutMousemove = scanWithoutMousemove;
         }
         if (typeof sentenceParsingOptions === 'object' && sentenceParsingOptions !== null) {
             const {scanExtent, terminationCharacterMode, terminationCharacters} = sentenceParsingOptions;
@@ -650,6 +654,7 @@ export class TextScanner extends EventDispatcher {
     /** */
     _onMouseOut() {
         this._scanTimerClear();
+        this.clearMousePosition();
     }
 
     /**
@@ -731,8 +736,9 @@ export class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
         this._touchTapValid = true;
 
+        const languageNotNull = this._language !== null ? this._language : '';
         const selection = window.getSelection();
-        if (selection !== null && isPointInSelection(x, y, selection)) {
+        if (selection !== null && isPointInSelection(x, y, selection, languageNotNull)) {
             return;
         }
 
@@ -1115,7 +1121,10 @@ export class TextScanner extends EventDispatcher {
         } else if (this._arePointerEventsSupported()) {
             eventListenerInfos = this._getPointerEventListeners(capture);
         } else {
-            eventListenerInfos = [...this._getMouseEventListeners(capture), ...this._getKeyboardEventListeners(capture)];
+            eventListenerInfos = [...this._getMouseEventListeners(capture)];
+            if (this._scanWithoutMousemove) {
+                eventListenerInfos.push(...this._getKeyboardEventListeners(capture));
+            }
             if (this._touchInputEnabled) {
                 eventListenerInfos.push(...this._getTouchEventListeners(capture));
             }
@@ -1356,6 +1365,7 @@ export class TextScanner extends EventDispatcher {
             const textSource = this._textSourceGenerator.getRangeFromPoint(x, y, {
                 deepContentScan: this._deepContentScan,
                 normalizeCssZoom: this._normalizeCssZoom,
+                language: this._language,
             });
             if (textSource !== null) {
                 try {

@@ -296,6 +296,33 @@ export function isNonNounVerbOrAdjective(wordClasses) {
     return isVerbOrAdjective && !(isSuruVerb && isNoun);
 }
 
+/**
+ * @param {string} current
+ * @param {string} latest
+ * @returns {boolean}
+ */
+export function compareRevisions(current, latest) {
+    const simpleVersionTest = /^(\d+\.)*\d+$/; // dot-separated integers, so 4.7 or 24.1.1.1 are ok, 1.0.0-alpha is not
+    if (!simpleVersionTest.test(current) || !simpleVersionTest.test(latest)) {
+        return current < latest;
+    }
+
+    const currentParts = current.split('.').map((part) => Number.parseInt(part, 10));
+    const latestParts = latest.split('.').map((part) => Number.parseInt(part, 10));
+
+    if (currentParts.length !== latestParts.length) {
+        return current < latest;
+    }
+
+    for (let i = 0; i < currentParts.length; i++) {
+        if (currentParts[i] !== latestParts[i]) {
+            return currentParts[i] < latestParts[i];
+        }
+    }
+
+    return false;
+}
+
 // Private
 
 /**

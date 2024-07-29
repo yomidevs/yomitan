@@ -86,6 +86,7 @@
                                     "debugInfo",
                                     "maxResults",
                                     "showAdvanced",
+                                    "showDebug",
                                     "popupDisplayMode",
                                     "popupWidth",
                                     "popupHeight",
@@ -121,7 +122,11 @@
                                     "frequencyDisplayMode",
                                     "termDisplayMode",
                                     "sortFrequencyDictionary",
-                                    "sortFrequencyDictionaryOrder"
+                                    "sortFrequencyDictionaryOrder",
+                                    "stickySearchHeader",
+                                    "fontFamily",
+                                    "fontSize",
+                                    "lineHeight"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -137,6 +142,18 @@
                                         "enum": ["group", "merge", "split"],
                                         "default": "group"
                                     },
+                                    "fontFamily": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "fontSize": {
+                                        "type": "number",
+                                        "default": 14
+                                    },
+                                    "lineHeight": {
+                                        "type": "string",
+                                        "default": "1.5"
+                                    },
                                     "debugInfo": {
                                         "type": "boolean",
                                         "default": false
@@ -147,6 +164,10 @@
                                         "default": 32
                                     },
                                     "showAdvanced": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "showDebug": {
                                         "type": "boolean",
                                         "default": false
                                     },
@@ -306,6 +327,10 @@
                                         "type": "string",
                                         "enum": ["ascending", "descending"],
                                         "default": "descending"
+                                    },
+                                    "stickySearchHeader": {
+                                        "type": "boolean",
+                                        "default": false
                                     }
                                 }
                             },
@@ -447,7 +472,8 @@
                                     "matchTypePrefix",
                                     "hidePopupOnCursorExit",
                                     "hidePopupOnCursorExitDelay",
-                                    "normalizeCssZoom"
+                                    "normalizeCssZoom",
+                                    "scanWithoutMousemove"
                                 ],
                                 "properties": {
                                     "inputs": {
@@ -732,6 +758,10 @@
                                         "default": 0
                                     },
                                     "normalizeCssZoom": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "scanWithoutMousemove": {
                                         "type": "boolean",
                                         "default": true
                                     }

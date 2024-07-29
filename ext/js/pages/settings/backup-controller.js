@@ -17,6 +17,7 @@
  */
 
 import {Dexie} from '../../../lib/dexie.js';
+import {ThemeController} from '../../app/theme-controller.js';
 import {parseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {isObjectNotArray} from '../../core/object-utilities.js';
@@ -62,6 +63,9 @@ export class BackupController {
         } catch (e) {
             // NOP
         }
+
+        /** @type {ThemeController} */
+        this._themeController = new ThemeController(document.documentElement);
     }
 
     /** */
@@ -523,6 +527,12 @@ export class BackupController {
 
         // Update dictionaries
         await DictionaryController.ensureDictionarySettings(this._settingsController, void 0, optionsFull, false, false);
+
+        // Update display theme
+        this._themeController.theme = optionsFull.profiles[optionsFull.profileCurrent].options.general.popupTheme;
+        this._themeController.prepare();
+        this._themeController.siteOverride = true;
+        this._themeController.updateTheme();
 
         // Assign options
         try {

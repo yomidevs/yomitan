@@ -61,9 +61,9 @@ class DisplayController {
         this._setupButtonEvents('.action-open-permissions', null, chrome.runtime.getURL('/permissions.html'));
 
         const {profiles, profileCurrent} = optionsFull;
-        const primaryProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
-        if (primaryProfile !== null) {
-            this._setupOptions(primaryProfile);
+        const defaultProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
+        if (defaultProfile !== null) {
+            this._setupOptions(defaultProfile);
         }
 
         /** @type {NodeListOf<HTMLElement>} */
@@ -219,9 +219,9 @@ class DisplayController {
         await hotkeyHelpController.prepare(this._api);
 
         const {profiles, profileCurrent} = /** @type {import('settings').Options} */ (this._optionsFull);
-        const primaryProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
-        if (primaryProfile !== null) {
-            hotkeyHelpController.setOptions(primaryProfile.options);
+        const defaultProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
+        if (defaultProfile !== null) {
+            hotkeyHelpController.setOptions(defaultProfile.options);
         }
 
         hotkeyHelpController.setupNode(document.documentElement);
@@ -260,14 +260,14 @@ class DisplayController {
         const node = /** @type {HTMLInputElement} */ (event.currentTarget);
         const value = Number.parseInt(node.value, 10);
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= /** @type {import('settings').Options} */ (this._optionsFull).profiles.length) {
-            void this._setPrimaryProfileIndex(value);
+            void this._setDefaultProfileIndex(value);
         }
     }
 
     /**
      * @param {number} value
      */
-    async _setPrimaryProfileIndex(value) {
+    async _setDefaultProfileIndex(value) {
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',

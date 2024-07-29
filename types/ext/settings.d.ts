@@ -106,6 +106,9 @@ export type GeneralOptions = {
     debugInfo: boolean;
     maxResults: number;
     showAdvanced: boolean;
+    fontFamily: string;
+    fontSize: number;
+    lineHeight: string;
     popupDisplayMode: PopupDisplayMode;
     popupWidth: number;
     popupHeight: number;
@@ -142,6 +145,7 @@ export type GeneralOptions = {
     termDisplayMode: TermDisplayMode;
     sortFrequencyDictionary: string | null;
     sortFrequencyDictionaryOrder: SortFrequencyDictionaryOrder;
+    stickySearchHeader: boolean;
 };
 
 export type PopupWindowOptions = {
@@ -191,6 +195,7 @@ export type ScanningOptions = {
     hidePopupOnCursorExitDelay: number;
     normalizeCssZoom: boolean;
     scanAltText: boolean;
+    scanWithoutMousemove: boolean;
 };
 
 export type ScanningInput = {

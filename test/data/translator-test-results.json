@@ -291,6 +291,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -459,6 +462,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -646,6 +652,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -816,6 +825,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -986,6 +998,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -1156,6 +1171,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -1326,6 +1344,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -1494,6 +1515,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -1681,6 +1705,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -1875,6 +1902,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -2069,6 +2099,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -2263,6 +2296,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -2457,6 +2493,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -2632,6 +2671,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -2807,6 +2849,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -2982,6 +3027,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -3157,6 +3205,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -3325,6 +3376,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -3512,6 +3566,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -3630,6 +3687,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -3804,6 +3864,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -3985,6 +4048,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "convertHiraganaToKatakana"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -4159,6 +4227,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -4329,6 +4400,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -4505,6 +4579,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -4675,6 +4752,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -4851,6 +4931,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -5045,6 +5128,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -5239,6 +5325,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -5414,6 +5503,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -5595,6 +5687,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -5789,6 +5884,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -5983,6 +6081,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -6158,6 +6259,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -6339,6 +6443,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -6467,6 +6574,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -6529,6 +6639,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -6591,6 +6704,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -6653,6 +6769,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -6715,6 +6834,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -6782,6 +6904,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -6849,6 +6974,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -6916,6 +7044,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -6983,6 +7114,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -7045,6 +7179,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -7113,6 +7250,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -7355,6 +7495,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -7597,6 +7740,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -7820,6 +7966,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -8043,6 +8192,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -8211,6 +8363,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -8398,6 +8553,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -8858,6 +9016,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -9276,6 +9437,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -9444,6 +9608,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -9631,6 +9798,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -9846,6 +10016,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -10061,6 +10234,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -10276,6 +10452,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -10491,6 +10670,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -10666,6 +10848,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -10841,6 +11026,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -11016,6 +11204,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -11191,6 +11382,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -11359,6 +11553,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -11546,6 +11743,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -11740,6 +11942,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -11934,6 +12141,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -12128,6 +12340,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -12322,6 +12539,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -12497,6 +12719,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -12672,6 +12899,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -12847,6 +13079,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -13022,6 +13259,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -13190,6 +13432,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -13377,6 +13624,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -13571,6 +13823,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -13765,6 +14022,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -13959,6 +14221,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -14153,6 +14420,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -14328,6 +14600,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -14503,6 +14780,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -14678,6 +14960,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -14853,6 +15140,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -15021,6 +15313,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -15208,6 +15505,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -15321,6 +15623,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -15429,6 +15736,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "Text Replacement 1"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -15546,6 +15858,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -16006,6 +16321,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -16430,6 +16748,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -16584,6 +16905,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -16684,6 +17008,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -16784,6 +17111,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -16884,6 +17214,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -16984,6 +17317,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -17101,6 +17437,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -17217,6 +17556,9 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -17322,6 +17664,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "alphanumericWidthVariants"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -17387,6 +17734,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "alphanumericWidthVariants"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -17468,6 +17820,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "alphanumericWidthVariants"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -17549,6 +17906,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "alphabeticToHiragana"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -17719,6 +18081,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "alphabeticToHiragana"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -17895,6 +18262,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "convertHiraganaToKatakana"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -18065,6 +18437,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "convertHiraganaToKatakana"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -18241,6 +18618,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "convertHiraganaToKatakana"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -18350,6 +18732,12 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "convertHalfWidthCharacters",
+            "convertHiraganaToKatakana"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -18520,6 +18908,12 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "convertHalfWidthCharacters",
+            "convertHiraganaToKatakana"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -18696,6 +19090,15 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "collapseEmphaticSequences"
+          ],
+          [
+            "convertHiraganaToKatakana",
+            "collapseEmphaticSequences"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -18788,6 +19191,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "capitalizeFirstLetter"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -18869,6 +19277,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "decapitalize"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -18950,6 +19363,12 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "disassembleHangul",
+            "reassembleHangul"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
@@ -19033,6 +19452,11 @@
       {
         "type": "term",
         "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          [
+            "capitalizeFirstLetter"
+          ]
+        ],
         "inflectionRuleChainCandidates": [
           {
             "source": "algorithm",
