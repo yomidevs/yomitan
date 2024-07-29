@@ -219,7 +219,7 @@ export class Translator {
      */
     async _findTermsInternal(text, options, tagAggregator) {
         const {removeNonJapaneseCharacters, enabledDictionaryMap} = options;
-        if (removeNonJapaneseCharacters && options.language === 'ja') {
+        if (removeNonJapaneseCharacters && (['ja', 'zh', 'yue'].includes(options.language))) {
             text = this._getJapaneseOnlyText(text);
         }
         if (text.length === 0) {
