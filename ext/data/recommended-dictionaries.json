@@ -7,7 +7,7 @@
             {"name": "KANJIDIC", "url": "https://github.com/themoeway/jmdict-yomitan/releases/latest/download/KANJIDIC_english.zip"}
         ],
         "frequency": [
-            {"name": "BCCWJ-LUW", "url": "https://github.com/toasted-nutbread/yomichan-bccwj-frequency-dictionary/releases/download/1.0.1/BCCWJ-LUW.zip"}
+            {"name": "BCCWJ", "url": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/BCCWJ_SUW_LUW_combined.zip"}
         ],
         "grammar": [],
         "pronunciation": []
