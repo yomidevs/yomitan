@@ -4,7 +4,7 @@
             {"name": "Jitendex", "url": "https://github.com/stephenmk/stephenmk.github.io/releases/latest/download/jitendex-yomitan.zip"}
         ],
         "kanji": [
-            {"name": "Kanjidic English", "url": "https://github.com/themoeway/jmdict-yomitan/releases/latest/download/KANJIDIC_english.zip"}
+            {"name": "KANJIDIC", "url": "https://github.com/themoeway/jmdict-yomitan/releases/latest/download/KANJIDIC_english.zip"}
         ],
         "frequency": [
             {"name": "BCCWJ-LUW", "url": "https://github.com/toasted-nutbread/yomichan-bccwj-frequency-dictionary/releases/download/1.0.1/BCCWJ-LUW.zip"}
