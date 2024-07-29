@@ -1,0 +1,69 @@
+{{<<<<<<<}}
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~#set "any" false}}{{/set~}}
+            {{~#each definitionTags~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#unless noDictionaryTag~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{dictionary}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/unless~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
+    {{~/if~}}
+    {{~#set "previousDictionary" dictionary~}}{{~/set~}}
+{{/inline}}
+{{=======}}
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~#set "any" false}}{{/set~}}
+            {{~#each definitionTags~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#unless noDictionaryTag~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{dictionaryAlias}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/unless~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
+    {{~/if~}}
+    {{~#set "previousDictionary" dictionary~}}{{~/set~}}
+{{/inline}}
+{{>>>>>>>}}
+
+{{#*inline "dictionary-alias"}}
+    {{~definition.dictionaryAlias~}}
+{{/inline}}

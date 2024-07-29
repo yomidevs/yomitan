@@ -327,7 +327,7 @@ function getDefinition(dictionaryEntry, context, resultOutputMode, dictionarySty
  * @returns {import('anki-templates').KanjiDictionaryEntry}
  */
 function getKanjiDefinition(dictionaryEntry, context) {
-    const {character, dictionary, onyomi, kunyomi, definitions} = dictionaryEntry;
+    const {character, dictionary, dictionaryAlias, onyomi, kunyomi, definitions} = dictionaryEntry;
 
     let {url} = context;
     if (typeof url !== 'string') { url = ''; }
@@ -343,6 +343,7 @@ function getKanjiDefinition(dictionaryEntry, context) {
         type: 'kanji',
         character,
         dictionary,
+        dictionaryAlias,
         onyomi,
         kunyomi,
         glossary: definitions,
@@ -429,6 +430,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
 
     const primarySource = getPrimarySource(dictionaryEntry);
 
+    const dictionaryAliases = createCachedValue(getTermDictionaryAliases.bind(null, dictionaryEntry));
     const dictionaryNames = createCachedValue(getTermDictionaryNames.bind(null, dictionaryEntry));
     const commonInfo = createCachedValue(getTermDictionaryEntryCommonInfo.bind(null, dictionaryEntry, type, dictionaryStylesMap));
     const termTags = createCachedValue(getTermTags.bind(null, dictionaryEntry, type));
@@ -455,6 +457,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
         isPrimary: (type === 'term' ? dictionaryEntry.isPrimary : void 0),
         get sequence() { return getCachedValue(sequence); },
         get dictionary() { return getCachedValue(dictionaryNames)[0]; },
+        get dictionaryAlias() { return getCachedValue(dictionaryAliases)[0]; },
         dictionaryOrder: {
             index: dictionaryIndex,
             priority: dictionaryPriority,
@@ -501,6 +504,18 @@ function getTermDictionaryNames(dictionaryEntry) {
 
 /**
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+ * @returns {string[]}
+ */
+function getTermDictionaryAliases(dictionaryEntry) {
+    const dictionaryAliases = new Set();
+    for (const {dictionaryAlias} of dictionaryEntry.definitions) {
+        dictionaryAliases.add(dictionaryAlias);
+    }
+    return [...dictionaryAliases];
+}
+
+/**
+ * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
  * @param {import('anki-templates').TermDictionaryEntryType} type
  * @param {Map<string, string>} dictionaryStylesMap
  * @returns {import('anki-templates').TermDictionaryEntryCommonInfo}
@@ -524,7 +539,7 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
     const definitions = [];
     /** @type {import('anki-templates').Tag[]} */
     const definitionTags = [];
-    for (const {tags, headwordIndices, entries, dictionary, sequences} of dictionaryEntry.definitions) {
+    for (const {tags, headwordIndices, entries, dictionary, dictionaryAlias, sequences} of dictionaryEntry.definitions) {
         const dictionaryStyles = dictionaryStylesMap.get(dictionary);
         let glossaryScopedStyles = '';
         let dictScopedStyles = '';
@@ -542,6 +557,7 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
         definitions.push({
             sequence: sequences[0],
             dictionary,
+            dictionaryAlias,
             glossaryScopedStyles,
             dictScopedStyles,
             glossary: entries,

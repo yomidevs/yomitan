@@ -1440,6 +1440,7 @@ export class OptionsUtil {
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion48(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v48.handlebars');
         for (const {options: profileOptions} of options.profiles) {
             if (Array.isArray(profileOptions.dictionaries)) {
                 for (const dictionary of profileOptions.dictionaries) {
