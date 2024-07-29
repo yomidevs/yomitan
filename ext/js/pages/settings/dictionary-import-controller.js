@@ -124,14 +124,11 @@ export class DictionaryImportController {
             try {
                 const url = this._recommendedDictionaryQueue.shift();
                 if (!url) { continue; }
-                const file = await fetch(url.trim())
-                    .then((res) => res.blob())
-                    .then((blob) => {
-                        return new File([blob], 'fileFromURL');
-                    });
-                const importProgressTracker = new ImportProgressTracker(this._getFileImportSteps(), 1);
+
+                const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), 1);
+                const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
                 void this._importDictionaries(
-                    this._arrayToAsyncGenerator([file]),
+                    this._generateFilesFromUrls([url], onProgress),
                     importProgressTracker,
                 );
             } catch (error) {
