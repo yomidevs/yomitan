@@ -560,6 +560,7 @@ export class OptionsUtil {
             this._updateVersion46,
             this._updateVersion47,
             this._updateVersion48,
+            this._updateVersion49,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {

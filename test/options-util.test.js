@@ -640,7 +640,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 48,
+        version: 49,
         global: {
             database: {
                 prefixWildcardsSupported: false,
@@ -1834,6 +1834,89 @@ describe('OptionsUtil', () => {
                 expected: `
 {{#*inline "popup-selection-text"}}
     {{~#if (hasMedia "popupSelectionText")}}{{{getMedia "popupSelectionText"}}}{{/if~}}
+{{/inline}}
+`.trimStart(),
+            },
+            {
+                oldVersion: 48,
+                newVersion: 49,
+                old: `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~set "any" false~}}
+            {{~#each definitionTags~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~set "any" true~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#unless noDictionaryTag~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{dictionary}}
+                    {{~set "any" true~}}
+                {{~/if~}}
+            {{~/unless~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
+    {{~/if~}}
+    {{~set "previousDictionary" dictionary~}}
+{{/inline}}
+
+{{#*inline "dictionary"}}
+    {{~definition.dictionary~}}
+{{/inline}}
+`.trimStart(),
+
+                expected: `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~set "any" false~}}
+            {{~#each definitionTags~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~set "any" true~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#unless noDictionaryTag~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{dictionaryAlias}}
+                    {{~set "any" true~}}
+                {{~/if~}}
+            {{~/unless~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
+    {{~/if~}}
+    {{~set "previousDictionary" dictionary~}}
+{{/inline}}
+
+{{#*inline "dictionary"}}
+    {{~definition.dictionary~}}
+{{/inline}}
+
+{{#*inline "dictionary-alias"}}
+    {{~definition.dictionaryAlias~}}
 {{/inline}}
 `.trimStart(),
             },
