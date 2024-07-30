@@ -61,6 +61,14 @@ export function isStringPartiallyChinese(str) {
     return false;
 }
 
+/**
+ * @param {number} codePoint
+ * @returns {boolean}
+ */
+export function isCodePointChinese(codePoint) {
+    return isCodePointInRanges(codePoint, CHINESE_RANGES);
+}
+
 /** @type {import('language').ReadingNormalizer} */
 export function normalizePinyin(str) {
     return str.normalize('NFC').toLowerCase().replace(/[\s・:]|\/\//g, '');
