@@ -1,0 +1,15 @@
+{
+    "ja": {
+        "terms": [
+            {"name": "Jitendex", "url": "https://github.com/stephenmk/stephenmk.github.io/releases/latest/download/jitendex-yomitan.zip"}
+        ],
+        "kanji": [
+            {"name": "KANJIDIC", "url": "https://github.com/themoeway/jmdict-yomitan/releases/latest/download/KANJIDIC_english.zip"}
+        ],
+        "frequency": [
+            {"name": "BCCWJ", "url": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/BCCWJ_SUW_LUW_combined.zip"}
+        ],
+        "grammar": [],
+        "pronunciation": []
+    }
+}

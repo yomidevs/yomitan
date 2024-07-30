@@ -21,6 +21,7 @@ import {isCodePointJapanese} from './ja/japanese.js';
 import {LanguageTransformer} from './language-transformer.js';
 import {getAllLanguageReadingNormalizers, getAllLanguageTextProcessors} from './languages.js';
 import {MultiLanguageTransformer} from './multi-language-transformer.js';
+import {isCodePointChinese} from './zh/chinese.js';
 
 /**
  * Class which finds term and kanji dictionary entries for text.
@@ -135,7 +136,7 @@ export class Translator {
      */
     async findKanji(text, options) {
         if (options.removeNonJapaneseCharacters) {
-            text = this._getJapaneseOnlyText(text);
+            text = this._getJapaneseChineseOnlyText(text);
         }
         const {enabledDictionaryMap} = options;
         /** @type {Set<string>} */
@@ -220,8 +221,8 @@ export class Translator {
      */
     async _findTermsInternal(text, options, tagAggregator) {
         const {removeNonJapaneseCharacters, enabledDictionaryMap} = options;
-        if (removeNonJapaneseCharacters && options.language === 'ja') {
-            text = this._getJapaneseOnlyText(text);
+        if (removeNonJapaneseCharacters && (['ja', 'zh', 'yue'].includes(options.language))) {
+            text = this._getJapaneseChineseOnlyText(text);
         }
         if (text.length === 0) {
             return {dictionaryEntries: [], originalTextLength: 0};
@@ -637,10 +638,11 @@ export class Translator {
      * @param {string} text
      * @returns {string}
      */
-    _getJapaneseOnlyText(text) {
+    _getJapaneseChineseOnlyText(text) {
         let length = 0;
         for (const c of text) {
-            if (!isCodePointJapanese(/** @type {number} */ (c.codePointAt(0)))) {
+            const codePoint = /** @type {number} */ (c.codePointAt(0));
+            if (!isCodePointJapanese(codePoint) && !isCodePointChinese(codePoint)) {
                 return text.substring(0, length);
             }
             length += c.length;
