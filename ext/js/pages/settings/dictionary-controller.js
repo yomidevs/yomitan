@@ -87,6 +87,7 @@ class DictionaryEntry {
         this._priorityInput.dataset.setting = `dictionaries[${index}].priority`;
         this._enabledCheckbox.dataset.setting = `dictionaries[${index}].enabled`;
         this._eventListeners.addEventListener(this._aliasNode, 'blur', this._onAliasBlur.bind(this), false);
+        this._eventListeners.addEventListener(this._aliasNode, 'keydown', this._onAliasKeyDown.bind(this), false);
         this._eventListeners.addEventListener(this._enabledCheckbox, 'settingChanged', this._onEnabledChanged.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
@@ -185,8 +186,22 @@ class DictionaryEntry {
      *
      */
     _onAliasBlur() {
-        if (!this._aliasNode.textContent) {
-            this._aliasNode.textContent = this.dictionaryTitle;
+        let newAlias = (this._aliasNode.textContent ?? '').trim()
+        if (!newAlias) {
+            newAlias = this.dictionaryTitle;
+        }
+        this._aliasNode.textContent = newAlias;
+    }
+
+    /**
+        * @param {KeyboardEvent} e
+     */
+    _onAliasKeyDown(e) {
+        // if enter then blur
+        const {code, key} = e;
+        if (code === 'Enter' || key === 'Enter' || code === 'NumpadEnter') {
+            e.preventDefault();
+            this._aliasNode.blur();
         }
     }
 
