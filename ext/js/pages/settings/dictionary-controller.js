@@ -86,8 +86,6 @@ class DictionaryEntry {
         this._outdatedButton.hidden = (version >= 3);
         this._priorityInput.dataset.setting = `dictionaries[${index}].priority`;
         this._enabledCheckbox.dataset.setting = `dictionaries[${index}].enabled`;
-        this._eventListeners.addEventListener(this._aliasNode, 'blur', this._onAliasBlur.bind(this), false);
-        this._eventListeners.addEventListener(this._aliasNode, 'keydown', this._onAliasKeyDown.bind(this), false);
         this._eventListeners.addEventListener(this._enabledCheckbox, 'settingChanged', this._onEnabledChanged.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
@@ -179,29 +177,9 @@ class DictionaryEntry {
             case 'moveTo':
                 this._showMoveToModal();
                 break;
-        }
-    }
-
-    /**
-     *
-     */
-    _onAliasBlur() {
-        let newAlias = (this._aliasNode.textContent ?? '').trim()
-        if (!newAlias) {
-            newAlias = this.dictionaryTitle;
-        }
-        this._aliasNode.textContent = newAlias;
-    }
-
-    /**
-        * @param {KeyboardEvent} e
-     */
-    _onAliasKeyDown(e) {
-        // if enter then blur
-        const {code, key} = e;
-        if (code === 'Enter' || key === 'Enter' || code === 'NumpadEnter') {
-            e.preventDefault();
-            this._aliasNode.blur();
+            case 'setAlias':
+                this._showSetAliasModal();
+                break;
         }
     }
 
@@ -369,6 +347,23 @@ class DictionaryEntry {
 
         modal.setVisible(true);
     }
+
+    /** */
+    _showSetAliasModal() {
+        const {title} = this._dictionaryInfo;
+        const modal = this._dictionaryController.modalController.getModal('dictionary-set-alias');
+        if (modal === null) { return; }
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#dictionary-alias-input');
+        /** @type {HTMLElement} */
+        const titleNode = querySelectorNotNull(modal.node, '.dictionary-title');
+
+        modal.node.dataset.index = `${this._index}`;
+        titleNode.textContent = title;
+        input.value = this._aliasNode.textContent || title;
+
+        modal.setVisible(true);
+    }
 }
 
 class DictionaryExtraInfo {
@@ -528,6 +523,11 @@ export class DictionaryController {
         /** @type {HTMLButtonElement} */
         const dictionaryMoveButton = querySelectorNotNull(document, '#dictionary-move-button');
 
+        /** @type {HTMLButtonElement} */
+        const dictiontaryResetAliasButton = querySelectorNotNull(document, '#dictionary-reset-alias-button');
+        /** @type {HTMLButtonElement} */
+        const dictionarySetAliasButton = querySelectorNotNull(document, '#dictionary-set-alias-button');
+
         this._settingsController.application.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
@@ -535,6 +535,10 @@ export class DictionaryController {
         dictionaryUpdateButton.addEventListener('click', this._onDictionaryConfirmUpdate.bind(this), false);
 
         dictionaryMoveButton.addEventListener('click', this._onDictionaryMoveButtonClick.bind(this), false);
+
+        dictionarySetAliasButton.addEventListener('click', this._onDictionarySetAliasButtonClick.bind(this), false);
+        dictiontaryResetAliasButton.addEventListener('click', this._onDictionaryResetAliasButtonClick.bind(this), false);
+
         if (this._checkUpdatesButton !== null) {
             this._checkUpdatesButton.addEventListener('click', this._onCheckUpdatesButtonClick.bind(this), false);
         }
@@ -888,6 +892,34 @@ export class DictionaryController {
         if (!Number.isFinite(target) || !Number.isFinite(indexNumber) || indexNumber === target) { return; }
 
         void this.moveDictionaryOptions(indexNumber, target);
+    }
+
+    /** */
+    _onDictionaryResetAliasButtonClick() {
+        const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('dictionary-set-alias'));
+        const index = modal.node.dataset.index ?? '';
+        const indexNumber = Number.parseInt(index, 10);
+        if (Number.isNaN(indexNumber)) { return; }
+
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#dictionary-alias-input');
+        input.value = this._dictionaryEntries[indexNumber].dictionaryTitle;
+    }
+
+    /** */
+    _onDictionarySetAliasButtonClick() {
+        const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('dictionary-set-alias'));
+        const index = modal.node.dataset.index ?? '';
+        const indexNumber = Number.parseInt(index, 10);
+        if (Number.isNaN(indexNumber)) { return; }
+
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#dictionary-alias-input');
+        const inputValue = input.value.trim();
+        if (!inputValue) return;
+        const aliasNode = this._dictionaryEntries[indexNumber]._aliasNode;
+        aliasNode.textContent = inputValue;
+        aliasNode.dispatchEvent(new Event('change', {bubbles: true}));
     }
 
     /**

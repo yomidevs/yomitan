@@ -175,7 +175,7 @@ export class DOMDataBinder {
         const metadata = this._createElementMetadata(element);
         if (typeof metadata === 'undefined') { return void 0; }
         const type = this._getNormalizedElementType(element);
-        const eventType = this._getElementEventType(element);
+        const eventType = 'change';
         /** @type {import('dom-data-binder').ElementObserver<T>} */
         const observer = {
             element,
@@ -212,13 +212,6 @@ export class DOMDataBinder {
         if (!observer.hasValue) {
             return;
         }
-        // When contenteditable is made empty or inputted from empty,
-        // the value is reset back to original state
-        // because there is a removal / addition of text node.
-        // This is a workaround to prevent the value from being reset back when typing.
-        if (this._isElementContentEditable(element)) {
-            return;
-        }
         this._setElementValue(element, observer.value);
     }
 
@@ -249,7 +242,7 @@ export class DOMDataBinder {
             case 'select':
                 /** @type {HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement} */ (element).value = typeof value === 'string' ? value : `${value}`;
                 break;
-            case 'contenteditable':
+            case 'element':
                 element.textContent = typeof value === 'string' ? value : `${value}`;
                 break;
         }
@@ -287,22 +280,9 @@ export class DOMDataBinder {
                 return /** @type {HTMLTextAreaElement} */ (element).value;
             case 'select':
                 return /** @type {HTMLSelectElement} */ (element).value;
-            case 'contenteditable':
+            case 'element':
                 return element.textContent;
         }
-        return null;
-    }
-
-
-    /**
-     * @param {Element} element
-     * @returns {import('dom-data-binder').EventType}
-     */
-    _getElementEventType(element) {
-        if (this._isElementContentEditable(element)) {
-            return 'blur';
-        }
-        return 'change';
     }
 
     /**
@@ -310,9 +290,6 @@ export class DOMDataBinder {
      * @returns {import('dom-data-binder').NormalizedElementType}
      */
     _getNormalizedElementType(element) {
-        if (this._isElementContentEditable(element)) {
-            return 'contenteditable';
-        }
         switch (element.nodeName.toUpperCase()) {
             case 'INPUT':
             {
@@ -332,14 +309,6 @@ export class DOMDataBinder {
             case 'SELECT':
                 return 'select';
         }
-        return null;
-    }
-
-    /**
-     * @param {Element} element
-     * @returns {boolean}
-     */
-    _isElementContentEditable(element) {
-        return element instanceof HTMLElement && element.isContentEditable;
+        return 'element';
     }
 }
