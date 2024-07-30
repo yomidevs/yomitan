@@ -80,6 +80,7 @@ export type GroupedPronunciation = {
 
 export type DictionaryGroupedPronunciations = {
     dictionary: string;
+    dictionaryAlias: string;
     pronunciations: GroupedPronunciation[];
 };
 

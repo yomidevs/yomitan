@@ -147,6 +147,7 @@ export function getGroupedPronunciations(dictionaryEntry) {
 
     const allTerms = new Set();
     const allReadings = new Set();
+    const aliasMap = new Map();
     for (const {term, reading} of headwords) {
         allTerms.add(term);
         allReadings.add(reading);
@@ -154,12 +155,13 @@ export function getGroupedPronunciations(dictionaryEntry) {
 
     /** @type {Map<string, import('dictionary-data-util').GroupedPronunciationInternal[]>} */
     const groupedPronunciationsMap = new Map();
-    for (const {headwordIndex, dictionary, pronunciations} of termPronunciations) {
+    for (const {headwordIndex, dictionary, dictionaryAlias, pronunciations} of termPronunciations) {
         const {term, reading} = headwords[headwordIndex];
         let dictionaryGroupedPronunciationList = groupedPronunciationsMap.get(dictionary);
         if (typeof dictionaryGroupedPronunciationList === 'undefined') {
             dictionaryGroupedPronunciationList = [];
             groupedPronunciationsMap.set(dictionary, dictionaryGroupedPronunciationList);
+            aliasMap.set(dictionary, dictionaryAlias);
         }
         for (const pronunciation of pronunciations) {
             let groupedPronunciation = findExistingGroupedPronunciation(reading, pronunciation, dictionaryGroupedPronunciationList);
@@ -181,6 +183,7 @@ export function getGroupedPronunciations(dictionaryEntry) {
     for (const [dictionary, dictionaryGroupedPronunciationList] of groupedPronunciationsMap.entries()) {
         /** @type {import('dictionary-data-util').GroupedPronunciation[]} */
         const pronunciations2 = [];
+        const dictionaryAlias = aliasMap.get(dictionary) ?? dictionary;
         for (const groupedPronunciation of dictionaryGroupedPronunciationList) {
             const {pronunciation, terms, reading} = groupedPronunciation;
             const exclusiveTerms = !areSetsEqual(terms, allTerms) ? getSetIntersection(terms, allTerms) : [];
@@ -197,7 +200,7 @@ export function getGroupedPronunciations(dictionaryEntry) {
             });
         }
 
-        results2.push({dictionary, pronunciations: pronunciations2});
+        results2.push({dictionary, dictionaryAlias, pronunciations: pronunciations2});
     }
     return results2;
 }
