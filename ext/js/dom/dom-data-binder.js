@@ -215,9 +215,8 @@ export class DOMDataBinder {
         // When contenteditable is made empty or inputted from empty,
         // the value is reset back to original state
         // because there is a removal / addition of text node.
-        // This is a workaround to prevent the value from being reset back.
-        if (this._isElementContentEditable(element) && element.textContent !== observer.value) {
-            this._setElementValue(element, element.textContent);
+        // This is a workaround to prevent the value from being reset back when typing.
+        if (this._isElementContentEditable(element)) {
             return;
         }
         this._setElementValue(element, observer.value);
