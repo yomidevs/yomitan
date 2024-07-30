@@ -1875,6 +1875,23 @@ describe('OptionsUtil', () => {
 {{#*inline "dictionary"}}
     {{~definition.dictionary~}}
 {{/inline}}
+
+{{#*inline "frequencies"}}
+    {{~#if (op ">" definition.frequencies.length 0)~}}
+        <ul style="text-align: left;">
+        {{~#each definition.frequencies~}}
+            <li>
+            {{~#if (op "!==" ../definition.type "kanji")~}}
+                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
+                    {{~furigana expression reading~}}
+                ) {{/if~}}
+            {{~/if~}}
+            {{~dictionary}}: {{frequency~}}
+            </li>
+        {{~/each~}}
+        </ul>
+    {{~/if~}}
+{{/inline}}
 `.trimStart(),
 
                 expected: `
@@ -1916,6 +1933,23 @@ describe('OptionsUtil', () => {
 
 {{#*inline "dictionary-alias"}}
     {{~definition.dictionaryAlias~}}
+{{/inline}}
+
+{{#*inline "frequencies"}}
+    {{~#if (op ">" definition.frequencies.length 0)~}}
+        <ul style="text-align: left;">
+        {{~#each definition.frequencies~}}
+            <li>
+            {{~#if (op "!==" ../definition.type "kanji")~}}
+                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
+                    {{~furigana expression reading~}}
+                ) {{/if~}}
+            {{~/if~}}
+            {{~dictionaryAlias}}: {{frequency~}}
+            </li>
+        {{~/each~}}
+        </ul>
+    {{~/if~}}
 {{/inline}}
 `.trimStart(),
             },
