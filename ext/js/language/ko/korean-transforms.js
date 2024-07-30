@@ -3311,9 +3311,9 @@ export const koreanTransforms = {
             name: '-아/어다',
             rules: [
                 suffixInflection('ㅏㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅓㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
+                suffixInflection('ㅓㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅏㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
-                suffixInflection('ㅇㅓㄷㅏ', 'ㄷㅏ', [], ['v', 'adj']),
+                suffixInflection('ㅇㅓㄷㅏ', 'ㄷㅏ', [], ['v', 'adj', 'ida']),
                 suffixInflection('ㅕㄷㅏ', 'ㅣㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅕㄷㅏ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
                 suffixInflection('ㅎㅐㄷㅏ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
