@@ -12145,7 +12145,7 @@
           "score": 10,
           "sequence": 4,
           "dictionary": "Test Dictionary 2",
-          "dictionaryAlias": "termsDictAlias",
+          "dictionaryAlias": "",
           "dictionaryOrder": {
             "index": 0,
             "priority": 0
@@ -12349,6 +12349,7 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -12370,6 +12371,7 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -12595,7 +12597,7 @@
           "score": 10,
           "sequence": 4,
           "dictionary": "Test Dictionary 2",
-          "dictionaryAlias": "termsDictAlias",
+          "dictionaryAlias": "",
           "dictionaryOrder": {
             "index": 0,
             "priority": 0
@@ -12799,6 +12801,7 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -12820,6 +12823,7 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -13050,7 +13054,7 @@
           "score": 10,
           "sequence": 3,
           "dictionary": "Test Dictionary 2",
-          "dictionaryAlias": "termsDictAlias",
+          "dictionaryAlias": "",
           "dictionaryOrder": {
             "index": 0,
             "priority": 0
@@ -13224,6 +13228,7 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -13245,6 +13250,7 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -13405,7 +13411,7 @@
           "score": 10,
           "sequence": 3,
           "dictionary": "Test Dictionary 2",
-          "dictionaryAlias": "termsDictAlias",
+          "dictionaryAlias": "",
           "dictionaryOrder": {
             "index": 0,
             "priority": 0
@@ -13579,6 +13585,7 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -13600,6 +13607,7 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -13755,7 +13763,7 @@
           "score": 1,
           "sequence": 1,
           "dictionary": "Test Dictionary 2",
-          "dictionaryAlias": "termsDictAlias",
+          "dictionaryAlias": "",
           "dictionaryOrder": {
             "index": 0,
             "priority": 0
@@ -13902,6 +13910,7 @@
             {
               "sequence": 1,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -14070,7 +14079,7 @@
           "score": 1,
           "sequence": 2,
           "dictionary": "Test Dictionary 2",
-          "dictionaryAlias": "termsDictAlias",
+          "dictionaryAlias": "",
           "dictionaryOrder": {
             "index": 0,
             "priority": 0
@@ -14217,6 +14226,7 @@
             {
               "sequence": 2,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -14398,7 +14408,7 @@
           "score": 10,
           "sequence": 4,
           "dictionary": "Test Dictionary 2",
-          "dictionaryAlias": "termsDictAlias",
+          "dictionaryAlias": "",
           "dictionaryOrder": {
             "index": 0,
             "priority": 0
@@ -14737,6 +14747,7 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -14761,6 +14772,7 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -14785,6 +14797,7 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -14809,6 +14822,7 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -15185,7 +15199,7 @@
           "score": 10,
           "sequence": 3,
           "dictionary": "Test Dictionary 2",
-          "dictionaryAlias": "termsDictAlias",
+          "dictionaryAlias": "",
           "dictionaryOrder": {
             "index": 0,
             "priority": 0
@@ -15464,6 +15478,7 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -15488,6 +15503,7 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -15512,6 +15528,7 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -15536,6 +15553,7 @@
             {
               "sequence": 3,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -15772,7 +15790,7 @@
           "score": 1,
           "sequence": 1,
           "dictionary": "Test Dictionary 2",
-          "dictionaryAlias": "termsDictAlias",
+          "dictionaryAlias": "",
           "dictionaryOrder": {
             "index": 0,
             "priority": 0
@@ -15912,6 +15930,7 @@
             {
               "sequence": 1,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -16080,7 +16099,7 @@
           "score": 1,
           "sequence": 2,
           "dictionary": "Test Dictionary 2",
-          "dictionaryAlias": "termsDictAlias",
+          "dictionaryAlias": "",
           "dictionaryOrder": {
             "index": 0,
             "priority": 0
@@ -16220,6 +16239,7 @@
             {
               "sequence": 2,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -27897,7 +27917,7 @@
           "score": 10,
           "sequence": 4,
           "dictionary": "Test Dictionary 2",
-          "dictionaryAlias": "termsDictAlias",
+          "dictionaryAlias": "",
           "dictionaryOrder": {
             "index": 0,
             "priority": 0
@@ -28236,6 +28256,7 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -28259,7 +28280,8 @@
             },
             {
               "sequence": 4,
-              "dictionary": "Test Dictionary 2",
+              "dicttionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -28284,6 +28306,7 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
@@ -28308,6 +28331,7 @@
             {
               "sequence": 4,
               "dictionary": "Test Dictionary 2",
+              "dictionaryAlias": "termsDictAlias",
               "glossaryScopedStyles": ".yomitan-glossary [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] [data-sc-content='glossary'] {\n    color: #ffff00;\n}",
               "glossary": [
