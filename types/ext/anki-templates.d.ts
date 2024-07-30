@@ -242,6 +242,7 @@ export type TermFrequency = {
     index: number;
     expressionIndex: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
@@ -256,6 +257,7 @@ export type TermPitchAccent = {
     index: number;
     expressionIndex: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;

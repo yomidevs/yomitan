@@ -614,12 +614,13 @@ function addScopeToCss(css, scopeSelector) {
 function getTermFrequencies(dictionaryEntry) {
     const results = [];
     const {headwords} = dictionaryEntry;
-    for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue} of dictionaryEntry.frequencies) {
+    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue} of dictionaryEntry.frequencies) {
         const {term, reading} = headwords[headwordIndex];
         results.push({
             index: results.length,
             expressionIndex: headwordIndex,
             dictionary,
+            dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
                 priority: dictionaryPriority,
@@ -640,7 +641,7 @@ function getTermFrequencies(dictionaryEntry) {
 function getTermPitches(dictionaryEntry) {
     const results = [];
     const {headwords} = dictionaryEntry;
-    for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pronunciations} of dictionaryEntry.pronunciations) {
+    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, pronunciations} of dictionaryEntry.pronunciations) {
         const {term, reading} = headwords[headwordIndex];
         const pitches = getPronunciationsOfType(pronunciations, 'pitch-accent');
         const cachedPitches = createCachedValue(getTermPitchesInner.bind(null, pitches));
@@ -648,6 +649,7 @@ function getTermPitches(dictionaryEntry) {
             index: results.length,
             expressionIndex: headwordIndex,
             dictionary,
+            dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
                 priority: dictionaryPriority,
@@ -758,13 +760,14 @@ function getTermExpressions(dictionaryEntry) {
 function getTermExpressionFrequencies(dictionaryEntry, i) {
     const results = [];
     const {headwords, frequencies} = dictionaryEntry;
-    for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue} of frequencies) {
+    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue} of frequencies) {
         if (headwordIndex !== i) { continue; }
         const {term, reading} = headwords[headwordIndex];
         results.push({
             index: results.length,
             expressionIndex: headwordIndex,
             dictionary,
+            dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
                 priority: dictionaryPriority,
@@ -786,7 +789,7 @@ function getTermExpressionFrequencies(dictionaryEntry, i) {
 function getTermExpressionPitches(dictionaryEntry, i) {
     const results = [];
     const {headwords, pronunciations: termPronunciations} = dictionaryEntry;
-    for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pronunciations} of termPronunciations) {
+    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, pronunciations} of termPronunciations) {
         if (headwordIndex !== i) { continue; }
         const {term, reading} = headwords[headwordIndex];
         const pitches = getPronunciationsOfType(pronunciations, 'pitch-accent');
@@ -795,6 +798,7 @@ function getTermExpressionPitches(dictionaryEntry, i) {
             index: results.length,
             expressionIndex: headwordIndex,
             dictionary,
+            dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
                 priority: dictionaryPriority,
