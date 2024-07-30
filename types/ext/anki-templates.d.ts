@@ -159,6 +159,7 @@ export type KanjiStat = {
 export type KanjiFrequency = {
     index: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
@@ -276,6 +277,7 @@ export type TermPhoneticTranscription = {
     index: number;
     expressionIndex: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;

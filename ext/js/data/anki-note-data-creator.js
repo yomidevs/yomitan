@@ -393,10 +393,11 @@ function convertKanjiStat({name, category, content, order, score, dictionary, va
 function getKanjiFrequencies(dictionaryEntry) {
     /** @type {import('anki-templates').KanjiFrequency[]} */
     const results = [];
-    for (const {index, dictionary, dictionaryIndex, dictionaryPriority, character, frequency, displayValue} of dictionaryEntry.frequencies) {
+    for (const {index, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, character, frequency, displayValue} of dictionaryEntry.frequencies) {
         results.push({
             index,
             dictionary,
+            dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
                 priority: dictionaryPriority,
@@ -685,7 +686,7 @@ function getTermPitchesInner(pitches) {
 function getTermPhoneticTranscriptions(dictionaryEntry) {
     const results = [];
     const {headwords} = dictionaryEntry;
-    for (const {headwordIndex, dictionary, dictionaryIndex, dictionaryPriority, pronunciations} of dictionaryEntry.pronunciations) {
+    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, pronunciations} of dictionaryEntry.pronunciations) {
         const {term, reading} = headwords[headwordIndex];
         const phoneticTranscriptions = getPronunciationsOfType(pronunciations, 'phonetic-transcription');
         const termPhoneticTranscriptions = getTermPhoneticTranscriptionsInner(phoneticTranscriptions);
@@ -693,6 +694,7 @@ function getTermPhoneticTranscriptions(dictionaryEntry) {
             index: results.length,
             expressionIndex: headwordIndex,
             dictionary,
+            dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
                 priority: dictionaryPriority,
