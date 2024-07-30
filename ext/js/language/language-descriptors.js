@@ -59,6 +59,13 @@ const languageDescriptors = [
         },
     },
     {
+        iso: 'cs',
+        iso639_3: 'ces',
+        name: 'Czech',
+        exampleText: 'číst',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'de',
         iso639_3: 'deu',
         name: 'German',
@@ -83,6 +90,13 @@ const languageDescriptors = [
         exampleText: 'read',
         textPreprocessors: capitalizationPreprocessors,
         languageTransforms: englishTransforms,
+    },
+    {
+        iso: 'eo',
+        iso639_3: 'epo',
+        name: 'Esperanto',
+        exampleText: 'legi',
+        textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'es',
@@ -167,6 +181,13 @@ const languageDescriptors = [
         exampleText: 'ອ່ານ',
     },
     {
+        iso: 'lv',
+        iso639_3: 'lav',
+        name: 'Latvian',
+        exampleText: 'lasīt',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'ja',
         iso639_3: 'jpn',
         name: 'Japanese',
@@ -181,6 +202,12 @@ const languageDescriptors = [
             collapseEmphaticSequences,
         },
         languageTransforms: japaneseTransforms,
+    },
+    {
+        iso: 'kn',
+        iso639_3: 'kan',
+        name: 'Kannada',
+        exampleText: 'ಓದು',
     },
     {
         iso: 'km',
@@ -308,6 +335,13 @@ const languageDescriptors = [
         iso639_3: 'tur',
         name: 'Turkish',
         exampleText: 'okuyor',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
+        iso: 'uk',
+        iso639_3: 'ukr',
+        name: 'Ukrainian',
+        exampleText: 'читаєте',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
