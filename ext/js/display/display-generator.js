@@ -672,6 +672,7 @@ export class DisplayGenerator {
 
         const n1 = this._querySelector(node, '.pronunciation-group-tag-list');
         const tag = this._createTag(this._createTagData(dictionaryAlias, 'pronunciation-dictionary'));
+        tag.dataset.details = dictionary;
         n1.appendChild(tag);
 
         let hasTags = false;
@@ -686,7 +687,6 @@ export class DisplayGenerator {
         n.dataset.hasTags = `${hasTags}`;
         this._appendMultiple(n, this._createPronunciation.bind(this), pronunciations);
 
-        tag.dataset.details = dictionary;
         return node;
     }
 
