@@ -184,6 +184,14 @@ class DictionaryEntry {
     }
 
     /**
+     * @param {string} alias
+     */
+    updateAliasSettings(alias) {
+        this._aliasNode.textContent = alias;
+        this._aliasNode.dispatchEvent(new CustomEvent('change', {bubbles: true}));
+    }
+
+    /**
      * @param {import('dom-data-binder').SettingChangedEvent} e
      */
     _onEnabledChanged(e) {
@@ -916,10 +924,9 @@ export class DictionaryController {
         /** @type {HTMLInputElement} */
         const input = querySelectorNotNull(modal.node, '#dictionary-alias-input');
         const inputValue = input.value.trim();
-        if (!inputValue) return;
-        const aliasNode = this._dictionaryEntries[indexNumber]._aliasNode;
-        aliasNode.textContent = inputValue;
-        aliasNode.dispatchEvent(new Event('change', {bubbles: true}));
+        if (inputValue) {
+            this._dictionaryEntries[indexNumber].updateAliasSettings(inputValue);
+        }
     }
 
     /**
