@@ -147,6 +147,7 @@ export function getGroupedPronunciations(dictionaryEntry) {
 
     const allTerms = new Set();
     const allReadings = new Set();
+    /** @type {Map<string, string>} */
     const aliasMap = new Map();
     for (const {term, reading} of headwords) {
         allTerms.add(term);
