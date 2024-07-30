@@ -76,6 +76,9 @@ type AllTextProcessors = {
             removeArabicScriptDiacritics: TextProcessor<boolean>;
         };
     };
+    cs: {
+        pre: CapitalizationPreprocessors;
+    };
     de: {
         pre: CapitalizationPreprocessors & {
             eszettPreprocessor: BidirectionalConversionPreprocessor;
@@ -85,6 +88,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     en: {
+        pre: CapitalizationPreprocessors;
+    };
+    eo: {
         pre: CapitalizationPreprocessors;
     };
     es: {
@@ -117,6 +123,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
     lo: Record<string, never>;
+    lv: {
+        pre: CapitalizationPreprocessors;
+    };
     ja: {
         pre: {
             convertHalfWidthCharacters: TextProcessor<boolean>;
@@ -136,6 +145,7 @@ type AllTextProcessors = {
         };
     };
     km: Record<string, never>;
+    kn: Record<string, never>;
     mn: {
         pre: CapitalizationPreprocessors;
     };
@@ -176,6 +186,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
     tr: {
+        pre: CapitalizationPreprocessors;
+    };
+    uk: {
         pre: CapitalizationPreprocessors;
     };
     vi: {
