@@ -13,12 +13,13 @@ The default audio sources for Japanese are:
 
 #### Other languages
 
-The default audio sources for other languages are from Wikimedia Commons:
+The default audio sources for other languages are:
 
-- Lingua Libre
-- Wiktionary
+- LanguagePod101
+- (Commons) Lingua Libre
+- (Commons) Wiktionary
 
-While Commons has audio for many languages, some of them have limited coverage, and you may want to add additional sources, as described below.
+Depending on language, you may want to increase coverage by adding additional sources, as described below.
 
 ## Configuration
 
