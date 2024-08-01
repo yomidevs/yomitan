@@ -192,8 +192,8 @@ export class AudioDownloader {
         const responseText = await response.text();
 
         const dom = this._createSimpleDOMParser(responseText);
-        /** @type {import('audio-downloader').Info[]} */
-        const results = [];
+        /** @type {Set<string>} */
+        const urls = new Set();
         for (const row of dom.getElementsByClassName('dc-result-row')) {
             try {
                 const audio = dom.getElementByTagName('audio', row);
@@ -207,12 +207,12 @@ export class AudioDownloader {
 
                 if (!this._validateLanguagePod101Row(language, dom, row, term, reading)) { continue; }
                 url = this._normalizeUrl(url, response.url);
-                results.push({type: 'url', url});
+                urls.add(url);
             } catch (e) {
                 // NOP
             }
         }
-        return results;
+        return [...urls].map((url) => ({type: 'url', url}));
     }
 
     /**
