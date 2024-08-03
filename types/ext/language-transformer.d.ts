@@ -58,10 +58,12 @@ export type TransformI18n = {
     description?: string;
 };
 
+export type DeinflectFunction = (inflectedWord: string) => string;
+
 export type Rule<TCondition = string> = {
     type: 'suffix' | 'prefix' | 'wholeWord' | 'other';
     isInflected: RegExp;
-    deinflect: (inflectedWord: string) => string;
+    deinflect: DeinflectFunction;
     conditionsIn: TCondition[];
     conditionsOut: TCondition[];
 };
@@ -70,7 +72,7 @@ export type SuffixRule<TCondition = string> = {
     type: 'suffix';
     isInflected: RegExp;
     deinflected: string;
-    deinflect: (inflectedWord: string) => string;
+    deinflect: DeinflectFunction;
     conditionsIn: TCondition[];
     conditionsOut: TCondition[];
 };

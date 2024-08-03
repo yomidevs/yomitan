@@ -21,6 +21,7 @@ import {prefixInflection, suffixInflection} from '../language-transforms.js';
 
 // https://www.dartmouth.edu/~deutsch/Grammatik/Wortbildung/Separables.html
 const separablePrefixes = ['ab', 'an', 'auf', 'aus', 'auseinander', 'bei', 'da', 'dabei', 'dar', 'daran', 'dazwischen', 'durch', 'ein', 'empor', 'entgegen', 'entlang', 'entzwei', 'fehl', 'fern', 'fest', 'fort', 'frei', 'gegenüber', 'gleich', 'heim', 'her', 'herab', 'heran', 'herauf', 'heraus', 'herbei', 'herein', 'herüber', 'herum', 'herunter', 'hervor', 'hin', 'hinab', 'hinauf', 'hinaus', 'hinein', 'hinterher', 'hinunter', 'hinweg', 'hinzu', 'hoch', 'los', 'mit', 'nach', 'nebenher', 'nieder', 'statt', 'um', 'vor', 'voran', 'voraus', 'vorbei', 'vorüber', 'vorweg', 'weg', 'weiter', 'wieder', 'zu', 'zurecht', 'zurück', 'zusammen'];
+const germanLetters = 'a-zA-ZäöüßÄÖÜẞ';
 
 /**
  * @param {string} prefix
@@ -29,7 +30,6 @@ const separablePrefixes = ['ab', 'an', 'auf', 'aus', 'auseinander', 'bei', 'da',
  * @returns {import('language-transformer').Rule<Condition>}
  */
 function separatedPrefix(prefix, conditionsIn, conditionsOut) {
-    const germanLetters = 'a-zA-ZäöüßÄÖÜẞ';
     const regex = new RegExp(`^([${germanLetters}]+) .+ ${prefix}$`);
     return {
         type: 'other',
@@ -50,9 +50,37 @@ const zuInfinitiveInflections = separablePrefixes.map((prefix) => {
     return prefixInflection(prefix + 'zu', prefix, [], ['v']);
 });
 
+/**
+ * @returns {import('language-transformer').Rule<Condition>[]}
+ */
+function getPastParticipleRules() {
+    const regularPastParticiple = new RegExp(`^ge([${germanLetters}]+)t$`);
+    return [
+        {
+            type: 'other',
+            isInflected: regularPastParticiple,
+            deinflect:
+                (term) => {
+                    return term.replace(regularPastParticiple, '$1en');
+                },
+            conditionsIn: [],
+            conditionsOut: ['vw'],
+        },
+    ];
+}
+
 const conditions = {
     v: {
         name: 'Verb',
+        isDictionaryForm: true,
+        subConditions: ['vw', 'vs'],
+    },
+    vw: {
+        name: 'Weak verb',
+        isDictionaryForm: true,
+    },
+    vs: {
+        name: 'Strong verb',
         isDictionaryForm: true,
     },
     n: {
@@ -92,16 +120,18 @@ export const germanTransforms = {
                 prefixInflection('un', '', [], ['adj']),
             ],
         },
+        'past participle': {
+            name: 'past participle',
+            rules: getPastParticipleRules(),
+        },
         'separated prefix': {
             name: 'separated prefix',
-            description: 'Separable prefix',
             rules: [
                 ...separatedPrefixInflections,
             ],
         },
         'zu-infinitive': {
             name: 'zu-infinitive',
-            description: 'zu-infinitive',
             rules: [
                 ...zuInfinitiveInflections,
             ],
