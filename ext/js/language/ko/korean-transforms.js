@@ -3630,6 +3630,7 @@ export const koreanTransforms = {
                 suffixInflection('ㅇㅛ', 'ㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅕㅇㅛ', 'ㅣㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅕㅇㅛ', 'ㅇㅣㄷㅏ', [], ['v', 'adj', 'ida']),
+                suffixInflection('ㅇㅖㅇㅛ', 'ㅇㅣㄷㅏ', [], ['adj', 'ida']),
                 suffixInflection('ㅎㅐㅇㅛ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅎㅏㅇㅕㅇㅛ', 'ㅎㅏㄷㅏ', [], ['v', 'adj']),
                 suffixInflection('ㅇㅗㅏㅇㅛ', 'ㅂㄷㅏ', [], ['v', 'adj']),

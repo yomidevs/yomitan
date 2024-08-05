@@ -735,6 +735,7 @@ const tests = [
             {term: '이다', source: '일께',     rule: 'ida', reasons: ['-(으)ㄹ께']},
             {term: '이다', source: '이나',     rule: 'ida', reasons: ['-(으)나']},
             {term: '이다', source: '인',     rule: 'ida', reasons: ['-(으)ㄴ']},
+            {term: '이다', source: '예요',     rule: 'ida', reasons: ['-아/어요']},
         ],
     },
     {
