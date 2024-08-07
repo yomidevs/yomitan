@@ -61,11 +61,12 @@ function getPastParticipleRules() {
             isInflected: regularPastParticiple,
             deinflect:
                 (term) => {
-                    return term.replace(regularPastParticiple, '$1en');
+                    return term.replace(regularPastParticiple, '$1en'); // geschnitzt
                 },
             conditionsIn: [],
             conditionsOut: ['vw'],
         },
+        //  gescheitert
     ];
 }
 
@@ -101,8 +102,9 @@ export const germanTransforms = {
             name: 'nominalization',
             description: 'Noun formed from a verb',
             rules: [
-                suffixInflection('ung', 'en', [], []),
-                suffixInflection('lung', 'eln', [], []),
+                suffixInflection('ung', 'en', [], []), // Reinigung
+                suffixInflection('lung', 'eln', [], []), // Entwicklung
+                suffixInflection('rung', 'rn', [], []), // Säuberung
             ],
         },
         '-bar': {
