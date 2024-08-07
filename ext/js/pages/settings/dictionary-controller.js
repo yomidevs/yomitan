@@ -177,8 +177,8 @@ class DictionaryEntry {
             case 'moveTo':
                 this._showMoveToModal();
                 break;
-            case 'setAlias':
-                this._showSetAliasModal();
+            case 'rename':
+                this._showRenameModal();
                 break;
         }
     }
@@ -357,7 +357,7 @@ class DictionaryEntry {
     }
 
     /** */
-    _showSetAliasModal() {
+    _showRenameModal() {
         const {title} = this._dictionaryInfo;
         const modal = this._dictionaryController.modalController.getModal('dictionary-set-alias');
         if (modal === null) { return; }
