@@ -55,19 +55,17 @@ const zuInfinitiveInflections = separablePrefixes.map((prefix) => {
  */
 function getPastParticipleRules() {
     const regularPastParticiple = new RegExp(`^ge([${germanLetters}]+)t$`);
-    return [
-        {
-            type: 'other',
-            isInflected: regularPastParticiple,
-            deinflect:
+    const suffixes = ['n', 'en'];
+    return suffixes.map((suffix) => ({
+        type: 'other',
+        isInflected: regularPastParticiple,
+        deinflect:
                 (term) => {
-                    return term.replace(regularPastParticiple, '$1en'); // geschnitzt
+                    return term.replace(regularPastParticiple, `$1${suffix}`);
                 },
-            conditionsIn: [],
-            conditionsOut: ['vw'],
-        },
-        //  gescheitert
-    ];
+        conditionsIn: [],
+        conditionsOut: ['vw'],
+    }));
 }
 
 const conditions = {
@@ -102,9 +100,9 @@ export const germanTransforms = {
             name: 'nominalization',
             description: 'Noun formed from a verb',
             rules: [
-                suffixInflection('ung', 'en', [], []), // Reinigung
-                suffixInflection('lung', 'eln', [], []), // Entwicklung
-                suffixInflection('rung', 'rn', [], []), // Säuberung
+                suffixInflection('ung', 'en', [], ['v']),
+                suffixInflection('lung', 'eln', [], ['v']),
+                suffixInflection('rung', 'rn', [], ['v']),
             ],
         },
         '-bar': {
@@ -112,7 +110,7 @@ export const germanTransforms = {
             description: '-able adjective from a verb',
             rules: [
                 suffixInflection('bar', 'en', [], ['v']),
-                suffixInflection('bar', 'n', [], ['v']), // Lieferbar
+                suffixInflection('bar', 'n', [], ['v']),
             ],
         },
         'negative': {
