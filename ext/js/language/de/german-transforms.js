@@ -21,6 +21,7 @@ import {prefixInflection, suffixInflection} from '../language-transforms.js';
 
 // https://www.dartmouth.edu/~deutsch/Grammatik/Wortbildung/Separables.html
 const separablePrefixes = ['ab', 'an', 'auf', 'aus', 'auseinander', 'bei', 'da', 'dabei', 'dar', 'daran', 'dazwischen', 'durch', 'ein', 'empor', 'entgegen', 'entlang', 'entzwei', 'fehl', 'fern', 'fest', 'fort', 'frei', 'gegenüber', 'gleich', 'heim', 'her', 'herab', 'heran', 'herauf', 'heraus', 'herbei', 'herein', 'herüber', 'herum', 'herunter', 'hervor', 'hin', 'hinab', 'hinauf', 'hinaus', 'hinein', 'hinterher', 'hinunter', 'hinweg', 'hinzu', 'hoch', 'los', 'mit', 'nach', 'nebenher', 'nieder', 'statt', 'um', 'vor', 'voran', 'voraus', 'vorbei', 'vorüber', 'vorweg', 'weg', 'weiter', 'wieder', 'zu', 'zurecht', 'zurück', 'zusammen'];
+const germanLetters = 'a-zA-ZäöüßÄÖÜẞ';
 
 /**
  * @param {string} prefix
@@ -29,7 +30,6 @@ const separablePrefixes = ['ab', 'an', 'auf', 'aus', 'auseinander', 'bei', 'da',
  * @returns {import('language-transformer').Rule<Condition>}
  */
 function separatedPrefix(prefix, conditionsIn, conditionsOut) {
-    const germanLetters = 'a-zA-ZäöüßÄÖÜẞ';
     const regex = new RegExp(`^([${germanLetters}]+) .+ ${prefix}$`);
     return {
         type: 'other',
@@ -50,9 +50,53 @@ const zuInfinitiveInflections = separablePrefixes.map((prefix) => {
     return prefixInflection(prefix + 'zu', prefix, [], ['v']);
 });
 
+/**
+ * @returns {import('language-transformer').Rule<Condition>[]}
+ */
+function getBasicPastParticiples() {
+    const regularPastParticiple = new RegExp(`^ge([${germanLetters}]+)t$`);
+    const suffixes = ['n', 'en'];
+    return suffixes.map((suffix) => ({
+        type: 'other',
+        isInflected: regularPastParticiple,
+        deinflect: (term) => {
+            return term.replace(regularPastParticiple, `$1${suffix}`);
+        },
+        conditionsIn: [],
+        conditionsOut: ['vw'],
+    }));
+}
+
+/**
+ * @returns {import('language-transformer').Rule<Condition>[]}
+ */
+function getSeparablePastParticiples() {
+    const prefixDisjunction = separablePrefixes.join('|');
+    const separablePastParticiple = new RegExp(`^(${prefixDisjunction})ge([${germanLetters}]+)t$`);
+    const suffixes = ['n', 'en'];
+    return suffixes.map((suffix) => ({
+        type: 'other',
+        isInflected: separablePastParticiple,
+        deinflect: (term) => {
+            return term.replace(separablePastParticiple, `$1$2${suffix}`);
+        },
+        conditionsIn: [],
+        conditionsOut: ['vw'],
+    }));
+}
+
 const conditions = {
     v: {
         name: 'Verb',
+        isDictionaryForm: true,
+        subConditions: ['vw', 'vs'],
+    },
+    vw: {
+        name: 'Weak verb',
+        isDictionaryForm: true,
+    },
+    vs: {
+        name: 'Strong verb',
         isDictionaryForm: true,
     },
     n: {
@@ -73,16 +117,17 @@ export const germanTransforms = {
             name: 'nominalization',
             description: 'Noun formed from a verb',
             rules: [
-                suffixInflection('ung', 'en', [], []),
-                suffixInflection('lung', 'eln', [], []),
+                suffixInflection('ung', 'en', [], ['v']),
+                suffixInflection('lung', 'eln', [], ['v']),
+                suffixInflection('rung', 'rn', [], ['v']),
             ],
         },
         '-bar': {
             name: '-bar',
             description: '-able adjective from a verb',
             rules: [
-                suffixInflection('bar', 'en', [], ['v']),
-                suffixInflection('bar', 'n', [], ['v']), // Lieferbar
+                suffixInflection('bar', 'en', ['adj'], ['v']),
+                suffixInflection('bar', 'n', ['adj'], ['v']),
             ],
         },
         'negative': {
@@ -92,19 +137,40 @@ export const germanTransforms = {
                 prefixInflection('un', '', [], ['adj']),
             ],
         },
+        'past participle': {
+            name: 'past participle',
+            rules: [
+                ...getBasicPastParticiples(),
+                ...getSeparablePastParticiples(),
+            ],
+        },
         'separated prefix': {
             name: 'separated prefix',
-            description: 'Separable prefix',
             rules: [
                 ...separatedPrefixInflections,
             ],
         },
         'zu-infinitive': {
             name: 'zu-infinitive',
-            description: 'zu-infinitive',
             rules: [
                 ...zuInfinitiveInflections,
             ],
         },
+        '-heit': {
+            name: '-heit',
+            description:
+                '1. Converts an adjective into a noun and usually denotes an abstract quality of the adjectival root. ' +
+                'It is often equivalent to the English suffixes -ness, -th, -ty, -dom:\n' +
+                '\t schön (“beautiful”) + -heit → Schönheit (“beauty”)\n' +
+                '\t neu (“new”) + -heit → Neuheit (“novelty”)\n' +
+                '2. Converts concrete nouns into abstract nouns:\n' +
+                '\t Kind (“child”) + -heit → Kindheit (“childhood”)\n' +
+                '\t Christ (“Christian”) + -heit → Christenheit (“Christendom”)\n',
+            rules: [
+                suffixInflection('heit', '', ['n'], ['adj', 'n']),
+                suffixInflection('keit', '', ['n'], ['adj', 'n']),
+            ],
+        },
+
     },
 };
