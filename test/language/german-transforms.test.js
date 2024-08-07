@@ -52,6 +52,8 @@ const tests = [
         tests: [
             {term: 'schnitzen',  source: 'geschnitzt',   rule: 'v',   reasons: ['past participle']},
             {term: 'scheitern',  source: 'gescheitert',  rule: 'v',   reasons: ['past participle']},
+
+            {term: 'darstellen', source: 'dargestellt',  rule: 'v',   reasons: ['past participle']},
         ],
     },
     {

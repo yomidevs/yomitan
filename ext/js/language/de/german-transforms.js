@@ -53,16 +53,33 @@ const zuInfinitiveInflections = separablePrefixes.map((prefix) => {
 /**
  * @returns {import('language-transformer').Rule<Condition>[]}
  */
-function getPastParticipleRules() {
+function getBasicPastParticiples() {
     const regularPastParticiple = new RegExp(`^ge([${germanLetters}]+)t$`);
     const suffixes = ['n', 'en'];
     return suffixes.map((suffix) => ({
         type: 'other',
         isInflected: regularPastParticiple,
-        deinflect:
-                (term) => {
-                    return term.replace(regularPastParticiple, `$1${suffix}`);
-                },
+        deinflect: (term) => {
+            return term.replace(regularPastParticiple, `$1${suffix}`);
+        },
+        conditionsIn: [],
+        conditionsOut: ['vw'],
+    }));
+}
+
+/**
+ * @returns {import('language-transformer').Rule<Condition>[]}
+ */
+function getSeparablePastParticiples() {
+    const prefixDisjunction = separablePrefixes.join('|');
+    const separablePastParticiple = new RegExp(`^(${prefixDisjunction})ge([${germanLetters}]+)t$`);
+    const suffixes = ['n', 'en'];
+    return suffixes.map((suffix) => ({
+        type: 'other',
+        isInflected: separablePastParticiple,
+        deinflect: (term) => {
+            return term.replace(separablePastParticiple, `$1$2${suffix}`);
+        },
         conditionsIn: [],
         conditionsOut: ['vw'],
     }));
@@ -122,7 +139,10 @@ export const germanTransforms = {
         },
         'past participle': {
             name: 'past participle',
-            rules: getPastParticipleRules(),
+            rules: [
+                ...getBasicPastParticiples(),
+                ...getSeparablePastParticiples(),
+            ],
         },
         'separated prefix': {
             name: 'separated prefix',
