@@ -83,6 +83,10 @@ export type KanjiDictionaryEntry = {
      */
     dictionary: string;
     /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
+    /**
      * Onyomi readings for the kanji character.
      */
     onyomi: string[];
@@ -171,6 +175,10 @@ export type KanjiFrequency = {
      */
     dictionaryIndex: number;
     /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
+    /**
      * The priority of the dictionary.
      */
     dictionaryPriority: number;
@@ -227,6 +235,10 @@ export type TermDictionaryEntry = {
      * The index of the dictionary in the original list of dictionaries used for the lookup.
      */
     dictionaryIndex: number;
+    /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
     /**
      * The priority of the dictionary.
      */
@@ -324,6 +336,10 @@ export type TermDefinition = {
      */
     dictionaryIndex: number;
     /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
+    /**
      * The priority of the dictionary.
      */
     dictionaryPriority: number;
@@ -380,6 +396,10 @@ export type TermPronunciation = {
      * The index of the dictionary in the original list of dictionaries used for the lookup.
      */
     dictionaryIndex: number;
+    /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
     /**
      * The priority of the dictionary.
      */
@@ -458,6 +478,10 @@ export type TermFrequency = {
      * The index of the dictionary in the original list of dictionaries used for the lookup.
      */
     dictionaryIndex: number;
+    /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
     /**
      * The priority of the dictionary.
      */

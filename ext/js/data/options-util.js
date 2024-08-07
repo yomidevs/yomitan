@@ -560,6 +560,7 @@ export class OptionsUtil {
             this._updateVersion46,
             this._updateVersion47,
             this._updateVersion48,
+            this._updateVersion49,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1442,6 +1443,21 @@ export class OptionsUtil {
     async _updateVersion48(options) {
         for (const profile of options.profiles) {
             profile.options.general.showDebug = false;
+        }
+    }
+
+    /**
+     * - Added dictionary alias
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion49(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v49.handlebars');
+        for (const {options: profileOptions} of options.profiles) {
+            if (Array.isArray(profileOptions.dictionaries)) {
+                for (const dictionary of profileOptions.dictionaries) {
+                    dictionary.alias = dictionary.name;
+                }
+            }
         }
     }
 

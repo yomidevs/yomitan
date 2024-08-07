@@ -129,6 +129,7 @@ export type KanjiDictionaryEntry = {
     type: 'kanji';
     character: string;
     dictionary: string;
+    dictionaryAlias: string;
     onyomi: string[];
     kunyomi: string[];
     glossary: string[];
@@ -158,6 +159,7 @@ export type KanjiStat = {
 export type KanjiFrequency = {
     index: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
@@ -179,6 +181,7 @@ export type TermDictionaryEntry = {
     isPrimary?: boolean;
     readonly sequence: number;
     readonly dictionary: string;
+    readonly dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
@@ -228,6 +231,7 @@ export type Tag = {
 export type TermDefinition = {
     sequence: number;
     dictionary: string;
+    dictionaryAlias: string;
     glossary: DictionaryData.TermGlossary[];
     definitionTags: Tag[];
     glossaryScopedStyles: string;
@@ -239,6 +243,7 @@ export type TermFrequency = {
     index: number;
     expressionIndex: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
@@ -253,6 +258,7 @@ export type TermPitchAccent = {
     index: number;
     expressionIndex: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
@@ -271,6 +277,7 @@ export type TermPhoneticTranscription = {
     index: number;
     expressionIndex: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
