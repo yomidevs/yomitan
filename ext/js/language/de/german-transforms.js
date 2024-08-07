@@ -126,8 +126,8 @@ export const germanTransforms = {
             name: '-bar',
             description: '-able adjective from a verb',
             rules: [
-                suffixInflection('bar', 'en', [], ['v']),
-                suffixInflection('bar', 'n', [], ['v']),
+                suffixInflection('bar', 'en', ['adj'], ['v']),
+                suffixInflection('bar', 'n', ['adj'], ['v']),
             ],
         },
         'negative': {
@@ -156,5 +156,21 @@ export const germanTransforms = {
                 ...zuInfinitiveInflections,
             ],
         },
+        '-heit': {
+            name: '-heit',
+            description:
+                '1. Converts an adjective into a noun and usually denotes an abstract quality of the adjectival root. ' +
+                'It is often equivalent to the English suffixes -ness, -th, -ty, -dom:\n' +
+                '\t schön (“beautiful”) + -heit → Schönheit (“beauty”)\n' +
+                '\t neu (“new”) + -heit → Neuheit (“novelty”)\n' +
+                '2. Converts concrete nouns into abstract nouns:\n' +
+                '\t Kind (“child”) + -heit → Kindheit (“childhood”)\n' +
+                '\t Christ (“Christian”) + -heit → Christenheit (“Christendom”)\n',
+            rules: [
+                suffixInflection('heit', '', ['n'], ['adj', 'n']),
+                suffixInflection('keit', '', ['n'], ['adj', 'n']),
+            ],
+        },
+
     },
 };

@@ -70,6 +70,15 @@ const tests = [
             {term: 'aufräumen', source: 'aufzuräumen', rule: 'v',   reasons: ['zu-infinitive']},
         ],
     },
+    {
+        category: '-heit',
+        valid: true,
+        tests: [
+            {term: 'wahr', source: 'wahrheit', rule: 'adj', reasons: ['-heit']},
+            {term: 'Kind', source: 'Kindheit', rule: 'n', reasons: ['-heit']},
+            {term: 'anwenden', source: 'anwendbarkeit', rule: 'v', reasons: ['-bar', '-heit']},
+        ],
+    },
 ];
 /* eslint-enable @stylistic/no-multi-spaces */
 
