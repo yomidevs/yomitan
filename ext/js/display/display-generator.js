@@ -716,6 +716,7 @@ export class DisplayGenerator {
 
         const node = this._instantiate('pronunciation');
 
+        node.dataset.pronunciationType = pronunciation.type;
         node.dataset.tagCount = `${tags.length}`;
 
         let n = this._querySelector(node, '.pronunciation-tag-list');
@@ -744,6 +745,7 @@ export class DisplayGenerator {
         const node = this._instantiate('pronunciation');
 
         node.dataset.pitchAccentDownstepPosition = `${position}`;
+        node.dataset.pronunciationType = pitchAccent.type;
         if (nasalPositions.length > 0) { node.dataset.nasalMoraPosition = nasalPositions.join(' '); }
         if (devoicePositions.length > 0) { node.dataset.devoiceMoraPosition = devoicePositions.join(' '); }
         node.dataset.tagCount = `${tags.length}`;
