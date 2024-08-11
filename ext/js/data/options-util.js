@@ -561,6 +561,7 @@ export class OptionsUtil {
             this._updateVersion47,
             this._updateVersion48,
             this._updateVersion49,
+            this._updateVersion50,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1456,6 +1457,20 @@ export class OptionsUtil {
             if (Array.isArray(profileOptions.dictionaries)) {
                 for (const dictionary of profileOptions.dictionaries) {
                     dictionary.alias = dictionary.name;
+                }
+            }
+        }
+    }
+
+    /**
+     * - Generalized jpod101-alternate to language-pod-101
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion50(options) {
+        for (const profile of options.profiles) {
+            for (const source of profile.options.audio.sources) {
+                if (source.type === 'jpod101-alternate') {
+                    source.type = 'language-pod-101';
                 }
             }
         }
