@@ -1966,7 +1966,7 @@ button.footer-notification-close-button {
 :root[data-show-pronunciation-text=true] .pronunciation-disambiguation[data-type=reading] {
     display: none;
 }
-:root[data-show-pronunciation-text=false] .pronunciation-text-container {
+:root[data-show-pronunciation-text=false] .pronunciation[data-pronunciation-type=pitch-accent]>.pronunciation-representation-list>.pronunciation-text-container {
     display: none;
 }
 :root[data-show-pronunciation-downstep-position=false] .pronunciation-downstep-notation-container {
