@@ -644,7 +644,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 49,
+        version: 50,
         global: {
             database: {
                 prefixWildcardsSupported: false,
