@@ -2404,6 +2404,10 @@ input[type=number].dictionary-priority {
     overflow: auto;
 }
 
+#dictionary-alias-input {
+    width: 100%;
+}
+
 #dictionary-move-up>span.icon-button-inner,
 #dictionary-move-down>span.icon-button-inner {
     width: 26px;

@@ -52,7 +52,7 @@
     <label class="toggle dictionary-item-enabled-toggle-container"><input type="checkbox" class="dictionary-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
     <div class="dictionary-item-title-container">
         <span>
-            <strong class="dictionary-title"></strong> <span class="light dictionary-revision"></span>
+            <strong class="dictionary-title dictionary-alias"></strong> <span class="light dictionary-revision"></span>
         </span>
         <button type="button" class="dictionary-outdated-button" hidden>
             <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
@@ -97,6 +97,7 @@
 </template>
 <template id="dictionary-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
     <button type="button" class="popup-menu-item" data-menu-action="showDetails">Details&hellip;</button>
+    <button type="button" class="popup-menu-item" data-menu-action="rename">Rename&hellip;</button>
     <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to&hellip;</button>
     <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
 </div></div></div></template>

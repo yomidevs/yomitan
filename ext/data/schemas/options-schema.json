@@ -831,6 +831,7 @@
                                     "type": "object",
                                     "required": [
                                         "name",
+                                        "alias",
                                         "priority",
                                         "enabled",
                                         "allowSecondarySearches",
@@ -840,6 +841,10 @@
                                     ],
                                     "properties": {
                                         "name": {
+                                            "type": "string",
+                                            "default": ""
+                                        },
+                                        "alias": {
                                             "type": "string",
                                             "default": ""
                                         },

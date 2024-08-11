@@ -174,18 +174,20 @@ export class DOMDataBinder {
     _createObserver(element) {
         const metadata = this._createElementMetadata(element);
         if (typeof metadata === 'undefined') { return void 0; }
+        const type = this._getNormalizedElementType(element);
+        const eventType = 'change';
         /** @type {import('dom-data-binder').ElementObserver<T>} */
         const observer = {
             element,
-            type: this._getNormalizedElementType(element),
+            type,
             value: null,
             hasValue: false,
+            eventType,
             onChange: null,
             metadata,
         };
         observer.onChange = this._onElementChange.bind(this, observer);
-
-        element.addEventListener('change', observer.onChange, false);
+        element.addEventListener(eventType, observer.onChange, false);
 
         void this._updateTasks.enqueue(observer, {all: false});
 
@@ -198,7 +200,7 @@ export class DOMDataBinder {
      */
     _removeObserver(element, observer) {
         if (observer.onChange === null) { return; }
-        element.removeEventListener('change', observer.onChange, false);
+        element.removeEventListener(observer.eventType, observer.onChange, false);
         observer.onChange = null;
     }
 
@@ -207,9 +209,10 @@ export class DOMDataBinder {
      * @param {import('dom-data-binder').ElementObserver<T>} observer
      */
     _onObserverChildrenUpdated(element, observer) {
-        if (observer.hasValue) {
-            this._setElementValue(element, observer.value);
+        if (!observer.hasValue) {
+            return;
         }
+        this._setElementValue(element, observer.value);
     }
 
     /**
@@ -238,6 +241,9 @@ export class DOMDataBinder {
             case 'textarea':
             case 'select':
                 /** @type {HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement} */ (element).value = typeof value === 'string' ? value : `${value}`;
+                break;
+            case 'element':
+                element.textContent = typeof value === 'string' ? value : `${value}`;
                 break;
         }
 
@@ -274,8 +280,9 @@ export class DOMDataBinder {
                 return /** @type {HTMLTextAreaElement} */ (element).value;
             case 'select':
                 return /** @type {HTMLSelectElement} */ (element).value;
+            case 'element':
+                return element.textContent;
         }
-        return null;
     }
 
     /**
@@ -302,6 +309,6 @@ export class DOMDataBinder {
             case 'SELECT':
                 return 'select';
         }
-        return null;
+        return 'element';
     }
 }

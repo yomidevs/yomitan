@@ -263,6 +263,7 @@ export type DictionariesOptions = DictionaryOptions[];
 
 export type DictionaryOptions = {
     name: string;
+    alias: string;
     priority: number;
     enabled: boolean;
     allowSecondarySearches: boolean;

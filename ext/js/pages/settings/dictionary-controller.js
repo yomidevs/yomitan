@@ -63,7 +63,7 @@ class DictionaryEntry {
         /** @type {HTMLButtonElement} */
         this._updatesAvailable = querySelectorNotNull(fragment, '.dictionary-update-available');
         /** @type {HTMLElement} */
-        this._titleNode = querySelectorNotNull(fragment, '.dictionary-title');
+        this._aliasNode = querySelectorNotNull(fragment, '.dictionary-alias');
         /** @type {HTMLElement} */
         this._versionNode = querySelectorNotNull(fragment, '.dictionary-revision');
         /** @type {HTMLElement} */
@@ -79,9 +79,9 @@ class DictionaryEntry {
     prepare() {
         //
         const index = this._index;
-        const {title, revision, version} = this._dictionaryInfo;
+        const {revision, version} = this._dictionaryInfo;
 
-        this._titleNode.textContent = title;
+        this._aliasNode.dataset.setting = `dictionaries[${index}].alias`;
         this._versionNode.textContent = `rev.${revision}`;
         this._outdatedButton.hidden = (version >= 3);
         this._priorityInput.dataset.setting = `dictionaries[${index}].priority`;
@@ -177,7 +177,18 @@ class DictionaryEntry {
             case 'moveTo':
                 this._showMoveToModal();
                 break;
+            case 'rename':
+                this._showRenameModal();
+                break;
         }
+    }
+
+    /**
+     * @param {string} alias
+     */
+    updateAliasSettings(alias) {
+        this._aliasNode.textContent = alias;
+        this._aliasNode.dispatchEvent(new CustomEvent('change', {bubbles: true}));
     }
 
     /**
@@ -344,6 +355,23 @@ class DictionaryEntry {
 
         modal.setVisible(true);
     }
+
+    /** */
+    _showRenameModal() {
+        const {title} = this._dictionaryInfo;
+        const modal = this._dictionaryController.modalController.getModal('dictionary-set-alias');
+        if (modal === null) { return; }
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#dictionary-alias-input');
+        /** @type {HTMLElement} */
+        const titleNode = querySelectorNotNull(modal.node, '.dictionary-title');
+
+        modal.node.dataset.index = `${this._index}`;
+        titleNode.textContent = title;
+        input.value = this._aliasNode.textContent || title;
+
+        modal.setVisible(true);
+    }
 }
 
 class DictionaryExtraInfo {
@@ -503,6 +531,11 @@ export class DictionaryController {
         /** @type {HTMLButtonElement} */
         const dictionaryMoveButton = querySelectorNotNull(document, '#dictionary-move-button');
 
+        /** @type {HTMLButtonElement} */
+        const dictiontaryResetAliasButton = querySelectorNotNull(document, '#dictionary-reset-alias-button');
+        /** @type {HTMLButtonElement} */
+        const dictionarySetAliasButton = querySelectorNotNull(document, '#dictionary-set-alias-button');
+
         this._settingsController.application.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
@@ -510,6 +543,10 @@ export class DictionaryController {
         dictionaryUpdateButton.addEventListener('click', this._onDictionaryConfirmUpdate.bind(this), false);
 
         dictionaryMoveButton.addEventListener('click', this._onDictionaryMoveButtonClick.bind(this), false);
+
+        dictionarySetAliasButton.addEventListener('click', this._onDictionarySetAliasButtonClick.bind(this), false);
+        dictiontaryResetAliasButton.addEventListener('click', this._onDictionaryResetAliasButtonClick.bind(this), false);
+
         if (this._checkUpdatesButton !== null) {
             this._checkUpdatesButton.addEventListener('click', this._onCheckUpdatesButtonClick.bind(this), false);
         }
@@ -612,6 +649,7 @@ export class DictionaryController {
     static createDefaultDictionarySettings(name, enabled, styles) {
         return {
             name,
+            alias: name,
             priority: 0,
             enabled,
             allowSecondarySearches: false,
@@ -862,6 +900,33 @@ export class DictionaryController {
         if (!Number.isFinite(target) || !Number.isFinite(indexNumber) || indexNumber === target) { return; }
 
         void this.moveDictionaryOptions(indexNumber, target);
+    }
+
+    /** */
+    _onDictionaryResetAliasButtonClick() {
+        const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('dictionary-set-alias'));
+        const index = modal.node.dataset.index ?? '';
+        const indexNumber = Number.parseInt(index, 10);
+        if (Number.isNaN(indexNumber)) { return; }
+
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#dictionary-alias-input');
+        input.value = this._dictionaryEntries[indexNumber].dictionaryTitle;
+    }
+
+    /** */
+    _onDictionarySetAliasButtonClick() {
+        const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('dictionary-set-alias'));
+        const index = modal.node.dataset.index ?? '';
+        const indexNumber = Number.parseInt(index, 10);
+        if (Number.isNaN(indexNumber)) { return; }
+
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#dictionary-alias-input');
+        const inputValue = input.value.trim();
+        if (inputValue) {
+            this._dictionaryEntries[indexNumber].updateAliasSettings(inputValue);
+        }
     }
 
     /**
