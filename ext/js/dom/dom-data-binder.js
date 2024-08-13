@@ -209,13 +209,9 @@ export class DOMDataBinder {
      * @param {import('dom-data-binder').ElementObserver<T>} observer
      */
     _onObserverChildrenUpdated(element, observer) {
-        if (!observer.hasValue) {
-            return;
+        if (observer.hasValue && this._getNormalizedElementType(element) !== 'element') {
+            this._setElementValue(element, observer.value);
         }
-        if (this._getNormalizedElementType(element) === 'element') {
-            return;
-        }
-        this._setElementValue(element, observer.value);
     }
 
     /**
