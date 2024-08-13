@@ -212,6 +212,9 @@ export class DOMDataBinder {
         if (!observer.hasValue) {
             return;
         }
+        if (this._getNormalizedElementType(element) === 'element') {
+            return;
+        }
         this._setElementValue(element, observer.value);
     }
 
