@@ -8,7 +8,6 @@ jobs:
     environment: cd
     outputs:
       result: ${{ steps.webStorePublish.outcome }}
-      releaseUploadUrl: ${{ steps.getZipAsset.outputs.releaseUploadUrl }}
     permissions:
       actions: write
     steps:
