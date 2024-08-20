@@ -1,5 +1,5 @@
 name: publish-edge
-on: push
+on: workflow_dispatch
 permissions:
   contents: read
 jobs:
@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: robinraju/release-downloader@a96f54c1b5f5e09e47d9504526e96febd949d4c2 # pin@v1.11
         with:
-          tag: "24.8.19.0"
+          tag: ${{ github.ref_name }}
           fileName: "*"
 
       - name: Publish on Microsoft Edge Addons
@@ -22,7 +22,7 @@ jobs:
         id: webStorePublish
         with:
           product-id: 18e6c4cd-6383-4f38-95e9-92a629f60817
-          zip-path: yomitan-chrome.zip
+          zip-path: yomitan-edge.zip
           client-id: ${{ secrets.EDGE_CLIENT_ID }}
           client-secret: ${{ secrets.EDGE_CLIENT_SECRET }}
           access-token-url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
