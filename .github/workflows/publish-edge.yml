@@ -1,15 +1,5 @@
 name: publish-edge
-on:
-  workflow_dispatch:
-    inputs:
-      attemptNumber:
-        description: "Attempt number"
-        required: false
-        default: "1"
-      maxAttempts:
-        description: "Max attempts"
-        required: false
-        default: "10"
+on: push
 permissions:
   contents: read
 jobs:
