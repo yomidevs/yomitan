@@ -371,6 +371,14 @@
                 "js/background/offscreen.js",
                 "js/background/offscreen-main.js"
             ]
+        },
+        {
+            "name": "edge",
+            "inherit": "base",
+            "fileName": "yomitan-edge.zip",
+            "excludeFiles": [
+                "background.html"
+            ]
         }
     ]
 }
