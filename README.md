@@ -1,13 +1,13 @@
 # Yomitan
 
-[![Chrome Release](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&logoColor=lightblue&color=lightblue&label=chrome%20release%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn)
-[![Firefox Release](<https://img.shields.io/amo/v/yomitan?logo=Firefox&color=orange&label=firefox%20release%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
-[![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=flat)](https://discord.gg/UGNPMDE7zC)
+[![Get Yomitan for Chrome](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&style=for-the-badge&logoColor=lightblue&color=lightblue&label=get%20yomitan%20for%20chrome%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn)
+[![Get Yomitan for Firefox](<https://img.shields.io/amo/v/yomitan?logo=Firefox&style=for-the-badge&color=orange&label=get%20yomitan%20for%20firefox%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
+[![Get Yomitan for Edge](https://img.shields.io/badge/dynamic/json?logo=puzzle&label=get%20yomitan%20for%20edge&style=for-the-badge&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fidelnfbbmikgfiejhgmddlbkfgiifnnn)](https://microsoftedge.microsoft.com/addons/detail/yomitan/idelnfbbmikgfiejhgmddlbkfgiifnnn)
+[![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC)](https://discord.gg/UGNPMDE7zC)
 
-**Visit [Yomitan Wiki](https://yomitan.wiki) to learn more!**
+# Visit [yomitan.wiki](https://yomitan.wiki) to learn more!
 
-:wave: **Yomitan is [the successor](https://foosoft.net/posts/passing-the-torch-to-yomitan/) to Yomichan** ([migration guide](./docs/yomichan-migration.md#migrating-from-yomichan)) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26, 2023. We have made a number of [foundational changes](#changes) to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
+:wave: **Yomitan is [the successor](https://foosoft.net/posts/passing-the-torch-to-yomitan/) to Yomichan** ([migration guide](./docs/yomichan-migration.md#migrating-from-yomichan)) which was [sunset](https://foosoft.net/posts/sunsetting-the-yomichan-project/) by its owner on Feb 26, 2023. We have made a number of foundational changes to ensure **the project stays alive, works on latest browser versions, and is easy to contribute to**.
 
 📢 **New contributors [welcome](#contributing)!**
 
@@ -62,8 +62,12 @@ Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially 
   - [testing](https://chrome.google.com/webstore/detail/yomitan-development-build/glnaenfapkkecknnmginabpmgkenenml)
 
 - **Mozilla Firefox**
+
   - [stable](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
   - [testing](https://github.com/themoeway/yomitan/releases) ※
+
+- **Microsoft Edge**
+  - [stable](https://microsoftedge.microsoft.com/addons/detail/yomitan/idelnfbbmikgfiejhgmddlbkfgiifnnn)
 
 ※ Unlike Chrome, Firefox does not allow extensions meant for testing to be hosted in the marketplace. You will have to download the desired version and side-load it yourself. You only need to do this once, and you will get updates automatically.
 
@@ -93,26 +97,6 @@ Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially 
     <img src="resources/images/search-popup-kanji.png" width="300" alt="popup with kanji details">
 
 To further enhance your Yomitan experience, it's worth [integrating with Anki](./docs/anki-integration.md), a spaced-repetition flashcard program to help solidify the words you encounter.
-
-## Changes
-
-> While we have made some substantial changes, the majority of the extension's functionality is thanks to hard work of [FooSoft](https://foosoft.net/) and many other incredible open source contributors from 2016-2023.
-
-Major changes:
-
-- 🌐 Added multi-language support!
-- 💪 Completed the Manifest V2 → V3 transition, [read why here](https://developer.chrome.com/blog/resuming-the-transition-to-mv3/).
-- ⚡ Switched to using ECMAScript modules and npm-sourced dependencies.
-- 🔧 Implemented an end-to-end CI/CD pipeline.
-- 🧪 Switched to standard testing frameworks, vitest and playwrights.
-
-In addition, we have made important bug fixes and minor enhancements:
-
-- ⚡ Improved dictionary import speeds by 2x~10x.
-- 📚 Added functionality to import/export multiple dictionaries, enabling portability across devices.
-- ✨ And [more](https://github.com/themoeway/yomitan/pulls?q=is%3Apr+is%3Amerged+-label%3Aarea%2Fdependencies+-label%3Akind%2Fmeta).
-
-Since the owner requested forks be uniquely named, we have chosen a new name, _Yomitan_ (_-tan_ is an honorific used for anthropomorphic moe characters).
 
 ## Contributing
 
