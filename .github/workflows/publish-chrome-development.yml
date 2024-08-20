@@ -22,6 +22,11 @@ jobs:
     permissions:
       actions: write
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          egress-policy: audit
+
       - name: Get the next attempt number
         id: getNextAttemptNumber
         uses: cardinalby/js-eval-action@e905fd3681d757e992c976f61c2784dcb4060e13 # pin@v1.0.9
