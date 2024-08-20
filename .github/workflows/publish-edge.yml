@@ -1,0 +1,54 @@
+name: publish-edge
+on:
+  workflow_dispatch:
+    inputs:
+      attemptNumber:
+        description: "Attempt number"
+        required: false
+        default: "1"
+      maxAttempts:
+        description: "Max attempts"
+        required: false
+        default: "10"
+permissions:
+  contents: read
+jobs:
+  upload-on-webstore:
+    runs-on: ubuntu-latest
+    environment: cd
+    outputs:
+      result: ${{ steps.webStorePublish.outcome }}
+      releaseUploadUrl: ${{ steps.getZipAsset.outputs.releaseUploadUrl }}
+    permissions:
+      actions: write
+    steps:
+      - name: Get the next attempt number
+        id: getNextAttemptNumber
+        uses: cardinalby/js-eval-action@e905fd3681d757e992c976f61c2784dcb4060e13 # pin@v1.0.9
+        env:
+          attemptNumber: ${{ github.event.inputs.attemptNumber }}
+          maxAttempts: ${{ github.event.inputs.maxAttempts }}
+        with:
+          expression: |
+            {
+              const
+                attempt = parseInt(env.attemptNumber),
+                max = parseInt(env.maxAttempts);
+              assert(attempt && max && max >= attempt);
+              return attempt < max ? attempt + 1 : '';
+            }
+
+      - uses: robinraju/release-downloader@a96f54c1b5f5e09e47d9504526e96febd949d4c2 # pin@v1.11
+        with:
+          tag: ${{ github.ref_name }}
+          fileName: "*"
+
+      - name: Publish on Microsoft Edge Addons
+        uses: wdzeng/edge-addon@v1
+        id: webStorePublish
+        with:
+          product-id: 18e6c4cd-6383-4f38-95e9-92a629f60817
+          zip-path: yomitan-edge.zip
+          client-id: ${{ secrets.EDGE_CLIENT_ID }}
+          client-secret: ${{ secrets.EDGE_CLIENT_SECRET }}
+          access-token-url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}

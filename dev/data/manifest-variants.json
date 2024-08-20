@@ -371,6 +371,39 @@
                 "js/background/offscreen.js",
                 "js/background/offscreen-main.js"
             ]
+        },
+        {
+            "name": "edge",
+            "inherit": "base",
+            "fileName": "yomitan-edge.zip",
+            "excludeFiles": [
+                "background.html"
+            ]
+        },
+        {
+            "name": "edge-dev",
+            "inherit": "edge",
+            "fileName": "yomitan-edge-dev.zip",
+            "modifications": [
+                {
+                    "action": "replace",
+                    "path": [
+                        "name"
+                    ],
+                    "pattern": "^.*$",
+                    "patternFlags": "",
+                    "replacement": "$& (development build)"
+                },
+                {
+                    "action": "replace",
+                    "path": [
+                        "description"
+                    ],
+                    "pattern": "^(.*)(?:\\.\\s*)?$",
+                    "patternFlags": "",
+                    "replacement": "$1. This is a development build."
+                }
+            ]
         }
     ]
 }
