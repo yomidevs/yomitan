@@ -5,7 +5,8 @@ on:
     workflows: ["Playwright Tests"]
     types:
       - completed
-permissions: {}
+permissions:
+  contents: read
 jobs:
   playwright_comment:
     runs-on: ubuntu-latest
