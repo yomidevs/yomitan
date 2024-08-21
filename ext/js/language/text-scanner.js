@@ -469,11 +469,6 @@ export class TextScanner extends EventDispatcher {
                 return;
             }
 
-            if (true) {
-                // Set the offset of textSource to the start of the word
-                const {fullContent, startOffset} = textSource;
-            }
-
             const getSearchContextPromise = this._getSearchContext();
             const getSearchContextResult = getSearchContextPromise instanceof Promise ? await getSearchContextPromise : getSearchContextPromise;
             const {detail} = getSearchContextResult;
@@ -485,6 +480,7 @@ export class TextScanner extends EventDispatcher {
             let sentence = null;
             /** @type {'terms'|'kanji'} */
             let type = 'terms';
+            textSource.setStartOffset(10, this._layoutAwareScan, true);
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
@@ -1289,7 +1285,6 @@ export class TextScanner extends EventDispatcher {
         const sentenceBackwardQuoteMap = this._sentenceBackwardQuoteMap;
         const layoutAwareScan = this._layoutAwareScan;
         const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
-        debugger;
         if (searchText.length === 0) { return null; }
 
         /** @type {import('api').FindTermsDetails} */

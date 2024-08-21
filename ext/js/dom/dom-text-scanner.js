@@ -30,8 +30,9 @@ export class DOMTextScanner {
      * @param {boolean} forcePreserveWhitespace Whether or not whitespace should be forced to be preserved,
      *   regardless of CSS styling.
      * @param {boolean} generateLayoutContent Whether or not newlines should be added based on CSS styling.
+     * @param {boolean} stopAtWhitespaceBackwards Whether to pause scanning when whitespace is encountered when scanning backwards.
      */
-    constructor(node, offset, forcePreserveWhitespace = false, generateLayoutContent = true) {
+    constructor(node, offset, forcePreserveWhitespace = false, generateLayoutContent = true, stopAtWhitespaceBackwards = true) {
         const ruby = DOMTextScanner.getParentRubyElement(node);
         const resetOffset = (ruby !== null);
         if (resetOffset) { node = ruby; }
@@ -54,10 +55,17 @@ export class DOMTextScanner {
         this._lineHasWhitespace = false;
         /** @type {boolean} */
         this._lineHasContent = false;
-        /** @type {boolean} */
+        /**
+         * @type {boolean} Whether or not whitespace should be forced to be preserved,
+         * regardless of CSS styling.
+         */
         this._forcePreserveWhitespace = forcePreserveWhitespace;
         /** @type {boolean} */
         this._generateLayoutContent = generateLayoutContent;
+        /**
+         * @type {boolean} Whether or not whitespace should be scanned backwards.
+         */
+        this._stopAtWhitespaceBackwards = stopAtWhitespaceBackwards;
     }
 
     /**
@@ -145,7 +153,7 @@ export class DOMTextScanner {
 
             /** @type {Node[]} */
             const exitedNodes = [];
-            node = DOMTextScanner.getNextNode(node, forward, enterable, exitedNodes);
+            node = forward ? DOMTextScanner.getNextNode(node, enterable, exitedNodes) : DOMTextScanner.getPrevNode(node, enterable, exitedNodes);
 
             for (const exitedNode of exitedNodes) {
                 if (exitedNode.nodeType !== ELEMENT_NODE) { continue; }
@@ -209,6 +217,9 @@ export class DOMTextScanner {
 
         while (this._offset > 0) {
             const char = readCodePointsBackward(nodeValue, this._offset - 1, 1);
+            if (this._stopAtWhitespaceBackwards && DOMTextScanner.isWhitespace(char)) {
+                return false;
+            }
             this._offset -= char.length;
             const charAttributes = DOMTextScanner.getCharacterAttributes(char, preserveNewlines, preserveWhitespace);
             if (this._checkCharacterBackward(char, charAttributes)) { break; }
@@ -244,7 +255,7 @@ export class DOMTextScanner {
     /**
      * @param {string} char
      * @param {import('dom-text-scanner').CharacterAttributes} charAttributes
-     * @returns {boolean}
+     * @returns {boolean} Whether or not to stop scanning.
      */
     _checkCharacterForward(char, charAttributes) {
         switch (charAttributes) {
@@ -300,7 +311,7 @@ export class DOMTextScanner {
     /**
      * @param {string} char
      * @param {import('dom-text-scanner').CharacterAttributes} charAttributes
-     * @returns {boolean}
+     * @returns {boolean} Whether or not to stop scanning.
      */
     _checkCharacterBackward(char, charAttributes) {
         switch (charAttributes) {
@@ -356,21 +367,20 @@ export class DOMTextScanner {
     // Static helpers
 
     /**
-     * Gets the next node in the document for a specified scanning direction.
+     * Gets the next node in the document.
      * @param {Node} node The current DOM Node.
-     * @param {boolean} forward Whether to scan forward in the document or backward.
      * @param {boolean} visitChildren Whether the children of the current node should be visited.
      * @param {Node[]} exitedNodes An array which stores nodes which were exited.
      * @returns {?Node} The next node in the document, or `null` if there is no next node.
      */
-    static getNextNode(node, forward, visitChildren, exitedNodes) {
+    static getNextNode(node, visitChildren, exitedNodes) {
         /** @type {?Node} */
-        let next = visitChildren ? (forward ? node.firstChild : node.lastChild) : null;
+        let next = visitChildren ? node.firstChild : null;
         if (next === null) {
             while (true) {
                 exitedNodes.push(node);
 
-                next = (forward ? node.nextSibling : node.previousSibling);
+                next = node.nextSibling;
                 if (next !== null) { break; }
 
                 next = node.parentNode;
@@ -380,6 +390,32 @@ export class DOMTextScanner {
             }
         }
         return next;
+    }
+
+    /**
+     * Gets the prev node in the document.
+     * @param {Node} node The current DOM Node.
+     * @param {boolean} visitChildren Whether the children of the current node should be visited.
+     * @param {Node[]} exitedNodes An array which stores nodes which were exited.
+     * @returns {?Node} The prev node in the document, or `null` if there is no prev node.
+     */
+    static getPrevNode(node, visitChildren, exitedNodes) {
+        /** @type {?Node} */
+        let prev = visitChildren ? node.lastChild : null;
+        if (prev === null) {
+            while (true) {
+                exitedNodes.push(node);
+
+                prev = node.previousSibling;
+                if (prev !== null) { break; }
+
+                prev = node.parentNode;
+                if (prev === null) { break; }
+
+                node = prev;
+            }
+        }
+        return prev;
     }
 
     /**
@@ -485,6 +521,23 @@ export class DOMTextScanner {
                 return 0;
             default: // Other
                 return 2;
+        }
+    }
+
+    /**
+     * @param {string} character
+     * @returns {boolean}
+     */
+    static isWhitespace(character) {
+        switch (character.charCodeAt(0)) {
+            case 0x09: // Tab ('\t')
+            case 0x0c: // Form feed ('\f')
+            case 0x0d: // Carriage return ('\r')
+            case 0x20: // Space (' ')
+            case 0x0a: // Line feed ('\n')
+                return true;
+            default: // Other
+                return false;
         }
     }
 
