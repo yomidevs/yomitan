@@ -26,6 +26,24 @@ import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
 
+/**
+ * Throttles a function to be called at most once per `wait` milliseconds.
+ * @param {Function} func The function to be throttled.
+ * @param {number} wait The minimum time (in milliseconds) to wait between function calls.
+ * @param {unknown} self The value to be passed as the `this` parameter to the throttled function.
+ * @returns {(this: unknown, ...args: any[]) => void} The throttled function.
+ */
+function throttle(func, wait, self) {
+    let lastCall = 0;
+    return (...args) => {
+        const now = Date.now();
+        if (now - lastCall >= wait) {
+            lastCall = now;
+            return func.apply(self, args);
+        }
+    };
+}
+
 class DictionaryEntry {
     /**
      * @param {DictionaryController} dictionaryController
@@ -46,14 +64,10 @@ class DictionaryEntry {
         this._counts = null;
         /** @type {ChildNode[]} */
         this._nodes = [...fragment.childNodes];
+        /** @type {HTMLElement} */
+        this._dictionaryItem = querySelectorNotNull(fragment, '.dictionary-item');
         /** @type {HTMLInputElement} */
         this._enabledCheckbox = querySelectorNotNull(fragment, '.dictionary-enabled');
-        /** @type {HTMLInputElement} */
-        this._priorityInput = querySelectorNotNull(fragment, '.dictionary-priority');
-        /** @type {HTMLButtonElement} */
-        this._upButton = querySelectorNotNull(fragment, '#dictionary-move-up');
-        /** @type {HTMLButtonElement} */
-        this._downButton = querySelectorNotNull(fragment, '#dictionary-move-down');
         /** @type {HTMLButtonElement} */
         this._menuButton = querySelectorNotNull(fragment, '.dictionary-menu-button');
         /** @type {HTMLButtonElement} */
@@ -75,6 +89,16 @@ class DictionaryEntry {
         return this._dictionaryInfo.title;
     }
 
+    /** @type {HTMLElement} */
+    get dictionaryItem() {
+        return this._dictionaryItem;
+    }
+
+    /** @type {import('dictionary-importer').Summary} */
+    get dictionaryInfo() {
+        return this._dictionaryInfo;
+    }
+
     /** */
     prepare() {
         //
@@ -84,16 +108,15 @@ class DictionaryEntry {
         this._aliasNode.dataset.setting = `dictionaries[${index}].alias`;
         this._versionNode.textContent = `rev.${revision}`;
         this._outdatedButton.hidden = (version >= 3);
-        this._priorityInput.dataset.setting = `dictionaries[${index}].priority`;
         this._enabledCheckbox.dataset.setting = `dictionaries[${index}].enabled`;
         this._eventListeners.addEventListener(this._enabledCheckbox, 'settingChanged', this._onEnabledChanged.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
-        this._eventListeners.addEventListener(this._upButton, 'click', (() => { this._move(-1); }).bind(this), false);
-        this._eventListeners.addEventListener(this._downButton, 'click', (() => { this._move(1); }).bind(this), false);
         this._eventListeners.addEventListener(this._outdatedButton, 'click', this._onOutdatedButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButton, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._updatesAvailable, 'click', this._onUpdateButtonClick.bind(this), false);
+        this._eventListeners.addEventListener(this._dictionaryItem, 'dragstart', this._onDragStart.bind(this), false);
+        this._eventListeners.addEventListener(this._dictionaryItem, 'dragend', this._onDragEnd.bind(this), false);
     }
 
     /** */
@@ -212,6 +235,16 @@ class DictionaryEntry {
     }
 
     /** */
+    _onDragStart() {
+        this._dictionaryItem.classList.add('dragging');
+    }
+
+    /** */
+    _onDragEnd() {
+        this._dictionaryItem.classList.remove('dragging');
+    }
+
+    /** */
     _onIntegrityButtonClick() {
         this._showDetails();
     }
@@ -317,13 +350,6 @@ class DictionaryEntry {
     /** */
     _delete() {
         this._dictionaryController.deleteDictionary(this.dictionaryTitle);
-    }
-
-    /**
-     * @param {number} offset
-     */
-    _move(offset) {
-        void this._dictionaryController.moveDictionaryOptions(this._index, this._index + offset);
     }
 
     /**
@@ -505,6 +531,8 @@ export class DictionaryController {
         this._extraInfo = null;
         /** @type {boolean} */
         this._isDeleting = false;
+        /** @type {number|null} */
+        this._dragging = null;
     }
 
     /** @type {import('./modal-controller.js').ModalController} */
@@ -532,7 +560,7 @@ export class DictionaryController {
         const dictionaryMoveButton = querySelectorNotNull(document, '#dictionary-move-button');
 
         /** @type {HTMLButtonElement} */
-        const dictiontaryResetAliasButton = querySelectorNotNull(document, '#dictionary-reset-alias-button');
+        const dictionaryResetAliasButton = querySelectorNotNull(document, '#dictionary-reset-alias-button');
         /** @type {HTMLButtonElement} */
         const dictionarySetAliasButton = querySelectorNotNull(document, '#dictionary-set-alias-button');
 
@@ -545,7 +573,10 @@ export class DictionaryController {
         dictionaryMoveButton.addEventListener('click', this._onDictionaryMoveButtonClick.bind(this), false);
 
         dictionarySetAliasButton.addEventListener('click', this._onDictionarySetAliasButtonClick.bind(this), false);
-        dictiontaryResetAliasButton.addEventListener('click', this._onDictionaryResetAliasButtonClick.bind(this), false);
+        dictionaryResetAliasButton.addEventListener('click', this._onDictionaryResetAliasButtonClick.bind(this), false);
+
+        const onDragOverThrottled = throttle(this._onDragOver.bind(this), 100, this);
+        this._dictionaryEntryContainer.addEventListener('dragover', onDragOverThrottled.bind(this), false);
 
         if (this._checkUpdatesButton !== null) {
             this._checkUpdatesButton.addEventListener('click', this._onCheckUpdatesButtonClick.bind(this), false);
@@ -615,7 +646,19 @@ export class DictionaryController {
         const event = {source: this};
         this._settingsController.trigger('dictionarySettingsReordered', event);
 
-        await this._updateEntries();
+        const movedEntry = this._dictionaryEntries.splice(currentIndex, 1)[0];
+        this._dictionaryEntries.splice(targetIndex, 0, movedEntry);
+
+        const nextNeighborIndex = targetIndex + 1;
+        if (nextNeighborIndex < this._dictionaryEntries.length) {
+            this._dictionaryEntryContainer.removeChild(movedEntry.dictionaryItem);
+            const fragment = this._createDictionaryEntry(targetIndex, movedEntry.dictionaryInfo);
+            this._dictionaryEntryContainer.insertBefore(fragment, this._dictionaryEntries[nextNeighborIndex].dictionaryItem);
+        } else {
+            this._dictionaryEntryContainer.removeChild(movedEntry.dictionaryItem);
+            const fragment = this._createDictionaryEntry(targetIndex, movedEntry.dictionaryInfo);
+            this._dictionaryEntryContainer.appendChild(fragment);
+        }
     }
 
     /**
@@ -788,7 +831,8 @@ export class DictionaryController {
             const {name} = dictionaryOptionsArray[i];
             const dictionaryInfo = dictionaryInfoMap.get(name);
             if (typeof dictionaryInfo === 'undefined') { continue; }
-            this._createDictionaryEntry(i, dictionaryInfo);
+            const fragment = this._createDictionaryEntry(i, dictionaryInfo);
+            this._appendDictionaryEntryFragment(fragment);
         }
     }
 
@@ -900,6 +944,45 @@ export class DictionaryController {
         if (!Number.isFinite(target) || !Number.isFinite(indexNumber) || indexNumber === target) { return; }
 
         void this.moveDictionaryOptions(indexNumber, target);
+    }
+
+    /**
+     * @param {DragEvent} e
+     */
+    _onDragOver(e) {
+        // get dragged item from event
+        console.log('dragover', e);
+        const draggingIndex = this._dictionaryEntries.findIndex((entry) => entry.dictionaryItem.classList.contains('dragging'));
+        if (draggingIndex === -1) { return; }
+        let nextDictionaryIndex = this._getDragOverDictionaryItem(draggingIndex, e.clientY);
+        if (nextDictionaryIndex === draggingIndex) { return; }
+        if (nextDictionaryIndex === null) {
+            nextDictionaryIndex = this._dictionaryEntries.length - 1;
+        }
+        void this.moveDictionaryOptions(draggingIndex, nextDictionaryIndex);
+    }
+
+    /**
+     * @param {number} draggingIndex
+     * @param {number} y
+     * @returns {number|null}
+     */
+    _getDragOverDictionaryItem(draggingIndex, y) {
+        const neighbors = [draggingIndex - 1, draggingIndex + 1]
+            .filter((index) => index >= 0 && index < this._dictionaryEntries.length);
+
+        /** @type {{index: number|null, offset: number}} */
+        const currentBest = {index: null, offset: Number.NEGATIVE_INFINITY};
+        for (const index of neighbors) {
+            const item = this._dictionaryEntries[index].dictionaryItem;
+            const {top, height} = item.getBoundingClientRect();
+            const offset = y - (top + height / 2);
+            if (offset < 0 && offset > currentBest.offset) {
+                currentBest.index = index;
+                currentBest.offset = offset;
+            }
+        }
+        return currentBest.index;
     }
 
     /** */
@@ -1031,6 +1114,7 @@ export class DictionaryController {
     /**
      * @param {number} index
      * @param {import('dictionary-importer').Summary} dictionaryInfo
+     * @returns {DocumentFragment}
      */
     _createDictionaryEntry(index, dictionaryInfo) {
         const fragment = this.instantiateTemplateFragment('dictionary');
@@ -1039,6 +1123,13 @@ export class DictionaryController {
         this._dictionaryEntries.push(entry);
         entry.prepare();
 
+        return fragment;
+    }
+
+    /**
+     * @param {DocumentFragment} fragment
+     */
+    _appendDictionaryEntryFragment(fragment) {
         const container = /** @type {HTMLElement} */ (this._dictionaryEntryContainer);
         const relative = container.querySelector('.dictionary-item-bottom');
         container.insertBefore(fragment, relative);
