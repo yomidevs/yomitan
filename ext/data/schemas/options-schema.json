@@ -473,7 +473,8 @@
                                     "hidePopupOnCursorExit",
                                     "hidePopupOnCursorExitDelay",
                                     "normalizeCssZoom",
-                                    "scanWithoutMousemove"
+                                    "scanWithoutMousemove",
+                                    "scanResolution"
                                 ],
                                 "properties": {
                                     "inputs": {
@@ -764,6 +765,14 @@
                                     "scanWithoutMousemove": {
                                         "type": "boolean",
                                         "default": true
+                                    },
+                                    "scanResolution": {
+                                        "type": "string",
+                                        "enum": [
+                                            "character",
+                                            "word"
+                                        ],
+                                        "default": "character"
                                     }
                                 }
                             },

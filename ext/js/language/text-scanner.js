@@ -259,6 +259,7 @@ export class TextScanner extends EventDispatcher {
         matchTypePrefix,
         scanAltText,
         scanWithoutMousemove,
+        scanResolution,
     }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map((input) => this._convertInput(input));
@@ -298,6 +299,9 @@ export class TextScanner extends EventDispatcher {
         }
         if (typeof scanWithoutMousemove === 'boolean') {
             this._scanWithoutMousemove = scanWithoutMousemove;
+        }
+        if (typeof scanResolution === 'string') {
+            this._scanResolution = scanResolution;
         }
         if (typeof sentenceParsingOptions === 'object' && sentenceParsingOptions !== null) {
             const {scanExtent, terminationCharacterMode, terminationCharacters} = sentenceParsingOptions;
@@ -480,7 +484,10 @@ export class TextScanner extends EventDispatcher {
             let sentence = null;
             /** @type {'terms'|'kanji'} */
             let type = 'terms';
-            textSource.setStartOffset(10, this._layoutAwareScan, true);
+            if (this._scanResolution === 'word') {
+                // Move the start offset to the beginning of the word
+                textSource.setStartOffset(this._scanLength, this._layoutAwareScan, true);
+            }
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
@@ -1368,7 +1375,6 @@ export class TextScanner extends EventDispatcher {
                 normalizeCssZoom: this._normalizeCssZoom,
                 language: this._language,
             });
-            console.log(textSource);
             if (textSource !== null) {
                 try {
                     await this._search(textSource, searchTerms, searchKanji, inputInfo);
