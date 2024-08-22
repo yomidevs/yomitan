@@ -2312,9 +2312,6 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     --dictionary-item-index-margin: 0.5em;
     --dictionary-item-index-width: 1.2em;
 }
-.dictionary-item.dragging {
-    opacity: 0.5;
-}
 .dictionary-list-index {
     margin-right: var(--dictionary-item-index-margin);
 }

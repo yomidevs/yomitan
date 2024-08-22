@@ -99,6 +99,15 @@ class DictionaryEntry {
         return this._dictionaryInfo;
     }
 
+    /** @type {number} */
+    get index() {
+        return this._index;
+    }
+
+    set index(value) {
+        this._index = value;
+    }
+
     /** */
     prepare() {
         //
@@ -236,12 +245,12 @@ class DictionaryEntry {
 
     /** */
     _onDragStart() {
-        this._dictionaryItem.classList.add('dragging');
+        this._dictionaryItem.dispatchEvent(new CustomEvent('entryDragStart', {detail: {index: this._index}}));
     }
 
     /** */
     _onDragEnd() {
-        this._dictionaryItem.classList.remove('dragging');
+        this._dictionaryItem.dispatchEvent(new CustomEvent('entryDragEnd', {detail: {index: this._index}}));
     }
 
     /** */
@@ -532,7 +541,9 @@ export class DictionaryController {
         /** @type {boolean} */
         this._isDeleting = false;
         /** @type {number|null} */
-        this._dragging = null;
+        this._draggingIndex = null;
+        /** @type {EventListenerCollection} */
+        this._eventListeners = new EventListenerCollection();
     }
 
     /** @type {import('./modal-controller.js').ModalController} */
@@ -566,23 +577,23 @@ export class DictionaryController {
 
         this._settingsController.application.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
-        this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
-        dictionaryDeleteButton.addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
-        dictionaryUpdateButton.addEventListener('click', this._onDictionaryConfirmUpdate.bind(this), false);
+        this._eventListeners.addEventListener(this._allCheckbox, 'change', this._onAllCheckboxChange.bind(this), false);
+        this._eventListeners.addEventListener(dictionaryDeleteButton, 'click', this._onDictionaryConfirmDelete.bind(this), false);
+        this._eventListeners.addEventListener(dictionaryUpdateButton, 'click', this._onDictionaryConfirmUpdate.bind(this), false);
 
-        dictionaryMoveButton.addEventListener('click', this._onDictionaryMoveButtonClick.bind(this), false);
+        this._eventListeners.addEventListener(dictionaryMoveButton, 'click', this._onDictionaryMoveButtonClick.bind(this), false);
 
-        dictionarySetAliasButton.addEventListener('click', this._onDictionarySetAliasButtonClick.bind(this), false);
-        dictionaryResetAliasButton.addEventListener('click', this._onDictionaryResetAliasButtonClick.bind(this), false);
 
-        const onDragOverThrottled = throttle(this._onDragOver.bind(this), 100, this);
-        this._dictionaryEntryContainer.addEventListener('dragover', onDragOverThrottled.bind(this), false);
+        this._eventListeners.addEventListener(dictionarySetAliasButton, 'click', this._onDictionarySetAliasButtonClick.bind(this), false);
+        this._eventListeners.addEventListener(dictionaryResetAliasButton, 'click', this._onDictionaryResetAliasButtonClick.bind(this), false);
 
+        const onDragOverThrottled = throttle(this._onDragOver.bind(this), 1, this);
+        this._eventListeners.addEventListener(this._dictionaryEntryContainer, 'dragover', onDragOverThrottled, false);
         if (this._checkUpdatesButton !== null) {
-            this._checkUpdatesButton.addEventListener('click', this._onCheckUpdatesButtonClick.bind(this), false);
+            this._eventListeners.addEventListener(this._checkUpdatesButton, 'click', this._onCheckUpdatesButtonClick.bind(this), false);
         }
         if (this._checkIntegrityButton !== null) {
-            this._checkIntegrityButton.addEventListener('click', this._onCheckIntegrityButtonClick.bind(this), false);
+            this._eventListeners.addEventListener(this._checkIntegrityButton, 'click', this._onCheckIntegrityButtonClick.bind(this), false);
         }
 
         this._updateDictionaryEntryCount();
@@ -646,18 +657,20 @@ export class DictionaryController {
         const event = {source: this};
         this._settingsController.trigger('dictionarySettingsReordered', event);
 
-        const movedEntry = this._dictionaryEntries.splice(currentIndex, 1)[0];
-        this._dictionaryEntries.splice(targetIndex, 0, movedEntry);
-
         const nextNeighborIndex = targetIndex + 1;
-        if (nextNeighborIndex < this._dictionaryEntries.length) {
-            this._dictionaryEntryContainer.removeChild(movedEntry.dictionaryItem);
-            const fragment = this._createDictionaryEntry(targetIndex, movedEntry.dictionaryInfo);
-            this._dictionaryEntryContainer.insertBefore(fragment, this._dictionaryEntries[nextNeighborIndex].dictionaryItem);
-        } else {
-            this._dictionaryEntryContainer.removeChild(movedEntry.dictionaryItem);
-            const fragment = this._createDictionaryEntry(targetIndex, movedEntry.dictionaryInfo);
-            this._dictionaryEntryContainer.appendChild(fragment);
+
+        /** @type {(fragment: DocumentFragment) => void} */
+        const insertFunction = (nextNeighborIndex < this._dictionaryEntries.length) ?
+            (fragment) => this._dictionaryEntryContainer.insertBefore(fragment, this._dictionaryEntries[nextNeighborIndex].dictionaryItem) :
+            (fragment) => this._dictionaryEntryContainer.appendChild(fragment);
+
+        const removedEntry = this._removeDictionaryEntry(currentIndex);
+        const {entry: movedEntry, fragment} = this._createDictionaryEntry(targetIndex, removedEntry.dictionaryInfo);
+        this._dictionaryEntries.splice(targetIndex, 0, movedEntry);
+        insertFunction(fragment);
+
+        for (const [i, entry] of this._dictionaryEntries.entries()) {
+            entry.index = i;
         }
     }
 
@@ -831,7 +844,8 @@ export class DictionaryController {
             const {name} = dictionaryOptionsArray[i];
             const dictionaryInfo = dictionaryInfoMap.get(name);
             if (typeof dictionaryInfo === 'undefined') { continue; }
-            const fragment = this._createDictionaryEntry(i, dictionaryInfo);
+            const {entry, fragment} = this._createDictionaryEntry(i, dictionaryInfo);
+            this._dictionaryEntries.push(entry);
             this._appendDictionaryEntryFragment(fragment);
         }
     }
@@ -948,27 +962,36 @@ export class DictionaryController {
 
     /**
      * @param {DragEvent} e
+     * @throws {Error}
      */
     _onDragOver(e) {
-        // get dragged item from event
-        console.log('dragover', e);
-        const draggingIndex = this._dictionaryEntries.findIndex((entry) => entry.dictionaryItem.classList.contains('dragging'));
-        if (draggingIndex === -1) { return; }
-        let nextDictionaryIndex = this._getDragOverDictionaryItem(draggingIndex, e.clientY);
+        const draggingIndex = this._draggingIndex;
+        const cursorY = e.clientY;
+        if (draggingIndex === null) { throw new Error('No dragging index'); }
+
+        const nextDictionaryIndex = this._getDragOverDictionaryItem(draggingIndex, cursorY);
         if (nextDictionaryIndex === draggingIndex) { return; }
-        if (nextDictionaryIndex === null) {
-            nextDictionaryIndex = this._dictionaryEntries.length - 1;
-        }
         void this.moveDictionaryOptions(draggingIndex, nextDictionaryIndex);
+        this._draggingIndex = nextDictionaryIndex;
+
+        const containerRect = this._dictionaryEntryContainer.getBoundingClientRect();
+        const topZone = [containerRect.top - 30, containerRect.top + 60];
+        const bottomZone = [containerRect.bottom - 60, containerRect.bottom + 30];
+
+        if (cursorY > topZone[0] && cursorY < topZone[1]) {
+            this._dictionaryEntryContainer.scrollBy(0, -5); // Scroll up
+        } else if (cursorY > bottomZone[0] && cursorY < bottomZone[1]) {
+            this._dictionaryEntryContainer.scrollBy(0, 5); // Scroll down
+        }
     }
 
     /**
      * @param {number} draggingIndex
      * @param {number} y
-     * @returns {number|null}
+     * @returns {number}
      */
     _getDragOverDictionaryItem(draggingIndex, y) {
-        const neighbors = [draggingIndex - 1, draggingIndex + 1]
+        const neighbors = [draggingIndex - 1, draggingIndex, draggingIndex + 1]
             .filter((index) => index >= 0 && index < this._dictionaryEntries.length);
 
         /** @type {{index: number|null, offset: number}} */
@@ -982,6 +1005,11 @@ export class DictionaryController {
                 currentBest.offset = offset;
             }
         }
+
+        if (currentBest.index === null) {
+            return this._dictionaryEntries.length - 1;
+        }
+
         return currentBest.index;
     }
 
@@ -1114,16 +1142,26 @@ export class DictionaryController {
     /**
      * @param {number} index
      * @param {import('dictionary-importer').Summary} dictionaryInfo
-     * @returns {DocumentFragment}
+     * @returns {{entry: DictionaryEntry, fragment: DocumentFragment}}
      */
     _createDictionaryEntry(index, dictionaryInfo) {
         const fragment = this.instantiateTemplateFragment('dictionary');
 
         const entry = new DictionaryEntry(this, fragment, index, dictionaryInfo);
-        this._dictionaryEntries.push(entry);
         entry.prepare();
+        this._eventListeners.addEventListener(entry.dictionaryItem, 'entryDragStart', this._onEntryDragStart.bind(this), false);
+        this._eventListeners.addEventListener(entry.dictionaryItem, 'entryDragEnd', this._onEntryDragEnd.bind(this), false);
+        return {entry, fragment};
+    }
 
-        return fragment;
+    /**
+     * @param {number} index
+     * @returns {DictionaryEntry}
+     */
+    _removeDictionaryEntry(index) {
+        const entry = this._dictionaryEntries.splice(index, 1)[0];
+        entry.cleanup();
+        return entry;
     }
 
     /**
@@ -1135,6 +1173,20 @@ export class DictionaryController {
         container.insertBefore(fragment, relative);
 
         this._updateDictionaryEntryCount();
+    }
+
+    /**
+     * @param {CustomEvent<{index: number}>} e
+     */
+    _onEntryDragStart(e) {
+        const index = e?.detail?.index;
+        if (typeof index !== 'number') { return; }
+        this._draggingIndex = index;
+    }
+
+    /** */
+    _onEntryDragEnd() {
+        this._draggingIndex = null;
     }
 
     /**
