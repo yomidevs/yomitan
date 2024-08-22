@@ -48,7 +48,8 @@
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-description">Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a> and the web browser's <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings page</a>.</div>
+                <div class="settings-item-description" data-hide-for-browser="firefox firefox-mobile">Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a> and the web browser's <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings page</a>.</div>
+                <div class="settings-item-description" data-show-for-browser="firefox firefox-mobile">Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a> and the web browser's extension settings page.</div>
                 <div class="danger-text margin-above" id="permissions-disabled" hidden><strong>Yomitan features will be limited if the recommended permissions are not enabled.</strong></div>
                 <div class="success-text margin-above" id="recommended-permissions-enabled" hidden><strong>Essential Yomitan features are available.</strong></div>
                 <div class="success-text margin-above" id="full-permissions-enabled" hidden><strong>All Yomitan features are available.</strong></div>

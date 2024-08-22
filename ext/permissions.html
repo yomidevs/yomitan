@@ -124,8 +124,11 @@
                     <p>
                         When enabled, Yomitan is able to scan text and show definitions in private/incognito web browser windows.
                     </p>
-                    <p>
+                    <p data-hide-for-browser="firefox firefox-mobile">
                         This option can be configured from the web browser's <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings pages</a>.
+                    </p>
+                    <p data-show-for-browser="firefox firefox-mobile">
+                        This option can be configured from the web browser's extension settings pages. From your browser's address bar, go to <code>about:addons</code> and navigate to the settings for Yomitan.
                     </p>
                 </div>
             </div>
