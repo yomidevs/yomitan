@@ -469,6 +469,11 @@ export class TextScanner extends EventDispatcher {
                 null
             );
 
+            if (this._scanResolution === 'word') {
+                // Move the start offset to the beginning of the word
+                textSource.setStartOffset(this._scanLength, this._layoutAwareScan, true);
+            }
+
             if (this._textSourceCurrent !== null && this._textSourceCurrent.hasSameStart(textSource)) {
                 return;
             }
@@ -484,10 +489,6 @@ export class TextScanner extends EventDispatcher {
             let sentence = null;
             /** @type {'terms'|'kanji'} */
             let type = 'terms';
-            if (this._scanResolution === 'word') {
-                // Move the start offset to the beginning of the word
-                textSource.setStartOffset(this._scanLength, this._layoutAwareScan, true);
-            }
             const result = await this._findDictionaryEntries(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({dictionaryEntries, sentence, type} = result);
