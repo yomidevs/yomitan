@@ -356,6 +356,7 @@ function createProfileOptionsUpdatedTestData1() {
                 onSearchQuery: false,
             },
             scanWithoutMousemove: true,
+            scanResolution: 'character',
             inputs: [
                 {
                     include: 'shift',

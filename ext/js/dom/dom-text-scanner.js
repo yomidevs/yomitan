@@ -32,7 +32,7 @@ export class DOMTextScanner {
      * @param {boolean} generateLayoutContent Whether or not newlines should be added based on CSS styling.
      * @param {boolean} stopAtWhitespaceBackwards Whether to pause scanning when whitespace is encountered when scanning backwards.
      */
-    constructor(node, offset, forcePreserveWhitespace = false, generateLayoutContent = true, stopAtWhitespaceBackwards = true) {
+    constructor(node, offset, forcePreserveWhitespace = false, generateLayoutContent = true, stopAtWhitespaceBackwards = false) {
         const ruby = DOMTextScanner.getParentRubyElement(node);
         const resetOffset = (ruby !== null);
         if (resetOffset) { node = ruby; }
