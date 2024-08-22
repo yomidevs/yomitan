@@ -532,7 +532,7 @@ export class DictionaryController {
         const dictionaryMoveButton = querySelectorNotNull(document, '#dictionary-move-button');
 
         /** @type {HTMLButtonElement} */
-        const dictiontaryResetAliasButton = querySelectorNotNull(document, '#dictionary-reset-alias-button');
+        const dictionaryResetAliasButton = querySelectorNotNull(document, '#dictionary-reset-alias-button');
         /** @type {HTMLButtonElement} */
         const dictionarySetAliasButton = querySelectorNotNull(document, '#dictionary-set-alias-button');
 
@@ -545,7 +545,7 @@ export class DictionaryController {
         dictionaryMoveButton.addEventListener('click', this._onDictionaryMoveButtonClick.bind(this), false);
 
         dictionarySetAliasButton.addEventListener('click', this._onDictionarySetAliasButtonClick.bind(this), false);
-        dictiontaryResetAliasButton.addEventListener('click', this._onDictionaryResetAliasButtonClick.bind(this), false);
+        dictionaryResetAliasButton.addEventListener('click', this._onDictionaryResetAliasButtonClick.bind(this), false);
 
         if (this._checkUpdatesButton !== null) {
             this._checkUpdatesButton.addEventListener('click', this._onCheckUpdatesButtonClick.bind(this), false);
