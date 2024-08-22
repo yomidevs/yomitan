@@ -900,7 +900,6 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'isTextLookupWorthy'>} */
     _onApiIsTextLookupWorthy({text, language}) {
-        if (text === null) { return false; }
         return isTextLookupWorthy(text, language);
     }
 
