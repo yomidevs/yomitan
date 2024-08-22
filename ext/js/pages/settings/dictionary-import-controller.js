@@ -177,7 +177,9 @@ export class DictionaryImportController {
         }
 
         const installedDictionaries = await this._settingsController.getDictionaryInfo();
+        /** @type {Set<string>} */
         const installedDictionaryNames = new Set();
+        /** @type {Set<string>} */
         const installedDictionaryDownloadUrls = new Set();
         for (const dictionary of installedDictionaries) {
             installedDictionaryNames.add(dictionary.title);
