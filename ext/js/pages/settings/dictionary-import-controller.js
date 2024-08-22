@@ -176,8 +176,11 @@ export class DictionaryImportController {
             return;
         }
 
+        const installedDictionaries = await this._settingsController.getDictionaryInfo();
+        const installedDictionaryNames = new Set(installedDictionaries.map((dictionary) => dictionary.title));
+
         for (const {property, element} of recommendedDictionaryCategories) {
-            this._renderRecommendedDictionaryGroup(recommendedDictionaries[language][property], element);
+            this._renderRecommendedDictionaryGroup(recommendedDictionaries[language][property], element, installedDictionaryNames);
         }
 
         /** @type {NodeListOf<HTMLElement>} */
@@ -191,8 +194,9 @@ export class DictionaryImportController {
      *
      * @param {import('dictionary-recommended.js').Dictionary[]} recommendedDictionaries
      * @param {HTMLElement} dictionariesList
+     * @param {Set<string>} installedDictionaryNames
      */
-    _renderRecommendedDictionaryGroup(recommendedDictionaries, dictionariesList) {
+    _renderRecommendedDictionaryGroup(recommendedDictionaries, dictionariesList, installedDictionaryNames) {
         const dictionariesListParent = dictionariesList.parentElement;
         dictionariesList.innerHTML = '';
         for (const dictionary of recommendedDictionaries) {
@@ -202,7 +206,9 @@ export class DictionaryImportController {
                 }
                 const template = this._settingsController.instantiateTemplate('recommended-dictionaries-list-item');
                 const label = querySelectorNotNull(template, '.settings-item-label');
+                /** @type {HTMLButtonElement} */
                 const button = querySelectorNotNull(template, '.action-button[data-action=import-recommended-dictionary]');
+                button.disabled = installedDictionaryNames.has(dictionary.name);
 
                 const urlAttribute = document.createAttribute('data-import-url');
                 urlAttribute.value = dictionary.url;
