@@ -39,7 +39,7 @@ const tests = [
             {term: '愛しい', source: '愛しかった',             rule: 'adj-i', reasons: ['-ta']},
             {term: '愛しい', source: '愛しくありません',      rule: 'adj-i', reasons: ['-masu', 'negative']},
             {term: '愛しい', source: '愛しくありませんでした', rule: 'adj-i', reasons: ['-masu', 'negative', '-ta']},
-            {term: '愛しい', source: '愛しくありませんかった',      rule: 'adj-i', reasons: ['-masu', '-n past']},
+            {term: '愛しい', source: '愛しくありませんかった',      rule: 'adj-i', reasons: ['-masu', 'negative', '-n past']},
             {term: '愛しい', source: '愛しき',                 rule: 'adj-i', reasons: ['-ki']},
             {term: '愛しい', source: '愛しげ',                 rule: 'adj-i', reasons: ['-ge']},
             {term: '愛しい', source: '愛し気',                 rule: 'adj-i', reasons: ['-ge']},
