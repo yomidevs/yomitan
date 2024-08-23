@@ -166,7 +166,7 @@ export class DOMTextScanner {
 
             /** @type {Node[]} */
             const exitedNodes = [];
-            node = forward ? DOMTextScanner.getNextNode(node, enterable, exitedNodes) : DOMTextScanner.getPrevNode(node, enterable, exitedNodes);
+            node = DOMTextScanner.getNextNode(node, forward, enterable, exitedNodes);
 
             for (const exitedNode of exitedNodes) {
                 if (exitedNode.nodeType !== ELEMENT_NODE) { continue; }
@@ -379,20 +379,21 @@ export class DOMTextScanner {
     // Static helpers
 
     /**
-     * Gets the next node in the document.
+     * Gets the next node to process in the document for a specified scanning direction.
      * @param {Node} node The current DOM Node.
+     * @param {boolean} forward Whether to scan forward in the document or backward.
      * @param {boolean} visitChildren Whether the children of the current node should be visited.
      * @param {Node[]} exitedNodes An array which stores nodes which were exited.
      * @returns {?Node} The next node in the document, or `null` if there is no next node.
      */
-    static getNextNode(node, visitChildren, exitedNodes) {
+    static getNextNode(node, forward, visitChildren, exitedNodes) {
         /** @type {?Node} */
-        let next = visitChildren ? node.firstChild : null;
+        let next = visitChildren ? (forward ? node.firstChild : node.lastChild) : null;
         if (next === null) {
             while (true) {
                 exitedNodes.push(node);
 
-                next = node.nextSibling;
+                next = (forward ? node.nextSibling : node.previousSibling);
                 if (next !== null) { break; }
 
                 next = node.parentNode;
@@ -402,32 +403,6 @@ export class DOMTextScanner {
             }
         }
         return next;
-    }
-
-    /**
-     * Gets the prev node in the document.
-     * @param {Node} node The current DOM Node.
-     * @param {boolean} visitChildren Whether the children of the current node should be visited.
-     * @param {Node[]} exitedNodes An array which stores nodes which were exited.
-     * @returns {?Node} The prev node in the document, or `null` if there is no prev node.
-     */
-    static getPrevNode(node, visitChildren, exitedNodes) {
-        /** @type {?Node} */
-        let prev = visitChildren ? node.lastChild : null;
-        if (prev === null) {
-            while (true) {
-                exitedNodes.push(node);
-
-                prev = node.previousSibling;
-                if (prev !== null) { break; }
-
-                prev = node.parentNode;
-                if (prev === null) { break; }
-
-                node = prev;
-            }
-        }
-        return prev;
     }
 
     /**
