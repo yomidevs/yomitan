@@ -22,8 +22,7 @@ on:
         description: "Max attempts"
         required: false
         default: "10"
-permissions:
-  contents: read
+permissions: {}
 jobs:
   delay:
     runs-on: ubuntu-latest

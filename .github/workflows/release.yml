@@ -2,8 +2,7 @@ name: release
 on:
   release:
     types: [released]
-permissions:
-  contents: read
+permissions: {}
 jobs:
   build:
     runs-on: ubuntu-latest
