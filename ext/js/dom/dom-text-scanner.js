@@ -23,6 +23,15 @@ import {readCodePointsBackward, readCodePointsForward} from '../data/string-util
  */
 export class DOMTextScanner {
     /**
+     * A regular expression used to match word delimiters.
+     * \p{L} matches any kind of letter from any language
+     * \p{N} matches any kind of numeric character in any script
+     * `'` and `-` are also included as word characters.
+     * @type {RegExp}
+     */
+    static WORD_DELIMITER_REGEX = /[^\w\p{L}\p{N}']/u;
+
+    /**
      * Creates a new instance of a DOMTextScanner.
      * @param {Node} node The DOM Node to start at.
      * @param {number} offset The character offset in to start at when node is a text node.
@@ -30,9 +39,9 @@ export class DOMTextScanner {
      * @param {boolean} forcePreserveWhitespace Whether or not whitespace should be forced to be preserved,
      *   regardless of CSS styling.
      * @param {boolean} generateLayoutContent Whether or not newlines should be added based on CSS styling.
-     * @param {boolean} stopAtWhitespaceBackwards Whether to pause scanning when whitespace is encountered when scanning backwards.
+     * @param {boolean} stopAtWordBoundary Whether to pause scanning when whitespace is encountered when scanning backwards.
      */
-    constructor(node, offset, forcePreserveWhitespace = false, generateLayoutContent = true, stopAtWhitespaceBackwards = false) {
+    constructor(node, offset, forcePreserveWhitespace = false, generateLayoutContent = true, stopAtWordBoundary = false) {
         const ruby = DOMTextScanner.getParentRubyElement(node);
         const resetOffset = (ruby !== null);
         if (resetOffset) { node = ruby; }
@@ -63,9 +72,9 @@ export class DOMTextScanner {
         /** @type {boolean} */
         this._generateLayoutContent = generateLayoutContent;
         /**
-         * @type {boolean} Whether or not whitespace should be scanned backwards.
+         * @type {boolean} Whether or not to stop scanning when word boundaries are encountered.
          */
-        this._stopAtWhitespaceBackwards = stopAtWhitespaceBackwards;
+        this._stopAtWordBoundary = stopAtWordBoundary;
     }
 
     /**
@@ -214,10 +223,9 @@ export class DOMTextScanner {
         const nodeValueLength = nodeValue.length;
         const {preserveNewlines, preserveWhitespace} = this._getWhitespaceSettings(textNode);
         if (resetOffset) { this._offset = nodeValueLength; }
-
         while (this._offset > 0) {
             const char = readCodePointsBackward(nodeValue, this._offset - 1, 1);
-            if (this._stopAtWhitespaceBackwards && DOMTextScanner.isWhitespace(char)) {
+            if (this._stopAtWordBoundary && DOMTextScanner.isWordDelimiter(char)) {
                 return false;
             }
             this._offset -= char.length;
@@ -528,17 +536,8 @@ export class DOMTextScanner {
      * @param {string} character
      * @returns {boolean}
      */
-    static isWhitespace(character) {
-        switch (character.charCodeAt(0)) {
-            case 0x09: // Tab ('\t')
-            case 0x0c: // Form feed ('\f')
-            case 0x0d: // Carriage return ('\r')
-            case 0x20: // Space (' ')
-            case 0x0a: // Line feed ('\n')
-                return true;
-            default: // Other
-                return false;
-        }
+    static isWordDelimiter(character) {
+        return DOMTextScanner.WORD_DELIMITER_REGEX.test(character);
     }
 
     /**

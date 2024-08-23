@@ -161,12 +161,12 @@ export class TextSourceRange {
      * @param {number} length The maximum number of codepoints to move by.
      * @param {boolean} layoutAwareScan Whether or not HTML layout information should be used to generate
      *   the string content when scanning.
-     * @param {boolean} stopAtWhitespace Whether to stop at whitespace characters.
+     * @param {boolean} stopAtWordBoundary Whether to stop at whitespace characters.
      * @returns {number} The actual number of codepoints that were read.
      */
-    setStartOffset(length, layoutAwareScan, stopAtWhitespace = false) {
+    setStartOffset(length, layoutAwareScan, stopAtWordBoundary = false) {
         if (this._disallowExpandSelection) { return 0; }
-        const state = new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan, stopAtWhitespace).seek(-length);
+        const state = new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan, stopAtWordBoundary).seek(-length);
         this._range.setStart(state.node, state.offset);
         this._rangeStartOffset = this._range.startOffset;
         this._content = state.content + this._content;
