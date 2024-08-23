@@ -166,7 +166,7 @@ export class DOMTextScanner {
 
             /** @type {Node[]} */
             const exitedNodes = [];
-            node = DOMTextScanner.getNextNode(node, forward, enterable, exitedNodes);
+            node = DOMTextScanner.getNextNodeToProcess(node, forward, enterable, exitedNodes);
 
             for (const exitedNode of exitedNodes) {
                 if (exitedNode.nodeType !== ELEMENT_NODE) { continue; }
@@ -386,7 +386,7 @@ export class DOMTextScanner {
      * @param {Node[]} exitedNodes An array which stores nodes which were exited.
      * @returns {?Node} The next node in the document, or `null` if there is no next node.
      */
-    static getNextNode(node, forward, visitChildren, exitedNodes) {
+    static getNextNodeToProcess(node, forward, visitChildren, exitedNodes) {
         /** @type {?Node} */
         let next = visitChildren ? (forward ? node.firstChild : node.lastChild) : null;
         if (next === null) {
