@@ -147,6 +147,10 @@ export class DOMTextScanner {
                     break;
                 }
             } else if (nodeType === ELEMENT_NODE) {
+                if (this._stopAtWordBoundary && !forward) {
+                    // Element nodes are considered word boundaries when scanning backwards
+                    break;
+                }
                 lastNode = node;
                 const initialNodeAtBeginningOfNodeGoingBackwards = node === this._initialNode && this._offset === 0 && !forward;
                 const initialNodeAtEndOfNodeGoingForwards = node === this._initialNode && this._offset === node.childNodes.length && forward;
