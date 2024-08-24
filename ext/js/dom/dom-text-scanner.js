@@ -26,10 +26,9 @@ export class DOMTextScanner {
      * A regular expression used to match word delimiters.
      * \p{L} matches any kind of letter from any language
      * \p{N} matches any kind of numeric character in any script
-     * `'` and `-` are also included as word characters.
      * @type {RegExp}
      */
-    static WORD_DELIMITER_REGEX = /[^\w\p{L}\p{N}']/u;
+    static WORD_DELIMITER_REGEX = /[^\w\p{L}\p{N}]/u;
 
     /**
      * Creates a new instance of a DOMTextScanner.
@@ -230,7 +229,15 @@ export class DOMTextScanner {
         while (this._offset > 0) {
             const char = readCodePointsBackward(nodeValue, this._offset - 1, 1);
             if (this._stopAtWordBoundary && DOMTextScanner.isWordDelimiter(char)) {
-                return false;
+                if (DOMTextScanner.isSingleQuote(char) && this._offset > 1) {
+                    // Check to see if char before single quote is a word character (e.g. "don't")
+                    const prevChar = readCodePointsBackward(nodeValue, this._offset - 2, 1);
+                    if (DOMTextScanner.isWordDelimiter(prevChar)) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
             }
             this._offset -= char.length;
             const charAttributes = DOMTextScanner.getCharacterAttributes(char, preserveNewlines, preserveWhitespace);
@@ -517,6 +524,23 @@ export class DOMTextScanner {
      */
     static isWordDelimiter(character) {
         return DOMTextScanner.WORD_DELIMITER_REGEX.test(character);
+    }
+
+    /**
+     * @param {string} character
+     * @returns {boolean}
+     */
+    static isSingleQuote(character) {
+        switch (character.charCodeAt(0)) {
+            case 0x27: // Single quote ('')
+            case 0x2019: // Right single quote (’)
+            case 0x2032: // Prime (′)
+            case 0x2035: // Reversed prime (‵)
+            case 0x02bc: // Modifier letter apostrophe (ʼ)
+                return true;
+            default:
+                return false;
+        }
     }
 
     /**
