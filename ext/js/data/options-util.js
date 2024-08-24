@@ -562,6 +562,7 @@ export class OptionsUtil {
             this._updateVersion48,
             this._updateVersion49,
             this._updateVersion50,
+            this._updateVersion51,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1473,6 +1474,16 @@ export class OptionsUtil {
                     source.type = 'language-pod-101';
                 }
             }
+        }
+    }
+
+    /**
+     * - Add scanning.scanResolution
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion51(options) {
+        for (const profile of options.profiles) {
+            profile.options.scanning.scanResolution = 'character';
         }
     }
 

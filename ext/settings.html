@@ -370,6 +370,33 @@
                 </p>
             </div>
         </div>
+        <div class="settings-item">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Scan resolution</div>
+                    <div class="settings-item-description">
+                        Start the lookup scan at the word or character of the cursor position.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select data-setting="scanning.scanResolution">
+                        <option value="character">Character</option>
+                        <option value="word">Word</option>
+                    </select>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    The scan resolution determines where the scan starts when the cursor is moved.
+                    The <code>Character</code> option will start scanning at the cursor's current position,
+                    while the <code>Word</code> option will start scanning at the beginning of the word.
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Scan using middle mouse button</div>

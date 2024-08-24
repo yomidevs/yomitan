@@ -531,7 +531,7 @@ export class TextSourceGenerator {
         let previousStyles = null;
         try {
             let i = 0;
-            let startContinerPre = null;
+            let startContainerPre = null;
             while (true) {
                 const range = this._caretRangeFromPoint(x, y);
                 if (range === null) {
@@ -539,11 +539,11 @@ export class TextSourceGenerator {
                 }
 
                 const startContainer = range.startContainer;
-                if (startContinerPre !== startContainer) {
+                if (startContainerPre !== startContainer) {
                     if (this._isPointInRange(x, y, range, normalizeCssZoom, language)) {
                         return range;
                     }
-                    startContinerPre = startContainer;
+                    startContainerPre = startContainer;
                 }
 
                 if (previousStyles === null) { previousStyles = new Map(); }

@@ -196,6 +196,7 @@ export type ScanningOptions = {
     normalizeCssZoom: boolean;
     scanAltText: boolean;
     scanWithoutMousemove: boolean;
+    scanResolution: string;
 };
 
 export type ScanningInput = {

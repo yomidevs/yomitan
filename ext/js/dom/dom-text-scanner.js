@@ -23,6 +23,14 @@ import {readCodePointsBackward, readCodePointsForward} from '../data/string-util
  */
 export class DOMTextScanner {
     /**
+     * A regular expression used to match word delimiters.
+     * \p{L} matches any kind of letter from any language
+     * \p{N} matches any kind of numeric character in any script
+     * @type {RegExp}
+     */
+    static WORD_DELIMITER_REGEX = /[^\w\p{L}\p{N}]/u;
+
+    /**
      * Creates a new instance of a DOMTextScanner.
      * @param {Node} node The DOM Node to start at.
      * @param {number} offset The character offset in to start at when node is a text node.
@@ -30,8 +38,9 @@ export class DOMTextScanner {
      * @param {boolean} forcePreserveWhitespace Whether or not whitespace should be forced to be preserved,
      *   regardless of CSS styling.
      * @param {boolean} generateLayoutContent Whether or not newlines should be added based on CSS styling.
+     * @param {boolean} stopAtWordBoundary Whether to pause scanning when whitespace is encountered when scanning backwards.
      */
-    constructor(node, offset, forcePreserveWhitespace = false, generateLayoutContent = true) {
+    constructor(node, offset, forcePreserveWhitespace = false, generateLayoutContent = true, stopAtWordBoundary = false) {
         const ruby = DOMTextScanner.getParentRubyElement(node);
         const resetOffset = (ruby !== null);
         if (resetOffset) { node = ruby; }
@@ -54,10 +63,17 @@ export class DOMTextScanner {
         this._lineHasWhitespace = false;
         /** @type {boolean} */
         this._lineHasContent = false;
-        /** @type {boolean} */
+        /**
+         * @type {boolean} Whether or not whitespace should be forced to be preserved,
+         * regardless of CSS styling.
+         */
         this._forcePreserveWhitespace = forcePreserveWhitespace;
         /** @type {boolean} */
         this._generateLayoutContent = generateLayoutContent;
+        /**
+         * @type {boolean} Whether or not to stop scanning when word boundaries are encountered.
+         */
+        this._stopAtWordBoundary = stopAtWordBoundary;
     }
 
     /**
@@ -130,6 +146,10 @@ export class DOMTextScanner {
                     break;
                 }
             } else if (nodeType === ELEMENT_NODE) {
+                if (this._stopAtWordBoundary && !forward) {
+                    // Element nodes are considered word boundaries when scanning backwards
+                    break;
+                }
                 lastNode = node;
                 const initialNodeAtBeginningOfNodeGoingBackwards = node === this._initialNode && this._offset === 0 && !forward;
                 const initialNodeAtEndOfNodeGoingForwards = node === this._initialNode && this._offset === node.childNodes.length && forward;
@@ -145,7 +165,7 @@ export class DOMTextScanner {
 
             /** @type {Node[]} */
             const exitedNodes = [];
-            node = DOMTextScanner.getNextNode(node, forward, enterable, exitedNodes);
+            node = DOMTextScanner.getNextNodeToProcess(node, forward, enterable, exitedNodes);
 
             for (const exitedNode of exitedNodes) {
                 if (exitedNode.nodeType !== ELEMENT_NODE) { continue; }
@@ -206,9 +226,19 @@ export class DOMTextScanner {
         const nodeValueLength = nodeValue.length;
         const {preserveNewlines, preserveWhitespace} = this._getWhitespaceSettings(textNode);
         if (resetOffset) { this._offset = nodeValueLength; }
-
         while (this._offset > 0) {
             const char = readCodePointsBackward(nodeValue, this._offset - 1, 1);
+            if (this._stopAtWordBoundary && DOMTextScanner.isWordDelimiter(char)) {
+                if (DOMTextScanner.isSingleQuote(char) && this._offset > 1) {
+                    // Check to see if char before single quote is a word character (e.g. "don't")
+                    const prevChar = readCodePointsBackward(nodeValue, this._offset - 2, 1);
+                    if (DOMTextScanner.isWordDelimiter(prevChar)) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
             this._offset -= char.length;
             const charAttributes = DOMTextScanner.getCharacterAttributes(char, preserveNewlines, preserveWhitespace);
             if (this._checkCharacterBackward(char, charAttributes)) { break; }
@@ -244,7 +274,7 @@ export class DOMTextScanner {
     /**
      * @param {string} char
      * @param {import('dom-text-scanner').CharacterAttributes} charAttributes
-     * @returns {boolean}
+     * @returns {boolean} Whether or not to stop scanning.
      */
     _checkCharacterForward(char, charAttributes) {
         switch (charAttributes) {
@@ -300,7 +330,7 @@ export class DOMTextScanner {
     /**
      * @param {string} char
      * @param {import('dom-text-scanner').CharacterAttributes} charAttributes
-     * @returns {boolean}
+     * @returns {boolean} Whether or not to stop scanning.
      */
     _checkCharacterBackward(char, charAttributes) {
         switch (charAttributes) {
@@ -356,14 +386,14 @@ export class DOMTextScanner {
     // Static helpers
 
     /**
-     * Gets the next node in the document for a specified scanning direction.
+     * Gets the next node to process in the document for a specified scanning direction.
      * @param {Node} node The current DOM Node.
      * @param {boolean} forward Whether to scan forward in the document or backward.
      * @param {boolean} visitChildren Whether the children of the current node should be visited.
      * @param {Node[]} exitedNodes An array which stores nodes which were exited.
      * @returns {?Node} The next node in the document, or `null` if there is no next node.
      */
-    static getNextNode(node, forward, visitChildren, exitedNodes) {
+    static getNextNodeToProcess(node, forward, visitChildren, exitedNodes) {
         /** @type {?Node} */
         let next = visitChildren ? (forward ? node.firstChild : node.lastChild) : null;
         if (next === null) {
@@ -485,6 +515,31 @@ export class DOMTextScanner {
                 return 0;
             default: // Other
                 return 2;
+        }
+    }
+
+    /**
+     * @param {string} character
+     * @returns {boolean}
+     */
+    static isWordDelimiter(character) {
+        return DOMTextScanner.WORD_DELIMITER_REGEX.test(character);
+    }
+
+    /**
+     * @param {string} character
+     * @returns {boolean}
+     */
+    static isSingleQuote(character) {
+        switch (character.charCodeAt(0)) {
+            case 0x27: // Single quote ('')
+            case 0x2019: // Right single quote (’)
+            case 0x2032: // Prime (′)
+            case 0x2035: // Reversed prime (‵)
+            case 0x02bc: // Modifier letter apostrophe (ʼ)
+                return true;
+            default:
+                return false;
         }
     }
 

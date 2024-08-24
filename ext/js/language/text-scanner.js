@@ -259,6 +259,7 @@ export class TextScanner extends EventDispatcher {
         matchTypePrefix,
         scanAltText,
         scanWithoutMousemove,
+        scanResolution,
     }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map((input) => this._convertInput(input));
@@ -298,6 +299,9 @@ export class TextScanner extends EventDispatcher {
         }
         if (typeof scanWithoutMousemove === 'boolean') {
             this._scanWithoutMousemove = scanWithoutMousemove;
+        }
+        if (typeof scanResolution === 'string') {
+            this._scanResolution = scanResolution;
         }
         if (typeof sentenceParsingOptions === 'object' && sentenceParsingOptions !== null) {
             const {scanExtent, terminationCharacterMode, terminationCharacters} = sentenceParsingOptions;
@@ -464,6 +468,11 @@ export class TextScanner extends EventDispatcher {
                 (this._inputInfoCurrent === null ? this._createSelectionRestoreInfo() : null) :
                 null
             );
+
+            if (this._scanResolution === 'word') {
+                // Move the start offset to the beginning of the word
+                textSource.setStartOffset(this._scanLength, this._layoutAwareScan, true);
+            }
 
             if (this._textSourceCurrent !== null && this._textSourceCurrent.hasSameStart(textSource)) {
                 return;

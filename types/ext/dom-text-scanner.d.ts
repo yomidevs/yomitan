@@ -33,7 +33,15 @@ export type CharacterAttributes = 0 | 1 | 2 | 3;
  * - 2 newlines corresponds to a significant visual distinction since the previous content.
  */
 export type ElementSeekInfo = {
+    /**
+     * Indicates whether the content of this node should be entered.
+     */
     enterable: boolean;
+    /**
+     * The number of newline characters that should be added.
+     * - 1 newline corresponds to a simple new line in the layout.
+     * - 2 newlines corresponds to a significant visual distinction since the previous content.
+     */
     newlines: number;
 };
 
@@ -43,6 +51,12 @@ export type ElementSeekInfo = {
  * `preserveWhitespace` indicates whether or not sequences of whitespace characters are collapsed.
  */
 export type WhitespaceSettings = {
+    /**
+     * Indicates whether or not newline characters are treated as line breaks.
+     */
     preserveNewlines: boolean;
+    /**
+     * Indicates whether or not sequences of whitespace characters are collapsed.¬
+     */
     preserveWhitespace: boolean;
 };
