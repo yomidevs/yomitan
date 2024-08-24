@@ -726,6 +726,36 @@ export const japaneseTransforms = {
                 suffixInflection('來ん', '來る', [], ['vk']),
             ],
         },
+        '-n past': {
+            name: '-n',
+            description: 'Past negative form of verbs; a sound change of ぬ.\n',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～んかった',
+                    description: '打消の過去を示す。なかった。',
+                },
+            ],
+            rules: [
+                suffixInflection('んかった', 'る', [], ['v1']),
+                suffixInflection('かんかった', 'く', [], ['v5']),
+                suffixInflection('がんかった', 'ぐ', [], ['v5']),
+                suffixInflection('さんかった', 'す', [], ['v5']),
+                suffixInflection('たんかった', 'つ', [], ['v5']),
+                suffixInflection('なんかった', 'ぬ', [], ['v5']),
+                suffixInflection('ばんかった', 'ぶ', [], ['v5']),
+                suffixInflection('まんかった', 'む', [], ['v5']),
+                suffixInflection('らんかった', 'る', [], ['v5']),
+                suffixInflection('わんかった', 'う', [], ['v5']),
+                suffixInflection('ぜんかった', 'ずる', [], ['vz']),
+                suffixInflection('せんかった', 'する', [], ['vs']),
+                suffixInflection('為んかった', '為る', [], ['vs']),
+                suffixInflection('こんかった', 'くる', [], ['vk']),
+                suffixInflection('来んかった', '来る', [], ['vk']),
+                suffixInflection('來んかった', '來る', [], ['vk']),
+                suffixInflection('ませんかった', 'ません', [], ['v']),
+            ],
+        },
         '-mu': {
             name: '-mu',
             description: 'Archaic.\n' +
