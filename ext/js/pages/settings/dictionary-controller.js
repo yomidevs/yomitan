@@ -958,6 +958,7 @@ export class DictionaryController {
     /** */
     async _checkForUpdates() {
         if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isDeleting) { return; }
+        let hasUpdates;
         try {
             this._checkingUpdates = true;
             this._setButtonsEnabled(false);
@@ -965,11 +966,12 @@ export class DictionaryController {
             const updateChecks = this._dictionaryEntries.map((entry) => entry.checkForUpdate());
             const updateCount = (await Promise.all(updateChecks)).reduce((sum, value) => (sum + (value ? 1 : 0)), 0);
             if (this._checkUpdatesButton !== null) {
-                this._checkUpdatesButton.textContent = updateCount ? `${updateCount} update${updateCount > 1 ? 's' : ''}` : 'No updates';
+                hasUpdates = !!updateCount;
+                this._checkUpdatesButton.textContent = hasUpdates ? `${updateCount} update${updateCount > 1 ? 's' : ''}` : 'No updates';
             }
         } finally {
             this._setButtonsEnabled(true);
-            if (this._checkUpdatesButton !== null) {
+            if (this._checkUpdatesButton !== null && !hasUpdates) {
                 this._checkUpdatesButton.disabled = true;
             }
             this._checkingUpdates = false;
