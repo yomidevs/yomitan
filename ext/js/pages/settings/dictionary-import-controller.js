@@ -108,7 +108,6 @@ export class DictionaryImportController {
      * @param {MouseEvent} e
      */
     async _onRecommendedImportClick(e) {
-        if (!(e instanceof PointerEvent)) { return; }
         if (!e.target || !(e.target instanceof HTMLButtonElement)) { return; }
 
         const import_url = e.target.attributes.getNamedItem('data-import-url');
