@@ -969,6 +969,9 @@ export class DictionaryController {
             }
         } finally {
             this._setButtonsEnabled(true);
+            if (this._checkUpdatesButton !== null) {
+                this._checkUpdatesButton.disabled = true;
+            }
             this._checkingUpdates = false;
         }
     }
