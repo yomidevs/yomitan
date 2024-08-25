@@ -795,6 +795,7 @@ export class Display extends EventDispatcher {
             this._eventListeners.removeAllEventListeners();
             this._contentManager.unloadAll();
             this._hideTagNotification(false);
+            this._hideInflectionNotification(false);
             this._triggerContentClear();
             this._dictionaryEntries = [];
             this._dictionaryEntryNodes = [];
@@ -1156,6 +1157,14 @@ export class Display extends EventDispatcher {
     _hideTagNotification(animate) {
         if (this._tagNotification === null) { return; }
         this._tagNotification.close(animate);
+    }
+
+    /**
+     * @param {boolean} animate
+     */
+    _hideInflectionNotification(animate) {
+        if (this._inflectionNotification === null) { return; }
+        this._inflectionNotification.close(animate);
     }
 
     /**
