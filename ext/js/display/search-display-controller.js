@@ -107,6 +107,7 @@ export class SearchDisplayController {
         this._searchBackButton.addEventListener('click', this._onSearchBackButtonClick.bind(this), false);
         this._wanakanaEnableCheckbox.addEventListener('change', this._onWanakanaEnableChange.bind(this));
         window.addEventListener('copy', this._onCopy.bind(this));
+        window.addEventListener('paste', this._onPaste.bind(this));
         this._clipboardMonitor.on('change', this._onClipboardMonitorChange.bind(this));
         this._clipboardMonitorEnableCheckbox.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
         this._stickyHeaderEnableCheckbox.addEventListener('change', this._onStickyHeaderEnableChange.bind(this));
@@ -276,6 +277,26 @@ export class SearchDisplayController {
     async _onCopy() {
         // Ignore copy from search page
         this._clipboardMonitor.setPreviousText(document.hasFocus() ? await this._clipboardReaderLike.getText(false) : '');
+    }
+
+    /**
+     * @param {ClipboardEvent} e
+     */
+    _onPaste(e) {
+        if (e.target === this._queryInput) {
+            return;
+        }
+        e.stopPropagation();
+        e.preventDefault();
+        const text = e.clipboardData?.getData('text');
+        if (!text) {
+            return;
+        }
+        if (this._queryInput.value !== text) {
+            this._queryInput.value = text;
+            this._updateSearchHeight(true);
+            this._searchButton.click();
+        }
     }
 
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
