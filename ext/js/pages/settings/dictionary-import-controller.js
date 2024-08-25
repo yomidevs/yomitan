@@ -95,7 +95,6 @@ export class DictionaryImportController {
 
         this._settingsController.on('importDictionaryFromUrl', this._onEventImportDictionaryFromUrl.bind(this));
 
-        // Welcome page
         const recommendedDictionaryButton = document.querySelector('[data-modal-action="show,recommended-dictionaries"]');
         if (recommendedDictionaryButton) {
             recommendedDictionaryButton.addEventListener('click', this._renderRecommendedDictionaries.bind(this), false);
