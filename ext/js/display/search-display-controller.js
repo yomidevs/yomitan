@@ -295,7 +295,7 @@ export class SearchDisplayController {
         if (this._queryInput.value !== text) {
             this._queryInput.value = text;
             this._updateSearchHeight(true);
-            this._searchButton.click();
+            this._search(true, 'new', true, null);
         }
     }
 
