@@ -292,8 +292,11 @@ export class SearchDisplayController {
         if (!text) {
             return;
         }
-        this._queryInput.value = text;
-        this._searchButton.click();
+        if (this._queryInput.value !== text) {
+            this._queryInput.value = text;
+            this._updateSearchHeight(true);
+            this._searchButton.click();
+        }
     }
 
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
