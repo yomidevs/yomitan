@@ -102,7 +102,7 @@ To further enhance your Yomitan experience, it's worth [integrating with Anki](.
 
 ## Contributing
 
-🚀 **Dip your toes into contributing by looking at issues with the label [good-first-issue](https://github.com/themoeway/yomitan/issues?q=is%3Aopen+is%3Aissue+label%3Agood-first-issue).**
+🚀 **Dip your toes into contributing by looking at issues with the label [good first issue](https://github.com/themoeway/yomitan/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).**
 
 Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the [issue tracker](https://github.com/themoeway/yomitan/issues), and read our [contributing guidelines](./CONTRIBUTING.md).
 
