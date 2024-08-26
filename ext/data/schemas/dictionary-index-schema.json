@@ -4,7 +4,8 @@
     "definitions": {
         "isoLanguageCode": {
             "type": "string",
-            "description": "ISO language code (ISO 639-1 where possible, ISO 639-3 otherwise)."
+            "description": "ISO language code (ISO 639-1 where possible, ISO 639-3 otherwise).",
+            "pattern": "^[a-z]{2,3}$"
         }
     },
     "type": "object",
