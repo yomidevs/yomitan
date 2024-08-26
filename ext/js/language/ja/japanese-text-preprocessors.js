@@ -26,7 +26,7 @@ import {
     convertKatakanaToHiragana as convertKatakanaToHiraganaFunction,
     normalizeCombiningCharacters as normalizeCombiningCharactersFunction,
 } from './japanese.js';
-import { convertShinjitai as convertShinjitaiFunction } from './shinjitai-converter.js';
+import {convertShinjitai as convertShinjitaiFunction} from './shinjitai-converter.js';
 
 /** @type {import('language').TextProcessor<boolean>} */
 export const convertHalfWidthCharacters = {
