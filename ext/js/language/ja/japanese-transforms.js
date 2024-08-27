@@ -1245,7 +1245,7 @@ export const japaneseTransforms = {
             '1. Expresses speaker\'s assumption that something is likely not true.\n' +
             '2. Expresses speaker\'s will or intention not to do something.\n' +
             'Usage: Attach まい to the dictionary form (shuushikei) of verbs.\n' +
-            'Attach まい to the irrealis form (mizenkei) of godan verbs.\n' +
+            'Attach まい to the irrealis form (mizenkei) of ichidan verbs.\n' +
             'する becomes しまい, くる becomes こまい',
             i18n: [
                 {
