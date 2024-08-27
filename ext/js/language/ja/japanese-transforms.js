@@ -1239,6 +1239,33 @@ export const japaneseTransforms = {
                 suffixInflection('かろう', 'い', [], ['adj-i']),
             ],
         },
+        '-mai': {
+            name: '-mai',
+            description: 'Negative volitional form of verbs.\n' +
+            '1. Expresses speaker\'s assumption that something is likely not true.\n' +
+            '2. Expresses speaker\'s will or intention not to do something.\n' +
+            'Usage: Attach まい to the dictionary form (shuushikei) of verbs.\n' +
+            'Attach まい to the irrealis form (mizenkei) of godan verbs.\n' +
+            'する becomes しまい, くる becomes こまい',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～まい',
+                    description: '1. 打うち消けしの推量すいりょう 「～ないだろう」と想像する\n' +
+                    '2. 打うち消けしの意志いし「～ないつもりだ」という気持ち',
+                },
+            ],
+            rules: [
+                suffixInflection('まい', '', [], ['v']),
+                suffixInflection('まい', 'る', [], ['v1']),
+                suffixInflection('じまい', 'ずる', [], ['vz']),
+                suffixInflection('しまい', 'する', [], ['vs']),
+                suffixInflection('為まい', '為る', [], ['vs']),
+                suffixInflection('こまい', 'くる', [], ['vk']),
+                suffixInflection('来まい', '来る', [], ['vk']),
+                suffixInflection('來まい', '來る', [], ['vk']),
+            ],
+        },
         'causative-passive': {
             name: 'causative-passive',
             description: 'Contraction of the passive of the causative form of verbs.\n' +
