@@ -898,6 +898,40 @@ export const japaneseTransforms = {
                 suffixInflection('來させる', '來る', ['v1'], ['vk']),
             ],
         },
+        'shortened causative': {
+            name: 'shortened causative',
+            description: 'Contraction of the causative form.\n' +
+            'Describes the intention to make someone do something.\n' +
+            'Usage: Attach す to the irrealis form (mizenkei) of ichidan verbs.\n' +
+            'Attach さす to the dictionary form (shuushikei) of godan verbs.\n' +
+            'する becomes さす, くる becomes こさす.\n' +
+            'It itself conjugates as an godan verb.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '使役形の短縮形',
+                    description: 'だれかにある行為をさせる意を表わす時の言い方。例、「食べさす」の「さす」。',
+                },
+            ],
+            rules: [
+                suffixInflection('さす', 'る', ['v5'], ['v1']),
+                suffixInflection('かす', 'く', ['v5'], ['v5']),
+                suffixInflection('がす', 'ぐ', ['v5'], ['v5']),
+                suffixInflection('さす', 'す', ['v5'], ['v5']),
+                suffixInflection('たす', 'つ', ['v5'], ['v5']),
+                suffixInflection('なす', 'ぬ', ['v5'], ['v5']),
+                suffixInflection('ばす', 'ぶ', ['v5'], ['v5']),
+                suffixInflection('ます', 'む', ['v5'], ['v5']),
+                suffixInflection('らす', 'る', ['v5'], ['v5']),
+                suffixInflection('わす', 'う', ['v5'], ['v5']),
+                suffixInflection('じさす', 'ずる', ['v5'], ['vz']),
+                suffixInflection('さす', 'する', ['v5'], ['vs']),
+                suffixInflection('為す', '為る', ['v5'], ['vs']),
+                suffixInflection('こさす', 'くる', ['v5'], ['vk']),
+                suffixInflection('来さす', '来る', ['v5'], ['vk']),
+                suffixInflection('來さす', '來る', ['v5'], ['vk']),
+            ],
+        },
         'imperative': {
             name: 'imperative',
             description: '1. To give orders.\n' +
