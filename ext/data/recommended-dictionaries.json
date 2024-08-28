@@ -1,13 +1,25 @@
 {
     "ja": {
         "terms": [
-            {"name": "Jitendex", "url": "https://github.com/stephenmk/stephenmk.github.io/releases/latest/download/jitendex-yomitan.zip"}
+            {
+                "name": "Jitendex",
+                "url": "https://github.com/stephenmk/stephenmk.github.io/releases/latest/download/jitendex-yomitan.zip",
+                "description": "An improved version of JMdict for Yomitan. It features better formatting and some other improvements, and is actively being improved by its author."
+            }
         ],
         "kanji": [
-            {"name": "KANJIDIC", "url": "https://github.com/themoeway/jmdict-yomitan/releases/latest/download/KANJIDIC_english.zip"}
+            {
+                "name": "KANJIDIC",
+                "url": "https://github.com/themoeway/jmdict-yomitan/releases/latest/download/KANJIDIC_english.zip",
+                "description": "An English dictionary listing readings, meanings, and other info about kanji characters."
+            }
         ],
         "frequency": [
-            {"name": "BCCWJ", "url": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/BCCWJ_SUW_LUW_combined.zip"}
+            {
+                "name": "BCCWJ",
+                "url": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/BCCWJ_SUW_LUW_combined.zip",
+                "description": "A frequency dictionary based on the Balanced Corpus of Contemporary Written Japanese."
+            }
         ],
         "grammar": [],
         "pronunciation": []

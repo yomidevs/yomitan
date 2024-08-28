@@ -214,6 +214,7 @@ export class DictionaryImportController {
                 }
                 const template = this._settingsController.instantiateTemplate('recommended-dictionaries-list-item');
                 const label = querySelectorNotNull(template, '.settings-item-label');
+                const description = querySelectorNotNull(template, '.settings-item-description');
                 /** @type {HTMLButtonElement} */
                 const button = querySelectorNotNull(template, '.action-button[data-action=import-recommended-dictionary]');
                 button.disabled = installedDictionaryNames.has(dictionary.name) || installedDictionaryDownloadUrls.has(dictionary.url);
@@ -223,6 +224,7 @@ export class DictionaryImportController {
                 button.attributes.setNamedItem(urlAttribute);
 
                 label.textContent = dictionary.name;
+                description.textContent = dictionary.description;
 
                 dictionariesList.append(template);
             }
