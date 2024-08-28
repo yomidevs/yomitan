@@ -216,7 +216,7 @@ export class DictionaryImportController {
                 const label = querySelectorNotNull(template, '.settings-item-label');
                 const description = querySelectorNotNull(template, '.description');
                 /** @type {HTMLAnchorElement} */
-                const attribution = querySelectorNotNull(template, '.attribution');
+                const homepage = querySelectorNotNull(template, '.homepage');
                 /** @type {HTMLButtonElement} */
                 const button = querySelectorNotNull(template, '.action-button[data-action=import-recommended-dictionary]');
                 button.disabled = installedDictionaryNames.has(dictionary.name) || installedDictionaryDownloadUrls.has(dictionary.downloadUrl);
@@ -227,10 +227,10 @@ export class DictionaryImportController {
 
                 label.textContent = dictionary.name;
                 description.textContent = dictionary.description;
-                if (dictionary.attributionUrl) {
-                    attribution.href = dictionary.attributionUrl;
+                if (dictionary.homepage) {
+                    homepage.href = dictionary.homepage;
                 } else {
-                    attribution.remove();
+                    homepage.remove();
                 }
 
                 dictionariesList.append(template);

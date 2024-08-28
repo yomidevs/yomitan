@@ -31,7 +31,7 @@ export type RecommendedDictionary = {
     name: string;
     downloadUrl: string;
     description: string;
-    attributionUrl?: string;
+    homepage?: string;
 };
 
 export type RecommendedDictionariesTest = {

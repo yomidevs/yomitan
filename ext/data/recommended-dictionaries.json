@@ -5,7 +5,7 @@
                 "name": "Jitendex",
                 "downloadUrl": "https://github.com/stephenmk/stephenmk.github.io/releases/latest/download/jitendex-yomitan.zip",
                 "description": "A free and openly licensed Japanese-to-English dictionary with example sentences, usage notes, etymology notes, cross references, antonyms, definition notes.",
-                "attributionUrl": "https://jitendex.org"
+                "homepage": "https://jitendex.org"
             }
         ],
         "kanji": [
@@ -13,7 +13,7 @@
                 "name": "KANJIDIC",
                 "downloadUrl": "https://github.com/themoeway/jmdict-yomitan/releases/latest/download/KANJIDIC_english.zip",
                 "description": "An English dictionary with readings, meanings, stroke order diagrams, frequency, grade level, JLPT level and frequency of kanji characters.",
-                "attributionUrl": "http://www.edrdg.org/wiki/index.php/KANJIDIC_Project"
+                "homepage": "http://www.edrdg.org/wiki/index.php/KANJIDIC_Project"
             }
         ],
         "frequency": [
@@ -21,7 +21,7 @@
                 "name": "BCCWJ",
                 "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/BCCWJ_SUW_LUW_combined.zip",
                 "description": "Based on the Balanced Corpus of Contemporary Written Japanese covering books, magazines, newspapers, blogs, forums, textbooks, and legal documents among others.",
-                "attributionUrl": "https://clrd.ninjal.ac.jp/bccwj/en"
+                "homepage": "https://clrd.ninjal.ac.jp/bccwj/en"
             }
         ],
         "grammar": [],
