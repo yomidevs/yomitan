@@ -925,6 +925,7 @@ export const japaneseTransforms = {
                 suffixInflection('らす', 'る', ['v5'], ['v5']),
                 suffixInflection('わす', 'う', ['v5'], ['v5']),
                 suffixInflection('じさす', 'ずる', ['v5'], ['vz']),
+                suffixInflection('ぜさす', 'ずる', ['v5'], ['vz']),
                 suffixInflection('さす', 'する', ['v5'], ['vs']),
                 suffixInflection('為す', '為る', ['v5'], ['vs']),
                 suffixInflection('こさす', 'くる', ['v5'], ['vk']),
