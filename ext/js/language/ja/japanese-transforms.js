@@ -902,8 +902,8 @@ export const japaneseTransforms = {
             name: 'shortened causative',
             description: 'Contraction of the causative form.\n' +
             'Describes the intention to make someone do something.\n' +
-            'Usage: Attach す to the irrealis form (mizenkei) of ichidan verbs.\n' +
-            'Attach さす to the dictionary form (shuushikei) of godan verbs.\n' +
+            'Usage: Attach す to the irrealis form (mizenkei) of godan verbs.\n' +
+            'Attach さす to the dictionary form (shuushikei) of ichidan verbs.\n' +
             'する becomes さす, くる becomes こさす.\n' +
             'It itself conjugates as an godan verb.',
             i18n: [
