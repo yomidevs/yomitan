@@ -199,7 +199,7 @@ export class DictionaryImportController {
 
     /**
      *
-     * @param {import('dictionary-recommended.js').Dictionary[]} recommendedDictionaries
+     * @param {import('dictionary-recommended.js').RecommendedDictionary[]} recommendedDictionaries
      * @param {HTMLElement} dictionariesList
      * @param {Set<string>} installedDictionaryNames
      * @param {Set<string>} installedDictionaryDownloadUrls
@@ -214,17 +214,24 @@ export class DictionaryImportController {
                 }
                 const template = this._settingsController.instantiateTemplate('recommended-dictionaries-list-item');
                 const label = querySelectorNotNull(template, '.settings-item-label');
-                const description = querySelectorNotNull(template, '.settings-item-description');
+                const description = querySelectorNotNull(template, '.description');
+                /** @type {HTMLAnchorElement} */
+                const attribution = querySelectorNotNull(template, '.attribution');
                 /** @type {HTMLButtonElement} */
                 const button = querySelectorNotNull(template, '.action-button[data-action=import-recommended-dictionary]');
-                button.disabled = installedDictionaryNames.has(dictionary.name) || installedDictionaryDownloadUrls.has(dictionary.url);
+                button.disabled = installedDictionaryNames.has(dictionary.name) || installedDictionaryDownloadUrls.has(dictionary.downloadUrl);
 
                 const urlAttribute = document.createAttribute('data-import-url');
-                urlAttribute.value = dictionary.url;
+                urlAttribute.value = dictionary.downloadUrl;
                 button.attributes.setNamedItem(urlAttribute);
 
                 label.textContent = dictionary.name;
                 description.textContent = dictionary.description;
+                if (dictionary.attributionUrl) {
+                    attribution.href = dictionary.attributionUrl;
+                } else {
+                    attribution.remove();
+                }
 
                 dictionariesList.append(template);
             }
