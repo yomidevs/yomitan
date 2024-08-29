@@ -76,7 +76,7 @@ const conditions = {
             },
         ],
         isDictionaryForm: true,
-        subConditions: ['v5d', 'v5m'],
+        subConditions: ['v5d', 'v5m', 'v5s'],
     },
     'v5d': {
         name: 'Godan verb, dictionary form',
@@ -90,6 +90,10 @@ const conditions = {
     },
     'v5m': {
         name: 'Godan verb, polite (masu) form',
+        isDictionaryForm: false,
+    },
+    'v5s': {
+        name: 'Godan verb, short causative form',
         isDictionaryForm: false,
     },
     'vk': {
@@ -898,6 +902,41 @@ export const japaneseTransforms = {
                 suffixInflection('來させる', '來る', ['v1'], ['vk']),
             ],
         },
+        'short causative': {
+            name: 'short causative',
+            description: 'Contraction of the causative form.\n' +
+            'Describes the intention to make someone do something.\n' +
+            'Usage: Attach す to the irrealis form (mizenkei) of godan verbs.\n' +
+            'Attach さす to the dictionary form (shuushikei) of ichidan verbs.\n' +
+            'する becomes さす, くる becomes こさす.\n' +
+            'It itself conjugates as an godan verb.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '使役形の短縮形',
+                    description: 'だれかにある行為をさせる意を表わす時の言い方。例、「食べさす」の「さす」。',
+                },
+            ],
+            rules: [
+                suffixInflection('さす', 'る', ['v5s'], ['v1']),
+                suffixInflection('かす', 'く', ['v5s'], ['v5']),
+                suffixInflection('がす', 'ぐ', ['v5s'], ['v5']),
+                suffixInflection('さす', 'す', ['v5s'], ['v5']),
+                suffixInflection('たす', 'つ', ['v5s'], ['v5']),
+                suffixInflection('なす', 'ぬ', ['v5s'], ['v5']),
+                suffixInflection('ばす', 'ぶ', ['v5s'], ['v5']),
+                suffixInflection('ます', 'む', ['v5s'], ['v5']),
+                suffixInflection('らす', 'る', ['v5s'], ['v5']),
+                suffixInflection('わす', 'う', ['v5s'], ['v5']),
+                suffixInflection('じさす', 'ずる', ['v5s'], ['vz']),
+                suffixInflection('ぜさす', 'ずる', ['v5s'], ['vz']),
+                suffixInflection('さす', 'する', ['v5s'], ['vs']),
+                suffixInflection('為す', '為る', ['v5s'], ['vs']),
+                suffixInflection('こさす', 'くる', ['v5s'], ['vk']),
+                suffixInflection('来さす', '来る', ['v5s'], ['vk']),
+                suffixInflection('來さす', '來る', ['v5s'], ['vk']),
+            ],
+        },
         'imperative': {
             name: 'imperative',
             description: '1. To give orders.\n' +
@@ -1132,15 +1171,15 @@ export const japaneseTransforms = {
             ],
             rules: [
                 suffixInflection('ます', 'る', ['v1'], ['v1']),
-                suffixInflection('います', 'う', ['v5m'], ['v5d']),
-                suffixInflection('きます', 'く', ['v5m'], ['v5d']),
-                suffixInflection('ぎます', 'ぐ', ['v5m'], ['v5d']),
-                suffixInflection('します', 'す', ['v5m'], ['v5d']),
-                suffixInflection('ちます', 'つ', ['v5m'], ['v5d']),
-                suffixInflection('にます', 'ぬ', ['v5m'], ['v5d']),
-                suffixInflection('びます', 'ぶ', ['v5m'], ['v5d']),
-                suffixInflection('みます', 'む', ['v5m'], ['v5d']),
-                suffixInflection('ります', 'る', ['v5m'], ['v5d']),
+                suffixInflection('います', 'う', ['v5m'], ['v5d', 'v5s']),
+                suffixInflection('きます', 'く', ['v5m'], ['v5d', 'v5s']),
+                suffixInflection('ぎます', 'ぐ', ['v5m'], ['v5d', 'v5s']),
+                suffixInflection('します', 'す', ['v5m'], ['v5d', 'v5s']),
+                suffixInflection('ちます', 'つ', ['v5m'], ['v5d', 'v5s']),
+                suffixInflection('にます', 'ぬ', ['v5m'], ['v5d', 'v5s']),
+                suffixInflection('びます', 'ぶ', ['v5m'], ['v5d', 'v5s']),
+                suffixInflection('みます', 'む', ['v5m'], ['v5d', 'v5s']),
+                suffixInflection('ります', 'る', ['v5m'], ['v5d', 'v5s']),
                 suffixInflection('じます', 'ずる', ['vz'], ['vz']),
                 suffixInflection('します', 'する', ['vs'], ['vs']),
                 suffixInflection('為ます', '為る', ['vs'], ['vs']),
