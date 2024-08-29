@@ -902,8 +902,8 @@ export const japaneseTransforms = {
                 suffixInflection('來させる', '來る', ['v1'], ['vk']),
             ],
         },
-        'shortened causative': {
-            name: 'shortened causative',
+        'short causative': {
+            name: 'short causative',
             description: 'Contraction of the causative form.\n' +
             'Describes the intention to make someone do something.\n' +
             'Usage: Attach す to the irrealis form (mizenkei) of godan verbs.\n' +
