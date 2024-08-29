@@ -93,7 +93,7 @@ const conditions = {
         isDictionaryForm: false,
     },
     'v5s': {
-        name: 'Godan verb, short causative (sasu) form',
+        name: 'Godan verb, short causative form',
         isDictionaryForm: false,
     },
     'vk': {
