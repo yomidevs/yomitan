@@ -228,6 +228,7 @@ export class DictionaryImportController {
                 label.textContent = dictionary.name;
                 description.textContent = dictionary.description;
                 if (dictionary.homepage) {
+                    homepage.target = '_blank';
                     homepage.href = dictionary.homepage;
                 } else {
                     homepage.remove();
