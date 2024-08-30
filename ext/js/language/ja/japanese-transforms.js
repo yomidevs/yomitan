@@ -701,9 +701,9 @@ export const japaneseTransforms = {
         },
         '-n': {
             name: '-n',
-            description: '1. Negative form of verbs; a sound change of ぬ.\n' +
-            '2. (As …んばかり) Shows an action or condition is on the verge of occurring, or an excessive/extreme degree.\n' +
-            'Usage: Attach ん to the irrealis form (mizenkei) of verbs.',
+            description: 'Negative form of verbs; a sound change of ぬ.\n' +
+            'Usage: Attach ん to the irrealis form (mizenkei) of verbs.\n' +
+            'する becomes せん',
             i18n: [
                 {
                     language: 'ja',
@@ -732,7 +732,9 @@ export const japaneseTransforms = {
         },
         '-n past': {
             name: '-n',
-            description: 'Past negative form of verbs; a sound change of ぬ.\n',
+            description: 'Past negative form of verbs; a sound change of ぬ.\n' +
+            'Usage: Attach んかった to the irrealis form (mizenkei) of verbs.\n' +
+            'する becomes せんかった',
             i18n: [
                 {
                     language: 'ja',
@@ -758,6 +760,37 @@ export const japaneseTransforms = {
                 suffixInflection('来んかった', '来る', [], ['vk']),
                 suffixInflection('來んかった', '來る', [], ['vk']),
                 suffixInflection('ませんかった', 'ません', [], ['v']),
+            ],
+        },
+        '-nbakari': {
+            name: '-nbakari',
+            description: 'Shows an action or condition is on the verge of occurring, or an excessive/extreme degree.\n' +
+            'Usage: Attach んばかり to the irrealis form (mizenkei) of verbs.\n' +
+            'する becomes せんばかり',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～ん',
+                    description: '今にもそうなりそうな、しかし辛うじてそうなっていないようなさまを指す表現',
+                },
+            ],
+            rules: [
+                suffixInflection('んばかり', 'る', [], ['v1']),
+                suffixInflection('かんばかり', 'く', [], ['v5']),
+                suffixInflection('がんばかり', 'ぐ', [], ['v5']),
+                suffixInflection('さんばかり', 'す', [], ['v5']),
+                suffixInflection('たんばかり', 'つ', [], ['v5']),
+                suffixInflection('なんばかり', 'ぬ', [], ['v5']),
+                suffixInflection('ばんばかり', 'ぶ', [], ['v5']),
+                suffixInflection('まんばかり', 'む', [], ['v5']),
+                suffixInflection('らんばかり', 'る', [], ['v5']),
+                suffixInflection('わんばかり', 'う', [], ['v5']),
+                suffixInflection('ぜんばかり', 'ずる', [], ['vz']),
+                suffixInflection('せんばかり', 'する', [], ['vs']),
+                suffixInflection('為んばかり', '為る', [], ['vs']),
+                suffixInflection('こんばかり', 'くる', [], ['vk']),
+                suffixInflection('来んばかり', '来る', [], ['vk']),
+                suffixInflection('來んばかり', '來る', [], ['vk']),
             ],
         },
         '-mu': {
