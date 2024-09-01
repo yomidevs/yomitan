@@ -1341,6 +1341,11 @@ const tests = [
             {term: '食べる', source: '食べて', rule: null, reasons: ['-te', '-teiru', 'continuative']},
             {term: 'なる', source: 'なりません', rule: null, reasons: ['-masu', 'potential', '-n']},
             {term: '食べる', source: '食べさせられる', rule: null, reasons: ['short causative', 'potential', 'potential or passive']},
+            {term: '食べる', source: '食べまさない', rule: null, reasons: ['-masu', 'negative']},
+            {term: '食べる', source: '食べますな', rule: null, reasons: ['-masu', 'imperative negative']},
+            {term: '食べる', source: '食べましたい', rule: null, reasons: ['-masu', '-tai']},
+            {term: '済ます', source: '済ません', rule: null, reasons: ['-masu', 'negative']},
+            {term: '済ます', source: '済ましょう', rule: null, reasons: ['-masu', 'volitional']},
         ],
     },
     // Kansai-ben
