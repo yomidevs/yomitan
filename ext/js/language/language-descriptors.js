@@ -140,6 +140,12 @@ const languageDescriptors = [
         },
     },
     {
+        iso: 'hi',
+        iso639_3: 'hin',
+        name: 'Hindi',
+        exampleText: 'पढ़ने के लिए',
+    },
+    {
         iso: 'hu',
         iso639_3: 'hun',
         name: 'Hungarian',
