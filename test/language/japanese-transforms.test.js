@@ -171,6 +171,12 @@ const tests = [
             {term: '買う', source: '買ってる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '買う', source: '買っとる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '買う', source: '買ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+
+            {term: '買う', source: '買いますまい',     rule: 'v5', reasons: ['-masu', '-mai']},
+            {term: '買う', source: '買いましたら',     rule: 'v5', reasons: ['-masu', '-tara']},
+            {term: '買う', source: '買いませば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '買う', source: '買いますれば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '買う', source: '買いませんかった',     rule: 'v5', reasons: ['-masu', 'negative', '-n past']},
         ],
     },
     {
@@ -234,6 +240,12 @@ const tests = [
             {term: '行く', source: '行ってる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '行く', source: '行っとる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '行く', source: '行ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+
+            {term: '行く', source: '行きますまい',     rule: 'v5', reasons: ['-masu', '-mai']},
+            {term: '行く', source: '行きましたら',     rule: 'v5', reasons: ['-masu', '-tara']},
+            {term: '行く', source: '行きませば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '行く', source: '行きますれば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '行く', source: '行きませんかった',     rule: 'v5', reasons: ['-masu', 'negative', '-n past']},
         ],
     },
     {
@@ -296,6 +308,12 @@ const tests = [
             {term: '泳ぐ', source: '泳いでおる',       rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '泳ぐ', source: '泳いでる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '泳ぐ', source: '泳いでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+
+            {term: '泳ぐ', source: '泳ぎますまい',     rule: 'v5', reasons: ['-masu', '-mai']},
+            {term: '泳ぐ', source: '泳ぎましたら',     rule: 'v5', reasons: ['-masu', '-tara']},
+            {term: '泳ぐ', source: '泳ぎませば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '泳ぐ', source: '泳ぎますれば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '泳ぐ', source: '泳ぎませんかった',     rule: 'v5', reasons: ['-masu', 'negative', '-n past']},
         ],
     },
     {
@@ -362,6 +380,12 @@ const tests = [
             {term: '増す', source: '増せん',             rule: 'v5', reasons: ['potential', '-n']},
             {term: '増す', source: '増せんかった',             rule: 'v5', reasons: ['potential', '-n past']},
             {term: '増す', source: '増せんばかり',             rule: 'v5', reasons: ['potential', '-nbakari']},
+
+            {term: '話す', source: '話しますまい',     rule: 'v5', reasons: ['-masu', '-mai']},
+            {term: '話す', source: '話しましたら',     rule: 'v5', reasons: ['-masu', '-tara']},
+            {term: '話す', source: '話しませば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '話す', source: '話しますれば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '話す', source: '話しませんかった',     rule: 'v5', reasons: ['-masu', 'negative', '-n past']},
         ],
     },
     {
@@ -425,6 +449,12 @@ const tests = [
             {term: '待つ', source: '待ってる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '待つ', source: '待っとる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '待つ', source: '待ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+
+            {term: '待つ', source: '待ちますまい',     rule: 'v5', reasons: ['-masu', '-mai']},
+            {term: '待つ', source: '待ちましたら',     rule: 'v5', reasons: ['-masu', '-tara']},
+            {term: '待つ', source: '待ちませば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '待つ', source: '待ちますれば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '待つ', source: '待ちませんかった',     rule: 'v5', reasons: ['-masu', 'negative', '-n past']},
         ],
     },
     {
@@ -487,6 +517,12 @@ const tests = [
             {term: '死ぬ', source: '死んでおる',       rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '死ぬ', source: '死んでる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '死ぬ', source: '死んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+
+            {term: '死ぬ', source: '死にますまい',     rule: 'v5', reasons: ['-masu', '-mai']},
+            {term: '死ぬ', source: '死にましたら',     rule: 'v5', reasons: ['-masu', '-tara']},
+            {term: '死ぬ', source: '死にませば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '死ぬ', source: '死にますれば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '死ぬ', source: '死にませんかった',     rule: 'v5', reasons: ['-masu', 'negative', '-n past']},
         ],
     },
     {
@@ -549,6 +585,12 @@ const tests = [
             {term: '遊ぶ', source: '遊んでおる',       rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '遊ぶ', source: '遊んでる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '遊ぶ', source: '遊んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+
+            {term: '遊ぶ', source: '遊びますまい',     rule: 'v5', reasons: ['-masu', '-mai']},
+            {term: '遊ぶ', source: '遊びましたら',     rule: 'v5', reasons: ['-masu', '-tara']},
+            {term: '遊ぶ', source: '遊びませば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '遊ぶ', source: '遊びますれば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '遊ぶ', source: '遊びませんかった',     rule: 'v5', reasons: ['-masu', 'negative', '-n past']},
         ],
     },
     {
@@ -611,6 +653,12 @@ const tests = [
             {term: '飲む', source: '飲んでおる',       rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '飲む', source: '飲んでる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '飲む', source: '飲んでしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+
+            {term: '飲む', source: '飲みますまい',     rule: 'v5', reasons: ['-masu', '-mai']},
+            {term: '飲む', source: '飲みましたら',     rule: 'v5', reasons: ['-masu', '-tara']},
+            {term: '飲む', source: '飲みませば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '飲む', source: '飲みますれば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '飲む', source: '飲みませんかった',     rule: 'v5', reasons: ['-masu', 'negative', '-n past']},
         ],
     },
     {
@@ -673,6 +721,12 @@ const tests = [
             {term: '作る', source: '作ってる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '作る', source: '作っとる',         rule: 'v5', reasons: ['-te', '-teiru']},
             {term: '作る', source: '作ってしまう',     rule: 'v5', reasons: ['-te', '-shimau']},
+
+            {term: '作る', source: '作りますまい',     rule: 'v5', reasons: ['-masu', '-mai']},
+            {term: '作る', source: '作りましたら',     rule: 'v5', reasons: ['-masu', '-tara']},
+            {term: '作る', source: '作りませば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '作る', source: '作りますれば',     rule: 'v5', reasons: ['-masu', '-ba']},
+            {term: '作る', source: '作りませんかった',     rule: 'v5', reasons: ['-masu', 'negative', '-n past']},
         ],
     },
     {
@@ -742,6 +796,12 @@ const tests = [
             {term: '為る', source: '為とる',         rule: 'vs', reasons: ['-te', '-teiru']},
             {term: '為る', source: '為てしまう',     rule: 'vs', reasons: ['-te', '-shimau']},
 
+            {term: '為る', source: '為ますまい',     rule: 'vs', reasons: ['-masu', '-mai']},
+            {term: '為る', source: '為ましたら',     rule: 'vs', reasons: ['-masu', '-tara']},
+            {term: '為る', source: '為ませば',     rule: 'vs', reasons: ['-masu', '-ba']},
+            {term: '為る', source: '為ますれば',     rule: 'vs', reasons: ['-masu', '-ba']},
+            {term: '為る', source: '為ませんかった',     rule: 'vs', reasons: ['-masu', 'negative', '-n past']},
+
             {term: 'する', source: 'する',           rule: 'vs', reasons: []},
             {term: 'する', source: 'します',         rule: 'vs', reasons: ['-masu']},
             {term: 'する', source: 'した',           rule: 'vs', reasons: ['-ta']},
@@ -808,6 +868,12 @@ const tests = [
             {term: 'する', source: 'しとる',         rule: 'vs', reasons: ['-te', '-teiru']},
             {term: 'する', source: 'してしまう',     rule: 'vs', reasons: ['-te', '-shimau']},
 
+            {term: 'する', source: 'しますまい',     rule: 'vs', reasons: ['-masu', '-mai']},
+            {term: 'する', source: 'しましたら',     rule: 'vs', reasons: ['-masu', '-tara']},
+            {term: 'する', source: 'しませば',     rule: 'vs', reasons: ['-masu', '-ba']},
+            {term: 'する', source: 'しますれば',     rule: 'vs', reasons: ['-masu', '-ba']},
+            {term: 'する', source: 'しませんかった',     rule: 'vs', reasons: ['-masu', 'negative', '-n past']},
+
             {term: '来る', source: '来る',           rule: 'vk', reasons: []},
             {term: '来る', source: '来ます',         rule: 'vk', reasons: ['-masu']},
             {term: '来る', source: '来た',           rule: 'vk', reasons: ['-ta']},
@@ -866,6 +932,12 @@ const tests = [
             {term: '来る', source: '来てる',         rule: 'vk', reasons: ['-te', '-teiru']},
             {term: '来る', source: '来とる',         rule: 'vk', reasons: ['-te', '-teiru']},
             {term: '来る', source: '来てしまう',     rule: 'vk', reasons: ['-te', '-shimau']},
+
+            {term: '来る', source: '来ますまい',     rule: 'vk', reasons: ['-masu', '-mai']},
+            {term: '来る', source: '来ましたら',     rule: 'vk', reasons: ['-masu', '-tara']},
+            {term: '来る', source: '来ませば',     rule: 'vk', reasons: ['-masu', '-ba']},
+            {term: '来る', source: '来ますれば',     rule: 'vk', reasons: ['-masu', '-ba']},
+            {term: '来る', source: '来ませんかった',     rule: 'vk', reasons: ['-masu', 'negative', '-n past']},
 
             {term: '來る', source: '來る',           rule: 'vk', reasons: []},
             {term: '來る', source: '來ます',         rule: 'vk', reasons: ['-masu']},
@@ -926,6 +998,12 @@ const tests = [
             {term: '來る', source: '來とる',         rule: 'vk', reasons: ['-te', '-teiru']},
             {term: '來る', source: '來てしまう',     rule: 'vk', reasons: ['-te', '-shimau']},
 
+            {term: '來る', source: '來ますまい',     rule: 'vk', reasons: ['-masu', '-mai']},
+            {term: '來る', source: '來ましたら',     rule: 'vk', reasons: ['-masu', '-tara']},
+            {term: '來る', source: '來ませば',     rule: 'vk', reasons: ['-masu', '-ba']},
+            {term: '來る', source: '來ますれば',     rule: 'vk', reasons: ['-masu', '-ba']},
+            {term: '來る', source: '來ませんかった',     rule: 'vk', reasons: ['-masu', 'negative', '-n past']},
+
             {term: 'くる', source: 'くる',           rule: 'vk', reasons: []},
             {term: 'くる', source: 'きます',         rule: 'vk', reasons: ['-masu']},
             {term: 'くる', source: 'きた',           rule: 'vk', reasons: ['-ta']},
@@ -984,6 +1062,12 @@ const tests = [
             {term: 'くる', source: 'きてる',         rule: 'vk', reasons: ['-te', '-teiru']},
             {term: 'くる', source: 'きとる',         rule: 'vk', reasons: ['-te', '-teiru']},
             {term: 'くる', source: 'きてしまう',     rule: 'vk', reasons: ['-te', '-shimau']},
+
+            {term: 'くる', source: 'きますまい',     rule: 'vk', reasons: ['-masu', '-mai']},
+            {term: 'くる', source: 'きましたら',     rule: 'vk', reasons: ['-masu', '-tara']},
+            {term: 'くる', source: 'きませば',     rule: 'vk', reasons: ['-masu', '-ba']},
+            {term: 'くる', source: 'きますれば',     rule: 'vk', reasons: ['-masu', '-ba']},
+            {term: 'くる', source: 'きませんかった',     rule: 'vk', reasons: ['-masu', 'negative', '-n past']},
         ],
     },
     {
