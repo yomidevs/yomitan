@@ -1343,7 +1343,7 @@ export const japaneseTransforms = {
                 suffixInflection('こまい', 'くる', [], ['vk']),
                 suffixInflection('来まい', '来る', [], ['vk']),
                 suffixInflection('來まい', '來る', [], ['vk']),
-                suffixInflection('ますまい', 'ます', [], ['-masu']),
+                suffixInflection('まい', '', [], ['-masu']),
             ],
         },
         'causative-passive': {
