@@ -10,7 +10,8 @@
 # supported CodeQL languages.
 #
 name: "CodeQL"
-
+permissions:
+  contents: read
 on:
   push:
     branches: [ "master" ]
