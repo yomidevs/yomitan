@@ -66,6 +66,15 @@ const languageDescriptors = [
         textPreprocessors: capitalizationPreprocessors,
     },
     {
+        iso: 'da',
+        iso639_3: 'dan',
+        name: 'Danish',
+        exampleText: 'læse',
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+        },
+    },
+    {
         iso: 'de',
         iso639_3: 'deu',
         name: 'German',
