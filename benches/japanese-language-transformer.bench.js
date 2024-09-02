@@ -92,7 +92,6 @@ describe('japanese language transformer', () => {
             '食べんばかり',
             '食べますまい',
             '食べましたら',
-            '食べませば',
             '食べますれば',
             '食べませんかった',
         ];
@@ -158,7 +157,6 @@ describe('japanese language transformer', () => {
             'こんばかり',
             'きますまい',
             'きましたら',
-            'きませば',
             'きますれば',
             'きませんかった',
         ];
@@ -222,7 +220,6 @@ describe('japanese language transformer', () => {
             'せんばかり',
             'しますまい',
             'しましたら',
-            'しませば',
             'しますれば',
             'しませんかった',
         ];

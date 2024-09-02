@@ -198,7 +198,6 @@ export const japaneseTransforms = {
                 suffixInflection('べば', 'ぶ', ['-ba'], ['v5']),
                 suffixInflection('めば', 'む', ['-ba'], ['v5']),
                 suffixInflection('れば', 'る', ['-ba'], ['v1', 'v5', 'vk', 'vs', 'vz']),
-                suffixInflection('ませば', 'ます', ['-ba'], ['-masu']),
                 suffixInflection('れば', '', ['-ba'], ['-masu']),
             ],
         },
