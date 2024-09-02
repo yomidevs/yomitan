@@ -1,13 +1,28 @@
 {
     "ja": {
         "terms": [
-            {"name": "Jitendex", "url": "https://github.com/stephenmk/stephenmk.github.io/releases/latest/download/jitendex-yomitan.zip"}
+            {
+                "name": "Jitendex",
+                "downloadUrl": "https://github.com/stephenmk/stephenmk.github.io/releases/latest/download/jitendex-yomitan.zip",
+                "description": "A free and openly licensed Japanese-to-English dictionary with example sentences, usage notes, etymology notes, cross references, antonyms, definition notes.",
+                "homepage": "https://jitendex.org"
+            }
         ],
         "kanji": [
-            {"name": "KANJIDIC", "url": "https://github.com/themoeway/jmdict-yomitan/releases/latest/download/KANJIDIC_english.zip"}
+            {
+                "name": "KANJIDIC",
+                "downloadUrl": "https://github.com/themoeway/jmdict-yomitan/releases/latest/download/KANJIDIC_english.zip",
+                "description": "An English dictionary with readings, meanings, stroke order diagrams, frequency, grade level, JLPT level and frequency of kanji characters.",
+                "homepage": "https://github.com/themoeway/jmdict-yomitan?tab=readme-ov-file#kanjidic-for-yomitan"
+            }
         ],
         "frequency": [
-            {"name": "BCCWJ", "url": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/BCCWJ_SUW_LUW_combined.zip"}
+            {
+                "name": "BCCWJ",
+                "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/BCCWJ_SUW_LUW_combined.zip",
+                "description": "Based on the Balanced Corpus of Contemporary Written Japanese covering books, magazines, newspapers, blogs, forums, textbooks, and legal documents among others.",
+                "homepage": "https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#bccwj-suw-luw-combined"
+            }
         ],
         "grammar": [],
         "pronunciation": []
