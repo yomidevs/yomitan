@@ -18,7 +18,6 @@ These are the languages currently supported by Yomitan:
 | French         | fr   |
 | German         | de   |
 | Greek          | el   |
-| Hindi          | hi   |
 | Hungarian      | hu   |
 | Indonesian     | id   |
 | Italian        | it   |
