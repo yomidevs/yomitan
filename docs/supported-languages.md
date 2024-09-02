@@ -11,12 +11,14 @@ These are the languages currently supported by Yomitan:
 | Arabic         | ar   |
 | Cantonese      | yue  |
 | Chinese        | zh   |
+| Danish         | da   |
 | Dutch          | nl   |
 | English        | en   |
 | Finnish        | fi   |
 | French         | fr   |
 | German         | de   |
 | Greek          | el   |
+| Hindi          | hi   |
 | Hungarian      | hu   |
 | Indonesian     | id   |
 | Italian        | it   |
