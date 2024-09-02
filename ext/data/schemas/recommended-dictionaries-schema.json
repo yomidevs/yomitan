@@ -13,14 +13,23 @@
                         "type": "object",
                         "required": [
                             "name",
-                            "url"
+                            "downloadUrl",
+                            "description"
                         ],
                         "properties": {
                             "name": {
                                 "type": "string",
                                 "minLength": 2
                             },
-                            "url": {
+                            "downloadUrl": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "description": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "homepage": {
                                 "type": "string",
                                 "minLength": 2
                             }
@@ -33,14 +42,23 @@
                         "type": "object",
                         "required": [
                             "name",
-                            "url"
+                            "downloadUrl",
+                            "description"
                         ],
                         "properties": {
                             "name": {
                                 "type": "string",
                                 "minLength": 2
                             },
-                            "url": {
+                            "downloadUrl": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "description": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "homepage": {
                                 "type": "string",
                                 "minLength": 2
                             }
@@ -53,14 +71,23 @@
                         "type": "object",
                         "required": [
                             "name",
-                            "url"
+                            "downloadUrl",
+                            "description"
                         ],
                         "properties": {
                             "name": {
                                 "type": "string",
                                 "minLength": 2
                             },
-                            "url": {
+                            "downloadUrl": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "description": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "homepage": {
                                 "type": "string",
                                 "minLength": 2
                             }
@@ -73,14 +100,23 @@
                         "type": "object",
                         "required": [
                             "name",
-                            "url"
+                            "downloadUrl",
+                            "description"
                         ],
                         "properties": {
                             "name": {
                                 "type": "string",
                                 "minLength": 2
                             },
-                            "url": {
+                            "downloadUrl": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "description": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "homepage": {
                                 "type": "string",
                                 "minLength": 2
                             }
@@ -93,14 +129,23 @@
                         "type": "object",
                         "required": [
                             "name",
-                            "url"
+                            "downloadUrl",
+                            "description"
                         ],
                         "properties": {
                             "name": {
                                 "type": "string",
                                 "minLength": 2
                             },
-                            "url": {
+                            "downloadUrl": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "description": {
+                                "type": "string",
+                                "minLength": 2
+                            },
+                            "homepage": {
                                 "type": "string",
                                 "minLength": 2
                             }
