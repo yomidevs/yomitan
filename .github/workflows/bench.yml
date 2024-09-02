@@ -1,5 +1,6 @@
 name: Performance Benchmarks
-
+permissions:
+  contents: read
 on:
   push:
     branches: [master]

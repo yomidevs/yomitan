@@ -1299,7 +1299,7 @@ export class Backend {
         let apiKey = options.anki.apiKey;
         if (apiKey === '') { apiKey = null; }
         this._anki.server = options.anki.server;
-        this._anki.enabled = options.anki.enable && enabled;
+        this._anki.enabled = options.anki.enable;
         this._anki.apiKey = apiKey;
 
         this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);

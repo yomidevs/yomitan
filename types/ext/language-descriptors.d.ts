@@ -110,6 +110,7 @@ type AllTextProcessors = {
     grc: {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
+    hi: Record<string, never>;
     hu: {
         pre: CapitalizationPreprocessors;
     };

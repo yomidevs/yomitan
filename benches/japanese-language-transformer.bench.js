@@ -50,6 +50,7 @@ describe('japanese language transformer', () => {
             '食べられる',
             '食べられる',
             '食べさせる',
+            '食べさす',
             '食べさせられる',
             '食べろ',
             '食べない',
@@ -60,6 +61,7 @@ describe('japanese language transformer', () => {
             '食べられない',
             '食べられない',
             '食べさせない',
+            '食べささない',
             '食べさせられない',
             '食べ',
             '食べれば',
@@ -85,6 +87,9 @@ describe('japanese language transformer', () => {
             '食べてる',
             '食べとる',
             '食べてしまう',
+            '食べん',
+            '食べんかった',
+            '食べんばかり',
         ];
 
         const inflectionCombinations = [
@@ -103,6 +108,7 @@ describe('japanese language transformer', () => {
             'こられる',
             'こられる',
             'こさせる',
+            'こさす',
             'こさせられる',
             'こい',
             'こない',
@@ -113,6 +119,7 @@ describe('japanese language transformer', () => {
             'こられない',
             'こられない',
             'こさせない',
+            'こささない',
             'こさせられない',
             'くるな',
             'きまして',
@@ -141,6 +148,9 @@ describe('japanese language transformer', () => {
             'きてる',
             'きとる',
             'きてしまう',
+            'こん',
+            'こんかった',
+            'こんばかり',
         ];
 
         const suruInflections = [
@@ -154,6 +164,7 @@ describe('japanese language transformer', () => {
             'せられる',
             'される',
             'させる',
+            'さす',
             'せさせる',
             'させられる',
             'せさせられる',
@@ -167,6 +178,7 @@ describe('japanese language transformer', () => {
             'されない',
             'させない',
             'せさせない',
+            'ささない',
             'させられない',
             'せさせられない',
             'するな',
@@ -195,6 +207,9 @@ describe('japanese language transformer', () => {
             'してる',
             'しとる',
             'してしまう',
+            'せん',
+            'せんかった',
+            'せんばかり',
         ];
 
         const kansaibenInflections = [
