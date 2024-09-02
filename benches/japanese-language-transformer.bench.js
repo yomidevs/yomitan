@@ -90,6 +90,10 @@ describe('japanese language transformer', () => {
             '食べん',
             '食べんかった',
             '食べんばかり',
+            '食べますまい',
+            '食べましたら',
+            '食べますれば',
+            '食べませんかった',
         ];
 
         const inflectionCombinations = [
@@ -151,6 +155,10 @@ describe('japanese language transformer', () => {
             'こん',
             'こんかった',
             'こんばかり',
+            'きますまい',
+            'きましたら',
+            'きますれば',
+            'きませんかった',
         ];
 
         const suruInflections = [
@@ -210,6 +218,10 @@ describe('japanese language transformer', () => {
             'せん',
             'せんかった',
             'せんばかり',
+            'しますまい',
+            'しましたら',
+            'しますれば',
+            'しませんかった',
         ];
 
         const kansaibenInflections = [
