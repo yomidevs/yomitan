@@ -1148,7 +1148,7 @@ const tests = [
         ],
     },
     {
-        category: '-e verbs and adjetives',
+        category: '-e verbs and adjectives',
         valid: true,
         tests: [
             {term: 'すごい',     source: 'すげえ',     rule: 'adj-i', reasons: ['-e']},
