@@ -782,7 +782,7 @@ export const japaneseTransforms = {
                     language: 'ja',
                     name: '～んとする',
                     description: '…しようとする、…しようとしている',
-                }
+                },
             ],
             rules: [
                 suffixInflection('んとする', 'る', ['vs'], ['v1']),
