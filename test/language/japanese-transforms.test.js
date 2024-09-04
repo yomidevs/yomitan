@@ -1326,7 +1326,7 @@ const tests = [
             {term: '抱きかかえる', source: '抱きかかえていなければ', rule: 'v1', reasons: ['-te', '-teiru', 'negative', '-ba']},
             {term: '打ち込む', source: '打ち込んでいませんでした', rule: 'v5', reasons: ['-te', '-teiru', '-masu', 'negative', '-ta']},
             {term: '食べる', source: '食べさせられたくなかった', rule: 'v1', reasons: ['causative', 'potential or passive', '-tai', 'negative', '-ta']},
-            {term: '食べる', source: '食べんとしませんでした', rule: 'v1', reasons: ['-ntosuru', '-masu', 'negative', '-ta']},
+            {term: '食べる', source: '食べんとしませんかった', rule: 'v1', reasons: ['-ntosuru', '-masu', 'negative', '-ta']},
         ],
     },
     {

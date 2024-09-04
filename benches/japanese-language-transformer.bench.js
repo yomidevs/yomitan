@@ -102,6 +102,7 @@ describe('japanese language transformer', () => {
             '抱きかかえていなければ',
             '打ち込んでいませんでした',
             '食べさせられたくなかった',
+            '食べんとしませんかった',
         ];
 
         const kuruInflections = [
