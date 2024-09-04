@@ -1244,6 +1244,11 @@ const tests = [
             {term: 'のたまう', source: 'のたもうたら', rule: 'v5', reasons: ['-tara']},
             {term: 'のたまう', source: 'のたもうたり', rule: 'v5', reasons: ['-tari']},
 
+            {term: 'たまう', source: 'たもうて',   rule: 'v5', reasons: ['-te']},
+            {term: 'たまう', source: 'たもうた',   rule: 'v5', reasons: ['-ta']},
+            {term: 'たまう', source: 'たもうたら', rule: 'v5', reasons: ['-tara']},
+            {term: 'たまう', source: 'たもうたり', rule: 'v5', reasons: ['-tari']},
+
             {term: 'おう', source: 'おうて', rule: 'v5', reasons: ['-te']},
             {term: 'こう', source: 'こうて', rule: 'v5', reasons: ['-te']},
             {term: 'そう', source: 'そうて', rule: 'v5', reasons: ['-te']},
