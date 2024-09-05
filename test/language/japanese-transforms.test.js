@@ -1430,6 +1430,15 @@ const tests = [
             {term: 'はう', source: 'ほうたら', rule: null, reasons: ['-tara', 'kansai-ben -tara']},
         ],
     },
+    {
+        category: '-tari form of kansai-ben terms',
+        valid: true,
+        tests: [
+            {term: '買う', source: '買うたり', rule: null, reasons: ['-tari', 'kansai-ben -tari']},
+            {term: 'かう', source: 'こうたり', rule: null, reasons: ['-tari', 'kansai-ben -tari']},
+            {term: 'はう', source: 'ほうたり', rule: null, reasons: ['-tari', 'kansai-ben -tari']},
+        ],
+    },
 ];
 /* eslint-enable @stylistic/no-multi-spaces */
 
