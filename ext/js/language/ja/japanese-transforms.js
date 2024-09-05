@@ -25,7 +25,7 @@ const passiveEnglishDescription = '1. Indicates an action received from an actio
 '2. Expresses respect for the subject of action performer.\n';
 
 const ikuVerbs = ['いく', '行く', '逝く', '往く']
-const godanSpecialUVerbs = ['こう', 'とう', '請う', '乞う', '問う', '訪う', '宣う', '曰う', '給う', '賜う', '揺蕩う']
+const godanUSpecialVerbs = ['こう', 'とう', '請う', '乞う', '問う', '訪う', '宣う', '曰う', '給う', '賜う', '揺蕩う']
 const fuVerbTeFormRoots = {
     'のたまう': 'のたもう',
     'たまう': 'たもう',
@@ -44,7 +44,7 @@ function irregularVerbInflections(suffix, conditionsIn, conditionsOut) {
     for (const verb of ikuVerbs) {
         inflections.push(suffixInflection(`${verb[0]}っ${suffix}`, verb, conditionsIn, conditionsOut));
     }
-    for (const verb of godanSpecialUVerbs) {
+    for (const verb of godanUSpecialVerbs) {
         inflections.push(suffixInflection(`${verb}${suffix}`, verb, conditionsIn, conditionsOut));
     }
     for (const [verb, teFormRoot] of Object.entries(fuVerbTeFormRoots)) {
