@@ -233,6 +233,7 @@ describe('japanese language transformer', () => {
             '買うて',
             '買うた',
             '買うたら',
+            '買うたり',
         ];
 
         const basicTransformations = [...adjectiveInflections, ...verbInflections, ...inflectionCombinations];
