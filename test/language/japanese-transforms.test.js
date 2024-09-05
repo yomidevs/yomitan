@@ -1244,10 +1244,30 @@ const tests = [
             {term: 'のたまう', source: 'のたもうたら', rule: 'v5', reasons: ['-tara']},
             {term: 'のたまう', source: 'のたもうたり', rule: 'v5', reasons: ['-tari']},
 
+            {term: '宣う', source: '宣うて',   rule: 'v5', reasons: ['-te']},
+            {term: '宣う', source: '宣うた',   rule: 'v5', reasons: ['-ta']},
+            {term: '宣う', source: '宣うたら', rule: 'v5', reasons: ['-tara']},
+            {term: '宣う', source: '宣うたり', rule: 'v5', reasons: ['-tari']},
+
+            {term: '曰う', source: '曰うて',   rule: 'v5', reasons: ['-te']},
+            {term: '曰う', source: '曰うた',   rule: 'v5', reasons: ['-ta']},
+            {term: '曰う', source: '曰うたら', rule: 'v5', reasons: ['-tara']},
+            {term: '曰う', source: '曰うたり', rule: 'v5', reasons: ['-tari']},
+
             {term: 'たまう', source: 'たもうて',   rule: 'v5', reasons: ['-te']},
             {term: 'たまう', source: 'たもうた',   rule: 'v5', reasons: ['-ta']},
             {term: 'たまう', source: 'たもうたら', rule: 'v5', reasons: ['-tara']},
             {term: 'たまう', source: 'たもうたり', rule: 'v5', reasons: ['-tari']},
+
+            {term: '給う', source: '給うて',   rule: 'v5', reasons: ['-te']},
+            {term: '給う', source: '給うた',   rule: 'v5', reasons: ['-ta']},
+            {term: '給う', source: '給うたら', rule: 'v5', reasons: ['-tara']},
+            {term: '給う', source: '給うたり', rule: 'v5', reasons: ['-tari']},
+
+            {term: '賜う', source: '賜うて',   rule: 'v5', reasons: ['-te']},
+            {term: '賜う', source: '賜うた',   rule: 'v5', reasons: ['-ta']},
+            {term: '賜う', source: '賜うたら', rule: 'v5', reasons: ['-tara']},
+            {term: '賜う', source: '賜うたり', rule: 'v5', reasons: ['-tari']},
 
             {term: 'たゆたう', source: 'たゆとうて',   rule: 'v5', reasons: ['-te']},
             {term: 'たゆたう', source: 'たゆとうた',   rule: 'v5', reasons: ['-ta']},
