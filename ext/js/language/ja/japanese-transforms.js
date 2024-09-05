@@ -771,6 +771,38 @@ export const japaneseTransforms = {
                 suffixInflection('來んばかり', '來る', [], ['vk']),
             ],
         },
+        '-ntosuru': {
+            name: '-ntosuru',
+            description: '1. Shows the speaker\'s will or intention.\n' +
+            '2. Shows an action or condition is on the verge of occurring.\n' +
+            'Usage: Attach んとする to the irrealis form (mizenkei) of verbs.\n' +
+            'する becomes せんとする',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～んとする',
+                    description: '…しようとする、…しようとしている',
+                },
+            ],
+            rules: [
+                suffixInflection('んとする', 'る', ['vs'], ['v1']),
+                suffixInflection('かんとする', 'く', ['vs'], ['v5']),
+                suffixInflection('がんとする', 'ぐ', ['vs'], ['v5']),
+                suffixInflection('さんとする', 'す', ['vs'], ['v5']),
+                suffixInflection('たんとする', 'つ', ['vs'], ['v5']),
+                suffixInflection('なんとする', 'ぬ', ['vs'], ['v5']),
+                suffixInflection('ばんとする', 'ぶ', ['vs'], ['v5']),
+                suffixInflection('まんとする', 'む', ['vs'], ['v5']),
+                suffixInflection('らんとする', 'る', ['vs'], ['v5']),
+                suffixInflection('わんとする', 'う', ['vs'], ['v5']),
+                suffixInflection('ぜんとする', 'ずる', ['vs'], ['vz']),
+                suffixInflection('せんとする', 'する', ['vs'], ['vs']),
+                suffixInflection('為んとする', '為る', ['vs'], ['vs']),
+                suffixInflection('こんとする', 'くる', ['vs'], ['vk']),
+                suffixInflection('来んとする', '来る', ['vs'], ['vk']),
+                suffixInflection('來んとする', '來る', ['vs'], ['vk']),
+            ],
+        },
         '-mu': {
             name: '-mu',
             description: 'Archaic.\n' +

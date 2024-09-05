@@ -90,6 +90,7 @@ describe('japanese language transformer', () => {
             '食べん',
             '食べんかった',
             '食べんばかり',
+            '食べんとする',
             '食べますまい',
             '食べましたら',
             '食べますれば',
@@ -101,6 +102,7 @@ describe('japanese language transformer', () => {
             '抱きかかえていなければ',
             '打ち込んでいませんでした',
             '食べさせられたくなかった',
+            '食べんとしませんかった',
         ];
 
         const kuruInflections = [
@@ -155,6 +157,7 @@ describe('japanese language transformer', () => {
             'こん',
             'こんかった',
             'こんばかり',
+            'こんとする',
             'きますまい',
             'きましたら',
             'きますれば',
@@ -218,6 +221,7 @@ describe('japanese language transformer', () => {
             'せん',
             'せんかった',
             'せんばかり',
+            'せんとする',
             'しますまい',
             'しましたら',
             'しますれば',
