@@ -29,8 +29,8 @@ const godanUSpecialVerbs = ['こう', 'とう', '請う', '乞う', '問う', '�
 const fuVerbTeFormRoots = [
     ['のたまう', 'のたもう'],
     ['たまう', 'たもう'],
-    ['たゆたう', 'たゆとう']
-]
+    ['たゆたう', 'たゆとう'],
+];
 
 /** @typedef {keyof typeof conditions} Condition */
 /**
