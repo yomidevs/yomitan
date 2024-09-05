@@ -579,7 +579,6 @@ export const japaneseTransforms = {
                 suffixInflection('來たり', '來る', [], ['vk']),
                 suffixInflection('いったり', 'いく', [], ['v5']),
                 suffixInflection('こうたり', 'こう', [], ['v5']),
-                suffixInflection('そうたり', 'そう', [], ['v5']),
                 suffixInflection('とうたり', 'とう', [], ['v5']),
                 suffixInflection('行ったり', '行く', [], ['v5']),
                 suffixInflection('逝ったり', '逝く', [], ['v5']),
