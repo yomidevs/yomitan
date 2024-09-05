@@ -47,8 +47,8 @@ function irregularVerbInflections(suffix, conditionsIn, conditionsOut) {
     for (const verb of godanSpecialUVerbs) {
         inflections.push(suffixInflection(`${verb}${suffix}`, verb, conditionsIn, conditionsOut));
     }
-    for (const [verb, teRoot] of Object.entries(fuVerbTeFormRoots)) {
-        inflections.push(suffixInflection(`${teRoot}${suffix}`, verb, conditionsIn, conditionsOut));
+    for (const [verb, teFormRoot] of Object.entries(fuVerbTeFormRoots)) {
+        inflections.push(suffixInflection(`${teFormRoot}${suffix}`, verb, conditionsIn, conditionsOut));
     }
     return inflections;
 }
