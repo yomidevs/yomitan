@@ -1315,7 +1315,7 @@ export const japaneseTransforms = {
         },
         'volitional': {
             name: 'volitional',
-            description: '1. Expresses speaker\'s will or intention; volitional form.\n' +
+            description: '1. Expresses speaker\'s will or intention.\n' +
             '2. Expresses an invitation to the other party.\n' +
             '3. (Used in …ようとする) Indicates being on the verge of initiating an action or transforming a state.\n' +
             '4. Indicates an inference of a matter.\n' +
@@ -1353,7 +1353,7 @@ export const japaneseTransforms = {
         'volitional slang': {
             name: 'volitional slang',
             description: 'Contractive form of the volitional form + か\n' +
-            '1. Expresses speaker\'s will or intention; volitional form.\n' +
+            '1. Expresses speaker\'s will or intention.\n' +
             '2. Expresses an invitation to the other party.\n' +
             'Usage: Replace final う with っ of the volitional form then add か.\n' +
             'For example: 行こうか -> 行こっか.',
