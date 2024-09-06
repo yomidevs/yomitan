@@ -1363,7 +1363,7 @@ export const japaneseTransforms = {
                 suffixInflection('こっか', 'く', [], ['v5']),
                 suffixInflection('ごっか', 'ぐ', [], ['v5']),
                 suffixInflection('そっか', 'す', [], ['v5']),
-                suffixInflection('とうか', 'つ', [], ['v5']),
+                suffixInflection('とっか', 'つ', [], ['v5']),
                 suffixInflection('のっか', 'ぬ', [], ['v5']),
                 suffixInflection('ぼっか', 'ぶ', [], ['v5']),
                 suffixInflection('もっか', 'む', [], ['v5']),
