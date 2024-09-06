@@ -1324,10 +1324,10 @@ export const japaneseTransforms = {
         },
         'volitional slang': {
             name: 'volitional slang',
-            description: 'Contraction of the volitional form + か\n' +
+            description: 'Contraction of volitional form + か\n' +
             '1. Expresses speaker\'s will or intention.\n' +
             '2. Expresses an invitation to the other party.\n' +
-            'Usage: Replace final う with っ of the volitional form then add か.\n' +
+            'Usage: Replace final う with っ of volitional form then add か.\n' +
             'For example: 行こうか -> 行こっか.',
             rules: [
                 suffixInflection('よっか', 'る', [], ['v1']),
