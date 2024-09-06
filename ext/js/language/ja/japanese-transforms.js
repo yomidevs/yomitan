@@ -543,6 +543,7 @@ export const japaneseTransforms = {
                 suffixInflection('添うたら', '添う', [], ['v5']),
                 suffixInflection('副うたら', '副う', [], ['v5']),
                 suffixInflection('厭うたら', '厭う', [], ['v5']),
+                suffixInflection('のたもうたら', 'のたまう', [], ['v5']),
                 suffixInflection('ましたら', 'ます', [], ['-masu']),
             ],
         },
@@ -593,6 +594,7 @@ export const japaneseTransforms = {
                 suffixInflection('添うたり', '添う', [], ['v5']),
                 suffixInflection('副うたり', '副う', [], ['v5']),
                 suffixInflection('厭うたり', '厭う', [], ['v5']),
+                suffixInflection('のたもうたり', 'のたまう', [], ['v5']),
             ],
         },
         '-te': {
@@ -642,6 +644,7 @@ export const japaneseTransforms = {
                 suffixInflection('添うて', '添う', ['-te'], ['v5']),
                 suffixInflection('副うて', '副う', ['-te'], ['v5']),
                 suffixInflection('厭うて', '厭う', ['-te'], ['v5']),
+                suffixInflection('のたもうて', 'のたまう', ['-te'], ['v5']),
                 suffixInflection('まして', 'ます', [], ['-masu']),
             ],
         },
@@ -1194,6 +1197,7 @@ export const japaneseTransforms = {
                 suffixInflection('添うた', '添う', ['past'], ['v5']),
                 suffixInflection('副うた', '副う', ['past'], ['v5']),
                 suffixInflection('厭うた', '厭う', ['past'], ['v5']),
+                suffixInflection('のたもうた', 'のたまう', ['past'], ['v5']),
                 suffixInflection('ました', 'ます', ['past'], ['-masu']),
                 suffixInflection('でした', '', ['past'], ['-masen']),
                 suffixInflection('かった', '', ['past'], ['-masen', '-n']),
@@ -1320,7 +1324,7 @@ export const japaneseTransforms = {
         },
         'volitional slang': {
             name: 'volitional slang',
-            description: 'Contractive form of the volitional form + か\n' +
+            description: 'Contraction of the volitional form + か\n' +
             '1. Expresses speaker\'s will or intention.\n' +
             '2. Expresses an invitation to the other party.\n' +
             'Usage: Replace final う with っ of the volitional form then add か.\n' +
