@@ -1372,35 +1372,24 @@ export const japaneseTransforms = {
                 suffixInflection('わされる', 'う', ['v1'], ['v5']),
             ],
         },
-        '-toku': {
-            name: '-toku',
-            description: 'Contraction of -teoku.\n' +
-            'To do certain things in advance in preparation (or in anticipation) of latter needs.\n' +
-            'Usage: Attach おく to the te-form of verbs, then contract ておく into とく.',
+        '-teoku': {
+            name: '-teoku',
+            description: 'To do certain things in advance in preparation (or in anticipation) of latter needs.\n' +
+            'Usage: Attach おく to the te-form of verbs.\n' +
+            'Contraction: ておく → とく, でおく → どく',
             i18n: [
                 {
                     language: 'ja',
-                    name: '～とく',
-                    description: '「～テオク」の縮約系',
+                    name: '～ておく',
                 },
             ],
             rules: [
-                suffixInflection('とく', 'る', ['v5'], ['v1']),
-                suffixInflection('いとく', 'く', ['v5'], ['v5']),
-                suffixInflection('いどく', 'ぐ', ['v5'], ['v5']),
-                suffixInflection('しとく', 'す', ['v5'], ['v5']),
-                suffixInflection('っとく', 'う', ['v5'], ['v5']),
-                suffixInflection('っとく', 'つ', ['v5'], ['v5']),
-                suffixInflection('っとく', 'る', ['v5'], ['v5']),
-                suffixInflection('んどく', 'ぬ', ['v5'], ['v5']),
-                suffixInflection('んどく', 'ぶ', ['v5'], ['v5']),
-                suffixInflection('んどく', 'む', ['v5'], ['v5']),
-                suffixInflection('じとく', 'ずる', ['v5'], ['vz']),
-                suffixInflection('しとく', 'する', ['v5'], ['vs']),
-                suffixInflection('為とく', '為る', ['v5'], ['vs']),
-                suffixInflection('きとく', 'くる', ['v5'], ['vk']),
-                suffixInflection('来とく', '来る', ['v5'], ['vk']),
-                suffixInflection('來とく', '來る', ['v5'], ['vk']),
+                suffixInflection('ておく', 'て', ['v5'], ['-te']),
+                suffixInflection('でおく', 'で', ['v5'], ['-te']),
+                suffixInflection('とく', 'て', ['v5'], ['-te']),
+                suffixInflection('どく', 'で', ['v5'], ['-te']),
+                suffixInflection('ないでおく', 'ない', ['v5'], ['adj-i']),
+                suffixInflection('ないどく', 'ない', ['v5'], ['adj-i']),
             ],
         },
         '-teiru': {
