@@ -35,7 +35,8 @@
         "@stylistic",
         "unicorn",
         "sonarjs",
-        "import"
+        "import",
+        "perfectionist"
     ],
     "ignorePatterns": [
         "/ext/lib/",
@@ -672,6 +673,15 @@
                 "crypto": "readonly",
                 "AbortController": "readonly"
             }
+        },
+        {
+            "files": [
+                "*.js",
+                "*.ts"
+            ],
+            "extends": [
+                "plugin:perfectionist/recommended-natural-legacy"
+            ]
         }
     ]
 }
