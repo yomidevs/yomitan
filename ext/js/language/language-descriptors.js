@@ -43,10 +43,12 @@ import {normalizeDiacritics} from './vi/viet-text-preprocessors.js';
 import {isStringPartiallyChinese, normalizePinyin} from './zh/chinese.js';
 
 const capitalizationPreprocessors = {
-    decapitalize,
     capitalizeFirstLetter,
+    decapitalize,
 };
 
+// TODO: Refactor textPreprocessors to be arrays instead of arrays because the order is semantic
+/* eslint-disable perfectionist/sort-objects */
 /** @type {import('language-descriptors').LanguageDescriptorAny[]} */
 const languageDescriptors = [
     {
@@ -384,6 +386,7 @@ const languageDescriptors = [
         readingNormalizer: normalizePinyin,
     },
 ];
+/* eslint-enable perfectionist/sort-objects */
 
 /** @type {Map<string, import('language-descriptors').LanguageDescriptorAny>} */
 export const languageDescriptorMap = new Map();
