@@ -42,13 +42,12 @@ import {tagalogTransforms} from './tl/tagalog-transforms.js';
 import {normalizeDiacritics} from './vi/viet-text-preprocessors.js';
 import {isStringPartiallyChinese, normalizePinyin} from './zh/chinese.js';
 
+/* eslint-disable perfectionist/sort-objects */
 const capitalizationPreprocessors = {
-    capitalizeFirstLetter,
     decapitalize,
+    capitalizeFirstLetter,
 };
 
-// TODO: Refactor textPreprocessors to be arrays instead of arrays because the order is semantic
-/* eslint-disable perfectionist/sort-objects */
 /** @type {import('language-descriptors').LanguageDescriptorAny[]} */
 const languageDescriptors = [
     {
