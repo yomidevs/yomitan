@@ -1248,7 +1248,7 @@ export const japaneseTransforms = {
         },
         'volitional': {
             name: 'volitional',
-            description: '1. Expresses speaker\'s will or intention; volitional form.\n' +
+            description: '1. Expresses speaker\'s will or intention.\n' +
             '2. Expresses an invitation to the other party.\n' +
             '3. (Used in …ようとする) Indicates being on the verge of initiating an action or transforming a state.\n' +
             '4. Indicates an inference of a matter.\n' +
@@ -1281,6 +1281,33 @@ export const japaneseTransforms = {
                 suffixInflection('來よう', '來る', [], ['vk']),
                 suffixInflection('ましょう', 'ます', [], ['-masu']),
                 suffixInflection('かろう', 'い', [], ['adj-i']),
+            ],
+        },
+        'volitional slang': {
+            name: 'volitional slang',
+            description: 'Contraction of volitional form + か\n' +
+            '1. Expresses speaker\'s will or intention.\n' +
+            '2. Expresses an invitation to the other party.\n' +
+            'Usage: Replace final う with っ of volitional form then add か.\n' +
+            'For example: 行こうか -> 行こっか.',
+            rules: [
+                suffixInflection('よっか', 'る', [], ['v1']),
+                suffixInflection('おっか', 'う', [], ['v5']),
+                suffixInflection('こっか', 'く', [], ['v5']),
+                suffixInflection('ごっか', 'ぐ', [], ['v5']),
+                suffixInflection('そっか', 'す', [], ['v5']),
+                suffixInflection('とっか', 'つ', [], ['v5']),
+                suffixInflection('のっか', 'ぬ', [], ['v5']),
+                suffixInflection('ぼっか', 'ぶ', [], ['v5']),
+                suffixInflection('もっか', 'む', [], ['v5']),
+                suffixInflection('ろっか', 'る', [], ['v5']),
+                suffixInflection('じよっか', 'ずる', [], ['vz']),
+                suffixInflection('しよっか', 'する', [], ['vs']),
+                suffixInflection('為よっか', '為る', [], ['vs']),
+                suffixInflection('こよっか', 'くる', [], ['vk']),
+                suffixInflection('来よっか', '来る', [], ['vk']),
+                suffixInflection('來よっか', '來る', [], ['vk']),
+                suffixInflection('ましょっか', 'ます', [], ['-masu']),
             ],
         },
         '-mai': {
