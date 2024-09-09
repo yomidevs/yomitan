@@ -24,6 +24,35 @@ const shimauEnglishDescription = '1. Shows a sense of regret/surprise when you d
 const passiveEnglishDescription = '1. Indicates an action received from an action performer.\n' +
 '2. Expresses respect for the subject of action performer.\n';
 
+const ikuVerbs = ['いく', '行く', '逝く', '往く'];
+const godanUSpecialVerbs = ['こう', 'とう', '請う', '乞う', '問う', '訪う', '宣う', '曰う', '給う', '賜う', '揺蕩う'];
+const fuVerbTeConjugations = [
+    ['のたまう', 'のたもう'],
+    ['たまう', 'たもう'],
+    ['たゆたう', 'たゆとう'],
+];
+
+/** @typedef {keyof typeof conditions} Condition */
+/**
+ * @param {'て' | 'た' | 'たら' | 'たり'} suffix
+ * @param {Condition[]} conditionsIn
+ * @param {Condition[]} conditionsOut
+ * @returns {import('language-transformer').SuffixRule<Condition>[]}
+ */
+function irregularVerbInflections(suffix, conditionsIn, conditionsOut) {
+    const inflections = [];
+    for (const verb of ikuVerbs) {
+        inflections.push(suffixInflection(`${verb[0]}っ${suffix}`, verb, conditionsIn, conditionsOut));
+    }
+    for (const verb of godanUSpecialVerbs) {
+        inflections.push(suffixInflection(`${verb}${suffix}`, verb, conditionsIn, conditionsOut));
+    }
+    for (const [verb, teRoot] of fuVerbTeConjugations) {
+        inflections.push(suffixInflection(`${teRoot}${suffix}`, verb, conditionsIn, conditionsOut));
+    }
+    return inflections;
+}
+
 const conditions = {
     'v': {
         name: 'Verb',
@@ -526,24 +555,7 @@ export const japaneseTransforms = {
                 suffixInflection('きたら', 'くる', [], ['vk']),
                 suffixInflection('来たら', '来る', [], ['vk']),
                 suffixInflection('來たら', '來る', [], ['vk']),
-                suffixInflection('いったら', 'いく', [], ['v5']),
-                suffixInflection('おうたら', 'おう', [], ['v5']),
-                suffixInflection('こうたら', 'こう', [], ['v5']),
-                suffixInflection('そうたら', 'そう', [], ['v5']),
-                suffixInflection('とうたら', 'とう', [], ['v5']),
-                suffixInflection('行ったら', '行く', [], ['v5']),
-                suffixInflection('逝ったら', '逝く', [], ['v5']),
-                suffixInflection('往ったら', '往く', [], ['v5']),
-                suffixInflection('請うたら', '請う', [], ['v5']),
-                suffixInflection('乞うたら', '乞う', [], ['v5']),
-                suffixInflection('恋うたら', '恋う', [], ['v5']),
-                suffixInflection('問うたら', '問う', [], ['v5']),
-                suffixInflection('負うたら', '負う', [], ['v5']),
-                suffixInflection('沿うたら', '沿う', [], ['v5']),
-                suffixInflection('添うたら', '添う', [], ['v5']),
-                suffixInflection('副うたら', '副う', [], ['v5']),
-                suffixInflection('厭うたら', '厭う', [], ['v5']),
-                suffixInflection('のたもうたら', 'のたまう', [], ['v5']),
+                ...irregularVerbInflections('たら', [], ['v5']),
                 suffixInflection('ましたら', 'ます', [], ['-masu']),
             ],
         },
@@ -577,24 +589,7 @@ export const japaneseTransforms = {
                 suffixInflection('きたり', 'くる', [], ['vk']),
                 suffixInflection('来たり', '来る', [], ['vk']),
                 suffixInflection('來たり', '來る', [], ['vk']),
-                suffixInflection('いったり', 'いく', [], ['v5']),
-                suffixInflection('おうたり', 'おう', [], ['v5']),
-                suffixInflection('こうたり', 'こう', [], ['v5']),
-                suffixInflection('そうたり', 'そう', [], ['v5']),
-                suffixInflection('とうたり', 'とう', [], ['v5']),
-                suffixInflection('行ったり', '行く', [], ['v5']),
-                suffixInflection('逝ったり', '逝く', [], ['v5']),
-                suffixInflection('往ったり', '往く', [], ['v5']),
-                suffixInflection('請うたり', '請う', [], ['v5']),
-                suffixInflection('乞うたり', '乞う', [], ['v5']),
-                suffixInflection('恋うたり', '恋う', [], ['v5']),
-                suffixInflection('問うたり', '問う', [], ['v5']),
-                suffixInflection('負うたり', '負う', [], ['v5']),
-                suffixInflection('沿うたり', '沿う', [], ['v5']),
-                suffixInflection('添うたり', '添う', [], ['v5']),
-                suffixInflection('副うたり', '副う', [], ['v5']),
-                suffixInflection('厭うたり', '厭う', [], ['v5']),
-                suffixInflection('のたもうたり', 'のたまう', [], ['v5']),
+                ...irregularVerbInflections('たり', [], ['v5']),
             ],
         },
         '-te': {
@@ -627,24 +622,7 @@ export const japaneseTransforms = {
                 suffixInflection('きて', 'くる', ['-te'], ['vk']),
                 suffixInflection('来て', '来る', ['-te'], ['vk']),
                 suffixInflection('來て', '來る', ['-te'], ['vk']),
-                suffixInflection('いって', 'いく', ['-te'], ['v5']),
-                suffixInflection('おうて', 'おう', ['-te'], ['v5']),
-                suffixInflection('こうて', 'こう', ['-te'], ['v5']),
-                suffixInflection('そうて', 'そう', ['-te'], ['v5']),
-                suffixInflection('とうて', 'とう', ['-te'], ['v5']),
-                suffixInflection('行って', '行く', ['-te'], ['v5']),
-                suffixInflection('逝って', '逝く', ['-te'], ['v5']),
-                suffixInflection('往って', '往く', ['-te'], ['v5']),
-                suffixInflection('請うて', '請う', ['-te'], ['v5']),
-                suffixInflection('乞うて', '乞う', ['-te'], ['v5']),
-                suffixInflection('恋うて', '恋う', ['-te'], ['v5']),
-                suffixInflection('問うて', '問う', ['-te'], ['v5']),
-                suffixInflection('負うて', '負う', ['-te'], ['v5']),
-                suffixInflection('沿うて', '沿う', ['-te'], ['v5']),
-                suffixInflection('添うて', '添う', ['-te'], ['v5']),
-                suffixInflection('副うて', '副う', ['-te'], ['v5']),
-                suffixInflection('厭うて', '厭う', ['-te'], ['v5']),
-                suffixInflection('のたもうて', 'のたまう', ['-te'], ['v5']),
+                ...irregularVerbInflections('て', ['-te'], ['v5']),
                 suffixInflection('まして', 'ます', [], ['-masu']),
             ],
         },
@@ -1180,24 +1158,7 @@ export const japaneseTransforms = {
                 suffixInflection('きた', 'くる', ['past'], ['vk']),
                 suffixInflection('来た', '来る', ['past'], ['vk']),
                 suffixInflection('來た', '來る', ['past'], ['vk']),
-                suffixInflection('いった', 'いく', ['past'], ['v5']),
-                suffixInflection('おうた', 'おう', ['past'], ['v5']),
-                suffixInflection('こうた', 'こう', ['past'], ['v5']),
-                suffixInflection('そうた', 'そう', ['past'], ['v5']),
-                suffixInflection('とうた', 'とう', ['past'], ['v5']),
-                suffixInflection('行った', '行く', ['past'], ['v5']),
-                suffixInflection('逝った', '逝く', ['past'], ['v5']),
-                suffixInflection('往った', '往く', ['past'], ['v5']),
-                suffixInflection('請うた', '請う', ['past'], ['v5']),
-                suffixInflection('乞うた', '乞う', ['past'], ['v5']),
-                suffixInflection('恋うた', '恋う', ['past'], ['v5']),
-                suffixInflection('問うた', '問う', ['past'], ['v5']),
-                suffixInflection('負うた', '負う', ['past'], ['v5']),
-                suffixInflection('沿うた', '沿う', ['past'], ['v5']),
-                suffixInflection('添うた', '添う', ['past'], ['v5']),
-                suffixInflection('副うた', '副う', ['past'], ['v5']),
-                suffixInflection('厭うた', '厭う', ['past'], ['v5']),
-                suffixInflection('のたもうた', 'のたまう', ['past'], ['v5']),
+                ...irregularVerbInflections('た', ['past'], ['v5']),
                 suffixInflection('ました', 'ます', ['past'], ['-masu']),
                 suffixInflection('でした', '', ['past'], ['-masen']),
                 suffixInflection('かった', '', ['past'], ['-masen', '-n']),
@@ -1632,6 +1593,27 @@ export const japaneseTransforms = {
                 suffixInflection('ろうたら', 'らったら', [], []),
                 suffixInflection('ようたら', 'やったら', [], []),
                 suffixInflection('ゆうたら', 'いったら', [], []),
+            ],
+        },
+        'kansai-ben -tari': {
+            name: 'kansai-ben',
+            description: '-tari form of kansai-ben terms',
+            rules: [
+                suffixInflection('うたり', 'ったり', [], []),
+                suffixInflection('おうたり', 'あったり', [], []),
+                suffixInflection('こうたり', 'かったり', [], []),
+                suffixInflection('ごうたり', 'がったり', [], []),
+                suffixInflection('そうたり', 'さったり', [], []),
+                suffixInflection('ぞうたり', 'ざったり', [], []),
+                suffixInflection('とうたり', 'たったり', [], []),
+                suffixInflection('どうたり', 'だったり', [], []),
+                suffixInflection('のうたり', 'なったり', [], []),
+                suffixInflection('ほうたり', 'はったり', [], []),
+                suffixInflection('ぼうたり', 'ばったり', [], []),
+                suffixInflection('もうたり', 'まったり', [], []),
+                suffixInflection('ろうたり', 'らったり', [], []),
+                suffixInflection('ようたり', 'やったり', [], []),
+                suffixInflection('ゆうたり', 'いったり', [], []),
             ],
         },
         'kansai-ben -ku': {
