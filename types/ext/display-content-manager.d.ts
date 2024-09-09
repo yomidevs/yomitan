@@ -35,6 +35,6 @@ export type CachedMediaDataLoaded = {
 };
 
 export type LoadMediaDataInfo = {
-    onUnload: OnUnloadCallback;
     loaded: boolean;
+    onUnload: OnUnloadCallback;
 };

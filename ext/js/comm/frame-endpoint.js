@@ -80,7 +80,7 @@ export class FrameEndpoint {
         const {secret} = /** @type {import('core').SerializableObject} */ (params);
         if (secret !== this._secret) { return; } // Invalid authentication
 
-        const {token, hostFrameId} = /** @type {import('core').SerializableObject} */ (params);
+        const {hostFrameId, token} = /** @type {import('core').SerializableObject} */ (params);
         if (typeof token !== 'string' || typeof hostFrameId !== 'number') { return; } // Invalid target
 
         this._token = token;

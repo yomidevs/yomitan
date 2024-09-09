@@ -64,69 +64,69 @@ export class DictionaryDatabase {
             ([
                 /** @type {import('database').StructureDefinition<import('dictionary-database').ObjectStoreName>} */
                 ({
-                    version: 20,
                     stores: {
-                        terms: {
-                            primaryKey: {keyPath: 'id', autoIncrement: true},
-                            indices: ['dictionary', 'expression', 'reading'],
+                        dictionaries: {
+                            indices: ['title', 'version'],
+                            primaryKey: {autoIncrement: true},
                         },
                         kanji: {
-                            primaryKey: {autoIncrement: true},
                             indices: ['dictionary', 'character'],
+                            primaryKey: {autoIncrement: true},
                         },
                         tagMeta: {
-                            primaryKey: {autoIncrement: true},
                             indices: ['dictionary'],
-                        },
-                        dictionaries: {
                             primaryKey: {autoIncrement: true},
-                            indices: ['title', 'version'],
+                        },
+                        terms: {
+                            indices: ['dictionary', 'expression', 'reading'],
+                            primaryKey: {autoIncrement: true, keyPath: 'id'},
                         },
                     },
+                    version: 20,
                 }),
                 {
-                    version: 30,
                     stores: {
-                        termMeta: {
-                            primaryKey: {autoIncrement: true},
-                            indices: ['dictionary', 'expression'],
-                        },
                         kanjiMeta: {
-                            primaryKey: {autoIncrement: true},
                             indices: ['dictionary', 'character'],
+                            primaryKey: {autoIncrement: true},
                         },
                         tagMeta: {
-                            primaryKey: {autoIncrement: true},
                             indices: ['dictionary', 'name'],
+                            primaryKey: {autoIncrement: true},
+                        },
+                        termMeta: {
+                            indices: ['dictionary', 'expression'],
+                            primaryKey: {autoIncrement: true},
                         },
                     },
+                    version: 30,
                 },
                 {
-                    version: 40,
                     stores: {
                         terms: {
-                            primaryKey: {keyPath: 'id', autoIncrement: true},
                             indices: ['dictionary', 'expression', 'reading', 'sequence'],
+                            primaryKey: {autoIncrement: true, keyPath: 'id'},
                         },
                     },
+                    version: 40,
                 },
                 {
-                    version: 50,
                     stores: {
                         terms: {
-                            primaryKey: {keyPath: 'id', autoIncrement: true},
                             indices: ['dictionary', 'expression', 'reading', 'sequence', 'expressionReverse', 'readingReverse'],
+                            primaryKey: {autoIncrement: true, keyPath: 'id'},
                         },
                     },
+                    version: 50,
                 },
                 {
-                    version: 60,
                     stores: {
                         media: {
-                            primaryKey: {keyPath: 'id', autoIncrement: true},
                             indices: ['dictionary', 'path'],
+                            primaryKey: {autoIncrement: true, keyPath: 'id'},
                         },
                     },
+                    version: 60,
                 },
             ]),
         );
@@ -377,7 +377,7 @@ export class DictionaryDatabase {
             const databaseTargets = targets.map(([objectStoreName, indexName]) => {
                 const objectStore = transaction.objectStore(objectStoreName);
                 const index = objectStore.index(indexName);
-                return {objectStore, index};
+                return {index, objectStore};
             });
 
             /** @type {import('database').CountTarget[]} */
@@ -411,7 +411,7 @@ export class DictionaryDatabase {
                     counts.push(countGroup);
                 }
                 const total = getTotal ? /** @type {import('dictionary-database').DictionaryCountGroup} */ (counts.shift()) : null;
-                resolve({total, counts});
+                resolve({counts, total});
             };
 
             this._db.bulkCount(countTargets, onCountComplete, reject);
@@ -492,7 +492,7 @@ export class DictionaryDatabase {
                 const query = createQuery(item);
                 for (let j = 0; j < indexCount; ++j) {
                     /** @type {import('dictionary-database').FindMultiBulkData<TItem>} */
-                    const data = {item, itemIndex: i, indexIndex: j};
+                    const data = {indexIndex: j, item, itemIndex: i};
                     this._db.getAll(indexList[j], query, onGetAll, reject, data);
                 }
             }
@@ -584,19 +584,19 @@ export class DictionaryDatabase {
     _createTerm(matchSource, matchType, row, index) {
         const {sequence} = row;
         return {
-            index,
-            matchType,
-            matchSource,
-            term: row.expression,
-            reading: row.reading,
-            definitionTags: this._splitField(row.definitionTags || row.tags),
-            termTags: this._splitField(row.termTags),
-            rules: this._splitField(row.rules),
             definitions: row.glossary,
-            score: row.score,
+            definitionTags: this._splitField(row.definitionTags || row.tags),
             dictionary: row.dictionary,
             id: row.id,
+            index,
+            matchSource,
+            matchType,
+            reading: row.reading,
+            rules: this._splitField(row.rules),
+            score: row.score,
             sequence: typeof sequence === 'number' ? sequence : -1,
+            term: row.expression,
+            termTags: this._splitField(row.termTags),
         };
     }
 
@@ -608,14 +608,14 @@ export class DictionaryDatabase {
     _createKanji(row, {itemIndex: index}) {
         const {stats} = row;
         return {
-            index,
             character: row.character,
-            onyomi: this._splitField(row.onyomi),
-            kunyomi: this._splitField(row.kunyomi),
-            tags: this._splitField(row.tags),
             definitions: row.meanings,
-            stats: typeof stats === 'object' && stats !== null ? stats : {},
             dictionary: row.dictionary,
+            index,
+            kunyomi: this._splitField(row.kunyomi),
+            onyomi: this._splitField(row.onyomi),
+            stats: typeof stats === 'object' && stats !== null ? stats : {},
+            tags: this._splitField(row.tags),
         };
     }
 
@@ -625,14 +625,14 @@ export class DictionaryDatabase {
      * @returns {import('dictionary-database').TermMeta}
      * @throws {Error}
      */
-    _createTermMeta({expression: term, mode, data, dictionary}, {itemIndex: index}) {
+    _createTermMeta({data, dictionary, expression: term, mode}, {itemIndex: index}) {
         switch (mode) {
             case 'freq':
-                return {index, term, mode, data, dictionary};
-            case 'pitch':
-                return {index, term, mode, data, dictionary};
+                return {data, dictionary, index, mode, term};
             case 'ipa':
-                return {index, term, mode, data, dictionary};
+                return {data, dictionary, index, mode, term};
+            case 'pitch':
+                return {data, dictionary, index, mode, term};
             default:
                 throw new Error(`Unknown mode: ${mode}`);
         }
@@ -643,8 +643,8 @@ export class DictionaryDatabase {
      * @param {import('dictionary-database').FindMultiBulkData<string>} data
      * @returns {import('dictionary-database').KanjiMeta}
      */
-    _createKanjiMeta({character, mode, data, dictionary}, {itemIndex: index}) {
-        return {index, character, mode, data, dictionary};
+    _createKanjiMeta({character, data, dictionary, mode}, {itemIndex: index}) {
+        return {character, data, dictionary, index, mode};
     }
 
     /**
@@ -653,8 +653,8 @@ export class DictionaryDatabase {
      * @returns {import('dictionary-database').Media}
      */
     _createMedia(row, {itemIndex: index}) {
-        const {dictionary, path, mediaType, width, height, content} = row;
-        return {index, dictionary, path, mediaType, width, height, content};
+        const {content, dictionary, height, mediaType, path, width} = row;
+        return {content, dictionary, height, index, mediaType, path, width};
     }
 
     /**

@@ -36,68 +36,68 @@ describe('CacheMap', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         const data = [
             {
-                maxSize: 1,
-                expectedSize: 0,
                 calls: [],
+                expectedSize: 0,
+                maxSize: 1,
             },
             {
-                maxSize: 10,
+                calls: [
+                    {args: ['a1-b-c'], func: 'get',     returnValue: void 0},
+                    {args: ['a1-b-c'], func: 'has',     returnValue: false},
+                    {args: ['a1-b-c', 32], func: 'set', returnValue: void 0},
+                    {args: ['a1-b-c'], func: 'get',     returnValue: 32},
+                    {args: ['a1-b-c'], func: 'has',     returnValue: true},
+                ],
                 expectedSize: 1,
-                calls: [
-                    {func: 'get', args: ['a1-b-c'],     returnValue: void 0},
-                    {func: 'has', args: ['a1-b-c'],     returnValue: false},
-                    {func: 'set', args: ['a1-b-c', 32], returnValue: void 0},
-                    {func: 'get', args: ['a1-b-c'],     returnValue: 32},
-                    {func: 'has', args: ['a1-b-c'],     returnValue: true},
-                ],
-            },
-            {
                 maxSize: 10,
-                expectedSize: 2,
-                calls: [
-                    {func: 'set', args: ['a1-b-c', 32], returnValue: void 0},
-                    {func: 'get', args: ['a1-b-c'],     returnValue: 32},
-                    {func: 'set', args: ['a1-b-c', 64], returnValue: void 0},
-                    {func: 'get', args: ['a1-b-c'],     returnValue: 64},
-                    {func: 'set', args: ['a2-b-c', 96], returnValue: void 0},
-                    {func: 'get', args: ['a2-b-c'],     returnValue: 96},
-                ],
             },
             {
-                maxSize: 2,
-                expectedSize: 2,
                 calls: [
-                    {func: 'has', args: ['a1-b-c'],    returnValue: false},
-                    {func: 'has', args: ['a2-b-c'],    returnValue: false},
-                    {func: 'has', args: ['a3-b-c'],    returnValue: false},
-                    {func: 'set', args: ['a1-b-c', 1], returnValue: void 0},
-                    {func: 'has', args: ['a1-b-c'],    returnValue: true},
-                    {func: 'has', args: ['a2-b-c'],    returnValue: false},
-                    {func: 'has', args: ['a3-b-c'],    returnValue: false},
-                    {func: 'set', args: ['a2-b-c', 2], returnValue: void 0},
-                    {func: 'has', args: ['a1-b-c'],    returnValue: true},
-                    {func: 'has', args: ['a2-b-c'],    returnValue: true},
-                    {func: 'has', args: ['a3-b-c'],    returnValue: false},
-                    {func: 'set', args: ['a3-b-c', 3], returnValue: void 0},
-                    {func: 'has', args: ['a1-b-c'],    returnValue: false},
-                    {func: 'has', args: ['a2-b-c'],    returnValue: true},
-                    {func: 'has', args: ['a3-b-c'],    returnValue: true},
+                    {args: ['a1-b-c', 32], func: 'set', returnValue: void 0},
+                    {args: ['a1-b-c'], func: 'get',     returnValue: 32},
+                    {args: ['a1-b-c', 64], func: 'set', returnValue: void 0},
+                    {args: ['a1-b-c'], func: 'get',     returnValue: 64},
+                    {args: ['a2-b-c', 96], func: 'set', returnValue: void 0},
+                    {args: ['a2-b-c'], func: 'get',     returnValue: 96},
                 ],
+                expectedSize: 2,
+                maxSize: 10,
+            },
+            {
+                calls: [
+                    {args: ['a1-b-c'], func: 'has',    returnValue: false},
+                    {args: ['a2-b-c'], func: 'has',    returnValue: false},
+                    {args: ['a3-b-c'], func: 'has',    returnValue: false},
+                    {args: ['a1-b-c', 1], func: 'set', returnValue: void 0},
+                    {args: ['a1-b-c'], func: 'has',    returnValue: true},
+                    {args: ['a2-b-c'], func: 'has',    returnValue: false},
+                    {args: ['a3-b-c'], func: 'has',    returnValue: false},
+                    {args: ['a2-b-c', 2], func: 'set', returnValue: void 0},
+                    {args: ['a1-b-c'], func: 'has',    returnValue: true},
+                    {args: ['a2-b-c'], func: 'has',    returnValue: true},
+                    {args: ['a3-b-c'], func: 'has',    returnValue: false},
+                    {args: ['a3-b-c', 3], func: 'set', returnValue: void 0},
+                    {args: ['a1-b-c'], func: 'has',    returnValue: false},
+                    {args: ['a2-b-c'], func: 'has',    returnValue: true},
+                    {args: ['a3-b-c'], func: 'has',    returnValue: true},
+                ],
+                expectedSize: 2,
+                maxSize: 2,
             },
         ];
         /* eslint-enable @stylistic/no-multi-spaces */
 
-        test.each(data)('api-test-%#', ({maxSize, expectedSize, calls}) => {
+        test.each(data)('api-test-%#', ({calls, expectedSize, maxSize}) => {
             const cache = new CacheMap(maxSize);
             expect(cache.maxSize).toStrictEqual(maxSize);
             for (const call of calls) {
-                const {func, args} = call;
+                const {args, func} = call;
                 let returnValue;
                 switch (func) {
-                    case 'get': returnValue = cache.get(args[0]); break;
-                    case 'set': returnValue = cache.set(args[0], args[1]); break;
-                    case 'has': returnValue = cache.has(args[0]); break;
                     case 'clear': returnValue = cache.clear(); break;
+                    case 'get': returnValue = cache.get(args[0]); break;
+                    case 'has': returnValue = cache.has(args[0]); break;
+                    case 'set': returnValue = cache.set(args[0], args[1]); break;
                 }
                 if (Object.prototype.hasOwnProperty.call(call, 'returnValue')) {
                     const {returnValue: expectedReturnValue} = call;

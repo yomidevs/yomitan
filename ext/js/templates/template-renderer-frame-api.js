@@ -48,7 +48,7 @@ export class TemplateRendererFrameApi {
      * @param {MessageEvent<import('template-renderer-proxy').FrontendMessageAny>} e
      */
     _onWindowMessage(e) {
-        const {source, data: {action, params, id}} = e;
+        const {data: {action, id, params}, source} = e;
         invokeApiMapHandler(this._windowMessageHandlers, action, params, [], (response) => {
             this._postMessage(/** @type {Window} */ (source), 'response', response, id);
         });
@@ -58,7 +58,7 @@ export class TemplateRendererFrameApi {
      * @param {{template: string, data: import('template-renderer').PartialOrCompositeRenderData, type: import('anki-templates').RenderMode}} event
      * @returns {import('template-renderer').RenderResult}
      */
-    _onRender({template, data, type}) {
+    _onRender({data, template, type}) {
         return this._templateRenderer.render(template, data, type);
     }
 
@@ -97,7 +97,7 @@ export class TemplateRendererFrameApi {
      */
     _postMessage(target, action, params, id) {
         /** @type {import('template-renderer-proxy').BackendMessageAny} */
-        const data = {action, params, id};
+        const data = {action, id, params};
         target.postMessage(data, '*');
     }
 }

@@ -145,7 +145,7 @@ export class ThemeController {
      */
     computeSiteTheme() {
         const color = [255, 255, 255];
-        const {documentElement, body} = document;
+        const {body, documentElement} = document;
         if (documentElement !== null) {
             this._addColor(color, window.getComputedStyle(documentElement).backgroundColor);
         }
@@ -173,8 +173,8 @@ export class ThemeController {
      */
     _resolveThemeValue(theme, computedSiteTheme) {
         switch (theme) {
-            case 'site': return this.siteOverride ? this._browserTheme : computedSiteTheme;
             case 'browser': return this._browserTheme;
+            case 'site': return this.siteOverride ? this._browserTheme : computedSiteTheme;
             default: return theme;
         }
     }

@@ -142,14 +142,14 @@ export class DisplayAnki {
         try {
             if (this._noteContext === null) { throw new Error('Note context not initialized'); }
             ankiNoteData = await this._ankiNoteBuilder.getRenderingData({
-                dictionaryEntry,
-                mode: 'test',
-                context: this._noteContext,
-                resultOutputMode: this._resultOutputMode,
-                glossaryLayoutMode: this._glossaryLayoutMode,
                 compactTags: this._compactTags,
-                marker: 'test',
+                context: this._noteContext,
+                dictionaryEntry,
                 dictionaryStylesMap: this._ankiNoteBuilder.getDictionaryStylesMap(this._dictionaries),
+                glossaryLayoutMode: this._glossaryLayoutMode,
+                marker: 'test',
+                mode: 'test',
+                resultOutputMode: this._resultOutputMode,
             });
         } catch (e) {
             ankiNoteDataException = e;
@@ -164,7 +164,7 @@ export class DisplayAnki {
             let errors;
             let requirements;
             try {
-                ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, mode, []));
+                ({errors, note: note, requirements} = await this._createNote(dictionaryEntry, mode, []));
             } catch (e) {
                 errors = [toError(e)];
             }
@@ -193,25 +193,25 @@ export class DisplayAnki {
      */
     _onOptionsUpdated({options}) {
         const {
-            general: {
-                resultOutputMode,
-                glossaryLayoutMode,
-                compactTags,
-            },
-            dictionaries,
             anki: {
-                tags,
-                duplicateScope,
-                duplicateScopeCheckAllModels,
-                duplicateBehavior,
-                suspendNewCards,
                 checkForDuplicates,
                 displayTags,
+                downloadTimeout,
+                duplicateBehavior,
+                duplicateScope,
+                duplicateScopeCheckAllModels,
                 kanji,
-                terms,
                 noteGuiMode,
                 screenshot: {format, quality},
-                downloadTimeout,
+                suspendNewCards,
+                tags,
+                terms,
+            },
+            dictionaries,
+            general: {
+                compactTags,
+                glossaryLayoutMode,
+                resultOutputMode,
             },
             scanning: {length: scanLength},
         } = options;
@@ -339,7 +339,7 @@ export class DisplayAnki {
         const {state} = this._display.history;
         let documentTitle, url, sentence;
         if (typeof state === 'object' && state !== null) {
-            ({documentTitle, url, sentence} = state);
+            ({documentTitle, sentence, url} = state);
         }
         if (typeof documentTitle !== 'string') {
             documentTitle = document.title;
@@ -347,14 +347,14 @@ export class DisplayAnki {
         if (typeof url !== 'string') {
             url = window.location.href;
         }
-        const {query, fullQuery, queryOffset} = this._display;
+        const {fullQuery, query, queryOffset} = this._display;
         sentence = this._getValidSentenceData(sentence, fullQuery, queryOffset);
         return {
-            url,
-            sentence,
             documentTitle,
-            query,
             fullQuery,
+            query,
+            sentence,
+            url,
         };
     }
 
@@ -433,7 +433,7 @@ export class DisplayAnki {
         for (let i = 0, ii = dictionaryEntryDetails.length; i < ii; ++i) {
             /** @type {?Set<number>} */
             let allNoteIds = null;
-            for (const {mode, canAdd, noteIds, noteInfos, ankiError} of dictionaryEntryDetails[i].modeMap.values()) {
+            for (const {ankiError, canAdd, mode, noteIds, noteInfos} of dictionaryEntryDetails[i].modeMap.values()) {
                 const button = this._saveButtonFind(i, mode);
                 if (button !== null) {
                     button.disabled = !canAdd;
@@ -547,7 +547,7 @@ export class DisplayAnki {
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
         try {
-            const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, mode, requirements);
+            const {errors, note, requirements: outputRequirements} = await this._createNote(dictionaryEntry, mode, requirements);
             allErrors.push(...errors);
 
             const error = this._getAddNoteRequirementsError(requirements, outputRequirements);
@@ -776,10 +776,10 @@ export class DisplayAnki {
         }
 
         for (let i = 0, ii = noteInfoList.length; i < ii; ++i) {
-            const {note, errors, requirements} = noteInfoList[i];
-            const {canAdd, valid, noteIds, noteInfos} = infos[i];
-            const {mode, index} = noteTargets[i];
-            results[index].modeMap.set(mode, {mode, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
+            const {errors, note, requirements} = noteInfoList[i];
+            const {canAdd, noteIds, noteInfos, valid} = infos[i];
+            const {index, mode} = noteTargets[i];
+            results[index].modeMap.set(mode, {ankiError, canAdd, errors, mode, note, noteIds, noteInfos, requirements, valid});
         }
         return results;
     }
@@ -793,7 +793,7 @@ export class DisplayAnki {
         const results = [];
         for (const note of notes) {
             const valid = isNoteDataValid(note);
-            results.push({canAdd, valid, noteIds: null});
+            results.push({canAdd, noteIds: null, valid});
         }
         return results;
     }
@@ -819,36 +819,36 @@ export class DisplayAnki {
         const optionsContext = this._display.getOptionsContext();
         const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(this._dictionaries);
 
-        const {note, errors, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({
-            dictionaryEntry,
-            mode,
+        const {errors, note, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({
+            compactTags: this._compactTags,
             context,
-            template,
             deckName,
-            modelName,
-            fields,
-            tags: this._noteTags,
+            dictionaryEntry,
+            dictionaryStylesMap,
             duplicateScope: this._duplicateScope,
             duplicateScopeCheckAllModels: this._duplicateScopeCheckAllModels,
-            resultOutputMode: this._resultOutputMode,
+            fields,
             glossaryLayoutMode: this._glossaryLayoutMode,
-            compactTags: this._compactTags,
             mediaOptions: {
                 audio: audioDetails,
                 screenshot: {
+                    contentOrigin,
                     format: this._screenshotFormat,
                     quality: this._screenshotQuality,
-                    contentOrigin,
                 },
                 textParsing: {
                     optionsContext,
                     scanLength: this._scanLength,
                 },
             },
+            mode,
+            modelName,
             requirements,
-            dictionaryStylesMap,
+            resultOutputMode: this._resultOutputMode,
+            tags: this._noteTags,
+            template,
         });
-        return {note, errors, requirements: outputRequirements};
+        return {errors, note, requirements: outputRequirements};
     }
 
     /**
@@ -869,7 +869,7 @@ export class DisplayAnki {
         let text;
         let offset;
         if (typeof sentence === 'object' && sentence !== null) {
-            ({text, offset} = /** @type {import('core').UnknownObject} */ (sentence));
+            ({offset, text} = /** @type {import('core').UnknownObject} */ (sentence));
         }
         if (typeof text !== 'string') {
             text = fallback;
@@ -877,7 +877,7 @@ export class DisplayAnki {
         } else {
             if (typeof offset !== 'number') { offset = 0; }
         }
-        return {text, offset};
+        return {offset, text};
     }
 
     /**
@@ -886,13 +886,13 @@ export class DisplayAnki {
      */
     _getAnkiNoteMediaAudioDetails(details) {
         if (details.type !== 'term') { return null; }
-        const {sources, preferredAudioIndex} = this._displayAudio.getAnkiNoteMediaAudioDetails(details.term, details.reading);
+        const {preferredAudioIndex, sources} = this._displayAudio.getAnkiNoteMediaAudioDetails(details.term, details.reading);
         const languageSummary = this._display.getLanguageSummary();
         return {
-            sources,
-            preferredAudioIndex,
             idleTimeout: this._audioDownloadIdleTimeout,
             languageSummary,
+            preferredAudioIndex,
+            sources,
         };
     }
 
@@ -1062,8 +1062,8 @@ export class DisplayAnki {
     _getValidCreateMode(value) {
         switch (value) {
             case 'kanji':
-            case 'term-kanji':
             case 'term-kana':
+            case 'term-kanji':
                 return value;
             default:
                 return null;

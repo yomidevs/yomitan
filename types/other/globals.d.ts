@@ -16,7 +16,7 @@
  */
 
 declare global {
-    function clearTimeout(timeoutId: NodeJS.Timeout | string | number | undefined): void;
+    function clearTimeout(timeoutId: NodeJS.Timeout | number | string | undefined): void;
 }
 
 export { };

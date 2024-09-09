@@ -28,7 +28,7 @@ const textSourceRangeTestEnv = await setupDomTest(path.join(dirname, 'data/html/
 
 
 describe('TextSourceRange', () => {
-    const {window, teardown} = textSourceRangeTestEnv;
+    const {teardown, window} = textSourceRangeTestEnv;
     afterAll(() => teardown(global));
 
     test('lazy', () => {

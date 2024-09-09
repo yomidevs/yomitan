@@ -31,7 +31,7 @@ import {WebExtension} from '../ext/js/extension/web-extension.js';
 
 const documentSearchDisplayControllerEnv = await setupDomTest('ext/search.html');
 
-const {window, teardown} = documentSearchDisplayControllerEnv;
+const {teardown, window} = documentSearchDisplayControllerEnv;
 
 const {document} = window;
 
@@ -64,21 +64,21 @@ describe('Keyboard Event Handling', () => {
     afterAll(() => teardown(global));
 
     const validKeypressEvents = [
-        new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: false, altKey: false}),
+        new KeyboardEvent('keydown', {altKey: false, ctrlKey: false, key: 'a', metaKey: false}),
         new KeyboardEvent('keydown', {key: 'Backspace'}),
-        new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: true, metaKey: false, altKey: false}),
+        new KeyboardEvent('keydown', {altKey: false, ctrlKey: true, key: 'Backspace', metaKey: false}),
     ];
 
     const invalidKeypressEvents = [
-        new KeyboardEvent('keydown', {key: '', ctrlKey: true, metaKey: false, altKey: false}),
-        new KeyboardEvent('keydown', {key: '', ctrlKey: false, metaKey: true, altKey: false}),
-        new KeyboardEvent('keydown', {key: '', ctrlKey: false, metaKey: false, altKey: true}),
-        new KeyboardEvent('keydown', {key: ' ', ctrlKey: false, metaKey: false, altKey: false}),
-        new KeyboardEvent('keydown', {key: 'a', ctrlKey: true, metaKey: false, altKey: false}),
-        new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: true, altKey: false}),
-        new KeyboardEvent('keydown', {key: 'a', ctrlKey: false, metaKey: false, altKey: true}),
-        new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: false, metaKey: true, altKey: false}),
-        new KeyboardEvent('keydown', {key: 'Backspace', ctrlKey: false, metaKey: false, altKey: true}),
+        new KeyboardEvent('keydown', {altKey: false, ctrlKey: true, key: '', metaKey: false}),
+        new KeyboardEvent('keydown', {altKey: false, ctrlKey: false, key: '', metaKey: true}),
+        new KeyboardEvent('keydown', {altKey: true, ctrlKey: false, key: '', metaKey: false}),
+        new KeyboardEvent('keydown', {altKey: false, ctrlKey: false, key: ' ', metaKey: false}),
+        new KeyboardEvent('keydown', {altKey: false, ctrlKey: true, key: 'a', metaKey: false}),
+        new KeyboardEvent('keydown', {altKey: false, ctrlKey: false, key: 'a', metaKey: true}),
+        new KeyboardEvent('keydown', {altKey: true, ctrlKey: false, key: 'a', metaKey: false}),
+        new KeyboardEvent('keydown', {altKey: false, ctrlKey: false, key: 'Backspace', metaKey: true}),
+        new KeyboardEvent('keydown', {altKey: true, ctrlKey: false, key: 'Backspace', metaKey: false}),
         new KeyboardEvent('keydown', {key: 'ArrowDown'}),
     ];
 

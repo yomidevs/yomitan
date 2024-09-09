@@ -25,105 +25,39 @@ const passiveEnglishDescription = '1. Indicates an action received from an actio
 '2. Expresses respect for the subject of action performer.\n';
 
 const conditions = {
-    'v': {
-        name: 'Verb',
-        i18n: [
-            {
-                language: 'ja',
-                name: '動詞',
-            },
-        ],
+    '-ba': {
         isDictionaryForm: false,
-        subConditions: ['v1', 'v5', 'vk', 'vs', 'vz'],
+        name: 'Intermediate -ba endings for conditional contraction',
     },
-    'v1': {
-        name: 'Ichidan verb',
-        i18n: [
-            {
-                language: 'ja',
-                name: '一段動詞',
-            },
-        ],
-        isDictionaryForm: true,
-        subConditions: ['v1d', 'v1p'],
-    },
-    'v1d': {
-        name: 'Ichidan verb, dictionary form',
-        i18n: [
-            {
-                language: 'ja',
-                name: '一段動詞、辞書形',
-            },
-        ],
+    '-masen': {
         isDictionaryForm: false,
+        name: 'Polite negative -masen ending',
     },
-    'v1p': {
-        name: 'Ichidan verb, progressive or perfect form',
-        i18n: [
-            {
-                language: 'ja',
-                name: '一段動詞、進行形または完了形',
-            },
-        ],
+    '-masu': {
         isDictionaryForm: false,
+        name: 'Polite -masu ending',
     },
-    'v5': {
-        name: 'Godan verb',
-        i18n: [
-            {
-                language: 'ja',
-                name: '五段動詞',
-            },
-        ],
-        isDictionaryForm: true,
-        subConditions: ['v5d', 'v5s'],
-    },
-    'v5d': {
-        name: 'Godan verb, dictionary form',
-        i18n: [
-            {
-                language: 'ja',
-                name: '五段動詞、辞書形',
-            },
-        ],
+    '-n': {
         isDictionaryForm: false,
+        name: '-n negative ending',
     },
-    'v5s': {
-        name: 'Godan verb, short causative form',
+    '-na': {
         isDictionaryForm: false,
+        name: 'Intermediate -na ending (imperative negative)',
     },
-    'vk': {
-        name: 'Kuru verb',
-        i18n: [
-            {
-                language: 'ja',
-                name: '来る動詞',
-            },
-        ],
-        isDictionaryForm: true,
+    '-nasai': {
+        isDictionaryForm: false,
+        name: 'Intermediate -nasai ending (polite imperative)',
     },
-    'vs': {
-        name: 'Suru verb',
-        i18n: [
-            {
-                language: 'ja',
-                name: 'する動詞',
-            },
-        ],
-        isDictionaryForm: true,
+    '-te': {
+        isDictionaryForm: false,
+        name: 'Intermediate -te endings for progressive or perfect tense',
     },
-    'vz': {
-        name: 'Zuru verb',
-        i18n: [
-            {
-                language: 'ja',
-                name: 'ずる動詞',
-            },
-        ],
-        isDictionaryForm: true,
+    '-ya': {
+        isDictionaryForm: false,
+        name: 'Intermediate -ya ending (conditional contraction)',
     },
     'adj-i': {
-        name: 'Adjective with i ending',
         i18n: [
             {
                 language: 'ja',
@@ -131,66 +65,132 @@ const conditions = {
             },
         ],
         isDictionaryForm: true,
-    },
-    '-masu': {
-        name: 'Polite -masu ending',
-        isDictionaryForm: false,
-    },
-    '-masen': {
-        name: 'Polite negative -masen ending',
-        isDictionaryForm: false,
-    },
-    '-te': {
-        name: 'Intermediate -te endings for progressive or perfect tense',
-        isDictionaryForm: false,
-    },
-    '-ba': {
-        name: 'Intermediate -ba endings for conditional contraction',
-        isDictionaryForm: false,
+        name: 'Adjective with i ending',
     },
     'adv': {
-        name: 'Intermediate -ku endings for adverbs',
         isDictionaryForm: false,
+        name: 'Intermediate -ku endings for adverbs',
     },
     'past': {
+        isDictionaryForm: false,
         name: '-ta past form ending',
-        isDictionaryForm: false,
     },
-    '-n': {
-        name: '-n negative ending',
+    'v': {
+        i18n: [
+            {
+                language: 'ja',
+                name: '動詞',
+            },
+        ],
         isDictionaryForm: false,
+        name: 'Verb',
+        subConditions: ['v1', 'v5', 'vk', 'vs', 'vz'],
     },
-    '-na': {
-        name: 'Intermediate -na ending (imperative negative)',
-        isDictionaryForm: false,
+    'v1': {
+        i18n: [
+            {
+                language: 'ja',
+                name: '一段動詞',
+            },
+        ],
+        isDictionaryForm: true,
+        name: 'Ichidan verb',
+        subConditions: ['v1d', 'v1p'],
     },
-    '-nasai': {
-        name: 'Intermediate -nasai ending (polite imperative)',
+    'v1d': {
+        i18n: [
+            {
+                language: 'ja',
+                name: '一段動詞、辞書形',
+            },
+        ],
         isDictionaryForm: false,
+        name: 'Ichidan verb, dictionary form',
     },
-    '-ya': {
-        name: 'Intermediate -ya ending (conditional contraction)',
+    'v1p': {
+        i18n: [
+            {
+                language: 'ja',
+                name: '一段動詞、進行形または完了形',
+            },
+        ],
         isDictionaryForm: false,
+        name: 'Ichidan verb, progressive or perfect form',
+    },
+    'v5': {
+        i18n: [
+            {
+                language: 'ja',
+                name: '五段動詞',
+            },
+        ],
+        isDictionaryForm: true,
+        name: 'Godan verb',
+        subConditions: ['v5d', 'v5s'],
+    },
+    'v5d': {
+        i18n: [
+            {
+                language: 'ja',
+                name: '五段動詞、辞書形',
+            },
+        ],
+        isDictionaryForm: false,
+        name: 'Godan verb, dictionary form',
+    },
+    'v5s': {
+        isDictionaryForm: false,
+        name: 'Godan verb, short causative form',
+    },
+    'vk': {
+        i18n: [
+            {
+                language: 'ja',
+                name: '来る動詞',
+            },
+        ],
+        isDictionaryForm: true,
+        name: 'Kuru verb',
+    },
+    'vs': {
+        i18n: [
+            {
+                language: 'ja',
+                name: 'する動詞',
+            },
+        ],
+        isDictionaryForm: true,
+        name: 'Suru verb',
+    },
+    'vz': {
+        i18n: [
+            {
+                language: 'ja',
+                name: 'ずる動詞',
+            },
+        ],
+        isDictionaryForm: true,
+        name: 'Zuru verb',
     },
 };
 
 /** @type {import('language-transformer').LanguageTransformDescriptor<keyof typeof conditions>} */
 export const japaneseTransforms = {
-    language: 'ja',
     conditions,
+    language: 'ja',
     transforms: {
         '-ba': {
-            name: '-ba',
             description: '1. Conditional form; shows that the previous stated condition\'s establishment is the condition for the latter stated condition to occur.\n' +
             '2. Shows a trigger for a latter stated perception or judgment.\n' +
             'Usage: Attach ば to the hypothetical/realis form (kateikei/izenkei) of verbs and i-adjectives.',
             i18n: [
                 {
+                    description: '仮定形',
                     language: 'ja',
                     name: '～ば',
-                    description: '仮定形',
                 },
             ],
+            name: '-ba',
             rules: [
                 suffixInflection('ければ', 'い', ['-ba'], ['adj-i']),
                 suffixInflection('えば', 'う', ['-ba'], ['v5']),
@@ -205,32 +205,7 @@ export const japaneseTransforms = {
                 suffixInflection('れば', '', ['-ba'], ['-masu']),
             ],
         },
-        '-ya': {
-            name: '-ya',
-            description: 'Contraction of -ba.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～ゃ',
-                    description: '仮定形の縮約系',
-                },
-            ],
-            rules: [
-                suffixInflection('けりゃ', 'ければ', ['-ya'], ['-ba']),
-                suffixInflection('きゃ', 'ければ', ['-ya'], ['-ba']),
-                suffixInflection('や', 'えば', ['-ya'], ['-ba']),
-                suffixInflection('きゃ', 'けば', ['-ya'], ['-ba']),
-                suffixInflection('ぎゃ', 'げば', ['-ya'], ['-ba']),
-                suffixInflection('しゃ', 'せば', ['-ya'], ['-ba']),
-                suffixInflection('ちゃ', 'てば', ['-ya'], ['-ba']),
-                suffixInflection('にゃ', 'ねば', ['-ya'], ['-ba']),
-                suffixInflection('びゃ', 'べば', ['-ya'], ['-ba']),
-                suffixInflection('みゃ', 'めば', ['-ya'], ['-ba']),
-                suffixInflection('りゃ', 'れば', ['-ya'], ['-ba']),
-            ],
-        },
         '-cha': {
-            name: '-cha',
             description: 'Contraction of ～ては.\n' +
             '1. Explains how something always happens under the condition that it marks.\n' +
             '2. Expresses the repetition (of a series of) actions.\n' +
@@ -239,11 +214,12 @@ export const japaneseTransforms = {
             'Usage: Attach は after the te-form of verbs, contract ては into ちゃ.',
             i18n: [
                 {
+                    description: '「～ては」の縮約系',
                     language: 'ja',
                     name: '～ちゃ',
-                    description: '「～ては」の縮約系',
                 },
             ],
+            name: '-cha',
             rules: [
                 suffixInflection('ちゃ', 'る', ['v5'], ['v1']),
                 suffixInflection('いじゃ', 'ぐ', ['v5'], ['v5']),
@@ -265,16 +241,16 @@ export const japaneseTransforms = {
             ],
         },
         '-chau': {
-            name: '-chau',
             description: 'Contraction of -shimau.\n' + shimauEnglishDescription +
             'Usage: Attach しまう after the te-form of verbs, contract てしまう into ちゃう.',
             i18n: [
                 {
+                    description: '「～てしまう」のややくだけた口頭語的表現',
                     language: 'ja',
                     name: '～ちゃう',
-                    description: '「～てしまう」のややくだけた口頭語的表現',
                 },
             ],
+            name: '-chau',
             rules: [
                 suffixInflection('ちゃう', 'る', ['v5'], ['v1']),
                 suffixInflection('いじゃう', 'ぐ', ['v5'], ['v5']),
@@ -296,16 +272,16 @@ export const japaneseTransforms = {
             ],
         },
         '-chimau': {
-            name: '-chimau',
             description: 'Contraction of -shimau.\n' + shimauEnglishDescription +
             'Usage: Attach しまう after the te-form of verbs, contract てしまう into ちまう.',
             i18n: [
                 {
+                    description: '「～てしまう」の音変化',
                     language: 'ja',
                     name: '～ちまう',
-                    description: '「～てしまう」の音変化',
                 },
             ],
+            name: '-chimau',
             rules: [
                 suffixInflection('ちまう', 'る', ['v5'], ['v1']),
                 suffixInflection('いじまう', 'ぐ', ['v5'], ['v5']),
@@ -326,1166 +302,19 @@ export const japaneseTransforms = {
                 suffixInflection('來ちまう', '來る', ['v5'], ['vk']),
             ],
         },
-        '-shimau': {
-            name: '-shimau',
-            description: shimauEnglishDescription +
-            'Usage: Attach しまう after the te-form of verbs.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～しまう',
-                    description: 'その動作がすっかり終わる、その状態が完成することを表す。終わったことを強調したり、不本意である、困ったことになった、などの気持ちを添えたりすることもある。',
-                },
-            ],
-            rules: [
-                suffixInflection('てしまう', 'て', ['v5'], ['-te']),
-                suffixInflection('でしまう', 'で', ['v5'], ['-te']),
-            ],
-        },
-        '-nasai': {
-            name: '-nasai',
-            description: 'Polite imperative suffix.\n' +
-            'Usage: Attach なさい after the continuative form (renyoukei) of verbs.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～なさい',
-                    description: '動詞「なさる」の命令形',
-                },
-            ],
-            rules: [
-                suffixInflection('なさい', 'る', ['-nasai'], ['v1']),
-                suffixInflection('いなさい', 'う', ['-nasai'], ['v5']),
-                suffixInflection('きなさい', 'く', ['-nasai'], ['v5']),
-                suffixInflection('ぎなさい', 'ぐ', ['-nasai'], ['v5']),
-                suffixInflection('しなさい', 'す', ['-nasai'], ['v5']),
-                suffixInflection('ちなさい', 'つ', ['-nasai'], ['v5']),
-                suffixInflection('になさい', 'ぬ', ['-nasai'], ['v5']),
-                suffixInflection('びなさい', 'ぶ', ['-nasai'], ['v5']),
-                suffixInflection('みなさい', 'む', ['-nasai'], ['v5']),
-                suffixInflection('りなさい', 'る', ['-nasai'], ['v5']),
-                suffixInflection('じなさい', 'ずる', ['-nasai'], ['vz']),
-                suffixInflection('しなさい', 'する', ['-nasai'], ['vs']),
-                suffixInflection('為なさい', '為る', ['-nasai'], ['vs']),
-                suffixInflection('きなさい', 'くる', ['-nasai'], ['vk']),
-                suffixInflection('来なさい', '来る', ['-nasai'], ['vk']),
-                suffixInflection('來なさい', '來る', ['-nasai'], ['vk']),
-            ],
-        },
-        '-sou': {
-            name: '-sou',
-            description: 'Appearing that; looking like.\n' +
-            'Usage: Attach そう to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～そう',
-                    description: 'そういう様子だ、そうなる様子だということ、すなわち様態を表す助動詞。',
-                },
-            ],
-            rules: [
-                suffixInflection('そう', 'い', [], ['adj-i']),
-                suffixInflection('そう', 'る', [], ['v1']),
-                suffixInflection('いそう', 'う', [], ['v5']),
-                suffixInflection('きそう', 'く', [], ['v5']),
-                suffixInflection('ぎそう', 'ぐ', [], ['v5']),
-                suffixInflection('しそう', 'す', [], ['v5']),
-                suffixInflection('ちそう', 'つ', [], ['v5']),
-                suffixInflection('にそう', 'ぬ', [], ['v5']),
-                suffixInflection('びそう', 'ぶ', [], ['v5']),
-                suffixInflection('みそう', 'む', [], ['v5']),
-                suffixInflection('りそう', 'る', [], ['v5']),
-                suffixInflection('じそう', 'ずる', [], ['vz']),
-                suffixInflection('しそう', 'する', [], ['vs']),
-                suffixInflection('為そう', '為る', [], ['vs']),
-                suffixInflection('きそう', 'くる', [], ['vk']),
-                suffixInflection('来そう', '来る', [], ['vk']),
-                suffixInflection('來そう', '來る', [], ['vk']),
-            ],
-        },
-        '-sugiru': {
-            name: '-sugiru',
-            description: 'Shows something "is too..." or someone is doing something "too much".\n' +
-            'Usage: Attach すぎる to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～すぎる',
-                    description: '程度や限度を超える',
-                },
-            ],
-            rules: [
-                suffixInflection('すぎる', 'い', ['v1'], ['adj-i']),
-                suffixInflection('すぎる', 'る', ['v1'], ['v1']),
-                suffixInflection('いすぎる', 'う', ['v1'], ['v5']),
-                suffixInflection('きすぎる', 'く', ['v1'], ['v5']),
-                suffixInflection('ぎすぎる', 'ぐ', ['v1'], ['v5']),
-                suffixInflection('しすぎる', 'す', ['v1'], ['v5']),
-                suffixInflection('ちすぎる', 'つ', ['v1'], ['v5']),
-                suffixInflection('にすぎる', 'ぬ', ['v1'], ['v5']),
-                suffixInflection('びすぎる', 'ぶ', ['v1'], ['v5']),
-                suffixInflection('みすぎる', 'む', ['v1'], ['v5']),
-                suffixInflection('りすぎる', 'る', ['v1'], ['v5']),
-                suffixInflection('じすぎる', 'ずる', ['v1'], ['vz']),
-                suffixInflection('しすぎる', 'する', ['v1'], ['vs']),
-                suffixInflection('為すぎる', '為る', ['v1'], ['vs']),
-                suffixInflection('きすぎる', 'くる', ['v1'], ['vk']),
-                suffixInflection('来すぎる', '来る', ['v1'], ['vk']),
-                suffixInflection('來すぎる', '來る', ['v1'], ['vk']),
-            ],
-        },
-        '-sugiru-kanji': {
-            name: '-sugiru',
-            description: 'Shows something "is too..." or someone is doing something "too much".\n' +
-            'Usage: Attach 過ぎる to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～過ぎる',
-                    description: '程度や限度を超える',
-                },
-            ],
-            rules: [
-                suffixInflection('過ぎる', 'い', ['v1'], ['adj-i']),
-                suffixInflection('過ぎる', 'る', ['v1'], ['v1']),
-                suffixInflection('い過ぎる', 'う', ['v1'], ['v5']),
-                suffixInflection('き過ぎる', 'く', ['v1'], ['v5']),
-                suffixInflection('ぎ過ぎる', 'ぐ', ['v1'], ['v5']),
-                suffixInflection('し過ぎる', 'す', ['v1'], ['v5']),
-                suffixInflection('ち過ぎる', 'つ', ['v1'], ['v5']),
-                suffixInflection('に過ぎる', 'ぬ', ['v1'], ['v5']),
-                suffixInflection('び過ぎる', 'ぶ', ['v1'], ['v5']),
-                suffixInflection('み過ぎる', 'む', ['v1'], ['v5']),
-                suffixInflection('り過ぎる', 'る', ['v1'], ['v5']),
-                suffixInflection('じ過ぎる', 'ずる', ['v1'], ['vz']),
-                suffixInflection('し過ぎる', 'する', ['v1'], ['vs']),
-                suffixInflection('為過ぎる', '為る', ['v1'], ['vs']),
-                suffixInflection('き過ぎる', 'くる', ['v1'], ['vk']),
-                suffixInflection('来過ぎる', '来る', ['v1'], ['vk']),
-                suffixInflection('來過ぎる', '來る', ['v1'], ['vk']),
-            ],
-        },
-        '-tai': {
-            name: '-tai',
-            description: '1. Expresses the feeling of desire or hope.\n' +
-            '2. Used in ...たいと思います, an indirect way of saying what the speaker intends to do.\n' +
-            'Usage: Attach たい to the continuative form (renyoukei) of verbs. たい itself conjugates as i-adjective.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～たい',
-                    description: 'することをのぞんでいる、という、希望や願望の気持ちをあらわす。',
-                },
-            ],
-            rules: [
-                suffixInflection('たい', 'る', ['adj-i'], ['v1']),
-                suffixInflection('いたい', 'う', ['adj-i'], ['v5']),
-                suffixInflection('きたい', 'く', ['adj-i'], ['v5']),
-                suffixInflection('ぎたい', 'ぐ', ['adj-i'], ['v5']),
-                suffixInflection('したい', 'す', ['adj-i'], ['v5']),
-                suffixInflection('ちたい', 'つ', ['adj-i'], ['v5']),
-                suffixInflection('にたい', 'ぬ', ['adj-i'], ['v5']),
-                suffixInflection('びたい', 'ぶ', ['adj-i'], ['v5']),
-                suffixInflection('みたい', 'む', ['adj-i'], ['v5']),
-                suffixInflection('りたい', 'る', ['adj-i'], ['v5']),
-                suffixInflection('じたい', 'ずる', ['adj-i'], ['vz']),
-                suffixInflection('したい', 'する', ['adj-i'], ['vs']),
-                suffixInflection('為たい', '為る', ['adj-i'], ['vs']),
-                suffixInflection('きたい', 'くる', ['adj-i'], ['vk']),
-                suffixInflection('来たい', '来る', ['adj-i'], ['vk']),
-                suffixInflection('來たい', '來る', ['adj-i'], ['vk']),
-            ],
-        },
-        '-tara': {
-            name: '-tara',
-            description: '1. Denotes the latter stated event is a continuation of the previous stated event.\n' +
-            '2. Assumes that a matter has been completed or concluded.\n' +
-            'Usage: Attach たら to the continuative form (renyoukei) of verbs after euphonic change form, かったら to the stem of i-adjectives.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～たら',
-                    description: '仮定をあらわす・…すると・したあとに',
-                },
-            ],
-            rules: [
-                suffixInflection('かったら', 'い', [], ['adj-i']),
-                suffixInflection('たら', 'る', [], ['v1']),
-                suffixInflection('いたら', 'く', [], ['v5']),
-                suffixInflection('いだら', 'ぐ', [], ['v5']),
-                suffixInflection('したら', 'す', [], ['v5']),
-                suffixInflection('ったら', 'う', [], ['v5']),
-                suffixInflection('ったら', 'つ', [], ['v5']),
-                suffixInflection('ったら', 'る', [], ['v5']),
-                suffixInflection('んだら', 'ぬ', [], ['v5']),
-                suffixInflection('んだら', 'ぶ', [], ['v5']),
-                suffixInflection('んだら', 'む', [], ['v5']),
-                suffixInflection('じたら', 'ずる', [], ['vz']),
-                suffixInflection('したら', 'する', [], ['vs']),
-                suffixInflection('為たら', '為る', [], ['vs']),
-                suffixInflection('きたら', 'くる', [], ['vk']),
-                suffixInflection('来たら', '来る', [], ['vk']),
-                suffixInflection('來たら', '來る', [], ['vk']),
-                suffixInflection('いったら', 'いく', [], ['v5']),
-                suffixInflection('おうたら', 'おう', [], ['v5']),
-                suffixInflection('こうたら', 'こう', [], ['v5']),
-                suffixInflection('そうたら', 'そう', [], ['v5']),
-                suffixInflection('とうたら', 'とう', [], ['v5']),
-                suffixInflection('行ったら', '行く', [], ['v5']),
-                suffixInflection('逝ったら', '逝く', [], ['v5']),
-                suffixInflection('往ったら', '往く', [], ['v5']),
-                suffixInflection('請うたら', '請う', [], ['v5']),
-                suffixInflection('乞うたら', '乞う', [], ['v5']),
-                suffixInflection('恋うたら', '恋う', [], ['v5']),
-                suffixInflection('問うたら', '問う', [], ['v5']),
-                suffixInflection('負うたら', '負う', [], ['v5']),
-                suffixInflection('沿うたら', '沿う', [], ['v5']),
-                suffixInflection('添うたら', '添う', [], ['v5']),
-                suffixInflection('副うたら', '副う', [], ['v5']),
-                suffixInflection('厭うたら', '厭う', [], ['v5']),
-                suffixInflection('のたもうたら', 'のたまう', [], ['v5']),
-                suffixInflection('ましたら', 'ます', [], ['-masu']),
-            ],
-        },
-        '-tari': {
-            name: '-tari',
-            description: '1. Shows two actions occurring back and forth (when used with two verbs).\n' +
-            '2. Shows examples of actions and states (when used with multiple verbs and adjectives).\n' +
-            'Usage: Attach たり to the continuative form (renyoukei) of verbs after euphonic change form, かったり to the stem of i-adjectives',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～たり',
-                    description: 'ある動作を例示的にあげることを表わす。',
-                },
-            ],
-            rules: [
-                suffixInflection('かったり', 'い', [], ['adj-i']),
-                suffixInflection('たり', 'る', [], ['v1']),
-                suffixInflection('いたり', 'く', [], ['v5']),
-                suffixInflection('いだり', 'ぐ', [], ['v5']),
-                suffixInflection('したり', 'す', [], ['v5']),
-                suffixInflection('ったり', 'う', [], ['v5']),
-                suffixInflection('ったり', 'つ', [], ['v5']),
-                suffixInflection('ったり', 'る', [], ['v5']),
-                suffixInflection('んだり', 'ぬ', [], ['v5']),
-                suffixInflection('んだり', 'ぶ', [], ['v5']),
-                suffixInflection('んだり', 'む', [], ['v5']),
-                suffixInflection('じたり', 'ずる', [], ['vz']),
-                suffixInflection('したり', 'する', [], ['vs']),
-                suffixInflection('為たり', '為る', [], ['vs']),
-                suffixInflection('きたり', 'くる', [], ['vk']),
-                suffixInflection('来たり', '来る', [], ['vk']),
-                suffixInflection('來たり', '來る', [], ['vk']),
-                suffixInflection('いったり', 'いく', [], ['v5']),
-                suffixInflection('おうたり', 'おう', [], ['v5']),
-                suffixInflection('こうたり', 'こう', [], ['v5']),
-                suffixInflection('そうたり', 'そう', [], ['v5']),
-                suffixInflection('とうたり', 'とう', [], ['v5']),
-                suffixInflection('行ったり', '行く', [], ['v5']),
-                suffixInflection('逝ったり', '逝く', [], ['v5']),
-                suffixInflection('往ったり', '往く', [], ['v5']),
-                suffixInflection('請うたり', '請う', [], ['v5']),
-                suffixInflection('乞うたり', '乞う', [], ['v5']),
-                suffixInflection('恋うたり', '恋う', [], ['v5']),
-                suffixInflection('問うたり', '問う', [], ['v5']),
-                suffixInflection('負うたり', '負う', [], ['v5']),
-                suffixInflection('沿うたり', '沿う', [], ['v5']),
-                suffixInflection('添うたり', '添う', [], ['v5']),
-                suffixInflection('副うたり', '副う', [], ['v5']),
-                suffixInflection('厭うたり', '厭う', [], ['v5']),
-                suffixInflection('のたもうたり', 'のたまう', [], ['v5']),
-            ],
-        },
-        '-te': {
-            name: '-te',
-            description: 'te-form.\n' +
-            'It has a myriad of meanings. Primarily, it is a conjunctive particle that connects two clauses together.\n' +
-            'Usage: Attach て to the continuative form (renyoukei) of verbs after euphonic change form, くて to the stem of i-adjectives.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～て',
-                    description: 'て（で）形',
-                },
-            ],
-            rules: [
-                suffixInflection('くて', 'い', ['-te'], ['adj-i']),
-                suffixInflection('て', 'る', ['-te'], ['v1']),
-                suffixInflection('いて', 'く', ['-te'], ['v5']),
-                suffixInflection('いで', 'ぐ', ['-te'], ['v5']),
-                suffixInflection('して', 'す', ['-te'], ['v5']),
-                suffixInflection('って', 'う', ['-te'], ['v5']),
-                suffixInflection('って', 'つ', ['-te'], ['v5']),
-                suffixInflection('って', 'る', ['-te'], ['v5']),
-                suffixInflection('んで', 'ぬ', ['-te'], ['v5']),
-                suffixInflection('んで', 'ぶ', ['-te'], ['v5']),
-                suffixInflection('んで', 'む', ['-te'], ['v5']),
-                suffixInflection('じて', 'ずる', ['-te'], ['vz']),
-                suffixInflection('して', 'する', ['-te'], ['vs']),
-                suffixInflection('為て', '為る', ['-te'], ['vs']),
-                suffixInflection('きて', 'くる', ['-te'], ['vk']),
-                suffixInflection('来て', '来る', ['-te'], ['vk']),
-                suffixInflection('來て', '來る', ['-te'], ['vk']),
-                suffixInflection('いって', 'いく', ['-te'], ['v5']),
-                suffixInflection('おうて', 'おう', ['-te'], ['v5']),
-                suffixInflection('こうて', 'こう', ['-te'], ['v5']),
-                suffixInflection('そうて', 'そう', ['-te'], ['v5']),
-                suffixInflection('とうて', 'とう', ['-te'], ['v5']),
-                suffixInflection('行って', '行く', ['-te'], ['v5']),
-                suffixInflection('逝って', '逝く', ['-te'], ['v5']),
-                suffixInflection('往って', '往く', ['-te'], ['v5']),
-                suffixInflection('請うて', '請う', ['-te'], ['v5']),
-                suffixInflection('乞うて', '乞う', ['-te'], ['v5']),
-                suffixInflection('恋うて', '恋う', ['-te'], ['v5']),
-                suffixInflection('問うて', '問う', ['-te'], ['v5']),
-                suffixInflection('負うて', '負う', ['-te'], ['v5']),
-                suffixInflection('沿うて', '沿う', ['-te'], ['v5']),
-                suffixInflection('添うて', '添う', ['-te'], ['v5']),
-                suffixInflection('副うて', '副う', ['-te'], ['v5']),
-                suffixInflection('厭うて', '厭う', ['-te'], ['v5']),
-                suffixInflection('のたもうて', 'のたまう', ['-te'], ['v5']),
-                suffixInflection('まして', 'ます', [], ['-masu']),
-            ],
-        },
-        '-zu': {
-            name: '-zu',
-            description: '1. Negative form of verbs.\n' +
-            '2. Continuative form (renyoukei) of the particle ぬ (nu).\n' +
-            'Usage: Attach ず to the irrealis form (mizenkei) of verbs.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～ず',
-                    description: '口語の否定の助動詞「ぬ」の連用形',
-                },
-            ],
-            rules: [
-                suffixInflection('ず', 'る', [], ['v1']),
-                suffixInflection('かず', 'く', [], ['v5']),
-                suffixInflection('がず', 'ぐ', [], ['v5']),
-                suffixInflection('さず', 'す', [], ['v5']),
-                suffixInflection('たず', 'つ', [], ['v5']),
-                suffixInflection('なず', 'ぬ', [], ['v5']),
-                suffixInflection('ばず', 'ぶ', [], ['v5']),
-                suffixInflection('まず', 'む', [], ['v5']),
-                suffixInflection('らず', 'る', [], ['v5']),
-                suffixInflection('わず', 'う', [], ['v5']),
-                suffixInflection('ぜず', 'ずる', [], ['vz']),
-                suffixInflection('せず', 'する', [], ['vs']),
-                suffixInflection('為ず', '為る', [], ['vs']),
-                suffixInflection('こず', 'くる', [], ['vk']),
-                suffixInflection('来ず', '来る', [], ['vk']),
-                suffixInflection('來ず', '來る', [], ['vk']),
-            ],
-        },
-        '-nu': {
-            name: '-nu',
-            description: 'Negative form of verbs.\n' +
-            'Usage: Attach ぬ to the irrealis form (mizenkei) of verbs.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～ぬ',
-                    description: '動作・状態などを「…ない」と否定することを表わす。',
-                },
-            ],
-            rules: [
-                suffixInflection('ぬ', 'る', [], ['v1']),
-                suffixInflection('かぬ', 'く', [], ['v5']),
-                suffixInflection('がぬ', 'ぐ', [], ['v5']),
-                suffixInflection('さぬ', 'す', [], ['v5']),
-                suffixInflection('たぬ', 'つ', [], ['v5']),
-                suffixInflection('なぬ', 'ぬ', [], ['v5']),
-                suffixInflection('ばぬ', 'ぶ', [], ['v5']),
-                suffixInflection('まぬ', 'む', [], ['v5']),
-                suffixInflection('らぬ', 'る', [], ['v5']),
-                suffixInflection('わぬ', 'う', [], ['v5']),
-                suffixInflection('ぜぬ', 'ずる', [], ['vz']),
-                suffixInflection('せぬ', 'する', [], ['vs']),
-                suffixInflection('為ぬ', '為る', [], ['vs']),
-                suffixInflection('こぬ', 'くる', [], ['vk']),
-                suffixInflection('来ぬ', '来る', [], ['vk']),
-                suffixInflection('來ぬ', '來る', [], ['vk']),
-            ],
-        },
-        '-n': {
-            name: '-n',
-            description: 'Negative form of verbs; a sound change of ぬ.\n' +
-            'Usage: Attach ん to the irrealis form (mizenkei) of verbs.\n' +
-            'する becomes せん',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～ん',
-                    description: '〔否定の助動詞〕…ない',
-                },
-            ],
-            rules: [
-                suffixInflection('ん', 'る', ['-n'], ['v1']),
-                suffixInflection('かん', 'く', ['-n'], ['v5']),
-                suffixInflection('がん', 'ぐ', ['-n'], ['v5']),
-                suffixInflection('さん', 'す', ['-n'], ['v5']),
-                suffixInflection('たん', 'つ', ['-n'], ['v5']),
-                suffixInflection('なん', 'ぬ', ['-n'], ['v5']),
-                suffixInflection('ばん', 'ぶ', ['-n'], ['v5']),
-                suffixInflection('まん', 'む', ['-n'], ['v5']),
-                suffixInflection('らん', 'る', ['-n'], ['v5']),
-                suffixInflection('わん', 'う', ['-n'], ['v5']),
-                suffixInflection('ぜん', 'ずる', ['-n'], ['vz']),
-                suffixInflection('せん', 'する', ['-n'], ['vs']),
-                suffixInflection('為ん', '為る', ['-n'], ['vs']),
-                suffixInflection('こん', 'くる', ['-n'], ['vk']),
-                suffixInflection('来ん', '来る', ['-n'], ['vk']),
-                suffixInflection('來ん', '來る', ['-n'], ['vk']),
-            ],
-        },
-        '-nbakari': {
-            name: '-nbakari',
-            description: 'Shows an action or condition is on the verge of occurring, or an excessive/extreme degree.\n' +
-            'Usage: Attach んばかり to the irrealis form (mizenkei) of verbs.\n' +
-            'する becomes せんばかり',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～ん',
-                    description: '今にもそうなりそうな、しかし辛うじてそうなっていないようなさまを指す表現',
-                },
-            ],
-            rules: [
-                suffixInflection('んばかり', 'る', [], ['v1']),
-                suffixInflection('かんばかり', 'く', [], ['v5']),
-                suffixInflection('がんばかり', 'ぐ', [], ['v5']),
-                suffixInflection('さんばかり', 'す', [], ['v5']),
-                suffixInflection('たんばかり', 'つ', [], ['v5']),
-                suffixInflection('なんばかり', 'ぬ', [], ['v5']),
-                suffixInflection('ばんばかり', 'ぶ', [], ['v5']),
-                suffixInflection('まんばかり', 'む', [], ['v5']),
-                suffixInflection('らんばかり', 'る', [], ['v5']),
-                suffixInflection('わんばかり', 'う', [], ['v5']),
-                suffixInflection('ぜんばかり', 'ずる', [], ['vz']),
-                suffixInflection('せんばかり', 'する', [], ['vs']),
-                suffixInflection('為んばかり', '為る', [], ['vs']),
-                suffixInflection('こんばかり', 'くる', [], ['vk']),
-                suffixInflection('来んばかり', '来る', [], ['vk']),
-                suffixInflection('來んばかり', '來る', [], ['vk']),
-            ],
-        },
-        '-ntosuru': {
-            name: '-ntosuru',
-            description: '1. Shows the speaker\'s will or intention.\n' +
-            '2. Shows an action or condition is on the verge of occurring.\n' +
-            'Usage: Attach んとする to the irrealis form (mizenkei) of verbs.\n' +
-            'する becomes せんとする',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～んとする',
-                    description: '…しようとする、…しようとしている',
-                },
-            ],
-            rules: [
-                suffixInflection('んとする', 'る', ['vs'], ['v1']),
-                suffixInflection('かんとする', 'く', ['vs'], ['v5']),
-                suffixInflection('がんとする', 'ぐ', ['vs'], ['v5']),
-                suffixInflection('さんとする', 'す', ['vs'], ['v5']),
-                suffixInflection('たんとする', 'つ', ['vs'], ['v5']),
-                suffixInflection('なんとする', 'ぬ', ['vs'], ['v5']),
-                suffixInflection('ばんとする', 'ぶ', ['vs'], ['v5']),
-                suffixInflection('まんとする', 'む', ['vs'], ['v5']),
-                suffixInflection('らんとする', 'る', ['vs'], ['v5']),
-                suffixInflection('わんとする', 'う', ['vs'], ['v5']),
-                suffixInflection('ぜんとする', 'ずる', ['vs'], ['vz']),
-                suffixInflection('せんとする', 'する', ['vs'], ['vs']),
-                suffixInflection('為んとする', '為る', ['vs'], ['vs']),
-                suffixInflection('こんとする', 'くる', ['vs'], ['vk']),
-                suffixInflection('来んとする', '来る', ['vs'], ['vk']),
-                suffixInflection('來んとする', '來る', ['vs'], ['vk']),
-            ],
-        },
-        '-mu': {
-            name: '-mu',
-            description: 'Archaic.\n' +
-            '1. Shows an inference of a certain matter.\n' +
-            '2. Shows speaker\'s intention.\n' +
-            'Usage: Attach む to the irrealis form (mizenkei) of verbs.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～む',
-                    description: '…だろう',
-                },
-            ],
-            rules: [
-                suffixInflection('む', 'る', [], ['v1']),
-                suffixInflection('かむ', 'く', [], ['v5']),
-                suffixInflection('がむ', 'ぐ', [], ['v5']),
-                suffixInflection('さむ', 'す', [], ['v5']),
-                suffixInflection('たむ', 'つ', [], ['v5']),
-                suffixInflection('なむ', 'ぬ', [], ['v5']),
-                suffixInflection('ばむ', 'ぶ', [], ['v5']),
-                suffixInflection('まむ', 'む', [], ['v5']),
-                suffixInflection('らむ', 'る', [], ['v5']),
-                suffixInflection('わむ', 'う', [], ['v5']),
-                suffixInflection('ぜむ', 'ずる', [], ['vz']),
-                suffixInflection('せむ', 'する', [], ['vs']),
-                suffixInflection('為む', '為る', [], ['vs']),
-                suffixInflection('こむ', 'くる', [], ['vk']),
-                suffixInflection('来む', '来る', [], ['vk']),
-                suffixInflection('來む', '來る', [], ['vk']),
-            ],
-        },
-        '-zaru': {
-            name: '-zaru',
-            description: 'Negative form of verbs.\n' +
-            'Usage: Attach ざる to the irrealis form (mizenkei) of verbs.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～ざる',
-                    description: '…ない…',
-                },
-            ],
-            rules: [
-                suffixInflection('ざる', 'る', [], ['v1']),
-                suffixInflection('かざる', 'く', [], ['v5']),
-                suffixInflection('がざる', 'ぐ', [], ['v5']),
-                suffixInflection('さざる', 'す', [], ['v5']),
-                suffixInflection('たざる', 'つ', [], ['v5']),
-                suffixInflection('なざる', 'ぬ', [], ['v5']),
-                suffixInflection('ばざる', 'ぶ', [], ['v5']),
-                suffixInflection('まざる', 'む', [], ['v5']),
-                suffixInflection('らざる', 'る', [], ['v5']),
-                suffixInflection('わざる', 'う', [], ['v5']),
-                suffixInflection('ぜざる', 'ずる', [], ['vz']),
-                suffixInflection('せざる', 'する', [], ['vs']),
-                suffixInflection('為ざる', '為る', [], ['vs']),
-                suffixInflection('こざる', 'くる', [], ['vk']),
-                suffixInflection('来ざる', '来る', [], ['vk']),
-                suffixInflection('來ざる', '來る', [], ['vk']),
-            ],
-        },
-        '-neba': {
-            name: '-neba',
-            description: '1. Shows a hypothetical negation; if not ...\n' +
-            '2. Shows a must. Used with or without ならぬ.\n' +
-            'Usage: Attach ねば to the irrealis form (mizenkei) of verbs.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～ねば',
-                    description: 'もし…ないなら。…なければならない。',
-                },
-            ],
-            rules: [
-                suffixInflection('ねば', 'る', ['-ba'], ['v1']),
-                suffixInflection('かねば', 'く', ['-ba'], ['v5']),
-                suffixInflection('がねば', 'ぐ', ['-ba'], ['v5']),
-                suffixInflection('さねば', 'す', ['-ba'], ['v5']),
-                suffixInflection('たねば', 'つ', ['-ba'], ['v5']),
-                suffixInflection('なねば', 'ぬ', ['-ba'], ['v5']),
-                suffixInflection('ばねば', 'ぶ', ['-ba'], ['v5']),
-                suffixInflection('まねば', 'む', ['-ba'], ['v5']),
-                suffixInflection('らねば', 'る', ['-ba'], ['v5']),
-                suffixInflection('わねば', 'う', ['-ba'], ['v5']),
-                suffixInflection('ぜねば', 'ずる', ['-ba'], ['vz']),
-                suffixInflection('せねば', 'する', ['-ba'], ['vs']),
-                suffixInflection('為ねば', '為る', ['-ba'], ['vs']),
-                suffixInflection('こねば', 'くる', ['-ba'], ['vk']),
-                suffixInflection('来ねば', '来る', ['-ba'], ['vk']),
-                suffixInflection('來ねば', '來る', ['-ba'], ['vk']),
-            ],
-        },
-        '-ku': {
-            name: '-ku',
-            description: 'Adverbial form of i-adjectives.\n',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '連用形',
-                    description: '〔形容詞で〕用言へ続く。例、「大きく育つ」の「大きく」。',
-                },
-            ],
-            rules: [
-                suffixInflection('く', 'い', ['adv'], ['adj-i']),
-            ],
-        },
-        'causative': {
-            name: 'causative',
-            description: 'Describes the intention to make someone do something.\n' +
-            'Usage: Attach させる to the irrealis form (mizenkei) of ichidan verbs and くる.\n' +
-            'Attach せる to the irrealis form (mizenkei) of godan verbs and する.\n' +
-            'It itself conjugates as an ichidan verb.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '使役形',
-                    description: 'だれかにある行為をさせる意を表わす時の言い方。例、「行かせる」の「せる」。',
-                },
-            ],
-            rules: [
-                suffixInflection('させる', 'る', ['v1'], ['v1']),
-                suffixInflection('かせる', 'く', ['v1'], ['v5']),
-                suffixInflection('がせる', 'ぐ', ['v1'], ['v5']),
-                suffixInflection('させる', 'す', ['v1'], ['v5']),
-                suffixInflection('たせる', 'つ', ['v1'], ['v5']),
-                suffixInflection('なせる', 'ぬ', ['v1'], ['v5']),
-                suffixInflection('ばせる', 'ぶ', ['v1'], ['v5']),
-                suffixInflection('ませる', 'む', ['v1'], ['v5']),
-                suffixInflection('らせる', 'る', ['v1'], ['v5']),
-                suffixInflection('わせる', 'う', ['v1'], ['v5']),
-                suffixInflection('じさせる', 'ずる', ['v1'], ['vz']),
-                suffixInflection('ぜさせる', 'ずる', ['v1'], ['vz']),
-                suffixInflection('させる', 'する', ['v1'], ['vs']),
-                suffixInflection('為せる', '為る', ['v1'], ['vs']),
-                suffixInflection('せさせる', 'する', ['v1'], ['vs']),
-                suffixInflection('為させる', '為る', ['v1'], ['vs']),
-                suffixInflection('こさせる', 'くる', ['v1'], ['vk']),
-                suffixInflection('来させる', '来る', ['v1'], ['vk']),
-                suffixInflection('來させる', '來る', ['v1'], ['vk']),
-            ],
-        },
-        'short causative': {
-            name: 'short causative',
-            description: 'Contraction of the causative form.\n' +
-            'Describes the intention to make someone do something.\n' +
-            'Usage: Attach す to the irrealis form (mizenkei) of godan verbs.\n' +
-            'Attach さす to the dictionary form (shuushikei) of ichidan verbs.\n' +
-            'する becomes さす, くる becomes こさす.\n' +
-            'It itself conjugates as an godan verb.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '使役形の短縮形',
-                    description: 'だれかにある行為をさせる意を表わす時の言い方。例、「食べさす」の「さす」。',
-                },
-            ],
-            rules: [
-                suffixInflection('さす', 'る', ['v5s'], ['v1']),
-                suffixInflection('かす', 'く', ['v5s'], ['v5']),
-                suffixInflection('がす', 'ぐ', ['v5s'], ['v5']),
-                suffixInflection('さす', 'す', ['v5s'], ['v5']),
-                suffixInflection('たす', 'つ', ['v5s'], ['v5']),
-                suffixInflection('なす', 'ぬ', ['v5s'], ['v5']),
-                suffixInflection('ばす', 'ぶ', ['v5s'], ['v5']),
-                suffixInflection('ます', 'む', ['v5s'], ['v5']),
-                suffixInflection('らす', 'る', ['v5s'], ['v5']),
-                suffixInflection('わす', 'う', ['v5s'], ['v5']),
-                suffixInflection('じさす', 'ずる', ['v5s'], ['vz']),
-                suffixInflection('ぜさす', 'ずる', ['v5s'], ['vz']),
-                suffixInflection('さす', 'する', ['v5s'], ['vs']),
-                suffixInflection('為す', '為る', ['v5s'], ['vs']),
-                suffixInflection('こさす', 'くる', ['v5s'], ['vk']),
-                suffixInflection('来さす', '来る', ['v5s'], ['vk']),
-                suffixInflection('來さす', '來る', ['v5s'], ['vk']),
-            ],
-        },
-        'imperative': {
-            name: 'imperative',
-            description: '1. To give orders.\n' +
-            '2. (As あれ) Represents the fact that it will never change no matter the circumstances.\n' +
-            '3. Express a feeling of hope.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '命令形',
-                    description: '命令の意味を表わすときの形。例、「行け」。',
-                },
-            ],
-            rules: [
-                suffixInflection('ろ', 'る', [], ['v1']),
-                suffixInflection('よ', 'る', [], ['v1']),
-                suffixInflection('え', 'う', [], ['v5']),
-                suffixInflection('け', 'く', [], ['v5']),
-                suffixInflection('げ', 'ぐ', [], ['v5']),
-                suffixInflection('せ', 'す', [], ['v5']),
-                suffixInflection('て', 'つ', [], ['v5']),
-                suffixInflection('ね', 'ぬ', [], ['v5']),
-                suffixInflection('べ', 'ぶ', [], ['v5']),
-                suffixInflection('め', 'む', [], ['v5']),
-                suffixInflection('れ', 'る', [], ['v5']),
-                suffixInflection('じろ', 'ずる', [], ['vz']),
-                suffixInflection('ぜよ', 'ずる', [], ['vz']),
-                suffixInflection('しろ', 'する', [], ['vs']),
-                suffixInflection('せよ', 'する', [], ['vs']),
-                suffixInflection('為ろ', '為る', [], ['vs']),
-                suffixInflection('為よ', '為る', [], ['vs']),
-                suffixInflection('こい', 'くる', [], ['vk']),
-                suffixInflection('来い', '来る', [], ['vk']),
-                suffixInflection('來い', '來る', [], ['vk']),
-            ],
-        },
-        'imperative negative': {
-            name: 'imperative negative',
-            rules: [
-                suffixInflection('な', '', ['-na'], ['v']),
-            ],
-        },
-        'continuative': {
-            name: 'continuative',
-            description: 'Used to indicate actions that are (being) carried out.\n' +
-            'Refers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '連用形',
-                    description: '〔動詞などで〕「ます」などに続く。例、「バスを降りて歩きます」の「降り」「歩き」。',
-                },
-            ],
-            rules: [
-                suffixInflection('い', 'いる', [], ['v1d']),
-                suffixInflection('え', 'える', [], ['v1d']),
-                suffixInflection('き', 'きる', [], ['v1d']),
-                suffixInflection('ぎ', 'ぎる', [], ['v1d']),
-                suffixInflection('け', 'ける', [], ['v1d']),
-                suffixInflection('げ', 'げる', [], ['v1d']),
-                suffixInflection('じ', 'じる', [], ['v1d']),
-                suffixInflection('せ', 'せる', [], ['v1d']),
-                suffixInflection('ぜ', 'ぜる', [], ['v1d']),
-                suffixInflection('ち', 'ちる', [], ['v1d']),
-                suffixInflection('て', 'てる', [], ['v1d']),
-                suffixInflection('で', 'でる', [], ['v1d']),
-                suffixInflection('に', 'にる', [], ['v1d']),
-                suffixInflection('ね', 'ねる', [], ['v1d']),
-                suffixInflection('ひ', 'ひる', [], ['v1d']),
-                suffixInflection('び', 'びる', [], ['v1d']),
-                suffixInflection('へ', 'へる', [], ['v1d']),
-                suffixInflection('べ', 'べる', [], ['v1d']),
-                suffixInflection('み', 'みる', [], ['v1d']),
-                suffixInflection('め', 'める', [], ['v1d']),
-                suffixInflection('り', 'りる', [], ['v1d']),
-                suffixInflection('れ', 'れる', [], ['v1d']),
-                suffixInflection('い', 'う', [], ['v5']),
-                suffixInflection('き', 'く', [], ['v5']),
-                suffixInflection('ぎ', 'ぐ', [], ['v5']),
-                suffixInflection('し', 'す', [], ['v5']),
-                suffixInflection('ち', 'つ', [], ['v5']),
-                suffixInflection('に', 'ぬ', [], ['v5']),
-                suffixInflection('び', 'ぶ', [], ['v5']),
-                suffixInflection('み', 'む', [], ['v5']),
-                suffixInflection('り', 'る', [], ['v5']),
-                suffixInflection('き', 'くる', [], ['vk']),
-                suffixInflection('し', 'する', [], ['vs']),
-                suffixInflection('来', '来る', [], ['vk']),
-                suffixInflection('來', '來る', [], ['vk']),
-            ],
-        },
-        'negative': {
-            name: 'negative',
-            description: '1. Negative form of verbs.\n' +
-            '2. Expresses a feeling of solicitation to the other party.\n' +
-            'Usage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～ない',
-                    description: 'その動作・作用・状態の成立を否定することを表わす。',
-                },
-            ],
-            rules: [
-                suffixInflection('くない', 'い', ['adj-i'], ['adj-i']),
-                suffixInflection('ない', 'る', ['adj-i'], ['v1']),
-                suffixInflection('かない', 'く', ['adj-i'], ['v5']),
-                suffixInflection('がない', 'ぐ', ['adj-i'], ['v5']),
-                suffixInflection('さない', 'す', ['adj-i'], ['v5']),
-                suffixInflection('たない', 'つ', ['adj-i'], ['v5']),
-                suffixInflection('なない', 'ぬ', ['adj-i'], ['v5']),
-                suffixInflection('ばない', 'ぶ', ['adj-i'], ['v5']),
-                suffixInflection('まない', 'む', ['adj-i'], ['v5']),
-                suffixInflection('らない', 'る', ['adj-i'], ['v5']),
-                suffixInflection('わない', 'う', ['adj-i'], ['v5']),
-                suffixInflection('じない', 'ずる', ['adj-i'], ['vz']),
-                suffixInflection('しない', 'する', ['adj-i'], ['vs']),
-                suffixInflection('為ない', '為る', ['adj-i'], ['vs']),
-                suffixInflection('こない', 'くる', ['adj-i'], ['vk']),
-                suffixInflection('来ない', '来る', ['adj-i'], ['vk']),
-                suffixInflection('來ない', '來る', ['adj-i'], ['vk']),
-                suffixInflection('ません', 'ます', ['-masen'], ['-masu']),
-            ],
-        },
-        '-sa': {
-            name: '-sa',
-            description: 'Nominalizing suffix of i-adjectives indicating nature, state, mind or degree.\n' +
-            'Usage: Attach さ to the stem of i-adjectives.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～さ',
-                    description: 'こと。程度。',
-                },
-            ],
-            rules: [
-                suffixInflection('さ', 'い', [], ['adj-i']),
-            ],
-        },
-        'passive': {
-            name: 'passive',
-            description: passiveEnglishDescription +
-            'Usage: Attach れる to the irrealis form (mizenkei) of godan verbs.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '受身形',
-                },
-            ],
-            rules: [
-                suffixInflection('かれる', 'く', ['v1'], ['v5']),
-                suffixInflection('がれる', 'ぐ', ['v1'], ['v5']),
-                suffixInflection('される', 'す', ['v1'], ['v5']),
-                suffixInflection('たれる', 'つ', ['v1'], ['v5']),
-                suffixInflection('なれる', 'ぬ', ['v1'], ['v5']),
-                suffixInflection('ばれる', 'ぶ', ['v1'], ['v5']),
-                suffixInflection('まれる', 'む', ['v1'], ['v5']),
-                suffixInflection('われる', 'う', ['v1'], ['v5']),
-                suffixInflection('られる', 'る', ['v1'], ['v5']),
-                suffixInflection('じされる', 'ずる', ['v1'], ['vz']),
-                suffixInflection('ぜされる', 'ずる', ['v1'], ['vz']),
-                suffixInflection('される', 'する', ['v1'], ['vs']),
-                suffixInflection('為れる', '為る', ['v1'], ['vs']),
-                suffixInflection('こられる', 'くる', ['v1'], ['vk']),
-                suffixInflection('来られる', '来る', ['v1'], ['vk']),
-                suffixInflection('來られる', '來る', ['v1'], ['vk']),
-            ],
-        },
-        '-ta': {
-            name: '-ta',
-            description: '1. Indicates a reality that has happened in the past.\n' +
-            '2. Indicates the completion of an action.\n' +
-            '3. Indicates the confirmation of a matter.\n' +
-            '4. Indicates the speaker\'s confidence that the action will definitely be fulfilled.\n' +
-            '5. Indicates the events that occur before the main clause are represented as relative past.\n' +
-            '6. Indicates a mild imperative/command.\n' +
-            'Usage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～た・かった形',
-                },
-            ],
-            rules: [
-                suffixInflection('かった', 'い', ['past'], ['adj-i']),
-                suffixInflection('た', 'る', ['past'], ['v1']),
-                suffixInflection('いた', 'く', ['past'], ['v5']),
-                suffixInflection('いだ', 'ぐ', ['past'], ['v5']),
-                suffixInflection('した', 'す', ['past'], ['v5']),
-                suffixInflection('った', 'う', ['past'], ['v5']),
-                suffixInflection('った', 'つ', ['past'], ['v5']),
-                suffixInflection('った', 'る', ['past'], ['v5']),
-                suffixInflection('んだ', 'ぬ', ['past'], ['v5']),
-                suffixInflection('んだ', 'ぶ', ['past'], ['v5']),
-                suffixInflection('んだ', 'む', ['past'], ['v5']),
-                suffixInflection('じた', 'ずる', ['past'], ['vz']),
-                suffixInflection('した', 'する', ['past'], ['vs']),
-                suffixInflection('為た', '為る', ['past'], ['vs']),
-                suffixInflection('きた', 'くる', ['past'], ['vk']),
-                suffixInflection('来た', '来る', ['past'], ['vk']),
-                suffixInflection('來た', '來る', ['past'], ['vk']),
-                suffixInflection('いった', 'いく', ['past'], ['v5']),
-                suffixInflection('おうた', 'おう', ['past'], ['v5']),
-                suffixInflection('こうた', 'こう', ['past'], ['v5']),
-                suffixInflection('そうた', 'そう', ['past'], ['v5']),
-                suffixInflection('とうた', 'とう', ['past'], ['v5']),
-                suffixInflection('行った', '行く', ['past'], ['v5']),
-                suffixInflection('逝った', '逝く', ['past'], ['v5']),
-                suffixInflection('往った', '往く', ['past'], ['v5']),
-                suffixInflection('請うた', '請う', ['past'], ['v5']),
-                suffixInflection('乞うた', '乞う', ['past'], ['v5']),
-                suffixInflection('恋うた', '恋う', ['past'], ['v5']),
-                suffixInflection('問うた', '問う', ['past'], ['v5']),
-                suffixInflection('負うた', '負う', ['past'], ['v5']),
-                suffixInflection('沿うた', '沿う', ['past'], ['v5']),
-                suffixInflection('添うた', '添う', ['past'], ['v5']),
-                suffixInflection('副うた', '副う', ['past'], ['v5']),
-                suffixInflection('厭うた', '厭う', ['past'], ['v5']),
-                suffixInflection('のたもうた', 'のたまう', ['past'], ['v5']),
-                suffixInflection('ました', 'ます', ['past'], ['-masu']),
-                suffixInflection('でした', '', ['past'], ['-masen']),
-                suffixInflection('かった', '', ['past'], ['-masen', '-n']),
-            ],
-        },
-        '-masu': {
-            name: '-masu',
-            description: 'Polite conjugation of verbs and adjectives.\n' +
-            'Usage: Attach ます to the continuative form (renyoukei) of verbs.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～ます',
-                },
-            ],
-            rules: [
-                suffixInflection('ます', 'る', ['-masu'], ['v1']),
-                suffixInflection('います', 'う', ['-masu'], ['v5d', 'v5s']),
-                suffixInflection('きます', 'く', ['-masu'], ['v5d', 'v5s']),
-                suffixInflection('ぎます', 'ぐ', ['-masu'], ['v5d', 'v5s']),
-                suffixInflection('します', 'す', ['-masu'], ['v5d', 'v5s']),
-                suffixInflection('ちます', 'つ', ['-masu'], ['v5d', 'v5s']),
-                suffixInflection('にます', 'ぬ', ['-masu'], ['v5d', 'v5s']),
-                suffixInflection('びます', 'ぶ', ['-masu'], ['v5d', 'v5s']),
-                suffixInflection('みます', 'む', ['-masu'], ['v5d', 'v5s']),
-                suffixInflection('ります', 'る', ['-masu'], ['v5d', 'v5s']),
-                suffixInflection('じます', 'ずる', ['-masu'], ['vz']),
-                suffixInflection('します', 'する', ['-masu'], ['vs']),
-                suffixInflection('為ます', '為る', ['-masu'], ['vs']),
-                suffixInflection('きます', 'くる', ['-masu'], ['vk']),
-                suffixInflection('来ます', '来る', ['-masu'], ['vk']),
-                suffixInflection('來ます', '來る', ['-masu'], ['vk']),
-                suffixInflection('くあります', 'い', ['-masu'], ['adj-i']),
-            ],
-        },
-        'potential': {
-            name: 'potential',
-            description: 'Indicates a state of being (naturally) capable of doing an action.\n' +
-            'Usage: Attach (ら)れる to the irrealis form (mizenkei) of ichidan verbs.\n' +
-            'Attach る to the imperative form (meireikei) of godan verbs.\n' +
-            'する becomes できる, くる becomes こ(ら)れる',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '可能',
-                },
-            ],
-            rules: [
-                suffixInflection('れる', 'る', ['v1'], ['v1', 'v5d']),
-                suffixInflection('える', 'う', ['v1'], ['v5d']),
-                suffixInflection('ける', 'く', ['v1'], ['v5d']),
-                suffixInflection('げる', 'ぐ', ['v1'], ['v5d']),
-                suffixInflection('せる', 'す', ['v1'], ['v5d']),
-                suffixInflection('てる', 'つ', ['v1'], ['v5d']),
-                suffixInflection('ねる', 'ぬ', ['v1'], ['v5d']),
-                suffixInflection('べる', 'ぶ', ['v1'], ['v5d']),
-                suffixInflection('める', 'む', ['v1'], ['v5d']),
-                suffixInflection('できる', 'する', ['v1'], ['vs']),
-                suffixInflection('出来る', 'する', ['v1'], ['vs']),
-                suffixInflection('これる', 'くる', ['v1'], ['vk']),
-                suffixInflection('来れる', '来る', ['v1'], ['vk']),
-                suffixInflection('來れる', '來る', ['v1'], ['vk']),
-            ],
-        },
-        'potential or passive': {
-            name: 'potential or passive',
-            description: passiveEnglishDescription +
-            '3. Indicates a state of being (naturally) capable of doing an action.\n' +
-            'Usage: Attach られる to the irrealis form (mizenkei) of ichidan verbs.\n' +
-            'する becomes せられる, くる becomes こられる',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '受身・自発・可能・尊敬',
-                },
-            ],
-            rules: [
-                suffixInflection('られる', 'る', ['v1'], ['v1']),
-                suffixInflection('ざれる', 'ずる', ['v1'], ['vz']),
-                suffixInflection('ぜられる', 'ずる', ['v1'], ['vz']),
-                suffixInflection('せられる', 'する', ['v1'], ['vs']),
-                suffixInflection('為られる', '為る', ['v1'], ['vs']),
-                suffixInflection('こられる', 'くる', ['v1'], ['vk']),
-                suffixInflection('来られる', '来る', ['v1'], ['vk']),
-                suffixInflection('來られる', '來る', ['v1'], ['vk']),
-            ],
-        },
-        'volitional': {
-            name: 'volitional',
-            description: '1. Expresses speaker\'s will or intention; volitional form.\n' +
-            '2. Expresses an invitation to the other party.\n' +
-            '3. (Used in …ようとする) Indicates being on the verge of initiating an action or transforming a state.\n' +
-            '4. Indicates an inference of a matter.\n' +
-            'Usage: Attach よう to the irrealis form (mizenkei) of ichidan verbs.\n' +
-            'Attach う to the irrealis form (mizenkei) of godan verbs after -o euphonic change form.\n' +
-            'Attach かろう to the stem of i-adjectives (4th meaning only).',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～う形',
-                    description: '主体の意志を表わす',
-                },
-            ],
-            rules: [
-                suffixInflection('よう', 'る', [], ['v1']),
-                suffixInflection('おう', 'う', [], ['v5']),
-                suffixInflection('こう', 'く', [], ['v5']),
-                suffixInflection('ごう', 'ぐ', [], ['v5']),
-                suffixInflection('そう', 'す', [], ['v5']),
-                suffixInflection('とう', 'つ', [], ['v5']),
-                suffixInflection('のう', 'ぬ', [], ['v5']),
-                suffixInflection('ぼう', 'ぶ', [], ['v5']),
-                suffixInflection('もう', 'む', [], ['v5']),
-                suffixInflection('ろう', 'る', [], ['v5']),
-                suffixInflection('じよう', 'ずる', [], ['vz']),
-                suffixInflection('しよう', 'する', [], ['vs']),
-                suffixInflection('為よう', '為る', [], ['vs']),
-                suffixInflection('こよう', 'くる', [], ['vk']),
-                suffixInflection('来よう', '来る', [], ['vk']),
-                suffixInflection('來よう', '來る', [], ['vk']),
-                suffixInflection('ましょう', 'ます', [], ['-masu']),
-                suffixInflection('かろう', 'い', [], ['adj-i']),
-            ],
-        },
-        '-mai': {
-            name: '-mai',
-            description: 'Negative volitional form of verbs.\n' +
-            '1. Expresses speaker\'s assumption that something is likely not true.\n' +
-            '2. Expresses speaker\'s will or intention not to do something.\n' +
-            'Usage: Attach まい to the dictionary form (shuushikei) of verbs.\n' +
-            'Attach まい to the irrealis form (mizenkei) of ichidan verbs.\n' +
-            'する becomes しまい, くる becomes こまい',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～まい',
-                    description: '1. 打うち消けしの推量すいりょう 「～ないだろう」と想像する\n' +
-                    '2. 打うち消けしの意志いし「～ないつもりだ」という気持ち',
-                },
-            ],
-            rules: [
-                suffixInflection('まい', '', [], ['v']),
-                suffixInflection('まい', 'る', [], ['v1']),
-                suffixInflection('じまい', 'ずる', [], ['vz']),
-                suffixInflection('しまい', 'する', [], ['vs']),
-                suffixInflection('為まい', '為る', [], ['vs']),
-                suffixInflection('こまい', 'くる', [], ['vk']),
-                suffixInflection('来まい', '来る', [], ['vk']),
-                suffixInflection('來まい', '來る', [], ['vk']),
-                suffixInflection('まい', '', [], ['-masu']),
-            ],
-        },
-        'causative-passive': {
-            name: 'causative-passive',
-            description: 'Contraction of the passive of the causative form of verbs.\n' +
-            'Someone was made to do something by someone else.\n' +
-            'Usage: ～せられる becomes ~される (only for godan verbs)',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '使役受け身形',
-                },
-            ],
-            rules: [
-                suffixInflection('かされる', 'く', ['v1'], ['v5']),
-                suffixInflection('がされる', 'ぐ', ['v1'], ['v5']),
-                suffixInflection('たされる', 'つ', ['v1'], ['v5']),
-                suffixInflection('なされる', 'ぬ', ['v1'], ['v5']),
-                suffixInflection('ばされる', 'ぶ', ['v1'], ['v5']),
-                suffixInflection('まされる', 'む', ['v1'], ['v5']),
-                suffixInflection('らされる', 'る', ['v1'], ['v5']),
-                suffixInflection('わされる', 'う', ['v1'], ['v5']),
-            ],
-        },
-        '-toku': {
-            name: '-toku',
-            description: 'Contraction of -teoku.\n' +
-            'To do certain things in advance in preparation (or in anticipation) of latter needs.\n' +
-            'Usage: Attach おく to the te-form of verbs, then contract ておく into とく.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～とく',
-                    description: '「～テオク」の縮約系',
-                },
-            ],
-            rules: [
-                suffixInflection('とく', 'る', ['v5'], ['v1']),
-                suffixInflection('いとく', 'く', ['v5'], ['v5']),
-                suffixInflection('いどく', 'ぐ', ['v5'], ['v5']),
-                suffixInflection('しとく', 'す', ['v5'], ['v5']),
-                suffixInflection('っとく', 'う', ['v5'], ['v5']),
-                suffixInflection('っとく', 'つ', ['v5'], ['v5']),
-                suffixInflection('っとく', 'る', ['v5'], ['v5']),
-                suffixInflection('んどく', 'ぬ', ['v5'], ['v5']),
-                suffixInflection('んどく', 'ぶ', ['v5'], ['v5']),
-                suffixInflection('んどく', 'む', ['v5'], ['v5']),
-                suffixInflection('じとく', 'ずる', ['v5'], ['vz']),
-                suffixInflection('しとく', 'する', ['v5'], ['vs']),
-                suffixInflection('為とく', '為る', ['v5'], ['vs']),
-                suffixInflection('きとく', 'くる', ['v5'], ['vk']),
-                suffixInflection('来とく', '来る', ['v5'], ['vk']),
-                suffixInflection('來とく', '來る', ['v5'], ['vk']),
-            ],
-        },
-        '-teiru': {
-            name: '-teiru',
-            description: '1. Indicates an action continues or progresses to a point in time.\n' +
-            '2. Indicates an action is completed and remains as is.\n' +
-            '3. Indicates a state or condition that can be taken to be the result of undergoing some change.\n' +
-            'Usage: Attach いる to the te-form of verbs. い can be dropped in speech.\n' +
-            '(Slang) Attach おる to the te-form of verbs. Contracts to とる・でる in speech.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～ている',
-                },
-            ],
-            rules: [
-                suffixInflection('ている', 'て', ['v1'], ['-te']),
-                suffixInflection('ておる', 'て', ['v5'], ['-te']),
-                suffixInflection('てる', 'て', ['v1p'], ['-te']),
-                suffixInflection('でいる', 'で', ['v1'], ['-te']),
-                suffixInflection('でおる', 'で', ['v5'], ['-te']),
-                suffixInflection('でる', 'で', ['v1p'], ['-te']),
-                suffixInflection('とる', 'て', ['v5'], ['-te']),
-                suffixInflection('ないでいる', 'ない', ['v1'], ['adj-i']),
-            ],
-        },
-        '-ki': {
-            name: '-ki',
-            description: 'Attributive form (rentaikei) of i-adjectives. An archaic form that remains in modern Japanese.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～き',
-                    description: '連体形',
-                },
-            ],
-            rules: [
-                suffixInflection('き', 'い', [], ['adj-i']),
-            ],
-        },
-        '-ge': {
-            name: '-ge',
-            description: 'Describes a person\'s appearance. Shows feelings of the person.\n' +
-            'Usage: Attach げ or 気 to the stem of i-adjectives',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～げ',
-                    description: '…でありそうな様子。いかにも…らしいさま。',
-                },
-            ],
-            rules: [
-                suffixInflection('げ', 'い', [], ['adj-i']),
-                suffixInflection('気', 'い', [], ['adj-i']),
-            ],
-        },
-        '-garu': {
-            name: '-garu',
-            description: '1. Shows subject’s feelings contrast with what is thought/known about them.\n' +
-            '2. Indicates subject\'s behavior (stands out).\n' +
-            'Usage: Attach がる to the stem of i-adjectives. It itself conjugates as a godan verb.',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～がる',
-                    description: 'いかにもその状態にあるという印象を相手に与えるような言動をする。',
-                },
-            ],
-            rules: [
-                suffixInflection('がる', 'い', ['v5'], ['adj-i']),
-            ],
-        },
         '-e': {
-            name: '-e',
             description: 'Slang. A sound change of i-adjectives.\n' +
             'ai：やばい → やべぇ\n' +
             'ui：さむい → さみぃ/さめぇ\n' +
             'oi：すごい → すげぇ',
             i18n: [
                 {
+                    description: '方言。例、「ない→ねえ」',
                     language: 'ja',
                     name: '～え',
-                    description: '方言。例、「ない→ねえ」',
                 },
             ],
+            name: '-e',
             rules: [
                 suffixInflection('ねえ', 'ない', [], ['adj-i']),
                 suffixInflection('めえ', 'むい', [], ['adj-i']),
@@ -1531,91 +360,1011 @@ export const japaneseTransforms = {
                 suffixInflection('てぇ', 'たい', [], ['adj-i']),
             ],
         },
-        'slang': {
-            name: 'slang',
+        '-garu': {
+            description: '1. Shows subject’s feelings contrast with what is thought/known about them.\n' +
+            '2. Indicates subject\'s behavior (stands out).\n' +
+            'Usage: Attach がる to the stem of i-adjectives. It itself conjugates as a godan verb.',
+            i18n: [
+                {
+                    description: 'いかにもその状態にあるという印象を相手に与えるような言動をする。',
+                    language: 'ja',
+                    name: '～がる',
+                },
+            ],
+            name: '-garu',
             rules: [
-                suffixInflection('てぇてぇ', 'とうとい', [], ['adj-i']),
-                suffixInflection('てぇてぇ', '尊い', [], ['adj-i']),
-                suffixInflection('おなしゃす', 'おねがいします', [], ['v5']),
-                suffixInflection('おなしゃす', 'お願いします', [], ['v5']),
-                suffixInflection('あざす', 'ありがとうございます', [], ['v5']),
-                suffixInflection('さーせん', 'すみません', [], ['v5']),
-                suffixInflection('神ってる', '神がかっている', [], ['v1p']),
-                suffixInflection('じわる', 'じわじわ来る', [], ['vk']),
-                suffixInflection('おさしみ', 'おやすみ', [], []),
-                suffixInflection('おやさい', 'おやすみ', [], []),
-
+                suffixInflection('がる', 'い', ['v5'], ['adj-i']),
             ],
         },
-        'n-slang': {
-            name: 'n-slang',
-            description: 'Slang sound change of r-column syllables to n (when before an n-sound, usually の or な)',
+        '-ge': {
+            description: 'Describes a person\'s appearance. Shows feelings of the person.\n' +
+            'Usage: Attach げ or 気 to the stem of i-adjectives',
+            i18n: [
+                {
+                    description: '…でありそうな様子。いかにも…らしいさま。',
+                    language: 'ja',
+                    name: '～げ',
+                },
+            ],
+            name: '-ge',
             rules: [
-                suffixInflection('んな', 'るな', [], ['-na']),
-                suffixInflection('んなさい', 'りなさい', [], ['-nasai']),
-                suffixInflection('らんない', 'られない', ['adj-i'], ['adj-i']),
-                suffixInflection('んない', 'らない', ['adj-i'], ['adj-i']),
-                suffixInflection('んなきゃ', 'らなきゃ', [], ['-ya']),
-                suffixInflection('んなきゃ', 'れなきゃ', [], ['-ya']),
+                suffixInflection('げ', 'い', [], ['adj-i']),
+                suffixInflection('気', 'い', [], ['adj-i']),
             ],
         },
-        'kansai-ben negative': {
+        '-ki': {
+            description: 'Attributive form (rentaikei) of i-adjectives. An archaic form that remains in modern Japanese.',
+            i18n: [
+                {
+                    description: '連体形',
+                    language: 'ja',
+                    name: '～き',
+                },
+            ],
+            name: '-ki',
+            rules: [
+                suffixInflection('き', 'い', [], ['adj-i']),
+            ],
+        },
+        '-ku': {
+            description: 'Adverbial form of i-adjectives.\n',
+            i18n: [
+                {
+                    description: '〔形容詞で〕用言へ続く。例、「大きく育つ」の「大きく」。',
+                    language: 'ja',
+                    name: '連用形',
+                },
+            ],
+            name: '-ku',
+            rules: [
+                suffixInflection('く', 'い', ['adv'], ['adj-i']),
+            ],
+        },
+        '-mai': {
+            description: 'Negative volitional form of verbs.\n' +
+            '1. Expresses speaker\'s assumption that something is likely not true.\n' +
+            '2. Expresses speaker\'s will or intention not to do something.\n' +
+            'Usage: Attach まい to the dictionary form (shuushikei) of verbs.\n' +
+            'Attach まい to the irrealis form (mizenkei) of ichidan verbs.\n' +
+            'する becomes しまい, くる becomes こまい',
+            i18n: [
+                {
+                    description: '1. 打うち消けしの推量すいりょう 「～ないだろう」と想像する\n' +
+                    '2. 打うち消けしの意志いし「～ないつもりだ」という気持ち',
+                    language: 'ja',
+                    name: '～まい',
+                },
+            ],
+            name: '-mai',
+            rules: [
+                suffixInflection('まい', '', [], ['v']),
+                suffixInflection('まい', 'る', [], ['v1']),
+                suffixInflection('じまい', 'ずる', [], ['vz']),
+                suffixInflection('しまい', 'する', [], ['vs']),
+                suffixInflection('為まい', '為る', [], ['vs']),
+                suffixInflection('こまい', 'くる', [], ['vk']),
+                suffixInflection('来まい', '来る', [], ['vk']),
+                suffixInflection('來まい', '來る', [], ['vk']),
+                suffixInflection('まい', '', [], ['-masu']),
+            ],
+        },
+        '-masu': {
+            description: 'Polite conjugation of verbs and adjectives.\n' +
+            'Usage: Attach ます to the continuative form (renyoukei) of verbs.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～ます',
+                },
+            ],
+            name: '-masu',
+            rules: [
+                suffixInflection('ます', 'る', ['-masu'], ['v1']),
+                suffixInflection('います', 'う', ['-masu'], ['v5d', 'v5s']),
+                suffixInflection('きます', 'く', ['-masu'], ['v5d', 'v5s']),
+                suffixInflection('ぎます', 'ぐ', ['-masu'], ['v5d', 'v5s']),
+                suffixInflection('します', 'す', ['-masu'], ['v5d', 'v5s']),
+                suffixInflection('ちます', 'つ', ['-masu'], ['v5d', 'v5s']),
+                suffixInflection('にます', 'ぬ', ['-masu'], ['v5d', 'v5s']),
+                suffixInflection('びます', 'ぶ', ['-masu'], ['v5d', 'v5s']),
+                suffixInflection('みます', 'む', ['-masu'], ['v5d', 'v5s']),
+                suffixInflection('ります', 'る', ['-masu'], ['v5d', 'v5s']),
+                suffixInflection('じます', 'ずる', ['-masu'], ['vz']),
+                suffixInflection('します', 'する', ['-masu'], ['vs']),
+                suffixInflection('為ます', '為る', ['-masu'], ['vs']),
+                suffixInflection('きます', 'くる', ['-masu'], ['vk']),
+                suffixInflection('来ます', '来る', ['-masu'], ['vk']),
+                suffixInflection('來ます', '來る', ['-masu'], ['vk']),
+                suffixInflection('くあります', 'い', ['-masu'], ['adj-i']),
+            ],
+        },
+        '-mu': {
+            description: 'Archaic.\n' +
+            '1. Shows an inference of a certain matter.\n' +
+            '2. Shows speaker\'s intention.\n' +
+            'Usage: Attach む to the irrealis form (mizenkei) of verbs.',
+            i18n: [
+                {
+                    description: '…だろう',
+                    language: 'ja',
+                    name: '～む',
+                },
+            ],
+            name: '-mu',
+            rules: [
+                suffixInflection('む', 'る', [], ['v1']),
+                suffixInflection('かむ', 'く', [], ['v5']),
+                suffixInflection('がむ', 'ぐ', [], ['v5']),
+                suffixInflection('さむ', 'す', [], ['v5']),
+                suffixInflection('たむ', 'つ', [], ['v5']),
+                suffixInflection('なむ', 'ぬ', [], ['v5']),
+                suffixInflection('ばむ', 'ぶ', [], ['v5']),
+                suffixInflection('まむ', 'む', [], ['v5']),
+                suffixInflection('らむ', 'る', [], ['v5']),
+                suffixInflection('わむ', 'う', [], ['v5']),
+                suffixInflection('ぜむ', 'ずる', [], ['vz']),
+                suffixInflection('せむ', 'する', [], ['vs']),
+                suffixInflection('為む', '為る', [], ['vs']),
+                suffixInflection('こむ', 'くる', [], ['vk']),
+                suffixInflection('来む', '来る', [], ['vk']),
+                suffixInflection('來む', '來る', [], ['vk']),
+            ],
+        },
+        '-n': {
+            description: 'Negative form of verbs; a sound change of ぬ.\n' +
+            'Usage: Attach ん to the irrealis form (mizenkei) of verbs.\n' +
+            'する becomes せん',
+            i18n: [
+                {
+                    description: '〔否定の助動詞〕…ない',
+                    language: 'ja',
+                    name: '～ん',
+                },
+            ],
+            name: '-n',
+            rules: [
+                suffixInflection('ん', 'る', ['-n'], ['v1']),
+                suffixInflection('かん', 'く', ['-n'], ['v5']),
+                suffixInflection('がん', 'ぐ', ['-n'], ['v5']),
+                suffixInflection('さん', 'す', ['-n'], ['v5']),
+                suffixInflection('たん', 'つ', ['-n'], ['v5']),
+                suffixInflection('なん', 'ぬ', ['-n'], ['v5']),
+                suffixInflection('ばん', 'ぶ', ['-n'], ['v5']),
+                suffixInflection('まん', 'む', ['-n'], ['v5']),
+                suffixInflection('らん', 'る', ['-n'], ['v5']),
+                suffixInflection('わん', 'う', ['-n'], ['v5']),
+                suffixInflection('ぜん', 'ずる', ['-n'], ['vz']),
+                suffixInflection('せん', 'する', ['-n'], ['vs']),
+                suffixInflection('為ん', '為る', ['-n'], ['vs']),
+                suffixInflection('こん', 'くる', ['-n'], ['vk']),
+                suffixInflection('来ん', '来る', ['-n'], ['vk']),
+                suffixInflection('來ん', '來る', ['-n'], ['vk']),
+            ],
+        },
+        '-nasai': {
+            description: 'Polite imperative suffix.\n' +
+            'Usage: Attach なさい after the continuative form (renyoukei) of verbs.',
+            i18n: [
+                {
+                    description: '動詞「なさる」の命令形',
+                    language: 'ja',
+                    name: '～なさい',
+                },
+            ],
+            name: '-nasai',
+            rules: [
+                suffixInflection('なさい', 'る', ['-nasai'], ['v1']),
+                suffixInflection('いなさい', 'う', ['-nasai'], ['v5']),
+                suffixInflection('きなさい', 'く', ['-nasai'], ['v5']),
+                suffixInflection('ぎなさい', 'ぐ', ['-nasai'], ['v5']),
+                suffixInflection('しなさい', 'す', ['-nasai'], ['v5']),
+                suffixInflection('ちなさい', 'つ', ['-nasai'], ['v5']),
+                suffixInflection('になさい', 'ぬ', ['-nasai'], ['v5']),
+                suffixInflection('びなさい', 'ぶ', ['-nasai'], ['v5']),
+                suffixInflection('みなさい', 'む', ['-nasai'], ['v5']),
+                suffixInflection('りなさい', 'る', ['-nasai'], ['v5']),
+                suffixInflection('じなさい', 'ずる', ['-nasai'], ['vz']),
+                suffixInflection('しなさい', 'する', ['-nasai'], ['vs']),
+                suffixInflection('為なさい', '為る', ['-nasai'], ['vs']),
+                suffixInflection('きなさい', 'くる', ['-nasai'], ['vk']),
+                suffixInflection('来なさい', '来る', ['-nasai'], ['vk']),
+                suffixInflection('來なさい', '來る', ['-nasai'], ['vk']),
+            ],
+        },
+        '-nbakari': {
+            description: 'Shows an action or condition is on the verge of occurring, or an excessive/extreme degree.\n' +
+            'Usage: Attach んばかり to the irrealis form (mizenkei) of verbs.\n' +
+            'する becomes せんばかり',
+            i18n: [
+                {
+                    description: '今にもそうなりそうな、しかし辛うじてそうなっていないようなさまを指す表現',
+                    language: 'ja',
+                    name: '～ん',
+                },
+            ],
+            name: '-nbakari',
+            rules: [
+                suffixInflection('んばかり', 'る', [], ['v1']),
+                suffixInflection('かんばかり', 'く', [], ['v5']),
+                suffixInflection('がんばかり', 'ぐ', [], ['v5']),
+                suffixInflection('さんばかり', 'す', [], ['v5']),
+                suffixInflection('たんばかり', 'つ', [], ['v5']),
+                suffixInflection('なんばかり', 'ぬ', [], ['v5']),
+                suffixInflection('ばんばかり', 'ぶ', [], ['v5']),
+                suffixInflection('まんばかり', 'む', [], ['v5']),
+                suffixInflection('らんばかり', 'る', [], ['v5']),
+                suffixInflection('わんばかり', 'う', [], ['v5']),
+                suffixInflection('ぜんばかり', 'ずる', [], ['vz']),
+                suffixInflection('せんばかり', 'する', [], ['vs']),
+                suffixInflection('為んばかり', '為る', [], ['vs']),
+                suffixInflection('こんばかり', 'くる', [], ['vk']),
+                suffixInflection('来んばかり', '来る', [], ['vk']),
+                suffixInflection('來んばかり', '來る', [], ['vk']),
+            ],
+        },
+        '-neba': {
+            description: '1. Shows a hypothetical negation; if not ...\n' +
+            '2. Shows a must. Used with or without ならぬ.\n' +
+            'Usage: Attach ねば to the irrealis form (mizenkei) of verbs.',
+            i18n: [
+                {
+                    description: 'もし…ないなら。…なければならない。',
+                    language: 'ja',
+                    name: '～ねば',
+                },
+            ],
+            name: '-neba',
+            rules: [
+                suffixInflection('ねば', 'る', ['-ba'], ['v1']),
+                suffixInflection('かねば', 'く', ['-ba'], ['v5']),
+                suffixInflection('がねば', 'ぐ', ['-ba'], ['v5']),
+                suffixInflection('さねば', 'す', ['-ba'], ['v5']),
+                suffixInflection('たねば', 'つ', ['-ba'], ['v5']),
+                suffixInflection('なねば', 'ぬ', ['-ba'], ['v5']),
+                suffixInflection('ばねば', 'ぶ', ['-ba'], ['v5']),
+                suffixInflection('まねば', 'む', ['-ba'], ['v5']),
+                suffixInflection('らねば', 'る', ['-ba'], ['v5']),
+                suffixInflection('わねば', 'う', ['-ba'], ['v5']),
+                suffixInflection('ぜねば', 'ずる', ['-ba'], ['vz']),
+                suffixInflection('せねば', 'する', ['-ba'], ['vs']),
+                suffixInflection('為ねば', '為る', ['-ba'], ['vs']),
+                suffixInflection('こねば', 'くる', ['-ba'], ['vk']),
+                suffixInflection('来ねば', '来る', ['-ba'], ['vk']),
+                suffixInflection('來ねば', '來る', ['-ba'], ['vk']),
+            ],
+        },
+        '-ntosuru': {
+            description: '1. Shows the speaker\'s will or intention.\n' +
+            '2. Shows an action or condition is on the verge of occurring.\n' +
+            'Usage: Attach んとする to the irrealis form (mizenkei) of verbs.\n' +
+            'する becomes せんとする',
+            i18n: [
+                {
+                    description: '…しようとする、…しようとしている',
+                    language: 'ja',
+                    name: '～んとする',
+                },
+            ],
+            name: '-ntosuru',
+            rules: [
+                suffixInflection('んとする', 'る', ['vs'], ['v1']),
+                suffixInflection('かんとする', 'く', ['vs'], ['v5']),
+                suffixInflection('がんとする', 'ぐ', ['vs'], ['v5']),
+                suffixInflection('さんとする', 'す', ['vs'], ['v5']),
+                suffixInflection('たんとする', 'つ', ['vs'], ['v5']),
+                suffixInflection('なんとする', 'ぬ', ['vs'], ['v5']),
+                suffixInflection('ばんとする', 'ぶ', ['vs'], ['v5']),
+                suffixInflection('まんとする', 'む', ['vs'], ['v5']),
+                suffixInflection('らんとする', 'る', ['vs'], ['v5']),
+                suffixInflection('わんとする', 'う', ['vs'], ['v5']),
+                suffixInflection('ぜんとする', 'ずる', ['vs'], ['vz']),
+                suffixInflection('せんとする', 'する', ['vs'], ['vs']),
+                suffixInflection('為んとする', '為る', ['vs'], ['vs']),
+                suffixInflection('こんとする', 'くる', ['vs'], ['vk']),
+                suffixInflection('来んとする', '来る', ['vs'], ['vk']),
+                suffixInflection('來んとする', '來る', ['vs'], ['vk']),
+            ],
+        },
+        '-nu': {
+            description: 'Negative form of verbs.\n' +
+            'Usage: Attach ぬ to the irrealis form (mizenkei) of verbs.',
+            i18n: [
+                {
+                    description: '動作・状態などを「…ない」と否定することを表わす。',
+                    language: 'ja',
+                    name: '～ぬ',
+                },
+            ],
+            name: '-nu',
+            rules: [
+                suffixInflection('ぬ', 'る', [], ['v1']),
+                suffixInflection('かぬ', 'く', [], ['v5']),
+                suffixInflection('がぬ', 'ぐ', [], ['v5']),
+                suffixInflection('さぬ', 'す', [], ['v5']),
+                suffixInflection('たぬ', 'つ', [], ['v5']),
+                suffixInflection('なぬ', 'ぬ', [], ['v5']),
+                suffixInflection('ばぬ', 'ぶ', [], ['v5']),
+                suffixInflection('まぬ', 'む', [], ['v5']),
+                suffixInflection('らぬ', 'る', [], ['v5']),
+                suffixInflection('わぬ', 'う', [], ['v5']),
+                suffixInflection('ぜぬ', 'ずる', [], ['vz']),
+                suffixInflection('せぬ', 'する', [], ['vs']),
+                suffixInflection('為ぬ', '為る', [], ['vs']),
+                suffixInflection('こぬ', 'くる', [], ['vk']),
+                suffixInflection('来ぬ', '来る', [], ['vk']),
+                suffixInflection('來ぬ', '來る', [], ['vk']),
+            ],
+        },
+        '-sa': {
+            description: 'Nominalizing suffix of i-adjectives indicating nature, state, mind or degree.\n' +
+            'Usage: Attach さ to the stem of i-adjectives.',
+            i18n: [
+                {
+                    description: 'こと。程度。',
+                    language: 'ja',
+                    name: '～さ',
+                },
+            ],
+            name: '-sa',
+            rules: [
+                suffixInflection('さ', 'い', [], ['adj-i']),
+            ],
+        },
+        '-shimau': {
+            description: shimauEnglishDescription +
+            'Usage: Attach しまう after the te-form of verbs.',
+            i18n: [
+                {
+                    description: 'その動作がすっかり終わる、その状態が完成することを表す。終わったことを強調したり、不本意である、困ったことになった、などの気持ちを添えたりすることもある。',
+                    language: 'ja',
+                    name: '～しまう',
+                },
+            ],
+            name: '-shimau',
+            rules: [
+                suffixInflection('てしまう', 'て', ['v5'], ['-te']),
+                suffixInflection('でしまう', 'で', ['v5'], ['-te']),
+            ],
+        },
+        '-sou': {
+            description: 'Appearing that; looking like.\n' +
+            'Usage: Attach そう to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
+            i18n: [
+                {
+                    description: 'そういう様子だ、そうなる様子だということ、すなわち様態を表す助動詞。',
+                    language: 'ja',
+                    name: '～そう',
+                },
+            ],
+            name: '-sou',
+            rules: [
+                suffixInflection('そう', 'い', [], ['adj-i']),
+                suffixInflection('そう', 'る', [], ['v1']),
+                suffixInflection('いそう', 'う', [], ['v5']),
+                suffixInflection('きそう', 'く', [], ['v5']),
+                suffixInflection('ぎそう', 'ぐ', [], ['v5']),
+                suffixInflection('しそう', 'す', [], ['v5']),
+                suffixInflection('ちそう', 'つ', [], ['v5']),
+                suffixInflection('にそう', 'ぬ', [], ['v5']),
+                suffixInflection('びそう', 'ぶ', [], ['v5']),
+                suffixInflection('みそう', 'む', [], ['v5']),
+                suffixInflection('りそう', 'る', [], ['v5']),
+                suffixInflection('じそう', 'ずる', [], ['vz']),
+                suffixInflection('しそう', 'する', [], ['vs']),
+                suffixInflection('為そう', '為る', [], ['vs']),
+                suffixInflection('きそう', 'くる', [], ['vk']),
+                suffixInflection('来そう', '来る', [], ['vk']),
+                suffixInflection('來そう', '來る', [], ['vk']),
+            ],
+        },
+        '-sugiru': {
+            description: 'Shows something "is too..." or someone is doing something "too much".\n' +
+            'Usage: Attach すぎる to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
+            i18n: [
+                {
+                    description: '程度や限度を超える',
+                    language: 'ja',
+                    name: '～すぎる',
+                },
+            ],
+            name: '-sugiru',
+            rules: [
+                suffixInflection('すぎる', 'い', ['v1'], ['adj-i']),
+                suffixInflection('すぎる', 'る', ['v1'], ['v1']),
+                suffixInflection('いすぎる', 'う', ['v1'], ['v5']),
+                suffixInflection('きすぎる', 'く', ['v1'], ['v5']),
+                suffixInflection('ぎすぎる', 'ぐ', ['v1'], ['v5']),
+                suffixInflection('しすぎる', 'す', ['v1'], ['v5']),
+                suffixInflection('ちすぎる', 'つ', ['v1'], ['v5']),
+                suffixInflection('にすぎる', 'ぬ', ['v1'], ['v5']),
+                suffixInflection('びすぎる', 'ぶ', ['v1'], ['v5']),
+                suffixInflection('みすぎる', 'む', ['v1'], ['v5']),
+                suffixInflection('りすぎる', 'る', ['v1'], ['v5']),
+                suffixInflection('じすぎる', 'ずる', ['v1'], ['vz']),
+                suffixInflection('しすぎる', 'する', ['v1'], ['vs']),
+                suffixInflection('為すぎる', '為る', ['v1'], ['vs']),
+                suffixInflection('きすぎる', 'くる', ['v1'], ['vk']),
+                suffixInflection('来すぎる', '来る', ['v1'], ['vk']),
+                suffixInflection('來すぎる', '來る', ['v1'], ['vk']),
+            ],
+        },
+        '-sugiru-kanji': {
+            description: 'Shows something "is too..." or someone is doing something "too much".\n' +
+            'Usage: Attach 過ぎる to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
+            i18n: [
+                {
+                    description: '程度や限度を超える',
+                    language: 'ja',
+                    name: '～過ぎる',
+                },
+            ],
+            name: '-sugiru',
+            rules: [
+                suffixInflection('過ぎる', 'い', ['v1'], ['adj-i']),
+                suffixInflection('過ぎる', 'る', ['v1'], ['v1']),
+                suffixInflection('い過ぎる', 'う', ['v1'], ['v5']),
+                suffixInflection('き過ぎる', 'く', ['v1'], ['v5']),
+                suffixInflection('ぎ過ぎる', 'ぐ', ['v1'], ['v5']),
+                suffixInflection('し過ぎる', 'す', ['v1'], ['v5']),
+                suffixInflection('ち過ぎる', 'つ', ['v1'], ['v5']),
+                suffixInflection('に過ぎる', 'ぬ', ['v1'], ['v5']),
+                suffixInflection('び過ぎる', 'ぶ', ['v1'], ['v5']),
+                suffixInflection('み過ぎる', 'む', ['v1'], ['v5']),
+                suffixInflection('り過ぎる', 'る', ['v1'], ['v5']),
+                suffixInflection('じ過ぎる', 'ずる', ['v1'], ['vz']),
+                suffixInflection('し過ぎる', 'する', ['v1'], ['vs']),
+                suffixInflection('為過ぎる', '為る', ['v1'], ['vs']),
+                suffixInflection('き過ぎる', 'くる', ['v1'], ['vk']),
+                suffixInflection('来過ぎる', '来る', ['v1'], ['vk']),
+                suffixInflection('來過ぎる', '來る', ['v1'], ['vk']),
+            ],
+        },
+        '-ta': {
+            description: '1. Indicates a reality that has happened in the past.\n' +
+            '2. Indicates the completion of an action.\n' +
+            '3. Indicates the confirmation of a matter.\n' +
+            '4. Indicates the speaker\'s confidence that the action will definitely be fulfilled.\n' +
+            '5. Indicates the events that occur before the main clause are represented as relative past.\n' +
+            '6. Indicates a mild imperative/command.\n' +
+            'Usage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～た・かった形',
+                },
+            ],
+            name: '-ta',
+            rules: [
+                suffixInflection('かった', 'い', ['past'], ['adj-i']),
+                suffixInflection('た', 'る', ['past'], ['v1']),
+                suffixInflection('いた', 'く', ['past'], ['v5']),
+                suffixInflection('いだ', 'ぐ', ['past'], ['v5']),
+                suffixInflection('した', 'す', ['past'], ['v5']),
+                suffixInflection('った', 'う', ['past'], ['v5']),
+                suffixInflection('った', 'つ', ['past'], ['v5']),
+                suffixInflection('った', 'る', ['past'], ['v5']),
+                suffixInflection('んだ', 'ぬ', ['past'], ['v5']),
+                suffixInflection('んだ', 'ぶ', ['past'], ['v5']),
+                suffixInflection('んだ', 'む', ['past'], ['v5']),
+                suffixInflection('じた', 'ずる', ['past'], ['vz']),
+                suffixInflection('した', 'する', ['past'], ['vs']),
+                suffixInflection('為た', '為る', ['past'], ['vs']),
+                suffixInflection('きた', 'くる', ['past'], ['vk']),
+                suffixInflection('来た', '来る', ['past'], ['vk']),
+                suffixInflection('來た', '來る', ['past'], ['vk']),
+                suffixInflection('いった', 'いく', ['past'], ['v5']),
+                suffixInflection('おうた', 'おう', ['past'], ['v5']),
+                suffixInflection('こうた', 'こう', ['past'], ['v5']),
+                suffixInflection('そうた', 'そう', ['past'], ['v5']),
+                suffixInflection('とうた', 'とう', ['past'], ['v5']),
+                suffixInflection('行った', '行く', ['past'], ['v5']),
+                suffixInflection('逝った', '逝く', ['past'], ['v5']),
+                suffixInflection('往った', '往く', ['past'], ['v5']),
+                suffixInflection('請うた', '請う', ['past'], ['v5']),
+                suffixInflection('乞うた', '乞う', ['past'], ['v5']),
+                suffixInflection('恋うた', '恋う', ['past'], ['v5']),
+                suffixInflection('問うた', '問う', ['past'], ['v5']),
+                suffixInflection('負うた', '負う', ['past'], ['v5']),
+                suffixInflection('沿うた', '沿う', ['past'], ['v5']),
+                suffixInflection('添うた', '添う', ['past'], ['v5']),
+                suffixInflection('副うた', '副う', ['past'], ['v5']),
+                suffixInflection('厭うた', '厭う', ['past'], ['v5']),
+                suffixInflection('のたもうた', 'のたまう', ['past'], ['v5']),
+                suffixInflection('ました', 'ます', ['past'], ['-masu']),
+                suffixInflection('でした', '', ['past'], ['-masen']),
+                suffixInflection('かった', '', ['past'], ['-masen', '-n']),
+            ],
+        },
+        '-tai': {
+            description: '1. Expresses the feeling of desire or hope.\n' +
+            '2. Used in ...たいと思います, an indirect way of saying what the speaker intends to do.\n' +
+            'Usage: Attach たい to the continuative form (renyoukei) of verbs. たい itself conjugates as i-adjective.',
+            i18n: [
+                {
+                    description: 'することをのぞんでいる、という、希望や願望の気持ちをあらわす。',
+                    language: 'ja',
+                    name: '～たい',
+                },
+            ],
+            name: '-tai',
+            rules: [
+                suffixInflection('たい', 'る', ['adj-i'], ['v1']),
+                suffixInflection('いたい', 'う', ['adj-i'], ['v5']),
+                suffixInflection('きたい', 'く', ['adj-i'], ['v5']),
+                suffixInflection('ぎたい', 'ぐ', ['adj-i'], ['v5']),
+                suffixInflection('したい', 'す', ['adj-i'], ['v5']),
+                suffixInflection('ちたい', 'つ', ['adj-i'], ['v5']),
+                suffixInflection('にたい', 'ぬ', ['adj-i'], ['v5']),
+                suffixInflection('びたい', 'ぶ', ['adj-i'], ['v5']),
+                suffixInflection('みたい', 'む', ['adj-i'], ['v5']),
+                suffixInflection('りたい', 'る', ['adj-i'], ['v5']),
+                suffixInflection('じたい', 'ずる', ['adj-i'], ['vz']),
+                suffixInflection('したい', 'する', ['adj-i'], ['vs']),
+                suffixInflection('為たい', '為る', ['adj-i'], ['vs']),
+                suffixInflection('きたい', 'くる', ['adj-i'], ['vk']),
+                suffixInflection('来たい', '来る', ['adj-i'], ['vk']),
+                suffixInflection('來たい', '來る', ['adj-i'], ['vk']),
+            ],
+        },
+        '-tara': {
+            description: '1. Denotes the latter stated event is a continuation of the previous stated event.\n' +
+            '2. Assumes that a matter has been completed or concluded.\n' +
+            'Usage: Attach たら to the continuative form (renyoukei) of verbs after euphonic change form, かったら to the stem of i-adjectives.',
+            i18n: [
+                {
+                    description: '仮定をあらわす・…すると・したあとに',
+                    language: 'ja',
+                    name: '～たら',
+                },
+            ],
+            name: '-tara',
+            rules: [
+                suffixInflection('かったら', 'い', [], ['adj-i']),
+                suffixInflection('たら', 'る', [], ['v1']),
+                suffixInflection('いたら', 'く', [], ['v5']),
+                suffixInflection('いだら', 'ぐ', [], ['v5']),
+                suffixInflection('したら', 'す', [], ['v5']),
+                suffixInflection('ったら', 'う', [], ['v5']),
+                suffixInflection('ったら', 'つ', [], ['v5']),
+                suffixInflection('ったら', 'る', [], ['v5']),
+                suffixInflection('んだら', 'ぬ', [], ['v5']),
+                suffixInflection('んだら', 'ぶ', [], ['v5']),
+                suffixInflection('んだら', 'む', [], ['v5']),
+                suffixInflection('じたら', 'ずる', [], ['vz']),
+                suffixInflection('したら', 'する', [], ['vs']),
+                suffixInflection('為たら', '為る', [], ['vs']),
+                suffixInflection('きたら', 'くる', [], ['vk']),
+                suffixInflection('来たら', '来る', [], ['vk']),
+                suffixInflection('來たら', '來る', [], ['vk']),
+                suffixInflection('いったら', 'いく', [], ['v5']),
+                suffixInflection('おうたら', 'おう', [], ['v5']),
+                suffixInflection('こうたら', 'こう', [], ['v5']),
+                suffixInflection('そうたら', 'そう', [], ['v5']),
+                suffixInflection('とうたら', 'とう', [], ['v5']),
+                suffixInflection('行ったら', '行く', [], ['v5']),
+                suffixInflection('逝ったら', '逝く', [], ['v5']),
+                suffixInflection('往ったら', '往く', [], ['v5']),
+                suffixInflection('請うたら', '請う', [], ['v5']),
+                suffixInflection('乞うたら', '乞う', [], ['v5']),
+                suffixInflection('恋うたら', '恋う', [], ['v5']),
+                suffixInflection('問うたら', '問う', [], ['v5']),
+                suffixInflection('負うたら', '負う', [], ['v5']),
+                suffixInflection('沿うたら', '沿う', [], ['v5']),
+                suffixInflection('添うたら', '添う', [], ['v5']),
+                suffixInflection('副うたら', '副う', [], ['v5']),
+                suffixInflection('厭うたら', '厭う', [], ['v5']),
+                suffixInflection('のたもうたら', 'のたまう', [], ['v5']),
+                suffixInflection('ましたら', 'ます', [], ['-masu']),
+            ],
+        },
+        '-tari': {
+            description: '1. Shows two actions occurring back and forth (when used with two verbs).\n' +
+            '2. Shows examples of actions and states (when used with multiple verbs and adjectives).\n' +
+            'Usage: Attach たり to the continuative form (renyoukei) of verbs after euphonic change form, かったり to the stem of i-adjectives',
+            i18n: [
+                {
+                    description: 'ある動作を例示的にあげることを表わす。',
+                    language: 'ja',
+                    name: '～たり',
+                },
+            ],
+            name: '-tari',
+            rules: [
+                suffixInflection('かったり', 'い', [], ['adj-i']),
+                suffixInflection('たり', 'る', [], ['v1']),
+                suffixInflection('いたり', 'く', [], ['v5']),
+                suffixInflection('いだり', 'ぐ', [], ['v5']),
+                suffixInflection('したり', 'す', [], ['v5']),
+                suffixInflection('ったり', 'う', [], ['v5']),
+                suffixInflection('ったり', 'つ', [], ['v5']),
+                suffixInflection('ったり', 'る', [], ['v5']),
+                suffixInflection('んだり', 'ぬ', [], ['v5']),
+                suffixInflection('んだり', 'ぶ', [], ['v5']),
+                suffixInflection('んだり', 'む', [], ['v5']),
+                suffixInflection('じたり', 'ずる', [], ['vz']),
+                suffixInflection('したり', 'する', [], ['vs']),
+                suffixInflection('為たり', '為る', [], ['vs']),
+                suffixInflection('きたり', 'くる', [], ['vk']),
+                suffixInflection('来たり', '来る', [], ['vk']),
+                suffixInflection('來たり', '來る', [], ['vk']),
+                suffixInflection('いったり', 'いく', [], ['v5']),
+                suffixInflection('おうたり', 'おう', [], ['v5']),
+                suffixInflection('こうたり', 'こう', [], ['v5']),
+                suffixInflection('そうたり', 'そう', [], ['v5']),
+                suffixInflection('とうたり', 'とう', [], ['v5']),
+                suffixInflection('行ったり', '行く', [], ['v5']),
+                suffixInflection('逝ったり', '逝く', [], ['v5']),
+                suffixInflection('往ったり', '往く', [], ['v5']),
+                suffixInflection('請うたり', '請う', [], ['v5']),
+                suffixInflection('乞うたり', '乞う', [], ['v5']),
+                suffixInflection('恋うたり', '恋う', [], ['v5']),
+                suffixInflection('問うたり', '問う', [], ['v5']),
+                suffixInflection('負うたり', '負う', [], ['v5']),
+                suffixInflection('沿うたり', '沿う', [], ['v5']),
+                suffixInflection('添うたり', '添う', [], ['v5']),
+                suffixInflection('副うたり', '副う', [], ['v5']),
+                suffixInflection('厭うたり', '厭う', [], ['v5']),
+                suffixInflection('のたもうたり', 'のたまう', [], ['v5']),
+            ],
+        },
+        '-te': {
+            description: 'te-form.\n' +
+            'It has a myriad of meanings. Primarily, it is a conjunctive particle that connects two clauses together.\n' +
+            'Usage: Attach て to the continuative form (renyoukei) of verbs after euphonic change form, くて to the stem of i-adjectives.',
+            i18n: [
+                {
+                    description: 'て（で）形',
+                    language: 'ja',
+                    name: '～て',
+                },
+            ],
+            name: '-te',
+            rules: [
+                suffixInflection('くて', 'い', ['-te'], ['adj-i']),
+                suffixInflection('て', 'る', ['-te'], ['v1']),
+                suffixInflection('いて', 'く', ['-te'], ['v5']),
+                suffixInflection('いで', 'ぐ', ['-te'], ['v5']),
+                suffixInflection('して', 'す', ['-te'], ['v5']),
+                suffixInflection('って', 'う', ['-te'], ['v5']),
+                suffixInflection('って', 'つ', ['-te'], ['v5']),
+                suffixInflection('って', 'る', ['-te'], ['v5']),
+                suffixInflection('んで', 'ぬ', ['-te'], ['v5']),
+                suffixInflection('んで', 'ぶ', ['-te'], ['v5']),
+                suffixInflection('んで', 'む', ['-te'], ['v5']),
+                suffixInflection('じて', 'ずる', ['-te'], ['vz']),
+                suffixInflection('して', 'する', ['-te'], ['vs']),
+                suffixInflection('為て', '為る', ['-te'], ['vs']),
+                suffixInflection('きて', 'くる', ['-te'], ['vk']),
+                suffixInflection('来て', '来る', ['-te'], ['vk']),
+                suffixInflection('來て', '來る', ['-te'], ['vk']),
+                suffixInflection('いって', 'いく', ['-te'], ['v5']),
+                suffixInflection('おうて', 'おう', ['-te'], ['v5']),
+                suffixInflection('こうて', 'こう', ['-te'], ['v5']),
+                suffixInflection('そうて', 'そう', ['-te'], ['v5']),
+                suffixInflection('とうて', 'とう', ['-te'], ['v5']),
+                suffixInflection('行って', '行く', ['-te'], ['v5']),
+                suffixInflection('逝って', '逝く', ['-te'], ['v5']),
+                suffixInflection('往って', '往く', ['-te'], ['v5']),
+                suffixInflection('請うて', '請う', ['-te'], ['v5']),
+                suffixInflection('乞うて', '乞う', ['-te'], ['v5']),
+                suffixInflection('恋うて', '恋う', ['-te'], ['v5']),
+                suffixInflection('問うて', '問う', ['-te'], ['v5']),
+                suffixInflection('負うて', '負う', ['-te'], ['v5']),
+                suffixInflection('沿うて', '沿う', ['-te'], ['v5']),
+                suffixInflection('添うて', '添う', ['-te'], ['v5']),
+                suffixInflection('副うて', '副う', ['-te'], ['v5']),
+                suffixInflection('厭うて', '厭う', ['-te'], ['v5']),
+                suffixInflection('のたもうて', 'のたまう', ['-te'], ['v5']),
+                suffixInflection('まして', 'ます', [], ['-masu']),
+            ],
+        },
+        '-teiru': {
+            description: '1. Indicates an action continues or progresses to a point in time.\n' +
+            '2. Indicates an action is completed and remains as is.\n' +
+            '3. Indicates a state or condition that can be taken to be the result of undergoing some change.\n' +
+            'Usage: Attach いる to the te-form of verbs. い can be dropped in speech.\n' +
+            '(Slang) Attach おる to the te-form of verbs. Contracts to とる・でる in speech.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '～ている',
+                },
+            ],
+            name: '-teiru',
+            rules: [
+                suffixInflection('ている', 'て', ['v1'], ['-te']),
+                suffixInflection('ておる', 'て', ['v5'], ['-te']),
+                suffixInflection('てる', 'て', ['v1p'], ['-te']),
+                suffixInflection('でいる', 'で', ['v1'], ['-te']),
+                suffixInflection('でおる', 'で', ['v5'], ['-te']),
+                suffixInflection('でる', 'で', ['v1p'], ['-te']),
+                suffixInflection('とる', 'て', ['v5'], ['-te']),
+                suffixInflection('ないでいる', 'ない', ['v1'], ['adj-i']),
+            ],
+        },
+        '-toku': {
+            description: 'Contraction of -teoku.\n' +
+            'To do certain things in advance in preparation (or in anticipation) of latter needs.\n' +
+            'Usage: Attach おく to the te-form of verbs, then contract ておく into とく.',
+            i18n: [
+                {
+                    description: '「～テオク」の縮約系',
+                    language: 'ja',
+                    name: '～とく',
+                },
+            ],
+            name: '-toku',
+            rules: [
+                suffixInflection('とく', 'る', ['v5'], ['v1']),
+                suffixInflection('いとく', 'く', ['v5'], ['v5']),
+                suffixInflection('いどく', 'ぐ', ['v5'], ['v5']),
+                suffixInflection('しとく', 'す', ['v5'], ['v5']),
+                suffixInflection('っとく', 'う', ['v5'], ['v5']),
+                suffixInflection('っとく', 'つ', ['v5'], ['v5']),
+                suffixInflection('っとく', 'る', ['v5'], ['v5']),
+                suffixInflection('んどく', 'ぬ', ['v5'], ['v5']),
+                suffixInflection('んどく', 'ぶ', ['v5'], ['v5']),
+                suffixInflection('んどく', 'む', ['v5'], ['v5']),
+                suffixInflection('じとく', 'ずる', ['v5'], ['vz']),
+                suffixInflection('しとく', 'する', ['v5'], ['vs']),
+                suffixInflection('為とく', '為る', ['v5'], ['vs']),
+                suffixInflection('きとく', 'くる', ['v5'], ['vk']),
+                suffixInflection('来とく', '来る', ['v5'], ['vk']),
+                suffixInflection('來とく', '來る', ['v5'], ['vk']),
+            ],
+        },
+        '-ya': {
+            description: 'Contraction of -ba.',
+            i18n: [
+                {
+                    description: '仮定形の縮約系',
+                    language: 'ja',
+                    name: '～ゃ',
+                },
+            ],
+            name: '-ya',
+            rules: [
+                suffixInflection('けりゃ', 'ければ', ['-ya'], ['-ba']),
+                suffixInflection('きゃ', 'ければ', ['-ya'], ['-ba']),
+                suffixInflection('や', 'えば', ['-ya'], ['-ba']),
+                suffixInflection('きゃ', 'けば', ['-ya'], ['-ba']),
+                suffixInflection('ぎゃ', 'げば', ['-ya'], ['-ba']),
+                suffixInflection('しゃ', 'せば', ['-ya'], ['-ba']),
+                suffixInflection('ちゃ', 'てば', ['-ya'], ['-ba']),
+                suffixInflection('にゃ', 'ねば', ['-ya'], ['-ba']),
+                suffixInflection('びゃ', 'べば', ['-ya'], ['-ba']),
+                suffixInflection('みゃ', 'めば', ['-ya'], ['-ba']),
+                suffixInflection('りゃ', 'れば', ['-ya'], ['-ba']),
+            ],
+        },
+        '-zaru': {
+            description: 'Negative form of verbs.\n' +
+            'Usage: Attach ざる to the irrealis form (mizenkei) of verbs.',
+            i18n: [
+                {
+                    description: '…ない…',
+                    language: 'ja',
+                    name: '～ざる',
+                },
+            ],
+            name: '-zaru',
+            rules: [
+                suffixInflection('ざる', 'る', [], ['v1']),
+                suffixInflection('かざる', 'く', [], ['v5']),
+                suffixInflection('がざる', 'ぐ', [], ['v5']),
+                suffixInflection('さざる', 'す', [], ['v5']),
+                suffixInflection('たざる', 'つ', [], ['v5']),
+                suffixInflection('なざる', 'ぬ', [], ['v5']),
+                suffixInflection('ばざる', 'ぶ', [], ['v5']),
+                suffixInflection('まざる', 'む', [], ['v5']),
+                suffixInflection('らざる', 'る', [], ['v5']),
+                suffixInflection('わざる', 'う', [], ['v5']),
+                suffixInflection('ぜざる', 'ずる', [], ['vz']),
+                suffixInflection('せざる', 'する', [], ['vs']),
+                suffixInflection('為ざる', '為る', [], ['vs']),
+                suffixInflection('こざる', 'くる', [], ['vk']),
+                suffixInflection('来ざる', '来る', [], ['vk']),
+                suffixInflection('來ざる', '來る', [], ['vk']),
+            ],
+        },
+        '-zu': {
+            description: '1. Negative form of verbs.\n' +
+            '2. Continuative form (renyoukei) of the particle ぬ (nu).\n' +
+            'Usage: Attach ず to the irrealis form (mizenkei) of verbs.',
+            i18n: [
+                {
+                    description: '口語の否定の助動詞「ぬ」の連用形',
+                    language: 'ja',
+                    name: '～ず',
+                },
+            ],
+            name: '-zu',
+            rules: [
+                suffixInflection('ず', 'る', [], ['v1']),
+                suffixInflection('かず', 'く', [], ['v5']),
+                suffixInflection('がず', 'ぐ', [], ['v5']),
+                suffixInflection('さず', 'す', [], ['v5']),
+                suffixInflection('たず', 'つ', [], ['v5']),
+                suffixInflection('なず', 'ぬ', [], ['v5']),
+                suffixInflection('ばず', 'ぶ', [], ['v5']),
+                suffixInflection('まず', 'む', [], ['v5']),
+                suffixInflection('らず', 'る', [], ['v5']),
+                suffixInflection('わず', 'う', [], ['v5']),
+                suffixInflection('ぜず', 'ずる', [], ['vz']),
+                suffixInflection('せず', 'する', [], ['vs']),
+                suffixInflection('為ず', '為る', [], ['vs']),
+                suffixInflection('こず', 'くる', [], ['vk']),
+                suffixInflection('来ず', '来る', [], ['vk']),
+                suffixInflection('來ず', '來る', [], ['vk']),
+            ],
+        },
+        'causative': {
+            description: 'Describes the intention to make someone do something.\n' +
+            'Usage: Attach させる to the irrealis form (mizenkei) of ichidan verbs and くる.\n' +
+            'Attach せる to the irrealis form (mizenkei) of godan verbs and する.\n' +
+            'It itself conjugates as an ichidan verb.',
+            i18n: [
+                {
+                    description: 'だれかにある行為をさせる意を表わす時の言い方。例、「行かせる」の「せる」。',
+                    language: 'ja',
+                    name: '使役形',
+                },
+            ],
+            name: 'causative',
+            rules: [
+                suffixInflection('させる', 'る', ['v1'], ['v1']),
+                suffixInflection('かせる', 'く', ['v1'], ['v5']),
+                suffixInflection('がせる', 'ぐ', ['v1'], ['v5']),
+                suffixInflection('させる', 'す', ['v1'], ['v5']),
+                suffixInflection('たせる', 'つ', ['v1'], ['v5']),
+                suffixInflection('なせる', 'ぬ', ['v1'], ['v5']),
+                suffixInflection('ばせる', 'ぶ', ['v1'], ['v5']),
+                suffixInflection('ませる', 'む', ['v1'], ['v5']),
+                suffixInflection('らせる', 'る', ['v1'], ['v5']),
+                suffixInflection('わせる', 'う', ['v1'], ['v5']),
+                suffixInflection('じさせる', 'ずる', ['v1'], ['vz']),
+                suffixInflection('ぜさせる', 'ずる', ['v1'], ['vz']),
+                suffixInflection('させる', 'する', ['v1'], ['vs']),
+                suffixInflection('為せる', '為る', ['v1'], ['vs']),
+                suffixInflection('せさせる', 'する', ['v1'], ['vs']),
+                suffixInflection('為させる', '為る', ['v1'], ['vs']),
+                suffixInflection('こさせる', 'くる', ['v1'], ['vk']),
+                suffixInflection('来させる', '来る', ['v1'], ['vk']),
+                suffixInflection('來させる', '來る', ['v1'], ['vk']),
+            ],
+        },
+        'causative-passive': {
+            description: 'Contraction of the passive of the causative form of verbs.\n' +
+            'Someone was made to do something by someone else.\n' +
+            'Usage: ～せられる becomes ~される (only for godan verbs)',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '使役受け身形',
+                },
+            ],
+            name: 'causative-passive',
+            rules: [
+                suffixInflection('かされる', 'く', ['v1'], ['v5']),
+                suffixInflection('がされる', 'ぐ', ['v1'], ['v5']),
+                suffixInflection('たされる', 'つ', ['v1'], ['v5']),
+                suffixInflection('なされる', 'ぬ', ['v1'], ['v5']),
+                suffixInflection('ばされる', 'ぶ', ['v1'], ['v5']),
+                suffixInflection('まされる', 'む', ['v1'], ['v5']),
+                suffixInflection('らされる', 'る', ['v1'], ['v5']),
+                suffixInflection('わされる', 'う', ['v1'], ['v5']),
+            ],
+        },
+        'continuative': {
+            description: 'Used to indicate actions that are (being) carried out.\n' +
+            'Refers to the renyoukei, the part of the verb after conjugating with -masu and dropping masu.',
+            i18n: [
+                {
+                    description: '〔動詞などで〕「ます」などに続く。例、「バスを降りて歩きます」の「降り」「歩き」。',
+                    language: 'ja',
+                    name: '連用形',
+                },
+            ],
+            name: 'continuative',
+            rules: [
+                suffixInflection('い', 'いる', [], ['v1d']),
+                suffixInflection('え', 'える', [], ['v1d']),
+                suffixInflection('き', 'きる', [], ['v1d']),
+                suffixInflection('ぎ', 'ぎる', [], ['v1d']),
+                suffixInflection('け', 'ける', [], ['v1d']),
+                suffixInflection('げ', 'げる', [], ['v1d']),
+                suffixInflection('じ', 'じる', [], ['v1d']),
+                suffixInflection('せ', 'せる', [], ['v1d']),
+                suffixInflection('ぜ', 'ぜる', [], ['v1d']),
+                suffixInflection('ち', 'ちる', [], ['v1d']),
+                suffixInflection('て', 'てる', [], ['v1d']),
+                suffixInflection('で', 'でる', [], ['v1d']),
+                suffixInflection('に', 'にる', [], ['v1d']),
+                suffixInflection('ね', 'ねる', [], ['v1d']),
+                suffixInflection('ひ', 'ひる', [], ['v1d']),
+                suffixInflection('び', 'びる', [], ['v1d']),
+                suffixInflection('へ', 'へる', [], ['v1d']),
+                suffixInflection('べ', 'べる', [], ['v1d']),
+                suffixInflection('み', 'みる', [], ['v1d']),
+                suffixInflection('め', 'める', [], ['v1d']),
+                suffixInflection('り', 'りる', [], ['v1d']),
+                suffixInflection('れ', 'れる', [], ['v1d']),
+                suffixInflection('い', 'う', [], ['v5']),
+                suffixInflection('き', 'く', [], ['v5']),
+                suffixInflection('ぎ', 'ぐ', [], ['v5']),
+                suffixInflection('し', 'す', [], ['v5']),
+                suffixInflection('ち', 'つ', [], ['v5']),
+                suffixInflection('に', 'ぬ', [], ['v5']),
+                suffixInflection('び', 'ぶ', [], ['v5']),
+                suffixInflection('み', 'む', [], ['v5']),
+                suffixInflection('り', 'る', [], ['v5']),
+                suffixInflection('き', 'くる', [], ['vk']),
+                suffixInflection('し', 'する', [], ['vs']),
+                suffixInflection('来', '来る', [], ['vk']),
+                suffixInflection('來', '來る', [], ['vk']),
+            ],
+        },
+        'imperative': {
+            description: '1. To give orders.\n' +
+            '2. (As あれ) Represents the fact that it will never change no matter the circumstances.\n' +
+            '3. Express a feeling of hope.',
+            i18n: [
+                {
+                    description: '命令の意味を表わすときの形。例、「行け」。',
+                    language: 'ja',
+                    name: '命令形',
+                },
+            ],
+            name: 'imperative',
+            rules: [
+                suffixInflection('ろ', 'る', [], ['v1']),
+                suffixInflection('よ', 'る', [], ['v1']),
+                suffixInflection('え', 'う', [], ['v5']),
+                suffixInflection('け', 'く', [], ['v5']),
+                suffixInflection('げ', 'ぐ', [], ['v5']),
+                suffixInflection('せ', 'す', [], ['v5']),
+                suffixInflection('て', 'つ', [], ['v5']),
+                suffixInflection('ね', 'ぬ', [], ['v5']),
+                suffixInflection('べ', 'ぶ', [], ['v5']),
+                suffixInflection('め', 'む', [], ['v5']),
+                suffixInflection('れ', 'る', [], ['v5']),
+                suffixInflection('じろ', 'ずる', [], ['vz']),
+                suffixInflection('ぜよ', 'ずる', [], ['vz']),
+                suffixInflection('しろ', 'する', [], ['vs']),
+                suffixInflection('せよ', 'する', [], ['vs']),
+                suffixInflection('為ろ', '為る', [], ['vs']),
+                suffixInflection('為よ', '為る', [], ['vs']),
+                suffixInflection('こい', 'くる', [], ['vk']),
+                suffixInflection('来い', '来る', [], ['vk']),
+                suffixInflection('來い', '來る', [], ['vk']),
+            ],
+        },
+        'imperative negative': {
+            name: 'imperative negative',
+            rules: [
+                suffixInflection('な', '', ['-na'], ['v']),
+            ],
+        },
+        'kansai-ben -ku': {
+            description: '-ku stem of kansai-ben adjectives',
             name: 'kansai-ben',
-            description: 'Negative form of kansai-ben verbs',
             rules: [
-                suffixInflection('へん', 'ない', [], ['adj-i']),
-                suffixInflection('ひん', 'ない', [], ['adj-i']),
-                suffixInflection('せえへん', 'しない', [], ['adj-i']),
-                suffixInflection('へんかった', 'なかった', ['past'], ['past']),
-                suffixInflection('ひんかった', 'なかった', ['past'], ['past']),
-                suffixInflection('うてへん', 'ってない', [], ['adj-i']),
-            ],
-        },
-        'kansai-ben -te': {
-            name: 'kansai-ben',
-            description: '-te form of kansai-ben verbs',
-            rules: [
-                suffixInflection('うて', 'って', ['-te'], ['-te']),
-                suffixInflection('おうて', 'あって', ['-te'], ['-te']),
-                suffixInflection('こうて', 'かって', ['-te'], ['-te']),
-                suffixInflection('ごうて', 'がって', ['-te'], ['-te']),
-                suffixInflection('そうて', 'さって', ['-te'], ['-te']),
-                suffixInflection('ぞうて', 'ざって', ['-te'], ['-te']),
-                suffixInflection('とうて', 'たって', ['-te'], ['-te']),
-                suffixInflection('どうて', 'だって', ['-te'], ['-te']),
-                suffixInflection('のうて', 'なって', ['-te'], ['-te']),
-                suffixInflection('ほうて', 'はって', ['-te'], ['-te']),
-                suffixInflection('ぼうて', 'ばって', ['-te'], ['-te']),
-                suffixInflection('もうて', 'まって', ['-te'], ['-te']),
-                suffixInflection('ろうて', 'らって', ['-te'], ['-te']),
-                suffixInflection('ようて', 'やって', ['-te'], ['-te']),
-                suffixInflection('ゆうて', 'いって', ['-te'], ['-te']),
-            ],
-        },
-        'kansai-ben past': {
-            name: 'kansai-ben',
-            description: 'past form of kansai-ben terms',
-            rules: [
-                suffixInflection('うた', 'った', ['past'], ['past']),
-                suffixInflection('おうた', 'あった', ['past'], ['past']),
-                suffixInflection('こうた', 'かった', ['past'], ['past']),
-                suffixInflection('ごうた', 'がった', ['past'], ['past']),
-                suffixInflection('そうた', 'さった', ['past'], ['past']),
-                suffixInflection('ぞうた', 'ざった', ['past'], ['past']),
-                suffixInflection('とうた', 'たった', ['past'], ['past']),
-                suffixInflection('どうた', 'だった', ['past'], ['past']),
-                suffixInflection('のうた', 'なった', ['past'], ['past']),
-                suffixInflection('ほうた', 'はった', ['past'], ['past']),
-                suffixInflection('ぼうた', 'ばった', ['past'], ['past']),
-                suffixInflection('もうた', 'まった', ['past'], ['past']),
-                suffixInflection('ろうた', 'らった', ['past'], ['past']),
-                suffixInflection('ようた', 'やった', ['past'], ['past']),
-                suffixInflection('ゆうた', 'いった', ['past'], ['past']),
+                suffixInflection('う', 'く', [], ['adv']),
+                suffixInflection('こう', 'かく', [], ['adv']),
+                suffixInflection('ごう', 'がく', [], ['adv']),
+                suffixInflection('そう', 'さく', [], ['adv']),
+                suffixInflection('とう', 'たく', [], ['adv']),
+                suffixInflection('のう', 'なく', [], ['adv']),
+                suffixInflection('ぼう', 'ばく', [], ['adv']),
+                suffixInflection('もう', 'まく', [], ['adv']),
+                suffixInflection('ろう', 'らく', [], ['adv']),
+                suffixInflection('よう', 'よく', [], ['adv']),
+                suffixInflection('しゅう', 'しく', [], ['adv']),
             ],
         },
         'kansai-ben -tara': {
-            name: 'kansai-ben',
             description: '-tara form of kansai-ben terms',
+            name: 'kansai-ben',
             rules: [
                 suffixInflection('うたら', 'ったら', [], []),
                 suffixInflection('おうたら', 'あったら', [], []),
@@ -1634,26 +1383,30 @@ export const japaneseTransforms = {
                 suffixInflection('ゆうたら', 'いったら', [], []),
             ],
         },
-        'kansai-ben -ku': {
+        'kansai-ben -te': {
+            description: '-te form of kansai-ben verbs',
             name: 'kansai-ben',
-            description: '-ku stem of kansai-ben adjectives',
             rules: [
-                suffixInflection('う', 'く', [], ['adv']),
-                suffixInflection('こう', 'かく', [], ['adv']),
-                suffixInflection('ごう', 'がく', [], ['adv']),
-                suffixInflection('そう', 'さく', [], ['adv']),
-                suffixInflection('とう', 'たく', [], ['adv']),
-                suffixInflection('のう', 'なく', [], ['adv']),
-                suffixInflection('ぼう', 'ばく', [], ['adv']),
-                suffixInflection('もう', 'まく', [], ['adv']),
-                suffixInflection('ろう', 'らく', [], ['adv']),
-                suffixInflection('よう', 'よく', [], ['adv']),
-                suffixInflection('しゅう', 'しく', [], ['adv']),
+                suffixInflection('うて', 'って', ['-te'], ['-te']),
+                suffixInflection('おうて', 'あって', ['-te'], ['-te']),
+                suffixInflection('こうて', 'かって', ['-te'], ['-te']),
+                suffixInflection('ごうて', 'がって', ['-te'], ['-te']),
+                suffixInflection('そうて', 'さって', ['-te'], ['-te']),
+                suffixInflection('ぞうて', 'ざって', ['-te'], ['-te']),
+                suffixInflection('とうて', 'たって', ['-te'], ['-te']),
+                suffixInflection('どうて', 'だって', ['-te'], ['-te']),
+                suffixInflection('のうて', 'なって', ['-te'], ['-te']),
+                suffixInflection('ほうて', 'はって', ['-te'], ['-te']),
+                suffixInflection('ぼうて', 'ばって', ['-te'], ['-te']),
+                suffixInflection('もうて', 'まって', ['-te'], ['-te']),
+                suffixInflection('ろうて', 'らって', ['-te'], ['-te']),
+                suffixInflection('ようて', 'やって', ['-te'], ['-te']),
+                suffixInflection('ゆうて', 'いって', ['-te'], ['-te']),
             ],
         },
         'kansai-ben adjective -te': {
-            name: 'kansai-ben',
             description: '-te form of kansai-ben adjectives',
+            name: 'kansai-ben',
             rules: [
                 suffixInflection('うて', 'くて', ['-te'], ['-te']),
                 suffixInflection('こうて', 'かくて', ['-te'], ['-te']),
@@ -1669,8 +1422,8 @@ export const japaneseTransforms = {
             ],
         },
         'kansai-ben adjective negative': {
-            name: 'kansai-ben',
             description: 'Negative form of kansai-ben adjectives',
+            name: 'kansai-ben',
             rules: [
                 suffixInflection('うない', 'くない', ['adj-i'], ['adj-i']),
                 suffixInflection('こうない', 'かくない', ['adj-i'], ['adj-i']),
@@ -1683,6 +1436,253 @@ export const japaneseTransforms = {
                 suffixInflection('ろうない', 'らくない', ['adj-i'], ['adj-i']),
                 suffixInflection('ようない', 'よくない', ['adj-i'], ['adj-i']),
                 suffixInflection('しゅうない', 'しくない', ['adj-i'], ['adj-i']),
+            ],
+        },
+        'kansai-ben negative': {
+            description: 'Negative form of kansai-ben verbs',
+            name: 'kansai-ben',
+            rules: [
+                suffixInflection('へん', 'ない', [], ['adj-i']),
+                suffixInflection('ひん', 'ない', [], ['adj-i']),
+                suffixInflection('せえへん', 'しない', [], ['adj-i']),
+                suffixInflection('へんかった', 'なかった', ['past'], ['past']),
+                suffixInflection('ひんかった', 'なかった', ['past'], ['past']),
+                suffixInflection('うてへん', 'ってない', [], ['adj-i']),
+            ],
+        },
+        'kansai-ben past': {
+            description: 'past form of kansai-ben terms',
+            name: 'kansai-ben',
+            rules: [
+                suffixInflection('うた', 'った', ['past'], ['past']),
+                suffixInflection('おうた', 'あった', ['past'], ['past']),
+                suffixInflection('こうた', 'かった', ['past'], ['past']),
+                suffixInflection('ごうた', 'がった', ['past'], ['past']),
+                suffixInflection('そうた', 'さった', ['past'], ['past']),
+                suffixInflection('ぞうた', 'ざった', ['past'], ['past']),
+                suffixInflection('とうた', 'たった', ['past'], ['past']),
+                suffixInflection('どうた', 'だった', ['past'], ['past']),
+                suffixInflection('のうた', 'なった', ['past'], ['past']),
+                suffixInflection('ほうた', 'はった', ['past'], ['past']),
+                suffixInflection('ぼうた', 'ばった', ['past'], ['past']),
+                suffixInflection('もうた', 'まった', ['past'], ['past']),
+                suffixInflection('ろうた', 'らった', ['past'], ['past']),
+                suffixInflection('ようた', 'やった', ['past'], ['past']),
+                suffixInflection('ゆうた', 'いった', ['past'], ['past']),
+            ],
+        },
+        'n-slang': {
+            description: 'Slang sound change of r-column syllables to n (when before an n-sound, usually の or な)',
+            name: 'n-slang',
+            rules: [
+                suffixInflection('んな', 'るな', [], ['-na']),
+                suffixInflection('んなさい', 'りなさい', [], ['-nasai']),
+                suffixInflection('らんない', 'られない', ['adj-i'], ['adj-i']),
+                suffixInflection('んない', 'らない', ['adj-i'], ['adj-i']),
+                suffixInflection('んなきゃ', 'らなきゃ', [], ['-ya']),
+                suffixInflection('んなきゃ', 'れなきゃ', [], ['-ya']),
+            ],
+        },
+        'negative': {
+            description: '1. Negative form of verbs.\n' +
+            '2. Expresses a feeling of solicitation to the other party.\n' +
+            'Usage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません.',
+            i18n: [
+                {
+                    description: 'その動作・作用・状態の成立を否定することを表わす。',
+                    language: 'ja',
+                    name: '～ない',
+                },
+            ],
+            name: 'negative',
+            rules: [
+                suffixInflection('くない', 'い', ['adj-i'], ['adj-i']),
+                suffixInflection('ない', 'る', ['adj-i'], ['v1']),
+                suffixInflection('かない', 'く', ['adj-i'], ['v5']),
+                suffixInflection('がない', 'ぐ', ['adj-i'], ['v5']),
+                suffixInflection('さない', 'す', ['adj-i'], ['v5']),
+                suffixInflection('たない', 'つ', ['adj-i'], ['v5']),
+                suffixInflection('なない', 'ぬ', ['adj-i'], ['v5']),
+                suffixInflection('ばない', 'ぶ', ['adj-i'], ['v5']),
+                suffixInflection('まない', 'む', ['adj-i'], ['v5']),
+                suffixInflection('らない', 'る', ['adj-i'], ['v5']),
+                suffixInflection('わない', 'う', ['adj-i'], ['v5']),
+                suffixInflection('じない', 'ずる', ['adj-i'], ['vz']),
+                suffixInflection('しない', 'する', ['adj-i'], ['vs']),
+                suffixInflection('為ない', '為る', ['adj-i'], ['vs']),
+                suffixInflection('こない', 'くる', ['adj-i'], ['vk']),
+                suffixInflection('来ない', '来る', ['adj-i'], ['vk']),
+                suffixInflection('來ない', '來る', ['adj-i'], ['vk']),
+                suffixInflection('ません', 'ます', ['-masen'], ['-masu']),
+            ],
+        },
+        'passive': {
+            description: passiveEnglishDescription +
+            'Usage: Attach れる to the irrealis form (mizenkei) of godan verbs.',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '受身形',
+                },
+            ],
+            name: 'passive',
+            rules: [
+                suffixInflection('かれる', 'く', ['v1'], ['v5']),
+                suffixInflection('がれる', 'ぐ', ['v1'], ['v5']),
+                suffixInflection('される', 'す', ['v1'], ['v5']),
+                suffixInflection('たれる', 'つ', ['v1'], ['v5']),
+                suffixInflection('なれる', 'ぬ', ['v1'], ['v5']),
+                suffixInflection('ばれる', 'ぶ', ['v1'], ['v5']),
+                suffixInflection('まれる', 'む', ['v1'], ['v5']),
+                suffixInflection('われる', 'う', ['v1'], ['v5']),
+                suffixInflection('られる', 'る', ['v1'], ['v5']),
+                suffixInflection('じされる', 'ずる', ['v1'], ['vz']),
+                suffixInflection('ぜされる', 'ずる', ['v1'], ['vz']),
+                suffixInflection('される', 'する', ['v1'], ['vs']),
+                suffixInflection('為れる', '為る', ['v1'], ['vs']),
+                suffixInflection('こられる', 'くる', ['v1'], ['vk']),
+                suffixInflection('来られる', '来る', ['v1'], ['vk']),
+                suffixInflection('來られる', '來る', ['v1'], ['vk']),
+            ],
+        },
+        'potential': {
+            description: 'Indicates a state of being (naturally) capable of doing an action.\n' +
+            'Usage: Attach (ら)れる to the irrealis form (mizenkei) of ichidan verbs.\n' +
+            'Attach る to the imperative form (meireikei) of godan verbs.\n' +
+            'する becomes できる, くる becomes こ(ら)れる',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '可能',
+                },
+            ],
+            name: 'potential',
+            rules: [
+                suffixInflection('れる', 'る', ['v1'], ['v1', 'v5d']),
+                suffixInflection('える', 'う', ['v1'], ['v5d']),
+                suffixInflection('ける', 'く', ['v1'], ['v5d']),
+                suffixInflection('げる', 'ぐ', ['v1'], ['v5d']),
+                suffixInflection('せる', 'す', ['v1'], ['v5d']),
+                suffixInflection('てる', 'つ', ['v1'], ['v5d']),
+                suffixInflection('ねる', 'ぬ', ['v1'], ['v5d']),
+                suffixInflection('べる', 'ぶ', ['v1'], ['v5d']),
+                suffixInflection('める', 'む', ['v1'], ['v5d']),
+                suffixInflection('できる', 'する', ['v1'], ['vs']),
+                suffixInflection('出来る', 'する', ['v1'], ['vs']),
+                suffixInflection('これる', 'くる', ['v1'], ['vk']),
+                suffixInflection('来れる', '来る', ['v1'], ['vk']),
+                suffixInflection('來れる', '來る', ['v1'], ['vk']),
+            ],
+        },
+        'potential or passive': {
+            description: passiveEnglishDescription +
+            '3. Indicates a state of being (naturally) capable of doing an action.\n' +
+            'Usage: Attach られる to the irrealis form (mizenkei) of ichidan verbs.\n' +
+            'する becomes せられる, くる becomes こられる',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '受身・自発・可能・尊敬',
+                },
+            ],
+            name: 'potential or passive',
+            rules: [
+                suffixInflection('られる', 'る', ['v1'], ['v1']),
+                suffixInflection('ざれる', 'ずる', ['v1'], ['vz']),
+                suffixInflection('ぜられる', 'ずる', ['v1'], ['vz']),
+                suffixInflection('せられる', 'する', ['v1'], ['vs']),
+                suffixInflection('為られる', '為る', ['v1'], ['vs']),
+                suffixInflection('こられる', 'くる', ['v1'], ['vk']),
+                suffixInflection('来られる', '来る', ['v1'], ['vk']),
+                suffixInflection('來られる', '來る', ['v1'], ['vk']),
+            ],
+        },
+        'short causative': {
+            description: 'Contraction of the causative form.\n' +
+            'Describes the intention to make someone do something.\n' +
+            'Usage: Attach す to the irrealis form (mizenkei) of godan verbs.\n' +
+            'Attach さす to the dictionary form (shuushikei) of ichidan verbs.\n' +
+            'する becomes さす, くる becomes こさす.\n' +
+            'It itself conjugates as an godan verb.',
+            i18n: [
+                {
+                    description: 'だれかにある行為をさせる意を表わす時の言い方。例、「食べさす」の「さす」。',
+                    language: 'ja',
+                    name: '使役形の短縮形',
+                },
+            ],
+            name: 'short causative',
+            rules: [
+                suffixInflection('さす', 'る', ['v5s'], ['v1']),
+                suffixInflection('かす', 'く', ['v5s'], ['v5']),
+                suffixInflection('がす', 'ぐ', ['v5s'], ['v5']),
+                suffixInflection('さす', 'す', ['v5s'], ['v5']),
+                suffixInflection('たす', 'つ', ['v5s'], ['v5']),
+                suffixInflection('なす', 'ぬ', ['v5s'], ['v5']),
+                suffixInflection('ばす', 'ぶ', ['v5s'], ['v5']),
+                suffixInflection('ます', 'む', ['v5s'], ['v5']),
+                suffixInflection('らす', 'る', ['v5s'], ['v5']),
+                suffixInflection('わす', 'う', ['v5s'], ['v5']),
+                suffixInflection('じさす', 'ずる', ['v5s'], ['vz']),
+                suffixInflection('ぜさす', 'ずる', ['v5s'], ['vz']),
+                suffixInflection('さす', 'する', ['v5s'], ['vs']),
+                suffixInflection('為す', '為る', ['v5s'], ['vs']),
+                suffixInflection('こさす', 'くる', ['v5s'], ['vk']),
+                suffixInflection('来さす', '来る', ['v5s'], ['vk']),
+                suffixInflection('來さす', '來る', ['v5s'], ['vk']),
+            ],
+        },
+        'slang': {
+            name: 'slang',
+            rules: [
+                suffixInflection('てぇてぇ', 'とうとい', [], ['adj-i']),
+                suffixInflection('てぇてぇ', '尊い', [], ['adj-i']),
+                suffixInflection('おなしゃす', 'おねがいします', [], ['v5']),
+                suffixInflection('おなしゃす', 'お願いします', [], ['v5']),
+                suffixInflection('あざす', 'ありがとうございます', [], ['v5']),
+                suffixInflection('さーせん', 'すみません', [], ['v5']),
+                suffixInflection('神ってる', '神がかっている', [], ['v1p']),
+                suffixInflection('じわる', 'じわじわ来る', [], ['vk']),
+                suffixInflection('おさしみ', 'おやすみ', [], []),
+                suffixInflection('おやさい', 'おやすみ', [], []),
+
+            ],
+        },
+        'volitional': {
+            description: '1. Expresses speaker\'s will or intention; volitional form.\n' +
+            '2. Expresses an invitation to the other party.\n' +
+            '3. (Used in …ようとする) Indicates being on the verge of initiating an action or transforming a state.\n' +
+            '4. Indicates an inference of a matter.\n' +
+            'Usage: Attach よう to the irrealis form (mizenkei) of ichidan verbs.\n' +
+            'Attach う to the irrealis form (mizenkei) of godan verbs after -o euphonic change form.\n' +
+            'Attach かろう to the stem of i-adjectives (4th meaning only).',
+            i18n: [
+                {
+                    description: '主体の意志を表わす',
+                    language: 'ja',
+                    name: '～う形',
+                },
+            ],
+            name: 'volitional',
+            rules: [
+                suffixInflection('よう', 'る', [], ['v1']),
+                suffixInflection('おう', 'う', [], ['v5']),
+                suffixInflection('こう', 'く', [], ['v5']),
+                suffixInflection('ごう', 'ぐ', [], ['v5']),
+                suffixInflection('そう', 'す', [], ['v5']),
+                suffixInflection('とう', 'つ', [], ['v5']),
+                suffixInflection('のう', 'ぬ', [], ['v5']),
+                suffixInflection('ぼう', 'ぶ', [], ['v5']),
+                suffixInflection('もう', 'む', [], ['v5']),
+                suffixInflection('ろう', 'る', [], ['v5']),
+                suffixInflection('じよう', 'ずる', [], ['vz']),
+                suffixInflection('しよう', 'する', [], ['vs']),
+                suffixInflection('為よう', '為る', [], ['vs']),
+                suffixInflection('こよう', 'くる', [], ['vk']),
+                suffixInflection('来よう', '来る', [], ['vk']),
+                suffixInflection('來よう', '來る', [], ['vk']),
+                suffixInflection('ましょう', 'ます', [], ['-masu']),
+                suffixInflection('かろう', 'い', [], ['adj-i']),
             ],
         },
     },

@@ -254,31 +254,31 @@ export class AnkiTemplatesController {
                 const {dictionaryEntry, text: sentenceText} = data;
                 const options = await this._settingsController.getOptions();
                 const context = {
-                    url: window.location.href,
-                    sentence: {
-                        text: sentenceText,
-                        offset: 0,
-                    },
                     documentTitle: document.title,
-                    query: sentenceText,
                     fullQuery: sentenceText,
+                    query: sentenceText,
+                    sentence: {
+                        offset: 0,
+                        text: sentenceText,
+                    },
+                    url: window.location.href,
                 };
                 const template = this._getAnkiTemplate(options);
-                const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
-                const {note, errors} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
-                    dictionaryEntry,
-                    mode,
+                const {general: {compactTags, glossaryLayoutMode, resultOutputMode}} = options;
+                const {errors, note} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
+                    compactTags,
                     context,
-                    template,
                     deckName: '',
-                    modelName: '',
+                    dictionaryEntry,
+                    dictionaryStylesMap: this._ankiNoteBuilder.getDictionaryStylesMap(options.dictionaries),
                     fields: [
                         ['field', field],
                     ],
-                    resultOutputMode,
                     glossaryLayoutMode,
-                    compactTags,
-                    dictionaryStylesMap: this._ankiNoteBuilder.getDictionaryStylesMap(options.dictionaries),
+                    mode,
+                    modelName: '',
+                    resultOutputMode,
+                    template,
                 }));
                 result = note.fields.field;
                 allErrors.push(...errors);

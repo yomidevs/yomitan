@@ -83,8 +83,8 @@ export class SearchPersistentStateController extends EventDispatcher {
      */
     _normalizeMode(mode) {
         switch (mode) {
-            case 'popup':
             case 'action-popup':
+            case 'popup':
                 return mode;
             default:
                 return null;

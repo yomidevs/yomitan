@@ -425,18 +425,18 @@ export class AnkiDeckGeneratorController {
         const {dictionaryEntry, text: sentenceText} = data;
         const options = await this._settingsController.getOptions();
         const context = {
-            url: window.location.href,
-            sentence: {
-                text: sentenceText,
-                offset: 0,
-            },
             documentTitle: document.title,
-            query: sentenceText,
             fullQuery: sentenceText,
+            query: sentenceText,
+            sentence: {
+                offset: 0,
+                text: sentenceText,
+            },
+            url: window.location.href,
         };
         const template = this._getAnkiTemplate(options);
         const deckOptionsFields = options.anki.terms.fields;
-        const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
+        const {general: {compactTags, glossaryLayoutMode, resultOutputMode}} = options;
         const fields = [];
         for (const deckField in deckOptionsFields) {
             if (Object.prototype.hasOwnProperty.call(deckOptionsFields, deckField)) {
@@ -445,26 +445,26 @@ export class AnkiDeckGeneratorController {
         }
         const idleTimeout = (Number.isFinite(options.anki.downloadTimeout) && options.anki.downloadTimeout > 0 ? options.anki.downloadTimeout : null);
         const languageSummary = getLanguageSummaries().find(({iso}) => iso === options.general.language);
-        const mediaOptions = addMedia ? {audio: {sources: options.audio.sources, preferredAudioIndex: null, idleTimeout: idleTimeout, languageSummary: languageSummary}} : null;
+        const mediaOptions = addMedia ? {audio: {idleTimeout: idleTimeout, languageSummary: languageSummary, preferredAudioIndex: null, sources: options.audio.sources}} : null;
         const requirements = addMedia ? [...this._getDictionaryEntryMedia(dictionaryEntry), {type: 'audio'}] : [];
         const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(options.dictionaries);
         const {note} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
-            dictionaryEntry,
-            mode,
-            context,
-            template,
-            deckName: this._activeAnkiDeck,
-            modelName: this._activeNoteType,
-            fields: fields,
-            resultOutputMode,
-            glossaryLayoutMode,
             compactTags,
-            tags: options.anki.tags,
-            mediaOptions: mediaOptions,
-            requirements: requirements,
+            context,
+            deckName: this._activeAnkiDeck,
+            dictionaryEntry,
+            dictionaryStylesMap: dictionaryStylesMap,
             duplicateScope: options.anki.duplicateScope,
             duplicateScopeCheckAllModels: options.anki.duplicateScopeCheckAllModels,
-            dictionaryStylesMap: dictionaryStylesMap,
+            fields: fields,
+            glossaryLayoutMode,
+            mediaOptions: mediaOptions,
+            mode,
+            modelName: this._activeNoteType,
+            requirements: requirements,
+            resultOutputMode,
+            tags: options.anki.tags,
+            template,
         }));
         return note;
     }

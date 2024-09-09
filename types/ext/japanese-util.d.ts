@@ -18,20 +18,20 @@
 export type FuriganaGroup = {
     isKana: boolean;
     text: string;
-    textNormalized: string | null;
+    textNormalized: null | string;
 };
 
 export type FuriganaSegment = {
-    text: string;
     reading: string;
+    text: string;
 };
 
 export type PitchCategory = (
+    'atamadaka' |
     'heiban' |
     'kifuku' |
-    'atamadaka' |
-    'odaka' |
-    'nakadaka'
+    'nakadaka' |
+    'odaka'
 );
 
 export type DiacriticType = 'dakuten' | 'handakuten';

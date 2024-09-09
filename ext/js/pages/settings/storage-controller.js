@@ -91,7 +91,7 @@ export class StorageController {
             // Firefox reports usage as 0 when persistent storage is enabled.
             const finite = valid && ((typeof estimate.usage === 'number' && estimate.usage > 0) || !(await this._persistentStorageController.isStoragePeristent()));
             if (finite) {
-                let {usage, quota} = estimate;
+                let {quota, usage} = estimate;
 
                 if (typeof usage !== 'number') { usage = 0; }
                 if (typeof quota !== 'number') {

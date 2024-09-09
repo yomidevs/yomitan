@@ -88,12 +88,12 @@ export class CrossFrameAPIPort extends EventDispatcher {
             const id = this._invocationId++;
             /** @type {import('cross-frame-api').Invocation} */
             const invocation = {
-                id,
-                resolve,
-                reject,
-                responseTimeout,
-                action,
                 ack: false,
+                action,
+                id,
+                reject,
+                resolve,
+                responseTimeout,
                 timer: null,
             };
             this._activeInvocations.set(id, invocation);
@@ -108,7 +108,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
             }
 
             try {
-                this._port.postMessage(/** @type {import('cross-frame-api').InvokeMessage} */ ({type: 'invoke', id, data: {action, params}}));
+                this._port.postMessage(/** @type {import('cross-frame-api').InvokeMessage} */ ({data: {action, params}, id, type: 'invoke'}));
             } catch (e) {
                 this._onError(id, e);
             }
@@ -137,13 +137,13 @@ export class CrossFrameAPIPort extends EventDispatcher {
      * @param {import('cross-frame-api').Message} details
      */
     _onMessage(details) {
-        const {type, id} = details;
+        const {id, type} = details;
         switch (type) {
-            case 'invoke':
-                this._onInvoke(id, details.data);
-                break;
             case 'ack':
                 this._onAck(id);
+                break;
+            case 'invoke':
+                this._onInvoke(id, details.data);
                 break;
             case 'result':
                 this._onResult(id, details.data);
@@ -268,7 +268,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
      * @param {number} id
      */
     _sendAck(id) {
-        this._sendResponse({type: 'ack', id});
+        this._sendResponse({id, type: 'ack'});
     }
 
     /**
@@ -276,7 +276,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
      * @param {import('core').Response<import('cross-frame-api').ApiReturnAny>} data
      */
     _sendResult(id, data) {
-        this._sendResponse({type: 'result', id, data});
+        this._sendResponse({data, id, type: 'result'});
     }
 
     /**
@@ -284,7 +284,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
      * @param {Error} error
      */
     _sendError(id, error) {
-        this._sendResponse({type: 'result', id, data: {error: ExtensionError.serialize(error)}});
+        this._sendResponse({data: {error: ExtensionError.serialize(error)}, id, type: 'result'});
     }
 }
 
@@ -399,7 +399,7 @@ export class CrossFrameAPI {
      */
     _onDisconnect(commPort) {
         commPort.off('disconnect', this._onDisconnectBind);
-        const {otherTabId, otherFrameId} = commPort;
+        const {otherFrameId, otherTabId} = commPort;
         const tabPorts = this._commPorts.get(otherTabId);
         if (typeof tabPorts !== 'undefined') {
             tabPorts.delete(otherFrameId);

@@ -23,19 +23,19 @@ import type * as StructuredContent from './structured-content';
 
 export type OnProgressCallback = (data: ProgressData) => void;
 
-export type ImportStep = {label: string, callback?: () => void};
+export type ImportStep = {callback?: () => void, label: string};
 
 export type ImportSteps = ImportStep[];
 
 export type ProgressData = {
-    index: number;
     count: number;
+    index: number;
     nextStep?: boolean;
 };
 
 export type ImportResult = {
-    result: Summary | null;
     errors: Error[];
+    result: null | Summary;
 };
 
 export type ImportDetails = {
@@ -43,39 +43,39 @@ export type ImportDetails = {
 };
 
 export type Summary = {
-    title: string;
+    attribution?: string;
+    author?: string;
+    counts: SummaryCounts;
+    description?: string;
+    downloadUrl?: string;
+    frequencyMode?: 'occurrence-based' | 'rank-based';
+    importDate: number;
+    indexUrl?: string;
+    isUpdatable?: boolean;
+    prefixWildcardsSupported: boolean;
     revision: string;
     sequenced: boolean;
-    version: number;
-    importDate: number;
-    prefixWildcardsSupported: boolean;
-    counts: SummaryCounts;
-    styles: string;
-    isUpdatable?: boolean;
-    indexUrl?: string;
-    downloadUrl?: string;
-    author?: string;
-    url?: string;
-    description?: string;
-    attribution?: string;
     sourceLanguage?: string;
+    styles: string;
     targetLanguage?: string;
-    frequencyMode?: 'occurrence-based' | 'rank-based';
+    title: string;
+    url?: string;
+    version: number;
 };
 
 export type SummaryDetails = {
-    prefixWildcardsSupported: boolean;
     counts: SummaryCounts;
+    prefixWildcardsSupported: boolean;
     styles: string;
 };
 
 export type SummaryCounts = {
-    terms: SummaryItemCount;
-    termMeta: SummaryMetaCount;
     kanji: SummaryItemCount;
     kanjiMeta: SummaryMetaCount;
-    tagMeta: SummaryItemCount;
     media: SummaryItemCount;
+    tagMeta: SummaryItemCount;
+    termMeta: SummaryMetaCount;
+    terms: SummaryItemCount;
 };
 
 export type SummaryItemCount = {
@@ -83,8 +83,8 @@ export type SummaryItemCount = {
 };
 
 export type SummaryMetaCount = {
-    total: number;
     [key: string]: number;
+    total: number;
 };
 
 export type ImportRequirement = (
@@ -93,17 +93,17 @@ export type ImportRequirement = (
 );
 
 export type ImageImportRequirement = {
-    type: 'image';
-    target: DictionaryData.TermGlossaryImage;
-    source: DictionaryData.TermGlossaryImage;
     entry: DictionaryDatabase.DatabaseTermEntry;
+    source: DictionaryData.TermGlossaryImage;
+    target: DictionaryData.TermGlossaryImage;
+    type: 'image';
 };
 
 export type StructuredContentImageImportRequirement = {
-    type: 'structured-content-image';
-    target: StructuredContent.ImageElement;
-    source: StructuredContent.ImageElement;
     entry: DictionaryDatabase.DatabaseTermEntry;
+    source: StructuredContent.ImageElement;
+    target: StructuredContent.ImageElement;
+    type: 'structured-content-image';
 };
 
 export type ImportRequirementContext = {
@@ -133,13 +133,13 @@ export type CompiledSchemaNameArray = [
 
 export type CompiledSchemaValidators = {
     dictionaryIndex: Ajv.ValidateFunction<unknown>;
-    dictionaryTermBankV1: Ajv.ValidateFunction<unknown>;
-    dictionaryTermBankV3: Ajv.ValidateFunction<unknown>;
-    dictionaryTermMetaBankV3: Ajv.ValidateFunction<unknown>;
     dictionaryKanjiBankV1: Ajv.ValidateFunction<unknown>;
     dictionaryKanjiBankV3: Ajv.ValidateFunction<unknown>;
     dictionaryKanjiMetaBankV3: Ajv.ValidateFunction<unknown>;
     dictionaryTagBankV3: Ajv.ValidateFunction<unknown>;
+    dictionaryTermBankV1: Ajv.ValidateFunction<unknown>;
+    dictionaryTermBankV3: Ajv.ValidateFunction<unknown>;
+    dictionaryTermMetaBankV3: Ajv.ValidateFunction<unknown>;
 };
 
 export type CompiledSchemaName = keyof CompiledSchemaValidators;

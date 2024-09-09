@@ -141,7 +141,7 @@ export class ExtensionContentController {
         }
 
         return await new Promise((resolve, reject) => {
-            chrome.tabs.create({url, openerTabId}, (tab2) => {
+            chrome.tabs.create({openerTabId, url}, (tab2) => {
                 const e = chrome.runtime.lastError;
                 if (e) {
                     reject(new Error(e.message));

@@ -95,7 +95,7 @@ export class DynamicProperty extends EventDispatcher {
             if (priority > this._overrides[i].priority) { break; }
         }
         const token = generateId(16);
-        this._overrides.splice(i, 0, {value, priority, token});
+        this._overrides.splice(i, 0, {priority, token, value});
         if (i === 0) { this._updateValue(); }
         return token;
     }

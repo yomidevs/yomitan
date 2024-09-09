@@ -43,25 +43,25 @@ export class ElementOverflowController {
      */
     setOptions(options) {
         this._dictionaries.clear();
-        for (const {name, definitionsCollapsible} of options.dictionaries) {
+        for (const {definitionsCollapsible, name} of options.dictionaries) {
             let collapsible = false;
             let collapsed = false;
             let force = false;
             switch (definitionsCollapsible) {
-                case 'expanded':
-                    collapsible = true;
-                    break;
                 case 'collapsed':
                     collapsible = true;
                     collapsed = true;
                     break;
-                case 'force-expanded':
+                case 'expanded':
                     collapsible = true;
-                    force = true;
                     break;
                 case 'force-collapsed':
                     collapsible = true;
                     collapsed = true;
+                    force = true;
+                    break;
+                case 'force-expanded':
+                    collapsible = true;
                     force = true;
                     break;
             }

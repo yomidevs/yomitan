@@ -20,12 +20,12 @@ import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type Events = {
     close: {
-        menu: PopupMenu;
-        item: HTMLElement | null;
-        action: string | null;
-        cause: CloseReason;
+        action: null | string;
         altKey: boolean;
+        cause: CloseReason;
         ctrlKey: boolean;
+        item: HTMLElement | null;
+        menu: PopupMenu;
         metaKey: boolean;
         shiftKey: boolean;
     };
@@ -33,7 +33,7 @@ export type Events = {
 
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
-export type CloseReason = 'close' | 'outside' | 'item' | 'resize';
+export type CloseReason = 'close' | 'item' | 'outside' | 'resize';
 
 export type MenuOpenEventDetails = {
     menu: PopupMenu;

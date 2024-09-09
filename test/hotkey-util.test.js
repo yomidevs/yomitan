@@ -24,25 +24,25 @@ describe('HotkeyUtil', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{os: import('environment').OperatingSystem, command: string, expectedCommand: string, expectedInput: {key: string, modifiers: import('input').Modifier[]}}[]} */
         const data = [
-            {os: 'win', command: 'Alt+F', expectedCommand: 'Alt+F', expectedInput: {key: 'KeyF', modifiers: ['alt']}},
-            {os: 'win', command: 'F1',    expectedCommand: 'F1',    expectedInput: {key: 'F1', modifiers: []}},
+            {command: 'Alt+F', expectedCommand: 'Alt+F', expectedInput: {key: 'KeyF', modifiers: ['alt']}, os: 'win'},
+            {command: 'F1', expectedCommand: 'F1',    expectedInput: {key: 'F1', modifiers: []},    os: 'win'},
 
-            {os: 'win', command: 'Ctrl+Alt+Shift+F1',    expectedCommand: 'Ctrl+Alt+Shift+F1',    expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']}},
-            {os: 'win', command: 'MacCtrl+Alt+Shift+F1', expectedCommand: 'Ctrl+Alt+Shift+F1',    expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']}},
-            {os: 'win', command: 'Command+Alt+Shift+F1', expectedCommand: 'Command+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['meta', 'alt', 'shift']}},
+            {command: 'Ctrl+Alt+Shift+F1', expectedCommand: 'Ctrl+Alt+Shift+F1',    expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']},    os: 'win'},
+            {command: 'MacCtrl+Alt+Shift+F1', expectedCommand: 'Ctrl+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']},    os: 'win'},
+            {command: 'Command+Alt+Shift+F1', expectedCommand: 'Command+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['meta', 'alt', 'shift']}, os: 'win'},
 
-            {os: 'mac', command: 'Ctrl+Alt+Shift+F1',    expectedCommand: 'Command+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['meta', 'alt', 'shift']}},
-            {os: 'mac', command: 'MacCtrl+Alt+Shift+F1', expectedCommand: 'MacCtrl+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']}},
-            {os: 'mac', command: 'Command+Alt+Shift+F1', expectedCommand: 'Command+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['meta', 'alt', 'shift']}},
+            {command: 'Ctrl+Alt+Shift+F1', expectedCommand: 'Command+Alt+Shift+F1',    expectedInput: {key: 'F1', modifiers: ['meta', 'alt', 'shift']}, os: 'mac'},
+            {command: 'MacCtrl+Alt+Shift+F1', expectedCommand: 'MacCtrl+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']}, os: 'mac'},
+            {command: 'Command+Alt+Shift+F1', expectedCommand: 'Command+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['meta', 'alt', 'shift']}, os: 'mac'},
 
-            {os: 'linux', command: 'Ctrl+Alt+Shift+F1',    expectedCommand: 'Ctrl+Alt+Shift+F1',    expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']}},
-            {os: 'linux', command: 'MacCtrl+Alt+Shift+F1', expectedCommand: 'Ctrl+Alt+Shift+F1',    expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']}},
-            {os: 'linux', command: 'Command+Alt+Shift+F1', expectedCommand: 'Command+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['meta', 'alt', 'shift']}},
+            {command: 'Ctrl+Alt+Shift+F1', expectedCommand: 'Ctrl+Alt+Shift+F1',    expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']},    os: 'linux'},
+            {command: 'MacCtrl+Alt+Shift+F1', expectedCommand: 'Ctrl+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']},    os: 'linux'},
+            {command: 'Command+Alt+Shift+F1', expectedCommand: 'Command+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['meta', 'alt', 'shift']}, os: 'linux'},
         ];
         /* eslint-enable @stylistic/no-multi-spaces */
 
         const hotkeyUtil = new HotkeyUtil();
-        for (const {command, os, expectedInput, expectedCommand} of data) {
+        for (const {command, expectedCommand, expectedInput, os} of data) {
             test(`${command} on ${os} -> ${JSON.stringify(expectedInput)}`, () => {
                 hotkeyUtil.os = os;
                 const input = structuredClone(hotkeyUtil.convertCommandToInput(command));
@@ -57,87 +57,87 @@ describe('HotkeyUtil', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{os: import('environment').OperatingSystem, key: ?string, modifiers: import('input').Modifier[], expected: string}[]} */
         const data = [
-            {os: 'win', key: null,   modifiers: [], expected: ''},
-            {os: 'win', key: 'KeyF', modifiers: [], expected: 'F'},
-            {os: 'win', key: 'F1',   modifiers: [], expected: 'F1'},
-            {os: 'win', key: null,   modifiers: ['ctrl'], expected: 'Ctrl'},
-            {os: 'win', key: 'KeyF', modifiers: ['ctrl'], expected: 'Ctrl + F'},
-            {os: 'win', key: 'F1',   modifiers: ['ctrl'], expected: 'Ctrl + F1'},
-            {os: 'win', key: null,   modifiers: ['alt'], expected: 'Alt'},
-            {os: 'win', key: 'KeyF', modifiers: ['alt'], expected: 'Alt + F'},
-            {os: 'win', key: 'F1',   modifiers: ['alt'], expected: 'Alt + F1'},
-            {os: 'win', key: null,   modifiers: ['shift'], expected: 'Shift'},
-            {os: 'win', key: 'KeyF', modifiers: ['shift'], expected: 'Shift + F'},
-            {os: 'win', key: 'F1',   modifiers: ['shift'], expected: 'Shift + F1'},
-            {os: 'win', key: null,   modifiers: ['meta'], expected: 'Windows'},
-            {os: 'win', key: 'KeyF', modifiers: ['meta'], expected: 'Windows + F'},
-            {os: 'win', key: 'F1',   modifiers: ['meta'], expected: 'Windows + F1'},
-            {os: 'win', key: null,   modifiers: ['mouse1'], expected: 'Mouse 1'},
-            {os: 'win', key: 'KeyF', modifiers: ['mouse1'], expected: 'Mouse 1 + F'},
-            {os: 'win', key: 'F1',   modifiers: ['mouse1'], expected: 'Mouse 1 + F1'},
+            {expected: '', key: null,   modifiers: [], os: 'win'},
+            {expected: 'F', key: 'KeyF', modifiers: [], os: 'win'},
+            {expected: 'F1', key: 'F1',   modifiers: [], os: 'win'},
+            {expected: 'Ctrl', key: null,   modifiers: ['ctrl'], os: 'win'},
+            {expected: 'Ctrl + F', key: 'KeyF', modifiers: ['ctrl'], os: 'win'},
+            {expected: 'Ctrl + F1', key: 'F1',   modifiers: ['ctrl'], os: 'win'},
+            {expected: 'Alt', key: null,   modifiers: ['alt'], os: 'win'},
+            {expected: 'Alt + F', key: 'KeyF', modifiers: ['alt'], os: 'win'},
+            {expected: 'Alt + F1', key: 'F1',   modifiers: ['alt'], os: 'win'},
+            {expected: 'Shift', key: null,   modifiers: ['shift'], os: 'win'},
+            {expected: 'Shift + F', key: 'KeyF', modifiers: ['shift'], os: 'win'},
+            {expected: 'Shift + F1', key: 'F1',   modifiers: ['shift'], os: 'win'},
+            {expected: 'Windows', key: null,   modifiers: ['meta'], os: 'win'},
+            {expected: 'Windows + F', key: 'KeyF', modifiers: ['meta'], os: 'win'},
+            {expected: 'Windows + F1', key: 'F1',   modifiers: ['meta'], os: 'win'},
+            {expected: 'Mouse 1', key: null,   modifiers: ['mouse1'], os: 'win'},
+            {expected: 'Mouse 1 + F', key: 'KeyF', modifiers: ['mouse1'], os: 'win'},
+            {expected: 'Mouse 1 + F1', key: 'F1',   modifiers: ['mouse1'], os: 'win'},
 
-            {os: 'mac', key: null,   modifiers: [], expected: ''},
-            {os: 'mac', key: 'KeyF', modifiers: [], expected: 'F'},
-            {os: 'mac', key: 'F1',   modifiers: [], expected: 'F1'},
-            {os: 'mac', key: null,   modifiers: ['ctrl'], expected: 'Ctrl'},
-            {os: 'mac', key: 'KeyF', modifiers: ['ctrl'], expected: 'Ctrl + F'},
-            {os: 'mac', key: 'F1',   modifiers: ['ctrl'], expected: 'Ctrl + F1'},
-            {os: 'mac', key: null,   modifiers: ['alt'], expected: 'Opt'},
-            {os: 'mac', key: 'KeyF', modifiers: ['alt'], expected: 'Opt + F'},
-            {os: 'mac', key: 'F1',   modifiers: ['alt'], expected: 'Opt + F1'},
-            {os: 'mac', key: null,   modifiers: ['shift'], expected: 'Shift'},
-            {os: 'mac', key: 'KeyF', modifiers: ['shift'], expected: 'Shift + F'},
-            {os: 'mac', key: 'F1',   modifiers: ['shift'], expected: 'Shift + F1'},
-            {os: 'mac', key: null,   modifiers: ['meta'], expected: 'Cmd'},
-            {os: 'mac', key: 'KeyF', modifiers: ['meta'], expected: 'Cmd + F'},
-            {os: 'mac', key: 'F1',   modifiers: ['meta'], expected: 'Cmd + F1'},
-            {os: 'mac', key: null,   modifiers: ['mouse1'], expected: 'Mouse 1'},
-            {os: 'mac', key: 'KeyF', modifiers: ['mouse1'], expected: 'Mouse 1 + F'},
-            {os: 'mac', key: 'F1',   modifiers: ['mouse1'], expected: 'Mouse 1 + F1'},
+            {expected: '', key: null,   modifiers: [], os: 'mac'},
+            {expected: 'F', key: 'KeyF', modifiers: [], os: 'mac'},
+            {expected: 'F1', key: 'F1',   modifiers: [], os: 'mac'},
+            {expected: 'Ctrl', key: null,   modifiers: ['ctrl'], os: 'mac'},
+            {expected: 'Ctrl + F', key: 'KeyF', modifiers: ['ctrl'], os: 'mac'},
+            {expected: 'Ctrl + F1', key: 'F1',   modifiers: ['ctrl'], os: 'mac'},
+            {expected: 'Opt', key: null,   modifiers: ['alt'], os: 'mac'},
+            {expected: 'Opt + F', key: 'KeyF', modifiers: ['alt'], os: 'mac'},
+            {expected: 'Opt + F1', key: 'F1',   modifiers: ['alt'], os: 'mac'},
+            {expected: 'Shift', key: null,   modifiers: ['shift'], os: 'mac'},
+            {expected: 'Shift + F', key: 'KeyF', modifiers: ['shift'], os: 'mac'},
+            {expected: 'Shift + F1', key: 'F1',   modifiers: ['shift'], os: 'mac'},
+            {expected: 'Cmd', key: null,   modifiers: ['meta'], os: 'mac'},
+            {expected: 'Cmd + F', key: 'KeyF', modifiers: ['meta'], os: 'mac'},
+            {expected: 'Cmd + F1', key: 'F1',   modifiers: ['meta'], os: 'mac'},
+            {expected: 'Mouse 1', key: null,   modifiers: ['mouse1'], os: 'mac'},
+            {expected: 'Mouse 1 + F', key: 'KeyF', modifiers: ['mouse1'], os: 'mac'},
+            {expected: 'Mouse 1 + F1', key: 'F1',   modifiers: ['mouse1'], os: 'mac'},
 
-            {os: 'linux', key: null,   modifiers: [], expected: ''},
-            {os: 'linux', key: 'KeyF', modifiers: [], expected: 'F'},
-            {os: 'linux', key: 'F1',   modifiers: [], expected: 'F1'},
-            {os: 'linux', key: null,   modifiers: ['ctrl'], expected: 'Ctrl'},
-            {os: 'linux', key: 'KeyF', modifiers: ['ctrl'], expected: 'Ctrl + F'},
-            {os: 'linux', key: 'F1',   modifiers: ['ctrl'], expected: 'Ctrl + F1'},
-            {os: 'linux', key: null,   modifiers: ['alt'], expected: 'Alt'},
-            {os: 'linux', key: 'KeyF', modifiers: ['alt'], expected: 'Alt + F'},
-            {os: 'linux', key: 'F1',   modifiers: ['alt'], expected: 'Alt + F1'},
-            {os: 'linux', key: null,   modifiers: ['shift'], expected: 'Shift'},
-            {os: 'linux', key: 'KeyF', modifiers: ['shift'], expected: 'Shift + F'},
-            {os: 'linux', key: 'F1',   modifiers: ['shift'], expected: 'Shift + F1'},
-            {os: 'linux', key: null,   modifiers: ['meta'], expected: 'Super'},
-            {os: 'linux', key: 'KeyF', modifiers: ['meta'], expected: 'Super + F'},
-            {os: 'linux', key: 'F1',   modifiers: ['meta'], expected: 'Super + F1'},
-            {os: 'linux', key: null,   modifiers: ['mouse1'], expected: 'Mouse 1'},
-            {os: 'linux', key: 'KeyF', modifiers: ['mouse1'], expected: 'Mouse 1 + F'},
-            {os: 'linux', key: 'F1',   modifiers: ['mouse1'], expected: 'Mouse 1 + F1'},
+            {expected: '', key: null,   modifiers: [], os: 'linux'},
+            {expected: 'F', key: 'KeyF', modifiers: [], os: 'linux'},
+            {expected: 'F1', key: 'F1',   modifiers: [], os: 'linux'},
+            {expected: 'Ctrl', key: null,   modifiers: ['ctrl'], os: 'linux'},
+            {expected: 'Ctrl + F', key: 'KeyF', modifiers: ['ctrl'], os: 'linux'},
+            {expected: 'Ctrl + F1', key: 'F1',   modifiers: ['ctrl'], os: 'linux'},
+            {expected: 'Alt', key: null,   modifiers: ['alt'], os: 'linux'},
+            {expected: 'Alt + F', key: 'KeyF', modifiers: ['alt'], os: 'linux'},
+            {expected: 'Alt + F1', key: 'F1',   modifiers: ['alt'], os: 'linux'},
+            {expected: 'Shift', key: null,   modifiers: ['shift'], os: 'linux'},
+            {expected: 'Shift + F', key: 'KeyF', modifiers: ['shift'], os: 'linux'},
+            {expected: 'Shift + F1', key: 'F1',   modifiers: ['shift'], os: 'linux'},
+            {expected: 'Super', key: null,   modifiers: ['meta'], os: 'linux'},
+            {expected: 'Super + F', key: 'KeyF', modifiers: ['meta'], os: 'linux'},
+            {expected: 'Super + F1', key: 'F1',   modifiers: ['meta'], os: 'linux'},
+            {expected: 'Mouse 1', key: null,   modifiers: ['mouse1'], os: 'linux'},
+            {expected: 'Mouse 1 + F', key: 'KeyF', modifiers: ['mouse1'], os: 'linux'},
+            {expected: 'Mouse 1 + F1', key: 'F1',   modifiers: ['mouse1'], os: 'linux'},
 
-            {os: 'unknown', key: null,   modifiers: [], expected: ''},
-            {os: 'unknown', key: 'KeyF', modifiers: [], expected: 'F'},
-            {os: 'unknown', key: 'F1',   modifiers: [], expected: 'F1'},
-            {os: 'unknown', key: null,   modifiers: ['ctrl'], expected: 'Ctrl'},
-            {os: 'unknown', key: 'KeyF', modifiers: ['ctrl'], expected: 'Ctrl + F'},
-            {os: 'unknown', key: 'F1',   modifiers: ['ctrl'], expected: 'Ctrl + F1'},
-            {os: 'unknown', key: null,   modifiers: ['alt'], expected: 'Alt'},
-            {os: 'unknown', key: 'KeyF', modifiers: ['alt'], expected: 'Alt + F'},
-            {os: 'unknown', key: 'F1',   modifiers: ['alt'], expected: 'Alt + F1'},
-            {os: 'unknown', key: null,   modifiers: ['shift'], expected: 'Shift'},
-            {os: 'unknown', key: 'KeyF', modifiers: ['shift'], expected: 'Shift + F'},
-            {os: 'unknown', key: 'F1',   modifiers: ['shift'], expected: 'Shift + F1'},
-            {os: 'unknown', key: null,   modifiers: ['meta'], expected: 'Meta'},
-            {os: 'unknown', key: 'KeyF', modifiers: ['meta'], expected: 'Meta + F'},
-            {os: 'unknown', key: 'F1',   modifiers: ['meta'], expected: 'Meta + F1'},
-            {os: 'unknown', key: null,   modifiers: ['mouse1'], expected: 'Mouse 1'},
-            {os: 'unknown', key: 'KeyF', modifiers: ['mouse1'], expected: 'Mouse 1 + F'},
-            {os: 'unknown', key: 'F1',   modifiers: ['mouse1'], expected: 'Mouse 1 + F1'},
+            {expected: '', key: null,   modifiers: [], os: 'unknown'},
+            {expected: 'F', key: 'KeyF', modifiers: [], os: 'unknown'},
+            {expected: 'F1', key: 'F1',   modifiers: [], os: 'unknown'},
+            {expected: 'Ctrl', key: null,   modifiers: ['ctrl'], os: 'unknown'},
+            {expected: 'Ctrl + F', key: 'KeyF', modifiers: ['ctrl'], os: 'unknown'},
+            {expected: 'Ctrl + F1', key: 'F1',   modifiers: ['ctrl'], os: 'unknown'},
+            {expected: 'Alt', key: null,   modifiers: ['alt'], os: 'unknown'},
+            {expected: 'Alt + F', key: 'KeyF', modifiers: ['alt'], os: 'unknown'},
+            {expected: 'Alt + F1', key: 'F1',   modifiers: ['alt'], os: 'unknown'},
+            {expected: 'Shift', key: null,   modifiers: ['shift'], os: 'unknown'},
+            {expected: 'Shift + F', key: 'KeyF', modifiers: ['shift'], os: 'unknown'},
+            {expected: 'Shift + F1', key: 'F1',   modifiers: ['shift'], os: 'unknown'},
+            {expected: 'Meta', key: null,   modifiers: ['meta'], os: 'unknown'},
+            {expected: 'Meta + F', key: 'KeyF', modifiers: ['meta'], os: 'unknown'},
+            {expected: 'Meta + F1', key: 'F1',   modifiers: ['meta'], os: 'unknown'},
+            {expected: 'Mouse 1', key: null,   modifiers: ['mouse1'], os: 'unknown'},
+            {expected: 'Mouse 1 + F', key: 'KeyF', modifiers: ['mouse1'], os: 'unknown'},
+            {expected: 'Mouse 1 + F1', key: 'F1',   modifiers: ['mouse1'], os: 'unknown'},
         ];
         /* eslint-enable @stylistic/no-multi-spaces */
 
         const hotkeyUtil = new HotkeyUtil();
 
-        test.each(data)('$key with $modifiers on $os -> display value $expected', ({os, key, modifiers, expected}) => {
+        test.each(data)('$key with $modifiers on $os -> display value $expected', ({expected, key, modifiers, os}) => {
             hotkeyUtil.os = os;
             const displayName = hotkeyUtil.getInputDisplayValue(key, modifiers);
             expect(displayName).toStrictEqual(expected);
@@ -147,12 +147,12 @@ describe('HotkeyUtil', () => {
     describe('SortModifiers', () => {
         /** @type {{modifiers: import('input').Modifier[], expected: import('input').Modifier[]}[]} */
         const data = [
-            {modifiers: [], expected: []},
-            {modifiers: ['shift', 'alt', 'ctrl', 'mouse4', 'meta', 'mouse1', 'mouse0'], expected: ['meta', 'ctrl', 'alt', 'shift', 'mouse0', 'mouse1', 'mouse4']},
+            {expected: [], modifiers: []},
+            {expected: ['meta', 'ctrl', 'alt', 'shift', 'mouse0', 'mouse1', 'mouse4'], modifiers: ['shift', 'alt', 'ctrl', 'mouse4', 'meta', 'mouse1', 'mouse0']},
         ];
 
         const hotkeyUtil = new HotkeyUtil();
-        for (const {modifiers, expected} of data) {
+        for (const {expected, modifiers} of data) {
             test(`[${modifiers.join(',')}] -> [${expected.join(',')}]`, () => {
                 const modifiers2 = hotkeyUtil.sortModifiers(modifiers);
                 expect(modifiers2).toStrictEqual(modifiers);

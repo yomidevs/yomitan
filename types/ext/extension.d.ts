@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type HtmlElementWithContentWindow = HTMLIFrameElement | HTMLFrameElement | HTMLObjectElement;
+export type HtmlElementWithContentWindow = HTMLFrameElement | HTMLIFrameElement | HTMLObjectElement;
 
 export type ContentOrigin = {
-    tabId: number | null;
-    frameId: number | null;
+    frameId: null | number;
+    tabId: null | number;
 };
 
 export type ChromeRuntimeOnMessageCallback<TMessage = unknown> = (

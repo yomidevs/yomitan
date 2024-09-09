@@ -40,14 +40,14 @@ export class GenericSettingController {
         );
         /** @type {Map<import('generic-setting-controller').TransformType, import('generic-setting-controller').TransformFunction>} */
         this._transforms = new Map(/** @type {[key: import('generic-setting-controller').TransformType, value: import('generic-setting-controller').TransformFunction][]} */ ([
+            ['conditionalConvert', this._conditionalConvert.bind(this)],
+            ['joinTags', this._joinTags.bind(this)],
             ['setAttribute', this._setAttribute.bind(this)],
             ['setVisibility', this._setVisibility.bind(this)],
             ['splitTags', this._splitTags.bind(this)],
-            ['joinTags', this._joinTags.bind(this)],
-            ['toNumber', this._toNumber.bind(this)],
             ['toBoolean', this._toBoolean.bind(this)],
+            ['toNumber', this._toNumber.bind(this)],
             ['toString', this._toString.bind(this)],
-            ['conditionalConvert', this._conditionalConvert.bind(this)],
         ]));
     }
 
@@ -75,14 +75,14 @@ export class GenericSettingController {
      */
     _createElementMetadata(element) {
         if (!(element instanceof HTMLElement)) { return void 0; }
-        const {setting: path, scope, transform: transformRaw} = element.dataset;
+        const {scope, setting: path, transform: transformRaw} = element.dataset;
         if (typeof path !== 'string') { return void 0; }
         const scope2 = this._normalizeScope(scope);
         return {
             path,
             scope: scope2 !== null ? scope2 : this._defaultScope,
-            transforms: this._getTransformDataArray(transformRaw),
             transformRaw,
+            transforms: this._getTransformDataArray(transformRaw),
         };
     }
 
@@ -110,9 +110,9 @@ export class GenericSettingController {
         for (const {metadata: {path, scope}} of targets) {
             /** @type {import('settings-modifications').ScopedRead} */
             const target = {
+                optionsContext: null,
                 path,
                 scope: typeof scope === 'string' ? scope : defaultScope,
-                optionsContext: null,
             };
             settingsTargets.push(target);
         }
@@ -127,15 +127,15 @@ export class GenericSettingController {
         const defaultScope = this._defaultScope;
         /** @type {import('settings-modifications').ScopedModification[]} */
         const settingsTargets = [];
-        for (const {metadata: {path, scope, transforms}, value, element} of targets) {
+        for (const {element, metadata: {path, scope, transforms}, value} of targets) {
             const transformedValue = this._applyTransforms(value, transforms, 'pre', element);
             /** @type {import('settings-modifications').ScopedModification} */
             const target = {
+                action: 'set',
+                optionsContext: null,
                 path,
                 scope: typeof scope === 'string' ? scope : defaultScope,
-                action: 'set',
                 value: transformedValue,
-                optionsContext: null,
             };
             settingsTargets.push(target);
         }
@@ -151,7 +151,7 @@ export class GenericSettingController {
         return values.map((value, i) => {
             const error = value.error;
             if (error) { return {error: ExtensionError.deserialize(error)}; }
-            const {metadata: {transforms}, element} = targets[i];
+            const {element, metadata: {transforms}} = targets[i];
             const result = this._applyTransforms(value.result, transforms, 'post', element);
             return {result};
         });
@@ -223,18 +223,18 @@ export class GenericSettingController {
         switch (operation) {
             case '!': return !lhs;
             case '!!': return !!lhs;
-            case '===': return lhs === rhs;
             case '!==': return lhs !== rhs;
-            case '>=': return /** @type {number} */ (lhs) >= /** @type {number} */ (rhs);
-            case '<=': return /** @type {number} */ (lhs) <= /** @type {number} */ (rhs);
-            case '>': return /** @type {number} */ (lhs) > /** @type {number} */ (rhs);
-            case '<': return /** @type {number} */ (lhs) < /** @type {number} */ (rhs);
             case '&&':
                 for (const operationData2 of /** @type {import('generic-setting-controller').OperationData[]} */ (rhs)) {
                     const result = this._evaluateSimpleOperation(operationData2, lhs);
                     if (!result) { return result; }
                 }
                 return true;
+            case '<': return /** @type {number} */ (lhs) < /** @type {number} */ (rhs);
+            case '<=': return /** @type {number} */ (lhs) <= /** @type {number} */ (rhs);
+            case '===': return lhs === rhs;
+            case '>': return /** @type {number} */ (lhs) > /** @type {number} */ (rhs);
+            case '>=': return /** @type {number} */ (lhs) >= /** @type {number} */ (rhs);
             case '||':
                 for (const operationData2 of /** @type {import('generic-setting-controller').OperationData[]} */ (rhs)) {
                     const result = this._evaluateSimpleOperation(operationData2, lhs);
@@ -252,8 +252,8 @@ export class GenericSettingController {
      */
     _normalizeScope(value) {
         switch (value) {
-            case 'profile':
             case 'global':
+            case 'profile':
                 return value;
             default:
                 return null;
@@ -281,7 +281,7 @@ export class GenericSettingController {
      * @returns {unknown}
      */
     _setAttribute(value, data, element) {
-        const {ancestorDistance, selector, attribute} = data;
+        const {ancestorDistance, attribute, selector} = data;
         const relativeElement = this._getRelativeElement(element, ancestorDistance, selector);
         if (relativeElement !== null && relativeElement instanceof Element) {
             relativeElement.setAttribute(attribute, `${value}`);
@@ -296,7 +296,7 @@ export class GenericSettingController {
      * @returns {unknown}
      */
     _setVisibility(value, data, element) {
-        const {ancestorDistance, selector, condition} = data;
+        const {ancestorDistance, condition, selector} = data;
         const relativeElement = this._getRelativeElement(element, ancestorDistance, selector);
         if (relativeElement !== null && relativeElement instanceof HTMLElement) {
             relativeElement.hidden = !this._evaluateSimpleOperation(condition, value);

@@ -80,11 +80,11 @@ export class Modal extends PanelElement {
         const element = /** @type {HTMLElement} */ (e.currentTarget);
         const {modalAction} = element.dataset;
         switch (modalAction) {
-            case 'expand':
-                this._setExpanded(true);
-                break;
             case 'collapse':
                 this._setExpanded(false);
+                break;
+            case 'expand':
+                this._setExpanded(true);
                 break;
         }
     }

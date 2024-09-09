@@ -208,11 +208,11 @@ export class CollapsibleDictionaryController {
      */
     _normalizeDictionaryDefinitionsCollapsible(value) {
         switch (value) {
-            case 'not-collapsible':
-            case 'expanded':
             case 'collapsed':
+            case 'expanded':
             case 'force-collapsed':
             case 'force-expanded':
+            case 'not-collapsible':
                 return value;
             default:
                 return null;

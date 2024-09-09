@@ -15,4 +15,4 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type PseudoDOMRectList = DOMRect[] & {item: (index: number) => DOMRect};
+export type PseudoDOMRectList = {item: (index: number) => DOMRect} & DOMRect[];

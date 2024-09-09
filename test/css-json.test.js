@@ -21,7 +21,7 @@ import {describe, expect, test} from 'vitest';
 import {formatRulesJson, generateRules, getTargets} from '../dev/generate-css-json.js';
 
 describe('css-json', () => {
-    test.each(getTargets())('css-json-test-%#', ({cssFilePath, overridesCssFilePath, outputPath}) => {
+    test.each(getTargets())('css-json-test-%#', ({cssFilePath, outputPath, overridesCssFilePath}) => {
         const actual = fs.readFileSync(outputPath, {encoding: 'utf8'});
         const expected = formatRulesJson(generateRules(cssFilePath, overridesCssFilePath));
         expect(actual).toStrictEqual(expected);

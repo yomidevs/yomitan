@@ -43,7 +43,7 @@ export class FrameClient {
      * @param {number} [timeout]
      */
     async connect(frame, targetOrigin, hostFrameId, setupFrame, timeout = 10000) {
-        const {secret, token, frameId} = await this._connectInternal(frame, targetOrigin, hostFrameId, setupFrame, timeout);
+        const {frameId, secret, token} = await this._connectInternal(frame, targetOrigin, hostFrameId, setupFrame, timeout);
         this._secret = secret;
         this._token = token;
         this._frameId = frameId;
@@ -67,9 +67,9 @@ export class FrameClient {
             throw new Error('Not connected');
         }
         return {
-            token: /** @type {string} */ (this._token),
-            secret: /** @type {string} */ (this._secret),
             data,
+            secret: /** @type {string} */ (this._secret),
+            token: /** @type {string} */ (this._token),
         };
     }
 
@@ -130,14 +130,6 @@ export class FrameClient {
                     if (timer === null) { return; } // Done
 
                     switch (action) {
-                        case 'frameEndpointReady':
-                            {
-                                const {secret} = params;
-                                const token = generateId(16);
-                                tokenMap.set(secret, token);
-                                postMessage('frameEndpointConnect', {secret, token, hostFrameId});
-                            }
-                            break;
                         case 'frameEndpointConnected':
                             {
                                 const {secret, token} = params;
@@ -145,8 +137,16 @@ export class FrameClient {
                                 const token2 = tokenMap.get(secret);
                                 if (typeof token2 !== 'undefined' && token === token2 && typeof frameId === 'number') {
                                     cleanup();
-                                    resolve({secret, token, frameId});
+                                    resolve({frameId, secret, token});
                                 }
+                            }
+                            break;
+                        case 'frameEndpointReady':
+                            {
+                                const {secret} = params;
+                                const token = generateId(16);
+                                tokenMap.set(secret, token);
+                                postMessage('frameEndpointConnect', {hostFrameId, secret, token});
                             }
                             break;
                     }

@@ -17,16 +17,16 @@
 
 /** Details about how to acquire the popup. */
 export type GetOrCreatePopupDetails = {
-    /** The ID of the frame that should host the popup. */
-    frameId?: number | null;
-    /** A specific ID used to find an existing popup, or to assign to the new popup. */
-    id?: string | null;
-    /** The ID of the parent popup. */
-    parentPopupId?: string | null;
-    /** A specific depth value to assign to the popup. */
-    depth?: number | null;
-    /** Whether or not a separate popup window should be used, rather than an iframe. */
-    popupWindow?: boolean;
     /** Whether or not the popup is able to show child popups. */
     childrenSupported?: boolean;
+    /** A specific depth value to assign to the popup. */
+    depth?: null | number;
+    /** The ID of the frame that should host the popup. */
+    frameId?: null | number;
+    /** A specific ID used to find an existing popup, or to assign to the new popup. */
+    id?: null | string;
+    /** The ID of the parent popup. */
+    parentPopupId?: null | string;
+    /** Whether or not a separate popup window should be used, rather than an iframe. */
+    popupWindow?: boolean;
 };

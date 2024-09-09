@@ -16,27 +16,27 @@
  */
 
 export type DocumentUtilTestData = {
-    elementFromPointSelector: string;
     caretRangeFromPointSelector: string;
-    startNodeSelector: string;
-    startOffset: number;
+    elementFromPointSelector: string;
     endNodeSelector: string;
     endOffset: number;
-    resultType: string;
-    sentenceScanExtent: number;
-    sentence: string;
     hasImposter: boolean | undefined;
+    resultType: string;
+    sentence: string;
+    sentenceScanExtent: number;
+    startNodeSelector: string;
+    startOffset: number;
     terminateAtNewlines: boolean | undefined;
 };
 
 export type DOMTextScannerTestData = {
-    seekNodeSelector: string;
-    seekNodeIsText: boolean;
-    seekOffset: number;
-    seekLength: number;
-    seekDirection: string;
-    expectedResultNodeSelector: string;
-    expectedResultNodeIsText: boolean;
-    expectedResultOffset: number;
     expectedResultContent: string[];
+    expectedResultNodeIsText: boolean;
+    expectedResultNodeSelector: string;
+    expectedResultOffset: number;
+    seekDirection: string;
+    seekLength: number;
+    seekNodeIsText: boolean;
+    seekNodeSelector: string;
+    seekOffset: number;
 };

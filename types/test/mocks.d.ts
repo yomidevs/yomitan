@@ -24,9 +24,9 @@ export type ChromeMock = {
 export type FetchMock = (url: string) => Promise<FetchResponseMock>;
 
 export type FetchResponseMock = {
+    json(): Promise<unknown>;
     ok: boolean;
     status: number;
     statusText: string;
     text(): Promise<string>;
-    json(): Promise<unknown>;
 };

@@ -149,14 +149,14 @@ export class BackupController {
         }
 
         return {
-            version: this._currentVersion,
             date: this._getSettingsExportDateString(date, '-', ' ', ':', 6),
-            url: chrome.runtime.getURL('/'),
-            manifest: chrome.runtime.getManifest(),
             environment,
-            userAgent: navigator.userAgent,
-            permissions,
+            manifest: chrome.runtime.getManifest(),
             options: optionsFull,
+            permissions,
+            url: chrome.runtime.getURL('/'),
+            userAgent: navigator.userAgent,
+            version: this._currentVersion,
         };
     }
 
@@ -566,7 +566,7 @@ export class BackupController {
     /**
      * @param {{totalRows: number, completedRows: number, done: boolean}} details
      */
-    _databaseExportProgressCallback({totalRows, completedRows, done}) {
+    _databaseExportProgressCallback({completedRows, done, totalRows}) {
         log.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
         /** @type {HTMLElement} */
         const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
@@ -632,7 +632,7 @@ export class BackupController {
     /**
      * @param {{totalRows: number, completedRows: number, done: boolean}} details
      */
-    _databaseImportProgressCallback({totalRows, completedRows, done}) {
+    _databaseImportProgressCallback({completedRows, done, totalRows}) {
         log.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
         /** @type {HTMLElement} */
         const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');

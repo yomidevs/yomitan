@@ -19,8 +19,8 @@ import {basicTextProcessorOptions} from '../text-processors.js';
 
 /** @type {import('language').TextProcessor<boolean>} */
 export const removeSerboCroatianAccentMarks = {
-    name: 'Remove diacritics',
     description: 'A\u0301 → A, a\u0301 → a',
+    name: 'Remove diacritics',
     options: basicTextProcessorOptions,
     process: (str, setting) => (
         setting ?

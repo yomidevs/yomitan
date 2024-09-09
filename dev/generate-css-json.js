@@ -30,13 +30,13 @@ export function getTargets() {
     return [
         {
             cssFilePath: path.join(dirname, '..', 'ext/css/structured-content.css'),
-            overridesCssFilePath: path.join(dirname, 'data/structured-content-overrides.css'),
             outputPath: path.join(dirname, '..', 'ext/data/structured-content-style.json'),
+            overridesCssFilePath: path.join(dirname, 'data/structured-content-overrides.css'),
         },
         {
             cssFilePath: path.join(dirname, '..', 'ext/css/display-pronunciation.css'),
-            overridesCssFilePath: path.join(dirname, 'data/display-pronunciation-overrides.css'),
             outputPath: path.join(dirname, '..', 'ext/data/pronunciation-style.json'),
+            overridesCssFilePath: path.join(dirname, 'data/display-pronunciation-overrides.css'),
         },
     ];
 }
@@ -146,7 +146,7 @@ export function generateRules(cssFilePath, overridesCssFilePath) {
 
     for (const rule of defaultStylesheet.rules) {
         if (rule.type !== 'rule') { continue; }
-        const {selectors, declarations} = /** @type {css.Rule} */ (rule);
+        const {declarations, selectors} = /** @type {css.Rule} */ (rule);
         if (typeof selectors === 'undefined') { continue; }
         /** @type {import('css-style-applier').RawStyleDataStyleArray} */
         const styles = [];
@@ -168,7 +168,7 @@ export function generateRules(cssFilePath, overridesCssFilePath) {
 
     for (const rule of overridesStylesheet.rules) {
         if (rule.type !== 'rule') { continue; }
-        const {selectors, declarations} = /** @type {css.Rule} */ (rule);
+        const {declarations, selectors} = /** @type {css.Rule} */ (rule);
         if (typeof selectors === 'undefined' || typeof declarations === 'undefined') { continue; }
         /** @type {Map<string, number>} */
         const removedProperties = new Map();

@@ -18,11 +18,11 @@
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type Events = {
-    visibilityChanged: {
-        visible: boolean;
-    };
     closeCompleted: {
         reopening: boolean;
+    };
+    visibilityChanged: {
+        visible: boolean;
     };
 };
 

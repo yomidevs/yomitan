@@ -17,7 +17,7 @@
 
 export type Node<K = unknown, V = unknown> = {
     key: K | null;
-    value: V | null;
-    previous: Node<K, V> | null;
     next: Node<K, V> | null;
+    previous: Node<K, V> | null;
+    value: null | V;
 };

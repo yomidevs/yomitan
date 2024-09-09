@@ -56,10 +56,10 @@ export const expect = test.expect;
  */
 export function getMockModelFields() {
     return new Map([
-        ['Word', '{expression}'],
+        ['Audio', '{audio}'],
         ['Reading', '{furigana-plain}'],
         ['Sentence', '{clipboard-text}'],
-        ['Audio', '{audio}'],
+        ['Word', '{expression}'],
     ]);
 }
 
@@ -76,9 +76,9 @@ export async function mockAnkiRouteHandler(route) {
         }
         const body = getResponseBody(/** @type {import('core').SerializableObject} */ (requestJson).action);
         const responseJson = {
-            status: 200,
-            contentType: 'text/json',
             body: JSON.stringify(body),
+            contentType: 'text/json',
+            status: 200,
         };
         await route.fulfill(responseJson);
     } catch {
@@ -100,30 +100,30 @@ export const writeToClipboardFromPage = async (page, text) => {
  */
 export function getExpectedAddNoteBody() {
     return {
-        version: 2,
         action: 'addNote',
         params: {
             note: {
-                fields: {
-                    Word: '読む',
-                    Reading: '読[よ]む',
-                    Audio: '[sound:mock_audio.mp3]',
-                    Sentence: '読むの例文',
-                },
-                tags: ['yomitan'],
                 deckName: 'Mock Deck',
+                fields: {
+                    Audio: '[sound:mock_audio.mp3]',
+                    Reading: '読[よ]む',
+                    Sentence: '読むの例文',
+                    Word: '読む',
+                },
                 modelName: 'Mock Model',
                 options: {
                     allowDuplicate: true,
                     duplicateScope: 'collection',
                     duplicateScopeOptions: {
-                        deckName: null,
-                        checkChildren: false,
                         checkAllModels: false,
+                        checkChildren: false,
+                        deckName: null,
                     },
                 },
+                tags: ['yomitan'],
             },
         },
+        version: 2,
     };
 }
 
@@ -134,14 +134,14 @@ export function getExpectedAddNoteBody() {
  */
 function getResponseBody(action) {
     switch (action) {
-        case 'version': return 6;
-        case 'deckNames': return ['Mock Deck'];
-        case 'modelNames': return ['Mock Model'];
-        case 'modelFieldNames': return [...getMockModelFields().keys()];
-        case 'canAddNotes': return [true, true];
-        case 'storeMediaFile': return 'mock_audio.mp3';
         case 'addNote': return 102312488912;
+        case 'canAddNotes': return [true, true];
+        case 'deckNames': return ['Mock Deck'];
+        case 'modelFieldNames': return [...getMockModelFields().keys()];
+        case 'modelNames': return ['Mock Model'];
         case 'multi': return [];
+        case 'storeMediaFile': return 'mock_audio.mp3';
+        case 'version': return 6;
         default: throw new Error(`Unknown action: ${action}`);
     }
 }

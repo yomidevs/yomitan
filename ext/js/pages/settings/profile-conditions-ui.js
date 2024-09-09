@@ -55,54 +55,54 @@ export class ProfileConditionsUI extends EventDispatcher {
         /** @type {Map<import('profile-conditions-ui').DescriptorType, import('profile-conditions-ui').Descriptor>} */
         this._descriptors = new Map([
             [
-                'popupLevel',
+                'flags',
                 {
-                    displayName: 'Popup Level',
-                    defaultOperator: 'equal',
+                    defaultOperator: 'are',
+                    displayName: 'Flags',
                     operators: new Map([
-                        ['equal',              {displayName: '=',      type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
-                        ['notEqual',           {displayName: '\u2260', type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
-                        ['lessThan',           {displayName: '<',      type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
-                        ['greaterThan',        {displayName: '>',      type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
-                        ['lessThanOrEqual',    {displayName: '\u2264', type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
-                        ['greaterThanOrEqual', {displayName: '\u2265', type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
-                    ]),
-                },
-            ],
-            [
-                'url',
-                {
-                    displayName: 'URL',
-                    defaultOperator: 'matchDomain',
-                    operators: new Map([
-                        ['matchDomain', {displayName: 'Matches Domain', type: 'string', defaultValue: 'example.com',   resetDefaultOnChange: true, validate: this._validateDomains.bind(this), normalize: this._normalizeDomains.bind(this)}],
-                        ['matchRegExp', {displayName: 'Matches RegExp', type: 'string', defaultValue: 'example\\.com', resetDefaultOnChange: true, validate: this._validateRegExp.bind(this)}],
+                        ['are',        {defaultValue: '',            displayName: 'Are', normalize: normalizeFlags, type: 'string', validate: validateFlags}],
+                        ['areNot',     {defaultValue: '',        displayName: 'Are Not', normalize: normalizeFlags, type: 'string', validate: validateFlags}],
+                        ['include',    {defaultValue: '',        displayName: 'Include', normalize: normalizeFlags, type: 'string', validate: validateFlags}],
+                        ['notInclude', {defaultValue: '', displayName: 'Don\'t Include', normalize: normalizeFlags, type: 'string', validate: validateFlags}],
                     ]),
                 },
             ],
             [
                 'modifierKeys',
                 {
-                    displayName: 'Modifier Keys',
                     defaultOperator: 'are',
+                    displayName: 'Modifier Keys',
                     operators: new Map([
-                        ['are',        {displayName: 'Are',            type: 'modifierKeys', defaultValue: ''}],
-                        ['areNot',     {displayName: 'Are Not',        type: 'modifierKeys', defaultValue: ''}],
-                        ['include',    {displayName: 'Include',        type: 'modifierKeys', defaultValue: ''}],
-                        ['notInclude', {displayName: 'Don\'t Include', type: 'modifierKeys', defaultValue: ''}],
+                        ['are',        {defaultValue: '',            displayName: 'Are', type: 'modifierKeys'}],
+                        ['areNot',     {defaultValue: '',        displayName: 'Are Not', type: 'modifierKeys'}],
+                        ['include',    {defaultValue: '',        displayName: 'Include', type: 'modifierKeys'}],
+                        ['notInclude', {defaultValue: '', displayName: 'Don\'t Include', type: 'modifierKeys'}],
                     ]),
                 },
             ],
             [
-                'flags',
+                'popupLevel',
                 {
-                    displayName: 'Flags',
-                    defaultOperator: 'are',
+                    defaultOperator: 'equal',
+                    displayName: 'Popup Level',
                     operators: new Map([
-                        ['are',        {displayName: 'Are',            type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}],
-                        ['areNot',     {displayName: 'Are Not',        type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}],
-                        ['include',    {displayName: 'Include',        type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}],
-                        ['notInclude', {displayName: 'Don\'t Include', type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}],
+                        ['equal',              {defaultValue: '0',      displayName: '=', normalize: normalizeInteger, type: 'integer', validate: validateInteger}],
+                        ['greaterThan',        {defaultValue: '0',      displayName: '>', normalize: normalizeInteger, type: 'integer', validate: validateInteger}],
+                        ['greaterThanOrEqual', {defaultValue: '0', displayName: '\u2265', normalize: normalizeInteger, type: 'integer', validate: validateInteger}],
+                        ['lessThan',           {defaultValue: '0',      displayName: '<', normalize: normalizeInteger, type: 'integer', validate: validateInteger}],
+                        ['lessThanOrEqual',    {defaultValue: '0', displayName: '\u2264', normalize: normalizeInteger, type: 'integer', validate: validateInteger}],
+                        ['notEqual',           {defaultValue: '0', displayName: '\u2260', normalize: normalizeInteger, type: 'integer', validate: validateInteger}],
+                    ]),
+                },
+            ],
+            [
+                'url',
+                {
+                    defaultOperator: 'matchDomain',
+                    displayName: 'URL',
+                    operators: new Map([
+                        ['matchDomain', {defaultValue: 'example.com', displayName: 'Matches Domain', normalize: this._normalizeDomains.bind(this),   resetDefaultOnChange: true, type: 'string', validate: this._validateDomains.bind(this)}],
+                        ['matchRegExp', {defaultValue: 'example\\.com', displayName: 'Matches RegExp', resetDefaultOnChange: true, type: 'string', validate: this._validateRegExp.bind(this)}],
                     ]),
                 },
             ],
@@ -175,7 +175,7 @@ export class ProfileConditionsUI extends EventDispatcher {
     getDescriptorTypes() {
         const results = [];
         for (const [name, {displayName}] of this._descriptors.entries()) {
-            results.push({name, displayName});
+            results.push({displayName, name});
         }
         return results;
     }
@@ -189,7 +189,7 @@ export class ProfileConditionsUI extends EventDispatcher {
         const results = [];
         if (typeof info !== 'undefined') {
             for (const [name, {displayName}] of info.operators.entries()) {
-                results.push({name, displayName});
+                results.push({displayName, name});
             }
         }
         return results;
@@ -220,21 +220,21 @@ export class ProfileConditionsUI extends EventDispatcher {
         const info = this._getOperatorDetails(type, operator);
 
         const {
-            displayName = operator,
-            type: type2 = 'string',
             defaultValue = '',
-            resetDefaultOnChange = false,
-            validate = null,
+            displayName = operator,
             normalize = null,
+            resetDefaultOnChange = false,
+            type: type2 = 'string',
+            validate = null,
         } = (typeof info === 'undefined' ? {} : info);
 
         return {
-            displayName,
-            type: type2,
             defaultValue,
-            resetDefaultOnChange,
-            validate,
+            displayName,
             normalize,
+            resetDefaultOnChange,
+            type: type2,
+            validate,
         };
     }
 
@@ -245,7 +245,7 @@ export class ProfileConditionsUI extends EventDispatcher {
         const type = this.getDefaultType();
         const operator = this.getDefaultOperator(type);
         const {defaultValue: value} = this.getOperatorDetails(type, operator);
-        return {type, operator, value};
+        return {operator, type, value};
     }
 
     /**
@@ -268,10 +268,10 @@ export class ProfileConditionsUI extends EventDispatcher {
 
         void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
-            path: this.getPath('conditionGroups'),
-            start: index,
             deleteCount: 1,
             items: [],
+            path: this.getPath('conditionGroups'),
+            start: index,
         }]);
 
         this._triggerConditionGroupCountChanged(this._children.length);
@@ -311,10 +311,10 @@ export class ProfileConditionsUI extends EventDispatcher {
      */
     static normalizeProfileConditionType(value) {
         switch (value) {
+            case 'flags':
+            case 'modifierKeys':
             case 'popupLevel':
             case 'url':
-            case 'modifierKeys':
-            case 'flags':
                 return value;
             default:
                 return null;
@@ -335,10 +335,10 @@ export class ProfileConditionsUI extends EventDispatcher {
 
         void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
-            path: this.getPath('conditionGroups'),
-            start: index,
             deleteCount: 0,
             items: [conditionGroup],
+            path: this.getPath('conditionGroups'),
+            start: index,
         }]);
 
         this._triggerConditionGroupCountChanged(this._children.length);
@@ -545,10 +545,10 @@ class ProfileConditionGroupUI {
 
         void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
-            path: this.getPath('conditions'),
-            start: index,
             deleteCount: 1,
             items: [],
+            path: this.getPath('conditions'),
+            start: index,
         }]);
 
         if (this._children.length === 0) {
@@ -583,10 +583,10 @@ class ProfileConditionGroupUI {
 
         void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
-            path: this.getPath('conditions'),
-            start: index,
             deleteCount: 0,
             items: [condition],
+            path: this.getPath('conditions'),
+            start: index,
         }]);
     }
 
@@ -670,7 +670,7 @@ class ProfileConditionUI {
      * @param {import('settings').ProfileCondition} condition
      */
     prepare(condition) {
-        const {type, operator, value} = condition;
+        const {operator, type, value} = condition;
 
         const operatorDetails = this._getOperatorDetails(type, operator);
         this._updateTypes(type);
@@ -732,7 +732,7 @@ class ProfileConditionUI {
      * @param {import('profile-conditions-ui').InputData} details
      * @param {Event} e
      */
-    _onValueInputChange({validate, normalize}, e) {
+    _onValueInputChange({normalize, validate}, e) {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const value = node.value;
         const okay = this._validateValue(value, validate);
@@ -748,7 +748,7 @@ class ProfileConditionUI {
      * @param {import('profile-conditions-ui').InputData} details
      * @param {import('keyboard-mouse-input-field').EventArgument<'change'>} event
      */
-    _onModifierInputChange({validate, normalize}, event) {
+    _onModifierInputChange({normalize, validate}, event) {
         const modifiers = this._joinModifiers(event.modifiers);
         const okay = this._validateValue(modifiers, validate);
         this._value = modifiers;
@@ -836,7 +836,7 @@ class ProfileConditionUI {
      */
     _updateSelect(select, optionContainer, values, value) {
         optionContainer.textContent = '';
-        for (const {name, displayName} of values) {
+        for (const {displayName, name} of values) {
             const option = document.createElement('option');
             option.value = name;
             option.textContent = displayName;
@@ -850,7 +850,7 @@ class ProfileConditionUI {
      * @param {import('profile-conditions-ui').Operator} operator
      * @returns {boolean}
      */
-    _updateValueInput(value, {type, validate, normalize}) {
+    _updateValueInput(value, {normalize, type, validate}) {
         this._inputEventListeners.removeAllEventListeners();
         if (this._kbmInputField !== null) {
             this._kbmInputField.cleanup();
@@ -863,7 +863,7 @@ class ProfileConditionUI {
         let inputStep = null;
         let showMouseButton = false;
         /** @type {import('profile-conditions-ui').InputData} */
-        const inputData = {validate, normalize};
+        const inputData = {normalize, validate};
         const node = this._valueInput;
 
         switch (type) {
@@ -871,8 +871,8 @@ class ProfileConditionUI {
                 inputType = 'number';
                 inputStep = '1';
                 break;
-            case 'modifierKeys':
             case 'modifierInputs':
+            case 'modifierKeys':
                 inputValue = null;
                 showMouseButton = (type === 'modifierInputs');
                 this._kbmInputField = this._parent.parent.createKeyboardMouseInputField(node, this._mouseButton);
@@ -894,8 +894,8 @@ class ProfileConditionUI {
         this._mouseButtonContainer.hidden = !showMouseButton;
 
         switch (type) {
-            case 'modifierKeys':
             case 'modifierInputs':
+            case 'modifierKeys':
                 if (this._kbmInputField !== null) {
                     this._inputEventListeners.on(this._kbmInputField, 'change', this._onModifierInputChange.bind(this, inputData));
                 }

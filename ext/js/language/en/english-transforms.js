@@ -70,13 +70,13 @@ const phrasalVerbWordDisjunction = [...phrasalVerbWordSet].join('|');
  * @type {import('language-transformer').Rule<Condition>}
  */
 const phrasalVerbInterposedObjectRule = {
-    type: 'other',
-    isInflected: new RegExp(`^\\w* (?:(?!\\b(${phrasalVerbWordDisjunction})\\b).)+ (?:${particlesDisjunction})`),
+    conditionsIn: [],
+    conditionsOut: ['v_phr'],
     deinflect: (term) => {
         return term.replace(new RegExp(`(?<=\\w) (?:(?!\\b(${phrasalVerbWordDisjunction})\\b).)+ (?=(?:${particlesDisjunction}))`), ' ');
     },
-    conditionsIn: [],
-    conditionsOut: ['v_phr'],
+    isInflected: new RegExp(`^\\w* (?:(?!\\b(${phrasalVerbWordDisjunction})\\b).)+ (?:${particlesDisjunction})`),
+    type: 'other',
 };
 
 /**
@@ -86,13 +86,13 @@ const phrasalVerbInterposedObjectRule = {
  */
 function createPhrasalVerbInflection(inflected, deinflected) {
     return {
-        type: 'other',
-        isInflected: new RegExp(`^\\w*${inflected} (?:${phrasalVerbWordDisjunction})`),
+        conditionsIn: ['v'],
+        conditionsOut: ['v_phr'],
         deinflect: (term) => {
             return term.replace(new RegExp(`(?<=)${inflected}(?= (?:${phrasalVerbWordDisjunction}))`), deinflected);
         },
-        conditionsIn: ['v'],
-        conditionsOut: ['v_phr'],
+        isInflected: new RegExp(`^\\w*${inflected} (?:${phrasalVerbWordDisjunction})`),
+        type: 'other',
     };
 }
 
@@ -101,7 +101,7 @@ function createPhrasalVerbInflection(inflected, deinflected) {
  * @returns {import('language-transformer').Rule<Condition>[]}
  */
 function createPhrasalVerbInflectionsFromSuffixInflections(sourceRules) {
-    return sourceRules.flatMap(({isInflected, deinflected}) => {
+    return sourceRules.flatMap(({deinflected, isInflected}) => {
         if (typeof deinflected === 'undefined') { return []; }
         const inflectedSuffix = isInflected.source.replace('$', '');
         const deinflectedSuffix = deinflected;
@@ -110,46 +110,144 @@ function createPhrasalVerbInflectionsFromSuffixInflections(sourceRules) {
 }
 
 const conditions = {
-    v: {
-        name: 'Verb',
+    adj: {
         isDictionaryForm: true,
-        subConditions: ['v_phr'],
+        name: 'Adjective',
     },
-    v_phr: {
-        name: 'Phrasal verb',
+    adv: {
         isDictionaryForm: true,
+        name: 'Adverb',
     },
     n: {
-        name: 'Noun',
         isDictionaryForm: true,
+        name: 'Noun',
         subConditions: ['np', 'ns'],
     },
     np: {
-        name: 'Noun plural',
         isDictionaryForm: true,
+        name: 'Noun plural',
     },
     ns: {
+        isDictionaryForm: true,
         name: 'Noun singular',
-        isDictionaryForm: true,
     },
-    adj: {
-        name: 'Adjective',
+    v: {
         isDictionaryForm: true,
+        name: 'Verb',
+        subConditions: ['v_phr'],
     },
-    adv: {
-        name: 'Adverb',
+    v_phr: {
         isDictionaryForm: true,
+        name: 'Phrasal verb',
     },
 };
 
 /** @type {import('language-transformer').LanguageTransformDescriptor<Condition>} */
 export const englishTransforms = {
-    language: 'en',
     conditions,
+    language: 'en',
     transforms: {
+        '-able': {
+            description: 'Adjective formed from a verb',
+            name: '-able',
+            rules: [
+                suffixInflection('able', '', ['v'], ['adj']),
+                suffixInflection('able', 'e', ['v'], ['adj']),
+                suffixInflection('iable', 'y', ['v'], ['adj']),
+                ...doubledConsonantInflection('bdgklmnprstz', 'able', ['v'], ['adj']),
+            ],
+        },
+        '-y': {
+            description: 'Adjective formed from a verb or noun',
+            name: '-y',
+            rules: [
+                suffixInflection('y', '', ['adj'], ['n', 'v']), // 'dirty', 'pushy'
+                suffixInflection('y', 'e', ['adj'], ['n', 'v']), // 'hazy'
+                ...doubledConsonantInflection('glmnprst', 'y', [], ['n', 'v']), // 'baggy', 'saggy'
+            ],
+        },
+        '3rd pers. sing. pres': {
+            description: 'Third person singular present tense of a verb',
+            name: '3rd pers. sing. pres',
+            rules: [
+                ...thirdPersonSgPresentSuffixInflections,
+                ...createPhrasalVerbInflectionsFromSuffixInflections(thirdPersonSgPresentSuffixInflections),
+            ],
+        },
+        'adverb': {
+            description: 'Adverb form of an adjective',
+            name: 'adverb',
+            rules: [
+                suffixInflection('ly', '', ['adv'], ['adj']), // 'quickly'
+                suffixInflection('ily', 'y', ['adv'], ['adj']), // 'happily'
+                suffixInflection('ly', 'le', ['adv'], ['adj']), // 'humbly'
+            ],
+        },
+        'archaic': {
+            description: 'Archaic form of a word',
+            name: 'archaic',
+            rules: [
+                suffixInflection('\'d', 'ed', ['v'], ['v']),
+            ],
+        },
+        'comparative': {
+            description: 'Comparative form of an adjective',
+            name: 'comparative',
+            rules: [
+                suffixInflection('er', '', ['adj'], ['adj']), // 'faster'
+                suffixInflection('er', 'e', ['adj'], ['adj']), // 'nicer'
+                suffixInflection('ier', 'y', ['adj'], ['adj']), // 'happier'
+                ...doubledConsonantInflection('bdgmnt', 'er', ['adj'], ['adj']),
+            ],
+        },
+        'dropped g': {
+            description: 'Dropped g in -ing form of a verb',
+            name: 'dropped g',
+            rules: [
+                suffixInflection('in\'', 'ing', ['v'], ['v']),
+            ],
+        },
+        'going-to future': {
+            description: 'Going-to future tense of a verb',
+            name: 'going-to future',
+            rules: [
+                prefixInflection('going to ', '', ['v'], ['v']),
+            ],
+        },
+        'imperative negative': {
+            description: 'Negative imperative form of a verb',
+            name: 'imperative negative',
+            rules: [
+                prefixInflection('don\'t ', '', ['v'], ['v']),
+                prefixInflection('do not ', '', ['v'], ['v']),
+            ],
+        },
+        'ing': {
+            description: 'Present participle of a verb',
+            name: 'ing',
+            rules: [
+                ...ingSuffixInflections,
+                ...createPhrasalVerbInflectionsFromSuffixInflections(ingSuffixInflections),
+            ],
+        },
+        'interposed object': {
+            description: 'Phrasal verb with interposed object',
+            name: 'interposed object',
+            rules: [
+                phrasalVerbInterposedObjectRule,
+            ],
+        },
+        'past': {
+            description: 'Simple past tense of a verb',
+            name: 'past',
+            rules: [
+                ...pastSuffixInflections,
+                ...createPhrasalVerbInflectionsFromSuffixInflections(pastSuffixInflections),
+            ],
+        },
         'plural': {
-            name: 'plural',
             description: 'Plural form of a noun',
+            name: 'plural',
             rules: [
                 suffixInflection('s', '', ['np'], ['ns']),
                 suffixInflection('es', '', ['np'], ['ns']),
@@ -159,73 +257,16 @@ export const englishTransforms = {
             ],
         },
         'possessive': {
-            name: 'possessive',
             description: 'Possessive form of a noun',
+            name: 'possessive',
             rules: [
                 suffixInflection('\'s', '', ['n'], ['n']),
                 suffixInflection('s\'', 's', ['n'], ['n']),
             ],
         },
-        'past': {
-            name: 'past',
-            description: 'Simple past tense of a verb',
-            rules: [
-                ...pastSuffixInflections,
-                ...createPhrasalVerbInflectionsFromSuffixInflections(pastSuffixInflections),
-            ],
-        },
-        'ing': {
-            name: 'ing',
-            description: 'Present participle of a verb',
-            rules: [
-                ...ingSuffixInflections,
-                ...createPhrasalVerbInflectionsFromSuffixInflections(ingSuffixInflections),
-            ],
-        },
-        '3rd pers. sing. pres': {
-            name: '3rd pers. sing. pres',
-            description: 'Third person singular present tense of a verb',
-            rules: [
-                ...thirdPersonSgPresentSuffixInflections,
-                ...createPhrasalVerbInflectionsFromSuffixInflections(thirdPersonSgPresentSuffixInflections),
-            ],
-        },
-        'interposed object': {
-            name: 'interposed object',
-            description: 'Phrasal verb with interposed object',
-            rules: [
-                phrasalVerbInterposedObjectRule,
-            ],
-        },
-        'archaic': {
-            name: 'archaic',
-            description: 'Archaic form of a word',
-            rules: [
-                suffixInflection('\'d', 'ed', ['v'], ['v']),
-            ],
-        },
-        'adverb': {
-            name: 'adverb',
-            description: 'Adverb form of an adjective',
-            rules: [
-                suffixInflection('ly', '', ['adv'], ['adj']), // 'quickly'
-                suffixInflection('ily', 'y', ['adv'], ['adj']), // 'happily'
-                suffixInflection('ly', 'le', ['adv'], ['adj']), // 'humbly'
-            ],
-        },
-        'comparative': {
-            name: 'comparative',
-            description: 'Comparative form of an adjective',
-            rules: [
-                suffixInflection('er', '', ['adj'], ['adj']), // 'faster'
-                suffixInflection('er', 'e', ['adj'], ['adj']), // 'nicer'
-                suffixInflection('ier', 'y', ['adj'], ['adj']), // 'happier'
-                ...doubledConsonantInflection('bdgmnt', 'er', ['adj'], ['adj']),
-            ],
-        },
         'superlative': {
-            name: 'superlative',
             description: 'Superlative form of an adjective',
+            name: 'superlative',
             rules: [
                 suffixInflection('est', '', ['adj'], ['adj']), // 'fastest'
                 suffixInflection('est', 'e', ['adj'], ['adj']), // 'nicest'
@@ -233,59 +274,18 @@ export const englishTransforms = {
                 ...doubledConsonantInflection('bdgmnt', 'est', ['adj'], ['adj']),
             ],
         },
-        'dropped g': {
-            name: 'dropped g',
-            description: 'Dropped g in -ing form of a verb',
-            rules: [
-                suffixInflection('in\'', 'ing', ['v'], ['v']),
-            ],
-        },
-        '-y': {
-            name: '-y',
-            description: 'Adjective formed from a verb or noun',
-            rules: [
-                suffixInflection('y', '', ['adj'], ['n', 'v']), // 'dirty', 'pushy'
-                suffixInflection('y', 'e', ['adj'], ['n', 'v']), // 'hazy'
-                ...doubledConsonantInflection('glmnprst', 'y', [], ['n', 'v']), // 'baggy', 'saggy'
-            ],
-        },
         'un-': {
-            name: 'un-',
             description: 'Negative form of an adjective, adverb, or verb',
+            name: 'un-',
             rules: [
                 prefixInflection('un', '', ['adj', 'adv', 'v'], ['adj', 'adv', 'v']),
             ],
         },
-        'going-to future': {
-            name: 'going-to future',
-            description: 'Going-to future tense of a verb',
-            rules: [
-                prefixInflection('going to ', '', ['v'], ['v']),
-            ],
-        },
         'will future': {
-            name: 'will future',
             description: 'Will-future tense of a verb',
+            name: 'will future',
             rules: [
                 prefixInflection('will ', '', ['v'], ['v']),
-            ],
-        },
-        'imperative negative': {
-            name: 'imperative negative',
-            description: 'Negative imperative form of a verb',
-            rules: [
-                prefixInflection('don\'t ', '', ['v'], ['v']),
-                prefixInflection('do not ', '', ['v'], ['v']),
-            ],
-        },
-        '-able': {
-            name: '-able',
-            description: 'Adjective formed from a verb',
-            rules: [
-                suffixInflection('able', '', ['v'], ['adj']),
-                suffixInflection('able', 'e', ['v'], ['adj']),
-                suffixInflection('iable', 'y', ['v'], ['adj']),
-                ...doubledConsonantInflection('bdgklmnprstz', 'able', ['v'], ['adj']),
             ],
         },
     },

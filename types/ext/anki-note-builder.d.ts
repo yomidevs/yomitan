@@ -27,22 +27,22 @@ import type * as Api from './api';
 import type * as Language from './language';
 
 export type CreateNoteDetails = {
-    dictionaryEntry: Dictionary.DictionaryEntry;
-    mode: AnkiTemplatesInternal.CreateMode;
+    compactTags: boolean;
     context: AnkiTemplatesInternal.Context;
-    template: string;
     deckName: string;
-    modelName: string;
-    fields: Field[];
-    tags: string[];
-    requirements: Requirement[];
+    dictionaryEntry: Dictionary.DictionaryEntry;
+    dictionaryStylesMap: Map<string, string>;
     duplicateScope: Settings.AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
-    resultOutputMode: Settings.ResultOutputMode;
+    fields: Field[];
     glossaryLayoutMode: Settings.GlossaryLayoutMode;
-    compactTags: boolean;
     mediaOptions: MediaOptions | null;
-    dictionaryStylesMap: Map<string, string>;
+    mode: AnkiTemplatesInternal.CreateMode;
+    modelName: string;
+    requirements: Requirement[];
+    resultOutputMode: Settings.ResultOutputMode;
+    tags: string[];
+    template: string;
 };
 
 export type Field = [
@@ -51,55 +51,55 @@ export type Field = [
 ];
 
 export type CreateNoteResult = {
-    note: Anki.Note;
     errors: Error[];
+    note: Anki.Note;
     requirements: Requirement[];
 };
 
 export type GetRenderingDataDetails = {
-    dictionaryEntry: Dictionary.DictionaryEntry;
-    mode: AnkiTemplatesInternal.CreateMode;
-    context: AnkiTemplatesInternal.Context;
-    resultOutputMode?: Settings.ResultOutputMode;
-    glossaryLayoutMode?: Settings.GlossaryLayoutMode;
     compactTags?: boolean;
-    marker: string;
+    context: AnkiTemplatesInternal.Context;
+    dictionaryEntry: Dictionary.DictionaryEntry;
     dictionaryStylesMap: Map<string, string>;
+    glossaryLayoutMode?: Settings.GlossaryLayoutMode;
+    marker: string;
+    mode: AnkiTemplatesInternal.CreateMode;
+    resultOutputMode?: Settings.ResultOutputMode;
 };
 
 export type CommonData = AnkiTemplatesInternal.CreateDetails;
 
 export type RequirementGeneric = {
-    type: 'audio' | 'screenshot' | 'clipboardImage' | 'clipboardText' | 'popupSelectionText';
+    type: 'audio' | 'clipboardImage' | 'clipboardText' | 'popupSelectionText' | 'screenshot';
 };
 
 export type RequirementTextFurigana = {
-    type: 'textFurigana';
-    text: string;
     readingMode: AnkiTemplates.TextFuriganaReadingMode;
+    text: string;
+    type: 'textFurigana';
 };
 
 export type RequirementDictionaryMedia = {
-    type: 'dictionaryMedia';
     dictionary: string;
     path: string;
+    type: 'dictionaryMedia';
 };
 
-export type Requirement = RequirementGeneric | RequirementTextFurigana | RequirementDictionaryMedia;
+export type Requirement = RequirementDictionaryMedia | RequirementGeneric | RequirementTextFurigana;
 
 export type AudioMediaOptions = {
-    sources: Audio.AudioSourceInfo[];
-    preferredAudioIndex: number | null;
-    idleTimeout: number | null;
+    idleTimeout: null | number;
     languageSummary: Language.LanguageSummary;
+    preferredAudioIndex: null | number;
+    sources: Audio.AudioSourceInfo[];
 };
 
 export type MediaOptions = {
     audio: AudioMediaOptions | null;
     screenshot: {
+        contentOrigin: Extension.ContentOrigin;
         format: Settings.AnkiScreenshotFormat;
         quality: number;
-        contentOrigin: Extension.ContentOrigin;
     };
     textParsing: {
         optionsContext: Settings.OptionsContext;
@@ -108,19 +108,19 @@ export type MediaOptions = {
 };
 
 export type TextFuriganaDetails = {
-    text: string;
     readingMode: AnkiTemplates.TextFuriganaReadingMode;
+    text: string;
 };
 
 export type BatchedRequestGroup = {
-    template: string;
     commonDataRequestsMap: Map<CommonData, BatchedRequestData[]>;
+    template: string;
 };
 
 export type BatchedRequestData = {
-    resolve: (result: TemplateRenderer.RenderResult) => void;
-    reject: (reason?: unknown) => void;
     marker: string;
+    reject: (reason?: unknown) => void;
+    resolve: (result: TemplateRenderer.RenderResult) => void;
 };
 
 export type MinimalApi = {

@@ -63,10 +63,10 @@ export class SentenceTerminationCharactersController {
 
         await this._settingsController.modifyProfileSettings([{
             action: 'splice',
-            path: 'sentenceParsing.terminationCharacters',
-            start: terminationCharacters.length,
             deleteCount: 0,
             items: [terminationCharacterEntry],
+            path: 'sentenceParsing.terminationCharacters',
+            start: terminationCharacters.length,
         }]);
 
         await this._updateOptions();
@@ -84,10 +84,10 @@ export class SentenceTerminationCharactersController {
 
         await this._settingsController.modifyProfileSettings([{
             action: 'splice',
-            path: 'sentenceParsing.terminationCharacters',
-            start: index,
             deleteCount: 1,
             items: [],
+            path: 'sentenceParsing.terminationCharacters',
+            start: index,
         }]);
 
         await this._updateOptions();
@@ -149,11 +149,11 @@ export class SentenceTerminationCharactersController {
     /** */
     async _addNewEntry() {
         const newEntry = {
-            enabled: true,
             character1: '"',
             character2: '"',
-            includeCharacterAtStart: false,
+            enabled: true,
             includeCharacterAtEnd: false,
+            includeCharacterAtStart: false,
         };
         await this.addEntry(newEntry);
     }
@@ -202,7 +202,7 @@ class SentenceTerminationCharacterEntry {
 
     /** */
     prepare() {
-        const {enabled, character1, character2, includeCharacterAtStart, includeCharacterAtEnd} = this._data;
+        const {character1, character2, enabled, includeCharacterAtEnd, includeCharacterAtStart} = this._data;
         const node = this._node;
 
         /** @type {HTMLInputElement} */

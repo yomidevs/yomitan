@@ -15,15 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-type Operation = 'set.defaultValue' | 'setOverride' | 'clearOverride';
+type Operation = 'clearOverride' | 'set.defaultValue' | 'setOverride';
 
 type DynamicPropertyTestOperation = {
-    operation: Operation | null;
-    expectedDefaultValue: number;
-    expectedValue: number;
-    expectedOverrideCount: number;
-    expectedEventOccurred: boolean;
     args: [value: number, priority?: number];
+    expectedDefaultValue: number;
+    expectedEventOccurred: boolean;
+    expectedOverrideCount: number;
+    expectedValue: number;
+    operation: null | Operation;
 };
 
 export type DynamicPropertyTestData = {
@@ -32,7 +32,7 @@ export type DynamicPropertyTestData = {
 }[];
 
 export type DeepEqualTestData = {
+    expected: boolean;
     value1: unknown;
     value2: unknown;
-    expected: boolean;
 }[];

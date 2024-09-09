@@ -24,60 +24,60 @@ import {testLanguageTransformer} from '../fixtures/language-transformer-test.js'
 const tests = [
     {
         category: 'nominalization',
-        valid: true,
         tests: [
-            {term: 'reinigen',   source: 'reinigung',    rule: 'v',   reasons: ['nominalization']},
-            {term: 'säubern',    source: 'säuberung',    rule: 'v',   reasons: ['nominalization']},
-            {term: 'entwickeln', source: 'entwicklung',  rule: 'v',   reasons: ['nominalization']},
+            {reasons: ['nominalization'],   rule: 'v',    source: 'reinigung',   term: 'reinigen'},
+            {reasons: ['nominalization'],    rule: 'v',    source: 'säuberung',   term: 'säubern'},
+            {reasons: ['nominalization'], rule: 'v',  source: 'entwicklung',   term: 'entwickeln'},
         ],
+        valid: true,
     },
     {
         category: '-bar',
-        valid: true,
         tests: [
-            {term: 'essen',     source: 'essbar',       rule: 'v',   reasons: ['-bar']},
-            {term: 'liefern',   source: 'lieferbar',    rule: 'v',   reasons: ['-bar']},
+            {reasons: ['-bar'],     rule: 'v',       source: 'essbar',   term: 'essen'},
+            {reasons: ['-bar'],   rule: 'v',    source: 'lieferbar',   term: 'liefern'},
         ],
+        valid: true,
     },
     {
         category: 'negative',
-        valid: true,
         tests: [
-            {term: 'möglich',    source: 'unmöglich',    rule: 'adj',   reasons: ['negative']},
+            {reasons: ['negative'],    rule: 'adj',    source: 'unmöglich',   term: 'möglich'},
         ],
+        valid: true,
     },
     {
         category: 'past participle',
-        valid: true,
         tests: [
-            {term: 'schnitzen',  source: 'geschnitzt',   rule: 'v',   reasons: ['past participle']},
-            {term: 'scheitern',  source: 'gescheitert',  rule: 'v',   reasons: ['past participle']},
+            {reasons: ['past participle'],  rule: 'v',   source: 'geschnitzt',   term: 'schnitzen'},
+            {reasons: ['past participle'],  rule: 'v',  source: 'gescheitert',   term: 'scheitern'},
 
-            {term: 'darstellen', source: 'dargestellt',  rule: 'v',   reasons: ['past participle']},
+            {reasons: ['past participle'], rule: 'v',  source: 'dargestellt',   term: 'darstellen'},
         ],
+        valid: true,
     },
     {
         category: 'separated prefix',
-        valid: true,
         tests: [
-            {term: 'räum auf', source: 'räum den Tisch auf', rule: 'v',   reasons: ['separated prefix']},
+            {reasons: ['separated prefix'], rule: 'v', source: 'räum den Tisch auf',   term: 'räum auf'},
         ],
+        valid: true,
     },
     {
         category: 'zu-infinitive',
-        valid: true,
         tests: [
-            {term: 'aufräumen', source: 'aufzuräumen', rule: 'v',   reasons: ['zu-infinitive']},
+            {reasons: ['zu-infinitive'], rule: 'v', source: 'aufzuräumen',   term: 'aufräumen'},
         ],
+        valid: true,
     },
     {
         category: '-heit',
-        valid: true,
         tests: [
-            {term: 'wahr', source: 'wahrheit', rule: 'adj', reasons: ['-heit']},
-            {term: 'Kind', source: 'Kindheit', rule: 'n', reasons: ['-heit']},
-            {term: 'anwenden', source: 'anwendbarkeit', rule: 'v', reasons: ['-bar', '-heit']},
+            {reasons: ['-heit'], rule: 'adj', source: 'wahrheit', term: 'wahr'},
+            {reasons: ['-heit'], rule: 'n', source: 'Kindheit', term: 'Kind'},
+            {reasons: ['-bar', '-heit'], rule: 'v', source: 'anwendbarkeit', term: 'anwenden'},
         ],
+        valid: true,
     },
 ];
 /* eslint-enable @stylistic/no-multi-spaces */

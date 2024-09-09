@@ -24,32 +24,32 @@ export type OnChildrenUpdatedCallback<T = unknown> = (element: Element, data: T)
 export type IsStaleCallback<T = unknown> = (element: Element, data: T) => boolean;
 
 export type ConstructorDetails<T = unknown> = {
-    /** A string CSS selector used to find elements. */
-    selector: string;
     /** A string CSS selector used to filter elements, or `null` for no filtering. */
-    ignoreSelector?: string | null;
-    /** A function which is invoked for each element that is added that matches the selector. */
-    onAdded?: OnAddedCallback<T> | null;
-    /** A function which is invoked for each element that is removed, or `null`. */
-    onRemoved?: OnRemovedCallback<T> | null;
-    /** A function which is invoked for each element which has its children updated, or `null`. */
-    onChildrenUpdated?: OnChildrenUpdatedCallback<T> | null;
+    ignoreSelector?: null | string;
     /**
      * A function which checks if the data is stale for a given element, or `null`.
      * If the element is stale, it will be removed and potentially re-added.
      */
     isStale?: IsStaleCallback<T> | null;
+    /** A function which is invoked for each element that is added that matches the selector. */
+    onAdded?: null | OnAddedCallback<T>;
+    /** A function which is invoked for each element which has its children updated, or `null`. */
+    onChildrenUpdated?: null | OnChildrenUpdatedCallback<T>;
+    /** A function which is invoked for each element that is removed, or `null`. */
+    onRemoved?: null | OnRemovedCallback<T>;
+    /** A string CSS selector used to find elements. */
+    selector: string;
 };
 
 export type MutationRecordLike = {
-    type: string;
     addedNodes: Node[];
     removedNodes: Node[];
     target: Node;
+    type: string;
 };
 
 export type Observer<T = unknown> = {
-    element: Element;
     ancestors: Node[];
     data: T;
+    element: Element;
 };

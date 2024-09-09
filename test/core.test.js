@@ -27,100 +27,100 @@ describe('DynamicProperty', () => {
             initialValue: 0,
             operations: [
                 {
+                    args: [0],
+                    expectedDefaultValue: 0,
+                    expectedEventOccurred: false,
+                    expectedOverrideCount: 0,
+                    expectedValue: 0,
                     operation: null,
-                    args: [0],
-                    expectedDefaultValue: 0,
-                    expectedValue: 0,
-                    expectedOverrideCount: 0,
-                    expectedEventOccurred: false,
                 },
                 {
-                    operation: 'set.defaultValue',
                     args: [1],
                     expectedDefaultValue: 1,
-                    expectedValue: 1,
-                    expectedOverrideCount: 0,
                     expectedEventOccurred: true,
+                    expectedOverrideCount: 0,
+                    expectedValue: 1,
+                    operation: 'set.defaultValue',
                 },
                 {
-                    operation: 'set.defaultValue',
                     args: [1],
                     expectedDefaultValue: 1,
-                    expectedValue: 1,
-                    expectedOverrideCount: 0,
                     expectedEventOccurred: false,
+                    expectedOverrideCount: 0,
+                    expectedValue: 1,
+                    operation: 'set.defaultValue',
                 },
                 {
-                    operation: 'set.defaultValue',
                     args: [0],
                     expectedDefaultValue: 0,
-                    expectedValue: 0,
-                    expectedOverrideCount: 0,
                     expectedEventOccurred: true,
+                    expectedOverrideCount: 0,
+                    expectedValue: 0,
+                    operation: 'set.defaultValue',
                 },
                 {
-                    operation: 'setOverride',
                     args: [8],
                     expectedDefaultValue: 0,
-                    expectedValue: 8,
-                    expectedOverrideCount: 1,
                     expectedEventOccurred: true,
+                    expectedOverrideCount: 1,
+                    expectedValue: 8,
+                    operation: 'setOverride',
                 },
                 {
-                    operation: 'setOverride',
                     args: [16],
                     expectedDefaultValue: 0,
-                    expectedValue: 8,
-                    expectedOverrideCount: 2,
                     expectedEventOccurred: false,
+                    expectedOverrideCount: 2,
+                    expectedValue: 8,
+                    operation: 'setOverride',
                 },
                 {
-                    operation: 'setOverride',
                     args: [32, 1],
                     expectedDefaultValue: 0,
-                    expectedValue: 32,
-                    expectedOverrideCount: 3,
                     expectedEventOccurred: true,
+                    expectedOverrideCount: 3,
+                    expectedValue: 32,
+                    operation: 'setOverride',
                 },
                 {
-                    operation: 'setOverride',
                     args: [64, -1],
                     expectedDefaultValue: 0,
-                    expectedValue: 32,
-                    expectedOverrideCount: 4,
                     expectedEventOccurred: false,
+                    expectedOverrideCount: 4,
+                    expectedValue: 32,
+                    operation: 'setOverride',
                 },
                 {
-                    operation: 'clearOverride',
                     args: [-4],
                     expectedDefaultValue: 0,
-                    expectedValue: 32,
-                    expectedOverrideCount: 3,
                     expectedEventOccurred: false,
+                    expectedOverrideCount: 3,
+                    expectedValue: 32,
+                    operation: 'clearOverride',
                 },
                 {
-                    operation: 'clearOverride',
                     args: [-3],
                     expectedDefaultValue: 0,
-                    expectedValue: 32,
-                    expectedOverrideCount: 2,
                     expectedEventOccurred: false,
+                    expectedOverrideCount: 2,
+                    expectedValue: 32,
+                    operation: 'clearOverride',
                 },
                 {
-                    operation: 'clearOverride',
                     args: [-2],
                     expectedDefaultValue: 0,
-                    expectedValue: 64,
-                    expectedOverrideCount: 1,
                     expectedEventOccurred: true,
+                    expectedOverrideCount: 1,
+                    expectedValue: 64,
+                    operation: 'clearOverride',
                 },
                 {
-                    operation: 'clearOverride',
                     args: [-1],
                     expectedDefaultValue: 0,
-                    expectedValue: 0,
-                    expectedOverrideCount: 0,
                     expectedEventOccurred: true,
+                    expectedOverrideCount: 0,
+                    expectedValue: 0,
+                    operation: 'clearOverride',
                 },
             ],
         },
@@ -133,12 +133,12 @@ describe('DynamicProperty', () => {
             let eventOccurred = false;
             const onChange = () => { eventOccurred = true; };
             property.on('change', onChange);
-            for (const {operation, args, expectedDefaultValue, expectedValue, expectedOverrideCount, expectedEventOccurred} of operations) {
+            for (const {args, expectedDefaultValue, expectedEventOccurred, expectedOverrideCount, expectedValue, operation} of operations) {
                 eventOccurred = false;
                 switch (operation) {
+                    case 'clearOverride': property.clearOverride(overrideTokens[overrideTokens.length + args[0]]); break;
                     case 'set.defaultValue': property.defaultValue = args[0]; break;
                     case 'setOverride': overrideTokens.push(property.setOverride(...args)); break;
-                    case 'clearOverride': property.clearOverride(overrideTokens[overrideTokens.length + args[0]]); break;
                 }
                 expect(eventOccurred).toStrictEqual(expectedEventOccurred);
                 expect(property.defaultValue).toStrictEqual(expectedDefaultValue);
@@ -154,116 +154,117 @@ describe('deepEqual', () => {
     /** @type {import('test/core').DeepEqualTestData} */
     const simpleTestsData = [
         {
+            expected: true,
             value1: 0,
             value2: 0,
-            expected: true,
         },
         {
+            expected: true,
             value1: null,
             value2: null,
-            expected: true,
         },
         {
+            expected: true,
             value1: 'test',
             value2: 'test',
-            expected: true,
         },
         {
+            expected: true,
             value1: true,
             value2: true,
-            expected: true,
         },
         {
+            expected: false,
             value1: 0,
             value2: 1,
-            expected: false,
         },
         {
+            expected: false,
             value1: null,
             value2: false,
-            expected: false,
         },
         {
+            expected: false,
             value1: 'test1',
             value2: 'test2',
-            expected: false,
         },
         {
+            expected: false,
             value1: true,
             value2: false,
-            expected: false,
         },
     ];
     /** @type {import('test/core').DeepEqualTestData} */
     const simpleObjectTestsData = [
         {
+            expected: true,
             value1: {},
             value2: {},
-            expected: true,
         },
         {
+            expected: false,
             value1: {},
             value2: [],
-            expected: false,
         },
         {
+            expected: true,
             value1: [],
             value2: [],
-            expected: true,
         },
         {
+            expected: false,
             value1: {},
             value2: null,
-            expected: false,
         },
     ];
     /** @type {import('test/core').DeepEqualTestData} */
     const complexObjectTestsData = [
         {
+            expected: false,
             value1: [1],
             value2: [],
-            expected: false,
         },
         {
+            expected: true,
             value1: [1],
             value2: [1],
-            expected: true,
         },
         {
+            expected: false,
             value1: [1],
             value2: [2],
-            expected: false,
         },
 
         {
+            expected: false,
             value1: {},
             value2: {test: 1},
-            expected: false,
         },
         {
+            expected: true,
             value1: {test: 1},
             value2: {test: 1},
-            expected: true,
         },
         {
+            expected: false,
             value1: {test: 1},
             value2: {test: {test2: false}},
-            expected: false,
         },
         {
+            expected: false,
             value1: {test: {test2: true}},
             value2: {test: {test2: false}},
-            expected: false,
         },
         {
+            expected: true,
             value1: {test: {test2: [true]}},
             value2: {test: {test2: [true]}},
-            expected: true,
         },
     ];
     /** @type {import('test/core').DeepEqualTestData} */
     const recursiveTestsData = [
         {
+            expected: false,
             value1: (() => {
                 const x = {};
                 x.x = x;
@@ -274,11 +275,10 @@ describe('deepEqual', () => {
                 x.x = x;
                 return x;
             })(),
-            expected: false,
         },
     ];
     describe('simple tests', () => {
-        test.each(simpleTestsData)('deepEqual($value1, $value2) -> $expected', ({value1, value2, expected}) => {
+        test.each(simpleTestsData)('deepEqual($value1, $value2) -> $expected', ({expected, value1, value2}) => {
             const actual1 = deepEqual(value1, value2);
             expect(actual1).toStrictEqual(expected);
 
@@ -288,7 +288,7 @@ describe('deepEqual', () => {
     });
 
     describe('simple object tests', () => {
-        test.each(simpleObjectTestsData)('deepEqual($value1, $value2) -> $expected', ({value1, value2, expected}) => {
+        test.each(simpleObjectTestsData)('deepEqual($value1, $value2) -> $expected', ({expected, value1, value2}) => {
             const actual1 = deepEqual(value1, value2);
             expect(actual1).toStrictEqual(expected);
 
@@ -298,7 +298,7 @@ describe('deepEqual', () => {
     });
 
     describe('complex object tests', () => {
-        test.each(complexObjectTestsData)('deepEqual($value1, $value2) -> $expected', ({value1, value2, expected}) => {
+        test.each(complexObjectTestsData)('deepEqual($value1, $value2) -> $expected', ({expected, value1, value2}) => {
             const actual1 = deepEqual(value1, value2);
             expect(actual1).toStrictEqual(expected);
 
@@ -308,7 +308,7 @@ describe('deepEqual', () => {
     });
 
     describe('recursive tests', () => {
-        test.each(recursiveTestsData)('deepEqual($value1, $value2) -> $expected', ({value1, value2, expected}) => {
+        test.each(recursiveTestsData)('deepEqual($value1, $value2) -> $expected', ({expected, value1, value2}) => {
             const actual1 = deepEqual(value1, value2);
             expect(actual1).toStrictEqual(expected);
 

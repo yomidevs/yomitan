@@ -36,17 +36,17 @@ export class Frontend {
      * @param {import('frontend').ConstructorDetails} details Details about how to set up the instance.
      */
     constructor({
-        application,
-        pageType,
-        popupFactory,
-        depth,
-        parentPopupId,
-        parentFrameId,
-        useProxyPopup,
-        canUseWindowPopup = true,
         allowRootFramePopupProxy,
+        application,
+        canUseWindowPopup = true,
         childrenSupported = true,
+        depth,
         hotkeyHandler,
+        pageType,
+        parentFrameId,
+        parentPopupId,
+        popupFactory,
+        useProxyPopup,
     }) {
         /** @type {import('../application.js').Application} */
         this._application = application;
@@ -87,12 +87,12 @@ export class Frontend {
         /** @type {TextScanner} */
         this._textScanner = new TextScanner({
             api: application.api,
-            node: window,
+            getSearchContext: this._getSearchContext.bind(this),
             ignoreElements: this._ignoreElements.bind(this),
             ignorePoint: this._ignorePoint.bind(this),
-            getSearchContext: this._getSearchContext.bind(this),
-            searchTerms: true,
+            node: window,
             searchKanji: true,
+            searchTerms: true,
             textSourceGenerator: this._textSourceGenerator,
         });
         /** @type {boolean} */
@@ -314,13 +314,13 @@ export class Frontend {
     /** @type {import('cross-frame-api').ApiHandler<'frontendGetPageInfo'>} */
     _onApiGetPageInfo() {
         return {
-            url: window.location.href,
             documentTitle: document.title,
+            url: window.location.href,
         };
     }
 
     /** @type {import('application').ApiHandler<'frontendSetAllVisibleOverride'>} */
-    async _onApiSetAllVisibleOverride({value, priority, awaitFrame}) {
+    async _onApiSetAllVisibleOverride({awaitFrame, priority, value}) {
         const result = await this._popupFactory.setAllVisibleOverride(value, priority);
         if (awaitFrame) {
             await promiseAnimationFrame(100);
@@ -387,7 +387,7 @@ export class Frontend {
     /**
      * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
-    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo: {eventType, detail: inputInfoDetail}, textSource, optionsContext, detail, pageTheme}) {
+    _onSearchSuccess({detail, dictionaryEntries, inputInfo: {detail: inputInfoDetail, eventType}, optionsContext, pageTheme, sentence, textSource, type}) {
         this._stopClearSelectionDelayed();
         let focus = (eventType === 'mouseMove');
         if (typeof inputInfoDetail === 'object' && inputInfoDetail !== null) {
@@ -408,7 +408,7 @@ export class Frontend {
     /**
      * @param {import('text-scanner').EventArgument<'searchError'>} details
      */
-    _onSearchError({error, textSource, inputInfo: {passive}}) {
+    _onSearchError({error, inputInfo: {passive}, textSource}) {
         if (this._application.webExtension.unloaded) {
             if (textSource !== null && !passive) {
                 this._showExtensionUnloaded(textSource);
@@ -501,21 +501,21 @@ export class Frontend {
         const preventMiddleMouse = this._getPreventMiddleMouseValueForPageType(scanningOptions.preventMiddleMouse);
         this._textScanner.language = options.general.language;
         this._textScanner.setOptions({
-            inputs: scanningOptions.inputs,
             deepContentScan: scanningOptions.deepDomScan,
-            normalizeCssZoom: scanningOptions.normalizeCssZoom,
-            selectText: scanningOptions.selectText,
             delay: scanningOptions.delay,
-            touchInputEnabled: scanningOptions.touchInputEnabled,
-            pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
-            scanLength: scanningOptions.length,
+            inputs: scanningOptions.inputs,
             layoutAwareScan: scanningOptions.layoutAwareScan,
             matchTypePrefix: scanningOptions.matchTypePrefix,
+            normalizeCssZoom: scanningOptions.normalizeCssZoom,
+            pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
             preventMiddleMouse,
-            sentenceParsingOptions,
             scanAltText: scanningOptions.scanAltText,
-            scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
+            scanLength: scanningOptions.length,
             scanResolution: scanningOptions.scanResolution,
+            scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
+            selectText: scanningOptions.selectText,
+            sentenceParsingOptions,
+            touchInputEnabled: scanningOptions.touchInputEnabled,
         });
         this._updateTextScannerEnabled();
 
@@ -536,7 +536,7 @@ export class Frontend {
      * @returns {Promise<void>}
      */
     async _updatePopup() {
-        const {usePopupWindow, showIframePopupsInRootFrame} = /** @type {import('settings').ProfileOptions} */ (this._options).general;
+        const {showIframePopupsInRootFrame, usePopupWindow} = /** @type {import('settings').ProfileOptions} */ (this._options).general;
         const isIframe = !this._useProxyPopup && (window !== window.parent);
 
         const currentPopup = this._popup;
@@ -617,9 +617,9 @@ export class Frontend {
         }
 
         return await this._popupFactory.getOrCreatePopup({
-            frameId,
-            depth: this._depth,
             childrenSupported: this._childrenSupported,
+            depth: this._depth,
+            frameId,
         });
     }
 
@@ -628,10 +628,10 @@ export class Frontend {
      */
     async _getProxyPopup() {
         return await this._popupFactory.getOrCreatePopup({
-            frameId: this._parentFrameId,
-            depth: this._depth,
-            parentPopupId: this._parentPopupId,
             childrenSupported: this._childrenSupported,
+            depth: this._depth,
+            frameId: this._parentFrameId,
+            parentPopupId: this._parentPopupId,
         });
     }
 
@@ -653,9 +653,9 @@ export class Frontend {
         }
 
         const popup = await this._popupFactory.getOrCreatePopup({
+            childrenSupported: this._childrenSupported,
             frameId: targetFrameId,
             id: popupId,
-            childrenSupported: this._childrenSupported,
         });
         popup.on('offsetNotFound', () => {
             this._allowRootFramePopupProxy = false;
@@ -669,9 +669,9 @@ export class Frontend {
      */
     async _getPopupWindow() {
         return await this._popupFactory.getOrCreatePopup({
+            childrenSupported: this._childrenSupported,
             depth: this._depth,
             popupWindow: true,
-            childrenSupported: this._childrenSupported,
         });
     }
 
@@ -728,30 +728,30 @@ export class Frontend {
         const detailsState = {
             focusEntry: 0,
             optionsContext,
-            url,
             pageTheme,
+            url,
         };
         if (sentence !== null) { detailsState.sentence = sentence; }
         if (documentTitle !== null) { detailsState.documentTitle = documentTitle; }
-        const {tabId, frameId} = this._application;
+        const {frameId, tabId} = this._application;
         /** @type {import('display').HistoryContent} */
         const detailsContent = {
-            contentOrigin: {tabId, frameId},
+            contentOrigin: {frameId, tabId},
         };
         if (dictionaryEntries !== null) {
             detailsContent.dictionaryEntries = dictionaryEntries;
         }
         /** @type {import('display').ContentDetails} */
         const details = {
+            content: detailsContent,
             focus,
             historyMode: 'clear',
             params: {
-                type,
                 query,
+                type,
                 wildcards: 'off',
             },
             state: detailsState,
-            content: detailsContent,
         };
         if (textSource instanceof TextSourceElement && textSource.fullContent !== query) {
             details.params.full = textSource.fullContent;
@@ -768,8 +768,8 @@ export class Frontend {
      */
     _showPopupContent(textSource, optionsContext, details) {
         const sourceRects = [];
-        for (const {left, top, right, bottom} of textSource.getRects()) {
-            sourceRects.push({left, top, right, bottom});
+        for (const {bottom, left, right, top} of textSource.getRects()) {
+            sourceRects.push({bottom, left, right, top});
         }
         this._lastShowPromise = (
             this._popup !== null ?
@@ -809,7 +809,7 @@ export class Frontend {
      * @returns {void}
      */
     _updateContentScale() {
-        const {popupScalingFactor, popupScaleRelativeToPageZoom, popupScaleRelativeToVisualViewport} = /** @type {import('settings').ProfileOptions} */ (this._options).general;
+        const {popupScaleRelativeToPageZoom, popupScaleRelativeToVisualViewport, popupScalingFactor} = /** @type {import('settings').ProfileOptions} */ (this._options).general;
         let contentScale = popupScalingFactor;
         if (popupScaleRelativeToPageZoom) {
             contentScale /= this._pageZoomFactor;
@@ -930,7 +930,7 @@ export class Frontend {
         let documentTitle = document.title;
         if (this._useProxyPopup && this._parentFrameId !== null) {
             try {
-                ({url, documentTitle} = await this._application.crossFrame.invoke(this._parentFrameId, 'frontendGetPageInfo', void 0));
+                ({documentTitle, url} = await this._application.crossFrame.invoke(this._parentFrameId, 'frontendGetPageInfo', void 0));
             } catch (e) {
                 // NOP
             }
@@ -942,8 +942,8 @@ export class Frontend {
         }
 
         return {
-            optionsContext,
             detail: {documentTitle},
+            optionsContext,
         };
     }
 

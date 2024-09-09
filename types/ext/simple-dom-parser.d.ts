@@ -28,10 +28,10 @@ export type {
 export type Element = object;
 
 export type ISimpleDomParser = {
+    getAttribute(element: Element, attribute: string): null | string;
     getElementById(id: string, root?: Element): Element | null;
     getElementByTagName(tagName: string, root?: Element): Element | null;
-    getElementsByTagName(tagName: string, root?: Element): Element[];
     getElementsByClassName(className: string, root?: Element): Element[];
-    getAttribute(element: Element, attribute: string): string | null;
+    getElementsByTagName(tagName: string, root?: Element): Element[];
     getTextContent(element: Element): string;
 };

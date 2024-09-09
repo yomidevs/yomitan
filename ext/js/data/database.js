@@ -351,12 +351,12 @@ export class Database {
      * @param {import('database').StructureDefinition<TObjectStoreName>[]} upgrades
      */
     _upgrade(db, transaction, oldVersion, upgrades) {
-        for (const {version, stores} of upgrades) {
+        for (const {stores, version} of upgrades) {
             if (oldVersion >= version) { continue; }
 
             /** @type {[objectStoreName: string, value: import('database').StoreDefinition][]} */
             const entries = Object.entries(stores);
-            for (const [objectStoreName, {primaryKey, indices}] of entries) {
+            for (const [objectStoreName, {indices, primaryKey}] of entries) {
                 const existingObjectStoreNames = transaction.objectStoreNames || db.objectStoreNames;
                 const objectStore = (
                     this._listContains(existingObjectStoreNames, objectStoreName) ?

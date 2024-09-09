@@ -230,7 +230,7 @@ export class TextSourceElement {
                 break;
             case 'SELECT':
                 {
-                    const {selectedIndex, options} = /** @type {HTMLSelectElement} */ (element);
+                    const {options, selectedIndex} = /** @type {HTMLSelectElement} */ (element);
                     if (selectedIndex >= 0 && selectedIndex < options.length) {
                         const {textContent} = options[selectedIndex];
                         if (textContent !== null) {

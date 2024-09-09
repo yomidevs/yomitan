@@ -34,114 +34,114 @@ vi.stubGlobal('chrome', chrome);
  */
 function createProfileOptionsTestData1() {
     return {
-        version: 14,
-        general: {
-            enable: true,
-            enableClipboardPopups: false,
-            resultOutputMode: 'group',
-            debugInfo: false,
-            maxResults: 32,
-            showAdvanced: false,
-            popupDisplayMode: 'default',
-            popupWidth: 400,
-            popupHeight: 250,
-            popupHorizontalOffset: 0,
-            popupVerticalOffset: 10,
-            popupHorizontalOffset2: 10,
-            popupVerticalOffset2: 0,
-            popupHorizontalTextPosition: 'below',
-            popupVerticalTextPosition: 'before',
-            popupScalingFactor: 1,
-            popupScaleRelativeToPageZoom: false,
-            popupScaleRelativeToVisualViewport: true,
-            showGuide: true,
-            compactTags: false,
-            compactGlossaries: false,
-            mainDictionary: '',
-            popupTheme: 'default',
-            popupOuterTheme: 'default',
-            customPopupCss: '',
-            customPopupOuterCss: '',
-            enableWanakana: true,
-            enableClipboardMonitor: false,
-            showPitchAccentDownstepNotation: true,
-            showPitchAccentPositionNotation: true,
-            showPitchAccentGraph: false,
-            showIframePopupsInRootFrame: false,
-            useSecurePopupFrameUrl: true,
-            usePopupShadowDom: true,
+        anki: {
+            duplicateScope: 'collection',
+            enable: false,
+            fieldTemplates: null,
+            kanji: {
+                deck: '',
+                fields: {
+                    expression: '{selection-text}',
+                },
+                model: '',
+            },
+            screenshot: {format: 'png', quality: 92},
+            sentenceExt: 200,
+            server: 'http://127.0.0.1:8765',
+            tags: ['yomitan'],
+            terms: {
+                deck: '',
+                fields: {
+                    expression: '{selection-text}',
+                },
+                model: '',
+            },
         },
         audio: {
-            enabled: true,
-            sources: ['jpod101', 'text-to-speech', 'custom', 'jpod101-alternate'],
-            volume: 100,
             autoPlay: false,
             customSourceUrl: 'http://localhost/audio.mp3?term={expression}&reading={reading}',
+            enabled: true,
+            sources: ['jpod101', 'text-to-speech', 'custom', 'jpod101-alternate'],
             textToSpeechVoice: 'example-voice',
-        },
-        scanning: {
-            middleMouse: true,
-            touchInputEnabled: true,
-            selectText: true,
-            alphanumeric: true,
-            autoHideResults: false,
-            delay: 20,
-            length: 10,
-            modifier: 'shift',
-            deepDomScan: false,
-            popupNestingMaxDepth: 0,
-            enablePopupSearch: false,
-            enableOnPopupExpressions: false,
-            enableOnSearchPage: true,
-            enableSearchTags: false,
-            layoutAwareScan: false,
-            scanAltText: true,
-        },
-        translation: {
-            convertHalfWidthCharacters: 'false',
-            convertNumericCharacters: 'false',
-            convertAlphabeticCharacters: 'false',
-            convertHiraganaToKatakana: 'false',
-            convertKatakanaToHiragana: 'variant',
-            collapseEmphaticSequences: 'false',
+            volume: 100,
         },
         dictionaries: {
             'Test Dictionary': {
-                priority: 0,
-                enabled: true,
                 allowSecondarySearches: false,
+                enabled: true,
+                priority: 0,
             },
+        },
+        general: {
+            compactGlossaries: false,
+            compactTags: false,
+            customPopupCss: '',
+            customPopupOuterCss: '',
+            debugInfo: false,
+            enable: true,
+            enableClipboardMonitor: false,
+            enableClipboardPopups: false,
+            enableWanakana: true,
+            mainDictionary: '',
+            maxResults: 32,
+            popupDisplayMode: 'default',
+            popupHeight: 250,
+            popupHorizontalOffset: 0,
+            popupHorizontalOffset2: 10,
+            popupHorizontalTextPosition: 'below',
+            popupOuterTheme: 'default',
+            popupScaleRelativeToPageZoom: false,
+            popupScaleRelativeToVisualViewport: true,
+            popupScalingFactor: 1,
+            popupTheme: 'default',
+            popupVerticalOffset: 10,
+            popupVerticalOffset2: 0,
+            popupVerticalTextPosition: 'before',
+            popupWidth: 400,
+            resultOutputMode: 'group',
+            showAdvanced: false,
+            showGuide: true,
+            showIframePopupsInRootFrame: false,
+            showPitchAccentDownstepNotation: true,
+            showPitchAccentGraph: false,
+            showPitchAccentPositionNotation: true,
+            usePopupShadowDom: true,
+            useSecurePopupFrameUrl: true,
         },
         parsing: {
-            enableScanningParser: true,
             enableMecabParser: false,
+            enableScanningParser: true,
+            readingMode: 'hiragana',
             selectedParser: null,
             termSpacing: true,
-            readingMode: 'hiragana',
         },
-        anki: {
-            enable: false,
-            server: 'http://127.0.0.1:8765',
-            tags: ['yomitan'],
-            sentenceExt: 200,
-            screenshot: {format: 'png', quality: 92},
-            terms: {
-                deck: '',
-                model: '',
-                fields: {
-                    expression: '{selection-text}',
-                },
-            },
-            kanji: {
-                deck: '',
-                model: '',
-                fields: {
-                    expression: '{selection-text}',
-                },
-            },
-            duplicateScope: 'collection',
-            fieldTemplates: null,
+        scanning: {
+            alphanumeric: true,
+            autoHideResults: false,
+            deepDomScan: false,
+            delay: 20,
+            enableOnPopupExpressions: false,
+            enableOnSearchPage: true,
+            enablePopupSearch: false,
+            enableSearchTags: false,
+            layoutAwareScan: false,
+            length: 10,
+            middleMouse: true,
+            modifier: 'shift',
+            popupNestingMaxDepth: 0,
+            scanAltText: true,
+            selectText: true,
+            touchInputEnabled: true,
         },
+        translation: {
+            collapseEmphaticSequences: 'false',
+            convertAlphabeticCharacters: 'false',
+            convertHalfWidthCharacters: 'false',
+            convertHiraganaToKatakana: 'false',
+            convertKatakanaToHiragana: 'variant',
+            convertNumericCharacters: 'false',
+        },
+        version: 14,
     };
 }
 
@@ -150,41 +150,45 @@ function createProfileOptionsTestData1() {
  */
 function createOptionsTestData1() {
     return {
+        global: {
+            database: {
+                prefixWildcardsSupported: false,
+            },
+        },
+        profileCurrent: 0,
         profiles: [
             {
-                name: 'Default',
-                options: createProfileOptionsTestData1(),
                 conditionGroups: [
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'equal',
+                                type: 'popupLevel',
                                 value: 1,
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'notEqual',
+                                type: 'popupLevel',
                                 value: 0,
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'lessThan',
+                                type: 'popupLevel',
                                 value: 3,
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'greaterThan',
+                                type: 'popupLevel',
                                 value: 0,
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'lessThanOrEqual',
+                                type: 'popupLevel',
                                 value: 2,
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'greaterThanOrEqual',
+                                type: 'popupLevel',
                                 value: 1,
                             },
                         ],
@@ -192,13 +196,13 @@ function createOptionsTestData1() {
                     {
                         conditions: [
                             {
-                                type: 'url',
                                 operator: 'matchDomain',
+                                type: 'url',
                                 value: 'example.com',
                             },
                             {
-                                type: 'url',
                                 operator: 'matchRegExp',
+                                type: 'url',
                                 value: 'example\\.com',
                             },
                         ],
@@ -206,43 +210,39 @@ function createOptionsTestData1() {
                     {
                         conditions: [
                             {
-                                type: 'modifierKeys',
                                 operator: 'are',
+                                type: 'modifierKeys',
                                 value: [
                                     'ctrl',
                                     'shift',
                                 ],
                             },
                             {
-                                type: 'modifierKeys',
                                 operator: 'areNot',
+                                type: 'modifierKeys',
                                 value: [
                                     'alt',
                                     'shift',
                                 ],
                             },
                             {
-                                type: 'modifierKeys',
                                 operator: 'include',
+                                type: 'modifierKeys',
                                 value: 'alt',
                             },
                             {
-                                type: 'modifierKeys',
                                 operator: 'notInclude',
+                                type: 'modifierKeys',
                                 value: 'ctrl',
                             },
                         ],
                     },
                 ],
+                name: 'Default',
+                options: createProfileOptionsTestData1(),
             },
         ],
-        profileCurrent: 0,
         version: 2,
-        global: {
-            database: {
-                prefixWildcardsSupported: false,
-            },
-        },
     };
 }
 
@@ -252,56 +252,41 @@ function createOptionsTestData1() {
  */
 function createProfileOptionsUpdatedTestData1() {
     return {
-        general: {
-            enable: true,
-            language: 'ja',
-            resultOutputMode: 'group',
-            debugInfo: false,
-            maxResults: 32,
-            fontFamily: '',
-            fontSize: 14,
-            lineHeight: '1.5',
-            showAdvanced: false,
-            showDebug: false,
-            popupDisplayMode: 'default',
-            popupWidth: 400,
-            popupHeight: 250,
-            popupHorizontalOffset: 0,
-            popupVerticalOffset: 10,
-            popupHorizontalOffset2: 10,
-            popupVerticalOffset2: 0,
-            popupHorizontalTextPosition: 'below',
-            popupVerticalTextPosition: 'before',
-            popupScalingFactor: 1,
-            popupScaleRelativeToPageZoom: false,
-            popupScaleRelativeToVisualViewport: true,
-            showGuide: true,
-            enableContextMenuScanSelected: true,
-            compactTags: false,
-            glossaryLayoutMode: 'default',
-            mainDictionary: '',
-            popupTheme: 'light',
-            popupOuterTheme: 'light',
-            customPopupCss: '',
-            customPopupOuterCss: '',
-            enableWanakana: true,
-            showPitchAccentDownstepNotation: true,
-            showPitchAccentPositionNotation: true,
-            showPitchAccentGraph: false,
-            showIframePopupsInRootFrame: false,
-            useSecurePopupFrameUrl: true,
-            usePopupShadowDom: true,
-            usePopupWindow: false,
-            popupCurrentIndicatorMode: 'triangle',
-            popupActionBarVisibility: 'auto',
-            popupActionBarLocation: 'top',
-            frequencyDisplayMode: 'split-tags-grouped',
-            termDisplayMode: 'ruby',
-            sortFrequencyDictionary: null,
-            sortFrequencyDictionaryOrder: 'descending',
-            stickySearchHeader: false,
+        accessibility: {
+            forceGoogleDocsHtmlRendering: false,
+        },
+        anki: {
+            apiKey: '',
+            checkForDuplicates: true,
+            displayTags: 'never',
+            downloadTimeout: 0,
+            duplicateBehavior: 'new',
+            duplicateScope: 'collection',
+            duplicateScopeCheckAllModels: false,
+            enable: false,
+            fieldTemplates: null,
+            kanji: {
+                deck: '',
+                fields: {
+                    expression: '{popup-selection-text}',
+                },
+                model: '',
+            },
+            noteGuiMode: 'browse',
+            screenshot: {format: 'png', quality: 92},
+            server: 'http://127.0.0.1:8765',
+            suspendNewCards: false,
+            tags: ['yomitan'],
+            terms: {
+                deck: '',
+                fields: {
+                    expression: '{popup-selection-text}',
+                },
+                model: '',
+            },
         },
         audio: {
+            autoPlay: false,
             enabled: true,
             sources: [
                 {
@@ -326,235 +311,250 @@ function createProfileOptionsUpdatedTestData1() {
                 },
             ],
             volume: 100,
-            autoPlay: false,
         },
-        scanning: {
-            touchInputEnabled: true,
-            selectText: true,
-            alphanumeric: true,
-            autoHideResults: false,
-            delay: 20,
-            length: 10,
-            deepDomScan: false,
-            popupNestingMaxDepth: 0,
-            enablePopupSearch: false,
-            enableOnPopupExpressions: false,
-            enableOnSearchPage: true,
-            enableSearchTags: false,
-            layoutAwareScan: false,
-            hideDelay: 0,
-            pointerEventsEnabled: false,
-            matchTypePrefix: false,
-            hidePopupOnCursorExit: false,
-            hidePopupOnCursorExitDelay: 0,
-            normalizeCssZoom: true,
-            scanAltText: true,
-            preventMiddleMouse: {
-                onWebPages: false,
-                onPopupPages: false,
-                onSearchPages: false,
-                onSearchQuery: false,
-            },
-            scanWithoutMousemove: true,
-            scanResolution: 'character',
-            inputs: [
-                {
-                    include: 'shift',
-                    exclude: 'mouse0',
-                    types: {
-                        mouse: true,
-                        touch: false,
-                        pen: false,
-                    },
-                    options: {
-                        showAdvanced: false,
-                        searchTerms: true,
-                        searchKanji: true,
-                        scanOnTouchTap: true,
-                        scanOnTouchMove: false,
-                        scanOnTouchPress: false,
-                        scanOnTouchRelease: false,
-                        scanOnPenMove: true,
-                        scanOnPenHover: true,
-                        scanOnPenReleaseHover: false,
-                        scanOnPenPress: true,
-                        scanOnPenRelease: false,
-                        preventTouchScrolling: true,
-                        preventPenScrolling: true,
-                    },
-                },
-                {
-                    include: 'mouse2',
-                    exclude: '',
-                    types: {
-                        mouse: true,
-                        touch: false,
-                        pen: false,
-                    },
-                    options: {
-                        showAdvanced: false,
-                        searchTerms: true,
-                        searchKanji: true,
-                        scanOnTouchTap: true,
-                        scanOnTouchMove: false,
-                        scanOnTouchPress: false,
-                        scanOnTouchRelease: false,
-                        scanOnPenMove: true,
-                        scanOnPenHover: true,
-                        scanOnPenReleaseHover: false,
-                        scanOnPenPress: true,
-                        scanOnPenRelease: false,
-                        preventTouchScrolling: true,
-                        preventPenScrolling: true,
-                    },
-                },
-                {
-                    include: '',
-                    exclude: '',
-                    types: {
-                        mouse: false,
-                        touch: true,
-                        pen: true,
-                    },
-                    options: {
-                        showAdvanced: false,
-                        searchTerms: true,
-                        searchKanji: true,
-                        scanOnTouchTap: true,
-                        scanOnTouchMove: false,
-                        scanOnTouchPress: false,
-                        scanOnTouchRelease: false,
-                        scanOnPenMove: true,
-                        scanOnPenHover: true,
-                        scanOnPenReleaseHover: false,
-                        scanOnPenPress: true,
-                        scanOnPenRelease: false,
-                        preventTouchScrolling: true,
-                        preventPenScrolling: true,
-                    },
-                },
-            ],
-        },
-        translation: {
-            searchResolution: 'letter',
-            textReplacements: {
-                searchOriginal: true,
-                groups: [],
-            },
+        clipboard: {
+            autoSearchContent: true,
+            enableBackgroundMonitor: false,
+            enableSearchPageMonitor: false,
+            maximumSearchLength: 1000,
         },
         dictionaries: [
             {
-                name: 'Test Dictionary',
                 alias: 'Test Dictionary',
-                priority: 0,
-                enabled: true,
                 allowSecondarySearches: false,
                 definitionsCollapsible: 'not-collapsible',
+                enabled: true,
+                name: 'Test Dictionary',
                 partsOfSpeechFilter: true,
+                priority: 0,
                 useDeinflections: true,
             },
         ],
-        parsing: {
-            enableScanningParser: true,
-            enableMecabParser: false,
-            selectedParser: null,
-            termSpacing: true,
-            readingMode: 'hiragana',
-        },
-        anki: {
-            enable: false,
-            server: 'http://127.0.0.1:8765',
-            tags: ['yomitan'],
-            screenshot: {format: 'png', quality: 92},
-            terms: {
-                deck: '',
-                model: '',
-                fields: {
-                    expression: '{popup-selection-text}',
-                },
-            },
-            kanji: {
-                deck: '',
-                model: '',
-                fields: {
-                    expression: '{popup-selection-text}',
-                },
-            },
-            duplicateBehavior: 'new',
-            duplicateScope: 'collection',
-            duplicateScopeCheckAllModels: false,
-            displayTags: 'never',
-            checkForDuplicates: true,
-            fieldTemplates: null,
-            suspendNewCards: false,
-            noteGuiMode: 'browse',
-            apiKey: '',
-            downloadTimeout: 0,
-        },
-        sentenceParsing: {
-            scanExtent: 200,
-            terminationCharacterMode: 'custom',
-            terminationCharacters: [
-                {enabled: true, character1: '「', character2: '」', includeCharacterAtStart: false, includeCharacterAtEnd: false},
-                {enabled: true, character1: '『', character2: '』', includeCharacterAtStart: false, includeCharacterAtEnd: false},
-                {enabled: true, character1: '"', character2: '"', includeCharacterAtStart: false, includeCharacterAtEnd: false},
-                {enabled: true, character1: '\'', character2: '\'', includeCharacterAtStart: false, includeCharacterAtEnd: false},
-                {enabled: true, character1: '.', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '!', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '?', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '．', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '。', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '！', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '？', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '…', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '︒', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '︕', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '︖', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                {enabled: true, character1: '︙', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-            ],
+        general: {
+            compactTags: false,
+            customPopupCss: '',
+            customPopupOuterCss: '',
+            debugInfo: false,
+            enable: true,
+            enableContextMenuScanSelected: true,
+            enableWanakana: true,
+            fontFamily: '',
+            fontSize: 14,
+            frequencyDisplayMode: 'split-tags-grouped',
+            glossaryLayoutMode: 'default',
+            language: 'ja',
+            lineHeight: '1.5',
+            mainDictionary: '',
+            maxResults: 32,
+            popupActionBarLocation: 'top',
+            popupActionBarVisibility: 'auto',
+            popupCurrentIndicatorMode: 'triangle',
+            popupDisplayMode: 'default',
+            popupHeight: 250,
+            popupHorizontalOffset: 0,
+            popupHorizontalOffset2: 10,
+            popupHorizontalTextPosition: 'below',
+            popupOuterTheme: 'light',
+            popupScaleRelativeToPageZoom: false,
+            popupScaleRelativeToVisualViewport: true,
+            popupScalingFactor: 1,
+            popupTheme: 'light',
+            popupVerticalOffset: 10,
+            popupVerticalOffset2: 0,
+            popupVerticalTextPosition: 'before',
+            popupWidth: 400,
+            resultOutputMode: 'group',
+            showAdvanced: false,
+            showDebug: false,
+            showGuide: true,
+            showIframePopupsInRootFrame: false,
+            showPitchAccentDownstepNotation: true,
+            showPitchAccentGraph: false,
+            showPitchAccentPositionNotation: true,
+            sortFrequencyDictionary: null,
+            sortFrequencyDictionaryOrder: 'descending',
+            stickySearchHeader: false,
+            termDisplayMode: 'ruby',
+            usePopupShadowDom: true,
+            usePopupWindow: false,
+            useSecurePopupFrameUrl: true,
         },
         inputs: {
             /* eslint-disable @stylistic/no-multi-spaces */
             hotkeys: [
-                {action: 'close',             argument: '',  key: 'Escape',    modifiers: [],       scopes: ['popup'], enabled: true},
-                {action: 'focusSearchBox',    argument: '',  key: 'Escape',    modifiers: [],       scopes: ['search'], enabled: true},
-                {action: 'previousEntry',     argument: '3', key: 'PageUp',    modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'nextEntry',         argument: '3', key: 'PageDown',  modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'lastEntry',         argument: '',  key: 'End',       modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'firstEntry',        argument: '',  key: 'Home',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'previousEntry',     argument: '1', key: 'ArrowUp',   modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'nextEntry',         argument: '1', key: 'ArrowDown', modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'historyBackward',   argument: '',  key: 'KeyB',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'historyForward',    argument: '',  key: 'KeyF',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'addNoteKanji',      argument: '',  key: 'KeyK',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'addNoteTermKanji',  argument: '',  key: 'KeyE',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'addNoteTermKana',   argument: '',  key: 'KeyR',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'playAudio',         argument: '',  key: 'KeyP',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'viewNotes',         argument: '',  key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'copyHostSelection', argument: '',  key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true},
-                {action: 'profilePrevious',   argument: '',  key: 'Minus',     modifiers: ['alt'],  scopes: ['popup', 'search', 'web'], enabled: true},
-                {action: 'profileNext',       argument: '',  key: 'Equal',     modifiers: ['alt'],  scopes: ['popup', 'search', 'web'], enabled: true},
+                {action: 'close',             argument: '',  enabled: true,    key: 'Escape',       modifiers: [], scopes: ['popup']},
+                {action: 'focusSearchBox',    argument: '',  enabled: true,    key: 'Escape',       modifiers: [], scopes: ['search']},
+                {action: 'previousEntry',     argument: '3', enabled: true,    key: 'PageUp',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'nextEntry',         argument: '3', enabled: true,  key: 'PageDown',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'lastEntry',         argument: '',  enabled: true,       key: 'End',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'firstEntry',        argument: '',  enabled: true,      key: 'Home',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'previousEntry',     argument: '1', enabled: true,   key: 'ArrowUp',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'nextEntry',         argument: '1', enabled: true, key: 'ArrowDown',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'historyBackward',   argument: '',  enabled: true,      key: 'KeyB',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'historyForward',    argument: '',  enabled: true,      key: 'KeyF',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'addNoteKanji',      argument: '',  enabled: true,      key: 'KeyK',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'addNoteTermKanji',  argument: '',  enabled: true,      key: 'KeyE',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'addNoteTermKana',   argument: '',  enabled: true,      key: 'KeyR',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'playAudio',         argument: '',  enabled: true,      key: 'KeyP',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'viewNotes',         argument: '',  enabled: true,      key: 'KeyV',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'copyHostSelection', argument: '',  enabled: true,      key: 'KeyC', modifiers: ['ctrl'], scopes: ['popup']},
+                {action: 'profilePrevious',   argument: '',  enabled: true,     key: 'Minus',  modifiers: ['alt'], scopes: ['popup', 'search', 'web']},
+                {action: 'profileNext',       argument: '',  enabled: true,     key: 'Equal',  modifiers: ['alt'], scopes: ['popup', 'search', 'web']},
             ],
             /* eslint-enable @stylistic/no-multi-spaces */
         },
+        parsing: {
+            enableMecabParser: false,
+            enableScanningParser: true,
+            readingMode: 'hiragana',
+            selectedParser: null,
+            termSpacing: true,
+        },
         popupWindow: {
-            width: 400,
             height: 250,
             left: 0,
             top: 0,
             useLeft: false,
             useTop: false,
-            windowType: 'popup',
+            width: 400,
             windowState: 'normal',
+            windowType: 'popup',
         },
-        clipboard: {
-            enableBackgroundMonitor: false,
-            enableSearchPageMonitor: false,
-            autoSearchContent: true,
-            maximumSearchLength: 1000,
+        scanning: {
+            alphanumeric: true,
+            autoHideResults: false,
+            deepDomScan: false,
+            delay: 20,
+            enableOnPopupExpressions: false,
+            enableOnSearchPage: true,
+            enablePopupSearch: false,
+            enableSearchTags: false,
+            hideDelay: 0,
+            hidePopupOnCursorExit: false,
+            hidePopupOnCursorExitDelay: 0,
+            inputs: [
+                {
+                    exclude: 'mouse0',
+                    include: 'shift',
+                    options: {
+                        preventPenScrolling: true,
+                        preventTouchScrolling: true,
+                        scanOnPenHover: true,
+                        scanOnPenMove: true,
+                        scanOnPenPress: true,
+                        scanOnPenRelease: false,
+                        scanOnPenReleaseHover: false,
+                        scanOnTouchMove: false,
+                        scanOnTouchPress: false,
+                        scanOnTouchRelease: false,
+                        scanOnTouchTap: true,
+                        searchKanji: true,
+                        searchTerms: true,
+                        showAdvanced: false,
+                    },
+                    types: {
+                        mouse: true,
+                        pen: false,
+                        touch: false,
+                    },
+                },
+                {
+                    exclude: '',
+                    include: 'mouse2',
+                    options: {
+                        preventPenScrolling: true,
+                        preventTouchScrolling: true,
+                        scanOnPenHover: true,
+                        scanOnPenMove: true,
+                        scanOnPenPress: true,
+                        scanOnPenRelease: false,
+                        scanOnPenReleaseHover: false,
+                        scanOnTouchMove: false,
+                        scanOnTouchPress: false,
+                        scanOnTouchRelease: false,
+                        scanOnTouchTap: true,
+                        searchKanji: true,
+                        searchTerms: true,
+                        showAdvanced: false,
+                    },
+                    types: {
+                        mouse: true,
+                        pen: false,
+                        touch: false,
+                    },
+                },
+                {
+                    exclude: '',
+                    include: '',
+                    options: {
+                        preventPenScrolling: true,
+                        preventTouchScrolling: true,
+                        scanOnPenHover: true,
+                        scanOnPenMove: true,
+                        scanOnPenPress: true,
+                        scanOnPenRelease: false,
+                        scanOnPenReleaseHover: false,
+                        scanOnTouchMove: false,
+                        scanOnTouchPress: false,
+                        scanOnTouchRelease: false,
+                        scanOnTouchTap: true,
+                        searchKanji: true,
+                        searchTerms: true,
+                        showAdvanced: false,
+                    },
+                    types: {
+                        mouse: false,
+                        pen: true,
+                        touch: true,
+                    },
+                },
+            ],
+            layoutAwareScan: false,
+            length: 10,
+            matchTypePrefix: false,
+            normalizeCssZoom: true,
+            pointerEventsEnabled: false,
+            popupNestingMaxDepth: 0,
+            preventMiddleMouse: {
+                onPopupPages: false,
+                onSearchPages: false,
+                onSearchQuery: false,
+                onWebPages: false,
+            },
+            scanAltText: true,
+            scanResolution: 'character',
+            scanWithoutMousemove: true,
+            selectText: true,
+            touchInputEnabled: true,
         },
-        accessibility: {
-            forceGoogleDocsHtmlRendering: false,
+        sentenceParsing: {
+            scanExtent: 200,
+            terminationCharacterMode: 'custom',
+            terminationCharacters: [
+                {character1: '「', character2: '」', enabled: true, includeCharacterAtEnd: false, includeCharacterAtStart: false},
+                {character1: '『', character2: '』', enabled: true, includeCharacterAtEnd: false, includeCharacterAtStart: false},
+                {character1: '"', character2: '"', enabled: true, includeCharacterAtEnd: false, includeCharacterAtStart: false},
+                {character1: '\'', character2: '\'', enabled: true, includeCharacterAtEnd: false, includeCharacterAtStart: false},
+                {character1: '.', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                {character1: '!', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                {character1: '?', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                {character1: '．', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                {character1: '。', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                {character1: '！', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                {character1: '？', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                {character1: '…', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                {character1: '︒', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                {character1: '︕', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                {character1: '︖', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                {character1: '︙', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+            ],
+        },
+        translation: {
+            searchResolution: 'letter',
+            textReplacements: {
+                groups: [],
+                searchOriginal: true,
+            },
         },
     };
 }
@@ -564,41 +564,45 @@ function createProfileOptionsUpdatedTestData1() {
  */
 function createOptionsUpdatedTestData1() {
     return {
+        global: {
+            database: {
+                prefixWildcardsSupported: false,
+            },
+        },
+        profileCurrent: 0,
         profiles: [
             {
-                name: 'Default',
-                options: createProfileOptionsUpdatedTestData1(),
                 conditionGroups: [
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'equal',
+                                type: 'popupLevel',
                                 value: '1',
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'notEqual',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'lessThan',
+                                type: 'popupLevel',
                                 value: '3',
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'greaterThan',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'lessThanOrEqual',
+                                type: 'popupLevel',
                                 value: '2',
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'greaterThanOrEqual',
+                                type: 'popupLevel',
                                 value: '1',
                             },
                         ],
@@ -606,13 +610,13 @@ function createOptionsUpdatedTestData1() {
                     {
                         conditions: [
                             {
-                                type: 'url',
                                 operator: 'matchDomain',
+                                type: 'url',
                                 value: 'example.com',
                             },
                             {
-                                type: 'url',
                                 operator: 'matchRegExp',
+                                type: 'url',
                                 value: 'example\\.com',
                             },
                         ],
@@ -620,37 +624,33 @@ function createOptionsUpdatedTestData1() {
                     {
                         conditions: [
                             {
-                                type: 'modifierKeys',
                                 operator: 'are',
+                                type: 'modifierKeys',
                                 value: 'ctrl, shift',
                             },
                             {
-                                type: 'modifierKeys',
                                 operator: 'areNot',
+                                type: 'modifierKeys',
                                 value: 'alt, shift',
                             },
                             {
-                                type: 'modifierKeys',
                                 operator: 'include',
+                                type: 'modifierKeys',
                                 value: 'alt',
                             },
                             {
-                                type: 'modifierKeys',
                                 operator: 'notInclude',
+                                type: 'modifierKeys',
                                 value: 'ctrl',
                             },
                         ],
                     },
                 ],
+                name: 'Default',
+                options: createProfileOptionsUpdatedTestData1(),
             },
         ],
-        profileCurrent: 0,
         version: 51,
-        global: {
-            database: {
-                prefixWildcardsSupported: false,
-            },
-        },
     };
 }
 
@@ -743,8 +743,8 @@ describe('OptionsUtil', () => {
             const match = fileNameRegex.exec(fileName);
             if (match !== null) {
                 updates.push({
-                    version: Number.parseInt(match[1], 10),
                     changes: loadDataFile(path.join(templatesDirPath, match[0])),
+                    version: Number.parseInt(match[1], 10),
                 });
             }
         }
@@ -756,7 +756,7 @@ describe('OptionsUtil', () => {
          */
         const getUpdateAdditions = (startVersion, targetVersion) => {
             let value = '';
-            for (const {version, changes} of updates) {
+            for (const {changes, version} of updates) {
                 if (version <= startVersion || version > targetVersion || changes.length === 0) { continue; }
                 if (value.length > 0) { value += '\n'; }
                 value += changes;
@@ -767,7 +767,13 @@ describe('OptionsUtil', () => {
         const data = [
             // Standard format
             {
-                oldVersion: 0,
+                expected: `
+{{#*inline "character"}}
+    {{~definition.character~}}
+{{/inline}}
+
+<<<UPDATE-ADDITIONS>>>
+{{~> (lookup . "marker") ~}}`.trimStart(),
                 newVersion: 12,
                 old: `
 {{#*inline "character"}}
@@ -776,17 +782,17 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
+                oldVersion: 0,
+            },
+            // Non-standard marker format
+            {
                 expected: `
 {{#*inline "character"}}
     {{~definition.character~}}
 {{/inline}}
 
-<<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart(),
-            },
-            // Non-standard marker format
-            {
-                oldVersion: 0,
+{{~> (lookup . "marker2") ~}}
+<<<UPDATE-ADDITIONS>>>`.trimStart(),
                 newVersion: 12,
                 old: `
 {{#*inline "character"}}
@@ -795,52 +801,21 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker2") ~}}`.trimStart(),
 
-                expected: `
-{{#*inline "character"}}
-    {{~definition.character~}}
-{{/inline}}
-
-{{~> (lookup . "marker2") ~}}
-<<<UPDATE-ADDITIONS>>>`.trimStart(),
+                oldVersion: 0,
             },
             // Empty test
             {
-                oldVersion: 0,
-                newVersion: 12,
-                old: `
-{{~> (lookup . "marker") ~}}`.trimStart(),
-
                 expected: `
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart(),
+                newVersion: 12,
+                old: `
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+                oldVersion: 0,
             },
             // Definition tags update
             {
-                oldVersion: 0,
-                newVersion: 12,
-                old: `
-{{#*inline "glossary-single"}}
-    {{~#unless brief~}}
-        {{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
-        {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
-    {{~/unless~}}
-{{/inline}}
-
-{{#*inline "glossary-single2"}}
-    {{~#unless brief~}}
-        {{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
-        {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
-    {{~/unless~}}
-{{/inline}}
-
-{{#*inline "glossary"}}
-    {{~> glossary-single definition brief=brief compactGlossaries=compactGlossaries~}}
-    {{~> glossary-single definition brief=brief compactGlossaries=../compactGlossaries~}}
-{{/inline}}
-
-{{~> (lookup . "marker") ~}}
-`.trimStart(),
-
                 expected: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
@@ -886,77 +861,34 @@ describe('OptionsUtil', () => {
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}
 `.trimStart(),
-            },
-            // Glossary and glossary-brief update
-            {
-                oldVersion: 7,
                 newVersion: 12,
                 old: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
-        {{~#scope~}}
-            {{~#set "any" false}}{{/set~}}
-            {{~#if definitionTags~}}{{#each definitionTags~}}
-                {{~#if (op "||" (op "!" ../data.compactTags) (op "!" redundant))~}}
-                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
-                    {{name}}
-                    {{~#set "any" true}}{{/set~}}
-                {{~/if~}}
-            {{~/each~}}
-            {{~#if (get "any")}})</i> {{/if~}}
-            {{~/if~}}
-        {{~/scope~}}
+        {{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
         {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
     {{~/unless~}}
-    {{~#if glossary.[1]~}}
-        {{~#if compactGlossaries~}}
-            {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
-        {{~else~}}
-            <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
-        {{~/if~}}
-    {{~else~}}
-        {{~#multiLine}}{{glossary.[0]}}{{/multiLine~}}
-    {{~/if~}}
 {{/inline}}
 
-{{#*inline "character"}}
-    {{~definition.character~}}
+{{#*inline "glossary-single2"}}
+    {{~#unless brief~}}
+        {{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
+        {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
 {{/inline}}
 
 {{#*inline "glossary"}}
-    <div style="text-align: left;">
-    {{~#if modeKanji~}}
-        {{~#if definition.glossary.[1]~}}
-            <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
-        {{~else~}}
-            {{definition.glossary.[0]}}
-        {{~/if~}}
-    {{~else~}}
-        {{~#if group~}}
-            {{~#if definition.definitions.[1]~}}
-                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief compactGlossaries=../compactGlossaries data=../.}}</li>{{/each}}</ol>
-            {{~else~}}
-                {{~> glossary-single definition.definitions.[0] brief=brief compactGlossaries=compactGlossaries data=.~}}
-            {{~/if~}}
-        {{~else if merge~}}
-            {{~#if definition.definitions.[1]~}}
-                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief compactGlossaries=../compactGlossaries data=../.}}</li>{{/each}}</ol>
-            {{~else~}}
-                {{~> glossary-single definition.definitions.[0] brief=brief compactGlossaries=compactGlossaries data=.~}}
-            {{~/if~}}
-        {{~else~}}
-            {{~> glossary-single definition brief=brief compactGlossaries=compactGlossaries data=.~}}
-        {{~/if~}}
-    {{~/if~}}
-    </div>
+    {{~> glossary-single definition brief=brief compactGlossaries=compactGlossaries~}}
+    {{~> glossary-single definition brief=brief compactGlossaries=../compactGlossaries~}}
 {{/inline}}
 
-{{#*inline "glossary-brief"}}
-    {{~> glossary brief=true ~}}
-{{/inline}}
+{{~> (lookup . "marker") ~}}
+`.trimStart(),
 
-{{~> (lookup . "marker") ~}}`.trimStart(),
-
+                oldVersion: 0,
+            },
+            // Glossary and glossary-brief update
+            {
                 expected: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
@@ -1026,10 +958,90 @@ describe('OptionsUtil', () => {
 
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart(),
+                newVersion: 12,
+                old: `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~#set "any" false}}{{/set~}}
+            {{~#if definitionTags~}}{{#each definitionTags~}}
+                {{~#if (op "||" (op "!" ../data.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+            {{~/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+    {{~#if glossary.[1]~}}
+        {{~#if compactGlossaries~}}
+            {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
+        {{~else~}}
+            <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
+        {{~/if~}}
+    {{~else~}}
+        {{~#multiLine}}{{glossary.[0]}}{{/multiLine~}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "character"}}
+    {{~definition.character~}}
+{{/inline}}
+
+{{#*inline "glossary"}}
+    <div style="text-align: left;">
+    {{~#if modeKanji~}}
+        {{~#if definition.glossary.[1]~}}
+            <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
+        {{~else~}}
+            {{definition.glossary.[0]}}
+        {{~/if~}}
+    {{~else~}}
+        {{~#if group~}}
+            {{~#if definition.definitions.[1]~}}
+                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief compactGlossaries=../compactGlossaries data=../.}}</li>{{/each}}</ol>
+            {{~else~}}
+                {{~> glossary-single definition.definitions.[0] brief=brief compactGlossaries=compactGlossaries data=.~}}
+            {{~/if~}}
+        {{~else if merge~}}
+            {{~#if definition.definitions.[1]~}}
+                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief compactGlossaries=../compactGlossaries data=../.}}</li>{{/each}}</ol>
+            {{~else~}}
+                {{~> glossary-single definition.definitions.[0] brief=brief compactGlossaries=compactGlossaries data=.~}}
+            {{~/if~}}
+        {{~else~}}
+            {{~> glossary-single definition brief=brief compactGlossaries=compactGlossaries data=.~}}
+        {{~/if~}}
+    {{~/if~}}
+    </div>
+{{/inline}}
+
+{{#*inline "glossary-brief"}}
+    {{~> glossary brief=true ~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+                oldVersion: 7,
             },
             // formatGlossary update
             {
-                oldVersion: 12,
+                expected: `
+{{#*inline "example"}}
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
+    {{~/if~}}
+{{/inline}}
+
+<<<UPDATE-ADDITIONS>>>
+{{~> (lookup . "marker") ~}}`.trimStart(),
                 newVersion: 13,
                 old: `
 {{#*inline "example"}}
@@ -1044,47 +1056,10 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-                expected: `
-{{#*inline "example"}}
-    {{~#if (op "<=" glossary.length 1)~}}
-        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{/each}}
-    {{~else if @root.compactGlossaries~}}
-        {{#each glossary}}{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}{{#unless @last}} | {{/unless}}{{/each}}
-    {{~else~}}
-        <ul>{{#each glossary}}<li>{{#formatGlossary ../dictionary}}{{{.}}}{{/formatGlossary}}</li>{{/each}}</ul>
-    {{~/if~}}
-{{/inline}}
-
-<<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart(),
+                oldVersion: 12,
             },
             // hasMedia/getMedia update
             {
-                oldVersion: 12,
-                newVersion: 13,
-                old: `
-{{#*inline "audio"}}
-    {{~#if definition.audioFileName~}}
-        [sound:{{definition.audioFileName}}]
-    {{~/if~}}
-{{/inline}}
-
-{{#*inline "screenshot"}}
-    <img src="{{definition.screenshotFileName}}" />
-{{/inline}}
-
-{{#*inline "clipboard-image"}}
-    {{~#if definition.clipboardImageFileName~}}
-        <img src="{{definition.clipboardImageFileName}}" />
-    {{~/if~}}
-{{/inline}}
-
-{{#*inline "clipboard-text"}}
-    {{~#if definition.clipboardText~}}{{definition.clipboardText}}{{~/if~}}
-{{/inline}}
-
-{{~> (lookup . "marker") ~}}`.trimStart(),
-
                 expected: `
 {{#*inline "audio"}}
     {{~#if (hasMedia "audio")~}}
@@ -1110,10 +1085,84 @@ describe('OptionsUtil', () => {
 
 <<<UPDATE-ADDITIONS>>>
 {{~> (lookup . "marker") ~}}`.trimStart(),
+                newVersion: 13,
+                old: `
+{{#*inline "audio"}}
+    {{~#if definition.audioFileName~}}
+        [sound:{{definition.audioFileName}}]
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "screenshot"}}
+    <img src="{{definition.screenshotFileName}}" />
+{{/inline}}
+
+{{#*inline "clipboard-image"}}
+    {{~#if definition.clipboardImageFileName~}}
+        <img src="{{definition.clipboardImageFileName}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if definition.clipboardText~}}{{definition.clipboardText}}{{~/if~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
+
+                oldVersion: 12,
             },
             // hasMedia/getMedia update
             {
-                oldVersion: 12,
+                expected: `
+{{! Pitch Accents }}
+{{#*inline "pitch-accent-item"}}
+    {{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}{{~/pronunciation~}}
+{{/inline}}
+
+{{#*inline "pitch-accent-item-disambiguation"}}
+    {{~#scope~}}
+        {{~#set "exclusive" (spread exclusiveExpressions exclusiveReadings)}}{{/set~}}
+        {{~#if (op ">" (property (get "exclusive") "length") 0)~}}
+            {{~#set "separator" ""~}}{{/set~}}
+            <em>({{#each (get "exclusive")~}}
+                {{~#get "separator"}}{{/get~}}{{{.}}}
+            {{~/each}} only) </em>
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{#*inline "pitch-accent-list"}}
+    {{~#if (op ">" pitchCount 0)~}}
+        {{~#if (op ">" pitchCount 1)~}}<ol>{{~/if~}}
+        {{~#each pitches~}}
+            {{~#each pitches~}}
+                {{~#if (op ">" ../../pitchCount 1)~}}<li>{{~/if~}}
+                    {{~> pitch-accent-item-disambiguation~}}
+                    {{~> pitch-accent-item format=../../format~}}
+                {{~#if (op ">" ../../pitchCount 1)~}}</li>{{~/if~}}
+            {{~/each~}}
+        {{~/each~}}
+        {{~#if (op ">" pitchCount 1)~}}</ol>{{~/if~}}
+    {{~else~}}
+        No pitch accent data
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "pitch-accents"}}
+    {{~> pitch-accent-list format='text'~}}
+{{/inline}}
+
+{{#*inline "pitch-accent-graphs"}}
+    {{~> pitch-accent-list format='graph'~}}
+{{/inline}}
+
+{{#*inline "pitch-accent-positions"}}
+    {{~> pitch-accent-list format='position'~}}
+{{/inline}}
+{{! End Pitch Accents }}
+
+<<<UPDATE-ADDITIONS>>>
+{{~> (lookup . "marker") ~}}`.trimStart(),
                 newVersion: 13,
                 old: `
 {{! Pitch Accents }}
@@ -1228,60 +1277,51 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-                expected: `
-{{! Pitch Accents }}
-{{#*inline "pitch-accent-item"}}
-    {{~#pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}{{~/pronunciation~}}
-{{/inline}}
-
-{{#*inline "pitch-accent-item-disambiguation"}}
-    {{~#scope~}}
-        {{~#set "exclusive" (spread exclusiveExpressions exclusiveReadings)}}{{/set~}}
-        {{~#if (op ">" (property (get "exclusive") "length") 0)~}}
-            {{~#set "separator" ""~}}{{/set~}}
-            <em>({{#each (get "exclusive")~}}
-                {{~#get "separator"}}{{/get~}}{{{.}}}
-            {{~/each}} only) </em>
-        {{~/if~}}
-    {{~/scope~}}
-{{/inline}}
-
-{{#*inline "pitch-accent-list"}}
-    {{~#if (op ">" pitchCount 0)~}}
-        {{~#if (op ">" pitchCount 1)~}}<ol>{{~/if~}}
-        {{~#each pitches~}}
-            {{~#each pitches~}}
-                {{~#if (op ">" ../../pitchCount 1)~}}<li>{{~/if~}}
-                    {{~> pitch-accent-item-disambiguation~}}
-                    {{~> pitch-accent-item format=../../format~}}
-                {{~#if (op ">" ../../pitchCount 1)~}}</li>{{~/if~}}
-            {{~/each~}}
-        {{~/each~}}
-        {{~#if (op ">" pitchCount 1)~}}</ol>{{~/if~}}
-    {{~else~}}
-        No pitch accent data
-    {{~/if~}}
-{{/inline}}
-
-{{#*inline "pitch-accents"}}
-    {{~> pitch-accent-list format='text'~}}
-{{/inline}}
-
-{{#*inline "pitch-accent-graphs"}}
-    {{~> pitch-accent-list format='graph'~}}
-{{/inline}}
-
-{{#*inline "pitch-accent-positions"}}
-    {{~> pitch-accent-list format='position'~}}
-{{/inline}}
-{{! End Pitch Accents }}
-
-<<<UPDATE-ADDITIONS>>>
-{{~> (lookup . "marker") ~}}`.trimStart(),
+                oldVersion: 12,
             },
             // Block helper update: furigana and furiganaPlain
             {
-                oldVersion: 20,
+                expected: `
+{{#*inline "furigana"}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~furigana .~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{furigana definition}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "furigana-plain"}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~furiganaPlain .~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{furiganaPlain definition}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "frequencies"}}
+    {{~#if (op ">" definition.frequencies.length 0)~}}
+        <ul style="text-align: left;">
+        {{~#each definition.frequencies~}}
+            <li>
+            {{~#if (op "!==" ../definition.type "kanji")~}}
+                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
+                    {{~furigana expression reading~}}
+                ) {{/if~}}
+            {{~/if~}}
+            {{~dictionary}}: {{frequency~}}
+            </li>
+        {{~/each~}}
+        </ul>
+    {{~/if~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
                 newVersion: 21,
                 old: `
 {{#*inline "furigana"}}
@@ -1325,51 +1365,44 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-                expected: `
-{{#*inline "furigana"}}
-    {{~#if merge~}}
-        {{~#each definition.expressions~}}
-            <span class="expression-{{termFrequency}}">{{~furigana .~}}</span>
-            {{~#unless @last}}、{{/unless~}}
-        {{~/each~}}
-    {{~else~}}
-        {{furigana definition}}
-    {{~/if~}}
-{{/inline}}
-
-{{#*inline "furigana-plain"}}
-    {{~#if merge~}}
-        {{~#each definition.expressions~}}
-            <span class="expression-{{termFrequency}}">{{~furiganaPlain .~}}</span>
-            {{~#unless @last}}、{{/unless~}}
-        {{~/each~}}
-    {{~else~}}
-        {{furiganaPlain definition}}
-    {{~/if~}}
-{{/inline}}
-
-{{#*inline "frequencies"}}
-    {{~#if (op ">" definition.frequencies.length 0)~}}
-        <ul style="text-align: left;">
-        {{~#each definition.frequencies~}}
-            <li>
-            {{~#if (op "!==" ../definition.type "kanji")~}}
-                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
-                    {{~furigana expression reading~}}
-                ) {{/if~}}
-            {{~/if~}}
-            {{~dictionary}}: {{frequency~}}
-            </li>
-        {{~/each~}}
-        </ul>
-    {{~/if~}}
-{{/inline}}
-
-{{~> (lookup . "marker") ~}}`.trimStart(),
+                oldVersion: 20,
             },
             // Block helper update: formatGlossary
             {
-                oldVersion: 20,
+                expected: `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~set "any" false~}}
+            {{~#each definitionTags~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~set "any" true~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#unless noDictionaryTag~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{dictionary}}
+                    {{~set "any" true~}}
+                {{~/if~}}
+            {{~/unless~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
+    {{~/if~}}
+    {{~set "previousDictionary" dictionary~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
                 newVersion: 21,
                 old: `
 {{#*inline "glossary-single"}}
@@ -1406,44 +1439,58 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-                expected: `
-{{#*inline "glossary-single"}}
-    {{~#unless brief~}}
-        {{~#scope~}}
-            {{~set "any" false~}}
-            {{~#each definitionTags~}}
-                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
-                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
-                    {{name}}
-                    {{~set "any" true~}}
-                {{~/if~}}
-            {{~/each~}}
-            {{~#unless noDictionaryTag~}}
-                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
-                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
-                    {{dictionary}}
-                    {{~set "any" true~}}
-                {{~/if~}}
-            {{~/unless~}}
-            {{~#if (get "any")}})</i> {{/if~}}
-        {{~/scope~}}
-        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
-    {{~/unless~}}
-    {{~#if (op "<=" glossary.length 1)~}}
-        {{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
-    {{~else if @root.compactGlossaries~}}
-        {{#each glossary}}{{formatGlossary ../dictionary .}}{{#unless @last}} | {{/unless}}{{/each}}
-    {{~else~}}
-        <ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
-    {{~/if~}}
-    {{~set "previousDictionary" dictionary~}}
-{{/inline}}
-
-{{~> (lookup . "marker") ~}}`.trimStart(),
+                oldVersion: 20,
             },
             // Block helper update: set and get
             {
-                oldVersion: 20,
+                expected: `
+{{#*inline "pitch-accent-item-disambiguation"}}
+    {{~#scope~}}
+        {{~set "exclusive" (spread exclusiveExpressions exclusiveReadings)~}}
+        {{~#if (op ">" (property (get "exclusive") "length") 0)~}}
+            {{~set "separator" ""~}}
+            <em>({{#each (get "exclusive")~}}
+                {{~get "separator"~}}{{{.}}}
+            {{~/each}} only) </em>
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{#*inline "stroke-count"}}
+    {{~#scope~}}
+        {{~set "found" false~}}
+        {{~#each definition.stats.misc~}}
+            {{~#if (op "===" name "strokes")~}}
+                {{~set "found" true~}}
+                Stroke count: {{value}}
+            {{~/if~}}
+        {{~/each~}}
+        {{~#if (op "!" (get "found"))~}}
+            Stroke count: Unknown
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{#*inline "part-of-speech"}}
+    {{~#scope~}}
+        {{~#if (op "!==" definition.type "kanji")~}}
+            {{~set "first" true~}}
+            {{~#each definition.expressions~}}
+                {{~#each wordClasses~}}
+                    {{~#unless (get (concat "used_" .))~}}
+                        {{~> part-of-speech-pretty . ~}}
+                        {{~#unless (get "first")}}, {{/unless~}}
+                        {{~set (concat "used_" .) true~}}
+                        {{~set "first" false~}}
+                    {{~/unless~}}
+                {{~/each~}}
+            {{~/each~}}
+            {{~#if (get "first")~}}Unknown{{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
                 newVersion: 21,
                 old: `
 {{#*inline "pitch-accent-item-disambiguation"}}
@@ -1494,58 +1541,48 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-                expected: `
-{{#*inline "pitch-accent-item-disambiguation"}}
-    {{~#scope~}}
-        {{~set "exclusive" (spread exclusiveExpressions exclusiveReadings)~}}
-        {{~#if (op ">" (property (get "exclusive") "length") 0)~}}
-            {{~set "separator" ""~}}
-            <em>({{#each (get "exclusive")~}}
-                {{~get "separator"~}}{{{.}}}
-            {{~/each}} only) </em>
-        {{~/if~}}
-    {{~/scope~}}
-{{/inline}}
-
-{{#*inline "stroke-count"}}
-    {{~#scope~}}
-        {{~set "found" false~}}
-        {{~#each definition.stats.misc~}}
-            {{~#if (op "===" name "strokes")~}}
-                {{~set "found" true~}}
-                Stroke count: {{value}}
-            {{~/if~}}
-        {{~/each~}}
-        {{~#if (op "!" (get "found"))~}}
-            Stroke count: Unknown
-        {{~/if~}}
-    {{~/scope~}}
-{{/inline}}
-
-{{#*inline "part-of-speech"}}
-    {{~#scope~}}
-        {{~#if (op "!==" definition.type "kanji")~}}
-            {{~set "first" true~}}
-            {{~#each definition.expressions~}}
-                {{~#each wordClasses~}}
-                    {{~#unless (get (concat "used_" .))~}}
-                        {{~> part-of-speech-pretty . ~}}
-                        {{~#unless (get "first")}}, {{/unless~}}
-                        {{~set (concat "used_" .) true~}}
-                        {{~set "first" false~}}
-                    {{~/unless~}}
-                {{~/each~}}
-            {{~/each~}}
-            {{~#if (get "first")~}}Unknown{{~/if~}}
-        {{~/if~}}
-    {{~/scope~}}
-{{/inline}}
-
-{{~> (lookup . "marker") ~}}`.trimStart(),
+                oldVersion: 20,
             },
             // Block helper update: hasMedia and getMedia
             {
-                oldVersion: 20,
+                expected: `
+{{#*inline "audio"}}
+    {{~#if (hasMedia "audio")~}}
+        [sound:{{getMedia "audio"}}]
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "screenshot"}}
+    {{~#if (hasMedia "screenshot")~}}
+        <img src="{{getMedia "screenshot"}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-image"}}
+    {{~#if (hasMedia "clipboardImage")~}}
+        <img src="{{getMedia "clipboardImage"}}" />
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
+{{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
+{{/inline}}
+
+{{#*inline "sentence-furigana"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
+            {{getMedia "textFurigana" definition.cloze.sentence escape=false}}
+        {{~else~}}
+            {{definition.cloze.sentence}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
                 newVersion: 21,
                 old: `
 {{#*inline "audio"}}
@@ -1586,48 +1623,16 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-                expected: `
-{{#*inline "audio"}}
-    {{~#if (hasMedia "audio")~}}
-        [sound:{{getMedia "audio"}}]
-    {{~/if~}}
-{{/inline}}
-
-{{#*inline "screenshot"}}
-    {{~#if (hasMedia "screenshot")~}}
-        <img src="{{getMedia "screenshot"}}" />
-    {{~/if~}}
-{{/inline}}
-
-{{#*inline "clipboard-image"}}
-    {{~#if (hasMedia "clipboardImage")~}}
-        <img src="{{getMedia "clipboardImage"}}" />
-    {{~/if~}}
-{{/inline}}
-
-{{#*inline "clipboard-text"}}
-    {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
-{{/inline}}
-
-{{#*inline "selection-text"}}
-    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
-{{/inline}}
-
-{{#*inline "sentence-furigana"}}
-    {{~#if definition.cloze~}}
-        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
-            {{getMedia "textFurigana" definition.cloze.sentence escape=false}}
-        {{~else~}}
-            {{definition.cloze.sentence}}
-        {{~/if~}}
-    {{~/if~}}
-{{/inline}}
-
-{{~> (lookup . "marker") ~}}`.trimStart(),
+                oldVersion: 20,
             },
             // Block helper update: pronunciation
             {
-                oldVersion: 20,
+                expected: `
+{{#*inline "pitch-accent-item"}}
+    {{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}`.trimStart(),
                 newVersion: 21,
                 old: `
 {{#*inline "pitch-accent-item"}}
@@ -1636,26 +1641,9 @@ describe('OptionsUtil', () => {
 
 {{~> (lookup . "marker") ~}}`.trimStart(),
 
-                expected: `
-{{#*inline "pitch-accent-item"}}
-    {{~pronunciation format=format reading=reading downstepPosition=position nasalPositions=nasalPositions devoicePositions=devoicePositions~}}
-{{/inline}}
-
-{{~> (lookup . "marker") ~}}`.trimStart(),
+                oldVersion: 20,
             },
             {
-                oldVersion: 21,
-                newVersion: 24,
-                old: `
-{{#*inline "conjugation"}}
-    {{~#if definition.reasons~}}
-        {{~#each definition.reasons~}}
-            {{~#if (op ">" @index 0)}} « {{/if~}}
-            {{.}}
-        {{~/each~}}
-    {{~/if~}}
-{{/inline}}`.trimStart(),
-
                 expected: `
 {{#*inline "conjugation"}}
     {{~#if (op ">" definition.inflectionRuleChainCandidates.length 0)~}}
@@ -1736,9 +1724,31 @@ describe('OptionsUtil', () => {
 {{~#*inline "pitch-accent-categories"~}}
     {{~#each (pitchCategories @root)~}}{{~.~}}{{~#unless @last~}},{{~/unless~}}{{~/each~}}
 {{~/inline~}}`.trimStart(),
+                newVersion: 24,
+                old: `
+{{#*inline "conjugation"}}
+    {{~#if definition.reasons~}}
+        {{~#each definition.reasons~}}
+            {{~#if (op ">" @index 0)}} « {{/if~}}
+            {{.}}
+        {{~/each~}}
+    {{~/if~}}
+{{/inline}}`.trimStart(),
+
+                oldVersion: 21,
             },
             {
-                oldVersion: 24,
+                expected: `
+{{#*inline "sentence-furigana"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
+            {{{getMedia "textFurigana" definition.cloze.sentence escape=false}}}
+        {{~else~}}
+            {{{definition.cloze.sentence}}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+`.trimStart(),
                 newVersion: 27,
                 old: `
 {{#*inline "sentence-furigana"}}
@@ -1752,20 +1762,38 @@ describe('OptionsUtil', () => {
 {{/inline}}
 `.trimStart(),
 
-                expected: `
-{{#*inline "sentence-furigana"}}
-    {{~#if definition.cloze~}}
-        {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
-            {{{getMedia "textFurigana" definition.cloze.sentence escape=false}}}
-        {{~else~}}
-            {{{definition.cloze.sentence}}}
-        {{~/if~}}
-    {{~/if~}}
-{{/inline}}
-`.trimStart(),
+                oldVersion: 24,
             },
             {
-                oldVersion: 32,
+                expected: `
+{{#*inline "sentence"}}
+    {{~#if definition.cloze}}{{{definition.cloze.sentence}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-prefix"}}
+    {{~#if definition.cloze}}{{{definition.cloze.prefix}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body"}}
+    {{~#if definition.cloze}}{{{definition.cloze.body}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body-kana"}}
+    {{~#if definition.cloze}}{{{definition.cloze.bodyKana}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-suffix"}}
+    {{~#if definition.cloze}}{{{definition.cloze.suffix}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "clipboard-text"}}
+    {{~#if (hasMedia "clipboardText")}}{{{getMedia "clipboardText"}}}{{/if~}}
+{{/inline}}
+
+{{#*inline "selection-text"}}
+    {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
+{{/inline}}
+`.trimStart(),
                 newVersion: 33,
                 old: `
 {{#*inline "sentence"}}
@@ -1797,38 +1825,14 @@ describe('OptionsUtil', () => {
 {{/inline}}
 `.trimStart(),
 
-                expected: `
-{{#*inline "sentence"}}
-    {{~#if definition.cloze}}{{{definition.cloze.sentence}}}{{/if~}}
-{{/inline}}
-
-{{#*inline "cloze-prefix"}}
-    {{~#if definition.cloze}}{{{definition.cloze.prefix}}}{{/if~}}
-{{/inline}}
-
-{{#*inline "cloze-body"}}
-    {{~#if definition.cloze}}{{{definition.cloze.body}}}{{/if~}}
-{{/inline}}
-
-{{#*inline "cloze-body-kana"}}
-    {{~#if definition.cloze}}{{{definition.cloze.bodyKana}}}{{/if~}}
-{{/inline}}
-
-{{#*inline "cloze-suffix"}}
-    {{~#if definition.cloze}}{{{definition.cloze.suffix}}}{{/if~}}
-{{/inline}}
-
-{{#*inline "clipboard-text"}}
-    {{~#if (hasMedia "clipboardText")}}{{{getMedia "clipboardText"}}}{{/if~}}
-{{/inline}}
-
-{{#*inline "selection-text"}}
-    {{~#if (hasMedia "selectionText")}}{{{getMedia "selectionText"}}}{{/if~}}
-{{/inline}}
-`.trimStart(),
+                oldVersion: 32,
             },
             {
-                oldVersion: 44,
+                expected: `
+{{#*inline "popup-selection-text"}}
+    {{~#if (hasMedia "popupSelectionText")}}{{{getMedia "popupSelectionText"}}}{{/if~}}
+{{/inline}}
+`.trimStart(),
                 newVersion: 45,
                 old: `
 {{#*inline "selection-text"}}
@@ -1836,70 +1840,9 @@ describe('OptionsUtil', () => {
 {{/inline}}
 `.trimStart(),
 
-                expected: `
-{{#*inline "popup-selection-text"}}
-    {{~#if (hasMedia "popupSelectionText")}}{{{getMedia "popupSelectionText"}}}{{/if~}}
-{{/inline}}
-`.trimStart(),
+                oldVersion: 44,
             },
             {
-                oldVersion: 48,
-                newVersion: 49,
-                old: `
-{{#*inline "glossary-single"}}
-    {{~#unless brief~}}
-        {{~#scope~}}
-            {{~set "any" false~}}
-            {{~#each definitionTags~}}
-                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
-                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
-                    {{name}}
-                    {{~set "any" true~}}
-                {{~/if~}}
-            {{~/each~}}
-            {{~#unless noDictionaryTag~}}
-                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
-                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
-                    {{dictionary}}
-                    {{~set "any" true~}}
-                {{~/if~}}
-            {{~/unless~}}
-            {{~#if (get "any")}})</i> {{/if~}}
-        {{~/scope~}}
-        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
-    {{~/unless~}}
-    {{~#if (op "<=" glossary.length 1)~}}
-        {{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
-    {{~else if @root.compactGlossaries~}}
-        {{#each glossary}}{{formatGlossary ../dictionary .}}{{#unless @last}} | {{/unless}}{{/each}}
-    {{~else~}}
-        <ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
-    {{~/if~}}
-    {{~set "previousDictionary" dictionary~}}
-{{/inline}}
-
-{{#*inline "dictionary"}}
-    {{~definition.dictionary~}}
-{{/inline}}
-
-{{#*inline "frequencies"}}
-    {{~#if (op ">" definition.frequencies.length 0)~}}
-        <ul style="text-align: left;">
-        {{~#each definition.frequencies~}}
-            <li>
-            {{~#if (op "!==" ../definition.type "kanji")~}}
-                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
-                    {{~furigana expression reading~}}
-                ) {{/if~}}
-            {{~/if~}}
-            {{~dictionary}}: {{frequency~}}
-            </li>
-        {{~/each~}}
-        </ul>
-    {{~/if~}}
-{{/inline}}
-`.trimStart(),
-
                 expected: `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
@@ -1958,12 +1901,69 @@ describe('OptionsUtil', () => {
     {{~/if~}}
 {{/inline}}
 `.trimStart(),
+                newVersion: 49,
+                old: `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~set "any" false~}}
+            {{~#each definitionTags~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~set "any" true~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#unless noDictionaryTag~}}
+                {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{dictionary}}
+                    {{~set "any" true~}}
+                {{~/if~}}
+            {{~/unless~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{.}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+    {{~#if (op "<=" glossary.length 1)~}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{/each}}
+    {{~else if @root.compactGlossaries~}}
+        {{#each glossary}}{{formatGlossary ../dictionary .}}{{#unless @last}} | {{/unless}}{{/each}}
+    {{~else~}}
+        <ul>{{#each glossary}}<li>{{formatGlossary ../dictionary .}}</li>{{/each}}</ul>
+    {{~/if~}}
+    {{~set "previousDictionary" dictionary~}}
+{{/inline}}
+
+{{#*inline "dictionary"}}
+    {{~definition.dictionary~}}
+{{/inline}}
+
+{{#*inline "frequencies"}}
+    {{~#if (op ">" definition.frequencies.length 0)~}}
+        <ul style="text-align: left;">
+        {{~#each definition.frequencies~}}
+            <li>
+            {{~#if (op "!==" ../definition.type "kanji")~}}
+                {{~#if (op "||" (op ">" ../uniqueExpressions.length 1) (op ">" ../uniqueReadings.length 1))~}}(
+                    {{~furigana expression reading~}}
+                ) {{/if~}}
+            {{~/if~}}
+            {{~dictionary}}: {{frequency~}}
+            </li>
+        {{~/each~}}
+        </ul>
+    {{~/if~}}
+{{/inline}}
+`.trimStart(),
+
+                oldVersion: 48,
             },
         ];
 
         const updatesPattern = /<<<UPDATE-ADDITIONS>>>/g;
 
-        test.each(data)('field-templates-update-test-%#', async ({old, expected, oldVersion, newVersion}) => {
+        test.each(data)('field-templates-update-test-%#', async ({expected, newVersion, old, oldVersion}) => {
             const optionsUtil = new OptionsUtil();
             await optionsUtil.prepare();
 

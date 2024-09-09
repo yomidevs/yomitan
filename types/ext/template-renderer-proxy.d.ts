@@ -31,10 +31,17 @@ import type {
 // Frontend API
 
 type FrontendApiSurface = {
+    getModifiedData: {
+        params: {
+            data: CompositeRenderData;
+            type: RenderMode;
+        };
+        return: NoteData;
+    };
     render: {
         params: {
-            template: string;
             data: PartialOrCompositeRenderData;
+            template: string;
             type: RenderMode;
         };
         return: RenderResult;
@@ -44,13 +51,6 @@ type FrontendApiSurface = {
             items: RenderMultiItem[];
         };
         return: Response<RenderResult>[];
-    };
-    getModifiedData: {
-        params: {
-            data: CompositeRenderData;
-            type: RenderMode;
-        };
-        return: NoteData;
     };
 };
 
@@ -62,8 +62,8 @@ type FrontendApiReturnAny = BaseApiReturnAny<FrontendApiSurface>;
 
 export type FrontendMessage<TName extends FrontendApiNames> = {
     action: TName;
-    params: FrontendApiParams<TName>;
     id: string;
+    params: FrontendApiParams<TName>;
 };
 
 export type FrontendMessageAny = FrontendMessage<FrontendApiNames>;
@@ -95,8 +95,8 @@ type BackendApiParams<TName extends BackendApiNames> = BaseApiParams<BackendApiS
 
 export type BackendMessage<TName extends BackendApiNames> = {
     action: TName;
+    id: null | string;
     params: BackendApiParams<TName>;
-    id: string | null;
 };
 
 export type BackendMessageAny = BackendMessage<BackendApiNames>;

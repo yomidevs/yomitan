@@ -44,40 +44,40 @@ export type CrossFrameAPIPortEvents = {
 };
 
 export type AcknowledgeMessage = {
-    type: 'ack';
     id: number;
+    type: 'ack';
 };
 
 export type ResultMessage = {
-    type: 'result';
-    id: number;
     data: Response<ApiReturnAny>;
+    id: number;
+    type: 'result';
 };
 
 export type InvokeMessage = {
-    type: 'invoke';
-    id: number;
     data: ApiMessageAny;
+    id: number;
+    type: 'invoke';
 };
 
-export type Message = AcknowledgeMessage | ResultMessage | InvokeMessage;
+export type Message = AcknowledgeMessage | InvokeMessage | ResultMessage;
 
 export type Invocation = {
-    id: number;
-    resolve: (value: ApiReturnAny) => void;
-    reject: (reason: Error) => void;
-    responseTimeout: number;
-    action: string;
     ack: boolean;
-    timer: Timeout | null;
+    action: string;
+    id: number;
+    reject: (reason: Error) => void;
+    resolve: (value: ApiReturnAny) => void;
+    responseTimeout: number;
+    timer: null | Timeout;
 };
 
 export type PortDetails = CrossFrameCommunicationPortDetails;
 
 export type CrossFrameCommunicationPortDetails = {
     name: 'cross-frame-communication-port';
-    otherTabId: number;
     otherFrameId: number;
+    otherTabId: number;
 };
 
 type ApiSurface = {
@@ -89,6 +89,16 @@ type ApiSurface = {
         params: DisplayDirectApiMessageAny;
         return: DisplayDirectApiReturnAny;
     };
+    frameAncestryHandlerRequestFrameInfoResponse: {
+        params: RequestFrameInfoResponseParams;
+        return: RequestFrameInfoResponseReturn;
+    };
+    frameOffsetForwarderGetChildFrameRect: {
+        params: {
+            frameId: number;
+        };
+        return: ChildFrameRect | null;
+    };
     frontendClosePopup: {
         params: void;
         return: void;
@@ -97,28 +107,22 @@ type ApiSurface = {
         params: void;
         return: void;
     };
-    frontendGetPopupSelectionText: {
+    frontendGetPageInfo: {
         params: void;
-        return: string;
+        return: {
+            documentTitle: string;
+            url: string;
+        };
     };
     frontendGetPopupInfo: {
         params: void;
         return: {
-            popupId: string | null;
+            popupId: null | string;
         };
     };
-    frontendGetPageInfo: {
+    frontendGetPopupSelectionText: {
         params: void;
-        return: {
-            url: string;
-            documentTitle: string;
-        };
-    };
-    frameOffsetForwarderGetChildFrameRect: {
-        params: {
-            frameId: number;
-        };
-        return: ChildFrameRect | null;
+        return: string;
     };
     hotkeyHandlerForwardHotkey: {
         params: {
@@ -127,37 +131,11 @@ type ApiSurface = {
         };
         return: boolean;
     };
-    popupFactoryGetOrCreatePopup: {
-        params: GetOrCreatePopupDetails;
-        return: {id: string, depth: number, frameId: number};
-    };
-    popupFactorySetOptionsContext: {
+    popupFactoryClearAutoPlayTimer: {
         params: {
             id: string;
-            optionsContext: OptionsContext;
         };
         return: void;
-    };
-    popupFactoryHide: {
-        params: {
-            id: string;
-            changeFocus: boolean;
-        };
-        return: void;
-    };
-    popupFactoryIsVisible: {
-        params: {
-            id: string;
-        };
-        return: boolean;
-    };
-    popupFactorySetVisibleOverride: {
-        params: {
-            id: string;
-            value: boolean;
-            priority: number;
-        };
-        return: TokenString | null;
     };
     popupFactoryClearVisibleOverride: {
         params: {
@@ -174,26 +152,28 @@ type ApiSurface = {
         };
         return: boolean;
     };
-    popupFactoryShowContent: {
+    popupFactoryGetFrameSize: {
         params: {
             id: string;
-            details: PopupContentDetails;
-            displayDetails: DisplayContentDetails | null;
+        };
+        return: ValidSize;
+    };
+    popupFactoryGetOrCreatePopup: {
+        params: GetOrCreatePopupDetails;
+        return: {depth: number, frameId: number, id: string};
+    };
+    popupFactoryHide: {
+        params: {
+            changeFocus: boolean;
+            id: string;
         };
         return: void;
     };
-    popupFactorySetCustomCss: {
-        params: {
-            id: string;
-            css: string;
-        };
-        return: void;
-    };
-    popupFactoryClearAutoPlayTimer: {
+    popupFactoryIsVisible: {
         params: {
             id: string;
         };
-        return: void;
+        return: boolean;
     };
     popupFactorySetContentScale: {
         params: {
@@ -202,37 +182,57 @@ type ApiSurface = {
         };
         return: void;
     };
-    popupFactoryUpdateTheme: {
+    popupFactorySetCustomCss: {
         params: {
+            css: string;
             id: string;
         };
         return: void;
     };
     popupFactorySetCustomOuterCss: {
         params: {
-            id: string;
             css: string;
+            id: string;
             useWebExtensionApi: boolean;
         };
         return: void;
     };
-    popupFactoryGetFrameSize: {
-        params: {
-            id: string;
-        };
-        return: ValidSize;
-    };
     popupFactorySetFrameSize: {
         params: {
+            height: number;
             id: string;
             width: number;
-            height: number;
         };
         return: boolean;
     };
-    frameAncestryHandlerRequestFrameInfoResponse: {
-        params: RequestFrameInfoResponseParams;
-        return: RequestFrameInfoResponseReturn;
+    popupFactorySetOptionsContext: {
+        params: {
+            id: string;
+            optionsContext: OptionsContext;
+        };
+        return: void;
+    };
+    popupFactorySetVisibleOverride: {
+        params: {
+            id: string;
+            priority: number;
+            value: boolean;
+        };
+        return: null | TokenString;
+    };
+    popupFactoryShowContent: {
+        params: {
+            details: PopupContentDetails;
+            displayDetails: DisplayContentDetails | null;
+            id: string;
+        };
+        return: void;
+    };
+    popupFactoryUpdateTheme: {
+        params: {
+            id: string;
+        };
+        return: void;
     };
 };
 

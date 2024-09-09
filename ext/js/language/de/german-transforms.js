@@ -32,13 +32,13 @@ const germanLetters = 'a-zA-ZäöüßÄÖÜẞ';
 function separatedPrefix(prefix, conditionsIn, conditionsOut) {
     const regex = new RegExp(`^([${germanLetters}]+) .+ ${prefix}$`);
     return {
-        type: 'other',
-        isInflected: regex,
+        conditionsIn,
+        conditionsOut,
         deinflect: (term) => {
             return term.replace(regex, '$1 ' + prefix);
         },
-        conditionsIn,
-        conditionsOut,
+        isInflected: regex,
+        type: 'other',
     };
 }
 
@@ -57,13 +57,13 @@ function getBasicPastParticiples() {
     const regularPastParticiple = new RegExp(`^ge([${germanLetters}]+)t$`);
     const suffixes = ['n', 'en'];
     return suffixes.map((suffix) => ({
-        type: 'other',
-        isInflected: regularPastParticiple,
+        conditionsIn: [],
+        conditionsOut: ['vw'],
         deinflect: (term) => {
             return term.replace(regularPastParticiple, `$1${suffix}`);
         },
-        conditionsIn: [],
-        conditionsOut: ['vw'],
+        isInflected: regularPastParticiple,
+        type: 'other',
     }));
 }
 
@@ -75,66 +75,81 @@ function getSeparablePastParticiples() {
     const separablePastParticiple = new RegExp(`^(${prefixDisjunction})ge([${germanLetters}]+)t$`);
     const suffixes = ['n', 'en'];
     return suffixes.map((suffix) => ({
-        type: 'other',
-        isInflected: separablePastParticiple,
+        conditionsIn: [],
+        conditionsOut: ['vw'],
         deinflect: (term) => {
             return term.replace(separablePastParticiple, `$1$2${suffix}`);
         },
-        conditionsIn: [],
-        conditionsOut: ['vw'],
+        isInflected: separablePastParticiple,
+        type: 'other',
     }));
 }
 
 const conditions = {
-    v: {
-        name: 'Verb',
+    adj: {
         isDictionaryForm: true,
-        subConditions: ['vw', 'vs'],
-    },
-    vw: {
-        name: 'Weak verb',
-        isDictionaryForm: true,
-    },
-    vs: {
-        name: 'Strong verb',
-        isDictionaryForm: true,
+        name: 'Adjective',
     },
     n: {
+        isDictionaryForm: true,
         name: 'Noun',
-        isDictionaryForm: true,
     },
-    adj: {
-        name: 'Adjective',
+    v: {
         isDictionaryForm: true,
+        name: 'Verb',
+        subConditions: ['vw', 'vs'],
+    },
+    vs: {
+        isDictionaryForm: true,
+        name: 'Strong verb',
+    },
+    vw: {
+        isDictionaryForm: true,
+        name: 'Weak verb',
     },
 };
 
 export const germanTransforms = {
-    language: 'de',
     conditions,
+    language: 'de',
     transforms: {
-        'nominalization': {
-            name: 'nominalization',
-            description: 'Noun formed from a verb',
-            rules: [
-                suffixInflection('ung', 'en', [], ['v']),
-                suffixInflection('lung', 'eln', [], ['v']),
-                suffixInflection('rung', 'rn', [], ['v']),
-            ],
-        },
         '-bar': {
-            name: '-bar',
             description: '-able adjective from a verb',
+            name: '-bar',
             rules: [
                 suffixInflection('bar', 'en', ['adj'], ['v']),
                 suffixInflection('bar', 'n', ['adj'], ['v']),
             ],
         },
+        '-heit': {
+            description:
+                '1. Converts an adjective into a noun and usually denotes an abstract quality of the adjectival root. ' +
+                'It is often equivalent to the English suffixes -ness, -th, -ty, -dom:\n' +
+                '\t schön (“beautiful”) + -heit → Schönheit (“beauty”)\n' +
+                '\t neu (“new”) + -heit → Neuheit (“novelty”)\n' +
+                '2. Converts concrete nouns into abstract nouns:\n' +
+                '\t Kind (“child”) + -heit → Kindheit (“childhood”)\n' +
+                '\t Christ (“Christian”) + -heit → Christenheit (“Christendom”)\n',
+            name: '-heit',
+            rules: [
+                suffixInflection('heit', '', ['n'], ['adj', 'n']),
+                suffixInflection('keit', '', ['n'], ['adj', 'n']),
+            ],
+        },
         'negative': {
-            name: 'negative',
             description: 'Negation',
+            name: 'negative',
             rules: [
                 prefixInflection('un', '', [], ['adj']),
+            ],
+        },
+        'nominalization': {
+            description: 'Noun formed from a verb',
+            name: 'nominalization',
+            rules: [
+                suffixInflection('ung', 'en', [], ['v']),
+                suffixInflection('lung', 'eln', [], ['v']),
+                suffixInflection('rung', 'rn', [], ['v']),
             ],
         },
         'past participle': {
@@ -154,21 +169,6 @@ export const germanTransforms = {
             name: 'zu-infinitive',
             rules: [
                 ...zuInfinitiveInflections,
-            ],
-        },
-        '-heit': {
-            name: '-heit',
-            description:
-                '1. Converts an adjective into a noun and usually denotes an abstract quality of the adjectival root. ' +
-                'It is often equivalent to the English suffixes -ness, -th, -ty, -dom:\n' +
-                '\t schön (“beautiful”) + -heit → Schönheit (“beauty”)\n' +
-                '\t neu (“new”) + -heit → Neuheit (“novelty”)\n' +
-                '2. Converts concrete nouns into abstract nouns:\n' +
-                '\t Kind (“child”) + -heit → Kindheit (“childhood”)\n' +
-                '\t Christ (“Christian”) + -heit → Christenheit (“Christendom”)\n',
-            rules: [
-                suffixInflection('heit', '', ['n'], ['adj', 'n']),
-                suffixInflection('keit', '', ['n'], ['adj', 'n']),
             ],
         },
 

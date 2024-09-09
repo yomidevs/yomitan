@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type NormalizedWritingMode = 'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | 'sideways-lr';
+export type NormalizedWritingMode = 'horizontal-tb' | 'sideways-lr' | 'sideways-rl' | 'vertical-lr' | 'vertical-rl';
 
 /**
  * Options to configure how element detection is performed.
@@ -27,17 +27,17 @@ export type GetRangeFromPointOptions = {
      */
     deepContentScan: boolean;
     /**
+     * ISO-639 code of the language.
+     */
+    language: null | string;
+    /**
      * Whether or not zoom coordinates should be normalized.
      */
     normalizeCssZoom: boolean;
-    /**
-     * ISO-639 code of the language.
-     */
-    language: string | null;
 };
 
 export type ToNumberConstraints = {
-    min?: string | number;
-    max?: string | number;
-    step?: string | number;
+    max?: number | string;
+    min?: number | string;
+    step?: number | string;
 };

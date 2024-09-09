@@ -31,14 +31,14 @@ export function injectStylesheet(type, content, tabId, frameId, allFrames) {
     return new Promise((resolve, reject) => {
         /** @type {chrome.scripting.InjectionTarget} */
         const target = {
-            tabId,
             allFrames,
+            tabId,
         };
         /** @type {chrome.scripting.CSSInjection} */
         const details = (
             type === 'file' ?
-            {origin: 'AUTHOR', files: [content], target} :
-            {origin: 'USER', css: content, target}
+            {files: [content], origin: 'AUTHOR', target} :
+            {css: content, origin: 'USER', target}
         );
         if (!allFrames && typeof frameId === 'number') {
             details.target.frameIds = [frameId];
@@ -120,7 +120,7 @@ export async function unregisterContentScript(id) {
  * @returns {chrome.scripting.RegisteredContentScript}
  */
 function createContentScriptRegistrationOptions(details, id) {
-    const {css, js, allFrames, matches, runAt, world} = details;
+    const {allFrames, css, js, matches, runAt, world} = details;
     /** @type {chrome.scripting.RegisteredContentScript} */
     const options = {
         id: id,

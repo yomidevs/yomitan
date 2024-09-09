@@ -20,16 +20,16 @@ export const basicTextProcessorOptions = [false, true];
 
 /** @type {import('language').TextProcessor<boolean>} */
 export const decapitalize = {
-    name: 'Decapitalize text',
     description: 'CAPITALIZED TEXT → capitalized text',
+    name: 'Decapitalize text',
     options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? str.toLowerCase() : str),
 };
 
 /** @type {import('language').TextProcessor<boolean>} */
 export const capitalizeFirstLetter = {
-    name: 'Capitalize first letter',
     description: 'lowercase text → Lowercase text',
+    name: 'Capitalize first letter',
     options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? str.charAt(0).toUpperCase() + str.slice(1) : str),
 };
@@ -42,8 +42,8 @@ export const capitalizeFirstLetter = {
  * @type {import('language').TextProcessor<boolean>}
  */
 export const removeAlphabeticDiacritics = {
-    name: 'Remove Alphabetic Diacritics',
     description: 'ἄήé -> αηe',
+    name: 'Remove Alphabetic Diacritics',
     options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : str),
 };

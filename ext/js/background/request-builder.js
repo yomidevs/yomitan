@@ -58,34 +58,34 @@ export class RequestBuilder {
         try {
             /** @type {chrome.declarativeNetRequest.Rule[]} */
             const addRules = [{
-                id,
-                priority: 1,
-                condition: {
-                    urlFilter: `|${this._escapeDnrUrl(url)}|`,
-                    resourceTypes: [
-                        /** @type {chrome.declarativeNetRequest.ResourceType} */ ('xmlhttprequest'),
-                    ],
-                },
                 action: {
-                    type: /** @type {chrome.declarativeNetRequest.RuleActionType} */ ('modifyHeaders'),
                     requestHeaders: [
                         {
-                            operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('remove'),
                             header: 'Cookie',
+                            operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('remove'),
                         },
                         {
-                            operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('set'),
                             header: 'Origin',
+                            operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('set'),
                             value: originUrl,
                         },
                     ],
                     responseHeaders: [
                         {
-                            operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('remove'),
                             header: 'Set-Cookie',
+                            operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('remove'),
                         },
                     ],
+                    type: /** @type {chrome.declarativeNetRequest.RuleActionType} */ ('modifyHeaders'),
                 },
+                condition: {
+                    resourceTypes: [
+                        /** @type {chrome.declarativeNetRequest.ResourceType} */ ('xmlhttprequest'),
+                    ],
+                    urlFilter: `|${this._escapeDnrUrl(url)}|`,
+                },
+                id,
+                priority: 1,
             }];
 
             await this._updateSessionRules({addRules});

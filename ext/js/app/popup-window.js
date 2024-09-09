@@ -242,7 +242,7 @@ export class PopupWindow extends EventDispatcher {
      *   `valid` is `false` for `PopupProxy`, since the DOM node is hosted in a different frame.
      */
     getFrameRect() {
-        return {left: 0, top: 0, right: 0, bottom: 0, valid: false};
+        return {bottom: 0, left: 0, right: 0, top: 0, valid: false};
     }
 
     /**
@@ -250,7 +250,7 @@ export class PopupWindow extends EventDispatcher {
      * @returns {Promise<import('popup').ValidSize>} The size and whether or not it is valid.
      */
     async getFrameSize() {
-        return {width: 0, height: 0, valid: false};
+        return {height: 0, valid: false, width: 0};
     }
 
     /**

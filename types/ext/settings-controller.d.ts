@@ -28,6 +28,13 @@ export type PageExitPrevention = {
 };
 
 export type Events = {
+    dictionaryEnabled: Record<string, never>;
+    dictionarySettingsReordered: {
+        source: DictionaryController;
+    };
+    importDictionaryFromUrl: {
+        url: string;
+    };
     optionsChanged: {
         options: Settings.ProfileOptions;
         optionsContext: Settings.OptionsContext;
@@ -36,13 +43,6 @@ export type Events = {
     permissionsChanged: {
         permissions: chrome.permissions.Permissions;
     };
-    dictionarySettingsReordered: {
-        source: DictionaryController;
-    };
-    importDictionaryFromUrl: {
-        url: string;
-    };
-    dictionaryEnabled: Record<string, never>;
     scanInputsChanged: {
         source: ScanInputsController | ScanInputsSimpleController;
     };

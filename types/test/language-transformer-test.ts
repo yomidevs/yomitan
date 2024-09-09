@@ -17,13 +17,13 @@
 
 export type LanguageTransformerTestCategory = {
     category: string;
-    valid: boolean;
     tests: LanguageTransformerTestCase[];
+    valid: boolean;
 };
 
 export type LanguageTransformerTestCase = {
-    term: string;
+    reasons: null | string[];
+    rule: null | string;
     source: string;
-    rule: string | null;
-    reasons: string[] | null;
+    term: string;
 };

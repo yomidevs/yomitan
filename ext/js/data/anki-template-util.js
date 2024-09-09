@@ -23,6 +23,35 @@
  */
 export function getStandardFieldMarkers(type) {
     switch (type) {
+        case 'kanji':
+            return [
+                'character',
+                'clipboard-image',
+                'clipboard-text',
+                'cloze-body',
+                'cloze-prefix',
+                'cloze-suffix',
+                'dictionary',
+                'dictionary-alias',
+                'document-title',
+                'frequencies',
+                'frequency-harmonic-rank',
+                'frequency-harmonic-occurrence',
+                'frequency-average-rank',
+                'frequency-average-occurrence',
+                'glossary',
+                'kunyomi',
+                'onyomi',
+                'onyomi-hiragana',
+                'screenshot',
+                'search-query',
+                'popup-selection-text',
+                'sentence',
+                'sentence-furigana',
+                'stroke-count',
+                'tags',
+                'url',
+            ];
         case 'term':
             return [
                 'audio',
@@ -63,35 +92,6 @@ export function getStandardFieldMarkers(type) {
                 'popup-selection-text',
                 'sentence',
                 'sentence-furigana',
-                'tags',
-                'url',
-            ];
-        case 'kanji':
-            return [
-                'character',
-                'clipboard-image',
-                'clipboard-text',
-                'cloze-body',
-                'cloze-prefix',
-                'cloze-suffix',
-                'dictionary',
-                'dictionary-alias',
-                'document-title',
-                'frequencies',
-                'frequency-harmonic-rank',
-                'frequency-harmonic-occurrence',
-                'frequency-average-rank',
-                'frequency-average-occurrence',
-                'glossary',
-                'kunyomi',
-                'onyomi',
-                'onyomi-hiragana',
-                'screenshot',
-                'search-query',
-                'popup-selection-text',
-                'sentence',
-                'sentence-furigana',
-                'stroke-count',
                 'tags',
                 'url',
             ];

@@ -25,15 +25,15 @@ import type {HistoryStateSentence, PageType} from './display';
 
 export type Events = {
     searched: {
-        textScanner: TextScanner;
-        type: PageType;
         dictionaryEntries: DictionaryEntry[];
-        sentence: HistoryStateSentence;
         inputInfo: InputInfo;
-        textSource: TextSource;
         optionsContext: OptionsContext;
-        sentenceOffset: number | null;
         pageTheme: 'dark' | 'light';
+        sentence: HistoryStateSentence;
+        sentenceOffset: null | number;
+        textScanner: TextScanner;
+        textSource: TextSource;
+        type: PageType;
     };
 };
 

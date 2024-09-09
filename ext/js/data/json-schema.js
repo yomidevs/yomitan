@@ -148,7 +148,7 @@ export class JsonSchema {
      */
     getValidValueOrDefault(value) {
         const schema = this._startSchema;
-        return this._getValidValueOrDefault(schema, null, value, [{schema, path: null}]);
+        return this._getValidValueOrDefault(schema, null, value, [{path: null, schema}]);
     }
 
     /**
@@ -157,7 +157,7 @@ export class JsonSchema {
      */
     getObjectPropertySchema(property) {
         const schema = this._startSchema;
-        const {schema: schema2, stack} = this._getResolvedSchemaInfo(schema, [{schema, path: null}]);
+        const {schema: schema2, stack} = this._getResolvedSchemaInfo(schema, [{path: null, schema}]);
         this._schemaPushMultiple(stack);
         try {
             const {schema: propertySchema} = this._getObjectPropertySchemaInfo(schema2, property);
@@ -173,7 +173,7 @@ export class JsonSchema {
      */
     getArrayItemSchema(index) {
         const schema = this._startSchema;
-        const {schema: schema2, stack} = this._getResolvedSchemaInfo(schema, [{schema, path: null}]);
+        const {schema: schema2, stack} = this._getResolvedSchemaInfo(schema, [{path: null, schema}]);
         this._schemaPushMultiple(stack);
         try {
             const {schema: itemSchema} = this._getArrayItemSchemaInfo(schema2, index);
@@ -201,8 +201,8 @@ export class JsonSchema {
      */
     getValueStack() {
         const result = [];
-        for (const {value, path} of this._valueStack) {
-            result.push({value, path});
+        for (const {path, value} of this._valueStack) {
+            result.push({path, value});
         }
         return result;
     }
@@ -212,8 +212,8 @@ export class JsonSchema {
      */
     getSchemaStack() {
         const result = [];
-        for (const {schema, path} of this._schemaStack) {
-            result.push({schema, path});
+        for (const {path, schema} of this._schemaStack) {
+            result.push({path, schema});
         }
         return result;
     }
@@ -230,8 +230,8 @@ export class JsonSchema {
      * @returns {import('ext/json-schema').ValueStackItem}
      */
     getValueStackItem(index) {
-        const {value, path} = this._valueStack[index + 1];
-        return {value, path};
+        const {path, value} = this._valueStack[index + 1];
+        return {path, value};
     }
 
     /**
@@ -246,8 +246,8 @@ export class JsonSchema {
      * @returns {import('ext/json-schema').SchemaStackItem}
      */
     getSchemaStackItem(index) {
-        const {schema, path} = this._schemaStack[index + 1];
-        return {schema, path};
+        const {path, schema} = this._schemaStack[index + 1];
+        return {path, schema};
     }
 
     /**
@@ -266,7 +266,7 @@ export class JsonSchema {
      * @param {string|number|null} path
      */
     _valuePush(value, path) {
-        this._valueStack.push({value, path});
+        this._valueStack.push({path, value});
     }
 
     /**
@@ -281,7 +281,7 @@ export class JsonSchema {
      * @param {string|number|null} path
      */
     _schemaPush(schema, path) {
-        this._schemaStack.push({schema, path});
+        this._schemaStack.push({path, schema});
     }
 
     /**
@@ -345,7 +345,7 @@ export class JsonSchema {
      */
     _getObjectPropertySchemaInfo(schema, property) {
         if (typeof schema === 'boolean') {
-            return {schema, stack: [{schema, path: null}]};
+            return {schema, stack: [{path: null, schema}]};
         }
         const {properties} = schema;
         if (typeof properties !== 'undefined' && Object.prototype.hasOwnProperty.call(properties, property)) {
@@ -354,8 +354,8 @@ export class JsonSchema {
                 return {
                     schema: propertySchema,
                     stack: [
-                        {schema: properties, path: 'properties'},
-                        {schema: propertySchema, path: property},
+                        {path: 'properties', schema: properties},
+                        {path: property, schema: propertySchema},
                     ],
                 };
             }
@@ -370,7 +370,7 @@ export class JsonSchema {
      */
     _getArrayItemSchemaInfo(schema, index) {
         if (typeof schema === 'boolean') {
-            return {schema, stack: [{schema, path: null}]};
+            return {schema, stack: [{path: null, schema}]};
         }
         const {prefixItems} = schema;
         if (typeof prefixItems !== 'undefined' && index >= 0 && index < prefixItems.length) {
@@ -379,8 +379,8 @@ export class JsonSchema {
                 return {
                     schema: itemSchema,
                     stack: [
-                        {schema: prefixItems, path: 'prefixItems'},
-                        {schema: itemSchema, path: index},
+                        {path: 'prefixItems', schema: prefixItems},
+                        {path: index, schema: itemSchema},
                     ],
                 };
             }
@@ -394,8 +394,8 @@ export class JsonSchema {
                         return {
                             schema: itemSchema,
                             stack: [
-                                {schema: items, path: 'items'},
-                                {schema: itemSchema, path: index},
+                                {path: 'items', schema: items},
+                                {path: index, schema: itemSchema},
                             ],
                         };
                     }
@@ -403,7 +403,7 @@ export class JsonSchema {
             } else {
                 return {
                     schema: items,
-                    stack: [{schema: items, path: 'items'}],
+                    stack: [{path: 'items', schema: items}],
                 };
             }
         }
@@ -425,7 +425,7 @@ export class JsonSchema {
                 path = null;
                 break;
         }
-        return {schema, stack: [{schema, path}]};
+        return {schema, stack: [{path, schema}]};
     }
 
     /**
@@ -436,14 +436,14 @@ export class JsonSchema {
     _getValueType(value) {
         const type = typeof value;
         switch (type) {
+            case 'boolean':
+            case 'number':
+            case 'string':
+                return type;
             case 'object':
                 if (value === null) { return 'null'; }
                 if (Array.isArray(value)) { return 'array'; }
                 return 'object';
-            case 'string':
-            case 'number':
-            case 'boolean':
-                return type;
             default:
                 return null;
         }
@@ -569,7 +569,7 @@ export class JsonSchema {
 
             const pathParts = ref.substring(2).split('/');
             let schema = this._rootSchema;
-            stack.push({schema, path: null});
+            stack.push({path: null, schema});
             for (const pathPart of pathParts) {
                 if (!(typeof schema === 'object' && schema !== null && Object.prototype.hasOwnProperty.call(schema, pathPart))) {
                     throw this._createError(`Invalid reference: ${ref}`);
@@ -579,7 +579,7 @@ export class JsonSchema {
                     throw this._createError(`Invalid reference: ${ref}`);
                 }
                 schema = schemaNext;
-                stack.push({schema, path: pathPart});
+                stack.push({path: pathPart, schema});
             }
             if (Array.isArray(schema)) {
                 throw this._createError(`Invalid reference: ${ref}`);
@@ -600,8 +600,8 @@ export class JsonSchema {
     _copySchemaStack(schemaStack) {
         /** @type {import('ext/json-schema').SchemaStackItem[]} */
         const results = [];
-        for (const {schema, path} of schemaStack) {
-            results.push({schema, path});
+        for (const {path, schema} of schemaStack) {
+            results.push({path, schema});
         }
         return results;
     }
@@ -802,7 +802,7 @@ export class JsonSchema {
      * @throws {Error}
      */
     _validateSingleSchema(schema, value) {
-        const {type: schemaType, const: schemaConst, enum: schemaEnum} = schema;
+        const {const: schemaConst, enum: schemaEnum, type: schemaType} = schema;
         const type = this._getValueType(value);
         if (!this._isValueTypeAny(value, type, schemaType)) {
             throw this._createError(`Value type ${type} does not match schema type ${Array.isArray(schemaType) ? schemaType.join(',') : schemaType}`);
@@ -817,17 +817,17 @@ export class JsonSchema {
         }
 
         switch (type) {
-            case 'number':
-                this._validateNumber(schema, /** @type {number} */ (value));
-                break;
-            case 'string':
-                this._validateString(schema, /** @type {string} */ (value));
-                break;
             case 'array':
                 this._validateArray(schema, /** @type {import('ext/json-schema').Value[]} */ (value));
                 break;
+            case 'number':
+                this._validateNumber(schema, /** @type {number} */ (value));
+                break;
             case 'object':
                 this._validateObject(schema, /** @type {import('ext/json-schema').ValueObject} */ (value));
+                break;
+            case 'string':
+                this._validateString(schema, /** @type {string} */ (value));
                 break;
         }
     }
@@ -838,7 +838,7 @@ export class JsonSchema {
      * @throws {Error}
      */
     _validateNumber(schema, value) {
-        const {multipleOf, minimum, exclusiveMinimum, maximum, exclusiveMaximum} = schema;
+        const {exclusiveMaximum, exclusiveMinimum, maximum, minimum, multipleOf} = schema;
         if (typeof multipleOf === 'number' && Math.floor(value / multipleOf) * multipleOf !== value) {
             throw this._createError(`Number is not a multiple of ${multipleOf}`);
         }
@@ -866,7 +866,7 @@ export class JsonSchema {
      * @throws {Error}
      */
     _validateString(schema, value) {
-        const {minLength, maxLength, pattern} = schema;
+        const {maxLength, minLength, pattern} = schema;
         if (typeof minLength === 'number' && value.length < minLength) {
             throw this._createError('String length too short');
         }
@@ -898,7 +898,7 @@ export class JsonSchema {
      * @throws {Error}
      */
     _validateArray(schema, value) {
-        const {minItems, maxItems} = schema;
+        const {maxItems, minItems} = schema;
         const {length} = value;
 
         if (typeof minItems === 'number' && length < minItems) {
@@ -965,7 +965,7 @@ export class JsonSchema {
      * @throws {Error}
      */
     _validateObject(schema, value) {
-        const {required, minProperties, maxProperties} = schema;
+        const {maxProperties, minProperties, required} = schema;
         const properties = Object.getOwnPropertyNames(value);
         const {length} = properties;
 
@@ -1015,19 +1015,19 @@ export class JsonSchema {
         if (Array.isArray(type)) { type = type[0]; }
         if (typeof type === 'string') {
             switch (type) {
-                case 'null':
-                    return null;
-                case 'boolean':
-                    return false;
-                case 'number':
-                case 'integer':
-                    return 0;
-                case 'string':
-                    return '';
                 case 'array':
                     return [];
+                case 'boolean':
+                    return false;
+                case 'integer':
+                case 'number':
+                    return 0;
+                case 'null':
+                    return null;
                 case 'object':
                     return {};
+                case 'string':
+                    return '';
             }
         }
         return null;
@@ -1038,7 +1038,7 @@ export class JsonSchema {
      * @returns {import('ext/json-schema').Value}
      */
     _getDefaultSchemaValue(schema) {
-        const {type: schemaType, default: schemaDefault} = schema;
+        const {default: schemaDefault, type: schemaType} = schema;
         return (
             typeof schemaDefault !== 'undefined' &&
             this._isValueTypeAny(schemaDefault, this._getValueType(schemaDefault), schemaType) ?
@@ -1082,10 +1082,10 @@ export class JsonSchema {
         }
 
         switch (type) {
-            case 'object':
-                return this._populateObjectDefaults(schema, /** @type {import('ext/json-schema').ValueObject} */ (value));
             case 'array':
                 return this._populateArrayDefaults(schema, /** @type {import('ext/json-schema').Value[]} */ (value));
+            case 'object':
+                return this._populateObjectDefaults(schema, /** @type {import('ext/json-schema').ValueObject} */ (value));
             default:
                 if (!this._isValidCurrent(schema, value)) {
                     const schemaDefault = this._getDefaultSchemaValue(schema);
@@ -1143,7 +1143,7 @@ export class JsonSchema {
             value[i] = this._getValidValueOrDefault(itemSchema, i, propertyValue, stack);
         }
 
-        const {minItems, maxItems} = schema;
+        const {maxItems, minItems} = schema;
         if (typeof minItems === 'number' && value.length < minItems) {
             for (let i = value.length; i < minItems; ++i) {
                 const {schema: itemSchema, stack} = this._getArrayItemSchemaInfo(schema, i);

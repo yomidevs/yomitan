@@ -32,17 +32,17 @@ const extDir = path.join(dirname, '..', 'ext');
  */
 async function buildLib(scriptPath) {
     await esbuild.build({
-        entryPoints: [scriptPath],
-        bundle: true,
-        minify: false,
-        sourcemap: true,
-        target: 'es2020',
-        format: 'esm',
-        outfile: path.join(extDir, 'lib', path.basename(scriptPath)),
-        external: ['fs'],
         banner: {
             js: '// @ts-nocheck',
         },
+        bundle: true,
+        entryPoints: [scriptPath],
+        external: ['fs'],
+        format: 'esm',
+        minify: false,
+        outfile: path.join(extDir, 'lib', path.basename(scriptPath)),
+        sourcemap: true,
+        target: 'es2020',
     });
 }
 
@@ -69,9 +69,9 @@ export async function buildLibs() {
         return result;
     });
     const ajv = new Ajv({
-        schemas,
-        code: {source: true, esm: true},
         allowUnionTypes: true,
+        code: {esm: true, source: true},
+        schemas,
     });
     const moduleCode = standaloneCode(ajv);
 

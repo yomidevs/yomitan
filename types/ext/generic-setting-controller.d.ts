@@ -23,8 +23,8 @@ export type TransformType = TransformData['type'];
 export type ElementMetadata = {
     path: string;
     scope: SettingsModifications.OptionsScopeType | undefined;
-    transforms: TransformData[];
     transformRaw: string | undefined;
+    transforms: TransformData[];
 };
 
 export type TransformFunction = (
@@ -33,62 +33,62 @@ export type TransformFunction = (
     element: Element,
 ) => unknown;
 
-export type TransformStep = 'pre' | 'post';
+export type TransformStep = 'post' | 'pre';
 
 export type TransformData = (
+    ConditionalConvertTransformData |
+    JoinTagsTransformData |
     SetAttributeTransformData |
     SetVisibilityTransformData |
     SplitTagsTransformData |
-    JoinTagsTransformData |
-    ToNumberConstraintsTransformData |
     ToBooleanTransformData |
-    ToStringTransformData |
-    ConditionalConvertTransformData
+    ToNumberConstraintsTransformData |
+    ToStringTransformData
 );
 
 export type TransformDataBase = {
     step?: TransformStep;
 };
 
-export type SetAttributeTransformData = TransformDataBase & {
-    type: 'setAttribute';
+export type SetAttributeTransformData = {
     ancestorDistance?: number;
-    selector?: string;
     attribute: string;
-};
-
-export type SetVisibilityTransformData = TransformDataBase & {
-    type: 'setVisibility';
-    ancestorDistance?: number;
     selector?: string;
+    type: 'setAttribute';
+} & TransformDataBase;
+
+export type SetVisibilityTransformData = {
+    ancestorDistance?: number;
     condition: OperationData;
-};
+    selector?: string;
+    type: 'setVisibility';
+} & TransformDataBase;
 
-export type SplitTagsTransformData = TransformDataBase & {
+export type SplitTagsTransformData = {
     type: 'splitTags';
-};
+} & TransformDataBase;
 
-export type JoinTagsTransformData = TransformDataBase & {
+export type JoinTagsTransformData = {
     type: 'joinTags';
-};
+} & TransformDataBase;
 
-export type ToNumberConstraintsTransformData = TransformDataBase & {
-    type: 'toNumber';
+export type ToNumberConstraintsTransformData = {
     constraints?: DocumentUtil.ToNumberConstraints;
-};
+    type: 'toNumber';
+} & TransformDataBase;
 
-export type ToBooleanTransformData = TransformDataBase & {
+export type ToBooleanTransformData = {
     type: 'toBoolean';
-};
+} & TransformDataBase;
 
-export type ToStringTransformData = TransformDataBase & {
+export type ToStringTransformData = {
     type: 'toString';
-};
+} & TransformDataBase;
 
-export type ConditionalConvertTransformData = TransformDataBase & {
-    type: 'conditionalConvert';
+export type ConditionalConvertTransformData = {
     cases?: ConditionalConvertCase[];
-};
+    type: 'conditionalConvert';
+} & TransformDataBase;
 
 export type ConditionalConvertCase = {
     default?: boolean;

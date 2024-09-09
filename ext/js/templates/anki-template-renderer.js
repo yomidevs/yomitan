@@ -100,8 +100,8 @@ export class AnkiTemplateRenderer {
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
         this._templateRenderer.registerDataType('ankiNote', {
-            modifier: ({marker, commonData}) => createAnkiNoteData(marker, commonData),
-            composeData: ({marker}, commonData) => ({marker, commonData}),
+            composeData: ({marker}, commonData) => ({commonData, marker}),
+            modifier: ({commonData, marker}) => createAnkiNoteData(marker, commonData),
         });
         this._templateRenderer.setRenderCallbacks(
             this._onRenderSetup.bind(this),
@@ -159,7 +159,7 @@ export class AnkiTemplateRenderer {
         const segments = distributeFurigana(expression, reading);
 
         let result = '';
-        for (const {text, reading: reading2} of segments) {
+        for (const {reading: reading2, text} of segments) {
             result += (
                 reading2.length > 0 ?
                 `<ruby>${text}<rt>${reading2}</rt></ruby>` :
@@ -176,7 +176,7 @@ export class AnkiTemplateRenderer {
         const segments = distributeFurigana(expression, reading);
 
         let result = '';
-        for (const {text, reading: reading2} of segments) {
+        for (const {reading: reading2, text} of segments) {
             if (reading2.length > 0) {
                 if (result.length > 0) { result += ' '; }
                 result += `${text}[${reading2}]`;
@@ -358,10 +358,10 @@ export class AnkiTemplateRenderer {
      */
     _evaluateUnaryExpression(operator, operand1) {
         switch (operator) {
-            case '+': return +operand1;
-            case '-': return -operand1;
-            case '~': return ~operand1;
             case '!': return !operand1;
+            case '+': return +operand1;
+            case '~': return ~operand1;
+            case '-': return -operand1;
             default: return void 0;
         }
     }
@@ -374,28 +374,28 @@ export class AnkiTemplateRenderer {
      */
     _evaluateBinaryExpression(operator, operand1, operand2) {
         switch (operator) {
-            case '+': return operand1 + operand2;
-            case '-': return operand1 - operand2;
-            case '/': return operand1 / operand2;
-            case '*': return operand1 * operand2;
-            case '%': return operand1 % operand2;
-            case '**': return operand1 ** operand2;
-            case '==': return operand1 == operand2; // eslint-disable-line eqeqeq
             case '!=': return operand1 != operand2; // eslint-disable-line eqeqeq
-            case '===': return operand1 === operand2;
             case '!==': return operand1 !== operand2;
+            case '%': return operand1 % operand2;
+            case '&': return operand1 & operand2;
+            case '&&': return operand1 && operand2;
+            case '*': return operand1 * operand2;
+            case '**': return operand1 ** operand2;
+            case '+': return operand1 + operand2;
+            case '/': return operand1 / operand2;
             case '<': return operand1 < operand2;
+            case '<<': return operand1 << operand2;
             case '<=': return operand1 <= operand2;
+            case '==': return operand1 == operand2; // eslint-disable-line eqeqeq
+            case '===': return operand1 === operand2;
             case '>': return operand1 > operand2;
             case '>=': return operand1 >= operand2;
-            case '<<': return operand1 << operand2;
             case '>>': return operand1 >> operand2;
             case '>>>': return operand1 >>> operand2;
-            case '&': return operand1 & operand2;
-            case '|': return operand1 | operand2;
             case '^': return operand1 ^ operand2;
-            case '&&': return operand1 && operand2;
+            case '|': return operand1 | operand2;
             case '||': return operand1 || operand2;
+            case '-': return operand1 - operand2;
             default: return void 0;
         }
     }
@@ -534,7 +534,7 @@ export class AnkiTemplateRenderer {
         const [data] = /** @type {[data: import('anki-templates').NoteData]} */ (args);
         const {dictionaryEntry} = data;
         if (dictionaryEntry.type !== 'term') { return []; }
-        const {pronunciations: termPronunciations, headwords} = dictionaryEntry;
+        const {headwords, pronunciations: termPronunciations} = dictionaryEntry;
         /** @type {Set<string>} */
         const categories = new Set();
         for (const {headwordIndex, pronunciations} of termPronunciations) {
@@ -726,7 +726,7 @@ export class AnkiTemplateRenderer {
      * @type {import('template-renderer').HelperFunction<string>}
      */
     _pronunciation(_args, _context, options) {
-        const {format, reading, downstepPosition} = options.hash;
+        const {downstepPosition, format, reading} = options.hash;
 
         if (
             typeof reading !== 'string' ||

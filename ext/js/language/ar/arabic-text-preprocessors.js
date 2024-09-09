@@ -40,8 +40,8 @@ const diacriticsRegex = new RegExp(`[${optionalDiacritics.join('')}]`, 'g');
 
 /** @type {import('language').TextProcessor<boolean>} */
 export const removeArabicScriptDiacritics = {
-    name: 'Remove diacritics',
     description: 'وَلَدَ ⬅️ ولد',
+    name: 'Remove diacritics',
     options: basicTextProcessorOptions,
     process: (text, setting) => {
         return setting ? text.replace(diacriticsRegex, '') : text;

@@ -98,12 +98,12 @@ export class TemplateRendererMediaProvider {
         const type = args[0];
         switch (type) {
             case 'audio': return this._getSimpleMediaData(media, 'audio');
-            case 'screenshot': return this._getSimpleMediaData(media, 'screenshot');
             case 'clipboardImage': return this._getSimpleMediaData(media, 'clipboardImage');
             case 'clipboardText': return this._getSimpleMediaData(media, 'clipboardText');
-            case 'popupSelectionText': return this._getSimpleMediaData(media, 'popupSelectionText');
-            case 'textFurigana': return this._getTextFurigana(media, args[1], namedArgs);
             case 'dictionaryMedia': return this._getDictionaryMedia(media, args[1], namedArgs);
+            case 'popupSelectionText': return this._getSimpleMediaData(media, 'popupSelectionText');
+            case 'screenshot': return this._getSimpleMediaData(media, 'screenshot');
+            case 'textFurigana': return this._getTextFurigana(media, args[1], namedArgs);
             default: return null;
         }
     }
@@ -144,9 +144,9 @@ export class TemplateRendererMediaProvider {
             }
         }
         this._addRequirement({
-            type: 'dictionaryMedia',
             dictionary,
             path,
+            type: 'dictionaryMedia',
         });
         return null;
     }
@@ -168,9 +168,9 @@ export class TemplateRendererMediaProvider {
             }
         }
         this._addRequirement({
-            type: 'textFurigana',
-            text,
             readingMode,
+            text,
+            type: 'textFurigana',
         });
         return null;
     }

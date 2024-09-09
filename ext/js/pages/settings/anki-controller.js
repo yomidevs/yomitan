@@ -39,11 +39,11 @@ export class AnkiController {
         this._ankiConnect = new AnkiConnect();
         /** @type {SelectorObserver<AnkiCardController>} */
         this._selectorObserver = new SelectorObserver({
-            selector: '.anki-card',
             ignoreSelector: null,
+            isStale: this._isCardControllerStale.bind(this),
             onAdded: this._createCardController.bind(this),
             onRemoved: this._removeCardController.bind(this),
-            isStale: this._isCardControllerStale.bind(this),
+            selector: '.anki-card',
         });
         /** @type {Intl.Collator} */
         this._stringComparer = new Intl.Collator(); // Locale does not matter
@@ -208,7 +208,7 @@ export class AnkiController {
     _onAnkiCardPrimaryTypeRadioChange(e) {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         if (!node.checked) { return; }
-        const {value, ankiCardMenu} = node.dataset;
+        const {ankiCardMenu, value} = node.dataset;
         if (typeof value !== 'string') { return; }
         this._setAnkiCardPrimaryType(value, ankiCardMenu);
     }
@@ -597,7 +597,7 @@ class AnkiCardController {
 
         const cardOptions = this._getCardOptions(ankiOptions, this._optionsType);
         if (cardOptions === null) { return; }
-        const {deck, model, fields} = cardOptions;
+        const {deck, fields, model} = cardOptions;
         /** @type {HTMLSelectElement} */
         const deckControllerSelect = querySelectorNotNull(this._node, '.anki-card-deck');
         /** @type {HTMLSelectElement} */
@@ -692,7 +692,7 @@ class AnkiCardController {
     _onFieldMenuOpen(event) {
         const button = /** @type {HTMLElement} */ (event.currentTarget);
         const {menu} = event.detail;
-        const {index, fieldName} = button.dataset;
+        const {fieldName, index} = button.dataset;
         const indexNumber = typeof index === 'string' ? Number.parseInt(index, 10) : 0;
         if (typeof fieldName !== 'string') { return; }
 
@@ -759,8 +759,8 @@ class AnkiCardController {
      */
     _getCardOptions(ankiOptions, optionsType) {
         switch (optionsType) {
-            case 'terms': return ankiOptions.terms;
             case 'kanji': return ankiOptions.kanji;
+            case 'terms': return ankiOptions.terms;
             default: return null;
         }
     }
@@ -812,7 +812,7 @@ class AnkiCardController {
             }
 
             totalFragment.appendChild(content);
-            this._fieldEntries.push({fieldName, inputField, fieldNameContainerNode});
+            this._fieldEntries.push({fieldName, fieldNameContainerNode, inputField});
 
             ++index;
         }
@@ -1007,10 +1007,10 @@ class AnkiCardController {
 
         const markers = getStandardFieldMarkers(dictionaryEntryType);
         const markerAliases = new Map([
-            ['expression', ['phrase', 'term', 'word']],
-            ['glossary', ['definition', 'meaning']],
             ['audio', ['sound']],
             ['dictionary', ['dict']],
+            ['expression', ['phrase', 'term', 'word']],
+            ['glossary', ['definition', 'meaning']],
             ['pitch-accents', ['pitch']],
         ]);
 

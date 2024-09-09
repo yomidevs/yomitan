@@ -15,31 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type RunAt = 'document_start' | 'document_end' | 'document_idle';
+export type RunAt = 'document_end' | 'document_idle' | 'document_start';
 
 /** The script registration details. */
 export type RegistrationDetails = {
-    /** Same as `matches` in the `content_scripts` manifest key. */
-    matches: string[];
-    /** Same as `run_at` in the `content_scripts` manifest key. */
-    runAt: RunAt;
     /** Same as `all_frames` in the `content_scripts` manifest key. */
     allFrames: boolean;
     /** List of CSS paths. */
     css?: string[];
     /** List of script paths. */
     js?: string[];
+    /** Same as `matches` in the `content_scripts` manifest key. */
+    matches: string[];
+    /** Same as `run_at` in the `content_scripts` manifest key. */
+    runAt: RunAt;
     /** The execution world for the script. */
     world?: ExecutionWorld;
 };
 
 export type ContentScriptInjectionDetails = {
     allFrames: boolean;
-    matchAboutBlank: boolean;
-    runAt: RunAt;
     css?: string[];
     js?: string[];
-    urlRegex: RegExp | null;
+    matchAboutBlank: boolean;
+    runAt: RunAt;
+    urlRegex: null | RegExp;
 };
 
-export type ExecutionWorld = 'MAIN' | 'ISOLATED';
+export type ExecutionWorld = 'ISOLATED' | 'MAIN';

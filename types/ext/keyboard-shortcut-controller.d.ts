@@ -18,9 +18,9 @@
 import type * as Settings from './settings';
 
 export type ActionDetails = {
-    scopes: Set<Settings.InputsHotkeyScope>;
     argument?: {
-        template: string;
         default: string;
+        template: string;
     };
+    scopes: Set<Settings.InputsHotkeyScope>;
 };

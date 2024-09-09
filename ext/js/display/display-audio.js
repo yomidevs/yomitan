@@ -54,15 +54,15 @@ export class DisplayAudio {
         this._audioSources = [];
         /** @type {Map<import('settings').AudioSourceType, string>} */
         this._audioSourceTypeNames = new Map([
-            ['jpod101', 'JapanesePod101'],
-            ['language-pod-101', 'LanguagePod101'],
-            ['jisho', 'Jisho.org'],
-            ['lingua-libre', 'Lingua Libre'],
-            ['wiktionary', 'Wiktionary'],
-            ['text-to-speech', 'Text-to-speech'],
-            ['text-to-speech-reading', 'Text-to-speech (Kana reading)'],
             ['custom', 'Custom URL'],
             ['custom-json', 'Custom URL (JSON)'],
+            ['jisho', 'Jisho.org'],
+            ['jpod101', 'JapanesePod101'],
+            ['language-pod-101', 'LanguagePod101'],
+            ['lingua-libre', 'Lingua Libre'],
+            ['text-to-speech', 'Text-to-speech'],
+            ['text-to-speech-reading', 'Text-to-speech (Kana reading)'],
+            ['wiktionary', 'Wiktionary'],
         ]);
         /** @type {(event: MouseEvent) => void} */
         this._onAudioPlayButtonClickBind = this._onAudioPlayButtonClick.bind(this);
@@ -157,7 +157,7 @@ export class DisplayAudio {
                 sources.push(this._getSourceData(source));
             }
         }
-        return {sources, preferredAudioIndex};
+        return {preferredAudioIndex, sources};
     }
 
     // Private
@@ -167,8 +167,8 @@ export class DisplayAudio {
      */
     _onOptionsUpdated({options}) {
         const {
+            audio: {autoPlay, enabled, sources, volume},
             general: {language},
-            audio: {enabled, autoPlay, volume, sources},
         } = options;
         this._autoPlay = enabled && autoPlay;
         this._playbackVolume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume / 100)) : 1;
@@ -199,13 +199,13 @@ export class DisplayAudio {
     _getRequiredAudioSources(language) {
         return language === 'ja' ?
             new Set([
+                'jisho',
                 'jpod101',
                 'language-pod-101',
-                'jisho',
             ]) :
             new Set([
-                'lingua-libre',
                 'language-pod-101',
+                'lingua-libre',
                 'wiktionary',
             ]);
     }
@@ -308,15 +308,15 @@ export class DisplayAudio {
 
         /** @type {import('display-audio').AudioSource} */
         const source = {
-            index,
-            type,
-            url,
-            voice,
-            isInOptions,
             downloadable,
+            index,
+            isInOptions,
             name,
             nameIndex,
             nameUnique: (nameIndex === 0),
+            type,
+            url,
+            voice,
         };
 
         entries.push(source);
@@ -387,8 +387,8 @@ export class DisplayAudio {
         let cacheEntry = this._cache.get(key);
         if (typeof cacheEntry === 'undefined' && create) {
             cacheEntry = {
-                sourceMap: new Map(),
                 primaryCardAudio: null,
+                sourceMap: new Map(),
             };
             this._cache.set(key, cacheEntry);
         }
@@ -434,7 +434,7 @@ export class DisplayAudio {
 
         const buttons = this._getAudioPlayButtons(dictionaryEntryIndex, headwordIndex);
 
-        const {term, reading} = headword;
+        const {reading, term} = headword;
 
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
@@ -524,7 +524,7 @@ export class DisplayAudio {
         if (headword === null) { return; }
 
         const {index} = source;
-        const {term, reading} = headword;
+        const {reading, term} = headword;
         const cacheEntry = this._getCacheItem(term, reading, true);
         if (typeof cacheEntry === 'undefined') { return; }
 
@@ -597,7 +597,7 @@ export class DisplayAudio {
             let sourceInfo = sourceMap.get(index);
             if (typeof sourceInfo === 'undefined') {
                 const infoListPromise = this._getTermAudioInfoList(source, term, reading);
-                sourceInfo = {infoListPromise, infoList: null};
+                sourceInfo = {infoList: null, infoListPromise};
                 sourceMap.set(index, sourceInfo);
                 cacheUpdated = true;
             }
@@ -608,7 +608,7 @@ export class DisplayAudio {
                 sourceInfo.infoList = infoList;
             }
 
-            const {audio, index: subIndex, cacheUpdated: cacheUpdated2} = await this._createAudioFromInfoList(source, infoList, audioInfoListIndex);
+            const {audio, cacheUpdated: cacheUpdated2, index: subIndex} = await this._createAudioFromInfoList(source, infoList, audioInfoListIndex);
             if (cacheUpdated || cacheUpdated2) { this._updateOpenMenu(); }
             if (audio !== null) {
                 return {audio, source, subIndex};
@@ -635,8 +635,8 @@ export class DisplayAudio {
         /** @type {import('display-audio').CreateAudioResult} */
         const result = {
             audio: null,
-            index: -1,
             cacheUpdated: false,
+            index: -1,
         };
         for (let i = start; i < end; ++i) {
             const item = infoList[i];
@@ -698,7 +698,7 @@ export class DisplayAudio {
         const sourceData = this._getSourceData(source);
         const languageSummary = this._display.getLanguageSummary();
         const infoList = await this._display.application.api.getTermAudioInfoList(sourceData, term, reading, languageSummary);
-        return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
+        return infoList.map((info) => ({audio: null, audioPromise: null, audioResolved: false, info}));
     }
 
     /**
@@ -792,7 +792,7 @@ export class DisplayAudio {
         const headword = this._getHeadword(dictionaryEntryIndex, headwordIndex);
         if (headword === null) { return; }
 
-        const {term, reading} = headword;
+        const {reading, term} = headword;
         const popupMenu = this._createMenu(button, term, reading);
         this._openMenus.add(popupMenu);
         popupMenu.prepare();
@@ -856,10 +856,10 @@ export class DisplayAudio {
         let showIcons = false;
         const currentItems = [...menuItemContainer.children];
         for (const source of this._audioSources) {
-            const {index, name, nameIndex, nameUnique, isInOptions, downloadable} = source;
+            const {downloadable, index, isInOptions, name, nameIndex, nameUnique} = source;
             const entries = this._getMenuItemEntries(source, term, reading);
             for (let i = 0, ii = entries.length; i < ii; ++i) {
-                const {valid, index: subIndex, name: subName} = entries[i];
+                const {index: subIndex, name: subName, valid} = entries[i];
                 const existingNode = this._getOrCreateMenuItem(currentItems, index, subIndex);
                 const node = existingNode !== null ? existingNode : /** @type {HTMLElement} */ (displayGenerator.instantiateTemplate('audio-button-popup-menu-item'));
 
@@ -942,7 +942,7 @@ export class DisplayAudio {
                 if (infoList !== null) {
                     const ii = infoList.length;
                     if (ii === 0) {
-                        return [{valid: false, index: null, name: null}];
+                        return [{index: null, name: null, valid: false}];
                     }
 
                     /** @type {import('display-audio').MenuItemEntry[]} */
@@ -950,14 +950,14 @@ export class DisplayAudio {
                     for (let i = 0; i < ii; ++i) {
                         const {audio, audioResolved, info: {name}} = infoList[i];
                         const valid = audioResolved ? (audio !== null) : null;
-                        const entry = {valid, index: i, name: typeof name === 'string' ? name : null};
+                        const entry = {index: i, name: typeof name === 'string' ? name : null, valid};
                         results.push(entry);
                     }
                     return results;
                 }
             }
         }
-        return [{valid: null, index: null, name: null}];
+        return [{index: null, name: null, valid: null}];
     }
 
     /**
@@ -994,7 +994,7 @@ export class DisplayAudio {
     _updateOpenMenu() {
         for (const menu of this._openMenus) {
             const menuContainerNode = menu.containerNode;
-            const {term, reading} = menuContainerNode.dataset;
+            const {reading, term} = menuContainerNode.dataset;
             if (typeof term === 'string' && typeof reading === 'string') {
                 this._createMenuItems(menuContainerNode, menu.bodyNode, term, reading);
             }

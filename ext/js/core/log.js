@@ -133,13 +133,13 @@ class Logger extends EventDispatcher {
 
         /* eslint-disable no-console */
         switch (level) {
+            case 'error': console.error(message); break;
             case 'log': console.log(message); break;
             case 'warn': console.warn(message); break;
-            case 'error': console.error(message); break;
         }
         /* eslint-enable no-console */
 
-        this.trigger('logGenericError', {error, level, context});
+        this.trigger('logGenericError', {context, error, level});
     }
 }
 

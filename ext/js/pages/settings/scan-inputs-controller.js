@@ -69,10 +69,10 @@ export class ScanInputsController {
         this._updateCounts();
         void this._modifyProfileSettings([{
             action: 'splice',
-            path: 'scanning.inputs',
-            start: index,
             deleteCount: 1,
             items: [],
+            path: 'scanning.inputs',
+            start: index,
         }]);
         return true;
     }
@@ -146,10 +146,10 @@ export class ScanInputsController {
         this._updateCounts();
         void this._modifyProfileSettings([{
             action: 'splice',
-            path: 'scanning.inputs',
-            start: index,
             deleteCount: 0,
             items: [scanningInput],
+            path: 'scanning.inputs',
+            start: index,
         }]);
 
         // Scroll to bottom
@@ -201,25 +201,25 @@ export class ScanInputsController {
      */
     static createDefaultMouseInput(include, exclude) {
         return {
-            include,
             exclude,
-            types: {mouse: true, touch: false, pen: false},
+            include,
             options: {
-                showAdvanced: false,
-                searchTerms: true,
-                searchKanji: true,
-                scanOnTouchTap: true,
+                preventPenScrolling: true,
+                preventTouchScrolling: true,
+                scanOnPenHover: true,
+                scanOnPenMove: true,
+                scanOnPenPress: true,
+                scanOnPenRelease: false,
+                scanOnPenReleaseHover: false,
                 scanOnTouchMove: false,
                 scanOnTouchPress: false,
                 scanOnTouchRelease: false,
-                scanOnPenMove: true,
-                scanOnPenHover: true,
-                scanOnPenReleaseHover: false,
-                scanOnPenPress: true,
-                scanOnPenRelease: false,
-                preventTouchScrolling: true,
-                preventPenScrolling: true,
+                scanOnTouchTap: true,
+                searchKanji: true,
+                searchTerms: true,
+                showAdvanced: false,
             },
+            types: {mouse: true, pen: false, touch: false},
         };
     }
 }
@@ -262,7 +262,7 @@ class ScanInputField {
      * @param {import('settings').ScanningInput} scanningInput
      */
     prepare(container, scanningInput) {
-        const {include, exclude, options: {showAdvanced}} = scanningInput;
+        const {exclude, include, options: {showAdvanced}} = scanningInput;
 
         const node = /** @type {HTMLElement} */ (this._parent.instantiateTemplate('scan-input'));
         /** @type {HTMLInputElement} */

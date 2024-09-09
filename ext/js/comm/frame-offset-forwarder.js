@@ -83,7 +83,7 @@ export class FrameOffsetForwarder {
         const frameElement = this._frameAncestryHandler.getChildFrameElement(frameId);
         if (frameElement === null) { return null; }
 
-        const {left, top, width, height} = frameElement.getBoundingClientRect();
-        return {x: left, y: top, width, height};
+        const {height, left, top, width} = frameElement.getBoundingClientRect();
+        return {height, width, x: left, y: top};
     }
 }

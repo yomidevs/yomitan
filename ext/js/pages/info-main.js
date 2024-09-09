@@ -31,10 +31,10 @@ import {SettingsController} from './settings/settings-controller.js';
 function getBrowserDisplayName(browser) {
     switch (browser) {
         case 'chrome': return 'Chrome';
-        case 'firefox': return 'Firefox';
-        case 'firefox-mobile': return 'Firefox for Android';
         case 'edge': return 'Edge';
         case 'edge-legacy': return 'Edge Legacy';
+        case 'firefox': return 'Firefox';
+        case 'firefox-mobile': return 'Firefox for Android';
         case 'safari': return 'Safari';
         default: return `${browser}`;
     }
@@ -46,13 +46,13 @@ function getBrowserDisplayName(browser) {
  */
 function getOperatingSystemDisplayName(os) {
     switch (os) {
-        case 'mac': return 'Mac OS';
-        case 'win': return 'Windows';
         case 'android': return 'Android';
         case 'cros': return 'Chrome OS';
         case 'linux': return 'Linux';
+        case 'mac': return 'Mac OS';
         case 'openbsd': return 'Open BSD';
         case 'unknown': return 'Unknown';
+        case 'win': return 'Windows';
         default: return `${os}`;
     }
 }
@@ -124,7 +124,7 @@ await Application.main(true, async (application) => {
     const themeController = new ThemeController(document.documentElement);
     themeController.prepare();
     const optionsFull = await application.api.optionsGetFull();
-    const {profiles, profileCurrent} = optionsFull;
+    const {profileCurrent, profiles} = optionsFull;
     const defaultProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
     if (defaultProfile !== null) {
         themeController.theme = defaultProfile.options.general.popupTheme;

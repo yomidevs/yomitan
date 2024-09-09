@@ -259,7 +259,7 @@ export class AnkiConnect {
             throw new Error('AnkiConnect not enabled');
         }
         await this._checkVersion();
-        const result = await this._invoke('storeMediaFile', {filename: fileName, data: content});
+        const result = await this._invoke('storeMediaFile', {data: content, filename: fileName});
         if (result !== null && typeof result !== 'string') {
             throw this._createUnexpectedResultError('string|null', result);
         }
@@ -358,16 +358,16 @@ export class AnkiConnect {
      * @returns {Promise<import('anki').ApiReflectResult>} Information about the APIs.
      */
     async apiReflect(scopes, actions = null) {
-        const result = await this._invoke('apiReflect', {scopes, actions});
+        const result = await this._invoke('apiReflect', {actions, scopes});
         if (!(typeof result === 'object' && result !== null)) {
             throw this._createUnexpectedResultError('object', result);
         }
-        const {scopes: resultScopes, actions: resultActions} = /** @type {import('core').SerializableObject} */ (result);
+        const {actions: resultActions, scopes: resultScopes} = /** @type {import('core').SerializableObject} */ (result);
         const resultScopes2 = /** @type {string[]} */ (this._normalizeArray(resultScopes, -1, 'string', ', field scopes'));
         const resultActions2 = /** @type {string[]} */ (this._normalizeArray(resultActions, -1, 'string', ', field scopes'));
         return {
-            scopes: resultScopes2,
             actions: resultActions2,
+            scopes: resultScopes2,
         };
     }
 
@@ -430,20 +430,20 @@ export class AnkiConnect {
         try {
             if (this._server === null) { throw new Error('Server URL is null'); }
             response = await fetch(this._server, {
-                method: 'POST',
-                mode: 'cors',
+                body: JSON.stringify(body),
                 cache: 'default',
                 credentials: 'omit',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                method: 'POST',
+                mode: 'cors',
                 redirect: 'follow',
                 referrerPolicy: 'no-referrer',
-                body: JSON.stringify(body),
             });
         } catch (e) {
             const error = new ExtensionError('Anki connection failure');
-            error.data = {action, params, originalError: e};
+            error.data = {action, originalError: e, params};
             throw error;
         }
 
@@ -461,7 +461,7 @@ export class AnkiConnect {
             result = parseJson(responseText);
         } catch (e) {
             const error = new ExtensionError('Invalid Anki response');
-            error.data = {action, params, status: response.status, responseText, originalError: e};
+            error.data = {action, originalError: e, params, responseText, status: response.status};
             throw error;
         }
 
@@ -469,7 +469,7 @@ export class AnkiConnect {
             const apiError = /** @type {import('core').SerializableObject} */ (result).error;
             if (typeof apiError !== 'undefined') {
                 const error = new ExtensionError(`Anki error: ${apiError}`);
-                error.data = {action, params, status: response.status, apiError: typeof apiError === 'string' ? apiError : `${apiError}`};
+                error.data = {action, apiError: typeof apiError === 'string' ? apiError : `${apiError}`, params, status: response.status};
                 throw error;
             }
         }
@@ -631,7 +631,7 @@ export class AnkiConnect {
                 continue;
             }
 
-            const {tags, fields, modelName, cards} = /** @type {{[key: string]: unknown}} */ (item);
+            const {cards, fields, modelName, tags} = /** @type {{[key: string]: unknown}} */ (item);
             if (typeof modelName !== 'string') {
                 throw this._createError(`Unexpected result type at index ${i}, field modelName: expected string, received ${this._getTypeName(modelName)}`, result);
             }
@@ -644,17 +644,17 @@ export class AnkiConnect {
             const fields2 = {};
             for (const [key, fieldInfo] of Object.entries(fields)) {
                 if (!isObjectNotArray(fieldInfo)) { continue; }
-                const {value, order} = fieldInfo;
+                const {order, value} = fieldInfo;
                 if (typeof value !== 'string' || typeof order !== 'number') { continue; }
-                fields2[key] = {value, order};
+                fields2[key] = {order, value};
             }
             /** @type {import('anki').NoteInfo} */
             const item2 = {
-                noteId,
-                tags: tags2,
+                cards: cards2,
                 fields: fields2,
                 modelName,
-                cards: cards2,
+                noteId,
+                tags: tags2,
             };
             result2.push(item2);
         }

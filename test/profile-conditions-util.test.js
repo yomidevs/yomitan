@@ -26,25 +26,25 @@ describe('Profile conditions utilities', () => {
             // Empty
             {
                 context: {index: 0},
-                expected: {index: 0, flags: []},
+                expected: {flags: [], index: 0},
             },
 
             // Domain normalization
             {
                 context: {depth: 0, url: ''},
-                expected: {depth: 0, url: '', flags: []},
+                expected: {depth: 0, flags: [], url: ''},
             },
             {
                 context: {depth: 0, url: 'http://example.com/'},
-                expected: {depth: 0, url: 'http://example.com/', domain: 'example.com', flags: []},
+                expected: {depth: 0, domain: 'example.com', flags: [], url: 'http://example.com/'},
             },
             {
                 context: {depth: 0, url: 'http://example.com:1234/'},
-                expected: {depth: 0, url: 'http://example.com:1234/', domain: 'example.com', flags: []},
+                expected: {depth: 0, domain: 'example.com', flags: [], url: 'http://example.com:1234/'},
             },
             {
                 context: {depth: 0, url: 'http://user@example.com:1234/'},
-                expected: {depth: 0, url: 'http://user@example.com:1234/', domain: 'example.com', flags: []},
+                expected: {depth: 0, domain: 'example.com', flags: [], url: 'http://user@example.com:1234/'},
             },
         ];
 
@@ -63,7 +63,7 @@ describe('Profile conditions utilities', () => {
                 conditionGroups: [],
                 expectedSchema: {},
                 inputs: [
-                    {expected: true, context: {depth: 0, url: 'http://example.com/'}},
+                    {context: {depth: 0, url: 'http://example.com/'}, expected: true},
                 ],
             },
             {
@@ -72,7 +72,7 @@ describe('Profile conditions utilities', () => {
                 ],
                 expectedSchema: {},
                 inputs: [
-                    {expected: true, context: {depth: 0, url: 'http://example.com/'}},
+                    {context: {depth: 0, url: 'http://example.com/'}, expected: true},
                 ],
             },
             {
@@ -82,7 +82,7 @@ describe('Profile conditions utilities', () => {
                 ],
                 expectedSchema: {},
                 inputs: [
-                    {expected: true, context: {depth: 0, url: 'http://example.com/'}},
+                    {context: {depth: 0, url: 'http://example.com/'}, expected: true},
                 ],
             },
 
@@ -92,8 +92,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'equal',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                         ],
@@ -106,9 +106,9 @@ describe('Profile conditions utilities', () => {
                     required: ['depth'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: 1, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: -1, url: 'http://example.com/'}},
+                    {context: {depth: 0, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 1, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: -1, url: 'http://example.com/'}, expected: false},
                 ],
             },
             {
@@ -116,8 +116,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'notEqual',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                         ],
@@ -136,9 +136,9 @@ describe('Profile conditions utilities', () => {
                     },
                 },
                 inputs: [
-                    {expected: false, context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 1, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: -1, url: 'http://example.com/'}},
+                    {context: {depth: 0, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 1, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: -1, url: 'http://example.com/'},  expected: true},
                 ],
             },
             {
@@ -146,8 +146,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'lessThan',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                         ],
@@ -156,16 +156,16 @@ describe('Profile conditions utilities', () => {
                 expectedSchema: {
                     properties: {
                         depth: {
-                            type: 'number',
                             exclusiveMaximum: 0,
+                            type: 'number',
                         },
                     },
                     required: ['depth'],
                 },
                 inputs: [
-                    {expected: false, context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: 1, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: -1, url: 'http://example.com/'}},
+                    {context: {depth: 0, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 1, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: -1, url: 'http://example.com/'},  expected: true},
                 ],
             },
             {
@@ -173,8 +173,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'greaterThan',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                         ],
@@ -183,16 +183,16 @@ describe('Profile conditions utilities', () => {
                 expectedSchema: {
                     properties: {
                         depth: {
-                            type: 'number',
                             exclusiveMinimum: 0,
+                            type: 'number',
                         },
                     },
                     required: ['depth'],
                 },
                 inputs: [
-                    {expected: false, context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 1, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: -1, url: 'http://example.com/'}},
+                    {context: {depth: 0, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 1, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: -1, url: 'http://example.com/'}, expected: false},
                 ],
             },
             {
@@ -200,8 +200,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'lessThanOrEqual',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                         ],
@@ -210,16 +210,16 @@ describe('Profile conditions utilities', () => {
                 expectedSchema: {
                     properties: {
                         depth: {
-                            type: 'number',
                             maximum: 0,
+                            type: 'number',
                         },
                     },
                     required: ['depth'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: 1, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: -1, url: 'http://example.com/'}},
+                    {context: {depth: 0, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 1, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: -1, url: 'http://example.com/'},  expected: true},
                 ],
             },
             {
@@ -227,8 +227,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'greaterThanOrEqual',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                         ],
@@ -237,16 +237,16 @@ describe('Profile conditions utilities', () => {
                 expectedSchema: {
                     properties: {
                         depth: {
-                            type: 'number',
                             minimum: 0,
+                            type: 'number',
                         },
                     },
                     required: ['depth'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 1, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: -1, url: 'http://example.com/'}},
+                    {context: {depth: 0, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 1, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: -1, url: 'http://example.com/'}, expected: false},
                 ],
             },
 
@@ -256,8 +256,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'url',
                                 operator: 'matchDomain',
+                                type: 'url',
                                 value: 'example.com',
                             },
                         ],
@@ -274,11 +274,11 @@ describe('Profile conditions utilities', () => {
                     required: ['domain'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: 0, url: 'http://example1.com/'}},
-                    {expected: false, context: {depth: 0, url: 'http://example2.com/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com:1234/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://user@example.com:1234/'}},
+                    {context: {depth: 0, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, url: 'http://example1.com/'}, expected: false},
+                    {context: {depth: 0, url: 'http://example2.com/'}, expected: false},
+                    {context: {depth: 0, url: 'http://example.com:1234/'},  expected: true},
+                    {context: {depth: 0, url: 'http://user@example.com:1234/'},  expected: true},
                 ],
             },
             {
@@ -286,8 +286,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'url',
                                 operator: 'matchDomain',
+                                type: 'url',
                                 value: 'example.com, example1.com, example2.com',
                             },
                         ],
@@ -306,12 +306,12 @@ describe('Profile conditions utilities', () => {
                     required: ['domain'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://example1.com/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://example2.com/'}},
-                    {expected: false, context: {depth: 0, url: 'http://example3.com/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com:1234/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://user@example.com:1234/'}},
+                    {context: {depth: 0, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, url: 'http://example1.com/'},  expected: true},
+                    {context: {depth: 0, url: 'http://example2.com/'},  expected: true},
+                    {context: {depth: 0, url: 'http://example3.com/'}, expected: false},
+                    {context: {depth: 0, url: 'http://example.com:1234/'},  expected: true},
+                    {context: {depth: 0, url: 'http://user@example.com:1234/'},  expected: true},
                 ],
             },
             {
@@ -319,8 +319,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'url',
                                 operator: 'matchRegExp',
+                                type: 'url',
                                 value: '^http://example\\d?\\.com/[\\w\\W]*$',
                             },
                         ],
@@ -329,22 +329,22 @@ describe('Profile conditions utilities', () => {
                 expectedSchema: {
                     properties: {
                         url: {
-                            type: 'string',
                             pattern: '^http://example\\d?\\.com/[\\w\\W]*$',
                             patternFlags: 'i',
+                            type: 'string',
                         },
                     },
                     required: ['url'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://example1.com/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://example2.com/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://example3.com/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/example'}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com:1234/'}},
-                    {expected: false, context: {depth: 0, url: 'http://user@example.com:1234/'}},
-                    {expected: false, context: {depth: 0, url: 'http://example-1.com/'}},
+                    {context: {depth: 0, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, url: 'http://example1.com/'},  expected: true},
+                    {context: {depth: 0, url: 'http://example2.com/'},  expected: true},
+                    {context: {depth: 0, url: 'http://example3.com/'},  expected: true},
+                    {context: {depth: 0, url: 'http://example.com/example'},  expected: true},
+                    {context: {depth: 0, url: 'http://example.com:1234/'}, expected: false},
+                    {context: {depth: 0, url: 'http://user@example.com:1234/'}, expected: false},
+                    {context: {depth: 0, url: 'http://example-1.com/'}, expected: false},
                 ],
             },
 
@@ -354,8 +354,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'modifierKeys',
                                 operator: 'are',
+                                type: 'modifierKeys',
                                 value: '',
                             },
                         ],
@@ -364,18 +364,18 @@ describe('Profile conditions utilities', () => {
                 expectedSchema: {
                     properties: {
                         modifierKeys: {
-                            type: 'array',
                             maxItems: 0,
                             minItems: 0,
+                            type: 'array',
                         },
                     },
                     required: ['modifierKeys'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}},
+                    {context: {depth: 0, modifierKeys: [], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt'], url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift'], url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift', 'ctrl'], url: 'http://example.com/'}, expected: false},
                 ],
             },
             {
@@ -383,8 +383,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'modifierKeys',
                                 operator: 'are',
+                                type: 'modifierKeys',
                                 value: 'alt, shift',
                             },
                         ],
@@ -393,22 +393,22 @@ describe('Profile conditions utilities', () => {
                 expectedSchema: {
                     properties: {
                         modifierKeys: {
-                            type: 'array',
-                            maxItems: 2,
-                            minItems: 2,
                             allOf: [
                                 {contains: {const: 'alt'}},
                                 {contains: {const: 'shift'}},
                             ],
+                            maxItems: 2,
+                            minItems: 2,
+                            type: 'array',
                         },
                     },
                     required: ['modifierKeys'],
                 },
                 inputs: [
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}},
+                    {context: {depth: 0, modifierKeys: [], url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, modifierKeys: ['alt'], url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift'], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift', 'ctrl'], url: 'http://example.com/'}, expected: false},
                 ],
             },
             {
@@ -416,8 +416,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'modifierKeys',
                                 operator: 'areNot',
+                                type: 'modifierKeys',
                                 value: '',
                             },
                         ],
@@ -429,9 +429,9 @@ describe('Profile conditions utilities', () => {
                             {
                                 properties: {
                                     modifierKeys: {
-                                        type: 'array',
                                         maxItems: 0,
                                         minItems: 0,
+                                        type: 'array',
                                     },
                                 },
                                 required: ['modifierKeys'],
@@ -440,10 +440,10 @@ describe('Profile conditions utilities', () => {
                     },
                 },
                 inputs: [
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}},
+                    {context: {depth: 0, modifierKeys: [], url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, modifierKeys: ['alt'], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift'], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift', 'ctrl'], url: 'http://example.com/'},  expected: true},
                 ],
             },
             {
@@ -451,8 +451,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'modifierKeys',
                                 operator: 'areNot',
+                                type: 'modifierKeys',
                                 value: 'alt, shift',
                             },
                         ],
@@ -464,13 +464,13 @@ describe('Profile conditions utilities', () => {
                             {
                                 properties: {
                                     modifierKeys: {
-                                        type: 'array',
-                                        maxItems: 2,
-                                        minItems: 2,
                                         allOf: [
                                             {contains: {const: 'alt'}},
                                             {contains: {const: 'shift'}},
                                         ],
+                                        maxItems: 2,
+                                        minItems: 2,
+                                        type: 'array',
                                     },
                                 },
                                 required: ['modifierKeys'],
@@ -479,10 +479,10 @@ describe('Profile conditions utilities', () => {
                     },
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}},
+                    {context: {depth: 0, modifierKeys: [], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt'], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift'], url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift', 'ctrl'], url: 'http://example.com/'},  expected: true},
                 ],
             },
             {
@@ -490,8 +490,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'modifierKeys',
                                 operator: 'include',
+                                type: 'modifierKeys',
                                 value: '',
                             },
                         ],
@@ -500,17 +500,17 @@ describe('Profile conditions utilities', () => {
                 expectedSchema: {
                     properties: {
                         modifierKeys: {
-                            type: 'array',
                             minItems: 0,
+                            type: 'array',
                         },
                     },
                     required: ['modifierKeys'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}},
+                    {context: {depth: 0, modifierKeys: [], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt'], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift'], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift', 'ctrl'], url: 'http://example.com/'},  expected: true},
                 ],
             },
             {
@@ -518,8 +518,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'modifierKeys',
                                 operator: 'include',
+                                type: 'modifierKeys',
                                 value: 'alt, shift',
                             },
                         ],
@@ -528,21 +528,21 @@ describe('Profile conditions utilities', () => {
                 expectedSchema: {
                     properties: {
                         modifierKeys: {
-                            type: 'array',
-                            minItems: 2,
                             allOf: [
                                 {contains: {const: 'alt'}},
                                 {contains: {const: 'shift'}},
                             ],
+                            minItems: 2,
+                            type: 'array',
                         },
                     },
                     required: ['modifierKeys'],
                 },
                 inputs: [
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}},
+                    {context: {depth: 0, modifierKeys: [], url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, modifierKeys: ['alt'], url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift'], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift', 'ctrl'], url: 'http://example.com/'},  expected: true},
                 ],
             },
             {
@@ -550,8 +550,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'modifierKeys',
                                 operator: 'notInclude',
+                                type: 'modifierKeys',
                                 value: '',
                             },
                         ],
@@ -566,10 +566,10 @@ describe('Profile conditions utilities', () => {
                     required: ['modifierKeys'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}},
+                    {context: {depth: 0, modifierKeys: [], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt'], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift'], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift', 'ctrl'], url: 'http://example.com/'},  expected: true},
                 ],
             },
             {
@@ -577,8 +577,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'modifierKeys',
                                 operator: 'notInclude',
+                                type: 'modifierKeys',
                                 value: 'alt, shift',
                             },
                         ],
@@ -587,22 +587,22 @@ describe('Profile conditions utilities', () => {
                 expectedSchema: {
                     properties: {
                         modifierKeys: {
-                            type: 'array',
                             not: {
                                 anyOf: [
                                     {contains: {const: 'alt'}},
                                     {contains: {const: 'shift'}},
                                 ],
                             },
+                            type: 'array',
                         },
                     },
                     required: ['modifierKeys'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/', modifierKeys: []}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift']}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/', modifierKeys: ['alt', 'shift', 'ctrl']}},
+                    {context: {depth: 0, modifierKeys: [], url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, modifierKeys: ['alt'], url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift'], url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, modifierKeys: ['alt', 'shift', 'ctrl'], url: 'http://example.com/'}, expected: false},
                 ],
             },
 
@@ -612,31 +612,31 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'flags',
                                 operator: 'are',
+                                type: 'flags',
                                 value: '',
                             },
                         ],
                     },
                 ],
                 expectedSchema: {
-                    required: ['flags'],
                     properties: {
                         flags: {
-                            type: 'array',
                             maxItems: 0,
                             minItems: 0,
+                            type: 'array',
                         },
                     },
+                    required: ['flags'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: ''}},
-                    {expected: true,  context: {depth: 0, url: '', flags: []}},
-                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
+                    {context: {depth: 0, url: ''},  expected: true},
+                    {context: {depth: 0, flags: [], url: ''},  expected: true},
+                    {context: {depth: 0, flags: ['clipboard'], url: ''}, expected: false},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2'], url: ''}, expected: false},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2', 'test3'], url: ''}, expected: false},
                 ],
             },
             {
@@ -644,35 +644,35 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'flags',
                                 operator: 'are',
+                                type: 'flags',
                                 value: 'clipboard, test2',
                             },
                         ],
                     },
                 ],
                 expectedSchema: {
-                    required: ['flags'],
                     properties: {
                         flags: {
-                            type: 'array',
-                            maxItems: 2,
-                            minItems: 2,
                             allOf: [
                                 {contains: {const: 'clipboard'}},
                                 {contains: {const: 'test2'}},
                             ],
+                            maxItems: 2,
+                            minItems: 2,
+                            type: 'array',
                         },
                     },
+                    required: ['flags'],
                 },
                 inputs: [
-                    {expected: false, context: {depth: 0, url: ''}},
-                    {expected: false, context: {depth: 0, url: '', flags: []}},
-                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
+                    {context: {depth: 0, url: ''}, expected: false},
+                    {context: {depth: 0, flags: [], url: ''}, expected: false},
+                    {context: {depth: 0, flags: ['clipboard'], url: ''}, expected: false},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2'], url: ''},  expected: true},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2', 'test3'], url: ''}, expected: false},
                 ],
             },
             {
@@ -680,8 +680,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'flags',
                                 operator: 'areNot',
+                                type: 'flags',
                                 value: '',
                             },
                         ],
@@ -691,26 +691,26 @@ describe('Profile conditions utilities', () => {
                     not: {
                         anyOf: [
                             {
-                                required: ['flags'],
                                 properties: {
                                     flags: {
-                                        type: 'array',
                                         maxItems: 0,
                                         minItems: 0,
+                                        type: 'array',
                                     },
                                 },
+                                required: ['flags'],
                             },
                         ],
                     },
                 },
                 inputs: [
-                    {expected: false, context: {depth: 0, url: ''}},
-                    {expected: false, context: {depth: 0, url: '', flags: []}},
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
+                    {context: {depth: 0, url: ''}, expected: false},
+                    {context: {depth: 0, flags: [], url: ''}, expected: false},
+                    {context: {depth: 0, flags: ['clipboard'], url: ''},  expected: true},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2'], url: ''},  expected: true},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2', 'test3'], url: ''},  expected: true},
                 ],
             },
             {
@@ -718,8 +718,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'flags',
                                 operator: 'areNot',
+                                type: 'flags',
                                 value: 'clipboard, test2',
                             },
                         ],
@@ -729,30 +729,30 @@ describe('Profile conditions utilities', () => {
                     not: {
                         anyOf: [
                             {
-                                required: ['flags'],
                                 properties: {
                                     flags: {
-                                        type: 'array',
-                                        maxItems: 2,
-                                        minItems: 2,
                                         allOf: [
                                             {contains: {const: 'clipboard'}},
                                             {contains: {const: 'test2'}},
                                         ],
+                                        maxItems: 2,
+                                        minItems: 2,
+                                        type: 'array',
                                     },
                                 },
+                                required: ['flags'],
                             },
                         ],
                     },
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: ''}},
-                    {expected: true,  context: {depth: 0, url: '', flags: []}},
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
+                    {context: {depth: 0, url: ''},  expected: true},
+                    {context: {depth: 0, flags: [], url: ''},  expected: true},
+                    {context: {depth: 0, flags: ['clipboard'], url: ''},  expected: true},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2'], url: ''}, expected: false},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2', 'test3'], url: ''},  expected: true},
                 ],
             },
             {
@@ -760,30 +760,30 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'flags',
                                 operator: 'include',
+                                type: 'flags',
                                 value: '',
                             },
                         ],
                     },
                 ],
                 expectedSchema: {
-                    required: ['flags'],
                     properties: {
                         flags: {
-                            type: 'array',
                             minItems: 0,
+                            type: 'array',
                         },
                     },
+                    required: ['flags'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: ''}},
-                    {expected: true,  context: {depth: 0, url: '', flags: []}},
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
+                    {context: {depth: 0, url: ''},  expected: true},
+                    {context: {depth: 0, flags: [], url: ''},  expected: true},
+                    {context: {depth: 0, flags: ['clipboard'], url: ''},  expected: true},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2'], url: ''},  expected: true},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2', 'test3'], url: ''},  expected: true},
                 ],
             },
             {
@@ -791,34 +791,34 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'flags',
                                 operator: 'include',
+                                type: 'flags',
                                 value: 'clipboard, test2',
                             },
                         ],
                     },
                 ],
                 expectedSchema: {
-                    required: ['flags'],
                     properties: {
                         flags: {
-                            type: 'array',
-                            minItems: 2,
                             allOf: [
                                 {contains: {const: 'clipboard'}},
                                 {contains: {const: 'test2'}},
                             ],
+                            minItems: 2,
+                            type: 'array',
                         },
                     },
+                    required: ['flags'],
                 },
                 inputs: [
-                    {expected: false, context: {depth: 0, url: ''}},
-                    {expected: false, context: {depth: 0, url: '', flags: []}},
-                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
+                    {context: {depth: 0, url: ''}, expected: false},
+                    {context: {depth: 0, flags: [], url: ''}, expected: false},
+                    {context: {depth: 0, flags: ['clipboard'], url: ''}, expected: false},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2'], url: ''},  expected: true},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2', 'test3'], url: ''},  expected: true},
                 ],
             },
             {
@@ -826,29 +826,29 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'flags',
                                 operator: 'notInclude',
+                                type: 'flags',
                                 value: '',
                             },
                         ],
                     },
                 ],
                 expectedSchema: {
-                    required: ['flags'],
                     properties: {
                         flags: {
                             type: 'array',
                         },
                     },
+                    required: ['flags'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: ''}},
-                    {expected: true,  context: {depth: 0, url: '', flags: []}},
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard']}},
+                    {context: {depth: 0, url: ''},  expected: true},
+                    {context: {depth: 0, flags: [], url: ''},  expected: true},
+                    {context: {depth: 0, flags: ['clipboard'], url: ''},  expected: true},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2'], url: ''},  expected: true},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: true,  context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2', 'test3'], url: ''},  expected: true},
                 ],
             },
             {
@@ -856,35 +856,35 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'flags',
                                 operator: 'notInclude',
+                                type: 'flags',
                                 value: 'clipboard, test2',
                             },
                         ],
                     },
                 ],
                 expectedSchema: {
-                    required: ['flags'],
                     properties: {
                         flags: {
-                            type: 'array',
                             not: {
                                 anyOf: [
                                     {contains: {const: 'clipboard'}},
                                     {contains: {const: 'test2'}},
                                 ],
                             },
+                            type: 'array',
                         },
                     },
+                    required: ['flags'],
                 },
                 inputs: [
-                    {expected: true,  context: {depth: 0, url: ''}},
-                    {expected: true,  context: {depth: 0, url: '', flags: []}},
-                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard']}},
+                    {context: {depth: 0, url: ''},  expected: true},
+                    {context: {depth: 0, flags: [], url: ''},  expected: true},
+                    {context: {depth: 0, flags: ['clipboard'], url: ''}, expected: false},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2'], url: ''}, expected: false},
                     // @ts-expect-error - Ignore type for string flag for testing purposes
-                    {expected: false, context: {depth: 0, url: '', flags: ['clipboard', 'test2', 'test3']}},
+                    {context: {depth: 0, flags: ['clipboard', 'test2', 'test3'], url: ''}, expected: false},
                 ],
             },
 
@@ -894,13 +894,13 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'greaterThan',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'lessThan',
+                                type: 'popupLevel',
                                 value: '3',
                             },
                         ],
@@ -911,8 +911,8 @@ describe('Profile conditions utilities', () => {
                         {
                             properties: {
                                 depth: {
-                                    type: 'number',
                                     exclusiveMinimum: 0,
+                                    type: 'number',
                                 },
                             },
                             required: ['depth'],
@@ -920,8 +920,8 @@ describe('Profile conditions utilities', () => {
                         {
                             properties: {
                                 depth: {
-                                    type: 'number',
                                     exclusiveMaximum: 3,
+                                    type: 'number',
                                 },
                             },
                             required: ['depth'],
@@ -929,12 +929,12 @@ describe('Profile conditions utilities', () => {
                     ],
                 },
                 inputs: [
-                    {expected: false, context: {depth: -2, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: -1, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 1, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 2, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: 3, url: 'http://example.com/'}},
+                    {context: {depth: -2, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: -1, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 1, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 2, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 3, url: 'http://example.com/'}, expected: false},
                 ],
             },
             {
@@ -942,13 +942,13 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'greaterThan',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'lessThan',
+                                type: 'popupLevel',
                                 value: '3',
                             },
                         ],
@@ -956,8 +956,8 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'equal',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                         ],
@@ -970,8 +970,8 @@ describe('Profile conditions utilities', () => {
                                 {
                                     properties: {
                                         depth: {
-                                            type: 'number',
                                             exclusiveMinimum: 0,
+                                            type: 'number',
                                         },
                                     },
                                     required: ['depth'],
@@ -979,8 +979,8 @@ describe('Profile conditions utilities', () => {
                                 {
                                     properties: {
                                         depth: {
-                                            type: 'number',
                                             exclusiveMaximum: 3,
+                                            type: 'number',
                                         },
                                     },
                                     required: ['depth'],
@@ -996,12 +996,12 @@ describe('Profile conditions utilities', () => {
                     ],
                 },
                 inputs: [
-                    {expected: false, context: {depth: -2, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: -1, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 1, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 2, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: 3, url: 'http://example.com/'}},
+                    {context: {depth: -2, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: -1, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: 0, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 1, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 2, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 3, url: 'http://example.com/'}, expected: false},
                 ],
             },
             {
@@ -1009,13 +1009,13 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'greaterThan',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'lessThan',
+                                type: 'popupLevel',
                                 value: '3',
                             },
                         ],
@@ -1023,13 +1023,13 @@ describe('Profile conditions utilities', () => {
                     {
                         conditions: [
                             {
-                                type: 'popupLevel',
                                 operator: 'lessThanOrEqual',
+                                type: 'popupLevel',
                                 value: '0',
                             },
                             {
-                                type: 'popupLevel',
                                 operator: 'greaterThanOrEqual',
+                                type: 'popupLevel',
                                 value: '-1',
                             },
                         ],
@@ -1042,8 +1042,8 @@ describe('Profile conditions utilities', () => {
                                 {
                                     properties: {
                                         depth: {
-                                            type: 'number',
                                             exclusiveMinimum: 0,
+                                            type: 'number',
                                         },
                                     },
                                     required: ['depth'],
@@ -1051,8 +1051,8 @@ describe('Profile conditions utilities', () => {
                                 {
                                     properties: {
                                         depth: {
-                                            type: 'number',
                                             exclusiveMaximum: 3,
+                                            type: 'number',
                                         },
                                     },
                                     required: ['depth'],
@@ -1064,8 +1064,8 @@ describe('Profile conditions utilities', () => {
                                 {
                                     properties: {
                                         depth: {
-                                            type: 'number',
                                             maximum: 0,
+                                            type: 'number',
                                         },
                                     },
                                     required: ['depth'],
@@ -1073,8 +1073,8 @@ describe('Profile conditions utilities', () => {
                                 {
                                     properties: {
                                         depth: {
-                                            type: 'number',
                                             minimum: -1,
+                                            type: 'number',
                                         },
                                     },
                                     required: ['depth'],
@@ -1084,12 +1084,12 @@ describe('Profile conditions utilities', () => {
                     ],
                 },
                 inputs: [
-                    {expected: false, context: {depth: -2, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: -1, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 0, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 1, url: 'http://example.com/'}},
-                    {expected: true,  context: {depth: 2, url: 'http://example.com/'}},
-                    {expected: false, context: {depth: 3, url: 'http://example.com/'}},
+                    {context: {depth: -2, url: 'http://example.com/'}, expected: false},
+                    {context: {depth: -1, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 0, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 1, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 2, url: 'http://example.com/'},  expected: true},
+                    {context: {depth: 3, url: 'http://example.com/'}, expected: false},
                 ],
             },
         ];
@@ -1101,7 +1101,7 @@ describe('Profile conditions utilities', () => {
                 expect(schema.schema).toStrictEqual(expectedSchema);
             }
             if (Array.isArray(inputs)) {
-                for (const {expected, context} of inputs) {
+                for (const {context, expected} of inputs) {
                     const normalizedContext = normalizeContext(context);
                     const actual = schema.isValid(normalizedContext);
                     expect(actual).toStrictEqual(expected);

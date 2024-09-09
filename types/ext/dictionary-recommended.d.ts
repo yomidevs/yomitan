@@ -20,26 +20,26 @@ export type RecommendedDictionaries = {
 };
 
 export type LanguageRecommendedDictionaries = {
-    terms: RecommendedDictionary[];
-    kanji: RecommendedDictionary[];
     frequency: RecommendedDictionary[];
     grammar: RecommendedDictionary[];
+    kanji: RecommendedDictionary[];
     pronunciation: RecommendedDictionary[];
+    terms: RecommendedDictionary[];
 };
 
 export type RecommendedDictionary = {
-    name: string;
-    downloadUrl: string;
     description: string;
+    downloadUrl: string;
     homepage?: string;
+    name: string;
 };
 
 export type RecommendedDictionariesTest = {
-    type: 'recommendedDictionaries';
     recommendedDictionaries: RecommendedDictionaries;
+    type: 'recommendedDictionaries';
 };
 
 export type RecommendedDictionaryElementMap = {
-    property: 'terms' | 'kanji' | 'frequency' | 'grammar' | 'pronunciation';
     element: HTMLElement;
+    property: 'frequency' | 'grammar' | 'kanji' | 'pronunciation' | 'terms';
 };

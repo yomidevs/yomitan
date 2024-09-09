@@ -29,9 +29,9 @@ export type LogData = {
 };
 
 export type AnkiNoteLogData = {
+    errors?: Error[];
     mode: CreateMode;
     note: Anki.Note | undefined;
-    errors?: Error[];
     requirements?: AnkiNoteBuilder.Requirement[];
 };
 
@@ -40,22 +40,22 @@ export type DictionaryEntryDetails = {
 };
 
 export type DictionaryEntryModeDetails = {
+    ankiError: Error | null;
+    canAdd: boolean;
+    errors: Error[];
     mode: CreateMode;
     note: Anki.Note;
-    errors: Error[];
-    requirements: AnkiNoteBuilder.Requirement[];
-    canAdd: boolean;
-    valid: boolean;
     /**
      * Anki IDs of duplicate notes. May contain INVALID_NOTE_ID for notes whose ID could not be found.
      */
     noteIds: Anki.NoteId[] | null;
     noteInfos?: (Anki.NoteInfo | null)[];
-    ankiError: Error | null;
+    requirements: AnkiNoteBuilder.Requirement[];
+    valid: boolean;
 };
 
 export type CreateNoteResult = {
-    note: Anki.Note;
     errors: Error[];
+    note: Anki.Note;
     requirements: AnkiNoteBuilder.Requirement[];
 };

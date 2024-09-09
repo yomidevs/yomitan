@@ -21,7 +21,7 @@ import type * as Translation from './translation';
 import type * as Language from './language';
 
 export type TextDeinflectionOptions = [
-    textReplacements: Translation.FindTermsTextReplacement[] | null,
+    textReplacements: null | Translation.FindTermsTextReplacement[],
     halfWidth: boolean,
     numeric: boolean,
     alphabetic: boolean,
@@ -31,7 +31,7 @@ export type TextDeinflectionOptions = [
 ];
 
 export type TextDeinflectionOptionsArrays = [
-    textReplacements: (Translation.FindTermsTextReplacement[] | null)[],
+    textReplacements: (null | Translation.FindTermsTextReplacement[])[],
     halfWidth: boolean[],
     numeric: boolean[],
     alphabetic: boolean[],
@@ -44,36 +44,36 @@ export type TextProcessorRuleChainCandidate = string[];
 
 export type VariantAndTextProcessorRuleChainCandidatesMap = Map<string, TextProcessorRuleChainCandidate[]>;
 
-export type TermDictionaryEntry = Omit<Dictionary.TermDictionaryEntry, 'inflectionRuleChainCandidates'> & {
+export type TermDictionaryEntry = {
     inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
     textProcessorRuleChainCandidates: TextProcessorRuleChainCandidate[];
-};
+} & Omit<Dictionary.TermDictionaryEntry, 'inflectionRuleChainCandidates'>;
 
 export type InflectionRuleChainCandidate = {
-    source: Dictionary.InflectionSource;
     inflectionRules: string[];
+    source: Dictionary.InflectionSource;
 };
 
 export type DatabaseDeinflection = {
-    originalText: string;
-    transformedText: string;
-    deinflectedText: string;
     conditions: number;
-    textProcessorRuleChainCandidates: TextProcessorRuleChainCandidate[];
-    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
     databaseEntries: DictionaryDatabase.TermEntry[];
+    deinflectedText: string;
+    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
+    originalText: string;
+    textProcessorRuleChainCandidates: TextProcessorRuleChainCandidate[];
+    transformedText: string;
 };
 
 export type DictionaryEntryGroup = {
-    ids: Set<number>;
     dictionaryEntries: TermDictionaryEntry[];
+    ids: Set<number>;
 };
 
 export type TextProcessorMap = Map<
     string,
     {
-        textPreprocessors: Language.TextProcessorWithId<unknown>[];
         textPostprocessors: Language.TextProcessorWithId<unknown>[];
+        textPreprocessors: Language.TextProcessorWithId<unknown>[];
     }
 >;
 

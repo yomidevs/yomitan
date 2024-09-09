@@ -24,19 +24,19 @@ export type JsonInfo = {
 export type JsonFileInfo = JsonFileIgnoreInfo | JsonFileParseInfo;
 
 export type JsonFileIgnoreInfo = {
-    path: string;
     ignore: true;
+    path: string;
 };
 
 export type JsonFileParseInfo = {
-    path: string;
     ignore?: undefined;
-    typeFile: string;
-    type: string;
-    schema?: string;
     jsconfig?: JsconfigType;
+    path: string;
+    schema?: string;
+    type: string;
+    typeFile: string;
 };
 
 export type AjvSchema = Schema;
 
-export type JsconfigType = 'main' | 'dev' | 'test' | 'benches';
+export type JsconfigType = 'benches' | 'dev' | 'main' | 'test';

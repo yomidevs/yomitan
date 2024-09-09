@@ -34,7 +34,7 @@ export class DictionaryWorker {
     importDictionary(archiveContent, details, onProgress) {
         return this._invoke(
             'importDictionary',
-            {details, archiveContent},
+            {archiveContent, details},
             [archiveContent],
             onProgress,
             this._formatImportDictionaryResult.bind(this),
@@ -77,12 +77,12 @@ export class DictionaryWorker {
             /** @type {import('dictionary-worker').InvokeDetails<TResponseRaw, TResponse>} */
             const details = {
                 complete: false,
-                worker,
-                resolve,
-                reject,
+                formatResult,
                 onMessage: null,
                 onProgress,
-                formatResult,
+                reject,
+                resolve,
+                worker,
             };
             // Ugly typecast below due to not being able to explicitly state the template types
             /** @type {(event: MessageEvent<import('dictionary-worker').MessageData<TResponseRaw>>) => void} */
@@ -105,7 +105,7 @@ export class DictionaryWorker {
         switch (action) {
             case 'complete':
                 {
-                    const {worker, resolve, reject, onMessage, formatResult} = details;
+                    const {formatResult, onMessage, reject, resolve, worker} = details;
                     if (worker === null || onMessage === null || resolve === null || reject === null) { return; }
                     details.complete = true;
                     details.worker = null;
@@ -119,15 +119,15 @@ export class DictionaryWorker {
                     this._onMessageComplete(params, resolve, reject, formatResult);
                 }
                 break;
-            case 'progress':
-                this._onMessageProgress(params, details.onProgress);
-                break;
             case 'getImageDetails':
                 {
                     const {worker} = details;
                     if (worker === null) { return; }
                     void this._onMessageGetImageDetails(params, worker);
                 }
+                break;
+            case 'progress':
+                this._onMessageProgress(params, details.onProgress);
                 break;
         }
     }
@@ -179,7 +179,7 @@ export class DictionaryWorker {
      * @param {Worker} worker
      */
     async _onMessageGetImageDetails(params, worker) {
-        const {id, content, mediaType} = params;
+        const {content, id, mediaType} = params;
         /** @type {Transferable[]} */
         const transfer = [];
         let response;
@@ -187,7 +187,7 @@ export class DictionaryWorker {
             const result = await this._dictionaryImporterMediaLoader.getImageDetails(content, mediaType, transfer);
             response = {id, result};
         } catch (e) {
-            response = {id, error: ExtensionError.serialize(e)};
+            response = {error: ExtensionError.serialize(e), id};
         }
         worker.postMessage({action: 'getImageDetails.response', params: response}, transfer);
     }
@@ -197,10 +197,10 @@ export class DictionaryWorker {
      * @returns {import('dictionary-worker').MessageCompleteResult}
      */
     _formatImportDictionaryResult(response) {
-        const {result, errors} = response;
+        const {errors, result} = response;
         return {
-            result,
             errors: errors.map((error) => ExtensionError.deserialize(error)),
+            result,
         };
     }
 }

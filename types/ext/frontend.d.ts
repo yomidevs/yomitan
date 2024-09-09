@@ -21,28 +21,28 @@ import type {Application} from '../../ext/js/application';
 
 /** Details about how to set up the instance. */
 export type ConstructorDetails = {
-    /** The main application instance. */
-    application: Application;
-    /** The type of page, one of 'web', 'popup', or 'search'. */
-    pageType: PageType;
-    /** A PopupFactory instance to use for generating popups. */
-    popupFactory: PopupFactory;
-    /** The nesting depth value of the popup. */
-    depth: number;
-    /** The popup ID of the parent popup if one exists, otherwise null. */
-    parentPopupId: string | null;
-    /** The frame ID of the parent popup if one exists, otherwise null. */
-    parentFrameId: number | null;
-    /** Whether or not proxy popups should be used. */
-    useProxyPopup: boolean;
-    /** Whether or not window popups can be used. */
-    canUseWindowPopup: boolean;
     /** Whether or not popups can be hosted in the root frame. */
     allowRootFramePopupProxy: boolean;
+    /** The main application instance. */
+    application: Application;
+    /** Whether or not window popups can be used. */
+    canUseWindowPopup: boolean;
     /** Whether popups can create child popups or not. */
     childrenSupported: boolean;
+    /** The nesting depth value of the popup. */
+    depth: number;
     /** A HotkeyHandler instance. */
     hotkeyHandler: HotkeyHandler;
+    /** The type of page, one of 'web', 'popup', or 'search'. */
+    pageType: PageType;
+    /** The frame ID of the parent popup if one exists, otherwise null. */
+    parentFrameId: null | number;
+    /** The popup ID of the parent popup if one exists, otherwise null. */
+    parentPopupId: null | string;
+    /** A PopupFactory instance to use for generating popups. */
+    popupFactory: PopupFactory;
+    /** Whether or not proxy popups should be used. */
+    useProxyPopup: boolean;
 };
 
-export type PageType = 'web' | 'popup' | 'search';
+export type PageType = 'popup' | 'search' | 'web';

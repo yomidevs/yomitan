@@ -20,42 +20,42 @@ import type * as Input from './input';
 export type OptionsContextFlag = 'clipboard';
 
 export type OptionsContext1 = {
-    url: string;
-    depth: number;
-    index?: undefined;
     current?: undefined;
+    depth: number;
     flags?: OptionsContextFlag[];
-    modifiers?: Input.Modifier[];
+    index?: undefined;
     modifierKeys?: Input.ModifierKey[];
+    modifiers?: Input.Modifier[];
+    url: string;
 };
 
 export type OptionsContext2 = {
-    index: number;
-    url?: undefined;
-    depth?: undefined;
     current?: undefined;
+    depth?: undefined;
     flags?: OptionsContextFlag[];
-    modifiers?: Input.Modifier[];
+    index: number;
     modifierKeys?: Input.ModifierKey[];
+    modifiers?: Input.Modifier[];
+    url?: undefined;
 };
 
 export type OptionsContext3 = {
     current: true;
-    url?: undefined;
     depth?: undefined;
-    index?: undefined;
     flags?: OptionsContextFlag[];
-    modifiers?: Input.Modifier[];
+    index?: undefined;
     modifierKeys?: Input.ModifierKey[];
+    modifiers?: Input.Modifier[];
+    url?: undefined;
 };
 
 export type OptionsContext = OptionsContext1 | OptionsContext2 | OptionsContext3;
 
 export type Options = {
-    version: number;
-    profiles: Profile[];
-    profileCurrent: number;
     global: GlobalOptions;
+    profileCurrent: number;
+    profiles: Profile[];
+    version: number;
 };
 
 export type GlobalOptions = {
@@ -67,8 +67,8 @@ export type GlobalDatabaseOptions = {
 };
 
 export type Profile = {
-    name: string;
     conditionGroups: ProfileConditionGroup[];
+    name: string;
     options: ProfileOptions;
 };
 
@@ -76,94 +76,94 @@ export type ProfileConditionGroup = {
     conditions: ProfileCondition[];
 };
 
-export type ProfileConditionType = 'popupLevel' | 'url' | 'modifierKeys' | 'flags';
+export type ProfileConditionType = 'flags' | 'modifierKeys' | 'popupLevel' | 'url';
 
 export type ProfileCondition = {
-    type: ProfileConditionType;
     operator: string;
+    type: ProfileConditionType;
     value: string;
 };
 
 export type ProfileOptions = {
-    general: GeneralOptions;
-    popupWindow: PopupWindowOptions;
-    audio: AudioOptions;
-    scanning: ScanningOptions;
-    translation: TranslationOptions;
-    dictionaries: DictionariesOptions;
-    parsing: ParsingOptions;
-    anki: AnkiOptions;
-    sentenceParsing: SentenceParsingOptions;
-    inputs: InputsOptions;
-    clipboard: ClipboardOptions;
     accessibility: AccessibilityOptions;
+    anki: AnkiOptions;
+    audio: AudioOptions;
+    clipboard: ClipboardOptions;
+    dictionaries: DictionariesOptions;
+    general: GeneralOptions;
+    inputs: InputsOptions;
+    parsing: ParsingOptions;
+    popupWindow: PopupWindowOptions;
+    scanning: ScanningOptions;
+    sentenceParsing: SentenceParsingOptions;
+    translation: TranslationOptions;
 };
 
 export type GeneralOptions = {
-    enable: boolean;
-    language: string;
-    resultOutputMode: ResultOutputMode;
-    debugInfo: boolean;
-    maxResults: number;
-    showAdvanced: boolean;
-    fontFamily: string;
-    fontSize: number;
-    lineHeight: string;
-    popupDisplayMode: PopupDisplayMode;
-    popupWidth: number;
-    popupHeight: number;
-    popupHorizontalOffset: number;
-    popupVerticalOffset: number;
-    popupHorizontalOffset2: number;
-    popupVerticalOffset2: number;
-    popupHorizontalTextPosition: PopupHorizontalTextPosition;
-    popupVerticalTextPosition: PopupVerticalTextPosition;
-    popupScalingFactor: number;
-    popupScaleRelativeToPageZoom: boolean;
-    popupScaleRelativeToVisualViewport: boolean;
-    showGuide: boolean;
-    enableContextMenuScanSelected: boolean;
     compactTags: boolean;
-    glossaryLayoutMode: GlossaryLayoutMode;
-    mainDictionary: string;
-    popupTheme: PopupTheme;
-    popupOuterTheme: PopupOuterTheme;
     customPopupCss: string;
     customPopupOuterCss: string;
+    debugInfo: boolean;
+    enable: boolean;
+    enableContextMenuScanSelected: boolean;
     enableWanakana: boolean;
-    showPitchAccentDownstepNotation: boolean;
-    showPitchAccentPositionNotation: boolean;
-    showPitchAccentGraph: boolean;
-    showIframePopupsInRootFrame: boolean;
-    useSecurePopupFrameUrl: boolean;
-    usePopupShadowDom: boolean;
-    usePopupWindow: boolean;
-    popupCurrentIndicatorMode: PopupCurrentIndicatorMode;
-    popupActionBarVisibility: PopupActionBarVisibility;
-    popupActionBarLocation: PopupActionBarLocation;
+    fontFamily: string;
+    fontSize: number;
     frequencyDisplayMode: FrequencyDisplayMode;
-    termDisplayMode: TermDisplayMode;
-    sortFrequencyDictionary: string | null;
+    glossaryLayoutMode: GlossaryLayoutMode;
+    language: string;
+    lineHeight: string;
+    mainDictionary: string;
+    maxResults: number;
+    popupActionBarLocation: PopupActionBarLocation;
+    popupActionBarVisibility: PopupActionBarVisibility;
+    popupCurrentIndicatorMode: PopupCurrentIndicatorMode;
+    popupDisplayMode: PopupDisplayMode;
+    popupHeight: number;
+    popupHorizontalOffset: number;
+    popupHorizontalOffset2: number;
+    popupHorizontalTextPosition: PopupHorizontalTextPosition;
+    popupOuterTheme: PopupOuterTheme;
+    popupScaleRelativeToPageZoom: boolean;
+    popupScaleRelativeToVisualViewport: boolean;
+    popupScalingFactor: number;
+    popupTheme: PopupTheme;
+    popupVerticalOffset: number;
+    popupVerticalOffset2: number;
+    popupVerticalTextPosition: PopupVerticalTextPosition;
+    popupWidth: number;
+    resultOutputMode: ResultOutputMode;
+    showAdvanced: boolean;
+    showGuide: boolean;
+    showIframePopupsInRootFrame: boolean;
+    showPitchAccentDownstepNotation: boolean;
+    showPitchAccentGraph: boolean;
+    showPitchAccentPositionNotation: boolean;
+    sortFrequencyDictionary: null | string;
     sortFrequencyDictionaryOrder: SortFrequencyDictionaryOrder;
     stickySearchHeader: boolean;
+    termDisplayMode: TermDisplayMode;
+    usePopupShadowDom: boolean;
+    usePopupWindow: boolean;
+    useSecurePopupFrameUrl: boolean;
 };
 
 export type PopupWindowOptions = {
-    width: number;
     height: number;
     left: number;
     top: number;
     useLeft: boolean;
     useTop: boolean;
-    windowType: PopupWindowType;
+    width: number;
     windowState: PopupWindowState;
+    windowType: PopupWindowType;
 };
 
 export type AudioOptions = {
-    enabled: boolean;
-    volume: number;
     autoPlay: boolean;
+    enabled: boolean;
     sources: AudioSourceOptions[];
+    volume: number;
 };
 
 export type AudioSourceOptions = {
@@ -173,132 +173,132 @@ export type AudioSourceOptions = {
 };
 
 export type ScanningOptions = {
-    inputs: ScanningInput[];
-    preventMiddleMouse: ScanningPreventMiddleMouseOptions;
-    touchInputEnabled: boolean;
-    pointerEventsEnabled: boolean;
-    selectText: boolean;
     alphanumeric: boolean;
     autoHideResults: boolean;
-    delay: number;
-    hideDelay: number;
-    length: number;
     deepDomScan: boolean;
-    popupNestingMaxDepth: number;
-    enablePopupSearch: boolean;
+    delay: number;
     enableOnPopupExpressions: boolean;
     enableOnSearchPage: boolean;
+    enablePopupSearch: boolean;
     enableSearchTags: boolean;
-    layoutAwareScan: boolean;
-    matchTypePrefix: boolean;
+    hideDelay: number;
     hidePopupOnCursorExit: boolean;
     hidePopupOnCursorExitDelay: number;
+    inputs: ScanningInput[];
+    layoutAwareScan: boolean;
+    length: number;
+    matchTypePrefix: boolean;
     normalizeCssZoom: boolean;
+    pointerEventsEnabled: boolean;
+    popupNestingMaxDepth: number;
+    preventMiddleMouse: ScanningPreventMiddleMouseOptions;
     scanAltText: boolean;
-    scanWithoutMousemove: boolean;
     scanResolution: string;
+    scanWithoutMousemove: boolean;
+    selectText: boolean;
+    touchInputEnabled: boolean;
 };
 
 export type ScanningInput = {
-    include: string;
     exclude: string;
-    types: ScanningInputTypes;
+    include: string;
     options: ScanningInputOptions;
+    types: ScanningInputTypes;
 };
 
 export type ScanningInputTypes = {
     mouse: boolean;
-    touch: boolean;
     pen: boolean;
+    touch: boolean;
 };
 
 export type ScanningInputOptions = {
-    showAdvanced: boolean;
-    searchTerms: boolean;
-    searchKanji: boolean;
+    preventPenScrolling: boolean;
+    preventTouchScrolling: boolean;
+    scanOnPenHover: boolean;
+    scanOnPenMove: boolean;
+    scanOnPenPress: boolean;
+    scanOnPenRelease: boolean;
+    scanOnPenReleaseHover: boolean;
     scanOnTouchMove: boolean;
     scanOnTouchPress: boolean;
     scanOnTouchRelease: boolean;
     scanOnTouchTap: boolean;
-    scanOnPenMove: boolean;
-    scanOnPenHover: boolean;
-    scanOnPenReleaseHover: boolean;
-    scanOnPenPress: boolean;
-    scanOnPenRelease: boolean;
-    preventTouchScrolling: boolean;
-    preventPenScrolling: boolean;
+    searchKanji: boolean;
+    searchTerms: boolean;
+    showAdvanced: boolean;
 };
 
 export type ScanningPreventMiddleMouseOptions = {
-    onWebPages: boolean;
     onPopupPages: boolean;
     onSearchPages: boolean;
     onSearchQuery: boolean;
+    onWebPages: boolean;
 };
 
 export type TranslationOptions = {
-    convertHalfWidthCharacters: TranslationConvertType;
-    convertNumericCharacters: TranslationConvertType;
     alphabeticToHiragana: TranslationConvertType;
+    collapseEmphaticSequences: TranslationCollapseEmphaticSequences;
+    convertHalfWidthCharacters: TranslationConvertType;
     convertHiraganaToKatakana: TranslationConvertType;
     convertKatakanaToHiragana: TranslationConvertType;
-    collapseEmphaticSequences: TranslationCollapseEmphaticSequences;
-    textReplacements: TranslationTextReplacementOptions;
+    convertNumericCharacters: TranslationConvertType;
     searchResolution: SearchResolution;
+    textReplacements: TranslationTextReplacementOptions;
 };
 
 export type SearchResolution = 'letter' | 'word';
 
 export type TranslationTextReplacementOptions = {
-    searchOriginal: boolean;
     groups: TranslationTextReplacementGroup[][];
+    searchOriginal: boolean;
 };
 
 export type TranslationTextReplacementGroup = {
-    pattern: string;
     ignoreCase: boolean;
+    pattern: string;
     replacement: string;
 };
 
 export type DictionariesOptions = DictionaryOptions[];
 
 export type DictionaryOptions = {
-    name: string;
     alias: string;
-    priority: number;
-    enabled: boolean;
     allowSecondarySearches: boolean;
     definitionsCollapsible: DictionaryDefinitionsCollapsible;
+    enabled: boolean;
+    name: string;
     partsOfSpeechFilter: boolean;
-    useDeinflections: boolean;
+    priority: number;
     styles?: string;
+    useDeinflections: boolean;
 };
 
 export type ParsingOptions = {
-    enableScanningParser: boolean;
     enableMecabParser: boolean;
-    selectedParser: string | null;
-    termSpacing: boolean;
+    enableScanningParser: boolean;
     readingMode: ParsingReadingMode;
+    selectedParser: null | string;
+    termSpacing: boolean;
 };
 
 export type AnkiOptions = {
-    enable: boolean;
-    server: string;
-    tags: string[];
-    screenshot: AnkiScreenshotOptions;
-    terms: AnkiNoteOptions;
-    kanji: AnkiNoteOptions;
+    apiKey: string;
+    checkForDuplicates: boolean;
+    displayTags: AnkiDisplayTags;
+    downloadTimeout: number;
+    duplicateBehavior: AnkiDuplicateBehavior;
     duplicateScope: AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
-    duplicateBehavior: AnkiDuplicateBehavior;
-    checkForDuplicates: boolean;
-    fieldTemplates: string | null;
-    suspendNewCards: boolean;
-    displayTags: AnkiDisplayTags;
+    enable: boolean;
+    fieldTemplates: null | string;
+    kanji: AnkiNoteOptions;
     noteGuiMode: AnkiNoteGuiMode;
-    apiKey: string;
-    downloadTimeout: number;
+    screenshot: AnkiScreenshotOptions;
+    server: string;
+    suspendNewCards: boolean;
+    tags: string[];
+    terms: AnkiNoteOptions;
 };
 
 export type AnkiScreenshotOptions = {
@@ -308,8 +308,8 @@ export type AnkiScreenshotOptions = {
 
 export type AnkiNoteOptions = {
     deck: string;
-    model: string;
     fields: AnkiNoteFields;
+    model: string;
 };
 
 export type AnkiNoteFields = {
@@ -323,11 +323,11 @@ export type SentenceParsingOptions = {
 };
 
 export type SentenceParsingTerminationCharacterOption = {
-    enabled: boolean;
     character1: string;
-    character2: string | null;
-    includeCharacterAtStart: boolean;
+    character2: null | string;
+    enabled: boolean;
     includeCharacterAtEnd: boolean;
+    includeCharacterAtStart: boolean;
 };
 
 export type InputsOptions = {
@@ -337,16 +337,16 @@ export type InputsOptions = {
 export type InputsHotkeyOptions = {
     action: string;
     argument: string;
-    key: string | null;
+    enabled: boolean;
+    key: null | string;
     modifiers: InputsHotkeyModifier[];
     scopes: InputsHotkeyScope[];
-    enabled: boolean;
 };
 
 export type ClipboardOptions = {
+    autoSearchContent: boolean;
     enableBackgroundMonitor: boolean;
     enableSearchPageMonitor: boolean;
-    autoSearchContent: boolean;
     maximumSearchLength: number;
 };
 
@@ -355,33 +355,33 @@ export type AccessibilityOptions = {
 };
 
 export type PreventMiddleMouseOptions = {
-    onWebPages: boolean;
     onPopupPages: boolean;
     onSearchPages: boolean;
     onSearchQuery: boolean;
+    onWebPages: boolean;
 };
 
 export type ResultOutputMode = 'group' | 'merge' | 'split';
 
 export type PopupDisplayMode = 'default' | 'full-width';
 
-export type PopupHorizontalTextPosition = 'below' | 'above';
+export type PopupHorizontalTextPosition = 'above' | 'below';
 
-export type PopupVerticalTextPosition = 'default' | 'before' | 'after' | 'left' | 'right';
+export type PopupVerticalTextPosition = 'after' | 'before' | 'default' | 'left' | 'right';
 
-export type GlossaryLayoutMode = 'default' | 'compact';
+export type GlossaryLayoutMode = 'compact' | 'default';
 
-export type PopupTheme = 'light' | 'dark' | 'browser';
+export type PopupTheme = 'browser' | 'dark' | 'light';
 
-export type PopupOuterTheme = 'light' | 'dark' | 'browser' | 'site';
+export type PopupOuterTheme = 'browser' | 'dark' | 'light' | 'site';
 
-export type PopupCurrentIndicatorMode = 'none' | 'asterisk' | 'triangle' | 'bar-left' | 'bar-right' | 'dot-left' | 'dot-right';
+export type PopupCurrentIndicatorMode = 'asterisk' | 'bar-left' | 'bar-right' | 'dot-left' | 'dot-right' | 'none' | 'triangle';
 
-export type PopupActionBarVisibility = 'auto' | 'always';
+export type PopupActionBarVisibility = 'always' | 'auto';
 
-export type PopupActionBarLocation = 'left' | 'right' | 'top' | 'bottom';
+export type PopupActionBarLocation = 'bottom' | 'left' | 'right' | 'top';
 
-export type FrequencyDisplayMode = 'tags' | 'tags-grouped' | 'split-tags' | 'split-tags-grouped' | 'inline-list' | 'list';
+export type FrequencyDisplayMode = 'inline-list' | 'list' | 'split-tags' | 'split-tags-grouped' | 'tags' | 'tags-grouped';
 
 export type TermDisplayMode = 'ruby' | 'ruby-and-reading' | 'term-and-reading' | 'term-only';
 
@@ -389,30 +389,30 @@ export type SortFrequencyDictionaryOrder = 'ascending' | 'descending';
 
 export type PopupWindowType = 'normal' | 'popup';
 
-export type PopupWindowState = 'normal' | 'maximized' | 'fullscreen';
+export type PopupWindowState = 'fullscreen' | 'maximized' | 'normal';
 
-export type AudioSourceType = 'jpod101' | 'language-pod-101' | 'jisho' | 'lingua-libre' | 'wiktionary' | 'text-to-speech' | 'text-to-speech-reading' | 'custom' | 'custom-json';
+export type AudioSourceType = 'custom' | 'custom-json' | 'jisho' | 'jpod101' | 'language-pod-101' | 'lingua-libre' | 'text-to-speech' | 'text-to-speech-reading' | 'wiktionary';
 
 export type TranslationConvertType = 'false' | 'true' | 'variant';
 
-export type TranslationCollapseEmphaticSequences = 'false' | 'true' | 'full';
+export type TranslationCollapseEmphaticSequences = 'false' | 'full' | 'true';
 
-export type DictionaryDefinitionsCollapsible = 'not-collapsible' | 'expanded' | 'collapsed' | 'force-collapsed' | 'force-expanded';
+export type DictionaryDefinitionsCollapsible = 'collapsed' | 'expanded' | 'force-collapsed' | 'force-expanded' | 'not-collapsible';
 
-export type ParsingReadingMode = 'hiragana' | 'katakana' | 'romaji' | 'dictionary-reading' | 'none';
+export type ParsingReadingMode = 'dictionary-reading' | 'hiragana' | 'katakana' | 'none' | 'romaji';
 
-export type AnkiScreenshotFormat = 'png' | 'jpeg';
+export type AnkiScreenshotFormat = 'jpeg' | 'png';
 
 export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
 
-export type AnkiDuplicateBehavior = 'prevent' | 'overwrite' | 'new';
+export type AnkiDuplicateBehavior = 'new' | 'overwrite' | 'prevent';
 
-export type AnkiDisplayTags = 'never' | 'always' | 'non-standard';
+export type AnkiDisplayTags = 'always' | 'never' | 'non-standard';
 
 export type AnkiNoteGuiMode = 'browse' | 'edit';
 
 export type SentenceTerminationCharacterMode = 'custom' | 'custom-no-newlines' | 'newlines' | 'none';
 
-export type InputsHotkeyModifier = 'alt' | 'ctrl' | 'shift' | 'meta';
+export type InputsHotkeyModifier = 'alt' | 'ctrl' | 'meta' | 'shift';
 
 export type InputsHotkeyScope = 'popup' | 'search' | 'web';

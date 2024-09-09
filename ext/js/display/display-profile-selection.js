@@ -129,10 +129,10 @@ export class DisplayProfileSelection {
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',
-            path: 'profileCurrent',
-            value: index,
-            scope: 'global',
             optionsContext: null,
+            path: 'profileCurrent',
+            scope: 'global',
+            value: index,
         };
         await this._display.application.api.modifySettings([modification], this._source);
         this._setProfilePanelVisible(false);

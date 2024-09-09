@@ -134,7 +134,7 @@ export class CacheMap {
      * @returns {import('cache-map').Node<K, V>}
      */
     _createNode(key, value) {
-        return {key, value, previous: null, next: null};
+        return {key, next: null, previous: null, value};
     }
 
     /**

@@ -25,12 +25,6 @@ import type {
 import type {OptionsContext} from './settings';
 
 export type ApiSurface = {
-    setText: {
-        params: {
-            text: string;
-        };
-        return: void;
-    };
     setCustomCss: {
         params: {
             css: string;
@@ -43,15 +37,21 @@ export type ApiSurface = {
         };
         return: void;
     };
-    updateOptionsContext: {
-        params: {
-            optionsContext: OptionsContext;
-        };
-        return: void;
-    };
     setLanguageExampleText: {
         params: {
             language: string;
+        };
+        return: void;
+    };
+    setText: {
+        params: {
+            text: string;
+        };
+        return: void;
+    };
+    updateOptionsContext: {
+        params: {
+            optionsContext: OptionsContext;
         };
         return: void;
     };

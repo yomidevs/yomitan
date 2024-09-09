@@ -30,14 +30,14 @@ const rootDir = join(dirname(fileURLToPath(import.meta.url)), '..');
  */
 async function getDependencies(scriptPaths) {
     const v = await esbuild.build({
-        entryPoints: scriptPaths,
         bundle: true,
+        entryPoints: scriptPaths,
+        format: 'esm',
+        metafile: true,
         minify: false,
         sourcemap: true,
         target: 'es2022',
-        format: 'esm',
         write: false,
-        metafile: true,
     });
     const dependencies = Object.keys(v.metafile.inputs);
     const stringComparer = new Intl.Collator('en-US'); // Invariant locale
@@ -88,36 +88,36 @@ function filesMatch(files1, files2) {
 
 const targets = [
     {
-        name: 'sandbox',
-        paths: [
-            'ext/js/templates/template-renderer-frame-main.js',
-        ],
         /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
             webextensions: false,
         },
+        name: 'sandbox',
+        paths: [
+            'ext/js/templates/template-renderer-frame-main.js',
+        ],
     },
     {
-        name: 'worker',
-        paths: [
-            'ext/js/dictionary/dictionary-worker-main.js',
-        ],
         /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
             browser: false,
             worker: true,
         },
+        name: 'worker',
+        paths: [
+            'ext/js/dictionary/dictionary-worker-main.js',
+        ],
     },
     {
-        name: 'serviceworker',
-        paths: [
-            'ext/js/background/background-main.js',
-        ],
         /** @type {import('test/eslint-config').MinimalEslintConfigEnv} */
         env: {
             browser: false,
             serviceworker: true,
         },
+        name: 'serviceworker',
+        paths: [
+            'ext/js/background/background-main.js',
+        ],
     },
 ];
 
@@ -125,7 +125,7 @@ describe('Eslint configuration', () => {
     const eslintConfigPath = '.eslintrc.json';
     /** @type {import('test/eslint-config').MinimalEslintConfig} */
     const eslintConfig = parseJson(readFileSync(join(rootDir, eslintConfigPath), 'utf8'));
-    describe.each(targets)('Environment is $name', ({name, paths, env}) => {
+    describe.each(targets)('Environment is $name', ({env, name, paths}) => {
         test('Entry exists', async ({expect}) => {
             const fullPaths = paths.map((v) => join(rootDir, v));
             const dependencies = removeLibraryDependencies(await getDependencies(fullPaths));

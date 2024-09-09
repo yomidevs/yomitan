@@ -33,10 +33,10 @@ export class DictionaryImporterMediaLoader {
                 eventListeners.removeAllEventListeners();
             };
             eventListeners.addEventListener(image, 'load', () => {
-                const {naturalWidth: width, naturalHeight: height} = image;
+                const {naturalHeight: height, naturalWidth: width} = image;
                 if (Array.isArray(transfer)) { transfer.push(content); }
                 cleanup();
-                resolve({content, width, height});
+                resolve({content, height, width});
             }, false);
             eventListeners.addEventListener(image, 'error', () => {
                 cleanup();

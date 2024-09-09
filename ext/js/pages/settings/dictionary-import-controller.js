@@ -140,10 +140,10 @@ export class DictionaryImportController {
     async _renderRecommendedDictionaries() {
         const url = '../../data/recommended-dictionaries.json';
         const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors',
             cache: 'default',
             credentials: 'omit',
+            method: 'GET',
+            mode: 'no-cors',
             redirect: 'follow',
             referrerPolicy: 'no-referrer',
         });
@@ -153,11 +153,11 @@ export class DictionaryImportController {
 
         /** @type {import('dictionary-recommended.js').RecommendedDictionaryElementMap[]} */
         const recommendedDictionaryCategories = [
-            {property: 'terms', element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-term-dictionaries'), '.recommended-dictionary-list')},
-            {property: 'kanji', element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-kanji-dictionaries'), '.recommended-dictionary-list')},
-            {property: 'frequency', element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-frequency-dictionaries'), '.recommended-dictionary-list')},
-            {property: 'grammar', element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-grammar-dictionaries'), '.recommended-dictionary-list')},
-            {property: 'pronunciation', element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-pronunciation-dictionaries'), '.recommended-dictionary-list')},
+            {element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-term-dictionaries'), '.recommended-dictionary-list'), property: 'terms'},
+            {element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-kanji-dictionaries'), '.recommended-dictionary-list'), property: 'kanji'},
+            {element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-frequency-dictionaries'), '.recommended-dictionary-list'), property: 'frequency'},
+            {element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-grammar-dictionaries'), '.recommended-dictionary-list'), property: 'grammar'},
+            {element: querySelectorNotNull(querySelectorNotNull(document, '#recommended-pronunciation-dictionaries'), '.recommended-dictionary-list'), property: 'pronunciation'},
         ];
 
         const language = (await this._settingsController.getOptions()).general.language;
@@ -186,7 +186,7 @@ export class DictionaryImportController {
             }
         }
 
-        for (const {property, element} of recommendedDictionaryCategories) {
+        for (const {element, property} of recommendedDictionaryCategories) {
             this._renderRecommendedDictionaryGroup(recommendedDictionaries[language][property], element, installedDictionaryNames, installedDictionaryDownloadUrls);
         }
 
@@ -440,7 +440,7 @@ export class DictionaryImportController {
      */
     async *_generateFilesFromUrls(urls, onProgress) {
         for (const url of urls) {
-            onProgress({nextStep: true, index: 0, count: 0});
+            onProgress({count: 0, index: 0, nextStep: true});
 
             try {
                 const xhr = new XMLHttpRequest();
@@ -449,7 +449,7 @@ export class DictionaryImportController {
 
                 xhr.onprogress = (event) => {
                     if (event.lengthComputable) {
-                        onProgress({nextStep: false, index: event.loaded, count: event.total});
+                        onProgress({count: event.total, index: event.loaded, nextStep: false});
                     }
                 };
 
@@ -570,14 +570,14 @@ export class DictionaryImportController {
      */
     _getFileImportSteps() {
         return [
-            {label: '', callback: this._triggerStorageChanged.bind(this)}, // Dictionary import is uninitialized
+            {callback: this._triggerStorageChanged.bind(this), label: ''}, // Dictionary import is uninitialized
             {label: 'Initializing import'}, // Dictionary import is uninitialized
             {label: 'Loading dictionary'}, // Load dictionary archive and validate index
             {label: 'Loading schemas'}, // Load schemas and get archive files
             {label: 'Validating data'}, // Load and validate dictionary data
             {label: 'Formatting data'}, // Format dictionary data and extended data support
             {label: 'Importing media'}, // Resolve async requirements and import media
-            {label: 'Importing data', callback: this._triggerStorageChanged.bind(this)}, // Add dictionary descriptor and import data
+            {callback: this._triggerStorageChanged.bind(this), label: 'Importing data'}, // Add dictionary descriptor and import data
         ];
     }
 
@@ -610,7 +610,7 @@ export class DictionaryImportController {
      */
     async _importDictionaryFromZip(file, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
-        const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
+        const {errors, result} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
         if (!result) {
             return errors;
         }
@@ -632,7 +632,7 @@ export class DictionaryImportController {
      * @returns {Promise<Error[]>}
      */
     async _addDictionarySettings(summary) {
-        const {title, sequenced, styles} = summary;
+        const {sequenced, styles, title} = summary;
         let optionsFull;
         // Workaround Firefox bug sometimes causing getOptionsFull to fail
         for (let i = 0, success = false; (i < 10) && (success === false); i++) {
@@ -654,7 +654,7 @@ export class DictionaryImportController {
             const enabled = profileIndex === i;
             const value = DictionaryController.createDefaultDictionarySettings(title, enabled, styles);
             const path1 = `profiles[${i}].options.dictionaries`;
-            targets.push({action: 'push', path: path1, items: [value]});
+            targets.push({action: 'push', items: [value], path: path1});
 
             if (sequenced && options.general.mainDictionary === '') {
                 const path2 = `profiles[${i}].options.general.mainDictionary`;
@@ -822,7 +822,7 @@ export class ImportProgressTracker {
         /** @type {NodeListOf<HTMLElement>} */
         this._statusLabels = (document.querySelectorAll(`${progressSelector} .progress-status`));
 
-        this.onProgress({nextStep: false, index: 0, count: 0});
+        this.onProgress({count: 0, index: 0, nextStep: false});
     }
 
     /** @type {string} */
@@ -847,7 +847,7 @@ export class ImportProgressTracker {
 
     /** @type {import('dictionary-worker').ImportProgressCallback} */
     onProgress(data) {
-        const {nextStep, index, count} = data;
+        const {count, index, nextStep} = data;
         if (nextStep) {
             this._stepIndex++;
         }
@@ -873,9 +873,9 @@ export class ImportProgressTracker {
         this._dictionaryIndex += 1;
         this._stepIndex = 0;
         this.onProgress({
-            nextStep: true,
-            index: 0,
             count: 0,
+            index: 0,
+            nextStep: true,
         });
     }
 }

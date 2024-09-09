@@ -48,7 +48,7 @@ export class HotkeyHelpController {
         const hotkeys = options.inputs.hotkeys;
         const hotkeyMap = this._localActionHotkeys;
         hotkeyMap.clear();
-        for (const {enabled, action, key, modifiers} of hotkeys) {
+        for (const {action, enabled, key, modifiers} of hotkeys) {
             if (!enabled || key === null || action === '' || hotkeyMap.has(action)) { continue; }
             hotkeyMap.set(action, this._hotkeyUtil.getInputDisplayValue(key, modifiers));
         }
@@ -62,7 +62,7 @@ export class HotkeyHelpController {
         for (const node2 of /** @type {NodeListOf<HTMLElement>} */ (node.querySelectorAll('[data-hotkey]'))) {
             const info = this._getNodeInfo(node2);
             if (info === null) { continue; }
-            const {action, global, attributes, values, defaultAttributeValues} = info;
+            const {action, attributes, defaultAttributeValues, global, values} = info;
             const multipleValues = Array.isArray(values);
             const hotkey = (global ? this._globalActionHotkeys : this._localActionHotkeys).get(action);
             for (let i = 0, ii = attributes.length; i < ii; ++i) {
@@ -177,10 +177,10 @@ export class HotkeyHelpController {
         const global = action.startsWith(globalPrexix);
         return {
             action: global ? action.substring(globalPrexix.length) : action,
-            global,
             attributes: attributesArray,
-            values,
             defaultAttributeValues,
+            global,
+            values,
         };
     }
 

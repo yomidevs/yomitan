@@ -185,7 +185,7 @@ export class FrameAncestryHandler {
      */
     async _onRequestFrameInfo(params, source) {
         try {
-            let {originFrameId, childFrameId, uniqueId, nonce} = params;
+            let {childFrameId, nonce, originFrameId, uniqueId} = params;
             if (
                 typeof originFrameId !== 'number' ||
                 typeof childFrameId !== 'number' ||
@@ -203,7 +203,7 @@ export class FrameAncestryHandler {
             const more = (window !== parent);
 
             try {
-                const response = await this._crossFrameApi.invoke(originFrameId, 'frameAncestryHandlerRequestFrameInfoResponse', {uniqueId, frameId, nonce, more});
+                const response = await this._crossFrameApi.invoke(originFrameId, 'frameAncestryHandlerRequestFrameInfoResponse', {frameId, more, nonce, uniqueId});
                 if (response === null) { return; }
                 const nonce2 = response.nonce;
                 if (typeof nonce2 !== 'string') { return; }
@@ -213,7 +213,7 @@ export class FrameAncestryHandler {
             }
 
             if (!this._childFrameMap.has(childFrameId)) {
-                this._childFrameMap.set(childFrameId, {window: source, frameElement: void 0});
+                this._childFrameMap.set(childFrameId, {frameElement: void 0, window: source});
             }
 
             if (more) {
@@ -234,7 +234,7 @@ export class FrameAncestryHandler {
     _requestFrameInfo(targetWindow, originFrameId, childFrameId, uniqueId, nonce) {
         targetWindow.postMessage({
             action: this._requestMessageId,
-            params: {originFrameId, childFrameId, uniqueId, nonce},
+            params: {childFrameId, nonce, originFrameId, uniqueId},
         }, '*');
     }
 

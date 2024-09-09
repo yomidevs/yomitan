@@ -24,7 +24,7 @@ export type Events = {
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
 export type VoiceInfo = {
-    voice: SpeechSynthesisVoice;
-    isJapanese: boolean;
     index: number;
+    isJapanese: boolean;
+    voice: SpeechSynthesisVoice;
 };

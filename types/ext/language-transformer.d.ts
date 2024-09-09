@@ -16,8 +16,8 @@
  */
 
 export type LanguageTransformDescriptor<TCondition extends string = string> = {
-    language: string;
     conditions: ConditionMapObject<TCondition>;
+    language: string;
     transforms: TransformMapObject<TCondition>;
 };
 
@@ -34,9 +34,9 @@ export type ConditionMapEntry = [type: string, condition: Condition];
 export type ConditionMapEntries = ConditionMapEntry[];
 
 export type Condition = {
-    name: string;
-    isDictionaryForm: boolean;
     i18n?: RuleI18n[];
+    isDictionaryForm: boolean;
+    name: string;
     subConditions?: string[];
 };
 
@@ -46,33 +46,33 @@ export type RuleI18n = {
 };
 
 export type Transform<TCondition> = {
-    name: string;
     description?: string;
     i18n?: TransformI18n[];
+    name: string;
     rules: Rule<TCondition>[];
 };
 
 export type TransformI18n = {
+    description?: string;
     language: string;
     name: string;
-    description?: string;
 };
 
 export type DeinflectFunction = (inflectedWord: string) => string;
 
 export type Rule<TCondition = string> = {
-    type: 'suffix' | 'prefix' | 'wholeWord' | 'other';
-    isInflected: RegExp;
-    deinflect: DeinflectFunction;
     conditionsIn: TCondition[];
     conditionsOut: TCondition[];
+    deinflect: DeinflectFunction;
+    isInflected: RegExp;
+    type: 'other' | 'prefix' | 'suffix' | 'wholeWord';
 };
 
 export type SuffixRule<TCondition = string> = {
-    type: 'suffix';
-    isInflected: RegExp;
-    deinflected: string;
-    deinflect: DeinflectFunction;
     conditionsIn: TCondition[];
     conditionsOut: TCondition[];
+    deinflect: DeinflectFunction;
+    deinflected: string;
+    isInflected: RegExp;
+    type: 'suffix';
 };

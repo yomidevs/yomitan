@@ -27,12 +27,12 @@
 export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsIn, conditionsOut) {
     const suffixRegExp = new RegExp(inflectedSuffix + '$');
     return {
-        type: 'suffix',
-        isInflected: suffixRegExp,
-        deinflected: deinflectedSuffix,
-        deinflect: (text) => text.slice(0, -inflectedSuffix.length) + deinflectedSuffix,
         conditionsIn,
         conditionsOut,
+        deinflect: (text) => text.slice(0, -inflectedSuffix.length) + deinflectedSuffix,
+        deinflected: deinflectedSuffix,
+        isInflected: suffixRegExp,
+        type: 'suffix',
     };
 }
 
@@ -47,11 +47,11 @@ export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsI
 export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsIn, conditionsOut) {
     const prefixRegExp = new RegExp('^' + inflectedPrefix);
     return {
-        type: 'prefix',
-        isInflected: prefixRegExp,
-        deinflect: (text) => deinflectedPrefix + text.slice(inflectedPrefix.length),
         conditionsIn,
         conditionsOut,
+        deinflect: (text) => deinflectedPrefix + text.slice(inflectedPrefix.length),
+        isInflected: prefixRegExp,
+        type: 'prefix',
     };
 }
 
@@ -66,10 +66,10 @@ export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsI
 export function wholeWordInflection(inflectedWord, deinflectedWord, conditionsIn, conditionsOut) {
     const regex = new RegExp('^' + inflectedWord + '$');
     return {
-        type: 'wholeWord',
-        isInflected: regex,
-        deinflect: () => deinflectedWord,
         conditionsIn,
         conditionsOut,
+        deinflect: () => deinflectedWord,
+        isInflected: regex,
+        type: 'wholeWord',
     };
 }

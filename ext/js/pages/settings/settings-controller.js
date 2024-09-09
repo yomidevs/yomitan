@@ -81,7 +81,7 @@ export class SettingsController extends EventDispatcher {
             chrome.permissions.onRemoved.addListener(this._onPermissionsChanged.bind(this));
         }
         const optionsFull = await this.getOptionsFull();
-        const {profiles, profileCurrent} = optionsFull;
+        const {profileCurrent, profiles} = optionsFull;
         if (profileCurrent >= 0 && profileCurrent < profiles.length) {
             this._profileIndex = profileCurrent;
         }
@@ -129,7 +129,7 @@ export class SettingsController extends EventDispatcher {
      * @returns {Promise<import('settings-controller').ModifyResult[]>}
      */
     async getGlobalSettings(targets) {
-        return await this._getSettings(targets, {scope: 'global', optionsContext: null});
+        return await this._getSettings(targets, {optionsContext: null, scope: 'global'});
     }
 
     /**
@@ -137,7 +137,7 @@ export class SettingsController extends EventDispatcher {
      * @returns {Promise<import('settings-controller').ModifyResult[]>}
      */
     async getProfileSettings(targets) {
-        return await this._getSettings(targets, {scope: 'profile', optionsContext: null});
+        return await this._getSettings(targets, {optionsContext: null, scope: 'profile'});
     }
 
     /**
@@ -153,7 +153,7 @@ export class SettingsController extends EventDispatcher {
      * @returns {Promise<import('settings-controller').ModifyResult[]>}
      */
     async modifyGlobalSettings(targets) {
-        return await this._modifySettings(targets, {scope: 'global', optionsContext: null});
+        return await this._modifySettings(targets, {optionsContext: null, scope: 'global'});
     }
 
     /**
@@ -161,7 +161,7 @@ export class SettingsController extends EventDispatcher {
      * @returns {Promise<import('settings-controller').ModifyResult[]>}
      */
     async modifyProfileSettings(targets) {
-        return await this._modifySettings(targets, {scope: 'profile', optionsContext: null});
+        return await this._modifySettings(targets, {optionsContext: null, scope: 'profile'});
     }
 
     /**

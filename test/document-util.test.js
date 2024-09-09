@@ -113,7 +113,7 @@ function findImposterElement(document) {
 const documentUtilTestEnv = await setupDomTest(path.join(dirname, 'data/html/document-util.html'));
 
 describe('Document utility tests', () => {
-    const {window, teardown} = documentUtilTestEnv;
+    const {teardown, window} = documentUtilTestEnv;
     afterAll(() => teardown(global));
 
     describe('DocumentUtil', () => {
@@ -125,16 +125,16 @@ describe('Document utility tests', () => {
                     // Get test parameters
                     /** @type {import('test/document-util').DocumentUtilTestData} */
                     const {
-                        elementFromPointSelector,
                         caretRangeFromPointSelector,
-                        startNodeSelector,
-                        startOffset,
+                        elementFromPointSelector,
                         endNodeSelector,
                         endOffset,
-                        resultType,
-                        sentenceScanExtent,
-                        sentence,
                         hasImposter,
+                        resultType,
+                        sentence,
+                        sentenceScanExtent,
+                        startNodeSelector,
+                        startOffset,
                         terminateAtNewlines,
                     } = parseJson(/** @type {string} */ (testElement.dataset.testData));
 
@@ -186,18 +186,18 @@ describe('Document utility tests', () => {
                     const textSourceGenerator = new TextSourceGenerator();
                     const source = textSourceGenerator.getRangeFromPoint(0, 0, {
                         deepContentScan: false,
-                        normalizeCssZoom: true,
                         language: null,
+                        normalizeCssZoom: true,
                     });
                     switch (resultType) {
-                        case 'TextSourceRange':
-                            expect(getPrototypeOfOrNull(source)).toStrictEqual(TextSourceRange.prototype);
+                        case 'null':
+                            expect(source).toStrictEqual(null);
                             break;
                         case 'TextSourceElement':
                             expect(getPrototypeOfOrNull(source)).toStrictEqual(TextSourceElement.prototype);
                             break;
-                        case 'null':
-                            expect(source).toStrictEqual(null);
+                        case 'TextSourceRange':
+                            expect(getPrototypeOfOrNull(source)).toStrictEqual(TextSourceRange.prototype);
                             break;
                         default:
                             expect.unreachable();
@@ -250,15 +250,15 @@ describe('Document utility tests', () => {
                     // Get test parameters
                     /** @type {import('test/document-util').DOMTextScannerTestData} */
                     const {
-                        seekNodeSelector,
-                        seekNodeIsText,
-                        seekOffset,
-                        seekLength,
-                        seekDirection,
-                        expectedResultNodeSelector,
-                        expectedResultNodeIsText,
-                        expectedResultOffset,
                         expectedResultContent,
+                        expectedResultNodeIsText,
+                        expectedResultNodeSelector,
+                        expectedResultOffset,
+                        seekDirection,
+                        seekLength,
+                        seekNodeIsText,
+                        seekNodeSelector,
+                        seekOffset,
                     } = parseJson(/** @type {string} */ (testElement.dataset.testData));
 
                     /** @type {?Node} */
@@ -275,7 +275,7 @@ describe('Document utility tests', () => {
                         expectedResultNode = expectedResultNode.firstChild;
                     }
 
-                    const {node, offset, content} = (
+                    const {content, node, offset} = (
                 seekDirection === 'forward' ?
                 new DOMTextScanner(/** @type {Node} */ (seekNode), seekOffset, true, false).seek(seekLength) :
                 new DOMTextScanner(/** @type {Node} */ (seekNode), seekOffset, true, false).seek(-seekLength)

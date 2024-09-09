@@ -44,11 +44,11 @@ export class ExtensionError extends Error {
     static serialize(error) {
         try {
             if (typeof error === 'object' && error !== null) {
-                const {name, message, stack} = /** @type {import('core').SerializableObject} */ (error);
+                const {message, name, stack} = /** @type {import('core').SerializableObject} */ (error);
                 /** @type {import('core').SerializedError1} */
                 const result = {
-                    name: typeof name === 'string' ? name : '',
                     message: typeof message === 'string' ? message : '',
+                    name: typeof name === 'string' ? name : '',
                     stack: typeof stack === 'string' ? stack : '',
                 };
                 if (error instanceof ExtensionError) {
@@ -60,8 +60,8 @@ export class ExtensionError extends Error {
             // NOP
         }
         return /** @type {import('core').SerializedError2} */ ({
-            value: error,
             hasValue: true,
+            value: error,
         });
     }
 
@@ -75,7 +75,7 @@ export class ExtensionError extends Error {
             const {value} = serializedError;
             return new ExtensionError(`Error of type ${typeof value}: ${value}`);
         }
-        const {message, name, stack, data} = serializedError;
+        const {data, message, name, stack} = serializedError;
         const error = new ExtensionError(message);
         error.name = name;
         error.stack = stack;

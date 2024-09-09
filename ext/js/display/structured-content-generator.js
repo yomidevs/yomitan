@@ -58,23 +58,23 @@ export class StructuredContentGenerator {
      */
     createDefinitionImage(data, dictionary) {
         const {
-            path,
-            width = 100,
-            height = 100,
-            preferredWidth,
-            preferredHeight,
-            title,
             alt,
-            pixelated,
-            imageRendering,
             appearance,
             background,
-            collapsed,
-            collapsible,
-            verticalAlign,
             border,
             borderRadius,
+            collapsed,
+            collapsible,
+            height = 100,
+            imageRendering,
+            path,
+            pixelated,
+            preferredHeight,
+            preferredWidth,
             sizeUnits,
+            title,
+            verticalAlign,
+            width = 100,
         } = data;
 
         const hasPreferredWidth = (typeof preferredWidth === 'number');
@@ -254,34 +254,34 @@ export class StructuredContentGenerator {
     _createStructuredContentGenericElement(content, dictionary, language) {
         const {tag} = content;
         switch (tag) {
+            case 'a':
+                return this._createLinkElement(content, dictionary, language);
             case 'br':
                 return this._createStructuredContentElement(tag, content, dictionary, language, 'simple', false, false);
-            case 'ruby':
-            case 'rt':
-            case 'rp':
-                return this._createStructuredContentElement(tag, content, dictionary, language, 'simple', true, false);
-            case 'table':
-                return this._createStructuredContentTableElement(tag, content, dictionary, language);
-            case 'thead':
-            case 'tbody':
-            case 'tfoot':
-            case 'tr':
-                return this._createStructuredContentElement(tag, content, dictionary, language, 'table', true, false);
-            case 'th':
-            case 'td':
-                return this._createStructuredContentElement(tag, content, dictionary, language, 'table-cell', true, true);
-            case 'div':
-            case 'span':
-            case 'ol':
-            case 'ul':
-            case 'li':
             case 'details':
+            case 'div':
+            case 'li':
+            case 'ol':
+            case 'span':
             case 'summary':
+            case 'ul':
                 return this._createStructuredContentElement(tag, content, dictionary, language, 'simple', true, true);
             case 'img':
                 return this.createDefinitionImage(content, dictionary);
-            case 'a':
-                return this._createLinkElement(content, dictionary, language);
+            case 'rp':
+            case 'rt':
+            case 'ruby':
+                return this._createStructuredContentElement(tag, content, dictionary, language, 'simple', true, false);
+            case 'table':
+                return this._createStructuredContentTableElement(tag, content, dictionary, language);
+            case 'tbody':
+            case 'tfoot':
+            case 'thead':
+            case 'tr':
+                return this._createStructuredContentElement(tag, content, dictionary, language, 'table', true, false);
+            case 'td':
+            case 'th':
+                return this._createStructuredContentElement(tag, content, dictionary, language, 'table-cell', true, true);
         }
         return null;
     }
@@ -348,38 +348,38 @@ export class StructuredContentGenerator {
     _setStructuredContentElementStyle(node, contentStyle) {
         const {style} = node;
         const {
-            fontStyle,
-            fontWeight,
-            fontSize,
-            color,
             background,
             backgroundColor,
-            textDecorationLine,
-            textDecorationStyle,
-            textDecorationColor,
             borderColor,
-            borderStyle,
             borderRadius,
+            borderStyle,
             borderWidth,
             clipPath,
-            verticalAlign,
-            textAlign,
-            textEmphasis,
-            textShadow,
+            color,
+            cursor,
+            fontSize,
+            fontStyle,
+            fontWeight,
+            listStyleType,
             margin,
-            marginTop,
+            marginBottom,
             marginLeft,
             marginRight,
-            marginBottom,
+            marginTop,
             padding,
-            paddingTop,
+            paddingBottom,
             paddingLeft,
             paddingRight,
-            paddingBottom,
-            wordBreak,
+            paddingTop,
+            textAlign,
+            textDecorationColor,
+            textDecorationLine,
+            textDecorationStyle,
+            textEmphasis,
+            textShadow,
+            verticalAlign,
             whiteSpace,
-            cursor,
-            listStyleType,
+            wordBreak,
         } = contentStyle;
         if (typeof fontStyle === 'string') { style.fontStyle = fontStyle; }
         if (typeof fontWeight === 'string') { style.fontWeight = fontWeight; }

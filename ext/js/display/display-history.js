@@ -226,12 +226,12 @@ export class DisplayHistory extends EventDispatcher {
     _createHistoryEntry(id, url, state, content, previous) {
         /** @type {import('display-history').Entry} */
         const entry = {
+            content,
             id: typeof id === 'string' ? id : this._generateId(),
-            url,
             next: null,
             previous,
             state,
-            content,
+            url,
         };
         this._historyMap.set(entry.id, entry);
         return entry;

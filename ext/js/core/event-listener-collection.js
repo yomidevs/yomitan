@@ -45,7 +45,7 @@ export class EventListenerCollection {
      */
     addEventListener(target, type, listener, options) {
         target.addEventListener(type, listener, options);
-        this._eventListeners.push({type: 'removeEventListener', target, eventName: type, listener, options});
+        this._eventListeners.push({eventName: type, listener, options, target, type: 'removeEventListener'});
     }
 
     /**
@@ -58,7 +58,7 @@ export class EventListenerCollection {
      */
     addListener(target, callback, ...args) {
         target.addListener(callback, ...args);
-        this._eventListeners.push({type: 'removeListener', target, callback, args});
+        this._eventListeners.push({args, callback, target, type: 'removeListener'});
     }
 
     /**
@@ -71,7 +71,7 @@ export class EventListenerCollection {
      */
     on(target, eventName, callback) {
         target.on(eventName, callback);
-        this._eventListeners.push({type: 'off', eventName, target, callback});
+        this._eventListeners.push({callback, eventName, target, type: 'off'});
     }
 
     /**

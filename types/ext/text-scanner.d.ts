@@ -29,48 +29,48 @@ export type SearchResultDetail = {
 };
 
 export type Options = {
-    inputs?: InputOptionsOuter[];
     deepContentScan?: boolean;
-    normalizeCssZoom?: boolean;
-    selectText?: boolean;
     delay?: number;
-    touchInputEnabled?: boolean;
-    pointerEventsEnabled?: boolean;
-    scanLength?: number;
+    inputs?: InputOptionsOuter[];
     layoutAwareScan?: boolean;
-    preventMiddleMouse?: boolean;
     matchTypePrefix?: boolean;
-    sentenceParsingOptions?: SentenceParsingOptions;
+    normalizeCssZoom?: boolean;
+    pointerEventsEnabled?: boolean;
+    preventMiddleMouse?: boolean;
     scanAltText?: boolean;
-    scanWithoutMousemove?: boolean;
+    scanLength?: number;
     scanResolution?: string;
+    scanWithoutMousemove?: boolean;
+    selectText?: boolean;
+    sentenceParsingOptions?: SentenceParsingOptions;
+    touchInputEnabled?: boolean;
 };
 
 export type InputOptionsOuter = {
-    include: string;
     exclude: string;
+    include: string;
+    options: InputOptions;
     types: {
         mouse: boolean;
-        touch: boolean;
         pen: boolean;
+        touch: boolean;
     };
-    options: InputOptions;
 };
 
 export type InputOptions = {
-    searchTerms: boolean;
-    searchKanji: boolean;
+    preventPenScrolling: boolean;
+    preventTouchScrolling: boolean;
+    scanOnPenHover: boolean;
+    scanOnPenMove: boolean;
+    scanOnPenPress: boolean;
+    scanOnPenRelease: boolean;
+    scanOnPenReleaseHover: boolean;
     scanOnTouchMove: boolean;
     scanOnTouchPress: boolean;
     scanOnTouchRelease: boolean;
     scanOnTouchTap: boolean;
-    scanOnPenMove: boolean;
-    scanOnPenHover: boolean;
-    scanOnPenReleaseHover: boolean;
-    scanOnPenPress: boolean;
-    scanOnPenRelease: boolean;
-    preventTouchScrolling: boolean;
-    preventPenScrolling: boolean;
+    searchKanji: boolean;
+    searchTerms: boolean;
 };
 
 export type SentenceParsingOptions = {
@@ -80,32 +80,32 @@ export type SentenceParsingOptions = {
 };
 
 export type InputConfig = {
-    include: string[];
     exclude: string[];
-    types: Set<PointerType>;
-    searchTerms: boolean;
-    searchKanji: boolean;
+    include: string[];
+    preventPenScrolling: boolean;
+    preventTouchScrolling: boolean;
+    scanOnPenHover: boolean;
+    scanOnPenMove: boolean;
+    scanOnPenPress: boolean;
+    scanOnPenRelease: boolean;
+    scanOnPenReleaseHover: boolean;
     scanOnTouchMove: boolean;
     scanOnTouchPress: boolean;
     scanOnTouchRelease: boolean;
     scanOnTouchTap: boolean;
-    scanOnPenMove: boolean;
-    scanOnPenHover: boolean;
-    scanOnPenReleaseHover: boolean;
-    scanOnPenPress: boolean;
-    scanOnPenRelease: boolean;
-    preventTouchScrolling: boolean;
-    preventPenScrolling: boolean;
+    searchKanji: boolean;
+    searchTerms: boolean;
+    types: Set<PointerType>;
 };
 
 export type InputInfo = {
-    input: InputConfig | null;
-    pointerType: PointerType;
-    eventType: PointerEventType;
-    passive: boolean;
-    modifiers: Input.Modifier[];
-    modifierKeys: Input.ModifierKey[];
     detail: InputInfoDetail | undefined;
+    eventType: PointerEventType;
+    input: InputConfig | null;
+    modifierKeys: Input.ModifierKey[];
+    modifiers: Input.Modifier[];
+    passive: boolean;
+    pointerType: PointerType;
 };
 
 export type InputInfoDetail = {
@@ -117,23 +117,23 @@ export type Events = {
     clear: {
         reason: ClearReason;
     };
-    searchSuccess: {
-        type: 'terms' | 'kanji';
-        dictionaryEntries: Dictionary.DictionaryEntry[];
-        sentence: Display.HistoryStateSentence;
-        inputInfo: InputInfo;
-        textSource: TextSource.TextSource;
-        optionsContext: Settings.OptionsContext;
-        detail: SearchResultDetail;
-        pageTheme: 'dark' | 'light';
-    };
     searchEmpty: {
         inputInfo: InputInfo;
     };
     searchError: {
         error: Error;
-        textSource: TextSource.TextSource;
         inputInfo: InputInfo;
+        textSource: TextSource.TextSource;
+    };
+    searchSuccess: {
+        detail: SearchResultDetail;
+        dictionaryEntries: Dictionary.DictionaryEntry[];
+        inputInfo: InputInfo;
+        optionsContext: Settings.OptionsContext;
+        pageTheme: 'dark' | 'light';
+        sentence: Display.HistoryStateSentence;
+        textSource: TextSource.TextSource;
+        type: 'kanji' | 'terms';
     };
 };
 
@@ -141,7 +141,7 @@ export type ClearReason = 'mousedown';
 
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
 
-export type GetSearchContextCallback = GetSearchContextCallbackSync | GetSearchContextCallbackAsync;
+export type GetSearchContextCallback = GetSearchContextCallbackAsync | GetSearchContextCallbackSync;
 
 export type GetSearchContextCallbackSync = () => SearchContext;
 
@@ -149,20 +149,20 @@ export type GetSearchContextCallbackAsync = () => Promise<SearchContext>;
 
 export type ConstructorDetails = {
     api: API;
-    node: HTMLElement | Window;
     getSearchContext: GetSearchContextCallback;
     ignoreElements?: (() => Element[]) | null;
     ignorePoint?: ((x: number, y: number) => Promise<boolean>) | null;
-    searchTerms?: boolean;
+    node: HTMLElement | Window;
     searchKanji?: boolean;
     searchOnClick?: boolean;
     searchOnClickOnly?: boolean;
+    searchTerms?: boolean;
     textSourceGenerator: TextSourceGenerator;
 };
 
 export type SearchContext = {
-    optionsContext: Settings.OptionsContext;
     detail: SearchResultDetail;
+    optionsContext: Settings.OptionsContext;
 };
 
 export type SelectionRestoreInfo = {
@@ -170,42 +170,42 @@ export type SelectionRestoreInfo = {
 };
 
 export type TermSearchResults = {
-    type: 'terms';
     dictionaryEntries: Dictionary.TermDictionaryEntry[];
     sentence: Sentence;
+    type: 'terms';
 };
 
 export type KanjiSearchResults = {
-    type: 'kanji';
     dictionaryEntries: Dictionary.KanjiDictionaryEntry[];
     sentence: Sentence;
+    type: 'kanji';
 };
 
-export type SearchResults = TermSearchResults | KanjiSearchResults;
+export type SearchResults = KanjiSearchResults | TermSearchResults;
 
 export type Sentence = {
-    text: string;
     offset: number;
+    text: string;
 };
 
 export type PointerType = (
-    'pen' |
     'mouse' |
-    'touch' |
-    'script'
+    'pen' |
+    'script' |
+    'touch'
 );
 
 export type PointerEventType = (
+    'click' |
     'mouseMove' |
-    'pointerOver' |
     'pointerDown' |
     'pointerMove' |
+    'pointerOver' |
     'pointerUp' |
-    'touchStart' |
+    'script' |
     'touchEnd' |
     'touchMove' |
-    'click' |
-    'script'
+    'touchStart'
 );
 
 /**

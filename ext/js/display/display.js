@@ -363,8 +363,8 @@ export class Display extends EventDispatcher {
      */
     getContentOrigin() {
         return {
-            tabId: this._contentOriginTabId,
             frameId: this._contentOriginFrameId,
+            tabId: this._contentOriginTabId,
         };
     }
 
@@ -445,29 +445,29 @@ export class Display extends EventDispatcher {
         this._elementOverflowController.setOptions(options);
 
         this._queryParser.setOptions({
+            language: options.general.language,
+            readingMode: options.parsing.readingMode,
+            scanning: {
+                deepContentScan: scanningOptions.deepDomScan,
+                delay: scanningOptions.delay,
+                inputs: scanningOptions.inputs,
+                layoutAwareScan: scanningOptions.layoutAwareScan,
+                matchTypePrefix: false,
+                normalizeCssZoom: scanningOptions.normalizeCssZoom,
+                pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
+                preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery,
+                scanAltText: scanningOptions.scanAltText,
+                scanLength: scanningOptions.length,
+                scanResolution: scanningOptions.scanResolution,
+                scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
+                selectText: scanningOptions.selectText,
+                sentenceParsingOptions,
+                touchInputEnabled: scanningOptions.touchInputEnabled,
+            },
             selectedParser: options.parsing.selectedParser,
             termSpacing: options.parsing.termSpacing,
-            readingMode: options.parsing.readingMode,
             useInternalParser: options.parsing.enableScanningParser,
             useMecabParser: options.parsing.enableMecabParser,
-            language: options.general.language,
-            scanning: {
-                inputs: scanningOptions.inputs,
-                deepContentScan: scanningOptions.deepDomScan,
-                normalizeCssZoom: scanningOptions.normalizeCssZoom,
-                selectText: scanningOptions.selectText,
-                delay: scanningOptions.delay,
-                touchInputEnabled: scanningOptions.touchInputEnabled,
-                pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
-                scanLength: scanningOptions.length,
-                layoutAwareScan: scanningOptions.layoutAwareScan,
-                preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery,
-                matchTypePrefix: false,
-                sentenceParsingOptions,
-                scanAltText: scanningOptions.scanAltText,
-                scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
-                scanResolution: scanningOptions.scanResolution,
-            },
         });
 
         void this._updateNestedFrontend(options);
@@ -481,7 +481,7 @@ export class Display extends EventDispatcher {
      * @param {import('display').ContentDetails} details Information about the content to show.
      */
     setContent(details) {
-        const {focus, params, state, content} = details;
+        const {content, focus, params, state} = details;
         const historyMode = this._historyHasChanged ? details.historyMode : 'clear';
 
         if (focus) {
@@ -500,12 +500,12 @@ export class Display extends EventDispatcher {
                 this._history.clear();
                 this._history.replaceState(state, content, url);
                 break;
-            case 'overwrite':
-                this._history.replaceState(state, content, url);
-                break;
             case 'new':
                 this._updateHistoryState();
                 this._history.pushState(state, content, url);
+                break;
+            case 'overwrite':
+                this._history.replaceState(state, content, url);
                 break;
         }
 
@@ -591,11 +591,11 @@ export class Display extends EventDispatcher {
             hasState ?
             clone(state) :
             {
+                documentTitle: document.title,
                 focusEntry: 0,
                 optionsContext: void 0,
+                sentence: {offset: 0, text: query},
                 url: window.location.href,
-                sentence: {text: query, offset: 0},
-                documentTitle: document.title,
             }
         );
         if (!hasState || updateOptionsContext) {
@@ -603,13 +603,13 @@ export class Display extends EventDispatcher {
         }
         /** @type {import('display').ContentDetails} */
         const details = {
+            content: {
+                contentOrigin: this.getContentOrigin(),
+            },
             focus: false,
             historyMode: 'clear',
             params: this._createSearchParams(type, query, false, this._queryOffset),
             state: newState,
-            content: {
-                contentOrigin: this.getContentOrigin(),
-            },
         };
         this.setContent(details);
     }
@@ -746,7 +746,7 @@ export class Display extends EventDispatcher {
     }
 
     /** @type {import('display').DirectApiHandler<'displayConfigure'>} */
-    async _onMessageConfigure({depth, parentPopupId, parentFrameId, childrenSupported, scale, optionsContext}) {
+    async _onMessageConfigure({childrenSupported, depth, optionsContext, parentFrameId, parentPopupId, scale}) {
         this._depth = depth;
         this._parentPopupId = parentPopupId;
         this._parentFrameId = parentFrameId;
@@ -813,8 +813,8 @@ export class Display extends EventDispatcher {
 
             // Set content
             switch (type) {
-                case 'terms':
                 case 'kanji':
+                case 'terms':
                     this._contentType = type;
                     await this._setContentTermsOrKanji(type, urlSearchParams, token);
                     break;
@@ -835,7 +835,7 @@ export class Display extends EventDispatcher {
     /**
      * @param {import('query-parser').EventArgument<'searched'>} details
      */
-    _onQueryParserSearch({type, dictionaryEntries, sentence, inputInfo: {eventType}, textSource, optionsContext, sentenceOffset}) {
+    _onQueryParserSearch({dictionaryEntries, inputInfo: {eventType}, optionsContext, sentence, sentenceOffset, textSource, type}) {
         const query = textSource.text();
         const historyState = this._history.state;
         const historyMode = (
@@ -847,17 +847,17 @@ export class Display extends EventDispatcher {
         );
         /** @type {import('display').ContentDetails} */
         const details = {
+            content: {
+                contentOrigin: this.getContentOrigin(),
+                dictionaryEntries,
+            },
             focus: false,
             historyMode,
             params: this._createSearchParams(type, query, false, sentenceOffset),
             state: {
-                sentence,
-                optionsContext,
                 cause: 'queryParser',
-            },
-            content: {
-                dictionaryEntries,
-                contentOrigin: this.getContentOrigin(),
+                optionsContext,
+                sentence,
             },
         };
         this.setContent(details);
@@ -867,16 +867,16 @@ export class Display extends EventDispatcher {
     _onExtensionUnloaded() {
         const type = 'unloaded';
         if (this._contentType === type) { return; }
-        const {tabId, frameId} = this._application;
+        const {frameId, tabId} = this._application;
         /** @type {import('display').ContentDetails} */
         const details = {
+            content: {
+                contentOrigin: {frameId, tabId},
+            },
             focus: false,
             historyMode: 'clear',
             params: {type},
             state: {},
-            content: {
-                contentOrigin: {tabId, frameId},
-            },
         };
         this.setContent(details);
     }
@@ -936,7 +936,7 @@ export class Display extends EventDispatcher {
             const {state} = this._history;
             if (!(typeof state === 'object' && state !== null)) { return; }
 
-            let {sentence, url, documentTitle} = state;
+            let {documentTitle, sentence, url} = state;
             if (typeof url !== 'string') { url = window.location.href; }
             if (typeof documentTitle !== 'string') { documentTitle = document.title; }
             const optionsContext = this.getOptionsContext();
@@ -946,19 +946,19 @@ export class Display extends EventDispatcher {
             const dictionaryEntries = await this._application.api.kanjiFind(query, optionsContext);
             /** @type {import('display').ContentDetails} */
             const details = {
+                content: {
+                    contentOrigin: this.getContentOrigin(),
+                    dictionaryEntries,
+                },
                 focus: false,
                 historyMode: 'new',
                 params: this._createSearchParams('kanji', query, false, null),
                 state: {
+                    documentTitle,
                     focusEntry: 0,
                     optionsContext,
-                    url,
                     sentence,
-                    documentTitle,
-                },
-                content: {
-                    dictionaryEntries,
-                    contentOrigin: this.getContentOrigin(),
+                    url,
                 },
             };
             this.setContent(details);
@@ -1194,7 +1194,7 @@ export class Display extends EventDispatcher {
      */
     _setTheme(options) {
         const {general} = options;
-        const {popupTheme, popupOuterTheme, fontFamily, fontSize, lineHeight} = general;
+        const {fontFamily, fontSize, lineHeight, popupOuterTheme, popupTheme} = general;
         /** @type {string} */
         let pageType = this._pageType;
         try {
@@ -1224,9 +1224,9 @@ export class Display extends EventDispatcher {
      * @returns {string}
      */
     _getCustomCss(options) {
-        const {general: {customPopupCss}, dictionaries} = options;
+        const {dictionaries, general: {customPopupCss}} = options;
         let customCss = customPopupCss;
-        for (const {name, enabled, styles = ''} of dictionaries) {
+        for (const {enabled, name, styles = ''} of dictionaries) {
             if (enabled) {
                 customCss += '\n' + this._addScopeToCss(styles, name);
             }
@@ -1322,7 +1322,7 @@ export class Display extends EventDispatcher {
         }
         this._setQuery(query, queryFull, queryOffset);
 
-        let {state, content} = this._history;
+        let {content, state} = this._history;
         let changeHistory = false;
         if (!(typeof content === 'object' && content !== null)) {
             content = {};
@@ -1333,7 +1333,7 @@ export class Display extends EventDispatcher {
             changeHistory = true;
         }
 
-        let {focusEntry, scrollX, scrollY, optionsContext} = state;
+        let {focusEntry, optionsContext, scrollX, scrollY} = state;
         if (typeof focusEntry !== 'number') { focusEntry = 0; }
         if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
             optionsContext = this.getOptionsContext();
@@ -1352,7 +1352,7 @@ export class Display extends EventDispatcher {
         let contentOriginValid = false;
         const {contentOrigin} = content;
         if (typeof contentOrigin === 'object' && contentOrigin !== null) {
-            const {tabId, frameId} = contentOrigin;
+            const {frameId, tabId} = contentOrigin;
             if (tabId !== null && frameId !== null) {
                 this._contentOriginTabId = tabId;
                 this._contentOriginFrameId = frameId;
@@ -1657,7 +1657,7 @@ export class Display extends EventDispatcher {
      * @returns {?number}
      */
     _getDictionaryEntryVisibleDefinitionIndex(index, sign) {
-        const {top: scrollTop, bottom: scrollBottom} = this._windowScroll.getRect();
+        const {bottom: scrollBottom, top: scrollTop} = this._windowScroll.getRect();
 
         const {definitions} = this._dictionaryEntries[index];
         const nodes = this._getDictionaryEntryDefinitionNodes(index);
@@ -1667,7 +1667,7 @@ export class Display extends EventDispatcher {
         let visibleIndex = null;
         let visibleCoverage = 0;
         for (let i = (sign > 0 ? 0 : definitionCount - 1); i >= 0 && i < definitionCount; i += sign) {
-            const {top, bottom} = nodes[i].getBoundingClientRect();
+            const {bottom, top} = nodes[i].getBoundingClientRect();
             if (bottom <= scrollTop || top >= scrollBottom) { continue; }
             const top2 = Math.max(scrollTop, Math.min(scrollBottom, top));
             const bottom2 = Math.max(scrollTop, Math.min(scrollBottom, bottom));
@@ -1732,7 +1732,7 @@ export class Display extends EventDispatcher {
 
     /** */
     _updateHistoryState() {
-        const {state, content} = this._history;
+        const {content, state} = this._history;
         if (!(typeof state === 'object' && state !== null)) { return; }
 
         state.focusEntry = this._index;
@@ -1823,7 +1823,7 @@ export class Display extends EventDispatcher {
      * @param {import('settings').ProfileOptions} options
      */
     async _updateNestedFrontend(options) {
-        const {tabId, frameId} = this._application;
+        const {frameId, tabId} = this._application;
         if (tabId === null || frameId === null) { return; }
 
         const isSearchPage = (this._pageType === 'search');
@@ -1870,17 +1870,17 @@ export class Display extends EventDispatcher {
         popupFactory.prepare();
 
         const frontend = new Frontend({
-            application: this._application,
-            useProxyPopup,
-            parentPopupId,
-            parentFrameId,
-            depth: this._depth + 1,
-            popupFactory,
-            pageType: this._pageType,
             allowRootFramePopupProxy: true,
-            childrenSupported: this._childrenSupported,
-            hotkeyHandler: this._hotkeyHandler,
+            application: this._application,
             canUseWindowPopup: true,
+            childrenSupported: this._childrenSupported,
+            depth: this._depth + 1,
+            hotkeyHandler: this._hotkeyHandler,
+            pageType: this._pageType,
+            parentFrameId,
+            parentPopupId,
+            popupFactory,
+            useProxyPopup,
         });
         this._frontend = frontend;
         await frontend.prepare();
@@ -1984,12 +1984,12 @@ export class Display extends EventDispatcher {
         if (this._contentTextScanner === null) {
             this._contentTextScanner = new TextScanner({
                 api: this._application.api,
-                node: window,
                 getSearchContext: this._getSearchContext.bind(this),
-                searchTerms: true,
+                node: window,
                 searchKanji: false,
                 searchOnClick: true,
                 searchOnClickOnly: true,
+                searchTerms: true,
                 textSourceGenerator: this._textSourceGenerator,
             });
             this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
@@ -2003,37 +2003,37 @@ export class Display extends EventDispatcher {
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._contentTextScanner.language = options.general.language;
         this._contentTextScanner.setOptions({
+            deepContentScan: scanningOptions.deepDomScan,
+            delay: scanningOptions.delay,
             inputs: [{
-                include: 'mouse0',
                 exclude: '',
-                types: {mouse: true, pen: false, touch: false},
+                include: 'mouse0',
                 options: {
-                    searchTerms: true,
-                    searchKanji: true,
-                    scanOnTouchTap: true,
+                    preventPenScrolling: false,
+                    preventTouchScrolling: false,
+                    scanOnPenHover: false,
+                    scanOnPenMove: false,
+                    scanOnPenPress: false,
+                    scanOnPenRelease: false,
+                    scanOnPenReleaseHover: false,
                     scanOnTouchMove: false,
                     scanOnTouchPress: false,
                     scanOnTouchRelease: false,
-                    scanOnPenMove: false,
-                    scanOnPenHover: false,
-                    scanOnPenReleaseHover: false,
-                    scanOnPenPress: false,
-                    scanOnPenRelease: false,
-                    preventTouchScrolling: false,
-                    preventPenScrolling: false,
+                    scanOnTouchTap: true,
+                    searchKanji: true,
+                    searchTerms: true,
                 },
+                types: {mouse: true, pen: false, touch: false},
             }],
-            deepContentScan: scanningOptions.deepDomScan,
-            normalizeCssZoom: scanningOptions.normalizeCssZoom,
-            selectText: false,
-            delay: scanningOptions.delay,
-            touchInputEnabled: false,
-            pointerEventsEnabled: false,
-            scanLength: scanningOptions.length,
             layoutAwareScan: scanningOptions.layoutAwareScan,
+            normalizeCssZoom: scanningOptions.normalizeCssZoom,
+            pointerEventsEnabled: false,
             preventMiddleMouse: false,
-            sentenceParsingOptions,
             scanAltText: scanningOptions.scanAltText,
+            scanLength: scanningOptions.length,
+            selectText: false,
+            sentenceParsingOptions,
+            touchInputEnabled: false,
         });
 
         this._contentTextScanner.setEnabled(true);
@@ -2047,30 +2047,30 @@ export class Display extends EventDispatcher {
     /**
      * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
-    _onContentTextScannerSearchSuccess({type, dictionaryEntries, sentence, textSource, optionsContext}) {
+    _onContentTextScannerSearchSuccess({dictionaryEntries, optionsContext, sentence, textSource, type}) {
         const query = textSource.text();
         const url = window.location.href;
         const documentTitle = document.title;
         /** @type {import('display').ContentDetails} */
         const details = {
+            content: {
+                contentOrigin: this.getContentOrigin(),
+                dictionaryEntries: dictionaryEntries !== null ? dictionaryEntries : void 0,
+            },
             focus: false,
             historyMode: 'new',
             params: {
-                type,
                 query,
+                type,
                 wildcards: 'off',
             },
             state: {
+                documentTitle,
                 focusEntry: 0,
                 optionsContext: optionsContext !== null ? optionsContext : void 0,
-                url,
-                sentence: sentence !== null ? sentence : void 0,
-                documentTitle,
                 pageTheme: 'light',
-            },
-            content: {
-                dictionaryEntries: dictionaryEntries !== null ? dictionaryEntries : void 0,
-                contentOrigin: this.getContentOrigin(),
+                sentence: sentence !== null ? sentence : void 0,
+                url,
             },
         };
         /** @type {TextScanner} */ (this._contentTextScanner).clearSelection();
@@ -2091,10 +2091,10 @@ export class Display extends EventDispatcher {
      */
     _getSearchContext() {
         return {
-            optionsContext: this.getOptionsContext(),
             detail: {
                 documentTitle: document.title,
             },
+            optionsContext: this.getOptionsContext(),
         };
     }
 
@@ -2209,7 +2209,7 @@ export class Display extends EventDispatcher {
 
     /** */
     _triggerContentUpdateStart() {
-        this.trigger('contentUpdateStart', {type: this._contentType, query: this._query});
+        this.trigger('contentUpdateStart', {query: this._query, type: this._contentType});
     }
 
     /**

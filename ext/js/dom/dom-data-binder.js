@@ -51,12 +51,12 @@ export class DOMDataBinder {
         this._assignTasks = new TaskAccumulator(this._onBulkAssign.bind(this));
         /** @type {SelectorObserver<import('dom-data-binder').ElementObserver<T>>} */
         this._selectorObserver = new SelectorObserver({
-            selector,
             ignoreSelector: null,
-            onAdded: this._createObserver.bind(this),
-            onRemoved: this._removeObserver.bind(this),
-            onChildrenUpdated: this._onObserverChildrenUpdated.bind(this),
             isStale: this._isObserverStale.bind(this),
+            onAdded: this._createObserver.bind(this),
+            onChildrenUpdated: this._onObserverChildrenUpdated.bind(this),
+            onRemoved: this._removeObserver.bind(this),
+            selector,
         });
     }
 
@@ -179,12 +179,12 @@ export class DOMDataBinder {
         /** @type {import('dom-data-binder').ElementObserver<T>} */
         const observer = {
             element,
+            eventType,
+            hasValue: false,
+            metadata,
+            onChange: null,
             type,
             value: null,
-            hasValue: false,
-            eventType,
-            onChange: null,
-            metadata,
         };
         observer.onChange = this._onElementChange.bind(this, observer);
         element.addEventListener(eventType, observer.onChange, false);
@@ -220,7 +220,7 @@ export class DOMDataBinder {
      * @returns {boolean}
      */
     _isObserverStale(element, observer) {
-        const {type, metadata} = observer;
+        const {metadata, type} = observer;
         if (type !== this._getNormalizedElementType(element)) { return false; }
         const newMetadata = this._createElementMetadata(element);
         return typeof newMetadata === 'undefined' || !this._compareElementMetadata(metadata, newMetadata);
@@ -294,12 +294,12 @@ export class DOMDataBinder {
             {
                 const {type} = /** @type {HTMLInputElement} */ (element);
                 switch (type) {
-                    case 'text':
-                    case 'password':
-                        return 'text';
-                    case 'number':
                     case 'checkbox':
+                    case 'number':
                         return type;
+                    case 'password':
+                    case 'text':
+                        return 'text';
                 }
                 break;
             }

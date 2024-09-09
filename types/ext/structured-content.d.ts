@@ -17,169 +17,130 @@
 
 import type * as DictionaryData from './dictionary-data';
 
-export type VerticalAlign = 'baseline' | 'sub' | 'super' | 'text-top' | 'text-bottom' | 'middle' | 'top' | 'bottom';
+export type VerticalAlign = 'baseline' | 'bottom' | 'middle' | 'sub' | 'super' | 'text-bottom' | 'text-top' | 'top';
 
-export type TextDecorationLine = 'underline' | 'overline' | 'line-through';
+export type TextDecorationLine = 'line-through' | 'overline' | 'underline';
 
 export type TextDecorationLineOrNone = 'none' | TextDecorationLine;
 
-export type TextDecorationStyle = 'solid' | 'double' | 'dotted' | 'dashed' | 'wavy';
+export type TextDecorationStyle = 'dashed' | 'dotted' | 'double' | 'solid' | 'wavy';
 
-export type FontStyle = 'normal' | 'italic';
+export type FontStyle = 'italic' | 'normal';
 
-export type FontWeight = 'normal' | 'bold';
+export type FontWeight = 'bold' | 'normal';
 
-export type WordBreak = 'normal' | 'break-all' | 'keep-all';
+export type WordBreak = 'break-all' | 'keep-all' | 'normal';
 
-export type TextAlign = 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'justify-all' | 'match-parent';
+export type TextAlign = 'center' | 'end' | 'justify' | 'justify-all' | 'left' | 'match-parent' | 'right' | 'start';
 
-export type SizeUnits = 'px' | 'em';
+export type SizeUnits = 'em' | 'px';
 
-export type ImageRendering = 'auto' | 'pixelated' | 'crisp-edges';
+export type ImageRendering = 'auto' | 'crisp-edges' | 'pixelated';
 
 export type ImageAppearance = 'auto' | 'monochrome';
 
-export type Image = DictionaryData.TermImage & {
-    verticalAlign: VerticalAlign;
+export type Image = {
     border: string;
     borderRadius: string;
     sizeUnits: SizeUnits;
-};
+    verticalAlign: VerticalAlign;
+} & DictionaryData.TermImage;
 
 export type Data = {
     [key: string]: string;
 };
 
 export type StructuredContentStyle = {
-    fontStyle?: FontStyle;
-    fontWeight?: FontWeight;
-    fontSize?: string;
-    color?: string;
     background?: string;
     backgroundColor?: string;
-    textDecorationLine?: TextDecorationLineOrNone | TextDecorationLine[];
-    textDecorationStyle?: TextDecorationStyle;
-    textDecorationColor?: string;
     borderColor?: string;
-    borderStyle?: string;
     borderRadius?: string;
+    borderStyle?: string;
     borderWidth?: string;
     clipPath?: string;
-    verticalAlign?: VerticalAlign;
-    textAlign?: TextAlign;
-    textEmphasis?: string;
-    textShadow?: string;
+    color?: string;
+    cursor?: string;
+    fontSize?: string;
+    fontStyle?: FontStyle;
+    fontWeight?: FontWeight;
+    listStyleType?: string;
     margin?: string;
-    marginTop?: number | string;
+    marginBottom?: number | string;
     marginLeft?: number | string;
     marginRight?: number | string;
-    marginBottom?: number | string;
+    marginTop?: number | string;
     padding?: string;
-    paddingTop?: string;
+    paddingBottom?: string;
     paddingLeft?: string;
     paddingRight?: string;
-    paddingBottom?: string;
-    wordBreak?: WordBreak;
+    paddingTop?: string;
+    textAlign?: TextAlign;
+    textDecorationColor?: string;
+    textDecorationLine?: TextDecorationLine[] | TextDecorationLineOrNone;
+    textDecorationStyle?: TextDecorationStyle;
+    textEmphasis?: string;
+    textShadow?: string;
+    verticalAlign?: VerticalAlign;
     whiteSpace?: string;
-    cursor?: string;
-    listStyleType?: string;
+    wordBreak?: WordBreak;
 };
 
 export type LineBreak = {
-    tag: 'br';
-    data?: Data;
     /**
      * This element doesn't support children.
      */
     content?: undefined;
+    data?: Data;
     /**
      * This element doesn't support language.
      */
     lang?: undefined;
+    tag: 'br';
 };
 
 export type UnstyledElement = {
-    tag: 'ruby' | 'rt' | 'rp' | 'table' | 'thead' | 'tbody' | 'tfoot' | 'tr';
     content?: Content;
     data?: Data;
     /**
      * Defines the language of an element in the format defined by RFC 5646.
      */
     lang?: string;
+    tag: 'rp' | 'rt' | 'ruby' | 'table' | 'tbody' | 'tfoot' | 'thead' | 'tr';
 };
 
 export type TableElement = {
-    tag: 'td' | 'th';
+    colSpan?: number;
     content?: Content;
     data?: Data;
-    colSpan?: number;
-    rowSpan?: number;
-    style?: StructuredContentStyle;
     /**
      * Defines the language of an element in the format defined by RFC 5646.
      */
     lang?: string;
+    rowSpan?: number;
+    style?: StructuredContentStyle;
+    tag: 'td' | 'th';
 };
 
 export type StyledElement = {
-    tag: 'span' | 'div' | 'ol' | 'ul' | 'li' | 'details' | 'summary';
     content?: Content;
     data?: Data;
+    /**
+     * Defines the language of an element in the format defined by RFC 5646.
+     */
+    lang?: string;
     style?: StructuredContentStyle;
+    tag: 'details' | 'div' | 'li' | 'ol' | 'span' | 'summary' | 'ul';
     /**
      * Hover text for the element.
      */
     title?: string;
-    /**
-     * Defines the language of an element in the format defined by RFC 5646.
-     */
-    lang?: string;
 };
 
 export type ImageElementBase = {
-    data?: Data;
-    /**
-     * Path to the image file in the archive.
-     */
-    path: string;
-    /**
-     * Preferred width of the image.
-     */
-    width?: number;
-    /**
-     * Preferred height of the image.
-     */
-    height?: number;
-    /**
-     * Preferred width of the image.
-     * This is only used in the internal database.
-     */
-    preferredWidth?: number;
-    /**
-     * Preferred height of the image.
-     * This is only used in the internal database.
-     */
-    preferredHeight?: number;
-    /**
-     * Hover text for the image.
-     */
-    title?: string;
     /**
      * Alt text for the image.
      */
     alt?: string;
-    /**
-     * Description of the image.
-     */
-    description?: string;
-    /**
-     * Whether or not the image should appear pixelated at sizes larger than the image's native resolution.
-     */
-    pixelated?: boolean;
-    /**
-     * Controls how the image is rendered. The value of this field supersedes the pixelated field.
-     */
-    imageRendering?: ImageRendering;
     /**
      * Controls the appearance of the image. The 'monochrome' value will mask the opaque parts of the image using the current text color.
      */
@@ -196,18 +157,48 @@ export type ImageElementBase = {
      * Whether or not the image can be collapsed.
      */
     collapsible?: boolean;
+    data?: Data;
+    /**
+     * Description of the image.
+     */
+    description?: string;
+    /**
+     * Preferred height of the image.
+     */
+    height?: number;
+    /**
+     * Controls how the image is rendered. The value of this field supersedes the pixelated field.
+     */
+    imageRendering?: ImageRendering;
+    /**
+     * Path to the image file in the archive.
+     */
+    path: string;
+    /**
+     * Whether or not the image should appear pixelated at sizes larger than the image's native resolution.
+     */
+    pixelated?: boolean;
+    /**
+     * Preferred height of the image.
+     * This is only used in the internal database.
+     */
+    preferredHeight?: number;
+    /**
+     * Preferred width of the image.
+     * This is only used in the internal database.
+     */
+    preferredWidth?: number;
+    /**
+     * Hover text for the image.
+     */
+    title?: string;
+    /**
+     * Preferred width of the image.
+     */
+    width?: number;
 };
 
-export type ImageElement = ImageElementBase & {
-    tag: 'img';
-    /**
-     * This element doesn't support children.
-     */
-    content?: undefined;
-    /**
-     * The vertical alignment of the image.
-     */
-    verticalAlign?: VerticalAlign;
+export type ImageElement = {
     /**
      * Shorthand for border width, style, and color.
      */
@@ -217,13 +208,21 @@ export type ImageElement = ImageElementBase & {
      */
     borderRadius?: string;
     /**
+     * This element doesn't support children.
+     */
+    content?: undefined;
+    /**
      * The units for the width and height.
      */
     sizeUnits?: SizeUnits;
-};
+    tag: 'img';
+    /**
+     * The vertical alignment of the image.
+     */
+    verticalAlign?: VerticalAlign;
+} & ImageElementBase;
 
 export type LinkElement = {
-    tag: 'a';
     content?: Content;
     /**
      * The URL for the link. URLs starting with a ? are treated as internal links to other dictionary content.
@@ -233,8 +232,9 @@ export type LinkElement = {
      * Defines the language of an element in the format defined by RFC 5646.
      */
     lang?: string;
+    tag: 'a';
 };
 
-export type Element = LineBreak | UnstyledElement | TableElement | StyledElement | ImageElement | LinkElement;
+export type Element = ImageElement | LineBreak | LinkElement | StyledElement | TableElement | UnstyledElement;
 
-export type Content = string | Element | Content[];
+export type Content = Content[] | Element | string;

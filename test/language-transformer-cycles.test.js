@@ -126,9 +126,9 @@ describe.each(languagesWithTransforms)('Cycles Test $iso', ({languageTransforms}
 
         for (let i = 0; i < deinflectionNodes.length; ++i) {
             const deinflectionNode = deinflectionNodes[i];
-            const {text, ruleNames} = deinflectionNode;
+            const {ruleNames, text} = deinflectionNode;
             for (const ruleNode of ruleNodes) {
-                const {isInflected, deinflected: suffixOut, conditionsIn, conditionsOut} = ruleNode.rule;
+                const {conditionsIn, conditionsOut, deinflected: suffixOut, isInflected} = ruleNode.rule;
                 const suffixIn = isInflected.source.substring(0, isInflected.source.length - 1);
                 if (
                     !LanguageTransformer.conditionsMatch(
@@ -151,7 +151,7 @@ describe.each(languagesWithTransforms)('Cycles Test $iso', ({languageTransforms}
                 // Cycle check
                 if (deinflectionNode.historyIncludes(newDeinflectionNode)) {
                     const stack = [];
-                    for (const {text: itemText, ruleNode: itemNode} of newDeinflectionNode.getHistory()) {
+                    for (const {ruleNode: itemNode, text: itemText} of newDeinflectionNode.getHistory()) {
                         if (itemNode !== null) {
                             const itemSuffixIn = itemNode.rule.isInflected.source.substring(0, itemNode.rule.isInflected.source.length - 1);
                             const itemSuffixOut = itemNode.rule.deinflected;

@@ -23,72 +23,72 @@ const test = await createAnkiTemplateRendererTest();
 describe('AnkiTemplateRenderer', () => {
     /** @type {import('template-renderer').CompositeRenderData} */
     const data = {
-        marker: 'test',
         commonData: {
-            dictionaryEntry: {
-                type: 'kanji',
-                character: 'c',
-                dictionary: 'dictionary',
-                dictionaryAlias: 'dictionaryAlias',
-                onyomi: [],
-                kunyomi: [],
-                tags: [],
-                stats: {},
-                definitions: [],
-                frequencies: [],
-            },
-            resultOutputMode: 'split',
-            mode: 'test',
-            glossaryLayoutMode: 'default',
             compactTags: false,
             context: {
-                url: 'http://localhost/',
                 documentTitle: 'documentTitle',
-                query: 'query',
                 fullQuery: 'query.full',
+                query: 'query',
                 sentence: {
-                    text: 'sentence.query.full',
                     offset: 9,
+                    text: 'sentence.query.full',
                 },
+                url: 'http://localhost/',
             },
-            media: void 0,
+            dictionaryEntry: {
+                character: 'c',
+                definitions: [],
+                dictionary: 'dictionary',
+                dictionaryAlias: 'dictionaryAlias',
+                frequencies: [],
+                kunyomi: [],
+                onyomi: [],
+                stats: {},
+                tags: [],
+                type: 'kanji',
+            },
             dictionaryStylesMap: new Map(),
+            glossaryLayoutMode: 'default',
+            media: void 0,
+            mode: 'test',
+            resultOutputMode: 'split',
         },
+        marker: 'test',
     };
     const testCases = [
         {
             name: 'regexMatch 1',
-            template: '{{#regexMatch "test" "gu"}}this is a test of regexMatch{{/regexMatch}}',
             result: 'test',
+            template: '{{#regexMatch "test" "gu"}}this is a test of regexMatch{{/regexMatch}}',
         },
         {
             name: 'regexMatch 2',
-            template: '{{regexMatch "test" "gu" "this is a test of regexMatch"}}',
             result: 'test',
+            template: '{{regexMatch "test" "gu" "this is a test of regexMatch"}}',
         },
         {
             name: 'regexMatch 3',
-            template: '{{#if (regexMatch "test" "gu" "this is a test of regexMatch")}}true{{else}}false{{/if}}',
             result: 'true',
+            template: '{{#if (regexMatch "test" "gu" "this is a test of regexMatch")}}true{{else}}false{{/if}}',
         },
         {
             name: 'regexReplace 1',
-            template: '{{#regexReplace "test" "TEST" "gu"}}this is a test of regexReplace{{/regexReplace}}',
             result: 'this is a TEST of regexReplace',
+            template: '{{#regexReplace "test" "TEST" "gu"}}this is a test of regexReplace{{/regexReplace}}',
         },
         {
             name: 'regexReplace 2',
-            template: '{{regexReplace "test" "TEST" "gu" "this is a test of regexReplace"}}',
             result: 'this is a TEST of regexReplace',
+            template: '{{regexReplace "test" "TEST" "gu" "this is a test of regexReplace"}}',
         },
         {
             name: 'regexReplace 3',
-            template: '{{#if (regexReplace "test" "" "gu" "test")}}true{{else}}false{{/if}}',
             result: 'false',
+            template: '{{#if (regexReplace "test" "" "gu" "test")}}true{{else}}false{{/if}}',
         },
     ];
-    describe.each(testCases)('$name', ({template, result: expectedResult}) => {
-        test('Test', ({expect, ankiTemplateRenderer}) => {
+    describe.each(testCases)('$name', ({result: expectedResult, template}) => {
+        test('Test', ({ankiTemplateRenderer, expect}) => {
             const {result} = ankiTemplateRenderer.templateRenderer.render(template, data, 'ankiNote');
             expect(result).toEqual(expectedResult);
         });

@@ -365,7 +365,7 @@ export class Popup extends EventDispatcher {
             parentNode = this._shadow;
         }
         const node = await loadStyle(this._application, 'yomitan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
-        this.trigger('customOuterCssChanged', {node, useWebExtensionApi, inShadow});
+        this.trigger('customOuterCssChanged', {inShadow, node, useWebExtensionApi});
     }
 
     /**
@@ -374,8 +374,8 @@ export class Popup extends EventDispatcher {
      *   `valid` is `false` for `PopupProxy`, since the DOM node is hosted in a different frame.
      */
     getFrameRect() {
-        const {left, top, right, bottom} = this._getFrameBoundingClientRect();
-        return {left, top, right, bottom, valid: true};
+        const {bottom, left, right, top} = this._getFrameBoundingClientRect();
+        return {bottom, left, right, top, valid: true};
     }
 
     /**
@@ -383,8 +383,8 @@ export class Popup extends EventDispatcher {
      * @returns {Promise<import('popup').ValidSize>} The size and whether or not it is valid.
      */
     async getFrameSize() {
-        const {width, height} = this._getFrameBoundingClientRect();
-        return {width, height, valid: true};
+        const {height, width} = this._getFrameBoundingClientRect();
+        return {height, valid: true, width};
     }
 
     /**
@@ -487,12 +487,12 @@ export class Popup extends EventDispatcher {
         // Configure
         /** @type {import('display').DirectApiParams<'displayConfigure'>} */
         const configureParams = {
-            depth: this._depth,
-            parentPopupId: this._id,
-            parentFrameId: this._frameId,
             childrenSupported: this._childrenSupported,
-            scale: this._contentScale,
+            depth: this._depth,
             optionsContext: this._optionsContext,
+            parentFrameId: this._frameId,
+            parentPopupId: this._id,
+            scale: this._contentScale,
         };
         await this._invokeSafe('displayConfigure', configureParams);
     }
@@ -529,7 +529,7 @@ export class Popup extends EventDispatcher {
         if (usePopupShadowDom && typeof this._frame.attachShadow === 'function') {
             const container = document.createElement('div');
             container.style.setProperty('all', 'initial', 'important');
-            const shadow = container.attachShadow({mode: 'closed', delegatesFocus: true});
+            const shadow = container.attachShadow({delegatesFocus: true, mode: 'closed'});
             shadow.appendChild(this._frame);
 
             this._container = container;
@@ -616,7 +616,7 @@ export class Popup extends EventDispatcher {
         if (!injected) { return; }
 
         const viewport = this._getViewport(this._scaleRelativeToVisualViewport);
-        let {left, top, width, height, after, below} = this._getPosition(sourceRects, writingMode, viewport);
+        let {after, below, height, left, top, width} = this._getPosition(sourceRects, writingMode, viewport);
 
         if (this._displayModeIsFullWidth) {
             left = viewport.left;
@@ -850,7 +850,7 @@ export class Popup extends EventDispatcher {
             viewport.bottom,
             preferBelow,
         );
-        return {left, top, width, height, after, below};
+        return {after, below, height, left, top, width};
     }
 
     /**
@@ -881,7 +881,7 @@ export class Popup extends EventDispatcher {
             viewport.bottom,
             true,
         );
-        return {left, top, width, height, after, below};
+        return {after, below, height, left, top, width};
     }
 
     /**
@@ -891,10 +891,10 @@ export class Popup extends EventDispatcher {
      */
     _isVerticalTextPopupOnRight(positionPreference, writingMode) {
         switch (positionPreference) {
-            case 'before':
-                return !this._isWritingModeLeftToRight(writingMode);
             case 'after':
                 return this._isWritingModeLeftToRight(writingMode);
+            case 'before':
+                return !this._isWritingModeLeftToRight(writingMode);
             case 'right':
                 return true;
             // case 'left':
@@ -909,8 +909,8 @@ export class Popup extends EventDispatcher {
      */
     _isWritingModeLeftToRight(writingMode) {
         switch (writingMode) {
-            case 'vertical-lr':
             case 'sideways-lr':
+            case 'vertical-lr':
                 return true;
             default:
                 return false;
@@ -984,27 +984,27 @@ export class Popup extends EventDispatcher {
             const height = visualViewport.height;
             if (useVisualViewport) {
                 return {
-                    left,
-                    top,
-                    right: left + width,
                     bottom: top + height,
+                    left,
+                    right: left + width,
+                    top,
                 };
             } else {
                 const scale = visualViewport.scale;
                 return {
-                    left: 0,
-                    top: 0,
-                    right: Math.max(left + width, width * scale),
                     bottom: Math.max(top + height, height * scale),
+                    left: 0,
+                    right: Math.max(left + width, width * scale),
+                    top: 0,
                 };
             }
         }
 
         return {
-            left: 0,
-            top: 0,
-            right: window.innerWidth,
             bottom: window.innerHeight,
+            left: 0,
+            right: window.innerWidth,
+            top: 0,
         };
     }
 
@@ -1053,10 +1053,10 @@ export class Popup extends EventDispatcher {
      */
     _getBoundingSourceRect(sourceRects) {
         switch (sourceRects.length) {
-            case 0: return {left: 0, top: 0, right: 0, bottom: 0};
+            case 0: return {bottom: 0, left: 0, right: 0, top: 0};
             case 1: return sourceRects[0];
         }
-        let {left, top, right, bottom} = sourceRects[0];
+        let {bottom, left, right, top} = sourceRects[0];
         for (let i = 1, ii = sourceRects.length; i < ii; ++i) {
             const sourceRect = sourceRects[i];
             left = Math.min(left, sourceRect.left);
@@ -1064,7 +1064,7 @@ export class Popup extends EventDispatcher {
             right = Math.max(right, sourceRect.right);
             bottom = Math.max(bottom, sourceRect.bottom);
         }
-        return {left, top, right, bottom};
+        return {bottom, left, right, top};
     }
 
     /**
@@ -1125,10 +1125,10 @@ export class Popup extends EventDispatcher {
      */
     _createScaledRect(rect, scale) {
         return {
-            left: rect.left * scale,
-            top: rect.top * scale,
-            right: rect.right * scale,
             bottom: rect.bottom * scale,
+            left: rect.left * scale,
+            right: rect.right * scale,
+            top: rect.top * scale,
         };
     }
 }

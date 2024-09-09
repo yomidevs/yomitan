@@ -49,29 +49,29 @@ export class KeyboardShortcutController {
         /** @type {Map<string, import('keyboard-shortcut-controller').ActionDetails>} */
         this._actionDetails = new Map([
             ['',                                 {scopes: new Set()}],
+            ['addNoteKanji',                     {scopes: new Set(['popup', 'search'])}],
+            ['addNoteTermKana',                  {scopes: new Set(['popup', 'search'])}],
+            ['addNoteTermKanji',                 {scopes: new Set(['popup', 'search'])}],
             ['close',                            {scopes: new Set(['popup', 'search'])}],
-            ['focusSearchBox',                   {scopes: new Set(['search'])}],
-            ['nextEntry',                        {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-move-offset', default: '1'}}],
-            ['previousEntry',                    {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-move-offset', default: '1'}}],
-            ['lastEntry',                        {scopes: new Set(['popup', 'search'])}],
+            ['copyHostSelection',                {scopes: new Set(['popup'])}],
             ['firstEntry',                       {scopes: new Set(['popup', 'search'])}],
-            ['nextEntryDifferentDictionary',     {scopes: new Set(['popup', 'search'])}],
-            ['previousEntryDifferentDictionary', {scopes: new Set(['popup', 'search'])}],
+            ['focusSearchBox',                   {scopes: new Set(['search'])}],
             ['historyBackward',                  {scopes: new Set(['popup', 'search'])}],
             ['historyForward',                   {scopes: new Set(['popup', 'search'])}],
-            ['profilePrevious',                  {scopes: new Set(['popup', 'search', 'web'])}],
-            ['profileNext',                      {scopes: new Set(['popup', 'search', 'web'])}],
-            ['addNoteKanji',                     {scopes: new Set(['popup', 'search'])}],
-            ['addNoteTermKanji',                 {scopes: new Set(['popup', 'search'])}],
-            ['addNoteTermKana',                  {scopes: new Set(['popup', 'search'])}],
-            ['viewNotes',                        {scopes: new Set(['popup', 'search'])}],
+            ['lastEntry',                        {scopes: new Set(['popup', 'search'])}],
+            ['nextEntry',                        {argument: {default: '1', template: 'hotkey-argument-move-offset'}, scopes: new Set(['popup', 'search'])}],
+            ['nextEntryDifferentDictionary',     {scopes: new Set(['popup', 'search'])}],
             ['playAudio',                        {scopes: new Set(['popup', 'search'])}],
-            ['playAudioFromSource',              {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-audio-source', default: 'jpod101'}}],
-            ['copyHostSelection',                {scopes: new Set(['popup'])}],
+            ['playAudioFromSource',              {argument: {default: 'jpod101', template: 'hotkey-argument-audio-source'}, scopes: new Set(['popup', 'search'])}],
+            ['previousEntry',                    {argument: {default: '1', template: 'hotkey-argument-move-offset'}, scopes: new Set(['popup', 'search'])}],
+            ['previousEntryDifferentDictionary', {scopes: new Set(['popup', 'search'])}],
+            ['profileNext',                      {scopes: new Set(['popup', 'search', 'web'])}],
+            ['profilePrevious',                  {scopes: new Set(['popup', 'search', 'web'])}],
             ['scanSelectedText',                 {scopes: new Set(['web'])}],
-            ['scanTextAtSelection',              {scopes: new Set(['web'])}],
             ['scanTextAtCaret',                  {scopes: new Set(['web'])}],
-            ['toggleOption',                     {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-setting-path', default: ''}}],
+            ['scanTextAtSelection',              {scopes: new Set(['web'])}],
+            ['toggleOption',                     {argument: {default: '', template: 'hotkey-argument-setting-path'}, scopes: new Set(['popup', 'search'])}],
+            ['viewNotes',                        {scopes: new Set(['popup', 'search'])}],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -102,10 +102,10 @@ export class KeyboardShortcutController {
 
         await this._settingsController.modifyProfileSettings([{
             action: 'splice',
-            path: 'inputs.hotkeys',
-            start: hotkeys.length,
             deleteCount: 0,
             items: [terminationCharacterEntry],
+            path: 'inputs.hotkeys',
+            start: hotkeys.length,
         }]);
 
         await this._updateOptions();
@@ -125,10 +125,10 @@ export class KeyboardShortcutController {
 
         await this._settingsController.modifyProfileSettings([{
             action: 'splice',
-            path: 'inputs.hotkeys',
-            start: index,
             deleteCount: 1,
             items: [],
+            path: 'inputs.hotkeys',
+            start: index,
         }]);
 
         await this._updateOptions();
@@ -211,10 +211,10 @@ export class KeyboardShortcutController {
         const newEntry = {
             action: '',
             argument: '',
+            enabled: true,
             key: null,
             modifiers: [],
             scopes: ['popup', 'search'],
-            enabled: true,
         };
         await this.addEntry(newEntry);
     }
@@ -386,7 +386,7 @@ class KeyboardShortcutHotkeyEntry {
      * @param {import('popup-menu').MenuCloseEvent} e
      */
     _onScopesMenuClose(e) {
-        const {menu, action} = e.detail;
+        const {action, menu} = e.detail;
         if (action === 'toggleScope') {
             e.preventDefault();
             return;
@@ -533,7 +533,7 @@ class KeyboardShortcutHotkeyEntry {
     _getDefaultKeyAndModifiers(defaultHotkeys, action) {
         for (const {action: action2, key, modifiers} of defaultHotkeys) {
             if (action2 !== action) { continue; }
-            return {modifiers, key};
+            return {key, modifiers};
         }
         return null;
     }

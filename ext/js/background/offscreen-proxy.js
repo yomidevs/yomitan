@@ -70,11 +70,11 @@ export class OffscreenProxy {
         }
 
         this._creatingOffscreen = chrome.offscreen.createDocument({
-            url: 'offscreen.html',
+            justification: 'Access to the clipboard',
             reasons: [
                 /** @type {chrome.offscreen.Reason} */ ('CLIPBOARD'),
             ],
-            justification: 'Access to the clipboard',
+            url: 'offscreen.html',
         });
         await this._creatingOffscreen;
         this._creatingOffscreen = null;
@@ -201,7 +201,7 @@ export class TranslatorProxy {
             ...options,
             enabledDictionaryMap: enabledDictionaryMapList,
         };
-        return this._offscreen.sendMessagePromise({action: 'findKanjiOffscreen', params: {text, options: modifiedOptions}});
+        return this._offscreen.sendMessagePromise({action: 'findKanjiOffscreen', params: {options: modifiedOptions, text}});
     }
 
     /**
@@ -224,7 +224,7 @@ export class TranslatorProxy {
             excludeDictionaryDefinitions: excludeDictionaryDefinitionsList,
             textReplacements: textReplacementsSerialized,
         };
-        return this._offscreen.sendMessagePromise({action: 'findTermsOffscreen', params: {mode, text, options: modifiedOptions}});
+        return this._offscreen.sendMessagePromise({action: 'findTermsOffscreen', params: {mode, options: modifiedOptions, text}});
     }
 
     /**
@@ -233,7 +233,7 @@ export class TranslatorProxy {
      * @returns {Promise<import('translator').TermFrequencySimple[]>}
      */
     async getTermFrequencies(termReadingList, dictionaries) {
-        return this._offscreen.sendMessagePromise({action: 'getTermFrequenciesOffscreen', params: {termReadingList, dictionaries}});
+        return this._offscreen.sendMessagePromise({action: 'getTermFrequenciesOffscreen', params: {dictionaries, termReadingList}});
     }
 
     /** */

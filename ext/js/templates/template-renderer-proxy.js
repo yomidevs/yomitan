@@ -43,7 +43,7 @@ export class TemplateRendererProxy {
      */
     async render(template, data, type) {
         await this._prepareFrame();
-        return await this._invoke('render', {template, data, type});
+        return await this._invoke('render', {data, template, type});
     }
 
     /**
@@ -233,7 +233,7 @@ export class TemplateRendererProxy {
 
             window.addEventListener('message', onMessage, false);
             /** @type {import('template-renderer-proxy').FrontendMessage<TName>} */
-            const requestMessage = {action, params, id};
+            const requestMessage = {action, id, params};
             frameWindow.postMessage(requestMessage, '*');
         });
     }

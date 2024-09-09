@@ -194,7 +194,7 @@ export class Application extends EventDispatcher {
         log.configure(webExtension.extensionName);
         const api = new API(webExtension);
         await waitForBackendReady(webExtension);
-        const {tabId, frameId} = await api.frameInformationGet();
+        const {frameId, tabId} = await api.frameInformationGet();
         const crossFrameApi = new CrossFrameAPI(api, tabId, frameId);
         crossFrameApi.prepare();
         const application = new Application(api, crossFrameApi);
@@ -241,19 +241,19 @@ export class Application extends EventDispatcher {
     }
 
     /** @type {import('application').ApiHandler<'applicationDatabaseUpdated'>} */
-    _onMessageDatabaseUpdated({type, cause}) {
-        this.trigger('databaseUpdated', {type, cause});
+    _onMessageDatabaseUpdated({cause, type}) {
+        this.trigger('databaseUpdated', {cause, type});
     }
 
     /** @type {import('application').ApiHandler<'applicationZoomChanged'>} */
-    _onMessageZoomChanged({oldZoomFactor, newZoomFactor}) {
-        this.trigger('zoomChanged', {oldZoomFactor, newZoomFactor});
+    _onMessageZoomChanged({newZoomFactor, oldZoomFactor}) {
+        this.trigger('zoomChanged', {newZoomFactor, oldZoomFactor});
     }
 
     /**
      * @param {import('log').Events['logGenericError']} params
      */
-    async _onLogGenericError({error, level, context}) {
+    async _onLogGenericError({context, error, level}) {
         try {
             await this._api.logGenericErrorBackend(ExtensionError.serialize(error), level, context);
         } catch (e) {

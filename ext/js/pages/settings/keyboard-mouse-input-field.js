@@ -170,10 +170,10 @@ export class KeyboardMouseInputField extends EventDispatcher {
             case 'ControlRight':
             case 'MetaLeft':
             case 'MetaRight':
-            case 'ShiftLeft':
-            case 'ShiftRight':
             case 'OSLeft':
             case 'OSRight':
+            case 'ShiftLeft':
+            case 'ShiftRight':
                 return true;
             default:
                 return false;
@@ -193,8 +193,8 @@ export class KeyboardMouseInputField extends EventDispatcher {
             this._updateModifiers([...this._getModifierKeys(e)], this._isModifierKey(key) ? void 0 : key);
         } else {
             switch (key) {
-                case 'Escape':
                 case 'Backspace':
+                case 'Escape':
                     this.clearInputs();
                     break;
                 default:
@@ -225,7 +225,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
     _onMouseButtonPointerDown(e) {
         if (!e.isPrimary) { return; }
 
-        let {pointerType, pointerId} = e;
+        let {pointerId, pointerType} = e;
         // Workaround for Firefox bug not detecting certain 'touch' events as 'pen' events.
         if (this._penPointerIds.has(pointerId)) { pointerType = 'pen'; }
 
@@ -243,7 +243,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
      * @param {PointerEvent} e
      */
     _onMouseButtonPointerOver(e) {
-        const {pointerType, pointerId} = e;
+        const {pointerId, pointerType} = e;
         if (pointerType === 'pen') {
             this._penPointerIds.add(pointerId);
         }
@@ -309,7 +309,7 @@ export class KeyboardMouseInputField extends EventDispatcher {
 
         this._updateDisplayString();
         if (changed) {
-            this.trigger('change', {modifiers: this._modifiers, key: this._key});
+            this.trigger('change', {key: this._key, modifiers: this._modifiers});
         }
     }
 

@@ -23,41 +23,41 @@ import {tagalogTransforms} from '../../ext/js/language/tl/tagalog-transforms.js'
 const tests = [
     {
         category: 'prefixes',
-        valid: true,
         tests: [
-            {term: 'luto', source: 'tagaluto', rule: 'n', reasons: ['taga-']},
-            {term: 'sigaw', source: 'kasisigaw', rule: 'n', reasons: ['kaka-']},
-            {term: 'isip', source: 'kaiisip', rule: 'n', reasons: ['kaka-']},
-            {term: 'gamot', source: 'manggagamot', rule: 'n', reasons: ['mang- + rep1']},
-            {term: 'pareho', source: 'kapareho', rule: 'adj', reasons: ['ka-']},
-            {term: 'hina', source: 'nakapanghihina', rule: 'n', reasons: ['nakapang- + rep1']},
-            {term: 'tulong', source: 'nakatutulong', rule: 'n', reasons: ['naka- + rep1']},
+            {reasons: ['taga-'], rule: 'n', source: 'tagaluto', term: 'luto'},
+            {reasons: ['kaka-'], rule: 'n', source: 'kasisigaw', term: 'sigaw'},
+            {reasons: ['kaka-'], rule: 'n', source: 'kaiisip', term: 'isip'},
+            {reasons: ['mang- + rep1'], rule: 'n', source: 'manggagamot', term: 'gamot'},
+            {reasons: ['ka-'], rule: 'adj', source: 'kapareho', term: 'pareho'},
+            {reasons: ['nakapang- + rep1'], rule: 'n', source: 'nakapanghihina', term: 'hina'},
+            {reasons: ['naka- + rep1'], rule: 'n', source: 'nakatutulong', term: 'tulong'},
         ],
+        valid: true,
     },
     {
         category: 'sandwich',
-        valid: true,
         tests: [
-            {term: 'sira', source: 'masiraan', rule: 'n', reasons: ['ma-...-an']},
+            {reasons: ['ma-...-an'], rule: 'n', source: 'masiraan', term: 'sira'},
         ],
+        valid: true,
     },
     {
         category: 'suffix',
-        valid: true,
         tests: [
-            {term: 'kain', source: 'kainin', rule: 'n', reasons: ['-in']},
-            {term: 'ako', source: 'akong', rule: 'n', reasons: ['-ng']},
+            {reasons: ['-in'], rule: 'n', source: 'kainin', term: 'kain'},
+            {reasons: ['-ng'], rule: 'n', source: 'akong', term: 'ako'},
         ],
+        valid: true,
     },
     {
         category: 'irregulars',
-        valid: true,
         tests: [
-            {term: 'dalawa', source: 'ikalawa', rule: 'num', reasons: ['ika-']},
-            {term: 'dalawa', source: 'pangalawa', rule: 'num', reasons: ['pang-']},
-            {term: 'tatlo', source: 'ikatlo', rule: 'num', reasons: ['ika-']},
-            {term: 'tatlo', source: 'pangatlo', rule: 'num', reasons: ['pang-']},
+            {reasons: ['ika-'], rule: 'num', source: 'ikalawa', term: 'dalawa'},
+            {reasons: ['pang-'], rule: 'num', source: 'pangalawa', term: 'dalawa'},
+            {reasons: ['ika-'], rule: 'num', source: 'ikatlo', term: 'tatlo'},
+            {reasons: ['pang-'], rule: 'num', source: 'pangatlo', term: 'tatlo'},
         ],
+        valid: true,
     },
 ];
 

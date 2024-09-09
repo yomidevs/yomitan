@@ -147,7 +147,7 @@ export class Mecab {
     _onMessage(message) {
         if (typeof message !== 'object' || message === null) { return; }
 
-        const {sequence, data} = /** @type {import('core').SerializableObject} */ (message);
+        const {data, sequence} = /** @type {import('core').SerializableObject} */ (message);
         if (typeof sequence !== 'number') { return; }
 
         const invocation = this._invocations.get(sequence);
@@ -192,7 +192,7 @@ export class Mecab {
                 reject(new Error(`MeCab invoke timed out after ${this._timeout}ms`));
             }, this._timeout);
 
-            this._invocations.set(sequence, {resolve, reject, timer});
+            this._invocations.set(sequence, {reject, resolve, timer});
 
             this._port.postMessage({action, params, sequence});
         });
@@ -214,11 +214,11 @@ export class Mecab {
                     if (typeof term !== 'string') { term = ''; }
                     if (typeof reading !== 'string') { reading = ''; }
                     if (typeof source !== 'string') { source = ''; }
-                    line.push({term, reading, source});
+                    line.push({reading, source, term});
                 }
                 lines.push(line);
             }
-            results.push({name, lines});
+            results.push({lines, name});
         }
         return results;
     }

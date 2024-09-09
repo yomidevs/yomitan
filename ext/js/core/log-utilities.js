@@ -21,8 +21,8 @@
  */
 export function logErrorLevelToNumber(errorLevel) {
     switch (errorLevel) {
-        case 'warn': return 1;
         case 'error': return 2;
+        case 'warn': return 1;
         default: return 0;
     }
 }

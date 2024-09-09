@@ -23,24 +23,13 @@ const splitPattern = /[,;\s]+/;
 /** @type {Map<string, {operators: Map<string, import('profile-conditions-util').CreateSchemaFunction>}>} */
 const descriptors = new Map([
     [
-        'popupLevel',
+        'flags',
         {
             operators: new Map(/** @type {import('profile-conditions-util').OperatorMapArray} */ ([
-                ['equal', createSchemaPopupLevelEqual.bind(this)],
-                ['notEqual', createSchemaPopupLevelNotEqual.bind(this)],
-                ['lessThan', createSchemaPopupLevelLessThan.bind(this)],
-                ['greaterThan', createSchemaPopupLevelGreaterThan.bind(this)],
-                ['lessThanOrEqual', createSchemaPopupLevelLessThanOrEqual.bind(this)],
-                ['greaterThanOrEqual', createSchemaPopupLevelGreaterThanOrEqual.bind(this)],
-            ])),
-        },
-    ],
-    [
-        'url',
-        {
-            operators: new Map(/** @type {import('profile-conditions-util').OperatorMapArray} */ ([
-                ['matchDomain', createSchemaUrlMatchDomain.bind(this)],
-                ['matchRegExp', createSchemaUrlMatchRegExp.bind(this)],
+                ['are', createSchemaFlagsAre.bind(this)],
+                ['areNot', createSchemaFlagsAreNot.bind(this)],
+                ['include', createSchemaFlagsInclude.bind(this)],
+                ['notInclude', createSchemaFlagsNotInclude.bind(this)],
             ])),
         },
     ],
@@ -56,13 +45,24 @@ const descriptors = new Map([
         },
     ],
     [
-        'flags',
+        'popupLevel',
         {
             operators: new Map(/** @type {import('profile-conditions-util').OperatorMapArray} */ ([
-                ['are', createSchemaFlagsAre.bind(this)],
-                ['areNot', createSchemaFlagsAreNot.bind(this)],
-                ['include', createSchemaFlagsInclude.bind(this)],
-                ['notInclude', createSchemaFlagsNotInclude.bind(this)],
+                ['equal', createSchemaPopupLevelEqual.bind(this)],
+                ['greaterThan', createSchemaPopupLevelGreaterThan.bind(this)],
+                ['greaterThanOrEqual', createSchemaPopupLevelGreaterThanOrEqual.bind(this)],
+                ['lessThan', createSchemaPopupLevelLessThan.bind(this)],
+                ['lessThanOrEqual', createSchemaPopupLevelLessThanOrEqual.bind(this)],
+                ['notEqual', createSchemaPopupLevelNotEqual.bind(this)],
+            ])),
+        },
+    ],
+    [
+        'url',
+        {
+            operators: new Map(/** @type {import('profile-conditions-util').OperatorMapArray} */ ([
+                ['matchDomain', createSchemaUrlMatchDomain.bind(this)],
+                ['matchRegExp', createSchemaUrlMatchRegExp.bind(this)],
             ])),
         },
     ],
@@ -78,7 +78,7 @@ export function createSchema(conditionGroups) {
     const anyOf = [];
     for (const {conditions} of conditionGroups) {
         const allOf = [];
-        for (const {type, operator, value} of conditions) {
+        for (const {operator, type, value} of conditions) {
             const conditionDescriptor = descriptors.get(type);
             if (typeof conditionDescriptor === 'undefined') { continue; }
 
@@ -154,10 +154,10 @@ function stringToNumber(value) {
 function createSchemaPopupLevelEqual(value) {
     const number = stringToNumber(value);
     return {
-        required: ['depth'],
         properties: {
             depth: {const: number},
         },
+        required: ['depth'],
     };
 }
 
@@ -180,10 +180,10 @@ function createSchemaPopupLevelNotEqual(value) {
 function createSchemaPopupLevelLessThan(value) {
     const number = stringToNumber(value);
     return {
-        required: ['depth'],
         properties: {
-            depth: {type: 'number', exclusiveMaximum: number},
+            depth: {exclusiveMaximum: number, type: 'number'},
         },
+        required: ['depth'],
     };
 }
 
@@ -194,10 +194,10 @@ function createSchemaPopupLevelLessThan(value) {
 function createSchemaPopupLevelGreaterThan(value) {
     const number = stringToNumber(value);
     return {
-        required: ['depth'],
         properties: {
-            depth: {type: 'number', exclusiveMinimum: number},
+            depth: {exclusiveMinimum: number, type: 'number'},
         },
+        required: ['depth'],
     };
 }
 
@@ -208,10 +208,10 @@ function createSchemaPopupLevelGreaterThan(value) {
 function createSchemaPopupLevelLessThanOrEqual(value) {
     const number = stringToNumber(value);
     return {
-        required: ['depth'],
         properties: {
-            depth: {type: 'number', maximum: number},
+            depth: {maximum: number, type: 'number'},
         },
+        required: ['depth'],
     };
 }
 
@@ -222,10 +222,10 @@ function createSchemaPopupLevelLessThanOrEqual(value) {
 function createSchemaPopupLevelGreaterThanOrEqual(value) {
     const number = stringToNumber(value);
     return {
-        required: ['depth'],
         properties: {
-            depth: {type: 'number', minimum: number},
+            depth: {minimum: number, type: 'number'},
         },
+        required: ['depth'],
     };
 }
 
@@ -243,10 +243,10 @@ function createSchemaUrlMatchDomain(value) {
         oneOf.push({const: domain});
     }
     return {
-        required: ['domain'],
         properties: {
             domain: {oneOf},
         },
+        required: ['domain'],
     };
 }
 
@@ -256,10 +256,10 @@ function createSchemaUrlMatchDomain(value) {
  */
 function createSchemaUrlMatchRegExp(value) {
     return {
-        required: ['url'],
         properties: {
-            url: {type: 'string', pattern: value, patternFlags: 'i'},
+            url: {pattern: value, patternFlags: 'i', type: 'string'},
         },
+        required: ['url'],
     };
 }
 
@@ -378,9 +378,9 @@ function createSchemaArrayCheck(key, value, exact, none) {
         }
     }
     return {
-        required: [key],
         properties: {
             [key]: schema,
         },
+        required: [key],
     };
 }

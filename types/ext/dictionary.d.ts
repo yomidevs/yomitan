@@ -32,21 +32,9 @@ export type DictionaryEntryType = DictionaryEntry['type'];
  */
 export type Tag = {
     /**
-     * The name of the tag.
-     */
-    name: string;
-    /**
      * The category of the tag.
      */
     category: string;
-    /**
-     * A number indicating the sorting order of the tag.
-     */
-    order: number;
-    /**
-     * A score value for the tag.
-     */
-    score: number;
     /**
      * An array of descriptions for the tag. * If there are multiple entries,
      * the values will typically have originated from different dictionaries.
@@ -59,9 +47,21 @@ export type Tag = {
      */
     dictionaries: string[];
     /**
+     * The name of the tag.
+     */
+    name: string;
+    /**
+     * A number indicating the sorting order of the tag.
+     */
+    order: number;
+    /**
      * Whether or not this tag is redundant with previous tags.
      */
     redundant: boolean;
+    /**
+     * A score value for the tag.
+     */
+    score: number;
 };
 
 // Kanji
@@ -71,13 +71,13 @@ export type Tag = {
  */
 export type KanjiDictionaryEntry = {
     /**
-     * The type of the entry.
-     */
-    type: 'kanji';
-    /**
      * The kanji character that was looked up.
      */
     character: string;
+    /**
+     * Definitions for the kanji character.
+     */
+    definitions: string[];
     /**
      * The name of the dictionary that the information originated from.
      */
@@ -87,29 +87,29 @@ export type KanjiDictionaryEntry = {
      */
     dictionaryAlias: string;
     /**
-     * Onyomi readings for the kanji character.
+     * Frequency information for the kanji character.
      */
-    onyomi: string[];
+    frequencies: KanjiFrequency[];
     /**
      * Kunyomi readings for the kanji character.
      */
     kunyomi: string[];
     /**
-     * Tags for the kanji character.
+     * Onyomi readings for the kanji character.
      */
-    tags: Tag[];
+    onyomi: string[];
     /**
      * An object containing stats about the kanji character.
      */
     stats: KanjiStatGroups;
     /**
-     * Definitions for the kanji character.
+     * Tags for the kanji character.
      */
-    definitions: string[];
+    tags: Tag[];
     /**
-     * Frequency information for the kanji character.
+     * The type of the entry.
      */
-    frequencies: KanjiFrequency[];
+    type: 'kanji';
 };
 
 /**
@@ -128,10 +128,6 @@ export type KanjiStatGroups = {
  */
 export type KanjiStat = {
     /**
-     * The name of the stat.
-     */
-    name: string;
-    /**
      * The category of the stat.
      */
     category: string;
@@ -140,6 +136,14 @@ export type KanjiStat = {
      */
     content: string;
     /**
+     * The name of the dictionary that the stat originated from.
+     */
+    dictionary: string;
+    /**
+     * The name of the stat.
+     */
+    name: string;
+    /**
      * A number indicating the sorting order of the stat.
      */
     order: number;
@@ -147,10 +151,6 @@ export type KanjiStat = {
      * A score value for the stat.
      */
     score: number;
-    /**
-     * The name of the dictionary that the stat originated from.
-     */
-    dictionary: string;
     /**
      * A value for the stat.
      */
@@ -163,41 +163,41 @@ export type KanjiStat = {
  */
 export type KanjiFrequency = {
     /**
-     * The original order of the frequency, which is usually used for sorting.
+     * The kanji character for the frequency.
      */
-    index: number;
+    character: string;
     /**
      * The name of the dictionary that the frequency information originated from.
      */
     dictionary: string;
     /**
-     * The index of the dictionary in the original list of dictionaries used for the lookup.
-     */
-    dictionaryIndex: number;
-    /**
      * The alias of the dictionary
      */
     dictionaryAlias: string;
+    /**
+     * The index of the dictionary in the original list of dictionaries used for the lookup.
+     */
+    dictionaryIndex: number;
     /**
      * The priority of the dictionary.
      */
     dictionaryPriority: number;
     /**
-     * The kanji character for the frequency.
+     * A display value to show to the user.
      */
-    character: string;
+    displayValue: null | string;
+    /**
+     * Whether or not the displayValue string was parsed to determine the frequency value.
+     */
+    displayValueParsed: boolean;
     /**
      * The frequency for the character, as a number of occurrences or an overall rank.
      */
     frequency: number;
     /**
-     * A display value to show to the user.
+     * The original order of the frequency, which is usually used for sorting.
      */
-    displayValue: string | null;
-    /**
-     * Whether or not the displayValue string was parsed to determine the frequency value.
-     */
-    displayValueParsed: boolean;
+    index: number;
 };
 
 // Terms
@@ -207,71 +207,71 @@ export type KanjiFrequency = {
  */
 export type TermDictionaryEntry = {
     /**
-     * The type of the entry.
+     * Definitions for the entry.
      */
-    type: 'term';
+    definitions: TermDefinition[];
+    /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
+    /**
+     * The index of the dictionary in the original list of dictionaries used for the lookup.
+     */
+    dictionaryIndex: number;
+    /**
+     * The priority of the dictionary.
+     */
+    dictionaryPriority: number;
+    /**
+     * Frequencies for the entry.
+     */
+    frequencies: TermFrequency[];
+    /**
+     * The sorting value based on the determined term frequency.
+     */
+    frequencyOrder: number;
+    /**
+     * Headwords for the entry.
+     */
+    headwords: TermHeadword[];
+    /**
+     * Ways that a looked-up word might be an inflected form of this term.
+     */
+    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
     /**
      * Whether or not any of the sources is a primary source. Primary sources are derived from the
      * original search text, while non-primary sources originate from related terms.
      */
     isPrimary: boolean;
     /**
-     * Ways that a looked-up word might be transformed into this term.
-     */
-    textProcessorRuleChainCandidates: textProcessorRuleChainCandidate[];
-    /**
-     * Ways that a looked-up word might be an inflected form of this term.
-     */
-    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
-    /**
-     * A score for the dictionary entry.
-     */
-    score: number;
-    /**
-     * The sorting value based on the determined term frequency.
-     */
-    frequencyOrder: number;
-    /**
-     * The index of the dictionary in the original list of dictionaries used for the lookup.
-     */
-    dictionaryIndex: number;
-    /**
-     * The alias of the dictionary
-     */
-    dictionaryAlias: string;
-    /**
-     * The priority of the dictionary.
-     */
-    dictionaryPriority: number;
-    /**
-     * The number of primary sources that had an exact text match for the term.
-     */
-    sourceTermExactMatchCount: number;
-    /**
      * The maximum length of the original text for all primary sources.
      */
     maxOriginalTextLength: number;
-    /**
-     * Headwords for the entry.
-     */
-    headwords: TermHeadword[];
-    /**
-     * Definitions for the entry.
-     */
-    definitions: TermDefinition[];
     /**
      * Pronunciations for the entry.
      */
     pronunciations: TermPronunciation[];
     /**
-     * Frequencies for the entry.
+     * A score for the dictionary entry.
      */
-    frequencies: TermFrequency[];
+    score: number;
+    /**
+     * The number of primary sources that had an exact text match for the term.
+     */
+    sourceTermExactMatchCount: number;
+    /**
+     * Ways that a looked-up word might be transformed into this term.
+     */
+    textProcessorRuleChainCandidates: textProcessorRuleChainCandidate[];
+    /**
+     * The type of the entry.
+     */
+    type: 'term';
 };
 
 export type InflectionRuleChainCandidate = {
-    source: InflectionSource;
     inflectionRules: InflectionRuleChain;
+    source: InflectionSource;
 };
 
 type textProcessorRuleChainCandidate = string[];
@@ -279,11 +279,11 @@ type textProcessorRuleChainCandidate = string[];
 export type InflectionRuleChain = InflectionRule[];
 
 export type InflectionRule = {
-    name: string;
     description?: string;
+    name: string;
 };
 
-export type InflectionSource = 'algorithm' | 'dictionary' | 'both';
+export type InflectionSource = 'algorithm' | 'both' | 'dictionary';
 
 /**
  * A term headword is a combination of a term, reading, and auxiliary information.
@@ -293,10 +293,6 @@ export type TermHeadword = {
      * The original order of the headword, which is usually used for sorting.
      */
     index: number;
-    /**
-     * The text for the term.
-     */
-    term: string;
     /**
      * The reading of the term.
      */
@@ -310,6 +306,10 @@ export type TermHeadword = {
      */
     tags: Tag[];
     /**
+     * The text for the term.
+     */
+    term: string;
+    /**
      * List of word classes (part of speech) for the headword.
      */
     wordClasses: string[];
@@ -320,41 +320,50 @@ export type TermHeadword = {
  */
 export type TermDefinition = {
     /**
-     * The original order of the definition, which is usually used for sorting.
-     */
-    index: number;
-    /**
-     * A list of headwords that this definition corresponds to.
-     */
-    headwordIndices: number[];
-    /**
      * The name of the dictionary that the definition information originated from.
      */
     dictionary: string;
-    /**
-     * The index of the dictionary in the original list of dictionaries used for the lookup.
-     */
-    dictionaryIndex: number;
     /**
      * The alias of the dictionary
      */
     dictionaryAlias: string;
     /**
+     * The index of the dictionary in the original list of dictionaries used for the lookup.
+     */
+    dictionaryIndex: number;
+    /**
      * The priority of the dictionary.
      */
     dictionaryPriority: number;
+    /**
+     * The definition entries.
+     */
+    entries: DictionaryData.TermGlossaryContent[];
+    /**
+     * The sorting value based on the determined term frequency.
+     */
+    frequencyOrder: number;
+    /**
+     * A list of headwords that this definition corresponds to.
+     */
+    headwordIndices: number[];
     /**
      * Database ID for the definition.
      */
     id: number;
     /**
+     * The original order of the definition, which is usually used for sorting.
+     */
+    index: number;
+    /**
+     * Whether or not any of the sources is a primary source. Primary sources are derived from the
+     * original search text, while non-primary sources originate from related terms.
+     */
+    isPrimary: boolean;
+    /**
      * A score for the definition.
      */
     score: number;
-    /**
-     * The sorting value based on the determined term frequency.
-     */
-    frequencyOrder: number;
     /**
      * A list of database sequence numbers for the term. A value of `-1` corresponds to no sequence.
      * The list can have multiple values if multiple definitions with different sequences have been merged.
@@ -362,18 +371,9 @@ export type TermDefinition = {
      */
     sequences: number[];
     /**
-     * Whether or not any of the sources is a primary source. Primary sources are derived from the
-     * original search text, while non-primary sources originate from related terms.
-     */
-    isPrimary: boolean;
-    /**
      * Tags for the definition.
      */
     tags: Tag[];
-    /**
-     * The definition entries.
-     */
-    entries: DictionaryData.TermGlossaryContent[];
 };
 
 /**
@@ -381,68 +381,64 @@ export type TermDefinition = {
  */
 export type TermPronunciation = {
     /**
-     * The original order of the pronunciation, which is usually used for sorting.
-     */
-    index: number;
-    /**
-     * Which headword this pronunciation corresponds to.
-     */
-    headwordIndex: number;
-    /**
      * The name of the dictionary that the proununciation information originated from.
      */
     dictionary: string;
-    /**
-     * The index of the dictionary in the original list of dictionaries used for the lookup.
-     */
-    dictionaryIndex: number;
     /**
      * The alias of the dictionary
      */
     dictionaryAlias: string;
     /**
+     * The index of the dictionary in the original list of dictionaries used for the lookup.
+     */
+    dictionaryIndex: number;
+    /**
      * The priority of the dictionary.
      */
     dictionaryPriority: number;
+    /**
+     * Which headword this pronunciation corresponds to.
+     */
+    headwordIndex: number;
+    /**
+     * The original order of the pronunciation, which is usually used for sorting.
+     */
+    index: number;
     /**
      * The pronunciations for the term.
      */
     pronunciations: Pronunciation[];
 };
 
-export type Pronunciation = PitchAccent | PhoneticTranscription;
+export type Pronunciation = PhoneticTranscription | PitchAccent;
 
 /**
  * Pitch accent information for a term, represented as the position of the downstep.
  */
 export type PitchAccent = {
     /**
-     * Type of the pronunciation, for disambiguation between union type members.
+     * Positions of morae with a devoiced sound.
      */
-    type: 'pitch-accent';
-    /**
-     * Position of the downstep, as a number of mora.
-     */
-    position: number;
+    devoicePositions: number[];
     /**
      * Positions of morae with a nasal sound.
      */
     nasalPositions: number[];
     /**
-     * Positions of morae with a devoiced sound.
+     * Position of the downstep, as a number of mora.
      */
-    devoicePositions: number[];
+    position: number;
     /**
      * Tags for the pitch accent.
      */
     tags: Tag[];
-};
-
-export type PhoneticTranscription = {
     /**
      * Type of the pronunciation, for disambiguation between union type members.
      */
-    type: 'phonetic-transcription';
+    type: 'pitch-accent';
+};
+
+export type PhoneticTranscription = {
     /**
      * An IPA transcription.
      */
@@ -451,6 +447,10 @@ export type PhoneticTranscription = {
      * Tags for the IPA transcription.
      */
     tags: Tag[];
+    /**
+     * Type of the pronunciation, for disambiguation between union type members.
+     */
+    type: 'phonetic-transcription';
 };
 
 export type PronunciationType = Pronunciation['type'];
@@ -463,45 +463,45 @@ export type PronunciationGeneric<T extends PronunciationType> = Extract<Pronunci
  */
 export type TermFrequency = {
     /**
-     * The original order of the frequency, which is usually used for sorting.
-     */
-    index: number;
-    /**
-     * Which headword this frequency corresponds to.
-     */
-    headwordIndex: number;
-    /**
      * The name of the dictionary that the frequency information originated from.
      */
     dictionary: string;
-    /**
-     * The index of the dictionary in the original list of dictionaries used for the lookup.
-     */
-    dictionaryIndex: number;
     /**
      * The alias of the dictionary
      */
     dictionaryAlias: string;
     /**
+     * The index of the dictionary in the original list of dictionaries used for the lookup.
+     */
+    dictionaryIndex: number;
+    /**
      * The priority of the dictionary.
      */
     dictionaryPriority: number;
     /**
-     * Whether or not the frequency had an explicit reading specified.
+     * A display value to show to the user.
      */
-    hasReading: boolean;
+    displayValue: null | string;
+    /**
+     * Whether or not the displayValue string was parsed to determine the frequency value.
+     */
+    displayValueParsed: boolean;
     /**
      * The frequency for the term, as a number of occurrences or an overall rank.
      */
     frequency: number;
     /**
-     * A display value to show to the user.
+     * Whether or not the frequency had an explicit reading specified.
      */
-    displayValue: string | null;
+    hasReading: boolean;
     /**
-     * Whether or not the displayValue string was parsed to determine the frequency value.
+     * Which headword this frequency corresponds to.
      */
-    displayValueParsed: boolean;
+    headwordIndex: number;
+    /**
+     * The original order of the frequency, which is usually used for sorting.
+     */
+    index: number;
 };
 
 /**
@@ -512,12 +512,29 @@ export type TermSourceMatchType = 'exact' | 'prefix' | 'suffix';
 /**
  * Enum representing what database field was used to match the source term.
  */
-export type TermSourceMatchSource = 'term' | 'reading' | 'sequence';
+export type TermSourceMatchSource = 'reading' | 'sequence' | 'term';
 
 /**
  * Source information represents how the original text was transformed to get to the final term.
  */
 export type TermSource = {
+    /**
+     * The final text after applying deinflections.
+     */
+    deinflectedText: string;
+    /**
+     * Whether or not this source is a primary source. Primary sources are derived from the
+     * original search text, while non-primary sources originate from related terms.
+     */
+    isPrimary: boolean;
+    /**
+     * Which field was used to match the database entry.
+     */
+    matchSource: TermSourceMatchSource;
+    /**
+     * How the deinflected text matches the value from the database.
+     */
+    matchType: TermSourceMatchType;
     /**
      * The original text that was searched.
      */
@@ -526,21 +543,4 @@ export type TermSource = {
      * The original text after being transformed, but before applying deinflections.
      */
     transformedText: string;
-    /**
-     * The final text after applying deinflections.
-     */
-    deinflectedText: string;
-    /**
-     * How the deinflected text matches the value from the database.
-     */
-    matchType: TermSourceMatchType;
-    /**
-     * Which field was used to match the database entry.
-     */
-    matchSource: TermSourceMatchSource;
-    /**
-     * Whether or not this source is a primary source. Primary sources are derived from the
-     * original search text, while non-primary sources originate from related terms.
-     */
-    isPrimary: boolean;
 };

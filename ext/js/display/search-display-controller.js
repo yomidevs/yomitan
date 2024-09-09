@@ -195,7 +195,7 @@ export class SearchDisplayController {
      * @param {import('settings').ProfileOptions} options
      */
     _updateSearchSettings(options) {
-        const {language, enableWanakana, stickySearchHeader} = options.general;
+        const {enableWanakana, language, stickySearchHeader} = options.general;
         const wanakanaEnabled = language === 'ja' && enableWanakana;
         this._wanakanaEnableCheckbox.checked = wanakanaEnabled;
         this._wanakanaSearchOption.style.display = language === 'ja' ? '' : 'none';
@@ -206,13 +206,18 @@ export class SearchDisplayController {
     /**
      * @param {import('display').EventArgument<'contentUpdateStart'>} details
      */
-    _onContentUpdateStart({type, query}) {
+    _onContentUpdateStart({query, type}) {
         let animate = false;
         let valid = false;
         let showBackButton = false;
         switch (type) {
-            case 'terms':
+            case 'clear':
+                valid = false;
+                animate = true;
+                query = '';
+                break;
             case 'kanji':
+            case 'terms':
                 {
                     const {content, state} = this._display.history;
                     animate = (typeof content === 'object' && content !== null && content.animate === true);
@@ -220,11 +225,6 @@ export class SearchDisplayController {
                     valid = (typeof query === 'string' && query.length > 0);
                     this._display.blurElement(this._queryInput);
                 }
-                break;
-            case 'clear':
-                valid = false;
-                animate = true;
-                query = '';
                 break;
         }
 
@@ -300,7 +300,7 @@ export class SearchDisplayController {
     }
 
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
-    _onExternalSearchUpdate({text, animate}) {
+    _onExternalSearchUpdate({animate, text}) {
         void this._updateSearchFromClipboard(text, animate, false);
     }
 
@@ -339,10 +339,10 @@ export class SearchDisplayController {
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',
-            path: 'general.enableWanakana',
-            value,
-            scope: 'profile',
             optionsContext: this._display.getOptionsContext(),
+            path: 'general.enableWanakana',
+            scope: 'profile',
+            value,
         };
         void this._display.application.api.modifySettings([modification], 'search');
     }
@@ -366,10 +366,10 @@ export class SearchDisplayController {
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',
-            path: 'general.stickySearchHeader',
-            value,
-            scope: 'profile',
             optionsContext: this._display.getOptionsContext(),
+            path: 'general.stickySearchHeader',
+            scope: 'profile',
+            value,
         };
         void this._display.application.api.modifySettings([modification], 'search');
     }
@@ -405,10 +405,10 @@ export class SearchDisplayController {
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',
-            path: 'profileCurrent',
-            value,
-            scope: 'global',
             optionsContext: null,
+            path: 'profileCurrent',
+            scope: 'global',
+            value,
         };
         await this._display.application.api.modifySettings([modification], 'search');
     }
@@ -524,10 +524,10 @@ export class SearchDisplayController {
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',
-            path: 'clipboard.enableSearchPageMonitor',
-            value,
-            scope: 'profile',
             optionsContext: this._display.getOptionsContext(),
+            path: 'clipboard.enableSearchPageMonitor',
+            scope: 'profile',
+            value,
         };
         await this._display.application.api.modifySettings([modification], 'search');
     }
@@ -587,25 +587,25 @@ export class SearchDisplayController {
         if (flags !== null) {
             optionsContext.flags = flags;
         }
-        const {tabId, frameId} = this._display.application;
+        const {frameId, tabId} = this._display.application;
         /** @type {import('display').ContentDetails} */
         const details = {
+            content: {
+                animate,
+                contentOrigin: {frameId, tabId},
+                dictionaryEntries: void 0,
+            },
             focus: false,
             historyMode,
             params: {
                 query,
             },
             state: {
+                documentTitle,
                 focusEntry: 0,
                 optionsContext,
+                sentence: {offset: 0, text: query},
                 url,
-                sentence: {text: query, offset: 0},
-                documentTitle,
-            },
-            content: {
-                dictionaryEntries: void 0,
-                animate,
-                contentOrigin: {tabId, frameId},
             },
         };
         if (!lookup) { details.params.lookup = 'false'; }
@@ -651,7 +651,7 @@ export class SearchDisplayController {
 
     /** */
     async _updateProfileSelect() {
-        const {profiles, profileCurrent} = await this._display.application.api.optionsGetFull();
+        const {profileCurrent, profiles} = await this._display.application.api.optionsGetFull();
 
         /** @type {HTMLElement} */
         const optionGroup = querySelectorNotNull(document, '#profile-select-option-group');

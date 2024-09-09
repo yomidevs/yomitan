@@ -18,11 +18,11 @@
 import type * as Settings from './settings';
 
 export type OptionsScope = {
+    optionsContext: null | Settings.OptionsContext;
     scope: OptionsScopeType;
-    optionsContext: Settings.OptionsContext | null;
 };
 
-export type OptionsScopeType = 'profile' | 'global';
+export type OptionsScopeType = 'global' | 'profile';
 
 export type Read = {
     path: string;
@@ -47,27 +47,27 @@ export type ModificationSwap = {
 
 export type ModificationSplice = {
     action: 'splice';
-    path: string;
-    start: number;
     deleteCount: number;
     items: unknown[];
+    path: string;
+    start: number;
 };
 
 export type ModificationPush = {
     action: 'push';
-    path: string;
     items: unknown[];
+    path: string;
 };
 
 export type Modification = (
-    ModificationSet |
     ModificationDelete |
-    ModificationSwap |
+    ModificationPush |
+    ModificationSet |
     ModificationSplice |
-    ModificationPush
+    ModificationSwap
 );
 
-export type ScopedRead = Read & OptionsScope;
+export type ScopedRead = OptionsScope & Read;
 
 export type ScopedModificationSet = ModificationSet & OptionsScope;
 
@@ -80,11 +80,11 @@ export type ScopedModificationSplice = ModificationSplice & OptionsScope;
 export type ScopedModificationPush = ModificationPush & OptionsScope;
 
 export type ScopedModification = (
-    ScopedModificationSet |
     ScopedModificationDelete |
-    ScopedModificationSwap |
+    ScopedModificationPush |
+    ScopedModificationSet |
     ScopedModificationSplice |
-    ScopedModificationPush
+    ScopedModificationSwap
 );
 
 export type ModificationSetResult = unknown;
@@ -100,11 +100,11 @@ export type ModificationPushResult = number;
 // There is some redundancy with this type currently due to the `unknown`s used in it.
 // For now, this is fine, but the types could be improved in the future.
 export type ModificationResult = (
+    ModificationDeleteResult |
+    ModificationPushResult |
     // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     ModificationSetResult |
-    ModificationDeleteResult |
-    // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
-    ModificationSwapResult |
     ModificationSpliceResult |
-    ModificationPushResult
+    // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+    ModificationSwapResult
 );

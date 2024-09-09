@@ -149,7 +149,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async hide(changeFocus) {
-        await this._invokeSafe('popupFactoryHide', {id: this._id, changeFocus}, void 0);
+        await this._invokeSafe('popupFactoryHide', {changeFocus, id: this._id}, void 0);
     }
 
     /**
@@ -168,7 +168,7 @@ export class PopupProxy extends EventDispatcher {
      *   or null if the override wasn't assigned.
      */
     setVisibleOverride(value, priority) {
-        return this._invokeSafe('popupFactorySetVisibleOverride', {id: this._id, value, priority}, null);
+        return this._invokeSafe('popupFactorySetVisibleOverride', {id: this._id, priority, value}, null);
     }
 
     /**
@@ -212,7 +212,7 @@ export class PopupProxy extends EventDispatcher {
                 sourceRect.bottom += this._frameOffsetY;
             }
         }
-        await this._invokeSafe('popupFactoryShowContent', {id: this._id, details, displayDetails}, void 0);
+        await this._invokeSafe('popupFactoryShowContent', {details, displayDetails, id: this._id}, void 0);
     }
 
     /**
@@ -221,7 +221,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async setCustomCss(css) {
-        await this._invokeSafe('popupFactorySetCustomCss', {id: this._id, css}, void 0);
+        await this._invokeSafe('popupFactorySetCustomCss', {css, id: this._id}, void 0);
     }
 
     /**
@@ -265,7 +265,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<void>}
      */
     async setCustomOuterCss(css, useWebExtensionApi) {
-        await this._invokeSafe('popupFactorySetCustomOuterCss', {id: this._id, css, useWebExtensionApi}, void 0);
+        await this._invokeSafe('popupFactorySetCustomOuterCss', {css, id: this._id, useWebExtensionApi}, void 0);
     }
 
     /**
@@ -274,7 +274,7 @@ export class PopupProxy extends EventDispatcher {
      *   `valid` is `false` for `PopupProxy`, since the DOM node is hosted in a different frame.
      */
     getFrameRect() {
-        return {left: 0, top: 0, right: 0, bottom: 0, valid: false};
+        return {bottom: 0, left: 0, right: 0, top: 0, valid: false};
     }
 
     /**
@@ -282,7 +282,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<import('popup').ValidSize>} The size and whether or not it is valid.
      */
     getFrameSize() {
-        return this._invokeSafe('popupFactoryGetFrameSize', {id: this._id}, {width: 0, height: 0, valid: false});
+        return this._invokeSafe('popupFactoryGetFrameSize', {id: this._id}, {height: 0, valid: false, width: 0});
     }
 
     /**
@@ -292,7 +292,7 @@ export class PopupProxy extends EventDispatcher {
      * @returns {Promise<boolean>} `true` if the size assignment was successful, `false` otherwise.
      */
     setFrameSize(width, height) {
-        return this._invokeSafe('popupFactorySetFrameSize', {id: this._id, width, height}, false);
+        return this._invokeSafe('popupFactorySetFrameSize', {height, id: this._id, width}, false);
     }
 
     // Private

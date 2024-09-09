@@ -30,4 +30,4 @@ export type GetRangeFromPointHandler = (
     y: number,
     /** Options to configure how element detection is performed. */
     options: GetRangeFromPointOptions,
-) => (TextSource | null);
+) => (null | TextSource);

@@ -22,35 +22,35 @@ import type * as DictionaryDataUtil from './dictionary-data-util';
 export type RenderMode = 'ankiNote';
 
 export type Context = {
-    query: string;
-    fullQuery: string;
     document: {title: string};
+    fullQuery: string;
+    query: string;
 };
 
 export type Media = {
     audio?: MediaObject;
-    screenshot?: MediaObject;
     clipboardImage?: MediaObject;
     clipboardText?: MediaObject;
-    popupSelectionText?: MediaObject;
-    textFurigana?: TextFuriganaSegment[];
     dictionaryMedia?: DictionaryMedia;
+    popupSelectionText?: MediaObject;
+    screenshot?: MediaObject;
+    textFurigana?: TextFuriganaSegment[];
 };
 
 export type MediaObject = {value: string};
 
 export type MediaSimpleType = (
     'audio' |
-    'screenshot' |
     'clipboardImage' |
     'clipboardText' |
-    'popupSelectionText'
+    'popupSelectionText' |
+    'screenshot'
 );
 
 export type TextFuriganaSegment = {
-    text: string;
-    readingMode: TextFuriganaReadingMode;
     details: MediaObject;
+    readingMode: TextFuriganaReadingMode;
+    text: string;
 };
 
 export type TextFuriganaReadingMode = 'hiragana' | 'katakana' | null;
@@ -62,24 +62,24 @@ export type DictionaryMedia = {
 };
 
 export type NoteData = {
-    marker: string;
-    readonly definition: DictionaryEntry;
-    glossaryLayoutMode: string;
-    compactTags: boolean;
-    group: boolean;
-    merge: boolean;
-    modeTermKanji: boolean;
-    modeTermKana: boolean;
-    modeKanji: boolean;
     compactGlossaries: boolean;
+    compactTags: boolean;
+    readonly context: Context;
+    readonly definition: DictionaryEntry;
+    readonly dictionaryEntry: Dictionary.DictionaryEntry;
+    glossaryLayoutMode: string;
+    group: boolean;
+    marker: string;
+    media: Media;
+    merge: boolean;
+    modeKanji: boolean;
+    modeTermKana: boolean;
+    modeTermKanji: boolean;
+    readonly phoneticTranscriptions: TranscriptionGroup[];
+    readonly pitchCount: number;
+    readonly pitches: PitchGroup[];
     readonly uniqueExpressions: string[];
     readonly uniqueReadings: string[];
-    readonly pitches: PitchGroup[];
-    readonly pitchCount: number;
-    readonly phoneticTranscriptions: TranscriptionGroup[];
-    readonly context: Context;
-    media: Media;
-    readonly dictionaryEntry: Dictionary.DictionaryEntry;
 };
 
 export type PitchGroup = {
@@ -88,14 +88,14 @@ export type PitchGroup = {
 };
 
 export type Pitch = {
-    expressions: string[];
-    reading: string;
-    position: number;
-    nasalPositions: number[];
     devoicePositions: number[];
-    tags: PitchTag[];
     exclusiveExpressions: string[];
     exclusiveReadings: string[];
+    expressions: string[];
+    nasalPositions: number[];
+    position: number;
+    reading: string;
+    tags: PitchTag[];
 };
 
 export type TranscriptionGroup = {
@@ -104,42 +104,42 @@ export type TranscriptionGroup = {
 };
 
 export type Transcription = {
-    expressions: string[];
-    reading: string;
-    ipa: string;
-    tags: Dictionary.Tag[];
     exclusiveExpressions: string[];
     exclusiveReadings: string[];
+    expressions: string[];
+    ipa: string;
+    reading: string;
+    tags: Dictionary.Tag[];
 };
 
 /**
  * For legacy reasons, {@link Pitch} has a custom tag type that resembles {@link Dictionary.Tag}.
  */
 export type PitchTag = {
-    name: string;
     category: string;
-    order: number;
-    score: number;
     content: string[];
     dictionaries: string[];
+    name: string;
+    order: number;
     redundant: boolean;
+    score: number;
 };
 
 export type KanjiDictionaryEntry = {
-    type: 'kanji';
     character: string;
+    readonly cloze: Cloze;
     dictionary: string;
     dictionaryAlias: string;
-    onyomi: string[];
-    kunyomi: string[];
-    glossary: string[];
-    readonly tags: Tag[];
-    readonly stats: KanjiStatGroups;
     readonly frequencies: KanjiFrequency[];
-    readonly frequencyHarmonic: number;
     readonly frequencyAverage: number;
+    readonly frequencyHarmonic: number;
+    glossary: string[];
+    kunyomi: string[];
+    onyomi: string[];
+    readonly stats: KanjiStatGroups;
+    readonly tags: Tag[];
+    type: 'kanji';
     url: string;
-    readonly cloze: Cloze;
 };
 
 export type KanjiStatGroups = {
@@ -147,71 +147,71 @@ export type KanjiStatGroups = {
 };
 
 export type KanjiStat = {
-    name: string;
     category: string;
+    dictionary: string;
+    name: string;
     notes: string;
     order: number;
     score: number;
-    dictionary: string;
     value: number | string;
 };
 
 export type KanjiFrequency = {
-    index: number;
+    character: string;
     dictionary: string;
     dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
     };
-    character: string;
     frequency: number | string;
+    index: number;
 };
 
 export type TermDictionaryEntryType = 'term' | 'termGrouped' | 'termMerged';
 
 export type TermDictionaryEntry = {
-    type: TermDictionaryEntryType;
-    id?: number;
-    source: string | null;
-    rawSource: string | null;
-    sourceTerm?: string | null;
-    inflectionRuleChainCandidates: Dictionary.InflectionRuleChainCandidate[];
-    score: number;
-    isPrimary?: boolean;
-    readonly sequence: number;
+    readonly cloze: Cloze;
+    readonly definitions?: TermDefinition[];
+    readonly definitionTags?: Tag[];
     readonly dictionary: string;
     readonly dictionaryAlias: string;
+    readonly dictionaryNames: string[];
     dictionaryOrder: {
         index: number;
         priority: number;
     };
-    readonly dictionaryNames: string[];
+    readonly dictScopedStyles?: string;
     readonly expression: string | string[];
-    readonly reading: string | string[];
     readonly expressions: TermHeadword[];
+    readonly frequencies: TermFrequency[];
+    readonly frequencyAverage: number;
+    readonly frequencyHarmonic: number;
+    readonly furiganaSegments?: FuriganaSegment[];
     readonly glossary?: DictionaryData.TermGlossary[];
     readonly glossaryScopedStyles?: string;
-    readonly dictScopedStyles?: string;
-    readonly definitionTags?: Tag[];
-    readonly termTags?: Tag[];
-    readonly definitions?: TermDefinition[];
-    readonly frequencies: TermFrequency[];
-    readonly frequencyHarmonic: number;
-    readonly frequencyAverage: number;
-    readonly pitches: TermPitchAccent[];
+    id?: number;
+    inflectionRuleChainCandidates: Dictionary.InflectionRuleChainCandidate[];
+    isPrimary?: boolean;
     readonly phoneticTranscriptions: TermPhoneticTranscription[];
+    readonly pitches: TermPitchAccent[];
+    rawSource: null | string;
+    readonly reading: string | string[];
+    score: number;
+    readonly sequence: number;
+    source: null | string;
+    sourceTerm?: null | string;
     sourceTermExactMatchCount: number;
+    readonly termTags?: Tag[];
+    type: TermDictionaryEntryType;
     url: string;
-    readonly cloze: Cloze;
-    readonly furiganaSegments?: FuriganaSegment[];
 };
 
 export type TermDictionaryEntryCommonInfo = {
-    uniqueTerms: string[];
-    uniqueReadings: string[];
-    definitionTags: Tag[];
     definitions?: TermDefinition[];
+    definitionTags: Tag[];
+    uniqueReadings: string[];
+    uniqueTerms: string[];
 };
 
 export type UnknownDictionaryEntry = Record<string, never>;
@@ -219,29 +219,27 @@ export type UnknownDictionaryEntry = Record<string, never>;
 export type DictionaryEntry = KanjiDictionaryEntry | TermDictionaryEntry | UnknownDictionaryEntry;
 
 export type Tag = {
-    name: string;
     category: string;
-    order: number;
-    score: number;
-    notes: string;
     dictionary: string;
+    name: string;
+    notes: string;
+    order: number;
     redundant: boolean;
+    score: number;
 };
 
 export type TermDefinition = {
-    sequence: number;
+    definitionTags: Tag[];
     dictionary: string;
     dictionaryAlias: string;
-    glossary: DictionaryData.TermGlossary[];
-    definitionTags: Tag[];
-    glossaryScopedStyles: string;
     dictScopedStyles: string;
+    glossary: DictionaryData.TermGlossary[];
+    glossaryScopedStyles: string;
     only?: string[];
+    sequence: number;
 };
 
 export type TermFrequency = {
-    index: number;
-    expressionIndex: number;
     dictionary: string;
     dictionaryAlias: string;
     dictionaryOrder: {
@@ -249,14 +247,14 @@ export type TermFrequency = {
         priority: number;
     };
     expression: string;
-    reading: string;
-    hasReading: boolean;
+    expressionIndex: number;
     frequency: number | string;
+    hasReading: boolean;
+    index: number;
+    reading: string;
 };
 
 export type TermPitchAccent = {
-    index: number;
-    expressionIndex: number;
     dictionary: string;
     dictionaryAlias: string;
     dictionaryOrder: {
@@ -264,8 +262,10 @@ export type TermPitchAccent = {
         priority: number;
     };
     expression: string;
-    reading: string;
+    expressionIndex: number;
+    index: number;
     readonly pitches: PitchAccent[];
+    reading: string;
 };
 
 export type PitchAccent = {
@@ -274,8 +274,6 @@ export type PitchAccent = {
 };
 
 export type TermPhoneticTranscription = {
-    index: number;
-    expressionIndex: number;
     dictionary: string;
     dictionaryAlias: string;
     dictionaryOrder: {
@@ -283,8 +281,10 @@ export type TermPhoneticTranscription = {
         priority: number;
     };
     expression: string;
-    reading: string;
+    expressionIndex: number;
+    index: number;
     readonly phoneticTranscriptions: PhoneticTranscription[];
+    reading: string;
 };
 
 export type PhoneticTranscription = {
@@ -295,26 +295,26 @@ export type PhoneticTranscription = {
 export type TermFrequencyType = DictionaryDataUtil.TermFrequencyType;
 
 export type TermHeadword = {
-    sourceTerm: string;
     expression: string;
-    reading: string;
-    readonly termTags: Tag[];
     readonly frequencies: TermFrequency[];
-    readonly pitches: TermPitchAccent[];
     readonly furiganaSegments: FuriganaSegment[];
+    readonly pitches: TermPitchAccent[];
+    reading: string;
+    sourceTerm: string;
     readonly termFrequency: TermFrequencyType;
+    readonly termTags: Tag[];
     wordClasses: string[];
 };
 
 export type FuriganaSegment = {
-    text: string;
     furigana: string;
+    text: string;
 };
 
 export type Cloze = {
-    sentence: string;
-    prefix: string;
     body: string;
     bodyKana: string;
+    prefix: string;
+    sentence: string;
     suffix: string;
 };

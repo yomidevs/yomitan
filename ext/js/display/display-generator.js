@@ -78,7 +78,7 @@ export class DisplayGenerator {
         const definitionsContainer = this._querySelector(node, '.definition-list');
         const headwordTagsContainer = this._querySelector(node, '.headword-list-tag-list');
 
-        const {headwords, type, inflectionRuleChainCandidates, definitions, frequencies, pronunciations} = dictionaryEntry;
+        const {definitions, frequencies, headwords, inflectionRuleChainCandidates, pronunciations, type} = dictionaryEntry;
         const groupedPronunciations = getGroupedPronunciations(dictionaryEntry);
         const pronunciationCount = groupedPronunciations.reduce((i, v) => i + v.pronunciations.length, 0);
         const groupedFrequencies = groupTermFrequencies(dictionaryEntry);
@@ -90,10 +90,10 @@ export class DisplayGenerator {
         const uniqueReadings = new Set();
         /** @type {Set<import('dictionary').TermSourceMatchType>} */
         const primaryMatchTypes = new Set();
-        for (const {term, reading, sources} of headwords) {
+        for (const {reading, sources, term} of headwords) {
             uniqueTerms.add(term);
             uniqueReadings.add(reading);
-            for (const {matchType, isPrimary} of sources) {
+            for (const {isPrimary, matchType} of sources) {
                 if (!isPrimary) { continue; }
                 primaryMatchTypes.add(matchType);
             }
@@ -238,7 +238,7 @@ export class DisplayGenerator {
                     if (typeof value === 'undefined') { continue; }
                     disambiguationContainer.dataset[attribute] = value;
                 }
-                for (const {term, reading} of disambiguationHeadwords) {
+                for (const {reading, term} of disambiguationHeadwords) {
                     const disambiguationItem = document.createElement('span');
                     disambiguationItem.className = 'tag-details-disambiguation';
                     this._appendFurigana(disambiguationItem, term, reading, (container, text) => {
@@ -325,12 +325,12 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createTermHeadword(headword, headwordIndex, pronunciations) {
-        const {term, reading, tags, sources} = headword;
+        const {reading, sources, tags, term} = headword;
 
         let isPrimaryAny = false;
         const matchTypes = new Set();
         const matchSources = new Set();
-        for (const {matchType, matchSource, isPrimary} of sources) {
+        for (const {isPrimary, matchSource, matchType} of sources) {
             if (isPrimary) {
                 isPrimaryAny = true;
             }
@@ -370,7 +370,7 @@ export class DisplayGenerator {
      * @returns {?HTMLElement}
      */
     _createInflectionRuleChain(inflectionRuleChain) {
-        const {source, inflectionRules} = inflectionRuleChain;
+        const {inflectionRules, source} = inflectionRuleChain;
         if (!Array.isArray(inflectionRules) || inflectionRules.length === 0) { return null; }
         const fragment = this._instantiate('inflection-rule-chain');
 
@@ -391,14 +391,14 @@ export class DisplayGenerator {
         icon.classList.add('inflection-source-icon');
         icon.dataset.inflectionSource = source;
         switch (source) {
-            case 'dictionary':
-                icon.title = 'Dictionary Deinflection';
-                return icon;
             case 'algorithm':
                 icon.title = 'Algorithm Deinflection';
                 return icon;
             case 'both':
                 icon.title = 'Dictionary and Algorithm Deinflection';
+                return icon;
+            case 'dictionary':
+                icon.title = 'Dictionary Deinflection';
                 return icon;
         }
     }
@@ -408,7 +408,7 @@ export class DisplayGenerator {
      * @returns {DocumentFragment}
      */
     _createTermInflection(inflection) {
-        const {name, description} = inflection;
+        const {description, name} = inflection;
         const fragment = this._templates.instantiateFragment('inflection');
         const node = this._querySelector(fragment, '.inflection');
         this._setTextContent(node, name);
@@ -426,7 +426,7 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createTermDefinition(definition, dictionaryTag, headwords, uniqueTerms, uniqueReadings) {
-        const {dictionary, tags, headwordIndices, entries} = definition;
+        const {dictionary, entries, headwordIndices, tags} = definition;
         const disambiguations = getDisambiguations(headwords, headwordIndices, uniqueTerms, uniqueReadings);
 
         const node = this._instantiate('definition-item');
@@ -602,7 +602,7 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createTag(tag) {
-        const {content, name, category, redundant} = tag;
+        const {category, content, name, redundant} = tag;
         const node = this._instantiate('tag');
 
         const inner = this._querySelector(node, '.tag-label-content');
@@ -624,7 +624,7 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createTermTag(tagInfo, totalHeadwordCount) {
-        const {tag, headwordIndices} = tagInfo;
+        const {headwordIndices, tag} = tagInfo;
         const node = this._createTag(tag);
         node.dataset.headwords = headwordIndices.join(' ');
         node.dataset.totalHeadwordCount = `${totalHeadwordCount}`;
@@ -640,13 +640,13 @@ export class DisplayGenerator {
      */
     _createTagData(name, category) {
         return {
-            name,
             category,
-            order: 0,
-            score: 0,
             content: [],
             dictionaries: [],
+            name,
+            order: 0,
             redundant: false,
+            score: 0,
         };
     }
 
@@ -712,7 +712,7 @@ export class DisplayGenerator {
      */
     _createPronunciationPhoneticTranscription(pronunciation, details) {
         const {ipa, tags} = pronunciation;
-        const {exclusiveTerms, exclusiveReadings} = details;
+        const {exclusiveReadings, exclusiveTerms} = details;
 
         const node = this._instantiate('pronunciation');
 
@@ -738,8 +738,8 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createPronunciationPitchAccent(pitchAccent, details) {
-        const {position, nasalPositions, devoicePositions, tags} = pitchAccent;
-        const {reading, exclusiveTerms, exclusiveReadings} = details;
+        const {devoicePositions, nasalPositions, position, tags} = pitchAccent;
+        const {exclusiveReadings, exclusiveTerms, reading} = details;
         const morae = getKanaMorae(reading);
 
         const node = this._instantiate('pronunciation');
@@ -838,7 +838,7 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createTermFrequency(details, dictionary, dictionaryAlias) {
-        const {term, reading, values} = details;
+        const {reading, term, values} = details;
         const node = this._instantiate('term-frequency-item');
         const tagLabel = this._querySelector(node, '.tag-label-content');
         const tag = this._querySelector(node, '.tag');
@@ -894,7 +894,7 @@ export class DisplayGenerator {
     _populateFrequencyValueList(node, values) {
         let fullFrequency = '';
         for (let i = 0, ii = values.length; i < ii; ++i) {
-            const {frequency, displayValue} = values[i];
+            const {displayValue, frequency} = values[i];
             const frequencyString = `${frequency}`;
             const text = displayValue !== null ? displayValue : `${frequency}`;
 
@@ -987,7 +987,7 @@ export class DisplayGenerator {
     _appendFurigana(container, term, reading, addText) {
         container.lang = this._language;
         const segments = distributeFurigana(term, reading);
-        for (const {text, reading: furigana} of segments) {
+        for (const {reading: furigana, text} of segments) {
             if (furigana) {
                 const ruby = document.createElement('ruby');
                 const rt = document.createElement('rt');

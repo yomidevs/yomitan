@@ -24,28 +24,28 @@ import {testLanguageTransformer} from '../fixtures/language-transformer-test.js'
 const tests = [
     {
         category: 'plural',
-        valid: true,
         tests: [
-            {term: 'fluvius',   source: 'fluvii',    rule: 'n',   reasons: ['plural']},
-            {term: 'magnus',    source: 'magni',     rule: 'adj', reasons: ['plural']},
-            {term: 'insula',    source: 'insulae',   rule: 'n',   reasons: ['plural']},
+            {reasons: ['plural'],   rule: 'n',    source: 'fluvii',   term: 'fluvius'},
+            {reasons: ['plural'],    rule: 'adj',     source: 'magni', term: 'magnus'},
+            {reasons: ['plural'],    rule: 'n',   source: 'insulae',   term: 'insula'},
         ],
+        valid: true,
     },
     {
         category: 'adjective',
-        valid: true,
         tests: [
-            {term: 'magnus',    source: 'magna',    rule: 'adj',  reasons: ['feminine']},
-            {term: 'Graecus',   source: 'Graecum',  rule: 'adj',  reasons: ['neuter']},
-            {term: 'primus',    source: 'prima',    rule: 'adj',  reasons: ['neuter', 'plural']},
+            {reasons: ['feminine'],    rule: 'adj',    source: 'magna',  term: 'magnus'},
+            {reasons: ['neuter'],   rule: 'adj',  source: 'Graecum',  term: 'Graecus'},
+            {reasons: ['neuter', 'plural'],    rule: 'adj',    source: 'prima',  term: 'primus'},
         ],
+        valid: true,
     },
     {
         category: 'ablative',
-        valid: true,
         tests: [
-            {term: 'vocabulum', source: 'vocabulo', rule: 'n',    reasons: ['ablative']},
+            {reasons: ['ablative'], rule: 'n', source: 'vocabulo',    term: 'vocabulum'},
         ],
+        valid: true,
     },
 ];
 /* eslint-enable @stylistic/no-multi-spaces */

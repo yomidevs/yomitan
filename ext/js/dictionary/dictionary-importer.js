@@ -101,7 +101,7 @@ export class DictionaryImporter {
             ['kanjiMetaFiles', /^kanji_meta_bank_(\d+)\.json$/],
             ['tagFiles', /^tag_bank_(\d+)\.json$/],
         ];
-        const {termFiles, termMetaFiles, kanjiFiles, kanjiMetaFiles, tagFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
+        const {kanjiFiles, kanjiMetaFiles, tagFiles, termFiles, termMetaFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
 
         // Load data
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
@@ -158,12 +158,12 @@ export class DictionaryImporter {
 
         /** @type {import('dictionary-importer').SummaryCounts} */
         const counts = {
-            terms: {total: termList.length},
-            termMeta: this._getMetaCounts(termMetaList),
             kanji: {total: kanjiList.length},
             kanjiMeta: this._getMetaCounts(kanjiMetaList),
-            tagMeta: {total: tagList.length},
             media: {total: media.length},
+            tagMeta: {total: tagList.length},
+            termMeta: this._getMetaCounts(termMetaList),
+            terms: {total: termList.length},
         };
 
         const stylesFileName = 'styles.css';
@@ -181,7 +181,7 @@ export class DictionaryImporter {
         }
 
         /** @type {import('dictionary-importer').SummaryDetails} */
-        const summaryDetails = {prefixWildcardsSupported, counts, styles};
+        const summaryDetails = {counts, prefixWildcardsSupported, styles};
 
         const summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
         await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
@@ -221,7 +221,7 @@ export class DictionaryImporter {
 
         this._progress();
 
-        return {result: summary, errors};
+        return {errors, result: summary};
     }
 
     /**
@@ -265,7 +265,7 @@ export class DictionaryImporter {
         const version = typeof validIndex.format === 'number' ? validIndex.format : validIndex.version;
         validIndex.version = version;
 
-        const {title, revision} = validIndex;
+        const {revision, title} = validIndex;
         if (typeof version !== 'number' || !title || !revision) {
             throw new Error('Unrecognized dictionary format');
         }
@@ -278,8 +278,8 @@ export class DictionaryImporter {
      */
     _createProgressData() {
         return {
-            index: 0,
             count: 0,
+            index: 0,
         };
     }
 
@@ -315,20 +315,20 @@ export class DictionaryImporter {
      */
     _createSummary(dictionaryTitle, version, index, details) {
         const indexSequenced = index.sequenced;
-        const {prefixWildcardsSupported, counts, styles} = details;
+        const {counts, prefixWildcardsSupported, styles} = details;
         /** @type {import('dictionary-importer').Summary} */
         const summary = {
-            title: dictionaryTitle,
-            revision: index.revision,
-            sequenced: typeof indexSequenced === 'boolean' && indexSequenced,
-            version,
+            counts,
             importDate: Date.now(),
             prefixWildcardsSupported,
-            counts,
+            revision: index.revision,
+            sequenced: typeof indexSequenced === 'boolean' && indexSequenced,
             styles,
+            title: dictionaryTitle,
+            version,
         };
 
-        const {author, url, description, attribution, frequencyMode, isUpdatable, sourceLanguage, targetLanguage} = index;
+        const {attribution, author, description, frequencyMode, isUpdatable, sourceLanguage, targetLanguage, url} = index;
         if (typeof author === 'string') { summary.author = author; }
         if (typeof url === 'string') { summary.url = url; }
         if (typeof description === 'string') { summary.description = description; }
@@ -337,7 +337,7 @@ export class DictionaryImporter {
         if (typeof sourceLanguage === 'string') { summary.sourceLanguage = sourceLanguage; }
         if (typeof targetLanguage === 'string') { summary.targetLanguage = targetLanguage; }
         if (typeof isUpdatable === 'boolean') {
-            const {indexUrl, downloadUrl} = index;
+            const {downloadUrl, indexUrl} = index;
             if (!isUpdatable || !this._validateUrl(indexUrl) || !this._validateUrl(downloadUrl)) {
                 throw new Error('Invalid index data for updatable dictionary');
             }
@@ -438,10 +438,10 @@ export class DictionaryImporter {
     _formatDictionaryTermGlossaryImage(data, entry, requirements) {
         /** @type {import('dictionary-data').TermGlossaryImage} */
         const target = {
-            type: 'image',
             path: '', // Will be populated during requirement resolution
+            type: 'image',
         };
-        requirements.push({type: 'image', target, source: data, entry});
+        requirements.push({entry, source: data, target, type: 'image'});
         return target;
     }
 
@@ -454,8 +454,8 @@ export class DictionaryImporter {
     _formatStructuredContent(data, entry, requirements) {
         const content = this._prepareStructuredContent(data.content, entry, requirements);
         return {
-            type: 'structured-content',
             content,
+            type: 'structured-content',
         };
     }
 
@@ -496,10 +496,10 @@ export class DictionaryImporter {
     _prepareStructuredContentImage(content, entry, requirements) {
         /** @type {import('structured-content').ImageElement} */
         const target = {
-            tag: 'img',
             path: '', // Will be populated during requirement resolution
+            tag: 'img',
         };
-        requirements.push({type: 'structured-content-image', target, source: content, entry});
+        requirements.push({entry, source: content, target, type: 'structured-content-image'});
         return target;
     }
 
@@ -570,10 +570,10 @@ export class DictionaryImporter {
      */
     async _resolveStructuredContentImage(context, target, source, entry) {
         const {
-            verticalAlign,
             border,
             borderRadius,
             sizeUnits,
+            verticalAlign,
         } = source;
         await this._createImageData(context, target, source, entry);
         if (typeof verticalAlign === 'string') { target.verticalAlign = verticalAlign; }
@@ -590,20 +590,20 @@ export class DictionaryImporter {
      */
     async _createImageData(context, target, source, entry) {
         const {
-            path,
-            width: preferredWidth,
-            height: preferredHeight,
-            title,
             alt,
-            description,
-            pixelated,
-            imageRendering,
             appearance,
             background,
             collapsed,
             collapsible,
+            description,
+            height: preferredHeight,
+            imageRendering,
+            path,
+            pixelated,
+            title,
+            width: preferredWidth,
         } = source;
-        const {width, height} = await this._getImageMedia(context, path, entry);
+        const {height, width} = await this._getImageMedia(context, path, entry);
         target.path = path;
         target.width = width;
         target.height = height;
@@ -667,19 +667,19 @@ export class DictionaryImporter {
         let width;
         let height;
         try {
-            ({content, width, height} = await this._mediaLoader.getImageDetails(content, mediaType));
+            ({content, height, width} = await this._mediaLoader.getImageDetails(content, mediaType));
         } catch (e) {
             throw createError('Could not load image');
         }
 
         // Create image data
         mediaData = {
-            dictionary,
-            path,
-            mediaType,
-            width,
-            height,
             content,
+            dictionary,
+            height,
+            mediaType,
+            path,
+            width,
         };
         media.set(path, mediaData);
 
@@ -694,7 +694,7 @@ export class DictionaryImporter {
     _convertTermBankEntryV1(entry, dictionary) {
         let [expression, reading, definitionTags, rules, score, ...glossary] = entry;
         reading = reading.length > 0 ? reading : expression;
-        return {expression, reading, definitionTags, rules, score, glossary, dictionary};
+        return {definitionTags, dictionary, expression, glossary, reading, rules, score};
     }
 
     /**
@@ -705,7 +705,7 @@ export class DictionaryImporter {
     _convertTermBankEntryV3(entry, dictionary) {
         let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
         reading = reading.length > 0 ? reading : expression;
-        return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, dictionary};
+        return {definitionTags, dictionary, expression, glossary, reading, rules, score, sequence, termTags};
     }
 
     /**
@@ -715,7 +715,7 @@ export class DictionaryImporter {
      */
     _convertTermMetaBankEntry(entry, dictionary) {
         const [expression, mode, data] = entry;
-        return /** @type {import('dictionary-database').DatabaseTermMeta} */ ({expression, mode, data, dictionary});
+        return /** @type {import('dictionary-database').DatabaseTermMeta} */ ({data, dictionary, expression, mode});
     }
 
     /**
@@ -725,7 +725,7 @@ export class DictionaryImporter {
      */
     _convertKanjiBankEntryV1(entry, dictionary) {
         const [character, onyomi, kunyomi, tags, ...meanings] = entry;
-        return {character, onyomi, kunyomi, tags, meanings, dictionary};
+        return {character, dictionary, kunyomi, meanings, onyomi, tags};
     }
 
     /**
@@ -735,7 +735,7 @@ export class DictionaryImporter {
      */
     _convertKanjiBankEntryV3(entry, dictionary) {
         const [character, onyomi, kunyomi, tags, meanings, stats] = entry;
-        return {character, onyomi, kunyomi, tags, meanings, stats, dictionary};
+        return {character, dictionary, kunyomi, meanings, onyomi, stats, tags};
     }
 
     /**
@@ -745,7 +745,7 @@ export class DictionaryImporter {
      */
     _convertKanjiMetaBankEntry(entry, dictionary) {
         const [character, mode, data] = entry;
-        return {character, mode, data, dictionary};
+        return {character, data, dictionary, mode};
     }
 
     /**
@@ -755,7 +755,7 @@ export class DictionaryImporter {
      */
     _convertTagBankEntry(entry, dictionary) {
         const [name, category, order, notes, score] = entry;
-        return {name, category, order, notes, score, dictionary};
+        return {category, dictionary, name, notes, order, score};
     }
 
     /**
@@ -767,8 +767,8 @@ export class DictionaryImporter {
         const {tagMeta} = index;
         if (typeof tagMeta !== 'object' || tagMeta === null) { return; }
         for (const [name, value] of Object.entries(tagMeta)) {
-            const {category, order, notes, score} = value;
-            results.push({name, category, order, notes, score, dictionary});
+            const {category, notes, order, score} = value;
+            results.push({category, dictionary, name, notes, order, score});
         }
     }
 

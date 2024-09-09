@@ -35,9 +35,9 @@ export class HotkeyUtil {
         this._mouseInputNamePattern = /^mouse(\d+)$/;
         /** @type {Map<import('input').Modifier, number>} */
         this._modifierPriorities = new Map([
-            ['meta', -4],
-            ['ctrl', -3],
             ['alt', -2],
+            ['ctrl', -3],
+            ['meta', -4],
             ['shift', -1],
         ]);
         /** @type {Intl.Collator} */
@@ -238,12 +238,15 @@ export class HotkeyUtil {
      */
     _getModifierKeyNames(os) {
         switch (os) {
-            case 'win':
+            case 'android':
+            case 'cros':
+            case 'linux':
+            case 'openbsd':
                 return [
                     ['alt', 'Alt'],
                     ['ctrl', 'Ctrl'],
                     ['shift', 'Shift'],
-                    ['meta', 'Windows'],
+                    ['meta', 'Super'],
                 ];
             case 'mac':
                 return [
@@ -252,15 +255,12 @@ export class HotkeyUtil {
                     ['shift', 'Shift'],
                     ['meta', 'Cmd'],
                 ];
-            case 'linux':
-            case 'openbsd':
-            case 'cros':
-            case 'android':
+            case 'win':
                 return [
                     ['alt', 'Alt'],
                     ['ctrl', 'Ctrl'],
                     ['shift', 'Shift'],
-                    ['meta', 'Super'],
+                    ['meta', 'Windows'],
                 ];
             default: // 'unknown', etc
                 return [
@@ -300,11 +300,11 @@ export class HotkeyUtil {
      */
     _convertCommandModifierToInputModifier(modifier) {
         switch (modifier) {
-            case 'Ctrl': return (this._os === 'mac' ? 'meta' : 'ctrl');
             case 'Alt': return 'alt';
-            case 'Shift': return 'shift';
-            case 'MacCtrl': return 'ctrl';
             case 'Command': return 'meta';
+            case 'Ctrl': return (this._os === 'mac' ? 'meta' : 'ctrl');
+            case 'MacCtrl': return 'ctrl';
+            case 'Shift': return 'shift';
             default: return null;
         }
     }
@@ -326,10 +326,10 @@ export class HotkeyUtil {
      */
     _convertInputModifierToCommandModifier(modifier) {
         switch (modifier) {
-            case 'ctrl': return (this._os === 'mac' ? 'MacCtrl' : 'Ctrl');
             case 'alt': return 'Alt';
-            case 'shift': return 'Shift';
+            case 'ctrl': return (this._os === 'mac' ? 'MacCtrl' : 'Ctrl');
             case 'meta': return 'Command';
+            case 'shift': return 'Shift';
             default: return modifier;
         }
     }

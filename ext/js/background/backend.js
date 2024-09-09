@@ -121,7 +121,7 @@ export class Backend {
         /** @type {?Promise<void>} */
         this._preparePromise = null;
         /** @type {import('core').DeferredPromiseDetails<void>} */
-        const {promise, resolve, reject} = deferPromise();
+        const {promise, reject, resolve} = deferPromise();
         /** @type {Promise<void>} */
         this._prepareCompletePromise = promise;
         /** @type {() => void} */
@@ -191,11 +191,11 @@ export class Backend {
 
         /** @type {Map<string, (params?: import('core').SerializableObject) => void>} */
         this._commandHandlers = new Map(/** @type {[name: string, handler: (params?: import('core').SerializableObject) => void][]} */ ([
-            ['toggleTextScanning', this._onCommandToggleTextScanning.bind(this)],
             ['openInfoPage', this._onCommandOpenInfoPage.bind(this)],
-            ['openSettingsPage', this._onCommandOpenSettingsPage.bind(this)],
-            ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
             ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)],
+            ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
+            ['openSettingsPage', this._onCommandOpenSettingsPage.bind(this)],
+            ['toggleTextScanning', this._onCommandToggleTextScanning.bind(this)],
         ]));
     }
 
@@ -318,15 +318,15 @@ export class Backend {
         if (await this._tabExists('/search.html')) { return; }
 
         const {
-            general: {language},
             clipboard: {maximumSearchLength},
+            general: {language},
         } = this._getProfileOptions({current: true}, false);
         if (!isTextLookupWorthy(text, language)) { return; }
         if (text.length > maximumSearchLength) {
             text = text.substring(0, maximumSearchLength);
         }
         try {
-            const {tab, created} = await this._getOrCreateSearchPopupWrapper();
+            const {created, tab} = await this._getOrCreateSearchPopupWrapper();
             const {id} = tab;
             if (typeof id !== 'number') {
                 throw new Error('Tab does not have an id');
@@ -412,8 +412,8 @@ export class Backend {
     /**
      * @param {chrome.tabs.ZoomChangeInfo} event
      */
-    _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
-        this._sendMessageTabIgnoreResponse(tabId, {action: 'applicationZoomChanged', params: {oldZoomFactor, newZoomFactor}}, {});
+    _onZoomChange({newZoomFactor, oldZoomFactor, tabId}) {
+        this._sendMessageTabIgnoreResponse(tabId, {action: 'applicationZoomChanged', params: {newZoomFactor, oldZoomFactor}}, {});
     }
 
     /**
@@ -435,7 +435,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'applicationReady'>} */
     _onApiApplicationReady(_params, sender) {
-        const {tab, frameId} = sender;
+        const {frameId, tab} = sender;
         if (!tab || typeof frameId !== 'number') { return; }
         const {id} = tab;
         if (typeof id !== 'number') { return; }
@@ -476,7 +476,7 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'kanjiFind'>} */
-    async _onApiKanjiFind({text, optionsContext}) {
+    async _onApiKanjiFind({optionsContext, text}) {
         const options = this._getProfileOptions(optionsContext, false);
         const {general: {maxResults}} = options;
         const findKanjiOptions = this._getTranslatorFindKanjiOptions(options);
@@ -486,9 +486,9 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'termsFind'>} */
-    async _onApiTermsFind({text, details, optionsContext}) {
+    async _onApiTermsFind({details, optionsContext, text}) {
         const options = this._getProfileOptions(optionsContext, false);
-        const {general: {resultOutputMode: mode, maxResults}} = options;
+        const {general: {maxResults, resultOutputMode: mode}} = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
         const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
         dictionaryEntries.splice(maxResults);
@@ -496,7 +496,7 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'parseText'>} */
-    async _onApiParseText({text, optionsContext, scanLength, useInternalParser, useMecabParser}) {
+    async _onApiParseText({optionsContext, scanLength, text, useInternalParser, useMecabParser}) {
         const [internalResults, mecabResults] = await Promise.all([
             (useInternalParser ? this._textParseScanning(text, scanLength, optionsContext) : null),
             (useMecabParser ? this._textParseMecab(text) : null),
@@ -507,20 +507,20 @@ export class Backend {
 
         if (internalResults !== null) {
             results.push({
+                content: internalResults,
+                dictionary: null,
                 id: 'scan',
                 source: 'scanning-parser',
-                dictionary: null,
-                content: internalResults,
             });
         }
 
         if (mecabResults !== null) {
             for (const [dictionary, content] of mecabResults) {
                 results.push({
+                    content,
+                    dictionary,
                     id: `mecab-${dictionary}`,
                     source: 'mecab',
-                    dictionary,
-                    content,
                 });
             }
         }
@@ -569,9 +569,9 @@ export class Backend {
 
         for (let i = 0; i < withDuplicatesAllowed.length; i++) {
             if (withDuplicatesAllowed[i] === noDuplicatesAllowed[i]) {
-                canAddArray.push({note: notes[i], isDuplicate: false});
+                canAddArray.push({isDuplicate: false, note: notes[i]});
             } else {
-                canAddArray.push({note: notes[i], isDuplicate: true});
+                canAddArray.push({isDuplicate: true, note: notes[i]});
             }
         }
 
@@ -579,13 +579,13 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'getAnkiNoteInfo'>} */
-    async _onApiGetAnkiNoteInfo({notes, fetchAdditionalInfo}) {
+    async _onApiGetAnkiNoteInfo({fetchAdditionalInfo, notes}) {
         const {canAddArray, cannotAddArray} = await this.partitionAddibleNotes(notes);
 
         /** @type {import('anki').NoteInfoWrapper[]} */
         const results = cannotAddArray
             .filter((note) => isNoteDataValid(note))
-            .map(() => ({canAdd: false, valid: false, noteIds: null}));
+            .map(() => ({canAdd: false, noteIds: null, valid: false}));
 
         /** @type {import('anki').Note[]} */
         const duplicateNotes = [];
@@ -604,7 +604,7 @@ export class Backend {
         const duplicateNoteIds = await this._anki.findNoteIds(duplicateNotes);
 
         for (let i = 0; i < canAddArray.length; ++i) {
-            const {note, isDuplicate} = canAddArray[i];
+            const {isDuplicate, note} = canAddArray[i];
 
             const valid = isNoteDataValid(note);
 
@@ -617,9 +617,9 @@ export class Backend {
 
             const info = {
                 canAdd: valid,
-                valid,
                 noteIds: noteIds,
                 noteInfos: noteInfos,
+                valid,
             };
 
             results.push(info);
@@ -629,7 +629,7 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'injectAnkiNoteMedia'>} */
-    async _onApiInjectAnkiNoteMedia({timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails}) {
+    async _onApiInjectAnkiNoteMedia({audioDetails, clipboardDetails, definitionDetails, dictionaryMediaDetails, screenshotDetails, timestamp}) {
         return await this._injectAnkNoteMedia(
             this._anki,
             timestamp,
@@ -642,7 +642,7 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'viewNotes'>} */
-    async _onApiViewNotes({noteIds, mode, allowFallback}) {
+    async _onApiViewNotes({allowFallback, mode, noteIds}) {
         if (noteIds.length === 1 && mode === 'edit') {
             try {
                 await this._anki.guiEditNote(noteIds[0]);
@@ -676,7 +676,7 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'getTermAudioInfoList'>} */
-    async _onApiGetTermAudioInfoList({source, term, reading, languageSummary}) {
+    async _onApiGetTermAudioInfoList({languageSummary, reading, source, term}) {
         return await this._audioDownloader.getTermAudioInfoList(source, term, reading, languageSummary);
     }
 
@@ -714,8 +714,8 @@ export class Backend {
         const tabId = tab ? tab.id : void 0;
         const frameId = sender.frameId;
         return {
-            tabId: typeof tabId === 'number' ? tabId : null,
             frameId: typeof frameId === 'number' ? frameId : null,
+            tabId: typeof tabId === 'number' ? tabId : null,
         };
     }
 
@@ -796,7 +796,7 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'logGenericErrorBackend'>} */
-    _onApiLogGenericErrorBackend({error, level, context}) {
+    _onApiLogGenericErrorBackend({context, error, level}) {
         log.logGenericError(ExtensionError.deserialize(error), level, context);
     }
 
@@ -808,7 +808,7 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'modifySettings'>} */
-    _onApiModifySettings({targets, source}) {
+    _onApiModifySettings({source, targets}) {
         return this._modifySettings(targets, source);
     }
 
@@ -827,7 +827,7 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'setAllSettings'>} */
-    async _onApiSetAllSettings({value, source}) {
+    async _onApiSetAllSettings({source, value}) {
         this._optionsUtil.validate(value);
         this._options = clone(value);
         await this._saveOptions(source);
@@ -835,7 +835,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandlerNoExtraArgs<'getOrCreateSearchPopup'>} */
     async _onApiGetOrCreateSearchPopup({focus = false, text}) {
-        const {tab, created} = await this._getOrCreateSearchPopupWrapper();
+        const {created, tab} = await this._getOrCreateSearchPopupWrapper();
         if (focus === true || (focus === 'ifCreated' && created)) {
             await this._focusTab(tab);
         }
@@ -857,7 +857,7 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'triggerDatabaseUpdated'>} */
-    _onApiTriggerDatabaseUpdated({type, cause}) {
+    _onApiTriggerDatabaseUpdated({cause, type}) {
         this._triggerDatabaseUpdated(type, cause);
     }
 
@@ -899,12 +899,12 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'isTextLookupWorthy'>} */
-    _onApiIsTextLookupWorthy({text, language}) {
+    _onApiIsTextLookupWorthy({language, text}) {
         return isTextLookupWorthy(text, language);
     }
 
     /** @type {import('api').ApiHandler<'getTermFrequencies'>} */
-    async _onApiGetTermFrequencies({termReadingList, dictionaries}) {
+    async _onApiGetTermFrequencies({dictionaries, termReadingList}) {
         return await this._translator.getTermFrequencies(termReadingList, dictionaries);
     }
 
@@ -914,7 +914,7 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'openCrossFramePort'>} */
-    _onApiOpenCrossFramePort({targetTabId, targetFrameId}, sender) {
+    _onApiOpenCrossFramePort({targetFrameId, targetTabId}, sender) {
         const sourceTabId = (sender && sender.tab ? sender.tab.id : null);
         if (typeof sourceTabId !== 'number') {
             throw new Error('Port does not have an associated tab ID');
@@ -927,14 +927,14 @@ export class Backend {
         /** @type {import('cross-frame-api').CrossFrameCommunicationPortDetails} */
         const sourceDetails = {
             name: 'cross-frame-communication-port',
-            otherTabId: targetTabId,
             otherFrameId: targetFrameId,
+            otherTabId: targetTabId,
         };
         /** @type {import('cross-frame-api').CrossFrameCommunicationPortDetails} */
         const targetDetails = {
             name: 'cross-frame-communication-port',
-            otherTabId: sourceTabId,
             otherFrameId: sourceFrameId,
+            otherTabId: sourceTabId,
         };
         /** @type {?chrome.runtime.Port} */
         let sourcePort = chrome.tabs.connect(sourceTabId, {frameId: sourceFrameId, name: JSON.stringify(sourceDetails)});
@@ -962,7 +962,7 @@ export class Backend {
         sourcePort.onDisconnect.addListener(cleanup);
         targetPort.onDisconnect.addListener(cleanup);
 
-        return {targetTabId, targetFrameId};
+        return {targetFrameId, targetTabId};
     }
 
     /** @type {import('api').ApiHandler<'getLanguageSummaries'>} */
@@ -1064,10 +1064,10 @@ export class Backend {
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',
-            path: 'general.enable',
-            value: !options.general.enable,
-            scope: 'profile',
             optionsContext: {current: true},
+            path: 'general.enable',
+            scope: 'profile',
+            value: !options.general.enable,
         };
         await this._modifySettings([modification], 'backend');
     }
@@ -1127,7 +1127,7 @@ export class Backend {
         if (this._searchPopupTabId !== null) {
             const tab = await this._checkTabUrl(this._searchPopupTabId, urlPredicate);
             if (tab !== null) {
-                return {tab, created: false};
+                return {created: false, tab};
             }
             this._searchPopupTabId = null;
         }
@@ -1139,7 +1139,7 @@ export class Backend {
             const {id} = existingTab;
             if (typeof id === 'number') {
                 this._searchPopupTabId = id;
-                return {tab: existingTab, created: false};
+                return {created: false, tab: existingTab};
             }
         }
 
@@ -1176,7 +1176,7 @@ export class Backend {
         );
 
         this._searchPopupTabId = id;
-        return {tab, created: true};
+        return {created: true, tab};
     }
 
     /**
@@ -1185,7 +1185,7 @@ export class Backend {
      */
     async _findSearchPopupTab(urlPredicate) {
         /** @type {import('backend').FindTabsPredicate} */
-        const predicate = async ({url, tab}) => {
+        const predicate = async ({tab, url}) => {
             const {id} = tab;
             if (typeof id === 'undefined' || !urlPredicate(url)) { return false; }
             try {
@@ -1218,15 +1218,15 @@ export class Backend {
      * @returns {chrome.windows.CreateData}
      */
     _getSearchPopupWindowCreateData(url, options) {
-        const {popupWindow: {width, height, left, top, useLeft, useTop, windowType}} = options;
+        const {popupWindow: {height, left, top, useLeft, useTop, width, windowType}} = options;
         return {
-            url,
-            width,
             height,
             left: useLeft ? left : void 0,
+            state: 'normal',
             top: useTop ? top : void 0,
             type: windowType,
-            state: 'normal',
+            url,
+            width,
         };
     }
 
@@ -1281,7 +1281,7 @@ export class Backend {
     async _updateSearchQuery(tabId, text, animate) {
         await this._sendMessageTabPromise(
             tabId,
-            {action: 'searchDisplayControllerUpdateSearchQuery', params: {text, animate}},
+            {action: 'searchDisplayControllerUpdateSearchQuery', params: {animate, text}},
             {frameId: 0},
         );
     }
@@ -1313,9 +1313,9 @@ export class Backend {
         try {
             if (options.general.enableContextMenuScanSelected) {
                 chrome.contextMenus.create({
+                    contexts: ['selection'],
                     id: 'yomitan_lookup',
                     title: 'Lookup in Yomitan',
-                    contexts: ['selection'],
                 }, () => this._checkLastError(chrome.runtime.lastError));
                 chrome.contextMenus.onClicked.addListener((info) => {
                     if (info.selectionText) {
@@ -1463,7 +1463,7 @@ export class Backend {
         /** @type {import('translator').FindTermsMode} */
         const mode = 'simple';
         const options = this._getProfileOptions(optionsContext, false);
-        const details = {matchType: /** @type {import('translation').FindTermsMatchType} */ ('exact'), deinflect: true};
+        const details = {deinflect: true, matchType: /** @type {import('translation').FindTermsMatchType} */ ('exact')};
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
         /** @type {import('api').ParseTextLine[]} */
         const results = [];
@@ -1484,17 +1484,17 @@ export class Backend {
                 (originalTextLength !== character.length || isCodePointJapanese(codePoint))
             ) {
                 previousUngroupedSegment = null;
-                const {headwords: [{term, reading}]} = dictionaryEntries[0];
+                const {headwords: [{reading, term}]} = dictionaryEntries[0];
                 const source = text.substring(i, i + originalTextLength);
                 const textSegments = [];
-                for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, source)) {
-                    textSegments.push({text: text2, reading: reading2});
+                for (const {reading: reading2, text: text2} of distributeFuriganaInflected(term, reading, source)) {
+                    textSegments.push({reading: reading2, text: text2});
                 }
                 results.push(textSegments);
                 i += originalTextLength;
             } else {
                 if (previousUngroupedSegment === null) {
-                    previousUngroupedSegment = {text: character, reading: ''};
+                    previousUngroupedSegment = {reading: '', text: character};
                     results.push([previousUngroupedSegment]);
                 } else {
                     previousUngroupedSegment.text += character;
@@ -1519,22 +1519,22 @@ export class Backend {
 
         /** @type {import('backend').MecabParseResults} */
         const results = [];
-        for (const {name, lines} of parseTextResults) {
+        for (const {lines, name} of parseTextResults) {
             /** @type {import('api').ParseTextLine[]} */
             const result = [];
             for (const line of lines) {
-                for (const {term, reading, source} of line) {
+                for (const {reading, source, term} of line) {
                     const termParts = [];
-                    for (const {text: text2, reading: reading2} of distributeFuriganaInflected(
+                    for (const {reading: reading2, text: text2} of distributeFuriganaInflected(
                         term.length > 0 ? term : source,
                         jpConvertKatakanaToHiragana(reading),
                         source,
                     )) {
-                        termParts.push({text: text2, reading: reading2});
+                        termParts.push({reading: reading2, text: text2});
                     }
                     result.push(termParts);
                 }
-                result.push([{text: '\n', reading: ''}]);
+                result.push([{reading: '', text: '\n'}]);
             }
             results.push([name, result]);
         }
@@ -1610,7 +1610,7 @@ export class Backend {
             }
             case 'splice':
             {
-                const {path, start, deleteCount, items} = target;
+                const {deleteCount, items, path, start} = target;
                 if (typeof path !== 'string') { throw new Error('Invalid path'); }
                 if (typeof start !== 'number' || Math.floor(start) !== start) { throw new Error('Invalid start'); }
                 if (typeof deleteCount !== 'number' || Math.floor(deleteCount) !== deleteCount) { throw new Error('Invalid deleteCount'); }
@@ -1621,7 +1621,7 @@ export class Backend {
             }
             case 'push':
             {
-                const {path, items} = target;
+                const {items, path} = target;
                 if (typeof path !== 'string') { throw new Error('Invalid path'); }
                 if (!Array.isArray(items)) { throw new Error('Invalid items'); }
                 const array = accessor.get(ObjectPropertyAccessor.getPathArray(path));
@@ -2060,7 +2060,7 @@ export class Backend {
         try {
             if (typeof tabId === 'number' && typeof frameId === 'number') {
                 const action = 'frontendSetAllVisibleOverride';
-                const params = {value: false, priority: 0, awaitFrame: true};
+                const params = {awaitFrame: true, priority: 0, value: false};
                 token = await this._sendMessageTabPromise(tabId, {action, params}, {frameId});
             }
 
@@ -2140,7 +2140,7 @@ export class Backend {
         let dictionaryMedia;
         try {
             let errors2;
-            ({results: dictionaryMedia, errors: errors2} = await this._injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, dictionaryMediaDetails));
+            ({errors: errors2, results: dictionaryMedia} = await this._injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, dictionaryMediaDetails));
             for (const error of errors2) {
                 errors.push(ExtensionError.serialize(error));
             }
@@ -2150,12 +2150,12 @@ export class Backend {
         }
 
         return {
-            screenshotFileName,
+            audioFileName,
             clipboardImageFileName,
             clipboardText,
-            audioFileName,
             dictionaryMedia,
             errors: errors,
+            screenshotFileName,
         };
     }
 
@@ -2168,14 +2168,14 @@ export class Backend {
      */
     async _injectAnkiNoteAudio(ankiConnect, timestamp, definitionDetails, details) {
         if (definitionDetails.type !== 'term') { return null; }
-        const {term, reading} = definitionDetails;
+        const {reading, term} = definitionDetails;
         if (term.length === 0 && reading.length === 0) { return null; }
 
-        const {sources, preferredAudioIndex, idleTimeout, languageSummary} = details;
+        const {idleTimeout, languageSummary, preferredAudioIndex, sources} = details;
         let data;
         let contentType;
         try {
-            ({data, contentType} = await this._audioDownloader.downloadTermAudio(
+            ({contentType, data} = await this._audioDownloader.downloadTermAudio(
                 sources,
                 preferredAudioIndex,
                 term,
@@ -2205,10 +2205,10 @@ export class Backend {
      * @returns {Promise<?string>}
      */
     async _injectAnkiNoteScreenshot(ankiConnect, timestamp, details) {
-        const {tabId, frameId, format, quality} = details;
+        const {format, frameId, quality, tabId} = details;
         const dataUrl = await this._getScreenshot(tabId, frameId, format, quality);
 
-        const {mediaType, data} = this._getDataUrlInfo(dataUrl);
+        const {data, mediaType} = this._getDataUrlInfo(dataUrl);
         const extension = getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for screenshot image');
@@ -2229,7 +2229,7 @@ export class Backend {
             return null;
         }
 
-        const {mediaType, data} = this._getDataUrlInfo(dataUrl);
+        const {data, mediaType} = this._getDataUrlInfo(dataUrl);
         const extension = getFileExtensionFromImageMediaType(mediaType);
         if (extension === null) {
             throw new Error('Unknown media type for clipboard image');
@@ -2262,7 +2262,7 @@ export class Backend {
         const detailsMap = new Map();
         for (const {dictionary, path} of dictionaryMediaDetails) {
             const target = {dictionary, path};
-            const details = {dictionary, path, media: null};
+            const details = {dictionary, media: null, path};
             const key = JSON.stringify(target);
             targets.push(target);
             detailsList.push(details);
@@ -2282,7 +2282,7 @@ export class Backend {
         /** @type {import('api').InjectAnkiNoteDictionaryMediaResult[]} */
         const results = [];
         for (let i = 0, ii = detailsList.length; i < ii; ++i) {
-            const {dictionary, path, media} = detailsList[i];
+            const {dictionary, media, path} = detailsList[i];
             let fileName = null;
             if (media !== null) {
                 const {content, mediaType} = media;
@@ -2299,10 +2299,10 @@ export class Backend {
                     fileName = null;
                 }
             }
-            results.push({dictionary, path, fileName});
+            results.push({dictionary, fileName, path});
         }
 
-        return {results, errors};
+        return {errors, results};
     }
 
     /**
@@ -2326,15 +2326,15 @@ export class Backend {
                     const error3 = /** @type {import('core').SerializableObject} */ (details).error;
                     if (typeof error3 !== 'string') { continue; }
                     switch (error3) {
+                        case 'net::ERR_CERT_DATE_INVALID': // Chrome
+                        case 'Peer’s Certificate has expired.': // Firefox
+                            // This error occurs when a server certificate expires.
+                            return this._createAudioDownloadError('Audio download failed due to an expired server certificate', 'audio-download-failed-expired-server-certificate', errors);
                         case 'net::ERR_FAILED':
                             // This is potentially an error due to the extension not having enough URL privileges.
                             // The message logged to the console looks like this:
                             //  Access to fetch at '<URL>' from origin 'chrome-extension://<ID>' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
                             return this._createAudioDownloadError('Audio download failed due to possible extension permissions error', 'audio-download-failed-permissions-error', errors);
-                        case 'net::ERR_CERT_DATE_INVALID': // Chrome
-                        case 'Peer’s Certificate has expired.': // Firefox
-                            // This error occurs when a server certificate expires.
-                            return this._createAudioDownloadError('Audio download failed due to an expired server certificate', 'audio-download-failed-expired-server-certificate', errors);
                     }
                 }
             }
@@ -2425,7 +2425,7 @@ export class Backend {
         let data = dataUrl.substring(match[0].length);
         if (typeof match[2] === 'undefined') { data = btoa(data); }
 
-        return {mediaType, data};
+        return {data, mediaType};
     }
 
     /**
@@ -2434,7 +2434,7 @@ export class Backend {
      */
     _triggerDatabaseUpdated(type, cause) {
         void this._translator.clearDatabaseCaches();
-        this._sendMessageAllTabsIgnoreResponse({action: 'applicationDatabaseUpdated', params: {type, cause}});
+        this._sendMessageAllTabsIgnoreResponse({action: 'applicationDatabaseUpdated', params: {cause, type}});
     }
 
     /**
@@ -2455,44 +2455,44 @@ export class Backend {
      * @returns {import('translation').FindTermsOptions} An options object.
      */
     _getTranslatorFindTermsOptions(mode, details, options) {
-        let {matchType, deinflect} = details;
+        let {deinflect, matchType} = details;
         if (typeof matchType !== 'string') { matchType = /** @type {import('translation').FindTermsMatchType} */ ('exact'); }
         if (typeof deinflect !== 'boolean') { deinflect = true; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
-            general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language},
+            general: {language, mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder},
             scanning: {alphanumeric},
             translation: {
-                textReplacements: textReplacementsOptions,
                 searchResolution,
+                textReplacements: textReplacementsOptions,
             },
         } = options;
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
         let excludeDictionaryDefinitions = null;
         if (mode === 'merge' && !enabledDictionaryMap.has(mainDictionary)) {
             enabledDictionaryMap.set(mainDictionary, {
-                index: enabledDictionaryMap.size,
                 alias: mainDictionary,
-                priority: 0,
                 allowSecondarySearches: false,
+                index: enabledDictionaryMap.size,
                 partsOfSpeechFilter: true,
+                priority: 0,
                 useDeinflections: true,
             });
             excludeDictionaryDefinitions = new Set();
             excludeDictionaryDefinitions.add(mainDictionary);
         }
         return {
-            matchType,
             deinflect,
-            mainDictionary,
-            sortFrequencyDictionary,
-            sortFrequencyDictionaryOrder,
-            removeNonJapaneseCharacters: !alphanumeric,
-            searchResolution,
-            textReplacements,
             enabledDictionaryMap,
             excludeDictionaryDefinitions,
             language,
+            mainDictionary,
+            matchType,
+            removeNonJapaneseCharacters: !alphanumeric,
+            searchResolution,
+            sortFrequencyDictionary,
+            sortFrequencyDictionaryOrder,
+            textReplacements,
         };
     }
 
@@ -2517,13 +2517,13 @@ export class Backend {
         const enabledDictionaryMap = new Map();
         for (const dictionary of options.dictionaries) {
             if (!dictionary.enabled) { continue; }
-            const {name, alias, priority, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
+            const {alias, allowSecondarySearches, name, partsOfSpeechFilter, priority, useDeinflections} = dictionary;
             enabledDictionaryMap.set(name, {
-                index: enabledDictionaryMap.size,
                 alias,
-                priority,
                 allowSecondarySearches,
+                index: enabledDictionaryMap.size,
                 partsOfSpeechFilter,
+                priority,
                 useDeinflections,
             });
         }
@@ -2540,7 +2540,7 @@ export class Backend {
         for (const group of textReplacementsOptions.groups) {
             /** @type {import('translation').FindTermsTextReplacement[]} */
             const textReplacementsEntries = [];
-            for (const {pattern, ignoreCase, replacement} of group) {
+            for (const {ignoreCase, pattern, replacement} of group) {
                 let patternRegExp;
                 try {
                     patternRegExp = new RegExp(pattern, ignoreCase ? 'gi' : 'g');

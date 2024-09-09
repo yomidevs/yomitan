@@ -24,12 +24,12 @@ export type DatabaseId = {
 };
 
 export type MediaDataBase<TContentType = unknown> = {
-    dictionary: string;
-    path: string;
-    mediaType: string;
-    width: number;
-    height: number;
     content: TContentType;
+    dictionary: string;
+    height: number;
+    mediaType: string;
+    path: string;
+    width: number;
 };
 
 export type MediaDataArrayBufferContent = MediaDataBase<ArrayBuffer>;
@@ -41,132 +41,132 @@ type MediaType = ArrayBuffer | string;
 export type Media<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T>;
 
 export type DatabaseTermEntry = {
+    definitionTags: null | string;
+    dictionary: string;
     expression: string;
-    reading: string;
     expressionReverse?: string;
+    glossary: DictionaryData.TermGlossary[];
+    reading: string;
     readingReverse?: string;
-    definitionTags: string | null;
-    /** Legacy alias for the `definitionTags` field. */
-    tags?: string;
     rules: string;
     score: number;
-    glossary: DictionaryData.TermGlossary[];
     sequence?: number;
+    /** Legacy alias for the `definitionTags` field. */
+    tags?: string;
     termTags?: string;
-    dictionary: string;
 };
 
-export type DatabaseTermEntryWithId = DatabaseTermEntry & DatabaseId;
+export type DatabaseTermEntryWithId = DatabaseId & DatabaseTermEntry;
 
 export type TermEntry = {
-    index: number;
-    matchType: MatchType;
-    matchSource: MatchSource;
-    term: string;
-    reading: string;
-    definitionTags: string[];
-    termTags: string[];
-    rules: string[];
     definitions: DictionaryData.TermGlossary[];
-    score: number;
+    definitionTags: string[];
     dictionary: string;
     id: number;
+    index: number;
+    matchSource: MatchSource;
+    matchType: MatchType;
+    reading: string;
+    rules: string[];
+    score: number;
     sequence: number;
+    term: string;
+    termTags: string[];
 };
 
 export type DatabaseKanjiEntry = {
     character: string;
-    onyomi: string;
-    kunyomi: string;
-    tags: string;
-    meanings: string[];
     dictionary: string;
+    kunyomi: string;
+    meanings: string[];
+    onyomi: string;
     stats?: {[name: string]: string};
+    tags: string;
 };
 
 export type KanjiEntry = {
-    index: number;
     character: string;
-    onyomi: string[];
-    kunyomi: string[];
-    tags: string[];
     definitions: string[];
-    stats: {[name: string]: string};
     dictionary: string;
+    index: number;
+    kunyomi: string[];
+    onyomi: string[];
+    stats: {[name: string]: string};
+    tags: string[];
 };
 
 export type Tag = {
-    name: string;
     category: string;
-    order: number;
-    notes: string;
-    score: number;
     dictionary: string;
+    name: string;
+    notes: string;
+    order: number;
+    score: number;
 };
 
-export type DatabaseTermMeta = DatabaseTermMetaFrequency | DatabaseTermMetaPitch | DatabaseTermMetaPhoneticData;
+export type DatabaseTermMeta = DatabaseTermMetaFrequency | DatabaseTermMetaPhoneticData | DatabaseTermMetaPitch;
 
 export type DatabaseTermMetaFrequency = {
-    expression: string;
-    mode: 'freq';
     data: DictionaryData.GenericFrequencyData | DictionaryData.TermMetaFrequencyDataWithReading;
     dictionary: string;
+    expression: string;
+    mode: 'freq';
 };
 
 export type DatabaseTermMetaPitch = {
-    expression: string;
-    mode: 'pitch';
     data: DictionaryData.TermMetaPitchData;
     dictionary: string;
+    expression: string;
+    mode: 'pitch';
 };
 
 export type DatabaseTermMetaPhoneticData = {
-    expression: string;
-    mode: 'ipa';
     data: DictionaryData.TermMetaPhoneticData;
     dictionary: string;
+    expression: string;
+    mode: 'ipa';
 };
 
 export type TermMetaFrequencyDataWithReading = {
-    reading: string;
     frequency: DictionaryData.GenericFrequencyData;
+    reading: string;
 };
 
-export type TermMeta = TermMetaFrequency | TermMetaPitch | TermMetaPhoneticData;
+export type TermMeta = TermMetaFrequency | TermMetaPhoneticData | TermMetaPitch;
 
 export type TermMetaType = TermMeta['mode'];
 
 export type TermMetaFrequency = {
-    index: number;
-    term: string;
-    mode: 'freq';
     data: DictionaryData.GenericFrequencyData | DictionaryData.TermMetaFrequencyDataWithReading;
     dictionary: string;
+    index: number;
+    mode: 'freq';
+    term: string;
 };
 
 export type TermMetaPitch = {
-    mode: 'pitch';
-    index: number;
-    term: string;
     data: DictionaryData.TermMetaPitchData;
     dictionary: string;
+    index: number;
+    mode: 'pitch';
+    term: string;
 };
 
 export type TermMetaPhoneticData = {
-    mode: 'ipa';
-    index: number;
-    term: string;
     data: DictionaryData.TermMetaPhoneticData;
     dictionary: string;
+    index: number;
+    mode: 'ipa';
+    term: string;
 };
 
 export type DatabaseKanjiMeta = DatabaseKanjiMetaFrequency;
 
 export type DatabaseKanjiMetaFrequency = {
     character: string;
-    mode: 'freq';
     data: DictionaryData.GenericFrequencyData;
     dictionary: string;
+    mode: 'freq';
 };
 
 export type KanjiMeta = KanjiMetaFrequency;
@@ -174,16 +174,16 @@ export type KanjiMeta = KanjiMetaFrequency;
 export type KanjiMetaType = KanjiMeta['mode'];
 
 export type KanjiMetaFrequency = {
-    index: number;
     character: string;
-    mode: 'freq';
     data: DictionaryData.GenericFrequencyData;
     dictionary: string;
+    index: number;
+    mode: 'freq';
 };
 
 export type DictionaryCounts = {
-    total: DictionaryCountGroup | null;
     counts: DictionaryCountGroup[];
+    total: DictionaryCountGroup | null;
 };
 
 export type DictionaryCountGroup = {
@@ -192,12 +192,12 @@ export type DictionaryCountGroup = {
 
 export type ObjectStoreName = (
     'dictionaries' |
-    'terms' |
-    'termMeta' |
     'kanji' |
     'kanjiMeta' |
+    'media' |
     'tagMeta' |
-    'media'
+    'termMeta' |
+    'terms'
 );
 
 export type ObjectStoreData<T extends ObjectStoreName> = (
@@ -225,27 +225,27 @@ export type MatchType = Dictionary.TermSourceMatchType;
 export type MatchSource = Dictionary.TermSourceMatchSource;
 
 export type DictionaryAndQueryRequest = {
-    query: string | number;
     dictionary: string;
+    query: number | string;
 };
 
 export type TermExactRequest = {
-    term: string;
     reading: string;
+    term: string;
 };
 
 export type MediaRequest = {
-    path: string;
     dictionary: string;
+    path: string;
 };
 
 export type FindMultiBulkData<TItem = unknown> = {
+    indexIndex: number;
     item: TItem;
     itemIndex: number;
-    indexIndex: number;
 };
 
-export type CreateQuery<TItem = unknown> = (item: TItem) => (IDBValidKey | IDBKeyRange | null);
+export type CreateQuery<TItem = unknown> = (item: TItem) => (IDBKeyRange | IDBValidKey | null);
 
 export type FindPredicate<TItem = unknown, TRow = unknown> = (row: TRow, item: TItem) => boolean;
 

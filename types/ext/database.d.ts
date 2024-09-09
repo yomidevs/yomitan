@@ -16,23 +16,23 @@
  */
 
 export type StructureDefinition<TObjectStoreName extends string> = {
-    version: number;
     stores: {[name in TObjectStoreName]: StoreDefinition};
+    version: number;
 };
 
 export type StoreDefinition = {
-    primaryKey: IDBObjectStoreParameters;
     indices: string[];
+    primaryKey: IDBObjectStoreParameters;
 };
 
 export type UpdateFunction = (
     db: IDBDatabase,
     transaction: IDBTransaction,
     oldVersion: number,
-    newVersion: number | null,
+    newVersion: null | number,
 ) => void;
 
 export type CountTarget = [
-    objectStoreOrIndex: IDBObjectStore | IDBIndex,
-    query: IDBValidKey | IDBKeyRange | undefined,
+    objectStoreOrIndex: IDBIndex | IDBObjectStore,
+    query: IDBKeyRange | IDBValidKey | undefined,
 ];

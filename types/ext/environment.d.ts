@@ -20,6 +20,6 @@ export type Info = {
     platform: {os: OperatingSystem};
 };
 
-export type Browser = 'chrome' | 'firefox' | 'firefox-mobile' | 'edge' | 'edge-legacy' | 'safari';
+export type Browser = 'chrome' | 'edge' | 'edge-legacy' | 'firefox' | 'firefox-mobile' | 'safari';
 
-export type OperatingSystem = chrome.runtime.PlatformOs | 'unknown';
+export type OperatingSystem = 'unknown' | chrome.runtime.PlatformOs;

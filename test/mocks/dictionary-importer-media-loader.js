@@ -20,6 +20,6 @@ export class DictionaryImporterMediaLoader {
     /** @type {import('dictionary-importer-media-loader').GetImageDetailsFunction} */
     async getImageDetails(content) {
         // Placeholder values
-        return {content, width: 100, height: 100};
+        return {content, height: 100, width: 100};
     }
 }

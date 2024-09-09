@@ -173,8 +173,8 @@ export class TextSourceGenerator {
 
         // Result
         return {
-            text: text.substring(cursorStart, cursorEnd),
             offset: startLength - cursorStart,
+            text: text.substring(cursorStart, cursorEnd),
         };
     }
 
@@ -187,7 +187,7 @@ export class TextSourceGenerator {
      * @returns {?import('text-source').TextSource} A range for the hovered text or element, or `null` if no applicable content was found.
      */
     _getRangeFromPointInternal(x, y, options) {
-        const {deepContentScan, normalizeCssZoom, language} = options;
+        const {deepContentScan, language, normalizeCssZoom} = options;
 
         const elements = this._getElementsFromPoint(x, y, deepContentScan);
         /** @type {?HTMLDivElement} */
@@ -368,7 +368,7 @@ export class TextSourceGenerator {
         const nodePre = range.endContainer;
         const offsetPre = range.endOffset;
         try {
-            const {node, offset, content} = new DOMTextScanner(nodePre, offsetPre, true, false).seek(1);
+            const {content, node, offset} = new DOMTextScanner(nodePre, offsetPre, true, false).seek(1);
             range.setEnd(node, offset);
 
             if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects(), language)) {
@@ -379,7 +379,7 @@ export class TextSourceGenerator {
         }
 
         // Scan backward
-        const {node, offset, content} = new DOMTextScanner(startContainer, range.startOffset, true, false).seek(-1);
+        const {content, node, offset} = new DOMTextScanner(startContainer, range.startOffset, true, false).seek(-1);
         range.setStart(node, offset);
 
         if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects(), language)) {
@@ -432,15 +432,15 @@ export class TextSourceGenerator {
         let offset = 0;
         const {nodeType} = node;
         switch (nodeType) {
-            case Node.TEXT_NODE:
-                offset = position.offset;
-                break;
             case Node.ELEMENT_NODE:
                 // Elements with user-select: all will return the element
                 // instead of a text point inside the element.
                 if (this._isElementUserSelectAll(/** @type {Element} */ (node))) {
                     return this._caretPositionFromPointNormalizeStyles(x, y, /** @type {Element} */ (node));
                 }
+                break;
+            case Node.TEXT_NODE:
+                offset = position.offset;
                 break;
         }
 
@@ -485,9 +485,6 @@ export class TextSourceGenerator {
                 let offset = 0;
                 const {nodeType} = node;
                 switch (nodeType) {
-                    case Node.TEXT_NODE:
-                        offset = position.offset;
-                        break;
                     case Node.ELEMENT_NODE:
                         // Elements with user-select: all will return the element
                         // instead of a text point inside the element.
@@ -499,6 +496,9 @@ export class TextSourceGenerator {
                             nextElement = /** @type {Element} */ (node);
                             continue;
                         }
+                        break;
+                    case Node.TEXT_NODE:
+                        offset = position.offset;
                         break;
                 }
 

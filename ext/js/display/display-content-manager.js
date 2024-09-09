@@ -56,7 +56,7 @@ export class DisplayContentManager {
      * Unloads all media that has been loaded.
      */
     unloadAll() {
-        for (const {onUnload, loaded} of this._loadMediaData) {
+        for (const {loaded, onUnload} of this._loadMediaData) {
             if (typeof onUnload === 'function') {
                 onUnload(loaded);
             }
@@ -102,7 +102,7 @@ export class DisplayContentManager {
         if (token !== this._token || media === null) { return; }
 
         /** @type {import('display-content-manager').LoadMediaDataInfo} */
-        const data = {onUnload, loaded: false};
+        const data = {loaded: false, onUnload};
         this._loadMediaData.push(data);
         onLoad(media.url);
         data.loaded = true;
@@ -139,7 +139,7 @@ export class DisplayContentManager {
      */
     async _getMediaData(path, dictionary) {
         const token = this._token;
-        const datas = await this._display.application.api.getMedia([{path, dictionary}]);
+        const datas = await this._display.application.api.getMedia([{dictionary, path}]);
         if (token === this._token && datas.length > 0) {
             const data = datas[0];
             const buffer = base64ToArrayBuffer(data.content);
@@ -170,11 +170,11 @@ export class DisplayContentManager {
             params[key] = value;
         }
         this._display.setContent({
-            historyMode: 'new',
+            content: null,
             focus: false,
+            historyMode: 'new',
             params,
             state: null,
-            content: null,
         });
     }
 

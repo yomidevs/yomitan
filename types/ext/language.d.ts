@@ -27,22 +27,22 @@ export type TextProcessorFunction<T = unknown> = (str: string, setting: T) => st
  * When a language has multiple processors, the translator will generate variants of the text by applying all combinations of the processors.
  */
 export type TextProcessor<T = unknown> = {
-    name: string;
     description: string;
+    name: string;
     options: TextProcessorOptions<T>;
     process: TextProcessorFunction<T>;
 };
 
 export type ReadingNormalizer = (str: string) => string;
 
-export type BidirectionalPreprocessorOptions = 'off' | 'direct' | 'inverse';
+export type BidirectionalPreprocessorOptions = 'direct' | 'inverse' | 'off';
 
 export type BidirectionalConversionPreprocessor = TextProcessor<BidirectionalPreprocessorOptions>;
 
 export type LanguageAndProcessors = {
     iso: string;
-    textPreprocessors?: TextProcessorWithId<unknown>[];
     textPostprocessors?: TextProcessorWithId<unknown>[];
+    textPreprocessors?: TextProcessorWithId<unknown>[];
 };
 
 export type LanguageAndReadingNormalizer = {
@@ -61,8 +61,8 @@ export type TextProcessorWithId<T = unknown> = {
 };
 
 export type LanguageSummary = {
-    name: string;
+    exampleText: string;
     iso: string;
     iso639_3: string;
-    exampleText: string;
+    name: string;
 };

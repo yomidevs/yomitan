@@ -106,7 +106,7 @@ export class SortFrequencyDictionaryController {
         option.value = '';
         option.textContent = 'None';
         fragment.appendChild(option);
-        for (const {title, counts} of dictionaries) {
+        for (const {counts, title} of dictionaries) {
             if (counts && counts.termMeta && counts.termMeta.freq > 0) {
                 option = document.createElement('option');
                 option.value = title;
@@ -158,7 +158,7 @@ export class SortFrequencyDictionaryController {
         const terms = [...moreCommonTerms, ...lessCommonTerms];
 
         const frequencies = await this._settingsController.application.api.getTermFrequencies(
-            terms.map((term) => ({term, reading: null})),
+            terms.map((term) => ({reading: null, term})),
             [dictionary],
         );
 
@@ -167,17 +167,17 @@ export class SortFrequencyDictionaryController {
         const moreCommonTermDetails = [];
         const lessCommonTermDetails = [];
         for (const term of moreCommonTerms) {
-            const details = {hasValue: false, minValue: Number.MAX_SAFE_INTEGER, maxValue: Number.MIN_SAFE_INTEGER};
+            const details = {hasValue: false, maxValue: Number.MIN_SAFE_INTEGER, minValue: Number.MAX_SAFE_INTEGER};
             termDetails.set(term, details);
             moreCommonTermDetails.push(details);
         }
         for (const term of lessCommonTerms) {
-            const details = {hasValue: false, minValue: Number.MAX_SAFE_INTEGER, maxValue: Number.MIN_SAFE_INTEGER};
+            const details = {hasValue: false, maxValue: Number.MIN_SAFE_INTEGER, minValue: Number.MAX_SAFE_INTEGER};
             termDetails.set(term, details);
             lessCommonTermDetails.push(details);
         }
 
-        for (const {term, frequency} of frequencies) {
+        for (const {frequency, term} of frequencies) {
             const details = termDetails.get(term);
             if (typeof details === 'undefined') { continue; }
             details.minValue = Math.min(details.minValue, frequency);

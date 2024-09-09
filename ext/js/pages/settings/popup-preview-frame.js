@@ -96,17 +96,17 @@ export class PopupPreviewFrame {
 
         // Overwrite frontend
         this._frontend = new Frontend({
-            application: this._application,
-            popupFactory: this._popupFactory,
-            depth: 0,
-            parentPopupId: null,
-            parentFrameId: null,
-            useProxyPopup: false,
-            canUseWindowPopup: false,
-            pageType: 'web',
             allowRootFramePopupProxy: false,
+            application: this._application,
+            canUseWindowPopup: false,
             childrenSupported: false,
+            depth: 0,
             hotkeyHandler: this._hotkeyHandler,
+            pageType: 'web',
+            parentFrameId: null,
+            parentPopupId: null,
+            popupFactory: this._popupFactory,
+            useProxyPopup: false,
         });
         this._frontend.setOptionsContextOverride(this._optionsContext);
         await this._frontend.prepare();
@@ -149,7 +149,7 @@ export class PopupPreviewFrame {
     /**
      * @param {import('popup').EventArgument<'customOuterCssChanged'>} details
      */
-    _onCustomOuterCssChanged({node, inShadow}) {
+    _onCustomOuterCssChanged({inShadow, node}) {
         if (node === null || inShadow) { return; }
 
         const node2 = document.querySelector('#popup-outer-css');

@@ -110,13 +110,13 @@ export class AccessibilityController {
         /** @type {import('script-manager').RegistrationDetails} */
         const details = {
             allFrames: true,
-            matches: ['*://docs.google.com/*'],
-            runAt: 'document_start',
             js: [
                 xray ?
                 'js/accessibility/google-docs-xray.js' :
                 'js/accessibility/google-docs.js',
             ],
+            matches: ['*://docs.google.com/*'],
+            runAt: 'document_start',
         };
         if (!xray) { details.world = 'MAIN'; }
         return registerContentScript(id, details);

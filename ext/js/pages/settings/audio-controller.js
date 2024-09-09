@@ -96,10 +96,10 @@ export class AudioController extends EventDispatcher {
 
         await this._settingsController.modifyProfileSettings([{
             action: 'splice',
-            path: 'audio.sources',
-            start: index,
             deleteCount: 1,
             items: [],
+            path: 'audio.sources',
+            start: index,
         }]);
     }
 
@@ -124,8 +124,8 @@ export class AudioController extends EventDispatcher {
      */
     _onOptionsChanged({options}) {
         const {
-            general: {language},
             audio: {sources},
+            general: {language},
         } = options;
 
         this._language = language;
@@ -164,9 +164,9 @@ export class AudioController extends EventDispatcher {
         const voices = (
             typeof speechSynthesis !== 'undefined' ?
             [...speechSynthesis.getVoices()].map((voice, index) => ({
-                voice,
-                isJapanese: this._languageTagIsJapanese(voice.lang),
                 index,
+                isJapanese: this._languageTagIsJapanese(voice.lang),
+                voice,
             })) :
             []
         );
@@ -256,10 +256,10 @@ export class AudioController extends EventDispatcher {
         this._createAudioSourceEntry(index, source);
         await this._settingsController.modifyProfileSettings([{
             action: 'splice',
-            path: 'audio.sources',
-            start: index,
             deleteCount: 0,
             items: [source],
+            path: 'audio.sources',
+            start: index,
         }]);
     }
 }
@@ -501,15 +501,15 @@ class AudioSourceEntry {
      */
     _normalizeAudioSourceType(value) {
         switch (value) {
-            case 'jpod101':
-            case 'language-pod-101':
-            case 'jisho':
-            case 'lingua-libre':
-            case 'wiktionary':
-            case 'text-to-speech':
-            case 'text-to-speech-reading':
             case 'custom':
             case 'custom-json':
+            case 'jisho':
+            case 'jpod101':
+            case 'language-pod-101':
+            case 'lingua-libre':
+            case 'text-to-speech':
+            case 'text-to-speech-reading':
+            case 'wiktionary':
                 return value;
             default:
                 return null;

@@ -34,9 +34,9 @@ const rootDir = join(dirname, '..');
 function getJsconfigPath(jsconfigType) {
     let path;
     switch (jsconfigType) {
+        case 'benches': path = '../benches/jsconfig.json'; break;
         case 'dev': path = '../dev/jsconfig.json'; break;
         case 'test': path = '../test/jsconfig.json'; break;
-        case 'benches': path = '../benches/jsconfig.json'; break;
         default: path = '../jsconfig.json'; break;
     }
     return join(dirname, path);
@@ -47,9 +47,9 @@ function getJsconfigPath(jsconfigType) {
  */
 function createAjv() {
     return new Ajv({
+        allowUnionTypes: true,
         meta: true,
         strictTuples: false,
-        allowUnionTypes: true,
     });
 }
 
@@ -62,14 +62,14 @@ function createAjv() {
 function createValidatorFunctionFromTypeScript(path, type, jsconfigType) {
     /** @type {import('ts-json-schema-generator/dist/src/Config').Config} */
     const config = {
+        additionalProperties: false,
+        expose: 'none',
+        jsDoc: 'none',
+        minify: false,
         path,
+        strictTuples: true,
         tsconfig: getJsconfigPath(jsconfigType),
         type,
-        jsDoc: 'none',
-        additionalProperties: false,
-        minify: false,
-        expose: 'none',
-        strictTuples: true,
     };
     const schema = createGenerator(config).createSchema(config.type);
     const ajv = createAjv();
@@ -99,13 +99,13 @@ function normalizePathDirectorySeparators(value) {
 describe.concurrent('JSON validation', () => {
     const ignoreDirectories = new Set([
         'builds',
+        'dev/lib',
         'dictionaries',
         'node_modules',
-        'playwright-report',
         'playwright',
-        'test-results',
-        'dev/lib',
+        'playwright-report',
         'test/playwright',
+        'test-results',
     ]);
 
     const existingJsonFiles = getAllFiles(rootDir, (path, isDirectory) => {
@@ -161,7 +161,7 @@ describe.concurrent('JSON validation', () => {
         if (info.ignore || !existingJsonFileSet.has(info.path)) { continue; }
         schemaValidationTargets1.push(info);
     }
-    test.each(schemaValidationTargets1)('Validating file against TypeScript: $path', ({path, typeFile, type, jsconfig}) => {
+    test.each(schemaValidationTargets1)('Validating file against TypeScript: $path', ({jsconfig, path, type, typeFile}) => {
         const validate = createValidatorFunctionFromTypeScript(join(rootDir, typeFile), type, jsconfig);
         const data = parseJson(readFileSync(join(rootDir, path), {encoding: 'utf8'}));
         const valid = validate(data);
@@ -175,9 +175,9 @@ describe.concurrent('JSON validation', () => {
     const schemaValidationTargets2 = [];
     for (const info of jsonFileData.files) {
         if (info.ignore || !existingJsonFileSet.has(info.path)) { continue; }
-        const {schema, path} = info;
+        const {path, schema} = info;
         if (typeof schema !== 'string') { continue; }
-        schemaValidationTargets2.push({schema, path});
+        schemaValidationTargets2.push({path, schema});
     }
     test.each(schemaValidationTargets2)('Validating file against schema: $path', ({path, schema}) => {
         const validate = createValidatorFunctionFromSchemaJson(join(rootDir, schema));

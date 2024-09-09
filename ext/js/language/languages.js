@@ -22,8 +22,8 @@ import {languageDescriptorMap} from './language-descriptors.js';
  */
 export function getLanguageSummaries() {
     const results = [];
-    for (const {name, iso, iso639_3, exampleText} of languageDescriptorMap.values()) {
-        results.push({name, iso, iso639_3, exampleText});
+    for (const {exampleText, iso, iso639_3, name} of languageDescriptorMap.values()) {
+        results.push({exampleText, iso, iso639_3, name});
     }
     return results;
 }
@@ -46,7 +46,7 @@ export function getAllLanguageReadingNormalizers() {
  */
 export function getAllLanguageTextProcessors() {
     const results = [];
-    for (const {iso, textPreprocessors = {}, textPostprocessors = {}} of languageDescriptorMap.values()) {
+    for (const {iso, textPostprocessors = {}, textPreprocessors = {}} of languageDescriptorMap.values()) {
         /** @type {import('language').TextProcessorWithId<unknown>[]} */
         const textPreprocessorsArray = [];
         for (const [id, textPreprocessor] of Object.entries(textPreprocessors)) {
@@ -63,7 +63,7 @@ export function getAllLanguageTextProcessors() {
                 textProcessor: /** @type {import('language').TextProcessor<unknown>} */ (textPostprocessor),
             });
         }
-        results.push({iso, textPreprocessors: textPreprocessorsArray, textPostprocessors: textPostprocessorsArray});
+        results.push({iso, textPostprocessors: textPostprocessorsArray, textPreprocessors: textPreprocessorsArray});
     }
     return results;
 }

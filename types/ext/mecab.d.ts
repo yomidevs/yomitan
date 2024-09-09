@@ -29,18 +29,18 @@ export type ParseResultTermRaw = {
 
 /** The resulting data from an invocation of `parseText`. */
 export type ParseResult = {
-    /** The dictionary name for the parsed result. */
-    name: string;
     /** The resulting parsed terms. */
     lines: ParseFragment[][];
+    /** The dictionary name for the parsed result. */
+    name: string;
 };
 
 /** A fragment of the parsed text. */
 export type ParseFragment = {
-    /** The term. */
-    term: string;
     /** The reading of the term. */
     reading: string;
     /** The source text. */
     source: string;
+    /** The term. */
+    term: string;
 };

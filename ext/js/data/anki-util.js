@@ -75,7 +75,7 @@ export function cloneFieldMarkerPattern(global) {
  */
 export function isNoteDataValid(note) {
     if (!isObjectNotArray(note)) { return false; }
-    const {fields, deckName, modelName} = note;
+    const {deckName, fields, modelName} = note;
     return (
         typeof deckName === 'string' &&
         typeof modelName === 'string' &&

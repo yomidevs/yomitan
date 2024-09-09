@@ -25,7 +25,7 @@ test.beforeEach(async ({context}) => {
     await welcome.close(); // Close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
 });
 
-test('visual', async ({page, extensionId}) => {
+test('visual', async ({extensionId, page}) => {
     // Open settings
     await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
@@ -69,7 +69,7 @@ test('visual', async ({page, extensionId}) => {
     expect(boundingBox).not.toBe(null);
     const pageHeight = Math.ceil(boundingBox.y + boundingBox.height);
 
-    await page.setViewportSize({width: 1280, height: pageHeight});
+    await page.setViewportSize({height: pageHeight, width: 1280});
 
     // Wait for any animations or changes to complete
     await page.waitForTimeout(500);
@@ -89,7 +89,7 @@ test('visual', async ({page, extensionId}) => {
     const screenshot = async (doc_number, test_number, el, offset) => {
         const test_name = 'doc' + doc_number + '-test' + test_number;
 
-        const box = (await el.boundingBox()) || {x: 0, y: 0, width: 0, height: 0};
+        const box = (await el.boundingBox()) || {height: 0, width: 0, x: 0, y: 0};
 
         // Find the popup frame if it exists
         let popup_frame = page.frames().find((f) => f.url().includes('popup.html'));
@@ -120,7 +120,7 @@ test('visual', async ({page, extensionId}) => {
 
     // Test document 1
     await page.goto(pathToFileURL(path.join(root, 'test/data/html/document-util.html')).toString());
-    await page.setViewportSize({width: 1000, height: 1800});
+    await page.setViewportSize({height: 1800, width: 1000});
     await page.keyboard.down('Shift');
     let i = 1;
     for (const el of await page.locator('div > *:nth-child(1)').elementHandles()) {
@@ -130,7 +130,7 @@ test('visual', async ({page, extensionId}) => {
 
     // Test document 2
     await page.goto(pathToFileURL(path.join(root, 'test/data/html/popup-tests.html')).toString());
-    await page.setViewportSize({width: 1000, height: 4500});
+    await page.setViewportSize({height: 4500, width: 1000});
     await page.keyboard.down('Shift');
     i = 1;
     for (const el of await page.locator('.hovertarget').elementHandles()) {

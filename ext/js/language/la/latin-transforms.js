@@ -20,144 +20,144 @@ import {suffixInflection} from '../language-transforms.js';
 // TODO: -ne suffix (estne, nonne)?
 
 const conditions = {
-    v: {
-        name: 'Verb',
+    adj: {
         isDictionaryForm: true,
+        name: 'Adjective',
+        subConditions: ['adj3', 'adj12'],
+    },
+    adj3: {
+        isDictionaryForm: true,
+        name: 'Adjective, 3rd declension',
+    },
+    adj12: {
+        isDictionaryForm: true,
+        name: 'Adjective, 1st-2nd declension',
+    },
+    adv: {
+        isDictionaryForm: true,
+        name: 'Adverb',
     },
     n: {
-        name: 'Noun',
         isDictionaryForm: true,
+        name: 'Noun',
         subConditions: ['ns', 'np'],
     },
-    ns: {
-        name: 'Noun, singular',
-        isDictionaryForm: true,
-        subConditions: ['n1s', 'n2s', 'n3s', 'n4s', 'n5s'],
-    },
-    np: {
-        name: 'Noun, plural',
-        isDictionaryForm: true,
-        subConditions: ['n1p', 'n2p', 'n3p', 'n4p', 'n5p'],
-    },
     n1: {
-        name: 'Noun, 1st declension',
         isDictionaryForm: true,
+        name: 'Noun, 1st declension',
         subConditions: ['n1s', 'n1p'],
     },
     n1p: {
-        name: 'Noun, 1st declension, plural',
         isDictionaryForm: true,
+        name: 'Noun, 1st declension, plural',
     },
     n1s: {
-        name: 'Noun, 1st declension, singular',
         isDictionaryForm: true,
+        name: 'Noun, 1st declension, singular',
     },
     n2: {
-        name: 'Noun, 2nd declension',
         isDictionaryForm: true,
+        name: 'Noun, 2nd declension',
         subConditions: ['n2s', 'n2p'],
     },
     n2p: {
-        name: 'Noun, 2nd declension, plural',
         isDictionaryForm: true,
+        name: 'Noun, 2nd declension, plural',
     },
     n2s: {
-        name: 'Noun, 2nd declension, singular',
         isDictionaryForm: true,
+        name: 'Noun, 2nd declension, singular',
     },
     n3: {
-        name: 'Noun, 3rd declension',
         isDictionaryForm: true,
+        name: 'Noun, 3rd declension',
         subConditions: ['n3s', 'n3p'],
     },
     n3p: {
-        name: 'Noun, 3rd declension, plural',
         isDictionaryForm: true,
+        name: 'Noun, 3rd declension, plural',
     },
     n3s: {
-        name: 'Noun, 3rd declension, singular',
         isDictionaryForm: true,
+        name: 'Noun, 3rd declension, singular',
     },
     n4: {
-        name: 'Noun, 4th declension',
         isDictionaryForm: true,
+        name: 'Noun, 4th declension',
         subConditions: ['n4s', 'n4p'],
     },
     n4p: {
-        name: 'Noun, 4th declension, plural',
         isDictionaryForm: true,
+        name: 'Noun, 4th declension, plural',
     },
     n4s: {
-        name: 'Noun, 4th declension, singular',
         isDictionaryForm: true,
+        name: 'Noun, 4th declension, singular',
     },
     n5: {
-        name: 'Noun, 5th declension',
         isDictionaryForm: true,
+        name: 'Noun, 5th declension',
         subConditions: ['n5s', 'n5p'],
     },
     n5p: {
-        name: 'Noun, 5th declension, plural',
         isDictionaryForm: true,
+        name: 'Noun, 5th declension, plural',
     },
     n5s: {
+        isDictionaryForm: true,
         name: 'Noun, 5th declension, singular',
-        isDictionaryForm: true,
     },
-    adj: {
-        name: 'Adjective',
+    np: {
         isDictionaryForm: true,
-        subConditions: ['adj3', 'adj12'],
+        name: 'Noun, plural',
+        subConditions: ['n1p', 'n2p', 'n3p', 'n4p', 'n5p'],
     },
-    adj12: {
-        name: 'Adjective, 1st-2nd declension',
+    ns: {
         isDictionaryForm: true,
+        name: 'Noun, singular',
+        subConditions: ['n1s', 'n2s', 'n3s', 'n4s', 'n5s'],
     },
-    adj3: {
-        name: 'Adjective, 3rd declension',
+    v: {
         isDictionaryForm: true,
-    },
-    adv: {
-        name: 'Adverb',
-        isDictionaryForm: true,
+        name: 'Verb',
     },
 };
 
 /** @type {import('language-transformer').LanguageTransformDescriptor<keyof typeof conditions>} */
 export const latinTransforms = {
-    language: 'la',
     conditions,
+    language: 'la',
     transforms: {
+        ablative: {
+            description: 'Ablative case',
+            name: 'ablative',
+            rules: [
+                suffixInflection('o', 'um', ['n2s'], ['n2s']),
+            ],
+        },
+        feminine: {
+            description: 'Adjective form',
+            name: 'feminine',
+            rules: [
+                suffixInflection('a', 'us', ['adj12'], ['adj12']),
+            ],
+        },
+        neuter: {
+            description: 'Adjective form',
+            name: 'neuter',
+            rules: [
+                suffixInflection('um', 'us', ['adj12'], ['adj12']),
+            ],
+        },
         plural: {
-            name: 'plural',
             description: 'Plural declension',
+            name: 'plural',
             rules: [
                 suffixInflection('i', 'us', ['n2p'], ['n2s']),
                 suffixInflection('i', 'us', ['adj12'], ['adj12']),
                 suffixInflection('e', '', ['n1p'], ['n1s']),
                 suffixInflection('ae', 'a', ['adj12'], ['adj12']),
                 suffixInflection('a', 'um', ['adj12'], ['adj12']),
-            ],
-        },
-        feminine: {
-            name: 'feminine',
-            description: 'Adjective form',
-            rules: [
-                suffixInflection('a', 'us', ['adj12'], ['adj12']),
-            ],
-        },
-        neuter: {
-            name: 'neuter',
-            description: 'Adjective form',
-            rules: [
-                suffixInflection('um', 'us', ['adj12'], ['adj12']),
-            ],
-        },
-        ablative: {
-            name: 'ablative',
-            description: 'Ablative case',
-            rules: [
-                suffixInflection('o', 'um', ['n2s'], ['n2s']),
             ],
         },
     },

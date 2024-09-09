@@ -196,10 +196,10 @@ export class ProfileController {
         // Modify settings
         await this._settingsController.modifyGlobalSettings([{
             action: 'splice',
-            path: 'profiles',
-            start: index,
             deleteCount: 0,
             items: [newProfile],
+            path: 'profiles',
+            start: index,
         }]);
 
         // Update profile index
@@ -221,10 +221,10 @@ export class ProfileController {
         /** @type {import('settings-modifications').Modification[]} */
         const modifications = [{
             action: 'splice',
-            path: 'profiles',
-            start: profileIndex,
             deleteCount: 1,
             items: [],
+            path: 'profiles',
+            start: profileIndex,
         }];
         if (profileCurrentNew >= profileIndex) {
             profileCurrentNew = Math.min(profileCurrentNew - 1, this._profiles.length - 1);
@@ -387,7 +387,7 @@ export class ProfileController {
     /** */
     async _onOptionsChanged() {
         // Update state
-        const {profiles, profileCurrent} = await this._settingsController.getOptionsFull();
+        const {profileCurrent, profiles} = await this._settingsController.getOptionsFull();
         this._profiles = profiles;
         this._profileCurrent = profileCurrent;
 

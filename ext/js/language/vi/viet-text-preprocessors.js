@@ -35,8 +35,8 @@ const re7 = new RegExp(`(?<!q)([ou])([aeoy])${TONE}(?!\\w)`, 'i');
  * @type {import('language').TextProcessor<'old'|'new'|'off'>}
  */
 export const normalizeDiacritics = {
-    name: 'Normalize Diacritics',
     description: 'Normalize diacritics and their placements (in either the old style or new style). NFC normalization is used.',
+    name: 'Normalize Diacritics',
     options: ['old', 'new', 'off'],
     process: (str, setting) => {
         if (setting === 'off') { return str; }

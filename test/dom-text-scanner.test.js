@@ -113,7 +113,7 @@ function createAbsoluteGetComputedStyle(window) {
 const domTestEnv = await setupDomTest(path.join(dirname, 'data/html/dom-text-scanner.html'));
 
 describe('DOMTextScanner seek tests', () => {
-    const {window, teardown} = domTestEnv;
+    const {teardown, window} = domTestEnv;
     afterAll(() => teardown(global));
 
     const {document} = window;
@@ -130,18 +130,18 @@ describe('DOMTextScanner seek tests', () => {
 
         for (const testDataItem of testData) {
             const {
-                node: nodeSelector,
-                offset,
-                length,
-                forcePreserveWhitespace,
-                generateLayoutContent,
-                reversible,
                 expected: {
+                    content: expectedContent,
                     node: expectedNodeSelector,
                     offset: expectedOffset,
-                    content: expectedContent,
                     remainder: expectedRemainder,
                 },
+                forcePreserveWhitespace,
+                generateLayoutContent,
+                length,
+                node: nodeSelector,
+                offset,
+                reversible,
             } = testDataItem;
 
             const node = querySelectorTextNode(testElement, nodeSelector);
@@ -155,7 +155,7 @@ describe('DOMTextScanner seek tests', () => {
                 const scanner = new DOMTextScanner(node, offset, forcePreserveWhitespace, generateLayoutContent);
                 scanner.seek(length);
 
-                const {node: actualNode1, offset: actualOffset1, content: actualContent1, remainder: actualRemainder1} = scanner;
+                const {content: actualContent1, node: actualNode1, offset: actualOffset1, remainder: actualRemainder1} = scanner;
                 expect(actualContent1).toStrictEqual(expectedContent);
                 expect(actualOffset1).toStrictEqual(expectedOffset);
                 expect(actualNode1).toStrictEqual(expectedNode);

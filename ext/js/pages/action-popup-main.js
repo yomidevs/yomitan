@@ -60,7 +60,7 @@ class DisplayController {
         this._setupButtonEvents('.action-open-settings', 'openSettingsPage', chrome.runtime.getURL(optionsPageUrl));
         this._setupButtonEvents('.action-open-permissions', null, chrome.runtime.getURL('/permissions.html'));
 
-        const {profiles, profileCurrent} = optionsFull;
+        const {profileCurrent, profiles} = optionsFull;
         const defaultProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
         if (defaultProfile !== null) {
             this._setupOptions(defaultProfile);
@@ -218,7 +218,7 @@ class DisplayController {
         const hotkeyHelpController = new HotkeyHelpController();
         await hotkeyHelpController.prepare(this._api);
 
-        const {profiles, profileCurrent} = /** @type {import('settings').Options} */ (this._optionsFull);
+        const {profileCurrent, profiles} = /** @type {import('settings').Options} */ (this._optionsFull);
         const defaultProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
         if (defaultProfile !== null) {
             hotkeyHelpController.setOptions(defaultProfile.options);
@@ -271,10 +271,10 @@ class DisplayController {
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',
-            path: 'profileCurrent',
-            value,
-            scope: 'global',
             optionsContext: null,
+            path: 'profileCurrent',
+            scope: 'global',
+            value,
         };
         await this._api.modifySettings([modification], 'action-popup');
     }
@@ -287,7 +287,7 @@ class DisplayController {
         const dictionaries = await this._api.getDictionaryInfo();
 
         const enabledDictionaries = new Set();
-        for (const {name, enabled} of options.dictionaries) {
+        for (const {enabled, name} of options.dictionaries) {
             if (enabled) {
                 enabledDictionaries.add(name);
             }

@@ -19,14 +19,14 @@ import type * as Environment from './environment';
 import type * as Settings from './settings';
 
 export type BackupData = {
-    version: number;
     date: string;
-    url: string;
-    manifest: chrome.runtime.Manifest;
     environment: Environment.Info;
-    userAgent: string;
-    permissions: chrome.permissions.Permissions;
+    manifest: chrome.runtime.Manifest;
     options: Settings.Options;
+    permissions: chrome.permissions.Permissions;
+    url: string;
+    userAgent: string;
+    version: number;
 };
 
 export type ShowSettingsImportWarningsResult = {

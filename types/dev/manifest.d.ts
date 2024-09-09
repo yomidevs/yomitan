@@ -23,33 +23,33 @@ export type ManifestOverrides = {
     author?: chrome.runtime.Manifest['author'] | string;
 };
 
-export type Manifest = Omit<chrome.runtime.Manifest, keyof ManifestOverrides> & ManifestOverrides;
+export type Manifest = ManifestOverrides & Omit<chrome.runtime.Manifest, keyof ManifestOverrides>;
 
 export type ManifestConfig = {
-    manifest: Manifest;
     defaultVariant: string;
+    manifest: Manifest;
     variants: ManifestVariant[];
 };
 
 export type ManifestVariant = {
-    name: string;
     buildable?: boolean;
-    inherit?: string;
-    fileName?: string;
-    fileCopies?: string[];
     excludeFiles?: string[];
+    fileCopies?: string[];
+    fileName?: string;
+    inherit?: string;
     modifications?: Modification[];
+    name: string;
 };
 
 export type Modification = (
-    ModificationReplace |
-    ModificationDelete |
-    ModificationSet |
     ModificationAdd |
-    ModificationRemove |
-    ModificationSplice |
     ModificationCopy |
-    ModificationMove
+    ModificationDelete |
+    ModificationMove |
+    ModificationRemove |
+    ModificationReplace |
+    ModificationSet |
+    ModificationSplice
 );
 
 export type ModificationReplace = {
@@ -67,56 +67,56 @@ export type ModificationDelete = {
 
 export type ModificationSet = {
     action: 'set';
+    after?: string;
+    before?: string;
+    command?: Command;
+    index?: number;
     path: PropertyPath;
     value: unknown;
-    before?: string;
-    after?: string;
-    index?: number;
-    command?: Command;
 };
 
 export type ModificationAdd = {
     action: 'add';
-    path: PropertyPath;
     items: unknown[];
+    path: PropertyPath;
 };
 
 export type ModificationRemove = {
     action: 'remove';
-    path: PropertyPath;
     item: unknown;
+    path: PropertyPath;
 };
 
 export type ModificationSplice = {
     action: 'splice';
-    path: PropertyPath;
-    start: number;
     deleteCount: number;
     items: unknown[];
+    path: PropertyPath;
+    start: number;
 };
 
 export type ModificationCopy = {
     action: 'copy';
-    path: PropertyPath;
-    newPath: PropertyPath;
-    before?: string;
     after?: string;
+    before?: string;
     index?: number;
+    newPath: PropertyPath;
+    path: PropertyPath;
 };
 
 export type ModificationMove = {
     action: 'move';
-    path: PropertyPath;
-    newPath: PropertyPath;
-    before?: string;
     after?: string;
+    before?: string;
     index?: number;
+    newPath: PropertyPath;
+    path: PropertyPath;
 };
 
-export type PropertyPath = (string | number)[];
+export type PropertyPath = (number | string)[];
 
 export type Command = {
-    command: string;
     args: string[];
+    command: string;
     trim: boolean;
 };

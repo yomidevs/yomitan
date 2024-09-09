@@ -28,31 +28,31 @@ export type GetInfoHandler = (
 export type Info = Info1 | Info2;
 
 export type Info1 = {
+    name?: string;
     type: 'url';
     url: string;
-    name?: string;
 };
 
 export type Info2 = {
-    type: 'tts';
-    text: string;
-    voice: string;
     name?: undefined;
+    text: string;
+    type: 'tts';
+    voice: string;
 };
 
 export type AudioBinaryBase64 = {
+    contentType: null | string;
     data: string;
-    contentType: string | null;
 };
 
 export type CustomAudioList = {
-    type: 'audioSourceList';
     audioSources: CustomAudioListSource[];
+    type: 'audioSourceList';
 };
 
 export type CustomAudioListSource = {
-    url: string;
     name?: string;
+    url: string;
 };
 
 export type WikimediaCommonsLookupResponse = {
@@ -72,8 +72,8 @@ export type WikimediaCommonsLookupResult = {
 };
 
 export type WikimediaCommonsFileResult = {
-    title: string;
     imageinfo: WikimediaCommonsFileResultImageInfo[];
+    title: string;
 };
 
 export type WikimediaCommonsFileResultImageInfo = {

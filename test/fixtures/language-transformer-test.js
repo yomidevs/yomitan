@@ -28,7 +28,7 @@ import {LanguageTransformer} from '../../ext/js/language/language-transformer.js
  * @returns {{has: false, reasons: null, rules: null}|{has: true, reasons: string[], rules: number}}
  */
 function hasTermReasons(languageTransformer, source, expectedTerm, expectedConditionName, expectedReasons) {
-    for (const {text, conditions, trace} of languageTransformer.transform(source)) {
+    for (const {conditions, text, trace} of languageTransformer.transform(source)) {
         if (text !== expectedTerm) { continue; }
         if (expectedConditionName !== null) {
             const expectedConditions = languageTransformer.getConditionFlagsFromConditionType(expectedConditionName);
@@ -63,8 +63,8 @@ function hasTermReasons(languageTransformer, source, expectedTerm, expectedCondi
 export function testLanguageTransformer(languageTransformer, data, preprocess) {
     if (typeof preprocess === 'undefined') { preprocess = (input) => input; }
     describe('deinflections', () => {
-        describe.each(data)('$category', ({valid, tests}) => {
-            for (const {source, term, rule, reasons} of tests) {
+        describe.each(data)('$category', ({tests, valid}) => {
+            for (const {reasons, rule, source, term} of tests) {
                 const {has} = hasTermReasons(languageTransformer, preprocess(source), preprocess(term), rule, reasons);
                 let message = `${source} ${valid ? 'has' : 'does not have'} term candidate ${JSON.stringify(term)}`;
                 if (rule !== null) {

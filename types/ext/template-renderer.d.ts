@@ -20,8 +20,8 @@ import type * as AnkiTemplates from './anki-templates';
 import type * as Core from './core';
 
 export type RenderResult = {
-    result: string;
     requirements: AnkiNoteBuilder.Requirement[];
+    result: string;
 };
 
 export type RenderMultiItem = {
@@ -30,35 +30,35 @@ export type RenderMultiItem = {
 };
 
 export type RenderMultiTemplateItem = {
-    type: AnkiTemplates.RenderMode;
     commonData: AnkiNoteBuilder.CommonData;
     datas: PartialOrCompositeRenderData[];
+    type: AnkiTemplates.RenderMode;
 };
 
 export type PartialRenderData = {
-    marker: string;
     commonData?: undefined;
+    marker: string;
 };
 
 export type CompositeRenderData = {
-    marker: string;
     commonData: AnkiNoteBuilder.CommonData;
+    marker: string;
 };
 
-export type PartialOrCompositeRenderData = PartialRenderData | CompositeRenderData;
+export type PartialOrCompositeRenderData = CompositeRenderData | PartialRenderData;
 
 export type DataType = {
-    modifier: (data: CompositeRenderData) => AnkiTemplates.NoteData;
     composeData: (data: PartialOrCompositeRenderData, commonData: AnkiNoteBuilder.CommonData) => CompositeRenderData;
+    modifier: (data: CompositeRenderData) => AnkiTemplates.NoteData;
 };
 
 export type HelperOptionsFunction<TResult = unknown> = (context: unknown) => TResult;
 
 export type HelperOptions = {
-    fn?: HelperOptionsFunction;
-    inverse?: HelperOptionsFunction;
-    hash: Core.SerializableObject;
     data?: Core.SafeAny;
+    fn?: HelperOptionsFunction;
+    hash: Core.SerializableObject;
+    inverse?: HelperOptionsFunction;
 };
 
 export type HelperFunction<TReturn = unknown> = (args: unknown[], context: unknown, options: HelperOptions) => TReturn;

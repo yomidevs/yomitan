@@ -20,7 +20,7 @@ import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type Events = {
     change: {
-        key: string | null;
+        key: null | string;
         modifiers: Modifier[];
     };
 };

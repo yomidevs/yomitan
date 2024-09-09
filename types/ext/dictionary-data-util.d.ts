@@ -18,8 +18,8 @@
 import type * as Dictionary from './dictionary';
 
 export type FrequencyData = {
+    displayValue: null | string;
     frequency: number;
-    displayValue: string | null;
 };
 
 export type KanjiFrequenciesMap3 = Map<string, FrequencyData>;
@@ -29,8 +29,8 @@ export type TermFrequenciesMap1 = Map<string, TermFrequenciesMap2>;
 export type TermFrequenciesMap2 = Map<string, TermFrequenciesMap2Data>;
 
 export type TermFrequenciesMap2Data = {
+    reading: null | string;
     term: string;
-    reading: string | null;
     values: TermFrequenciesMap3;
 };
 
@@ -52,8 +52,8 @@ export type DictionaryFrequency<T = unknown> = {
 };
 
 export type TermFrequency = {
+    reading: null | string;
     term: string;
-    reading: string | null;
     values: FrequencyData[];
 };
 
@@ -62,20 +62,20 @@ export type KanjiFrequency = {
     values: FrequencyData[];
 };
 
-export type TermFrequencyType = 'popular' | 'rare' | 'normal';
+export type TermFrequencyType = 'normal' | 'popular' | 'rare';
 
 export type GroupedPronunciationInternal = {
     pronunciation: Dictionary.Pronunciation;
-    terms: Set<string>;
     reading: string;
+    terms: Set<string>;
 };
 
 export type GroupedPronunciation = {
-    pronunciation: Dictionary.Pronunciation;
-    terms: string[];
-    reading: string;
-    exclusiveTerms: string[];
     exclusiveReadings: string[];
+    exclusiveTerms: string[];
+    pronunciation: Dictionary.Pronunciation;
+    reading: string;
+    terms: string[];
 };
 
 export type DictionaryGroupedPronunciations = {
@@ -85,6 +85,6 @@ export type DictionaryGroupedPronunciations = {
 };
 
 export type TagGroup = {
-    tag: Dictionary.Tag;
     headwordIndices: number[];
+    tag: Dictionary.Tag;
 };

@@ -35,7 +35,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
-test('Write dictionary data expected data', async ({window, translator, styles, expect}) => {
+test('Write dictionary data expected data', async ({expect, styles, translator, window}) => {
     // The window property needs to be referenced for it to be initialized.
     // It is needed for DOM access for structured content.
     void window;
@@ -66,7 +66,7 @@ test('Write dictionary data expected data', async ({window, translator, styles, 
                     const {dictionaryEntries, originalTextLength} = await translator.findTerms(mode, text, options);
                     const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, mode, template, null, styles) : null;
                     const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, mode, styles)) : null;
-                    actualResults1.push({name, originalTextLength, dictionaryEntries});
+                    actualResults1.push({dictionaryEntries, name, originalTextLength});
                     actualResults2.push({name, noteDataList});
                     actualResults3.push({name, results: renderResults});
                 }
@@ -78,7 +78,7 @@ test('Write dictionary data expected data', async ({window, translator, styles, 
                     const dictionaryEntries = await translator.findKanji(text, options);
                     const renderResults = await getTemplateRenderResults(dictionaryEntries, 'split', template, null);
                     const noteDataList = dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, 'split'));
-                    actualResults1.push({name, dictionaryEntries});
+                    actualResults1.push({dictionaryEntries, name});
                     actualResults2.push({name, noteDataList});
                     actualResults3.push({name, results: renderResults});
                 }

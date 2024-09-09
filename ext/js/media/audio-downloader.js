@@ -27,10 +27,10 @@ import {isStringEntirelyKana} from '../language/ja/japanese.js';
 
 /** @type {RequestInit} */
 const DEFAULT_REQUEST_INIT_PARAMS = {
-    method: 'GET',
-    mode: 'cors',
     cache: 'default',
     credentials: 'omit',
+    method: 'GET',
+    mode: 'cors',
     redirect: 'follow',
     referrerPolicy: 'no-referrer',
 };
@@ -46,15 +46,15 @@ export class AudioDownloader {
         this._customAudioListSchema = null;
         /** @type {Map<import('settings').AudioSourceType, import('audio-downloader').GetInfoHandler>} */
         this._getInfoHandlers = new Map(/** @type {[name: import('settings').AudioSourceType, handler: import('audio-downloader').GetInfoHandler][]} */ ([
-            ['jpod101', this._getInfoJpod101.bind(this)],
-            ['language-pod-101', this._getInfoLanguagePod101.bind(this)],
-            ['jisho', this._getInfoJisho.bind(this)],
-            ['lingua-libre', this._getInfoLinguaLibre.bind(this)],
-            ['wiktionary', this._getInfoWiktionary.bind(this)],
-            ['text-to-speech', this._getInfoTextToSpeech.bind(this)],
-            ['text-to-speech-reading', this._getInfoTextToSpeechReading.bind(this)],
             ['custom', this._getInfoCustom.bind(this)],
             ['custom-json', this._getInfoCustomJson.bind(this)],
+            ['jisho', this._getInfoJisho.bind(this)],
+            ['jpod101', this._getInfoJpod101.bind(this)],
+            ['language-pod-101', this._getInfoLanguagePod101.bind(this)],
+            ['lingua-libre', this._getInfoLinguaLibre.bind(this)],
+            ['text-to-speech', this._getInfoTextToSpeech.bind(this)],
+            ['text-to-speech-reading', this._getInfoTextToSpeechReading.bind(this)],
+            ['wiktionary', this._getInfoWiktionary.bind(this)],
         ]));
         /** @type {Intl.DisplayNames} */
         this._regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
@@ -125,13 +125,13 @@ export class AudioDownloader {
         /** @type {Set<import('settings').AudioSourceType>} */
         const requiredSources = language === 'ja' ?
             new Set([
+                'jisho',
                 'jpod101',
                 'language-pod-101',
-                'jisho',
             ]) :
             new Set([
-                'lingua-libre',
                 'language-pod-101',
+                'lingua-libre',
                 'wiktionary',
             ]);
 
@@ -176,18 +176,18 @@ export class AudioDownloader {
 
         const fetchUrl = this._getLanguagePod101FetchUrl(language);
         const data = new URLSearchParams({
-            post: 'dictionary_reference',
             match_type: 'exact',
+            post: 'dictionary_reference',
             search_query: term,
             vulgar: 'true',
         });
         const response = await this._requestBuilder.fetchAnonymous(fetchUrl, {
             ...DEFAULT_REQUEST_INIT_PARAMS,
-            method: 'POST',
+            body: data,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: data,
+            method: 'POST',
         });
         const responseText = await response.text();
 
@@ -411,7 +411,7 @@ export class AudioDownloader {
                 const fileUrl = page.imageinfo[0].url;
                 const fileUser = page.imageinfo[0].user;
                 if (validateFilename(title, fileUser)) {
-                    results.push({type: 'url', url: fileUrl, name: displayName(title, fileUser)});
+                    results.push({name: displayName(title, fileUser), type: 'url', url: fileUrl});
                 }
             }
             return /** @type {import('audio-downloader').Info1[]} */ (results);
@@ -429,7 +429,7 @@ export class AudioDownloader {
         if (typeof voice !== 'string') {
             throw new Error('Invalid voice');
         }
-        return [{type: 'tts', text: term, voice: voice}];
+        return [{text: term, type: 'tts', voice: voice}];
     }
 
     /** @type {import('audio-downloader').GetInfoHandler} */
@@ -441,7 +441,7 @@ export class AudioDownloader {
         if (typeof voice !== 'string') {
             throw new Error('Invalid voice');
         }
-        return [{type: 'tts', text: reading, voice: voice}];
+        return [{text: reading, type: 'tts', voice: voice}];
     }
 
     /** @type {import('audio-downloader').GetInfoHandler} */
@@ -485,7 +485,7 @@ export class AudioDownloader {
 
         /** @type {import('audio-downloader').Info[]} */
         const results = [];
-        for (const {url: url2, name} of responseJson.audioSources) {
+        for (const {name, url: url2} of responseJson.audioSources) {
             /** @type {import('audio-downloader').Info1} */
             const info = {type: 'url', url: url2};
             if (typeof name === 'string') { info.name = name; }
@@ -505,7 +505,7 @@ export class AudioDownloader {
         if (typeof url !== 'string') {
             throw new Error('No custom URL defined');
         }
-        const data = {term, reading};
+        const data = {reading, term};
         /**
          * @param {string} m0
          * @param {string} m1
@@ -567,7 +567,7 @@ export class AudioDownloader {
 
         const data = arrayBufferToBase64(arrayBuffer);
         const contentType = response.headers.get('Content-Type');
-        return {data, contentType};
+        return {contentType, data};
     }
 
     /**

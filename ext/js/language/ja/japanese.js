@@ -127,12 +127,12 @@ const HALFWIDTH_KATAKANA_MAPPING = new Map([
 ]);
 
 const VOWEL_TO_KANA_MAPPING = new Map([
-    ['a', 'ぁあかがさざただなはばぱまゃやらゎわヵァアカガサザタダナハバパマャヤラヮワヵヷ'],
-    ['i', 'ぃいきぎしじちぢにひびぴみりゐィイキギシジチヂニヒビピミリヰヸ'],
-    ['u', 'ぅうくぐすずっつづぬふぶぷむゅゆるゥウクグスズッツヅヌフブプムュユルヴ'],
-    ['e', 'ぇえけげせぜてでねへべぺめれゑヶェエケゲセゼテデネヘベペメレヱヶヹ'],
-    ['o', 'ぉおこごそぞとどのほぼぽもょよろをォオコゴソゾトドノホボポモョヨロヲヺ'],
     ['', 'のノ'],
+    ['a', 'ぁあかがさざただなはばぱまゃやらゎわヵァアカガサザタダナハバパマャヤラヮワヵヷ'],
+    ['e', 'ぇえけげせぜてでねへべぺめれゑヶェエケゲセゼテデネヘベペメレヱヶヹ'],
+    ['i', 'ぃいきぎしじちぢにひびぴみりゐィイキギシジチヂニヒビピミリヰヸ'],
+    ['o', 'ぉおこごそぞとどのほぼぽもょよろをォオコゴソゾトドノホボポモョヨロヲヺ'],
+    ['u', 'ぅうくぐすずっつづぬふぶぷむゅゆるゥウクグスズッツヅヌフブプムュユルヴ'],
 ]);
 
 /** @type {Map<string, string>} */
@@ -177,7 +177,7 @@ function getProlongedHiragana(previousCharacter) {
  * @returns {import('japanese-util').FuriganaSegment}
  */
 function createFuriganaSegment(text, reading) {
-    return {text, reading};
+    return {reading, text};
 }
 
 /**
@@ -430,15 +430,15 @@ export function convertKatakanaToHiragana(text, keepProlongedSoundMarks = false)
     for (let char of text) {
         const codePoint = /** @type {number} */ (char.codePointAt(0));
         switch (codePoint) {
-            case KATAKANA_SMALL_KA_CODE_POINT:
-            case KATAKANA_SMALL_KE_CODE_POINT:
-                // No change
-                break;
             case KANA_PROLONGED_SOUND_MARK_CODE_POINT:
                 if (!keepProlongedSoundMarks && result.length > 0) {
                     const char2 = getProlongedHiragana(result[result.length - 1]);
                     if (char2 !== null) { char = char2; }
                 }
+                break;
+            case KATAKANA_SMALL_KA_CODE_POINT:
+            case KATAKANA_SMALL_KE_CODE_POINT:
+                // No change
                 break;
             default:
                 if (isCodePointInRange(codePoint, KATAKANA_CONVERSION_RANGE)) {

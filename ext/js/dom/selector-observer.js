@@ -26,12 +26,12 @@ export class SelectorObserver {
      * @param {import('selector-observer').ConstructorDetails<T>} details The configuration for the object.
      */
     constructor({
-        selector,
         ignoreSelector = null,
-        onAdded = null,
-        onRemoved = null,
-        onChildrenUpdated = null,
         isStale = null,
+        onAdded = null,
+        onChildrenUpdated = null,
+        onRemoved = null,
+        selector,
     }) {
         /** @type {string} */
         this._selector = selector;
@@ -89,10 +89,10 @@ export class SelectorObserver {
 
         const {parentNode} = element;
         this._onMutation([{
-            type: 'childList',
-            target: parentNode !== null ? parentNode : element,
             addedNodes: [element],
             removedNodes: [],
+            target: parentNode !== null ? parentNode : element,
+            type: 'childList',
         }]);
     }
 
@@ -116,7 +116,7 @@ export class SelectorObserver {
      * @returns {Generator<[element: Element, data: T], void, unknown>}
      */
     *entries() {
-        for (const {element, data} of this._elementMap.values()) {
+        for (const {data, element} of this._elementMap.values()) {
             yield [element, data];
         }
     }
@@ -221,7 +221,7 @@ export class SelectorObserver {
         const data = this._onAdded(element);
         if (typeof data === 'undefined') { return; }
         const ancestors = this._getAncestors(element);
-        const observer = {element, ancestors, data};
+        const observer = {ancestors, data, element};
 
         this._elementMap.set(element, observer);
 
@@ -239,7 +239,7 @@ export class SelectorObserver {
      * @param {import('selector-observer').Observer<T>} observer
      */
     _removeObserver(observer) {
-        const {element, ancestors, data} = observer;
+        const {ancestors, data, element} = observer;
 
         this._elementMap.delete(element);
 

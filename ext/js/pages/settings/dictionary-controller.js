@@ -127,7 +127,7 @@ class DictionaryEntry {
      */
     async checkForUpdate() {
         this._updatesAvailable.hidden = true;
-        const {isUpdatable, indexUrl, revision: currentRevision, downloadUrl: currentDownloadUrl} = this._dictionaryInfo;
+        const {downloadUrl: currentDownloadUrl, indexUrl, isUpdatable, revision: currentRevision} = this._dictionaryInfo;
         if (!isUpdatable || !indexUrl || !currentDownloadUrl) { return false; }
         const response = await fetch(indexUrl);
 
@@ -139,7 +139,7 @@ class DictionaryEntry {
         }
 
         const validIndex = /** @type {import('dictionary-data').Index} */ (index);
-        const {revision: latestRevision, downloadUrl: latestDownloadUrl} = validIndex;
+        const {downloadUrl: latestDownloadUrl, revision: latestRevision} = validIndex;
 
         if (!compareRevisions(currentRevision, latestRevision)) {
             return false;
@@ -218,7 +218,7 @@ class DictionaryEntry {
 
     /** */
     _showDetails() {
-        const {title, revision, version, counts, prefixWildcardsSupported} = this._dictionaryInfo;
+        const {counts, prefixWildcardsSupported, revision, title, version} = this._dictionaryInfo;
 
         const modal = this._dictionaryController.modalController.getModal('dictionary-details');
         if (modal === null) { return; }
@@ -267,17 +267,17 @@ class DictionaryEntry {
     _setupDetails(detailsTable) {
         /** @type {Partial<Record<keyof (typeof this._dictionaryInfo & typeof this._dictionaryInfo.counts), string>>} */
         const targets = {
-            author: 'Author',
-            url: 'URL',
-            description: 'Description',
             attribution: 'Attribution',
-            sourceLanguage: 'Source Language',
-            targetLanguage: 'Target Language',
-            terms: 'Term Count',
+            author: 'Author',
+            description: 'Description',
             kanji: 'Kanji Count',
             kanjiMeta: 'Kanji Meta Count',
-            tagMeta: 'Tag Count',
             media: 'Media Count',
+            sourceLanguage: 'Source Language',
+            tagMeta: 'Tag Count',
+            targetLanguage: 'Target Language',
+            terms: 'Term Count',
+            url: 'URL',
         };
 
         const dictionaryInfo = {...this._dictionaryInfo, ...this._dictionaryInfo.counts};
@@ -648,15 +648,15 @@ export class DictionaryController {
      */
     static createDefaultDictionarySettings(name, enabled, styles) {
         return {
-            name,
             alias: name,
-            priority: 0,
-            enabled,
             allowSecondarySearches: false,
             definitionsCollapsible: 'not-collapsible',
+            enabled,
+            name,
             partsOfSpeechFilter: true,
-            useDeinflections: true,
+            priority: 0,
             styles: styles ?? '',
+            useDeinflections: true,
         };
     }
 
@@ -802,7 +802,7 @@ export class DictionaryController {
         const dictionaryCount = dictionaries.length;
         if (this._dictionaries !== null) {
             const enabledDictionaries = new Set();
-            for (const {name, enabled} of dictionaries) {
+            for (const {enabled, name} of dictionaries) {
                 if (enabled) {
                     ++enabledDictionaryCount;
                     enabledDictionaries.add(name);
@@ -942,7 +942,7 @@ export class DictionaryController {
             option.textContent = 'Not selected';
             fragment.appendChild(option);
 
-            for (const {title, sequenced} of dictionaries) {
+            for (const {sequenced, title} of dictionaries) {
                 if (!sequenced) { continue; }
                 option = document.createElement('option');
                 option.value = title;
@@ -1074,7 +1074,7 @@ export class DictionaryController {
             /**
              * @param {import('dictionary-database').DeleteDictionaryProgressData} details
              */
-            const onProgress = ({processed, count, storeCount, storesProcesed}) => {
+            const onProgress = ({count, processed, storeCount, storesProcesed}) => {
                 const percent = (
                     (count > 0 && storesProcesed > 0) ?
                     (processed / count) * (storesProcesed / storeCount) * 100 :
@@ -1086,7 +1086,7 @@ export class DictionaryController {
                 for (const label of statusLabels) { label.textContent = statusString; }
             };
 
-            onProgress({processed: 0, count: 1, storeCount: 1, storesProcesed: 0});
+            onProgress({count: 1, processed: 0, storeCount: 1, storesProcesed: 0});
 
             for (const progress of progressContainers) { progress.hidden = false; }
             for (const label of infoLabels) { label.textContent = 'Deleting dictionary...'; }
@@ -1157,10 +1157,10 @@ export class DictionaryController {
                 const path = `profiles[${i}].options.dictionaries`;
                 targets.push({
                     action: 'splice',
-                    path,
-                    start: j,
                     deleteCount: 1,
                     items: [],
+                    path,
+                    start: j,
                 });
             }
         }

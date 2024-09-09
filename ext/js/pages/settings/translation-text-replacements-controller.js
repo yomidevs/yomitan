@@ -53,17 +53,17 @@ export class TranslationTextReplacementsController {
             (groups.length === 0) ?
             {
                 action: 'splice',
-                path: 'translation.textReplacements.groups',
-                start: 0,
                 deleteCount: 0,
                 items: [[newEntry]],
+                path: 'translation.textReplacements.groups',
+                start: 0,
             } :
             {
                 action: 'splice',
-                path: 'translation.textReplacements.groups[0]',
-                start: groups[0].length,
                 deleteCount: 0,
                 items: [newEntry],
+                path: 'translation.textReplacements.groups[0]',
+                start: groups[0].length,
             }
         );
 
@@ -88,17 +88,17 @@ export class TranslationTextReplacementsController {
             (group0.length > 1) ?
             {
                 action: 'splice',
-                path: 'translation.textReplacements.groups[0]',
-                start: index,
                 deleteCount: 1,
                 items: [],
+                path: 'translation.textReplacements.groups[0]',
+                start: index,
             } :
             {
                 action: 'splice',
-                path: 'translation.textReplacements.groups',
-                start: 0,
                 deleteCount: group0.length,
                 items: [],
+                path: 'translation.textReplacements.groups',
+                start: 0,
             }
         );
 
@@ -147,7 +147,7 @@ export class TranslationTextReplacementsController {
      * @returns {import('settings').TranslationTextReplacementGroup}
      */
     _createNewEntry() {
-        return {pattern: '', ignoreCase: false, replacement: ''};
+        return {ignoreCase: false, pattern: '', replacement: ''};
     }
 }
 

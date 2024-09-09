@@ -114,7 +114,7 @@ export class Environment {
      * @returns {boolean};
      */
     _isSafari() {
-        const {vendor, userAgent} = navigator;
+        const {userAgent, vendor} = navigator;
         return (
             typeof vendor === 'string' &&
             typeof userAgent === 'string' &&

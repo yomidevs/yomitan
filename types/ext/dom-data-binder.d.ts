@@ -40,21 +40,21 @@ export type OnErrorCallback<T = unknown> = (error: Error, stale: boolean, elemen
 
 export type ElementObserver<T = unknown> = {
     element: Element;
+    eventType: EventType;
+    hasValue: boolean;
+    metadata: T;
+    onChange: (() => void) | null;
     type: NormalizedElementType;
     value: unknown;
-    hasValue: boolean;
-    eventType: EventType;
-    onChange: null | (() => void);
-    metadata: T;
 };
 
 export type SettingChangedEventData = {
-    value: boolean | string | number;
+    value: boolean | number | string;
 };
 
 export type SettingChangedEvent = CustomEvent<SettingChangedEventData>;
 
-export type NormalizedElementType = 'textarea' | 'select' | 'text' | 'checkbox' | 'number' | 'element';
+export type NormalizedElementType = 'checkbox' | 'element' | 'number' | 'select' | 'text' | 'textarea';
 
 export type EventType = 'change';
 
@@ -62,7 +62,7 @@ export type UpdateTaskValue = {all: boolean};
 
 export type AssignTaskValue = {value: ValueType};
 
-export type ValueType = boolean | string | number | null;
+export type ValueType = boolean | null | number | string;
 
 export type UpdateTask<T = unknown> = [
     key: ElementObserver<T> | null,
@@ -76,7 +76,7 @@ export type AssignTask<T = unknown> = [
 
 export type ApplyTarget<T = unknown> = [
     observer: ElementObserver<T>,
-    task: TaskAccumulator.Task<UpdateTaskValue> | TaskAccumulator.Task<AssignTaskValue> | null,
+    task: null | TaskAccumulator.Task<AssignTaskValue> | TaskAccumulator.Task<UpdateTaskValue>,
 ];
 
 export type TaskResultError = {

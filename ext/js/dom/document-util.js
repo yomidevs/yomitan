@@ -42,7 +42,7 @@ export function computeZoomScale(node) {
     // Therefor, if CSS root zoom is specified as a value other than 1, the adjusted {x, y} values
     // would be incorrect, which is not new behaviour.
     let scale = 1;
-    const {ELEMENT_NODE, DOCUMENT_FRAGMENT_NODE} = Node;
+    const {DOCUMENT_FRAGMENT_NODE, ELEMENT_NODE} = Node;
     const {documentElement} = document;
     for (; node !== null && node !== documentElement; node = node.parentNode) {
         const {nodeType} = node;
@@ -337,8 +337,8 @@ export function isInputElementFocused() {
     const type = element.nodeName.toUpperCase();
     switch (type) {
         case 'INPUT':
-        case 'TEXTAREA':
         case 'SELECT':
+        case 'TEXTAREA':
             return true;
         default:
             return element instanceof HTMLElement && element.isContentEditable;
@@ -384,16 +384,16 @@ export function getElementWritingMode(element) {
  */
 export function normalizeWritingMode(writingMode) {
     switch (writingMode) {
+        case 'horizontal-tb':
+        case 'sideways-lr':
+        case 'sideways-rl':
+        case 'vertical-lr':
+        case 'vertical-rl':
+            return writingMode;
         case 'tb':
             return 'vertical-lr';
         case 'tb-rl':
             return 'vertical-rl';
-        case 'horizontal-tb':
-        case 'vertical-rl':
-        case 'vertical-lr':
-        case 'sideways-rl':
-        case 'sideways-lr':
-            return writingMode;
         default: // 'lr', 'lr-tb', 'rl'
             return 'horizontal-tb';
     }
@@ -427,13 +427,13 @@ export function normalizeModifier(value) {
         case 'alt':
         case 'ctrl':
         case 'meta':
-        case 'shift':
         case 'mouse0':
         case 'mouse1':
         case 'mouse2':
         case 'mouse3':
         case 'mouse4':
         case 'mouse5':
+        case 'shift':
             return value;
         default:
             return null;

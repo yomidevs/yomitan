@@ -27,9 +27,9 @@ export type CreateSchemaFunction = (
     value: unknown,
 ) => JsonSchema.Schema;
 
-export type NormalizedOptionsContext1 = Settings.OptionsContext1 & {
+export type NormalizedOptionsContext1 = {
     domain?: string;
-};
+} & Settings.OptionsContext1;
 
 export type NormalizedOptionsContext2 = Settings.OptionsContext2;
 

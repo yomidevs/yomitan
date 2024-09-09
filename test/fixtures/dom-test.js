@@ -50,8 +50,8 @@ export async function setupDomTest(htmlFilePath) {
     const window = /** @type {import('jsdom').DOMWindow} */ (/** @type {unknown} */ (global.window));
     prepareWindow(window);
     return {
-        window,
         teardown: (global) => environment.teardown(global),
+        window,
     };
 }
 

@@ -132,19 +132,19 @@ export class ScanInputsSimpleController {
      */
     _populateSelect(select, hasOther) {
         const modifierKeys = [
-            {value: 'none', name: 'No key'},
+            {name: 'No key', value: 'none'},
         ];
         for (const value of /** @type {import('input').ModifierKey[]} */ (['alt', 'ctrl', 'shift', 'meta'])) {
             const name = this._hotkeyUtil.getModifierDisplayValue(value);
-            modifierKeys.push({value, name});
+            modifierKeys.push({name, value});
         }
 
         if (hasOther) {
-            modifierKeys.push({value: 'other', name: 'Other'});
+            modifierKeys.push({name: 'Other', value: 'other'});
         }
 
         const fragment = document.createDocumentFragment();
-        for (const {value, name} of modifierKeys) {
+        for (const {name, value} of modifierKeys) {
             const option = document.createElement('option');
             option.value = value;
             option.textContent = name;
@@ -179,20 +179,20 @@ export class ScanInputsSimpleController {
             const input = ScanInputsController.createDefaultMouseInput('mouse2', '');
             await this._modifyProfileSettings([{
                 action: 'splice',
-                path: 'scanning.inputs',
-                start: insertionPosition,
                 deleteCount: 0,
                 items: [input],
+                path: 'scanning.inputs',
+                start: insertionPosition,
             }]);
         } else {
             // Modify existing
             if (index < 0) { return; }
             await this._modifyProfileSettings([{
                 action: 'splice',
-                path: 'scanning.inputs',
-                start: index,
                 deleteCount: 1,
                 items: [],
+                path: 'scanning.inputs',
+                start: index,
             }]);
         }
     }
@@ -215,10 +215,10 @@ export class ScanInputsSimpleController {
             const input = ScanInputsController.createDefaultMouseInput(value2, 'mouse0');
             await this._modifyProfileSettings([{
                 action: 'splice',
-                path: 'scanning.inputs',
-                start: inputs.length,
                 deleteCount: 0,
                 items: [input],
+                path: 'scanning.inputs',
+                start: inputs.length,
             }]);
         } else {
             // Modify existing
@@ -246,7 +246,7 @@ export class ScanInputsSimpleController {
      */
     _getIndexOfMainScanInput(inputs) {
         for (let i = 0, ii = inputs.length; i < ii; ++i) {
-            const {include, exclude, types: {mouse}} = inputs[i];
+            const {exclude, include, types: {mouse}} = inputs[i];
             if (!mouse) { continue; }
             const includeValues = this._splitValue(include);
             const excludeValues = this._splitValue(exclude);
@@ -270,7 +270,7 @@ export class ScanInputsSimpleController {
      */
     _getIndexOfMiddleMouseButtonScanInput(inputs) {
         for (let i = 0, ii = inputs.length; i < ii; ++i) {
-            const {include, exclude, types: {mouse}} = inputs[i];
+            const {exclude, include, types: {mouse}} = inputs[i];
             if (!mouse) { continue; }
             const includeValues = this._splitValue(include);
             const excludeValues = this._splitValue(exclude);

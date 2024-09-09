@@ -16,12 +16,12 @@
  */
 
 export type ParsePathStringState = (
+    | 'close-bracket' // Closing bracket after quoted string
     | 'empty' // Empty
-    | 'id-start' // Identifier start
     | 'id' // Identifier
+    | 'id-start' // Identifier start
+    | 'next' // . or [
+    | 'number' // Number
     | 'open-bracket' // Open bracket
     | 'string' // Quoted string
-    | 'number' // Number
-    | 'close-bracket' // Closing bracket after quoted string
-    | 'next' // . or [
 );

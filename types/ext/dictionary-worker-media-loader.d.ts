@@ -19,8 +19,8 @@ import type * as Core from './core';
 
 export type ImageDetails = {
     content: ArrayBuffer;
-    width: number;
     height: number;
+    width: number;
 };
 
 export type HandleMessageParams = {id: string} & Core.Response<ImageDetails>;

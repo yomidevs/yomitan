@@ -76,16 +76,16 @@ export class SettingsDisplayController {
         }
 
         const moreSelectorObserver = new SelectorObserver({
-            selector: '.more-toggle',
             onAdded: this._onMoreSetup.bind(this),
             onRemoved: this._onMoreCleanup.bind(this),
+            selector: '.more-toggle',
         });
         moreSelectorObserver.observe(document.documentElement, false);
 
         const menuSelectorObserver = new SelectorObserver({
-            selector: '[data-menu]',
             onAdded: this._onMenuSetup.bind(this),
             onRemoved: this._onMenuCleanup.bind(this),
+            selector: '[data-menu]',
         });
         menuSelectorObserver.observe(document.documentElement, false);
 
@@ -166,11 +166,11 @@ export class SettingsDisplayController {
         const element = /** @type {HTMLElement} */ (e.currentTarget);
         const action = element.dataset.action;
         switch (action) {
-            case 'toggle-sidebar':
-                document.body.classList.toggle('sidebar-visible');
-                break;
             case 'toggle-preview-sidebar':
                 document.body.classList.toggle('preview-sidebar-visible');
+                break;
+            case 'toggle-sidebar':
+                document.body.classList.toggle('sidebar-visible');
                 break;
         }
     }
@@ -243,11 +243,11 @@ export class SettingsDisplayController {
         if (modal === null) { return; }
 
         switch (action) {
-            case 'show':
-                modal.setVisible(true);
-                break;
             case 'hide':
                 modal.setVisible(false);
+                break;
+            case 'show':
+                modal.setVisible(true);
                 break;
             case 'toggle':
                 modal.setVisible(!modal.isVisible());
@@ -371,7 +371,7 @@ export class SettingsDisplayController {
             indent = (Number.isFinite(count) && count >= 0 ? ' '.repeat(count) : args[1]);
         }
 
-        const {selectionStart: start, selectionEnd: end, value} = node;
+        const {selectionEnd: end, selectionStart: start, value} = node;
         const lineStart = value.substring(0, start).lastIndexOf('\n') + 1;
         const lineWhitespaceMatch = /^[ \t]*/.exec(value.substring(lineStart));
         const lineWhitespace = lineWhitespaceMatch !== null ? lineWhitespaceMatch[0] : '';

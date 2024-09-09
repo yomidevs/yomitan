@@ -18,9 +18,9 @@
 import type * as Extension from './extension';
 
 export type Message<T = unknown> = {
-    token: string;
-    secret: string;
     data: T;
+    secret: string;
+    token: string;
 };
 
 export type SetupFrameFunction = (frame: Extension.HtmlElementWithContentWindow) => void;

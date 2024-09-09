@@ -28,10 +28,10 @@ export async function setProfile(direction, application) {
     /** @type {import('settings-modifications').ScopedModificationSet} */
     const modification = {
         action: 'set',
-        path: 'profileCurrent',
-        value: newProfile,
-        scope: 'global',
         optionsContext: null,
+        path: 'profileCurrent',
+        scope: 'global',
+        value: newProfile,
     };
     await application.api.modifySettings([modification], 'search');
 }

@@ -116,7 +116,7 @@ export class Offscreen {
     }
 
     /** @type {import('offscreen').ApiHandler<'findKanjiOffscreen'>} */
-    async _findKanjiHandler({text, options}) {
+    async _findKanjiHandler({options, text}) {
         /** @type {import('translation').FindKanjiOptions} */
         const modifiedOptions = {
             ...options,
@@ -126,7 +126,7 @@ export class Offscreen {
     }
 
     /** @type {import('offscreen').ApiHandler<'findTermsOffscreen'>} */
-    async _findTermsHandler({mode, text, options}) {
+    async _findTermsHandler({mode, options, text}) {
         const enabledDictionaryMap = new Map(options.enabledDictionaryMap);
         const excludeDictionaryDefinitions = (
             options.excludeDictionaryDefinitions !== null ?
@@ -153,7 +153,7 @@ export class Offscreen {
     }
 
     /** @type {import('offscreen').ApiHandler<'getTermFrequenciesOffscreen'>} */
-    _getTermFrequenciesHandler({termReadingList, dictionaries}) {
+    _getTermFrequenciesHandler({dictionaries, termReadingList}) {
         return this._translator.getTermFrequencies(termReadingList, dictionaries);
     }
 

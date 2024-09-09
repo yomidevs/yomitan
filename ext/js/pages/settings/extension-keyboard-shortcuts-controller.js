@@ -176,7 +176,7 @@ export class ExtensionKeyboardShortcutController {
 
         const fragment = document.createDocumentFragment();
 
-        for (const {name, description, shortcut} of commands) {
+        for (const {description, name, shortcut} of commands) {
             if (typeof name !== 'string' || name.startsWith('_')) { continue; }
 
             const {key, modifiers} = this._hotkeyUtil.convertCommandToInput(shortcut);

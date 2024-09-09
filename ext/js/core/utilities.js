@@ -141,8 +141,8 @@ export function deepEqual(value1, value2) {
     if (typeof value2 !== type) { return false; }
 
     switch (type) {
-        case 'object':
         case 'function':
+        case 'object':
             return deepEqualInternal(value1, value2, new Set());
         default:
             return false;
@@ -248,8 +248,8 @@ export function deferPromise() {
     });
     return {
         promise,
-        resolve: /** @type {(value: T) => void} */ (resolve),
         reject: /** @type {(reason?: import('core').RejectionReason) => void} */ (reject),
+        resolve: /** @type {(value: T) => void} */ (resolve),
     };
 }
 

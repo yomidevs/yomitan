@@ -19,12 +19,12 @@ import type {EventNames, EventArgument as BaseEventArgument} from './core';
 import type * as Display from './display';
 
 export type Entry = {
+    content: EntryContent | null;
     id: string;
-    url: string;
     next: Entry | null;
     previous: Entry | null;
     state: EntryState | null;
-    content: EntryContent | null;
+    url: string;
 };
 
 export type EntryState = Display.HistoryState;

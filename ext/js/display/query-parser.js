@@ -62,11 +62,11 @@ export class QueryParser extends EventDispatcher {
         /** @type {TextScanner} */
         this._textScanner = new TextScanner({
             api,
-            node: this._queryParser,
             getSearchContext,
-            searchTerms: true,
+            node: this._queryParser,
             searchKanji: false,
             searchOnClick: true,
+            searchTerms: true,
             textSourceGenerator,
         });
         /** @type {?(import('../language/ja/japanese-wanakana.js'))} */
@@ -92,7 +92,7 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('display').QueryParserOptions} display
      */
-    setOptions({selectedParser, termSpacing, readingMode, useInternalParser, useMecabParser, language, scanning}) {
+    setOptions({language, readingMode, scanning, selectedParser, termSpacing, useInternalParser, useMecabParser}) {
         let selectedParserChanged = false;
         if (selectedParser === null || typeof selectedParser === 'string') {
             selectedParserChanged = (this._selectedParser !== selectedParser);
@@ -155,17 +155,17 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
-    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext, pageTheme}) {
+    _onSearchSuccess({dictionaryEntries, inputInfo, optionsContext, pageTheme, sentence, textSource, type}) {
         this.trigger('searched', {
-            textScanner: this._textScanner,
-            type,
             dictionaryEntries,
-            sentence,
             inputInfo,
-            textSource,
             optionsContext,
-            sentenceOffset: this._getSentenceOffset(textSource),
             pageTheme: pageTheme,
+            sentence,
+            sentenceOffset: this._getSentenceOffset(textSource),
+            textScanner: this._textScanner,
+            textSource,
+            type,
         });
     }
 
@@ -208,10 +208,10 @@ export class QueryParser extends EventDispatcher {
         /** @type {import('settings-modifications').ScopedModificationSet} */
         const modification = {
             action: 'set',
-            path: 'parsing.selectedParser',
-            value,
-            scope: 'profile',
             optionsContext,
+            path: 'parsing.selectedParser',
+            scope: 'profile',
+            value,
         };
         void this._api.modifySettings([modification], 'search');
     }
@@ -228,7 +228,7 @@ export class QueryParser extends EventDispatcher {
      * @param {string} text
      */
     _setPreview(text) {
-        const terms = [[{text, reading: ''}]];
+        const terms = [[{reading: '', text}]];
         this._queryParser.textContent = '';
         this._queryParser.dataset.parsed = 'false';
         this._queryParser.appendChild(this._createParseResult(terms));
@@ -300,7 +300,7 @@ export class QueryParser extends EventDispatcher {
             const termNode = document.createElement('span');
             termNode.className = 'query-parser-term';
             termNode.dataset.offset = `${offset}`;
-            for (const {text, reading} of term) {
+            for (const {reading, text} of term) {
                 if (reading.length === 0) {
                     termNode.appendChild(document.createTextNode(text));
                 } else {

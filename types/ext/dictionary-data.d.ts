@@ -20,22 +20,22 @@ import type * as StructuredContent from './structured-content';
 export type IndexVersion = 1 | 2 | 3;
 
 export type Index = {
+    attribution?: string;
+    author?: string;
+    description?: string;
+    downloadUrl?: string;
     format?: IndexVersion;
-    version?: IndexVersion;
-    title: string;
+    frequencyMode?: 'occurrence-based' | 'rank-based';
+    indexUrl?: string;
+    isUpdatable?: true;
     revision: string;
     sequenced?: boolean;
-    isUpdatable?: true;
-    indexUrl?: string;
-    downloadUrl?: string;
-    author?: string;
-    url?: string;
-    description?: string;
-    attribution?: string;
     sourceLanguage?: string;
-    targetLanguage?: string;
-    frequencyMode?: 'occurrence-based' | 'rank-based';
     tagMeta?: IndexTagMeta;
+    targetLanguage?: string;
+    title: string;
+    url?: string;
+    version?: IndexVersion;
 };
 
 export type IndexTagMeta = {
@@ -44,8 +44,8 @@ export type IndexTagMeta = {
 
 export type IndexTag = {
     category: string;
-    order: number;
     notes: string;
+    order: number;
     score: number;
 };
 
@@ -54,7 +54,7 @@ export type TermV1Array = TermV1[];
 export type TermV1 = [
     expression: string,
     reading: string,
-    definitionTags: string | null,
+    definitionTags: null | string,
     rules: string,
     score: number,
     ...glossary: string[],
@@ -65,7 +65,7 @@ export type TermV3Array = TermV3[];
 export type TermV3 = [
     expression: string,
     reading: string,
-    definitionTags: string | null,
+    definitionTags: null | string,
     rules: string,
     score: number,
     glossary: TermGlossary[],
@@ -100,32 +100,32 @@ export type TermGlossary = (
 );
 
 export type TermGlossaryContent = (
-    TermGlossaryString |
-    TermGlossaryText |
     TermGlossaryImage |
-    TermGlossaryStructuredContent
+    TermGlossaryString |
+    TermGlossaryStructuredContent |
+    TermGlossaryText
 );
 
 export type TermGlossaryString = string;
 
-export type TermGlossaryText = {type: 'text', text: string};
+export type TermGlossaryText = {text: string, type: 'text'};
 
 export type TermGlossaryImage = {type: 'image'} & TermImage;
 
-export type TermGlossaryStructuredContent = {type: 'structured-content', content: StructuredContent.Content};
+export type TermGlossaryStructuredContent = {content: StructuredContent.Content, type: 'structured-content'};
 
 export type TermGlossaryDeinflection = [
     uninflected: string,
     inflectionRuleChain: string[],
 ];
 
-export type TermImage = StructuredContent.ImageElementBase & {
-    // Compatibility properties
-    verticalAlign?: undefined;
+export type TermImage = {
     border?: undefined;
     borderRadius?: undefined;
     sizeUnits?: undefined;
-};
+    // Compatibility properties
+    verticalAlign?: undefined;
+} & StructuredContent.ImageElementBase;
 
 export type TagArray = Tag[];
 
@@ -137,19 +137,19 @@ export type Tag = [
     score: number,
 ];
 
-export type GenericFrequencyData = string | number | {
-    value: number;
+export type GenericFrequencyData = {
     displayValue?: string;
     reading?: undefined; // Used for type disambiguation, field does not actually exist
-};
+    value: number;
+} | number | string;
 
 export type TermMetaArray = TermMeta[];
 
-export type TermMeta = TermMetaFrequency | TermMetaPitch | TermMetaPhonetic;
+export type TermMeta = TermMetaFrequency | TermMetaPhonetic | TermMetaPitch;
 
 export type TermMetaFrequencyDataWithReading = {
-    reading: string;
     frequency: GenericFrequencyData;
+    reading: string;
 };
 
 export type TermMetaFrequency = [
@@ -159,13 +159,13 @@ export type TermMetaFrequency = [
 ];
 
 export type TermMetaPitchData = {
-    reading: string;
     pitches: {
-        position: number;
-        nasal?: number | number[];
         devoice?: number | number[];
+        nasal?: number | number[];
+        position: number;
         tags?: string[];
     }[];
+    reading: string;
 };
 
 export type TermMetaPitch = [

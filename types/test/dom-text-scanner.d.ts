@@ -16,16 +16,16 @@
  */
 
 export type TestData = {
-    node: string;
-    offset: number;
-    length: number;
-    forcePreserveWhitespace?: boolean;
-    generateLayoutContent?: boolean;
-    reversible?: boolean;
     expected: {
+        content: string;
         node: string;
         offset: number;
-        content: string;
         remainder?: number;
     };
+    forcePreserveWhitespace?: boolean;
+    generateLayoutContent?: boolean;
+    length: number;
+    node: string;
+    offset: number;
+    reversible?: boolean;
 };

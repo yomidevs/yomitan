@@ -53,14 +53,14 @@ describe('Ajv schema compilation', () => {
                 messages.push(args.join(' '));
             };
             const ajv = new Ajv({
-                schemas: [schema],
-                code: {source: true, esm: true},
                 allowUnionTypes: true,
+                code: {esm: true, source: true},
                 logger: {
+                    error: log,
                     log,
                     warn: log,
-                    error: log,
                 },
+                schemas: [schema],
             });
             standaloneCode(ajv);
             if (messages.length > 0) {

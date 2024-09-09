@@ -80,9 +80,9 @@ export class OptionsUtil {
         // Require at least one profile
         if (profiles.length === 0) {
             profiles.push({
+                conditionGroups: [],
                 name: 'Default',
                 options: defaultProfileOptions,
-                conditionGroups: [],
             });
         }
 
@@ -287,103 +287,103 @@ export class OptionsUtil {
      */
     _legacyProfileUpdateGetDefaults() {
         return {
-            general: {
-                enable: true,
-                enableClipboardPopups: false,
-                resultOutputMode: 'group',
-                debugInfo: false,
-                maxResults: 32,
-                fontFamily: '',
-                fontSize: 14,
-                lineHeight: '1.5',
-                showAdvanced: false,
-                popupDisplayMode: 'default',
-                popupWidth: 400,
-                popupHeight: 250,
-                popupHorizontalOffset: 0,
-                popupVerticalOffset: 10,
-                popupHorizontalOffset2: 10,
-                popupVerticalOffset2: 0,
-                popupHorizontalTextPosition: 'below',
-                popupVerticalTextPosition: 'before',
-                popupScalingFactor: 1,
-                popupScaleRelativeToPageZoom: false,
-                popupScaleRelativeToVisualViewport: true,
-                showGuide: true,
-                compactTags: false,
-                compactGlossaries: false,
-                mainDictionary: '',
-                popupTheme: 'default',
-                popupOuterTheme: 'default',
-                customPopupCss: '',
-                customPopupOuterCss: '',
-                enableWanakana: true,
-                enableClipboardMonitor: false,
-                showPitchAccentDownstepNotation: true,
-                showPitchAccentPositionNotation: true,
-                showPitchAccentGraph: false,
-                showIframePopupsInRootFrame: false,
-                useSecurePopupFrameUrl: true,
-                usePopupShadowDom: true,
+            anki: {
+                duplicateScope: 'collection',
+                enable: false,
+                fieldTemplates: null,
+                kanji: {deck: '', fields: {}, model: ''},
+                screenshot: {format: 'png', quality: 92},
+                sentenceExt: 200,
+                server: 'http://127.0.0.1:8765',
+                tags: ['yomitan'],
+                terms: {deck: '', fields: {}, model: ''},
             },
 
             audio: {
-                enabled: true,
-                sources: ['jpod101'],
-                volume: 100,
                 autoPlay: false,
                 customSourceUrl: '',
+                enabled: true,
+                sources: ['jpod101'],
                 textToSpeechVoice: '',
-            },
-
-            scanning: {
-                middleMouse: true,
-                touchInputEnabled: true,
-                selectText: true,
-                alphanumeric: true,
-                autoHideResults: false,
-                delay: 20,
-                length: 10,
-                modifier: 'shift',
-                deepDomScan: false,
-                popupNestingMaxDepth: 0,
-                enablePopupSearch: false,
-                enableOnPopupExpressions: false,
-                enableOnSearchPage: true,
-                enableSearchTags: false,
-                layoutAwareScan: false,
-                scanAltText: true,
-            },
-
-            translation: {
-                convertHalfWidthCharacters: 'false',
-                convertNumericCharacters: 'false',
-                convertAlphabeticCharacters: 'false',
-                convertHiraganaToKatakana: 'false',
-                convertKatakanaToHiragana: 'variant',
-                collapseEmphaticSequences: 'false',
+                volume: 100,
             },
 
             dictionaries: {},
 
-            parsing: {
-                enableScanningParser: true,
-                enableMecabParser: false,
-                selectedParser: null,
-                termSpacing: true,
-                readingMode: 'hiragana',
+            general: {
+                compactGlossaries: false,
+                compactTags: false,
+                customPopupCss: '',
+                customPopupOuterCss: '',
+                debugInfo: false,
+                enable: true,
+                enableClipboardMonitor: false,
+                enableClipboardPopups: false,
+                enableWanakana: true,
+                fontFamily: '',
+                fontSize: 14,
+                lineHeight: '1.5',
+                mainDictionary: '',
+                maxResults: 32,
+                popupDisplayMode: 'default',
+                popupHeight: 250,
+                popupHorizontalOffset: 0,
+                popupHorizontalOffset2: 10,
+                popupHorizontalTextPosition: 'below',
+                popupOuterTheme: 'default',
+                popupScaleRelativeToPageZoom: false,
+                popupScaleRelativeToVisualViewport: true,
+                popupScalingFactor: 1,
+                popupTheme: 'default',
+                popupVerticalOffset: 10,
+                popupVerticalOffset2: 0,
+                popupVerticalTextPosition: 'before',
+                popupWidth: 400,
+                resultOutputMode: 'group',
+                showAdvanced: false,
+                showGuide: true,
+                showIframePopupsInRootFrame: false,
+                showPitchAccentDownstepNotation: true,
+                showPitchAccentGraph: false,
+                showPitchAccentPositionNotation: true,
+                usePopupShadowDom: true,
+                useSecurePopupFrameUrl: true,
             },
 
-            anki: {
-                enable: false,
-                server: 'http://127.0.0.1:8765',
-                tags: ['yomitan'],
-                sentenceExt: 200,
-                screenshot: {format: 'png', quality: 92},
-                terms: {deck: '', model: '', fields: {}},
-                kanji: {deck: '', model: '', fields: {}},
-                duplicateScope: 'collection',
-                fieldTemplates: null,
+            parsing: {
+                enableMecabParser: false,
+                enableScanningParser: true,
+                readingMode: 'hiragana',
+                selectedParser: null,
+                termSpacing: true,
+            },
+
+            scanning: {
+                alphanumeric: true,
+                autoHideResults: false,
+                deepDomScan: false,
+                delay: 20,
+                enableOnPopupExpressions: false,
+                enableOnSearchPage: true,
+                enablePopupSearch: false,
+                enableSearchTags: false,
+                layoutAwareScan: false,
+                length: 10,
+                middleMouse: true,
+                modifier: 'shift',
+                popupNestingMaxDepth: 0,
+                scanAltText: true,
+                selectText: true,
+                touchInputEnabled: true,
+            },
+
+            translation: {
+                collapseEmphaticSequences: 'false',
+                convertAlphabeticCharacters: 'false',
+                convertHalfWidthCharacters: 'false',
+                convertHiraganaToKatakana: 'false',
+                convertKatakanaToHiragana: 'variant',
+                convertNumericCharacters: 'false',
             },
         };
     }
@@ -629,27 +629,27 @@ export class OptionsUtil {
             }
         }
         const createInputDefaultOptions = () => ({
-            showAdvanced: false,
-            searchTerms: true,
-            searchKanji: true,
-            scanOnTouchMove: false,
+            preventTouchScrolling: true,
             scanOnPenHover: true,
             scanOnPenPress: true,
             scanOnPenRelease: false,
-            preventTouchScrolling: true,
+            scanOnTouchMove: false,
+            searchKanji: true,
+            searchTerms: true,
+            showAdvanced: false,
         });
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.general.usePopupWindow = false;
             profileOptions.scanning.hideDelay = 0;
             profileOptions.scanning.pointerEventsEnabled = false;
             profileOptions.scanning.preventMiddleMouse = {
-                onWebPages: false,
                 onPopupPages: false,
                 onSearchPages: false,
                 onSearchQuery: false,
+                onWebPages: false,
             };
 
-            const {modifier, middleMouse} = profileOptions.scanning;
+            const {middleMouse, modifier} = profileOptions.scanning;
             delete profileOptions.scanning.modifier;
             delete profileOptions.scanning.middleMouse;
             const scanningInputs = [];
@@ -657,8 +657,8 @@ export class OptionsUtil {
             switch (modifier) {
                 case 'alt':
                 case 'ctrl':
-                case 'shift':
                 case 'meta':
+                case 'shift':
                     modifierInput = modifier;
                     break;
                 case 'none':
@@ -666,24 +666,24 @@ export class OptionsUtil {
                     break;
             }
             scanningInputs.push({
-                include: modifierInput,
                 exclude: 'mouse0',
-                types: {mouse: true, touch: false, pen: false},
+                include: modifierInput,
                 options: createInputDefaultOptions(),
+                types: {mouse: true, pen: false, touch: false},
             });
             if (middleMouse) {
                 scanningInputs.push({
-                    include: 'mouse2',
                     exclude: '',
-                    types: {mouse: true, touch: false, pen: false},
+                    include: 'mouse2',
                     options: createInputDefaultOptions(),
+                    types: {mouse: true, pen: false, touch: false},
                 });
             }
             scanningInputs.push({
-                include: '',
                 exclude: '',
-                types: {mouse: false, touch: true, pen: true},
+                include: '',
                 options: createInputDefaultOptions(),
+                types: {mouse: false, pen: true, touch: true},
             });
             profileOptions.scanning.inputs = scanningInputs;
         }
@@ -792,25 +792,25 @@ export class OptionsUtil {
         options.global.useSettingsV2 = true;
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {
-                searchOriginal: true,
                 groups: [],
+                searchOriginal: true,
             };
             profile.options.sentenceParsing = {
-                scanExtent: profile.options.anki.sentenceExt,
                 enableTerminationCharacters: true,
+                scanExtent: profile.options.anki.sentenceExt,
                 terminationCharacters: [
-                    {enabled: true, character1: '「', character2: '」', includeCharacterAtStart: false, includeCharacterAtEnd: false},
-                    {enabled: true, character1: '『', character2: '』', includeCharacterAtStart: false, includeCharacterAtEnd: false},
-                    {enabled: true, character1: '"', character2: '"', includeCharacterAtStart: false, includeCharacterAtEnd: false},
-                    {enabled: true, character1: '\'', character2: '\'', includeCharacterAtStart: false, includeCharacterAtEnd: false},
-                    {enabled: true, character1: '.', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                    {enabled: true, character1: '!', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                    {enabled: true, character1: '?', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                    {enabled: true, character1: '．', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                    {enabled: true, character1: '。', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                    {enabled: true, character1: '！', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                    {enabled: true, character1: '？', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
-                    {enabled: true, character1: '…', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+                    {character1: '「', character2: '」', enabled: true, includeCharacterAtEnd: false, includeCharacterAtStart: false},
+                    {character1: '『', character2: '』', enabled: true, includeCharacterAtEnd: false, includeCharacterAtStart: false},
+                    {character1: '"', character2: '"', enabled: true, includeCharacterAtEnd: false, includeCharacterAtStart: false},
+                    {character1: '\'', character2: '\'', enabled: true, includeCharacterAtEnd: false, includeCharacterAtStart: false},
+                    {character1: '.', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                    {character1: '!', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                    {character1: '?', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                    {character1: '．', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                    {character1: '。', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                    {character1: '！', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                    {character1: '？', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
+                    {character1: '…', character2: null, enabled: true, includeCharacterAtEnd: true, includeCharacterAtStart: false},
                 ],
             };
             delete profile.options.anki.sentenceExt;
@@ -818,41 +818,41 @@ export class OptionsUtil {
             /* eslint-disable @stylistic/no-multi-spaces */
             profile.options.inputs = {
                 hotkeys: [
-                    {action: 'close',             key: 'Escape',    modifiers: [],       scopes: ['popup'], enabled: true},
-                    {action: 'focusSearchBox',    key: 'Escape',    modifiers: [],       scopes: ['search'], enabled: true},
-                    {action: 'previousEntry3',    key: 'PageUp',    modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'nextEntry3',        key: 'PageDown',  modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'lastEntry',         key: 'End',       modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'firstEntry',        key: 'Home',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'previousEntry',     key: 'ArrowUp',   modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'nextEntry',         key: 'ArrowDown', modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'historyBackward',   key: 'KeyB',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'historyForward',    key: 'KeyF',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'addNoteKanji',      key: 'KeyK',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'addNoteTermKanji',  key: 'KeyE',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'addNoteTermKana',   key: 'KeyR',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'playAudio',         key: 'KeyP',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'viewNote',          key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                    {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true},
+                    {action: 'close',             enabled: true,    key: 'Escape',       modifiers: [], scopes: ['popup']},
+                    {action: 'focusSearchBox',    enabled: true,    key: 'Escape',       modifiers: [], scopes: ['search']},
+                    {action: 'previousEntry3',    enabled: true,    key: 'PageUp',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'nextEntry3',        enabled: true,  key: 'PageDown',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'lastEntry',         enabled: true,       key: 'End',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'firstEntry',        enabled: true,      key: 'Home',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'previousEntry',     enabled: true,   key: 'ArrowUp',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'nextEntry',         enabled: true, key: 'ArrowDown',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'historyBackward',   enabled: true,      key: 'KeyB',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'historyForward',    enabled: true,      key: 'KeyF',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'addNoteKanji',      enabled: true,      key: 'KeyK',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'addNoteTermKanji',  enabled: true,      key: 'KeyE',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'addNoteTermKana',   enabled: true,      key: 'KeyR',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'playAudio',         enabled: true,      key: 'KeyP',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'viewNote',          enabled: true,      key: 'KeyV',  modifiers: ['alt'], scopes: ['popup', 'search']},
+                    {action: 'copyHostSelection', enabled: true,      key: 'KeyC', modifiers: ['ctrl'], scopes: ['popup']},
                 ],
             };
             /* eslint-enable @stylistic/no-multi-spaces */
             profile.options.anki.suspendNewCards = false;
             profile.options.popupWindow = {
-                width: profile.options.general.popupWidth,
                 height: profile.options.general.popupHeight,
                 left: 0,
                 top: 0,
                 useLeft: false,
                 useTop: false,
-                windowType: 'popup',
+                width: profile.options.general.popupWidth,
                 windowState: 'normal',
+                windowType: 'popup',
             };
             profile.options.audio.customSourceType = 'audio';
             profile.options.clipboard = {
+                autoSearchContent: true,
                 enableBackgroundMonitor: profile.options.general.enableClipboardPopups,
                 enableSearchPageMonitor: false,
-                autoSearchContent: true,
                 maximumSearchLength: profile.options.general.maximumClipboardSearchLength,
             };
             delete profile.options.general.enableClipboardPopups;
@@ -921,8 +921,8 @@ export class OptionsUtil {
         const customSourceUrlPattern = /\{expression\}/g;
         for (const profile of options.profiles) {
             const dictionariesNew = [];
-            for (const [name, {priority, enabled, allowSecondarySearches, definitionsCollapsible}] of Object.entries(profile.options.dictionaries)) {
-                dictionariesNew.push({name, priority, enabled, allowSecondarySearches, definitionsCollapsible});
+            for (const [name, {allowSecondarySearches, definitionsCollapsible, enabled, priority}] of Object.entries(profile.options.dictionaries)) {
+                dictionariesNew.push({allowSecondarySearches, definitionsCollapsible, enabled, name, priority});
             }
             profile.options.dictionaries = dictionariesNew;
 
@@ -946,19 +946,19 @@ export class OptionsUtil {
     async _updateVersion12(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v12.handlebars');
         for (const profile of options.profiles) {
-            const {sentenceParsing, audio} = profile.options;
+            const {audio, sentenceParsing} = profile.options;
 
             sentenceParsing.terminationCharacterMode = sentenceParsing.enableTerminationCharacters ? 'custom' : 'newlines';
             delete sentenceParsing.enableTerminationCharacters;
 
-            const {sources, customSourceUrl, customSourceType, textToSpeechVoice} = audio;
+            const {customSourceType, customSourceUrl, sources, textToSpeechVoice} = audio;
             audio.sources = /** @type {string[]} */ (sources).map((type) => {
                 switch (type) {
+                    case 'custom':
+                        return {type: (customSourceType === 'json' ? 'custom-json' : 'custom'), url: customSourceUrl, voice: ''};
                     case 'text-to-speech':
                     case 'text-to-speech-reading':
                         return {type, url: '', voice: textToSpeechVoice};
-                    case 'custom':
-                        return {type: (customSourceType === 'json' ? 'custom-json' : 'custom'), url: customSourceUrl, voice: ''};
                     default:
                         return {type, url: '', voice: ''};
                 }
@@ -1036,11 +1036,11 @@ export class OptionsUtil {
             }
             for (const character of newAdditions) {
                 terminationCharacters.push({
-                    enabled: true,
                     character1: character,
                     character2: null,
-                    includeCharacterAtStart: false,
+                    enabled: true,
                     includeCharacterAtEnd: true,
+                    includeCharacterAtStart: false,
                 });
             }
         }
@@ -1276,8 +1276,8 @@ export class OptionsUtil {
     async _updateVersion32(options) {
         for (const profile of options.profiles) {
             profile.options.inputs.hotkeys.push(
-                {action: 'profilePrevious', key: 'Minus', modifiers: ['alt'], scopes: ['popup', 'search'], enabled: true},
-                {action: 'profileNext', key: 'Equal', modifiers: ['alt'], scopes: ['popup', 'search'], enabled: true},
+                {action: 'profilePrevious', enabled: true, key: 'Minus', modifiers: ['alt'], scopes: ['popup', 'search']},
+                {action: 'profileNext', enabled: true, key: 'Equal', modifiers: ['alt'], scopes: ['popup', 'search']},
             );
         }
     }

@@ -124,5 +124,5 @@ export class PopupPreviewController {
  * @returns {boolean}
  */
 export function checkPopupPreviewURL(url) {
-    return !!(url && url.includes('popup-preview.html') && !['http:', 'https:', 'ws:', 'wss:', 'ftp:', 'data:', 'file:'].includes(new URL(url).protocol));
+    return !!(url && url.includes('popup-preview.html') && !['data:', 'file:', 'ftp:', 'http:', 'https:', 'ws:', 'wss:'].includes(new URL(url).protocol));
 }

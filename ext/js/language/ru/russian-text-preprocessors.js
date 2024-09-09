@@ -19,8 +19,8 @@ import {basicTextProcessorOptions} from '../text-processors.js';
 
 /** @type {import('language').TextProcessor<boolean>} */
 export const removeRussianDiacritics = {
-    name: 'Remove diacritics',
     description: 'A\u0301 → A, a\u0301 → a',
+    name: 'Remove diacritics',
     options: basicTextProcessorOptions,
     process: (str, setting) => {
         return setting ? str.replace(/\u0301/g, '') : str;
@@ -29,8 +29,8 @@ export const removeRussianDiacritics = {
 
 /** @type {import('language').TextProcessor<boolean>} */
 export const yoToE = {
-    name: 'Yo to E',
     description: 'ё → е, Ё → Е',
+    name: 'Yo to E',
     options: basicTextProcessorOptions,
     process: (str, setting) => {
         return setting ? str.replace(/ё/g, 'е').replace(/Ё/g, 'Е') : str;

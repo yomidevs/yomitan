@@ -20,38 +20,38 @@ import type * as Dictionary from './dictionary';
 import type * as Settings from './settings';
 
 export type Context = {
-    url: string;
     documentTitle: string;
-    query: string;
     fullQuery: string;
+    query: string;
     sentence: ContextSentence;
+    url: string;
 };
 
 export type ContextSentence = {
-    text?: string;
     offset?: number;
+    text?: string;
 };
 
-export type CreateModeNoTest = 'kanji' | 'term-kanji' | 'term-kana';
+export type CreateModeNoTest = 'kanji' | 'term-kana' | 'term-kanji';
 
-export type CreateMode = CreateModeNoTest | 'test';
+export type CreateMode = 'test' | CreateModeNoTest;
 
 export type CreateDetails = {
-    /** The dictionary entry. */
-    dictionaryEntry: Dictionary.DictionaryEntry;
-    /** The result output mode. */
-    resultOutputMode: Settings.ResultOutputMode;
-    /** The mode being used to generate the Anki data. */
-    mode: CreateMode;
-    /** The glossary layout mode. */
-    glossaryLayoutMode: Settings.GlossaryLayoutMode;
     /** Whether or not compact tags mode is enabled. */
     compactTags: boolean;
     /** Contextual information about the source of the dictionary entry. */
     context: Context;
+    /** The dictionary entry. */
+    dictionaryEntry: Dictionary.DictionaryEntry;
+    dictionaryStylesMap: Map<string, string>;
+    /** The glossary layout mode. */
+    glossaryLayoutMode: Settings.GlossaryLayoutMode;
     /** Media data. */
     media?: AnkiTemplates.Media;
-    dictionaryStylesMap: Map<string, string>;
+    /** The mode being used to generate the Anki data. */
+    mode: CreateMode;
+    /** The result output mode. */
+    resultOutputMode: Settings.ResultOutputMode;
 };
 
 export type CachedValue<T = unknown> = {

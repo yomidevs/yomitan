@@ -29,7 +29,7 @@ await Application.main(true, async (application) => {
     const themeController = new ThemeController(document.documentElement);
     themeController.prepare();
     const optionsFull = await application.api.optionsGetFull();
-    const {profiles, profileCurrent} = optionsFull;
+    const {profileCurrent, profiles} = optionsFull;
     const defaultProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
     if (defaultProfile !== null) {
         themeController.theme = defaultProfile.options.general.popupTheme;

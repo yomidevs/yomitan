@@ -72,9 +72,9 @@ export class OptionToggleHotkeyHandler {
             const optionsContext = this._display.getOptionsContext();
 
             const getSettingsResponse = (await this._display.application.api.getSettings([{
-                scope: 'profile',
-                path,
                 optionsContext,
+                path,
+                scope: 'profile',
             }]))[0];
             const {error: getSettingsError} = getSettingsResponse;
             if (typeof getSettingsError !== 'undefined') {
@@ -90,11 +90,11 @@ export class OptionToggleHotkeyHandler {
 
             /** @type {import('settings-modifications').ScopedModificationSet} */
             const modification = {
-                scope: 'profile',
                 action: 'set',
-                path,
-                value,
                 optionsContext,
+                path,
+                scope: 'profile',
+                value,
             };
             const modifySettingsResponse = (await this._display.application.api.modifySettings([modification], this._source))[0];
             const {error: modifySettingsError} = modifySettingsResponse;

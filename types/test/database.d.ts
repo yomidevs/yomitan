@@ -19,90 +19,90 @@ import type {Summary} from '../ext/dictionary-importer';
 import type {Tag, MatchType, TermMetaType, KanjiMetaType, TermExactRequest, DictionaryCounts} from '../ext/dictionary-database';
 
 export type DatabaseTestData = {
-    expectedSummary: Summary;
     expectedCounts: DictionaryCounts;
+    expectedSummary: Summary;
     tests: {
-        findTermsBulk: FindTermsBulkTestCase[];
-        findTermsExactBulk: FindTermsExactBulkTestCase[];
-        findTermsBySequenceBulk: FindTermsBySequenceBulkTestCase[];
-        findTermMetaBulk: FindTermMetaBulkTestCase[];
         findKanjiBulk: FindKanjiBulkTestCase[];
         findKanjiMetaBulk: FindKanjiMetaBulkTestCase[];
         findTagForTitle: FindTagForTitleTestCase[];
+        findTermMetaBulk: FindTermMetaBulkTestCase[];
+        findTermsBulk: FindTermsBulkTestCase[];
+        findTermsBySequenceBulk: FindTermsBySequenceBulkTestCase[];
+        findTermsExactBulk: FindTermsExactBulkTestCase[];
     };
 };
 
 export type ItemCount<TKey = unknown> = [key: TKey, count: number];
 
 export type FindTermsBulkTestCase = {
+    expectedResults: {
+        readings: ItemCount<string>[];
+        terms: ItemCount<string>[];
+        total: number;
+    };
     inputs: {
         matchType: MatchType;
         termList: string[];
     }[];
-    expectedResults: {
-        total: number;
-        terms: ItemCount<string>[];
-        readings: ItemCount<string>[];
-    };
 };
 
 export type FindTermsExactBulkTestCase = {
+    expectedResults: {
+        readings: ItemCount<string>[];
+        terms: ItemCount<string>[];
+        total: number;
+    };
     inputs: {
         termList: TermExactRequest[];
     }[];
-    expectedResults: {
-        total: number;
-        terms: ItemCount<string>[];
-        readings: ItemCount<string>[];
-    };
 };
 
 export type FindTermsBySequenceBulkTestCase = {
+    expectedResults: {
+        readings: ItemCount<string>[];
+        terms: ItemCount<string>[];
+        total: number;
+    };
     inputs: {
         sequenceList: number[];
     }[];
-    expectedResults: {
-        total: number;
-        terms: ItemCount<string>[];
-        readings: ItemCount<string>[];
-    };
 };
 
 export type FindTermMetaBulkTestCase = {
+    expectedResults: {
+        modes: ItemCount<TermMetaType>[];
+        total: number;
+    };
     inputs: {
         termList: string[];
     }[];
-    expectedResults: {
-        total: number;
-        modes: ItemCount<TermMetaType>[];
-    };
 };
 
 export type FindKanjiBulkTestCase = {
+    expectedResults: {
+        kanji: ItemCount<string>[];
+        total: number;
+    };
     inputs: {
         kanjiList: string[];
     }[];
-    expectedResults: {
-        total: number;
-        kanji: ItemCount<string>[];
-    };
 };
 
 export type FindKanjiMetaBulkTestCase = {
+    expectedResults: {
+        modes: ItemCount<KanjiMetaType>[];
+        total: number;
+    };
     inputs: {
         kanjiList: string[];
     }[];
-    expectedResults: {
-        total: number;
-        modes: ItemCount<KanjiMetaType>[];
-    };
 };
 
 export type FindTagForTitleTestCase = {
+    expectedResults: {
+        value: null | Tag;
+    };
     inputs: {
         name: string;
     }[];
-    expectedResults: {
-        value: Tag | null;
-    };
 };

@@ -107,10 +107,10 @@ export class CssStyleApplier {
      */
     async _fetchJsonAsset(url) {
         const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors',
             cache: 'default',
             credentials: 'omit',
+            method: 'GET',
+            mode: 'no-cors',
             redirect: 'follow',
             referrerPolicy: 'no-referrer',
         });

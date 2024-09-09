@@ -46,8 +46,8 @@ export class TemplateRenderer {
      * @param {import('anki-templates').RenderMode} name
      * @param {import('template-renderer').DataType} details
      */
-    registerDataType(name, {modifier, composeData}) {
-        this._dataTypes.set(name, {modifier, composeData});
+    registerDataType(name, {composeData, modifier}) {
+        this._dataTypes.set(name, {composeData, modifier});
     }
 
     /**
@@ -80,7 +80,7 @@ export class TemplateRenderer {
         const results = [];
         for (const {template, templateItems} of items) {
             const instance = this._getTemplateInstance(template);
-            for (const {type, commonData, datas} of templateItems) {
+            for (const {commonData, datas, type} of templateItems) {
                 for (const data of datas) {
                     let result;
                     try {

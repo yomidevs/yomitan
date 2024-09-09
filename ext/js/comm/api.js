@@ -49,7 +49,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'termsFind'>>}
      */
     termsFind(text, details, optionsContext) {
-        return this._invoke('termsFind', {text, details, optionsContext});
+        return this._invoke('termsFind', {details, optionsContext, text});
     }
 
     /**
@@ -61,7 +61,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'parseText'>>}
      */
     parseText(text, optionsContext, scanLength, useInternalParser, useMecabParser) {
-        return this._invoke('parseText', {text, optionsContext, scanLength, useInternalParser, useMecabParser});
+        return this._invoke('parseText', {optionsContext, scanLength, text, useInternalParser, useMecabParser});
     }
 
     /**
@@ -70,7 +70,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'kanjiFind'>>}
      */
     kanjiFind(text, optionsContext) {
-        return this._invoke('kanjiFind', {text, optionsContext});
+        return this._invoke('kanjiFind', {optionsContext, text});
     }
 
     /**
@@ -109,7 +109,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'getAnkiNoteInfo'>>}
      */
     getAnkiNoteInfo(notes, fetchAdditionalInfo) {
-        return this._invoke('getAnkiNoteInfo', {notes, fetchAdditionalInfo});
+        return this._invoke('getAnkiNoteInfo', {fetchAdditionalInfo, notes});
     }
 
     /**
@@ -122,7 +122,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'injectAnkiNoteMedia'>>}
      */
     injectAnkiNoteMedia(timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails) {
-        return this._invoke('injectAnkiNoteMedia', {timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails, dictionaryMediaDetails});
+        return this._invoke('injectAnkiNoteMedia', {audioDetails, clipboardDetails, definitionDetails, dictionaryMediaDetails, screenshotDetails, timestamp});
     }
 
     /**
@@ -132,7 +132,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'viewNotes'>>}
      */
     viewNotes(noteIds, mode, allowFallback) {
-        return this._invoke('viewNotes', {noteIds, mode, allowFallback});
+        return this._invoke('viewNotes', {allowFallback, mode, noteIds});
     }
 
     /**
@@ -151,7 +151,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'getTermAudioInfoList'>>}
      */
     getTermAudioInfoList(source, term, reading, languageSummary) {
-        return this._invoke('getTermAudioInfoList', {source, term, reading, languageSummary});
+        return this._invoke('getTermAudioInfoList', {languageSummary, reading, source, term});
     }
 
     /**
@@ -261,7 +261,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'logGenericErrorBackend'>>}
      */
     logGenericErrorBackend(error, level, context) {
-        return this._invoke('logGenericErrorBackend', {error, level, context});
+        return this._invoke('logGenericErrorBackend', {context, error, level});
     }
 
     /**
@@ -277,7 +277,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'modifySettings'>>}
      */
     modifySettings(targets, source) {
-        return this._invoke('modifySettings', {targets, source});
+        return this._invoke('modifySettings', {source, targets});
     }
 
     /**
@@ -294,7 +294,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'setAllSettings'>>}
      */
     setAllSettings(value, source) {
-        return this._invoke('setAllSettings', {value, source});
+        return this._invoke('setAllSettings', {source, value});
     }
 
     /**
@@ -319,7 +319,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'triggerDatabaseUpdated'>>}
      */
     triggerDatabaseUpdated(type, cause) {
-        return this._invoke('triggerDatabaseUpdated', {type, cause});
+        return this._invoke('triggerDatabaseUpdated', {cause, type});
     }
 
     /**
@@ -335,7 +335,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'isTextLookupWorthy'>>}
      */
     isTextLookupWorthy(text, language) {
-        return this._invoke('isTextLookupWorthy', {text, language});
+        return this._invoke('isTextLookupWorthy', {language, text});
     }
 
     /**
@@ -344,7 +344,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'getTermFrequencies'>>}
      */
     getTermFrequencies(termReadingList, dictionaries) {
-        return this._invoke('getTermFrequencies', {termReadingList, dictionaries});
+        return this._invoke('getTermFrequencies', {dictionaries, termReadingList});
     }
 
     /**
@@ -361,7 +361,7 @@ export class API {
      * @returns {Promise<import('api').ApiReturn<'openCrossFramePort'>>}
      */
     openCrossFramePort(targetTabId, targetFrameId) {
-        return this._invoke('openCrossFramePort', {targetTabId, targetFrameId});
+        return this._invoke('openCrossFramePort', {targetFrameId, targetTabId});
     }
 
     /**

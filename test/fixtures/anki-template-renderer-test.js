@@ -32,13 +32,13 @@ export async function createAnkiTemplateRendererTest() {
     /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, ankiTemplateRenderer: AnkiTemplateRenderer}>} */
     // eslint-disable-next-line sonarjs/prefer-immediate-return
     const result = test.extend({
-        window: async ({window}, use) => { await use(window); },
         ankiTemplateRenderer: async ({window}, use) => {
             // The window property needs to be referenced for it to be initialized.
             // It is needed for DOM access for structured content.
             void window;
             await use(ankiTemplateRenderer);
         },
+        window: async ({window}, use) => { await use(window); },
     });
     return result;
 }

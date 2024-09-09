@@ -34,7 +34,7 @@ test.beforeEach(async ({context}) => {
     await welcome.close(); // Close the welcome tab so our main tab becomes the foreground tab -- otherwise, the screenshot can hang
 });
 
-test('search clipboard', async ({page, extensionId}) => {
+test('search clipboard', async ({extensionId, page}) => {
     await page.goto(`chrome-extension://${extensionId}/search.html`);
     await page.locator('#search-option-clipboard-monitor-container > label').click();
     await page.waitForTimeout(200); // Race
@@ -43,7 +43,7 @@ test('search clipboard', async ({page, extensionId}) => {
     await expect(page.locator('#search-textbox')).toHaveValue('あ');
 });
 
-test('anki add', async ({context, page, extensionId}) => {
+test('anki add', async ({context, extensionId, page}) => {
     // Mock anki routes
     /** @type {import('core').DeferredPromiseDetails<Record<string, unknown>>} */
     const addNotePromiseDetails = deferPromise();
@@ -69,9 +69,9 @@ test('anki add', async ({context, page, extensionId}) => {
     // Load in test dictionary
     const dictionary = await createDictionaryArchiveData(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1');
     await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
-        name: 'valid-dictionary1.zip',
-        mimeType: 'application/x-zip',
         buffer: Buffer.from(dictionary),
+        mimeType: 'application/x-zip',
+        name: 'valid-dictionary1.zip',
     });
     await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 

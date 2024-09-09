@@ -22,14 +22,14 @@ import type * as DocumentUtil from './document-util';
 import type * as Settings from './settings';
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
-export type PopupAny = Popup | PopupWindow | PopupProxy;
+export type PopupAny = Popup | PopupProxy | PopupWindow;
 
 /**
  * Information about how popup content should be shown, specifically related to the outer popup frame.
  */
 export type ContentDetails = {
     /** The options context for the content to show. */
-    optionsContext: Settings.OptionsContext | null;
+    optionsContext: null | Settings.OptionsContext;
     /** The rectangles of the source content. */
     sourceRects: Rect[];
     /** The normalized CSS writing-mode value of the source content. */
@@ -40,28 +40,28 @@ export type ContentDetails = {
  * A rectangle representing a DOM region, similar to DOMRect.
  */
 export type Rect = {
-    /** The left position of the rectangle. */
-    left: number;
-    /** The top position of the rectangle. */
-    top: number;
-    /** The right position of the rectangle. */
-    right: number;
     /** The bottom position of the rectangle. */
     bottom: number;
+    /** The left position of the rectangle. */
+    left: number;
+    /** The right position of the rectangle. */
+    right: number;
+    /** The top position of the rectangle. */
+    top: number;
 };
 
 /**
  * A rectangle representing a DOM region, similar to DOMRect but with a `valid` property.
  */
 export type ValidRect = {
-    /** The left position of the rectangle. */
-    left: number;
-    /** The top position of the rectangle. */
-    top: number;
-    /** The right position of the rectangle. */
-    right: number;
     /** The bottom position of the rectangle. */
     bottom: number;
+    /** The left position of the rectangle. */
+    left: number;
+    /** The right position of the rectangle. */
+    right: number;
+    /** The top position of the rectangle. */
+    top: number;
     /** Whether or not the rectangle is valid. */
     valid: boolean;
 };
@@ -70,34 +70,34 @@ export type ValidRect = {
  * A rectangle representing a DOM region for placing the popup frame.
  */
 export type SizeRect = {
+    /** Whether or not the rectangle is positioned to the right of the source rectangle. */
+    after: boolean;
+    /** Whether or not the rectangle is positioned below the source rectangle. */
+    below: boolean;
+    /** The height of the rectangle. */
+    height: number;
     /** The left position of the rectangle. */
     left: number;
     /** The top position of the rectangle. */
     top: number;
     /** The width of the rectangle. */
     width: number;
-    /** The height of the rectangle. */
-    height: number;
-    /** Whether or not the rectangle is positioned to the right of the source rectangle. */
-    after: boolean;
-    /** Whether or not the rectangle is positioned below the source rectangle. */
-    below: boolean;
 };
 
 export type ValidSize = {
-    width: number;
     height: number;
     valid: boolean;
+    width: number;
 };
 
 export type Events = {
     customOuterCssChanged: {
-        node: HTMLStyleElement | HTMLLinkElement | null;
-        useWebExtensionApi: boolean;
         inShadow: boolean;
+        node: HTMLLinkElement | HTMLStyleElement | null;
+        useWebExtensionApi: boolean;
     };
-    framePointerOver: Record<string, never>;
     framePointerOut: Record<string, never>;
+    framePointerOver: Record<string, never>;
     offsetNotFound: Record<string, never>;
 };
 

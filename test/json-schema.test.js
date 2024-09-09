@@ -57,8 +57,8 @@ describe('JsonSchema', () => {
                 },
                 {
                     anyOf: [
-                        {minimum: 10, maximum: 100},
-                        {minimum: -100, maximum: -10},
+                        {maximum: 100, minimum: 10},
+                        {maximum: -10, minimum: -100},
                     ],
                 },
                 {
@@ -114,9 +114,6 @@ describe('JsonSchema', () => {
         const data = [
             // String tests
             {
-                schema: {
-                    type: 'string',
-                },
                 inputs: [
                     {expected: false, value: null},
                     {expected: false, value: void 0},
@@ -125,36 +122,35 @@ describe('JsonSchema', () => {
                     {expected: false, value: []},
                     {expected: true,  value: ''},
                 ],
-            },
-            {
                 schema: {
                     type: 'string',
-                    minLength: 2,
                 },
+            },
+            {
                 inputs: [
                     {expected: false, value: ''},
                     {expected: false,  value: '1'},
                     {expected: true,  value: '12'},
                     {expected: true,  value: '123'},
                 ],
+                schema: {
+                    minLength: 2,
+                    type: 'string',
+                },
             },
             {
-                schema: {
-                    type: 'string',
-                    maxLength: 2,
-                },
                 inputs: [
                     {expected: true,  value: ''},
                     {expected: true,  value: '1'},
                     {expected: true,  value: '12'},
                     {expected: false, value: '123'},
                 ],
+                schema: {
+                    maxLength: 2,
+                    type: 'string',
+                },
             },
             {
-                schema: {
-                    type: 'string',
-                    pattern: 'test',
-                },
                 inputs: [
                     {expected: false, value: ''},
                     {expected: true,  value: 'test'},
@@ -162,12 +158,12 @@ describe('JsonSchema', () => {
                     {expected: true,  value: 'ABCtestDEF'},
                     {expected: false, value: 'ABCTESTDEF'},
                 ],
+                schema: {
+                    pattern: 'test',
+                    type: 'string',
+                },
             },
             {
-                schema: {
-                    type: 'string',
-                    pattern: '^test$',
-                },
                 inputs: [
                     {expected: false, value: ''},
                     {expected: true,  value: 'test'},
@@ -175,13 +171,12 @@ describe('JsonSchema', () => {
                     {expected: false, value: 'ABCtestDEF'},
                     {expected: false, value: 'ABCTESTDEF'},
                 ],
+                schema: {
+                    pattern: '^test$',
+                    type: 'string',
+                },
             },
             {
-                schema: {
-                    type: 'string',
-                    pattern: '^test$',
-                    patternFlags: 'i',
-                },
                 inputs: [
                     {expected: false, value: ''},
                     {expected: true,  value: 'test'},
@@ -189,32 +184,34 @@ describe('JsonSchema', () => {
                     {expected: false, value: 'ABCtestDEF'},
                     {expected: false, value: 'ABCTESTDEF'},
                 ],
+                schema: {
+                    pattern: '^test$',
+                    patternFlags: 'i',
+                    type: 'string',
+                },
             },
             {
-                schema: {
-                    type: 'string',
-                    pattern: '*',
-                },
                 inputs: [
                     {expected: false, value: ''},
                 ],
+                schema: {
+                    pattern: '*',
+                    type: 'string',
+                },
             },
             {
+                inputs: [
+                    {expected: false, value: ''},
+                ],
                 schema: {
-                    type: 'string',
                     pattern: '.',
                     patternFlags: '?',
+                    type: 'string',
                 },
-                inputs: [
-                    {expected: false, value: ''},
-                ],
             },
 
             // Const tests
             {
-                schema: {
-                    const: 32,
-                },
                 inputs: [
                     {expected: true,  value: 32},
                     {expected: false, value: 0},
@@ -223,11 +220,11 @@ describe('JsonSchema', () => {
                     {expected: false, value: {a: 'b'}},
                     {expected: false, value: [1, 2, 3]},
                 ],
+                schema: {
+                    const: 32,
+                },
             },
             {
-                schema: {
-                    const: '32',
-                },
                 inputs: [
                     {expected: false, value: 32},
                     {expected: false, value: 0},
@@ -236,11 +233,11 @@ describe('JsonSchema', () => {
                     {expected: false, value: {a: 'b'}},
                     {expected: false, value: [1, 2, 3]},
                 ],
+                schema: {
+                    const: '32',
+                },
             },
             {
-                schema: {
-                    const: null,
-                },
                 inputs: [
                     {expected: false, value: 32},
                     {expected: false, value: 0},
@@ -249,11 +246,11 @@ describe('JsonSchema', () => {
                     {expected: false, value: {a: 'b'}},
                     {expected: false, value: [1, 2, 3]},
                 ],
+                schema: {
+                    const: null,
+                },
             },
             {
-                schema: {
-                    const: {a: 'b'},
-                },
                 inputs: [
                     {expected: false, value: 32},
                     {expected: false, value: 0},
@@ -262,11 +259,11 @@ describe('JsonSchema', () => {
                     {expected: false, value: {a: 'b'}},
                     {expected: false, value: [1, 2, 3]},
                 ],
+                schema: {
+                    const: {a: 'b'},
+                },
             },
             {
-                schema: {
-                    const: [1, 2, 3],
-                },
                 inputs: [
                     {expected: false, value: 32},
                     {expected: false, value: 0},
@@ -275,14 +272,13 @@ describe('JsonSchema', () => {
                     {expected: false, value: {a: 'b'}},
                     {expected: false, value: [1, 2, 3]},
                 ],
+                schema: {
+                    const: [1, 2, 3],
+                },
             },
 
             // Array contains tests
             {
-                schema: {
-                    type: 'array',
-                    contains: {const: 32},
-                },
                 inputs: [
                     {expected: false, value: []},
                     {expected: true,  value: [32]},
@@ -292,104 +288,104 @@ describe('JsonSchema', () => {
                     {expected: false, value: [1, 33]},
                     {expected: false, value: [1, 33, 1]},
                 ],
+                schema: {
+                    contains: {const: 32},
+                    type: 'array',
+                },
             },
 
             // Number limits tests
             {
+                inputs: [
+                    {expected: false, value: -1},
+                    {expected: true,  value: 0},
+                    {expected: true,  value: 1},
+                ],
                 schema: {
-                    type: 'number',
                     minimum: 0,
+                    type: 'number',
                 },
-                inputs: [
-                    {expected: false, value: -1},
-                    {expected: true,  value: 0},
-                    {expected: true,  value: 1},
-                ],
             },
             {
+                inputs: [
+                    {expected: false, value: -1},
+                    {expected: false, value: 0},
+                    {expected: true,  value: 1},
+                ],
                 schema: {
-                    type: 'number',
                     exclusiveMinimum: 0,
+                    type: 'number',
                 },
-                inputs: [
-                    {expected: false, value: -1},
-                    {expected: false, value: 0},
-                    {expected: true,  value: 1},
-                ],
             },
             {
-                schema: {
-                    type: 'number',
-                    maximum: 0,
-                },
                 inputs: [
                     {expected: true,  value: -1},
                     {expected: true,  value: 0},
                     {expected: false, value: 1},
                 ],
+                schema: {
+                    maximum: 0,
+                    type: 'number',
+                },
             },
             {
-                schema: {
-                    type: 'number',
-                    exclusiveMaximum: 0,
-                },
                 inputs: [
                     {expected: true,  value: -1},
                     {expected: false, value: 0},
                     {expected: false, value: 1},
                 ],
+                schema: {
+                    exclusiveMaximum: 0,
+                    type: 'number',
+                },
             },
 
             // Integer limits tests
             {
+                inputs: [
+                    {expected: false, value: -1},
+                    {expected: true,  value: 0},
+                    {expected: true,  value: 1},
+                ],
                 schema: {
-                    type: 'integer',
                     minimum: 0,
+                    type: 'integer',
                 },
-                inputs: [
-                    {expected: false, value: -1},
-                    {expected: true,  value: 0},
-                    {expected: true,  value: 1},
-                ],
             },
             {
+                inputs: [
+                    {expected: false, value: -1},
+                    {expected: false, value: 0},
+                    {expected: true,  value: 1},
+                ],
                 schema: {
-                    type: 'integer',
                     exclusiveMinimum: 0,
+                    type: 'integer',
                 },
-                inputs: [
-                    {expected: false, value: -1},
-                    {expected: false, value: 0},
-                    {expected: true,  value: 1},
-                ],
             },
             {
-                schema: {
-                    type: 'integer',
-                    maximum: 0,
-                },
                 inputs: [
                     {expected: true,  value: -1},
                     {expected: true,  value: 0},
                     {expected: false, value: 1},
                 ],
+                schema: {
+                    maximum: 0,
+                    type: 'integer',
+                },
             },
             {
-                schema: {
-                    type: 'integer',
-                    exclusiveMaximum: 0,
-                },
                 inputs: [
                     {expected: true,  value: -1},
                     {expected: false, value: 0},
                     {expected: false, value: 1},
                 ],
+                schema: {
+                    exclusiveMaximum: 0,
+                    type: 'integer',
+                },
             },
             {
-                schema: {
-                    type: 'integer',
-                    multipleOf: 2,
-                },
                 inputs: [
                     {expected: true,  value: -2},
                     {expected: false, value: -1},
@@ -397,13 +393,14 @@ describe('JsonSchema', () => {
                     {expected: false, value: 1},
                     {expected: true,  value: 2},
                 ],
+                schema: {
+                    multipleOf: 2,
+                    type: 'integer',
+                },
             },
 
             // Numeric type tests
             {
-                schema: {
-                    type: 'number',
-                },
                 inputs: [
                     {expected: true,  value: 0},
                     {expected: true,  value: 0.5},
@@ -413,11 +410,11 @@ describe('JsonSchema', () => {
                     {expected: false, value: []},
                     {expected: false, value: {}},
                 ],
+                schema: {
+                    type: 'number',
+                },
             },
             {
-                schema: {
-                    type: 'integer',
-                },
                 inputs: [
                     {expected: true,  value: 0},
                     {expected: false, value: 0.5},
@@ -427,37 +424,32 @@ describe('JsonSchema', () => {
                     {expected: false, value: []},
                     {expected: false, value: {}},
                 ],
+                schema: {
+                    type: 'integer',
+                },
             },
 
             // Reference tests
             {
+                inputs: [
+                    {expected: true,  value: 0},
+                    {expected: true,  value: 0.5},
+                    {expected: true,  value: 1},
+                    {expected: false, value: '0'},
+                    {expected: false, value: null},
+                    {expected: false, value: []},
+                    {expected: false, value: {}},
+                ],
                 schema: {
+                    $ref: '#/definitions/example',
                     definitions: {
                         example: {
                             type: 'number',
                         },
                     },
-                    $ref: '#/definitions/example',
                 },
-                inputs: [
-                    {expected: true,  value: 0},
-                    {expected: true,  value: 0.5},
-                    {expected: true,  value: 1},
-                    {expected: false, value: '0'},
-                    {expected: false, value: null},
-                    {expected: false, value: []},
-                    {expected: false, value: {}},
-                ],
             },
             {
-                schema: {
-                    definitions: {
-                        example: {
-                            type: 'integer',
-                        },
-                    },
-                    $ref: '#/definitions/example',
-                },
                 inputs: [
                     {expected: true,  value: 0},
                     {expected: false, value: 0.5},
@@ -467,22 +459,16 @@ describe('JsonSchema', () => {
                     {expected: false, value: []},
                     {expected: false, value: {}},
                 ],
-            },
-            {
                 schema: {
+                    $ref: '#/definitions/example',
                     definitions: {
                         example: {
-                            type: 'object',
-                            additionalProperties: false,
-                            properties: {
-                                test: {
-                                    $ref: '#/definitions/example',
-                                },
-                            },
+                            type: 'integer',
                         },
                     },
-                    $ref: '#/definitions/example',
                 },
+            },
+            {
                 inputs: [
                     {expected: false, value: 0},
                     {expected: false, value: 0.5},
@@ -501,11 +487,25 @@ describe('JsonSchema', () => {
                     {expected: true,  value: {test: {test: {}}}},
                     {expected: true,  value: {test: {test: {test: {}}}}},
                 ],
+                schema: {
+                    $ref: '#/definitions/example',
+                    definitions: {
+                        example: {
+                            additionalProperties: false,
+                            properties: {
+                                test: {
+                                    $ref: '#/definitions/example',
+                                },
+                            },
+                            type: 'object',
+                        },
+                    },
+                },
             },
         ];
         /* eslint-enable @stylistic/no-multi-spaces */
 
-        describe.each(data)('Schema %#', ({schema, inputs}) => {
+        describe.each(data)('Schema %#', ({inputs, schema}) => {
             test.each(inputs)(`schemaValidate(${JSON.stringify(schema)}, $value) -> $expected`, ({expected, value}) => {
                 const actual = schemaValidate(schema, value);
                 expect(actual).toStrictEqual(expected);
@@ -518,17 +518,6 @@ describe('JsonSchema', () => {
         const data = [
             // Test value defaulting on objects with additionalProperties=false
             {
-                schema: {
-                    type: 'object',
-                    required: ['test'],
-                    properties: {
-                        test: {
-                            type: 'string',
-                            default: 'default',
-                        },
-                    },
-                    additionalProperties: false,
-                },
                 inputs: [
                     [
                         void 0,
@@ -567,21 +556,21 @@ describe('JsonSchema', () => {
                         {test: 'value'},
                     ],
                 ],
+                schema: {
+                    additionalProperties: false,
+                    properties: {
+                        test: {
+                            default: 'default',
+                            type: 'string',
+                        },
+                    },
+                    required: ['test'],
+                    type: 'object',
+                },
             },
 
             // Test value defaulting on objects with additionalProperties=true
             {
-                schema: {
-                    type: 'object',
-                    required: ['test'],
-                    properties: {
-                        test: {
-                            type: 'string',
-                            default: 'default',
-                        },
-                    },
-                    additionalProperties: true,
-                },
                 inputs: [
                     [
                         {},
@@ -600,24 +589,21 @@ describe('JsonSchema', () => {
                         {test: 'value', test2: 'value2'},
                     ],
                 ],
+                schema: {
+                    additionalProperties: true,
+                    properties: {
+                        test: {
+                            default: 'default',
+                            type: 'string',
+                        },
+                    },
+                    required: ['test'],
+                    type: 'object',
+                },
             },
 
             // Test value defaulting on objects with additionalProperties={schema}
             {
-                schema: {
-                    type: 'object',
-                    required: ['test'],
-                    properties: {
-                        test: {
-                            type: 'string',
-                            default: 'default',
-                        },
-                    },
-                    additionalProperties: {
-                        type: 'number',
-                        default: 10,
-                    },
-                },
                 inputs: [
                     [
                         {},
@@ -652,20 +638,24 @@ describe('JsonSchema', () => {
                         {test: 'value', test2: 2, test3: 10},
                     ],
                 ],
+                schema: {
+                    additionalProperties: {
+                        default: 10,
+                        type: 'number',
+                    },
+                    properties: {
+                        test: {
+                            default: 'default',
+                            type: 'string',
+                        },
+                    },
+                    required: ['test'],
+                    type: 'object',
+                },
             },
 
             // Test value defaulting where hasOwnProperty is false
             {
-                schema: {
-                    type: 'object',
-                    required: ['test'],
-                    properties: {
-                        test: {
-                            type: 'string',
-                            default: 'default',
-                        },
-                    },
-                },
                 inputs: [
                     [
                         {},
@@ -680,18 +670,18 @@ describe('JsonSchema', () => {
                         {test: 'default'},
                     ],
                 ],
+                schema: {
+                    properties: {
+                        test: {
+                            default: 'default',
+                            type: 'string',
+                        },
+                    },
+                    required: ['test'],
+                    type: 'object',
+                },
             },
             {
-                schema: {
-                    type: 'object',
-                    required: ['toString'],
-                    properties: {
-                        toString: /** @type {import('ext/json-schema').SchemaObject} */ ({
-                            type: 'string',
-                            default: 'default',
-                        }),
-                    },
-                },
                 inputs: [
                     [
                         {},
@@ -706,21 +696,20 @@ describe('JsonSchema', () => {
                         {toString: 'default'},
                     ],
                 ],
+                schema: {
+                    properties: {
+                        toString: /** @type {import('ext/json-schema').SchemaObject} */ ({
+                            default: 'default',
+                            type: 'string',
+                        }),
+                    },
+                    required: ['toString'],
+                    type: 'object',
+                },
             },
 
             // Test enum
             {
-                schema: {
-                    type: 'object',
-                    required: ['test'],
-                    properties: {
-                        test: {
-                            type: 'string',
-                            default: 'value1',
-                            enum: ['value1', 'value2', 'value3'],
-                        },
-                    },
-                },
                 inputs: [
                     [
                         {test: 'value1'},
@@ -739,59 +728,61 @@ describe('JsonSchema', () => {
                         {test: 'value1'},
                     ],
                 ],
+                schema: {
+                    properties: {
+                        test: {
+                            default: 'value1',
+                            enum: ['value1', 'value2', 'value3'],
+                            type: 'string',
+                        },
+                    },
+                    required: ['test'],
+                    type: 'object',
+                },
             },
 
             // Test valid vs invalid default
             {
-                schema: {
-                    type: 'object',
-                    required: ['test'],
-                    properties: {
-                        test: {
-                            type: 'integer',
-                            default: 2,
-                            minimum: 1,
-                        },
-                    },
-                },
                 inputs: [
                     [
                         {test: -1},
                         {test: 2},
                     ],
                 ],
-            },
-            {
                 schema: {
-                    type: 'object',
-                    required: ['test'],
                     properties: {
                         test: {
+                            default: 2,
+                            minimum: 1,
                             type: 'integer',
-                            default: 1,
-                            minimum: 2,
                         },
                     },
+                    required: ['test'],
+                    type: 'object',
                 },
+            },
+            {
                 inputs: [
                     [
                         {test: -1},
                         {test: -1},
                     ],
                 ],
+                schema: {
+                    properties: {
+                        test: {
+                            default: 1,
+                            minimum: 2,
+                            type: 'integer',
+                        },
+                    },
+                    required: ['test'],
+                    type: 'object',
+                },
             },
 
             // Test references
             {
-                schema: {
-                    definitions: {
-                        example: {
-                            type: 'number',
-                            default: 0,
-                        },
-                    },
-                    $ref: '#/definitions/example',
-                },
                 inputs: [
                     [
                         1,
@@ -810,56 +801,65 @@ describe('JsonSchema', () => {
                         0,
                     ],
                 ],
-            },
-            {
                 schema: {
+                    $ref: '#/definitions/example',
                     definitions: {
                         example: {
-                            type: 'object',
+                            default: 0,
+                            type: 'number',
+                        },
+                    },
+                },
+            },
+            {
+                inputs: [
+                    [
+                        1,
+                        {},
+                    ],
+                    [
+                        null,
+                        {},
+                    ],
+                    [
+                        'test',
+                        {},
+                    ],
+                    [
+                        {},
+                        {},
+                    ],
+                    [
+                        {test: {}},
+                        {test: {}},
+                    ],
+                    [
+                        {test: 'value'},
+                        {test: {}},
+                    ],
+                    [
+                        {test: {test: {}}},
+                        {test: {test: {}}},
+                    ],
+                ],
+                schema: {
+                    $ref: '#/definitions/example',
+                    definitions: {
+                        example: {
                             additionalProperties: false,
                             properties: {
                                 test: {
                                     $ref: '#/definitions/example',
                                 },
                             },
+                            type: 'object',
                         },
                     },
-                    $ref: '#/definitions/example',
                 },
-                inputs: [
-                    [
-                        1,
-                        {},
-                    ],
-                    [
-                        null,
-                        {},
-                    ],
-                    [
-                        'test',
-                        {},
-                    ],
-                    [
-                        {},
-                        {},
-                    ],
-                    [
-                        {test: {}},
-                        {test: {}},
-                    ],
-                    [
-                        {test: 'value'},
-                        {test: {}},
-                    ],
-                    [
-                        {test: {test: {}}},
-                        {test: {test: {}}},
-                    ],
-                ],
             },
         ];
 
-        describe.each(data)('Schema %#', ({schema, inputs}) => {
+        describe.each(data)('Schema %#', ({inputs, schema}) => {
             test.each(inputs)(`getValidValueOrDefault(${JSON.stringify(schema)}, %o) -> %o`, (value, expected) => {
                 const actual = getValidValueOrDefault(schema, value);
                 expect(actual).toStrictEqual(expected);
@@ -874,103 +874,103 @@ describe('JsonSchema', () => {
             // Object tests
             {
                 schema: {
-                    type: 'object',
-                    required: ['test'],
                     additionalProperties: false,
                     properties: {
                         test: {
-                            type: 'string',
                             default: 'default',
+                            type: 'string',
                         },
                     },
+                    required: ['test'],
+                    type: 'object',
                 },
                 tests: [
-                    {error: false, value: {test: 'default'}, action: (value) => { value.test = 'string'; }},
-                    {error: true,  value: {test: 'default'}, action: (value) => { value.test = null; }},
-                    {error: true,  value: {test: 'default'}, action: (value) => { delete value.test; }},
-                    {error: true,  value: {test: 'default'}, action: (value) => { value.test2 = 'string'; }},
-                    {error: false, value: {test: 'default'}, action: (value) => { delete value.test2; }},
+                    {action: (value) => { value.test = 'string'; }, error: false, value: {test: 'default'}},
+                    {action: (value) => { value.test = null; },  error: true, value: {test: 'default'}},
+                    {action: (value) => { delete value.test; },  error: true, value: {test: 'default'}},
+                    {action: (value) => { value.test2 = 'string'; },  error: true, value: {test: 'default'}},
+                    {action: (value) => { delete value.test2; }, error: false, value: {test: 'default'}},
                 ],
             },
             {
                 schema: {
-                    type: 'object',
-                    required: ['test'],
                     additionalProperties: true,
                     properties: {
                         test: {
-                            type: 'string',
                             default: 'default',
+                            type: 'string',
                         },
                     },
+                    required: ['test'],
+                    type: 'object',
                 },
                 tests: [
-                    {error: false, value: {test: 'default'}, action: (value) => { value.test = 'string'; }},
-                    {error: true,  value: {test: 'default'}, action: (value) => { value.test = null; }},
-                    {error: true,  value: {test: 'default'}, action: (value) => { delete value.test; }},
-                    {error: false, value: {test: 'default'}, action: (value) => { value.test2 = 'string'; }},
-                    {error: false, value: {test: 'default'}, action: (value) => { delete value.test2; }},
+                    {action: (value) => { value.test = 'string'; }, error: false, value: {test: 'default'}},
+                    {action: (value) => { value.test = null; },  error: true, value: {test: 'default'}},
+                    {action: (value) => { delete value.test; },  error: true, value: {test: 'default'}},
+                    {action: (value) => { value.test2 = 'string'; }, error: false, value: {test: 'default'}},
+                    {action: (value) => { delete value.test2; }, error: false, value: {test: 'default'}},
                 ],
             },
             {
                 schema: {
-                    type: 'object',
-                    required: ['test1'],
                     additionalProperties: false,
                     properties: {
                         test1: {
-                            type: 'object',
-                            required: ['test2'],
                             additionalProperties: false,
                             properties: {
                                 test2: {
-                                    type: 'object',
-                                    required: ['test3'],
                                     additionalProperties: false,
                                     properties: {
                                         test3: {
-                                            type: 'string',
                                             default: 'default',
+                                            type: 'string',
                                         },
                                     },
+                                    required: ['test3'],
+                                    type: 'object',
                                 },
                             },
+                            required: ['test2'],
+                            type: 'object',
                         },
                     },
+                    required: ['test1'],
+                    type: 'object',
                 },
                 tests: [
-                    {error: false, action: (value) => { value.test1.test2.test3 = 'string'; }},
-                    {error: true,  action: (value) => { value.test1.test2.test3 = null; }},
-                    {error: true,  action: (value) => { delete value.test1.test2.test3; }},
-                    {error: true,  action: (value) => { value.test1.test2 = null; }},
-                    {error: true,  action: (value) => { value.test1 = null; }},
-                    {error: true,  action: (value) => { value.test4 = 'string'; }},
-                    {error: false, action: (value) => { delete value.test4; }},
+                    {action: (value) => { value.test1.test2.test3 = 'string'; }, error: false},
+                    {action: (value) => { value.test1.test2.test3 = null; },  error: true},
+                    {action: (value) => { delete value.test1.test2.test3; },  error: true},
+                    {action: (value) => { value.test1.test2 = null; },  error: true},
+                    {action: (value) => { value.test1 = null; },  error: true},
+                    {action: (value) => { value.test4 = 'string'; },  error: true},
+                    {action: (value) => { delete value.test4; }, error: false},
                 ],
             },
 
             // Array tests
             {
                 schema: {
-                    type: 'array',
                     items: {
-                        type: 'string',
                         default: 'default',
+                        type: 'string',
                     },
+                    type: 'array',
                 },
                 tests: [
-                    {error: false, value: ['default'], action: (value) => { value[0] = 'string'; }},
-                    {error: true,  value: ['default'], action: (value) => { value[0] = null; }},
-                    {error: false, value: ['default'], action: (value) => { delete value[0]; }},
-                    {error: false, value: ['default'], action: (value) => { value[1] = 'string'; }},
+                    {action: (value) => { value[0] = 'string'; }, error: false, value: ['default']},
+                    {action: (value) => { value[0] = null; },  error: true, value: ['default']},
+                    {action: (value) => { delete value[0]; }, error: false, value: ['default']},
+                    {action: (value) => { value[1] = 'string'; }, error: false, value: ['default']},
                     {
-                        error: false,
-                        value: ['default'],
                         action: (value) => {
                             value[1] = 'string';
                             if (value.length !== 2) { throw new Error(`Invalid length; expected=2; actual=${value.length}`); }
                             if (typeof value.push !== 'function') { throw new Error(`Invalid push; expected=function; actual=${typeof value.push}`); }
                         },
+                        error: false,
+                        value: ['default'],
                     },
                 ],
             },
@@ -978,34 +978,34 @@ describe('JsonSchema', () => {
             // Reference tests
             {
                 schema: {
+                    $ref: '#/definitions/example',
                     definitions: {
                         example: {
-                            type: 'object',
                             additionalProperties: false,
                             properties: {
                                 test: {
                                     $ref: '#/definitions/example',
                                 },
                             },
+                            type: 'object',
                         },
                     },
-                    $ref: '#/definitions/example',
                 },
                 tests: [
-                    {error: false, value: {}, action: (value) => { value.test = {}; }},
-                    {error: false, value: {}, action: (value) => { value.test = {}; value.test.test = {}; }},
-                    {error: false, value: {}, action: (value) => { value.test = {test: {}}; }},
-                    {error: true,  value: {}, action: (value) => { value.test = null; }},
-                    {error: true,  value: {}, action: (value) => { value.test = 'string'; }},
-                    {error: true,  value: {}, action: (value) => { value.test = {}; value.test.test = 'string'; }},
-                    {error: true,  value: {}, action: (value) => { value.test = {test: 'string'}; }},
+                    {action: (value) => { value.test = {}; }, error: false, value: {}},
+                    {action: (value) => { value.test = {}; value.test.test = {}; }, error: false, value: {}},
+                    {action: (value) => { value.test = {test: {}}; }, error: false, value: {}},
+                    {action: (value) => { value.test = null; },  error: true, value: {}},
+                    {action: (value) => { value.test = 'string'; },  error: true, value: {}},
+                    {action: (value) => { value.test = {}; value.test.test = 'string'; },  error: true, value: {}},
+                    {action: (value) => { value.test = {test: 'string'}; },  error: true, value: {}},
                 ],
             },
         ];
         /* eslint-enable @stylistic/no-multi-spaces */
 
         describe.each(data)('Schema %#', ({schema, tests}) => {
-            test.each(tests)('proxy %#', ({error, value, action}) => {
+            test.each(tests)('proxy %#', ({action, error, value}) => {
                 if (typeof value === 'undefined') { value = getValidValueOrDefault(schema, void 0); }
                 value = structuredClone(value);
                 expect(schemaValidate(schema, value)).toBe(true);
@@ -1019,7 +1019,7 @@ describe('JsonSchema', () => {
         });
 
         for (const {schema, tests} of data) {
-            for (let {error, value, action} of tests) {
+            for (let {action, error, value} of tests) {
                 if (typeof value === 'undefined') { value = getValidValueOrDefault(schema, void 0); }
                 value = structuredClone(value);
                 expect(schemaValidate(schema, value)).toBe(true);

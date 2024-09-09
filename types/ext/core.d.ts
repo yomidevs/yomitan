@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type TypeofResult = 'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'undefined' | 'object' | 'function';
+export type TypeofResult = 'bigint' | 'boolean' | 'function' | 'number' | 'object' | 'string' | 'symbol' | 'undefined';
 
 /** This type is used as an explicit way of permitting the `any` type. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,28 +40,28 @@ export type TokenObject = Record<string, never>;
 
 export type DeferredPromiseDetails<T = unknown> = {
     promise: Promise<T>;
-    resolve: (value: T) => void;
     reject: (reason?: RejectionReason) => void;
+    resolve: (value: T) => void;
 };
 
 export type SerializedError1 = {
-    name: string;
-    message: string;
-    stack: string;
     data?: unknown;
     hasValue?: undefined;
+    message: string;
+    name: string;
+    stack: string;
 };
 
 export type SerializedError2 = {
-    value: unknown;
     hasValue: true;
+    value: unknown;
 };
 
 export type SerializedError = SerializedError1 | SerializedError2;
 
 export type ResponseSuccess<T = unknown> = {
-    result: T;
     error?: undefined;
+    result: T;
 };
 
 export type ResponseError = {
@@ -69,9 +69,9 @@ export type ResponseError = {
     result?: undefined;
 };
 
-export type Response<T = unknown> = ResponseSuccess<T> | ResponseError;
+export type Response<T = unknown> = ResponseError | ResponseSuccess<T>;
 
-export type Timeout = number | NodeJS.Timeout;
+export type Timeout = NodeJS.Timeout | number;
 
 export type EventSurface = {[name: string]: unknown};
 

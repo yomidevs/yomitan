@@ -107,14 +107,14 @@ export class HotkeyHandler extends EventDispatcher {
         } else {
             registrations.length = 0;
         }
-        for (const {action, argument, key, modifiers, scopes, enabled} of hotkeys) {
+        for (const {action, argument, enabled, key, modifiers, scopes} of hotkeys) {
             registrations.push({
                 action,
                 argument,
+                enabled,
                 key,
                 modifiers: [...modifiers],
                 scopes: [...scopes],
-                enabled,
             });
         }
         this._updateHotkeyRegistrations();
@@ -193,7 +193,7 @@ export class HotkeyHandler extends EventDispatcher {
      * @returns {boolean}
      */
     _invokeHandlers(modifiers, hotkeyInfo, key) {
-        for (const {modifiers: handlerModifiers, action, argument} of hotkeyInfo.handlers) {
+        for (const {action, argument, modifiers: handlerModifiers} of hotkeyInfo.handlers) {
             if (!this._areSame(handlerModifiers, modifiers) || !this._isHotkeyPermitted(modifiers, key)) { continue; }
 
             const actionHandler = this._actions.get(action);
@@ -231,7 +231,7 @@ export class HotkeyHandler extends EventDispatcher {
 
         this._hotkeys.clear();
         for (const [scope, registrations] of this._hotkeyRegistrations.entries()) {
-            for (const {action, argument, key, modifiers, scopes, enabled} of registrations) {
+            for (const {action, argument, enabled, key, modifiers, scopes} of registrations) {
                 if (!(enabled && (key !== null || modifiers.length > 0) && action !== '' && scopes.includes(scope))) { continue; }
                 let hotkeyInfo = this._hotkeys.get(key);
                 if (typeof hotkeyInfo === 'undefined') {
@@ -239,7 +239,7 @@ export class HotkeyHandler extends EventDispatcher {
                     this._hotkeys.set(key, hotkeyInfo);
                 }
 
-                hotkeyInfo.handlers.push({modifiers: new Set(modifiers), action, argument});
+                hotkeyInfo.handlers.push({action, argument, modifiers: new Set(modifiers)});
             }
         }
         this._updateEventHandlers();

@@ -22,13 +22,13 @@ export type EventListenerFunction = (...args: Core.SafeAny[]) => unknown;
 export type EventTarget = {
     addEventListener(
         type: string,
-        listener: EventListener | EventListenerObject | EventListenerFunction,
+        listener: EventListener | EventListenerFunction | EventListenerObject,
         options?: AddEventListenerOptions | boolean,
     ): void;
     removeEventListener(
         type: string,
-        listener: EventListener | EventListenerObject | EventListenerFunction,
-        options?: EventListenerOptions | boolean,
+        listener: EventListener | EventListenerFunction | EventListenerObject,
+        options?: boolean | EventListenerOptions,
     ): void;
 };
 
@@ -38,32 +38,32 @@ export type ExtensionEvent<TCallback = EventListenerFunction, TArgs = unknown> =
 };
 
 export type EventTargetDetails = {
-    type: 'removeEventListener';
-    target: EventTarget;
     eventName: string;
-    listener: EventListener | EventListenerObject | EventListenerFunction;
-    options: EventListenerOptions | boolean | undefined;
+    listener: EventListener | EventListenerFunction | EventListenerObject;
+    options: boolean | EventListenerOptions | undefined;
+    target: EventTarget;
+    type: 'removeEventListener';
 };
 
 export type ExtensionEventDetails = {
-    type: 'removeListener';
-    target: ExtensionEvent;
-    callback: EventListenerFunction;
     args: unknown[];
+    callback: EventListenerFunction;
+    target: ExtensionEvent;
+    type: 'removeListener';
 };
 
 export type EventDispatcherDetails = {
-    type: 'off';
-    target: Core.EventDispatcherOffGeneric;
-    eventName: string;
     callback: EventListenerFunction;
+    eventName: string;
+    target: Core.EventDispatcherOffGeneric;
+    type: 'off';
 };
 
-export type EventListenerDetails = EventTargetDetails | ExtensionEventDetails | EventDispatcherDetails;
+export type EventListenerDetails = EventDispatcherDetails | EventTargetDetails | ExtensionEventDetails;
 
 export type AddEventListenerArgs = [
     target: EventTarget,
     type: string,
-    listener: EventListener | EventListenerObject | EventListenerFunction,
+    listener: EventListener | EventListenerFunction | EventListenerObject,
     options?: AddEventListenerOptions | boolean,
 ];

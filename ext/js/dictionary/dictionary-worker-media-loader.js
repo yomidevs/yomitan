@@ -53,11 +53,11 @@ export class DictionaryWorkerMediaLoader {
     getImageDetails(content, mediaType) {
         return new Promise((resolve, reject) => {
             const id = generateId(16);
-            this._requests.set(id, {resolve, reject});
+            this._requests.set(id, {reject, resolve});
             // This is executed in a Worker context, so the self needs to be force cast
             /** @type {Worker} */ (/** @type {unknown} */ (self)).postMessage({
                 action: 'getImageDetails',
-                params: {id, content, mediaType},
+                params: {content, id, mediaType},
             }, [content]);
         });
     }

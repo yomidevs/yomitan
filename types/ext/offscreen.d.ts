@@ -31,59 +31,13 @@ import type {
 } from './api-map';
 
 type ApiSurface = {
-    databasePrepareOffscreen: {
-        params: void;
-        return: void;
-    };
-    getDictionaryInfoOffscreen: {
-        params: void;
-        return: DictionaryImporter.Summary[];
-    };
-    databasePurgeOffscreen: {
-        params: void;
-        return: boolean;
-    };
-    databaseGetMediaOffscreen: {
-        params: {
-            targets: DictionaryDatabase.MediaRequest[];
-        };
-        return: DictionaryDatabase.Media<string>[];
-    };
-    translatorPrepareOffscreen: {
-        params: void;
-        return: void;
-    };
-    findKanjiOffscreen: {
-        params: {
-            text: string;
-            options: FindKanjiOptionsOffscreen;
-        };
-        return: Dictionary.KanjiDictionaryEntry[];
-    };
-    findTermsOffscreen: {
-        params: {
-            mode: Translator.FindTermsMode;
-            text: string;
-            options: FindTermsOptionsOffscreen;
-        };
-        return: Translator.FindTermsResult;
-    };
-    getTermFrequenciesOffscreen: {
-        params: {
-            termReadingList: Translator.TermReadingList;
-            dictionaries: string[];
-        };
-        return: Translator.TermFrequencySimple[];
-    };
     clearDatabaseCachesOffscreen: {
         params: void;
         return: void;
     };
-    clipboardSetBrowserOffscreen: {
-        params: {
-            value: Environment.Browser | null;
-        };
-        return: void;
+    clipboardGetImageOffscreen: {
+        params: void;
+        return: null | string;
     };
     clipboardGetTextOffscreen: {
         params: {
@@ -91,9 +45,55 @@ type ApiSurface = {
         };
         return: string;
     };
-    clipboardGetImageOffscreen: {
+    clipboardSetBrowserOffscreen: {
+        params: {
+            value: Environment.Browser | null;
+        };
+        return: void;
+    };
+    databaseGetMediaOffscreen: {
+        params: {
+            targets: DictionaryDatabase.MediaRequest[];
+        };
+        return: DictionaryDatabase.Media<string>[];
+    };
+    databasePrepareOffscreen: {
         params: void;
-        return: string | null;
+        return: void;
+    };
+    databasePurgeOffscreen: {
+        params: void;
+        return: boolean;
+    };
+    findKanjiOffscreen: {
+        params: {
+            options: FindKanjiOptionsOffscreen;
+            text: string;
+        };
+        return: Dictionary.KanjiDictionaryEntry[];
+    };
+    findTermsOffscreen: {
+        params: {
+            mode: Translator.FindTermsMode;
+            options: FindTermsOptionsOffscreen;
+            text: string;
+        };
+        return: Translator.FindTermsResult;
+    };
+    getDictionaryInfoOffscreen: {
+        params: void;
+        return: DictionaryImporter.Summary[];
+    };
+    getTermFrequenciesOffscreen: {
+        params: {
+            dictionaries: string[];
+            termReadingList: Translator.TermReadingList;
+        };
+        return: Translator.TermFrequencySimple[];
+    };
+    translatorPrepareOffscreen: {
+        params: void;
+        return: void;
     };
 };
 
@@ -105,25 +105,25 @@ export type ApiMessage<TName extends ApiNames> = (
 
 export type ApiNames = BaseApiNames<ApiSurface>;
 
-export type FindKanjiOptionsOffscreen = Omit<Translation.FindKanjiOptions, 'enabledDictionaryMap'> & {
+export type FindKanjiOptionsOffscreen = {
     enabledDictionaryMap: [
         key: string,
         options: Translation.FindKanjiDictionary,
     ][];
-};
+} & Omit<Translation.FindKanjiOptions, 'enabledDictionaryMap'>;
 
-export type FindTermsOptionsOffscreen = Omit<Translation.FindTermsOptions, 'enabledDictionaryMap' | 'excludeDictionaryDefinitions' | 'textReplacements'> & {
+export type FindTermsOptionsOffscreen = {
     enabledDictionaryMap: [
         key: string,
         options: Translation.FindTermDictionary,
     ][];
-    excludeDictionaryDefinitions: string[] | null;
+    excludeDictionaryDefinitions: null | string[];
     textReplacements: (FindTermsTextReplacementOffscreen[] | null)[];
-};
+} & Omit<Translation.FindTermsOptions, 'enabledDictionaryMap' | 'excludeDictionaryDefinitions' | 'textReplacements'>;
 
-export type FindTermsTextReplacementOffscreen = Omit<Translation.FindTermsTextReplacement, 'pattern'> & {
+export type FindTermsTextReplacementOffscreen = {
     pattern: string;
-};
+} & Omit<Translation.FindTermsTextReplacement, 'pattern'>;
 
 export type ApiMap = BaseApiMap<ApiSurface>;
 

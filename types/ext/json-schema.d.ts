@@ -17,59 +17,59 @@
 
 export type ValueObject = {[key: string]: Value};
 
-export type Value = string | number | boolean | null | Value[] | ValueObject;
+export type Value = boolean | null | number | string | Value[] | ValueObject;
 
-export type ValueObjectOrArray = ValueObject | Value[];
+export type ValueObjectOrArray = Value[] | ValueObject;
 
-export type Type = 'string' | 'number' | 'integer' | 'object' | 'array' | 'boolean' | 'null';
+export type Type = 'array' | 'boolean' | 'integer' | 'null' | 'number' | 'object' | 'string';
 
 export type SchemaObject = {
-    type?: Type | Type[];
-    required?: string[];
-
-    default?: Value;
-    enum?: Value[];
-    const?: Value;
-    minimum?: number;
-    maximum?: number;
-    exclusiveMinimum?: number;
-    exclusiveMaximum?: number;
-    multipleOf?: number;
-    minLength?: number;
-    maxLength?: number;
-    pattern?: string;
-    patternFlags?: string;
-    minItems?: number;
-    maxItems?: number;
-    minProperties?: number;
-    maxProperties?: number;
-    definitions?: {[key: string]: Schema};
-
     $ref?: string;
+    additionalItems?: Schema;
 
-    properties?: {[key: string]: Schema};
     additionalProperties?: Schema;
-    not?: Schema;
-    oneOf?: Schema[];
     allOf?: Schema[];
     anyOf?: Schema[];
+    const?: Value;
     contains?: Schema;
-    prefixItems?: Schema[];
-    items?: Schema | Schema[]; // Legacy schema format for the array
-    additionalItems?: Schema;
-    if?: Schema;
-    then?: Schema;
+    default?: Value;
+    definitions?: {[key: string]: Schema};
     else?: Schema;
+    enum?: Value[];
+    exclusiveMaximum?: number;
+    exclusiveMinimum?: number;
+    if?: Schema;
+    items?: Schema | Schema[]; // Legacy schema format for the array
+    maximum?: number;
+    maxItems?: number;
+    maxLength?: number;
+    maxProperties?: number;
+
+    minimum?: number;
+
+    minItems?: number;
+    minLength?: number;
+    minProperties?: number;
+    multipleOf?: number;
+    not?: Schema;
+    oneOf?: Schema[];
+    pattern?: string;
+    patternFlags?: string;
+    prefixItems?: Schema[];
+    properties?: {[key: string]: Schema};
+    required?: string[];
+    then?: Schema;
+    type?: Type | Type[];
 };
 
-export type Schema = SchemaObject | true | false;
+export type Schema = false | SchemaObject | true;
 
 export type SchemaStackItem = {
+    path: null | number | string;
     schema: Schema | Schema[];
-    path: string | number | null;
 };
 
 export type ValueStackItem = {
+    path: null | number | string;
     value: unknown;
-    path: string | number | null;
 };

@@ -46,44 +46,44 @@ import type {
 } from './api-map';
 
 export type FindTermsDetails = {
-    matchType?: Translation.FindTermsMatchType;
     deinflect?: boolean;
+    matchType?: Translation.FindTermsMatchType;
 };
 
 export type ParseTextResultItem = {
-    id: string;
-    source: 'scanning-parser' | 'mecab';
-    dictionary: null | string;
     content: ParseTextLine[];
+    dictionary: null | string;
+    id: string;
+    source: 'mecab' | 'scanning-parser';
 };
 
 export type ParseTextSegment = {
-    text: string;
     reading: string;
+    text: string;
 };
 
 export type ParseTextLine = ParseTextSegment[];
 
 export type InjectAnkiNoteMediaTermDefinitionDetails = {
-    type: 'term';
-    term: string;
     reading: string;
+    term: string;
+    type: 'term';
 };
 
 export type InjectAnkiNoteMediaKanjiDefinitionDetails = {
-    type: 'kanji';
     character: string;
+    type: 'kanji';
 };
 
-export type InjectAnkiNoteMediaDefinitionDetails = InjectAnkiNoteMediaTermDefinitionDetails | InjectAnkiNoteMediaKanjiDefinitionDetails;
+export type InjectAnkiNoteMediaDefinitionDetails = InjectAnkiNoteMediaKanjiDefinitionDetails | InjectAnkiNoteMediaTermDefinitionDetails;
 
 export type InjectAnkiNoteMediaAudioDetails = AnkiNoteBuilder.AudioMediaOptions;
 
 export type InjectAnkiNoteMediaScreenshotDetails = {
-    tabId: number;
-    frameId: number;
     format: Settings.AnkiScreenshotFormat;
+    frameId: number;
     quality: number;
+    tabId: number;
 };
 
 export type InjectAnkiNoteMediaClipboardDetails = {
@@ -98,24 +98,212 @@ export type InjectAnkiNoteMediaDictionaryMediaDetails = {
 
 export type InjectAnkiNoteDictionaryMediaResult = {
     dictionary: string;
+    fileName: null | string;
     path: string;
-    fileName: string | null;
 };
 
 export type GetMediaDetailsTarget = {
-    path: string;
     dictionary: string;
+    path: string;
 };
 
 export type GetTermFrequenciesDetailsTermReadingListItem = {
+    reading: null | string;
     term: string;
-    reading: string | null;
 };
 
 type ApiSurface = {
+    addAnkiNote: {
+        params: {
+            note: Anki.Note;
+        };
+        return: Anki.NoteId | null;
+    };
     applicationReady: {
         params: void;
         return: void;
+    };
+    broadcastTab: {
+        params: {
+            message: ApplicationApiMessageNoFrameIdAny;
+        };
+        return: boolean;
+    };
+    clipboardGet: {
+        params: void;
+        return: string;
+    };
+    commandExec: {
+        params: {
+            command: string;
+            params?: Core.SerializableObject;
+        };
+        return: boolean;
+    };
+    findAnkiNotes: {
+        params: {
+            query: string;
+        };
+        return: Anki.NoteId[];
+    };
+    frameInformationGet: {
+        params: void;
+        return: Extension.ContentOrigin;
+    };
+    getAnkiConnectVersion: {
+        params: void;
+        return: null | number;
+    };
+    getAnkiNoteInfo: {
+        params: {
+            fetchAdditionalInfo: boolean;
+            notes: Anki.Note[];
+        };
+        return: Anki.NoteInfoWrapper[];
+    };
+    getDefaultAnkiFieldTemplates: {
+        params: void;
+        return: string;
+    };
+    getDictionaryInfo: {
+        params: void;
+        return: DictionaryImporter.Summary[];
+    };
+    getEnvironmentInfo: {
+        params: void;
+        return: Environment.Info;
+    };
+    getLanguageSummaries: {
+        params: void;
+        return: Language.LanguageSummary[];
+    };
+    getMedia: {
+        params: {
+            targets: GetMediaDetailsTarget[];
+        };
+        return: DictionaryDatabase.MediaDataStringContent[];
+    };
+    getOrCreateSearchPopup: {
+        params: {
+            focus?: 'ifCreated' | boolean;
+            text?: string;
+        };
+        return: {
+            tabId: null | number;
+            windowId: number;
+        };
+    };
+    getSettings: {
+        params: {
+            targets: SettingsModifications.ScopedRead[];
+        };
+        return: Core.Response<SettingsModifications.ModificationResult>[];
+    };
+    getStylesheetContent: {
+        params: {
+            url: string;
+        };
+        return: string;
+    };
+    getTermAudioInfoList: {
+        params: {
+            languageSummary: Language.LanguageSummary;
+            reading: string;
+            source: Audio.AudioSourceInfo;
+            term: string;
+        };
+        return: AudioDownloader.Info[];
+    };
+    getTermFrequencies: {
+        params: {
+            dictionaries: string[];
+            termReadingList: GetTermFrequenciesDetailsTermReadingListItem[];
+        };
+        return: Translator.TermFrequencySimple[];
+    };
+    getZoom: {
+        params: void;
+        return: {
+            zoomFactor: number;
+        };
+    };
+    injectAnkiNoteMedia: {
+        params: {
+            audioDetails: InjectAnkiNoteMediaAudioDetails | null;
+            clipboardDetails: InjectAnkiNoteMediaClipboardDetails | null;
+            definitionDetails: InjectAnkiNoteMediaDefinitionDetails;
+            dictionaryMediaDetails: InjectAnkiNoteMediaDictionaryMediaDetails[];
+            screenshotDetails: InjectAnkiNoteMediaScreenshotDetails | null;
+            timestamp: number;
+        };
+        return: {
+            audioFileName: null | string;
+            clipboardImageFileName: null | string;
+            clipboardText: null | string;
+            dictionaryMedia: InjectAnkiNoteDictionaryMediaResult[];
+            errors: Core.SerializedError[];
+            screenshotFileName: null | string;
+        };
+    };
+    injectStylesheet: {
+        params: {
+            type: 'code' | 'file';
+            value: string;
+        };
+        return: void;
+    };
+    isAnkiConnected: {
+        params: void;
+        return: boolean;
+    };
+    isTabSearchPopup: {
+        params: {
+            tabId: number;
+        };
+        return: boolean;
+    };
+    isTextLookupWorthy: {
+        params: {
+            language: string;
+            text: string;
+        };
+        return: boolean;
+    };
+    kanjiFind: {
+        params: {
+            optionsContext: Settings.OptionsContext;
+            text: string;
+        };
+        return: Dictionary.KanjiDictionaryEntry[];
+    };
+    logGenericErrorBackend: {
+        params: {
+            context: Log.LogContext | undefined;
+            error: Core.SerializedError;
+            level: Log.LogLevel;
+        };
+        return: void;
+    };
+    logIndicatorClear: {
+        params: void;
+        return: void;
+    };
+    modifySettings: {
+        params: {
+            source: string;
+            targets: SettingsModifications.ScopedModification[];
+        };
+        return: Core.Response<SettingsModifications.ModificationResult>[];
+    };
+    openCrossFramePort: {
+        params: {
+            targetFrameId: number;
+            targetTabId: number;
+        };
+        return: {
+            targetFrameId: number;
+            targetTabId: number;
+        };
     };
     optionsGet: {
         params: {
@@ -127,107 +315,22 @@ type ApiSurface = {
         params: void;
         return: Settings.Options;
     };
-    termsFind: {
-        params: {
-            text: string;
-            details: FindTermsDetails;
-            optionsContext: Settings.OptionsContext;
-        };
-        return: {
-            dictionaryEntries: Dictionary.TermDictionaryEntry[];
-            originalTextLength: number;
-        };
-    };
     parseText: {
         params: {
-            text: string;
             optionsContext: Settings.OptionsContext;
             scanLength: number;
+            text: string;
             useInternalParser: boolean;
             useMecabParser: boolean;
         };
         return: ParseTextResultItem[];
     };
-    kanjiFind: {
-        params: {
-            text: string;
-            optionsContext: Settings.OptionsContext;
-        };
-        return: Dictionary.KanjiDictionaryEntry[];
-    };
-    isAnkiConnected: {
+    purgeDatabase: {
         params: void;
-        return: boolean;
+        return: void;
     };
-    getAnkiConnectVersion: {
+    requestBackendReadySignal: {
         params: void;
-        return: number | null;
-    };
-    addAnkiNote: {
-        params: {
-            note: Anki.Note;
-        };
-        return: Anki.NoteId | null;
-    };
-    updateAnkiNote: {
-        params: {
-            noteWithId: Anki.NoteWithId;
-        };
-        return: null;
-    };
-    getAnkiNoteInfo: {
-        params: {
-            notes: Anki.Note[];
-            fetchAdditionalInfo: boolean;
-        };
-        return: Anki.NoteInfoWrapper[];
-    };
-    injectAnkiNoteMedia: {
-        params: {
-            timestamp: number;
-            definitionDetails: InjectAnkiNoteMediaDefinitionDetails;
-            audioDetails: InjectAnkiNoteMediaAudioDetails | null;
-            screenshotDetails: InjectAnkiNoteMediaScreenshotDetails | null;
-            clipboardDetails: InjectAnkiNoteMediaClipboardDetails | null;
-            dictionaryMediaDetails: InjectAnkiNoteMediaDictionaryMediaDetails[];
-        };
-        return: {
-            screenshotFileName: string | null;
-            clipboardImageFileName: string | null;
-            clipboardText: string | null;
-            audioFileName: string | null;
-            dictionaryMedia: InjectAnkiNoteDictionaryMediaResult[];
-            errors: Core.SerializedError[];
-        };
-    };
-    viewNotes: {
-        params: {
-            noteIds: Anki.NoteId[];
-            mode: Settings.AnkiNoteGuiMode;
-            allowFallback: boolean;
-        };
-        return: Settings.AnkiNoteGuiMode;
-    };
-    suspendAnkiCardsForNote: {
-        params: {
-            noteId: Anki.NoteId;
-        };
-        return: number;
-    };
-    getTermAudioInfoList: {
-        params: {
-            source: Audio.AudioSourceInfo;
-            term: string;
-            reading: string;
-            languageSummary: Language.LanguageSummary;
-        };
-        return: AudioDownloader.Info[];
-    };
-    commandExec: {
-        params: {
-            command: string;
-            params?: Core.SerializableObject;
-        };
         return: boolean;
     };
     sendMessageToFrame: {
@@ -237,157 +340,54 @@ type ApiSurface = {
         };
         return: boolean;
     };
-    broadcastTab: {
-        params: {
-            message: ApplicationApiMessageNoFrameIdAny;
-        };
-        return: boolean;
-    };
-    frameInformationGet: {
-        params: void;
-        return: Extension.ContentOrigin;
-    };
-    injectStylesheet: {
-        params: {
-            type: 'file' | 'code';
-            value: string;
-        };
-        return: void;
-    };
-    getStylesheetContent: {
-        params: {
-            url: string;
-        };
-        return: string;
-    };
-    getEnvironmentInfo: {
-        params: void;
-        return: Environment.Info;
-    };
-    clipboardGet: {
-        params: void;
-        return: string;
-    };
-    getZoom: {
-        params: void;
-        return: {
-            zoomFactor: number;
-        };
-    };
-    getDefaultAnkiFieldTemplates: {
-        params: void;
-        return: string;
-    };
-    getDictionaryInfo: {
-        params: void;
-        return: DictionaryImporter.Summary[];
-    };
-    purgeDatabase: {
-        params: void;
-        return: void;
-    };
-    getMedia: {
-        params: {
-            targets: GetMediaDetailsTarget[];
-        };
-        return: DictionaryDatabase.MediaDataStringContent[];
-    };
-    logGenericErrorBackend: {
-        params: {
-            error: Core.SerializedError;
-            level: Log.LogLevel;
-            context: Log.LogContext | undefined;
-        };
-        return: void;
-    };
-    logIndicatorClear: {
-        params: void;
-        return: void;
-    };
-    modifySettings: {
-        params: {
-            targets: SettingsModifications.ScopedModification[];
-            source: string;
-        };
-        return: Core.Response<SettingsModifications.ModificationResult>[];
-    };
-    getSettings: {
-        params: {
-            targets: SettingsModifications.ScopedRead[];
-        };
-        return: Core.Response<SettingsModifications.ModificationResult>[];
-    };
     setAllSettings: {
         params: {
-            value: Settings.Options;
             source: string;
+            value: Settings.Options;
         };
         return: void;
     };
-    getOrCreateSearchPopup: {
+    suspendAnkiCardsForNote: {
         params: {
-            focus?: boolean | 'ifCreated';
-            text?: string;
+            noteId: Anki.NoteId;
+        };
+        return: number;
+    };
+    termsFind: {
+        params: {
+            details: FindTermsDetails;
+            optionsContext: Settings.OptionsContext;
+            text: string;
         };
         return: {
-            tabId: number | null;
-            windowId: number;
+            dictionaryEntries: Dictionary.TermDictionaryEntry[];
+            originalTextLength: number;
         };
-    };
-    isTabSearchPopup: {
-        params: {
-            tabId: number;
-        };
-        return: boolean;
-    };
-    triggerDatabaseUpdated: {
-        params: {
-            type: Backend.DatabaseUpdateType;
-            cause: Backend.DatabaseUpdateCause;
-        };
-        return: void;
     };
     testMecab: {
         params: void;
         return: true;
     };
-    isTextLookupWorthy: {
+    triggerDatabaseUpdated: {
         params: {
-            text: string;
-            language: string;
+            cause: Backend.DatabaseUpdateCause;
+            type: Backend.DatabaseUpdateType;
         };
-        return: boolean;
+        return: void;
     };
-    getTermFrequencies: {
+    updateAnkiNote: {
         params: {
-            termReadingList: GetTermFrequenciesDetailsTermReadingListItem[];
-            dictionaries: string[];
+            noteWithId: Anki.NoteWithId;
         };
-        return: Translator.TermFrequencySimple[];
+        return: null;
     };
-    findAnkiNotes: {
+    viewNotes: {
         params: {
-            query: string;
+            allowFallback: boolean;
+            mode: Settings.AnkiNoteGuiMode;
+            noteIds: Anki.NoteId[];
         };
-        return: Anki.NoteId[];
-    };
-    openCrossFramePort: {
-        params: {
-            targetTabId: number;
-            targetFrameId: number;
-        };
-        return: {
-            targetTabId: number;
-            targetFrameId: number;
-        };
-    };
-    requestBackendReadySignal: {
-        params: void;
-        return: boolean;
-    };
-    getLanguageSummaries: {
-        params: void;
-        return: Language.LanguageSummary[];
+        return: Settings.AnkiNoteGuiMode;
     };
 };
 

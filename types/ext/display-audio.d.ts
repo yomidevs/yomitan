@@ -21,44 +21,44 @@ import type * as AudioDownloader from './audio-downloader';
 import type * as Settings from './settings';
 
 export type CacheItem = {
+    primaryCardAudio: null | PrimaryCardAudio;
     sourceMap: Map<number, CachedInfoList>;
-    primaryCardAudio: PrimaryCardAudio | null;
 };
 
 export type CachedInfoList = {
-    infoListPromise: Promise<AudioInfoList>;
     infoList: AudioInfoList | null;
+    infoListPromise: Promise<AudioInfoList>;
 };
 
 export type AudioInfoList = AudioInfoListItem[];
 
 export type AudioInfoListItem = {
-    info: AudioDownloader.Info;
-    audioPromise: Promise<GenericAudio> | null;
-    audioResolved: boolean;
     audio: GenericAudio | null;
+    audioPromise: null | Promise<GenericAudio>;
+    audioResolved: boolean;
+    info: AudioDownloader.Info;
 };
 
 export type PrimaryCardAudio = {
     index: number;
-    subIndex: number | null;
+    subIndex: null | number;
 };
 
 export type SourceInfo = {
     source: AudioSource | null;
-    subIndex: number | null;
+    subIndex: null | number;
 };
 
 export type AudioSource = {
-    index: number;
-    type: Settings.AudioSourceType;
-    url: string;
-    voice: string;
-    isInOptions: boolean;
     downloadable: boolean;
+    index: number;
+    isInOptions: boolean;
     name: string;
     nameIndex: number;
     nameUnique: boolean;
+    type: Settings.AudioSourceType;
+    url: string;
+    voice: string;
 };
 
 export type AudioSourceShort = {
@@ -68,8 +68,8 @@ export type AudioSourceShort = {
 };
 
 export type AudioMediaOptions = {
+    preferredAudioIndex: null | number;
     sources: Audio.AudioSourceInfo[];
-    preferredAudioIndex: number | null;
 };
 
 export type PlayAudioResult = {
@@ -87,14 +87,14 @@ export type TermAudio = {
 
 export type CreateAudioResult = {
     audio: GenericAudio | null;
-    index: number;
     cacheUpdated: boolean;
+    index: number;
 };
 
 export type GenericAudio = HTMLAudioElement | TextToSpeechAudio;
 
 export type MenuItemEntry = {
+    index: null | number;
+    name: null | string;
     valid: boolean | null;
-    index: number | null;
-    name: string | null;
 };

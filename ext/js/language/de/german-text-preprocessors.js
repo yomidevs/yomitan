@@ -18,17 +18,17 @@
 
 /** @type {import('language').BidirectionalConversionPreprocessor} */
 export const eszettPreprocessor = {
-    name: 'Convert "ß" to "ss"',
     description: 'ß → ss, ẞ → SS and vice versa',
+    name: 'Convert "ß" to "ss"',
     options: ['off', 'direct', 'inverse'],
     process: (str, setting) => {
         switch (setting) {
-            case 'off':
-                return str;
             case 'direct':
                 return str.replace(/ẞ/g, 'SS').replace(/ß/g, 'ss');
             case 'inverse':
                 return str.replace(/SS/g, 'ẞ').replace(/ss/g, 'ß');
+            case 'off':
+                return str;
         }
     },
 };

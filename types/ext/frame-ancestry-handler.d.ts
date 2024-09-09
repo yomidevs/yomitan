@@ -16,10 +16,10 @@
  */
 
 export type RequestFrameInfoResponseParams = {
-    uniqueId: string;
     frameId: number;
-    nonce: string;
     more: boolean;
+    nonce: string;
+    uniqueId: string;
 };
 
 export type RequestFrameInfoResponseReturn = {nonce: string} | null;

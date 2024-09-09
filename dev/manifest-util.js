@@ -28,7 +28,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 export class ManifestUtil {
     constructor() {
         const fileName = path.join(dirname, 'data', 'manifest-variants.json');
-        const {manifest, variants, defaultVariant} = /** @type {import('dev/manifest').ManifestConfig} */ (parseJson(fs.readFileSync(fileName, {encoding: 'utf8'})));
+        const {defaultVariant, manifest, variants} = /** @type {import('dev/manifest').ManifestConfig} */ (parseJson(fs.readFileSync(fileName, {encoding: 'utf8'})));
         /** @type {import('dev/manifest').Manifest} */
         this._manifest = manifest;
         /** @type {import('dev/manifest').ManifestVariant[]} */
@@ -95,11 +95,11 @@ export class ManifestUtil {
      * @throws {Error}
      */
     _evaluateModificationCommand(data) {
-        const {command, args, trim} = data;
-        const {stdout, stderr, status} = childProcess.spawnSync(command, args, {
+        const {args, command, trim} = data;
+        const {status, stderr, stdout} = childProcess.spawnSync(command, args, {
             cwd: dirname,
-            stdio: 'pipe',
             shell: false,
+            stdio: 'pipe',
         });
         if (status !== 0) {
             const message = stderr.toString('utf8').trim();
@@ -121,73 +121,19 @@ export class ManifestUtil {
                 // Rename to path2 to avoid clashing with imported `node:path` module.
                 const {action, path: path2} = modification;
                 switch (action) {
-                    case 'set':
+                    case 'add':
                         {
-                            let {value, before, after, command} = modification;
-                            /** @type {import('core').UnknownObject} */
-                            const object = this._getObjectProperties(manifest, path2, path2.length - 1);
-                            const key = path2[path2.length - 1];
-
-                            let {index} = modification;
-                            if (typeof index !== 'number') {
-                                index = -1;
-                            }
-                            if (typeof before === 'string') {
-                                index = this._getObjectKeyIndex(object, before);
-                            }
-                            if (typeof after === 'string') {
-                                index = this._getObjectKeyIndex(object, after);
-                                if (index >= 0) { ++index; }
-                            }
-                            if (typeof command === 'object' && command !== null) {
-                                value = this._evaluateModificationCommand(command);
-                            }
-
-                            this._setObjectKeyAtIndex(object, key, value, index);
-                        }
-                        break;
-                    case 'replace':
-                        {
-                            const {pattern, patternFlags, replacement} = modification;
-                            /** @type {import('core').UnknownObject} */
-                            const value = this._getObjectProperties(manifest, path2, path2.length - 1);
-                            const regex = new RegExp(pattern, patternFlags);
-                            const last = path2[path2.length - 1];
-                            let value2 = value[last];
-                            value2 = `${value2}`.replace(regex, replacement);
-                            value[last] = value2;
-                        }
-                        break;
-                    case 'delete':
-                        {
-                            /** @type {import('core').UnknownObject} */
-                            const value = this._getObjectProperties(manifest, path2, path2.length - 1);
-                            const last = path2[path2.length - 1];
-                            delete value[last];
-                        }
-                        break;
-                    case 'remove':
-                        {
-                            const {item} = modification;
-                            /** @type {unknown[]} */
-                            const value = this._getObjectProperties(manifest, path2, path2.length);
-                            const index = value.indexOf(item);
-                            if (index >= 0) { value.splice(index, 1); }
-                        }
-                        break;
-                    case 'splice':
-                        {
-                            const {start, deleteCount, items} = modification;
+                            const {items} = modification;
                             /** @type {unknown[]} */
                             const value = this._getObjectProperties(manifest, path2, path2.length);
                             const itemsNew = items.map((v) => structuredClone(v));
-                            value.splice(start, deleteCount, ...itemsNew);
+                            value.push(...itemsNew);
                         }
                         break;
                     case 'copy':
                     case 'move':
                         {
-                            const {newPath, before, after} = modification;
+                            const {after, before, newPath} = modification;
                             const oldKey = path2[path2.length - 1];
                             const newKey = newPath[newPath.length - 1];
                             /** @type {import('core').UnknownObject} */
@@ -215,13 +161,67 @@ export class ManifestUtil {
                             }
                         }
                         break;
-                    case 'add':
+                    case 'delete':
                         {
-                            const {items} = modification;
+                            /** @type {import('core').UnknownObject} */
+                            const value = this._getObjectProperties(manifest, path2, path2.length - 1);
+                            const last = path2[path2.length - 1];
+                            delete value[last];
+                        }
+                        break;
+                    case 'remove':
+                        {
+                            const {item} = modification;
+                            /** @type {unknown[]} */
+                            const value = this._getObjectProperties(manifest, path2, path2.length);
+                            const index = value.indexOf(item);
+                            if (index >= 0) { value.splice(index, 1); }
+                        }
+                        break;
+                    case 'replace':
+                        {
+                            const {pattern, patternFlags, replacement} = modification;
+                            /** @type {import('core').UnknownObject} */
+                            const value = this._getObjectProperties(manifest, path2, path2.length - 1);
+                            const regex = new RegExp(pattern, patternFlags);
+                            const last = path2[path2.length - 1];
+                            let value2 = value[last];
+                            value2 = `${value2}`.replace(regex, replacement);
+                            value[last] = value2;
+                        }
+                        break;
+                    case 'set':
+                        {
+                            let {after, before, command, value} = modification;
+                            /** @type {import('core').UnknownObject} */
+                            const object = this._getObjectProperties(manifest, path2, path2.length - 1);
+                            const key = path2[path2.length - 1];
+
+                            let {index} = modification;
+                            if (typeof index !== 'number') {
+                                index = -1;
+                            }
+                            if (typeof before === 'string') {
+                                index = this._getObjectKeyIndex(object, before);
+                            }
+                            if (typeof after === 'string') {
+                                index = this._getObjectKeyIndex(object, after);
+                                if (index >= 0) { ++index; }
+                            }
+                            if (typeof command === 'object' && command !== null) {
+                                value = this._evaluateModificationCommand(command);
+                            }
+
+                            this._setObjectKeyAtIndex(object, key, value, index);
+                        }
+                        break;
+                    case 'splice':
+                        {
+                            const {deleteCount, items, start} = modification;
                             /** @type {unknown[]} */
                             const value = this._getObjectProperties(manifest, path2, path2.length);
                             const itemsNew = items.map((v) => structuredClone(v));
-                            value.push(...itemsNew);
+                            value.splice(start, deleteCount, ...itemsNew);
                         }
                         break;
                 }
@@ -304,7 +304,7 @@ export class ManifestUtil {
         const visited = new Set();
         const inheritance = [];
         while (true) {
-            const {name, inherit} = variant;
+            const {inherit, name} = variant;
             if (visited.has(name)) { break; }
 
             visited.add(name);

@@ -53,7 +53,7 @@ describe('Dictionary data', () => {
         expected3: expectedResults3[i],
     }));
     describe.each(testCases)('Test %#: $data.name', ({data, expected1, expected2, expected3}) => {
-        test('Test', async ({window, translator, styles, expect}) => {
+        test('Test', async ({expect, styles, translator, window}) => {
             // The window property needs to be referenced for it to be initialized.
             // It is needed for DOM access for structured content.
             void window;

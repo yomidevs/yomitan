@@ -408,14 +408,14 @@ function textJJ(x, mora, svgns, svg) {
 function pathJJ(x, y, type, stepWidth, svgns) {
     let delta = '';
     switch (type) {
+        case 'd':
+            delta = stepWidth + ',25';
+            break;
         case 's':
             delta = stepWidth + ',0';
             break;
         case 'u':
             delta = stepWidth + ',-25';
-            break;
-        case 'd':
-            delta = stepWidth + ',25';
             break;
     }
 

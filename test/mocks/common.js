@@ -43,10 +43,10 @@ export async function fetch(url) {
     await Promise.resolve();
     const content = readFileSync(filePath, {encoding: null});
     return {
+        json: async () => parseJson(content.toString('utf8')),
         ok: true,
         status: 200,
         statusText: 'OK',
         text: async () => content.toString('utf8'),
-        json: async () => parseJson(content.toString('utf8')),
     };
 }

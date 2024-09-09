@@ -49,7 +49,7 @@ async function createTestDictionaryArchiveData(dictionary, dictionaryName) {
 function createDictionaryImporter(expect, onProgress) {
     const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
     return new DictionaryImporter(dictionaryImporterMediaLoader, (...args) => {
-        const {index, count} = args[0];
+        const {count, index} = args[0];
         expect.soft(index <= count).toBe(true);
         if (typeof onProgress === 'function') {
             onProgress(...args);
@@ -114,7 +114,7 @@ describe('Database', () => {
 
         const title = testDictionaryIndex.title;
         const titles = new Map([
-            [title, {alias: title, priority: 0, allowSecondarySearches: false}],
+            [title, {alias: title, allowSecondarySearches: false, priority: 0}],
         ]);
 
         // Setup database
@@ -125,8 +125,8 @@ describe('Database', () => {
         // Database not open
         await expect.soft(dictionaryDatabase.deleteDictionary(title, 1000, () => {})).rejects.toThrow('Database not open');
         await expect.soft(dictionaryDatabase.findTermsBulk(['?'], titles, 'exact')).rejects.toThrow('Database not open');
-        await expect.soft(dictionaryDatabase.findTermsExactBulk([{term: '?', reading: '?'}], titles)).rejects.toThrow('Database not open');
-        await expect.soft(dictionaryDatabase.findTermsBySequenceBulk([{query: 1, dictionary: title}])).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.findTermsExactBulk([{reading: '?', term: '?'}], titles)).rejects.toThrow('Database not open');
+        await expect.soft(dictionaryDatabase.findTermsBySequenceBulk([{dictionary: title, query: 1}])).rejects.toThrow('Database not open');
         await expect.soft(dictionaryDatabase.findTermMetaBulk(['?'], titles)).rejects.toThrow('Database not open');
         await expect.soft(dictionaryDatabase.findTermMetaBulk(['?'], titles)).rejects.toThrow('Database not open');
         await expect.soft(dictionaryDatabase.findKanjiBulk(['?'], titles)).rejects.toThrow('Database not open');
@@ -144,7 +144,7 @@ describe('Database', () => {
         await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails);
 
         // Dictionary already imported
-        expect.soft(await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails)).toEqual({result: null, errors: [new Error('Dictionary Test Dictionary is already imported, skipped it.')]});
+        expect.soft(await createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, defaultImportDetails)).toEqual({errors: [new Error('Dictionary Test Dictionary is already imported, skipped it.')], result: null});
 
         await dictionaryDatabase.close();
     });
@@ -184,7 +184,7 @@ describe('Database', () => {
 
             const title = testDictionaryIndex.title;
             const titles = new Map([
-                [title, {alias: title, priority: 0, allowSecondarySearches: false}],
+                [title, {alias: title, allowSecondarySearches: false, priority: 0}],
             ]);
 
             // Setup database
@@ -194,7 +194,7 @@ describe('Database', () => {
             // Import data
             let progressEvent1 = false;
             const dictionaryImporter = createDictionaryImporter(expect, () => { progressEvent1 = true; });
-            const {result: importDictionaryResult, errors: importDictionaryErrors} = await dictionaryImporter.importDictionary(
+            const {errors: importDictionaryErrors, result: importDictionaryResult} = await dictionaryImporter.importDictionary(
                 dictionaryDatabase,
                 testDictionarySource,
                 {prefixWildcardsSupported: true},
@@ -218,8 +218,8 @@ describe('Database', () => {
             expect.soft(counts).toStrictEqual(testData.expectedCounts);
 
             // Test findTermsBulk
-            for (const {inputs, expectedResults} of testData.tests.findTermsBulk) {
-                for (const {termList, matchType} of inputs) {
+            for (const {expectedResults, inputs} of testData.tests.findTermsBulk) {
+                for (const {matchType, termList} of inputs) {
                     const results = await dictionaryDatabase.findTermsBulk(termList, titles, matchType);
                     expect.soft(results.length).toStrictEqual(expectedResults.total);
                     for (const [term, count] of expectedResults.terms) {
@@ -232,7 +232,7 @@ describe('Database', () => {
             }
 
             // Test findTermsExactBulk
-            for (const {inputs, expectedResults} of testData.tests.findTermsExactBulk) {
+            for (const {expectedResults, inputs} of testData.tests.findTermsExactBulk) {
                 for (const {termList} of inputs) {
                     const results = await dictionaryDatabase.findTermsExactBulk(termList, titles);
                     expect.soft(results.length).toStrictEqual(expectedResults.total);
@@ -246,9 +246,9 @@ describe('Database', () => {
             }
 
             // Test findTermsBySequenceBulk
-            for (const {inputs, expectedResults} of testData.tests.findTermsBySequenceBulk) {
+            for (const {expectedResults, inputs} of testData.tests.findTermsBySequenceBulk) {
                 for (const {sequenceList} of inputs) {
-                    const results = await dictionaryDatabase.findTermsBySequenceBulk(sequenceList.map((query) => ({query, dictionary: title})));
+                    const results = await dictionaryDatabase.findTermsBySequenceBulk(sequenceList.map((query) => ({dictionary: title, query})));
                     expect.soft(results.length).toStrictEqual(expectedResults.total);
                     for (const [term, count] of expectedResults.terms) {
                         expect.soft(countDictionaryDatabaseEntriesWithTerm(results, term)).toStrictEqual(count);
@@ -260,7 +260,7 @@ describe('Database', () => {
             }
 
             // Test findTermMetaBulk
-            for (const {inputs, expectedResults} of testData.tests.findTermMetaBulk) {
+            for (const {expectedResults, inputs} of testData.tests.findTermMetaBulk) {
                 for (const {termList} of inputs) {
                     const results = await dictionaryDatabase.findTermMetaBulk(termList, titles);
                     expect.soft(results.length).toStrictEqual(expectedResults.total);
@@ -271,7 +271,7 @@ describe('Database', () => {
             }
 
             // Test findKanjiBulk
-            for (const {inputs, expectedResults} of testData.tests.findKanjiBulk) {
+            for (const {expectedResults, inputs} of testData.tests.findKanjiBulk) {
                 for (const {kanjiList} of inputs) {
                     const results = await dictionaryDatabase.findKanjiBulk(kanjiList, titles);
                     expect.soft(results.length).toStrictEqual(expectedResults.total);
@@ -282,7 +282,7 @@ describe('Database', () => {
             }
 
             // Test findKanjiBulk
-            for (const {inputs, expectedResults} of testData.tests.findKanjiMetaBulk) {
+            for (const {expectedResults, inputs} of testData.tests.findKanjiMetaBulk) {
                 for (const {kanjiList} of inputs) {
                     const results = await dictionaryDatabase.findKanjiMetaBulk(kanjiList, titles);
                     expect.soft(results.length).toStrictEqual(expectedResults.total);
@@ -293,7 +293,7 @@ describe('Database', () => {
             }
 
             // Test findTagForTitle
-            for (const {inputs, expectedResults} of testData.tests.findTagForTitle) {
+            for (const {expectedResults, inputs} of testData.tests.findTagForTitle) {
                 for (const {name} of inputs) {
                     const result = await dictionaryDatabase.findTagForTitle(name, title);
                     expect.soft(result).toStrictEqual(expectedResults.value);
@@ -326,9 +326,6 @@ describe('Database', () => {
 
                 // Clear
                 switch (clearMethod) {
-                    case 'purge':
-                        await dictionaryDatabase.purge();
-                        break;
                     case 'delete':
                         {
                             let progressEvent2 = false;
@@ -340,6 +337,9 @@ describe('Database', () => {
                             expect(progressEvent2).toBe(true);
                         }
                         break;
+                    case 'purge':
+                        await dictionaryDatabase.purge();
+                        break;
                 }
 
                 // Test empty
@@ -350,7 +350,7 @@ describe('Database', () => {
                 /** @type {import('dictionary-database').DictionaryCounts} */
                 const countsExpected = {
                     counts: [],
-                    total: {kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0},
+                    total: {kanji: 0, kanjiMeta: 0, media: 0, tagMeta: 0, termMeta: 0, terms: 0},
                 };
                 expect.soft(counts).toStrictEqual(countsExpected);
 

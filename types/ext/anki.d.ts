@@ -22,22 +22,22 @@ export type NoteId = number;
 
 export type CardId = number;
 
-export type NoteWithId = Note & {id: NoteId};
+export type NoteWithId = {id: NoteId} & Note;
 
 export type Note = {
-    fields: NoteFields;
-    tags: string[];
     deckName: string;
+    fields: NoteFields;
     modelName: string;
     options: {
         allowDuplicate: boolean;
         duplicateScope: Settings.AnkiDuplicateScope;
         duplicateScopeOptions: {
-            deckName: string | null;
-            checkChildren: boolean;
             checkAllModels: boolean;
+            checkChildren: boolean;
+            deckName: null | string;
         };
     };
+    tags: string[];
 };
 
 export type NoteFields = {
@@ -46,32 +46,32 @@ export type NoteFields = {
 
 export type NoteInfoWrapper = {
     canAdd: boolean;
-    valid: boolean;
     noteIds: NoteId[] | null;
     noteInfos?: (NoteInfo | null)[];
+    valid: boolean;
 };
 
 export type NoteInfo = {
-    noteId: NoteId;
-    tags: string[];
+    cards: CardId[];
     fields: {[key: string]: NoteFieldInfo};
     modelName: string;
-    cards: CardId[];
+    noteId: NoteId;
+    tags: string[];
 };
 
 export type NoteFieldInfo = {
-    value: string;
     order: number;
+    value: string;
 };
 
 export type ApiReflectResult = {
-    scopes: string[];
     actions: string[];
+    scopes: string[];
 };
 
 export type MessageBody = {
     action: string;
+    key?: string;
     params: Core.SerializableObject;
     version: number;
-    key?: string;
 };

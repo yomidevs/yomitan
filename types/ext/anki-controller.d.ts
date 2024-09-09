@@ -22,6 +22,6 @@ export type AnkiData = {
 
 export type FieldEntry = {
     fieldName: string;
-    inputField: HTMLInputElement;
     fieldNameContainerNode: HTMLElement;
+    inputField: HTMLInputElement;
 };

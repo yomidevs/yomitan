@@ -16,8 +16,8 @@
  */
 
 export type ChildFrameRect = {
+    height: number;
+    width: number;
     x: number;
     y: number;
-    width: number;
-    height: number;
 };

@@ -250,12 +250,12 @@ export class PopupMenu extends EventDispatcher {
 
         /** @type {import('popup-menu').EventArgument<'close'>} */
         const detail = {
-            menu: this,
-            item,
             action,
-            cause,
             altKey,
+            cause,
             ctrlKey,
+            item,
+            menu: this,
             metaKey,
             shiftKey,
         };
@@ -279,6 +279,6 @@ export class PopupMenu extends EventDispatcher {
 Object.defineProperty(PopupMenu, 'openMenus', {
     configurable: false,
     enumerable: true,
-    writable: false,
     value: new Set(),
+    writable: false,
 });

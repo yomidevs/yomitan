@@ -28,6 +28,78 @@ import type {
 } from './api-map';
 
 export type ApiSurface = {
+    applicationBackendReady: {
+        params: void;
+        return: void;
+    };
+    applicationDatabaseUpdated: {
+        params: {
+            cause: DatabaseUpdateCause;
+            type: DatabaseUpdateType;
+        };
+        return: void;
+    };
+    applicationGetUrl: {
+        params: void;
+        return: {
+            url: string;
+        };
+    };
+    applicationIsReady: {
+        params: void;
+        return: boolean;
+    };
+    applicationOptionsUpdated: {
+        params: {
+            source: string;
+        };
+        return: void;
+    };
+    applicationZoomChanged: {
+        params: {
+            newZoomFactor: number;
+            oldZoomFactor: number;
+        };
+        return: void;
+    };
+    frameEndpointConnected: {
+        params: FrameEndpointConnectedDetails;
+        return: void;
+    };
+    frameEndpointReady: {
+        params: FrameEndpointReadyDetails;
+        return: void;
+    };
+    frontendClearAllVisibleOverride: {
+        params: {
+            token: TokenString;
+        };
+        return: boolean;
+    };
+    frontendReady: {
+        params: {
+            frameId: null | number;
+        };
+        return: void;
+    };
+    frontendRequestReadyBroadcast: {
+        params: {
+            frameId: null | number;
+        };
+        return: void;
+    };
+    frontendScanSelectedText: {
+        params: void;
+        return: void;
+    };
+    frontendSetAllVisibleOverride: {
+        params: {
+            awaitFrame: boolean;
+            priority: number;
+            value: boolean;
+        };
+        return: TokenString;
+    };
     searchDisplayControllerGetMode: {
         params: void;
         return: SearchMode;
@@ -40,81 +112,9 @@ export type ApiSurface = {
     };
     searchDisplayControllerUpdateSearchQuery: {
         params: {
-            text: string;
             animate: boolean;
+            text: string;
         };
-        return: void;
-    };
-    applicationIsReady: {
-        params: void;
-        return: boolean;
-    };
-    applicationBackendReady: {
-        params: void;
-        return: void;
-    };
-    applicationGetUrl: {
-        params: void;
-        return: {
-            url: string;
-        };
-    };
-    applicationOptionsUpdated: {
-        params: {
-            source: string;
-        };
-        return: void;
-    };
-    applicationDatabaseUpdated: {
-        params: {
-            type: DatabaseUpdateType;
-            cause: DatabaseUpdateCause;
-        };
-        return: void;
-    };
-    applicationZoomChanged: {
-        params: {
-            oldZoomFactor: number;
-            newZoomFactor: number;
-        };
-        return: void;
-    };
-    frontendRequestReadyBroadcast: {
-        params: {
-            frameId: number | null;
-        };
-        return: void;
-    };
-    frontendSetAllVisibleOverride: {
-        params: {
-            value: boolean;
-            priority: number;
-            awaitFrame: boolean;
-        };
-        return: TokenString;
-    };
-    frontendClearAllVisibleOverride: {
-        params: {
-            token: TokenString;
-        };
-        return: boolean;
-    };
-    frontendReady: {
-        params: {
-            frameId: number | null;
-        };
-        return: void;
-    };
-    frontendScanSelectedText: {
-        params: void;
-        return: void;
-    };
-    frameEndpointReady: {
-        params: FrameEndpointReadyDetails;
-        return: void;
-    };
-    frameEndpointConnected: {
-        params: FrameEndpointConnectedDetails;
         return: void;
     };
 };
@@ -129,13 +129,13 @@ export type ApiMessageNoFrameId<TName extends ApiNames> = (
         {action: TName, params: ApiParams<TName>}
 );
 
-export type ApiMessage<TName extends ApiNames> = ApiMessageNoFrameId<TName> & {
+export type ApiMessage<TName extends ApiNames> = {
     /**
      * The origin frameId that sent this message.
      * If sent from the backend, this value will be undefined.
      */
     frameId?: number;
-};
+} & ApiMessageNoFrameId<TName>;
 
 export type ApiMessageNoFrameIdAny = {[name in ApiNames]: ApiMessageNoFrameId<name>}[ApiNames];
 
@@ -148,20 +148,20 @@ export type ApiHandler<TName extends ApiNames> = BaseApiHandler<ApiSurface[TName
 export type ApiReturn<TName extends ApiNames> = BaseApiReturn<ApiSurface[TName]>;
 
 export type Events = {
+    closePopups: Record<string, never>;
+    databaseUpdated: {
+        cause: DatabaseUpdateCause;
+        type: DatabaseUpdateType;
+    };
     extensionUnloaded: Record<string, never>;
     optionsUpdated: {
         source: string;
     };
-    databaseUpdated: {
-        type: DatabaseUpdateType;
-        cause: DatabaseUpdateCause;
-    };
-    zoomChanged: {
-        oldZoomFactor: number;
-        newZoomFactor: number;
-    };
-    closePopups: Record<string, never>;
     storageChanged: Record<string, never>;
+    zoomChanged: {
+        newZoomFactor: number;
+        oldZoomFactor: number;
+    };
 };
 
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;

@@ -29,17 +29,17 @@ await Application.main(false, async (application) => {
     popupFactory.prepare();
 
     const frontend = new Frontend({
-        application,
-        popupFactory,
-        depth: 0,
-        parentPopupId: null,
-        parentFrameId: null,
-        useProxyPopup: false,
-        pageType: 'web',
-        canUseWindowPopup: true,
         allowRootFramePopupProxy: true,
+        application,
+        canUseWindowPopup: true,
         childrenSupported: true,
+        depth: 0,
         hotkeyHandler,
+        pageType: 'web',
+        parentFrameId: null,
+        parentPopupId: null,
+        popupFactory,
+        useProxyPopup: false,
     });
     await frontend.prepare();
 });

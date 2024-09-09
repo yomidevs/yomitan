@@ -30,8 +30,8 @@ export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<
 export type DescriptorType = Settings.ProfileConditionType;
 
 export type Descriptor = {
-    displayName: string;
     defaultOperator: string;
+    displayName: string;
     operators: Map<string, OperatorInternal>;
 };
 
@@ -40,34 +40,34 @@ export type ValidateFunction = (value: string) => boolean;
 export type NormalizeFunction = (value: unknown) => string;
 
 export type OperatorInternal = {
-    displayName: string;
-    type: string;
     defaultValue: string;
-    resetDefaultOnChange?: boolean;
-    validate?: ValidateFunction;
+    displayName: string;
     normalize?: NormalizeFunction;
+    resetDefaultOnChange?: boolean;
+    type: string;
+    validate?: ValidateFunction;
 };
 
 export type Operator = {
-    displayName: string;
-    type: string;
     defaultValue: string;
-    resetDefaultOnChange: boolean | null;
-    validate: ValidateFunction | null;
+    displayName: string;
     normalize: NormalizeFunction | null;
+    resetDefaultOnChange: boolean | null;
+    type: string;
+    validate: null | ValidateFunction;
 };
 
 export type DescriptorInfo = {
-    name: DescriptorType;
     displayName: string;
+    name: DescriptorType;
 };
 
 export type OperatorInfo = {
-    name: string;
     displayName: string;
+    name: string;
 };
 
 export type InputData = {
-    validate: ValidateFunction | null;
     normalize: NormalizeFunction | null;
+    validate: null | ValidateFunction;
 };

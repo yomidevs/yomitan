@@ -21,12 +21,12 @@ import type * as DictionaryImporter from './dictionary-importer';
 
 export type InvokeDetails<TResponseRaw = unknown, TResponse = unknown> = {
     complete: boolean;
-    worker: Worker | null;
-    resolve: ((result: TResponse) => void) | null;
-    reject: ((reason?: Core.RejectionReason) => void) | null;
+    formatResult: ((result: TResponseRaw) => TResponse) | null;
     onMessage: ((event: MessageEvent<MessageData<TResponseRaw>>) => void) | null;
     onProgress: ((...args: unknown[]) => void) | null;
-    formatResult: ((result: TResponseRaw) => TResponse) | null;
+    reject: ((reason?: Core.RejectionReason) => void) | null;
+    resolve: ((result: TResponse) => void) | null;
+    worker: null | Worker;
 };
 
 export type MessageCompleteData<TResponseRaw = unknown> = {
@@ -51,21 +51,21 @@ export type MessageProgressParams = {
 };
 
 export type MessageGetImageDetailsParams = {
-    id: string;
     content: ArrayBuffer;
+    id: string;
     mediaType: string;
 };
 
-export type MessageData<TResponseRaw = unknown> = MessageCompleteData<TResponseRaw> | MessageProgressData | MessageGetImageDetailsData;
+export type MessageData<TResponseRaw = unknown> = MessageCompleteData<TResponseRaw> | MessageGetImageDetailsData | MessageProgressData;
 
 export type MessageCompleteResultSerialized = {
-    result: DictionaryImporter.Summary | null;
     errors: Core.SerializedError[];
+    result: DictionaryImporter.Summary | null;
 };
 
 export type MessageCompleteResult = {
-    result: DictionaryImporter.Summary | null;
     errors: Error[];
+    result: DictionaryImporter.Summary | null;
 };
 
 export type ImportProgressCallback = (details: DictionaryImporter.ProgressData) => void;

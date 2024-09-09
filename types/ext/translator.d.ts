@@ -22,20 +22,20 @@ import type * as DictionaryDatabaseTypes from './dictionary-database';
  * Information about how popup content should be shown, specifically related to the outer popup frame.
  */
 export type TermFrequencySimple = {
-    /** The term. */
-    term: string;
-    /** The reading of the term. */
-    reading: string | null;
     /** The name of the dictionary that the term frequency originates from. */
     dictionary: string;
-    /** Whether or not a reading was specified. */
-    hasReading: boolean;
-    /** The frequency value for the term. */
-    frequency: number;
     /** The display value for the frequency, or `null` if none is specified. */
-    displayValue: string | null;
+    displayValue: null | string;
     /** Whether or not the `frequency` field is derived from a parsed string. */
     displayValueParsed: boolean;
+    /** The frequency value for the term. */
+    frequency: number;
+    /** Whether or not a reading was specified. */
+    hasReading: boolean;
+    /** The reading of the term. */
+    reading: null | string;
+    /** The term. */
+    term: string;
 };
 
 export type TagGroup = {
@@ -44,8 +44,8 @@ export type TagGroup = {
 };
 
 export type TagExpansionTarget = {
-    tags: Dictionary.Tag[];
     tagGroups: TagGroup[];
+    tags: Dictionary.Tag[];
 };
 
 export type DictionaryTagCache = Map<string, TagCache>;
@@ -55,24 +55,24 @@ export type TagCache = Map<string, DictionaryDatabaseTypes.Tag | null>;
 export type TagTargetMap = Map<string, Map<string, TagTargetItem>>;
 
 export type TagTargetItem = {
-    query: string;
-    dictionary: string;
-    tagName: string;
-    cache: TagCache | null;
+    cache: null | TagCache;
     databaseTag: DictionaryDatabaseTypes.Tag | null;
+    dictionary: string;
+    query: string;
+    tagName: string;
     targets: Dictionary.Tag[][];
 };
 
 export type SequenceQuery = {
-    query: number;
     dictionary: string;
+    query: number;
 };
 
-export type FindTermsMode = 'simple' | 'group' | 'merge' | 'split';
+export type FindTermsMode = 'group' | 'merge' | 'simple' | 'split';
 
 export type TermReadingItem = {
+    reading: null | string;
     term: string;
-    reading: string | null;
 };
 
 export type TermReadingList = TermReadingItem[];

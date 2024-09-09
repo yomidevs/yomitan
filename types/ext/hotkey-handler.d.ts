@@ -19,9 +19,9 @@ import type {ModifierKey} from './input';
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
 export type HotkeyInfo = {
-    modifiers: Set<ModifierKey>;
     action: string;
     argument: unknown;
+    modifiers: Set<ModifierKey>;
 };
 
 export type HotkeyHandlers = {

@@ -19,7 +19,7 @@ import type * as Api from './api';
 
 export type DatabaseUpdateType = 'dictionary';
 
-export type DatabaseUpdateCause = 'purge' | 'delete' | 'import';
+export type DatabaseUpdateCause = 'delete' | 'import' | 'purge';
 
 export type MecabParseResults = [
     dictionary: string,
@@ -28,13 +28,13 @@ export type MecabParseResults = [
 
 export type TabInfo = {
     tab: chrome.tabs.Tab;
-    url: string | null;
+    url: null | string;
 };
 
 export type FindTabsPredicate = (tabInfo: TabInfo) => boolean | Promise<boolean>;
 
 export type CanAddResults = {
-    canAddArray: {note: import('anki').Note, isDuplicate: boolean}[];
+    canAddArray: {isDuplicate: boolean, note: import('anki').Note}[];
     cannotAddArray: import('anki').Note[];
 };
 

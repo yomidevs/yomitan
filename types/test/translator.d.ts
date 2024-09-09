@@ -26,29 +26,29 @@ export type OptionsPresetObject = {
     [key: string]: OptionsPreset;
 };
 
-export type OptionsList = string | (string | OptionsPreset)[];
+export type OptionsList = (OptionsPreset | string)[] | string;
 
 export type OptionsPreset = FindKanjiOptionsPreset | FindTermsOptionsPreset;
 
 export type FindKanjiOptionsPreset = {
-    type: 'kanji';
     enabledDictionaryMap?: [key: string, value: FindKanjiDictionary][];
     removeNonJapaneseCharacters?: boolean;
+    type: 'kanji';
 };
 
 export type FindTermsOptionsPreset = {
-    type: 'terms';
-    matchType?: FindTermsMatchType;
     deinflect?: boolean;
-    mainDictionary?: string;
-    sortFrequencyDictionary?: string | null;
-    sortFrequencyDictionaryOrder?: FindTermsSortOrder;
-    removeNonJapaneseCharacters?: boolean;
-    textReplacements?: (FindTermsTextReplacement[] | null)[];
     enabledDictionaryMap?: [key: string, value: FindTermDictionary][];
-    excludeDictionaryDefinitions?: string[] | null;
-    searchResolution?: SearchResolution;
+    excludeDictionaryDefinitions?: null | string[];
     language?: string;
+    mainDictionary?: string;
+    matchType?: FindTermsMatchType;
+    removeNonJapaneseCharacters?: boolean;
+    searchResolution?: SearchResolution;
+    sortFrequencyDictionary?: null | string;
+    sortFrequencyDictionaryOrder?: FindTermsSortOrder;
+    textReplacements?: (FindTermsTextReplacement[] | null)[];
+    type: 'terms';
 };
 
 export type OptionsType = OptionsPreset['type'];
@@ -59,8 +59,8 @@ export type OptionsPresetGeneric<T extends OptionsType> = {
 }[T];
 
 export type FindTermsTextReplacement = {
-    pattern: string;
     flags: string;
+    pattern: string;
     replacement: string;
 };
 
@@ -74,31 +74,31 @@ export type TestInput = TestInputFindKanji | TestInputFindTerm;
 export type TestInputFindKanji = {
     func: 'findKanji';
     name: string;
-    text: string;
     options: OptionsList;
+    text: string;
 };
 
 export type TestInputFindTerm = {
     func: 'findTerms';
-    name: string;
     mode: FindTermsMode;
-    text: string;
+    name: string;
     options: OptionsList;
+    text: string;
 };
 
 export type TranslatorTestResults = TranslatorTestResult[];
 
 export type TranslatorTestResult = {
+    dictionaryEntries: DictionaryEntry[];
     name: string;
     originalTextLength?: number;
-    dictionaryEntries: DictionaryEntry[];
 };
 
 export type TranslatorTestNoteDataResults = TranslatorTestNoteDataResult[];
 
 export type TranslatorTestNoteDataResult = {
     name: string;
-    noteDataList: Omit<NoteData, 'dictionaryEntry'>[] | null;
+    noteDataList: null | Omit<NoteData, 'dictionaryEntry'>[];
 };
 
 export type AnkiNoteBuilderTestResults = AnkiNoteBuilderTestResult[];

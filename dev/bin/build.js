@@ -94,9 +94,9 @@ async function createJSZip(directory, excludeFiles, outputFileName, onUpdate, dr
     }
 
     const data = await zip.generateAsync({
-        type: 'nodebuffer',
         compression: 'DEFLATE',
         compressionOptions: {level: 9},
+        type: 'nodebuffer',
     }, onUpdate);
     process.stdout.write('\n');
 
@@ -174,7 +174,7 @@ async function build(buildDir, extDir, manifestUtil, variantNames, manifestPath,
         const variant = manifestUtil.getVariant(variantName);
         if (typeof variant === 'undefined' || variant.buildable === false) { continue; }
 
-        const {name, fileName, fileCopies} = variant;
+        const {fileCopies, fileName, name} = variant;
         let {excludeFiles} = variant;
         if (!Array.isArray(excludeFiles)) { excludeFiles = []; }
 
@@ -222,32 +222,32 @@ export async function main() {
     /** @type {import('util').ParseArgsConfig['options']} */
     const parseArgsConfigOptions = {
         all: {
-            type: 'boolean',
             default: false,
+            type: 'boolean',
         },
         default: {
-            type: 'boolean',
             default: false,
+            type: 'boolean',
+        },
+        dryRun: {
+            default: false,
+            type: 'boolean',
+        },
+        dryRunBuildZip: {
+            default: false,
+            type: 'boolean',
         },
         manifest: {
             type: 'string',
         },
-        dryRun: {
-            type: 'boolean',
-            default: false,
-        },
-        dryRunBuildZip: {
-            type: 'boolean',
-            default: false,
-        },
         version: {
-            type: 'string',
             default: '0.0.0.0',
+            type: 'string',
         },
     };
 
     const argv = process.argv.slice(2);
-    const {values: args, positionals: targets} = parseArgs({args: argv, options: parseArgsConfigOptions, allowPositionals: true});
+    const {positionals: targets, values: args} = parseArgs({allowPositionals: true, args: argv, options: parseArgsConfigOptions});
 
     const dryRun = /** @type {boolean} */ (args.dryRun);
     const dryRunBuildZip = /** @type {boolean} */ (args.dryRunBuildZip);

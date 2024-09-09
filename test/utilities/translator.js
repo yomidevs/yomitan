@@ -106,7 +106,7 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         for (const value of preset.textReplacements) {
             if (Array.isArray(value)) {
                 const array = [];
-                for (const {pattern, flags, replacement} of value) {
+                for (const {flags, pattern, replacement} of value) {
                     array.push({pattern: new RegExp(pattern, flags), replacement});
                 }
                 textReplacements.push(array);
@@ -118,28 +118,28 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
     }
 
     const {
-        matchType,
         deinflect,
+        excludeDictionaryDefinitions,
+        language,
         mainDictionary,
+        matchType,
+        removeNonJapaneseCharacters,
+        searchResolution,
         sortFrequencyDictionary,
         sortFrequencyDictionaryOrder,
-        removeNonJapaneseCharacters,
-        excludeDictionaryDefinitions,
-        searchResolution,
-        language,
     } = preset;
 
     return {
-        matchType: typeof matchType !== 'undefined' ? matchType : 'exact',
         deinflect: typeof deinflect !== 'undefined' ? deinflect : true,
-        mainDictionary: typeof mainDictionary !== 'undefined' && mainDictionary !== placeholder ? mainDictionary : dictionaryName,
-        sortFrequencyDictionary: typeof sortFrequencyDictionary !== 'undefined' ? sortFrequencyDictionary : null,
-        sortFrequencyDictionaryOrder: typeof sortFrequencyDictionaryOrder !== 'undefined' ? sortFrequencyDictionaryOrder : 'ascending',
-        removeNonJapaneseCharacters: typeof removeNonJapaneseCharacters !== 'undefined' ? removeNonJapaneseCharacters : false,
-        textReplacements,
         enabledDictionaryMap,
         excludeDictionaryDefinitions: Array.isArray(excludeDictionaryDefinitions) ? new Set(excludeDictionaryDefinitions) : null,
-        searchResolution: typeof searchResolution !== 'undefined' ? searchResolution : 'letter',
         language: typeof language !== 'undefined' ? language : 'ja',
+        mainDictionary: typeof mainDictionary !== 'undefined' && mainDictionary !== placeholder ? mainDictionary : dictionaryName,
+        matchType: typeof matchType !== 'undefined' ? matchType : 'exact',
+        removeNonJapaneseCharacters: typeof removeNonJapaneseCharacters !== 'undefined' ? removeNonJapaneseCharacters : false,
+        searchResolution: typeof searchResolution !== 'undefined' ? searchResolution : 'letter',
+        sortFrequencyDictionary: typeof sortFrequencyDictionary !== 'undefined' ? sortFrequencyDictionary : null,
+        sortFrequencyDictionaryOrder: typeof sortFrequencyDictionaryOrder !== 'undefined' ? sortFrequencyDictionaryOrder : 'ascending',
+        textReplacements,
     };
 }

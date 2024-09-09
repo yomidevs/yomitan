@@ -21,10 +21,10 @@ import type * as DictionaryWorkerMediaLoader from './dictionary-worker-media-loa
 export type OnProgressCallback = (...args: unknown[]) => void;
 
 export type Message = (
-    ImportDictionaryMessage |
     DeleteDictionaryMessage |
     GetDictionaryCountsMessage |
-    GetImageDetailsResponseMessage
+    GetImageDetailsResponseMessage |
+    ImportDictionaryMessage
 );
 
 export type ImportDictionaryMessage = {
@@ -33,8 +33,8 @@ export type ImportDictionaryMessage = {
 };
 
 export type ImportDictionaryMessageParams = {
-    details: DictionaryImporter.ImportDetails;
     archiveContent: ArrayBuffer;
+    details: DictionaryImporter.ImportDetails;
 };
 
 export type DeleteDictionaryMessage = {

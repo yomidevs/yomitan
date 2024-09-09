@@ -41,13 +41,13 @@ export type FindKanjiOptions = {
  */
 export type FindKanjiDictionary = {
     /**
-     * The index of the dictionary
-     */
-    index: number;
-    /**
      * The alias of the dictionary
      */
     alias: string;
+    /**
+     * The index of the dictionary
+     */
+    index: number;
     /**
      * The priority of the dictionary
      */
@@ -61,33 +61,9 @@ export type FindKanjiDictionary = {
  */
 export type FindTermsOptions = {
     /**
-     * The matching type for looking up terms.
-     */
-    matchType: FindTermsMatchType;
-    /**
      * Whether or not deinflection should be performed.
      */
     deinflect: boolean;
-    /**
-     * The name of the primary dictionary to search.
-     */
-    mainDictionary: string;
-    /**
-     * The name of the frequency dictionary used for sorting
-     */
-    sortFrequencyDictionary: string | null;
-    /**
-     * The order used when using a sorting dictionary.
-     */
-    sortFrequencyDictionaryOrder: FindTermsSortOrder;
-    /**
-     * Whether or not non-Japanese characters should be searched.
-     */
-    removeNonJapaneseCharacters: boolean;
-    /**
-     * An iterable sequence of text replacements to be applied during the term lookup process.
-     */
-    textReplacements: FindTermsTextReplacements;
     /**
      * The mapping of dictionaries to search for terms in.
      * The key is the dictionary name.
@@ -96,15 +72,39 @@ export type FindTermsOptions = {
     /**
      * A set of dictionary names which should have definitions removed.
      */
-    excludeDictionaryDefinitions: Set<string> | null;
+    excludeDictionaryDefinitions: null | Set<string>;
+    /**
+     * ISO-639 code of the language.
+     */
+    language: string;
+    /**
+     * The name of the primary dictionary to search.
+     */
+    mainDictionary: string;
+    /**
+     * The matching type for looking up terms.
+     */
+    matchType: FindTermsMatchType;
+    /**
+     * Whether or not non-Japanese characters should be searched.
+     */
+    removeNonJapaneseCharacters: boolean;
     /**
      * Whether every substring should be searched for, or only whole words.
      */
     searchResolution: SearchResolution;
     /**
-     * ISO-639 code of the language.
+     * The name of the frequency dictionary used for sorting
      */
-    language: string;
+    sortFrequencyDictionary: null | string;
+    /**
+     * The order used when using a sorting dictionary.
+     */
+    sortFrequencyDictionaryOrder: FindTermsSortOrder;
+    /**
+     * An iterable sequence of text replacements to be applied during the term lookup process.
+     */
+    textReplacements: FindTermsTextReplacements;
 };
 
 /**
@@ -141,25 +141,25 @@ export type FindTermsTextReplacements = (FindTermsTextReplacement[] | null)[];
  */
 export type FindTermDictionary = {
     /**
-     * The index of the dictionary
-     */
-    index: number;
-    /**
      * The alias of the dictionary
      */
     alias: string;
-    /**
-     * The priority of the dictionary
-     */
-    priority: number;
     /**
      * Whether or not secondary term searches are allowed for this dictionary.
      */
     allowSecondarySearches: boolean;
     /**
+     * The index of the dictionary
+     */
+    index: number;
+    /**
      * Whether this dictionary's part of speech rules should be used to filter results.
      */
     partsOfSpeechFilter: boolean;
+    /**
+     * The priority of the dictionary
+     */
+    priority: number;
     /**
      * Whether to use the deinflections from this dictionary.
      */

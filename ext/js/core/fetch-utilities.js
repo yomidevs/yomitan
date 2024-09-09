@@ -23,10 +23,10 @@ import {readResponseJson} from './json.js';
  */
 async function fetchAsset(url) {
     const response = await fetch(chrome.runtime.getURL(url), {
-        method: 'GET',
-        mode: 'no-cors',
         cache: 'default',
         credentials: 'omit',
+        method: 'GET',
+        mode: 'no-cors',
         redirect: 'follow',
         referrerPolicy: 'no-referrer',
     });

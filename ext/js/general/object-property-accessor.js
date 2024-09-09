@@ -210,15 +210,15 @@ export class ObjectPropertyAccessor {
                         value += c;
                     } else {
                         switch (v) {
-                            case 0x5b: // '['
-                                pathArray.push(value);
-                                value = '';
-                                state = 'open-bracket';
-                                break;
                             case 0x2e: // '.'
                                 pathArray.push(value);
                                 value = '';
                                 state = 'id-start';
+                                break;
+                            case 0x5b: // '['
+                                pathArray.push(value);
+                                value = '';
+                                state = 'open-bracket';
                                 break;
                             default:
                                 throw new Error(`Unexpected character: ${c}`);
@@ -270,11 +270,11 @@ export class ObjectPropertyAccessor {
                     break;
                 case 'next': { // Expecting . or [
                     switch (v) {
-                        case 0x5b: // '['
-                            state = 'open-bracket';
-                            break;
                         case 0x2e: // '.'
                             state = 'id-start';
+                            break;
+                        case 0x5b: // '['
+                            state = 'open-bracket';
                             break;
                         default:
                             throw new Error(`Unexpected character: ${c}`);

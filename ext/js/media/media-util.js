@@ -83,8 +83,6 @@ export function getFileExtensionFromImageMediaType(mediaType) {
             return '.bmp';
         case 'image/gif':
             return '.gif';
-        case 'image/x-icon':
-            return '.ico';
         case 'image/jpeg':
             return '.jpeg';
         case 'image/png':
@@ -95,6 +93,8 @@ export function getFileExtensionFromImageMediaType(mediaType) {
             return '.tiff';
         case 'image/webp':
             return '.webp';
+        case 'image/x-icon':
+            return '.ico';
         default:
             return null;
     }
@@ -108,25 +108,25 @@ export function getFileExtensionFromImageMediaType(mediaType) {
  */
 export function getFileExtensionFromAudioMediaType(mediaType) {
     switch (mediaType) {
+        case 'application/ogg':
+        case 'audio/ogg':
+        case 'audio/vorbis':
+            return '.ogg';
         case 'audio/aac':
             return '.aac';
-        case 'audio/mpeg':
+        case 'audio/flac':
+            return '.flac';
         case 'audio/mp3':
+        case 'audio/mpeg':
             return '.mp3';
         case 'audio/mp4':
             return '.mp4';
-        case 'audio/ogg':
-        case 'audio/vorbis':
-        case 'application/ogg':
-            return '.ogg';
         case 'audio/vnd.wav':
-        case 'audio/wave':
         case 'audio/wav':
-        case 'audio/x-wav':
+        case 'audio/wave':
         case 'audio/x-pn-wav':
+        case 'audio/x-wav':
             return '.wav';
-        case 'audio/flac':
-            return '.flac';
         case 'audio/webm':
             return '.webm';
         default:

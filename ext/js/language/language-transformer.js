@@ -52,26 +52,26 @@ export class LanguageTransformer {
         const transforms2 = [];
 
         for (const [transformId, transform] of Object.entries(transforms)) {
-            const {name, description, rules} = transform;
+            const {description, name, rules} = transform;
             /** @type {import('language-transformer-internal').Rule[]} */
             const rules2 = [];
             for (let j = 0, jj = rules.length; j < jj; ++j) {
-                const {type, isInflected, deinflect, conditionsIn, conditionsOut} = rules[j];
+                const {conditionsIn, conditionsOut, deinflect, isInflected, type} = rules[j];
                 const conditionFlagsIn = this._getConditionFlagsStrict(conditionFlagsMap, conditionsIn);
                 if (conditionFlagsIn === null) { throw new Error(`Invalid conditionsIn for transform ${transformId}.rules[${j}]`); }
                 const conditionFlagsOut = this._getConditionFlagsStrict(conditionFlagsMap, conditionsOut);
                 if (conditionFlagsOut === null) { throw new Error(`Invalid conditionsOut for transform ${transformId}.rules[${j}]`); }
                 rules2.push({
-                    type,
-                    isInflected,
-                    deinflect,
                     conditionsIn: conditionFlagsIn,
                     conditionsOut: conditionFlagsOut,
+                    deinflect,
+                    isInflected,
+                    type,
                 });
             }
             const isInflectedTests = rules.map((rule) => rule.isInflected);
             const heuristic = new RegExp(isInflectedTests.map((regExp) => regExp.source).join('|'));
-            transforms2.push({id: transformId, name, description, rules: rules2, heuristic});
+            transforms2.push({description, heuristic, id: transformId, name, rules: rules2});
         }
 
         this._nextFlagIndex = nextFlagIndex;
@@ -120,7 +120,7 @@ export class LanguageTransformer {
     transform(sourceText) {
         const results = [LanguageTransformer.createTransformedText(sourceText, 0, [])];
         for (let i = 0; i < results.length; ++i) {
-            const {text, conditions, trace} = results[i];
+            const {conditions, text, trace} = results[i];
             for (const transform of this._transforms) {
                 if (!transform.heuristic.test(text)) { continue; }
 
@@ -128,7 +128,7 @@ export class LanguageTransformer {
                 for (let j = 0, jj = rules.length; j < jj; ++j) {
                     const rule = rules[j];
                     if (!LanguageTransformer.conditionsMatch(conditions, rule.conditionsIn)) { continue; }
-                    const {isInflected, deinflect} = rule;
+                    const {deinflect, isInflected} = rule;
                     if (!isInflected.test(text)) { continue; }
 
                     const isCycle = trace.some((frame) => frame.transform === id && frame.ruleIndex === j && frame.text === text);
@@ -140,7 +140,7 @@ export class LanguageTransformer {
                     results.push(LanguageTransformer.createTransformedText(
                         deinflect(text),
                         rule.conditionsOut,
-                        this._extendTrace(trace, {transform: id, ruleIndex: j, text}),
+                        this._extendTrace(trace, {ruleIndex: j, text, transform: id}),
                     ));
                 }
             }
@@ -156,8 +156,8 @@ export class LanguageTransformer {
         return inflectionRules.map((rule) => {
             const fullRule = this._transforms.find((transform) => transform.id === rule);
             if (typeof fullRule === 'undefined') { return {name: rule}; }
-            const {name, description} = fullRule;
-            return description ? {name, description} : {name};
+            const {description, name} = fullRule;
+            return description ? {description, name} : {name};
         });
     }
 
@@ -168,7 +168,7 @@ export class LanguageTransformer {
      * @returns {import('language-transformer-internal').TransformedText}
      */
     static createTransformedText(text, conditions, trace) {
-        return {text, conditions, trace};
+        return {conditions, text, trace};
     }
 
     /**
@@ -267,8 +267,8 @@ export class LanguageTransformer {
      */
     _extendTrace(trace, newFrame) {
         const newTrace = [newFrame];
-        for (const {transform, ruleIndex, text} of trace) {
-            newTrace.push({transform, ruleIndex, text});
+        for (const {ruleIndex, text, transform} of trace) {
+            newTrace.push({ruleIndex, text, transform});
         }
         return newTrace;
     }

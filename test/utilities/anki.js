@@ -48,20 +48,20 @@ export function createTestAnkiNoteData(dictionaryEntry, mode, styles = '') {
     }
     /** @type {import('anki-templates-internal').CreateDetails} */
     const data = {
-        dictionaryEntry,
-        resultOutputMode: mode,
-        mode: 'test',
-        glossaryLayoutMode: 'default',
         compactTags: false,
         context: {
-            url: 'url:',
-            sentence: {text: '', offset: 0},
             documentTitle: 'title',
-            query: 'query',
             fullQuery: 'fullQuery',
+            query: 'query',
+            sentence: {offset: 0, text: ''},
+            url: 'url:',
         },
-        media: {},
+        dictionaryEntry,
         dictionaryStylesMap,
+        glossaryLayoutMode: 'default',
+        media: {},
+        mode: 'test',
+        resultOutputMode: mode,
     };
     return createAnkiNoteData(marker, data);
 }
@@ -95,14 +95,14 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
         const api = new MinimalApi();
         const ankiNoteBuilder = new AnkiNoteBuilder(api, ankiTemplateRenderer.templateRenderer);
         const context = {
-            url: 'url:',
-            sentence: {
-                text: `${clozePrefix}${source}${clozeSuffix}`,
-                offset: clozePrefix.length,
-            },
             documentTitle: 'title',
-            query: 'query',
             fullQuery: 'fullQuery',
+            query: 'query',
+            sentence: {
+                offset: clozePrefix.length,
+                text: `${clozePrefix}${source}${clozeSuffix}`,
+            },
+            url: 'url:',
         };
         const dictionaryStylesMap = new Map();
         if (styles) {
@@ -110,24 +110,24 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
         }
         /** @type {import('anki-note-builder').CreateNoteDetails} */
         const details = {
-            dictionaryEntry,
-            mode: 'test',
+            compactTags: false,
             context,
-            template,
             deckName: 'deckName',
-            modelName: 'modelName',
-            fields: createTestFields(dictionaryEntry.type),
-            tags: ['yomitan'],
+            dictionaryEntry,
+            dictionaryStylesMap,
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
-            resultOutputMode: mode,
+            fields: createTestFields(dictionaryEntry.type),
             glossaryLayoutMode: 'default',
-            compactTags: false,
-            requirements: [],
             mediaOptions: null,
-            dictionaryStylesMap,
+            mode: 'test',
+            modelName: 'modelName',
+            requirements: [],
+            resultOutputMode: mode,
+            tags: ['yomitan'],
+            template,
         };
-        const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote(details);
+        const {errors, note: {fields: noteFields}} = await ankiNoteBuilder.createNote(details);
         for (const error of errors) {
             console.error(error);
         }

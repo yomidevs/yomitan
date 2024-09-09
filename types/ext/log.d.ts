@@ -17,7 +17,7 @@
 
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
 
-export type LogLevel = 'log' | 'warn' | 'error';
+export type LogLevel = 'error' | 'log' | 'warn';
 
 export type LogContext = {
     url: string;
@@ -25,9 +25,9 @@ export type LogContext = {
 
 export type Events = {
     logGenericError: {
+        context: LogContext;
         error: unknown;
         level: LogLevel;
-        context: LogContext;
     };
 };
 

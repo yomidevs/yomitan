@@ -16,39 +16,39 @@
  */
 
 export type Transform = {
+    description?: string;
+    heuristic: RegExp;
     id: string;
     name: string;
     rules: Rule[];
-    heuristic: RegExp;
-    description?: string;
 };
 
 export type Rule = {
-    type: 'suffix' | 'prefix' | 'wholeWord' | 'other';
-    isInflected: RegExp;
-    deinflect: (inflectedWord: string) => string;
     conditionsIn: number;
     conditionsOut: number;
+    deinflect: (inflectedWord: string) => string;
+    isInflected: RegExp;
+    type: 'other' | 'prefix' | 'suffix' | 'wholeWord';
 };
 
 export type TransformedText = {
-    text: string;
     conditions: number;
+    text: string;
     trace: Trace;
 };
 
 export type Trace = TraceFrame[];
 
 export type TraceFrame = {
+    ruleIndex: number;
     text: string;
     transform: string;
-    ruleIndex: number;
 };
 
 export type ConditionTypeToConditionFlagsMap = Map<string, number>;
 
 export type LanguageTransformDescriptorInternal = {
-    transforms: Transform[];
     conditionTypeToConditionFlagsMap: ConditionTypeToConditionFlagsMap;
     partOfSpeechToConditionFlagsMap: ConditionTypeToConditionFlagsMap;
+    transforms: Transform[];
 };

@@ -28,7 +28,7 @@ type ApiSurface = {
  */
 type ApiDescriptor = {
     /** The parameters for the function. If there are no parameters, `void` should be used. */
-    params: void | {[name: string]: unknown};
+    params: {[name: string]: unknown} | void;
     /** The return type for the function. */
     return: unknown;
 };

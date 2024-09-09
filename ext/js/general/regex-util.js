@@ -80,8 +80,8 @@ export function applyMatchReplacement(replacement, match) {
             switch (g0) {
                 case '$': return '$';
                 case '&': return match[0];
-                case '`': return replacement.substring(0, index);
                 case '\'': return replacement.substring(index + g0.length);
+                case '`': return replacement.substring(0, index);
             }
         }
         return g0;

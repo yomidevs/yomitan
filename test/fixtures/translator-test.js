@@ -61,7 +61,7 @@ export async function createTranslatorContext(dictionaryDirectory, dictionaryNam
     const translator = new Translator(dictionaryDatabase);
     translator.prepare();
 
-    return {translator, styles};
+    return {styles, translator};
 }
 
 /**
@@ -72,15 +72,15 @@ export async function createTranslatorContext(dictionaryDirectory, dictionaryNam
  */
 export async function createTranslatorTest(htmlFilePath, dictionaryDirectory, dictionaryName) {
     const test = createDomTest(htmlFilePath);
-    const {translator, styles} = await createTranslatorContext(dictionaryDirectory, dictionaryName);
+    const {styles, translator} = await createTranslatorContext(dictionaryDirectory, dictionaryName);
     /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator, styles: string}>} */
     // eslint-disable-next-line sonarjs/prefer-immediate-return
     const result = test.extend({
-        window: async ({window}, use) => { await use(window); },
-        // eslint-disable-next-line no-empty-pattern
-        translator: async ({}, use) => { await use(translator); },
         // eslint-disable-next-line no-empty-pattern
         styles: async ({}, use) => { await use(styles); },
+        // eslint-disable-next-line no-empty-pattern
+        translator: async ({}, use) => { await use(translator); },
+        window: async ({window}, use) => { await use(window); },
     });
     return result;
 }

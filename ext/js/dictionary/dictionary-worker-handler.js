@@ -40,9 +40,6 @@ export class DictionaryWorkerHandler {
     _onMessage(event) {
         const {action, params} = event.data;
         switch (action) {
-            case 'importDictionary':
-                void this._onMessageWithProgress(params, this._importDictionary.bind(this));
-                break;
             case 'deleteDictionary':
                 void this._onMessageWithProgress(params, this._deleteDictionary.bind(this));
                 break;
@@ -51,6 +48,9 @@ export class DictionaryWorkerHandler {
                 break;
             case 'getImageDetails.response':
                 this._mediaLoader.handleMessage(params);
+                break;
+            case 'importDictionary':
+                void this._onMessageWithProgress(params, this._importDictionary.bind(this));
                 break;
         }
     }
@@ -85,14 +85,14 @@ export class DictionaryWorkerHandler {
      * @param {import('dictionary-worker-handler').OnProgressCallback} onProgress
      * @returns {Promise<import('dictionary-worker').MessageCompleteResultSerialized>}
      */
-    async _importDictionary({details, archiveContent}, onProgress) {
+    async _importDictionary({archiveContent, details}, onProgress) {
         const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
         try {
             const dictionaryImporter = new DictionaryImporter(this._mediaLoader, onProgress);
-            const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
+            const {errors, result} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, details);
             return {
-                result,
                 errors: errors.map((error) => ExtensionError.serialize(error)),
+                result,
             };
         } finally {
             void dictionaryDatabase.close();

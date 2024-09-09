@@ -43,7 +43,7 @@ export class AnkiTemplateRendererContentManager {
      * @param {import('anki-template-renderer-content-manager').OnUnloadCallback} onUnload The callback that is executed when the media should be unloaded.
      */
     loadMedia(path, dictionary, onLoad, onUnload) {
-        const imageUrl = this._mediaProvider.getMedia(this._data, ['dictionaryMedia', path], {dictionary, format: 'fileName', default: null});
+        const imageUrl = this._mediaProvider.getMedia(this._data, ['dictionaryMedia', path], {default: null, dictionary, format: 'fileName'});
         if (imageUrl === null) { return; }
         onLoad(imageUrl);
         if (typeof onUnload === 'function') {

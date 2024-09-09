@@ -33,14 +33,14 @@ export class TextScanner extends EventDispatcher {
      */
     constructor({
         api,
-        node,
         getSearchContext,
         ignoreElements = null,
         ignorePoint = null,
-        searchTerms = false,
+        node,
         searchKanji = false,
         searchOnClick = false,
         searchOnClickOnly = false,
+        searchTerms = false,
         textSourceGenerator,
     }) {
         super();
@@ -245,21 +245,21 @@ export class TextScanner extends EventDispatcher {
      * @param {import('text-scanner').Options} options
      */
     setOptions({
-        inputs,
         deepContentScan,
-        normalizeCssZoom,
-        selectText,
         delay,
-        touchInputEnabled,
-        pointerEventsEnabled,
-        scanLength,
+        inputs,
         layoutAwareScan,
-        preventMiddleMouse,
-        sentenceParsingOptions,
         matchTypePrefix,
+        normalizeCssZoom,
+        pointerEventsEnabled,
+        preventMiddleMouse,
         scanAltText,
-        scanWithoutMousemove,
+        scanLength,
         scanResolution,
+        scanWithoutMousemove,
+        selectText,
+        sentenceParsingOptions,
+        touchInputEnabled,
     }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map((input) => this._convertInput(input));
@@ -321,7 +321,7 @@ export class TextScanner extends EventDispatcher {
                     Array.isArray(terminationCharacters) &&
                     (terminationCharacterMode === 'custom' || terminationCharacterMode === 'custom-no-newlines')
                 ) {
-                    for (const {enabled, character1, character2, includeCharacterAtStart, includeCharacterAtEnd} of terminationCharacters) {
+                    for (const {character1, character2, enabled, includeCharacterAtEnd, includeCharacterAtStart} of terminationCharacters) {
                         if (!enabled) { continue; }
                         if (character2 === null) {
                             sentenceTerminatorMap.set(character1, [includeCharacterAtStart, includeCharacterAtEnd]);
@@ -442,7 +442,7 @@ export class TextScanner extends EventDispatcher {
      */
     _createOptionsContextForInput(baseOptionsContext, inputInfo) {
         const optionsContext = clone(baseOptionsContext);
-        const {modifiers, modifierKeys} = inputInfo;
+        const {modifierKeys, modifiers} = inputInfo;
         optionsContext.modifiers = [...modifiers];
         optionsContext.modifierKeys = [...modifierKeys];
         return optionsContext;
@@ -495,7 +495,7 @@ export class TextScanner extends EventDispatcher {
             } else if (showEmpty || (textSource !== null && isAltText && await this._isTextLookupWorthy(textSource.fullContent))) {
                 // Shows a "No results found" message
                 dictionaryEntries = [];
-                sentence = {text: '', offset: 0};
+                sentence = {offset: 0, text: ''};
             }
 
             if (dictionaryEntries !== null && sentence !== null) {
@@ -508,14 +508,14 @@ export class TextScanner extends EventDispatcher {
                 const pageTheme = this._themeController.computeSiteTheme();
 
                 this.trigger('searchSuccess', {
-                    type,
-                    dictionaryEntries,
-                    sentence,
-                    inputInfo,
-                    textSource,
-                    optionsContext,
                     detail,
+                    dictionaryEntries,
+                    inputInfo,
+                    optionsContext,
                     pageTheme,
+                    sentence,
+                    textSource,
+                    type,
                 });
             } else {
                 this._triggerSearchEmpty(inputInfo);
@@ -523,8 +523,8 @@ export class TextScanner extends EventDispatcher {
         } catch (error) {
             this.trigger('searchError', {
                 error: error instanceof Error ? error : new Error(`A search error occurred: ${error}`),
-                textSource,
                 inputInfo,
+                textSource,
             });
         }
     }
@@ -603,17 +603,17 @@ export class TextScanner extends EventDispatcher {
         if (this._lastMouseMove !== null && (modifiers.length > 0)) {
             if (this._inputtingText()) { return; }
             const syntheticMouseEvent = new MouseEvent(this._lastMouseMove.type, {
-                screenX: this._lastMouseMove.screenX,
-                screenY: this._lastMouseMove.screenY,
+                altKey: modifiers.includes('alt'),
+                button: this._lastMouseMove.button,
+                buttons: this._lastMouseMove.buttons,
                 clientX: this._lastMouseMove.clientX,
                 clientY: this._lastMouseMove.clientY,
                 ctrlKey: modifiers.includes('ctrl'),
-                shiftKey: modifiers.includes('shift'),
-                altKey: modifiers.includes('alt'),
                 metaKey: modifiers.includes('meta'),
-                button: this._lastMouseMove.button,
-                buttons: this._lastMouseMove.buttons,
                 relatedTarget: this._lastMouseMove.relatedTarget,
+                screenX: this._lastMouseMove.screenX,
+                screenY: this._lastMouseMove.screenY,
+                shiftKey: modifiers.includes('shift'),
             });
             this._onMouseMove(syntheticMouseEvent);
         }
@@ -842,7 +842,7 @@ export class TextScanner extends EventDispatcher {
      * @returns {boolean|void}
      */
     _onPointerOver(e) {
-        const {pointerType, pointerId, isPrimary} = e;
+        const {isPrimary, pointerId, pointerType} = e;
         if (pointerType === 'pen') {
             this._pointerIdTypeMap.set(pointerId, pointerType);
         }
@@ -850,8 +850,8 @@ export class TextScanner extends EventDispatcher {
         if (!isPrimary) { return; }
         switch (pointerType) {
             case 'mouse': return this._onMousePointerOver(e);
-            case 'touch': return this._onTouchPointerOver();
             case 'pen': return this._onPenPointerOver(e);
+            case 'touch': return this._onTouchPointerOver();
         }
     }
 
@@ -1161,7 +1161,7 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'pointerup', this._onPointerUp.bind(this), capture],
             [this._node, 'pointercancel', this._onPointerCancel.bind(this), capture],
             [this._node, 'pointerout', this._onPointerOut.bind(this), capture],
-            [this._node, 'touchmove', this._onTouchMovePreventScroll.bind(this), {passive: false, capture}],
+            [this._node, 'touchmove', this._onTouchMovePreventScroll.bind(this), {capture, passive: false}],
             [this._node, 'mousedown', this._onMouseDown.bind(this), capture],
             [this._node, 'click', this._onClick.bind(this), capture],
             [this._node, 'auxclick', this._onAuxClick.bind(this), capture],
@@ -1199,10 +1199,10 @@ export class TextScanner extends EventDispatcher {
     _getTouchEventListeners(capture) {
         return [
             [this._node, 'auxclick', this._onAuxClick.bind(this), capture],
-            [this._node, 'touchstart', this._onTouchStart.bind(this), {passive: true, capture}],
+            [this._node, 'touchstart', this._onTouchStart.bind(this), {capture, passive: true}],
             [this._node, 'touchend', this._onTouchEnd.bind(this), capture],
             [this._node, 'touchcancel', this._onTouchCancel.bind(this), capture],
-            [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false, capture}],
+            [this._node, 'touchmove', this._onTouchMove.bind(this), {capture, passive: false}],
             [this._node, 'contextmenu', this._onContextMenu.bind(this), capture],
         ];
     }
@@ -1230,7 +1230,7 @@ export class TextScanner extends EventDispatcher {
         if (documentElement !== null) {
             entries.push([documentElement, 'mousedown', this._onSearchClickMouseDown.bind(this), capture]);
             if (this._touchInputEnabled) {
-                entries.push([documentElement, 'touchstart', this._onSearchClickTouchStart.bind(this), {passive: true, capture}]);
+                entries.push([documentElement, 'touchstart', this._onSearchClickTouchStart.bind(this), {capture, passive: true}]);
             }
         }
         return entries;
@@ -1373,8 +1373,8 @@ export class TextScanner extends EventDispatcher {
 
             const textSource = this._textSourceGenerator.getRangeFromPoint(x, y, {
                 deepContentScan: this._deepContentScan,
-                normalizeCssZoom: this._normalizeCssZoom,
                 language: this._language,
+                normalizeCssZoom: this._normalizeCssZoom,
             });
             if (textSource !== null) {
                 try {
@@ -1516,7 +1516,7 @@ export class TextScanner extends EventDispatcher {
         const modifiersSet = new Set(modifiers);
         for (let i = 0, ii = this._inputs.length; i < ii; ++i) {
             const input = this._inputs[i];
-            const {include, exclude, types} = input;
+            const {exclude, include, types} = input;
             if (!types.has(pointerType)) { continue; }
             if (this._setHasAll(modifiersSet, include) && (exclude.length === 0 || !this._setHasAll(modifiersSet, exclude))) {
                 if (include.length > 0) {
@@ -1545,7 +1545,7 @@ export class TextScanner extends EventDispatcher {
      * @returns {import('text-scanner').InputInfo}
      */
     _createInputInfo(input, pointerType, eventType, passive, modifiers, modifierKeys, detail) {
-        return {input, pointerType, eventType, passive, modifiers, modifierKeys, detail};
+        return {detail, eventType, input, modifierKeys, modifiers, passive, pointerType};
     }
 
     /**
@@ -1569,22 +1569,22 @@ export class TextScanner extends EventDispatcher {
     _convertInput(input) {
         const {options} = input;
         return {
-            include: this._getInputArray(input.include),
             exclude: this._getInputArray(input.exclude),
-            types: this._getInputTypeSet(input.types),
-            searchTerms: this._getInputBoolean(options.searchTerms),
-            searchKanji: this._getInputBoolean(options.searchKanji),
+            include: this._getInputArray(input.include),
+            preventPenScrolling: this._getInputBoolean(options.preventPenScrolling),
+            preventTouchScrolling: this._getInputBoolean(options.preventTouchScrolling),
+            scanOnPenHover: this._getInputBoolean(options.scanOnPenHover),
+            scanOnPenMove: this._getInputBoolean(options.scanOnPenMove),
+            scanOnPenPress: this._getInputBoolean(options.scanOnPenPress),
+            scanOnPenRelease: this._getInputBoolean(options.scanOnPenRelease),
+            scanOnPenReleaseHover: this._getInputBoolean(options.scanOnPenReleaseHover),
             scanOnTouchMove: this._getInputBoolean(options.scanOnTouchMove),
             scanOnTouchPress: this._getInputBoolean(options.scanOnTouchPress),
             scanOnTouchRelease: this._getInputBoolean(options.scanOnTouchRelease),
             scanOnTouchTap: this._getInputBoolean(options.scanOnTouchTap),
-            scanOnPenMove: this._getInputBoolean(options.scanOnPenMove),
-            scanOnPenHover: this._getInputBoolean(options.scanOnPenHover),
-            scanOnPenReleaseHover: this._getInputBoolean(options.scanOnPenReleaseHover),
-            scanOnPenPress: this._getInputBoolean(options.scanOnPenPress),
-            scanOnPenRelease: this._getInputBoolean(options.scanOnPenRelease),
-            preventTouchScrolling: this._getInputBoolean(options.preventTouchScrolling),
-            preventPenScrolling: this._getInputBoolean(options.preventPenScrolling),
+            searchKanji: this._getInputBoolean(options.searchKanji),
+            searchTerms: this._getInputBoolean(options.searchTerms),
+            types: this._getInputTypeSet(input.types),
         };
     }
 
@@ -1604,7 +1604,7 @@ export class TextScanner extends EventDispatcher {
      * @param {{mouse: boolean, touch: boolean, pen: boolean}} details
      * @returns {Set<'mouse'|'touch'|'pen'>}
      */
-    _getInputTypeSet({mouse, touch, pen}) {
+    _getInputTypeSet({mouse, pen, touch}) {
         const set = new Set();
         if (mouse) { set.add('mouse'); }
         if (touch) { set.add('touch'); }
