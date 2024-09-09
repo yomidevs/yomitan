@@ -681,7 +681,29 @@
             ],
             "extends": [
                 "plugin:perfectionist/recommended-natural-legacy"
-            ]
+            ],
+            "rules": {
+                "perfectionist/sort-array-includes": ["error"],
+                "perfectionist/sort-astro-attributes": ["off"],
+                "perfectionist/sort-classes": ["off"],
+                "perfectionist/sort-enums": ["error"],
+                "perfectionist/sort-exports": ["error"],
+                "perfectionist/sort-imports": ["off"],
+                "perfectionist/sort-interfaces": ["error"],
+                "perfectionist/sort-intersection-types": ["error"],
+                "perfectionist/sort-jsx-props": ["off"],
+                "perfectionist/sort-maps": ["error"],
+                "perfectionist/sort-named-exports": ["error"],
+                "perfectionist/sort-named-imports": ["off"],
+                "perfectionist/sort-object-types": ["error"],
+                "perfectionist/sort-objects": ["error"],
+                "perfectionist/sort-sets": ["error"],
+                "perfectionist/sort-svelte-attributes": ["off"],
+                "perfectionist/sort-switch-case": ["error"],
+                "perfectionist/sort-union-types": ["error"],
+                "perfectionist/sort-variable-declarations": ["off"],
+                "perfectionist/sort-vue-attributes": ["off"]
+            }
         }
     ]
 }
