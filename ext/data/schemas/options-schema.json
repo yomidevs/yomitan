@@ -743,7 +743,7 @@
                                     },
                                     "layoutAwareScan": {
                                         "type": "boolean",
-                                        "default": false
+                                        "default": true
                                     },
                                     "matchTypePrefix": {
                                         "type": "boolean",
