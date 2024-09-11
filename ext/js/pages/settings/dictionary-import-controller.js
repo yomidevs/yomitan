@@ -125,7 +125,7 @@ export class DictionaryImportController {
 
                 const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), 1);
                 const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
-                void this._importDictionaries(
+                void await this._importDictionaries(
                     this._generateFilesFromUrls([url], onProgress),
                     importProgressTracker,
                 );
