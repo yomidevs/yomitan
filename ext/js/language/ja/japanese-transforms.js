@@ -1142,7 +1142,7 @@ export const japaneseTransforms = {
             '2. Indicates the completion of an action.\n' +
             '3. Indicates the confirmation of a matter.\n' +
             '4. Indicates the speaker\'s confidence that the action will definitely be fulfilled.\n' +
-            '5. Indicates the events that occur before the main clause are represented as relative -ta.\n' +
+            '5. Indicates the events that occur before the main clause are represented as relative past.\n' +
             '6. Indicates a mild imperative/command.\n' +
             'Usage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives.',
             i18n: [
