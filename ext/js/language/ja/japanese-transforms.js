@@ -177,7 +177,7 @@ const conditions = {
         name: 'Intermediate -ba endings for conditional contraction',
         isDictionaryForm: false,
     },
-    'adv': {
+    '-ku': {
         name: 'Intermediate -ku endings for adverbs',
         isDictionaryForm: false,
     },
@@ -889,7 +889,7 @@ export const japaneseTransforms = {
                 },
             ],
             rules: [
-                suffixInflection('く', 'い', ['adv'], ['adj-i']),
+                suffixInflection('く', 'い', ['-ku'], ['adj-i']),
             ],
         },
         'causative': {
@@ -1710,17 +1710,17 @@ export const japaneseTransforms = {
                 },
             ],
             rules: [
-                suffixInflection('う', 'く', [], ['adv']),
-                suffixInflection('こう', 'かく', [], ['adv']),
-                suffixInflection('ごう', 'がく', [], ['adv']),
-                suffixInflection('そう', 'さく', [], ['adv']),
-                suffixInflection('とう', 'たく', [], ['adv']),
-                suffixInflection('のう', 'なく', [], ['adv']),
-                suffixInflection('ぼう', 'ばく', [], ['adv']),
-                suffixInflection('もう', 'まく', [], ['adv']),
-                suffixInflection('ろう', 'らく', [], ['adv']),
-                suffixInflection('よう', 'よく', [], ['adv']),
-                suffixInflection('しゅう', 'しく', [], ['adv']),
+                suffixInflection('う', 'く', [], ['-ku']),
+                suffixInflection('こう', 'かく', [], ['-ku']),
+                suffixInflection('ごう', 'がく', [], ['-ku']),
+                suffixInflection('そう', 'さく', [], ['-ku']),
+                suffixInflection('とう', 'たく', [], ['-ku']),
+                suffixInflection('のう', 'なく', [], ['-ku']),
+                suffixInflection('ぼう', 'ばく', [], ['-ku']),
+                suffixInflection('もう', 'まく', [], ['-ku']),
+                suffixInflection('ろう', 'らく', [], ['-ku']),
+                suffixInflection('よう', 'よく', [], ['-ku']),
+                suffixInflection('しゅう', 'しく', [], ['-ku']),
             ],
         },
         'kansai-ben adjective -te': {
