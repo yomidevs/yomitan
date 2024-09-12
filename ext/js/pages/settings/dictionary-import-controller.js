@@ -120,15 +120,16 @@ export class DictionaryImportController {
         while (this._recommendedDictionaryQueue.length > 0) {
             this._recommendedDictionaryActiveImport = true;
             try {
-                const url = this._recommendedDictionaryQueue.shift();
+                const url = this._recommendedDictionaryQueue[0];
                 if (!url) { continue; }
 
                 const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), 1);
                 const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
-                void this._importDictionaries(
+                await this._importDictionaries(
                     this._generateFilesFromUrls([url], onProgress),
                     importProgressTracker,
                 );
+                void this._recommendedDictionaryQueue.shift();
             } catch (error) {
                 log.error(error);
             }
@@ -219,7 +220,11 @@ export class DictionaryImportController {
                 const homepage = querySelectorNotNull(template, '.homepage');
                 /** @type {HTMLButtonElement} */
                 const button = querySelectorNotNull(template, '.action-button[data-action=import-recommended-dictionary]');
-                button.disabled = installedDictionaryNames.has(dictionary.name) || installedDictionaryDownloadUrls.has(dictionary.downloadUrl);
+                button.disabled = (
+                    installedDictionaryNames.has(dictionary.name) ||
+                    installedDictionaryDownloadUrls.has(dictionary.downloadUrl) ||
+                    this._recommendedDictionaryQueue.includes(dictionary.downloadUrl)
+                );
 
                 const urlAttribute = document.createAttribute('data-import-url');
                 urlAttribute.value = dictionary.downloadUrl;
