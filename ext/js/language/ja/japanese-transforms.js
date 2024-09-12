@@ -1556,7 +1556,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '俗語',
-                    description: '「ん」の音変化。例、「するな→すんな」',
+                    description: '「ん」に音変化。例、「するな→すんな」',
                 },
             ],
             description: 'Slang sound change of r-column syllables to n (when before an n-sound, usually の or な)',
