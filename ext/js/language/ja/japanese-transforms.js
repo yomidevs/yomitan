@@ -1148,7 +1148,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '過去形',
+                    name: '～た・かった形',
                 },
             ],
             rules: [
@@ -1615,14 +1615,14 @@ export const japaneseTransforms = {
                 suffixInflection('ゆうて', 'いって', ['-te'], ['-te']),
             ],
         },
-        'kansai-ben past': {
+        'kansai-ben -ta': {
             name: 'kansai-ben',
-            description: 'past form of kansai-ben terms',
+            description: '-ta form of kansai-ben terms',
             i18n: [
                 {
                     language: 'ja',
                     name: '関西弁',
-                    description: '過去形 (関西弁)',
+                    description: '～た・かった形 (関西弁)',
                 },
             ],
             rules: [
