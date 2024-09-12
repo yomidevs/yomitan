@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { japaneseTransforms } from '../../ext/js/language/ja/japanese-transforms.js';
-import { LanguageTransformer } from '../../ext/js/language/language-transformer.js';
-import { testLanguageTransformer } from '../fixtures/language-transformer-test.js';
+import {japaneseTransforms} from '../../ext/js/language/ja/japanese-transforms.js';
+import {LanguageTransformer} from '../../ext/js/language/language-transformer.js';
+import {testLanguageTransformer} from '../fixtures/language-transformer-test.js';
 
 /* eslint-disable @stylistic/no-multi-spaces */
 const tests = [
@@ -1491,7 +1491,7 @@ const tests = [
         ],
     },
     {
-        category: 'past form of kansai-ben terms',
+        category: '-ta form of kansai-ben terms',
         valid: true,
         tests: [
             {term: '買う', source: '買うた', rule: null, reasons: ['-ta', 'kansai-ben -ta']},
