@@ -1148,7 +1148,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '～た・かった過去形',
+                    name: '過去形',
                 },
             ],
             rules: [
