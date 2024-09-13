@@ -1548,7 +1548,6 @@ export const japaneseTransforms = {
             ],
             description: 'Slang sound change of r-column syllables to n (when before an n-sound, usually の or な)',
             rules: [
-                suffixInflection('んな', 'る', [], ['v']),
                 suffixInflection('んなさい', 'りなさい', [], ['-なさい']),
                 suffixInflection('らんない', 'られない', ['adj-i'], ['adj-i']),
                 suffixInflection('んない', 'らない', ['adj-i'], ['adj-i']),
