@@ -271,7 +271,7 @@ export const japaneseTransforms = {
             '2. Expresses the repetition (of a series of) actions.\n' +
             '3. Indicates a hypothetical situation in which the speaker gives a (negative) evaluation about the other party\'s intentions.\n' +
             '4. Used in "Must Not" patterns like ～てはいけない.\n' +
-            'Usage: Attach は after the te-form of verbs, contract ては into ちゃ.',
+            'Usage: Attach は after the て-form of verbs, contract ては into ちゃ.',
             i18n: [
                 {
                     language: 'ja',
@@ -302,7 +302,7 @@ export const japaneseTransforms = {
         '-ちゃう': {
             name: '-ちゃう',
             description: 'Contraction of -しまう.\n' + shimauEnglishDescription +
-            'Usage: Attach しまう after the te-form of verbs, contract てしまう into ちゃう.',
+            'Usage: Attach しまう after the て-form of verbs, contract てしまう into ちゃう.',
             i18n: [
                 {
                     language: 'ja',
@@ -333,7 +333,7 @@ export const japaneseTransforms = {
         '-ちまう': {
             name: '-ちまう',
             description: 'Contraction of -しまう.\n' + shimauEnglishDescription +
-            'Usage: Attach しまう after the te-form of verbs, contract てしまう into ちまう.',
+            'Usage: Attach しまう after the て-form of verbs, contract てしまう into ちまう.',
             i18n: [
                 {
                     language: 'ja',
@@ -364,7 +364,7 @@ export const japaneseTransforms = {
         '-しまう': {
             name: '-しまう',
             description: shimauEnglishDescription +
-            'Usage: Attach しまう after the te-form of verbs.',
+            'Usage: Attach しまう after the て-form of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -600,7 +600,7 @@ export const japaneseTransforms = {
         },
         '-て': {
             name: '-て',
-            description: 'te-form.\n' +
+            description: 'て-form.\n' +
             'It has a myriad of meanings. Primarily, it is a conjunctive particle that connects two clauses together.\n' +
             'Usage: Attach て to the continuative form (renyoukei) of verbs after euphonic change form, くて to the stem of i-adjectives.',
             i18n: [
@@ -1387,7 +1387,7 @@ export const japaneseTransforms = {
         '-ておく': {
             name: '-ておく',
             description: 'To do certain things in advance in preparation (or in anticipation) of latter needs.\n' +
-            'Usage: Attach おく to the te-form of verbs.\n' +
+            'Usage: Attach おく to the て-form of verbs.\n' +
             'Attach でおく after ない negative form of verbs.\n' +
             'Contracts to とく・どく in speech.',
             i18n: [
@@ -1410,9 +1410,9 @@ export const japaneseTransforms = {
             description: '1. Indicates an action continues or progresses to a point in time.\n' +
             '2. Indicates an action is completed and remains as is.\n' +
             '3. Indicates a state or condition that can be taken to be the result of undergoing some change.\n' +
-            'Usage: Attach いる to the te-form of verbs. い can be dropped in speech.\n' +
+            'Usage: Attach いる to the て-form of verbs. い can be dropped in speech.\n' +
             'Attach でいる after ない negative form of verbs.\n' +
-            '(Slang) Attach おる to the te-form of verbs. Contracts to とる・でる in speech.',
+            '(Slang) Attach おる to the て-form of verbs. Contracts to とる・でる in speech.',
             i18n: [
                 {
                     language: 'ja',
