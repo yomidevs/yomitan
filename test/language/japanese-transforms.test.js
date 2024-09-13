@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {japaneseTransforms} from '../../ext/js/language/ja/japanese-transforms.js';
-import {LanguageTransformer} from '../../ext/js/language/language-transformer.js';
-import {testLanguageTransformer} from '../fixtures/language-transformer-test.js';
+import { japaneseTransforms } from '../../ext/js/language/ja/japanese-transforms.js';
+import { LanguageTransformer } from '../../ext/js/language/language-transformer.js';
+import { testLanguageTransformer } from '../fixtures/language-transformer-test.js';
 
 /* eslint-disable @stylistic/no-multi-spaces */
 const tests = [
@@ -76,7 +76,7 @@ const tests = [
             {term: '食べる', source: '食べまして',        rule: 'v1', reasons: ['-ます', '-て']},
 
             {term: '食べる', source: '食べれば',         rule: 'v1', reasons: ['-ば']},
-            {term: '食べる', source: '食べりゃ',         rule: 'v1', reasons: ['-ば', '-や']},
+            {term: '食べる', source: '食べりゃ',         rule: 'v1', reasons: ['-ば', '-ゃ']},
             {term: '食べる', source: '食べちゃ',         rule: 'v1', reasons: ['-ちゃ']},
             {term: '食べる', source: '食べちゃう',       rule: 'v1', reasons: ['-ちゃう']},
             {term: '食べる', source: '食べちまう',       rule: 'v1', reasons: ['-ちまう']},
@@ -96,7 +96,7 @@ const tests = [
             {term: '食べる', source: '食べんとする',           rule: 'v1', reasons: ['-んとする']},
             {term: '食べる', source: '食べざる',           rule: 'v1', reasons: ['-ざる']},
             {term: '食べる', source: '食べねば',           rule: 'v1', reasons: ['-ねば']},
-            {term: '食べる', source: '食べにゃ',         rule: 'v1', reasons: ['-ねば', '-や']},
+            {term: '食べる', source: '食べにゃ',         rule: 'v1', reasons: ['-ねば', '-ゃ']},
             {term: '食べる', source: '食べ',             rule: 'v1d', reasons: ['continuative']},
             {term: '食べる', source: '食べましょう',     rule: 'v1', reasons: ['-ます', 'volitional']},
             {term: '食べる', source: '食べましょっか',         rule: 'v1', reasons: ['-ます', 'volitional slang']},
@@ -146,7 +146,7 @@ const tests = [
             {term: '買う', source: '買いまして',     rule: 'v5', reasons: ['-ます', '-て']},
 
             {term: '買う', source: '買えば',           rule: 'v5', reasons: ['-ば']},
-            {term: '買う', source: '買や',           rule: 'v5', reasons: ['-ば', '-や']},
+            {term: '買う', source: '買や',           rule: 'v5', reasons: ['-ば', '-ゃ']},
             {term: '買う', source: '買っちゃ',       rule: 'v5', reasons: ['-ちゃ']},
             {term: '買う', source: '買っちゃう',       rule: 'v5', reasons: ['-ちゃう']},
             {term: '買う', source: '買っちまう',       rule: 'v5', reasons: ['-ちまう']},
@@ -166,7 +166,7 @@ const tests = [
             {term: '買う', source: '買わんとする',           rule: 'v5', reasons: ['-んとする']},
             {term: '買う', source: '買わざる',           rule: 'v5', reasons: ['-ざる']},
             {term: '買う', source: '買わねば',           rule: 'v5', reasons: ['-ねば']},
-            {term: '買う', source: '買わにゃ',         rule: 'v5', reasons: ['-ねば', '-や']},
+            {term: '買う', source: '買わにゃ',         rule: 'v5', reasons: ['-ねば', '-ゃ']},
             {term: '買う', source: '買い',             rule: 'v5', reasons: ['continuative']},
             {term: '買う', source: '買いましょう',     rule: 'v5', reasons: ['-ます', 'volitional']},
             {term: '買う', source: '買いましょっか',     rule: 'v5', reasons: ['-ます', 'volitional slang']},
@@ -222,7 +222,7 @@ const tests = [
             {term: '行く', source: '行きまして',     rule: 'v5', reasons: ['-ます', '-て']},
 
             {term: '行く', source: '行けば',           rule: 'v5', reasons: ['-ば']},
-            {term: '行く', source: '行きゃ',           rule: 'v5', reasons: ['-ば', '-や']},
+            {term: '行く', source: '行きゃ',           rule: 'v5', reasons: ['-ば', '-ゃ']},
             {term: '行く', source: '行っちゃ',       rule: 'v5', reasons: ['-ちゃ']},
             {term: '行く', source: '行っちゃう',       rule: 'v5', reasons: ['-ちゃう']},
             {term: '行く', source: '行っちまう',       rule: 'v5', reasons: ['-ちまう']},
@@ -242,7 +242,7 @@ const tests = [
             {term: '行く', source: '行かんとする',           rule: 'v5', reasons: ['-んとする']},
             {term: '行く', source: '行かざる',           rule: 'v5', reasons: ['-ざる']},
             {term: '行く', source: '行かねば',           rule: 'v5', reasons: ['-ねば']},
-            {term: '行く', source: '行かにゃ',         rule: 'v5', reasons: ['-ねば', '-や']},
+            {term: '行く', source: '行かにゃ',         rule: 'v5', reasons: ['-ねば', '-ゃ']},
             {term: '行く', source: '行き',             rule: 'v5', reasons: ['continuative']},
             {term: '行く', source: '行きましょう',     rule: 'v5', reasons: ['-ます', 'volitional']},
             {term: '行く', source: '行きましょっか',     rule: 'v5', reasons: ['-ます', 'volitional slang']},
@@ -298,7 +298,7 @@ const tests = [
             {term: '泳ぐ', source: '泳ぎまして',     rule: 'v5', reasons: ['-ます', '-て']},
 
             {term: '泳ぐ', source: '泳げば',           rule: 'v5', reasons: ['-ば']},
-            {term: '泳ぐ', source: '泳ぎゃ',           rule: 'v5', reasons: ['-ば', '-や']},
+            {term: '泳ぐ', source: '泳ぎゃ',           rule: 'v5', reasons: ['-ば', '-ゃ']},
             {term: '泳ぐ', source: '泳いじゃ',       rule: 'v5', reasons: ['-ちゃ']},
             {term: '泳ぐ', source: '泳いじゃう',       rule: 'v5', reasons: ['-ちゃう']},
             {term: '泳ぐ', source: '泳いじまう',       rule: 'v5', reasons: ['-ちまう']},
@@ -318,7 +318,7 @@ const tests = [
             {term: '泳ぐ', source: '泳がんとする',           rule: 'v5', reasons: ['-んとする']},
             {term: '泳ぐ', source: '泳がざる',           rule: 'v5', reasons: ['-ざる']},
             {term: '泳ぐ', source: '泳がねば',           rule: 'v5', reasons: ['-ねば']},
-            {term: '泳ぐ', source: '泳がにゃ',         rule: 'v5', reasons: ['-ねば', '-や']},
+            {term: '泳ぐ', source: '泳がにゃ',         rule: 'v5', reasons: ['-ねば', '-ゃ']},
             {term: '泳ぐ', source: '泳ぎ',             rule: 'v5', reasons: ['continuative']},
             {term: '泳ぐ', source: '泳ぎましょう',     rule: 'v5', reasons: ['-ます', 'volitional']},
             {term: '泳ぐ', source: '泳ぎましょっか',     rule: 'v5', reasons: ['-ます', 'volitional slang']},
@@ -374,7 +374,7 @@ const tests = [
             {term: '話す', source: '話しまして',     rule: 'v5', reasons: ['-ます', '-て']},
 
             {term: '話す', source: '話せば',           rule: 'v5', reasons: ['-ば']},
-            {term: '話す', source: '話しゃ',           rule: 'v5', reasons: ['-ば', '-や']},
+            {term: '話す', source: '話しゃ',           rule: 'v5', reasons: ['-ば', '-ゃ']},
             {term: '話す', source: '話しちゃ',       rule: 'v5', reasons: ['-ちゃ']},
             {term: '話す', source: '話しちゃう',       rule: 'v5', reasons: ['-ちゃう']},
             {term: '話す', source: '話しちまう',       rule: 'v5', reasons: ['-ちまう']},
@@ -394,7 +394,7 @@ const tests = [
             {term: '話す', source: '話さんとする',           rule: 'v5', reasons: ['-んとする']},
             {term: '話す', source: '話さざる',           rule: 'v5', reasons: ['-ざる']},
             {term: '話す', source: '話さねば',           rule: 'v5', reasons: ['-ねば']},
-            {term: '話す', source: '話さにゃ',         rule: 'v5', reasons: ['-ねば', '-や']},
+            {term: '話す', source: '話さにゃ',         rule: 'v5', reasons: ['-ねば', '-ゃ']},
             {term: '話す', source: '話し',             rule: 'v5', reasons: ['continuative']},
             {term: '話す', source: '話しましょう',     rule: 'v5', reasons: ['-ます', 'volitional']},
             {term: '話す', source: '話しましょっか',     rule: 'v5', reasons: ['-ます', 'volitional slang']},
@@ -453,7 +453,7 @@ const tests = [
             {term: '待つ', source: '待ちまして',     rule: 'v5', reasons: ['-ます', '-て']},
 
             {term: '待つ', source: '待てば',           rule: 'v5', reasons: ['-ば']},
-            {term: '待つ', source: '待ちゃ',           rule: 'v5', reasons: ['-ば', '-や']},
+            {term: '待つ', source: '待ちゃ',           rule: 'v5', reasons: ['-ば', '-ゃ']},
             {term: '待つ', source: '待っちゃ',       rule: 'v5', reasons: ['-ちゃ']},
             {term: '待つ', source: '待っちゃう',       rule: 'v5', reasons: ['-ちゃう']},
             {term: '待つ', source: '待っちまう',       rule: 'v5', reasons: ['-ちまう']},
@@ -473,7 +473,7 @@ const tests = [
             {term: '待つ', source: '待たんとする',           rule: 'v5', reasons: ['-んとする']},
             {term: '待つ', source: '待たざる',           rule: 'v5', reasons: ['-ざる']},
             {term: '待つ', source: '待たねば',           rule: 'v5', reasons: ['-ねば']},
-            {term: '待つ', source: '待たにゃ',         rule: 'v5', reasons: ['-ねば', '-や']},
+            {term: '待つ', source: '待たにゃ',         rule: 'v5', reasons: ['-ねば', '-ゃ']},
             {term: '待つ', source: '待ち',             rule: 'v5', reasons: ['continuative']},
             {term: '待つ', source: '待ちましょう',     rule: 'v5', reasons: ['-ます', 'volitional']},
             {term: '待つ', source: '待ちましょっか',     rule: 'v5', reasons: ['-ます', 'volitional slang']},
@@ -530,7 +530,7 @@ const tests = [
             {term: '死ぬ', source: '死にまして',     rule: 'v5', reasons: ['-ます', '-て']},
 
             {term: '死ぬ', source: '死ねば',           rule: 'v5', reasons: ['-ば']},
-            {term: '死ぬ', source: '死にゃ',           rule: 'v5', reasons: ['-ば', '-や']},
+            {term: '死ぬ', source: '死にゃ',           rule: 'v5', reasons: ['-ば', '-ゃ']},
             {term: '死ぬ', source: '死んじゃ',       rule: 'v5', reasons: ['-ちゃ']},
             {term: '死ぬ', source: '死んじゃう',       rule: 'v5', reasons: ['-ちゃう']},
             {term: '死ぬ', source: '死んじまう',       rule: 'v5', reasons: ['-ちまう']},
@@ -550,7 +550,7 @@ const tests = [
             {term: '死ぬ', source: '死なんとする',           rule: 'v5', reasons: ['-んとする']},
             {term: '死ぬ', source: '死なざる',           rule: 'v5', reasons: ['-ざる']},
             {term: '死ぬ', source: '死なねば',           rule: 'v5', reasons: ['-ねば']},
-            {term: '死ぬ', source: '死なにゃ',         rule: 'v5', reasons: ['-ねば', '-や']},
+            {term: '死ぬ', source: '死なにゃ',         rule: 'v5', reasons: ['-ねば', '-ゃ']},
             {term: '死ぬ', source: '死に',             rule: 'v5', reasons: ['continuative']},
             {term: '死ぬ', source: '死にましょう',     rule: 'v5', reasons: ['-ます', 'volitional']},
             {term: '死ぬ', source: '死にましょっか',     rule: 'v5', reasons: ['-ます', 'volitional slang']},
@@ -605,7 +605,7 @@ const tests = [
             {term: '遊ぶ', source: '遊びまして',     rule: 'v5', reasons: ['-ます', '-て']},
 
             {term: '遊ぶ', source: '遊べば',           rule: 'v5', reasons: ['-ば']},
-            {term: '遊ぶ', source: '遊びゃ',           rule: 'v5', reasons: ['-ば', '-や']},
+            {term: '遊ぶ', source: '遊びゃ',           rule: 'v5', reasons: ['-ば', '-ゃ']},
             {term: '遊ぶ', source: '遊んじゃ',       rule: 'v5', reasons: ['-ちゃ']},
             {term: '遊ぶ', source: '遊んじゃう',       rule: 'v5', reasons: ['-ちゃう']},
             {term: '遊ぶ', source: '遊んじまう',       rule: 'v5', reasons: ['-ちまう']},
@@ -625,7 +625,7 @@ const tests = [
             {term: '遊ぶ', source: '遊ばんとする',           rule: 'v5', reasons: ['-んとする']},
             {term: '遊ぶ', source: '遊ばざる',           rule: 'v5', reasons: ['-ざる']},
             {term: '遊ぶ', source: '遊ばねば',           rule: 'v5', reasons: ['-ねば']},
-            {term: '遊ぶ', source: '遊ばにゃ',         rule: 'v5', reasons: ['-ねば', '-や']},
+            {term: '遊ぶ', source: '遊ばにゃ',         rule: 'v5', reasons: ['-ねば', '-ゃ']},
             {term: '遊ぶ', source: '遊び',             rule: 'v5', reasons: ['continuative']},
             {term: '遊ぶ', source: '遊びましょう',     rule: 'v5', reasons: ['-ます', 'volitional']},
             {term: '遊ぶ', source: '遊びましょっか',     rule: 'v5', reasons: ['-ます', 'volitional slang']},
@@ -680,7 +680,7 @@ const tests = [
             {term: '飲む', source: '飲みまして',     rule: 'v5', reasons: ['-ます', '-て']},
 
             {term: '飲む', source: '飲めば',           rule: 'v5', reasons: ['-ば']},
-            {term: '飲む', source: '飲みゃ',           rule: 'v5', reasons: ['-ば', '-や']},
+            {term: '飲む', source: '飲みゃ',           rule: 'v5', reasons: ['-ば', '-ゃ']},
             {term: '飲む', source: '飲んじゃ',       rule: 'v5', reasons: ['-ちゃ']},
             {term: '飲む', source: '飲んじゃう',       rule: 'v5', reasons: ['-ちゃう']},
             {term: '飲む', source: '飲んじまう',       rule: 'v5', reasons: ['-ちまう']},
@@ -700,7 +700,7 @@ const tests = [
             {term: '飲む', source: '飲まんとする',           rule: 'v5', reasons: ['-んとする']},
             {term: '飲む', source: '飲まざる',           rule: 'v5', reasons: ['-ざる']},
             {term: '飲む', source: '飲まねば',           rule: 'v5', reasons: ['-ねば']},
-            {term: '飲む', source: '飲まにゃ',         rule: 'v5', reasons: ['-ねば', '-や']},
+            {term: '飲む', source: '飲まにゃ',         rule: 'v5', reasons: ['-ねば', '-ゃ']},
             {term: '飲む', source: '飲み',             rule: 'v5', reasons: ['continuative']},
             {term: '飲む', source: '飲みましょう',     rule: 'v5', reasons: ['-ます', 'volitional']},
             {term: '飲む', source: '飲みましょっか',     rule: 'v5', reasons: ['-ます', 'volitional slang']},
@@ -756,7 +756,7 @@ const tests = [
             {term: '作る', source: '作りまして',     rule: 'v5', reasons: ['-ます', '-て']},
 
             {term: '作る', source: '作れば',           rule: 'v5', reasons: ['-ば']},
-            {term: '作る', source: '作りゃ',           rule: 'v5', reasons: ['-ば', '-や']},
+            {term: '作る', source: '作りゃ',           rule: 'v5', reasons: ['-ば', '-ゃ']},
             {term: '作る', source: '作っちゃ',       rule: 'v5', reasons: ['-ちゃ']},
             {term: '作る', source: '作っちゃう',       rule: 'v5', reasons: ['-ちゃう']},
             {term: '作る', source: '作っちまう',       rule: 'v5', reasons: ['-ちまう']},
@@ -774,7 +774,7 @@ const tests = [
             {term: '作る', source: '作らんかった',           rule: 'v5', reasons: ['-ん', '-た']},
             {term: '作る', source: '作らざる',           rule: 'v5', reasons: ['-ざる']},
             {term: '作る', source: '作らねば',           rule: 'v5', reasons: ['-ねば']},
-            {term: '作る', source: '作らにゃ',         rule: 'v5', reasons: ['-ねば', '-や']},
+            {term: '作る', source: '作らにゃ',         rule: 'v5', reasons: ['-ねば', '-ゃ']},
             {term: '作る', source: '作り',             rule: 'v5', reasons: ['continuative']},
             {term: '作る', source: '作りましょう',     rule: 'v5', reasons: ['-ます', 'volitional']},
             {term: '作る', source: '作りましょっか',     rule: 'v5', reasons: ['-ます', 'volitional slang']},
@@ -834,7 +834,7 @@ const tests = [
             {term: '為る', source: '為まして',     rule: 'vs', reasons: ['-ます', '-て']},
 
             {term: '為る', source: '為れば',         rule: 'vs', reasons: ['-ば']},
-            {term: '為る', source: '為りゃ',         rule: 'vs', reasons: ['-ば', '-や']},
+            {term: '為る', source: '為りゃ',         rule: 'vs', reasons: ['-ば', '-ゃ']},
             {term: '為る', source: '為ちゃ',       rule: 'vs', reasons: ['-ちゃ']},
             {term: '為る', source: '為ちゃう',       rule: 'vs', reasons: ['-ちゃう']},
             {term: '為る', source: '為ちまう',       rule: 'vs', reasons: ['-ちまう']},
@@ -854,7 +854,7 @@ const tests = [
             {term: '為る', source: '為んとする',           rule: 'vs', reasons: ['-んとする']},
             {term: '為る', source: '為ざる',           rule: 'vs', reasons: ['-ざる']},
             {term: '為る', source: '為ねば',           rule: 'vs', reasons: ['-ねば']},
-            {term: '為る', source: '為にゃ',         rule: 'vs', reasons: ['-ねば', '-や']},
+            {term: '為る', source: '為にゃ',         rule: 'vs', reasons: ['-ねば', '-ゃ']},
 
             {term: '為る', source: '為ましょう',     rule: 'vs', reasons: ['-ます', 'volitional']},
             {term: '為る', source: '為ましょっか',     rule: 'vs', reasons: ['-ます', 'volitional slang']},
@@ -910,7 +910,7 @@ const tests = [
             {term: 'する', source: 'しまして',     rule: 'vs', reasons: ['-ます', '-て']},
 
             {term: 'する', source: 'すれば',         rule: 'vs', reasons: ['-ば']},
-            {term: 'する', source: 'すりゃ',         rule: 'vs', reasons: ['-ば', '-や']},
+            {term: 'する', source: 'すりゃ',         rule: 'vs', reasons: ['-ば', '-ゃ']},
             {term: 'する', source: 'しちゃ',       rule: 'vs', reasons: ['-ちゃ']},
             {term: 'する', source: 'しちゃう',       rule: 'vs', reasons: ['-ちゃう']},
             {term: 'する', source: 'しちまう',       rule: 'vs', reasons: ['-ちまう']},
@@ -930,7 +930,7 @@ const tests = [
             {term: 'する', source: 'せんとする',           rule: 'vs', reasons: ['-んとする']},
             {term: 'する', source: 'せざる',           rule: 'vs', reasons: ['-ざる']},
             {term: 'する', source: 'せねば',           rule: 'vs', reasons: ['-ねば']},
-            {term: 'する', source: 'せにゃ',         rule: 'vs', reasons: ['-ねば', '-や']},
+            {term: 'する', source: 'せにゃ',         rule: 'vs', reasons: ['-ねば', '-ゃ']},
             {term: 'する', source: 'し',             rule: 'vs', reasons: ['continuative']},
             {term: 'する', source: 'しましょう',     rule: 'vs', reasons: ['-ます', 'volitional']},
             {term: 'する', source: 'しましょっか',     rule: 'vs', reasons: ['-ます', 'volitional slang']},
@@ -938,7 +938,7 @@ const tests = [
             {term: 'する', source: 'しよっか',         rule: 'vs', reasons: ['volitional slang']},
             {term: 'する', source: 'するまい',       rule: 'vs', reasons: ['-まい']},
             {term: 'する', source: 'しまい',       rule: 'vs', reasons: ['-まい']},
-            {term: 'する', source: 'しなきゃ',        rule: 'vs', reasons: ['negative', '-ば', '-や']},
+            {term: 'する', source: 'しなきゃ',        rule: 'vs', reasons: ['negative', '-ば', '-ゃ']},
 
             {term: 'する', source: 'しておく',       rule: 'vs', reasons: ['-て', '-ておく']},
             {term: 'する', source: 'しとく',         rule: 'vs', reasons: ['-て', '-ておく']},
@@ -981,7 +981,7 @@ const tests = [
             {term: '来る', source: '来まして',     rule: 'vk', reasons: ['-ます', '-て']},
 
             {term: '来る', source: '来れば',         rule: 'vk', reasons: ['-ば']},
-            {term: '来る', source: '来りゃ',         rule: 'vk', reasons: ['-ば', '-や']},
+            {term: '来る', source: '来りゃ',         rule: 'vk', reasons: ['-ば', '-ゃ']},
             {term: '来る', source: '来ちゃ',       rule: 'vk', reasons: ['-ちゃ']},
             {term: '来る', source: '来ちゃう',       rule: 'vk', reasons: ['-ちゃう']},
             {term: '来る', source: '来ちまう',       rule: 'vk', reasons: ['-ちまう']},
@@ -1001,7 +1001,7 @@ const tests = [
             {term: '来る', source: '来んとする',           rule: 'vk', reasons: ['-んとする']},
             {term: '来る', source: '来ざる',           rule: 'vk', reasons: ['-ざる']},
             {term: '来る', source: '来ねば',           rule: 'vk', reasons: ['-ねば']},
-            {term: '来る', source: '来にゃ',         rule: 'vk', reasons: ['-ねば', '-や']},
+            {term: '来る', source: '来にゃ',         rule: 'vk', reasons: ['-ねば', '-ゃ']},
             {term: '来る', source: '来',             rule: 'vk', reasons: ['continuative']},
             {term: '来る', source: '来ましょう',     rule: 'vk', reasons: ['-ます', 'volitional']},
             {term: '来る', source: '来ましょっか',     rule: 'vk', reasons: ['-ます', 'volitional slang']},
@@ -1051,7 +1051,7 @@ const tests = [
             {term: '來る', source: '來まして',     rule: 'vk', reasons: ['-ます', '-て']},
 
             {term: '來る', source: '來れば',         rule: 'vk', reasons: ['-ば']},
-            {term: '來る', source: '來りゃ',         rule: 'vk', reasons: ['-ば', '-や']},
+            {term: '來る', source: '來りゃ',         rule: 'vk', reasons: ['-ば', '-ゃ']},
             {term: '來る', source: '來ちゃ',       rule: 'vk', reasons: ['-ちゃ']},
             {term: '來る', source: '來ちゃう',       rule: 'vk', reasons: ['-ちゃう']},
             {term: '來る', source: '來ちまう',       rule: 'vk', reasons: ['-ちまう']},
@@ -1071,7 +1071,7 @@ const tests = [
             {term: '來る', source: '來んとする',           rule: 'vk', reasons: ['-んとする']},
             {term: '來る', source: '來ざる',           rule: 'vk', reasons: ['-ざる']},
             {term: '來る', source: '來ねば',           rule: 'vk', reasons: ['-ねば']},
-            {term: '來る', source: '來にゃ',         rule: 'vk', reasons: ['-ねば', '-や']},
+            {term: '來る', source: '來にゃ',         rule: 'vk', reasons: ['-ねば', '-ゃ']},
             {term: '來る', source: '來',             rule: 'vk', reasons: ['continuative']},
             {term: '來る', source: '來ましょう',     rule: 'vk', reasons: ['-ます', 'volitional']},
             {term: '來る', source: '來ましょっか',     rule: 'vk', reasons: ['-ます', 'volitional slang']},
@@ -1122,7 +1122,7 @@ const tests = [
             {term: 'くる', source: 'きまして',     rule: 'vk', reasons: ['-ます', '-て']},
 
             {term: 'くる', source: 'くれば',         rule: 'vk', reasons: ['-ば']},
-            {term: 'くる', source: 'くりゃ',         rule: 'vk', reasons: ['-ば', '-や']},
+            {term: 'くる', source: 'くりゃ',         rule: 'vk', reasons: ['-ば', '-ゃ']},
             {term: 'くる', source: 'きちゃ',       rule: 'vk', reasons: ['-ちゃ']},
             {term: 'くる', source: 'きちゃう',       rule: 'vk', reasons: ['-ちゃう']},
             {term: 'くる', source: 'きちまう',       rule: 'vk', reasons: ['-ちまう']},
@@ -1142,7 +1142,7 @@ const tests = [
             {term: 'くる', source: 'こんとする',           rule: 'vk', reasons: ['-んとする']},
             {term: 'くる', source: 'こざる',           rule: 'vk', reasons: ['-ざる']},
             {term: 'くる', source: 'こねば',           rule: 'vk', reasons: ['-ねば']},
-            {term: 'くる', source: 'こにゃ',         rule: 'vk', reasons: ['-ねば', '-や']},
+            {term: 'くる', source: 'こにゃ',         rule: 'vk', reasons: ['-ねば', '-ゃ']},
             {term: 'くる', source: 'き',             rule: 'vk', reasons: ['continuative']},
             {term: 'くる', source: 'きましょう',     rule: 'vk', reasons: ['-ます', 'volitional']},
             {term: 'くる', source: 'きましょっか',     rule: 'vk', reasons: ['-ます', 'volitional slang']},
@@ -1207,7 +1207,7 @@ const tests = [
             {term: '論ずる', source: '論じまして',     rule: 'vz', reasons: ['-ます', '-て']},
 
             {term: '論ずる', source: '論ずれば',         rule: 'vz', reasons: ['-ば']},
-            {term: '論ずる', source: '論ずりゃ',         rule: 'vz', reasons: ['-ば', '-や']},
+            {term: '論ずる', source: '論ずりゃ',         rule: 'vz', reasons: ['-ば', '-ゃ']},
             {term: '論ずる', source: '論じちゃ',       rule: 'vz', reasons: ['-ちゃ']},
             {term: '論ずる', source: '論じちゃう',       rule: 'vz', reasons: ['-ちゃう']},
             {term: '論ずる', source: '論じちまう',       rule: 'vz', reasons: ['-ちまう']},
@@ -1227,7 +1227,7 @@ const tests = [
             {term: '論ずる', source: '論ぜんとする',           rule: 'vz', reasons: ['-んとする']},
             {term: '論ずる', source: '論ぜざる',           rule: 'vz', reasons: ['-ざる']},
             {term: '論ずる', source: '論ぜねば',           rule: 'vz', reasons: ['-ねば']},
-            {term: '論ずる', source: '論ぜにゃ',         rule: 'vz', reasons: ['-ねば', '-や']},
+            {term: '論ずる', source: '論ぜにゃ',         rule: 'vz', reasons: ['-ねば', '-ゃ']},
 
             {term: '論ずる', source: '論じましょう',     rule: 'vz', reasons: ['-ます', 'volitional']},
             {term: '論ずる', source: '論じよう',         rule: 'vz', reasons: ['volitional']},
@@ -1302,8 +1302,8 @@ const tests = [
             {term: 'する', source: 'すんな', rule: 'vs', reasons: ['imperative negative', 'n-slang']},
             {term: 'やる', source: 'やんなさい', rule: 'v5', reasons: ['-なさい', 'n-slang']},
             {term: '食べる', source: '食べらんない', rule: 'v1', reasons: ['potential or passive', 'negative', 'n-slang']},
-            {term: 'やる', source: 'やんなきゃ', rule: 'v5', reasons: ['negative', 'n-slang', '-ば', '-や']},
-            {term: 'くれる', source: 'くんなきゃ', rule: 'v1', reasons: ['negative', '-ば', '-や', 'n-slang']},
+            {term: 'やる', source: 'やんなきゃ', rule: 'v5', reasons: ['negative', 'n-slang', '-ば', '-ゃ']},
+            {term: 'くれる', source: 'くんなきゃ', rule: 'v1', reasons: ['negative', '-ば', '-ゃ', 'n-slang']},
         ],
     },
     {

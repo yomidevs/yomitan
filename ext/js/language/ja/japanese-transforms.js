@@ -203,7 +203,7 @@ const conditions = {
         name: 'Intermediate -なさい ending (polite imperative)',
         isDictionaryForm: false,
     },
-    '-や': {
+    '-ゃ': {
         name: 'Intermediate -や ending (conditional contraction)',
         isDictionaryForm: false,
     },
@@ -240,8 +240,8 @@ export const japaneseTransforms = {
                 suffixInflection('れば', '', ['-ば'], ['-ます']),
             ],
         },
-        '-や': {
-            name: '-や',
+        '-ゃ': {
+            name: '-ゃ',
             description: 'Contraction of -ば.',
             i18n: [
                 {
@@ -251,17 +251,17 @@ export const japaneseTransforms = {
                 },
             ],
             rules: [
-                suffixInflection('けりゃ', 'ければ', ['-や'], ['-ば']),
-                suffixInflection('きゃ', 'ければ', ['-や'], ['-ば']),
-                suffixInflection('や', 'えば', ['-や'], ['-ば']),
-                suffixInflection('きゃ', 'けば', ['-や'], ['-ば']),
-                suffixInflection('ぎゃ', 'げば', ['-や'], ['-ば']),
-                suffixInflection('しゃ', 'せば', ['-や'], ['-ば']),
-                suffixInflection('ちゃ', 'てば', ['-や'], ['-ば']),
-                suffixInflection('にゃ', 'ねば', ['-や'], ['-ば']),
-                suffixInflection('びゃ', 'べば', ['-や'], ['-ば']),
-                suffixInflection('みゃ', 'めば', ['-や'], ['-ば']),
-                suffixInflection('りゃ', 'れば', ['-や'], ['-ば']),
+                suffixInflection('けりゃ', 'ければ', ['-ゃ'], ['-ば']),
+                suffixInflection('きゃ', 'ければ', ['-ゃ'], ['-ば']),
+                suffixInflection('や', 'えば', ['-ゃ'], ['-ば']),
+                suffixInflection('きゃ', 'けば', ['-ゃ'], ['-ば']),
+                suffixInflection('ぎゃ', 'げば', ['-ゃ'], ['-ば']),
+                suffixInflection('しゃ', 'せば', ['-ゃ'], ['-ば']),
+                suffixInflection('ちゃ', 'てば', ['-ゃ'], ['-ば']),
+                suffixInflection('にゃ', 'ねば', ['-ゃ'], ['-ば']),
+                suffixInflection('びゃ', 'べば', ['-ゃ'], ['-ば']),
+                suffixInflection('みゃ', 'めば', ['-ゃ'], ['-ば']),
+                suffixInflection('りゃ', 'れば', ['-ゃ'], ['-ば']),
             ],
         },
         '-ちゃ': {
@@ -1571,8 +1571,8 @@ export const japaneseTransforms = {
                 suffixInflection('んなさい', 'りなさい', [], ['-なさい']),
                 suffixInflection('らんない', 'られない', ['adj-i'], ['adj-i']),
                 suffixInflection('んない', 'らない', ['adj-i'], ['adj-i']),
-                suffixInflection('んなきゃ', 'らなきゃ', [], ['-や']),
-                suffixInflection('んなきゃ', 'れなきゃ', [], ['-や']),
+                suffixInflection('んなきゃ', 'らなきゃ', [], ['-ゃ']),
+                suffixInflection('んなきゃ', 'れなきゃ', [], ['-ゃ']),
             ],
         },
         'kansai-ben negative': {
