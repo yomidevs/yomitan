@@ -1168,7 +1168,7 @@ const tests = [
         ],
     },
     {
-        category: '-zuru verbs',
+        category: '-ずる verbs',
         valid: true,
         tests: [
             {term: '論ずる', source: '論ずる',           rule: 'vz', reasons: []},
