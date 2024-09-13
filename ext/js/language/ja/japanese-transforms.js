@@ -195,10 +195,6 @@ const conditions = {
         name: '-ん negative ending',
         isDictionaryForm: false,
     },
-    '-な': {
-        name: 'Intermediate -な ending (imperative negative)',
-        isDictionaryForm: false,
-    },
     '-なさい': {
         name: 'Intermediate -なさい ending (polite imperative)',
         isDictionaryForm: false,
@@ -1002,19 +998,6 @@ export const japaneseTransforms = {
                 suffixInflection('來い', '來る', [], ['vk']),
             ],
         },
-        'imperative negative': {
-            name: 'imperative negative',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '否定命令形',
-                    description: '相手に何かをしないように命令する。例、「行くな」。',
-                },
-            ],
-            rules: [
-                suffixInflection('な', '', ['-な'], ['v']),
-            ],
-        },
         'continuative': {
             name: 'continuative',
             description: 'Used to indicate actions that are (being) carried out.\n' +
@@ -1561,17 +1544,28 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '俗語',
-                    description: 'ら行子音が「ん」に音変化。例、「するな→すんな」',
                 },
             ],
             description: 'Slang sound change of r-column syllables to n (when before an n-sound, usually の or な)',
             rules: [
-                suffixInflection('んな', 'るな', [], ['-な']),
+                suffixInflection('んな', 'る', [], ['v']),
                 suffixInflection('んなさい', 'りなさい', [], ['-なさい']),
                 suffixInflection('らんない', 'られない', ['adj-i'], ['adj-i']),
                 suffixInflection('んない', 'らない', ['adj-i'], ['adj-i']),
                 suffixInflection('んなきゃ', 'らなきゃ', [], ['-ゃ']),
                 suffixInflection('んなきゃ', 'れなきゃ', [], ['-ゃ']),
+            ],
+        },
+        'imperative negative slang': {
+            name: 'imperative negative slang',
+            i18n: [
+                {
+                    language: 'ja',
+                    name: '否定命令形の俗語',
+                },
+            ],
+            rules: [
+                suffixInflection('んな', 'る', [], ['v']),
             ],
         },
         'kansai-ben negative': {
