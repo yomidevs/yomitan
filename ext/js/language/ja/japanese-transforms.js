@@ -1148,7 +1148,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '～た・かった形',
+                    name: 'タ形',
                 },
             ],
             rules: [
@@ -1623,7 +1623,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '関西弁',
-                    description: '～た・かった形 (関西弁)',
+                    description: 'タ形 (関西弁)',
                 },
             ],
             rules: [
