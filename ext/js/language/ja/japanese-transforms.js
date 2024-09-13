@@ -1366,8 +1366,8 @@ export const japaneseTransforms = {
                 suffixInflection('わされる', 'う', ['v1'], ['v5']),
             ],
         },
-        '-ておく': {
-            name: '-ておく',
+        '-おく': {
+            name: '-おく',
             description: 'To do certain things in advance in preparation (or in anticipation) of latter needs.\n' +
             'Usage: Attach おく to the て-form of verbs.\n' +
             'Attach でおく after ない negative form of verbs.\n' +
@@ -1375,7 +1375,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '～ておく',
+                    name: '～おく',
                 },
             ],
             rules: [
@@ -1387,8 +1387,8 @@ export const japaneseTransforms = {
                 suffixInflection('ないどく', 'ない', ['v5'], ['adj-i']),
             ],
         },
-        '-ている': {
-            name: '-ている',
+        '-いる': {
+            name: '-いる',
             description: '1. Indicates an action continues or progresses to a point in time.\n' +
             '2. Indicates an action is completed and remains as is.\n' +
             '3. Indicates a state or condition that can be taken to be the result of undergoing some change.\n' +
@@ -1398,7 +1398,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '～ている',
+                    name: '～いる',
                 },
             ],
             rules: [
