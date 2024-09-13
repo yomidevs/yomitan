@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { prefixInflection, suffixInflection } from '../language-transforms.js';
+import {prefixInflection, suffixInflection} from '../language-transforms.js';
 
 /** @typedef {keyof typeof conditions} Condition */
 
@@ -200,7 +200,7 @@ export const oldIrishTransforms = {
                 prefixInflection('d-d', 'd', [], []),
                 prefixInflection('r-r', 'r', [], []),
                 prefixInflection('l-l', 'l', [], []),
-                prefixInflection('n-ん', 'n', [], []),
+                prefixInflection('n-n', 'n', [], []),
                 prefixInflection('m-m', 'm', [], []),
                 prefixInflection('s-s', 's', [], []),
             ],
