@@ -123,7 +123,7 @@ const conditions = {
             {
                 language: 'ja',
                 name: '五段動詞、使役形の短縮形',
-            }
+            },
         ],
         isDictionaryForm: false,
     },
