@@ -174,6 +174,7 @@ const tests = [
             {term: '買う', source: '買おっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '買う', source: '買うまい',       rule: 'v5', reasons: ['-mai']},
             {term: '買う', source: '買わされる',       rule: 'v5', reasons: ['causative-passive']},
+            {term: '買う', source: '買わされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '買う', source: '買っておく',       rule: 'v5', reasons: ['-te', '-teoku']},
             {term: '買う', source: '買っとく',         rule: 'v5', reasons: ['-te', '-teoku']},
@@ -249,6 +250,7 @@ const tests = [
             {term: '行く', source: '行こっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '行く', source: '行くまい',       rule: 'v5', reasons: ['-mai']},
             {term: '行く', source: '行かされる',       rule: 'v5', reasons: ['causative-passive']},
+            {term: '行く', source: '行かされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '行く', source: '行っておく',       rule: 'v5', reasons: ['-te', '-teoku']},
             {term: '行く', source: '行いとく',         rule: 'v5', reasons: ['-te', '-teoku']},
@@ -324,6 +326,7 @@ const tests = [
             {term: '泳ぐ', source: '泳ごっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '泳ぐ', source: '泳ぐまい',       rule: 'v5', reasons: ['-mai']},
             {term: '泳ぐ', source: '泳がされる',       rule: 'v5', reasons: ['causative-passive']},
+            {term: '泳ぐ', source: '泳がされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '泳ぐ', source: '泳いでおく',       rule: 'v5', reasons: ['-te', '-teoku']},
             {term: '泳ぐ', source: '泳いどく',         rule: 'v5', reasons: ['-te', '-teoku']},
@@ -478,6 +481,7 @@ const tests = [
             {term: '待つ', source: '待とっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '待つ', source: '待つまい',       rule: 'v5', reasons: ['-mai']},
             {term: '待つ', source: '待たされる',       rule: 'v5', reasons: ['causative-passive']},
+            {term: '待つ', source: '待たされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '待つ', source: '待っておく',       rule: 'v5', reasons: ['-te', '-teoku']},
             {term: '待つ', source: '待っとく',         rule: 'v5', reasons: ['-te', '-teoku']},
@@ -554,6 +558,7 @@ const tests = [
             {term: '死ぬ', source: '死のっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '死ぬ', source: '死ぬまい',       rule: 'v5', reasons: ['-mai']},
             {term: '死ぬ', source: '死なされる',       rule: 'v5', reasons: ['causative-passive']},
+            {term: '死ぬ', source: '死なされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '死ぬ', source: '死んでおく',       rule: 'v5', reasons: ['-te', '-teoku']},
             {term: '死ぬ', source: '死んどく',         rule: 'v5', reasons: ['-te', '-teoku']},
@@ -628,6 +633,7 @@ const tests = [
             {term: '遊ぶ', source: '遊ぼっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '遊ぶ', source: '遊ぶまい',       rule: 'v5', reasons: ['-mai']},
             {term: '遊ぶ', source: '遊ばされる',       rule: 'v5', reasons: ['causative-passive']},
+            {term: '遊ぶ', source: '遊ばされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '遊ぶ', source: '遊んでおく',       rule: 'v5', reasons: ['-te', '-teoku']},
             {term: '遊ぶ', source: '遊んどく',         rule: 'v5', reasons: ['-te', '-teoku']},
@@ -702,6 +708,7 @@ const tests = [
             {term: '飲む', source: '飲もっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '飲む', source: '飲むまい',       rule: 'v5', reasons: ['-mai']},
             {term: '飲む', source: '飲まされる',       rule: 'v5', reasons: ['causative-passive']},
+            {term: '飲む', source: '飲まされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '飲む', source: '飲んでおく',       rule: 'v5', reasons: ['-te', '-teoku']},
             {term: '飲む', source: '飲んどく',         rule: 'v5', reasons: ['-te', '-teoku']},
@@ -775,6 +782,7 @@ const tests = [
             {term: '作る', source: '作ろっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '作る', source: '作るまい',       rule: 'v5', reasons: ['-mai']},
             {term: '作る', source: '作らされる',       rule: 'v5', reasons: ['causative-passive']},
+            {term: '作る', source: '作らされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '作る', source: '作っておく',       rule: 'v5', reasons: ['-te', '-teoku']},
             {term: '作る', source: '作っとく',         rule: 'v5', reasons: ['-te', '-teoku']},
