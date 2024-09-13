@@ -218,7 +218,7 @@ export const japaneseTransforms = {
             name: '-ば',
             description: '1. Conditional form; shows that the previous stated condition\'s establishment is the condition for the latter stated condition to occur.\n' +
             '2. Shows a trigger for a latter stated perception or judgment.\n' +
-            'Usage: Attach ば to the hypothetical/realis form (kateikei/izenkei) of verbs and i-adjectives.',
+            'Usage: Attach ば to the hypothetical/realis form (仮定形・已然形) of verbs and i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -380,7 +380,7 @@ export const japaneseTransforms = {
         '-なさい': {
             name: '-なさい',
             description: 'Polite imperative suffix.\n' +
-            'Usage: Attach なさい after the continuative form (renyoukei) of verbs.',
+            'Usage: Attach なさい after the continuative form (連用形) of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -410,7 +410,7 @@ export const japaneseTransforms = {
         '-そう': {
             name: '-そう',
             description: 'Appearing that; looking like.\n' +
-            'Usage: Attach そう to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
+            'Usage: Attach そう to the continuative form (連用形) of verbs, or to the stem of adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -441,7 +441,7 @@ export const japaneseTransforms = {
         '-すぎる': {
             name: '-すぎる',
             description: 'Shows something "is too..." or someone is doing something "too much".\n' +
-            'Usage: Attach すぎる to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
+            'Usage: Attach すぎる to the continuative form (連用形) of verbs, or to the stem of adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -472,7 +472,7 @@ export const japaneseTransforms = {
         '-過ぎる': {
             name: '-過ぎる',
             description: 'Shows something "is too..." or someone is doing something "too much".\n' +
-            'Usage: Attach 過ぎる to the continuative form (renyoukei) of verbs, or to the stem of adjectives.',
+            'Usage: Attach 過ぎる to the continuative form (連用形) of verbs, or to the stem of adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -504,7 +504,7 @@ export const japaneseTransforms = {
             name: '-たい',
             description: '1. Expresses the feeling of desire or hope.\n' +
             '2. Used in ...たいと思います, an indirect way of saying what the speaker intends to do.\n' +
-            'Usage: Attach たい to the continuative form (renyoukei) of verbs. たい itself conjugates as i-adjective.',
+            'Usage: Attach たい to the continuative form (連用形) of verbs. たい itself conjugates as i-adjective.',
             i18n: [
                 {
                     language: 'ja',
@@ -535,7 +535,7 @@ export const japaneseTransforms = {
             name: '-たら',
             description: '1. Denotes the latter stated event is a continuation of the previous stated event.\n' +
             '2. Assumes that a matter has been completed or concluded.\n' +
-            'Usage: Attach たら to the continuative form (renyoukei) of verbs after euphonic change form, かったら to the stem of i-adjectives.',
+            'Usage: Attach たら to the continuative form (連用形) of verbs after euphonic change form, かったら to the stem of i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -569,7 +569,7 @@ export const japaneseTransforms = {
             name: '-たり',
             description: '1. Shows two actions occurring back and forth (when used with two verbs).\n' +
             '2. Shows examples of actions and states (when used with multiple verbs and adjectives).\n' +
-            'Usage: Attach たり to the continuative form (renyoukei) of verbs after euphonic change form, かったり to the stem of i-adjectives',
+            'Usage: Attach たり to the continuative form (連用形) of verbs after euphonic change form, かったり to the stem of i-adjectives',
             i18n: [
                 {
                     language: 'ja',
@@ -602,7 +602,7 @@ export const japaneseTransforms = {
             name: '-て',
             description: 'て-form.\n' +
             'It has a myriad of meanings. Primarily, it is a conjunctive particle that connects two clauses together.\n' +
-            'Usage: Attach て to the continuative form (renyoukei) of verbs after euphonic change form, くて to the stem of i-adjectives.',
+            'Usage: Attach て to the continuative form (連用形) of verbs after euphonic change form, くて to the stem of i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -635,8 +635,8 @@ export const japaneseTransforms = {
         '-ず': {
             name: '-ず',
             description: '1. Negative form of verbs.\n' +
-            '2. Continuative form (renyoukei) of the particle ぬ (nu).\n' +
-            'Usage: Attach ず to the irrealis form (mizenkei) of verbs.',
+            '2. Continuative form (連用形) of the particle ぬ (nu).\n' +
+            'Usage: Attach ず to the irrealis form (未然形) of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -666,7 +666,7 @@ export const japaneseTransforms = {
         '-ぬ': {
             name: '-ぬ',
             description: 'Negative form of verbs.\n' +
-            'Usage: Attach ぬ to the irrealis form (mizenkei) of verbs.\n' +
+            'Usage: Attach ぬ to the irrealis form (未然形) of verbs.\n' +
             'する becomes せぬ',
             i18n: [
                 {
@@ -697,7 +697,7 @@ export const japaneseTransforms = {
         '-ん': {
             name: '-ん',
             description: 'Negative form of verbs; a sound change of ぬ.\n' +
-            'Usage: Attach ん to the irrealis form (mizenkei) of verbs.\n' +
+            'Usage: Attach ん to the irrealis form (未然形) of verbs.\n' +
             'する becomes せん',
             i18n: [
                 {
@@ -728,7 +728,7 @@ export const japaneseTransforms = {
         '-んばかり': {
             name: '-んばかり',
             description: 'Shows an action or condition is on the verge of occurring, or an excessive/extreme degree.\n' +
-            'Usage: Attach んばかり to the irrealis form (mizenkei) of verbs.\n' +
+            'Usage: Attach んばかり to the irrealis form (未然形) of verbs.\n' +
             'する becomes せんばかり',
             i18n: [
                 {
@@ -760,7 +760,7 @@ export const japaneseTransforms = {
             name: '-んとする',
             description: '1. Shows the speaker\'s will or intention.\n' +
             '2. Shows an action or condition is on the verge of occurring.\n' +
-            'Usage: Attach んとする to the irrealis form (mizenkei) of verbs.\n' +
+            'Usage: Attach んとする to the irrealis form (未然形) of verbs.\n' +
             'する becomes せんとする',
             i18n: [
                 {
@@ -793,7 +793,7 @@ export const japaneseTransforms = {
             description: 'Archaic.\n' +
             '1. Shows an inference of a certain matter.\n' +
             '2. Shows speaker\'s intention.\n' +
-            'Usage: Attach む to the irrealis form (mizenkei) of verbs.\n' +
+            'Usage: Attach む to the irrealis form (未然形) of verbs.\n' +
             'する becomes せむ',
             i18n: [
                 {
@@ -824,7 +824,7 @@ export const japaneseTransforms = {
         '-ざる': {
             name: '-ざる',
             description: 'Negative form of verbs.\n' +
-            'Usage: Attach ざる to the irrealis form (mizenkei) of verbs.\n' +
+            'Usage: Attach ざる to the irrealis form (未然形) of verbs.\n' +
             'する becomes せざる',
             i18n: [
                 {
@@ -856,7 +856,7 @@ export const japaneseTransforms = {
             name: '-ねば',
             description: '1. Shows a hypothetical negation; if not ...\n' +
             '2. Shows a must. Used with or without ならぬ.\n' +
-            'Usage: Attach ねば to the irrealis form (mizenkei) of verbs.\n' +
+            'Usage: Attach ねば to the irrealis form (未然形) of verbs.\n' +
             'する becomes せねば',
             i18n: [
                 {
@@ -901,8 +901,8 @@ export const japaneseTransforms = {
         'causative': {
             name: 'causative',
             description: 'Describes the intention to make someone do something.\n' +
-            'Usage: Attach させる to the irrealis form (mizenkei) of ichidan verbs and くる.\n' +
-            'Attach せる to the irrealis form (mizenkei) of godan verbs and する.\n' +
+            'Usage: Attach させる to the irrealis form (未然形) of ichidan verbs and くる.\n' +
+            'Attach せる to the irrealis form (未然形) of godan verbs and する.\n' +
             'It itself conjugates as an ichidan verb.',
             i18n: [
                 {
@@ -937,8 +937,8 @@ export const japaneseTransforms = {
             name: 'short causative',
             description: 'Contraction of the causative form.\n' +
             'Describes the intention to make someone do something.\n' +
-            'Usage: Attach す to the irrealis form (mizenkei) of godan verbs.\n' +
-            'Attach さす to the dictionary form (shuushikei) of ichidan verbs.\n' +
+            'Usage: Attach す to the irrealis form (未然形) of godan verbs.\n' +
+            'Attach さす to the dictionary form (終止形) of ichidan verbs.\n' +
             'する becomes さす, くる becomes こさす.\n' +
             'It itself conjugates as an godan verb.',
             i18n: [
@@ -1019,7 +1019,7 @@ export const japaneseTransforms = {
         'continuative': {
             name: 'continuative',
             description: 'Used to indicate actions that are (being) carried out.\n' +
-            'Refers to the renyoukei, the part of the verb after conjugating with -ます and dropping ます.',
+            'Refers to 連用形, the part of the verb after conjugating with -ます and dropping ます.',
             i18n: [
                 {
                     language: 'ja',
@@ -1069,7 +1069,7 @@ export const japaneseTransforms = {
             name: 'negative',
             description: '1. Negative form of verbs.\n' +
             '2. Expresses a feeling of solicitation to the other party.\n' +
-            'Usage: Attach ない to the irrealis form (mizenkei) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません.',
+            'Usage: Attach ない to the irrealis form (未然形) of verbs, くない to the stem of i-adjectives. ない itself conjugates as i-adjective. ます becomes ません.',
             i18n: [
                 {
                     language: 'ja',
@@ -1116,7 +1116,7 @@ export const japaneseTransforms = {
         'passive': {
             name: 'passive',
             description: passiveEnglishDescription +
-            'Usage: Attach れる to the irrealis form (mizenkei) of godan verbs.',
+            'Usage: Attach れる to the irrealis form (未然形) of godan verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -1150,7 +1150,7 @@ export const japaneseTransforms = {
             '4. Indicates the speaker\'s confidence that the action will definitely be fulfilled.\n' +
             '5. Indicates the events that occur before the main clause are represented as relative past.\n' +
             '6. Indicates a mild imperative/command.\n' +
-            'Usage: Attach た to the continuative form (renyoukei) of verbs after euphonic change form, かった to the stem of i-adjectives.',
+            'Usage: Attach た to the continuative form (連用形) of verbs after euphonic change form, かった to the stem of i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
@@ -1184,7 +1184,7 @@ export const japaneseTransforms = {
         '-ます': {
             name: '-ます',
             description: 'Polite conjugation of verbs and adjectives.\n' +
-            'Usage: Attach ます to the continuative form (renyoukei) of verbs.',
+            'Usage: Attach ます to the continuative form (連用形) of verbs.',
             i18n: [
                 {
                     language: 'ja',
@@ -1214,8 +1214,8 @@ export const japaneseTransforms = {
         'potential': {
             name: 'potential',
             description: 'Indicates a state of being (naturally) capable of doing an action.\n' +
-            'Usage: Attach (ら)れる to the irrealis form (mizenkei) of ichidan verbs.\n' +
-            'Attach る to the imperative form (meireikei) of godan verbs.\n' +
+            'Usage: Attach (ら)れる to the irrealis form (未然形) of ichidan verbs.\n' +
+            'Attach る to the imperative form (命令形) of godan verbs.\n' +
             'する becomes できる, くる becomes こ(ら)れる',
             i18n: [
                 {
@@ -1244,7 +1244,7 @@ export const japaneseTransforms = {
             name: 'potential or passive',
             description: passiveEnglishDescription +
             '3. Indicates a state of being (naturally) capable of doing an action.\n' +
-            'Usage: Attach られる to the irrealis form (mizenkei) of ichidan verbs.\n' +
+            'Usage: Attach られる to the irrealis form (未然形) of ichidan verbs.\n' +
             'する becomes せられる, くる becomes こられる',
             i18n: [
                 {
@@ -1269,8 +1269,8 @@ export const japaneseTransforms = {
             '2. Expresses an invitation to the other party.\n' +
             '3. (Used in …ようとする) Indicates being on the verge of initiating an action or transforming a state.\n' +
             '4. Indicates an inference of a matter.\n' +
-            'Usage: Attach よう to the irrealis form (mizenkei) of ichidan verbs.\n' +
-            'Attach う to the irrealis form (mizenkei) of godan verbs after -o euphonic change form.\n' +
+            'Usage: Attach よう to the irrealis form (未然形) of ichidan verbs.\n' +
+            'Attach う to the irrealis form (未然形) of godan verbs after -o euphonic change form.\n' +
             'Attach かろう to the stem of i-adjectives (4th meaning only).',
             i18n: [
                 {
@@ -1339,8 +1339,8 @@ export const japaneseTransforms = {
             description: 'Negative volitional form of verbs.\n' +
             '1. Expresses speaker\'s assumption that something is likely not true.\n' +
             '2. Expresses speaker\'s will or intention not to do something.\n' +
-            'Usage: Attach まい to the dictionary form (shuushikei) of verbs.\n' +
-            'Attach まい to the irrealis form (mizenkei) of ichidan verbs.\n' +
+            'Usage: Attach まい to the dictionary form (終止形) of verbs.\n' +
+            'Attach まい to the irrealis form (未然形) of ichidan verbs.\n' +
             'する becomes しまい, くる becomes こまい',
             i18n: [
                 {
@@ -1432,7 +1432,7 @@ export const japaneseTransforms = {
         },
         '-き': {
             name: '-き',
-            description: 'Attributive form (rentaikei) of i-adjectives. An archaic form that remains in modern Japanese.',
+            description: 'Attributive form (連体形) of i-adjectives. An archaic form that remains in modern Japanese.',
             i18n: [
                 {
                     language: 'ja',
