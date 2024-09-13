@@ -81,7 +81,7 @@ const conditions = {
         i18n: [
             {
                 language: 'ja',
-                name: '一段動詞、辞書形',
+                name: '一段動詞、終止形',
             },
         ],
         isDictionaryForm: false,
@@ -112,7 +112,7 @@ const conditions = {
         i18n: [
             {
                 language: 'ja',
-                name: '五段動詞、辞書形',
+                name: '五段動詞、終止形',
             },
         ],
         isDictionaryForm: false,
@@ -606,8 +606,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: 'て形',
-                    description: 'て（で）形',
+                    name: '～て',
                 },
             ],
             rules: [
@@ -1154,7 +1153,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: 'タ形',
+                    name: '～た',
                 },
             ],
             rules: [
@@ -1601,7 +1600,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '関西弁',
-                    description: 'て形 (関西弁)',
+                    description: '～て (関西弁)',
                 },
             ],
             rules: [
@@ -1629,7 +1628,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '関西弁',
-                    description: 'タ形 (関西弁)',
+                    description: '～た (関西弁)',
                 },
             ],
             rules: [
@@ -1737,7 +1736,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '関西弁',
-                    description: '形容詞のて形 (関西弁)',
+                    description: '～て (関西弁)',
                 },
             ],
             rules: [
