@@ -1516,28 +1516,6 @@ export const japaneseTransforms = {
                 suffixInflection('てぇ', 'たい', [], ['adj-i']),
             ],
         },
-        'slang': {
-            name: 'slang',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '俗語',
-                },
-            ],
-            rules: [
-                suffixInflection('てぇてぇ', 'とうとい', [], ['adj-i']),
-                suffixInflection('てぇてぇ', '尊い', [], ['adj-i']),
-                suffixInflection('おなしゃす', 'おねがいします', [], ['v5']),
-                suffixInflection('おなしゃす', 'お願いします', [], ['v5']),
-                suffixInflection('あざす', 'ありがとうございます', [], ['v5']),
-                suffixInflection('さーせん', 'すみません', [], ['v5']),
-                suffixInflection('神ってる', '神がかっている', [], ['v1p']),
-                suffixInflection('じわる', 'じわじわ来る', [], ['vk']),
-                suffixInflection('おさしみ', 'おやすみ', [], []),
-                suffixInflection('おやさい', 'おやすみ', [], []),
-
-            ],
-        },
         'n-slang': {
             name: 'n-slang',
             i18n: [
