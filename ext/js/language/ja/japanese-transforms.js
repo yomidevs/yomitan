@@ -91,7 +91,7 @@ const conditions = {
         i18n: [
             {
                 language: 'ja',
-                name: '一段動詞、進行形または完了形',
+                name: '一段動詞、～てる・でる',
             },
         ],
         isDictionaryForm: false,
@@ -122,7 +122,7 @@ const conditions = {
         i18n: [
             {
                 language: 'ja',
-                name: '五段動詞、使役形の短縮形',
+                name: '五段動詞、～す・さす',
             },
         ],
         isDictionaryForm: false,
@@ -214,12 +214,11 @@ export const japaneseTransforms = {
             name: '-ば',
             description: '1. Conditional form; shows that the previous stated condition\'s establishment is the condition for the latter stated condition to occur.\n' +
             '2. Shows a trigger for a latter stated perception or judgment.\n' +
-            'Usage: Attach ば to the hypothetical/realis form (仮定形・已然形) of verbs and i-adjectives.',
+            'Usage: Attach ば to the hypothetical form (仮定形) of verbs and i-adjectives.',
             i18n: [
                 {
                     language: 'ja',
                     name: '～ば',
-                    description: '仮定形',
                 },
             ],
             rules: [
@@ -243,7 +242,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '～ゃ',
-                    description: '仮定形の縮約形',
+                    description: '「～ば」の短縮',
                 },
             ],
             rules: [
@@ -272,7 +271,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '～ちゃ',
-                    description: '「～ては」の縮約形',
+                    description: '「～ては」の短縮',
                 },
             ],
             rules: [
@@ -636,7 +635,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '～ず',
-                    description: '口語の否定の助動詞「ぬ」の連用形',
+                    description: '～ない',
                 },
             ],
             rules: [
@@ -667,7 +666,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '～ぬ',
-                    description: '動作・状態などを「…ない」と否定することを表わす。',
+                    description: '～ない',
                 },
             ],
             rules: [
@@ -698,7 +697,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '～ん',
-                    description: '〔否定の助動詞〕…ない',
+                    description: '～ない',
                 },
             ],
             rules: [
@@ -885,7 +884,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '形容詞の連用形',
+                    name: '～く',
                     description: '〔形容詞で〕用言へ続く。例、「大きく育つ」の「大きく」。',
                 },
             ],
@@ -902,7 +901,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '使役形',
+                    name: '～せる・させる',
                     description: 'だれかにある行為をさせる意を表わす時の言い方。例、「行かせる」の「せる」。',
                 },
             ],
@@ -939,7 +938,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '使役形の短縮形',
+                    name: '～す・さす',
                     description: 'だれかにある行為をさせる意を表わす時の言い方。例、「食べさす」の「さす」。',
                 },
             ],
@@ -1005,7 +1004,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '動詞の連用形',
+                    name: '連用形',
                     description: '〔動詞などで〕「ます」などに続く。例、「バスを降りて歩きます」の「降り」「歩き」。',
                 },
             ],
@@ -1055,7 +1054,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '否定形',
+                    name: '～ない',
                     description: 'その動作・作用・状態の成立を否定することを表わす。',
                 },
             ],
@@ -1102,7 +1101,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '受身形',
+                    name: '～れる',
                 },
             ],
             rules: [
@@ -1202,7 +1201,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '可能形',
+                    name: '～(ら)れる',
                 },
             ],
             rules: [
@@ -1231,7 +1230,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '可能形または受身形',
+                    name: '～られる',
                 },
             ],
             rules: [
@@ -1257,7 +1256,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '意志形',
+                    name: '～う・よう',
                     description: '主体の意志を表わす',
                 },
             ],
@@ -1292,8 +1291,8 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '「意志形＋か」の縮約形',
-                    description: '主体の意志を表わす',
+                    name: '～っか・よっか',
+                    description: '「うか・ようか」の短縮',
                 },
             ],
             rules: [
@@ -1352,7 +1351,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '使役受身形',
+                    name: '～される',
                 },
             ],
             rules: [
@@ -1468,7 +1467,6 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '～え',
-                    description: '俗語。例、「ない→ねえ」',
                 },
             ],
             rules: [
@@ -1521,7 +1519,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '俗語',
+                    name: '～んな',
                 },
             ],
             description: 'Slang sound change of r-column syllables to n (when before an n-sound, usually の or な)',
@@ -1538,7 +1536,7 @@ export const japaneseTransforms = {
             i18n: [
                 {
                     language: 'ja',
-                    name: '否定命令形の俗語',
+                    name: '～んな',
                 },
             ],
             rules: [
@@ -1552,7 +1550,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '関西弁',
-                    description: '否定形 (関西弁)',
+                    description: '～ない (関西弁)',
                 },
             ],
             rules: [
@@ -1683,7 +1681,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '関西弁',
-                    description: '形容詞の連用形 (関西弁)',
+                    description: '連用形 (関西弁)',
                 },
             ],
             rules: [
@@ -1731,7 +1729,7 @@ export const japaneseTransforms = {
                 {
                     language: 'ja',
                     name: '関西弁',
-                    description: '形容詞の否定形 (関西弁)',
+                    description: '～ない (関西弁)',
                 },
             ],
             rules: [
