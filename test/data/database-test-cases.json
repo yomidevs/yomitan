@@ -3,7 +3,7 @@
     "title": "Test Dictionary",
     "revision": "test",
     "sequenced": true,
-    "styles": "[data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+    "styles": "ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}",
     "version": 3,
     "importDate": 0,
     "prefixWildcardsSupported": true,
