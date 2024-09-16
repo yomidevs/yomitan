@@ -161,6 +161,7 @@ class DictionaryEntry {
         const bodyNode = e.detail.menu.bodyNode;
         const count = this._dictionaryController.dictionaryOptionCount;
         this._setMenuActionEnabled(bodyNode, 'moveTo', count > 1);
+        this._setMenuActionEnabled(bodyNode, 'delete', !this._dictionaryController.isDictionaryInDeleteQueue(this.dictionaryTitle));
     }
 
     /**
@@ -505,6 +506,8 @@ export class DictionaryController {
         this._extraInfo = null;
         /** @type {boolean} */
         this._isDeleting = false;
+        /** @type {string[]} */
+        this._dictionaryDeleteQueue = [];
     }
 
     /** @type {import('./modal-controller.js').ModalController} */
@@ -563,7 +566,6 @@ export class DictionaryController {
      * @param {string} dictionaryTitle
      */
     deleteDictionary(dictionaryTitle) {
-        if (this._isDeleting) { return; }
         const modal = /** @type {import('./modal.js').Modal} */ (this._deleteDictionaryModal);
         modal.node.dataset.dictionaryTitle = dictionaryTitle;
         /** @type {Element} */
@@ -849,7 +851,7 @@ export class DictionaryController {
         if (typeof title !== 'string') { return; }
         delete modal.node.dataset.dictionaryTitle;
 
-        void this._deleteDictionary(title);
+        void this._enqueueDictionaryDelete(title);
     }
 
     /**
@@ -1049,6 +1051,30 @@ export class DictionaryController {
         container.insertBefore(fragment, relative);
 
         this._updateDictionaryEntryCount();
+    }
+
+
+    /**
+     * @param {string} dictionaryTitle
+     * @returns {boolean}
+     */
+    isDictionaryInDeleteQueue(dictionaryTitle) {
+        return this._dictionaryDeleteQueue.includes(dictionaryTitle);
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     */
+    async _enqueueDictionaryDelete(dictionaryTitle) {
+        if (this.isDictionaryInDeleteQueue(dictionaryTitle)) { return; }
+        this._dictionaryDeleteQueue.push(dictionaryTitle);
+        if (this._isDeleting) { return; }
+        while (this._dictionaryDeleteQueue.length > 0) {
+            const title = this._dictionaryDeleteQueue[0];
+            if (!title) { continue; }
+            await this._deleteDictionary(title);
+            void this._dictionaryDeleteQueue.shift();
+        }
     }
 
     /**
