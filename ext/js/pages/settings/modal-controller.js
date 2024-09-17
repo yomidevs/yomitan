@@ -36,10 +36,12 @@ export class ModalController {
 
     /** */
     async prepare() {
-        await this._templates.loadFromFiles(['/templates-modals.html']);
-        for (const name of this._templateNames) {
-            const template = this._templates.getTemplateContent(name);
-            document.body.appendChild(template);
+        if (this._templateNames.length > 0) {
+            await this._templates.loadFromFiles(['/templates-modals.html']);
+            for (const name of this._templateNames) {
+                const template = this._templates.getTemplateContent(name);
+                document.body.appendChild(template);
+            }
         }
 
         const idSuffix = '-modal';
