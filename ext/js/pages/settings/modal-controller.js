@@ -80,12 +80,4 @@ export class ModalController {
         }
         return null;
     }
-
-    /**
-     * @param {string} name
-     * @returns {Element}
-     */
-    instantiateTemplate(name) {
-        return this._templates.instantiate(name);
-    }
 }
