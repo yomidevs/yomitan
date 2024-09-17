@@ -679,7 +679,8 @@
             ],
             "rules": {
                 "jsonc/sort-keys": ["error", {
-                    "pathPattern": "^\\w+.\\w+\\[\\d+\\]$",
+                    "pathPattern": ".*",
+                    "hasProperties": ["name"],
                     "order": [
                         "name",
                         "description",
