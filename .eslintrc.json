@@ -678,7 +678,20 @@
                 "ext/data/recommended-dictionaries.json"
             ],
             "rules": {
-                "jsonc/sort-keys": ["error", "asc"]
+                "jsonc/sort-keys": ["error", {
+                    "pathPattern": "^\\w+.\\w+\\[\\d+\\]$",
+                    "order": [
+                        "name",
+                        "description",
+                        "homepage",
+                        "downloadUrl"
+                    ]
+                }, {
+                    "pathPattern": ".*",
+                    "order": {
+                        "type": "asc"
+                    }
+                }]
             }
         }
     ]
