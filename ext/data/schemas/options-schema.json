@@ -251,7 +251,7 @@
                                     },
                                     "popupOuterTheme": {
                                         "type": "string",
-                                        "enum": ["light", "dark", "browser", "site"],
+                                        "enum": ["light", "dark", "browser", "site", "none"],
                                         "default": "site"
                                     },
                                     "customPopupCss": {
