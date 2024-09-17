@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {PointerType} from './text-scanner';
+import type {PointerType} from './text-scanner';
 import type * as Input from './input';
 
 export type OptionsContextFlag = 'clipboard';
