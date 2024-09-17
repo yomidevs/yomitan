@@ -155,7 +155,7 @@ export class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
         /** @type {boolean} */
         this._preventScroll = false;
-        /** @type {import('text-scanner').PenPointerState} */
+        /** @type {import('input').PenPointerState} */
         this._penPointerState = 0;
         /** @type {Map<number, string>} */
         this._pointerIdTypeMap = new Map();
@@ -339,7 +339,7 @@ export class TextScanner extends EventDispatcher {
      * @param {import('text-source').TextSource} textSource
      * @param {number} length
      * @param {boolean} layoutAwareScan
-     * @param {import('text-scanner').PointerType | undefined} pointerType
+     * @param {import('input').PointerType | undefined} pointerType
      * @returns {string}
      */
     getTextSourceContent(textSource, length, layoutAwareScan, pointerType) {
@@ -1443,7 +1443,7 @@ export class TextScanner extends EventDispatcher {
 
     /**
      * @param {PointerEvent} e
-     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('input').PointerEventType} eventType
      * @param {boolean} prevent
      */
     async _searchAtFromPen(e, eventType, prevent) {
@@ -1471,7 +1471,7 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('input').PointerEventType} eventType
      * @param {import('text-scanner').InputConfig} input
      * @returns {boolean}
      */
@@ -1495,8 +1495,8 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {import('text-scanner').PointerType} pointerType
-     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('input').PointerType} pointerType
+     * @param {import('input').PointerEventType} eventType
      * @param {MouseEvent|TouchEvent} event
      * @returns {?import('text-scanner').InputInfo}
      */
@@ -1507,8 +1507,8 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {import('text-scanner').PointerType} pointerType
-     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('input').PointerType} pointerType
+     * @param {import('input').PointerEventType} eventType
      * @param {import('input').Modifier[]} modifiers
      * @param {import('input').ModifierKey[]} modifierKeys
      * @returns {?import('text-scanner').InputInfo}
@@ -1538,8 +1538,8 @@ export class TextScanner extends EventDispatcher {
 
     /**
      * @param {?import('text-scanner').InputConfig} input
-     * @param {import('text-scanner').PointerType} pointerType
-     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('input').PointerType} pointerType
+     * @param {import('input').PointerEventType} eventType
      * @param {boolean} passive
      * @param {import('input').Modifier[]} modifiers
      * @param {import('input').ModifierKey[]} modifierKeys
@@ -1637,7 +1637,7 @@ export class TextScanner extends EventDispatcher {
      * @param {?string} includeSelector
      * @param {?string} excludeSelector
      * @param {boolean} layoutAwareScan
-     * @param {import('text-scanner').PointerType | undefined} pointerType
+     * @param {import('input').PointerType | undefined} pointerType
      */
     _constrainTextSource(textSource, includeSelector, excludeSelector, layoutAwareScan, pointerType) {
         let length = textSource.text().length;
@@ -1659,7 +1659,7 @@ export class TextScanner extends EventDispatcher {
 
     /**
      * @param {?string} excludeSelector
-     * @param {import('text-scanner').PointerType | undefined} pointerType
+     * @param {import('input').PointerType | undefined} pointerType
      * @returns {?string}
      */
     _getExcludeSelectorForPointerType(excludeSelector, pointerType) {
