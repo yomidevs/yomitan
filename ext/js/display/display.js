@@ -465,6 +465,7 @@ export class Display extends EventDispatcher {
                 matchTypePrefix: false,
                 sentenceParsingOptions,
                 scanAltText: scanningOptions.scanAltText,
+                scanHyperlinkText: scanningOptions.scanHyperlinkText,
                 scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
                 scanResolution: scanningOptions.scanResolution,
             },
@@ -2034,6 +2035,7 @@ export class Display extends EventDispatcher {
             preventMiddleMouse: false,
             sentenceParsingOptions,
             scanAltText: scanningOptions.scanAltText,
+            scanHyperlinkText: scanningOptions.scanHyperlinkText,
         });
 
         this._contentTextScanner.setEnabled(true);

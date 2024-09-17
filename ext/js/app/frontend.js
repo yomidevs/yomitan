@@ -519,7 +519,11 @@ export class Frontend {
         });
         this._updateTextScannerEnabled();
 
-        if (this._pageType !== 'web') {
+        if (this._pageType === 'web') {
+            if (!scanningOptions.scanHyperlinkText) {
+                this._textScanner.excludeSelector = 'a,a *';
+            }
+        } else {
             const excludeSelectors = ['.scan-disable', '.scan-disable *'];
             if (!scanningOptions.enableOnPopupExpressions) {
                 excludeSelectors.push('.source-text', '.source-text *');

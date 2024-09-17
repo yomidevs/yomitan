@@ -463,6 +463,7 @@
                                     "length",
                                     "deepDomScan",
                                     "scanAltText",
+                                    "scanHyperlinkText",
                                     "popupNestingMaxDepth",
                                     "enablePopupSearch",
                                     "enableOnPopupExpressions",
@@ -717,6 +718,10 @@
                                         "default": false
                                     },
                                     "scanAltText": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "scanHyperlinkText": {
                                         "type": "boolean",
                                         "default": true
                                     },

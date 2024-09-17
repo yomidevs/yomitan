@@ -563,6 +563,7 @@ export class OptionsUtil {
             this._updateVersion49,
             this._updateVersion50,
             this._updateVersion51,
+            this._updateVersion52,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1488,6 +1489,16 @@ export class OptionsUtil {
     }
 
     /**
+     * - Added scanning.scanAltText
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion52(options) {
+        for (const profile of options.profiles) {
+            profile.options.scanning.scanHyperlinkText = true;
+        }
+    }
+
+    /**
      * @param {string} url
      * @returns {Promise<chrome.tabs.Tab>}
      */
@@ -1503,6 +1514,7 @@ export class OptionsUtil {
             });
         });
     }
+
 }
 
 /* eslint-enable @typescript-eslint/no-unsafe-assignment */

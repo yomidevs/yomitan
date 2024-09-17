@@ -349,6 +349,7 @@ function createProfileOptionsUpdatedTestData1() {
             hidePopupOnCursorExitDelay: 0,
             normalizeCssZoom: true,
             scanAltText: true,
+            scanHyperlinkText: true,
             preventMiddleMouse: {
                 onWebPages: false,
                 onPopupPages: false,
@@ -645,7 +646,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 51,
+        version: 52,
         global: {
             database: {
                 prefixWildcardsSupported: false,

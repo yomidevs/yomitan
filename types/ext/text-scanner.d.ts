@@ -42,6 +42,7 @@ export type Options = {
     matchTypePrefix?: boolean;
     sentenceParsingOptions?: SentenceParsingOptions;
     scanAltText?: boolean;
+    scanHyperlinkText?: boolean;
     scanWithoutMousemove?: boolean;
     scanResolution?: string;
 };
