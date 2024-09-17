@@ -672,6 +672,14 @@
                 "crypto": "readonly",
                 "AbortController": "readonly"
             }
+        },
+        {
+            "files": [
+                "ext/data/recommended-dictionaries.json"
+            ],
+            "rules": {
+                "jsonc/sort-keys": ["error", "asc"]
+            }
         }
     ]
 }
