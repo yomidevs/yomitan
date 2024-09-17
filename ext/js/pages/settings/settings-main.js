@@ -85,8 +85,8 @@ await Application.main(true, async (application) => {
 
     const preparePromises = [];
 
-    const modalController = new ModalController();
-    modalController.prepare();
+    const modalController = new ModalController(['welcome-modals', 'settings-modals']);
+    await modalController.prepare();
 
     const settingsController = new SettingsController(application);
     await settingsController.prepare();
