@@ -371,9 +371,9 @@ export type PopupVerticalTextPosition = 'default' | 'before' | 'after' | 'left' 
 
 export type GlossaryLayoutMode = 'default' | 'compact';
 
-export type PopupTheme = 'light' | 'dark' | 'browser';
+export type PopupTheme = 'light' | 'dark' | 'browser' | 'site';
 
-export type PopupOuterTheme = 'light' | 'dark' | 'browser' | 'site';
+export type PopupOuterTheme = 'light' | 'dark' | 'browser' | 'site' | 'none';
 
 export type PopupCurrentIndicatorMode = 'none' | 'asterisk' | 'triangle' | 'bar-left' | 'bar-right' | 'dot-left' | 'dot-right';
 
