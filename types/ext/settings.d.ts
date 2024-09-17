@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as TextScanner from './text-scanner';
 import type * as Input from './input';
 
 export type OptionsContextFlag = 'clipboard';
@@ -28,7 +27,6 @@ export type OptionsContext1 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
-    pointerType?: TextScanner.PointerType;
 };
 
 export type OptionsContext2 = {
@@ -39,7 +37,6 @@ export type OptionsContext2 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
-    pointerType?: TextScanner.PointerType;
 };
 
 export type OptionsContext3 = {
@@ -50,7 +47,6 @@ export type OptionsContext3 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
-    pointerType?: TextScanner.PointerType;
 };
 
 export type OptionsContext = OptionsContext1 | OptionsContext2 | OptionsContext3;

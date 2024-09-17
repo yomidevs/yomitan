@@ -1514,7 +1514,6 @@ export class OptionsUtil {
             });
         });
     }
-
 }
 
 /* eslint-enable @typescript-eslint/no-unsafe-assignment */
