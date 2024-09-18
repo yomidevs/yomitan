@@ -1664,7 +1664,8 @@ export class TextScanner extends EventDispatcher {
      */
     _createExcludeSelectorForPointerType(excludeSelector, pointerType) {
         if (pointerType === 'touch') {
-            return '.gloss-link,.gloss-link *,' + (excludeSelector ?? '');
+            const extraSelector = '.gloss-link,.gloss-link *';
+            return excludeSelector ? `${excludeSelector},${extraSelector}` : extraSelector;
         }
         return excludeSelector;
     }
