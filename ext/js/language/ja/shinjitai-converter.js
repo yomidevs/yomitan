@@ -16,9 +16,15 @@
  */
 
 /**
- * List used to convert Kujitai to Shinjitai, based on https://github.com/DrTurnon/kyujipy
+ * Map used to convert 旧字体 (Kyujitai) to 新字体 (Shinjitai), compiled from various sources.
+ * This map does not include transformations caused by the 同音による書き換え reform.
+ * This map does not include 俗字, 別体, 誤字 or other uncommon forms or variants.
  */
 const shinjitaiMap = new Map([
+    //  A source comment signifies that the entries below are from that source and not included in any of the above ones.
+
+    /* https://github.com/DrTurnon/kyujipy */
+
     // 常用漢字
     ['亞', '亜'],
     ['惡', '悪'],
@@ -494,6 +500,71 @@ const shinjitaiMap = new Map([
     ['晄', '晃'],
     ['晉', '晋'],
     ['萠', '萌'],
+
+    /* 新字源 */
+
+    ["冬", "冬"],
+    ["割", "割"],
+    ["勇", "勇"],
+    ["周", "周"],
+    ["噴", "噴"],
+    ["城", "城"],
+    ["墳", "墳"],
+    ["奔", "奔"],
+    ["姬", "姫"],
+    ["寧", "寧"],
+    ["瓣", "弁"],
+    ["辨", "弁"],
+    ["辯", "弁"],
+    ["彫", "彫"],
+    ["惱", "悩"],
+    ["慈", "慈"],
+    ["憤", "憤"],
+    ["憲", "憲"],
+    ["成", "成"],
+    ["戴", "戴"],
+    ["搜", "捜"],
+    ["滋", "滋"],
+    ["潮", "潮"],
+    ["炭", "炭"],
+    ["爵", "爵"],
+    ["異", "異"],
+    ["盛", "盛"],
+    ["𥔵", "磁"],
+    ["𥳑", "簡"],
+    ["糖", "糖"],
+    ["𦤶", "致"],
+    ["芽", "芽"],
+    ["若", "若"],
+    ["茶", "茶"],
+    ["華", "華"],
+    ["落", "落"],
+    ["葉", "葉"],
+    ["藍", "藍"],
+    ["覆", "覆"],
+    ["諭", "諭"],
+    ["諾", "諾"],
+    ["輸", "輸"],
+    ["閒", "間"],
+    ["降", "降"],
+
+    /* 三省堂 */
+    ["充", "充"],
+    ["册", "冊"],
+    ["勺", "勺"],
+    ["巽", "巽"],
+    ["强", "強"],
+    ["旣", "既"],
+    ["流", "流"],
+    ["浩", "浩"],
+    ["煕", "熙"],
+
+    /* 大修館 */
+    ["兔", "兎"],
+    ["廚", "厨"],
+    ["廏", "厩"],
+    ["壻", "婿"],
+    ["槪", "概"],
 ]);
 
 let regexString = '';

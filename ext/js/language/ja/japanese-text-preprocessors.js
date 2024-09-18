@@ -104,7 +104,7 @@ export const normalizeCombiningCharacters = {
 /** @type {import('language').TextProcessor<boolean>} */
 export const convertShinjitai = {
     name: 'Convert Kyujitai to Shinjitai',
-    description: '万 → 萬',
+    description: '萬 → 万',
     options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? convertShinjitaiFunction(str) : str),
 };
