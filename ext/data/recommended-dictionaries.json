@@ -258,6 +258,12 @@
                 "description": "Based on the Balanced Corpus of Contemporary Written Japanese covering books, magazines, newspapers, blogs, forums, textbooks, and legal documents among others.",
                 "homepage": "https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#bccwj-suw-luw-combined",
                 "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/BCCWJ_SUW_LUW_combined.zip"
+            },
+            {
+                "name": "JPDB",
+                "description": "A frequency dictionary based on the corpus from the online Japanese dictionary and SRS system at https://jpdb.io.",
+                "homepage": "https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#jpdb-v21-frequency",
+                "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/JPDB_v2.1_kana_display_only.zip"
             }
         ],
         "grammar": [],
