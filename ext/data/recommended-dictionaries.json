@@ -258,6 +258,12 @@
                 "description": "Based on the Balanced Corpus of Contemporary Written Japanese covering books, magazines, newspapers, blogs, forums, textbooks, and legal documents among others.",
                 "homepage": "https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#bccwj-suw-luw-combined",
                 "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/BCCWJ_SUW_LUW_combined.zip"
+            },
+            {
+                "name": "JPDB",
+                "description": "A frequency dictionary based on the corpus from the online Japanese dictionary and SRS system at https://jpdb.io.",
+                "homepage": "https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#jpdb-v21-frequency",
+                "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/JPDB_v2.1_kana_display_only.zip"
             }
         ],
         "grammar": [],
@@ -573,12 +579,53 @@
             }
         ]
     },
+    "yue": {
+        "frequency": [
+            {
+                "name": "Words.hk Frequency",
+                "description": "Frequency list of Cantonese terms and honzi provided by words.hk.",
+                "homepage": "https://github.com/MarvNC/wordshk-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2024-09-17/YUE.Freq.Words.hk.Frequency.zip"
+            }
+        ],
+        "grammar": [],
+        "kanji": [
+            {
+                "name": "Words.hk 粵典 漢字",
+                "description": "A free and open Cantonese dictionary with definitions and example sentences in Cantonese and English.",
+                "homepage": "https://github.com/MarvNC/wordshk-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2024-09-17/Words.hk.Honzi.2024-09-16.zip"
+            }
+        ],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "Words.hk 粵典",
+                "description": "A free and open Cantonese dictionary with definitions and example sentences in Cantonese and English.",
+                "homepage": "https://github.com/MarvNC/wordshk-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2024-09-17/Words.hk.2024-09-16.zip"
+            }
+        ]
+    },
     "zh": {
         "frequency": [],
         "grammar": [],
-        "kanji": [],
+        "kanji": [
+            {
+                "name": "CC-CEDICT",
+                "description": "A free and open Chinese-English dictionary provided by the CC-CEDICT project.",
+                "homepage": "https://github.com/MarvNC/cc-cedict-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.Hanzi.zip"
+            }
+        ],
         "pronunciation": [],
         "terms": [
+            {
+                "name": "CC-CEDICT",
+                "description": "A free and open Chinese-English dictionary provided by the CC-CEDICT project.",
+                "homepage": "https://github.com/MarvNC/cc-cedict-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.zip"
+            },
             {
                 "name": "kty-zh-en",
                 "description": "Chinese to English dictionary created from Wiktionary data.",
