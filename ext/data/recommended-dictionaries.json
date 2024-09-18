@@ -573,12 +573,53 @@
             }
         ]
     },
+    "yue": {
+        "frequency": [
+            {
+                "name": "Words.hk Frequency",
+                "description": "Frequency list of Cantonese terms and honzi provided by words.hk.",
+                "homepage": "https://github.com/MarvNC/wordshk-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2024-09-17/YUE.Freq.Words.hk.Frequency.zip"
+            }
+        ],
+        "grammar": [],
+        "kanji": [
+            {
+                "name": "Words.hk 粵典 漢字",
+                "description": "A free and open Cantonese dictionary with definitions and example sentences in Cantonese and English.",
+                "homepage": "https://github.com/MarvNC/wordshk-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2024-09-17/Words.hk.Honzi.2024-09-16.zip"
+            }
+        ],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "Words.hk 粵典",
+                "description": "A free and open Cantonese dictionary with definitions and example sentences in Cantonese and English.",
+                "homepage": "https://github.com/MarvNC/wordshk-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2024-09-17/Words.hk.2024-09-16.zip"
+            }
+        ]
+    },
     "zh": {
         "frequency": [],
         "grammar": [],
-        "kanji": [],
+        "kanji": [
+            {
+                "name": "CC-CEDICT",
+                "description": "A free and open Chinese-English dictionary provided by the CC-CEDICT project.",
+                "homepage": "https://github.com/MarvNC/cc-cedict-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.Hanzi.zip"
+            }
+        ],
         "pronunciation": [],
         "terms": [
+            {
+                "name": "CC-CEDICT",
+                "description": "A free and open Chinese-English dictionary provided by the CC-CEDICT project.",
+                "homepage": "https://github.com/MarvNC/cc-cedict-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.zip"
+            },
             {
                 "name": "kty-zh-en",
                 "description": "Chinese to English dictionary created from Wiktionary data.",
