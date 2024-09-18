@@ -83,6 +83,20 @@
             }
         ]
     },
+    "en": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-en-en",
+                "description": "English to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/themoeway/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/themoeway/kaikki-to-yomitan/releases/latest/download/kty-en-en.zip"
+            }
+        ]
+    },
     "enm": {
         "frequency": [],
         "grammar": [],
