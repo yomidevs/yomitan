@@ -508,8 +508,6 @@ const regex = new RegExp('[' + regexString + ']', 'g');
  */
 export function convertShinjitai(str) {
     return str.replace(regex, (c) => {
-        const shinji = shinjitaiMap.get(c);
-        if (typeof shinji !== 'undefined') { return shinji; }
-        return c;
+        return shinjitaiMap.get(c) ?? c;
     });
 }
