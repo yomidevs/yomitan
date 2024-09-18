@@ -1641,7 +1641,7 @@ export class TextScanner extends EventDispatcher {
      */
     _constrainTextSource(textSource, includeSelector, excludeSelector, layoutAwareScan, pointerType) {
         let length = textSource.text().length;
-        excludeSelector = this._getExcludeSelectorForPointerType(excludeSelector, pointerType);
+        excludeSelector = this._createExcludeSelectorForPointerType(excludeSelector, pointerType);
 
         while (length > 0) {
             const nodes = textSource.getNodesInRange();
@@ -1662,7 +1662,7 @@ export class TextScanner extends EventDispatcher {
      * @param {import('input').PointerType | undefined} pointerType
      * @returns {?string}
      */
-    _getExcludeSelectorForPointerType(excludeSelector, pointerType) {
+    _createExcludeSelectorForPointerType(excludeSelector, pointerType) {
         if (pointerType === 'touch') {
             return '.gloss-link,.gloss-link *,' + (excludeSelector ?? '');
         }
