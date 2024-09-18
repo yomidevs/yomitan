@@ -30,5 +30,13 @@
     "files.trimTrailingWhitespace": true,
     "html-validate.validate": [
         "html"
+    ],
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "/ext/data/recommended-dictionaries.json"
+            ],
+            "url": "/ext/data/schemas/recommended-dictionaries-schema.json"
+        }
     ]
 }
