@@ -1664,8 +1664,9 @@ export class TextScanner extends EventDispatcher {
      */
     _createExcludeSelectorForPointerType(excludeSelector, pointerType) {
         if (pointerType === 'touch') {
-            const extraSelector = '.gloss-link,.gloss-link *';
-            return excludeSelector ? `${excludeSelector},${extraSelector}` : extraSelector;
+            // Avoid trigger search with tapping on popup link, tag and inflection.
+            const popupClickableSelector = '.gloss-link, .gloss-link *, .tag, .tag *, .inflection';
+            return excludeSelector ? `${excludeSelector},${popupClickableSelector}` : popupClickableSelector;
         }
         return excludeSelector;
     }
