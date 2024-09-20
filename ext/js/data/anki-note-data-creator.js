@@ -187,11 +187,16 @@ function getFrequencyNumbers(dictionaryEntry) {
         if (displayValue !== null) {
             const frequencyMatch = displayValue.match(/\d+/);
             if (frequencyMatch !== null) {
-                frequencies.push(Number.parseInt(frequencyMatch[0], 10));
-                continue;
+                const frequencyParsed = Number.parseInt(frequencyMatch[0], 10);
+                if (frequencyParsed > 0) {
+                    frequencies.push();
+                    continue;
+                }
             }
         }
-        frequencies.push(frequency);
+        if (frequency > 0) {
+            frequencies.push(frequency);
+        }
     }
     return frequencies;
 }
