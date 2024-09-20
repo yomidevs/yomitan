@@ -1426,7 +1426,7 @@ const tests = [
         ],
     },
     {
-        category: 'incorrect causative-passive chains',
+        category: 'incorrect short causative -> passive chains',
         valid: false,
         tests: [
             {term: '食べる', source: '食べさされる', rule: null, reasons: ['short causative', 'passive']},
