@@ -126,6 +126,27 @@ const conditions = {
             },
         ],
         isDictionaryForm: false,
+        subConditions: ['v5ss', 'v5sp'],
+    },
+    'v5ss': {
+        name: 'Godan verb, short causative form having さす ending (cannot conjugate with passive form)',
+        i18n: [
+            {
+                language: 'ja',
+                name: '五段動詞、～さす',
+            },
+        ],
+        isDictionaryForm: false,
+    },
+    'v5sp': {
+        name: 'Godan verb, short causative form not having さす ending (can conjugate with passive form)',
+        i18n: [
+            {
+                language: 'ja',
+                name: '五段動詞、～す',
+            },
+        ],
+        isDictionaryForm: false,
     },
     'vk': {
         name: 'Kuru verb',
@@ -943,23 +964,23 @@ export const japaneseTransforms = {
                 },
             ],
             rules: [
-                suffixInflection('さす', 'る', ['v5s'], ['v1']),
-                suffixInflection('かす', 'く', ['v5s'], ['v5']),
-                suffixInflection('がす', 'ぐ', ['v5s'], ['v5']),
-                suffixInflection('さす', 'す', ['v5s'], ['v5']),
-                suffixInflection('たす', 'つ', ['v5s'], ['v5']),
-                suffixInflection('なす', 'ぬ', ['v5s'], ['v5']),
-                suffixInflection('ばす', 'ぶ', ['v5s'], ['v5']),
-                suffixInflection('ます', 'む', ['v5s'], ['v5']),
-                suffixInflection('らす', 'る', ['v5s'], ['v5']),
-                suffixInflection('わす', 'う', ['v5s'], ['v5']),
-                suffixInflection('じさす', 'ずる', ['v5s'], ['vz']),
-                suffixInflection('ぜさす', 'ずる', ['v5s'], ['vz']),
-                suffixInflection('さす', 'する', ['v5s'], ['vs']),
-                suffixInflection('為す', '為る', ['v5s'], ['vs']),
-                suffixInflection('こさす', 'くる', ['v5s'], ['vk']),
-                suffixInflection('来さす', '来る', ['v5s'], ['vk']),
-                suffixInflection('來さす', '來る', ['v5s'], ['vk']),
+                suffixInflection('さす', 'る', ['v5ss'], ['v1']),
+                suffixInflection('かす', 'く', ['v5sp'], ['v5']),
+                suffixInflection('がす', 'ぐ', ['v5sp'], ['v5']),
+                suffixInflection('さす', 'す', ['v5ss'], ['v5']),
+                suffixInflection('たす', 'つ', ['v5sp'], ['v5']),
+                suffixInflection('なす', 'ぬ', ['v5sp'], ['v5']),
+                suffixInflection('ばす', 'ぶ', ['v5sp'], ['v5']),
+                suffixInflection('ます', 'む', ['v5sp'], ['v5']),
+                suffixInflection('らす', 'る', ['v5sp'], ['v5']),
+                suffixInflection('わす', 'う', ['v5sp'], ['v5']),
+                suffixInflection('じさす', 'ずる', ['v5ss'], ['vz']),
+                suffixInflection('ぜさす', 'ずる', ['v5ss'], ['vz']),
+                suffixInflection('さす', 'する', ['v5ss'], ['vs']),
+                suffixInflection('為す', '為る', ['v5ss'], ['vs']),
+                suffixInflection('こさす', 'くる', ['v5ss'], ['vk']),
+                suffixInflection('来さす', '来る', ['v5ss'], ['vk']),
+                suffixInflection('來さす', '來る', ['v5ss'], ['vk']),
             ],
         },
         'imperative': {
@@ -1107,7 +1128,7 @@ export const japaneseTransforms = {
             rules: [
                 suffixInflection('かれる', 'く', ['v1'], ['v5']),
                 suffixInflection('がれる', 'ぐ', ['v1'], ['v5']),
-                suffixInflection('される', 'す', ['v1'], ['v5']),
+                suffixInflection('される', 'す', ['v1'], ['v5d', 'v5sp']),
                 suffixInflection('たれる', 'つ', ['v1'], ['v5']),
                 suffixInflection('なれる', 'ぬ', ['v1'], ['v5']),
                 suffixInflection('ばれる', 'ぶ', ['v1'], ['v5']),
@@ -1341,28 +1362,6 @@ export const japaneseTransforms = {
                 suffixInflection('来まい', '来る', [], ['vk']),
                 suffixInflection('來まい', '來る', [], ['vk']),
                 suffixInflection('まい', '', [], ['-ます']),
-            ],
-        },
-        'causative-passive': {
-            name: 'causative-passive',
-            description: 'Contraction of the passive of the causative form of verbs.\n' +
-            'Someone was made to do something by someone else.\n' +
-            'Usage: ～せられる becomes ~される (only for godan verbs)',
-            i18n: [
-                {
-                    language: 'ja',
-                    name: '～される',
-                },
-            ],
-            rules: [
-                suffixInflection('かされる', 'く', ['v1'], ['v5']),
-                suffixInflection('がされる', 'ぐ', ['v1'], ['v5']),
-                suffixInflection('たされる', 'つ', ['v1'], ['v5']),
-                suffixInflection('なされる', 'ぬ', ['v1'], ['v5']),
-                suffixInflection('ばされる', 'ぶ', ['v1'], ['v5']),
-                suffixInflection('まされる', 'む', ['v1'], ['v5']),
-                suffixInflection('らされる', 'る', ['v1'], ['v5']),
-                suffixInflection('わされる', 'う', ['v1'], ['v5']),
             ],
         },
         '-おく': {

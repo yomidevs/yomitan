@@ -171,7 +171,6 @@ const tests = [
             {term: '買う', source: '買おう',           rule: 'v5', reasons: ['volitional']},
             {term: '買う', source: '買おっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '買う', source: '買うまい',       rule: 'v5', reasons: ['-まい']},
-            {term: '買う', source: '買わされる',       rule: 'v5', reasons: ['causative-passive']},
             {term: '買う', source: '買わされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '買う', source: '買っておく',       rule: 'v5', reasons: ['-て', '-おく']},
@@ -246,7 +245,6 @@ const tests = [
             {term: '行く', source: '行こう',           rule: 'v5', reasons: ['volitional']},
             {term: '行く', source: '行こっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '行く', source: '行くまい',       rule: 'v5', reasons: ['-まい']},
-            {term: '行く', source: '行かされる',       rule: 'v5', reasons: ['causative-passive']},
             {term: '行く', source: '行かされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '行く', source: '行っておく',       rule: 'v5', reasons: ['-て', '-おく']},
@@ -321,7 +319,6 @@ const tests = [
             {term: '泳ぐ', source: '泳ごう',           rule: 'v5', reasons: ['volitional']},
             {term: '泳ぐ', source: '泳ごっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '泳ぐ', source: '泳ぐまい',       rule: 'v5', reasons: ['-まい']},
-            {term: '泳ぐ', source: '泳がされる',       rule: 'v5', reasons: ['causative-passive']},
             {term: '泳ぐ', source: '泳がされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '泳ぐ', source: '泳いでおく',       rule: 'v5', reasons: ['-て', '-おく']},
@@ -474,7 +471,6 @@ const tests = [
             {term: '待つ', source: '待とう',           rule: 'v5', reasons: ['volitional']},
             {term: '待つ', source: '待とっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '待つ', source: '待つまい',       rule: 'v5', reasons: ['-まい']},
-            {term: '待つ', source: '待たされる',       rule: 'v5', reasons: ['causative-passive']},
             {term: '待つ', source: '待たされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '待つ', source: '待っておく',       rule: 'v5', reasons: ['-て', '-おく']},
@@ -550,7 +546,6 @@ const tests = [
             {term: '死ぬ', source: '死のう',           rule: 'v5', reasons: ['volitional']},
             {term: '死ぬ', source: '死のっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '死ぬ', source: '死ぬまい',       rule: 'v5', reasons: ['-まい']},
-            {term: '死ぬ', source: '死なされる',       rule: 'v5', reasons: ['causative-passive']},
             {term: '死ぬ', source: '死なされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '死ぬ', source: '死んでおく',       rule: 'v5', reasons: ['-て', '-おく']},
@@ -624,7 +619,6 @@ const tests = [
             {term: '遊ぶ', source: '遊ぼう',           rule: 'v5', reasons: ['volitional']},
             {term: '遊ぶ', source: '遊ぼっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '遊ぶ', source: '遊ぶまい',       rule: 'v5', reasons: ['-まい']},
-            {term: '遊ぶ', source: '遊ばされる',       rule: 'v5', reasons: ['causative-passive']},
             {term: '遊ぶ', source: '遊ばされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '遊ぶ', source: '遊んでおく',       rule: 'v5', reasons: ['-て', '-おく']},
@@ -698,7 +692,6 @@ const tests = [
             {term: '飲む', source: '飲もう',           rule: 'v5', reasons: ['volitional']},
             {term: '飲む', source: '飲もっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '飲む', source: '飲むまい',       rule: 'v5', reasons: ['-まい']},
-            {term: '飲む', source: '飲まされる',       rule: 'v5', reasons: ['causative-passive']},
             {term: '飲む', source: '飲まされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '飲む', source: '飲んでおく',       rule: 'v5', reasons: ['-て', '-おく']},
@@ -771,7 +764,6 @@ const tests = [
             {term: '作る', source: '作ろう',           rule: 'v5', reasons: ['volitional']},
             {term: '作る', source: '作ろっか',           rule: 'v5', reasons: ['volitional slang']},
             {term: '作る', source: '作るまい',       rule: 'v5', reasons: ['-まい']},
-            {term: '作る', source: '作らされる',       rule: 'v5', reasons: ['causative-passive']},
             {term: '作る', source: '作らされる',       rule: 'v5', reasons: ['short causative', 'passive']},
 
             {term: '作る', source: '作っておく',       rule: 'v5', reasons: ['-て', '-おく']},
@@ -1431,6 +1423,21 @@ const tests = [
             {term: '食べる', source: '食べましたい', rule: null, reasons: ['-ます', '-たい']},
             {term: '済ます', source: '済ません', rule: null, reasons: ['-ます', 'negative']},
             {term: '済ます', source: '済ましょう', rule: null, reasons: ['-ます', 'volitional']},
+        ],
+    },
+    {
+        category: 'incorrect causative-passive chains',
+        valid: false,
+        tests: [
+            {term: '食べる', source: '食べさされる', rule: null, reasons: ['short causative', 'passive']},
+            {term: '話す', source: '話さされる', rule: null, reasons: ['short causative', 'passive']},
+            {term: '論ずる', source: '論じさされる', rule: null, reasons: ['short causative', 'passive']},
+            {term: '論ずる', source: '論ぜさされる', rule: null, reasons: ['short causative', 'passive']},
+            {term: 'する', source: 'さされる', rule: null, reasons: ['short causative', 'passive']},
+            {term: '為る', source: '為される', rule: null, reasons: ['short causative', 'passive']},
+            {term: 'くる', source: 'こさされる', rule: null, reasons: ['short causative', 'passive']},
+            {term: '来る', source: '来さされる', rule: null, reasons: ['short causative', 'passive']},
+            {term: '來る', source: '來さされる', rule: null, reasons: ['short causative', 'passive']},
         ],
     },
     // Kansai-ben
