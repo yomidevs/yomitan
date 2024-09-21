@@ -16,20 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Application } from '../application.js';
-import { DocumentFocusController } from '../dom/document-focus-controller.js';
-import { querySelectorNotNull } from '../dom/query-selector.js';
-import { ExtensionContentController } from './common/extension-content-controller.js';
-import { DictionaryController } from './settings/dictionary-controller.js';
-import { DictionaryImportController } from './settings/dictionary-import-controller.js';
-import { GenericSettingController } from './settings/generic-setting-controller.js';
-import { LanguagesController } from './settings/languages-controller.js';
-import { ModalController } from './settings/modal-controller.js';
-import { RecommendedPermissionsController } from './settings/recommended-permissions-controller.js';
-import { ScanInputsSimpleController } from './settings/scan-inputs-simple-controller.js';
-import { SettingsController } from './settings/settings-controller.js';
-import { SettingsDisplayController } from './settings/settings-display-controller.js';
-import { StatusFooter } from './settings/status-footer.js';
+import {Application} from '../application.js';
+import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {querySelectorNotNull} from '../dom/query-selector.js';
+import {ExtensionContentController} from './common/extension-content-controller.js';
+import {DictionaryController} from './settings/dictionary-controller.js';
+import {DictionaryImportController} from './settings/dictionary-import-controller.js';
+import {GenericSettingController} from './settings/generic-setting-controller.js';
+import {LanguagesController} from './settings/languages-controller.js';
+import {ModalController} from './settings/modal-controller.js';
+import {RecommendedPermissionsController} from './settings/recommended-permissions-controller.js';
+import {ScanInputsSimpleController} from './settings/scan-inputs-simple-controller.js';
+import {SettingsController} from './settings/settings-controller.js';
+import {SettingsDisplayController} from './settings/settings-display-controller.js';
+import {StatusFooter} from './settings/status-footer.js';
 
 /**
  * @param {import('../comm/api.js').API} api
