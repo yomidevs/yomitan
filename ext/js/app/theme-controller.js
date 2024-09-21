@@ -27,9 +27,9 @@ export class ThemeController {
     constructor(element) {
         /** @type {?HTMLElement} */
         this._element = element;
-        /** @type {'light'|'dark'|'browser'|'site'} */
+        /** @type {import("settings.js").PopupTheme} */
         this._theme = 'site';
-        /** @type {'light'|'dark'|'browser'|'site'} */
+        /** @type {import("settings.js").PopupOuterTheme} */
         this._outerTheme = 'site';
         /** @type {?('dark'|'light')} */
         this._siteTheme = null;
@@ -57,7 +57,7 @@ export class ThemeController {
 
     /**
      * Gets the main theme for the content.
-     * @type {'light'|'dark'|'browser'|'site'}
+     * @type {import("settings.js").PopupTheme}
      */
     get theme() {
         return this._theme;
@@ -65,7 +65,7 @@ export class ThemeController {
 
     /**
      * Sets the main theme for the content.
-     * @param {'light'|'dark'|'browser'|'site'} value The theme value to assign.
+     * @param {import("settings.js").PopupTheme} value The theme value to assign.
      */
     set theme(value) {
         this._theme = value;
@@ -73,7 +73,7 @@ export class ThemeController {
 
     /**
      * Gets the outer theme for the content.
-     * @type {'light'|'dark'|'browser'|'site'}
+     * @type {import("settings.js").PopupOuterTheme}
      */
     get outerTheme() {
         return this._outerTheme;
@@ -81,7 +81,7 @@ export class ThemeController {
 
     /**
      * Sets the outer theme for the content.
-     * @param {'light'|'dark'|'browser'|'site'} value The outer theme value to assign.
+     * @param {import("settings.js").PopupOuterTheme} value The outer theme value to assign.
      */
     set outerTheme(value) {
         this._outerTheme = value;

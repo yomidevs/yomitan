@@ -155,7 +155,7 @@ export class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
         /** @type {boolean} */
         this._preventScroll = false;
-        /** @type {import('text-scanner').PenPointerState} */
+        /** @type {import('input').PenPointerState} */
         this._penPointerState = 0;
         /** @type {Map<number, string>} */
         this._pointerIdTypeMap = new Map();
@@ -339,9 +339,10 @@ export class TextScanner extends EventDispatcher {
      * @param {import('text-source').TextSource} textSource
      * @param {number} length
      * @param {boolean} layoutAwareScan
+     * @param {import('input').PointerType | undefined} pointerType
      * @returns {string}
      */
-    getTextSourceContent(textSource, length, layoutAwareScan) {
+    getTextSourceContent(textSource, length, layoutAwareScan, pointerType) {
         const clonedTextSource = textSource.clone();
 
         clonedTextSource.setEndOffset(length, false, layoutAwareScan);
@@ -349,7 +350,7 @@ export class TextScanner extends EventDispatcher {
         const includeSelector = this._includeSelector;
         const excludeSelector = this._excludeSelector;
         if (includeSelector !== null || excludeSelector !== null) {
-            this._constrainTextSource(clonedTextSource, includeSelector, excludeSelector, layoutAwareScan);
+            this._constrainTextSource(clonedTextSource, includeSelector, excludeSelector, layoutAwareScan, pointerType);
         }
 
         return clonedTextSource.text();
@@ -442,9 +443,10 @@ export class TextScanner extends EventDispatcher {
      */
     _createOptionsContextForInput(baseOptionsContext, inputInfo) {
         const optionsContext = clone(baseOptionsContext);
-        const {modifiers, modifierKeys} = inputInfo;
+        const {modifiers, modifierKeys, pointerType} = inputInfo;
         optionsContext.modifiers = [...modifiers];
         optionsContext.modifierKeys = [...modifierKeys];
+        optionsContext.pointerType = pointerType;
         return optionsContext;
     }
 
@@ -1292,7 +1294,7 @@ export class TextScanner extends EventDispatcher {
         const sentenceForwardQuoteMap = this._sentenceForwardQuoteMap;
         const sentenceBackwardQuoteMap = this._sentenceBackwardQuoteMap;
         const layoutAwareScan = this._layoutAwareScan;
-        const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
+        const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan, optionsContext.pointerType);
         if (searchText.length === 0) { return null; }
 
         /** @type {import('api').FindTermsDetails} */
@@ -1327,7 +1329,7 @@ export class TextScanner extends EventDispatcher {
         const sentenceForwardQuoteMap = this._sentenceForwardQuoteMap;
         const sentenceBackwardQuoteMap = this._sentenceBackwardQuoteMap;
         const layoutAwareScan = this._layoutAwareScan;
-        const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan);
+        const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan, optionsContext.pointerType);
         if (searchText.length === 0) { return null; }
 
         const dictionaryEntries = await this._api.kanjiFind(searchText, optionsContext);
@@ -1441,7 +1443,7 @@ export class TextScanner extends EventDispatcher {
 
     /**
      * @param {PointerEvent} e
-     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('input').PointerEventType} eventType
      * @param {boolean} prevent
      */
     async _searchAtFromPen(e, eventType, prevent) {
@@ -1469,7 +1471,7 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('input').PointerEventType} eventType
      * @param {import('text-scanner').InputConfig} input
      * @returns {boolean}
      */
@@ -1493,8 +1495,8 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {import('text-scanner').PointerType} pointerType
-     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('input').PointerType} pointerType
+     * @param {import('input').PointerEventType} eventType
      * @param {MouseEvent|TouchEvent} event
      * @returns {?import('text-scanner').InputInfo}
      */
@@ -1505,8 +1507,8 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {import('text-scanner').PointerType} pointerType
-     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('input').PointerType} pointerType
+     * @param {import('input').PointerEventType} eventType
      * @param {import('input').Modifier[]} modifiers
      * @param {import('input').ModifierKey[]} modifierKeys
      * @returns {?import('text-scanner').InputInfo}
@@ -1536,8 +1538,8 @@ export class TextScanner extends EventDispatcher {
 
     /**
      * @param {?import('text-scanner').InputConfig} input
-     * @param {import('text-scanner').PointerType} pointerType
-     * @param {import('text-scanner').PointerEventType} eventType
+     * @param {import('input').PointerType} pointerType
+     * @param {import('input').PointerEventType} eventType
      * @param {boolean} passive
      * @param {import('input').Modifier[]} modifiers
      * @param {import('input').ModifierKey[]} modifierKeys
@@ -1635,9 +1637,12 @@ export class TextScanner extends EventDispatcher {
      * @param {?string} includeSelector
      * @param {?string} excludeSelector
      * @param {boolean} layoutAwareScan
+     * @param {import('input').PointerType | undefined} pointerType
      */
-    _constrainTextSource(textSource, includeSelector, excludeSelector, layoutAwareScan) {
+    _constrainTextSource(textSource, includeSelector, excludeSelector, layoutAwareScan, pointerType) {
         let length = textSource.text().length;
+        excludeSelector = this._createExcludeSelectorForPointerType(excludeSelector, pointerType);
+
         while (length > 0) {
             const nodes = textSource.getNodesInRange();
             if (
@@ -1650,6 +1655,20 @@ export class TextScanner extends EventDispatcher {
                 break;
             }
         }
+    }
+
+    /**
+     * @param {?string} excludeSelector
+     * @param {import('input').PointerType | undefined} pointerType
+     * @returns {?string}
+     */
+    _createExcludeSelectorForPointerType(excludeSelector, pointerType) {
+        if (pointerType === 'touch') {
+            // Avoid trigger search with tapping on popup link, tag and inflection.
+            const popupClickableSelector = '.gloss-link, .gloss-link *, .tag, .tag *, .inflection';
+            return excludeSelector ? `${excludeSelector},${popupClickableSelector}` : popupClickableSelector;
+        }
+        return excludeSelector;
     }
 
     /**

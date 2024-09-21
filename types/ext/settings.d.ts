@@ -27,6 +27,7 @@ export type OptionsContext1 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
+    pointerType?: Input.PointerType;
 };
 
 export type OptionsContext2 = {
@@ -37,6 +38,7 @@ export type OptionsContext2 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
+    pointerType?: Input.PointerType;
 };
 
 export type OptionsContext3 = {
@@ -47,6 +49,7 @@ export type OptionsContext3 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
+    pointerType?: Input.PointerType;
 };
 
 export type OptionsContext = OptionsContext1 | OptionsContext2 | OptionsContext3;
@@ -371,9 +374,9 @@ export type PopupVerticalTextPosition = 'default' | 'before' | 'after' | 'left' 
 
 export type GlossaryLayoutMode = 'default' | 'compact';
 
-export type PopupTheme = 'light' | 'dark' | 'browser';
+export type PopupTheme = 'light' | 'dark' | 'browser' | 'site';
 
-export type PopupOuterTheme = 'light' | 'dark' | 'browser' | 'site';
+export type PopupOuterTheme = 'light' | 'dark' | 'browser' | 'site' | 'none';
 
 export type PopupCurrentIndicatorMode = 'none' | 'asterisk' | 'triangle' | 'bar-left' | 'bar-right' | 'dot-left' | 'dot-right';
 
