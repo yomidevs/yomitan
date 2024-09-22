@@ -513,7 +513,6 @@ export class Frontend {
             matchTypePrefix: scanningOptions.matchTypePrefix,
             preventMiddleMouse,
             sentenceParsingOptions,
-            scanAltText: scanningOptions.scanAltText,
             scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
             scanResolution: scanningOptions.scanResolution,
         });

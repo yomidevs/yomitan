@@ -41,7 +41,6 @@ export type Options = {
     preventMiddleMouse?: boolean;
     matchTypePrefix?: boolean;
     sentenceParsingOptions?: SentenceParsingOptions;
-    scanAltText?: boolean;
     scanWithoutMousemove?: boolean;
     scanResolution?: string;
 };
