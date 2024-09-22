@@ -200,6 +200,15 @@ type AllTextProcessors = {
             normalizeDiacritics: TextProcessor<'old' | 'new' | 'off'>;
         };
     };
+    yi: {
+        pre: {
+            removeYiddishDiacritics: TextProcessor<boolean>;
+            convertYiddishLigatures: BidirectionalConversionPreprocessor;
+        };
+        post: {
+            convertFinalLetters: TextProcessor<boolean>;
+        };
+    };
     yue: Record<string, never>;
     zh: Record<string, never>;
 };
