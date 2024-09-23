@@ -21,9 +21,9 @@ import {Modal} from './modal.js';
 
 export class ModalController {
     /**
-     * @param {string[] | undefined} templateNames
+     * @param {string[]|undefined} templateNames
      */
-    constructor(templateNames = undefined) {
+    constructor(templateNames) {
         /** @type {Modal[]} */
         this._modals = [];
         /** @type {Map<string|Element, Modal>} */
