@@ -518,7 +518,7 @@ export class Frontend {
         });
         this._updateTextScannerEnabled();
 
-        const touchEventExcludeSelectors = ['a', 'a *']
+        const touchEventExcludeSelectors = ['a', 'a *'];
         if (this._pageType !== 'web') {
             const excludeSelectors = ['.scan-disable', '.scan-disable *'];
             if (!scanningOptions.enableOnPopupExpressions) {
