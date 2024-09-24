@@ -1658,6 +1658,7 @@ export class TextScanner extends EventDispatcher {
         if (pointerType === 'touch') {
             // Avoid trigger search with tapping on interactive elements.
             const popupClickableSelector = '.gloss-link,.gloss-link *,.tag, .tag *, .inflection, a, a *, input, textarea, textarea *';
+            const popupClickableSelector = '.gloss-link,.gloss-link *,.tag, .tag *, .inflection, a, a *'
             return this._excludeSelector ? `${this._excludeSelector},${popupClickableSelector}` : popupClickableSelector;
         }
         return this._excludeSelector;
