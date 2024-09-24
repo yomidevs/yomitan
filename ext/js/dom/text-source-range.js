@@ -96,6 +96,17 @@ export class TextSourceRange {
     }
 
     /**
+     * Determines whether the imposter source element is an input or textarea element.
+     * @return {boolean} `true` if the imposter source element is an input or textarea element, `false` otherwise.
+     */
+     isImposterInputOrTextArea() {
+        if (this._imposterSourceElement) {
+            return this._imposterSourceElement.tagName === 'INPUT' || this._imposterSourceElement.tagName === 'TEXTAREA';
+        }
+        return false;
+     }
+
+    /**
      * Creates a clone of the instance.
      * @returns {TextSourceRange} The new clone.
      */
