@@ -524,7 +524,7 @@ export class Frontend {
             if (!scanningOptions.enableOnPopupExpressions) {
                 excludeSelectors.push('.source-text', '.source-text *');
             }
-            touchEventExcludeSelectors.push('.gloss-link', '.gloss-link *', '.tag', '.tag *');
+            touchEventExcludeSelectors.push('.gloss-link', '.gloss-link *', '.tag', '.tag *', '.inflection');
             this._textScanner.excludeSelector = excludeSelectors.join(',');
         }
         this._textScanner.touchEventExcludeSelector = touchEventExcludeSelectors.join(',');
