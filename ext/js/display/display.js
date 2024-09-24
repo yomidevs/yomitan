@@ -1993,7 +1993,7 @@ export class Display extends EventDispatcher {
             });
             this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
             this._contentTextScanner.excludeSelector = '.scan-disable,.scan-disable *';
-            this._contentTextScanner.touchEventExcludeSelector = 'a,.a *'
+            this._contentTextScanner.touchEventExcludeSelector = 'a,.a *';
             this._contentTextScanner.prepare();
             this._contentTextScanner.on('clear', this._onContentTextScannerClear.bind(this));
             this._contentTextScanner.on('searchSuccess', this._onContentTextScannerSearchSuccess.bind(this));
