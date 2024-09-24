@@ -101,7 +101,8 @@ export class TextSourceRange {
      */
      isImposterInputOrTextArea() {
         if (this._imposterSourceElement) {
-            return this._imposterSourceElement.tagName === 'INPUT' || this._imposterSourceElement.tagName === 'TEXTAREA';
+            const type = this._imposterSourceElement.nodeName.toUpperCase();
+            return type === 'INPUT' || type === 'TEXTAREA';
         }
         return false;
      }
