@@ -204,7 +204,10 @@ export class TextSourceGenerator {
                 case 'SELECT':
                     return TextSourceElement.create(element);
                 case 'INPUT':
-                    if (/** @type {HTMLInputElement} */ (element).type === 'text') {
+                    if (
+                        /** @type {HTMLInputElement} */ (element).type === 'text' ||
+                        /** @type {HTMLInputElement} */ (element).type === 'search'
+                    ) {
                         imposterSourceElement = element;
                         [imposter, imposterContainer] = this._createImposter(/** @type {HTMLInputElement} */ (element), false);
                     }
