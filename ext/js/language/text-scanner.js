@@ -73,6 +73,8 @@ export class TextScanner extends EventDispatcher {
         /** @type {?string} */
         this._excludeSelector = null;
         /** @type {?string} */
+        this._touchExcludeSelector = null;
+        /** @type {?string} */
         this._language = null;
 
         /** @type {?import('text-scanner').InputInfo} */
@@ -195,6 +197,15 @@ export class TextScanner extends EventDispatcher {
 
     set excludeSelector(value) {
         this._excludeSelector = value;
+    }
+
+    /** @type {?string} */
+    get touchEventExcludeSelector() {
+        return this._touchExcludeSelector;
+    }
+
+    set touchEventExcludeSelector(value) {
+        this._touchExcludeSelector = value;
     }
 
     /** @type {?string} */
@@ -1657,9 +1668,7 @@ export class TextScanner extends EventDispatcher {
      */
     _getExcludeSelectorForPointerType(pointerType) {
         if (pointerType === 'touch') {
-            // Avoid trigger search with tapping on interactive elements.
-            const popupClickableSelector = '.gloss-link,.gloss-link *,.tag, .tag *, .inflection, a, a *';
-            return this._excludeSelector ? `${this._excludeSelector},${popupClickableSelector}` : popupClickableSelector;
+            return this._excludeSelector ? `${this._excludeSelector},${this.touchEventExcludeSelector}` : this.touchEventExcludeSelector;
         }
         return this._excludeSelector;
     }

@@ -518,13 +518,16 @@ export class Frontend {
         });
         this._updateTextScannerEnabled();
 
+        const touchEventExcludeSelectors = ['a', 'a *']
         if (this._pageType !== 'web') {
             const excludeSelectors = ['.scan-disable', '.scan-disable *'];
             if (!scanningOptions.enableOnPopupExpressions) {
                 excludeSelectors.push('.source-text', '.source-text *');
             }
+            touchEventExcludeSelectors.push('.gloss-link', '.gloss-link *', '.tag', '.tag *');
             this._textScanner.excludeSelector = excludeSelectors.join(',');
         }
+        this._textScanner.touchEventExcludeSelector = touchEventExcludeSelectors.join(',');
 
         this._updateContentScale();
 
