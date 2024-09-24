@@ -52,6 +52,44 @@ TODO
         -e
 */
 
+const umlautTable = new Map([
+    ['\u05e2', '\u05d0'], // Ayin to Shtumer alef
+    ['\u05f2', '\u05f1'], // Tsvey yudn to Vov yud
+    ['\u05d9', '\u05d5'], // Yud to Vov
+]);
+
+/**
+ * @param {string} str
+ * @returns {string}
+ */
+function umlautMutation(str) {
+    const match = (/[עװאאַױוײיִײַיאָ](?!.*[װאאַױוײיִײַיאָע])/).exec(str);
+    if (match !== null && [...umlautTable.keys()].includes(str.charAt(match.index))) {
+        str = str.substring(0, match.index) + umlautTable.get(str.charAt(match.index)) + str.substring(match.index + 1);
+    }
+    return str;
+}
+
+/**
+ * @template {string} TCondition
+ * @param {string} inflectedSuffix
+ * @param {string} deinflectedSuffix
+ * @param {TCondition[]} conditionsIn
+ * @param {TCondition[]} conditionsOut
+ * @returns {import('language-transformer').SuffixRule<TCondition>}
+ */
+function umlautMutationSuffixInflection(inflectedSuffix, deinflectedSuffix, conditionsIn, conditionsOut) {
+    const suffixRegExp = new RegExp(inflectedSuffix + '$');
+    return {
+        type: 'suffix',
+        isInflected: suffixRegExp,
+        deinflected: deinflectedSuffix,
+        deinflect: (text) => umlautMutation(text.slice(0, -inflectedSuffix.length)) + deinflectedSuffix,
+        conditionsIn,
+        conditionsOut,
+    };
+}
+
 const conditions = {
     v: {
         name: 'Verb',
@@ -91,8 +129,16 @@ export const yiddishTransforms = {
             rules: [
                 suffixInflection('ס', '', ['np'], ['ns']),
                 suffixInflection('ן', '', ['np'], ['ns']),
-                suffixInflection('ער', '', ['np'], ['ns']),
                 suffixInflection('ים', '', ['np'], ['ns']),
+                suffixInflection('ער', '', ['np'], ['ns']),
+            ],
+        },
+        umlaut_plural: {
+            name: 'umlaut_plural',
+            description: 'plural form of a umlaut noun',
+            rules: [
+                umlautMutationSuffixInflection('ער', '', ['np'], ['ns']),
+                umlautMutationSuffixInflection('לעך', '', ['np'], ['ns']),
             ],
         },
         diminutive: {
@@ -102,6 +148,8 @@ export const yiddishTransforms = {
                 suffixInflection('לעך', '', ['n'], ['n']),
                 suffixInflection('טשיק', '', ['n'], ['n']),
                 suffixInflection('קע', '', ['n'], ['n']),
+                umlautMutationSuffixInflection('ל', '', ['n'], ['n']),
+                umlautMutationSuffixInflection('עלע', '', ['n'], ['n']),
             ],
         },
     },

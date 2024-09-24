@@ -40,8 +40,8 @@ import {albanianTransforms} from './sq/albanian-transforms.js';
 import {capitalizeFirstLetter, decapitalize, removeAlphabeticDiacritics} from './text-processors.js';
 import {tagalogTransforms} from './tl/tagalog-transforms.js';
 import {normalizeDiacritics} from './vi/viet-text-preprocessors.js';
-import {convertFinalLetters} from './yi/yiddish-text-postprocessors.js';
-import {convertYiddishLigatures, removeYiddishDiacritics} from './yi/yiddish-text-preprocessors.js';
+import {convertFinalLetters, convertYiddishLigatures} from './yi/yiddish-text-postprocessors.js';
+import {combineYiddishLigatures, removeYiddishDiacritics} from './yi/yiddish-text-preprocessors.js';
 import {yiddishTransforms} from './yi/yiddish-transforms.js';
 import {isStringPartiallyChinese, normalizePinyin} from './zh/chinese.js';
 
@@ -378,11 +378,12 @@ const languageDescriptors = [
         name: 'Yiddish',
         exampleText: 'באַשאַפֿן',
         textPreprocessors: {
-            convertYiddishLigatures,
             removeYiddishDiacritics,
+            combineYiddishLigatures,
         },
         textPostprocessors: {
             convertFinalLetters,
+            convertYiddishLigatures,
         },
         languageTransforms: yiddishTransforms,
     },

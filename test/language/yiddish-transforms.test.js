@@ -34,6 +34,10 @@ const tests = [
             {term: 'עטיקעט', source: 'עטיקעטקע', rule: 'n', reasons: ['diminutive']},
             {term: 'עטיקעט', source: 'עטיקעטקע', rule: 'n', reasons: ['diminutive']},
             {term: 'קליענטעל', source: 'קליענטעלטשיק', rule: 'n', reasons: ['diminutive']},
+            {term: 'קאצ', source: 'קעצעלע', rule: 'n', reasons: ['diminutive']},
+            {term: 'קאצ', source: 'קעצל', rule: 'n', reasons: ['diminutive']},
+            {term: 'מױד', source: 'מײדלעך', rule: 'ns', reasons: ['umlaut_plural']},
+            {term: 'מאנ', source: 'מענער', rule: 'ns', reasons: ['umlaut_plural']},
         ],
     },
 ];

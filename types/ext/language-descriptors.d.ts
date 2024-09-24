@@ -202,11 +202,12 @@ type AllTextProcessors = {
     };
     yi: {
         pre: {
+            combineYiddishLigatures: TextProcessor<boolean>;
             removeYiddishDiacritics: TextProcessor<boolean>;
-            convertYiddishLigatures: BidirectionalConversionPreprocessor;
         };
         post: {
             convertFinalLetters: TextProcessor<boolean>;
+            convertYiddishLigatures: BidirectionalConversionPreprocessor;
         };
     };
     yue: Record<string, never>;
