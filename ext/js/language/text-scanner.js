@@ -344,7 +344,7 @@ export class TextScanner extends EventDispatcher {
 
         const includeSelector = this._includeSelector;
         const excludeSelector = this._getExcludeSelectorForPointerType(pointerType);
-        if (includeSelector !== null || excludeSelector !== null ) {
+        if (includeSelector !== null || excludeSelector !== null) {
             this._constrainTextSource(clonedTextSource, includeSelector, excludeSelector, layoutAwareScan);
         }
 
@@ -1658,7 +1658,7 @@ export class TextScanner extends EventDispatcher {
     _getExcludeSelectorForPointerType(pointerType) {
         if (pointerType === 'touch') {
             // Avoid trigger search with tapping on interactive elements.
-            const popupClickableSelector = '.gloss-link,.gloss-link *,.tag, .tag *, .inflection, a, a *'
+            const popupClickableSelector = '.gloss-link,.gloss-link *,.tag, .tag *, .inflection, a, a *';
             return this._excludeSelector ? `${this._excludeSelector},${popupClickableSelector}` : popupClickableSelector;
         }
         return this._excludeSelector;
