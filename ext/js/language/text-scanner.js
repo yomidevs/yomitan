@@ -23,7 +23,6 @@ import {log} from '../core/log.js';
 import {clone} from '../core/utilities.js';
 import {anyNodeMatchesSelector, everyNodeMatchesSelector, getActiveModifiers, getActiveModifiersAndButtons, isPointInSelection} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
-import {TextSourceRange} from '../dom/text-source-range.js';
 
 /**
  * @augments EventDispatcher<import('text-scanner').Events>
@@ -466,9 +465,14 @@ export class TextScanner extends EventDispatcher {
     async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false) {
         try {
             const isAltText = textSource instanceof TextSourceElement;
-            const isInputOrTextArea = textSource instanceof TextSourceRange && textSource.isImposterInputOrTextArea();
-            if (inputInfo.pointerType === 'touch' && (isAltText || isInputOrTextArea)) {
-                return;
+            if (inputInfo.pointerType === 'touch') {
+                if (isAltText) {
+                    return;
+                }
+                const {imposterSourceElement} = textSource;
+                if (imposterSourceElement instanceof HTMLTextAreaElement || imposterSourceElement instanceof HTMLInputElement) {
+                    return;
+                }
             }
 
             const inputInfoDetail = inputInfo.detail;
