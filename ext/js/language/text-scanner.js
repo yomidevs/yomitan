@@ -469,9 +469,12 @@ export class TextScanner extends EventDispatcher {
                 if (isAltText) {
                     return;
                 }
-                const {imposterSourceElement} = textSource;
+                const {imposterSourceElement, rangeStartOffset} = textSource;
                 if (imposterSourceElement instanceof HTMLTextAreaElement || imposterSourceElement instanceof HTMLInputElement) {
-                    return;
+                    const isFocused = imposterSourceElement === document.activeElement;
+                    if (!isFocused || imposterSourceElement.selectionStart !== rangeStartOffset) {
+                        return;
+                    }
                 }
             }
 
