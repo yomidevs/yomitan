@@ -21,7 +21,7 @@ import {Modal} from './modal.js';
 
 export class ModalController {
     /**
-     * @param {string[]|undefined} templateNames
+     * @param {string[]} templateNames
      */
     constructor(templateNames) {
         /** @type {Modal[]} */
@@ -31,7 +31,7 @@ export class ModalController {
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
         /** @type {string[]} */
-        this._templateNames = templateNames ?? [];
+        this._templateNames = templateNames;
     }
 
     /** */

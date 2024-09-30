@@ -87,7 +87,7 @@ function setupPermissionsToggles() {
 }
 
 await Application.main(true, async (application) => {
-    const modalController = new ModalController();
+    const modalController = new ModalController([]);
     await modalController.prepare();
 
     const settingsController = new SettingsController(application);
