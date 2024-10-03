@@ -66,7 +66,7 @@ export class TextSourceGenerator {
         source = source.clone();
         const startLength = source.setStartOffset(extent, layoutAwareScan);
         const endLength = source.setEndOffset(extent * 2 - startLength, true, layoutAwareScan);
-        const text = source.text();
+        const text = [...source.text()];
         const textLength = text.length;
         const textEndAnchor = textLength - endLength;
 
@@ -173,7 +173,7 @@ export class TextSourceGenerator {
 
         // Result
         return {
-            text: text.substring(cursorStart, cursorEnd),
+            text: text.slice(cursorStart, cursorEnd).join(''),
             offset: startLength - cursorStart,
         };
     }
