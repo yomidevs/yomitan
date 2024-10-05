@@ -677,31 +677,26 @@ export class DictionaryController {
             optionsFull = await settingsController.getOptionsFull();
         }
 
-        /** @type {Set<string>} */
-        const installedDictionaries = new Set();
-        for (const {title} of dictionaries) {
-            installedDictionaries.add(title);
-        }
-
         /** @type {import('settings-modifications').Modification[]} */
         const targets = [];
         const {profiles} = optionsFull;
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
             let modified = false;
-            const missingDictionaries = new Set(installedDictionaries);
+            const missingDictionaries = [...dictionaries];
             const dictionaryOptionsArray = profiles[i].options.dictionaries;
             for (let j = dictionaryOptionsArray.length - 1; j >= 0; --j) {
                 const {name} = dictionaryOptionsArray[j];
-                if (installedDictionaries.has(name)) {
-                    missingDictionaries.delete(name);
+                const missingDictionariesNameIndex = missingDictionaries.findIndex((x) => x.title === name);
+                if (missingDictionariesNameIndex !== -1) {
+                    missingDictionaries.splice(missingDictionariesNameIndex, 1);
                 } else {
                     dictionaryOptionsArray.splice(j, 1);
                     modified = true;
                 }
             }
 
-            for (const name of missingDictionaries) {
-                const value = DictionaryController.createDefaultDictionarySettings(name, newDictionariesEnabled, '');
+            for (const {title, styles} of missingDictionaries) {
+                const value = DictionaryController.createDefaultDictionarySettings(title, newDictionariesEnabled, styles);
                 dictionaryOptionsArray.push(value);
                 modified = true;
             }
