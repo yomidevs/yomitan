@@ -72,6 +72,8 @@ export class TextScanner extends EventDispatcher {
         /** @type {?string} */
         this._excludeSelector = null;
         /** @type {?string} */
+        this._touchExcludeSelector = null;
+        /** @type {?string} */
         this._language = null;
 
         /** @type {?import('text-scanner').InputInfo} */
@@ -124,8 +126,6 @@ export class TextScanner extends EventDispatcher {
         this._sentenceBackwardQuoteMap = new Map();
         /** @type {import('text-scanner').InputConfig[]} */
         this._inputs = [];
-        /** @type {boolean} */
-        this._scanAltText = true;
 
         /** @type {boolean} */
         this._enabled = false;
@@ -199,6 +199,15 @@ export class TextScanner extends EventDispatcher {
     }
 
     /** @type {?string} */
+    get touchEventExcludeSelector() {
+        return this._touchExcludeSelector;
+    }
+
+    set touchEventExcludeSelector(value) {
+        this._touchExcludeSelector = value;
+    }
+
+    /** @type {?string} */
     get language() { return this._language; }
     set language(value) { this._language = value; }
 
@@ -257,7 +266,6 @@ export class TextScanner extends EventDispatcher {
         preventMiddleMouse,
         sentenceParsingOptions,
         matchTypePrefix,
-        scanAltText,
         scanWithoutMousemove,
         scanResolution,
     }) {
@@ -293,9 +301,6 @@ export class TextScanner extends EventDispatcher {
         }
         if (typeof matchTypePrefix === 'boolean') {
             this._matchTypePrefix = matchTypePrefix;
-        }
-        if (typeof scanAltText === 'boolean') {
-            this._scanAltText = scanAltText;
         }
         if (typeof scanWithoutMousemove === 'boolean') {
             this._scanWithoutMousemove = scanWithoutMousemove;
@@ -348,9 +353,9 @@ export class TextScanner extends EventDispatcher {
         clonedTextSource.setEndOffset(length, false, layoutAwareScan);
 
         const includeSelector = this._includeSelector;
-        const excludeSelector = this._excludeSelector;
+        const excludeSelector = this._getExcludeSelectorForPointerType(pointerType);
         if (includeSelector !== null || excludeSelector !== null) {
-            this._constrainTextSource(clonedTextSource, includeSelector, excludeSelector, layoutAwareScan, pointerType);
+            this._constrainTextSource(clonedTextSource, includeSelector, excludeSelector, layoutAwareScan);
         }
 
         return clonedTextSource.text();
@@ -460,8 +465,17 @@ export class TextScanner extends EventDispatcher {
     async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false) {
         try {
             const isAltText = textSource instanceof TextSourceElement;
-            if (isAltText && !this._scanAltText) {
-                return;
+            if (inputInfo.pointerType === 'touch') {
+                if (isAltText) {
+                    return;
+                }
+                const {imposterSourceElement, rangeStartOffset} = textSource;
+                if (imposterSourceElement instanceof HTMLTextAreaElement || imposterSourceElement instanceof HTMLInputElement) {
+                    const isFocused = imposterSourceElement === document.activeElement;
+                    if (!isFocused || imposterSourceElement.selectionStart !== rangeStartOffset) {
+                        return;
+                    }
+                }
             }
 
             const inputInfoDetail = inputInfo.detail;
@@ -1637,11 +1651,9 @@ export class TextScanner extends EventDispatcher {
      * @param {?string} includeSelector
      * @param {?string} excludeSelector
      * @param {boolean} layoutAwareScan
-     * @param {import('input').PointerType | undefined} pointerType
      */
-    _constrainTextSource(textSource, includeSelector, excludeSelector, layoutAwareScan, pointerType) {
+    _constrainTextSource(textSource, includeSelector, excludeSelector, layoutAwareScan) {
         let length = textSource.text().length;
-        excludeSelector = this._createExcludeSelectorForPointerType(excludeSelector, pointerType);
 
         while (length > 0) {
             const nodes = textSource.getNodesInRange();
@@ -1658,17 +1670,14 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {?string} excludeSelector
      * @param {import('input').PointerType | undefined} pointerType
      * @returns {?string}
      */
-    _createExcludeSelectorForPointerType(excludeSelector, pointerType) {
+    _getExcludeSelectorForPointerType(pointerType) {
         if (pointerType === 'touch') {
-            // Avoid trigger search with tapping on popup link, tag and inflection.
-            const popupClickableSelector = '.gloss-link, .gloss-link *, .tag, .tag *, .inflection';
-            return excludeSelector ? `${excludeSelector},${popupClickableSelector}` : popupClickableSelector;
+            return this._excludeSelector ? `${this._excludeSelector},${this.touchEventExcludeSelector}` : this.touchEventExcludeSelector;
         }
-        return excludeSelector;
+        return this._excludeSelector;
     }
 
     /**

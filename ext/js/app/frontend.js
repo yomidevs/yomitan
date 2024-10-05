@@ -513,7 +513,6 @@ export class Frontend {
             matchTypePrefix: scanningOptions.matchTypePrefix,
             preventMiddleMouse,
             sentenceParsingOptions,
-            scanAltText: scanningOptions.scanAltText,
             scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
             scanResolution: scanningOptions.scanResolution,
         });
@@ -525,6 +524,7 @@ export class Frontend {
                 excludeSelectors.push('.source-text', '.source-text *');
             }
             this._textScanner.excludeSelector = excludeSelectors.join(',');
+            this._textScanner.touchEventExcludeSelector = 'gloss-link, gloss-link *, tag, tag *, inflection';
         }
 
         this._updateContentScale();
