@@ -3,8 +3,9 @@
 [![Get Yomitan for Chrome](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&style=for-the-badge&logoColor=lightblue&color=lightblue&label=get%20yomitan%20for%20chrome%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn)
 [![Get Yomitan for Firefox](<https://img.shields.io/amo/v/yomitan?logo=Firefox&style=for-the-badge&color=orange&label=get%20yomitan%20for%20firefox%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
 [![Get Yomitan for Edge](https://img.shields.io/badge/dynamic/json?logo=puzzle&label=get%20yomitan%20for%20edge&style=for-the-badge&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fidelnfbbmikgfiejhgmddlbkfgiifnnn)](https://microsoftedge.microsoft.com/addons/detail/yomitan/idelnfbbmikgfiejhgmddlbkfgiifnnn)
-[![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC)](https://discord.gg/UGNPMDE7zC)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge?style=for-the-badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
+
+<strong style="font-size:20px; position: relative; bottom: 7px;">General: </strong>[![Discord](https://dcbadge.vercel.app/api/server/YkQrXW6TXF?style=for-the-badge)](https://discord.gg/YkQrXW6TXF) <strong style="font-size:20px; position: relative; bottom: 7px;">Japanese: </strong>[![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=for-the-badge)](https://discord.gg/UGNPMDE7zC)
 
 # Visit [yomitan.wiki](https://yomitan.wiki) to learn more!
 
