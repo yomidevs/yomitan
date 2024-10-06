@@ -464,7 +464,6 @@ export class Display extends EventDispatcher {
                 preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery,
                 matchTypePrefix: false,
                 sentenceParsingOptions,
-                scanAltText: scanningOptions.scanAltText,
                 scanWithoutMousemove: scanningOptions.scanWithoutMousemove,
                 scanResolution: scanningOptions.scanResolution,
             },
@@ -1994,6 +1993,7 @@ export class Display extends EventDispatcher {
             });
             this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
             this._contentTextScanner.excludeSelector = '.scan-disable,.scan-disable *';
+            this._contentTextScanner.touchEventExcludeSelector = null;
             this._contentTextScanner.prepare();
             this._contentTextScanner.on('clear', this._onContentTextScannerClear.bind(this));
             this._contentTextScanner.on('searchSuccess', this._onContentTextScannerSearchSuccess.bind(this));
@@ -2033,7 +2033,6 @@ export class Display extends EventDispatcher {
             layoutAwareScan: scanningOptions.layoutAwareScan,
             preventMiddleMouse: false,
             sentenceParsingOptions,
-            scanAltText: scanningOptions.scanAltText,
         });
 
         this._contentTextScanner.setEnabled(true);

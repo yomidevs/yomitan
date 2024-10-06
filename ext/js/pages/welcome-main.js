@@ -60,8 +60,8 @@ async function checkNeedsCustomTemplatesWarning() {
 }
 
 await Application.main(true, async (application) => {
-    const modalController = new ModalController();
-    modalController.prepare();
+    const modalController = new ModalController(['shared-modals']);
+    await modalController.prepare();
 
     const settingsController = new SettingsController(application);
     await settingsController.prepare();

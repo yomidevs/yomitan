@@ -563,6 +563,7 @@ export class OptionsUtil {
             this._updateVersion49,
             this._updateVersion50,
             this._updateVersion51,
+            this._updateVersion52,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1484,6 +1485,16 @@ export class OptionsUtil {
     async _updateVersion51(options) {
         for (const profile of options.profiles) {
             profile.options.scanning.scanResolution = 'character';
+        }
+    }
+
+    /**
+     * - Remove scanning.scanAltText
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion52(options) {
+        for (const profile of options.profiles) {
+            delete profile.options.scanning.scanAltText;
         }
     }
 
