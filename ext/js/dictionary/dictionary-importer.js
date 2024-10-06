@@ -815,8 +815,19 @@ export class DictionaryImporter {
         const results = [];
         for (const file of files) {
             const content = await this._getData(file, new TextWriter());
-            /** @type {unknown} */
-            const entries = parseJson(content);
+            let entries;
+
+            try {
+                /** @type {unknown} */
+                entries = parseJson(content);
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    let newError = new Error(error.message + `. Dictionary has invalid data in '${file.filename}'`);
+                    console.error(newError);
+                    throw newError;
+                }
+            }
 
             startIndex = progressData.index;
             this._progress();
