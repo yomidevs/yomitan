@@ -305,7 +305,6 @@ export class AnkiTemplateRenderer {
 
         const tags = new Set();
         for (const tagSource of tagSources) {
-            if (!Array.isArray(tagSource)) { continue; }
             for (const tag of tagSource) {
                 tags.add(tag.name);
             }
