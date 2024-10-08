@@ -1,6 +1,6 @@
 # Issues and Features
 
-Issues reported on [GitHub](https://github.com/themoeway/yomitan/issues) should include information about:
+Issues reported on [GitHub](https://github.com/yomidevs/yomitan/issues) should include information about:
 
 - What the problem, question, or request is.
 - What browser is being used.

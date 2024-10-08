@@ -3,7 +3,7 @@
 [![Get Yomitan for Chrome](<https://img.shields.io/chrome-web-store/v/likgccmbimhjbgkjambclfkhldnlhbnn?logo=Google%20Chrome&style=for-the-badge&logoColor=lightblue&color=lightblue&label=get%20yomitan%20for%20chrome%20(stable)>)](https://chrome.google.com/webstore/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn)
 [![Get Yomitan for Firefox](<https://img.shields.io/amo/v/yomitan?logo=Firefox&style=for-the-badge&color=orange&label=get%20yomitan%20for%20firefox%20(stable)>)](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
 [![Get Yomitan for Edge](https://img.shields.io/badge/dynamic/json?logo=puzzle&label=get%20yomitan%20for%20edge&style=for-the-badge&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fidelnfbbmikgfiejhgmddlbkfgiifnnn)](https://microsoftedge.microsoft.com/addons/detail/yomitan/idelnfbbmikgfiejhgmddlbkfgiifnnn)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/themoeway/yomitan/badge?style=for-the-badge)](https://securityscorecards.dev/viewer/?uri=github.com/themoeway/yomitan)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/yomidevs/yomitan/badge?style=for-the-badge)](https://securityscorecards.dev/viewer/?uri=github.com/yomidevs/yomitan)
 
 <strong style="font-size:20px; position: relative; bottom: 7px;">General: </strong>[![Discord](https://dcbadge.vercel.app/api/server/YkQrXW6TXF?style=for-the-badge)](https://discord.gg/YkQrXW6TXF) <strong style="font-size:20px; position: relative; bottom: 7px;">Japanese: </strong>[![Discord](https://dcbadge.vercel.app/api/server/UGNPMDE7zC?style=for-the-badge)](https://discord.gg/UGNPMDE7zC)
 
@@ -26,7 +26,7 @@ Yomitan provides powerful features not available in other browser-based dictiona
 - ✍️ Kanji stroke order diagrams are just a click away.
 - 📝 [Automatic flashcard creation](./docs/anki-integration.md#anki-integration) for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 - 🔍 Custom search page for easily executing custom search queries.
-- 📖 Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomitan Import](https://github.com/themoeway/yomitan-import) tool.
+- 📖 Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomitan Import](https://github.com/yomidevs/yomitan-import) tool.
 - ✨ Clean, modern code makes it easy for developers to [contribute](#contributing) new features and languages.
 
 [![Term definitions](img/ss-terms-thumb.png)](img/ss-terms.png)
@@ -56,7 +56,7 @@ Yomitan provides powerful features not available in other browser-based dictiona
 
 ## Installation
 
-Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially introduced into the _testing_ version, and after some time spent ensuring that they are relatively bug free, they will be promoted to the _stable_ version. If you are technically savvy and don't mind [submitting issues](https://github.com/themoeway/yomitan/issues/new/choose) on GitHub, try the _testing_ version; otherwise, the _stable_ version will be your best bet. Check [contributing](#contributing) for more information on how to help.
+Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially introduced into the _testing_ version, and after some time spent ensuring that they are relatively bug free, they will be promoted to the _stable_ version. If you are technically savvy and don't mind [submitting issues](https://github.com/yomidevs/yomitan/issues/new/choose) on GitHub, try the _testing_ version; otherwise, the _stable_ version will be your best bet. Check [contributing](#contributing) for more information on how to help.
 
 - **Google Chrome**
 
@@ -66,7 +66,7 @@ Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially 
 - **Mozilla Firefox**
 
   - [stable](https://addons.mozilla.org/en-US/firefox/addon/yomitan/)
-  - [testing](https://github.com/themoeway/yomitan/releases) ※
+  - [testing](https://github.com/yomidevs/yomitan/releases) ※
 
 - **Microsoft Edge**
   - [stable](https://microsoftedge.microsoft.com/addons/detail/yomitan/idelnfbbmikgfiejhgmddlbkfgiifnnn)
@@ -103,9 +103,9 @@ To further enhance your Yomitan experience, it's worth [integrating with Anki](.
 
 ## Contributing
 
-🚀 **Dip your toes into contributing by looking at issues with the label [good first issue](https://github.com/themoeway/yomitan/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).**
+🚀 **Dip your toes into contributing by looking at issues with the label [good first issue](https://github.com/yomidevs/yomitan/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).**
 
-Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the [issue tracker](https://github.com/themoeway/yomitan/issues), and read our [contributing guidelines](./CONTRIBUTING.md).
+Since this is a distributed effort, we **highly welcome new contributors**! Feel free to browse the [issue tracker](https://github.com/yomidevs/yomitan/issues), and read our [contributing guidelines](./CONTRIBUTING.md).
 
 Here are some ways anyone can help:
 
@@ -119,7 +119,7 @@ If you're looking to code, please let us know what you plan on working on before
 
 Some contributions we always appreciate:
 
-- Well-written tests covering different functionalities. This includes [playwright tests](https://github.com/themoeway/yomitan/tree/master/test/playwright), [benchmark tests](https://github.com/themoeway/yomitan/tree/master/benches), and unit tests.
+- Well-written tests covering different functionalities. This includes [playwright tests](https://github.com/yomidevs/yomitan/tree/master/test/playwright), [benchmark tests](https://github.com/yomidevs/yomitan/tree/master/benches), and unit tests.
 - Increasing our type coverage.
 - More and better documentation!
 

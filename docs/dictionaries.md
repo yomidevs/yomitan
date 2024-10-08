@@ -9,16 +9,16 @@ Be aware that non-English dictionaries generally contain fewer entries than thei
 #### Japanese
 
 - [Jitendex](https://github.com/stephenmk/Jitendex) - An improved version of JMdict for Yomitan. It features better formatting and some other improvements, and is actively being improved by its author.
-- [JMdict](https://github.com/themoeway/jmdict-yomitan#jmdict-for-yomitan-1) - There are daily automatically updated builds of JMdict for Yomitan available in this repository. It is available in multiple languages and formats, but we recommend installing the more modern Jitendex for English users.
-- [JMnedict](https://github.com/themoeway/jmdict-yomitan#jmnedict-for-yomitan) - Lists readings of person/place/organization names and other proper nouns.
-- [KANJIDIC](https://github.com/themoeway/jmdict-yomitan#kanjidic-for-yomitan) - An English dictionary listing readings, meanings, and other info about kanji characters.
+- [JMdict](https://github.com/yomidevs/jmdict-yomitan#jmdict-for-yomitan-1) - There are daily automatically updated builds of JMdict for Yomitan available in this repository. It is available in multiple languages and formats, but we recommend installing the more modern Jitendex for English users.
+- [JMnedict](https://github.com/yomidevs/jmdict-yomitan#jmnedict-for-yomitan) - Lists readings of person/place/organization names and other proper nouns.
+- [KANJIDIC](https://github.com/yomidevs/jmdict-yomitan#kanjidic-for-yomitan) - An English dictionary listing readings, meanings, and other info about kanji characters.
 - [BCCWJ Frequency Dictionary](https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#bccwj-suw-luw-combined) - A frequency dictionary based on the Balanced Corpus of Contemporary Written Japanese.
 - [JPDB Frequency Dictionary](https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#jpdb-v21-frequency) - A frequency dictionary based on the corpus from the online Japanese dictionary and SRS system at https://jpdb.io.
 
 #### Other Languages
 
 - **Multilingual**
-  - [KTY](https://github.com/themoeway/kaikki-to-yomitan) - Wiktionaries in various languages converted to Yomitan format.
+  - [KTY](https://github.com/yomidevs/kaikki-to-yomitan) - Wiktionaries in various languages converted to Yomitan format.
   - [Wikipedia for Yomitan](https://github.com/MarvNC/wikipedia-yomitan) - All of Wikipedia in Yomitan for various languages.
 - **Korean**
   - [KRDICT/STDICT](https://github.com/Lyroxide/yomitan-ko-dic/releases) - Korean dictionaries for Yomitan.
@@ -31,7 +31,7 @@ Be aware that non-English dictionaries generally contain fewer entries than thei
 
 Yomitan supports dictionaries in the esoteric but popular [EPWING](https://ja.wikipedia.org/wiki/EPWING) format. They were often utilized in portable electronic dictionaries. These dictionaries are often sought after by language learners for their correctness and excellent coverage of the Japanese language.
 
-Unfortunately, as most of the dictionaries released in this format are proprietary, you will need to procure these dictionaries yourself and import them using [Yomitan Import](https://github.com/themoeway/yomitan-import). Check the project page for additional details.
+Unfortunately, as most of the dictionaries released in this format are proprietary, you will need to procure these dictionaries yourself and import them using [Yomitan Import](https://github.com/yomidevs/yomitan-import). Check the project page for additional details.
 
 ### Bulk Importing Dictionaries
 
