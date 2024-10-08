@@ -127,7 +127,7 @@ Information on how to setup and build the codebase can be found [here](./CONTRIB
 
 If you want to add or improve support for a language, read the documentation on [language features](./docs/development/language-features.md).
 
-Feel free to join us on [Yomitan Discord](https://discord.gg/YkQrXW6TXF).
+Feel free to join us on the [Yomitan Discord](https://discord.gg/YkQrXW6TXF).
 
 ## Third-Party Libraries
 
