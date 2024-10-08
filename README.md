@@ -127,7 +127,7 @@ Information on how to setup and build the codebase can be found [here](./CONTRIB
 
 If you want to add or improve support for a language, read the documentation on [language features](./docs/development/language-features.md).
 
-Feel free to join us on [TheMoeWay Discord 🐇](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
+Feel free to join us on the [Yomitan Discord](https://discord.gg/YkQrXW6TXF).
 
 ## Third-Party Libraries
 
