@@ -309,7 +309,7 @@
                         "gecko",
                         "update_url"
                     ],
-                    "value": "https://raw.githubusercontent.com/themoeway/yomitan/metadata/updates.json"
+                    "value": "https://raw.githubusercontent.com/yomidevs/yomitan/metadata/updates.json"
                 }
             ],
             "excludeFiles": [
