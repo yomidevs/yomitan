@@ -189,7 +189,7 @@ function getFrequencyNumbers(dictionaryEntry) {
             if (frequencyMatch !== null) {
                 const frequencyParsed = Number.parseInt(frequencyMatch[0], 10);
                 if (frequencyParsed > 0) {
-                    frequencies.push();
+                    frequencies.push(frequencyParsed);
                     continue;
                 }
             }
