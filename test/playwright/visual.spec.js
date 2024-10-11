@@ -26,6 +26,12 @@ test.beforeEach(async ({context}) => {
 });
 
 test('visual', async ({page, extensionId}) => {
+    // Open welcome page
+    await page.goto(`chrome-extension://${extensionId}/welcome.html`);
+
+    // Take a screenshot of the welcome page
+    await expect.soft(page).toHaveScreenshot('welcome-page.png');
+
     // Open settings
     await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
