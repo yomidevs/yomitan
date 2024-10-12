@@ -1064,14 +1064,19 @@ export class DisplayGenerator {
     }
 
 
+    /**
+     *
+     * @param {HTMLElement} container
+     * @param {import('dictionary-data-util').DictionaryFrequency<import('dictionary-data-util').TermFrequency>[]} groupedFrequencies
+     */
     _appendMeanFrequency(container, groupedFrequencies) {
         let partialSum = 0;
         for (let i = 0, ii = groupedFrequencies.length; i < ii; ++i) {
-            let {dictionary, frequencies} = groupedFrequencies[i];
-            if(frequencies[0]['values'][0]['frequency'] == null) {continue;}
-            partialSum += 1/(frequencies[0]['values'][0]['frequency']);
+            const {frequencies} = groupedFrequencies[i];
+            if (frequencies[0].values[0].frequency === null) { continue; }
+            partialSum += 1 / (frequencies[0].values[0].frequency);
         }
-        partialSum = Math.floor(groupedFrequencies.length/partialSum);
+        partialSum = Math.floor(groupedFrequencies.length / partialSum);
         const itemNode = this._instantiate('term-frequency-item');
 
 
