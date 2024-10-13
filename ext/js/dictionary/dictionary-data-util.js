@@ -83,37 +83,41 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
     }
 
     const results = [];
+
+    /** @type {import('dictionary').AverageFrequencyListTerm} */
     const averages = {};
     for (const [dictionary, map2] of map1.entries()) {
         const frequencies = [];
         const dictionaryAlias = aliasMap.get(dictionary) ?? dictionary;
-        for (const {term, reading, values} of map2.values()) {
+        for (let {term, reading, values} of map2.values()) {
             frequencies.push({
                 term,
                 reading,
                 values: [...values.values()],
             });
             const valuesArray = [...values.values()];
-            let { currentAvg, count} = averages[term]?.[reading] ?? {currentAvg:1, count:0};
+            // console.log(valuesArray);
+            if (reading === null) { reading = ''; }
+            let {currentAvg, count} = averages[term]?.[reading] ?? {currentAvg: 1, count: 0};
             if (valuesArray[0].frequency === null) { continue; }
 
-            currentAvg = (count/(currentAvg))+(1/(valuesArray[0].frequency))
-            currentAvg = (count +1)/currentAvg
-            count += 1
+            currentAvg = (count / (currentAvg)) + (1 / (valuesArray[0].frequency));
+            currentAvg = (count + 1) / currentAvg;
+            count += 1;
 
             averages[term] = {
                 ...averages[term],
                 [reading]: {
-                    currentAvg, count
-                }
-            }
+                    currentAvg, count,
+                },
+            };
         }
         const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
         const freqCount = currentDictionaryInfo?.counts?.termMeta.freq ?? 0;
         results.push({dictionary, frequencies, dictionaryAlias, freqCount});
     }
-    const avgFrequencies = Object.keys(averages).flatMap(termName => Object.keys(averages[termName]).map(readingName => ({term: termName, reading: readingName, values: [{frequency: Math.round(averages[termName][readingName].currentAvg), displayValue: Math.round(averages[termName][readingName].currentAvg).toString()}]})))
-    results.push({dictionary:'Average', frequencies: avgFrequencies, dictionaryAlias:'Average'})
+    const avgFrequencies = Object.keys(averages).flatMap((termName) => Object.keys(averages[termName]).map((readingName) => ({term: termName, reading: readingName, values: [{frequency: Math.round(averages[termName][readingName].currentAvg), displayValue: Math.round(averages[termName][readingName].currentAvg).toString()}]})));
+    results.push({dictionary: 'Average', frequencies: avgFrequencies, dictionaryAlias: 'Average'});
 
     return results;
 }
