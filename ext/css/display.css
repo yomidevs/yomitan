@@ -1934,6 +1934,15 @@ button.footer-notification-close-button {
 :root[data-anki-enabled=false] .action-button[data-action=save-note] {
     display: none;
 }
+
+:root[data-average-frequency=false] .frequency-group-item:last-child {
+    display: none;
+}
+
+:root[data-average-frequency=true] .frequency-group-item:not(:last-child){
+    display: none;
+}
+
 :root[data-audio-enabled=false] .action-button[data-action=play-audio] {
     display: none;
 }

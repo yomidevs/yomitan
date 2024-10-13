@@ -1175,6 +1175,7 @@ export class Display extends EventDispatcher {
         data.resultOutputMode = `${options.general.resultOutputMode}`;
         data.glossaryLayoutMode = `${options.general.glossaryLayoutMode}`;
         data.compactTags = `${options.general.compactTags}`;
+        data.averageFrequency = `${options.general.averageFrequency}`;
         data.frequencyDisplayMode = `${options.general.frequencyDisplayMode}`;
         data.termDisplayMode = `${options.general.termDisplayMode}`;
         data.enableSearchTags = `${options.scanning.enableSearchTags}`;
