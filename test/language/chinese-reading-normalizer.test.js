@@ -26,7 +26,7 @@ const tests = [
     ['fān・yì', 'fānyì'],
     ['fān//yì', 'fānyì'],
     ['fān’yì', 'fānyì'],
-    ['fān'yì', 'fānyì'],
+    ['fān\'yì', 'fānyì'],
     ['fān-yì', 'fānyì'],
 ];
 
