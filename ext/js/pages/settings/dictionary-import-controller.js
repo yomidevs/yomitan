@@ -208,6 +208,10 @@ export class DictionaryImportController {
     _renderRecommendedDictionaryGroup(recommendedDictionaries, dictionariesList, installedDictionaryNames, installedDictionaryDownloadUrls) {
         const dictionariesListParent = dictionariesList.parentElement;
         dictionariesList.innerHTML = '';
+        // Hide section if no dictionaries are available
+        if (dictionariesListParent) {
+            dictionariesListParent.hidden = recommendedDictionaries.length === 0;
+        }
         for (const dictionary of recommendedDictionaries) {
             if (dictionariesList) {
                 if (dictionariesListParent) {
