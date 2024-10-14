@@ -30,7 +30,6 @@ export class RecommendedSettingsController {
         this._languageSelect = querySelectorNotNull(document, '#language-select');
         /** @type {HTMLInputElement} */
         this._applyButton = querySelectorNotNull(document, '#recommended-settings-apply-button');
-        /** @type {} */
     }
 
     /** */
@@ -53,9 +52,15 @@ export class RecommendedSettingsController {
             for (const {path, value, description} of recommendedSettings) {
                 const template = this._settingsController.instantiateTemplate('recommended-settings-list-item');
 
-                // Render checkbox
+                // Render label
                 const label = querySelectorNotNull(template, '.settings-item-label');
-                label.innerHTML = `<code>${path}</code> -> <code>${value}</code>`;
+                const pathCodeElement = document.createElement('code');
+                pathCodeElement.textContent = path;
+                const valueCodeElement = document.createElement('code');
+                valueCodeElement.textContent = value;
+                label.appendChild(pathCodeElement);
+                label.appendChild(document.createTextNode(' -> '));
+                label.appendChild(valueCodeElement);
 
                 // Render description
                 const descriptionElement = querySelectorNotNull(template, '.settings-item-description');
@@ -78,12 +83,17 @@ export class RecommendedSettingsController {
      */
     _onApplyButtonClicked(e) {
         e.preventDefault();
-        const enabledCheckboxes = querySelectorNotNull(document, '#recommended-settings-list').querySelectorAll('input[type="checkbox"]:checked');
+        const enabledCheckboxes /** @type {HTMLInputElement} */ = querySelectorNotNull(document, '#recommended-settings-list').querySelectorAll('input[type="checkbox"]:checked');
         if (enabledCheckboxes.length > 0) {
             const recommendedSettings = this._settingsController.getRecommendedSettings(this._languageSelect.value);
+            const modifications = [];
             for (const checkbox of enabledCheckboxes) {
-                this._settingsController.setSetting(path, value);
+                const path = checkbox.value;
+                const {action, value} = recommendedSettings.find((setting) => setting.path === path);
+                modifications.push({action, path, value});
             }
+            void this._settingsController.modifyProfileSettings(modifications);
+            void this._settingsController.refresh();
         }
         this._recommendedSettingsModal.hidden = true;
     }

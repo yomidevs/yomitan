@@ -17,6 +17,16 @@
                         "type": "string",
                         "minLength": 2
                     },
+                    "action": {
+                        "type": "string",
+                        "enum": [
+                            "set",
+                            "delete",
+                            "swap",
+                            "splice",
+                            "push"
+                        ]
+                    },
                     "value": {
                         "anyOf": [
                             {
@@ -36,6 +46,10 @@
                                 "type": "object"
                             }
                         ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "minLength": 2
                     }
                 }
             }
