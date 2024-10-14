@@ -135,7 +135,7 @@ h1 {
     --icon-size: 16px 16px;
 }
 
-.cross-button {
+.clear-button {
     flex: 0 0 auto;
     position: relative;
     width: 2.5em;
@@ -151,22 +151,22 @@ h1 {
     transition: background-color var(--animation-duration) ease-in-out;
     border-radius: 0;
 }
-.cross-button:hover,
-.cross-button:focus {
+.clear-button:hover,
+.clear-button:focus {
     background-color: var(--input-background-color-dark);
 }
-.cross-button:focus:not(:focus-visible):not(:hover) {
+.clear-button:focus:not(:focus-visible):not(:hover) {
     background-color: var(--input-background-color);
 }
-.cross-button:focus-visible {
+.clear-button:focus-visible {
     background-color: var(--input-background-color-dark);
 }
-.cross-button:active,
-.cross-button:active:focus {
+.clear-button:active,
+.clear-button:active:focus {
     background-color: var(--input-background-color-darker);
 }
 
-.cross-button>.icon {
+.clear-button>.icon {
     display: block;
     position: absolute;
     left: 0;
