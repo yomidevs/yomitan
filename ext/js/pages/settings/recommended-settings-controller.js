@@ -69,7 +69,8 @@ export class RecommendedSettingsController {
                 }
 
                 // Render checkbox
-                const checkbox /** @type {HTMLInputElement} */ = querySelectorNotNull(template, 'input[type="checkbox"]');
+                /** @type {HTMLInputElement} */
+                const checkbox = querySelectorNotNull(template, 'input[type="checkbox"]');
                 checkbox.value = path;
 
                 settingsList.append(template);
@@ -83,7 +84,8 @@ export class RecommendedSettingsController {
      */
     _onApplyButtonClicked(e) {
         e.preventDefault();
-        const enabledCheckboxes /** @type {HTMLInputElement} */ = querySelectorNotNull(document, '#recommended-settings-list').querySelectorAll('input[type="checkbox"]:checked');
+        /** @type {HTMLInputElement[]} */
+        const enabledCheckboxes = querySelectorNotNull(document, '#recommended-settings-list').querySelectorAll('input[type="checkbox"]:checked');
         if (enabledCheckboxes.length > 0) {
             const recommendedSettings = this._settingsController.getRecommendedSettings(this._languageSelect.value);
             const modifications = [];
