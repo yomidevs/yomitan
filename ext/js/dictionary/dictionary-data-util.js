@@ -131,8 +131,6 @@ export function groupTermFrequencies(dictionaryEntry) {
     }
 
     const avgFrequencies = Object.keys(averages).flatMap((termName) => Object.keys(averages[termName]).map((readingName) => ({term: termName, reading: readingName, values: [{frequency: Math.round(averages[termName][readingName].currentAvg), displayValue: Math.round(averages[termName][readingName].currentAvg).toString()}]})));
-
-
     results.push({dictionary: 'Average', frequencies: avgFrequencies, dictionaryAlias: 'Average'});
 
     return results;
