@@ -1939,7 +1939,7 @@ button.footer-notification-close-button {
     display: none;
 }
 
-:root[data-average-frequency=true] .frequency-group-item:not(:last-child){
+:root[data-average-frequency=true] .frequency-group-item:not(:last-child) {
     display: none;
 }
 
