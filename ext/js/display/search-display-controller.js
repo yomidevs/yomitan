@@ -38,6 +38,8 @@ export class SearchDisplayController {
         /** @type {HTMLButtonElement} */
         this._searchButton = querySelectorNotNull(document, '#search-button');
         /** @type {HTMLButtonElement} */
+        this._crossButton = querySelectorNotNull(document, '#cross-button');
+        /** @type {HTMLButtonElement} */
         this._searchBackButton = querySelectorNotNull(document, '#search-back-button');
         /** @type {HTMLTextAreaElement} */
         this._queryInput = querySelectorNotNull(document, '#search-textbox');
@@ -104,6 +106,8 @@ export class SearchDisplayController {
         this._display.setHistorySettings({useBrowserHistory: true});
 
         this._searchButton.addEventListener('click', this._onSearch.bind(this), false);
+        this._crossButton.addEventListener('click', this._onCancel.bind(this), false);
+
         this._searchBackButton.addEventListener('click', this._onSearchBackButtonClick.bind(this), false);
         this._wanakanaEnableCheckbox.addEventListener('change', this._onWanakanaEnableChange.bind(this));
         window.addEventListener('copy', this._onCopy.bind(this));
@@ -266,6 +270,14 @@ export class SearchDisplayController {
     _onSearch(e) {
         e.preventDefault();
         this._search(true, 'new', true, null);
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    _onCancel(e) {
+        e.preventDefault();
+        this._queryInput.value = '';
     }
 
     /** */
