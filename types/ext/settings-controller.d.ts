@@ -22,6 +22,7 @@ import type * as Core from './core';
 import type * as Settings from './settings';
 import type * as SettingsModifications from './settings-modifications';
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
+import type {Modification} from './settings-modifications';
 
 export type PageExitPrevention = {
     end: () => void;
@@ -58,13 +59,11 @@ export type SettingsExtraFields<THasScope extends boolean> = THasScope extends t
 
 export type ModifyResult = Core.Response<SettingsModifications.ModificationResult>;
 
-export type RecommendedSettingsByLanguage = {
-    [key: string]: RecommendedSetting[];
+export type RecommendedSetting = {
+    modification: Modification;
+    description: string;
 };
 
-export type RecommendedSetting = {
-    action: string;
-    path: string;
-    value: string;
-    description: string;
+export type RecommendedSettingsByLanguage = {
+    [key: string]: RecommendedSetting[];
 };
