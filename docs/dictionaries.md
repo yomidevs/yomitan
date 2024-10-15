@@ -13,7 +13,7 @@ Be aware that non-English dictionaries generally contain fewer entries than thei
 - [JMnedict](https://github.com/yomidevs/jmdict-yomitan#jmnedict-for-yomitan) - Lists readings of person/place/organization names and other proper nouns.
 - [KANJIDIC](https://github.com/yomidevs/jmdict-yomitan#kanjidic-for-yomitan) - An English dictionary listing readings, meanings, and other info about kanji characters.
 - [BCCWJ Frequency Dictionary](https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#bccwj-suw-luw-combined) - A frequency dictionary based on the Balanced Corpus of Contemporary Written Japanese.
-- [JPDB Frequency Dictionary](https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#jpdb-v21-frequency) - A frequency dictionary based on the corpus from the online Japanese dictionary and SRS system at https://jpdb.io.
+- [JPDB Frequency Dictionary](https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#jpdb-v22-frequency) - A frequency dictionary based on the corpus from the online Japanese dictionary and SRS system at https://jpdb.io.
 
 #### Other Languages
 
