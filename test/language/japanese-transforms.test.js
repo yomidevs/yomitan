@@ -1366,6 +1366,7 @@ const tests = [
             {term: 'とう', source: 'とうて', rule: 'v5', reasons: ['-て']},
             {term: '請う', source: '請うて', rule: 'v5', reasons: ['-て']},
             {term: '乞う', source: '乞うて', rule: 'v5', reasons: ['-て']},
+            {term: '恋う', source: '恋うて', rule: 'v5', reasons: ['-て']},
             {term: '問う', source: '問うて', rule: 'v5', reasons: ['-て']},
             {term: '訪う', source: '訪うて', rule: 'v5', reasons: ['-て']},
 
@@ -1373,6 +1374,7 @@ const tests = [
             {term: 'とう', source: 'とうた', rule: 'v5', reasons: ['-た']},
             {term: '請う', source: '請うた', rule: 'v5', reasons: ['-た']},
             {term: '乞う', source: '乞うた', rule: 'v5', reasons: ['-た']},
+            {term: '恋う', source: '恋うた', rule: 'v5', reasons: ['-た']},
             {term: '問う', source: '問うた', rule: 'v5', reasons: ['-た']},
             {term: '訪う', source: '訪うた', rule: 'v5', reasons: ['-た']},
 
@@ -1380,6 +1382,7 @@ const tests = [
             {term: 'とう', source: 'とうたら', rule: 'v5', reasons: ['-たら']},
             {term: '請う', source: '請うたら', rule: 'v5', reasons: ['-たら']},
             {term: '乞う', source: '乞うたら', rule: 'v5', reasons: ['-たら']},
+            {term: '恋う', source: '恋うたら', rule: 'v5', reasons: ['-たら']},
             {term: '問う', source: '問うたら', rule: 'v5', reasons: ['-たら']},
             {term: '訪う', source: '訪うたら', rule: 'v5', reasons: ['-たら']},
 
@@ -1387,6 +1390,7 @@ const tests = [
             {term: 'とう', source: 'とうたり', rule: 'v5', reasons: ['-たり']},
             {term: '請う', source: '請うたり', rule: 'v5', reasons: ['-たり']},
             {term: '乞う', source: '乞うたり', rule: 'v5', reasons: ['-たり']},
+            {term: '恋う', source: '恋うたり', rule: 'v5', reasons: ['-たり']},
             {term: '問う', source: '問うたり', rule: 'v5', reasons: ['-たり']},
             {term: '訪う', source: '訪うたり', rule: 'v5', reasons: ['-たり']},
         ],

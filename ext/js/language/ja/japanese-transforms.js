@@ -25,7 +25,7 @@ const passiveEnglishDescription = '1. Indicates an action received from an actio
 '2. Expresses respect for the subject of action performer.\n';
 
 const ikuVerbs = ['いく', '行く', '逝く', '往く'];
-const godanUSpecialVerbs = ['こう', 'とう', '請う', '乞う', '問う', '訪う', '宣う', '曰う', '給う', '賜う', '揺蕩う'];
+const godanUSpecialVerbs = ['こう', 'とう', '請う', '乞う', '恋う', '問う', '訪う', '宣う', '曰う', '給う', '賜う', '揺蕩う'];
 const fuVerbTeConjugations = [
     ['のたまう', 'のたもう'],
     ['たまう', 'たもう'],

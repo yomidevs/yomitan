@@ -135,6 +135,48 @@ h1 {
     --icon-size: 16px 16px;
 }
 
+.clear-button {
+    flex: 0 0 auto;
+    position: relative;
+    width: 2.5em;
+    height: var(--search-textbox-height);
+    min-height: var(--search-textbox-min-height);
+    max-height: var(--search-textbox-max-height);
+    background-color: var(--input-background-color);
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    outline: none;
+    transition: background-color var(--animation-duration) ease-in-out;
+    border-radius: 0;
+}
+.clear-button:hover,
+.clear-button:focus {
+    background-color: var(--input-background-color-dark);
+}
+.clear-button:focus:not(:focus-visible):not(:hover) {
+    background-color: var(--input-background-color);
+}
+.clear-button:focus-visible {
+    background-color: var(--input-background-color-dark);
+}
+.clear-button:active,
+.clear-button:active:focus {
+    background-color: var(--input-background-color-darker);
+}
+
+.clear-button>.icon {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--button-default-icon-color);
+    --icon-size: 16px 16px;
+}
+
 /* Search options */
 #search-settings-button>.icon {
     display: block;
