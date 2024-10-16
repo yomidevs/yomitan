@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {log} from '../../core/log.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
 export class RecommendedSettingsController {
@@ -30,6 +31,8 @@ export class RecommendedSettingsController {
         this._languageSelect = querySelectorNotNull(document, '#language-select');
         /** @type {HTMLInputElement} */
         this._applyButton = querySelectorNotNull(document, '#recommended-settings-apply-button');
+        /** @type {Map<string, import('settings-controller').RecommendedSetting>} */
+        this._recommendedSettings = new Map();
     }
 
     /** */
@@ -49,18 +52,16 @@ export class RecommendedSettingsController {
         if (typeof recommendedSettings !== 'undefined') {
             const settingsList = querySelectorNotNull(document, '#recommended-settings-list');
             settingsList.innerHTML = '';
-            for (const {path, value, description} of recommendedSettings) {
+            this._recommendedSettings = new Map();
+
+            for (const [index, setting] of recommendedSettings.entries()) {
+                this._recommendedSettings.set(index.toString(), setting);
+
+                const {description} = setting;
                 const template = this._settingsController.instantiateTemplate('recommended-settings-list-item');
 
                 // Render label
-                const label = querySelectorNotNull(template, '.settings-item-label');
-                const pathCodeElement = document.createElement('code');
-                pathCodeElement.textContent = path;
-                const valueCodeElement = document.createElement('code');
-                valueCodeElement.textContent = value;
-                label.appendChild(pathCodeElement);
-                label.appendChild(document.createTextNode(' -> '));
-                label.appendChild(valueCodeElement);
+                this._renderLabel(template, setting);
 
                 // Render description
                 const descriptionElement = querySelectorNotNull(template, '.settings-item-description');
@@ -70,7 +71,7 @@ export class RecommendedSettingsController {
 
                 // Render checkbox
                 const checkbox = /** @type {HTMLInputElement} */ (querySelectorNotNull(template, 'input[type="checkbox"]'));
-                checkbox.value = path;
+                checkbox.value = index.toString();
 
                 settingsList.append(template);
             }
@@ -86,16 +87,85 @@ export class RecommendedSettingsController {
         /** @type {NodeListOf<HTMLInputElement>} */
         const enabledCheckboxes = querySelectorNotNull(document, '#recommended-settings-list').querySelectorAll('input[type="checkbox"]:checked');
         if (enabledCheckboxes.length > 0) {
-            const recommendedSettings = this._settingsController.getRecommendedSettings(this._languageSelect.value);
             const modifications = [];
             for (const checkbox of enabledCheckboxes) {
-                const path = checkbox.value;
-                const {action, value} = recommendedSettings.find((setting) => setting.path === path);
-                modifications.push({action, path, value});
+                const index = checkbox.value;
+                const setting = this._recommendedSettings.get(index);
+                if (typeof setting === 'undefined') { continue; }
+                modifications.push(setting.modification);
             }
             void this._settingsController.modifyProfileSettings(modifications);
             void this._settingsController.refresh();
         }
         this._recommendedSettingsModal.hidden = true;
+    }
+
+    /**
+     * @param {Element} template
+     * @param {import('settings-controller').RecommendedSetting} setting
+     */
+    _renderLabel(template, setting) {
+        const label = querySelectorNotNull(template, '.settings-item-label');
+
+        const {modification} = setting;
+        switch (modification.action) {
+            case 'set': {
+                const {path, value} = modification;
+                const pathCodeElement = document.createElement('code');
+                pathCodeElement.textContent = path;
+                const valueCodeElement = document.createElement('code');
+                valueCodeElement.textContent = String(value);
+
+                label.appendChild(document.createTextNode('Setting '));
+                label.appendChild(pathCodeElement);
+                label.appendChild(document.createTextNode(' = '));
+                label.appendChild(valueCodeElement);
+                break;
+            }
+            case 'delete': {
+                const {path} = modification;
+                const pathCodeElement = document.createElement('code');
+                pathCodeElement.textContent = path;
+
+                label.appendChild(document.createTextNode('Deleting '));
+                label.appendChild(pathCodeElement);
+                break;
+            }
+            case 'swap': {
+                const {path1, path2} = modification;
+                const path1CodeElement = document.createElement('code');
+                path1CodeElement.textContent = path1;
+                const path2CodeElement = document.createElement('code');
+                path2CodeElement.textContent = path2;
+
+                label.appendChild(document.createTextNode('Swapping '));
+                label.appendChild(path1CodeElement);
+                label.appendChild(document.createTextNode(' and '));
+                label.appendChild(path2CodeElement);
+                break;
+            }
+            case 'splice': {
+                const {path, start, deleteCount, items} = modification;
+                const pathCodeElement = document.createElement('code');
+                pathCodeElement.textContent = path;
+
+                label.appendChild(document.createTextNode('Splicing '));
+                label.appendChild(pathCodeElement);
+                label.appendChild(document.createTextNode(` at ${start} deleting ${deleteCount} items and inserting ${items.length} items`));
+                break;
+            }
+            case 'push': {
+                const {path, items} = modification;
+                const pathCodeElement = document.createElement('code');
+                pathCodeElement.textContent = path;
+
+                label.appendChild(document.createTextNode(`Pushing ${items.length} items to `));
+                label.appendChild(pathCodeElement);
+                break;
+            }
+            default: {
+                log.error(new Error(`Unknown modification: ${modification}`));
+            }
+        }
     }
 }
