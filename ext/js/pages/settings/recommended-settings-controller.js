@@ -94,7 +94,15 @@ export class RecommendedSettingsController {
                 if (typeof setting === 'undefined') { continue; }
                 modifications.push(setting.modification);
             }
-            void this._settingsController.modifyProfileSettings(modifications);
+            void this._settingsController.modifyProfileSettings(modifications).then(
+                (results) => {
+                    results.map((result) => {
+                        if (Object.hasOwn(result, 'error')) {
+                            log.error(new Error(`Failed to apply recommended setting: ${JSON.stringify(result)}`));
+                        }
+                    });
+                },
+            );
             void this._settingsController.refresh();
         }
         this._recommendedSettingsModal.hidden = true;
@@ -114,7 +122,7 @@ export class RecommendedSettingsController {
                 const pathCodeElement = document.createElement('code');
                 pathCodeElement.textContent = path;
                 const valueCodeElement = document.createElement('code');
-                valueCodeElement.textContent = String(value);
+                valueCodeElement.textContent = JSON.stringify(value, null, 2);
 
                 label.appendChild(document.createTextNode('Setting '));
                 label.appendChild(pathCodeElement);
