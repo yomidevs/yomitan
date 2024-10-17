@@ -1265,7 +1265,7 @@ export class Display extends EventDispatcher {
     /**
      * @param {boolean} isKanji
      * @param {string} source
-     * @param {string | null} reading
+     * @param {string | undefined} reading
      * @param {boolean} wildcardsEnabled
      * @param {import('settings').OptionsContext} optionsContext
      * @returns {Promise<import('dictionary').DictionaryEntry[]>}
@@ -1290,7 +1290,7 @@ export class Display extends EventDispatcher {
 
     /**
      * @param {string} source
-     * @param {string | null} reading
+     * @param {string | undefined} reading
      * @param {boolean} wildcardsEnabled
      * @returns {{findDetails: import('api').FindTermsDetails, source: string}}
      */
@@ -1321,7 +1321,7 @@ export class Display extends EventDispatcher {
     async _setContentTermsOrKanji(type, urlSearchParams, token) {
         const lookup = (urlSearchParams.get('lookup') !== 'false');
         const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
-        const reading = urlSearchParams.get('reading');
+        const reading = urlSearchParams.get('reading') ?? undefined;
         const hasEnabledDictionaries = this._options ? this._options.dictionaries.some(({enabled}) => enabled) : false;
 
         // Set query

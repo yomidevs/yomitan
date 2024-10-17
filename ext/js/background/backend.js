@@ -1463,7 +1463,9 @@ export class Backend {
         /** @type {import('translator').FindTermsMode} */
         const mode = 'simple';
         const options = this._getProfileOptions(optionsContext, false);
-        const details = {matchType: /** @type {import('translation').FindTermsMatchType} */ ('exact'), deinflect: true, reading: null};
+
+        /** @type {import('api').FindTermsDetails} */
+        const details = {matchType: 'exact', deinflect: true};
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
         /** @type {import('api').ParseTextLine[]} */
         const results = [];

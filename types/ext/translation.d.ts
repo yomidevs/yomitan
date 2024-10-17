@@ -71,7 +71,7 @@ export type FindTermsOptions = {
     /**
      * Exact reading of the term.
      */
-    reading: string | null;
+    reading: string | undefined;
     /**
      * The name of the primary dictionary to search.
      */
