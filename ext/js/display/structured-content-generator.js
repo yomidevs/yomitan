@@ -457,22 +457,21 @@ export class StructuredContentGenerator {
         }
 
         if (internal) {
-            let hasFurigana = false;
-            let reading = '';
-            for (const childNode of text.childNodes) {
-                if (childNode instanceof HTMLElement) {
-                    const furigana = childNode.querySelector('.gloss-sc-rt')?.textContent;
-                    if (furigana && furigana.length > 0) {
-                        reading += furigana;
-                        hasFurigana = true;
-                    }
-                } else {
-                    reading += childNode.textContent ?? '';
-                }
-            }
-
             let query = '';
             if (href.length > 1) {
+                let hasFurigana = false;
+                let reading = '';
+                for (const childNode of text.childNodes) {
+                    if (childNode instanceof HTMLElement) {
+                        const furigana = childNode.querySelector('.gloss-sc-rt')?.textContent;
+                        if (furigana && furigana.length > 0) {
+                            reading += furigana;
+                            hasFurigana = true;
+                        }
+                    } else {
+                        reading += childNode.textContent ?? '';
+                    }
+                }
                 query = href;
                 if (reading.length > 0 && hasFurigana) {
                     query += `&prioritized_reading=${reading}`;
