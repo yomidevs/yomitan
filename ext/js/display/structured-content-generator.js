@@ -461,9 +461,9 @@ export class StructuredContentGenerator {
             let reading = '';
             for (const childNode of text.childNodes) {
                 if (childNode instanceof HTMLElement) {
-                    const nodeReading = childNode.querySelector('.gloss-sc-rt')?.textContent;
-                    if (nodeReading && nodeReading.length > 0) {
-                        reading += nodeReading;
+                    const furigana = childNode.querySelector('.gloss-sc-rt')?.textContent;
+                    if (furigana && furigana.length > 0) {
+                        reading += furigana;
                         hasFurigana = true;
                     }
                 } else {
