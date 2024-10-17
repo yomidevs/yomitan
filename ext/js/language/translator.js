@@ -2033,9 +2033,6 @@ export class Translator {
          * @returns {number}
          */
         const compareFunction = (v1, v2) => {
-            const headwords1 = v1.headwords;
-            const headwords2 = v2.headwords;
-
             // Sort by reading match
             let i = (v2.matchPrioritizedReading ? 1 : 0) - (v1.matchPrioritizedReading ? 1 : 0);
             if (i !== 0) { return i; }
@@ -2073,6 +2070,8 @@ export class Translator {
             if (i !== 0) { return i; }
 
             // Sort by headword term text
+            const headwords1 = v1.headwords;
+            const headwords2 = v2.headwords;
             for (let j = 0, jj = Math.min(headwords1.length, headwords2.length); j < jj; ++j) {
                 const term1 = headwords1[j].term;
                 const term2 = headwords2[j].term;
