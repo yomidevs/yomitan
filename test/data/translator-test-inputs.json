@@ -513,6 +513,32 @@
                     "searchResolution": "word"
                 }
             ]
+        },
+        {
+            "name": "Find terms using prioritized reading 1",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "自重",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "prioritizedReading": "じちょう"
+                }
+            ]
+        },
+        {
+            "name": "Find terms using prioritized reading 2",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "自重",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "prioritizedReading": "じじゅう"
+                }
+            ]
         }
     ]
 }
