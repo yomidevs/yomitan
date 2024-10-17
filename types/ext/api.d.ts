@@ -48,7 +48,7 @@ import type {
 export type FindTermsDetails = {
     matchType?: Translation.FindTermsMatchType;
     deinflect?: boolean;
-    prioritizedReading?: string;
+    primaryReading?: string;
 };
 
 export type ParseTextResultItem = {

@@ -314,7 +314,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -495,7 +495,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -695,7 +695,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -877,7 +877,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -1059,7 +1059,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -1241,7 +1241,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -1423,7 +1423,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -1604,7 +1604,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -1804,7 +1804,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -2011,7 +2011,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -2218,7 +2218,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -2425,7 +2425,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -2637,7 +2637,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -2824,7 +2824,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -3011,7 +3011,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -3198,7 +3198,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -3380,7 +3380,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -3561,7 +3561,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -3761,7 +3761,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -3885,7 +3885,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -4072,7 +4072,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -4268,7 +4268,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -4455,7 +4455,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -4637,7 +4637,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -4825,7 +4825,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -5007,7 +5007,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -5195,7 +5195,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -5402,7 +5402,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -5614,7 +5614,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -5801,7 +5801,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -5989,7 +5989,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -6196,7 +6196,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -6408,7 +6408,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -6595,7 +6595,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -6783,7 +6783,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -6917,7 +6917,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -6985,7 +6985,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -7053,7 +7053,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -7121,7 +7121,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -7194,7 +7194,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -7267,7 +7267,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -7340,7 +7340,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -7413,7 +7413,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -7481,7 +7481,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -7549,7 +7549,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -7623,7 +7623,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -7879,7 +7879,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -8140,7 +8140,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -8376,7 +8376,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -8607,7 +8607,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -8788,7 +8788,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -8988,7 +8988,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 2,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -9476,7 +9476,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 2,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -9910,7 +9910,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -10091,7 +10091,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -10312,7 +10312,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -10540,7 +10540,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -10768,7 +10768,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -10996,7 +10996,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -11208,7 +11208,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -11395,7 +11395,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -11582,7 +11582,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -11769,7 +11769,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -11951,7 +11951,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -12132,7 +12132,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -12334,7 +12334,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 10,
         "headwords": [
           {
@@ -12543,7 +12543,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 10,
         "headwords": [
           {
@@ -12752,7 +12752,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 10,
         "headwords": [
           {
@@ -12961,7 +12961,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 10,
         "headwords": [
           {
@@ -13175,7 +13175,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -13364,7 +13364,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -13553,7 +13553,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -13742,7 +13742,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -13926,7 +13926,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -14109,7 +14109,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -14311,7 +14311,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -14520,7 +14520,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -14729,7 +14729,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -14938,7 +14938,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -15152,7 +15152,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 6,
         "headwords": [
           {
@@ -15341,7 +15341,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 6,
         "headwords": [
           {
@@ -15530,7 +15530,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 6,
         "headwords": [
           {
@@ -15719,7 +15719,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 6,
         "headwords": [
           {
@@ -15903,7 +15903,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -16086,7 +16086,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -16293,7 +16293,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -16409,7 +16409,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -16534,7 +16534,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 7,
         "headwords": [
           {
@@ -16648,7 +16648,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -17136,7 +17136,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -17576,7 +17576,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -17737,7 +17737,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -17844,7 +17844,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -17951,7 +17951,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -18058,7 +18058,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -18165,7 +18165,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -18289,7 +18289,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -18437,7 +18437,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -18524,7 +18524,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -18597,7 +18597,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 7,
         "headwords": [
           {
@@ -18686,7 +18686,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -18775,7 +18775,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -18959,7 +18959,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -19149,7 +19149,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -19333,7 +19333,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -19523,7 +19523,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -19641,7 +19641,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -19826,7 +19826,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -20033,7 +20033,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 7,
         "headwords": [
           {
@@ -20120,7 +20120,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 7,
         "headwords": [
           {
@@ -20209,7 +20209,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 8,
         "headwords": [
           {
@@ -20303,7 +20303,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -20390,7 +20390,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 7,
         "headwords": [
           {
@@ -20456,7 +20456,7 @@
     ]
   },
   {
-    "name": "Find term using prioritized reading 1",
+    "name": "Find term using primary reading 1",
     "originalTextLength": 2,
     "dictionaryEntries": [
       {
@@ -20477,7 +20477,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": true,
+        "matchPrimaryReading": true,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -20558,7 +20558,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -20624,7 +20624,7 @@
     ]
   },
   {
-    "name": "Find term using prioritized reading 2",
+    "name": "Find term using primary reading 2",
     "originalTextLength": 2,
     "dictionaryEntries": [
 
@@ -20646,7 +20646,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": true,
+        "matchPrimaryReading": true,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -20727,7 +20727,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
-        "matchPrioritizedReading": false,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {

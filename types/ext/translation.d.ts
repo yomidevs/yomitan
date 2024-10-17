@@ -71,7 +71,7 @@ export type FindTermsOptions = {
     /**
      * The reading which will be sorted to the top of the results.
      */
-    prioritizedReading: string;
+    primaryReading: string;
     /**
      * The name of the primary dictionary to search.
      */

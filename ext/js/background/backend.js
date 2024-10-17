@@ -2457,10 +2457,10 @@ export class Backend {
      * @returns {import('translation').FindTermsOptions} An options object.
      */
     _getTranslatorFindTermsOptions(mode, details, options) {
-        let {matchType, deinflect, prioritizedReading} = details;
+        let {matchType, deinflect, primaryReading} = details;
         if (typeof matchType !== 'string') { matchType = /** @type {import('translation').FindTermsMatchType} */ ('exact'); }
         if (typeof deinflect !== 'boolean') { deinflect = true; }
-        if (typeof prioritizedReading !== 'string') { prioritizedReading = ''; }
+        if (typeof primaryReading !== 'string') { primaryReading = ''; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
             general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language},
@@ -2487,7 +2487,7 @@ export class Backend {
         return {
             matchType,
             deinflect,
-            prioritizedReading,
+            primaryReading,
             mainDictionary,
             sortFrequencyDictionary,
             sortFrequencyDictionaryOrder,

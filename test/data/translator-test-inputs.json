@@ -515,7 +515,7 @@
             ]
         },
         {
-            "name": "Find terms using prioritized reading 1",
+            "name": "Find terms using primary reading 1",
             "func": "findTerms",
             "mode": "split",
             "text": "自重",
@@ -523,12 +523,12 @@
                 "default",
                 {
                     "type": "terms",
-                    "prioritizedReading": "じちょう"
+                    "primaryReading": "じちょう"
                 }
             ]
         },
         {
-            "name": "Find terms using prioritized reading 2",
+            "name": "Find terms using primary reading 2",
             "func": "findTerms",
             "mode": "split",
             "text": "自重",
@@ -536,7 +536,7 @@
                 "default",
                 {
                     "type": "terms",
-                    "prioritizedReading": "じじゅう"
+                    "primaryReading": "じじゅう"
                 }
             ]
         }

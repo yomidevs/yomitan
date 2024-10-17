@@ -474,7 +474,7 @@ export class StructuredContentGenerator {
                 }
                 query = href;
                 if (reading.length > 0 && hasFurigana) {
-                    query += `&prioritized_reading=${reading}`;
+                    query += `&primary_reading=${reading}`;
                 }
             }
             href = `${location.protocol}//${location.host}/search.html${query}`;

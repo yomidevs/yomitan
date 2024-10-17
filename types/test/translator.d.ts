@@ -44,7 +44,7 @@ export type FindTermsOptionsPreset = {
     sortFrequencyDictionary?: string | null;
     sortFrequencyDictionaryOrder?: FindTermsSortOrder;
     removeNonJapaneseCharacters?: boolean;
-    prioritizedReading?: string;
+    primaryReading?: string;
     textReplacements?: (FindTermsTextReplacement[] | null)[];
     enabledDictionaryMap?: [key: string, value: FindTermDictionary][];
     excludeDictionaryDefinitions?: string[] | null;
