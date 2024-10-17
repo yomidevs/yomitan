@@ -217,7 +217,7 @@ export class Translator {
      * @param {string} text
      * @param {import('translation').FindTermsOptions} options
      * @param {TranslatorTagAggregator} tagAggregator
-     * @param {string | undefined} prioritizedReading
+     * @param {string} prioritizedReading
      * @returns {Promise<{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}>}
      */
     async _findTermsInternal(text, options, tagAggregator, prioritizedReading) {
@@ -238,7 +238,7 @@ export class Translator {
      * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
      * @param {import('translation').TermEnabledDictionaryMap} enabledDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
-     * @param {string | undefined} prioritizedReading
+     * @param {string} prioritizedReading
      * @returns {{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}}
      */
     _getDictionaryEntries(deinflections, enabledDictionaryMap, tagAggregator, prioritizedReading) {
@@ -736,7 +736,7 @@ export class Translator {
      * @param {import('translator').SequenceQuery[]} sequenceList
      * @param {import('translation').TermEnabledDictionaryMap} enabledDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
-     * @param {string | undefined} prioritizedReading
+     * @param {string} prioritizedReading
      */
     async _addRelatedDictionaryEntries(groupedDictionaryEntries, ungroupedDictionaryEntriesMap, sequenceList, enabledDictionaryMap, tagAggregator, prioritizedReading) {
         const databaseEntries = await this._database.findTermsBySequenceBulk(sequenceList);
@@ -760,7 +760,7 @@ export class Translator {
      * @param {import('translation').TermEnabledDictionaryMap} enabledDictionaryMap
      * @param {import('translation').TermEnabledDictionaryMap} secondarySearchDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
-     * @param {string | undefined} prioritizedReading
+     * @param {string} prioritizedReading
      */
     async _addSecondaryRelatedDictionaryEntries(language, groupedDictionaryEntries, ungroupedDictionaryEntriesMap, enabledDictionaryMap, secondarySearchDictionaryMap, tagAggregator, prioritizedReading) {
         // Prepare grouping info
@@ -832,7 +832,7 @@ export class Translator {
      * @param {string} language
      * @param {Iterable<import('translation-internal').TermDictionaryEntry>} dictionaryEntries
      * @param {TranslatorTagAggregator} tagAggregator
-     * @param {string | undefined} prioritizedReading
+     * @param {string} prioritizedReading
      * @returns {import('translation-internal').TermDictionaryEntry[]}
      */
     _groupDictionaryEntriesByHeadword(language, dictionaryEntries, tagAggregator, prioritizedReading) {
@@ -1710,7 +1710,7 @@ export class Translator {
      * @param {boolean} isPrimary
      * @param {Map<string, import('translation').FindTermDictionary>} enabledDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
-     * @param {string | undefined} prioritizedReading
+     * @param {string} prioritizedReading
      * @returns {import('translation-internal').TermDictionaryEntry}
      */
     _createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, isPrimary, enabledDictionaryMap, tagAggregator, prioritizedReading) {
@@ -1731,7 +1731,7 @@ export class Translator {
         // Cast is safe because getDeinflections filters out deinflection definitions
         const contentDefinitions = /** @type {import('dictionary-data').TermGlossaryContent[]} */ (definitions);
         const reading = (rawReading.length > 0 ? rawReading : term);
-        const matchPrioritizedReading = reading === prioritizedReading;
+        const matchPrioritizedReading = prioritizedReading.length > 0 && reading === prioritizedReading;
         const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const dictionaryAlias = this._getDictionaryAlias(dictionary, enabledDictionaryMap);
         const sourceTermExactMatchCount = (isPrimary && deinflectedText === term ? 1 : 0);
@@ -1768,7 +1768,7 @@ export class Translator {
      * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
      * @param {boolean} checkDuplicateDefinitions
      * @param {TranslatorTagAggregator} tagAggregator
-     * @param {string | undefined} prioritizedReading
+     * @param {string} prioritizedReading
      * @returns {import('translation-internal').TermDictionaryEntry}
      */
     _createGroupedDictionaryEntry(language, dictionaryEntries, checkDuplicateDefinitions, tagAggregator, prioritizedReading) {
@@ -1833,7 +1833,7 @@ export class Translator {
         let sourceTermExactMatchCount = 0;
         let matchPrioritizedReading = false;
         for (const {sources, reading} of headwordsArray) {
-            if (reading === prioritizedReading) {
+            if (prioritizedReading.length > 0 && reading === prioritizedReading) {
                 matchPrioritizedReading = true;
             }
             for (const source of sources) {

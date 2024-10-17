@@ -137,7 +137,7 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         sortFrequencyDictionary: typeof sortFrequencyDictionary !== 'undefined' ? sortFrequencyDictionary : null,
         sortFrequencyDictionaryOrder: typeof sortFrequencyDictionaryOrder !== 'undefined' ? sortFrequencyDictionaryOrder : 'ascending',
         removeNonJapaneseCharacters: typeof removeNonJapaneseCharacters !== 'undefined' ? removeNonJapaneseCharacters : false,
-        prioritizedReading: typeof prioritizedReading !== 'undefined' ? prioritizedReading : undefined,
+        prioritizedReading: typeof prioritizedReading !== 'undefined' ? prioritizedReading : '',
         textReplacements,
         enabledDictionaryMap,
         excludeDictionaryDefinitions: Array.isArray(excludeDictionaryDefinitions) ? new Set(excludeDictionaryDefinitions) : null,

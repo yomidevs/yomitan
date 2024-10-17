@@ -1265,15 +1265,15 @@ export class Display extends EventDispatcher {
     /**
      * @param {boolean} isKanji
      * @param {string} source
-     * @param {string | undefined} prioritzedReading
+     * @param {string} prioritizedReading
      * @param {boolean} wildcardsEnabled
      * @param {import('settings').OptionsContext} optionsContext
      * @returns {Promise<import('dictionary').DictionaryEntry[]>}
      */
-    async _findDictionaryEntries(isKanji, source, prioritzedReading, wildcardsEnabled, optionsContext) {
+    async _findDictionaryEntries(isKanji, source, prioritizedReading, wildcardsEnabled, optionsContext) {
         /** @type {import('dictionary').DictionaryEntry[]} */
         let dictionaryEntries = [];
-        const {findDetails, source: source2} = this._getFindDetails(source, prioritzedReading, wildcardsEnabled);
+        const {findDetails, source: source2} = this._getFindDetails(source, prioritizedReading, wildcardsEnabled);
         if (isKanji) {
             dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
             if (dictionaryEntries.length > 0) { return dictionaryEntries; }
@@ -1290,7 +1290,7 @@ export class Display extends EventDispatcher {
 
     /**
      * @param {string} source
-     * @param {string | undefined} prioritizedReading
+     * @param {string} prioritizedReading
      * @param {boolean} wildcardsEnabled
      * @returns {{findDetails: import('api').FindTermsDetails, source: string}}
      */
@@ -1329,8 +1329,7 @@ export class Display extends EventDispatcher {
         if (query === null) { query = ''; }
         let queryFull = urlSearchParams.get('full');
         queryFull = (queryFull !== null ? queryFull : query);
-        /** @type {string | undefined} */
-        let prioritizedReading = urlSearchParams.get('prioritized_reading') ?? undefined;
+        const prioritizedReading = urlSearchParams.get('prioritized_reading') ?? '';
         const queryOffsetString = urlSearchParams.get('offset');
         let queryOffset = 0;
         if (queryOffsetString !== null) {
