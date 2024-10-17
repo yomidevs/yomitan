@@ -48,6 +48,7 @@ import type {
 export type FindTermsDetails = {
     matchType?: Translation.FindTermsMatchType;
     deinflect?: boolean;
+    reading: string | null;
 };
 
 export type ParseTextResultItem = {

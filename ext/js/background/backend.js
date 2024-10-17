@@ -1463,7 +1463,7 @@ export class Backend {
         /** @type {import('translator').FindTermsMode} */
         const mode = 'simple';
         const options = this._getProfileOptions(optionsContext, false);
-        const details = {matchType: /** @type {import('translation').FindTermsMatchType} */ ('exact'), deinflect: true};
+        const details = {matchType: /** @type {import('translation').FindTermsMatchType} */ ('exact'), deinflect: true, reading: null};
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
         /** @type {import('api').ParseTextLine[]} */
         const results = [];
@@ -2455,7 +2455,7 @@ export class Backend {
      * @returns {import('translation').FindTermsOptions} An options object.
      */
     _getTranslatorFindTermsOptions(mode, details, options) {
-        let {matchType, deinflect} = details;
+        let {matchType, deinflect, reading} = details;
         if (typeof matchType !== 'string') { matchType = /** @type {import('translation').FindTermsMatchType} */ ('exact'); }
         if (typeof deinflect !== 'boolean') { deinflect = true; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
@@ -2484,6 +2484,7 @@ export class Backend {
         return {
             matchType,
             deinflect,
+            reading,
             mainDictionary,
             sortFrequencyDictionary,
             sortFrequencyDictionaryOrder,

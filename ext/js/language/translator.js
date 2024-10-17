@@ -76,7 +76,7 @@ export class Translator {
      * @returns {Promise<{dictionaryEntries: import('dictionary').TermDictionaryEntry[], originalTextLength: number}>} An object containing dictionary entries and the length of the original source text.
      */
     async findTerms(mode, text, options) {
-        const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language} = options;
+        const {reading, enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language} = options;
         const tagAggregator = new TranslatorTagAggregator();
         let {dictionaryEntries, originalTextLength} = await this._findTermsInternal(text, options, tagAggregator);
 
@@ -220,7 +220,7 @@ export class Translator {
      * @returns {Promise<{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}>}
      */
     async _findTermsInternal(text, options, tagAggregator) {
-        const {removeNonJapaneseCharacters, enabledDictionaryMap} = options;
+        const {reading, removeNonJapaneseCharacters, enabledDictionaryMap} = options;
         if (removeNonJapaneseCharacters && (['ja', 'zh', 'yue'].includes(options.language))) {
             text = this._getJapaneseChineseOnlyText(text);
         }
@@ -230,16 +230,17 @@ export class Translator {
 
         const deinflections = await this._getDeinflections(text, options);
 
-        return this._getDictionaryEntries(deinflections, enabledDictionaryMap, tagAggregator);
+        return this._getDictionaryEntries(deinflections, enabledDictionaryMap, tagAggregator, reading);
     }
 
     /**
      * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
      * @param {import('translation').TermEnabledDictionaryMap} enabledDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
+     * @param {string | null} reading
      * @returns {{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}}
      */
-    _getDictionaryEntries(deinflections, enabledDictionaryMap, tagAggregator) {
+    _getDictionaryEntries(deinflections, enabledDictionaryMap, tagAggregator, reading) {
         let originalTextLength = 0;
         /** @type {import('translation-internal').TermDictionaryEntry[]} */
         const dictionaryEntries = [];
@@ -268,6 +269,12 @@ export class Translator {
                     }
                 } else {
                     const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, true, enabledDictionaryMap, tagAggregator);
+                    if (reading) {
+                        const headwordReadings = new Set(dictionaryEntry.headwords.map((headword) => headword.reading));
+                        if (!headwordReadings.has(reading)) {
+                            continue;
+                        }
+                    }
                     dictionaryEntries.push(dictionaryEntry);
                     ids.add(id);
                 }

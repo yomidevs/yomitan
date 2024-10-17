@@ -1265,14 +1265,15 @@ export class Display extends EventDispatcher {
     /**
      * @param {boolean} isKanji
      * @param {string} source
+     * @param {string | null} reading
      * @param {boolean} wildcardsEnabled
      * @param {import('settings').OptionsContext} optionsContext
      * @returns {Promise<import('dictionary').DictionaryEntry[]>}
      */
-    async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
+    async _findDictionaryEntries(isKanji, source, reading, wildcardsEnabled, optionsContext) {
         /** @type {import('dictionary').DictionaryEntry[]} */
         let dictionaryEntries = [];
-        const {findDetails, source: source2} = this._getFindDetails(source, wildcardsEnabled);
+        const {findDetails, source: source2} = this._getFindDetails(source, reading, wildcardsEnabled);
         if (isKanji) {
             dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
             if (dictionaryEntries.length > 0) { return dictionaryEntries; }
@@ -1289,12 +1290,13 @@ export class Display extends EventDispatcher {
 
     /**
      * @param {string} source
+     * @param {string | null} reading
      * @param {boolean} wildcardsEnabled
      * @returns {{findDetails: import('api').FindTermsDetails, source: string}}
      */
-    _getFindDetails(source, wildcardsEnabled) {
+    _getFindDetails(source, reading, wildcardsEnabled) {
         /** @type {import('api').FindTermsDetails} */
-        const findDetails = {};
+        const findDetails = {reading};
         if (wildcardsEnabled) {
             const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
             if (match !== null) {
@@ -1319,6 +1321,7 @@ export class Display extends EventDispatcher {
     async _setContentTermsOrKanji(type, urlSearchParams, token) {
         const lookup = (urlSearchParams.get('lookup') !== 'false');
         const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
+        const reading = urlSearchParams.get('reading');
         const hasEnabledDictionaries = this._options ? this._options.dictionaries.some(({enabled}) => enabled) : false;
 
         // Set query
@@ -1358,7 +1361,7 @@ export class Display extends EventDispatcher {
 
         let {dictionaryEntries} = content;
         if (!Array.isArray(dictionaryEntries)) {
-            dictionaryEntries = hasEnabledDictionaries && lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, wildcardsEnabled, optionsContext) : [];
+            dictionaryEntries = hasEnabledDictionaries && lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, reading, wildcardsEnabled, optionsContext) : [];
             if (this._setContentToken !== token) { return; }
             content.dictionaryEntries = dictionaryEntries;
             changeHistory = true;

@@ -69,6 +69,10 @@ export type FindTermsOptions = {
      */
     deinflect: boolean;
     /**
+     * Exact reading of the term.
+     */
+    reading: string | null;
+    /**
      * The name of the primary dictionary to search.
      */
     mainDictionary: string;
