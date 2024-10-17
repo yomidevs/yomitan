@@ -475,7 +475,7 @@ export class StructuredContentGenerator {
             if (href.length > 1) {
                 query = href;
                 if (reading.length > 0 && hasFurigana) {
-                    query += `&reading=${reading}`;
+                    query += `&prioritized_reading=${reading}`;
                 }
             }
             href = `${location.protocol}//${location.host}/search.html${query}`;

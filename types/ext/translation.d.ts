@@ -69,9 +69,9 @@ export type FindTermsOptions = {
      */
     deinflect: boolean;
     /**
-     * Exact reading of the term.
+     * The reading which will be sorted to the top of the results.
      */
-    reading: string | undefined;
+    prioritizedReading: string | undefined;
     /**
      * The name of the primary dictionary to search.
      */

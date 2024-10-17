@@ -2457,7 +2457,7 @@ export class Backend {
      * @returns {import('translation').FindTermsOptions} An options object.
      */
     _getTranslatorFindTermsOptions(mode, details, options) {
-        let {matchType, deinflect, reading} = details;
+        let {matchType, deinflect, prioritizedReading} = details;
         if (typeof matchType !== 'string') { matchType = /** @type {import('translation').FindTermsMatchType} */ ('exact'); }
         if (typeof deinflect !== 'boolean') { deinflect = true; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
@@ -2486,7 +2486,7 @@ export class Backend {
         return {
             matchType,
             deinflect,
-            reading,
+            prioritizedReading,
             mainDictionary,
             sortFrequencyDictionary,
             sortFrequencyDictionaryOrder,

@@ -1265,15 +1265,15 @@ export class Display extends EventDispatcher {
     /**
      * @param {boolean} isKanji
      * @param {string} source
-     * @param {string | undefined} reading
+     * @param {string | undefined} prioritzedReading
      * @param {boolean} wildcardsEnabled
      * @param {import('settings').OptionsContext} optionsContext
      * @returns {Promise<import('dictionary').DictionaryEntry[]>}
      */
-    async _findDictionaryEntries(isKanji, source, reading, wildcardsEnabled, optionsContext) {
+    async _findDictionaryEntries(isKanji, source, prioritzedReading, wildcardsEnabled, optionsContext) {
         /** @type {import('dictionary').DictionaryEntry[]} */
         let dictionaryEntries = [];
-        const {findDetails, source: source2} = this._getFindDetails(source, reading, wildcardsEnabled);
+        const {findDetails, source: source2} = this._getFindDetails(source, prioritzedReading, wildcardsEnabled);
         if (isKanji) {
             dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
             if (dictionaryEntries.length > 0) { return dictionaryEntries; }
@@ -1290,13 +1290,13 @@ export class Display extends EventDispatcher {
 
     /**
      * @param {string} source
-     * @param {string | undefined} reading
+     * @param {string | undefined} prioritizedReading
      * @param {boolean} wildcardsEnabled
      * @returns {{findDetails: import('api').FindTermsDetails, source: string}}
      */
-    _getFindDetails(source, reading, wildcardsEnabled) {
+    _getFindDetails(source, prioritizedReading, wildcardsEnabled) {
         /** @type {import('api').FindTermsDetails} */
-        const findDetails = {reading};
+        const findDetails = {prioritizedReading};
         if (wildcardsEnabled) {
             const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
             if (match !== null) {
@@ -1321,7 +1321,7 @@ export class Display extends EventDispatcher {
     async _setContentTermsOrKanji(type, urlSearchParams, token) {
         const lookup = (urlSearchParams.get('lookup') !== 'false');
         const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
-        const reading = urlSearchParams.get('reading') ?? undefined;
+        const prioritizedReading = urlSearchParams.get('prioritized_reading') ?? undefined;
         const hasEnabledDictionaries = this._options ? this._options.dictionaries.some(({enabled}) => enabled) : false;
 
         // Set query
@@ -1361,7 +1361,7 @@ export class Display extends EventDispatcher {
 
         let {dictionaryEntries} = content;
         if (!Array.isArray(dictionaryEntries)) {
-            dictionaryEntries = hasEnabledDictionaries && lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, reading, wildcardsEnabled, optionsContext) : [];
+            dictionaryEntries = hasEnabledDictionaries && lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, prioritizedReading, wildcardsEnabled, optionsContext) : [];
             if (this._setContentToken !== token) { return; }
             content.dictionaryEntries = dictionaryEntries;
             changeHistory = true;

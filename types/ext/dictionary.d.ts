@@ -248,6 +248,10 @@ export type TermDictionaryEntry = {
      */
     sourceTermExactMatchCount: number;
     /**
+     * Whether the term reading matched the prioritized reading.
+     */
+    matchPrioritizedReading: boolean;
+    /**
      * The maximum length of the original text for all primary sources.
      */
     maxOriginalTextLength: number;
