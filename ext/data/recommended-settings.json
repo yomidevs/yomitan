@@ -51,6 +51,32 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.textReplacements.groups",
+                "value": [
+                    [
+                        {
+                            "pattern": "l'",
+                            "ignoreCase": true,
+                            "replacement": ""
+                        },
+                        {
+                            "pattern": "j'",
+                            "ignoreCase": true,
+                            "replacement": ""
+                        },
+                        {
+                            "pattern": "d'",
+                            "ignoreCase": true,
+                            "replacement": ""
+                        }
+                    ]
+                ]
+            },
+            "description": "Separating the l', j', d' from the word."
         }
     ]
 }
