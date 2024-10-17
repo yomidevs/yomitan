@@ -1321,7 +1321,6 @@ export class Display extends EventDispatcher {
     async _setContentTermsOrKanji(type, urlSearchParams, token) {
         const lookup = (urlSearchParams.get('lookup') !== 'false');
         const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
-        const prioritizedReading = urlSearchParams.get('prioritized_reading') ?? undefined;
         const hasEnabledDictionaries = this._options ? this._options.dictionaries.some(({enabled}) => enabled) : false;
 
         // Set query
@@ -1330,6 +1329,8 @@ export class Display extends EventDispatcher {
         if (query === null) { query = ''; }
         let queryFull = urlSearchParams.get('full');
         queryFull = (queryFull !== null ? queryFull : query);
+        /** @type {string | undefined} */
+        let prioritizedReading = urlSearchParams.get('prioritized_reading') ?? undefined;
         const queryOffsetString = urlSearchParams.get('offset');
         let queryOffset = 0;
         if (queryOffsetString !== null) {

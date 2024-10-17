@@ -2041,7 +2041,7 @@ export class Translator {
             if (i !== 0) { return i; }
 
             // Sort by length of source term
-             i = v2.maxOriginalTextLength - v1.maxOriginalTextLength;
+            i = v2.maxOriginalTextLength - v1.maxOriginalTextLength;
             if (i !== 0) { return i; }
 
             // Sort by length of the shortest text processing chain
