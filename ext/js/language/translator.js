@@ -237,7 +237,7 @@ export class Translator {
      * @param {import('translation-internal').DatabaseDeinflection[]} deinflections
      * @param {import('translation').TermEnabledDictionaryMap} enabledDictionaryMap
      * @param {TranslatorTagAggregator} tagAggregator
-     * @param {string | null} reading
+     * @param {string | undefined} reading
      * @returns {{dictionaryEntries: import('translation-internal').TermDictionaryEntry[], originalTextLength: number}}
      */
     _getDictionaryEntries(deinflections, enabledDictionaryMap, tagAggregator, reading) {
