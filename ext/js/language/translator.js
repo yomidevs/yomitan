@@ -76,7 +76,7 @@ export class Translator {
      * @returns {Promise<{dictionaryEntries: import('dictionary').TermDictionaryEntry[], originalTextLength: number}>} An object containing dictionary entries and the length of the original source text.
      */
     async findTerms(mode, text, options) {
-        const {reading, enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language} = options;
+        const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language} = options;
         const tagAggregator = new TranslatorTagAggregator();
         let {dictionaryEntries, originalTextLength} = await this._findTermsInternal(text, options, tagAggregator);
 
