@@ -26,6 +26,7 @@ import {GenericSettingController} from './settings/generic-setting-controller.js
 import {LanguagesController} from './settings/languages-controller.js';
 import {ModalController} from './settings/modal-controller.js';
 import {RecommendedPermissionsController} from './settings/recommended-permissions-controller.js';
+import {RecommendedSettingsController} from './settings/recommended-settings-controller.js';
 import {ScanInputsSimpleController} from './settings/scan-inputs-simple-controller.js';
 import {SettingsController} from './settings/settings-controller.js';
 import {SettingsDisplayController} from './settings/settings-display-controller.js';
@@ -104,6 +105,9 @@ await Application.main(true, async (application) => {
 
     const languagesController = new LanguagesController(settingsController);
     preparePromises.push(languagesController.prepare());
+
+    const recommendedSettingsController = new RecommendedSettingsController(settingsController);
+    preparePromises.push(recommendedSettingsController.prepare());
 
     await Promise.all(preparePromises);
 
