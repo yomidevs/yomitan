@@ -28,7 +28,7 @@
         "ipa": 1
       },
       "terms": {
-        "total": 31
+        "total": 33
       }
     }
   },
@@ -37,7 +37,7 @@
       {
         "kanji": 2,
         "kanjiMeta": 6,
-        "terms": 31,
+        "terms": 33,
         "termMeta": 39,
         "tagMeta": 15,
         "media": 6
@@ -46,7 +46,7 @@
     "total": {
       "kanji": 2,
       "kanjiMeta": 6,
-      "terms": 31,
+      "terms": 33,
       "termMeta": 39,
       "tagMeta": 15,
       "media": 6
