@@ -335,6 +335,30 @@
             <button type="button" data-modal-action="hide">Close</button>
         </div>
     </div></div>
+
+    <!-- Recommended settings modal -->
+    <div id="recommended-settings-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Recommended settings</div>
+        </div>
+        <div class="modal-body">
+            <span>We recommend the following settings for your selected language</span>
+            <div id="recommended-settings-body">
+                <div class="settings-item">
+                    <div class="settings-item-inner">
+                        <div class="settings-item-left">
+                            <div class="settings-item-label"><strong>Recommendations</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="recommended-settings-list"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" id="recommended-settings-apply-button">Apply</button>
+        </div>
+    </div></div>
 </template>
 
 <template id="settings-modals-template">
