@@ -436,6 +436,10 @@ export class StructuredContentGenerator {
     _createLinkElement(content, dictionary, language) {
         let {href} = content;
         const internal = href.startsWith('?');
+        if (internal) {
+            href = `${location.protocol}//${location.host}/search.html${href.length > 1 ? href : ''}`;
+        }
+
         const node = /** @type {HTMLAnchorElement} */ (this._createElement('a', 'gloss-link'));
         node.dataset.external = `${!internal}`;
 
@@ -454,30 +458,6 @@ export class StructuredContentGenerator {
             const icon = this._createElement('span', 'gloss-link-external-icon icon');
             icon.dataset.icon = 'external-link';
             node.appendChild(icon);
-        }
-
-        if (internal) {
-            let query = '';
-            if (href.length > 1) {
-                let hasFurigana = false;
-                let reading = '';
-                for (const childNode of text.childNodes) {
-                    if (childNode instanceof HTMLElement) {
-                        const furigana = childNode.querySelector('.gloss-sc-rt')?.textContent;
-                        if (furigana && furigana.length > 0) {
-                            reading += furigana;
-                            hasFurigana = true;
-                        }
-                    } else {
-                        reading += childNode.textContent ?? '';
-                    }
-                }
-                query = href;
-                if (reading.length > 0 && hasFurigana) {
-                    query += `&primary_reading=${reading}`;
-                }
-            }
-            href = `${location.protocol}//${location.host}/search.html${query}`;
         }
 
         this._contentManager.prepareLink(node, href, internal);
