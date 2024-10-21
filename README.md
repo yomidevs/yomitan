@@ -22,7 +22,7 @@ Yomitan turns your web browser into a tool for building language literacy by hel
 Yomitan provides powerful features not available in other browser-based dictionaries:
 
 - 💬 Interactive popup definition window for displaying search results.
-- 🔊 Built-in native pronunciation audio with the ability to add your own [custom audio sources](./docs/audio.md).
+- 🔊 Built-in native pronunciation audio with the ability to add your own [custom audio sources](https://yomitan.wiki/advanced/#default-audio-sources).
 - ✍️ Kanji stroke order diagrams are just a click away.
 - 📝 [Automatic flashcard creation](https://yomitan.wiki/anki/) for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 - 🔍 Custom search page for easily executing custom search queries.
