@@ -1,4 +1,58 @@
 {
+    "da": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "de": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "el": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
     "en": [
         {
             "modification": {
@@ -18,6 +72,24 @@
         }
     ],
     "es": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "fi": [
         {
             "modification": {
                 "action": "set",
@@ -77,6 +149,258 @@
                 ]
             },
             "description": "Separating the l', j', d' from the word."
+        }
+    ],
+    "hu": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "id": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "it": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "mn": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "nl": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "pl": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "pt": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "ro": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "ru": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "sh": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "sq": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "sv": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "tr": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "vi": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
         }
     ]
 }
