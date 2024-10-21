@@ -34,25 +34,19 @@ Yomitan provides powerful features not available in other browser-based dictiona
 [![Dictionary options](img/ss-dictionaries-thumb.png)](img/ss-dictionaries.png)
 [![Anki options](img/ss-anki-thumb.png)](img/ss-anki.png)
 
-## Helpful information
+## Documentation/How To
 
-- ✨ [Migrating from Yomichan (legacy)](./docs/yomichan-migration.md)
+**Please visit the [Yomitan Wiki](https://yomitan.wiki) for the most up-to-date usage documentation.**
+
+### Developer Documentation
+
 - Dictionaries
-  - 📚 [Recommended Dictionaries](./docs/dictionaries.md#recommended-dictionaries)
-  - 🗂️ [Importing and exporting dictionaries](./docs/dictionaries.md#importing-a-dictionary-collection)
   - 🛠️ [Making Yomitan Dictionaries](./docs/making-yomitan-dictionaries.md)
 - Anki Integration
-  - 📇 [Anki integration and flashcard creation guide](./docs/anki-integration.md)
   - 🔧 [Anki handlebar templates](./docs/templates.md)
 - Advanced Features
-  - ⌨️ [Keyboard shortcuts](./docs/keyboard-shortcuts.md)
-  - 🔍 [Advanced options, including MeCab](./docs/advanced-options.md)
-  - 🔊 [Adding custom audio sources](./docs/audio.md)
 - Troubleshooting
   - 🕷️ [Known browser bugs](./docs/browser-bugs.md)
-  - ❓ [Frequently asked questions](./docs/faq.md)
-- 🔒 [Browser Permissions](./docs/permissions.md)
-- 🌎 [Supported Languages](./docs/supported-languages.md)
 
 ## Installation
 
@@ -73,33 +67,6 @@ Yomitan comes in two flavors: _stable_ and _testing_. New changes are initially 
   - Testing: Coming soon
 
 ※ Unlike Chrome, Firefox does not allow extensions meant for testing to be hosted in the marketplace. You will have to download the desired version and side-load it yourself. You only need to do this once, and you will get updates automatically.
-
-## Basic Usage
-
-1.  Click the <img src="ext/images/yomitan-icon.svg" width="16" height="16" alt="yomitan icon"> _Yomitan_ button in the browser bar to open the quick-actions popup.
-
-    <img src="resources/images/browser-action-popup1.png" alt="yomitan main popup">
-
-    - The <img src="ext/images/cog.svg" width="16" height="16" alt="cog"> _cog_ button will open the Settings page.
-    - The <img src="ext/images/magnifying-glass.svg" width="16" height="16" alt="magnifying glass"> _magnifying glass_ button will open the Search page.
-    - The <img src="ext/images/question-mark-circle.svg" width="16" height="16" alt="question mark symbol"> _question mark_ button will open the Information page.
-    - The <img src="ext/images/profile.svg" width="16" height="16" alt="profile icon"> _profile_ button will appear when multiple profiles exist, allowing the current profile to be quickly changed.
-
-2.  Import the dictionaries you wish to use for term and kanji searches; head over to the [dictionary docs](./docs/dictionaries.md) to get set up! If you do not have any dictionaries installed or enabled, Yomitan will warn you that it is not ready for use by displaying an orange exclamation mark over its icon. This exclamation mark will disappear once you have installed and enabled at least one dictionary.
-
-    <img src="resources/images/settings-dictionaries-popup.png" width="300" alt="custom dictionaries list">
-
-3.  Webpage text can be scanned by moving the cursor while holding a modifier key, which is <kbd>Shift</kbd> by default. If definitions are found for the text at the cursor position, a popup window containing term definitions will open. This window can be dismissed by clicking anywhere outside of it.
-
-    <img src="resources/images/search-popup-terms.png" width="300" alt="popup with search terms">
-
-4.  Click on the <img src="ext/images/play-audio.svg" width="16" height="16" alt="loudspeaker icon"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is not available, you will hear a short click instead. For more options, see [Audio Configuration](./docs/audio.md).
-
-5.  Click on individual kanji in the term definition results to view additional information about those characters, including stroke order diagrams, readings, meanings, and other useful data.
-
-    <img src="resources/images/search-popup-kanji.png" width="300" alt="popup with kanji details">
-
-To further enhance your Yomitan experience, it's worth [integrating with Anki](./docs/anki-integration.md), a spaced-repetition flashcard program to help solidify the words you encounter.
 
 ## Contributing
 
