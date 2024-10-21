@@ -131,7 +131,7 @@ export class QueryParser extends EventDispatcher {
      */
     async setText(text) {
         this._text = text;
-        this._setPreview(text); // this sets the text as the original, queried sentence
+        this._setPreview(text);
 
         if (this._useInternalParser === false && this._useMecabParser === false) {
             return;
@@ -139,7 +139,7 @@ export class QueryParser extends EventDispatcher {
         /** @type {?import('core').TokenObject} */
         const token = {};
         this._setTextToken = token;
-        this._parseResults = await this._api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser); // everything below parses the queried sentence and puts spaces between them
+        this._parseResults = await this._api.parseText(text, this._getOptionsContext(), this._scanLength, this._useInternalParser, this._useMecabParser);
         if (this._setTextToken !== token) { return; }
 
         this._refreshSelectedParser();
