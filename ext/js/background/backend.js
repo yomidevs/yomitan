@@ -827,7 +827,6 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'drawMedia'>} */
     async _onApiDrawMedia({targets}) {
-        console.log('_onApiDrawMedia', targets);
         await this._dictionaryDatabase.drawMedia(targets);
     }
 

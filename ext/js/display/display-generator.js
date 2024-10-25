@@ -132,7 +132,7 @@ export class DisplayGenerator {
             this._appendMultiple(inflectionRuleChainsContainer, this._createInflectionRuleChain.bind(this), inflectionRuleChainCandidates),
             this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false),
             this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations),
-            this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length)
+            this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length),
         ]);
         performance.mark('displayGenerator:createTermEntry:promises:end');
         performance.measure('displayGenerator:createTermEntry:promises', 'displayGenerator:createTermEntry:promises:start', 'displayGenerator:createTermEntry:promises:end');
@@ -201,7 +201,7 @@ export class DisplayGenerator {
             this._appendMultiple(tagContainer, this._createTag.bind(this), [...dictionaryEntry.tags, dictionaryTag]),
             this._appendMultiple(definitionsContainer, this._createKanjiDefinition.bind(this), dictionaryEntry.definitions),
             this._appendMultiple(chineseReadingsContainer, this._createKanjiReading.bind(this), dictionaryEntry.onyomi),
-            this._appendMultiple(japaneseReadingsContainer, this._createKanjiReading.bind(this), dictionaryEntry.kunyomi)
+            this._appendMultiple(japaneseReadingsContainer, this._createKanjiReading.bind(this), dictionaryEntry.kunyomi),
         ]);
 
         statisticsContainer.appendChild(await this._createKanjiInfoTable(dictionaryEntry.stats.misc));
@@ -458,7 +458,7 @@ export class DisplayGenerator {
         await Promise.all([
             this._appendMultiple(tagListContainer, this._createTag.bind(this), [...tags, dictionaryTag]),
             this._appendMultiple(onlyListContainer, this._createTermDisambiguation.bind(this), disambiguations),
-            this._appendMultiple(entriesContainer, this._createTermDefinitionEntry.bind(this), entries, dictionary)
+            this._appendMultiple(entriesContainer, this._createTermDefinitionEntry.bind(this), entries, dictionary),
         ]);
         return node;
     }

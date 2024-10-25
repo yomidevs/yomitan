@@ -15,12 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DrawMediaRequest, DrawImageBitmapRequest as DrawImageBitmapRequest} from 'dictionary-database';
+import {DrawMediaRequest} from 'dictionary-database';
 
 export type OnProgressCallback = (...args: unknown[]) => void;
 
 export type MessageToWorker = (
-    DrawMediaMessage | DrawImageBitmapsMessage
+    DrawMediaMessage
 );
 
 export type DrawMediaMessage = {
@@ -30,13 +30,4 @@ export type DrawMediaMessage = {
 
 export type DrawMediaMessageParams = {
     items: DrawMediaRequest[];
-};
-
-export type DrawImageBitmapsMessage = {
-    action: 'drawImageBitmaps';
-    params: DrawImageBitmapsMessageParams;
-};
-
-export type DrawImageBitmapsMessageParams = {
-    requests: DrawImageBitmapRequest[];
 };

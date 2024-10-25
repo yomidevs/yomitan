@@ -123,8 +123,8 @@ export class StructuredContentGenerator {
         if (sizeUnits === 'em' && (hasPreferredWidth || hasPreferredHeight)) {
             canvas.style.width = `${usedWidth}em`;
             canvas.style.height = `${usedWidth * invAspectRatio}em`;
-            canvas.width = usedWidth * 16;
-            canvas.height = usedWidth * invAspectRatio * 16;
+            canvas.width = usedWidth * 14 * 2 * window.devicePixelRatio;
+            canvas.height = usedWidth * invAspectRatio * 14 * 2 * window.devicePixelRatio;
         } else {
             canvas.width = usedWidth;
             canvas.height = usedWidth * invAspectRatio;

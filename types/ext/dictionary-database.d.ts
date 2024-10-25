@@ -40,7 +40,7 @@ type MediaType = ArrayBuffer | string | null;
 
 export type Media<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T>;
 
-export type DrawMedia<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T> & {canvases: [OffscreenCanvas]};
+export type DrawMedia<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T> & {canvases: OffscreenCanvas[]};
 
 export type DatabaseTermEntry = {
     expression: string;
@@ -267,22 +267,4 @@ export type CreateResult<TItem = unknown, TRow = unknown, TResult = unknown> = (
 
 export type DictionarySet = {
     has(value: string): boolean;
-};
-
-export type MessageFromWorker = (
-    RasterizeSVGsMessage
-);
-
-export type RasterizeSVGsMessage = {
-    action: 'rasterizeSVGs';
-    params: RasterizeSVGsMessageParams;
-};
-
-export type RasterizeSVGsMessageParams = {
-    svgs: DrawMedia<ArrayBuffer>[];
-};
-
-export type DrawImageBitmapRequest = {
-    canvases: [OffscreenCanvas];
-    imageBitmap: ImageBitmap;
 };

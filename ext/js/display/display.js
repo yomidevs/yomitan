@@ -25,7 +25,7 @@ import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
-import {clone, deepEqual} from '../core/utilities.js';
+import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
 import {setProfile} from '../data/profiles-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
@@ -1415,8 +1415,10 @@ export class Display extends EventDispatcher {
         for (const dictionaryEntry of dictionaryEntries) {
             performance.mark('display:createEntry:start');
 
-            if (i > 0 && /* await promiseTimeout(1); */
-            this._setContentToken !== token) { return; }
+            if (i > 0) {
+                await promiseTimeout(1);
+                if (this._setContentToken !== token) { return; }
+            }
 
             performance.mark('display:createEntryReal:start');
 

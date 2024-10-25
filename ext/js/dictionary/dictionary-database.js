@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {initWasm, Resvg} from '../../lib/resvg-wasm.js';
 import {log} from '../core/log.js';
 import {stringReverse} from '../core/utilities.js';
 import {Database} from '../data/database.js';
@@ -59,9 +60,14 @@ export class DictionaryDatabase {
         this._createDrawMediaBind = this._createDrawMedia.bind(this);
 
         /**
-         *
+         * @type {Worker?}
          */
-        this.worker = null;
+        this._worker = null;
+
+        /**
+         * @type {Uint8Array?}
+         */
+        this._resvgFontBuffer = null;
     }
 
     /** */
@@ -148,8 +154,15 @@ export class DictionaryDatabase {
         // when we are not a worker ourselves, create a worker which is basically just a wrapper around this class, which we can use to offload some functions to
         if (self.constructor.name === 'Window') {
             console.log('creating worker');
-            this.worker = new Worker('/js/dictionary/dictionary-database-worker-main.js', {type: 'module'});
-            this.worker.addEventListener('message', this.onMessageFromWorker.bind(this));
+            this._worker = new Worker('/js/dictionary/dictionary-database-worker-main.js', {type: 'module'});
+        } else {
+            // when we are the worker, prepare to need to do some SVG work and load appropriate wasm & fonts
+            console.log('loading wasm');
+            await initWasm(fetch('/lib/resvg.wasm'));
+
+            const font = await fetch('/fonts/NotoSansJP-Regular.ttf');
+            const fontData = await font.arrayBuffer();
+            this._resvgFontBuffer = new Uint8Array(fontData);
         }
     }
 
@@ -371,10 +384,10 @@ export class DictionaryDatabase {
      * @param {import('dictionary-database').DrawMediaRequest[]} items
      */
     async drawMedia(items) {
-        if (this.worker !== null) { // if a worker is available, offload the work to it
+        if (this._worker !== null) { // if a worker is available, offload the work to it
             // extract canvases to transfer them
-            const canvases = items.map((item) => item.canvas);
-            this.worker.postMessage({action: 'drawMedia', params: {items}}, canvases);
+            const transferables = items.map(({canvas}) => canvas);
+            this._worker.postMessage({action: 'drawMedia', params: {items}}, transferables);
             return;
         }
         // otherwise, you are the worker, so do the work
@@ -397,84 +410,58 @@ export class DictionaryDatabase {
 
         /** @type {import('dictionary-database').FindPredicate<import('dictionary-database').MediaRequest, import('dictionary-database').MediaDataArrayBufferContent>} */
         const predicate = (row, item) => (row.dictionary === item.dictionary);
-        const drawPromises = [];
         // performance.mark('drawMedia:findMultiBulk:start');
         const results = await this._findMultiBulk('media', ['path'], groupedItemsArray, this._createOnlyQuery5, predicate, this._createDrawMediaBind);
         // performance.mark('drawMedia:findMultiBulk:end');
         // performance.measure('drawMedia:findMultiBulk', 'drawMedia:findMultiBulk:start', 'drawMedia:findMultiBulk:end');
 
-        performance.mark('drawMedia:decode:start');
-        const svgs = [];
-        for (const m of results) {
-            if (m.mediaType === 'image/svg+xml') {
-                // SVGs can't be rasterized in a Worker (since there is no DOM available), so we need to send them back in another loop through the main thread...
-                // they will be rasterized in the main thread and then sent back to the worker to be drawn on the canvases
-                svgs.push(m);
-            } else {
-                const imageDecoder = new ImageDecoder({type: m.mediaType, data: m.content});
-                drawPromises.push(imageDecoder.decode().then((decodedImage) => {
-                    return {canvases: m.canvases, image: decodedImage.image};
-                }));
-            }
-        }
-        performance.mark('drawMedia:decode:end');
-        performance.measure('drawMedia:decode', 'drawMedia:decode:start', 'drawMedia:decode:end');
-
-        const transferables = svgs.flatMap((m) => [...m.canvases, m.content]);
-        (/** @type {Worker} */ (/** @type {unknown} */ (self))).postMessage({action: 'rasterizeSVGs', params: {svgs: svgs}}, transferables);
+        // move all svgs to front to have a hotter loop
+        results.sort((a, _b) => (a.mediaType === 'image/svg+xml' ? -1 : 1));
 
         performance.mark('drawMedia:draw:start');
-        for (const {canvases, image} of await Promise.all(drawPromises)) {
-            for (const c of canvases) {
-                c.getContext('2d')?.drawImage(image, 0, 0, c.width, c.height);
+        for (const m of results) {
+            if (m.mediaType === 'image/svg+xml') {
+                performance.mark('drawMedia:draw:svg:start');
+                /** @type {import('@resvg/resvg-wasm').ResvgRenderOptions} */
+                const opts = {
+                    fitTo: {
+                        mode: 'width',
+                        value: m.canvases[0].width,
+                    },
+                    font: {
+                        fontBuffers: this._resvgFontBuffer !== null ? [this._resvgFontBuffer] : [],
+                    },
+                };
+                const resvgJS = new Resvg(new Uint8Array(m.content), opts);
+                const render = resvgJS.render();
+                for (const c of m.canvases) {
+                    c.getContext('2d')?.putImageData(new ImageData(new Uint8ClampedArray(render.pixels), render.width, render.height), 0, 0);
+                }
+                performance.mark('drawMedia:draw:svg:end');
+                performance.measure('drawMedia:draw:svg', 'drawMedia:draw:svg:start', 'drawMedia:draw:svg:end');
+            } else {
+                performance.mark('drawMedia:draw:raster:start');
+                const imageDecoder = new ImageDecoder({type: m.mediaType, data: m.content});
+                await imageDecoder.decode().then((decodedImage) => {
+                    for (const c of m.canvases) {
+                        c.getContext('2d')?.drawImage(decodedImage.image, 0, 0, c.width, c.height);
+                    }
+                });
+                // const image = new Blob([m.content], {type: m.mediaType});
+                // await createImageBitmap(image).then((decodedImage) => {
+                //     for (const c of m.canvases) {
+                //         c.getContext('2d')?.drawImage(decodedImage, 0, 0, c.width, c.height);
+                //     }
+                // });
+                performance.mark('drawMedia:draw:raster:end');
+                performance.measure('drawMedia:draw:raster', 'drawMedia:draw:raster:start', 'drawMedia:draw:raster:end');
             }
         }
         performance.mark('drawMedia:draw:end');
         performance.measure('drawMedia:draw', 'drawMedia:draw:start', 'drawMedia:draw:end');
 
         performance.mark('drawMedia:end');
-        // performance.measure('drawMedia', 'drawMedia:start', 'drawMedia:end');
-    }
-
-    /**
-     *
-     * @param {import('dictionary-database').DrawImageBitmapRequest[]} requests
-     */
-    async drawImageBitmaps(requests) {
-        for (const {canvases, imageBitmap} of requests) {
-            for (const canvas of canvases) {
-                const ctx = canvas.getContext('2d');
-                if (ctx === null) { continue; }
-                ctx.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
-            }
-        }
-    }
-
-    /**
-     *
-     * @param {MessageEvent<import('dictionary-database').MessageFromWorker>} event
-     */
-    async onMessageFromWorker(event) {
-        const {action, params} = event.data;
-        switch (action) {
-            case 'rasterizeSVGs': {
-                const rasterizePromises = [];
-                for (const m of params.svgs) {
-                    const blob = new Blob([m.content], {type: m.mediaType});
-                    const url = URL.createObjectURL(blob);
-                    const image = new Image(m.width, m.height);
-                    image.src = url;
-                    rasterizePromises.push(image.decode().then(() => createImageBitmap(image, {resizeWidth: m.width, resizeHeight: m.height}).then((imageBitmap) => {
-                        URL.revokeObjectURL(url);
-                        return {canvases: m.canvases, imageBitmap};
-                    })));
-                }
-                const results = await Promise.all(rasterizePromises);
-                const transferables = results.flatMap(({canvases, imageBitmap}) => [...canvases, imageBitmap]);
-                this.worker?.postMessage({action: 'drawImageBitmaps', params: {requests: results}}, transferables);
-                break;
-            }
-        }
+        performance.measure('drawMedia', 'drawMedia:start', 'drawMedia:end');
     }
 
     /**
@@ -605,12 +592,11 @@ export class DictionaryDatabase {
             let completeCount = 0;
             const requiredCompleteCount = itemCount * indexCount;
             /**
-             * @param {TRow[]} rows
-             * @param {import('dictionary-database').FindMultiBulkData<TItem>} data
-             * @param item
+             * @param {TItem} item
+             * @returns {(rows: TRow[], data: import('dictionary-database').FindMultiBulkData<TItem>) => void}
              */
             const onGetAll = (item) => (rows, data) => {
-                if (typeof item === 'object' && 'path' in item) {
+                if (typeof item === 'object' && item !== null && 'path' in item) {
                     performance.mark(`findMultiBulk:onGetAll:${item.path}:end`);
                     performance.measure(`findMultiBulk:onGetAll:${item.path}`, `findMultiBulk:onGetAll:${item.path}:start`, `findMultiBulk:onGetAll:${item.path}:end`);
                 }
@@ -631,7 +617,7 @@ export class DictionaryDatabase {
                 for (let j = 0; j < indexCount; ++j) {
                     /** @type {import('dictionary-database').FindMultiBulkData<TItem>} */
                     const data = {item, itemIndex: i, indexIndex: j};
-                    if (typeof item === 'object' && 'path' in item) {
+                    if (typeof item === 'object' && item !== null && 'path' in item) {
                         performance.mark(`findMultiBulk:onGetAll:${item.path}:start`);
                     }
                     this._db.getAll(indexList[j], query, onGetAll(item), reject, data);

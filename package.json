@@ -105,6 +105,7 @@
         "vitest": "^1.2.2"
     },
     "dependencies": {
+        "@resvg/resvg-wasm": "^2.6.2",
         "@zip.js/zip.js": "^2.7.45",
         "dexie": "^3.2.5",
         "dexie-export-import": "^4.1.2",

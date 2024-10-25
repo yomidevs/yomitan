@@ -48,9 +48,6 @@ export class DictionaryDatabaseWorkerHandler {
             case 'drawMedia':
                 void this._dictionaryDatabase?.drawMedia(params.items);
                 break;
-            case 'drawImageBitmaps':
-                void this._dictionaryDatabase?.drawImageBitmaps(params.requests);
-                break;
         }
     }
 }
