@@ -268,3 +268,21 @@ export type CreateResult<TItem = unknown, TRow = unknown, TResult = unknown> = (
 export type DictionarySet = {
     has(value: string): boolean;
 };
+
+export type MessageFromWorker = (
+    RasterizeSVGsMessage
+);
+
+export type RasterizeSVGsMessage = {
+    action: 'rasterizeSVGs';
+    params: RasterizeSVGsMessageParams;
+};
+
+export type RasterizeSVGsMessageParams = {
+    svgs: DrawMedia<ArrayBuffer>[];
+};
+
+export type DrawImageBitmapRequest = {
+    canvases: [OffscreenCanvas];
+    imageBitmap: ImageBitmap;
+};

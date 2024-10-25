@@ -57,14 +57,20 @@ export class DictionaryDatabase {
         this._createMediaBind = this._createMedia.bind(this);
         /** @type {import('dictionary-database').CreateResult<import('dictionary-database').DrawMediaGroupedRequest, import('dictionary-database').MediaDataArrayBufferContent, import('dictionary-database').DrawMedia>} */
         this._createDrawMediaBind = this._createDrawMedia.bind(this);
+
+        /**
+         *
+         */
+        this.worker = null;
     }
 
     /** */
     async prepare() {
-        await this._db.open(
-            this._dbName,
-            60,
-            /** @type {import('database').StructureDefinition<import('dictionary-database').ObjectStoreName>[]} */
+        console.log(self.constructor.name);
+        // do not do upgrades in web workers as they are considered to be children of the main thread and are not responsible for database upgrades
+        const upgrade = self.constructor.name !== 'Window' ?
+            null :
+            /** @type {import('database').StructureDefinition<import('dictionary-database').ObjectStoreName>[]?} */
             ([
                 /** @type {import('database').StructureDefinition<import('dictionary-database').ObjectStoreName>} */
                 ({
@@ -132,8 +138,19 @@ export class DictionaryDatabase {
                         },
                     },
                 },
-            ]),
+            ]);
+        await this._db.open(
+            this._dbName,
+            60,
+            upgrade,
         );
+
+        // when we are not a worker ourselves, create a worker which is basically just a wrapper around this class, which we can use to offload some functions to
+        if (self.constructor.name === 'Window') {
+            console.log('creating worker');
+            this.worker = new Worker('/js/dictionary/dictionary-database-worker-main.js', {type: 'module'});
+            this.worker.addEventListener('message', this.onMessageFromWorker.bind(this));
+        }
     }
 
     /** */
@@ -354,6 +371,14 @@ export class DictionaryDatabase {
      * @param {import('dictionary-database').DrawMediaRequest[]} items
      */
     async drawMedia(items) {
+        if (this.worker !== null) { // if a worker is available, offload the work to it
+            // extract canvases to transfer them
+            const canvases = items.map((item) => item.canvas);
+            this.worker.postMessage({action: 'drawMedia', params: {items}}, canvases);
+            return;
+        }
+        // otherwise, you are the worker, so do the work
+
         performance.mark('drawMedia:start');
 
         // merge items with the same path to reduce the number of database queries. collects the canvases into a single array for each path.
@@ -368,7 +393,7 @@ export class DictionaryDatabase {
             groupedItems.get(key)?.canvases.push(canvas);
         }
         const groupedItemsArray = [...groupedItems.values()];
-        console.log(groupedItemsArray);
+        // console.log(groupedItemsArray);
 
         /** @type {import('dictionary-database').FindPredicate<import('dictionary-database').MediaRequest, import('dictionary-database').MediaDataArrayBufferContent>} */
         const predicate = (row, item) => (row.dictionary === item.dictionary);
@@ -379,16 +404,12 @@ export class DictionaryDatabase {
         // performance.measure('drawMedia:findMultiBulk', 'drawMedia:findMultiBulk:start', 'drawMedia:findMultiBulk:end');
 
         performance.mark('drawMedia:decode:start');
+        const svgs = [];
         for (const m of results) {
             if (m.mediaType === 'image/svg+xml') {
-                const blob = new Blob([m.content], {type: m.mediaType});
-                const url = URL.createObjectURL(blob);
-                const image = new Image(m.width, m.height);
-                image.src = url;
-                drawPromises.push(image.decode().then(() => {
-                    URL.revokeObjectURL(url);
-                    return {canvases: m.canvases, image};
-                }));
+                // SVGs can't be rasterized in a Worker (since there is no DOM available), so we need to send them back in another loop through the main thread...
+                // they will be rasterized in the main thread and then sent back to the worker to be drawn on the canvases
+                svgs.push(m);
             } else {
                 const imageDecoder = new ImageDecoder({type: m.mediaType, data: m.content});
                 drawPromises.push(imageDecoder.decode().then((decodedImage) => {
@@ -398,6 +419,9 @@ export class DictionaryDatabase {
         }
         performance.mark('drawMedia:decode:end');
         performance.measure('drawMedia:decode', 'drawMedia:decode:start', 'drawMedia:decode:end');
+
+        const transferables = svgs.flatMap((m) => [...m.canvases, m.content]);
+        (/** @type {Worker} */ (/** @type {unknown} */ (self))).postMessage({action: 'rasterizeSVGs', params: {svgs: svgs}}, transferables);
 
         performance.mark('drawMedia:draw:start');
         for (const {canvases, image} of await Promise.all(drawPromises)) {
@@ -410,6 +434,47 @@ export class DictionaryDatabase {
 
         performance.mark('drawMedia:end');
         // performance.measure('drawMedia', 'drawMedia:start', 'drawMedia:end');
+    }
+
+    /**
+     *
+     * @param {import('dictionary-database').DrawImageBitmapRequest[]} requests
+     */
+    async drawImageBitmaps(requests) {
+        for (const {canvases, imageBitmap} of requests) {
+            for (const canvas of canvases) {
+                const ctx = canvas.getContext('2d');
+                if (ctx === null) { continue; }
+                ctx.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param {MessageEvent<import('dictionary-database').MessageFromWorker>} event
+     */
+    async onMessageFromWorker(event) {
+        const {action, params} = event.data;
+        switch (action) {
+            case 'rasterizeSVGs': {
+                const rasterizePromises = [];
+                for (const m of params.svgs) {
+                    const blob = new Blob([m.content], {type: m.mediaType});
+                    const url = URL.createObjectURL(blob);
+                    const image = new Image(m.width, m.height);
+                    image.src = url;
+                    rasterizePromises.push(image.decode().then(() => createImageBitmap(image, {resizeWidth: m.width, resizeHeight: m.height}).then((imageBitmap) => {
+                        URL.revokeObjectURL(url);
+                        return {canvases: m.canvases, imageBitmap};
+                    })));
+                }
+                const results = await Promise.all(rasterizePromises);
+                const transferables = results.flatMap(({canvases, imageBitmap}) => [...canvases, imageBitmap]);
+                this.worker?.postMessage({action: 'drawImageBitmaps', params: {requests: results}}, transferables);
+                break;
+            }
+        }
     }
 
     /**
