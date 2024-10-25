@@ -38,6 +38,7 @@
     --background-color: #f8f9fa;
     --text-color: #333333;
     --svg-filter: 0;
+    --animation-duration: 0.5s;
 }
 
 :root[data-theme=dark] {
@@ -89,31 +90,6 @@ label {
 :root[data-mode=full] #full {
     display: initial;
 }
-
-
-/* Icons */
-.icon {
-    --icon-image: none;
-    --icon-size: contain;
-
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center center;
-    -webkit-mask-mode: alpha;
-    -webkit-mask-size: var(--icon-size);
-    -webkit-mask-image: var(--icon-image);
-    mask-repeat: no-repeat;
-    mask-position: center center;
-    mask-mode: alpha;
-    mask-size: var(--icon-size);
-    mask-image: var(--icon-image);
-}
-.icon[data-icon=profile]                 { --icon-image: url(/images/profile.svg); }
-.icon[data-icon=cog]                     { --icon-image: url(/images/cog.svg); }
-.icon[data-icon=key]                     { --icon-image: url(/images/key.svg); }
-.icon[data-icon=magnifying-glass]        { --icon-image: url(/images/magnifying-glass.svg); }
-.icon[data-icon=exclamation-point-short] { --icon-image: url(/images/exclamation-point-short.svg); }
-.icon[data-icon=question-mark-circle]    { --icon-image: url(/images/question-mark-circle.svg); }
-
 
 /* Page-specific styles */
 .link-group {
@@ -185,19 +161,22 @@ label {
     -moz-appearance: none;
     appearance: none;
 }
+
 .toggle>input[type=checkbox]:not(:checked)~.toggle-group {
     transform: translateX(-50%);
 }
+
 .toggle {
     box-sizing: border-box;
-    width: 60px;
-    height: 34px;
+    width: 85px;
+    height: 43px;
     position: relative;
     overflow: hidden;
     border: 1px solid #245580;
     border-radius: 4px;
     display: inline-block;
 }
+
 .toggle-group {
     position: absolute;
     width: 200%;
@@ -206,12 +185,15 @@ label {
     bottom: 0;
     user-select: none;
 }
+
 body[data-loaded=true] .toggle-group {
     transition: transform 0.35s;
 }
+
 body[data-loaded=true] #loading {
     display: none;
 }
+
 body:not([data-loaded=true]) #action-popups {
     display: none;
 }
@@ -224,12 +206,13 @@ body:not([data-loaded=true]) #action-popups {
     align-items: center;
     padding: 6px 12px;
     font-size: var(--font-size);
-    font-weight: normal;
+    font-weight: bold;
     line-height: var(--line-height);
     text-align: center;
     white-space: nowrap;
     cursor: pointer;
 }
+
 .toggle-on,
 .toggle-off {
     position: absolute;
@@ -244,30 +227,24 @@ body:not([data-loaded=true]) #action-popups {
     left: 0;
     right: 50%;
     color: #ffffff;
-    background-color: #337ab7;
     border-color: #2e6da4;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 3px 5px rgba(0, 0, 0, 0);
-    background-image: linear-gradient(#337ab7, #265a88);
+    background-image: linear-gradient(225deg, #bc00ff, #00eeff);
     background-repeat: repeat-x;
 }
 input[type=checkbox]:focus~.toggle-group>.toggle-on,
 input[type=checkbox]~.toggle-group>.toggle-on:hover {
-    background-color: #265a88;
-    background-image: linear-gradient(#2d65a0, #265a88 50%);
+    filter: grayscale(30%);
 }
 input[type=checkbox]:focus:not(:focus-visible)~.toggle-group>.toggle-on:not(:hover) {
-    background-color: #337ab7;
-    background-image: linear-gradient(#337ab7, #265a88);
+    background-image: linear-gradient(225deg, #bc00ff, #00eeff);
 }
 input[type=checkbox]:focus-visible~.toggle-group>.toggle-on {
-    background-color: #265a88;
-    background-image: linear-gradient(#2d65a0, #265a88 50%);
+    filter: grayscale(30%);
 }
 input[type=checkbox]~.toggle-group>.toggle-on:active,
 input[type=checkbox]~.toggle-group>.toggle-on:active:focus {
-    background-color: #204d74;
-    background-image: none;
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
 }
 
@@ -295,104 +272,32 @@ input[type=checkbox]~.toggle-group>.toggle-on:active:focus {
     color: #333333;
     text-shadow: 0 1px 0 #ffffff;
     background-color: #ffffff;
-    background-image: linear-gradient(#ffffff, #e0e0e0);
     background-repeat: repeat-x;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 input[type=checkbox]:focus~.toggle-group>.toggle-off,
 input[type=checkbox]~.toggle-group>.toggle-off:hover,
 input[type=checkbox]~.toggle-group>.toggle-handle:hover {
     background-color: #e6e6e6;
-    background-image: linear-gradient(#e0e0e0, #e6e6e6 50%);
-    border-color: #adadad;
 }
 input[type=checkbox]:focus:not(:focus-visible)~.toggle-group>.toggle-off:not(:hover) {
     background-color: #ffffff;
-    background-image: linear-gradient(#ffffff, #e0e0e0);
-    border-color: #cccccc;
 }
 input[type=checkbox]:focus-visible~.toggle-group>.toggle-off,
 input[type=checkbox]~.toggle-group>.toggle-off:hover {
     background-color: #e6e6e6;
-    background-image: linear-gradient(#e0e0e0, #e6e6e6 50%);
-    border-color: #adadad;
 }
 input[type=checkbox]~.toggle-group>.toggle-off:active,
 input[type=checkbox]~.toggle-group>.toggle-handle:active,
 input[type=checkbox]~.toggle-group>.toggle-off:active:focus,
 input[type=checkbox]~.toggle-group>.toggle-handle:active:focus {
-    background-color: #d4d4d4;
-    background-image: none;
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-    border-color: #8c8c8c;
 }
 
-
-/* Navigation buttons and icons */
-.nav-button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    white-space: nowrap;
-}
-.nav-button {
-    background-image: var(--nav-button-background-image);
-    border: 1px solid var(--nav-button-border-color);
-    margin: 0;
-    padding: 2px 3px;
-    cursor: pointer;
-    position: relative;
-}
-.nav-button+.nav-button {
-    margin-left: -1px;
-}
-.nav-button:hover,
-.nav-button:focus {
-    z-index: 1;
-    border-color: var(--nav-button-border-color-focus);
-    background-image: var(--nav-button-background-image-focus);
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    outline: none;
-}
-.nav-button:focus:not(:focus-visible) {
-    background-image: var(--nav-button-background-image);
-    border-color: var(--nav-button-border-color);
-    box-shadow: none;
-}
-.nav-button:focus-visible {
-    z-index: 1;
-    border-color: var(--nav-button-border-color-focus);
-    background-image: var(--nav-button-background-image-focus);
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-}
-.nav-button:active,
-.nav-button:active:focus {
-    z-index: 1;
-    border-color: var(--nav-button-border-color-active-focus);
-    background-image: var(--nav-button-background-image-active-focus);
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-}
-.nav-button>.icon {
-    --icon-size: 16px 16px;
-    display: block;
-    width: 16px;
-    height: 16px;
-    box-sizing: content-box;
-    background-color: var(--nav-button-icon-bg);
-}
-.nav-button:first-child,
-.nav-button:first-child[hidden]+.nav-button {
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
-}
-.nav-button:last-child {
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
-}
-
+/* Actions */
 .action-select-profile {
     position: relative;
 }
+
 .profile-select-container {
     position: absolute;
     left: -1px;
@@ -400,36 +305,21 @@ input[type=checkbox]~.toggle-group>.toggle-handle:active:focus {
     right: -1px;
     bottom: -1px;
 }
+
 select.profile-select {
-    position: absolute;
     left: 0;
     top: 0;
-    width: 100%;
+    width: 6em;
     height: 100%;
     box-sizing: border-box;
     border: 0;
     margin: 0;
-    padding: 0.375em;
-    appearance: none;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    opacity: 0;
-    outline: none;
+    /* background-position: right calc(3em / var(--font-size-no-units)) center; */
     cursor: pointer;
     font-size: var(--font-size);
 }
-.profile-select optgroup {
-    color: #666666;
-    font-weight: normal;
-    font-style: normal;
-    background-color: #f2f2f2;
-}
-.profile-select option {
-    color: #333333;
-    font-weight: normal;
-    font-style: normal;
-    background-color: initial;
-}
+
+/* Warnings */
 
 .nav-button-warning-badge {
     pointer-events: none;
@@ -496,6 +386,104 @@ select.profile-select {
     bottom: 0;
     background-color: var(--warning-color);
 }
+
+/* Action Containers */
+
+.action-icon:hover {
+    cursor: pointer;
+}
+
+
+.action-icon {
+    flex: 0 0 auto;
+    align-self: center;
+}
+.action-icon>.icon {
+    display: block;
+    background-color: var(--button-default-icon-color);
+    width: 1.5em;
+    height: 1.5em;
+}
+
+.action-item {
+    position: relative;
+    padding: .5em;
+}
+.action-item:not([hidden]) {
+    display: block;
+}
+.action-item-outer {
+    display: block;
+    width: 100%;
+}
+.action-item-inner {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-content: stretch;
+    width: 100%;
+}
+
+.action-item-left {
+    padding: var(--action-group-inner-vertical-padding) var(--action-group-inner-horizontal-padding-half) var(--action-group-inner-vertical-padding) var(--action-group-inner-horizontal-padding);
+    flex: 1 1 auto;
+    align-self: center;
+    position: relative;
+}
+.action-item-center {
+    padding: var(--action-group-inner-vertical-padding) var(--action-group-inner-horizontal-padding);
+    flex: 1 1 auto;
+    align-self: center;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+}
+.action-item-right {
+    padding: var(--action-group-inner-vertical-padding) var(--action-group-inner-horizontal-padding) var(--action-group-inner-vertical-padding) var(--action-group-inner-horizontal-padding-half);
+    flex: 0 1 auto;
+    align-self: stretch;
+    max-height: var(--action-group-right-max-height);
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    align-content: center;
+    justify-content: flex-end;
+    padding-left: .5em;
+}
+
+.action-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.action-container button {
+    flex: 0 0 auto;
+}
+
+/* Misc */
+
+h2 {
+    padding: 0;
+    margin: 0;
+    font-size: 1.125em;
+    font-weight: normal;
+    line-height: 1.5;
+}
+
+.tooltip {
+    color: gray;
+    padding: 0;
+    margin: 0;
+}
+
+input[type=text] {
+    width: 12em;
+}
+
+
 
 /* Mobile overrides */
 

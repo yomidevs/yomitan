@@ -81,6 +81,15 @@ class DisplayController {
 
     // Private
 
+    _updateDisplayModifierKey() {
+        const {profiles, profileCurrent} = /** @type {import('settings').Options} */ (this._optionsFull);
+        /** @type {NodeListOf<HTMLElement>} */
+        const modifierKeys = document.querySelectorAll('em.modifier-key');
+        for (let i = 0; i < modifierKeys.length; i++) {
+            modifierKeys[i].textContent = profiles[profileCurrent].options.scanning.inputs[0].include ? profiles[profileCurrent].options.scanning.inputs[0].include : "no key"; // Change to your desired text
+        }
+    }
+
     /**
      * @param {MouseEvent} e
      */
@@ -202,7 +211,9 @@ class DisplayController {
         const extensionEnabled = options.general.enable;
         const onToggleChanged = () => this._api.commandExec('toggleTextScanning');
         for (const toggle of /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('.enable-search,.enable-search2'))) {
-            toggle.checked = extensionEnabled;
+            if (toggle.checked !== extensionEnabled) {
+                toggle.checked = extensionEnabled;
+            }
             toggle.addEventListener('change', onToggleChanged, false);
         }
         void this._updateDictionariesEnabledWarnings(options);
@@ -211,6 +222,7 @@ class DisplayController {
         this._themeController.theme = options.general.popupTheme;
         this._themeController.siteOverride = true;
         this._themeController.updateTheme();
+        this._updateDisplayModifierKey();
     }
 
     /** */
@@ -235,8 +247,8 @@ class DisplayController {
         /** @type {NodeListOf<HTMLSelectElement>} */
         const selects = document.querySelectorAll('.profile-select');
         /** @type {NodeListOf<HTMLElement>} */
-        const optionGroups = document.querySelectorAll('.profile-select-option-group');
-        for (let i = 0; i < Math.min(selects.length, optionGroups.length); i++) {
+        // const optionGroups = document.querySelectorAll('.profile-select-option-group');
+        for (let i = 0; i < Math.min(selects.length); i++) {
             const fragment = document.createDocumentFragment();
             for (let j = 0, jj = profiles.length; j < jj; ++j) {
                 const {name} = profiles[j];
@@ -245,8 +257,8 @@ class DisplayController {
                 option.value = `${j}`;
                 fragment.appendChild(option);
             }
-            optionGroups[i].textContent = '';
-            optionGroups[i].appendChild(fragment);
+            selects[i].textContent = '';
+            selects[i].appendChild(fragment);
             selects[i].value = `${profileCurrent}`;
 
             selects[i].addEventListener('change', this._onProfileSelectChange.bind(this), false);
@@ -259,8 +271,18 @@ class DisplayController {
     _onProfileSelectChange(event) {
         const node = /** @type {HTMLInputElement} */ (event.currentTarget);
         const value = Number.parseInt(node.value, 10);
-        if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= /** @type {import('settings').Options} */ (this._optionsFull).profiles.length) {
+
+        console.log('Selected profile index:', value); // Debug log
+
+        if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value < /** @type {import('settings').Options} */ (this._optionsFull).profiles.length) {
             void this._setDefaultProfileIndex(value);
+            // Update the displayed modifier key after changing the profile
+            this._optionsFull.profileCurrent = value;
+            const defaultProfile = this._optionsFull.profiles[this._optionsFull.profileCurrent];
+            if (defaultProfile !== null) {
+                this._setupOptions(defaultProfile);
+            }
+            console.log('Modifier key text updated for profile:', this._optionsFull.profiles[value]); // Debug log
         }
     }
 
