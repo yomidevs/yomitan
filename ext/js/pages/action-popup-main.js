@@ -271,18 +271,13 @@ class DisplayController {
     _onProfileSelectChange(event) {
         const node = /** @type {HTMLInputElement} */ (event.currentTarget);
         const value = Number.parseInt(node.value, 10);
-
-        console.log('Selected profile index:', value); // Debug log
-
         if (typeof value === 'number' && Number.isFinite(value) && value >= 0 && value < /** @type {import('settings').Options} */ (this._optionsFull).profiles.length) {
             void this._setDefaultProfileIndex(value);
-            // Update the displayed modifier key after changing the profile
             this._optionsFull.profileCurrent = value;
             const defaultProfile = this._optionsFull.profiles[this._optionsFull.profileCurrent];
             if (defaultProfile !== null) {
                 this._setupOptions(defaultProfile);
             }
-            console.log('Modifier key text updated for profile:', this._optionsFull.profiles[value]); // Debug log
         }
     }
 
