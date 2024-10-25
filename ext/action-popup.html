@@ -44,17 +44,26 @@
             </div>
         </div>
         <div tabindex="0" class="action-container">
-            <button type="button" class="low-emphasis action-open-settings">
+            <button type="button" class="low-emphasis action-open-settings" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'>
                 <div class="action-icon">
                     <span class="icon" data-icon="cog"></span>
                 </div>
             </button>
-            <button type="button" class="low-emphasis action-open-search">
+            <button type="button" class="low-emphasis action-open-permissions" title="Permissions" hidden>
+                <div class="action-icon">
+                    <span class="icon" data-icon="key"></span>
+                    <div class="nav-button-warning-badge permissions-required-warning" hidden>
+                        <div class="nav-button-warning-badge-outer"></div>
+                        <div class="nav-button-warning-badge-inner"></div>
+                    </div>
+                </div>
+            </button>
+            <button type="button" class="low-emphasis action-open-search" title="Search" data-hotkey='["global:openSearchPage","title","Search ({0})\nShift+click to open here"]'>
                 <div class="action-icon">
                     <span class="icon" data-icon="magnifying-glass"></span>
                 </div>
             </button>
-            <button type="button" class="low-emphasis action-open-info">
+            <button type="button" class="low-emphasis action-open-info" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'>
                 <div class="action-icon">
                     <span class="icon" data-icon="info"></span>
                 </div>
