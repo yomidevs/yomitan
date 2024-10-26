@@ -29,12 +29,13 @@ describe('AnkiTemplateRenderer', () => {
                 type: 'kanji',
                 character: 'c',
                 dictionary: 'dictionary',
+                dictionaryAlias: 'dictionaryAlias',
                 onyomi: [],
                 kunyomi: [],
                 tags: [],
                 stats: {},
                 definitions: [],
-                frequencies: []
+                frequencies: [],
             },
             resultOutputMode: 'split',
             mode: 'test',
@@ -47,43 +48,44 @@ describe('AnkiTemplateRenderer', () => {
                 fullQuery: 'query.full',
                 sentence: {
                     text: 'sentence.query.full',
-                    offset: 9
-                }
+                    offset: 9,
+                },
             },
-            media: void 0
-        }
+            media: void 0,
+            dictionaryStylesMap: new Map(),
+        },
     };
     const testCases = [
         {
             name: 'regexMatch 1',
             template: '{{#regexMatch "test" "gu"}}this is a test of regexMatch{{/regexMatch}}',
-            result: 'test'
+            result: 'test',
         },
         {
             name: 'regexMatch 2',
             template: '{{regexMatch "test" "gu" "this is a test of regexMatch"}}',
-            result: 'test'
+            result: 'test',
         },
         {
             name: 'regexMatch 3',
             template: '{{#if (regexMatch "test" "gu" "this is a test of regexMatch")}}true{{else}}false{{/if}}',
-            result: 'true'
+            result: 'true',
         },
         {
             name: 'regexReplace 1',
             template: '{{#regexReplace "test" "TEST" "gu"}}this is a test of regexReplace{{/regexReplace}}',
-            result: 'this is a TEST of regexReplace'
+            result: 'this is a TEST of regexReplace',
         },
         {
             name: 'regexReplace 2',
             template: '{{regexReplace "test" "TEST" "gu" "this is a test of regexReplace"}}',
-            result: 'this is a TEST of regexReplace'
+            result: 'this is a TEST of regexReplace',
         },
         {
             name: 'regexReplace 3',
             template: '{{#if (regexReplace "test" "" "gu" "test")}}true{{else}}false{{/if}}',
-            result: 'false'
-        }
+            result: 'false',
+        },
     ];
     describe.each(testCases)('$name', ({template, result: expectedResult}) => {
         test('Test', ({expect, ankiTemplateRenderer}) => {

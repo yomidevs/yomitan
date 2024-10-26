@@ -1,0 +1,78 @@
+{
+    "$id": "recommendedDictionaries",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Contains data for recommended dictionaries on welcome page.",
+    "type": "object",
+    "patternProperties": {
+        "^.{2,}$": {
+            "type": "object",
+            "properties": {
+                "terms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Dictionary"
+                    }
+                },
+                "kanji": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Dictionary"
+                    }
+                },
+                "frequency": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Dictionary"
+                    }
+                },
+                "grammar": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Dictionary"
+                    }
+                },
+                "pronunciation": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Dictionary"
+                    }
+                }
+            },
+            "required": [
+                "terms",
+                "kanji",
+                "frequency",
+                "grammar"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "definitions": {
+        "Dictionary": {
+            "type": "object",
+            "required": [
+                "name",
+                "downloadUrl",
+                "description"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 2
+                },
+                "downloadUrl": {
+                    "type": "string",
+                    "minLength": 2
+                },
+                "description": {
+                    "type": "string",
+                    "minLength": 2
+                },
+                "homepage": {
+                    "type": "string",
+                    "minLength": 2
+                }
+            }
+        }
+    }
+}

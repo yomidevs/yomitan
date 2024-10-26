@@ -135,7 +135,7 @@ describe('Document utility tests', () => {
                         sentenceScanExtent,
                         sentence,
                         hasImposter,
-                        terminateAtNewlines
+                        terminateAtNewlines,
                     } = parseJson(/** @type {string} */ (testElement.dataset.testData));
 
                     const elementFromPointValue = querySelectorChildOrSelf(testElement, elementFromPointSelector);
@@ -174,8 +174,8 @@ describe('Document utility tests', () => {
                                      * @param {number} index
                                      * @returns {DOMRect}
                                      */
-                                    item: function item(index) { return this[index]; }
-                                }
+                                    item: function item(index) { return this[index]; },
+                                },
                             );
                             return domRectList;
                         };
@@ -186,7 +186,8 @@ describe('Document utility tests', () => {
                     const textSourceGenerator = new TextSourceGenerator();
                     const source = textSourceGenerator.getRangeFromPoint(0, 0, {
                         deepContentScan: false,
-                        normalizeCssZoom: true
+                        normalizeCssZoom: true,
+                        language: null,
                     });
                     switch (resultType) {
                         case 'TextSourceRange':
@@ -229,7 +230,7 @@ describe('Document utility tests', () => {
                         terminateAtNewlines2,
                         terminatorMap,
                         forwardQuoteMap,
-                        backwardQuoteMap
+                        backwardQuoteMap,
                     ).text;
                     expect(sentenceActual).toStrictEqual(sentence);
 
@@ -257,7 +258,7 @@ describe('Document utility tests', () => {
                         expectedResultNodeSelector,
                         expectedResultNodeIsText,
                         expectedResultOffset,
-                        expectedResultContent
+                        expectedResultContent,
                     } = parseJson(/** @type {string} */ (testElement.dataset.testData));
 
                     /** @type {?Node} */

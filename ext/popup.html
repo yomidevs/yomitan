@@ -21,7 +21,7 @@
 
 <div class="content-outer">
     <div class="content">
-        <div class="content-scroll scrollbar" id="content-scroll">
+        <div class="content-scroll contain-overscroll scrollbar" id="content-scroll">
             <div class="content-body" id="content-body">
                 <div class="top-progress-bar-container"><div class="progress-bar-indeterminant" id="progress-indicator" hidden></div></div>
                 <div class="content-body-inner">
@@ -45,6 +45,12 @@
                         </div>
                     </div>
 
+                    <div id="no-dictionaries" hidden>
+                        <div class="entry">
+                            <p>No dictionaries have been installed or enabled yet.</p>
+                            <p><a href="/settings.html#!dictionaries" target="_top">Go to Dictionaries settings.</a></p>
+                        </div>
+                    </div>
                     <div id="error-extension-unloaded" hidden>
                         <div class="entry">
                             <h1>Yomitan Updated!</h1>

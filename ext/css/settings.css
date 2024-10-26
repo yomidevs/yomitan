@@ -53,6 +53,8 @@
     --modal-height: 400px;
     --modal-width-small: 400px;
     --modal-height-small: 200px;
+    --modal-width-medium: 600px;
+    --modal-height-medium: 400px;
     --modal-transition-offset: -64px;
     --badge-size: 16px;
 
@@ -74,6 +76,19 @@
     --modal-padding-vertical: 0.625em;
     --modal-padding-vertical-half: calc(var(--modal-padding-vertical) * 0.5);
     --modal-button-spacing: 0.625em;
+
+    --scrollbar-thumb-color: #c1c1c1;
+    --scrollbar-track-color: #f1f1f1;
+    --scrollbar-inverse-thumb-color: #444444;
+    --scrollbar-inverse-track-color: #2f2f2f;
+
+    --dictionary-import-border-color: #cccccc;
+    --dictionary-import-border-color-hover: #bfd1ff;
+    --dictionary-import-hover-background-color: rgba(28, 116, 233, 0.05);
+
+    --custom-css-dim-size: 73.5%;
+    --custom-css-dim-fade-length: 3.5%;
+    --custom-css-modal-background: linear-gradient(90deg, var(--dim-background-color) calc(100% - var(--custom-css-dim-fade-length)), rgba(0, 0, 0, 0));
 }
 :root:not([data-loaded=true]) {
     --animation-duration: 0s;
@@ -81,6 +96,45 @@
 :root[data-theme=dark] {
     --separator-color1: #333333;
     --separator-color2: #222222;
+
+    --scrollbar-thumb-color: #444444;
+    --scrollbar-track-color: #2f2f2f;
+    --scrollbar-inverse-thumb-color: #c1c1c1;
+    --scrollbar-inverse-track-color: #f1f1f1;
+
+    --dictionary-import-border-color: #333333;
+    --dictionary-import-border-color-hover: #1c74e9;
+    --dictionary-import-hover-background-color: rgba(191, 209, 255, 0.05);
+}
+
+/* Scrollbars */
+:root:not([data-theme=light]) .scrollbar,
+:root:not([data-theme=light]) .modal-body {
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar {
+    width: auto;
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-button,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-button {
+    height: 0;
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-thumb,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-thumb-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-track-piece,
+:root:not([data-theme=light]) .modal-::-webkit-scrollbar-track-piece {
+    background-color: var(--scrollbar-track-color);
+}
+:root:not([data-theme=light]) .scrollbar::-webkit-scrollbar-corner,
+:root:not([data-theme=light]) .modal-body::-webkit-scrollbar-corner {
+    background-color: var(--scrollbar-track-color);
 }
 
 
@@ -584,7 +638,16 @@ a.heading-link-light {
 .settings-item-children.settings-item-children-group .settings-item-children {
     padding-left: 0;
 }
+:root:not([data-debug=true]) .debug-only {
+    display: none;
+}
 :root:not([data-advanced=true]) .advanced-only {
+    display: none;
+}
+:root:not([data-advanced=false]) .basic-only {
+    display: none;
+}
+:root:not([data-language=ja]):not([data-language=zh]):not([data-language=yue]) .jpzhyue-only {
     display: none;
 }
 .settings-item.settings-item-button,
@@ -709,6 +772,22 @@ select.short-height {
     --accent-color-transparent25: var(--advanced-color-transparent25);
 }
 
+/* Debug settings */
+.settings-group.debug-only>.settings-item::after,
+.settings-item.debug-only::after {
+    content: '';
+    background-color: var(--danger-color-lighter);
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 0.25em;
+}
+.debug-toggle {
+    --accent-color: var(--danger-color);
+    --accent-color-lighter: var(--danger-color-lighter);
+    --accent-color-transparent25: var(--danger-color-transparent25);
+}
 
 /* Modal */
 .modal {
@@ -766,6 +845,12 @@ select.short-height {
 .modal-content.modal-content-small {
     width: var(--modal-width-small);
     min-height: var(--modal-height-small);
+    height: auto;
+    max-height: 100%;
+}
+.modal-content.modal-content-medium {
+    width: var(--modal-width-medium);
+    min-height: var(--modal-height-medium);
     height: auto;
     max-height: 100%;
 }
@@ -853,26 +938,8 @@ select.short-height {
     background-color: transparent;
     pointer-events: none;
 }
-.modal.modal-left::after {
-    content: '';
-    display: block;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    visibility: hidden;
-}
-.modal-content-container1 {
-    flex: 1 1 auto;
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr minmax(auto, var(--content-width)) 1fr;
-    grid-template-rows: auto;
-    align-items: stretch;
-}
-.modal-content-container2 {
-    grid-area: 1/1/2/3;
-    background-color: var(--dim-background-color);
-    pointer-events: auto;
+.modal-content-container {
+    pointer-events: none;
     width: 100%;
     height: 100%;
     display: flex;
@@ -880,20 +947,18 @@ select.short-height {
     justify-content: center;
     align-items: center;
 }
-.modal-content-container1-fade {
-    display: block;
-    position: relative;
-    grid-area: 1/3/2/4;
+
+.modal-content-container>.modal-content,
+.modal-content-container>.modal-content-dimmer {
+    pointer-events: auto;
 }
-.modal-content-container1-fade::after {
-    content: '';
-    display: block;
+
+.modal-content-container>.modal-content-dimmer {
+    background: var(--custom-css-modal-background);
+    width: var(--custom-css-dim-size);
+    height: 100%;
+    margin-right: calc(100% - var(--custom-css-dim-size));
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 64px;
-    background: transparent linear-gradient(to right, var(--dim-background-color), transparent) repeat-y;
 }
 
 .modal-header-button-container {
@@ -1640,6 +1705,40 @@ code.anki-field-marker {
     min-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
 }
 
+.generate-anki-notes-layout {
+    display: flex;
+    flex-flow: column nowrap;
+}
+.generate-anki-notes-info {
+    flex: 0 1 auto;
+}
+.generate-anki-notes-test-container {
+    flex: 0 1 auto;
+}
+.generate-anki-notes-test-table {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    column-gap: 0.85em;
+}
+.generate-anki-notes-test-table-header {
+    font-size: var(--font-size-small);
+}
+#generate-anki-notes-textarea {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    resize: none;
+    min-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
+}
+#generate-anki-notes-test-text-input {
+    width: 100%;
+}
+
 .code {
     flex: 0 0 auto;
     width: 100%;
@@ -2201,10 +2300,13 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 .dictionary-list {
     width: 100%;
     display: grid;
-    grid-template-columns: auto auto 1fr auto auto;
+    grid-template-columns: auto auto 1fr auto auto auto auto;
     grid-template-rows: auto;
     place-items: center start;
     margin-top: 0.5em;
+}
+:root:not([data-advanced=true]) .dictionary-list {
+    grid-template-columns: auto auto 1fr auto auto auto;
 }
 .dictionary-list-index {
     margin-right: 0.5em;
@@ -2230,6 +2332,7 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     flex-flow: row nowrap;
     align-items: center;
     margin-right: 0.5em;
+    overflow-wrap: anywhere;
 }
 .dictionary-title {
     color: inherit;
@@ -2243,6 +2346,7 @@ input[type=number].dictionary-priority {
     margin-right: 0.5em;
 }
 .dictionary-outdated-button,
+.dictionary-update-available,
 .dictionary-integrity-button {
     --button-content-color: transparent;
     --button-border-color: transparent;
@@ -2300,6 +2404,14 @@ input[type=number].dictionary-priority {
     overflow: auto;
 }
 
+#dictionary-alias-input {
+    width: 100%;
+}
+
+#dictionary-move-up>span.icon-button-inner,
+#dictionary-move-down>span.icon-button-inner {
+    width: 26px;
+}
 
 /* Secondary search dictionary settings */
 .secondary-search-dictionary-list {
@@ -2307,6 +2419,67 @@ input[type=number].dictionary-priority {
 }
 .secondary-search-dictionary-item {
     padding: 0.375em 0;
+}
+
+
+/* Dictionary Import */
+#dictionary-import-url-text {
+    width: 100%;
+    height: 4em;
+    white-space: nowrap;
+    resize: none;
+}
+
+#dictionary-import-url-button {
+    flex: auto;
+}
+
+#dictionary-drop-file-zone {
+    transition: background-color var(--animation-duration) ease-in-out, border var(--animation-duration) ease-in-out;
+    border: 2px dashed var(--dictionary-import-border-color);
+    border-radius: 5px;
+    flex: auto;
+    min-height: 20em;
+    user-select: none;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#dictionary-drop-file-zone:hover {
+    background-color: var(--dictionary-import-hover-background-color);
+    border: 2px dashed var(--accent-color);
+}
+
+#dictionary-drop-file-zone.drag-over {
+    border: 2px solid var(--accent-color);
+    background-color: var(--dictionary-import-border-color-hover);
+}
+
+#dictionary-drag-drop-text {
+    pointer-events: none;
+}
+
+#dictionary-drag-drop-text>.icon {
+    display: block;
+    margin: auto;
+    background-color: var(--button-default-icon-color);
+    width: var(--outline-item-icon-size);
+    height: var(--outline-item-icon-size);
+}
+
+#dictionary-drag-drop-text h1,
+#dictionary-drag-drop-text h5 {
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+    border-bottom: none;
+}
+
+#dictionary-import-modal .modal-body:has(#dictionary-drop-file-zone) {
+    display: flex;
 }
 
 
@@ -2481,5 +2654,27 @@ input[type=number].dictionary-priority {
 @media (max-width: 700px) {
     .sidebar-inner {
         box-shadow: var(--shadow-right);
+    }
+    :root {
+        --custom-css-dim-size: 100%;
+        --custom-css-modal-background: var(--dim-background-color);
+    }
+}
+
+/* Mobile overrides */
+
+/* Treat devices that can't hover as mobile devices */
+@media (hover: none) {
+    #dictionary-move-up>span.icon-button-inner,
+    #dictionary-move-down>span.icon-button-inner {
+        width: 36px;
+    }
+}
+
+/* Dark mode before themes are applied
+   DO NOT use this for normal theming */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-loaded=true]) {
+        background-color: #1e1e1e;
     }
 }

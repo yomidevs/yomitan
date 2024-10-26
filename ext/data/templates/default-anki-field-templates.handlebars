@@ -12,7 +12,7 @@
             {{~#unless noDictionaryTag~}}
                 {{~#if (op "||" (op "!" @root.compactTags) (op "!==" dictionary (get "previousDictionary")))~}}
                     {{~#if (get "any")}}, {{else}}<i>({{/if~}}
-                    {{dictionary}}
+                    {{dictionaryAlias}}
                     {{~set "any" true~}}
                 {{~/if~}}
             {{~/unless~}}
@@ -42,6 +42,10 @@
 
 {{#*inline "dictionary"}}
     {{~definition.dictionary~}}
+{{/inline}}
+
+{{#*inline "dictionary-alias"}}
+    {{~definition.dictionaryAlias~}}
 {{/inline}}
 
 {{#*inline "expression"}}
@@ -98,15 +102,38 @@
 {{/inline}}
 
 {{~#*inline "glossary"~}}
-    <div style="text-align: left;">
+    <div style="text-align: left;" class="yomitan-glossary">
     {{~#scope~}}
         {{~#if (op "===" definition.type "term")~}}
-            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+            {{~#unless (op "&&" selectedDictionary (op "!=" selectedDictionary definition.dictionary))~}}
+                {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+                {{~#if definition.glossaryScopedStyles~}}
+                    <style>{{{definition.glossaryScopedStyles}}}</style>
+                {{~/if~}}
+            {{~/unless~}}
         {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
             {{~#if (op ">" definition.definitions.length 1)~}}
-                <ol>{{~#each definition.definitions~}}<li>{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}</li>{{~/each~}}</ol>
+                <ol>
+                    {{~#each definition.definitions~}}
+                        {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                            <li data-dictionary="{{dictionary}}">
+                                {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                            </li>
+                            {{~#if dictScopedStyles~}}
+                                <style>{{{dictScopedStyles}}}</style>
+                            {{~/if~}}
+                        {{~/unless~}}
+                    {{~/each~}}
+                </ol>
             {{~else~}}
-                {{~#each definition.definitions~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/each~}}
+                {{~#each definition.definitions~}}
+                    {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                        {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                        {{~#if glossaryScopedStyles~}}
+                            <style>{{{glossaryScopedStyles}}}</style>
+                        {{~/if~}}
+                    {{~/unless~}}
+                {{~/each~}}
             {{~/if~}}
         {{~else if (op "===" definition.type "kanji")~}}
             {{~#if (op ">" definition.glossary.length 1)~}}
@@ -127,12 +154,53 @@
     {{~> glossary brief=true ~}}
 {{/inline}}
 
+{{~#*inline "glossary-first"~}}
+    <div style="text-align: left;" class="yomitan-glossary">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+            {{~#if definition.glossaryScopedStyles~}}
+                <style>{{{definition.glossaryScopedStyles}}}</style>
+            {{~/if~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                {{~#with definition.definitions.[0]~}}
+                    {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                    {{~#if glossaryScopedStyles~}}
+                        <style>{{{glossaryScopedStyles}}}</style>
+                    {{~/if~}}
+                {{~/with~}}
+            {{~else~}}
+                {{~#with definition.definitions.[0]~}}
+                    {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                    {{~#if glossaryScopedStyles~}}
+                        <style>{{{glossaryScopedStyles}}}</style>
+                    {{~/if~}}
+                {{~/with~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+
+{{#*inline "glossary-first-no-dictionary"}}
+    {{~> glossary-first noDictionaryTag=true ~}}
+{{/inline}}
+
+{{#*inline "glossary-first-brief"}}
+    {{~> glossary-first brief=true ~}}
+{{/inline}}
+
 {{#*inline "kunyomi"}}
     {{~#each definition.kunyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
 {{/inline}}
 
 {{#*inline "onyomi"}}
     {{~#each definition.onyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+
+{{#*inline "onyomi-hiragana"}}
+    {{~#each definition.onyomi}}{{hiragana .}}{{#unless @last}}, {{/unless}}{{/each~}}
 {{/inline}}
 
 {{#*inline "reading"}}
@@ -149,23 +217,23 @@
 {{/inline}}
 
 {{#*inline "sentence"}}
-    {{~#if definition.cloze}}{{definition.cloze.sentence}}{{/if~}}
+    {{~#if definition.cloze}}{{{definition.cloze.sentence}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "cloze-prefix"}}
-    {{~#if definition.cloze}}{{definition.cloze.prefix}}{{/if~}}
+    {{~#if definition.cloze}}{{{definition.cloze.prefix}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "cloze-body"}}
-    {{~#if definition.cloze}}{{definition.cloze.body}}{{/if~}}
+    {{~#if definition.cloze}}{{{definition.cloze.body}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "cloze-body-kana"}}
-    {{~#if definition.cloze}}{{definition.cloze.bodyKana}}{{/if~}}
+    {{~#if definition.cloze}}{{{definition.cloze.bodyKana}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "cloze-suffix"}}
-    {{~#if definition.cloze}}{{definition.cloze.suffix}}{{/if~}}
+    {{~#if definition.cloze}}{{{definition.cloze.suffix}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "tags"}}
@@ -215,8 +283,6 @@
             {{~/each~}}
         {{~/each~}}
         {{~#if (op ">" pitchCount 1)~}}</ol>{{~/if~}}
-    {{~else~}}
-        No pitch accent data
     {{~/if~}}
 {{/inline}}
 
@@ -269,7 +335,7 @@
 {{/inline}}
 
 {{#*inline "clipboard-text"}}
-    {{~#if (hasMedia "clipboardText")}}{{getMedia "clipboardText"}}{{/if~}}
+    {{~#if (hasMedia "clipboardText")}}{{{getMedia "clipboardText"}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "conjugation"}}
@@ -284,7 +350,7 @@
                     {{~#if (get "multiple")~}}<li>{{/if~}}
                     {{~#each inflectionRules~}}
                         {{~#if (op ">" @index 0)}} « {{/if~}}
-                        {{.}}
+                        {{name}}
                     {{~/each~}}
                     {{~#if (get "multiple")~}}</li>{{/if~}}
                 {{~/if~}}
@@ -303,7 +369,7 @@
                     {{~furigana expression reading~}}
                 ) {{/if~}}
             {{~/if~}}
-            {{~dictionary}}: {{frequency~}}
+            {{~dictionaryAlias}}: {{frequency~}}
             </li>
         {{~/each~}}
         </ul>
@@ -392,8 +458,8 @@
     {{~#multiLine}}{{context.fullQuery}}{{/multiLine~}}
 {{/inline}}
 
-{{#*inline "selection-text"}}
-    {{~#if (hasMedia "selectionText")}}{{getMedia "selectionText"}}{{/if~}}
+{{#*inline "popup-selection-text"}}
+    {{~#if (hasMedia "popupSelectionText")}}{{{getMedia "popupSelectionText"}}}{{/if~}}
 {{/inline}}
 
 {{#*inline "sentence-furigana"}}

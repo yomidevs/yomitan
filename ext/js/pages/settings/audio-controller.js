@@ -47,6 +47,8 @@ export class AudioController extends EventDispatcher {
         this._voiceTestTextInput = querySelectorNotNull(document, '#text-to-speech-voice-test-text');
         /** @type {import('audio-controller').VoiceInfo[]} */
         this._voices = [];
+        /** @type {string} */
+        this._language = 'ja';
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
@@ -97,7 +99,7 @@ export class AudioController extends EventDispatcher {
             path: 'audio.sources',
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
     }
 
@@ -121,12 +123,18 @@ export class AudioController extends EventDispatcher {
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
+        const {
+            general: {language},
+            audio: {sources},
+        } = options;
+
+        this._language = language;
+
         for (const entry of this._audioSourceEntries) {
             entry.cleanup();
         }
         this._audioSourceEntries = [];
 
-        const {sources} = options.audio;
         for (let i = 0, ii = sources.length; i < ii; ++i) {
             this._createAudioSourceEntry(i, sources[i]);
         }
@@ -158,7 +166,7 @@ export class AudioController extends EventDispatcher {
             [...speechSynthesis.getVoices()].map((voice, index) => ({
                 voice,
                 isJapanese: this._languageTagIsJapanese(voice.lang),
-                index
+                index,
             })) :
             []
         );
@@ -216,19 +224,27 @@ export class AudioController extends EventDispatcher {
      * @returns {import('settings').AudioSourceType}
      */
     _getUnusedAudioSourceType() {
-        /** @type {import('settings').AudioSourceType[]} */
-        const typesAvailable = [
-            'jpod101',
-            'jpod101-alternate',
-            'jisho',
-            'custom'
-        ];
+        const typesAvailable = this._getAvailableAudioSourceTypes();
         for (const type of typesAvailable) {
             if (!this._audioSourceEntries.some((entry) => entry.type === type)) {
                 return type;
             }
         }
         return typesAvailable[0];
+    }
+
+    /**
+     * @returns {import('settings').AudioSourceType[]}
+     */
+    _getAvailableAudioSourceTypes() {
+        /** @type {import('settings').AudioSourceType[]} */
+        const generalAudioSources = ['language-pod-101', 'lingua-libre', 'wiktionary', 'text-to-speech', 'custom'];
+        if (this._language === 'ja') {
+            /** @type {import('settings').AudioSourceType[]} */
+            const japaneseAudioSources = ['jpod101', 'jisho'];
+            return [...japaneseAudioSources, ...generalAudioSources];
+        }
+        return generalAudioSources;
     }
 
     /** */
@@ -243,7 +259,7 @@ export class AudioController extends EventDispatcher {
             path: 'audio.sources',
             start: index,
             deleteCount: 0,
-            items: [source]
+            items: [source],
         }]);
     }
 }
@@ -486,8 +502,10 @@ class AudioSourceEntry {
     _normalizeAudioSourceType(value) {
         switch (value) {
             case 'jpod101':
-            case 'jpod101-alternate':
+            case 'language-pod-101':
             case 'jisho':
+            case 'lingua-libre':
+            case 'wiktionary':
             case 'text-to-speech':
             case 'text-to-speech-reading':
             case 'custom':

@@ -22,7 +22,7 @@ import {
     TextWriter as TextWriter0,
     Uint8ArrayReader as Uint8ArrayReader0,
     ZipReader as ZipReader0,
-    configure
+    configure,
 } from '../../lib/zip.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
@@ -69,46 +69,22 @@ export class DictionaryImporter {
         configure({
             workerScripts: {
                 deflate: ['../../lib/z-worker.js'],
-                inflate: ['../../lib/z-worker.js']
-            }
+                inflate: ['../../lib/z-worker.js'],
+            },
         });
 
         // Read archive
-        const zipFileReader = new Uint8ArrayReader(new Uint8Array(archiveContent));
-        const zipReader = new ZipReader(zipFileReader);
-        const zipEntries = await zipReader.getEntries();
-        /** @type {import('dictionary-importer').ArchiveFileMap} */
-        const fileMap = new Map();
-        for (const entry of zipEntries) {
-            fileMap.set(entry.filename, entry);
-        }
-        // Read and validate index
-        const indexFileName = 'index.json';
-        const indexFile = fileMap.get(indexFileName);
-        if (typeof indexFile === 'undefined') {
-            throw new Error('No dictionary index found in archive');
-        }
-        const indexFile2 = /** @type {import('@zip.js/zip.js').Entry} */ (indexFile);
-
-        const indexContent = await this._getData(indexFile2, new TextWriter());
-        const index = /** @type {import('dictionary-data').Index} */ (parseJson(indexContent));
-
-        if (!ajvSchemas.dictionaryIndex(index)) {
-            throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, indexFileName);
-        }
+        const fileMap = await this._getFilesFromArchive(archiveContent);
+        const index = await this._readAndValidateIndex(fileMap);
 
         const dictionaryTitle = index.title;
-        const version = typeof index.format === 'number' ? index.format : index.version;
-
-        if (typeof version !== 'number' || !dictionaryTitle || !index.revision) {
-            throw new Error('Unrecognized dictionary format');
-        }
+        const version = /** @type {import('dictionary-data').IndexVersion} */ (index.version);
 
         // Verify database is not already imported
         if (await dictionaryDatabase.dictionaryExists(dictionaryTitle)) {
             return {
                 errors: [new Error(`Dictionary ${dictionaryTitle} is already imported, skipped it.`)],
-                result: null
+                result: null,
             };
         }
 
@@ -123,7 +99,7 @@ export class DictionaryImporter {
             ['termMetaFiles', /^term_meta_bank_(\d+)\.json$/],
             ['kanjiFiles', /^kanji_bank_(\d+)\.json$/],
             ['kanjiMetaFiles', /^kanji_meta_bank_(\d+)\.json$/],
-            ['tagFiles', /^tag_bank_(\d+)\.json$/]
+            ['tagFiles', /^tag_bank_(\d+)\.json$/],
         ];
         const {termFiles, termMetaFiles, kanjiFiles, kanjiMetaFiles, tagFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
 
@@ -187,9 +163,27 @@ export class DictionaryImporter {
             kanji: {total: kanjiList.length},
             kanjiMeta: this._getMetaCounts(kanjiMetaList),
             tagMeta: {total: tagList.length},
-            media: {total: media.length}
+            media: {total: media.length},
         };
-        const summary = this._createSummary(dictionaryTitle, version, index, {prefixWildcardsSupported, counts});
+
+        const stylesFileName = 'styles.css';
+        const stylesFile = fileMap.get(stylesFileName);
+        let styles = '';
+        if (typeof stylesFile !== 'undefined') {
+            styles = await this._getData(stylesFile, new TextWriter());
+            const cssErrors = this._validateCss(styles);
+            if (cssErrors.length > 0) {
+                return {
+                    errors: cssErrors,
+                    result: null,
+                };
+            }
+        }
+
+        /** @type {import('dictionary-importer').SummaryDetails} */
+        const summaryDetails = {prefixWildcardsSupported, counts, styles};
+
+        const summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
         await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
 
         // Add data
@@ -231,49 +225,97 @@ export class DictionaryImporter {
     }
 
     /**
+     * @param {ArrayBuffer} archiveContent
+     * @returns {Promise<import('dictionary-importer').ArchiveFileMap>}
+     */
+    async _getFilesFromArchive(archiveContent) {
+        const zipFileReader = new Uint8ArrayReader(new Uint8Array(archiveContent));
+        const zipReader = new ZipReader(zipFileReader);
+        const zipEntries = await zipReader.getEntries();
+        /** @type {import('dictionary-importer').ArchiveFileMap} */
+        const fileMap = new Map();
+        for (const entry of zipEntries) {
+            fileMap.set(entry.filename, entry);
+        }
+        return fileMap;
+    }
+
+    /**
+     * @param {import('dictionary-importer').ArchiveFileMap} fileMap
+     * @returns {Promise<import('dictionary-data').Index>}
+     * @throws {Error}
+     */
+    async _readAndValidateIndex(fileMap) {
+        const indexFileName = 'index.json';
+        const indexFile = fileMap.get(indexFileName);
+        if (typeof indexFile === 'undefined') {
+            throw new Error('No dictionary index found in archive');
+        }
+        const indexFile2 = /** @type {import('@zip.js/zip.js').Entry} */ (indexFile);
+
+        const indexContent = await this._getData(indexFile2, new TextWriter());
+        const index = /** @type {unknown} */ (parseJson(indexContent));
+
+        if (!ajvSchemas.dictionaryIndex(index)) {
+            throw this._formatAjvSchemaError(ajvSchemas.dictionaryIndex, indexFileName);
+        }
+
+        const validIndex = /** @type {import('dictionary-data').Index} */ (index);
+
+        const version = typeof validIndex.format === 'number' ? validIndex.format : validIndex.version;
+        validIndex.version = version;
+
+        const {title, revision} = validIndex;
+        if (typeof version !== 'number' || !title || !revision) {
+            throw new Error('Unrecognized dictionary format');
+        }
+
+        return validIndex;
+    }
+
+    /**
      * @returns {import('dictionary-importer').ProgressData}
      */
     _createProgressData() {
         return {
-            stepIndex: 0,
-            stepCount: 6,
             index: 0,
-            count: 0
+            count: 0,
         };
     }
 
     /** */
     _progressReset() {
         this._progressData = this._createProgressData();
-        this._progress();
+        this._progress(true);
     }
 
     /**
      * @param {number} count
      */
     _progressNextStep(count) {
-        ++this._progressData.stepIndex;
         this._progressData.index = 0;
         this._progressData.count = count;
-        this._progress();
+        this._progress(true);
     }
 
-    /** */
-    _progress() {
-        this._onProgress(this._progressData);
+    /**
+     * @param {boolean} nextStep
+     */
+    _progress(nextStep = false) {
+        this._onProgress({...this._progressData, nextStep});
     }
 
     /**
      * @param {string} dictionaryTitle
      * @param {number} version
      * @param {import('dictionary-data').Index} index
-     * @param {{prefixWildcardsSupported: boolean, counts: import('dictionary-importer').SummaryCounts}} details
+     * @param {import('dictionary-importer').SummaryDetails} details
      * @returns {import('dictionary-importer').Summary}
+     * @throws {Error}
      */
     _createSummary(dictionaryTitle, version, index, details) {
         const indexSequenced = index.sequenced;
-        const {prefixWildcardsSupported, counts} = details;
-
+        const {prefixWildcardsSupported, counts, styles} = details;
         /** @type {import('dictionary-importer').Summary} */
         const summary = {
             title: dictionaryTitle,
@@ -282,17 +324,47 @@ export class DictionaryImporter {
             version,
             importDate: Date.now(),
             prefixWildcardsSupported,
-            counts
+            counts,
+            styles,
         };
 
-        const {author, url, description, attribution, frequencyMode} = index;
+        const {author, url, description, attribution, frequencyMode, isUpdatable, sourceLanguage, targetLanguage} = index;
         if (typeof author === 'string') { summary.author = author; }
         if (typeof url === 'string') { summary.url = url; }
         if (typeof description === 'string') { summary.description = description; }
         if (typeof attribution === 'string') { summary.attribution = attribution; }
         if (typeof frequencyMode === 'string') { summary.frequencyMode = frequencyMode; }
-
+        if (typeof sourceLanguage === 'string') { summary.sourceLanguage = sourceLanguage; }
+        if (typeof targetLanguage === 'string') { summary.targetLanguage = targetLanguage; }
+        if (typeof isUpdatable === 'boolean') {
+            const {indexUrl, downloadUrl} = index;
+            if (!isUpdatable || !this._validateUrl(indexUrl) || !this._validateUrl(downloadUrl)) {
+                throw new Error('Invalid index data for updatable dictionary');
+            }
+            summary.isUpdatable = isUpdatable;
+            summary.indexUrl = indexUrl;
+            summary.downloadUrl = downloadUrl;
+        }
         return summary;
+    }
+
+    /**
+     * @param {string|undefined} string
+     * @returns {boolean}
+     */
+    _validateUrl(string) {
+        if (typeof string !== 'string') {
+            return false;
+        }
+
+        let url;
+        try {
+            url = new URL(string);
+        } catch (_) {
+            return false;
+        }
+
+        return url.protocol === 'http:' || url.protocol === 'https:';
     }
 
     /**
@@ -301,10 +373,9 @@ export class DictionaryImporter {
      * @returns {ExtensionError}
      */
     _formatAjvSchemaError(schema, fileName) {
-        const e2 = new ExtensionError(`Dictionary has invalid data in '${fileName}'`);
-        e2.data = schema.errors;
-
-        return e2;
+        const e = new ExtensionError(`Dictionary has invalid data in '${fileName}' '${JSON.stringify(schema.errors)}'`);
+        e.data = schema.errors;
+        return e;
     }
 
     /**
@@ -327,6 +398,14 @@ export class DictionaryImporter {
         const tagBank = 'dictionaryTagBankV3';
 
         return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
+    }
+
+    /**
+     * @param {string} css
+     * @returns {Error[]}
+     */
+    _validateCss(css) {
+        return css ? [] : [new Error('No styles found')];
     }
 
     /**
@@ -359,7 +438,7 @@ export class DictionaryImporter {
         /** @type {import('dictionary-data').TermGlossaryImage} */
         const target = {
             type: 'image',
-            path: '' // Will be populated during requirement resolution
+            path: '', // Will be populated during requirement resolution
         };
         requirements.push({type: 'image', target, source: data, entry});
         return target;
@@ -375,7 +454,7 @@ export class DictionaryImporter {
         const content = this._prepareStructuredContent(data.content, entry, requirements);
         return {
             type: 'structured-content',
-            content
+            content,
         };
     }
 
@@ -417,7 +496,7 @@ export class DictionaryImporter {
         /** @type {import('structured-content').ImageElement} */
         const target = {
             tag: 'img',
-            path: '' // Will be populated during requirement resolution
+            path: '', // Will be populated during requirement resolution
         };
         requirements.push({type: 'structured-content-image', target, source: content, entry});
         return target;
@@ -439,7 +518,7 @@ export class DictionaryImporter {
         }
 
         return {
-            media: [...media.values()]
+            media: [...media.values()],
         };
     }
 
@@ -454,7 +533,7 @@ export class DictionaryImporter {
                     context,
                     requirement.target,
                     requirement.source,
-                    requirement.entry
+                    requirement.entry,
                 );
                 break;
             case 'structured-content-image':
@@ -462,7 +541,7 @@ export class DictionaryImporter {
                     context,
                     requirement.target,
                     requirement.source,
-                    requirement.entry
+                    requirement.entry,
                 );
                 break;
             default:
@@ -493,7 +572,7 @@ export class DictionaryImporter {
             verticalAlign,
             border,
             borderRadius,
-            sizeUnits
+            sizeUnits,
         } = source;
         await this._createImageData(context, target, source, entry);
         if (typeof verticalAlign === 'string') { target.verticalAlign = verticalAlign; }
@@ -521,7 +600,7 @@ export class DictionaryImporter {
             appearance,
             background,
             collapsed,
-            collapsible
+            collapsible,
         } = source;
         const {width, height} = await this._getImageMedia(context, path, entry);
         target.path = path;
@@ -599,7 +678,7 @@ export class DictionaryImporter {
             mediaType,
             width,
             height,
-            content
+            content,
         };
         media.set(path, mediaData);
 
@@ -613,8 +692,7 @@ export class DictionaryImporter {
      */
     _convertTermBankEntryV1(entry, dictionary) {
         let [expression, reading, definitionTags, rules, score, ...glossary] = entry;
-        expression = this._normalizeTermOrReading(expression);
-        reading = this._normalizeTermOrReading(reading.length > 0 ? reading : expression);
+        reading = reading.length > 0 ? reading : expression;
         return {expression, reading, definitionTags, rules, score, glossary, dictionary};
     }
 
@@ -625,8 +703,7 @@ export class DictionaryImporter {
      */
     _convertTermBankEntryV3(entry, dictionary) {
         let [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
-        expression = this._normalizeTermOrReading(expression);
-        reading = this._normalizeTermOrReading(reading.length > 0 ? reading : expression);
+        reading = reading.length > 0 ? reading : expression;
         return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags, dictionary};
     }
 
@@ -737,8 +814,16 @@ export class DictionaryImporter {
         const results = [];
         for (const file of files) {
             const content = await this._getData(file, new TextWriter());
-            /** @type {unknown} */
-            const entries = parseJson(content);
+            let entries;
+
+            try {
+                /** @type {unknown} */
+                entries = parseJson(content);
+            } catch (error) {
+                if (error instanceof Error) {
+                    throw new Error(error.message + ` in '${file.filename}'`);
+                }
+            }
 
             startIndex = progressData.index;
             this._progress();
@@ -779,20 +864,6 @@ export class DictionaryImporter {
             counts[key] = value;
         }
         return counts;
-    }
-
-    /**
-     * @param {string} text
-     * @returns {string}
-     */
-    _normalizeTermOrReading(text) {
-        // Note: this function should not perform String.normalize on the text,
-        // as it will normalize characters in an undesirable way.
-        // Thus, this function is currently a no-op.
-        // Example:
-        // - '\u9038'.normalize('NFC') => '\u9038' (逸)
-        // - '\ufa67'.normalize('NFC') => '\u9038' (逸 => 逸)
-        return text;
     }
 
     /**

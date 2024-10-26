@@ -59,7 +59,8 @@ export class AnkiNoteBuilder {
         resultOutputMode = 'split',
         glossaryLayoutMode = 'default',
         compactTags = false,
-        mediaOptions = null
+        mediaOptions = null,
+        dictionaryStylesMap = new Map(),
     }) {
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
@@ -80,7 +81,7 @@ export class AnkiNoteBuilder {
             }
         }
 
-        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media);
+        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template);
@@ -88,6 +89,7 @@ export class AnkiNoteBuilder {
         }
 
         const formattedFieldValues = await Promise.all(formattedFieldValuePromises);
+        /** @type {Map<string, import('anki-note-builder').Requirement>} */
         const uniqueRequirements = new Map();
         /** @type {import('anki').NoteFields} */
         const noteFields = {};
@@ -115,9 +117,9 @@ export class AnkiNoteBuilder {
                 duplicateScopeOptions: {
                     deckName: duplicateScopeDeckName,
                     checkChildren: duplicateScopeCheckChildren,
-                    checkAllModels: duplicateScopeCheckAllModels
-                }
-            }
+                    checkAllModels: duplicateScopeCheckAllModels,
+                },
+            },
         };
         return {note, errors: allErrors, requirements: [...uniqueRequirements.values()]};
     }
@@ -133,9 +135,10 @@ export class AnkiNoteBuilder {
         resultOutputMode = 'split',
         glossaryLayoutMode = 'default',
         compactTags = false,
-        marker
+        marker,
+        dictionaryStylesMap,
     }) {
-        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0);
+        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0, dictionaryStylesMap);
         return await this._templateRenderer.getModifiedData({marker, commonData}, 'ankiNote');
     }
 
@@ -170,6 +173,21 @@ export class AnkiNoteBuilder {
         return {type, term, reading};
     }
 
+    /**
+     * @param {import('settings').DictionariesOptions} dictionaries
+     * @returns {Map<string, string>}
+     */
+    getDictionaryStylesMap(dictionaries) {
+        const styleMap = new Map();
+        for (const dictionary of dictionaries) {
+            const {name, styles} = dictionary;
+            if (typeof styles === 'string') {
+                styleMap.set(name, styles);
+            }
+        }
+        return styleMap;
+    }
+
     // Private
 
     /**
@@ -180,9 +198,10 @@ export class AnkiNoteBuilder {
      * @param {import('settings').GlossaryLayoutMode} glossaryLayoutMode
      * @param {boolean} compactTags
      * @param {import('anki-templates').Media|undefined} media
+     * @param {Map<string, string>} dictionaryStylesMap
      * @returns {import('anki-note-builder').CommonData}
      */
-    _createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media) {
+    _createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap) {
         return {
             dictionaryEntry,
             mode,
@@ -190,7 +209,8 @@ export class AnkiNoteBuilder {
             resultOutputMode,
             glossaryLayoutMode,
             compactTags,
-            media
+            media,
+            dictionaryStylesMap,
         };
     }
 
@@ -313,7 +333,7 @@ export class AnkiNoteBuilder {
                 templateItems.push({
                     type: /** @type {import('anki-templates').RenderMode} */ ('ankiNote'),
                     commonData,
-                    datas
+                    datas,
                 });
             }
             items.push({template, templateItems});
@@ -369,7 +389,7 @@ export class AnkiNoteBuilder {
         let injectScreenshot = false;
         let injectClipboardImage = false;
         let injectClipboardText = false;
-        let injectSelectionText = false;
+        let injectPopupSelectionText = false;
         /** @type {import('anki-note-builder').TextFuriganaDetails[]} */
         const textFuriganaDetails = [];
         /** @type {import('api').InjectAnkiNoteMediaDictionaryMediaDetails[]} */
@@ -381,7 +401,7 @@ export class AnkiNoteBuilder {
                 case 'screenshot': injectScreenshot = true; break;
                 case 'clipboardImage': injectClipboardImage = true; break;
                 case 'clipboardText': injectClipboardText = true; break;
-                case 'selectionText': injectSelectionText = true; break;
+                case 'popupSelectionText': injectPopupSelectionText = true; break;
                 case 'textFurigana':
                     {
                         const {text, readingMode} = requirement;
@@ -408,8 +428,8 @@ export class AnkiNoteBuilder {
         if (injectAudio && dictionaryEntryDetails.type !== 'kanji') {
             const audioOptions = mediaOptions.audio;
             if (typeof audioOptions === 'object' && audioOptions !== null) {
-                const {sources, preferredAudioIndex, idleTimeout} = audioOptions;
-                audioDetails = {sources, preferredAudioIndex, idleTimeout};
+                const {sources, preferredAudioIndex, idleTimeout, languageSummary} = audioOptions;
+                audioDetails = {sources, preferredAudioIndex, idleTimeout, languageSummary};
             }
         }
         if (injectScreenshot) {
@@ -431,14 +451,14 @@ export class AnkiNoteBuilder {
         }
 
         // Inject media
-        const selectionText = injectSelectionText ? this._getSelectionText() : null;
+        const popupSelectionText = injectPopupSelectionText ? this._getPopupSelectionText() : null;
         const injectedMedia = await this._api.injectAnkiNoteMedia(
             timestamp,
             dictionaryEntryDetails,
             audioDetails,
             screenshotDetails,
             clipboardDetails,
-            dictionaryMediaDetails
+            dictionaryMediaDetails,
         );
         const {audioFileName, screenshotFileName, clipboardImageFileName, clipboardText, dictionaryMedia: dictionaryMediaArray, errors} = injectedMedia;
         const textFurigana = textFuriganaPromise !== null ? await textFuriganaPromise : [];
@@ -460,9 +480,9 @@ export class AnkiNoteBuilder {
             screenshot: (typeof screenshotFileName === 'string' ? {value: screenshotFileName} : void 0),
             clipboardImage: (typeof clipboardImageFileName === 'string' ? {value: clipboardImageFileName} : void 0),
             clipboardText: (typeof clipboardText === 'string' ? {value: clipboardText} : void 0),
-            selectionText: (typeof selectionText === 'string' ? {value: selectionText} : void 0),
+            popupSelectionText: (typeof popupSelectionText === 'string' ? {value: popupSelectionText} : void 0),
             textFurigana,
-            dictionaryMedia
+            dictionaryMedia,
         };
         return {media, errors};
     }
@@ -470,7 +490,7 @@ export class AnkiNoteBuilder {
     /**
      * @returns {string}
      */
-    _getSelectionText() {
+    _getPopupSelectionText() {
         const selection = document.getSelection();
         return selection !== null ? selection.toString() : '';
     }

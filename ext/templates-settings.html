@@ -52,7 +52,7 @@
     <label class="toggle dictionary-item-enabled-toggle-container"><input type="checkbox" class="dictionary-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
     <div class="dictionary-item-title-container">
         <span>
-            <strong class="dictionary-title"></strong> <span class="light dictionary-version"></span>
+            <strong class="dictionary-title dictionary-alias"></strong> <span class="light dictionary-revision"></span>
         </span>
         <button type="button" class="dictionary-outdated-button" hidden>
             <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
@@ -60,14 +60,27 @@
         <button type="button" class="dictionary-integrity-button" hidden>
             <div class="badge info-badge badge-small-icon"><span class="icon" data-icon="checkmark"></span></div>
         </button>
+        <button type="button" class="dictionary-update-available" hidden>
+            <div class="badge info-badge badge-small-icon"><span class="icon" data-icon="exclamation-point-short" title="Update available"></span></div>
+        </button>
     </div>
-    <input type="number" step="1" class="short-height dictionary-priority">
+    <input type="number" step="1" class="short-height dictionary-priority advanced-only">
+    <button type="button" class="icon-button" id="dictionary-move-up" data-menu-action="moveUp"><span class="icon-button-inner"><span class="icon" data-icon="up-chevron"></span></span></button>
+    <button type="button" class="icon-button" id="dictionary-move-down" data-menu-action="moveDown"><span class="icon-button-inner"><span class="icon" data-icon="down-chevron"></span></span></button>
     <button type="button" class="icon-button dictionary-menu-button" data-menu="dictionary-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
 </template>
 <template id="dictionary-details-entry-template"><div class="dictionary-details-entry">
     <span class="dictionary-details-entry-label"></span>
     <span class="dictionary-details-entry-info"></span>
 </div></template>
+<template id="dictionary-stats-table-template">
+    <table class="dictionary-stats-table">
+        <thead class="dictionary-stats-table-head"></thead>
+        <tbody class="dictionary-stats-table-body">
+            <tr class="dictionary-stats-table-row"></tr>
+        </tbody>
+    </table>
+</template>
 <template id="dictionary-extra-template">
     <div class="dictionary-item-bottom"></div>
     <div class="dictionary-item-bottom"></div>
@@ -84,18 +97,17 @@
 </template>
 <template id="dictionary-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
     <button type="button" class="popup-menu-item" data-menu-action="showDetails">Details&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveUp">Move up</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveDown">Move down</button>
+    <button type="button" class="popup-menu-item" data-menu-action="rename">Rename&hellip;</button>
     <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to&hellip;</button>
     <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
 </div></div></div></template>
 <template id="secondary-search-dictionary-template"><div class="secondary-search-dictionary-item horizontal-flex">
     <label class="toggle"><input type="checkbox" class="dictionary-allow-secondary-searches"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-    <span class="horizontal-flex-fill"><strong class="dictionary-title"></strong> <span class="light dictionary-version"></span></span>
+    <span class="horizontal-flex-fill"><strong class="dictionary-title"></strong> <span class="light dictionary-revision"></span></span>
 </div></template>
 <template id="collapsible-dictionary-item-template"><div class="collapsible-dictionary-item">
     <div class="collapsible-dictionary-cell">
-        <span class="dictionary-info-label"><strong class="dictionary-title"></strong> <span class="light dictionary-version"></span></span>
+        <span class="dictionary-info-label"><strong class="dictionary-title"></strong> <span class="light dictionary-revision"></span></span>
     </div>
     <div class="collapsible-dictionary-cell">
         <select class="definitions-collapsible medium-width">
@@ -107,6 +119,22 @@
         </select>
     </div>
 </div></template>
+<template id="recommended-dictionaries-list-item-template">
+    <div class="settings-item">
+        <div class="settings-item-inner">
+            <div class="settings-item-left">
+                <strong><div class="settings-item-label"></div></strong>
+                <div class="settings-item-description description"></div>
+                <div class="settings-item-description">
+                    <a class="homepage">Homepage</a>
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <button type="button" class="action-button" data-action="import-recommended-dictionary" data-import-url="">Download</button>
+            </div>
+        </div>
+    </div>
+</template>
 
 <!-- Audio -->
 <template id="audio-source-template"><div class="audio-source">
@@ -114,8 +142,10 @@
     <div class="audio-source-inner">
         <select class="audio-source-type-select">
             <option value="jpod101">JapanesePod101</option>
-            <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
+            <option value="language-pod-101">LanguagePod101</option>
             <option value="jisho">Jisho.org</option>
+            <option value="lingua-libre">(Commons) Lingua Libre</option>
+            <option value="wiktionary">(Commons) Wiktionary</option>
             <option value="text-to-speech">Text-to-speech</option>
             <option value="text-to-speech-reading">Text-to-speech (Kana reading)</option>
             <option value="custom">Custom URL</option>
@@ -363,6 +393,8 @@
             <option value="previousEntryDifferentDictionary">Go to previous dictionary</option>
             <option value="historyBackward">Navigate backward in history</option>
             <option value="historyForward">Navigate forward in history</option>
+            <option value="profilePrevious">Switch to previous profile</option>
+            <option value="profileNext">Switch to next profile</option>
             <option value="addNoteKanji">Add kanji note</option>
             <option value="addNoteTermKanji">Add term note</option>
             <option value="addNoteTermKana">Add term note (reading)</option>
@@ -371,6 +403,7 @@
             <option value="playAudioFromSource">Play audio from source</option>
             <option value="copyHostSelection">Copy host window selection</option>
             <option value="scanSelectedText">Scan selected text</option>
+            <option value="scanTextAtSelection">Scan text at selection</option>
             <option value="scanTextAtCaret">Scan text at caret</option>
             <option value="toggleOption">Toggle option</option>
         </select>
@@ -424,8 +457,10 @@
     <span class="hotkey-argument-label">Source:</span>
     <select class="audio-source-select hotkey-argument-input horizontal-flex-fill">
         <option value="jpod101">JapanesePod101</option>
-        <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
+        <option value="language-pod-101">LanguagePod101</option>
         <option value="jisho">Jisho.org</option>
+        <option value="lingua-libre">Lingua Libre</option>
+        <option value="wiktionary">Wiktionary</option>
         <option value="text-to-speech">Text-to-speech</option>
         <option value="text-to-speech-reading">Text-to-speech (Kana reading)</option>
         <option value="custom">Custom</option>
@@ -441,5 +476,22 @@
 <template id="permissions-origin-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
     <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
 </div></div></div></template>
+
+<!-- Recommended Settings -->
+<template id="recommended-settings-list-item-template">
+    <div class="settings-item">
+        <div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label"></div>
+                <div class="settings-item-description"></div>
+            </div>
+            <div class="settings-item-right">
+                <label class="recommended-settings-checkbox-item toggle">
+                    <input type="checkbox" checked><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</template>
 
 </body></html>

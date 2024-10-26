@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: cd
     steps:
-      - uses: robinraju/release-downloader@368754b9c6f47c345fcfbf42bcb577c2f0f5f395 # pin@v1.9
+      - uses: robinraju/release-downloader@a96f54c1b5f5e09e47d9504526e96febd949d4c2 # pin@v1.11
         with:
           tag: ${{ github.ref_name }}
           fileName: "*"

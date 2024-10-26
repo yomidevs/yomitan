@@ -29,7 +29,7 @@ class Logger extends EventDispatcher {
         /** @type {string} */
         this._extensionName = 'Extension';
         /** @type {?string} */
-        this._issueUrl = 'https://github.com/themoeway/yomitan/issues';
+        this._issueUrl = 'https://github.com/yomidevs/yomitan/issues';
     }
 
     /**
@@ -73,7 +73,7 @@ class Logger extends EventDispatcher {
      */
     logGenericError(error, level, context) {
         if (typeof context === 'undefined') {
-            context = {url: location.href};
+            context = typeof location === 'undefined' ? {url: 'unknown'} : {url: location.href};
         }
 
         let errorString;

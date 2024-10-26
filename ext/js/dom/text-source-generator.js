@@ -66,7 +66,7 @@ export class TextSourceGenerator {
         source = source.clone();
         const startLength = source.setStartOffset(extent, layoutAwareScan);
         const endLength = source.setEndOffset(extent * 2 - startLength, true, layoutAwareScan);
-        const text = source.text();
+        const text = [...source.text()];
         const textLength = text.length;
         const textEndAnchor = textLength - endLength;
 
@@ -173,8 +173,8 @@ export class TextSourceGenerator {
 
         // Result
         return {
-            text: text.substring(cursorStart, cursorEnd),
-            offset: startLength - cursorStart
+            text: text.slice(cursorStart, cursorEnd).join(''),
+            offset: startLength - cursorStart,
         };
     }
 
@@ -187,7 +187,7 @@ export class TextSourceGenerator {
      * @returns {?import('text-source').TextSource} A range for the hovered text or element, or `null` if no applicable content was found.
      */
     _getRangeFromPointInternal(x, y, options) {
-        const {deepContentScan, normalizeCssZoom} = options;
+        const {deepContentScan, normalizeCssZoom, language} = options;
 
         const elements = this._getElementsFromPoint(x, y, deepContentScan);
         /** @type {?HTMLDivElement} */
@@ -204,7 +204,10 @@ export class TextSourceGenerator {
                 case 'SELECT':
                     return TextSourceElement.create(element);
                 case 'INPUT':
-                    if (/** @type {HTMLInputElement} */ (element).type === 'text') {
+                    if (
+                        /** @type {HTMLInputElement} */ (element).type === 'text' ||
+                        /** @type {HTMLInputElement} */ (element).type === 'search'
+                    ) {
                         imposterSourceElement = element;
                         [imposter, imposterContainer] = this._createImposter(/** @type {HTMLInputElement} */ (element), false);
                     }
@@ -216,7 +219,7 @@ export class TextSourceGenerator {
             }
         }
 
-        const range = this._caretRangeFromPointExt(x, y, deepContentScan ? elements : [], normalizeCssZoom);
+        const range = this._caretRangeFromPointExt(x, y, deepContentScan ? elements : [], normalizeCssZoom, language);
         if (range !== null) {
             if (imposter !== null) {
                 this._setImposterStyle(/** @type {HTMLDivElement} */ (imposterContainer).style, 'z-index', '-2147483646');
@@ -347,9 +350,10 @@ export class TextSourceGenerator {
      * @param {number} y
      * @param {Range} range
      * @param {boolean} normalizeCssZoom
+     * @param {?string} language
      * @returns {boolean}
      */
-    _isPointInRange(x, y, range, normalizeCssZoom) {
+    _isPointInRange(x, y, range, normalizeCssZoom, language) {
         // Require a text node to start
         const {startContainer} = range;
         if (startContainer.nodeType !== Node.TEXT_NODE) {
@@ -370,7 +374,7 @@ export class TextSourceGenerator {
             const {node, offset, content} = new DOMTextScanner(nodePre, offsetPre, true, false).seek(1);
             range.setEnd(node, offset);
 
-            if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects())) {
+            if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects(), language)) {
                 return true;
             }
         } finally {
@@ -381,7 +385,7 @@ export class TextSourceGenerator {
         const {node, offset, content} = new DOMTextScanner(startContainer, range.startOffset, true, false).seek(-1);
         range.setStart(node, offset);
 
-        if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects())) {
+        if (!this._isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects(), language)) {
             // This purposefully leaves the starting offset as modified and sets the range length to 0.
             range.setEnd(node, offset);
             return true;
@@ -522,14 +526,15 @@ export class TextSourceGenerator {
      * @param {number} y
      * @param {Element[]} elements
      * @param {boolean} normalizeCssZoom
+     * @param {?string} language
      * @returns {?Range}
      */
-    _caretRangeFromPointExt(x, y, elements, normalizeCssZoom) {
+    _caretRangeFromPointExt(x, y, elements, normalizeCssZoom, language) {
         /** @type {?Map<Element, ?string>} */
         let previousStyles = null;
         try {
             let i = 0;
-            let startContinerPre = null;
+            let startContainerPre = null;
             while (true) {
                 const range = this._caretRangeFromPoint(x, y);
                 if (range === null) {
@@ -537,11 +542,11 @@ export class TextSourceGenerator {
                 }
 
                 const startContainer = range.startContainer;
-                if (startContinerPre !== startContainer) {
-                    if (this._isPointInRange(x, y, range, normalizeCssZoom)) {
+                if (startContainerPre !== startContainer) {
+                    if (this._isPointInRange(x, y, range, normalizeCssZoom, language)) {
                         return range;
                     }
-                    startContinerPre = startContainer;
+                    startContainerPre = startContainer;
                 }
 
                 if (previousStyles === null) { previousStyles = new Map(); }

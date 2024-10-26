@@ -62,7 +62,7 @@ export class GoogleDocsUtil {
             const style = document.createElement('style');
             style.textContent = [
                 '.kix-canvas-tile-content{pointer-events:none!important;}',
-                '.kix-canvas-tile-content svg>g>rect{pointer-events:all!important;}'
+                '.kix-canvas-tile-content svg>g>rect{pointer-events:all!important;}',
             ].join('\n');
             const parent = document.head || document.documentElement;
             if (parent !== null) {
@@ -137,7 +137,7 @@ export class GoogleDocsUtil {
             const mid = Math.floor((start + end) / 2);
             range.setStart(textNode, mid);
             range.setEnd(textNode, end);
-            if (isPointInAnyRect(x, y, range.getClientRects())) {
+            if (isPointInAnyRect(x, y, range.getClientRects(), null)) {
                 start = mid;
             } else {
                 end = mid;

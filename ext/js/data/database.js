@@ -194,10 +194,10 @@ export class Database {
         request.onsuccess = (e) => {
             const cursor = /** @type {IDBRequest<?IDBCursorWithValue>} */ (e.target).result;
             if (cursor) {
-                /** @type {TResult} */
+                /** @type {unknown} */
                 const value = cursor.value;
-                if (noPredicate || predicate(value, predicateArg)) {
-                    resolve(value, data);
+                if (noPredicate || predicate(/** @type {TResult} */ (value), predicateArg)) {
+                    resolve(/** @type {TResult} */ (value), data);
                 } else {
                     cursor.continue();
                 }
@@ -424,9 +424,9 @@ export class Database {
         request.onsuccess = (e) => {
             const cursor = /** @type {IDBRequest<?IDBCursorWithValue>} */ (e.target).result;
             if (cursor) {
-                /** @type {TResult} */
+                /** @type {unknown} */
                 const value = cursor.value;
-                results.push(value);
+                results.push(/** @type {TResult} */ (value));
                 cursor.continue();
             } else {
                 onSuccess(results, data);

@@ -24,6 +24,7 @@ import type * as Extension from './extension';
 import type * as Settings from './settings';
 import type * as TemplateRenderer from './template-renderer';
 import type * as Api from './api';
+import type * as Language from './language';
 
 export type CreateNoteDetails = {
     dictionaryEntry: Dictionary.DictionaryEntry;
@@ -41,6 +42,7 @@ export type CreateNoteDetails = {
     glossaryLayoutMode: Settings.GlossaryLayoutMode;
     compactTags: boolean;
     mediaOptions: MediaOptions | null;
+    dictionaryStylesMap: Map<string, string>;
 };
 
 export type Field = [
@@ -62,12 +64,13 @@ export type GetRenderingDataDetails = {
     glossaryLayoutMode?: Settings.GlossaryLayoutMode;
     compactTags?: boolean;
     marker: string;
+    dictionaryStylesMap: Map<string, string>;
 };
 
 export type CommonData = AnkiTemplatesInternal.CreateDetails;
 
 export type RequirementGeneric = {
-    type: 'audio' | 'screenshot' | 'clipboardImage' | 'clipboardText' | 'selectionText';
+    type: 'audio' | 'screenshot' | 'clipboardImage' | 'clipboardText' | 'popupSelectionText';
 };
 
 export type RequirementTextFurigana = {
@@ -88,6 +91,7 @@ export type AudioMediaOptions = {
     sources: Audio.AudioSourceInfo[];
     preferredAudioIndex: number | null;
     idleTimeout: number | null;
+    languageSummary: Language.LanguageSummary;
 };
 
 export type MediaOptions = {

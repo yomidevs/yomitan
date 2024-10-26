@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ThemeController} from '../app/theme-controller.js';
 import {Application} from '../application.js';
 import {promiseTimeout} from '../core/utilities.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
@@ -116,6 +117,23 @@ async function showDictionaryInfo(api) {
 }
 
 await Application.main(true, async (application) => {
+    const settingsController = new SettingsController(application);
+    await settingsController.prepare();
+
+    /** @type {ThemeController} */
+    const themeController = new ThemeController(document.documentElement);
+    themeController.prepare();
+    const optionsFull = await application.api.optionsGetFull();
+    const {profiles, profileCurrent} = optionsFull;
+    const defaultProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
+    if (defaultProfile !== null) {
+        themeController.theme = defaultProfile.options.general.popupTheme;
+        themeController.siteOverride = true;
+        themeController.updateTheme();
+    }
+
+    document.body.hidden = false;
+
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -150,9 +168,6 @@ await Application.main(true, async (application) => {
 
     void showAnkiConnectInfo(application.api);
     void showDictionaryInfo(application.api);
-
-    const settingsController = new SettingsController(application);
-    await settingsController.prepare();
 
     const backupController = new BackupController(settingsController, null);
     await backupController.prepare();

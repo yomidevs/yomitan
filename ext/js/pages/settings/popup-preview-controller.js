@@ -48,11 +48,12 @@ export class PopupPreviewController {
         this._frame.addEventListener('load', this._onFrameLoad.bind(this), false);
         this._settingsController.on('optionsContextChanged', this._onOptionsContextChange.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+        this._settingsController.on('dictionaryEnabled', this._onOptionsContextChange.bind(this));
         const languageSelect = querySelectorNotNull(document, '#language-select');
         languageSelect.addEventListener(
             /** @type {string} */ ('settingChanged'),
             /** @type {EventListener} */ (this._onLanguageSelectChanged.bind(this)),
-            false
+            false,
         );
 
 
@@ -86,6 +87,11 @@ export class PopupPreviewController {
         this._invoke('updateOptionsContext', {optionsContext});
     }
 
+    /** */
+    _onDictionaryEnabled() {
+        this._invoke('updateSearch', {});
+    }
+
     /**
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
@@ -111,4 +117,12 @@ export class PopupPreviewController {
         if (this._frame === null || this._frame.contentWindow === null) { return; }
         this._frame.contentWindow.postMessage({action, params}, this._targetOrigin);
     }
+}
+
+/**
+ * @param {string | undefined} url
+ * @returns {boolean}
+ */
+export function checkPopupPreviewURL(url) {
+    return !!(url && url.includes('popup-preview.html') && !['http:', 'https:', 'ws:', 'wss:', 'ftp:', 'data:', 'file:'].includes(new URL(url).protocol));
 }

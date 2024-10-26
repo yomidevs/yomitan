@@ -19,7 +19,7 @@
 import {isObjectNotArray} from '../core/object-utilities.js';
 
 /** @type {RegExp} @readonly */
-const markerPattern = /\{([\w-]+)\}/g;
+const markerPattern = /\{([\p{Letter}\p{Number}_-]+)\}/gu;
 
 /**
  * Gets the root deck name of a full deck name. If the deck is a root deck,
@@ -65,7 +65,7 @@ export function getFieldMarkers(string) {
  * @returns {RegExp} A new `RegExp` instance.
  */
 export function cloneFieldMarkerPattern(global) {
-    return new RegExp(markerPattern.source, global ? 'g' : '');
+    return new RegExp(markerPattern.source, global ? 'gu' : 'u');
 }
 
 /**
@@ -83,4 +83,4 @@ export function isNoteDataValid(note) {
     );
 }
 
-export const invalidNoteId = -1;
+export const INVALID_NOTE_ID = -1;

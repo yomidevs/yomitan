@@ -36,11 +36,16 @@ function createTestFields(type) {
 /**
  * @param {import('dictionary').DictionaryEntry} dictionaryEntry
  * @param {import('settings').ResultOutputMode} mode
+ * @param {string} styles
  * @returns {import('anki-templates').NoteData}
  * @throws {Error}
  */
-export function createTestAnkiNoteData(dictionaryEntry, mode) {
+export function createTestAnkiNoteData(dictionaryEntry, mode, styles = '') {
     const marker = '{marker}';
+    const dictionaryStylesMap = new Map();
+    if (styles !== '') {
+        dictionaryStylesMap.set('Test Dictionary 2', styles);
+    }
     /** @type {import('anki-templates-internal').CreateDetails} */
     const data = {
         dictionaryEntry,
@@ -53,9 +58,10 @@ export function createTestAnkiNoteData(dictionaryEntry, mode) {
             sentence: {text: '', offset: 0},
             documentTitle: 'title',
             query: 'query',
-            fullQuery: 'fullQuery'
+            fullQuery: 'fullQuery',
         },
-        media: {}
+        media: {},
+        dictionaryStylesMap,
     };
     return createAnkiNoteData(marker, data);
 }
@@ -65,9 +71,10 @@ export function createTestAnkiNoteData(dictionaryEntry, mode) {
  * @param {import('settings').ResultOutputMode} mode
  * @param {string} template
  * @param {?import('vitest').ExpectStatic} expect
+ * @param {string} styles
  * @returns {Promise<import('anki').NoteFields[]>}
  */
-export async function getTemplateRenderResults(dictionaryEntries, mode, template, expect) {
+export async function getTemplateRenderResults(dictionaryEntries, mode, template, expect, styles = '') {
     const ankiTemplateRenderer = new AnkiTemplateRenderer();
     await ankiTemplateRenderer.prepare();
     const clozePrefix = 'cloze-prefix';
@@ -91,12 +98,16 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
             url: 'url:',
             sentence: {
                 text: `${clozePrefix}${source}${clozeSuffix}`,
-                offset: clozePrefix.length
+                offset: clozePrefix.length,
             },
             documentTitle: 'title',
             query: 'query',
-            fullQuery: 'fullQuery'
+            fullQuery: 'fullQuery',
         };
+        const dictionaryStylesMap = new Map();
+        if (styles) {
+            dictionaryStylesMap.set('Test Dictionary 2', styles);
+        }
         /** @type {import('anki-note-builder').CreateNoteDetails} */
         const details = {
             dictionaryEntry,
@@ -113,7 +124,8 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
             glossaryLayoutMode: 'default',
             compactTags: false,
             requirements: [],
-            mediaOptions: null
+            mediaOptions: null,
+            dictionaryStylesMap,
         };
         const {note: {fields: noteFields}, errors} = await ankiNoteBuilder.createNote(details);
         for (const error of errors) {

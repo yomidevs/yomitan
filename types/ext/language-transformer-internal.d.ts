@@ -16,13 +16,15 @@
  */
 
 export type Transform = {
+    id: string;
     name: string;
     rules: Rule[];
     heuristic: RegExp;
+    description?: string;
 };
 
 export type Rule = {
-    type: 'suffix' | 'prefix' | 'other';
+    type: 'suffix' | 'prefix' | 'wholeWord' | 'other';
     isInflected: RegExp;
     deinflect: (inflectedWord: string) => string;
     conditionsIn: number;

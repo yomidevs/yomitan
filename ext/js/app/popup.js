@@ -24,6 +24,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {deepEqual} from '../core/utilities.js';
 import {addFullscreenChangeEventListener, computeZoomScale, convertRectZoomCoordinates, getFullscreenElement} from '../dom/document-util.js';
 import {loadStyle} from '../dom/style-util.js';
+import {checkPopupPreviewURL} from '../pages/settings/popup-preview-controller.js';
 import {ThemeController} from './theme-controller.js';
 
 /**
@@ -329,7 +330,9 @@ export class Popup extends EventDispatcher {
     async setContentScale(scale) {
         this._contentScale = scale;
         this._frame.style.fontSize = `${scale}px`;
-        await this._invokeSafe('displaySetContentScale', {scale});
+        if (this._frameClient !== null && this._frameClient.isConnected() && this._frame.contentWindow !== null) {
+            await this._invokeSafe('displaySetContentScale', {scale});
+        }
     }
 
     /**
@@ -424,7 +427,7 @@ export class Popup extends EventDispatcher {
                     if (injectPromise !== this._injectPromise) { return; }
                     this._injectPromiseComplete = true;
                 },
-                () => {}
+                () => {},
             );
         }
         return injectPromise;
@@ -489,7 +492,7 @@ export class Popup extends EventDispatcher {
             parentFrameId: this._frameId,
             childrenSupported: this._childrenSupported,
             scale: this._contentScale,
-            optionsContext: this._optionsContext
+            optionsContext: this._optionsContext,
         };
         await this._invokeSafe('displayConfigure', configureParams);
     }
@@ -699,7 +702,7 @@ export class Popup extends EventDispatcher {
         return /** @type {import('display').DirectApiReturn<TName>} */ (await this._application.crossFrame.invoke(
             this._frameClient.frameId,
             'displayPopupMessage1',
-            /** @type {import('display').DirectApiFrameClientMessageAny} */ (wrappedMessage)
+            /** @type {import('display').DirectApiFrameClientMessageAny} */ (wrappedMessage),
         ));
     }
 
@@ -837,7 +840,7 @@ export class Popup extends EventDispatcher {
             frameWidth,
             viewport.left,
             viewport.right,
-            true
+            true,
         );
         const [top, height, below] = this._getConstrainedPositionBinary(
             sourceRect.top - verticalOffset,
@@ -845,7 +848,7 @@ export class Popup extends EventDispatcher {
             frameHeight,
             viewport.top,
             viewport.bottom,
-            preferBelow
+            preferBelow,
         );
         return {left, top, width, height, after, below};
     }
@@ -868,7 +871,7 @@ export class Popup extends EventDispatcher {
             frameWidth,
             viewport.left,
             viewport.right,
-            preferRight
+            preferRight,
         );
         const [top, height, below] = this._getConstrainedPosition(
             sourceRect.bottom - verticalOffset,
@@ -876,7 +879,7 @@ export class Popup extends EventDispatcher {
             frameHeight,
             viewport.top,
             viewport.bottom,
-            true
+            true,
         );
         return {left, top, width, height, after, below};
     }
@@ -984,7 +987,7 @@ export class Popup extends EventDispatcher {
                     left,
                     top,
                     right: left + width,
-                    bottom: top + height
+                    bottom: top + height,
                 };
             } else {
                 const scale = visualViewport.scale;
@@ -992,7 +995,7 @@ export class Popup extends EventDispatcher {
                     left: 0,
                     top: 0,
                     right: Math.max(left + width, width * scale),
-                    bottom: Math.max(top + height, height * scale)
+                    bottom: Math.max(top + height, height * scale),
                 };
             }
         }
@@ -1001,7 +1004,7 @@ export class Popup extends EventDispatcher {
             left: 0,
             top: 0,
             right: window.innerWidth,
-            bottom: window.innerHeight
+            bottom: window.innerHeight,
         };
     }
 
@@ -1014,6 +1017,10 @@ export class Popup extends EventDispatcher {
         const {general} = options;
         this._themeController.theme = general.popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;
+        this._themeController.siteOverride = checkPopupPreviewURL(optionsContext.url);
+        if (this._themeController.outerTheme === 'site' && this._themeController.siteOverride && ['dark', 'light'].includes(this._themeController.theme)) {
+            this._themeController.outerTheme = this._themeController.theme;
+        }
         this._initialWidth = general.popupWidth;
         this._initialHeight = general.popupHeight;
         this._horizontalOffset = general.popupHorizontalOffset;
@@ -1121,7 +1128,7 @@ export class Popup extends EventDispatcher {
             left: rect.left * scale,
             top: rect.top * scale,
             right: rect.right * scale,
-            bottom: rect.bottom * scale
+            bottom: rect.bottom * scale,
         };
     }
 }

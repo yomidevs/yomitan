@@ -8,6 +8,7 @@
         {"path": ".eslintrc.json", "ignore": true},
         {"path": ".vscode/settings.json", "ignore": true},
         {"path": ".vscode/extensions.json", "ignore": true},
+        {"path": ".vscode/launch.json", "ignore": true},
         {"path": "dev/jsconfig.json", "ignore": true},
         {"path": "ext/manifest.json", "ignore": true},
         {"path": "test/data/dictionaries/invalid-dictionary1/index.json", "ignore": true},
@@ -89,6 +90,16 @@
         },
         {
             "path": "ext/data/schemas/options-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/recommended-dictionaries-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/recommended-settings-schema.json",
             "typeFile": "types/test/json.d.ts",
             "type": "AjvSchema"
         },
@@ -180,6 +191,18 @@
             "typeFile": "types/ext/dictionary-data.d.ts",
             "type": "TermMetaArray",
             "schema": "ext/data/schemas/dictionary-term-meta-bank-v3-schema.json"
+        },
+        {
+            "path": "ext/data/recommended-dictionaries.json",
+            "typeFile": "types/ext/dictionary-recommended.d.ts",
+            "type": "RecommendedDictionaries",
+            "schema": "ext/data/schemas/recommended-dictionaries-schema.json"
+        },
+        {
+            "path": "ext/data/recommended-settings.json",
+            "typeFile": "types/ext/settings-controller.d.ts",
+            "type": "RecommendedSettingsByLanguage",
+            "schema": "ext/data/schemas/recommended-settings-schema.json"
         }
     ]
 }

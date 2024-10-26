@@ -3,6 +3,7 @@
     "title": "Test Dictionary",
     "revision": "test",
     "sequenced": true,
+    "styles": "ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}",
     "version": 3,
     "importDate": 0,
     "prefixWildcardsSupported": true,
@@ -27,7 +28,7 @@
         "ipa": 1
       },
       "terms": {
-        "total": 29
+        "total": 31
       }
     }
   },
@@ -36,7 +37,7 @@
       {
         "kanji": 2,
         "kanjiMeta": 6,
-        "terms": 29,
+        "terms": 31,
         "termMeta": 39,
         "tagMeta": 15,
         "media": 6
@@ -45,7 +46,7 @@
     "total": {
       "kanji": 2,
       "kanjiMeta": 6,
-      "terms": 29,
+      "terms": 31,
       "termMeta": 39,
       "tagMeta": 15,
       "media": 6

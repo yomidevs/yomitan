@@ -51,7 +51,7 @@ export class FrameAncestryHandler {
         if (this._isPrepared) { return; }
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
         this._crossFrameApi.registerHandlers([
-            ['frameAncestryHandlerRequestFrameInfoResponse', this._onFrameAncestryHandlerRequestFrameInfoResponse.bind(this)]
+            ['frameAncestryHandlerRequestFrameInfoResponse', this._onFrameAncestryHandlerRequestFrameInfoResponse.bind(this)],
         ]);
         this._isPrepared = true;
     }
@@ -234,7 +234,7 @@ export class FrameAncestryHandler {
     _requestFrameInfo(targetWindow, originFrameId, childFrameId, uniqueId, nonce) {
         targetWindow.postMessage({
             action: this._requestMessageId,
-            params: {originFrameId, childFrameId, uniqueId, nonce}
+            params: {originFrameId, childFrameId, uniqueId, nonce},
         }, '*');
     }
 
@@ -288,6 +288,7 @@ export class FrameAncestryHandler {
                 }
 
                 /** @type {?ShadowRoot|undefined} */
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const shadowRoot = (
                     element.shadowRoot ||
                     // @ts-expect-error - openOrClosedShadowRoot is available to Firefox 63+ for WebExtensions

@@ -19,51 +19,10 @@ import * as wanakana from '../../../lib/wanakana.js';
 
 /**
  * @param {string} text
- * @param {?import('../../general/text-source-map.js').TextSourceMap} sourceMap
- * @param {number} sourceMapStart
  * @returns {string}
  */
-function convertAlphabeticPartToKana(text, sourceMap, sourceMapStart) {
-    const result = wanakana.toHiragana(text);
-
-    // Generate source mapping
-    if (sourceMap !== null) {
-        let i = 0;
-        let resultPos = 0;
-        const ii = text.length;
-        while (i < ii) {
-            // Find smallest matching substring
-            let iNext = i + 1;
-            let resultPosNext = result.length;
-            while (iNext < ii) {
-                const t = wanakana.toHiragana(text.substring(0, iNext));
-                if (t === result.substring(0, t.length)) {
-                    resultPosNext = t.length;
-                    break;
-                }
-                ++iNext;
-            }
-
-            // Merge characters
-            const removals = iNext - i - 1;
-            if (removals > 0) {
-                sourceMap.combine(sourceMapStart, removals);
-            }
-            ++sourceMapStart;
-
-            // Empty elements
-            const additions = resultPosNext - resultPos - 1;
-            for (let j = 0; j < additions; ++j) {
-                sourceMap.insert(sourceMapStart, 0);
-                ++sourceMapStart;
-            }
-
-            i = iNext;
-            resultPos = resultPosNext;
-        }
-    }
-
-    return result;
+function convertAlphabeticPartToKana(text) {
+    return wanakana.toHiragana(text);
 }
 
 /**
@@ -84,10 +43,9 @@ export function convertToRomaji(text) {
 
 /**
  * @param {string} text
- * @param {?import('../../general/text-source-map.js').TextSourceMap} sourceMap
  * @returns {string}
  */
-export function convertAlphabeticToKana(text, sourceMap = null) {
+export function convertAlphabeticToKana(text) {
     let part = '';
     let result = '';
 
@@ -106,7 +64,7 @@ export function convertAlphabeticToKana(text, sourceMap = null) {
             c = 0x2d; // '-'
         } else {
             if (part.length > 0) {
-                result += convertAlphabeticPartToKana(part, sourceMap, result.length);
+                result += convertAlphabeticPartToKana(part);
                 part = '';
             }
             result += char;
@@ -116,7 +74,7 @@ export function convertAlphabeticToKana(text, sourceMap = null) {
     }
 
     if (part.length > 0) {
-        result += convertAlphabeticPartToKana(part, sourceMap, result.length);
+        result += convertAlphabeticPartToKana(part);
     }
     return result;
 }

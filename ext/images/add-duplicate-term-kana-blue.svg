@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" version="1.1" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+<linearGradient id="inner-fill" x1="-1.7198" x2="-1.7198" y1="2.7781" y2="1.4552" gradientTransform="matrix(3.7795 0 0 3.7795 14 .5)" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#6fb558" offset="0"/>
+   <stop stop-color="#a5db9b" offset="1"/>
+  </linearGradient>
+  <linearGradient id="outer-rim"  x1="2.1167" x2="1.4552" y1="2.3812" y2="1.7198" gradientTransform="scale(3.7795 3.7795)" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#34812c" offset="0"/>
+   <stop stop-color="#87b870" offset="1"/>
+  </linearGradient>
+  <radialGradient id="center-shadow" cx="2.1167" cy="2.1167" r=".66146" gradientTransform="matrix(2.2677 -7.9311e-7 7.9312e-7 2.2677 2.7 3.7)" gradientUnits="userSpaceOnUse">
+   <stop stop-opacity=".28986" offset="0"/>
+   <stop stop-opacity="0" offset="1"/>
+  </radialGradient>
+  <filter id="green-to-blue" x="-.083333" y="-.083333" width="1.1667" height="1.1667" color-interpolation-filters="sRGB">
+   <feColorMatrix result="color1" type="hueRotate" values="105"/>
+   <feColorMatrix result="color2" type="saturate" values="1"/>
+  </filter>
+  <symbol id="plus-in-circle" viewBox="0 0 16 16">
+    <circle cx="7.5" cy="8.5" r="3" fill="url(#inner-fill)"/>
+    <circle cx="7.5" cy="8.5" r="3" fill="none" stroke="url(#outer-rim)"/>
+    <circle cx="7.5" cy="8.5" r="1.5" fill="url(#center-shadow)"/>
+    <path d="m6 8h1v-1h1v1h1v1h-1v1h-1v-1h-1v-1" fill="#fff"/>
+  </symbol>
+ </defs>
+ <g transform="translate(1,-1)" filter="url(#green-to-blue)">
+  <use xlink:href="#plus-in-circle"/>
+ </g>
+ <g transform="translate(-1,1)" filter="url(#green-to-blue)">
+  <use xlink:href="#plus-in-circle"/>
+ </g>
+</svg>

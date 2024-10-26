@@ -15,10 +15,10 @@
     <link rel="stylesheet" type="text/css" href="/css/settings.css">
     <script src="/js/pages/generic-page-main.js" type="module"></script>
 </head>
-<body>
+<body hidden>
 
 <!-- Main content -->
-<div class="content-outer"><div class="content">
+<div class="content-outer"><div class="content scrollbar">
 <div class="content-left"></div>
 <div class="content-center">
 
@@ -35,9 +35,14 @@
                 This may be due to a permissions issue where Yomitan hasn't been granted access to
                 the sites hosting the audio files.
             </p>
-            <p>
+            <p data-hide-for-browser="firefox firefox-mobile">
                 Check the <em>Site access</em> section of the
                 <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings pages</a>
+                and grant the extension access to <em>all sites</em> or add the specific audio host URLs.
+            </p>
+            <p data-show-for-browser="firefox firefox-mobile">
+                From your browser's address bar, go to <code>about:addons</code> and navigate to the settings for Yomitan.
+                Check the <em>Site access</em> section of the extension settings pages
                 and grant the extension access to <em>all sites</em> or add the specific audio host URLs.
             </p>
         </div></div></div></div>

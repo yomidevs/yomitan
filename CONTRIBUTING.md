@@ -1,6 +1,6 @@
 # Issues and Features
 
-Issues reported on [GitHub](https://github.com/themoeway/yomitan/issues) should include information about:
+Issues reported on [GitHub](https://github.com/yomidevs/yomitan/issues) should include information about:
 
 - What the problem, question, or request is.
 - What browser is being used.
@@ -56,6 +56,19 @@ Several command line arguments are available for these scripts:
 - `--version <version>` - Sets the version number in the extension manifest. Defaults to 0.0.0.0 if not set.
 
 If no arguments are specified, the command is equivalent to `build.bat --all`.
+
+### Loading an unpacked build into Chromium browsers
+
+After building, you can load the compiled extension into Chromium browsers.
+
+- Navigate to the [extensions page](chrome://extensions/)
+- Turn on the toggle on the top right that says "Developer Mode"
+- Click "Load Unpacked" on the top left
+- Select the `ext` folder.
+
+Immediately you should see the "Welcome" page!
+
+Note: Yomitan may or may not update when you make and save new code changes locally. It depends on what file you've changed. Yomitan runs as collection of two programs. There is the background process called the "service worker" and there is the frontend called the "content_script". The frontend will reload on save, but to update the backend you need to click on the update icon next to the extension in `chrome://extensions/`. If you make changes to the manifest you will need to rerun `npm run build` to regenerate the manifest file.
 
 ### Build Tools
 

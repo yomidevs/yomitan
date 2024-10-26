@@ -43,15 +43,6 @@
     ],
     "rules": {
         "accessor-pairs": "error",
-        "capitalized-comments": [
-            "error",
-            "always",
-            {
-                "ignorePattern": "case|[a-z]+[A-Z0-9]|[a-z]+\\.\\w",
-                "ignoreInlineComments": true,
-                "ignoreConsecutiveComments": true
-            }
-        ],
         "curly": ["error", "all"],
         "default-case-last": "error",
         "dot-notation": "error",
@@ -117,7 +108,7 @@
         "@stylistic/arrow-spacing": ["error", {"before": true, "after": true}],
         "@stylistic/block-spacing": ["error", "always"],
         "@stylistic/brace-style": ["error", "1tbs", {"allowSingleLine": true}],
-        "@stylistic/comma-dangle": ["error", "never"],
+        "@stylistic/comma-dangle": ["error", "always-multiline"],
         "@stylistic/comma-spacing": ["error", {"before": false, "after": true}],
         "@stylistic/comma-style": ["error", "last"],
         "@stylistic/computed-property-spacing": ["error", "never"],
@@ -398,7 +389,7 @@
                 "@typescript-eslint/no-misused-promises": "off",
                 "@typescript-eslint/no-redundant-type-constituents": "error",
                 "@typescript-eslint/no-unsafe-argument": "error",
-                "@typescript-eslint/no-unsafe-assignment": "off",
+                "@typescript-eslint/no-unsafe-assignment": "error",
                 "@typescript-eslint/no-unsafe-call": "off",
                 "@typescript-eslint/no-unsafe-enum-comparison": "off",
                 "@typescript-eslint/no-unsafe-member-access": "off",
@@ -567,6 +558,7 @@
                 "ext/js/display/pronunciation-generator.js",
                 "ext/js/display/structured-content-generator.js",
                 "ext/js/dom/css-style-applier.js",
+                "ext/js/language/CJK-util.js",
                 "ext/js/language/ja/japanese.js",
                 "ext/js/language/text-utilities.js",
                 "ext/js/templates/anki-template-renderer-content-manager.js",
@@ -639,14 +631,19 @@
                 "ext/js/general/cache-map.js",
                 "ext/js/general/object-property-accessor.js",
                 "ext/js/general/regex-util.js",
-                "ext/js/general/text-source-map.js",
                 "ext/js/language/ar/arabic-text-preprocessors.js",
+                "ext/js/language/CJK-util.js",
                 "ext/js/language/de/german-text-preprocessors.js",
+                "ext/js/language/de/german-transforms.js",
                 "ext/js/language/en/english-transforms.js",
+                "ext/js/language/es/spanish-transforms.js",
                 "ext/js/language/ja/japanese-text-preprocessors.js",
                 "ext/js/language/ja/japanese-transforms.js",
                 "ext/js/language/ja/japanese-wanakana.js",
                 "ext/js/language/ja/japanese.js",
+                "ext/js/language/ko/korean-text-processors.js",
+                "ext/js/language/ko/korean-transforms.js",
+                "ext/js/language/la/latin-transforms.js",
                 "ext/js/language/language-descriptors.js",
                 "ext/js/language/language-transformer.js",
                 "ext/js/language/language-transforms.js",
@@ -654,9 +651,13 @@
                 "ext/js/language/multi-language-transformer.js",
                 "ext/js/language/ru/russian-text-preprocessors.js",
                 "ext/js/language/sga/old-irish-transforms.js",
+                "ext/js/language/sh/serbo-croatian-text-preprocessors.js",
                 "ext/js/language/sq/albanian-transforms.js",
-                "ext/js/language/text-preprocessors.js",
+                "ext/js/language/vi/viet-text-preprocessors.js",
+                "ext/js/language/tl/tagalog-transforms.js",
+                "ext/js/language/text-processors.js",
                 "ext/js/language/translator.js",
+                "ext/js/language/zh/chinese.js",
                 "ext/js/media/audio-downloader.js",
                 "ext/js/media/media-util.js",
                 "ext/js/templates/template-patcher.js"
@@ -670,6 +671,47 @@
                 "Intl": "readonly",
                 "crypto": "readonly",
                 "AbortController": "readonly"
+            }
+        },
+        {
+            "files": [
+                "ext/data/recommended-dictionaries.json"
+            ],
+            "rules": {
+                "jsonc/sort-keys": ["error", {
+                    "pathPattern": ".*",
+                    "hasProperties": ["name"],
+                    "order": [
+                        "name",
+                        "description",
+                        "homepage",
+                        "downloadUrl"
+                    ]
+                }, {
+                    "pathPattern": ".*",
+                    "order": {
+                        "type": "asc"
+                    }
+                }]
+            }
+        },
+        {
+            "files": [
+                "ext/data/recommended-settings.json"
+            ],
+            "rules": {
+                "jsonc/sort-keys": ["error", {
+                    "pathPattern": ".*",
+                    "order": [
+                        "modification",
+                        "description"
+                    ]
+                }, {
+                    "pathPattern": ".*",
+                    "order": {
+                        "type": "asc"
+                    }
+                }]
             }
         }
     ]

@@ -33,6 +33,7 @@ export type Events = {
         textSource: TextSource;
         optionsContext: OptionsContext;
         sentenceOffset: number | null;
+        pageTheme: 'dark' | 'light';
     };
 };
 

@@ -27,6 +27,12 @@
 
     --background-color: #ffffff;
     --separator-color1: #cccccc;
+
+    --search-textbox-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
+    --search-textbox-min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
+    --search-textbox-max-height: calc(var(--textarea-line-height) * 5 + var(--textarea-padding) * 2);
+
+    --cog-icon-size: 26px;
 }
 :root:not([data-loaded=true]) {
     --animation-duration: 0s;
@@ -43,7 +49,6 @@ body {
     background-color: var(--background-color);
     margin: 0;
     padding: 0;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     color: var(--text-color);
     height: 100%;
     overflow: hidden;
@@ -63,7 +68,7 @@ h1 {
     display: flex;
     flex-flow: row nowrap;
     width: 100%;
-    align-items: stretch;
+    align-items: center;
     margin: 0;
     padding: 0;
     border: 0;
@@ -79,20 +84,22 @@ h1 {
     border: 0;
     outline: none;
     width: 100%;
-    height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
-    min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
-    max-height: calc(var(--textarea-line-height) * 10 + var(--textarea-padding) * 2);
-    resize: vertical;
+    height: var(--search-textbox-height);
+    min-height: var(--search-textbox-min-height);
+    max-height: var(--search-textbox-max-height);
+    resize: none;
     font-size: var(--font-size);
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     white-space: pre-wrap;
     z-index: 1;
-    margin: 0 calc(-1 * var(--main-content-horizontal-padding));
 }
 .search-button {
     flex: 0 0 auto;
     position: relative;
     width: 2.5em;
+    height: var(--search-textbox-height);
+    min-height: var(--search-textbox-min-height);
+    max-height: var(--search-textbox-max-height);
     background-color: var(--input-background-color);
     border: 0;
     padding: 0;
@@ -128,12 +135,74 @@ h1 {
     --icon-size: 16px 16px;
 }
 
+.clear-button {
+    flex: 0 0 auto;
+    position: relative;
+    width: 2.5em;
+    height: var(--search-textbox-height);
+    min-height: var(--search-textbox-min-height);
+    max-height: var(--search-textbox-max-height);
+    background-color: var(--input-background-color);
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    outline: none;
+    transition: background-color var(--animation-duration) ease-in-out;
+    border-radius: 0;
+}
+.clear-button:hover,
+.clear-button:focus {
+    background-color: var(--input-background-color-dark);
+}
+.clear-button:focus:not(:focus-visible):not(:hover) {
+    background-color: var(--input-background-color);
+}
+.clear-button:focus-visible {
+    background-color: var(--input-background-color-dark);
+}
+.clear-button:active,
+.clear-button:active:focus {
+    background-color: var(--input-background-color-darker);
+}
+
+.clear-button>.icon {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--button-default-icon-color);
+    --icon-size: 16px 16px;
+}
+
 /* Search options */
+#search-settings-button>.icon {
+    display: block;
+    background-color: var(--button-default-icon-color);
+    width: var(--cog-icon-size);
+    height: var(--cog-icon-size);
+    transition: var(--animation-duration) filter ease-in-out;
+}
+#search-settings-button>.icon:hover,
+#search-settings-button>.icon:focus {
+    filter: invert(0.5);
+}
+#search-settings-button {
+    margin-right: 0;
+}
+.search-options-left {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+}
 .search-options {
     display: flex;
     flex-flow: row wrap;
-    margin: 0.5em calc(-1 * var(--main-content-horizontal-padding));
+    margin: 0.5em 0 0 0;
     align-items: center;
+    justify-content: space-between;
 }
 .search-option {
     flex: 0 1 auto;
@@ -146,20 +215,6 @@ h1 {
 }
 .search-option-label {
     padding-left: 0.5em;
-}
-.search-option-pre-label {
-    padding-right: 0.5em;
-}
-#query-parser-mode-container {
-    flex: 1 1 auto;
-}
-#query-parser-mode-container:not([hidden]) {
-    display: flex;
-}
-#query-parser-mode-select {
-    flex: 1 1 auto;
-    max-width: 220px;
-    min-width: 100px;
 }
 
 /* Search styles */
@@ -177,4 +232,12 @@ h1 {
 :root[data-search-mode=action-popup] body {
     width: 640px;
     height: 480px;
+}
+
+/* Dark mode before themes are applied
+   DO NOT use this for normal theming */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-loaded=true]) {
+        background-color: #1e1e1e;
+    }
 }

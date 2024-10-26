@@ -56,7 +56,7 @@ export class DOMDataBinder {
             onAdded: this._createObserver.bind(this),
             onRemoved: this._removeObserver.bind(this),
             onChildrenUpdated: this._onObserverChildrenUpdated.bind(this),
-            isStale: this._isObserverStale.bind(this)
+            isStale: this._isObserverStale.bind(this),
         });
     }
 
@@ -105,7 +105,7 @@ export class DOMDataBinder {
 
         const args = targets.map(([observer]) => ({
             element: observer.element,
-            metadata: observer.metadata
+            metadata: observer.metadata,
         }));
         const responses = await this._getValues(args);
         this._applyValues(targets, responses, true);
@@ -123,7 +123,7 @@ export class DOMDataBinder {
             args.push({
                 element: observer.element,
                 metadata: observer.metadata,
-                value: task.data.value
+                value: task.data.value,
             });
             targets.push([observer, task]);
         }
@@ -174,18 +174,20 @@ export class DOMDataBinder {
     _createObserver(element) {
         const metadata = this._createElementMetadata(element);
         if (typeof metadata === 'undefined') { return void 0; }
+        const type = this._getNormalizedElementType(element);
+        const eventType = 'change';
         /** @type {import('dom-data-binder').ElementObserver<T>} */
         const observer = {
             element,
-            type: this._getNormalizedElementType(element),
+            type,
             value: null,
             hasValue: false,
+            eventType,
             onChange: null,
-            metadata
+            metadata,
         };
         observer.onChange = this._onElementChange.bind(this, observer);
-
-        element.addEventListener('change', observer.onChange, false);
+        element.addEventListener(eventType, observer.onChange, false);
 
         void this._updateTasks.enqueue(observer, {all: false});
 
@@ -198,7 +200,7 @@ export class DOMDataBinder {
      */
     _removeObserver(element, observer) {
         if (observer.onChange === null) { return; }
-        element.removeEventListener('change', observer.onChange, false);
+        element.removeEventListener(observer.eventType, observer.onChange, false);
         observer.onChange = null;
     }
 
@@ -207,7 +209,7 @@ export class DOMDataBinder {
      * @param {import('dom-data-binder').ElementObserver<T>} observer
      */
     _onObserverChildrenUpdated(element, observer) {
-        if (observer.hasValue) {
+        if (observer.hasValue && this._getNormalizedElementType(element) !== 'element') {
             this._setElementValue(element, observer.value);
         }
     }
@@ -238,6 +240,9 @@ export class DOMDataBinder {
             case 'textarea':
             case 'select':
                 /** @type {HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement} */ (element).value = typeof value === 'string' ? value : `${value}`;
+                break;
+            case 'element':
+                element.textContent = typeof value === 'string' ? value : `${value}`;
                 break;
         }
 
@@ -274,8 +279,9 @@ export class DOMDataBinder {
                 return /** @type {HTMLTextAreaElement} */ (element).value;
             case 'select':
                 return /** @type {HTMLSelectElement} */ (element).value;
+            case 'element':
+                return element.textContent;
         }
-        return null;
     }
 
     /**
@@ -302,6 +308,6 @@ export class DOMDataBinder {
             case 'SELECT':
                 return 'select';
         }
-        return null;
+        return 'element';
     }
 }

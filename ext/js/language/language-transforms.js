@@ -17,11 +17,12 @@
 
 
 /**
+ * @template {string} TCondition
  * @param {string} inflectedSuffix
  * @param {string} deinflectedSuffix
- * @param {string[]} conditionsIn
- * @param {string[]} conditionsOut
- * @returns {import('language-transformer').SuffixRule}
+ * @param {TCondition[]} conditionsIn
+ * @param {TCondition[]} conditionsOut
+ * @returns {import('language-transformer').SuffixRule<TCondition>}
  */
 export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsIn, conditionsOut) {
     const suffixRegExp = new RegExp(inflectedSuffix + '$');
@@ -31,16 +32,17 @@ export function suffixInflection(inflectedSuffix, deinflectedSuffix, conditionsI
         deinflected: deinflectedSuffix,
         deinflect: (text) => text.slice(0, -inflectedSuffix.length) + deinflectedSuffix,
         conditionsIn,
-        conditionsOut
+        conditionsOut,
     };
 }
 
 /**
+ * @template {string} TCondition
  * @param {string} inflectedPrefix
  * @param {string} deinflectedPrefix
- * @param {string[]} conditionsIn
- * @param {string[]} conditionsOut
- * @returns {import('language-transformer').Rule}
+ * @param {TCondition[]} conditionsIn
+ * @param {TCondition[]} conditionsOut
+ * @returns {import('language-transformer').Rule<TCondition>}
  */
 export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsIn, conditionsOut) {
     const prefixRegExp = new RegExp('^' + inflectedPrefix);
@@ -49,6 +51,25 @@ export function prefixInflection(inflectedPrefix, deinflectedPrefix, conditionsI
         isInflected: prefixRegExp,
         deinflect: (text) => deinflectedPrefix + text.slice(inflectedPrefix.length),
         conditionsIn,
-        conditionsOut
+        conditionsOut,
+    };
+}
+
+/**
+ * @template {string} TCondition
+ * @param {string} inflectedWord
+ * @param {string} deinflectedWord
+ * @param {TCondition[]} conditionsIn
+ * @param {TCondition[]} conditionsOut
+ * @returns {import('language-transformer').Rule<TCondition>}
+ */
+export function wholeWordInflection(inflectedWord, deinflectedWord, conditionsIn, conditionsOut) {
+    const regex = new RegExp('^' + inflectedWord + '$');
+    return {
+        type: 'wholeWord',
+        isInflected: regex,
+        deinflect: () => deinflectedWord,
+        conditionsIn,
+        conditionsOut,
     };
 }

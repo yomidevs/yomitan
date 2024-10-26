@@ -86,6 +86,7 @@
                                     "debugInfo",
                                     "maxResults",
                                     "showAdvanced",
+                                    "showDebug",
                                     "popupDisplayMode",
                                     "popupWidth",
                                     "popupHeight",
@@ -99,6 +100,7 @@
                                     "popupScaleRelativeToPageZoom",
                                     "popupScaleRelativeToVisualViewport",
                                     "showGuide",
+                                    "enableContextMenuScanSelected",
                                     "compactTags",
                                     "glossaryLayoutMode",
                                     "mainDictionary",
@@ -120,7 +122,11 @@
                                     "frequencyDisplayMode",
                                     "termDisplayMode",
                                     "sortFrequencyDictionary",
-                                    "sortFrequencyDictionaryOrder"
+                                    "sortFrequencyDictionaryOrder",
+                                    "stickySearchHeader",
+                                    "fontFamily",
+                                    "fontSize",
+                                    "lineHeight"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -136,6 +142,18 @@
                                         "enum": ["group", "merge", "split"],
                                         "default": "group"
                                     },
+                                    "fontFamily": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "fontSize": {
+                                        "type": "number",
+                                        "default": 14
+                                    },
+                                    "lineHeight": {
+                                        "type": "string",
+                                        "default": "1.5"
+                                    },
                                     "debugInfo": {
                                         "type": "boolean",
                                         "default": false
@@ -146,6 +164,10 @@
                                         "default": 32
                                     },
                                     "showAdvanced": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "showDebug": {
                                         "type": "boolean",
                                         "default": false
                                     },
@@ -206,6 +228,10 @@
                                         "type": "boolean",
                                         "default": true
                                     },
+                                    "enableContextMenuScanSelected": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
                                     "compactTags": {
                                         "type": "boolean",
                                         "default": false
@@ -220,13 +246,13 @@
                                     },
                                     "popupTheme": {
                                         "type": "string",
-                                        "enum": ["light", "dark", "browser"],
-                                        "default": "light"
+                                        "enum": ["light", "dark", "browser", "site"],
+                                        "default": "site"
                                     },
                                     "popupOuterTheme": {
                                         "type": "string",
-                                        "enum": ["light", "dark", "browser", "site"],
-                                        "default": "light"
+                                        "enum": ["light", "dark", "browser", "site", "none"],
+                                        "default": "site"
                                     },
                                     "customPopupCss": {
                                         "type": "string",
@@ -290,7 +316,7 @@
                                     },
                                     "termDisplayMode": {
                                         "type": "string",
-                                        "enum": ["ruby", "ruby-and-reading", "term-and-reading"],
+                                        "enum": ["ruby", "ruby-and-reading", "term-and-reading", "term-only"],
                                         "default": "ruby"
                                     },
                                     "sortFrequencyDictionary": {
@@ -301,6 +327,10 @@
                                         "type": "string",
                                         "enum": ["ascending", "descending"],
                                         "default": "descending"
+                                    },
+                                    "stickySearchHeader": {
+                                        "type": "boolean",
+                                        "default": false
                                     }
                                 }
                             },
@@ -393,8 +423,10 @@
                                                     "type": "string",
                                                     "enum": [
                                                         "jpod101",
-                                                        "jpod101-alternate",
+                                                        "language-pod-101",
                                                         "jisho",
+                                                        "lingua-libre",
+                                                        "wiktionary",
                                                         "text-to-speech",
                                                         "text-to-speech-reading",
                                                         "custom",
@@ -412,13 +444,7 @@
                                                 }
                                             }
                                         },
-                                        "default": [
-                                            {
-                                                "type": "jpod101",
-                                                "url": "",
-                                                "voice": ""
-                                            }
-                                        ]
+                                        "default": []
                                     }
                                 }
                             },
@@ -445,7 +471,9 @@
                                     "matchTypePrefix",
                                     "hidePopupOnCursorExit",
                                     "hidePopupOnCursorExitDelay",
-                                    "normalizeCssZoom"
+                                    "normalizeCssZoom",
+                                    "scanWithoutMousemove",
+                                    "scanResolution"
                                 ],
                                 "properties": {
                                     "inputs": {
@@ -710,7 +738,7 @@
                                     },
                                     "layoutAwareScan": {
                                         "type": "boolean",
-                                        "default": false
+                                        "default": true
                                     },
                                     "matchTypePrefix": {
                                         "type": "boolean",
@@ -728,6 +756,18 @@
                                     "normalizeCssZoom": {
                                         "type": "boolean",
                                         "default": true
+                                    },
+                                    "scanWithoutMousemove": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "scanResolution": {
+                                        "type": "string",
+                                        "enum": [
+                                            "character",
+                                            "word"
+                                        ],
+                                        "default": "character"
                                     }
                                 }
                             },
@@ -795,6 +835,7 @@
                                     "type": "object",
                                     "required": [
                                         "name",
+                                        "alias",
                                         "priority",
                                         "enabled",
                                         "allowSecondarySearches",
@@ -804,6 +845,10 @@
                                     ],
                                     "properties": {
                                         "name": {
+                                            "type": "string",
+                                            "default": ""
+                                        },
+                                        "alias": {
                                             "type": "string",
                                             "default": ""
                                         },
@@ -988,6 +1033,11 @@
                                         "type": "boolean",
                                         "default": true
                                     },
+                                    "duplicateBehavior": {
+                                        "type": "string",
+                                        "enum": ["prevent", "overwrite", "new"],
+                                        "default": "prevent"
+                                    },
                                     "fieldTemplates": {
                                         "type": ["string", "null"],
                                         "default": null
@@ -1149,8 +1199,8 @@
                                             }
                                         },
                                         "default": [
-                                            {"action": "close",             "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["popup"], "enabled": true},
-                                            {"action": "focusSearchBox",    "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["search"], "enabled": true},
+                                            {"action": "close",             "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["popup"],           "enabled": true},
+                                            {"action": "focusSearchBox",    "argument": "",  "key": "Escape",    "modifiers": [],       "scopes": ["search"],          "enabled": true},
                                             {"action": "previousEntry",     "argument": "3", "key": "PageUp",    "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "nextEntry",         "argument": "3", "key": "PageDown",  "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "lastEntry",         "argument": "",  "key": "End",       "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
@@ -1159,12 +1209,14 @@
                                             {"action": "nextEntry",         "argument": "1", "key": "ArrowDown", "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "historyBackward",   "argument": "",  "key": "KeyB",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "historyForward",    "argument": "",  "key": "KeyF",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "profilePrevious",   "argument": "",  "key": "Minus",     "modifiers": ["alt"],  "scopes": ["popup", "search", "web"], "enabled": true},
+                                            {"action": "profileNext",       "argument": "",  "key": "Equal",     "modifiers": ["alt"],  "scopes": ["popup", "search", "web"], "enabled": true},
                                             {"action": "addNoteKanji",      "argument": "",  "key": "KeyK",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "addNoteTermKanji",  "argument": "",  "key": "KeyE",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "addNoteTermKana",   "argument": "",  "key": "KeyR",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "playAudio",         "argument": "",  "key": "KeyP",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "viewNotes",         "argument": "",  "key": "KeyV",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "copyHostSelection", "argument": "",  "key": "KeyC",      "modifiers": ["ctrl"], "scopes": ["popup"], "enabled": true}
+                                            {"action": "copyHostSelection", "argument": "",  "key": "KeyC",      "modifiers": ["ctrl"], "scopes": ["popup"],           "enabled": true}
                                         ]
                                     }
                                 }

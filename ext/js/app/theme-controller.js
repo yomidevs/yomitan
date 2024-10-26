@@ -27,14 +27,16 @@ export class ThemeController {
     constructor(element) {
         /** @type {?HTMLElement} */
         this._element = element;
-        /** @type {'light'|'dark'|'browser'} */
-        this._theme = 'light';
-        /** @type {'light'|'dark'|'browser'|'site'} */
-        this._outerTheme = 'light';
+        /** @type {import("settings.js").PopupTheme} */
+        this._theme = 'site';
+        /** @type {import("settings.js").PopupOuterTheme} */
+        this._outerTheme = 'site';
         /** @type {?('dark'|'light')} */
         this._siteTheme = null;
         /** @type {'dark'|'light'} */
         this._browserTheme = 'light';
+        /** @type {boolean} */
+        this.siteOverride = false;
     }
 
     /**
@@ -55,7 +57,7 @@ export class ThemeController {
 
     /**
      * Gets the main theme for the content.
-     * @type {'light'|'dark'|'browser'}
+     * @type {import("settings.js").PopupTheme}
      */
     get theme() {
         return this._theme;
@@ -63,7 +65,7 @@ export class ThemeController {
 
     /**
      * Sets the main theme for the content.
-     * @param {'light'|'dark'|'browser'} value The theme value to assign.
+     * @param {import("settings.js").PopupTheme} value The theme value to assign.
      */
     set theme(value) {
         this._theme = value;
@@ -71,7 +73,7 @@ export class ThemeController {
 
     /**
      * Gets the outer theme for the content.
-     * @type {'light'|'dark'|'browser'|'site'}
+     * @type {import("settings.js").PopupOuterTheme}
      */
     get outerTheme() {
         return this._outerTheme;
@@ -79,7 +81,7 @@ export class ThemeController {
 
     /**
      * Sets the outer theme for the content.
-     * @param {'light'|'dark'|'browser'|'site'} value The outer theme value to assign.
+     * @param {import("settings.js").PopupOuterTheme} value The outer theme value to assign.
      */
     set outerTheme(value) {
         this._outerTheme = value;
@@ -171,7 +173,7 @@ export class ThemeController {
      */
     _resolveThemeValue(theme, computedSiteTheme) {
         switch (theme) {
-            case 'auto': return computedSiteTheme;
+            case 'site': return this.siteOverride ? this._browserTheme : computedSiteTheme;
             case 'browser': return this._browserTheme;
             default: return theme;
         }
@@ -212,7 +214,7 @@ export class ThemeController {
             Number.parseInt(m[1], 10),
             Number.parseInt(m[2], 10),
             Number.parseInt(m[3], 10),
-            m4 ? Math.max(0, Math.min(1, Number.parseFloat(m4))) : 1
+            m4 ? Math.max(0, Math.min(1, Number.parseFloat(m4))) : 1,
         ];
     }
 }

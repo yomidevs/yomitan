@@ -83,6 +83,10 @@ export type KanjiDictionaryEntry = {
      */
     dictionary: string;
     /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
+    /**
      * Onyomi readings for the kanji character.
      */
     onyomi: string[];
@@ -171,6 +175,10 @@ export type KanjiFrequency = {
      */
     dictionaryIndex: number;
     /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
+    /**
      * The priority of the dictionary.
      */
     dictionaryPriority: number;
@@ -208,6 +216,10 @@ export type TermDictionaryEntry = {
      */
     isPrimary: boolean;
     /**
+     * Ways that a looked-up word might be transformed into this term.
+     */
+    textProcessorRuleChainCandidates: textProcessorRuleChainCandidate[];
+    /**
      * Ways that a looked-up word might be an inflected form of this term.
      */
     inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
@@ -223,6 +235,10 @@ export type TermDictionaryEntry = {
      * The index of the dictionary in the original list of dictionaries used for the lookup.
      */
     dictionaryIndex: number;
+    /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
     /**
      * The priority of the dictionary.
      */
@@ -258,7 +274,14 @@ export type InflectionRuleChainCandidate = {
     inflectionRules: InflectionRuleChain;
 };
 
-export type InflectionRuleChain = string[];
+type textProcessorRuleChainCandidate = string[];
+
+export type InflectionRuleChain = InflectionRule[];
+
+export type InflectionRule = {
+    name: string;
+    description?: string;
+};
 
 export type InflectionSource = 'algorithm' | 'dictionary' | 'both';
 
@@ -312,6 +335,10 @@ export type TermDefinition = {
      * The index of the dictionary in the original list of dictionaries used for the lookup.
      */
     dictionaryIndex: number;
+    /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
     /**
      * The priority of the dictionary.
      */
@@ -369,6 +396,10 @@ export type TermPronunciation = {
      * The index of the dictionary in the original list of dictionaries used for the lookup.
      */
     dictionaryIndex: number;
+    /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
     /**
      * The priority of the dictionary.
      */
@@ -447,6 +478,10 @@ export type TermFrequency = {
      * The index of the dictionary in the original list of dictionaries used for the lookup.
      */
     dictionaryIndex: number;
+    /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
     /**
      * The priority of the dictionary.
      */

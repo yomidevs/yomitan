@@ -21,6 +21,7 @@ import {DocumentFocusController} from '../../dom/document-focus-controller.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {ExtensionContentController} from '../common/extension-content-controller.js';
 import {AnkiController} from './anki-controller.js';
+import {AnkiDeckGeneratorController} from './anki-deck-generator-controller.js';
 import {AnkiTemplatesController} from './anki-templates-controller.js';
 import {AudioController} from './audio-controller.js';
 import {BackupController} from './backup-controller.js';
@@ -39,6 +40,7 @@ import {PersistentStorageController} from './persistent-storage-controller.js';
 import {PopupPreviewController} from './popup-preview-controller.js';
 import {PopupWindowController} from './popup-window-controller.js';
 import {ProfileController} from './profile-controller.js';
+import {RecommendedSettingsController} from './recommended-settings-controller.js';
 import {ScanInputsController} from './scan-inputs-controller.js';
 import {ScanInputsSimpleController} from './scan-inputs-simple-controller.js';
 import {SecondarySearchDictionaryController} from './secondary-search-dictionary-controller.js';
@@ -84,11 +86,19 @@ await Application.main(true, async (application) => {
 
     const preparePromises = [];
 
-    const modalController = new ModalController();
-    modalController.prepare();
+    const modalController = new ModalController(['shared-modals', 'settings-modals']);
+    await modalController.prepare();
 
     const settingsController = new SettingsController(application);
     await settingsController.prepare();
+
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    await settingsDisplayController.prepare();
+
+    document.body.hidden = false;
+
+    const popupPreviewController = new PopupPreviewController(settingsController);
+    popupPreviewController.prepare();
 
     const persistentStorageController = new PersistentStorageController(application);
     preparePromises.push(persistentStorageController.prepare());
@@ -117,11 +127,11 @@ await Application.main(true, async (application) => {
     const ankiController = new AnkiController(settingsController);
     preparePromises.push(ankiController.prepare());
 
-    const ankiTemplatesController = new AnkiTemplatesController(settingsController, modalController, ankiController);
-    preparePromises.push(ankiTemplatesController.prepare());
+    const ankiDeckGeneratorController = new AnkiDeckGeneratorController(application, settingsController, modalController, ankiController);
+    preparePromises.push(ankiDeckGeneratorController.prepare());
 
-    const popupPreviewController = new PopupPreviewController(settingsController);
-    popupPreviewController.prepare();
+    const ankiTemplatesController = new AnkiTemplatesController(application, settingsController, modalController, ankiController);
+    preparePromises.push(ankiTemplatesController.prepare());
 
     const scanInputsController = new ScanInputsController(settingsController);
     preparePromises.push(scanInputsController.prepare());
@@ -165,10 +175,10 @@ await Application.main(true, async (application) => {
     const sortFrequencyDictionaryController = new SortFrequencyDictionaryController(settingsController);
     preparePromises.push(sortFrequencyDictionaryController.prepare());
 
+    const recommendedSettingsController = new RecommendedSettingsController(settingsController);
+    preparePromises.push(recommendedSettingsController.prepare());
+
     await Promise.all(preparePromises);
 
     document.documentElement.dataset.loaded = 'true';
-
-    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    settingsDisplayController.prepare();
 });

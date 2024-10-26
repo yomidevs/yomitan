@@ -28,7 +28,7 @@ import {logErrorLevelToNumber} from '../core/log-utilities.js';
 import {log} from '../core/log.js';
 import {isObjectNotArray} from '../core/object-utilities.js';
 import {clone, deferPromise, promiseTimeout} from '../core/utilities.js';
-import {invalidNoteId, isNoteDataValid} from '../data/anki-util.js';
+import {INVALID_NOTE_ID, isNoteDataValid} from '../data/anki-util.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {OptionsUtil} from '../data/options-util.js';
 import {getAllPermissions, hasPermissions, hasRequiredPermissionsForOptions} from '../data/permissions-util.js';
@@ -75,7 +75,7 @@ export class Backend {
                 // eslint-disable-next-line no-undef
                 (typeof document === 'object' && document !== null ? document : null),
                 '#clipboard-paste-target',
-                '#clipboard-rich-content-paste-target'
+                '#clipboard-rich-content-paste-target',
             );
         } else {
             /** @type {?OffscreenProxy} */
@@ -153,6 +153,7 @@ export class Backend {
             ['getAnkiConnectVersion',        this._onApiGetAnkiConnectVersion.bind(this)],
             ['isAnkiConnected',              this._onApiIsAnkiConnected.bind(this)],
             ['addAnkiNote',                  this._onApiAddAnkiNote.bind(this)],
+            ['updateAnkiNote',               this._onApiUpdateAnkiNote.bind(this)],
             ['getAnkiNoteInfo',              this._onApiGetAnkiNoteInfo.bind(this)],
             ['injectAnkiNoteMedia',          this._onApiInjectAnkiNoteMedia.bind(this)],
             ['viewNotes',                    this._onApiViewNotes.bind(this)],
@@ -184,7 +185,7 @@ export class Backend {
             ['getTermFrequencies',           this._onApiGetTermFrequencies.bind(this)],
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
-            ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)]
+            ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -194,7 +195,7 @@ export class Backend {
             ['openInfoPage', this._onCommandOpenInfoPage.bind(this)],
             ['openSettingsPage', this._onCommandOpenSettingsPage.bind(this)],
             ['openSearchPage', this._onCommandOpenSearchPage.bind(this)],
-            ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)]
+            ['openPopupWindow', this._onCommandOpenPopupWindow.bind(this)],
         ]));
     }
 
@@ -213,7 +214,7 @@ export class Backend {
                 (error) => {
                     this._prepareError = true;
                     this._prepareCompleteReject(error);
-                }
+                },
             );
             void promise.finally(() => this._updateBadge());
             this._preparePromise = promise;
@@ -313,9 +314,12 @@ export class Backend {
      * @param {import('clipboard-monitor').EventArgument<'change'>} details
      */
     async _onClipboardTextChange({text}) {
+        // Only update if tab does not exist
+        if (await this._tabExists('/search.html')) { return; }
+
         const {
             general: {language},
-            clipboard: {maximumSearchLength}
+            clipboard: {maximumSearchLength},
         } = this._getProfileOptions({current: true}, false);
         if (!isTextLookupWorthy(text, language)) { return; }
         if (text.length > maximumSearchLength) {
@@ -368,7 +372,7 @@ export class Backend {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     handler(...args);
                 },
-                () => {} // NOP
+                () => {}, // NOP
             );
         });
     }
@@ -381,7 +385,7 @@ export class Backend {
 
         this._prepareCompletePromise.then(
             () => { this._onMessage(message, sender, sendResponse); },
-            () => { sendResponse(); }
+            () => { sendResponse(); },
         );
         return true;
     }
@@ -495,7 +499,7 @@ export class Backend {
     async _onApiParseText({text, optionsContext, scanLength, useInternalParser, useMecabParser}) {
         const [internalResults, mecabResults] = await Promise.all([
             (useInternalParser ? this._textParseScanning(text, scanLength, optionsContext) : null),
-            (useMecabParser ? this._textParseMecab(text) : null)
+            (useMecabParser ? this._textParseMecab(text) : null),
         ]);
 
         /** @type {import('api').ParseTextResultItem[]} */
@@ -506,7 +510,7 @@ export class Backend {
                 id: 'scan',
                 source: 'scanning-parser',
                 dictionary: null,
-                content: internalResults
+                content: internalResults,
             });
         }
 
@@ -516,7 +520,7 @@ export class Backend {
                     id: `mecab-${dictionary}`,
                     source: 'mecab',
                     dictionary,
-                    content
+                    content,
                 });
             }
         }
@@ -537,6 +541,11 @@ export class Backend {
     /** @type {import('api').ApiHandler<'addAnkiNote'>} */
     async _onApiAddAnkiNote({note}) {
         return await this._anki.addNote(note);
+    }
+
+    /** @type {import('api').ApiHandler<'updateAnkiNote'>} */
+    async _onApiUpdateAnkiNote({noteWithId}) {
+        return await this._anki.updateNoteFields(noteWithId);
     }
 
     /**
@@ -600,7 +609,7 @@ export class Backend {
             const valid = isNoteDataValid(note);
 
             if (isDuplicate && duplicateNoteIds[originalIndices.indexOf(i)].length === 0) {
-                duplicateNoteIds[originalIndices.indexOf(i)] = [invalidNoteId];
+                duplicateNoteIds[originalIndices.indexOf(i)] = [INVALID_NOTE_ID];
             }
 
             const noteIds = isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null;
@@ -610,7 +619,7 @@ export class Backend {
                 canAdd: valid,
                 valid,
                 noteIds: noteIds,
-                noteInfos: noteInfos
+                noteInfos: noteInfos,
             };
 
             results.push(info);
@@ -628,7 +637,7 @@ export class Backend {
             audioDetails,
             screenshotDetails,
             clipboardDetails,
-            dictionaryMediaDetails
+            dictionaryMediaDetails,
         );
     }
 
@@ -667,8 +676,8 @@ export class Backend {
     }
 
     /** @type {import('api').ApiHandler<'getTermAudioInfoList'>} */
-    async _onApiGetTermAudioInfoList({source, term, reading}) {
-        return await this._audioDownloader.getTermAudioInfoList(source, term, reading);
+    async _onApiGetTermAudioInfoList({source, term, reading, languageSummary}) {
+        return await this._audioDownloader.getTermAudioInfoList(source, term, reading, languageSummary);
     }
 
     /** @type {import('api').ApiHandler<'sendMessageToFrame'>} */
@@ -706,7 +715,7 @@ export class Backend {
         const frameId = sender.frameId;
         return {
             tabId: typeof tabId === 'number' ? tabId : null,
-            frameId: typeof frameId === 'number' ? frameId : null
+            frameId: typeof frameId === 'number' ? frameId : null,
         };
     }
 
@@ -919,13 +928,13 @@ export class Backend {
         const sourceDetails = {
             name: 'cross-frame-communication-port',
             otherTabId: targetTabId,
-            otherFrameId: targetFrameId
+            otherFrameId: targetFrameId,
         };
         /** @type {import('cross-frame-api').CrossFrameCommunicationPortDetails} */
         const targetDetails = {
             name: 'cross-frame-communication-port',
             otherTabId: sourceTabId,
-            otherFrameId: sourceFrameId
+            otherFrameId: sourceFrameId,
         };
         /** @type {?chrome.runtime.Port} */
         let sourcePort = chrome.tabs.connect(sourceTabId, {frameId: sourceFrameId, name: JSON.stringify(sourceDetails)});
@@ -964,10 +973,10 @@ export class Backend {
     // Command handlers
 
     /**
-     * @param {undefined|{mode: 'existingOrNewTab'|'newTab', query?: string}} params
+     * @param {undefined|{mode: import('backend').Mode, query?: string}} params
      */
     async _onCommandOpenSearchPage(params) {
-        /** @type {'existingOrNewTab'|'newTab'} */
+        /** @type {import('backend').Mode} */
         let mode = 'existingOrNewTab';
         let query = '';
         if (typeof params === 'object' && params !== null) {
@@ -1023,6 +1032,8 @@ export class Backend {
             case 'newTab':
                 await this._createTab(queryUrl);
                 return;
+            case 'popup':
+                return;
         }
     }
 
@@ -1034,10 +1045,10 @@ export class Backend {
     }
 
     /**
-     * @param {undefined|{mode: 'existingOrNewTab'|'newTab'}} params
+     * @param {undefined|{mode: import('backend').Mode}} params
      */
     async _onCommandOpenSettingsPage(params) {
-        /** @type {'existingOrNewTab'|'newTab'} */
+        /** @type {import('backend').Mode} */
         let mode = 'existingOrNewTab';
         if (typeof params === 'object' && params !== null) {
             mode = this._normalizeOpenSettingsPageMode(params.mode, mode);
@@ -1056,7 +1067,7 @@ export class Backend {
             path: 'general.enable',
             value: !options.general.enable,
             scope: 'profile',
-            optionsContext: {current: true}
+            optionsContext: {current: true},
         };
         await this._modifySettings([modification], 'backend');
     }
@@ -1161,7 +1172,7 @@ export class Backend {
         await this._sendMessageTabPromise(
             id,
             {action: 'searchDisplayControllerSetMode', params: {mode: 'popup'}},
-            {frameId: 0}
+            {frameId: 0},
         );
 
         this._searchPopupTabId = id;
@@ -1181,7 +1192,7 @@ export class Backend {
                 const mode = await this._sendMessageTabPromise(
                     id,
                     {action: 'searchDisplayControllerGetMode'},
-                    {frameId: 0}
+                    {frameId: 0},
                 );
                 return mode === 'popup';
             } catch (e) {
@@ -1189,6 +1200,16 @@ export class Backend {
             }
         };
         return /** @type {?import('backend').TabInfo} */ (await this._findTabs(1000, false, predicate, true));
+    }
+
+    /**
+     * @param {string} urlParam
+     * @returns {Promise<boolean>}
+     */
+    async _tabExists(urlParam) {
+        const baseUrl = chrome.runtime.getURL(urlParam);
+        const urlPredicate = (/** @type {?string} */ url) => url !== null && url.startsWith(baseUrl);
+        return await this._findSearchPopupTab(urlPredicate) !== null;
     }
 
     /**
@@ -1205,7 +1226,7 @@ export class Backend {
             left: useLeft ? left : void 0,
             top: useTop ? top : void 0,
             type: windowType,
-            state: 'normal'
+            state: 'normal',
         };
     }
 
@@ -1224,7 +1245,7 @@ export class Backend {
                     } else {
                         resolve(/** @type {chrome.windows.Window} */ (result));
                     }
-                }
+                },
             );
         });
     }
@@ -1246,7 +1267,7 @@ export class Backend {
                     } else {
                         resolve(result);
                     }
-                }
+                },
             );
         });
     }
@@ -1261,7 +1282,7 @@ export class Backend {
         await this._sendMessageTabPromise(
             tabId,
             {action: 'searchDisplayControllerUpdateSearchQuery', params: {text, animate}},
-            {frameId: 0}
+            {frameId: 0},
         );
     }
 
@@ -1278,7 +1299,7 @@ export class Backend {
         let apiKey = options.anki.apiKey;
         if (apiKey === '') { apiKey = null; }
         this._anki.server = options.anki.server;
-        this._anki.enabled = options.anki.enable && enabled;
+        this._anki.enabled = options.anki.enable;
         this._anki.apiKey = apiKey;
 
         this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);
@@ -1287,6 +1308,25 @@ export class Backend {
             this._clipboardMonitor.start();
         } else {
             this._clipboardMonitor.stop();
+        }
+
+        try {
+            if (options.general.enableContextMenuScanSelected) {
+                chrome.contextMenus.create({
+                    id: 'yomitan_lookup',
+                    title: 'Lookup in Yomitan',
+                    contexts: ['selection'],
+                }, () => this._checkLastError(chrome.runtime.lastError));
+                chrome.contextMenus.onClicked.addListener((info) => {
+                    if (info.selectionText) {
+                        this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
+                    }
+                });
+            } else {
+                chrome.contextMenus.remove('yomitan_lookup', () => this._checkLastError(chrome.runtime.lastError));
+            }
+        } catch (e) {
+            log.error(e);
         }
 
         void this._accessibilityController.update(this._getOptionsFull(false));
@@ -1434,7 +1474,7 @@ export class Backend {
             const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
                 mode,
                 text.substring(i, i + scanLength),
-                findTermsOptions
+                findTermsOptions,
             );
             const codePoint = /** @type {number} */ (text.codePointAt(i));
             const character = String.fromCodePoint(codePoint);
@@ -1488,7 +1528,7 @@ export class Backend {
                     for (const {text: text2, reading: reading2} of distributeFuriganaInflected(
                         term.length > 0 ? term : source,
                         jpConvertKatakanaToHiragana(reading),
-                        source
+                        source,
                     )) {
                         termParts.push({text: text2, reading: reading2});
                     }
@@ -1700,7 +1740,7 @@ export class Backend {
             const response = await this._sendMessageTabPromise(
                 tabId,
                 {action: 'applicationGetUrl'},
-                {frameId: 0}
+                {frameId: 0},
             );
             const url = typeof response === 'object' && response !== null ? /** @type {import('core').SerializableObject} */ (response).url : void 0;
             if (typeof url === 'string') {
@@ -1778,7 +1818,7 @@ export class Backend {
             const checkTabPromises = tabs.map((tab) => checkTab(tab, add));
             await Promise.race([
                 Promise.all(checkTabPromises),
-                promiseTimeout(timeout)
+                promiseTimeout(timeout),
             ]);
             return results;
         } else {
@@ -1798,7 +1838,7 @@ export class Backend {
             await Promise.race([
                 promise,
                 Promise.all(checkTabPromises),
-                promiseTimeout(timeout)
+                promiseTimeout(timeout),
             ]);
             resolve();
             return result;
@@ -1831,16 +1871,7 @@ export class Backend {
         }
 
         try {
-            const tabWindow = await new Promise((resolve, reject) => {
-                chrome.windows.get(tab.windowId, {}, (value) => {
-                    const e = chrome.runtime.lastError;
-                    if (e) {
-                        reject(new Error(e.message));
-                    } else {
-                        resolve(value);
-                    }
-                });
-            });
+            const tabWindow = await this._getWindow(tab.windowId);
             if (!tabWindow.focused) {
                 await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
                     chrome.windows.update(tab.windowId, {focused: true}, () => {
@@ -1856,6 +1887,23 @@ export class Backend {
         } catch (e) {
             // Edge throws exception for no reason here.
         }
+    }
+
+    /**
+     * @param {number} windowId
+     * @returns {Promise<chrome.windows.Window>}
+     */
+    _getWindow(windowId) {
+        return new Promise((resolve, reject) => {
+            chrome.windows.get(windowId, {}, (value) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(value);
+                }
+            });
+        });
     }
 
     /**
@@ -1890,7 +1938,7 @@ export class Backend {
                         cleanup();
                         resolve();
                     },
-                    () => {} // NOP
+                    () => {}, // NOP
                 );
 
             if (timeout !== null) {
@@ -2107,7 +2155,7 @@ export class Backend {
             clipboardText,
             audioFileName,
             dictionaryMedia,
-            errors: errors
+            errors: errors,
         };
     }
 
@@ -2123,7 +2171,7 @@ export class Backend {
         const {term, reading} = definitionDetails;
         if (term.length === 0 && reading.length === 0) { return null; }
 
-        const {sources, preferredAudioIndex, idleTimeout} = details;
+        const {sources, preferredAudioIndex, idleTimeout, languageSummary} = details;
         let data;
         let contentType;
         try {
@@ -2132,12 +2180,14 @@ export class Backend {
                 preferredAudioIndex,
                 term,
                 reading,
-                idleTimeout
+                idleTimeout,
+                languageSummary,
             ));
         } catch (e) {
             const error = this._getAudioDownloadError(e);
             if (error !== null) { throw error; }
             // No audio
+            log.logGenericError(e, 'log');
             return null;
         }
 
@@ -2208,6 +2258,7 @@ export class Backend {
     async _injectAnkiNoteDictionaryMedia(ankiConnect, timestamp, dictionaryMediaDetails) {
         const targets = [];
         const detailsList = [];
+        /** @type {Map<string, {dictionary: string, path: string, media: ?import('dictionary-database').MediaDataStringContent}>} */
         const detailsMap = new Map();
         for (const {dictionary, path} of dictionaryMediaDetails) {
             const target = {dictionary, path};
@@ -2239,7 +2290,7 @@ export class Backend {
                 fileName = this._generateAnkiNoteMediaFileName(
                     `yomitan_dictionary_media_${i + 1}`,
                     extension !== null ? extension : '',
-                    timestamp
+                    timestamp,
                 );
                 try {
                     fileName = await ankiConnect.storeMediaFile(fileName, content);
@@ -2413,18 +2464,19 @@ export class Backend {
             scanning: {alphanumeric},
             translation: {
                 textReplacements: textReplacementsOptions,
-                searchResolution
-            }
+                searchResolution,
+            },
         } = options;
         const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
         let excludeDictionaryDefinitions = null;
         if (mode === 'merge' && !enabledDictionaryMap.has(mainDictionary)) {
             enabledDictionaryMap.set(mainDictionary, {
                 index: enabledDictionaryMap.size,
+                alias: mainDictionary,
                 priority: 0,
                 allowSecondarySearches: false,
                 partsOfSpeechFilter: true,
-                useDeinflections: true
+                useDeinflections: true,
             });
             excludeDictionaryDefinitions = new Set();
             excludeDictionaryDefinitions.add(mainDictionary);
@@ -2440,7 +2492,7 @@ export class Backend {
             textReplacements,
             enabledDictionaryMap,
             excludeDictionaryDefinitions,
-            language
+            language,
         };
     }
 
@@ -2453,7 +2505,7 @@ export class Backend {
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         return {
             enabledDictionaryMap,
-            removeNonJapaneseCharacters: !options.scanning.alphanumeric
+            removeNonJapaneseCharacters: !options.scanning.alphanumeric,
         };
     }
 
@@ -2465,13 +2517,14 @@ export class Backend {
         const enabledDictionaryMap = new Map();
         for (const dictionary of options.dictionaries) {
             if (!dictionary.enabled) { continue; }
-            const {name, priority, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
+            const {name, alias, priority, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
             enabledDictionaryMap.set(name, {
                 index: enabledDictionaryMap.size,
+                alias,
                 priority,
                 allowSecondarySearches,
                 partsOfSpeechFilter,
-                useDeinflections
+                useDeinflections,
             });
         }
         return enabledDictionaryMap;
@@ -2515,7 +2568,7 @@ export class Backend {
         if (!result.openedWelcomePage) {
             await Promise.all([
                 this._openWelcomeGuidePage(),
-                chrome.storage.session.set({openedWelcomePage: true})
+                chrome.storage.session.set({openedWelcomePage: true}),
             ]);
         }
     }
@@ -2535,7 +2588,7 @@ export class Backend {
     }
 
     /**
-     * @param {'existingOrNewTab'|'newTab'} mode
+     * @param {import('backend').Mode} mode
      */
     async _openSettingsPage(mode) {
         const manifest = chrome.runtime.getManifest();
@@ -2595,7 +2648,7 @@ export class Backend {
                     } else {
                         resolve(result);
                     }
-                }
+                },
             );
         });
     }
@@ -2664,13 +2717,14 @@ export class Backend {
 
     /**
      * @param {unknown} mode
-     * @param {'existingOrNewTab'|'newTab'} defaultValue
-     * @returns {'existingOrNewTab'|'newTab'}
+     * @param {import('backend').Mode} defaultValue
+     * @returns {import('backend').Mode}
      */
     _normalizeOpenSettingsPageMode(mode, defaultValue) {
         switch (mode) {
             case 'existingOrNewTab':
             case 'newTab':
+            case 'popup':
                 return mode;
             default:
                 return defaultValue;

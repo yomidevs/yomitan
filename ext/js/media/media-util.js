@@ -38,6 +38,8 @@ export function getImageMediaTypeFromFileName(path) {
     switch (getFileNameExtension(path).toLowerCase()) {
         case '.apng':
             return 'image/apng';
+        case '.avif':
+            return 'image/avif';
         case '.bmp':
             return 'image/bmp';
         case '.gif':
@@ -75,6 +77,8 @@ export function getFileExtensionFromImageMediaType(mediaType) {
     switch (mediaType) {
         case 'image/apng':
             return '.apng';
+        case 'image/avif':
+            return '.avif';
         case 'image/bmp':
             return '.bmp';
         case 'image/gif':
@@ -113,6 +117,7 @@ export function getFileExtensionFromAudioMediaType(mediaType) {
             return '.mp4';
         case 'audio/ogg':
         case 'audio/vorbis':
+        case 'application/ogg':
             return '.ogg';
         case 'audio/vnd.wav':
         case 'audio/wave':

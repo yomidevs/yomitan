@@ -21,8 +21,6 @@
     /* Strings */
     --compact-list-separator: ' | ';
 
-    --disambiguation-prefix: '(';
-    --disambiguation-suffix: ' only)';
     --disambiguation-separator: ', ';
     --disambiguation-reading-separator: ':';
 
@@ -168,11 +166,11 @@
     --progress-bar-indicator-color: var(--accent-color);
     --entry-current-indicator-color: var(--accent-color);
 
-    --notification-text-color: #ffffff;
-    --notification-background-color: #333333;
-    --notification-background-color-light: #555555;
-    --notification-background-color-lighter: #666666;
-    --notification-shadow-color: rgba(0, 0, 0, 0.5);
+    --notification-text-color: #2f2f2f;
+    --notification-background-color: #f1f1f1;
+    --notification-background-color-light: #e1e1e1;
+    --notification-background-color-lighter: #bbbbbb;
+    --notification-shadow-color: rgba(255, 255, 255, 0.25);
 
     --action-button-hover-color: #dddddd;
     --action-button-active-color: #c1c1c1;
@@ -236,11 +234,11 @@
     --progress-bar-indicator-color: var(--accent-color);
     --entry-current-indicator-color: var(--accent-color);
 
-    --notification-text-color: #2f2f2f;
-    --notification-background-color: #e1e1e1;
-    --notification-background-color-light: #bbbbbb;
-    --notification-background-color-lighter: #aaaaaa;
-    --notification-shadow-color: rgba(255, 255, 255, 0.25);
+    --notification-text-color: #ffffff;
+    --notification-background-color: #333333;
+    --notification-background-color-light: #555555;
+    --notification-background-color-lighter: #666666;
+    --notification-shadow-color: rgba(0, 0, 0, 0.5);
 
     --action-button-hover-color: #282828;
     --action-button-active-color: #444444;
@@ -418,6 +416,9 @@ a:has(rt) {
     width: var(--content-width);
     max-width: 100%;
 }
+.contain-overscroll {
+    overscroll-behavior: contain;
+}
 
 
 /* Sidebar layout */
@@ -575,10 +576,29 @@ button.sidebar-button.sidebar-button-highlight {
 
 
 /* Search page */
+.search-header-wrapper {
+    background-color: var(--background-color);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.sticky-header {
+    position: sticky;
+    top: 0px;
+    z-index: 1000;
+}
+#sticky-search-header {
+    padding-top: 10px;
+}
+.sticky-header #query-parser-content {
+    max-height: calc(var(--query-parser-font-size) * 2);
+}
 .search-header {
+    width: var(--content-width);
     display: flex;
     flex-flow: column nowrap;
     max-height: 100vh;
+    padding: var(--main-content-vertical-padding) var(--main-content-horizontal-padding);
 }
 #query-parser-container {
     overflow-y: auto;
@@ -669,8 +689,13 @@ button.action-button:active {
 .icon[data-icon=view-note]      { background-image: url('/images/view-note.svg'); }
 .icon[data-icon=add-term-kanji] { background-image: url('/images/add-term-kanji.svg'); }
 .icon[data-icon=add-term-kana]  { background-image: url('/images/add-term-kana.svg'); }
+.icon[data-icon=add-kanji]  { background-image: url('/images/add-term-kanji.svg'); }
+.icon[data-icon=overwrite-term-kanji] { background-image: url('/images/overwrite-term-kanji.svg'); }
+.icon[data-icon=overwrite-term-kana]  { background-image: url('/images/overwrite-term-kana.svg'); }
+.icon[data-icon=overwrite-kanji]  { background-image: url('/images/overwrite-term-kanji.svg'); }
 .icon[data-icon=add-duplicate-term-kanji] { background-image: url('/images/add-duplicate-term-kanji.svg'); }
 .icon[data-icon=add-duplicate-term-kana]  { background-image: url('/images/add-duplicate-term-kana.svg'); }
+.icon[data-icon=add-duplicate-kanji]  { background-image: url('/images/add-duplicate-term-kanji.svg'); }
 .icon[data-icon=play-audio]     { background-image: url('/images/play-audio.svg'); }
 .icon[data-icon=source-term]    { background-image: url('/images/source-term.svg'); }
 .icon[data-icon=entry-current]  { background-image: url('/images/entry-current.svg'); }
@@ -850,6 +875,9 @@ button.action-button:active {
 .inflection-source-icon[data-inflection-source='both']::after {
     content: '🧩📖';
 }
+.inflection[title] {
+    cursor: pointer;
+}
 
 
 /* Headwords */
@@ -947,7 +975,8 @@ button.action-button:active {
 :root[data-term-display-mode=term-and-reading] .headword[data-reading-is-same=true] .headword-reading-outer {
     display: none;
 }
-:root[data-term-display-mode=term-and-reading] .headword-term>ruby>rt {
+:root[data-term-display-mode=term-and-reading] .headword-term>ruby>rt,
+:root[data-term-display-mode=term-only] .headword-term>ruby>rt {
     display: none;
 }
 
@@ -1138,12 +1167,6 @@ button.action-button:active {
 .definition-disambiguation-list[data-count='0'] {
     display: none;
 }
-.definition-disambiguation-list::before {
-    content: var(--disambiguation-prefix);
-}
-.definition-disambiguation-list::after {
-    content: var(--disambiguation-suffix);
-}
 .definition-disambiguation+.definition-disambiguation::before {
     content: var(--disambiguation-separator);
 }
@@ -1241,12 +1264,6 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 }
 .frequency-disambiguation-separator::before {
     content: var(--disambiguation-reading-separator);
-}
-.frequency-disambiguation::before {
-    content: var(--disambiguation-prefix);
-}
-.frequency-disambiguation::after {
-    content: var(--disambiguation-suffix);
 }
 .frequency-disambiguation-reading {
     display: inline;
@@ -1467,12 +1484,6 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     color: var(--text-color-light3);
     padding-right: var(--disambiguation-space);
 }
-.pronunciation-disambiguation-list::before {
-    content: var(--disambiguation-prefix);
-}
-.pronunciation-disambiguation-list::after {
-    content: var(--disambiguation-suffix);
-}
 .pronunciation-disambiguation+.pronunciation-disambiguation::before {
     content: var(--disambiguation-separator);
 }
@@ -1496,7 +1507,7 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
     position: relative;
 }
 .kanji-glyph {
-    font-family: kanji-stroke-orders, sans-serif;
+    font-family: sans-serif;
     font-size: 8.5em;
     line-height: 1;
     padding: 0.01em;
@@ -1703,6 +1714,7 @@ button.definition-item-expansion-button:focus:focus-visible+.definition-item-con
 .footer-notification-body {
     flex: 1 1 auto;
     padding: 0.5em 0.75em;
+    white-space: pre-line;
 }
 .footer-notification-close-button-container {
     align-self: stretch;
@@ -1919,7 +1931,7 @@ button.footer-notification-close-button {
     display: none;
 }
 :root[data-anki-enabled=false] .action-button[data-action=view-note],
-:root[data-anki-enabled=false] .action-button[data-action=add-note] {
+:root[data-anki-enabled=false] .action-button[data-action=save-note] {
     display: none;
 }
 :root[data-audio-enabled=false] .action-button[data-action=play-audio] {
@@ -1954,7 +1966,7 @@ button.footer-notification-close-button {
 :root[data-show-pronunciation-text=true] .pronunciation-disambiguation[data-type=reading] {
     display: none;
 }
-:root[data-show-pronunciation-text=false] .pronunciation-text-container {
+:root[data-show-pronunciation-text=false] .pronunciation[data-pronunciation-type=pitch-accent]>.pronunciation-representation-list>.pronunciation-text-container {
     display: none;
 }
 :root[data-show-pronunciation-downstep-position=false] .pronunciation-downstep-notation-container {

@@ -31,7 +31,7 @@ export class SelectorObserver {
         onAdded = null,
         onRemoved = null,
         onChildrenUpdated = null,
-        isStale = null
+        isStale = null,
     }) {
         /** @type {string} */
         this._selector = selector;
@@ -84,7 +84,7 @@ export class SelectorObserver {
         this._mutationObserver.observe(element, {
             attributes: !!attributes,
             childList: true,
-            subtree: true
+            subtree: true,
         });
 
         const {parentNode} = element;
@@ -92,7 +92,7 @@ export class SelectorObserver {
             type: 'childList',
             target: parentNode !== null ? parentNode : element,
             addedNodes: [element],
-            removedNodes: []
+            removedNodes: [],
         }]);
     }
 

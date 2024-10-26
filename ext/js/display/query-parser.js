@@ -67,7 +67,7 @@ export class QueryParser extends EventDispatcher {
             searchTerms: true,
             searchKanji: false,
             searchOnClick: true,
-            textSourceGenerator
+            textSourceGenerator,
         });
         /** @type {?(import('../language/ja/japanese-wanakana.js'))} */
         this._japaneseWanakanaModule = null;
@@ -122,6 +122,8 @@ export class QueryParser extends EventDispatcher {
         if (selectedParserChanged && this._parseResults.length > 0) {
             this._renderParseResult();
         }
+
+        this._queryParser.lang = language;
     }
 
     /**
@@ -131,6 +133,9 @@ export class QueryParser extends EventDispatcher {
         this._text = text;
         this._setPreview(text);
 
+        if (this._useInternalParser === false && this._useMecabParser === false) {
+            return;
+        }
         /** @type {?import('core').TokenObject} */
         const token = {};
         this._setTextToken = token;
@@ -153,7 +158,7 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
-    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext}) {
+    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext, pageTheme}) {
         this.trigger('searched', {
             textScanner: this._textScanner,
             type,
@@ -162,7 +167,8 @@ export class QueryParser extends EventDispatcher {
             inputInfo,
             textSource,
             optionsContext,
-            sentenceOffset: this._getSentenceOffset(textSource)
+            sentenceOffset: this._getSentenceOffset(textSource),
+            pageTheme: pageTheme,
         });
     }
 
@@ -208,7 +214,7 @@ export class QueryParser extends EventDispatcher {
             path: 'parsing.selectedParser',
             value,
             scope: 'profile',
-            optionsContext
+            optionsContext,
         };
         void this._api.modifySettings([modification], 'search');
     }

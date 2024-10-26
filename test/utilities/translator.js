@@ -78,7 +78,7 @@ export function createFindKanjiOptions(dictionaryName, optionsPresets, optionsAr
 
     return {
         enabledDictionaryMap,
-        removeNonJapaneseCharacters: !!preset.removeNonJapaneseCharacters
+        removeNonJapaneseCharacters: !!preset.removeNonJapaneseCharacters,
     };
 }
 
@@ -126,7 +126,7 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         removeNonJapaneseCharacters,
         excludeDictionaryDefinitions,
         searchResolution,
-        language
+        language,
     } = preset;
 
     return {
@@ -140,6 +140,6 @@ export function createFindTermsOptions(dictionaryName, optionsPresets, optionsAr
         enabledDictionaryMap,
         excludeDictionaryDefinitions: Array.isArray(excludeDictionaryDefinitions) ? new Set(excludeDictionaryDefinitions) : null,
         searchResolution: typeof searchResolution !== 'undefined' ? searchResolution : 'letter',
-        language: typeof language !== 'undefined' ? language : 'ja'
+        language: typeof language !== 'undefined' ? language : 'ja',
     };
 }

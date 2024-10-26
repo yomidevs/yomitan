@@ -32,7 +32,7 @@ export type Media = {
     screenshot?: MediaObject;
     clipboardImage?: MediaObject;
     clipboardText?: MediaObject;
-    selectionText?: MediaObject;
+    popupSelectionText?: MediaObject;
     textFurigana?: TextFuriganaSegment[];
     dictionaryMedia?: DictionaryMedia;
 };
@@ -44,7 +44,7 @@ export type MediaSimpleType = (
     'screenshot' |
     'clipboardImage' |
     'clipboardText' |
-    'selectionText'
+    'popupSelectionText'
 );
 
 export type TextFuriganaSegment = {
@@ -129,6 +129,7 @@ export type KanjiDictionaryEntry = {
     type: 'kanji';
     character: string;
     dictionary: string;
+    dictionaryAlias: string;
     onyomi: string[];
     kunyomi: string[];
     glossary: string[];
@@ -158,6 +159,7 @@ export type KanjiStat = {
 export type KanjiFrequency = {
     index: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
@@ -179,6 +181,7 @@ export type TermDictionaryEntry = {
     isPrimary?: boolean;
     readonly sequence: number;
     readonly dictionary: string;
+    readonly dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
@@ -188,6 +191,8 @@ export type TermDictionaryEntry = {
     readonly reading: string | string[];
     readonly expressions: TermHeadword[];
     readonly glossary?: DictionaryData.TermGlossary[];
+    readonly glossaryScopedStyles?: string;
+    readonly dictScopedStyles?: string;
     readonly definitionTags?: Tag[];
     readonly termTags?: Tag[];
     readonly definitions?: TermDefinition[];
@@ -226,8 +231,11 @@ export type Tag = {
 export type TermDefinition = {
     sequence: number;
     dictionary: string;
+    dictionaryAlias: string;
     glossary: DictionaryData.TermGlossary[];
     definitionTags: Tag[];
+    glossaryScopedStyles: string;
+    dictScopedStyles: string;
     only?: string[];
 };
 
@@ -235,6 +243,7 @@ export type TermFrequency = {
     index: number;
     expressionIndex: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
@@ -249,6 +258,7 @@ export type TermPitchAccent = {
     index: number;
     expressionIndex: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;
@@ -267,6 +277,7 @@ export type TermPhoneticTranscription = {
     index: number;
     expressionIndex: number;
     dictionary: string;
+    dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
         priority: number;

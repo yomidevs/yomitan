@@ -63,29 +63,29 @@ export class RequestBuilder {
                 condition: {
                     urlFilter: `|${this._escapeDnrUrl(url)}|`,
                     resourceTypes: [
-                        /** @type {chrome.declarativeNetRequest.ResourceType} */ ('xmlhttprequest')
-                    ]
+                        /** @type {chrome.declarativeNetRequest.ResourceType} */ ('xmlhttprequest'),
+                    ],
                 },
                 action: {
                     type: /** @type {chrome.declarativeNetRequest.RuleActionType} */ ('modifyHeaders'),
                     requestHeaders: [
                         {
                             operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('remove'),
-                            header: 'Cookie'
+                            header: 'Cookie',
                         },
                         {
                             operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('set'),
                             header: 'Origin',
-                            value: originUrl
-                        }
+                            value: originUrl,
+                        },
                     ],
                     responseHeaders: [
                         {
                             operation: /** @type {chrome.declarativeNetRequest.HeaderOperation} */ ('remove'),
-                            header: 'Set-Cookie'
-                        }
-                    ]
-                }
+                            header: 'Set-Cookie',
+                        },
+                    ],
+                },
             }];
 
             await this._updateSessionRules({addRules});

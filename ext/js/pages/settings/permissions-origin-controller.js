@@ -81,7 +81,7 @@ export class PermissionsOriginController {
 
         let any = false;
         const excludeOrigins = new Set([
-            '<all_urls>'
+            '<all_urls>',
         ]);
         const fragment = document.createDocumentFragment();
         for (const origin of originsSet) {

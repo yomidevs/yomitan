@@ -85,8 +85,13 @@ function createAbsoluteGetComputedStyle(window) {
     return (element, ...args) => {
         const style = getComputedStyleOld(element, ...args);
         return new Proxy(style, {
+            /**
+             * @param {CSSStyleDeclaration} target
+             * @param {string|symbol} property
+             * @returns {unknown}
+             */
             get: (target, property) => {
-                let result = /** @type {import('core').SafeAny} */ (target)[property];
+                let result = /** @type {Record<string|symbol, unknown>} */ (/** @type {unknown} */ (target))[property];
                 if (typeof result === 'string') {
                     /**
                      * @param {string} g0
@@ -100,63 +105,64 @@ function createAbsoluteGetComputedStyle(window) {
                     result = result.replace(/([-+]?\d(?:\.\d)?(?:[eE][-+]?\d+)?)em/g, replacer);
                 }
                 return result;
-            }
+            },
         });
     };
 }
 
 const domTestEnv = await setupDomTest(path.join(dirname, 'data/html/dom-text-scanner.html'));
 
-describe('DOMTextScanner', () => {
+describe('DOMTextScanner seek tests', () => {
     const {window, teardown} = domTestEnv;
     afterAll(() => teardown(global));
 
-    test('Seek tests', () => {
-        const {document} = window;
-        window.getComputedStyle = createAbsoluteGetComputedStyle(window);
+    const {document} = window;
+    window.getComputedStyle = createAbsoluteGetComputedStyle(window);
 
-        for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case'))) {
-            /** @type {import('test/dom-text-scanner').TestData|import('test/dom-text-scanner').TestData[]} */
-            let testData = parseJson(/** @type {string} */ (testElement.dataset.testData));
-            if (!Array.isArray(testData)) {
-                testData = [testData];
-            }
-            for (const testDataItem of testData) {
-                const {
-                    node: nodeSelector,
-                    offset,
-                    length,
-                    forcePreserveWhitespace,
-                    generateLayoutContent,
-                    reversible,
-                    expected: {
-                        node: expectedNodeSelector,
-                        offset: expectedOffset,
-                        content: expectedContent,
-                        remainder: expectedRemainder
-                    }
-                } = testDataItem;
+    for (const testElement of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('test-case'))) {
+        const testDescription = testElement.querySelector('test-description')?.textContent || 'Test description not found.';
 
-                const node = querySelectorTextNode(testElement, nodeSelector);
-                const expectedNode = querySelectorTextNode(testElement, expectedNodeSelector);
+        /** @type {import('test/dom-text-scanner').TestData|import('test/dom-text-scanner').TestData[]} */
+        let testData = parseJson(/** @type {string} */ (testElement.dataset.testData));
+        if (!Array.isArray(testData)) {
+            testData = [testData];
+        }
 
-                expect(node).not.toEqual(null);
-                expect(expectedNode).not.toEqual(null);
-                if (node === null || expectedNode === null) { continue; }
+        for (const testDataItem of testData) {
+            const {
+                node: nodeSelector,
+                offset,
+                length,
+                forcePreserveWhitespace,
+                generateLayoutContent,
+                reversible,
+                expected: {
+                    node: expectedNodeSelector,
+                    offset: expectedOffset,
+                    content: expectedContent,
+                    remainder: expectedRemainder,
+                },
+            } = testDataItem;
 
-                // Standard test
-                {
-                    const scanner = new DOMTextScanner(node, offset, forcePreserveWhitespace, generateLayoutContent);
-                    scanner.seek(length);
+            const node = querySelectorTextNode(testElement, nodeSelector);
+            const expectedNode = querySelectorTextNode(testElement, expectedNodeSelector);
 
-                    const {node: actualNode1, offset: actualOffset1, content: actualContent1, remainder: actualRemainder1} = scanner;
-                    expect(actualContent1).toStrictEqual(expectedContent);
-                    expect(actualOffset1).toStrictEqual(expectedOffset);
-                    expect(actualNode1).toStrictEqual(expectedNode);
-                    expect(actualRemainder1).toStrictEqual(expectedRemainder || 0);
-                }
+            expect(node).not.toEqual(null);
+            expect(expectedNode).not.toEqual(null);
+            if (node === null || expectedNode === null) { continue; }
 
-                // Substring tests
+            test(`${testDescription} standard test`, () => {
+                const scanner = new DOMTextScanner(node, offset, forcePreserveWhitespace, generateLayoutContent);
+                scanner.seek(length);
+
+                const {node: actualNode1, offset: actualOffset1, content: actualContent1, remainder: actualRemainder1} = scanner;
+                expect(actualContent1).toStrictEqual(expectedContent);
+                expect(actualOffset1).toStrictEqual(expectedOffset);
+                expect(actualNode1).toStrictEqual(expectedNode);
+                expect(actualRemainder1).toStrictEqual(expectedRemainder || 0);
+            });
+
+            test(`${testDescription} substring test`, () => {
                 for (let i = 1; i <= length; ++i) {
                     const scanner = new DOMTextScanner(node, offset, forcePreserveWhitespace, generateLayoutContent);
                     scanner.seek(length - i);
@@ -164,19 +170,17 @@ describe('DOMTextScanner', () => {
                     const {content: actualContent} = scanner;
                     expect(actualContent).toStrictEqual(expectedContent.substring(0, expectedContent.length - i));
                 }
+            });
 
-                if (reversible === false) { continue; }
+            test.runIf(reversible)(`${testDescription} reversed test`, () => {
+                const scanner = new DOMTextScanner(expectedNode, expectedOffset, forcePreserveWhitespace, generateLayoutContent);
+                scanner.seek(-length);
 
-                // Reversed test
-                {
-                    const scanner = new DOMTextScanner(expectedNode, expectedOffset, forcePreserveWhitespace, generateLayoutContent);
-                    scanner.seek(-length);
+                const {content: actualContent} = scanner;
+                expect(actualContent).toStrictEqual(expectedContent);
+            });
 
-                    const {content: actualContent} = scanner;
-                    expect(actualContent).toStrictEqual(expectedContent);
-                }
-
-                // Reversed substring tests
+            test.runIf(reversible)(`${testDescription} reversed substring test`, () => {
                 for (let i = 1; i <= length; ++i) {
                     const scanner = new DOMTextScanner(expectedNode, expectedOffset, forcePreserveWhitespace, generateLayoutContent);
                     scanner.seek(-(length - i));
@@ -184,7 +188,7 @@ describe('DOMTextScanner', () => {
                     const {content: actualContent} = scanner;
                     expect(actualContent).toStrictEqual(expectedContent.substring(i));
                 }
-            }
+            });
         }
-    });
+    }
 });

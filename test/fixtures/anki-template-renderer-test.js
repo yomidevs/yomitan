@@ -38,7 +38,7 @@ export async function createAnkiTemplateRendererTest() {
             // It is needed for DOM access for structured content.
             void window;
             await use(ankiTemplateRenderer);
-        }
+        },
     });
     return result;
 }

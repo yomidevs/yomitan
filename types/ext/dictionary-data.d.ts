@@ -25,10 +25,15 @@ export type Index = {
     title: string;
     revision: string;
     sequenced?: boolean;
+    isUpdatable?: true;
+    indexUrl?: string;
+    downloadUrl?: string;
     author?: string;
     url?: string;
     description?: string;
     attribution?: string;
+    sourceLanguage?: string;
+    targetLanguage?: string;
     frequencyMode?: 'occurrence-based' | 'rank-based';
     tagMeta?: IndexTagMeta;
 };

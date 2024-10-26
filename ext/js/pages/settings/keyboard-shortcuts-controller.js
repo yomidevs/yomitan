@@ -59,6 +59,8 @@ export class KeyboardShortcutController {
             ['previousEntryDifferentDictionary', {scopes: new Set(['popup', 'search'])}],
             ['historyBackward',                  {scopes: new Set(['popup', 'search'])}],
             ['historyForward',                   {scopes: new Set(['popup', 'search'])}],
+            ['profilePrevious',                  {scopes: new Set(['popup', 'search', 'web'])}],
+            ['profileNext',                      {scopes: new Set(['popup', 'search', 'web'])}],
             ['addNoteKanji',                     {scopes: new Set(['popup', 'search'])}],
             ['addNoteTermKanji',                 {scopes: new Set(['popup', 'search'])}],
             ['addNoteTermKana',                  {scopes: new Set(['popup', 'search'])}],
@@ -67,8 +69,9 @@ export class KeyboardShortcutController {
             ['playAudioFromSource',              {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-audio-source', default: 'jpod101'}}],
             ['copyHostSelection',                {scopes: new Set(['popup'])}],
             ['scanSelectedText',                 {scopes: new Set(['web'])}],
+            ['scanTextAtSelection',              {scopes: new Set(['web'])}],
             ['scanTextAtCaret',                  {scopes: new Set(['web'])}],
-            ['toggleOption',                     {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-setting-path', default: ''}}]
+            ['toggleOption',                     {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-setting-path', default: ''}}],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -102,7 +105,7 @@ export class KeyboardShortcutController {
             path: 'inputs.hotkeys',
             start: hotkeys.length,
             deleteCount: 0,
-            items: [terminationCharacterEntry]
+            items: [terminationCharacterEntry],
         }]);
 
         await this._updateOptions();
@@ -125,7 +128,7 @@ export class KeyboardShortcutController {
             path: 'inputs.hotkeys',
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
 
         await this._updateOptions();
@@ -211,7 +214,7 @@ export class KeyboardShortcutController {
             key: null,
             modifiers: [],
             scopes: ['popup', 'search'],
-            enabled: true
+            enabled: true,
         };
         await this.addEntry(newEntry);
     }
@@ -457,13 +460,13 @@ class KeyboardShortcutHotkeyEntry {
             {
                 action: 'set',
                 path: `${this._basePath}.key`,
-                value: key
+                value: key,
             },
             {
                 action: 'set',
                 path: `${this._basePath}.modifiers`,
-                value: modifiers
-            }
+                value: modifiers,
+            },
         ]);
     }
 
@@ -487,7 +490,7 @@ class KeyboardShortcutHotkeyEntry {
         await this._modifyProfileSettings([{
             action: 'set',
             path: `${this._basePath}.scopes`,
-            value: scopes
+            value: scopes,
         }]);
 
         this._updateScopesButton();
@@ -577,18 +580,18 @@ class KeyboardShortcutHotkeyEntry {
             {
                 action: 'set',
                 path: `${this._basePath}.action`,
-                value: this._data.action
+                value: this._data.action,
             },
             {
                 action: 'set',
                 path: `${this._basePath}.argument`,
-                value: this._data.argument
+                value: this._data.argument,
             },
             {
                 action: 'set',
                 path: `${this._basePath}.scopes`,
-                value: this._data.scopes
-            }
+                value: this._data.scopes,
+            },
         ]);
 
         this._updateScopesButton();
@@ -612,7 +615,7 @@ class KeyboardShortcutHotkeyEntry {
         await this._modifyProfileSettings([{
             action: 'set',
             path: `${this._basePath}.argument`,
-            value
+            value,
         }]);
     }
 

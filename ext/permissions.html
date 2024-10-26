@@ -16,10 +16,10 @@
     <link rel="stylesheet" type="text/css" href="/css/permissions.css">
     <script src="/js/pages/permissions-main.js" type="module"></script>
 </head>
-<body>
+<body hidden>
 
 <!-- Main content -->
-<div class="content-outer"><div class="content">
+<div class="content-outer"><div class="content scrollbar">
 <div class="content-left"></div>
 <div class="content-center">
 
@@ -74,6 +74,14 @@
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
+                <div class="settings-item-label"><code>contextMenus</code></div>
+                <div class="settings-item-description">
+                    Yomitan adds a context menu interface that lets you look up highlighted words.
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
                 <div class="settings-item-label"><code>clipboardWrite</code></div>
                 <div class="settings-item-description">
                     Yomitan supports simulating the <code>Ctrl+C</code> (copy to clipboard) keyboard shortcut
@@ -116,8 +124,11 @@
                     <p>
                         When enabled, Yomitan is able to scan text and show definitions in private/incognito web browser windows.
                     </p>
-                    <p>
+                    <p data-hide-for-browser="firefox firefox-mobile">
                         This option can be configured from the web browser's <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings pages</a>.
+                    </p>
+                    <p data-show-for-browser="firefox firefox-mobile">
+                        This option can be configured from the web browser's extension settings pages. From your browser's address bar, go to <code>about:addons</code> and navigate to the settings for Yomitan.
                     </p>
                 </div>
             </div>
