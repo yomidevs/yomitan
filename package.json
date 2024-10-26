@@ -104,7 +104,6 @@
         "vitest": "^1.2.2"
     },
     "dependencies": {
-        "@typescript-eslint/typescript-estree": "^8.11.0",
         "@zip.js/zip.js": "^2.7.45",
         "dexie": "^3.2.5",
         "dexie-export-import": "^4.1.2",
