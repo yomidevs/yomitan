@@ -18,7 +18,6 @@
 
 import {EventDispatcher} from '../../core/event-dispatcher.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {fetchJson} from '../../core/fetch-utilities.js';
 import {isObjectNotArray} from '../../core/object-utilities.js';
 import {generateId} from '../../core/utilities.js';
 import {OptionsUtil} from '../../data/options-util.js';
@@ -46,8 +45,6 @@ export class SettingsController extends EventDispatcher {
         this._pageExitPreventionEventListeners = new EventListenerCollection();
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
-        /** @type {import('settings-controller').RecommendedSettingsByLanguage} */
-        this._recommendedSettingsByLanguage = {};
     }
 
     /** @type {import('../../application.js').Application} */
@@ -78,7 +75,6 @@ export class SettingsController extends EventDispatcher {
     /** */
     async prepare() {
         await this._templates.loadFromFiles(['/templates-settings.html']);
-        this._recommendedSettingsByLanguage = await fetchJson('/data/recommended-settings.json');
         this._application.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         if (this._canObservePermissionsChanges()) {
             chrome.permissions.onAdded.addListener(this._onPermissionsChanged.bind(this));
@@ -184,14 +180,6 @@ export class SettingsController extends EventDispatcher {
      */
     async setProfileSetting(path, value) {
         return await this.modifyProfileSettings([{action: 'set', path, value}]);
-    }
-
-    /**
-     * @param {string} language
-     * @returns {import('settings-controller').RecommendedSetting[]}
-     */
-    getRecommendedSettings(language) {
-        return this._recommendedSettingsByLanguage[language];
     }
 
     /**
