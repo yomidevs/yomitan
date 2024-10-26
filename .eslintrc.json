@@ -694,25 +694,6 @@
                     }
                 }]
             }
-        },
-        {
-            "files": [
-                "ext/data/recommended-settings.json"
-            ],
-            "rules": {
-                "jsonc/sort-keys": ["error", {
-                    "pathPattern": ".*",
-                    "order": [
-                        "modification",
-                        "description"
-                    ]
-                }, {
-                    "pathPattern": ".*",
-                    "order": {
-                        "type": "asc"
-                    }
-                }]
-            }
         }
     ]
 }
