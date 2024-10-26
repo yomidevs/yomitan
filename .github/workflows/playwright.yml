@@ -10,6 +10,11 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - name: Remove all fonts
         run: rm -rf /usr/share/fonts
 
@@ -47,7 +52,7 @@ jobs:
       - name: Grab latest dictionaries from dictionaries branch
         uses: actions/checkout@v4
         with:
-          repository: themoeway/yomitan # so that this works on forks
+          repository: yomidevs/yomitan # so that this works on forks
           ref: dictionaries
           path: dictionaries
 
@@ -57,7 +62,7 @@ jobs:
         id: master-screenshots
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          repo: themoeway/yomitan # so that this works on forks
+          repo: yomidevs/yomitan # so that this works on forks
           name: playwright-screenshots
           branch: master
           workflow: playwright.yml

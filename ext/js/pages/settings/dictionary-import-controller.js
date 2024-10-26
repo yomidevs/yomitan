@@ -95,7 +95,6 @@ export class DictionaryImportController {
 
         this._settingsController.on('importDictionaryFromUrl', this._onEventImportDictionaryFromUrl.bind(this));
 
-        // Welcome page
         const recommendedDictionaryButton = document.querySelector('[data-modal-action="show,recommended-dictionaries"]');
         if (recommendedDictionaryButton) {
             recommendedDictionaryButton.addEventListener('click', this._renderRecommendedDictionaries.bind(this), false);
@@ -108,7 +107,6 @@ export class DictionaryImportController {
      * @param {MouseEvent} e
      */
     async _onRecommendedImportClick(e) {
-        if (!(e instanceof PointerEvent)) { return; }
         if (!e.target || !(e.target instanceof HTMLButtonElement)) { return; }
 
         const import_url = e.target.attributes.getNamedItem('data-import-url');
@@ -122,15 +120,16 @@ export class DictionaryImportController {
         while (this._recommendedDictionaryQueue.length > 0) {
             this._recommendedDictionaryActiveImport = true;
             try {
-                const url = this._recommendedDictionaryQueue.shift();
+                const url = this._recommendedDictionaryQueue[0];
                 if (!url) { continue; }
 
                 const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), 1);
                 const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
-                void this._importDictionaries(
+                await this._importDictionaries(
                     this._generateFilesFromUrls([url], onProgress),
                     importProgressTracker,
                 );
+                void this._recommendedDictionaryQueue.shift();
             } catch (error) {
                 log.error(error);
             }
@@ -176,8 +175,20 @@ export class DictionaryImportController {
             return;
         }
 
+        const installedDictionaries = await this._settingsController.getDictionaryInfo();
+        /** @type {Set<string>} */
+        const installedDictionaryNames = new Set();
+        /** @type {Set<string>} */
+        const installedDictionaryDownloadUrls = new Set();
+        for (const dictionary of installedDictionaries) {
+            installedDictionaryNames.add(dictionary.title);
+            if (dictionary.downloadUrl) {
+                installedDictionaryDownloadUrls.add(dictionary.downloadUrl);
+            }
+        }
+
         for (const {property, element} of recommendedDictionaryCategories) {
-            this._renderRecommendedDictionaryGroup(recommendedDictionaries[language][property], element);
+            this._renderRecommendedDictionaryGroup(recommendedDictionaries[language][property], element, installedDictionaryNames, installedDictionaryDownloadUrls);
         }
 
         /** @type {NodeListOf<HTMLElement>} */
@@ -189,12 +200,18 @@ export class DictionaryImportController {
 
     /**
      *
-     * @param {import('dictionary-recommended.js').Dictionary[]} recommendedDictionaries
+     * @param {import('dictionary-recommended.js').RecommendedDictionary[]} recommendedDictionaries
      * @param {HTMLElement} dictionariesList
+     * @param {Set<string>} installedDictionaryNames
+     * @param {Set<string>} installedDictionaryDownloadUrls
      */
-    _renderRecommendedDictionaryGroup(recommendedDictionaries, dictionariesList) {
+    _renderRecommendedDictionaryGroup(recommendedDictionaries, dictionariesList, installedDictionaryNames, installedDictionaryDownloadUrls) {
         const dictionariesListParent = dictionariesList.parentElement;
         dictionariesList.innerHTML = '';
+        // Hide section if no dictionaries are available
+        if (dictionariesListParent) {
+            dictionariesListParent.hidden = recommendedDictionaries.length === 0;
+        }
         for (const dictionary of recommendedDictionaries) {
             if (dictionariesList) {
                 if (dictionariesListParent) {
@@ -202,13 +219,29 @@ export class DictionaryImportController {
                 }
                 const template = this._settingsController.instantiateTemplate('recommended-dictionaries-list-item');
                 const label = querySelectorNotNull(template, '.settings-item-label');
+                const description = querySelectorNotNull(template, '.description');
+                /** @type {HTMLAnchorElement} */
+                const homepage = querySelectorNotNull(template, '.homepage');
+                /** @type {HTMLButtonElement} */
                 const button = querySelectorNotNull(template, '.action-button[data-action=import-recommended-dictionary]');
+                button.disabled = (
+                    installedDictionaryNames.has(dictionary.name) ||
+                    installedDictionaryDownloadUrls.has(dictionary.downloadUrl) ||
+                    this._recommendedDictionaryQueue.includes(dictionary.downloadUrl)
+                );
 
                 const urlAttribute = document.createAttribute('data-import-url');
-                urlAttribute.value = dictionary.url;
+                urlAttribute.value = dictionary.downloadUrl;
                 button.attributes.setNamedItem(urlAttribute);
 
                 label.textContent = dictionary.name;
+                description.textContent = dictionary.description;
+                if (dictionary.homepage) {
+                    homepage.target = '_blank';
+                    homepage.href = dictionary.homepage;
+                } else {
+                    homepage.remove();
+                }
 
                 dictionariesList.append(template);
             }

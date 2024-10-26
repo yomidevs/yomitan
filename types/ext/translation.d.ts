@@ -45,6 +45,10 @@ export type FindKanjiDictionary = {
      */
     index: number;
     /**
+     * The alias of the dictionary
+     */
+    alias: string;
+    /**
      * The priority of the dictionary
      */
     priority: number;
@@ -140,6 +144,10 @@ export type FindTermDictionary = {
      * The index of the dictionary
      */
     index: number;
+    /**
+     * The alias of the dictionary
+     */
+    alias: string;
     /**
      * The priority of the dictionary
      */

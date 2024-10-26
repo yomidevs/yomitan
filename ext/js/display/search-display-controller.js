@@ -38,6 +38,8 @@ export class SearchDisplayController {
         /** @type {HTMLButtonElement} */
         this._searchButton = querySelectorNotNull(document, '#search-button');
         /** @type {HTMLButtonElement} */
+        this._clearButton = querySelectorNotNull(document, '#clear-button');
+        /** @type {HTMLButtonElement} */
         this._searchBackButton = querySelectorNotNull(document, '#search-back-button');
         /** @type {HTMLTextAreaElement} */
         this._queryInput = querySelectorNotNull(document, '#search-textbox');
@@ -104,9 +106,12 @@ export class SearchDisplayController {
         this._display.setHistorySettings({useBrowserHistory: true});
 
         this._searchButton.addEventListener('click', this._onSearch.bind(this), false);
+        this._clearButton.addEventListener('click', this._onClear.bind(this), false);
+
         this._searchBackButton.addEventListener('click', this._onSearchBackButtonClick.bind(this), false);
         this._wanakanaEnableCheckbox.addEventListener('change', this._onWanakanaEnableChange.bind(this));
         window.addEventListener('copy', this._onCopy.bind(this));
+        window.addEventListener('paste', this._onPaste.bind(this));
         this._clipboardMonitor.on('change', this._onClipboardMonitorChange.bind(this));
         this._clipboardMonitorEnableCheckbox.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
         this._stickyHeaderEnableCheckbox.addEventListener('change', this._onStickyHeaderEnableChange.bind(this));
@@ -267,6 +272,15 @@ export class SearchDisplayController {
         this._search(true, 'new', true, null);
     }
 
+    /**
+     * @param {MouseEvent} e
+     */
+    _onClear(e) {
+        e.preventDefault();
+        this._queryInput.value = '';
+        this._queryInput.focus();
+    }
+
     /** */
     _onSearchBackButtonClick() {
         this._display.history.back();
@@ -276,6 +290,26 @@ export class SearchDisplayController {
     async _onCopy() {
         // Ignore copy from search page
         this._clipboardMonitor.setPreviousText(document.hasFocus() ? await this._clipboardReaderLike.getText(false) : '');
+    }
+
+    /**
+     * @param {ClipboardEvent} e
+     */
+    _onPaste(e) {
+        if (e.target === this._queryInput) {
+            return;
+        }
+        e.stopPropagation();
+        e.preventDefault();
+        const text = e.clipboardData?.getData('text');
+        if (!text) {
+            return;
+        }
+        if (this._queryInput.value !== text) {
+            this._queryInput.value = text;
+            this._updateSearchHeight(true);
+            this._search(true, 'new', true, null);
+        }
     }
 
     /** @type {import('application').ApiHandler<'searchDisplayControllerUpdateSearchQuery'>} */
@@ -596,7 +630,7 @@ export class SearchDisplayController {
      */
     _updateSearchHeight(shrink) {
         const searchTextbox = this._queryInput;
-        const searchItems = [this._queryInput, this._searchButton, this._searchBackButton];
+        const searchItems = [this._queryInput, this._searchButton, this._searchBackButton, this._clearButton];
 
         if (shrink) {
             for (const searchButton of searchItems) {

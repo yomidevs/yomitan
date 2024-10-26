@@ -560,6 +560,10 @@ export class OptionsUtil {
             this._updateVersion46,
             this._updateVersion47,
             this._updateVersion48,
+            this._updateVersion49,
+            this._updateVersion50,
+            this._updateVersion51,
+            this._updateVersion52,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1442,6 +1446,55 @@ export class OptionsUtil {
     async _updateVersion48(options) {
         for (const profile of options.profiles) {
             profile.options.general.showDebug = false;
+        }
+    }
+
+    /**
+     * - Added dictionary alias
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion49(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v49.handlebars');
+        for (const {options: profileOptions} of options.profiles) {
+            if (Array.isArray(profileOptions.dictionaries)) {
+                for (const dictionary of profileOptions.dictionaries) {
+                    dictionary.alias = dictionary.name;
+                }
+            }
+        }
+    }
+
+    /**
+     * - Generalized jpod101-alternate to language-pod-101
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion50(options) {
+        for (const profile of options.profiles) {
+            for (const source of profile.options.audio.sources) {
+                if (source.type === 'jpod101-alternate') {
+                    source.type = 'language-pod-101';
+                }
+            }
+        }
+    }
+
+    /**
+     * - Add scanning.scanResolution
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion51(options) {
+        for (const profile of options.profiles) {
+            profile.options.scanning.scanResolution = 'character';
+        }
+    }
+
+    /**
+     * - Remove scanning.scanAltText
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion52(options) {
+        for (const profile of options.profiles) {
+            delete profile.options.scanning.scanAltText;
         }
     }
 

@@ -29,7 +29,7 @@ class Logger extends EventDispatcher {
         /** @type {string} */
         this._extensionName = 'Extension';
         /** @type {?string} */
-        this._issueUrl = 'https://github.com/themoeway/yomitan/issues';
+        this._issueUrl = 'https://github.com/yomidevs/yomitan/issues';
     }
 
     /**

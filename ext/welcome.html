@@ -48,7 +48,8 @@
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-description">Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a> and the web browser's <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings page</a>.</div>
+                <div class="settings-item-description" data-hide-for-browser="firefox firefox-mobile">Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a> and the web browser's <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings page</a>.</div>
+                <div class="settings-item-description" data-show-for-browser="firefox firefox-mobile">Further configuration is available on the <a href="/permissions.html" rel="noopener">Permissions page</a> and the web browser's extension settings page.</div>
                 <div class="danger-text margin-above" id="permissions-disabled" hidden><strong>Yomitan features will be limited if the recommended permissions are not enabled.</strong></div>
                 <div class="success-text margin-above" id="recommended-permissions-enabled" hidden><strong>Essential Yomitan features are available.</strong></div>
                 <div class="success-text margin-above" id="full-permissions-enabled" hidden><strong>All Yomitan features are available.</strong></div>
@@ -62,7 +63,7 @@
       <div class="settings-item">
         <div class="settings-item-inner settings-item-inner-wrappable"><div class="settings-item-left"><div class="settings-item-label">
               <p>
-                There are custom Anki templates in your settings. Note that <a href="https://github.com/themoeway/yomitan/blob/master/docs/yomichan-migration.md#custom-templates" target="_blank" rel="noopener noreferrer">some syntax has changed from previous versions of Yomitan.</a>
+                There are custom Anki templates in your settings. Note that <a href="https://yomitan.wiki/yomichan-migration/#custom-templates" target="_blank" rel="noopener noreferrer">some syntax has changed from previous versions of Yomitan.</a>
                 Please ensure that your custom templates are using the updated syntax.
               </p>
           </div></div></div>
@@ -112,6 +113,14 @@
         <a href="/quick-start-guide.html" rel="noopener" class="settings-item settings-item-button"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Yomitan Quick Start Guide</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></a>
+        <a href="https://yomitan.wiki/" rel="noopener noreferrer" class="settings-item settings-item-button"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Read the wiki for more information</div>
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
@@ -197,324 +206,6 @@
 
 <div id="popup-menus"></div>
 
-
-<!-- Dictionary modals -->
-<div id="dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Dictionaries</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Enable support for prefix wildcard searches
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="global.database.prefixWildcardsSupported" data-scope="global"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    In order for dictionaries to support searches using prefix wildcards on the search page,
-                    some additional data must be stored in the database.
-                    Enabling this option will include this extra data for any new dictionaries that are imported.
-                </p>
-                <p class="warning-text">
-                    This option will not change any dictionaries that are already imported;
-                    they must be re-imported for the option to take effect.
-                </p>
-                <p>
-                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a>
-                </p>
-            </div>
-        </div>
-
-        <div class="warning-text margin-above no-dictionaries-installed-warning" hidden>
-            No dictionaries have been installed yet.
-            Visit the <a href="https://github.com/themoeway/yomitan/blob/master/docs/dictionaries.md#dictionaries" target="_blank" rel="noopener noreferrer">Yomitan homepage</a>
-            for a list of free dictionaries or click the <em>Import</em> button below to select a dictionary file to import.
-        </div>
-        <div id="dictionary-error" class="danger-text margin-above" hidden></div>
-        <div id="dictionary-list" class="dictionary-list generic-list" data-count="0">
-            <div class="dictionary-item-top"></div>
-            <label class="dictionary-item-top toggle dictionary-item-enabled-toggle-container"><input type="checkbox" id="all-dictionaries-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            <div class="dictionary-item-top dictionary-item-title-container">All</div>
-            <div class="dictionary-item-top advanced-only">Priority</div>
-            <div class="dictionary-item-top dictionary-item-button-height"></div>
-            <div class="dictionary-item-top dictionary-item-button-height"></div>
-            <div class="dictionary-item-top dictionary-item-button-height"></div>
-        </div>
-
-        <div hidden><input type="file" id="dictionary-import-file-input" accept=".zip,application/zip" multiple></div>
-    </div>
-    <div class="modal-body-addon dictionary-delete-progress" hidden>
-        <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
-        <div class="progress-bar-track"><div class="progress-bar danger"></div></div>
-    </div>
-    <div class="modal-body-addon dictionary-import-progress" hidden>
-        <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
-        <div class="progress-bar-track"><div class="progress-bar"></div></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis danger dictionary-database-mutating-input" id="dictionary-delete-all-button">Delete All</button>
-        <button type="button" class="low-emphasis dictionary-database-mutating-input debug-only" id="dictionary-check-integrity">Check Integrity</button>
-        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-check-updates">Check for Updates</button>
-        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-button">Import</button>
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="dictionary-import-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-medium">
-    <div class="modal-header"><div class="modal-title">Import Dictionaries</div></div>
-    <div class="modal-body">
-        <div id="dictionary-drop-file-zone">
-            <div id="dictionary-drag-drop-text">
-                <span class="icon" data-icon="book"></span>
-                <h1>Drag and drop dictionaries (.zip)</h1>
-                <h5>or click here to upload</h5>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide" class="basic-only">Close</button>
-    </div>
-    <div class="modal-body advanced-only">
-        <p>Import dictionaries from URLs:</p>
-        <textarea type="text" id="dictionary-import-url-text"></textarea>
-    </div>
-    <div class="modal-footer advanced-only">
-        <button type="button" data-modal-action="hide" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-url-button">Import from URLs</button>
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="dictionary-confirm-delete-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Confirm Dictionary Deletion</div></div>
-    <div class="modal-body">
-        <p>Are you sure you want to delete the dictionary:</p>
-        <p><strong id="dictionary-confirm-delete-name"></strong>?</p>
-        <p class="danger-text">This action cannot be undone.</p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-delete-button">Delete</button>
-    </div>
-</div></div>
-
-<div id="dictionary-confirm-delete-all-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Confirm Dictionary Deletion</div></div>
-    <div class="modal-body">
-        <p>Are you sure you want to delete <strong>all dictionaries</strong>?</p>
-        <p class="danger-text">This action cannot be undone.</p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-delete-all-button">Delete</button>
-    </div>
-</div></div>
-
-<div id="dictionary-confirm-update-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Confirm Dictionary Update</div></div>
-    <div class="modal-body">
-        <p>Are you sure you want to update the dictionary:</p>
-        <p><strong id="dictionary-confirm-update-name"></strong>?</p>
-        <section>
-            Updating a dictionary involves:
-            <ul>
-                <li>Deleting the installed version</li>
-                <li>Downloading the latest version </li>
-                <li>Importing the latest version</li>
-            </ul>
-            <p class="warning-text">Especially for large dictionaries, this process can take a while, and downloading will use your network.</p>
-        </section>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-update-button">Update</button>
-    </div>
-</div></div>
-
-<div id="secondary-search-dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Secondary Search Dictionaries</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <p>
-            These dictionaries will be used to search for definitions of the related terms when the grouping mode is
-            <em>Group related terms</em>.
-        </p>
-        <div id="secondary-search-dictionary-list" class="secondary-search-dictionary-list"></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="dictionary-details-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title"><strong class="dictionary-title"></strong> <span class="light dictionary-revision"></span></div>
-    </div>
-    <div class="modal-body">
-        <div class="settings-item dictionary-outdated-notification" hidden><div class="settings-item-children danger-text">
-            This dictionary is outdated and may not support new extension features.
-            Re-import the dictionary to enable support for the latest features.
-        </div></div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Prefix wildcard searches supported
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" class="dictionary-prefix-wildcard-searches-supported" disabled><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p class="warning-text">
-                    Changing this value requires the dictionary to be re-imported.
-                </p>
-                <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
-            </div>
-        </div>
-        <div class="settings-item dictionary-parts-of-speech-filter-setting" hidden>
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Part of speech filtering
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" class="dictionary-parts-of-speech-filter-toggle"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                When deinflecting words, only dictionary entries whose POS matches that expected by the deinflector will be shown.
-                <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
-            </div>
-        </div>
-        <div class="settings-item dictionary-use-deinflections-setting" hidden>
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Use deinflections
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" class="dictionary-use-deinflections-toggle"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                Deinflections from this dictionary will be used.
-                <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
-            </div>
-        </div>
-        <hr>
-        <div class="settings-item"><div class="settings-item-children">
-            <div class="dictionary-details-table"></div>
-            <div class="dictionary-counts"></div>
-        </div></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="dictionary-extra-data-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">
-            <strong class="dictionary-title">Unassociated Data</strong> <span class="light dictionary-total-count"></span>
-        </div>
-    </div>
-    <div class="modal-body">
-        <p class="warning-text">
-            The database contains extra data which is not associated with any installed dictionary.
-            Purging the database can fix this issue.
-        </p>
-        <div class="dictionary-counts"></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="dictionary-move-location-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Move Dictionary Options</div></div>
-    <div class="modal-body">
-        <p>Input the location the dictionary <strong class="dictionary-title"></strong> should be moved to:</p>
-        <div class="margin-above">
-            <input type="number" id="dictionary-move-location" min="1" step="1">
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" data-modal-action="hide" id="dictionary-move-button">Move</button>
-    </div>
-</div></div>
-
-<!-- Recommended dictionary modals -->
-<div id="recommended-dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Recommended Dictionaries</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <div id="recommended-term-dictionaries" hidden>
-            <h1 class="modal-title">Term Dictionaries</h1>
-            <div class="recommended-dictionary-list"></div>
-        </div>
-        <div id="recommended-kanji-dictionaries" hidden>
-            <h1 class="modal-title">Kanji Dictionaries</h1>
-            <div class="recommended-dictionary-list"></div>
-        </div>
-        <div id="recommended-frequency-dictionaries" hidden>
-            <h1 class="modal-title">Frequency Dictionaries</h1>
-            <div class="recommended-dictionary-list"></div>
-        </div>
-        <div id="recommended-grammar-dictionaries" hidden>
-            <h1 class="modal-title">Grammar Dictionaries</h1>
-            <div class="recommended-dictionary-list"></div>
-        </div>
-        <div id="recommended-pronunciation-dictionaries" hidden>
-            <h1 class="modal-title">Pronunciation Dictionaries</h1>
-            <div class="recommended-dictionary-list"></div>
-        </div>
-    </div>
-    <div class="modal-body-addon dictionary-delete-progress" hidden>
-        <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
-        <div class="progress-bar-track"><div class="progress-bar danger"></div></div>
-    </div>
-    <div class="modal-body-addon dictionary-import-progress" hidden>
-        <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
-        <div class="progress-bar-track"><div class="progress-bar"></div></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
 
 </body>
 </html>

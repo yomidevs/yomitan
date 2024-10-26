@@ -133,6 +133,9 @@ export class QueryParser extends EventDispatcher {
         this._text = text;
         this._setPreview(text);
 
+        if (this._useInternalParser === false && this._useMecabParser === false) {
+            return;
+        }
         /** @type {?import('core').TokenObject} */
         const token = {};
         this._setTextToken = token;

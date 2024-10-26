@@ -27,6 +27,7 @@ export type OptionsContext1 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
+    pointerType?: Input.PointerType;
 };
 
 export type OptionsContext2 = {
@@ -37,6 +38,7 @@ export type OptionsContext2 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
+    pointerType?: Input.PointerType;
 };
 
 export type OptionsContext3 = {
@@ -47,6 +49,7 @@ export type OptionsContext3 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
+    pointerType?: Input.PointerType;
 };
 
 export type OptionsContext = OptionsContext1 | OptionsContext2 | OptionsContext3;
@@ -194,8 +197,8 @@ export type ScanningOptions = {
     hidePopupOnCursorExit: boolean;
     hidePopupOnCursorExitDelay: number;
     normalizeCssZoom: boolean;
-    scanAltText: boolean;
     scanWithoutMousemove: boolean;
+    scanResolution: string;
 };
 
 export type ScanningInput = {
@@ -263,6 +266,7 @@ export type DictionariesOptions = DictionaryOptions[];
 
 export type DictionaryOptions = {
     name: string;
+    alias: string;
     priority: number;
     enabled: boolean;
     allowSecondarySearches: boolean;
@@ -369,9 +373,9 @@ export type PopupVerticalTextPosition = 'default' | 'before' | 'after' | 'left' 
 
 export type GlossaryLayoutMode = 'default' | 'compact';
 
-export type PopupTheme = 'light' | 'dark' | 'browser';
+export type PopupTheme = 'light' | 'dark' | 'browser' | 'site';
 
-export type PopupOuterTheme = 'light' | 'dark' | 'browser' | 'site';
+export type PopupOuterTheme = 'light' | 'dark' | 'browser' | 'site' | 'none';
 
 export type PopupCurrentIndicatorMode = 'none' | 'asterisk' | 'triangle' | 'bar-left' | 'bar-right' | 'dot-left' | 'dot-right';
 
@@ -389,7 +393,7 @@ export type PopupWindowType = 'normal' | 'popup';
 
 export type PopupWindowState = 'normal' | 'maximized' | 'fullscreen';
 
-export type AudioSourceType = 'jpod101' | 'jpod101-alternate' | 'jisho' | 'lingua-libre' | 'wiktionary' | 'text-to-speech' | 'text-to-speech-reading' | 'custom' | 'custom-json';
+export type AudioSourceType = 'jpod101' | 'language-pod-101' | 'jisho' | 'lingua-libre' | 'wiktionary' | 'text-to-speech' | 'text-to-speech-reading' | 'custom' | 'custom-json';
 
 export type TranslationConvertType = 'false' | 'true' | 'variant';
 

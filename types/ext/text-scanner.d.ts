@@ -41,8 +41,8 @@ export type Options = {
     preventMiddleMouse?: boolean;
     matchTypePrefix?: boolean;
     sentenceParsingOptions?: SentenceParsingOptions;
-    scanAltText?: boolean;
     scanWithoutMousemove?: boolean;
+    scanResolution?: string;
 };
 
 export type InputOptionsOuter = {
@@ -81,7 +81,7 @@ export type SentenceParsingOptions = {
 export type InputConfig = {
     include: string[];
     exclude: string[];
-    types: Set<PointerType>;
+    types: Set<Input.PointerType>;
     searchTerms: boolean;
     searchKanji: boolean;
     scanOnTouchMove: boolean;
@@ -99,8 +99,8 @@ export type InputConfig = {
 
 export type InputInfo = {
     input: InputConfig | null;
-    pointerType: PointerType;
-    eventType: PointerEventType;
+    pointerType: Input.PointerType;
+    eventType: Input.PointerEventType;
     passive: boolean;
     modifiers: Input.Modifier[];
     modifierKeys: Input.ModifierKey[];
@@ -186,35 +186,6 @@ export type Sentence = {
     text: string;
     offset: number;
 };
-
-export type PointerType = (
-    'pen' |
-    'mouse' |
-    'touch' |
-    'script'
-);
-
-export type PointerEventType = (
-    'mouseMove' |
-    'pointerOver' |
-    'pointerDown' |
-    'pointerMove' |
-    'pointerUp' |
-    'touchStart' |
-    'touchEnd' |
-    'touchMove' |
-    'click' |
-    'script'
-);
-
-/**
- * An enum representing the pen pointer state.
- * - `0` - Not active.
- * - `1` - Hovering.
- * - `2` - Touching.
- * - `3` - Hovering after touching.
- */
-export type PenPointerState = 0 | 1 | 2 | 3;
 
 export type SentenceTerminatorMap = Map<string, [includeCharacterAtStart: boolean, includeCharacterAtEnd: boolean]>;
 

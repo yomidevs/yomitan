@@ -1299,7 +1299,7 @@ export class Backend {
         let apiKey = options.anki.apiKey;
         if (apiKey === '') { apiKey = null; }
         this._anki.server = options.anki.server;
-        this._anki.enabled = options.anki.enable && enabled;
+        this._anki.enabled = options.anki.enable;
         this._anki.apiKey = apiKey;
 
         this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);
@@ -2187,7 +2187,7 @@ export class Backend {
             const error = this._getAudioDownloadError(e);
             if (error !== null) { throw error; }
             // No audio
-            log.error(e);
+            log.logGenericError(e, 'log');
             return null;
         }
 
@@ -2472,6 +2472,7 @@ export class Backend {
         if (mode === 'merge' && !enabledDictionaryMap.has(mainDictionary)) {
             enabledDictionaryMap.set(mainDictionary, {
                 index: enabledDictionaryMap.size,
+                alias: mainDictionary,
                 priority: 0,
                 allowSecondarySearches: false,
                 partsOfSpeechFilter: true,
@@ -2516,9 +2517,10 @@ export class Backend {
         const enabledDictionaryMap = new Map();
         for (const dictionary of options.dictionaries) {
             if (!dictionary.enabled) { continue; }
-            const {name, priority, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
+            const {name, alias, priority, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
             enabledDictionaryMap.set(name, {
                 index: enabledDictionaryMap.size,
+                alias,
                 priority,
                 allowSecondarySearches,
                 partsOfSpeechFilter,

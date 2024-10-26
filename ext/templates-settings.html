@@ -52,7 +52,7 @@
     <label class="toggle dictionary-item-enabled-toggle-container"><input type="checkbox" class="dictionary-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
     <div class="dictionary-item-title-container">
         <span>
-            <strong class="dictionary-title"></strong> <span class="light dictionary-revision"></span>
+            <strong class="dictionary-title dictionary-alias"></strong> <span class="light dictionary-revision"></span>
         </span>
         <button type="button" class="dictionary-outdated-button" hidden>
             <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
@@ -97,6 +97,7 @@
 </template>
 <template id="dictionary-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
     <button type="button" class="popup-menu-item" data-menu-action="showDetails">Details&hellip;</button>
+    <button type="button" class="popup-menu-item" data-menu-action="rename">Rename&hellip;</button>
     <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to&hellip;</button>
     <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
 </div></div></div></template>
@@ -123,6 +124,10 @@
         <div class="settings-item-inner">
             <div class="settings-item-left">
                 <strong><div class="settings-item-label"></div></strong>
+                <div class="settings-item-description description"></div>
+                <div class="settings-item-description">
+                    <a class="homepage">Homepage</a>
+                </div>
             </div>
             <div class="settings-item-right">
                 <button type="button" class="action-button" data-action="import-recommended-dictionary" data-import-url="">Download</button>
@@ -137,7 +142,7 @@
     <div class="audio-source-inner">
         <select class="audio-source-type-select">
             <option value="jpod101">JapanesePod101</option>
-            <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
+            <option value="language-pod-101">LanguagePod101</option>
             <option value="jisho">Jisho.org</option>
             <option value="lingua-libre">(Commons) Lingua Libre</option>
             <option value="wiktionary">(Commons) Wiktionary</option>
@@ -452,7 +457,7 @@
     <span class="hotkey-argument-label">Source:</span>
     <select class="audio-source-select hotkey-argument-input horizontal-flex-fill">
         <option value="jpod101">JapanesePod101</option>
-        <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
+        <option value="language-pod-101">LanguagePod101</option>
         <option value="jisho">Jisho.org</option>
         <option value="lingua-libre">Lingua Libre</option>
         <option value="wiktionary">Wiktionary</option>
@@ -471,5 +476,22 @@
 <template id="permissions-origin-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
     <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
 </div></div></div></template>
+
+<!-- Recommended Settings -->
+<template id="recommended-settings-list-item-template">
+    <div class="settings-item">
+        <div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label"></div>
+                <div class="settings-item-description"></div>
+            </div>
+            <div class="settings-item-right">
+                <label class="recommended-settings-checkbox-item toggle">
+                    <input type="checkbox" checked><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</template>
 
 </body></html>

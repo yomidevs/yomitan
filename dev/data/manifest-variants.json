@@ -309,7 +309,7 @@
                         "gecko",
                         "update_url"
                     ],
-                    "value": "https://raw.githubusercontent.com/themoeway/yomitan/metadata/updates.json"
+                    "value": "https://raw.githubusercontent.com/yomidevs/yomitan/metadata/updates.json"
                 }
             ],
             "excludeFiles": [
@@ -370,6 +370,14 @@
                 "offscreen.html",
                 "js/background/offscreen.js",
                 "js/background/offscreen-main.js"
+            ]
+        },
+        {
+            "name": "edge",
+            "inherit": "base",
+            "fileName": "yomitan-edge.zip",
+            "excludeFiles": [
+                "background.html"
             ]
         }
     ]

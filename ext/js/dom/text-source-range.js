@@ -157,15 +157,16 @@ export class TextSourceRange {
 
 
     /**
-     * Moves the start offset of the text by a set amount of unicode codepoints.
+     * Moves the start offset of the text backwards by a set amount of unicode codepoints.
      * @param {number} length The maximum number of codepoints to move by.
      * @param {boolean} layoutAwareScan Whether or not HTML layout information should be used to generate
      *   the string content when scanning.
+     * @param {boolean} stopAtWordBoundary Whether to stop at whitespace characters.
      * @returns {number} The actual number of codepoints that were read.
      */
-    setStartOffset(length, layoutAwareScan) {
+    setStartOffset(length, layoutAwareScan, stopAtWordBoundary = false) {
         if (this._disallowExpandSelection) { return 0; }
-        const state = new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan).seek(-length);
+        const state = new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan, stopAtWordBoundary).seek(-length);
         this._range.setStart(state.node, state.offset);
         this._rangeStartOffset = this._range.startOffset;
         this._content = state.content + this._content;

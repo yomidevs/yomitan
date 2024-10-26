@@ -63,7 +63,7 @@ class DictionaryEntry {
         /** @type {HTMLButtonElement} */
         this._updatesAvailable = querySelectorNotNull(fragment, '.dictionary-update-available');
         /** @type {HTMLElement} */
-        this._titleNode = querySelectorNotNull(fragment, '.dictionary-title');
+        this._aliasNode = querySelectorNotNull(fragment, '.dictionary-alias');
         /** @type {HTMLElement} */
         this._versionNode = querySelectorNotNull(fragment, '.dictionary-revision');
         /** @type {HTMLElement} */
@@ -79,9 +79,9 @@ class DictionaryEntry {
     prepare() {
         //
         const index = this._index;
-        const {title, revision, version} = this._dictionaryInfo;
+        const {revision, version} = this._dictionaryInfo;
 
-        this._titleNode.textContent = title;
+        this._aliasNode.dataset.setting = `dictionaries[${index}].alias`;
         this._versionNode.textContent = `rev.${revision}`;
         this._outdatedButton.hidden = (version >= 3);
         this._priorityInput.dataset.setting = `dictionaries[${index}].priority`;
@@ -161,6 +161,7 @@ class DictionaryEntry {
         const bodyNode = e.detail.menu.bodyNode;
         const count = this._dictionaryController.dictionaryOptionCount;
         this._setMenuActionEnabled(bodyNode, 'moveTo', count > 1);
+        this._setMenuActionEnabled(bodyNode, 'delete', !this._dictionaryController.isDictionaryInDeleteQueue(this.dictionaryTitle));
     }
 
     /**
@@ -177,7 +178,18 @@ class DictionaryEntry {
             case 'moveTo':
                 this._showMoveToModal();
                 break;
+            case 'rename':
+                this._showRenameModal();
+                break;
         }
+    }
+
+    /**
+     * @param {string} alias
+     */
+    updateAliasSettings(alias) {
+        this._aliasNode.textContent = alias;
+        this._aliasNode.dispatchEvent(new CustomEvent('change', {bubbles: true}));
     }
 
     /**
@@ -344,6 +356,23 @@ class DictionaryEntry {
 
         modal.setVisible(true);
     }
+
+    /** */
+    _showRenameModal() {
+        const {title} = this._dictionaryInfo;
+        const modal = this._dictionaryController.modalController.getModal('dictionary-set-alias');
+        if (modal === null) { return; }
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#dictionary-alias-input');
+        /** @type {HTMLElement} */
+        const titleNode = querySelectorNotNull(modal.node, '.dictionary-title');
+
+        modal.node.dataset.index = `${this._index}`;
+        titleNode.textContent = title;
+        input.value = this._aliasNode.textContent || title;
+
+        modal.setVisible(true);
+    }
 }
 
 class DictionaryExtraInfo {
@@ -477,6 +506,8 @@ export class DictionaryController {
         this._extraInfo = null;
         /** @type {boolean} */
         this._isDeleting = false;
+        /** @type {string[]} */
+        this._dictionaryDeleteQueue = [];
     }
 
     /** @type {import('./modal-controller.js').ModalController} */
@@ -503,6 +534,11 @@ export class DictionaryController {
         /** @type {HTMLButtonElement} */
         const dictionaryMoveButton = querySelectorNotNull(document, '#dictionary-move-button');
 
+        /** @type {HTMLButtonElement} */
+        const dictionaryResetAliasButton = querySelectorNotNull(document, '#dictionary-reset-alias-button');
+        /** @type {HTMLButtonElement} */
+        const dictionarySetAliasButton = querySelectorNotNull(document, '#dictionary-set-alias-button');
+
         this._settingsController.application.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._allCheckbox.addEventListener('change', this._onAllCheckboxChange.bind(this), false);
@@ -510,6 +546,10 @@ export class DictionaryController {
         dictionaryUpdateButton.addEventListener('click', this._onDictionaryConfirmUpdate.bind(this), false);
 
         dictionaryMoveButton.addEventListener('click', this._onDictionaryMoveButtonClick.bind(this), false);
+
+        dictionarySetAliasButton.addEventListener('click', this._onDictionarySetAliasButtonClick.bind(this), false);
+        dictionaryResetAliasButton.addEventListener('click', this._onDictionaryResetAliasButtonClick.bind(this), false);
+
         if (this._checkUpdatesButton !== null) {
             this._checkUpdatesButton.addEventListener('click', this._onCheckUpdatesButtonClick.bind(this), false);
         }
@@ -526,7 +566,6 @@ export class DictionaryController {
      * @param {string} dictionaryTitle
      */
     deleteDictionary(dictionaryTitle) {
-        if (this._isDeleting) { return; }
         const modal = /** @type {import('./modal.js').Modal} */ (this._deleteDictionaryModal);
         modal.node.dataset.dictionaryTitle = dictionaryTitle;
         /** @type {Element} */
@@ -612,6 +651,7 @@ export class DictionaryController {
     static createDefaultDictionarySettings(name, enabled, styles) {
         return {
             name,
+            alias: name,
             priority: 0,
             enabled,
             allowSecondarySearches: false,
@@ -637,31 +677,26 @@ export class DictionaryController {
             optionsFull = await settingsController.getOptionsFull();
         }
 
-        /** @type {Set<string>} */
-        const installedDictionaries = new Set();
-        for (const {title} of dictionaries) {
-            installedDictionaries.add(title);
-        }
-
         /** @type {import('settings-modifications').Modification[]} */
         const targets = [];
         const {profiles} = optionsFull;
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
             let modified = false;
-            const missingDictionaries = new Set(installedDictionaries);
+            const missingDictionaries = [...dictionaries];
             const dictionaryOptionsArray = profiles[i].options.dictionaries;
             for (let j = dictionaryOptionsArray.length - 1; j >= 0; --j) {
                 const {name} = dictionaryOptionsArray[j];
-                if (installedDictionaries.has(name)) {
-                    missingDictionaries.delete(name);
+                const missingDictionariesNameIndex = missingDictionaries.findIndex((x) => x.title === name);
+                if (missingDictionariesNameIndex !== -1) {
+                    missingDictionaries.splice(missingDictionariesNameIndex, 1);
                 } else {
                     dictionaryOptionsArray.splice(j, 1);
                     modified = true;
                 }
             }
 
-            for (const name of missingDictionaries) {
-                const value = DictionaryController.createDefaultDictionarySettings(name, newDictionariesEnabled, '');
+            for (const {title, styles} of missingDictionaries) {
+                const value = DictionaryController.createDefaultDictionarySettings(title, newDictionariesEnabled, styles);
                 dictionaryOptionsArray.push(value);
                 modified = true;
             }
@@ -811,7 +846,7 @@ export class DictionaryController {
         if (typeof title !== 'string') { return; }
         delete modal.node.dataset.dictionaryTitle;
 
-        void this._deleteDictionary(title);
+        void this._enqueueDictionaryDelete(title);
     }
 
     /**
@@ -864,6 +899,33 @@ export class DictionaryController {
         void this.moveDictionaryOptions(indexNumber, target);
     }
 
+    /** */
+    _onDictionaryResetAliasButtonClick() {
+        const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('dictionary-set-alias'));
+        const index = modal.node.dataset.index ?? '';
+        const indexNumber = Number.parseInt(index, 10);
+        if (Number.isNaN(indexNumber)) { return; }
+
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#dictionary-alias-input');
+        input.value = this._dictionaryEntries[indexNumber].dictionaryTitle;
+    }
+
+    /** */
+    _onDictionarySetAliasButtonClick() {
+        const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('dictionary-set-alias'));
+        const index = modal.node.dataset.index ?? '';
+        const indexNumber = Number.parseInt(index, 10);
+        if (Number.isNaN(indexNumber)) { return; }
+
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#dictionary-alias-input');
+        const inputValue = input.value.trim();
+        if (inputValue) {
+            this._dictionaryEntries[indexNumber].updateAliasSettings(inputValue);
+        }
+    }
+
     /**
      * @param {import('dictionary-importer').Summary[]} dictionaries
      */
@@ -893,6 +955,7 @@ export class DictionaryController {
     /** */
     async _checkForUpdates() {
         if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isDeleting) { return; }
+        let hasUpdates;
         try {
             this._checkingUpdates = true;
             this._setButtonsEnabled(false);
@@ -900,10 +963,14 @@ export class DictionaryController {
             const updateChecks = this._dictionaryEntries.map((entry) => entry.checkForUpdate());
             const updateCount = (await Promise.all(updateChecks)).reduce((sum, value) => (sum + (value ? 1 : 0)), 0);
             if (this._checkUpdatesButton !== null) {
-                this._checkUpdatesButton.textContent = updateCount ? `${updateCount} update${updateCount > 1 ? 's' : ''}` : 'No updates';
+                hasUpdates = !!updateCount;
+                this._checkUpdatesButton.textContent = hasUpdates ? `${updateCount} update${updateCount > 1 ? 's' : ''}` : 'No updates';
             }
         } finally {
             this._setButtonsEnabled(true);
+            if (this._checkUpdatesButton !== null && !hasUpdates) {
+                this._checkUpdatesButton.disabled = true;
+            }
             this._checkingUpdates = false;
         }
     }
@@ -979,6 +1046,30 @@ export class DictionaryController {
         container.insertBefore(fragment, relative);
 
         this._updateDictionaryEntryCount();
+    }
+
+
+    /**
+     * @param {string} dictionaryTitle
+     * @returns {boolean}
+     */
+    isDictionaryInDeleteQueue(dictionaryTitle) {
+        return this._dictionaryDeleteQueue.includes(dictionaryTitle);
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     */
+    async _enqueueDictionaryDelete(dictionaryTitle) {
+        if (this.isDictionaryInDeleteQueue(dictionaryTitle)) { return; }
+        this._dictionaryDeleteQueue.push(dictionaryTitle);
+        if (this._isDeleting) { return; }
+        while (this._dictionaryDeleteQueue.length > 0) {
+            const title = this._dictionaryDeleteQueue[0];
+            if (!title) { continue; }
+            await this._deleteDictionary(title);
+            void this._dictionaryDeleteQueue.shift();
+        }
     }
 
     /**

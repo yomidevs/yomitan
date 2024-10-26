@@ -79,6 +79,9 @@ type AllTextProcessors = {
     cs: {
         pre: CapitalizationPreprocessors;
     };
+    da: {
+        pre: CapitalizationPreprocessors;
+    };
     de: {
         pre: CapitalizationPreprocessors & {
             eszettPreprocessor: BidirectionalConversionPreprocessor;
@@ -110,6 +113,7 @@ type AllTextProcessors = {
     grc: {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
+    hi: Record<string, never>;
     hu: {
         pre: CapitalizationPreprocessors;
     };

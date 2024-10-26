@@ -251,7 +251,7 @@
                                     },
                                     "popupOuterTheme": {
                                         "type": "string",
-                                        "enum": ["light", "dark", "browser", "site"],
+                                        "enum": ["light", "dark", "browser", "site", "none"],
                                         "default": "site"
                                     },
                                     "customPopupCss": {
@@ -423,7 +423,7 @@
                                                     "type": "string",
                                                     "enum": [
                                                         "jpod101",
-                                                        "jpod101-alternate",
+                                                        "language-pod-101",
                                                         "jisho",
                                                         "lingua-libre",
                                                         "wiktionary",
@@ -462,7 +462,6 @@
                                     "hideDelay",
                                     "length",
                                     "deepDomScan",
-                                    "scanAltText",
                                     "popupNestingMaxDepth",
                                     "enablePopupSearch",
                                     "enableOnPopupExpressions",
@@ -473,7 +472,8 @@
                                     "hidePopupOnCursorExit",
                                     "hidePopupOnCursorExitDelay",
                                     "normalizeCssZoom",
-                                    "scanWithoutMousemove"
+                                    "scanWithoutMousemove",
+                                    "scanResolution"
                                 ],
                                 "properties": {
                                     "inputs": {
@@ -715,10 +715,6 @@
                                         "type": "boolean",
                                         "default": false
                                     },
-                                    "scanAltText": {
-                                        "type": "boolean",
-                                        "default": true
-                                    },
                                     "popupNestingMaxDepth": {
                                         "type": "integer",
                                         "minimum": 0,
@@ -742,7 +738,7 @@
                                     },
                                     "layoutAwareScan": {
                                         "type": "boolean",
-                                        "default": false
+                                        "default": true
                                     },
                                     "matchTypePrefix": {
                                         "type": "boolean",
@@ -764,6 +760,14 @@
                                     "scanWithoutMousemove": {
                                         "type": "boolean",
                                         "default": true
+                                    },
+                                    "scanResolution": {
+                                        "type": "string",
+                                        "enum": [
+                                            "character",
+                                            "word"
+                                        ],
+                                        "default": "character"
                                     }
                                 }
                             },
@@ -831,6 +835,7 @@
                                     "type": "object",
                                     "required": [
                                         "name",
+                                        "alias",
                                         "priority",
                                         "enabled",
                                         "allowSecondarySearches",
@@ -840,6 +845,10 @@
                                     ],
                                     "properties": {
                                         "name": {
+                                            "type": "string",
+                                            "default": ""
+                                        },
+                                        "alias": {
                                             "type": "string",
                                             "default": ""
                                         },

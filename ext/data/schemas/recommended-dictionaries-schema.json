@@ -10,101 +10,31 @@
                 "terms": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "required": [
-                            "name",
-                            "url"
-                        ],
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "minLength": 2
-                            },
-                            "url": {
-                                "type": "string",
-                                "minLength": 2
-                            }
-                        }
+                        "$ref": "#/definitions/Dictionary"
                     }
                 },
                 "kanji": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "required": [
-                            "name",
-                            "url"
-                        ],
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "minLength": 2
-                            },
-                            "url": {
-                                "type": "string",
-                                "minLength": 2
-                            }
-                        }
+                        "$ref": "#/definitions/Dictionary"
                     }
                 },
                 "frequency": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "required": [
-                            "name",
-                            "url"
-                        ],
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "minLength": 2
-                            },
-                            "url": {
-                                "type": "string",
-                                "minLength": 2
-                            }
-                        }
+                        "$ref": "#/definitions/Dictionary"
                     }
                 },
                 "grammar": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "required": [
-                            "name",
-                            "url"
-                        ],
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "minLength": 2
-                            },
-                            "url": {
-                                "type": "string",
-                                "minLength": 2
-                            }
-                        }
+                        "$ref": "#/definitions/Dictionary"
                     }
                 },
                 "pronunciation": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "required": [
-                            "name",
-                            "url"
-                        ],
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "minLength": 2
-                            },
-                            "url": {
-                                "type": "string",
-                                "minLength": 2
-                            }
-                        }
+                        "$ref": "#/definitions/Dictionary"
                     }
                 }
             },
@@ -115,6 +45,34 @@
                 "grammar"
             ],
             "additionalProperties": false
+        }
+    },
+    "definitions": {
+        "Dictionary": {
+            "type": "object",
+            "required": [
+                "name",
+                "downloadUrl",
+                "description"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 2
+                },
+                "downloadUrl": {
+                    "type": "string",
+                    "minLength": 2
+                },
+                "description": {
+                    "type": "string",
+                    "minLength": 2
+                },
+                "homepage": {
+                    "type": "string",
+                    "minLength": 2
+                }
+            }
         }
     }
 }

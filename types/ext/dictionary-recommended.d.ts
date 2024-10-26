@@ -16,20 +16,22 @@
  */
 
 export type RecommendedDictionaries = {
-    [key: string]: LanguageDictionaries;
+    [key: string]: LanguageRecommendedDictionaries;
 };
 
-export type LanguageDictionaries = {
-    terms: Dictionary[];
-    kanji: Dictionary[];
-    frequency: Dictionary[];
-    grammar: Dictionary[];
-    pronunciation: Dictionary[];
+export type LanguageRecommendedDictionaries = {
+    terms: RecommendedDictionary[];
+    kanji: RecommendedDictionary[];
+    frequency: RecommendedDictionary[];
+    grammar: RecommendedDictionary[];
+    pronunciation: RecommendedDictionary[];
 };
 
-export type Dictionary = {
+export type RecommendedDictionary = {
     name: string;
-    url: string;
+    downloadUrl: string;
+    description: string;
+    homepage?: string;
 };
 
 export type RecommendedDictionariesTest = {
