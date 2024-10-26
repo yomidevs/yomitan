@@ -47,6 +47,7 @@ jobs:
           cat ./master-screenshots-outcome >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
           echo "FAILED=$(grep -c '^ *[0-9] failed$' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
+          echo "FLAKY=$(grep -c 'flaky' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
 
       # this is required because github.event.workflow_run.pull_requests is not available for PRs from forks
       - name: "Get PR information"
@@ -64,16 +65,15 @@ jobs:
           message: |
             :heavy_exclamation_mark: Could not fetch screenshots from master branch, so had nothing to make a visual comparison against; please check the "master-screenshots" step in the workflow run and rerun it before merging.
 
-      - name: "[Comment] Success: No visual differences introduced by this PR"
+      - name: "[Comment] Warning: Flaky tests caused by this PR; please check the playwright report"
         uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
-        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FAILED == 0
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FAILED != 0
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
-            :heavy_check_mark: No visual differences introduced by this PR.
+            :warning: Flaky tests caused by this PR; please check the playwright report.
 
             <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
-          update-only: true
 
       - name: "[Comment] Warning: Visual differences introduced by this PR"
         uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
@@ -84,3 +84,14 @@ jobs:
             :warning: Visual differences introduced by this PR; please validate if they are desirable.
 
             <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
+
+      - name: "[Comment] Success: No visual differences introduced by this PR"
+        uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FAILED == 0
+        with:
+          issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
+          message: |
+            :heavy_check_mark: No visual differences introduced by this PR.
+
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
+          update-only: true
