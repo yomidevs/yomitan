@@ -47,7 +47,7 @@ jobs:
           cat ./master-screenshots-outcome >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
           echo "FAILED=$(grep -c '^ *[0-9] failed$' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
-          echo "FLAKY=$(grep -c 'flaky' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
+          echo "FLAKY=$(grep -c '^ *[0-9] flaky$' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
 
       # this is required because github.event.workflow_run.pull_requests is not available for PRs from forks
       - name: "Get PR information"
