@@ -498,6 +498,7 @@ function computeCssZoomSupported() {
     return (
         typeof style === 'object' &&
         style !== null &&
+        // @ts-expect-error - zoom is a non-standard property.
         typeof style.zoom === 'string'
     );
 }

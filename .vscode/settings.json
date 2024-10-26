@@ -38,5 +38,6 @@
             ],
             "url": "/ext/data/schemas/recommended-dictionaries-schema.json"
         }
-    ]
+    ],
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }
