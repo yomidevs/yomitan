@@ -58,6 +58,7 @@ export class Offscreen {
             ['findTermsOffscreen', this._findTermsHandler.bind(this)],
             ['getTermFrequenciesOffscreen', this._getTermFrequenciesHandler.bind(this)],
             ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)],
+            ['createAndRegisterPortOffscreen', this._createAndRegisterPort.bind(this)],
         ]);
 
 
@@ -68,25 +69,8 @@ export class Offscreen {
     /** */
     prepare() {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-
-        const registerPort = () => {
-            console.log(`[${self.constructor.name}] prepare; registerPort`);
-            const mc = new MessageChannel();
-            mc.port1.onmessage = (e) => {
-                console.log(`[${self.constructor.name}] MessageChannel onmessage`, e.data);
-                this._onSWMessage(e.data);
-            };
-            void navigator.serviceWorker.ready.then((swr) => {
-                console.log(`[${self.constructor.name}] prepare; navigator.serviceWorker.ready`, swr);
-                if (swr.active !== null) {
-                    swr.active.postMessage({action: 'registerOffscreenPort'}, [mc.port2]);
-                } else {
-                    console.log(`[${self.constructor.name}] prepare; swr.active is null`);
-                }
-            });
-        };
-        navigator.serviceWorker.addEventListener('controllerchange', registerPort);
-        registerPort();
+        navigator.serviceWorker.addEventListener('controllerchange', this._createAndRegisterPort.bind(this));
+        this._createAndRegisterPort();
     }
 
     /** @type {import('offscreen').ApiHandler<'clipboardGetTextOffscreen'>} */
@@ -189,6 +173,26 @@ export class Offscreen {
     /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('offscreen').ApiMessageAny>} */
     _onMessage({action, params}, _sender, callback) {
         return invokeApiMapHandler(this._apiMap, action, params, [], callback);
+    }
+
+    /**
+     *
+     */
+    _createAndRegisterPort() {
+        console.log(`[${self.constructor.name}] prepare; registerPort`);
+        const mc = new MessageChannel();
+        mc.port1.onmessage = (e) => {
+            console.log(`[${self.constructor.name}] MessageChannel onmessage`, e.data);
+            this._onSWMessage(e.data);
+        };
+        void navigator.serviceWorker.ready.then((swr) => {
+            console.log(`[${self.constructor.name}] prepare; navigator.serviceWorker.ready`, swr);
+            if (swr.active !== null) {
+                swr.active.postMessage({action: 'registerOffscreenPort'}, [mc.port2]);
+            } else {
+                console.log(`[${self.constructor.name}] prepare; swr.active is null`);
+            }
+        });
     }
 
     /** @param {{action: string, params: any}} obj */

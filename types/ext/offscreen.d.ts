@@ -101,6 +101,10 @@ type ApiSurface = {
         params: void;
         return: string | null;
     };
+    createAndRegisterPortOffscreen: {
+        params: void;
+        return: void;
+    };
 };
 
 export type ApiMessage<TName extends ApiNames> = (
