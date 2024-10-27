@@ -970,16 +970,16 @@ function getCloze(dictionaryEntry, context) {
     if (typeof offset !== 'number') { offset = 0; }
 
     const textSegments = [];
-    for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, text.substring(offset, offset + originalText.length))) {
+    for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, [...text].slice(offset, offset + originalText.length).join(''))) {
         textSegments.push(reading2.length > 0 ? reading2 : text2);
     }
 
     return {
         sentence: text,
-        prefix: text.substring(0, offset),
-        body: text.substring(offset, offset + originalText.length),
+        prefix: [...text].slice(0, offset).join(''),
+        body: [...text].slice(offset, offset + originalText.length).join(''),
         bodyKana: textSegments.join(''),
-        suffix: text.substring(offset + originalText.length),
+        suffix: [...text].slice(offset + originalText.length).join(''),
     };
 }
 
