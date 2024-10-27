@@ -680,8 +680,8 @@ export class AnkiTemplateRenderer {
         if (typeof content === 'string') { return this._safeString(this._stringToMultiLineHtml(content)); }
         if (!(typeof content === 'object' && content !== null)) { return ''; }
         switch (content.type) {
-            case 'image': return await this._formatGlossaryImage(content, dictionary, data);
-            case 'structured-content': return await this._formatStructuredContent(content, dictionary, data);
+            case 'image': return this._formatGlossaryImage(content, dictionary, data);
+            case 'structured-content': return this._formatStructuredContent(content, dictionary, data);
             case 'text': return this._safeString(this._stringToMultiLineHtml(content.text));
         }
         return '';
@@ -691,11 +691,11 @@ export class AnkiTemplateRenderer {
      * @param {import('dictionary-data').TermGlossaryImage} content
      * @param {string} dictionary
      * @param {import('anki-templates').NoteData} data
-     * @returns {Promise<string>}
+     * @returns {string}
      */
-    async _formatGlossaryImage(content, dictionary, data) {
+    _formatGlossaryImage(content, dictionary, data) {
         const structuredContentGenerator = this._createStructuredContentGenerator(data);
-        const node = await structuredContentGenerator.createDefinitionImage(content, dictionary);
+        const node = structuredContentGenerator.createDefinitionImage(content, dictionary);
         return this._getStructuredContentHtml(node);
     }
 
@@ -703,11 +703,11 @@ export class AnkiTemplateRenderer {
      * @param {import('dictionary-data').TermGlossaryStructuredContent} content
      * @param {string} dictionary
      * @param {import('anki-templates').NoteData} data
-     * @returns {Promise<string>}
+     * @returns {string}
      */
-    async _formatStructuredContent(content, dictionary, data) {
+    _formatStructuredContent(content, dictionary, data) {
         const structuredContentGenerator = this._createStructuredContentGenerator(data);
-        const node = await structuredContentGenerator.createStructuredContent(content.content, dictionary);
+        const node = structuredContentGenerator.createStructuredContent(content.content, dictionary);
         return node !== null ? this._getStructuredContentHtml(node) : '';
     }
 

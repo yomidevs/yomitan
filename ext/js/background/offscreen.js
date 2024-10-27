@@ -43,7 +43,6 @@ export class Offscreen {
         );
 
 
-        /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('offscreen').ApiMap} */
         this._apiMap = createApiMap([
             ['clipboardGetTextOffscreen', this._getTextHandler.bind(this)],
@@ -58,9 +57,9 @@ export class Offscreen {
             ['findKanjiOffscreen', this._findKanjiHandler.bind(this)],
             ['findTermsOffscreen', this._findTermsHandler.bind(this)],
             ['getTermFrequenciesOffscreen', this._getTermFrequenciesHandler.bind(this)],
-            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)]
+            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)],
         ]);
-        /* eslint-enable @stylistic/no-multi-spaces */
+
 
         /** @type {?Promise<void>} */
         this._prepareDatabasePromise = null;
@@ -79,7 +78,7 @@ export class Offscreen {
                 swr.active?.postMessage({action: 'registerOffscreenPort'}, [mc.port2]);
             });
         };
-        navigator.serviceWorker.addEventListener("controllerchange", registerPort);
+        navigator.serviceWorker.addEventListener('controllerchange', registerPort);
         registerPort();
     }
 
@@ -152,7 +151,7 @@ export class Offscreen {
                 null
         );
         const textReplacements = options.textReplacements.map((group) => {
-            if (group === null) {return null;}
+            if (group === null) { return null; }
             return group.map((opt) => {
                 // https://stackoverflow.com/a/33642463
                 const match = opt.pattern.match(/\/(.*?)\/([a-z]*)?$/i);
@@ -187,8 +186,9 @@ export class Offscreen {
 
     /** @param {{action: string, params: any}} obj */
     _onSWMessage({action, params}) {
+        console.log(`[${self.constructor.name}] _onSWMessage`, action, params);
         if (action === 'drawMedia') {
-            this._dictionaryDatabase.drawMedia(params);
+            void this._dictionaryDatabase.drawMedia(params);
         }
     }
 }

@@ -159,7 +159,7 @@ export class DictionaryDatabase {
                 log.log('Worker terminated with error:', event);
             });
             this._worker.addEventListener('unhandledrejection', (event) => {
-                log.log('Unhandled promise rejection in worker:', event.reason);
+                log.log('Unhandled promise rejection in worker:', event);
             });
         } else {
             // when we are the worker, prepare to need to do some SVG work and load appropriate wasm & fonts

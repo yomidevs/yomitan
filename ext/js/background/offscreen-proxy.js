@@ -203,6 +203,7 @@ export class DictionaryDatabaseProxy {
      * @returns {Promise<void>}
      */
     async drawMedia(targets) {
+        console.log(`[${self.constructor.name}] drawMedia`);
         this._offscreen.sendMessageViaPort({action: 'drawMedia', params: targets}, targets.map((t) => t.canvas));
     }
 }

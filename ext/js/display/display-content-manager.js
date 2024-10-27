@@ -82,7 +82,9 @@ export class DisplayContentManager {
      * Execute media requests
      */
     async executeMediaRequests() {
+        console.log(`[${self.constructor.name}] executeMediaRequests`);
         await navigator.serviceWorker.ready.then((swr) => {
+            console.log(`[${self.constructor.name}] executeMediaRequests swr`, swr);
             const canvases = this._loadMediaRequests.map(({canvas}) => /** @type {Transferable} */ (canvas));
             swr.active?.postMessage({action: 'drawMedia', params: this._loadMediaRequests}, canvases);
         });

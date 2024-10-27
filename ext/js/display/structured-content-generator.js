@@ -36,28 +36,28 @@ export class StructuredContentGenerator {
      * @param {import('structured-content').Content} content
      * @param {string} dictionary
      */
-    async appendStructuredContent(node, content, dictionary) {
+    appendStructuredContent(node, content, dictionary) {
         node.classList.add('structured-content');
-        await this._appendStructuredContent(node, content, dictionary, null);
+        this._appendStructuredContent(node, content, dictionary, null);
     }
 
     /**
      * @param {import('structured-content').Content} content
      * @param {string} dictionary
-     * @returns {Promise<HTMLElement>}
+     * @returns {HTMLElement}
      */
-    async createStructuredContent(content, dictionary) {
+    createStructuredContent(content, dictionary) {
         const node = this._createElement('span', 'structured-content');
-        await this._appendStructuredContent(node, content, dictionary, null);
+        this._appendStructuredContent(node, content, dictionary, null);
         return node;
     }
 
     /**
      * @param {import('structured-content').ImageElement|import('dictionary-data').TermGlossaryImage} data
      * @param {string} dictionary
-     * @returns {Promise<HTMLAnchorElement>}
+     * @returns {HTMLAnchorElement}
      */
-    async createDefinitionImage(data, dictionary) {
+    createDefinitionImage(data, dictionary) {
         const {
             path,
             width = 100,
@@ -154,7 +154,7 @@ export class StructuredContentGenerator {
      * @param {string} dictionary
      * @param {?string} language
      */
-    async _appendStructuredContent(container, content, dictionary, language) {
+    _appendStructuredContent(container, content, dictionary, language) {
         if (typeof content === 'string') {
             if (content.length > 0) {
                 container.appendChild(this._createTextNode(content));
@@ -172,11 +172,11 @@ export class StructuredContentGenerator {
         }
         if (Array.isArray(content)) {
             for (const item of content) {
-                await this._appendStructuredContent(container, item, dictionary, language);
+                this._appendStructuredContent(container, item, dictionary, language);
             }
             return;
         }
-        const node = await this._createStructuredContentGenericElement(content, dictionary, language);
+        const node = this._createStructuredContentGenericElement(content, dictionary, language);
         if (node !== null) {
             container.appendChild(node);
         }
@@ -223,9 +223,9 @@ export class StructuredContentGenerator {
      * @param {import('structured-content').Element} content
      * @param {string} dictionary
      * @param {?string} language
-     * @returns {Promise<?HTMLElement>}
+     * @returns {?HTMLElement}
      */
-    async _createStructuredContentGenericElement(content, dictionary, language) {
+    _createStructuredContentGenericElement(content, dictionary, language) {
         const {tag} = content;
         switch (tag) {
             case 'br':
@@ -253,7 +253,7 @@ export class StructuredContentGenerator {
             case 'summary':
                 return this._createStructuredContentElement(tag, content, dictionary, language, 'simple', true, true);
             case 'img':
-                return await this.createDefinitionImage(content, dictionary);
+                return this.createDefinitionImage(content, dictionary);
             case 'a':
                 return this._createLinkElement(content, dictionary, language);
         }
@@ -265,11 +265,11 @@ export class StructuredContentGenerator {
      * @param {import('structured-content').UnstyledElement} content
      * @param {string} dictionary
      * @param {?string} language
-     * @returns {Promise<HTMLElement>}
+     * @returns {HTMLElement}
      */
-    async _createStructuredContentTableElement(tag, content, dictionary, language) {
+    _createStructuredContentTableElement(tag, content, dictionary, language) {
         const container = this._createElement('div', 'gloss-sc-table-container');
-        const table = await this._createStructuredContentElement(tag, content, dictionary, language, 'table', true, false);
+        const table = this._createStructuredContentElement(tag, content, dictionary, language, 'table', true, false);
         container.appendChild(table);
         return container;
     }
@@ -282,9 +282,9 @@ export class StructuredContentGenerator {
      * @param {'simple'|'table'|'table-cell'} type
      * @param {boolean} hasChildren
      * @param {boolean} hasStyle
-     * @returns {Promise<HTMLElement>}
+     * @returns {HTMLElement}
      */
-    async _createStructuredContentElement(tag, content, dictionary, language, type, hasChildren, hasStyle) {
+    _createStructuredContentElement(tag, content, dictionary, language, type, hasChildren, hasStyle) {
         const node = this._createElement(tag, `gloss-sc-${tag}`);
         const {data, lang} = content;
         if (typeof data === 'object' && data !== null) { this._setElementDataset(node, data); }
@@ -310,7 +310,7 @@ export class StructuredContentGenerator {
             if (typeof title === 'string') { node.title = title; }
         }
         if (hasChildren) {
-            await this._appendStructuredContent(node, content.content, dictionary, language);
+            this._appendStructuredContent(node, content.content, dictionary, language);
         }
         return node;
     }
@@ -405,9 +405,9 @@ export class StructuredContentGenerator {
      * @param {import('structured-content').LinkElement} content
      * @param {string} dictionary
      * @param {?string} language
-     * @returns {Promise<HTMLAnchorElement>}
+     * @returns {HTMLAnchorElement}
      */
-    async _createLinkElement(content, dictionary, language) {
+    _createLinkElement(content, dictionary, language) {
         let {href} = content;
         const internal = href.startsWith('?');
         if (internal) {
@@ -426,7 +426,7 @@ export class StructuredContentGenerator {
             language = lang;
         }
 
-        await this._appendStructuredContent(text, content.content, dictionary, language);
+        this._appendStructuredContent(text, content.content, dictionary, language);
 
         if (!internal) {
             const icon = this._createElement('span', 'gloss-link-external-icon icon');
