@@ -30,6 +30,10 @@ Unit tests, integration tests, and various other tests can be executed by runnin
 Other individual tests can be looked up in the [package.json](package.json) file, and the source for specific tests
 can be found in the [test](test) directory
 
+### Playwright
+
+To run [playwright](https://playwright.dev/) tests locally, you can run `npx playwright install` to install the headless browsers, then copy the dictionary test data located in the `dictionaries` branch to a directory named `dictionaries` via `git clone --branch dictionaries git@github.com:yomidevs/yomitan.git dictionaries` ([source](https://github.com/yomidevs/yomitan/blob/086e043856ad54cf13cb65f9ba4c63afe8a22cc3/.github/workflows/playwright.yml#L52-L57)). Now you can run `npx playwright test`. The first run might produce some benign errors complaining about `Error: A snapshot doesn't exist at ...writing actual.`, but subsequent runs should succeed.
+
 ## Building
 
 By default, the development repository is configured for Chrome, and the [ext](ext) directory can be directly
