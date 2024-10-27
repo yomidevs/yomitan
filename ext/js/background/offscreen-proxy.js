@@ -68,6 +68,7 @@ export class OffscreenProxy {
      */
     async prepare() {
         if (await this._hasOffscreenDocument()) {
+            void this.sendMessagePromise({action: 'createAndRegisterPortOffscreen'});
             return;
         }
         if (this._creatingOffscreen) {
@@ -159,8 +160,6 @@ export class OffscreenProxy {
         if (this._currentOffscreenPort !== null) {
             this._currentOffscreenPort.postMessage(message, transfers);
         } else {
-            // ideally, this would not happen, and the port would automatically be created by the oncontrollerchange event listener, but it seems that it doesn't always work
-            console.log('OffscreenProxy.sendMessageViaPort: No offscreen port available, recreating');
             void this.sendMessagePromise({action: 'createAndRegisterPortOffscreen'});
         }
     }
