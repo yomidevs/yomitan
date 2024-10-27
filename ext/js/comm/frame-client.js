@@ -85,8 +85,6 @@ export class FrameClient {
         return new Promise((resolve, reject) => {
             /** @type {Map<string, string>} */
             const tokenMap = new Map();
-            /** @type {MessagePort | null} */
-            let messagePort = null;
             /** @type {?import('core').Timeout} */
             let timer = null;
             const deferPromiseDetails = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
@@ -135,12 +133,10 @@ export class FrameClient {
                     switch (action) {
                         case 'frameEndpointReady':
                             {
-                                const mc = new MessageChannel();
                                 const {secret} = params;
                                 const token = generateId(16);
                                 tokenMap.set(secret, token);
-                                messagePort = mc.port1;
-                                postMessage('frameEndpointConnect', {secret, token, hostFrameId}, [mc.port2]);
+                                postMessage('frameEndpointConnect', {secret, token, hostFrameId}, []);
                             }
                             break;
                         case 'frameEndpointConnected':
@@ -181,9 +177,6 @@ export class FrameClient {
                 if (timer === null) { return; } // Done
                 clearTimeout(timer);
                 timer = null;
-                if (messagePort !== null) {
-                    messagePort.close();
-                }
 
                 frameLoadedResolve = null;
                 if (frameLoadedReject !== null) {

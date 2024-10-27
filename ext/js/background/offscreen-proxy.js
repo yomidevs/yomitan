@@ -151,6 +151,7 @@ export class OffscreenProxy {
     }
 
     /**
+     * When you need to transfer Transferable objects, you can use this method which uses postMessage over the MessageChannel port established with the offscreen document.
      * @param {any} message
      * @param {Transferable[]} transfers
      */

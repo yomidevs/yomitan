@@ -69,7 +69,7 @@ export class FrameEndpoint {
     _onMessage(event) {
         if (this._token !== null) { return; } // Already initialized
 
-        const {data, ports} = event;
+        const {data} = event;
         if (typeof data !== 'object' || data === null) {
             log.error('Invalid message');
             return;
@@ -99,14 +99,6 @@ export class FrameEndpoint {
             return;
         }
 
-        if (typeof ports !== 'object' || ports.length !== 1) {
-            log.error('Invalid transfer');
-            return;
-        }
-
-        void navigator.serviceWorker.ready.then((swr) => {
-            swr.active?.postMessage('mcp', [ports[0]]);
-        });
         this._token = token;
 
         this._eventListeners.removeAllEventListeners();

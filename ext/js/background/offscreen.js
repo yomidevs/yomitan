@@ -70,12 +70,19 @@ export class Offscreen {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
 
         const registerPort = () => {
+            console.log(`[${self.constructor.name}] prepare; registerPort`);
             const mc = new MessageChannel();
             mc.port1.onmessage = (e) => {
+                console.log(`[${self.constructor.name}] MessageChannel onmessage`, e.data);
                 this._onSWMessage(e.data);
             };
             void navigator.serviceWorker.ready.then((swr) => {
-                swr.active?.postMessage({action: 'registerOffscreenPort'}, [mc.port2]);
+                console.log(`[${self.constructor.name}] prepare; navigator.serviceWorker.ready`, swr);
+                if (swr.active !== null) {
+                    swr.active.postMessage({action: 'registerOffscreenPort'}, [mc.port2]);
+                } else {
+                    console.log(`[${self.constructor.name}] prepare; swr.active is null`);
+                }
             });
         };
         navigator.serviceWorker.addEventListener('controllerchange', registerPort);

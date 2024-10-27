@@ -244,9 +244,11 @@ export class Backend {
         // This is for receiving messages sent with navigator.serviceWorker, which has the benefit of being able to transfer objects, but doesn't accept callbacks
         addEventListener('message', (event) => {
             if (event.data.action === 'drawMedia') {
-                this._dictionaryDatabase.drawMedia(event.data.params);
+                console.log(`[${self.constructor.name}] onmessage; drawMedia`, event);
+                void this._dictionaryDatabase.drawMedia(event.data.params);
             } else if (event.data.action === 'registerOffscreenPort' && this._offscreen !== null) {
-                this._offscreen.registerOffscreenPort(event.ports[0]);
+                console.log(`[${self.constructor.name}] onmessage; registerOffscreenPort`, event);
+                void this._offscreen.registerOffscreenPort(event.ports[0]);
             }
         });
 
