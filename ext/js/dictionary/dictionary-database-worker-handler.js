@@ -43,6 +43,7 @@ export class DictionaryDatabaseWorkerHandler {
      * @param {MessageEvent<import('dictionary-database-worker-handler').MessageToWorker>} event
      */
     _onMessage(event) {
+        console.log(`[${self.constructor.name}] received message`, event);
         const {action, params} = event.data;
         switch (action) {
             case 'drawMedia':

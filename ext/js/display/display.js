@@ -1451,6 +1451,7 @@ export class Display extends EventDispatcher {
 
             ++i;
         }
+        if (this._setContentToken !== token) { return; }
         void this._contentManager.executeMediaRequests();
 
         if (typeof scrollX === 'number' || typeof scrollY === 'number') {

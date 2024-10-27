@@ -153,11 +153,17 @@ export class DictionaryDatabase {
 
         // when we are not a worker ourselves, create a worker which is basically just a wrapper around this class, which we can use to offload some functions to
         if (self.constructor.name === 'Window') {
-            console.log('creating worker');
+            console.log(`[${self.constructor.name}] creating worker`);
             this._worker = new Worker('/js/dictionary/dictionary-database-worker-main.js', {type: 'module'});
+            this._worker.addEventListener('error', (event) => {
+                log.log('Worker terminated with error:', event);
+            });
+            this._worker.addEventListener('unhandledrejection', (event) => {
+                log.log('Unhandled promise rejection in worker:', event.reason);
+            });
         } else {
             // when we are the worker, prepare to need to do some SVG work and load appropriate wasm & fonts
-            console.log('loading wasm');
+            console.log(`[${self.constructor.name}] loading wasm`);
             await initWasm(fetch('/lib/resvg.wasm'));
 
             const font = await fetch('/fonts/NotoSansJP-Regular.ttf');
@@ -385,12 +391,14 @@ export class DictionaryDatabase {
      */
     async drawMedia(items) {
         if (this._worker !== null) { // if a worker is available, offload the work to it
+            console.log(`[${self.constructor.name}] sending drawMedia to worker`);
             // extract canvases to transfer them
             const transferables = items.map(({canvas}) => canvas);
             this._worker.postMessage({action: 'drawMedia', params: {items}}, transferables);
             return;
         }
         // otherwise, you are the worker, so do the work
+        console.log(`[${self.constructor.name}] executing drawMedia`);
 
         performance.mark('drawMedia:start');
 
@@ -434,25 +442,31 @@ export class DictionaryDatabase {
                 };
                 const resvgJS = new Resvg(new Uint8Array(m.content), opts);
                 const render = resvgJS.render();
+                const imageData = new ImageData(new Uint8ClampedArray(render.pixels), render.width, render.height);
                 for (const c of m.canvases) {
-                    c.getContext('2d')?.putImageData(new ImageData(new Uint8ClampedArray(render.pixels), render.width, render.height), 0, 0);
+                    c.getContext('2d')?.putImageData(imageData, 0, 0);
                 }
                 performance.mark('drawMedia:draw:svg:end');
                 performance.measure('drawMedia:draw:svg', 'drawMedia:draw:svg:start', 'drawMedia:draw:svg:end');
             } else {
                 performance.mark('drawMedia:draw:raster:start');
-                const imageDecoder = new ImageDecoder({type: m.mediaType, data: m.content});
-                await imageDecoder.decode().then((decodedImage) => {
-                    for (const c of m.canvases) {
-                        c.getContext('2d')?.drawImage(decodedImage.image, 0, 0, c.width, c.height);
-                    }
-                });
-                // const image = new Blob([m.content], {type: m.mediaType});
-                // await createImageBitmap(image).then((decodedImage) => {
-                //     for (const c of m.canvases) {
-                //         c.getContext('2d')?.drawImage(decodedImage, 0, 0, c.width, c.height);
-                //     }
-                // });
+
+                // ImageDecoder is slightly faster than Blob/createImageBitmap, but it is not available in Firefox
+                if (typeof ImageDecoder !== 'undefined') {
+                    const imageDecoder = new ImageDecoder({type: m.mediaType, data: m.content});
+                    await imageDecoder.decode().then((decodedImage) => {
+                        for (const c of m.canvases) {
+                            c.getContext('2d')?.drawImage(decodedImage.image, 0, 0, c.width, c.height);
+                        }
+                    });
+                } else {
+                    const image = new Blob([m.content], {type: m.mediaType});
+                    await createImageBitmap(image).then((decodedImage) => {
+                        for (const c of m.canvases) {
+                            c.getContext('2d')?.drawImage(decodedImage, 0, 0, c.width, c.height);
+                        }
+                    });
+                }
                 performance.mark('drawMedia:draw:raster:end');
                 performance.measure('drawMedia:draw:raster', 'drawMedia:draw:raster:start', 'drawMedia:draw:raster:end');
             }
