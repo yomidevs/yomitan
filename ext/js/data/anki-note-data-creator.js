@@ -968,19 +968,19 @@ function getCloze(dictionaryEntry, context) {
     }
     if (typeof text !== 'string') { text = ''; }
     if (typeof offset !== 'number') { offset = 0; }
-    text = [...text];
+    const textChars = [...text];
 
     const textSegments = [];
-    for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, text.slice(offset, offset + originalText.length).join(''))) {
+    for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, textChars.slice(offset, offset + originalText.length).join(''))) {
         textSegments.push(reading2.length > 0 ? reading2 : text2);
     }
 
     return {
-        sentence: text.join(''),
-        prefix: text.slice(0, offset).join(''),
-        body: text.slice(offset, offset + originalText.length).join(''),
+        sentence: textChars.join(''),
+        prefix: textChars.slice(0, offset).join(''),
+        body: textChars.slice(offset, offset + originalText.length).join(''),
         bodyKana: textSegments.join(''),
-        suffix: text.slice(offset + originalText.length).join(''),
+        suffix: textChars.slice(offset + originalText.length).join(''),
     };
 }
 
