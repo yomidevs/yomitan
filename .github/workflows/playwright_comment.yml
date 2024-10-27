@@ -65,29 +65,19 @@ jobs:
           message: |
             :heavy_exclamation_mark: Could not fetch screenshots from master branch, so had nothing to make a visual comparison against; please check the "master-screenshots" step in the workflow run and rerun it before merging.
 
-      - name: "[Comment] Warning: Flaky tests caused by this PR; please check the playwright report"
+      - name: "[Comment] Warning: Flaky tests or visual differences caused by this PR; please check the playwright report"
         uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
-        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FLAKY != 0
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && (steps.playwright.outputs.FLAKY != 0 || steps.playwright.outputs.FAILED != 0)
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
-            :warning: Flaky tests caused by this PR; please check the playwright report.
-
-            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
-
-      - name: "[Comment] Warning: Visual differences introduced by this PR"
-        uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
-        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FAILED != 0
-        with:
-          issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
-          message: |
-            :warning: Visual differences introduced by this PR; please validate if they are desirable.
+            :warning: Flaky tests or visual differences caused by this PR; please check the playwright report.
 
             <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
 
       - name: "[Comment] Success: No visual differences introduced by this PR"
         uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
-        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FAILED == 0
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FLAKY == 0 && steps.playwright.outputs.FAILED == 0
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
