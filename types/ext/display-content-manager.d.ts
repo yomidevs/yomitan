@@ -32,8 +32,6 @@ export type LoadMediaDataInfo = {
     loaded: boolean;
 };
 
-export type MediaCacheKey = string & {readonly __tag: unique symbol};
-
 export type LoadMediaRequest = {
     /**  The path to the media file in the dictionary. */
     path: string;

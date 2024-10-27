@@ -95,10 +95,9 @@ export class FrameClient {
             /**
              * @param {string} action
              * @param {import('core').SerializableObject} params
-             * @param {Transferable[]} transfers
              * @throws {Error}
              */
-            const postMessage = (action, params, transfers) => {
+            const postMessage = (action, params) => {
                 const contentWindow = frame.contentWindow;
                 if (contentWindow === null) { throw new Error('Frame missing content window'); }
 
@@ -110,7 +109,7 @@ export class FrameClient {
                 }
                 if (!validOrigin) { throw new Error('Unexpected frame origin'); }
 
-                contentWindow.postMessage({action, params}, targetOrigin, transfers);
+                contentWindow.postMessage({action, params}, targetOrigin);
             };
 
             /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
@@ -136,7 +135,7 @@ export class FrameClient {
                                 const {secret} = params;
                                 const token = generateId(16);
                                 tokenMap.set(secret, token);
-                                postMessage('frameEndpointConnect', {secret, token, hostFrameId}, []);
+                                postMessage('frameEndpointConnect', {secret, token, hostFrameId});
                             }
                             break;
                         case 'frameEndpointConnected':

@@ -17,6 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
+import {log} from '../core/log.js';
 
 export class API {
     /**
@@ -255,12 +256,12 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'drawMedia', 'targets'>} targets
-     * @returns {Promise<import('api').ApiReturn<'drawMedia'>>}
+     * @param {import('api').SwApiParam<'drawMedia', 'requests'>} requests
+     * @param {Transferable[]} transferables
      */
-    drawMedia(targets) {
-        console.log('drawMedia', targets);
-        return this._invoke('drawMedia', {targets});
+    drawMedia(requests, transferables) {
+        console.log('drawMedia', requests);
+        this._invokeSw('drawMedia', {requests}, transferables);
     }
 
     /**
@@ -374,6 +375,13 @@ export class API {
     }
 
     /**
+     * @param {Transferable[]} transferables
+     */
+    registerOffscreenPort(transferables) {
+        this._invokeSw('registerOffscreenPort', void 0, transferables);
+    }
+
+    /**
      * @returns {Promise<import('api').ApiReturn<'getLanguageSummaries'>>}
      */
     getLanguageSummaries() {
@@ -411,6 +419,24 @@ export class API {
                 });
             } catch (e) {
                 reject(e);
+            }
+        });
+    }
+
+    /**
+     * @template {import('api').SwApiNames} TAction
+     * @template {import('api').SwApiParams<TAction>} TParams
+     * @param {TAction} action
+     * @param {TParams} params
+     * @param {Transferable[]} transferables
+     */
+    _invokeSw(action, params, transferables) {
+        console.log(`[${self.constructor.name}] ${action}`, params);
+        void navigator.serviceWorker.ready.then((swr) => {
+            if (swr.active !== null) {
+                swr.active.postMessage({action, params}, transferables);
+            } else {
+                log.error(`[${self.constructor.name}] no active service worker`);
             }
         });
     }

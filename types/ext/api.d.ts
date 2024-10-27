@@ -293,12 +293,6 @@ type ApiSurface = {
         };
         return: DictionaryDatabase.MediaDataStringContent[];
     };
-    drawMedia: {
-        params: {
-            targets: DictionaryDatabase.DrawMediaRequest[];
-        };
-        return: void;
-    };
     logGenericErrorBackend: {
         params: {
             error: Core.SerializedError;
@@ -423,4 +417,46 @@ export type ApiMessageAny = {[name in ApiNames]: ApiMessage<name>}[ApiNames];
 type ApiMessage<TName extends ApiNames> = {
     action: TName;
     params: ApiParams<TName>;
+};
+
+// ServiceWorker API (i.e., API endpoints called via postMessage)
+
+type SwApiSurface = {
+    drawMedia: {
+        params: {
+            requests: DictionaryDatabase.DrawMediaRequest[];
+        };
+        return: void;
+    };
+    registerOffscreenPort: {
+        params: void;
+        return: void;
+    };
+};
+
+type SwApiExtraArgs = [ports: readonly MessagePort[] | null];
+
+export type SwApiNames = BaseApiNames<SwApiSurface>;
+
+export type SwApiMap = BaseApiMap<SwApiSurface, SwApiExtraArgs>;
+
+export type SwApiMapInit = BaseApiMapInit<SwApiSurface, SwApiExtraArgs>;
+
+export type SwApiHandler<TName extends SwApiNames> = BaseApiHandler<SwApiSurface[TName], SwApiExtraArgs>;
+
+export type SwApiHandlerNoExtraArgs<TName extends SwApiNames> = BaseApiHandler<SwApiSurface[TName], []>;
+
+export type SwApiParams<TName extends SwApiNames> = BaseApiParams<SwApiSurface[TName]>;
+
+export type SwApiParam<TName extends SwApiNames, TParamName extends BaseApiParamNames<SwApiSurface[TName]>> = BaseApiParam<SwApiSurface[TName], TParamName>;
+
+export type SwApiReturn<TName extends SwApiNames> = BaseApiReturn<SwApiSurface[TName]>;
+
+export type SwApiParamsAny = BaseApiParamsAny<SwApiSurface>;
+
+export type SwApiMessageAny = {[name in SwApiNames]: SwApiMessage<name>}[SwApiNames];
+
+type SwApiMessage<TName extends SwApiNames> = {
+    action: TName;
+    params: SwApiParams<TName>;
 };

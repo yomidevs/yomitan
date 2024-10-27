@@ -83,27 +83,8 @@ export class DisplayContentManager {
      */
     async executeMediaRequests() {
         console.log(`[${self.constructor.name}] executeMediaRequests`);
-        await navigator.serviceWorker.ready.then((swr) => {
-            console.log(`[${self.constructor.name}] executeMediaRequests swr`, swr);
-            const canvases = this._loadMediaRequests.map(({canvas}) => /** @type {Transferable} */ (canvas));
-            if (swr.active !== null) {
-                swr.active.postMessage({action: 'drawMedia', params: this._loadMediaRequests}, canvases);
-            } else {
-                console.log(`[${self.constructor.name}] executeMediaRequests swr.active is null`);
-            }
-        });
-        // await this._display.application.api.drawMedia(this._loadMediaRequests);
+        this._display.application.api.drawMedia(this._loadMediaRequests, this._loadMediaRequests.map(({canvas}) => canvas));
         this._loadMediaRequests = [];
-    }
-
-    /**
-     *
-     * @param {string} path
-     * @param {string} dictionary
-     * @returns {import('display-content-manager').MediaCacheKey}
-     */
-    _cacheKey(path, dictionary) {
-        return /** @type {import('display-content-manager').MediaCacheKey} */ (path + ':::' + dictionary);
     }
 
     /**

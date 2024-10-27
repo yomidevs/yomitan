@@ -16,10 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {API} from '../comm/api.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {WebExtension} from '../extension/web-extension.js';
 import {Translator} from '../language/translator.js';
 
 /**
@@ -42,28 +44,37 @@ export class Offscreen {
             '#clipboard-rich-content-paste-target',
         );
 
-
+        /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('offscreen').ApiMap} */
         this._apiMap = createApiMap([
-            ['clipboardGetTextOffscreen', this._getTextHandler.bind(this)],
-            ['clipboardGetImageOffscreen', this._getImageHandler.bind(this)],
-            ['clipboardSetBrowserOffscreen', this._setClipboardBrowser.bind(this)],
-            ['databasePrepareOffscreen', this._prepareDatabaseHandler.bind(this)],
-            ['getDictionaryInfoOffscreen', this._getDictionaryInfoHandler.bind(this)],
-            ['databasePurgeOffscreen', this._purgeDatabaseHandler.bind(this)],
-            ['databaseGetMediaOffscreen', this._getMediaHandler.bind(this)],
-            ['databaseDrawMediaOffscreen', this._drawMediaHandler.bind(this)],
-            ['translatorPrepareOffscreen', this._prepareTranslatorHandler.bind(this)],
-            ['findKanjiOffscreen', this._findKanjiHandler.bind(this)],
-            ['findTermsOffscreen', this._findTermsHandler.bind(this)],
-            ['getTermFrequenciesOffscreen', this._getTermFrequenciesHandler.bind(this)],
-            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)],
+            ['clipboardGetTextOffscreen',      this._getTextHandler.bind(this)],
+            ['clipboardGetImageOffscreen',     this._getImageHandler.bind(this)],
+            ['clipboardSetBrowserOffscreen',   this._setClipboardBrowser.bind(this)],
+            ['databasePrepareOffscreen',       this._prepareDatabaseHandler.bind(this)],
+            ['getDictionaryInfoOffscreen',     this._getDictionaryInfoHandler.bind(this)],
+            ['databasePurgeOffscreen',         this._purgeDatabaseHandler.bind(this)],
+            ['databaseGetMediaOffscreen',      this._getMediaHandler.bind(this)],
+            ['translatorPrepareOffscreen',     this._prepareTranslatorHandler.bind(this)],
+            ['findKanjiOffscreen',             this._findKanjiHandler.bind(this)],
+            ['findTermsOffscreen',             this._findTermsHandler.bind(this)],
+            ['getTermFrequenciesOffscreen',    this._getTermFrequenciesHandler.bind(this)],
+            ['clearDatabaseCachesOffscreen',   this._clearDatabaseCachesHandler.bind(this)],
             ['createAndRegisterPortOffscreen', this._createAndRegisterPort.bind(this)],
         ]);
+        /* eslint-enable @stylistic/no-multi-spaces */
 
+        /** @type {import('offscreen').McApiMap} */
+        this._mcApiMap = createApiMap([
+            ['drawMediaOffscreen', this._drawMediaHandler.bind(this)],
+        ]);
 
         /** @type {?Promise<void>} */
         this._prepareDatabasePromise = null;
+
+        /**
+         * @type {API}
+         */
+        this._api = new API(new WebExtension());
     }
 
     /** */
@@ -111,11 +122,6 @@ export class Offscreen {
     async _getMediaHandler({targets}) {
         const media = await this._dictionaryDatabase.getMedia(targets);
         return media.map((m) => ({...m, content: arrayBufferToBase64(m.content)}));
-    }
-
-    /** @type {import('offscreen').ApiHandler<'databaseDrawMediaOffscreen'>} */
-    async _drawMediaHandler({targets}) {
-        await this._dictionaryDatabase.drawMedia(targets);
     }
 
     /** @type {import('offscreen').ApiHandler<'translatorPrepareOffscreen'>} */
@@ -181,25 +187,21 @@ export class Offscreen {
     _createAndRegisterPort() {
         console.log(`[${self.constructor.name}] prepare; registerPort`);
         const mc = new MessageChannel();
-        mc.port1.onmessage = (e) => {
+        mc.port1.onmessage = (/** @type {MessageEvent<import('offscreen').McApiMessageAny>} */e) => {
             console.log(`[${self.constructor.name}] MessageChannel onmessage`, e.data);
-            this._onSWMessage(e.data);
+            this._onMcMessage(e.data);
         };
-        void navigator.serviceWorker.ready.then((swr) => {
-            console.log(`[${self.constructor.name}] prepare; navigator.serviceWorker.ready`, swr);
-            if (swr.active !== null) {
-                swr.active.postMessage({action: 'registerOffscreenPort'}, [mc.port2]);
-            } else {
-                console.log(`[${self.constructor.name}] prepare; swr.active is null`);
-            }
-        });
+        this._api.registerOffscreenPort([mc.port2]);
     }
 
-    /** @param {{action: string, params: any}} obj */
-    _onSWMessage({action, params}) {
-        console.log(`[${self.constructor.name}] _onSWMessage`, action, params);
-        if (action === 'drawMedia') {
-            void this._dictionaryDatabase.drawMedia(params);
-        }
+    /** @type {import('offscreen').McApiHandler<'drawMediaOffscreen'>} */
+    async _drawMediaHandler(params) {
+        await this._dictionaryDatabase.drawMedia(params.requests);
+    }
+
+    /** @param {import('offscreen').McApiMessageAny} obj */
+    _onMcMessage({action, params}) {
+        console.log(`[${self.constructor.name}] _onMCMessage`, action, params);
+        invokeApiMapHandler(this._mcApiMap, action, params, [], () => {});
     }
 }

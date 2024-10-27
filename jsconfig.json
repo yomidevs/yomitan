@@ -26,6 +26,12 @@
             "zip.js",
             "dexie",
             "ajv"
+        ],
+        "lib": [
+            "ES2022",
+            "DOM",
+            "DOM.Iterable",
+            "WebWorker"
         ]
     },
     "include": [

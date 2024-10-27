@@ -91,7 +91,7 @@ export class AnkiTemplateRenderer {
             ['join',             this._join.bind(this)],
             ['concat',           this._concat.bind(this)],
             ['pitchCategories',  this._pitchCategories.bind(this)],
-            ['formatGlossary',   this._formatGlossary.bind(this)], // TODO: Does this work when it's async?
+            ['formatGlossary',   this._formatGlossary.bind(this)],
             ['hasMedia',         this._hasMedia.bind(this)],
             ['getMedia',         this._getMedia.bind(this)],
             ['pronunciation',    this._pronunciation.bind(this)],
@@ -674,7 +674,7 @@ export class AnkiTemplateRenderer {
     /**
      * @type {import('template-renderer').HelperFunction<string>}
      */
-    async _formatGlossary(args, _context, options) {
+    _formatGlossary(args, _context, options) {
         const [dictionary, content] = /** @type {[dictionary: string, content: import('dictionary-data').TermGlossaryContent]} */ (args);
         const data = this._getNoteDataFromOptions(options);
         if (typeof content === 'string') { return this._safeString(this._stringToMultiLineHtml(content)); }

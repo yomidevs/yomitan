@@ -171,7 +171,6 @@ export class Backend {
             ['getDictionaryInfo',            this._onApiGetDictionaryInfo.bind(this)],
             ['purgeDatabase',                this._onApiPurgeDatabase.bind(this)],
             ['getMedia',                     this._onApiGetMedia.bind(this)],
-            ['drawMedia',                    this._onApiDrawMedia.bind(this)],
             ['logGenericErrorBackend',       this._onApiLogGenericErrorBackend.bind(this)],
             ['logIndicatorClear',            this._onApiLogIndicatorClear.bind(this)],
             ['modifySettings',               this._onApiModifySettings.bind(this)],
@@ -186,6 +185,12 @@ export class Backend {
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
             ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)],
+        ]);
+
+        /** @type {import('api').SwApiMap} */
+        this._swApiMap = createApiMap([
+            ['drawMedia',             this._onSwApiDrawMedia.bind(this)],
+            ['registerOffscreenPort', this._onSwApiRegisterOffscreenPort.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -242,15 +247,7 @@ export class Backend {
         chrome.runtime.onMessage.addListener(onMessage);
 
         // This is for receiving messages sent with navigator.serviceWorker, which has the benefit of being able to transfer objects, but doesn't accept callbacks
-        addEventListener('message', (event) => {
-            if (event.data.action === 'drawMedia') {
-                console.log(`[${self.constructor.name}] onmessage; drawMedia`, event);
-                void this._dictionaryDatabase.drawMedia(event.data.params);
-            } else if (event.data.action === 'registerOffscreenPort' && this._offscreen !== null) {
-                console.log(`[${self.constructor.name}] onmessage; registerOffscreenPort`, event);
-                void this._offscreen.registerOffscreenPort(event.ports[0]);
-            }
-        });
+        (/** @type {ServiceWorkerGlobalScope & typeof globalThis} */ (globalThis)).addEventListener('message', this._onSwMessage.bind(this));
 
         if (this._canObservePermissionsChanges()) {
             const onPermissionsChanged = this._onWebExtensionEventWrapper(this._onPermissionsChanged.bind(this));
@@ -259,6 +256,18 @@ export class Backend {
         }
 
         chrome.runtime.onInstalled.addListener(this._onInstalled.bind(this));
+    }
+
+    /** @type {import('api').SwApiHandler<'drawMedia'>} */
+    async _onSwApiDrawMedia({requests}) {
+        await this._dictionaryDatabase.drawMedia(requests);
+    }
+
+    /** @type {import('api').SwApiHandler<'registerOffscreenPort'>} */
+    async _onSwApiRegisterOffscreenPort(_params, ports) {
+        if (ports !== null && ports.length > 0) {
+            await this._offscreen?.registerOffscreenPort(ports[0]);
+        }
     }
 
     /**
@@ -418,6 +427,17 @@ export class Backend {
      */
     _onMessage({action, params}, sender, callback) {
         return invokeApiMapHandler(this._apiMap, action, params, [sender], callback);
+    }
+
+    /**
+     * @param {ExtendableMessageEvent} event
+     * @returns {boolean}
+     */
+    _onSwMessage(event) {
+        /** @type {import('api').SwApiMessageAny} */
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const message = event.data;
+        return invokeApiMapHandler(this._swApiMap, message.action, message.params, [event.ports], () => {});
     }
 
     /**
@@ -825,11 +845,6 @@ export class Backend {
     /** @type {import('api').ApiHandler<'getMedia'>} */
     async _onApiGetMedia({targets}) {
         return await this._getNormalizedDictionaryDatabaseMedia(targets);
-    }
-
-    /** @type {import('api').ApiHandler<'drawMedia'>} */
-    async _onApiDrawMedia({targets}) {
-        await this._dictionaryDatabase.drawMedia(targets);
     }
 
     /** @type {import('api').ApiHandler<'logGenericErrorBackend'>} */

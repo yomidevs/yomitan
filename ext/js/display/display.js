@@ -197,32 +197,33 @@ export class Display extends EventDispatcher {
         /** @type {import('language').LanguageSummary[]} */
         this._languageSummaries = [];
 
-
+        /* eslint-disable @stylistic/no-multi-spaces */
         this._hotkeyHandler.registerActions([
-            ['close', () => { this._onHotkeyClose(); }],
-            ['nextEntry', this._onHotkeyActionMoveRelative.bind(this, 1)],
-            ['previousEntry', this._onHotkeyActionMoveRelative.bind(this, -1)],
-            ['lastEntry', () => { this._focusEntry(this._dictionaryEntries.length - 1, 0, true); }],
-            ['firstEntry', () => { this._focusEntry(0, 0, true); }],
-            ['historyBackward', () => { this._sourceTermView(); }],
-            ['historyForward', () => { this._nextTermView(); }],
-            ['profilePrevious', async () => { await setProfile(-1, this._application); }],
-            ['profileNext', async () => { await setProfile(1, this._application); }],
+            ['close',             () => { this._onHotkeyClose(); }],
+            ['nextEntry',         this._onHotkeyActionMoveRelative.bind(this, 1)],
+            ['previousEntry',     this._onHotkeyActionMoveRelative.bind(this, -1)],
+            ['lastEntry',         () => { this._focusEntry(this._dictionaryEntries.length - 1, 0, true); }],
+            ['firstEntry',        () => { this._focusEntry(0, 0, true); }],
+            ['historyBackward',   () => { this._sourceTermView(); }],
+            ['historyForward',    () => { this._nextTermView(); }],
+            ['profilePrevious',   async () => { await setProfile(-1, this._application); }],
+            ['profileNext',       async () => { await setProfile(1, this._application); }],
             ['copyHostSelection', () => this._copyHostSelection()],
-            ['nextEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(1, true); }],
+            ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
             ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }],
         ]);
         this.registerDirectMessageHandlers([
             ['displaySetOptionsContext', this._onMessageSetOptionsContext.bind(this)],
-            ['displaySetContent', this._onMessageSetContent.bind(this)],
-            ['displaySetCustomCss', this._onMessageSetCustomCss.bind(this)],
-            ['displaySetContentScale', this._onMessageSetContentScale.bind(this)],
-            ['displayConfigure', this._onMessageConfigure.bind(this)],
+            ['displaySetContent',        this._onMessageSetContent.bind(this)],
+            ['displaySetCustomCss',      this._onMessageSetCustomCss.bind(this)],
+            ['displaySetContentScale',   this._onMessageSetContentScale.bind(this)],
+            ['displayConfigure',         this._onMessageConfigure.bind(this)],
             ['displayVisibilityChanged', this._onMessageVisibilityChanged.bind(this)],
         ]);
         this.registerWindowMessageHandlers([
             ['displayExtensionUnloaded', this._onMessageExtensionUnloaded.bind(this)],
         ]);
+        /* eslint-enable @stylistic/no-multi-spaces */
     }
 
     /** @type {import('../application.js').Application} */

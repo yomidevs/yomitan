@@ -22,14 +22,15 @@ import {base64ToArrayBuffer} from '../data/array-buffer-util.js';
 
 /**
  * This class is responsible for creating and communicating with an offscreen document.
- * This offscreen document is used to solve two issues:
+ * This offscreen document is used to solve three issues:
  *
  * - Provide clipboard access for the `ClipboardReader` class in the context of a MV3 extension.
  *   The background service workers doesn't have access a webpage to read the clipboard from,
  *   so it must be done in the offscreen page.
  *
- * - Provide access to `URL.createObjectURL` so that we can load media as blobs directly on the
- *   backend, which performs better than sending the media as base64 strings to the frontend.
+ * - Create a worker for image rendering, which both selects the images from the database,
+ *   decodes/rasterizes them, and then draws them on OffscreenCanvas objects provided by the
+ *   popup.
  *
  * - Provide a longer lifetime for the dictionary database. The background service worker can be
  *   terminated by the web browser, which means that when it restarts, it has to go through its
@@ -153,7 +154,8 @@ export class OffscreenProxy {
 
     /**
      * When you need to transfer Transferable objects, you can use this method which uses postMessage over the MessageChannel port established with the offscreen document.
-     * @param {any} message
+     * @template {import('offscreen').McApiNames} TMessageType
+     * @param {import('offscreen').McApiMessage<TMessageType>} message
      * @param {Transferable[]} transfers
      */
     sendMessageViaPort(message, transfers) {
@@ -205,12 +207,11 @@ export class DictionaryDatabaseProxy {
     }
 
     /**
-     * @param {import('dictionary-database').DrawMediaRequest[]} targets
+     * @param {import('dictionary-database').DrawMediaRequest[]} requests
      * @returns {Promise<void>}
      */
-    async drawMedia(targets) {
-        console.log(`[${self.constructor.name}] drawMedia`);
-        this._offscreen.sendMessageViaPort({action: 'drawMedia', params: targets}, targets.map((t) => t.canvas));
+    async drawMedia(requests) {
+        this._offscreen.sendMessageViaPort({action: 'drawMediaOffscreen', params: {requests}}, requests.map((t) => t.canvas));
     }
 }
 
