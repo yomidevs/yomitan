@@ -145,6 +145,7 @@ export function groupKanjiFrequencies(sourceFrequencies) {
 export function getGroupedPronunciations(dictionaryEntry) {
     const {headwords, pronunciations: termPronunciations} = dictionaryEntry;
 
+    /** @type {Set<string>} */
     const allTerms = new Set();
     const allReadings = new Set();
     /** @type {Map<string, string>} */
