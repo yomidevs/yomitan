@@ -654,6 +654,20 @@ export class TextScanner extends EventDispatcher {
             return false;
         }
 
+        switch (e.button) {
+            case 0: // Primary
+                this._scanTimerClear();
+                this._triggerClear('mousedown');
+                break;
+            case 1: // Middle
+                if (this._preventMiddleMouse) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                break;
+        }
+
         this._onMouseMove(e);
     }
 
