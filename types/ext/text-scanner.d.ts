@@ -154,8 +154,6 @@ export type ConstructorDetails = {
     ignorePoint?: ((x: number, y: number) => Promise<boolean>) | null;
     searchTerms?: boolean;
     searchKanji?: boolean;
-    searchOnClick?: boolean;
-    searchOnClickOnly?: boolean;
     textSourceGenerator: TextSourceGenerator;
 };
 
