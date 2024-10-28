@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: robinraju/release-downloader@a96f54c1b5f5e09e47d9504526e96febd949d4c2 # pin@v1.11
         with:
-          tag: 24.10.21.0
+          tag: ${{ github.ref_name }}
           fileName: "*"
 
       - name: Publish on Microsoft Edge Addons
