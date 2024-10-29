@@ -43,58 +43,62 @@ jobs:
           run_id: ${{ github.event.workflow_run.id }}
           name: playwright-results-json
 
-      - name: "[PR] Comment on the PR with Playwright results"
+      - name: Generate summary from playwright-results.json (expected to fail to comment)
+        id: playwright-summary
         if: github.event_name == 'pull_request'
         uses: daun/playwright-report-summary@v3
         with:
           report-file: playwright-results.json
 
-      # - name: Load artifacts into environment variables
-      #   id: playwright
-      #   run: |
-      #     EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-      #     echo "PLAYWRIGHT_OUTPUT<<$EOF" >> $GITHUB_OUTPUT
-      #     cat ./playwright-output >> $GITHUB_OUTPUT
-      #     echo "$EOF" >> $GITHUB_OUTPUT
-      #     echo "MASTER_SCREENSHOTS_OUTCOME<<$EOF" >> $GITHUB_OUTPUT
-      #     cat ./master-screenshots-outcome >> $GITHUB_OUTPUT
-      #     echo "$EOF" >> $GITHUB_OUTPUT
-      #     echo "FAILED=$(grep -c '^ *[0-9] failed$' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
-      #     echo "FLAKY=$(grep -c '^ *[0-9] flaky$' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
+      - name: Load artifacts into environment variables
+        id: playwright
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "PLAYWRIGHT_OUTPUT<<$EOF" >> $GITHUB_OUTPUT
+          cat ./playwright-output >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+          echo "MASTER_SCREENSHOTS_OUTCOME<<$EOF" >> $GITHUB_OUTPUT
+          cat ./master-screenshots-outcome >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+          echo "FAILED=$(grep -c '^ *[0-9] failed$' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
+          echo "FLAKY=$(grep -c '^ *[0-9] flaky$' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
 
-      # # this is required because github.event.workflow_run.pull_requests is not available for PRs from forks
-      # - name: "Get PR information"
-      #   uses: potiuk/get-workflow-origin@e2dae063368361e4cd1f510e8785cd73bca9352e # pin@v1_5
-      #   id: source-run-info
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     sourceRunId: ${{ github.event.workflow_run.id }}
+      # this is required because github.event.workflow_run.pull_requests is not available for PRs from forks
+      - name: "Get PR information"
+        uses: potiuk/get-workflow-origin@e2dae063368361e4cd1f510e8785cd73bca9352e # pin@v1_5
+        id: source-run-info
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sourceRunId: ${{ github.event.workflow_run.id }}
 
-      # - name: "[Comment] Couldn't download screenshots from master branch"
-      #   uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
-      #   if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME == 'failure'
-      #   with:
-      #     issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
-      #     message: |
-      #       :heavy_exclamation_mark: Could not fetch screenshots from master branch, so had nothing to make a visual comparison against; please check the "master-screenshots" step in the workflow run and rerun it before merging.
+      - name: "[Comment] Couldn't download screenshots from master branch"
+        uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME == 'failure'
+        with:
+          issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
+          message: |
+            :heavy_exclamation_mark: Could not fetch screenshots from master branch, so had nothing to make a visual comparison against; please check the "master-screenshots" step in the workflow run and rerun it before merging.
 
-      # - name: "[Comment] Warning: Flaky tests or visual differences caused by this PR; please check the playwright report"
-      #   uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
-      #   if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && (steps.playwright.outputs.FLAKY != 0 || steps.playwright.outputs.FAILED != 0)
-      #   with:
-      #     issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
-      #     message: |
-      #       :warning: Flaky tests or visual differences caused by this PR; please check the playwright report.
+      - name: "[Comment] Warning: Flaky tests or visual differences caused by this PR; please check the playwright report"
+        uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && (steps.playwright.outputs.FLAKY != 0 || steps.playwright.outputs.FAILED != 0)
+        with:
+          issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
+          message: ${{ steps.playwright-summary.outputs.summary }}
+          # message: |
+          #   :warning: Flaky tests or visual differences caused by this PR; please check the playwright report.
 
-      #       <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
+          #   <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
 
-      # - name: "[Comment] Success: No visual differences introduced by this PR"
-      #   uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
-      #   if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FLAKY == 0 && steps.playwright.outputs.FAILED == 0
-      #   with:
-      #     issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
-      #     message: |
-      #       :heavy_check_mark: No visual differences introduced by this PR.
+      - name: "[Comment] Success: No visual differences introduced by this PR"
+        uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
+        if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FLAKY == 0 && steps.playwright.outputs.FAILED == 0
+        with:
+          issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
+          message: ${{ steps.playwright-summary.outputs.summary }}
+          # message: |
+          #   :heavy_check_mark: No visual differences introduced by this PR.
 
-      #       <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
-      #     update-only: true
+          #   <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
+          # TODO: uncomment
+          # update-only: true
