@@ -314,6 +314,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -494,6 +495,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -693,6 +695,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -874,6 +877,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -1055,6 +1059,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -1236,6 +1241,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -1417,6 +1423,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -1597,6 +1604,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -1796,6 +1804,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -2002,6 +2011,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -2208,6 +2218,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -2414,6 +2425,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -2625,6 +2637,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -2811,6 +2824,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -2997,6 +3011,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -3183,6 +3198,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -3364,6 +3380,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -3544,6 +3561,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -3743,6 +3761,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -3866,6 +3885,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -4052,6 +4072,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -4247,6 +4268,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -4433,6 +4455,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -4614,6 +4637,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -4801,6 +4825,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -4982,6 +5007,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -5169,6 +5195,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -5375,6 +5402,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -5586,6 +5614,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -5772,6 +5801,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -5959,6 +5989,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -6165,6 +6196,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -6376,6 +6408,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -6562,6 +6595,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -6749,6 +6783,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -6882,6 +6917,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -6949,6 +6985,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -7016,6 +7053,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -7083,6 +7121,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -7155,6 +7194,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -7227,6 +7267,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -7299,6 +7340,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -7371,6 +7413,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -7438,6 +7481,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -7505,6 +7549,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -7578,6 +7623,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -7833,6 +7879,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -8093,6 +8140,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -8328,6 +8376,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -8558,6 +8607,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -8738,6 +8788,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -8937,6 +8988,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 2,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -9424,6 +9476,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 2,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -9857,6 +9910,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -10037,6 +10091,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -10257,6 +10312,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -10484,6 +10540,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -10711,6 +10768,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -10938,6 +10996,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -11149,6 +11208,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -11335,6 +11395,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -11521,6 +11582,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -11707,6 +11769,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -11888,6 +11951,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -12068,6 +12132,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 1,
         "headwords": [
           {
@@ -12269,6 +12334,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 10,
         "headwords": [
           {
@@ -12477,6 +12543,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 10,
         "headwords": [
           {
@@ -12685,6 +12752,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 10,
         "headwords": [
           {
@@ -12893,6 +12961,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 10,
         "headwords": [
           {
@@ -13106,6 +13175,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -13294,6 +13364,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -13482,6 +13553,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -13670,6 +13742,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -13853,6 +13926,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -14035,6 +14109,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -14236,6 +14311,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -14444,6 +14520,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -14652,6 +14729,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -14860,6 +14938,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 12,
         "headwords": [
           {
@@ -15073,6 +15152,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 6,
         "headwords": [
           {
@@ -15261,6 +15341,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 6,
         "headwords": [
           {
@@ -15449,6 +15530,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 6,
         "headwords": [
           {
@@ -15637,6 +15719,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 6,
         "headwords": [
           {
@@ -15820,6 +15903,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -16002,6 +16086,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -16208,6 +16293,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -16323,6 +16409,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -16447,6 +16534,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 7,
         "headwords": [
           {
@@ -16560,6 +16648,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -17047,6 +17136,7 @@
         "dictionaryAlias": "",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -17486,6 +17576,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -17646,6 +17737,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -17752,6 +17844,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -17858,6 +17951,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -17964,6 +18058,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -18070,6 +18165,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -18193,6 +18289,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -18340,6 +18437,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 5,
         "headwords": [
           {
@@ -18426,6 +18524,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -18498,6 +18597,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 7,
         "headwords": [
           {
@@ -18586,6 +18686,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 3,
         "headwords": [
           {
@@ -18674,6 +18775,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -18857,6 +18959,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -19046,6 +19149,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -19229,6 +19333,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -19418,6 +19523,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -19535,6 +19641,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -19719,6 +19826,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 2,
         "headwords": [
           {
@@ -19925,6 +20033,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 0,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 7,
         "headwords": [
           {
@@ -20011,6 +20120,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 7,
         "headwords": [
           {
@@ -20099,6 +20209,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 8,
         "headwords": [
           {
@@ -20192,6 +20303,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 4,
         "headwords": [
           {
@@ -20278,6 +20390,7 @@
         "dictionaryAlias": "termsDictAlias",
         "dictionaryPriority": 0,
         "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
         "maxOriginalTextLength": 7,
         "headwords": [
           {
@@ -20334,6 +20447,343 @@
             ],
             "entries": [
               "English definition"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      }
+    ]
+  },
+  {
+    "name": "Find term using primary reading 1",
+    "originalTextLength": 2,
+    "dictionaryEntries": [
+      {
+        "type": "term",
+        "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 1,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryAlias": "termsDictAlias",
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": true,
+        "maxOriginalTextLength": 2,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "自重",
+            "reading": "じちょう",
+            "sources": [
+              {
+                "originalText": "自重",
+                "transformedText": "自重",
+                "deinflectedText": "自重",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "dictionaryPriority": 0,
+            "id": 31,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              23
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "jichou definition"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      },
+      {
+        "type": "term",
+        "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 2,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryAlias": "termsDictAlias",
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
+        "maxOriginalTextLength": 2,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "自重",
+            "reading": "じじゅう",
+            "sources": [
+              {
+                "originalText": "自重",
+                "transformedText": "自重",
+                "deinflectedText": "自重",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "dictionaryPriority": 0,
+            "id": 32,
+            "score": 2,
+            "frequencyOrder": 0,
+            "sequences": [
+              24
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "jijuu definition"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      }
+    ]
+  },
+  {
+    "name": "Find term using primary reading 2",
+    "originalTextLength": 2,
+    "dictionaryEntries": [
+
+      {
+        "type": "term",
+        "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 2,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryAlias": "termsDictAlias",
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": true,
+        "maxOriginalTextLength": 2,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "自重",
+            "reading": "じじゅう",
+            "sources": [
+              {
+                "originalText": "自重",
+                "transformedText": "自重",
+                "deinflectedText": "自重",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "dictionaryPriority": 0,
+            "id": 32,
+            "score": 2,
+            "frequencyOrder": 0,
+            "sequences": [
+              24
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "jijuu definition"
+            ]
+          }
+        ],
+        "pronunciations": [],
+        "frequencies": []
+      },
+      {
+        "type": "term",
+        "isPrimary": true,
+        "textProcessorRuleChainCandidates": [
+          []
+        ],
+        "inflectionRuleChainCandidates": [
+          {
+            "source": "algorithm",
+            "inflectionRules": []
+          }
+        ],
+        "score": 1,
+        "frequencyOrder": 0,
+        "dictionaryIndex": 0,
+        "dictionaryAlias": "termsDictAlias",
+        "dictionaryPriority": 0,
+        "sourceTermExactMatchCount": 1,
+        "matchPrimaryReading": false,
+        "maxOriginalTextLength": 2,
+        "headwords": [
+          {
+            "index": 0,
+            "term": "自重",
+            "reading": "じちょう",
+            "sources": [
+              {
+                "originalText": "自重",
+                "transformedText": "自重",
+                "deinflectedText": "自重",
+                "matchType": "exact",
+                "matchSource": "term",
+                "isPrimary": true
+              }
+            ],
+            "tags": [],
+            "wordClasses": [
+              "n"
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "index": 0,
+            "headwordIndices": [
+              0
+            ],
+            "dictionary": "Test Dictionary 2",
+            "dictionaryIndex": 0,
+            "dictionaryAlias": "termsDictAlias",
+            "dictionaryPriority": 0,
+            "id": 31,
+            "score": 1,
+            "frequencyOrder": 0,
+            "sequences": [
+              23
+            ],
+            "isPrimary": true,
+            "tags": [
+              {
+                "name": "n",
+                "category": "partOfSpeech",
+                "order": 0,
+                "score": 0,
+                "content": [
+                  "noun"
+                ],
+                "dictionaries": [
+                  "Test Dictionary 2"
+                ],
+                "redundant": false
+              }
+            ],
+            "entries": [
+              "jichou definition"
             ]
           }
         ],

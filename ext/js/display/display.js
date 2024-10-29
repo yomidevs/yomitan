@@ -1265,14 +1265,15 @@ export class Display extends EventDispatcher {
     /**
      * @param {boolean} isKanji
      * @param {string} source
+     * @param {string} primaryReading
      * @param {boolean} wildcardsEnabled
      * @param {import('settings').OptionsContext} optionsContext
      * @returns {Promise<import('dictionary').DictionaryEntry[]>}
      */
-    async _findDictionaryEntries(isKanji, source, wildcardsEnabled, optionsContext) {
+    async _findDictionaryEntries(isKanji, source, primaryReading, wildcardsEnabled, optionsContext) {
         /** @type {import('dictionary').DictionaryEntry[]} */
         let dictionaryEntries = [];
-        const {findDetails, source: source2} = this._getFindDetails(source, wildcardsEnabled);
+        const {findDetails, source: source2} = this._getFindDetails(source, primaryReading, wildcardsEnabled);
         if (isKanji) {
             dictionaryEntries = await this._application.api.kanjiFind(source, optionsContext);
             if (dictionaryEntries.length > 0) { return dictionaryEntries; }
@@ -1289,12 +1290,13 @@ export class Display extends EventDispatcher {
 
     /**
      * @param {string} source
+     * @param {string} primaryReading
      * @param {boolean} wildcardsEnabled
      * @returns {{findDetails: import('api').FindTermsDetails, source: string}}
      */
-    _getFindDetails(source, wildcardsEnabled) {
+    _getFindDetails(source, primaryReading, wildcardsEnabled) {
         /** @type {import('api').FindTermsDetails} */
-        const findDetails = {};
+        const findDetails = {primaryReading};
         if (wildcardsEnabled) {
             const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
             if (match !== null) {
@@ -1327,6 +1329,7 @@ export class Display extends EventDispatcher {
         if (query === null) { query = ''; }
         let queryFull = urlSearchParams.get('full');
         queryFull = (queryFull !== null ? queryFull : query);
+        const primaryReading = urlSearchParams.get('primary_reading') ?? '';
         const queryOffsetString = urlSearchParams.get('offset');
         let queryOffset = 0;
         if (queryOffsetString !== null) {
@@ -1358,7 +1361,7 @@ export class Display extends EventDispatcher {
 
         let {dictionaryEntries} = content;
         if (!Array.isArray(dictionaryEntries)) {
-            dictionaryEntries = hasEnabledDictionaries && lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, wildcardsEnabled, optionsContext) : [];
+            dictionaryEntries = hasEnabledDictionaries && lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, primaryReading, wildcardsEnabled, optionsContext) : [];
             if (this._setContentToken !== token) { return; }
             content.dictionaryEntries = dictionaryEntries;
             changeHistory = true;
