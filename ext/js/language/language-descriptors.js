@@ -261,7 +261,7 @@ const languageDescriptors = [
         iso: 'pl',
         iso639_3: 'pol',
         name: 'Polish',
-        exampleText: 'czytacie',
+        exampleText: 'czytać',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
