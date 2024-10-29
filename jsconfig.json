@@ -3,7 +3,7 @@
         "module": "ES2022",
         "target": "ES2022",
         "checkJs": true,
-        "moduleResolution": "node",
+        "moduleResolution": "Bundler",
         "strict": true,
         "strictNullChecks": true,
         "noImplicitAny": true,
@@ -30,7 +30,8 @@
     "include": [
         "ext/**/*.js",
         "types/ext/**/*.ts",
-        "types/other/globals.d.ts"
+        "types/other/globals.d.ts",
+        "eslint.config.mjs"
     ],
     "exclude": [
         "node_modules",
