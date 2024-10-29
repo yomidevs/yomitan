@@ -106,3 +106,9 @@ jobs:
           name: playwright-output
           path: playwright-output
         if: github.event_name == 'pull_request'
+
+      - name: "[PR] Comment on the PR with Playwright results"
+        if: github.event_name == 'pull_request'
+        uses: daun/playwright-report-summary@v3
+        with:
+          report-file: results.json
