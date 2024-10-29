@@ -45,7 +45,6 @@ jobs:
 
       - name: Generate summary from playwright-results.json (expected to fail to comment)
         id: playwright-summary
-        if: github.event_name == 'pull_request'
         uses: daun/playwright-report-summary@v3
         with:
           report-file: playwright-results.json
