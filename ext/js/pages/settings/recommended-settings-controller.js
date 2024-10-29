@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {fetchJson} from '../../core/fetch-utilities.js';
 import {log} from '../../core/log.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 
@@ -44,11 +45,11 @@ export class RecommendedSettingsController {
     /**
      * @param {Event} _e
      */
-    _onLanguageSelectChanged(_e) {
+    async _onLanguageSelectChanged(_e) {
         const setLanguage = this._languageSelect.value;
         if (typeof setLanguage !== 'string') { return; }
 
-        const recommendedSettings = this._settingsController.getRecommendedSettings(setLanguage);
+        const recommendedSettings = await this._getRecommendedSettings(setLanguage);
         if (typeof recommendedSettings !== 'undefined') {
             const settingsList = querySelectorNotNull(document, '#recommended-settings-list');
             settingsList.innerHTML = '';
@@ -77,6 +78,20 @@ export class RecommendedSettingsController {
             }
             this._recommendedSettingsModal.hidden = false;
         }
+    }
+
+    /**
+     *
+     * @param {string} language
+     * @returns {Promise<import('settings-controller').RecommendedSetting[]>}
+     */
+    async _getRecommendedSettings(language) {
+        if (typeof this._recommendedSettingsByLanguage === 'undefined') {
+            /** @type {import('settings-controller').RecommendedSettingsByLanguage} */
+            this._recommendedSettingsByLanguage = await fetchJson('/data/recommended-settings.json');
+        }
+
+        return this._recommendedSettingsByLanguage[language];
     }
 
     /**
