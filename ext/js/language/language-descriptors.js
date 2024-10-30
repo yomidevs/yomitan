@@ -78,7 +78,7 @@ const languageDescriptors = [
         iso: 'de',
         iso639_3: 'deu',
         name: 'German',
-        exampleText: 'gelesen',
+        exampleText: 'lesen',
         textPreprocessors: {
             ...capitalizationPreprocessors,
             eszettPreprocessor,
@@ -142,7 +142,7 @@ const languageDescriptors = [
         iso: 'grc',
         iso639_3: 'grc',
         name: 'Ancient Greek',
-        exampleText: 'γράφω',
+        exampleText: 'γράφω', /* 'to write' */
         textPreprocessors: {
             ...capitalizationPreprocessors,
             removeAlphabeticDiacritics,
@@ -165,7 +165,7 @@ const languageDescriptors = [
         iso: 'id',
         iso639_3: 'ind',
         name: 'Indonesian',
-        exampleText: 'membaca',
+        exampleText: 'baca',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
@@ -182,7 +182,7 @@ const languageDescriptors = [
         iso: 'la',
         iso639_3: 'lat',
         name: 'Latin',
-        exampleText: 'legere',
+        exampleText: 'legō',
         textPreprocessors: {
             ...capitalizationPreprocessors,
             removeAlphabeticDiacritics,
@@ -275,7 +275,7 @@ const languageDescriptors = [
         iso: 'ro',
         iso639_3: 'ron',
         name: 'Romanian',
-        exampleText: 'citit',
+        exampleText: 'citi',
         textPreprocessors: {
             ...capitalizationPreprocessors,
             removeAlphabeticDiacritics,
@@ -307,7 +307,7 @@ const languageDescriptors = [
         iso: 'sh',
         iso639_3: 'hbs',
         name: 'Serbo-Croatian',
-        exampleText: 'čitaše',
+        exampleText: 'čìtati',
         textPreprocessors: {
             ...capitalizationPreprocessors,
             removeSerboCroatianAccentMarks,
@@ -317,7 +317,7 @@ const languageDescriptors = [
         iso: 'sq',
         iso639_3: 'sqi',
         name: 'Albanian',
-        exampleText: 'ndihmojme',
+        exampleText: 'ndihmoj', /* 'to help' */
         textPreprocessors: capitalizationPreprocessors,
         languageTransforms: albanianTransforms,
     },
@@ -349,14 +349,14 @@ const languageDescriptors = [
         iso: 'tr',
         iso639_3: 'tur',
         name: 'Turkish',
-        exampleText: 'okuyor',
+        exampleText: 'okumak',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
         iso: 'uk',
         iso639_3: 'ukr',
         name: 'Ukrainian',
-        exampleText: 'читаєте',
+        exampleText: 'читати',
         textPreprocessors: capitalizationPreprocessors,
     },
     {
