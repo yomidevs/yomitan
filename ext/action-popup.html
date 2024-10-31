@@ -16,58 +16,55 @@
     <script src="/js/pages/action-popup-main.js" type="module"></script>
 </head>
 <body>
-    <div>
-        <div tabindex="0" class="action-item action-select-profile" hidden>
-            <div class="action-item-inner">
-                <div class="action-item-left">
-                    <h2>Profile</h2>
-                </div>
-                <div class="action-item-right">
-                    <select class="profile-select" id="profile-select">
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div tabindex="0" class="action-item">
-            <div class="action-item-inner">
-                <div class="action-item-center">
-                    <label class="toggle">
-                        <input type="checkbox" class="enable-search">
-                        <div class="toggle-group">
-                            <span class="toggle-on">On</span>
-                            <span class="toggle-off">Off</span>
-                            <span class="toggle-handle"></span>
-                        </div>
-                    </label>
-                    <p class="tooltip">Hold <em class="modifier-key">shift</em> to scan</p>
-                </div>
-            </div>
-        </div>
-        <div tabindex="0" class="action-container">
-            <button type="button" class="low-emphasis action-open-settings" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'>
-                <div class="action-icon">
-                    <span class="icon" data-icon="cog"></span>
-                </div>
-            </button>
-            <button type="button" class="low-emphasis action-open-permissions" title="Permissions" hidden>
-                <div class="action-icon">
-                    <span class="icon" data-icon="key"></span>
-                    <div class="nav-button-warning-badge permissions-required-warning" hidden>
-                        <div class="nav-button-warning-badge-outer"></div>
-                        <div class="nav-button-warning-badge-inner"></div>
+    <div id="loading">
+        Loading...
+    </div>
+
+    <div id="action-popups">
+        <div id="mini">
+            <div tabindex="0" class="action-item action-select-profile" hidden>
+                <div class="action-item-inner">
+                    <div class="action-item-left">
+                        <h2 class="action-title">Profile</h2>
+                    </div>
+                    <div class="action-item-right">
+                        <select class="profile-select" id="profile-select">
+                        </select>
                     </div>
                 </div>
-            </button>
-            <button type="button" class="low-emphasis action-open-search" title="Search" data-hotkey='["global:openSearchPage","title","Search ({0})\nShift+click to open here"]'>
-                <div class="action-icon">
-                    <span class="icon" data-icon="magnifying-glass"></span>
+            </div>
+            <div tabindex="0" class="action-item">
+                <div class="action-item-inner">
+                    <div class="action-item-center">
+                        <label class="toggle">
+                            <input type="checkbox" class="enable-search">
+                            <div class="toggle-group">
+                                <span class="toggle-on">On</span>
+                                <span class="toggle-off">Off</span>
+                                <span class="toggle-handle"></span>
+                            </div>
+                        </label>
+                        <p class="tooltip">Hover over text to scan</p>
+                    </div>
                 </div>
-            </button>
-            <button type="button" class="low-emphasis action-open-info" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'>
-                <div class="action-icon">
-                    <span class="icon" data-icon="info"></span>
-                </div>
-            </button>
+            </div>
+            <div tabindex="0" class="action-container">
+                <button type="button" class="low-emphasis action-open-settings" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'>
+                    <div class="action-icon">
+                        <span class="icon" data-icon="cog"></span>
+                    </div>
+                </button>
+                <button type="button" class="low-emphasis action-open-search" title="Search&#010;Shift+click to open here" data-hotkey='["global:openSearchPage","title","Search ({0})\nShift+click to open here"]'>
+                    <div class="action-icon">
+                        <span class="icon" data-icon="magnifying-glass"></span>
+                    </div>
+                </button>
+                <button type="button" class="low-emphasis action-open-info" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'>
+                    <div class="action-icon">
+                        <span class="icon" data-icon="question-mark-circle"></span>
+                    </div>
+                </button>
+            </div>
         </div>
     </div>
 </body>

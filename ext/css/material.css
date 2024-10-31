@@ -282,7 +282,6 @@ body {
 .icon[data-icon=connection]              { --icon-image: url(/images/connection.svg); }
 .icon[data-icon=external-link]           { --icon-image: url(/images/external-link.svg); }
 .icon[data-icon=monitor]                 { --icon-image: url(/images/monitor.svg); }
-.icon[data-icon=info]                    { --icon-image: url(/images/info.svg); }
 .icon[data-icon=material-down-arrow] {
     --icon-image: url(/images/material-down-arrow.svg);
     --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1);
