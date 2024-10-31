@@ -471,7 +471,6 @@ h2.action-title {
     padding: 0;
     margin: 0;
     font-size: 1.125em;
-    font-weight: normal;
     line-height: 1.5;
 }
 
@@ -482,14 +481,11 @@ h2.action-title {
 }
 
 .enable-dictionary-tooltip {
-    color: #ff0000;
-    font-weight: bold;
-    font-style: normal;
+    color: #f0ad4e;
 }
 
 .tooltip>a:link, a:visited {
-    color: #ff0000;
-    font-style: normal;
+    color: #f0ad4e;
 }
 
 
