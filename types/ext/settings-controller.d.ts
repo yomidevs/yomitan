@@ -27,6 +27,9 @@ export type PageExitPrevention = {
     end: () => void;
 };
 
+type ProfileDictionarySettings = Settings.DictionaryOptions & {index: number};
+export type ProfilesDictionarySettings = ProfileDictionarySettings[] | null;
+
 export type Events = {
     optionsChanged: {
         options: Settings.ProfileOptions;
@@ -41,7 +44,7 @@ export type Events = {
     };
     importDictionaryFromUrl: {
         url: string;
-        insertIndex: number | null;
+        profilesDictionarySettings: ProfilesDictionarySettings;
     };
     dictionaryEnabled: Record<string, never>;
     scanInputsChanged: {

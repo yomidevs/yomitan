@@ -862,16 +862,12 @@ export class DictionaryController {
 
         const title = modal.node.dataset.dictionaryTitle;
         const downloadUrl = modal.node.dataset.downloadUrl;
-        const index = modal.node.dataset.index;
 
         if (typeof title !== 'string') { return; }
-        if (typeof index !== 'string') { return; }
-        const insertIndex = Number.parseInt(index, 10);
-        if (Number.isNaN(insertIndex)) { return; }
 
         delete modal.node.dataset.dictionaryTitle;
 
-        void this._updateDictionary(title, downloadUrl, insertIndex);
+        void this._updateDictionary(title, downloadUrl);
     }
 
 
@@ -1139,9 +1135,8 @@ export class DictionaryController {
     /**
      * @param {string} dictionaryTitle
      * @param {string|undefined} downloadUrl
-     * @param {number|null} insertIndex
      */
-    async _updateDictionary(dictionaryTitle, downloadUrl, insertIndex) {
+    async _updateDictionary(dictionaryTitle, downloadUrl) {
         if (this._checkingIntegrity || this._checkingUpdates || this._isDeleting || this._dictionaries === null) { return; }
 
         const dictionaryInfo = this._dictionaries.find((entry) => entry.title === dictionaryTitle);
@@ -1149,8 +1144,24 @@ export class DictionaryController {
         downloadUrl = downloadUrl ?? dictionaryInfo.downloadUrl;
         if (typeof downloadUrl !== 'string') { throw new Error('Attempted to update dictionary without download URL'); }
 
+        const options = await this._settingsController.getOptionsFull();
+        const {profiles} = options;
+
+        /** @type {import('settings-controller.js').ProfilesDictionarySettings} */
+        const profilesDictionarySettings = [];
+
+        for (let i = 0, ii = profiles.length; i < ii; ++i) {
+            const dictionaries = profiles[i].options.dictionaries;
+            for (let j = 0, jj = dictionaries.length; j < jj; ++j) {
+                if (dictionaries[j].name === dictionaryTitle) {
+                    profilesDictionarySettings.push({...dictionaries[j], index: j});
+                    break;
+                }
+            }
+        }
+
         await this._deleteDictionary(dictionaryTitle);
-        this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl, insertIndex});
+        this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl, profilesDictionarySettings});
     }
 
     /**

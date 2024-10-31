@@ -252,8 +252,8 @@ export class DictionaryImportController {
     /**
      * @param {import('settings-controller').EventArgument<'importDictionaryFromUrl'>} details
      */
-    _onEventImportDictionaryFromUrl({url, insertIndex}) {
-        void this.importFilesFromURLs(url, insertIndex);
+    _onEventImportDictionaryFromUrl({url, profilesDictionarySettings}) {
+        void this.importFilesFromURLs(url, profilesDictionarySettings);
     }
 
     /** */
@@ -432,16 +432,16 @@ export class DictionaryImportController {
 
     /**
      * @param {string} text
-     * @param {number | null} insertIndex
+     * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
      */
-    async importFilesFromURLs(text, insertIndex) {
+    async importFilesFromURLs(text, profilesDictionarySettings) {
         const urls = text.split('\n');
 
         const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), urls.length);
         const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
         void this._importDictionaries(
             this._generateFilesFromUrls(urls, onProgress),
-            insertIndex,
+            profilesDictionarySettings,
             importProgressTracker,
         );
     }
@@ -523,10 +523,10 @@ export class DictionaryImportController {
 
     /**
      * @param {AsyncGenerator<File, void, void>} dictionaries
-     * @param {number | null} insertIndex
+     * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
      * @param {ImportProgressTracker} importProgressTracker
      */
-    async _importDictionaries(dictionaries, insertIndex, importProgressTracker) {
+    async _importDictionaries(dictionaries, profilesDictionarySettings, importProgressTracker) {
         if (this._modifying) { return; }
 
         const statusFooter = this._statusFooter;
@@ -563,7 +563,7 @@ export class DictionaryImportController {
                     ...errors,
                     ...(await this._importDictionaryFromZip(
                         file,
-                        insertIndex,
+                        profilesDictionarySettings,
                         importDetails,
                         onProgress,
                     ) ?? []),
@@ -620,19 +620,19 @@ export class DictionaryImportController {
 
     /**
      * @param {File} file
-     * @param {number | null} insertIndex
+     * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
      * @param {import('dictionary-importer').ImportDetails} importDetails
      * @param {import('dictionary-worker').ImportProgressCallback} onProgress
      * @returns {Promise<Error[] | undefined>}
      */
-    async _importDictionaryFromZip(file, insertIndex, importDetails, onProgress) {
+    async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
         const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
         if (!result) {
             return errors;
         }
 
-        const errors2 = await this._addDictionarySettings(result, insertIndex);
+        const errors2 = await this._addDictionarySettings(result, profilesDictionarySettings);
 
         await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
 
@@ -646,10 +646,10 @@ export class DictionaryImportController {
 
     /**
      * @param {import('dictionary-importer').Summary} summary
-     * @param {number | null} insertIndex
+     * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
      * @returns {Promise<Error[]>}
      */
-    async _addDictionarySettings(summary, insertIndex) {
+    async _addDictionarySettings(summary, profilesDictionarySettings) {
         const {title, sequenced, styles} = summary;
         let optionsFull;
         // Workaround Firefox bug sometimes causing getOptionsFull to fail
@@ -670,16 +670,21 @@ export class DictionaryImportController {
         for (let i = 0; i < profileCount; ++i) {
             const {options} = optionsFull.profiles[i];
             const enabled = profileIndex === i;
-            const value = DictionaryController.createDefaultDictionarySettings(title, enabled, styles);
+            const defaultSettings = DictionaryController.createDefaultDictionarySettings(title, enabled, styles);
             const path1 = `profiles[${i}].options.dictionaries`;
-            if (insertIndex === null) {
-                targets.push({action: 'push', path: path1, items: [value]});
+
+            if (profilesDictionarySettings === null || typeof profilesDictionarySettings[i] === 'undefined') {
+                targets.push({action: 'push', path: path1, items: [defaultSettings]});
             } else {
+                const {index, ...currentSettings} = profilesDictionarySettings[i];
                 targets.push({
                     action: 'splice',
                     path: path1,
-                    start: insertIndex,
-                    items: [value],
+                    start: index,
+                    items: [{
+                        ...currentSettings,
+                        name: title,
+                    }],
                     deleteCount: 0,
                 });
             }
