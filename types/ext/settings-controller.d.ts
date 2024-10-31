@@ -41,6 +41,7 @@ export type Events = {
     };
     importDictionaryFromUrl: {
         url: string;
+        insertIndex: number | null;
     };
     dictionaryEnabled: Record<string, never>;
     scanInputsChanged: {

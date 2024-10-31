@@ -209,7 +209,7 @@ class DictionaryEntry {
     /** */
     _onUpdateButtonClick() {
         const downloadUrl = this._updatesAvailable.dataset.downloadUrl;
-        this._dictionaryController.updateDictionary(this.dictionaryTitle, downloadUrl);
+        this._dictionaryController.updateDictionary(this.dictionaryTitle, downloadUrl, this._index);
     }
 
     /** */
@@ -577,12 +577,14 @@ export class DictionaryController {
     /**
      * @param {string} dictionaryTitle
      * @param {string|undefined} downloadUrl
+     * @param {number} index
      */
-    updateDictionary(dictionaryTitle, downloadUrl) {
+    updateDictionary(dictionaryTitle, downloadUrl, index) {
         const modal = this._updateDictionaryModal;
         if (modal === null) { return; }
         modal.node.dataset.downloadUrl = downloadUrl;
         modal.node.dataset.dictionaryTitle = dictionaryTitle;
+        modal.node.dataset.index = `${index}`;
         /** @type {Element} */
         const nameElement = querySelectorNotNull(modal.node, '#dictionary-confirm-update-name');
         nameElement.textContent = dictionaryTitle;
@@ -860,11 +862,18 @@ export class DictionaryController {
 
         const title = modal.node.dataset.dictionaryTitle;
         const downloadUrl = modal.node.dataset.downloadUrl;
+        const index = modal.node.dataset.index;
+
         if (typeof title !== 'string') { return; }
+        if (typeof index !== 'string') { return; }
+        const insertIndex = Number.parseInt(index, 10);
+        if (Number.isNaN(insertIndex)) { return; }
+
         delete modal.node.dataset.dictionaryTitle;
 
-        void this._updateDictionary(title, downloadUrl);
+        void this._updateDictionary(title, downloadUrl, insertIndex);
     }
+
 
     /**
      * @param {MouseEvent} e
@@ -1130,8 +1139,9 @@ export class DictionaryController {
     /**
      * @param {string} dictionaryTitle
      * @param {string|undefined} downloadUrl
+     * @param {number|null} insertIndex
      */
-    async _updateDictionary(dictionaryTitle, downloadUrl) {
+    async _updateDictionary(dictionaryTitle, downloadUrl, insertIndex) {
         if (this._checkingIntegrity || this._checkingUpdates || this._isDeleting || this._dictionaries === null) { return; }
 
         const dictionaryInfo = this._dictionaries.find((entry) => entry.title === dictionaryTitle);
@@ -1140,8 +1150,7 @@ export class DictionaryController {
         if (typeof downloadUrl !== 'string') { throw new Error('Attempted to update dictionary without download URL'); }
 
         await this._deleteDictionary(dictionaryTitle);
-
-        this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl});
+        this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl, insertIndex});
     }
 
     /**
