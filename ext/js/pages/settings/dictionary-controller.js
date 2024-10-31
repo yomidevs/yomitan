@@ -860,14 +860,11 @@ export class DictionaryController {
 
         const title = modal.node.dataset.dictionaryTitle;
         const downloadUrl = modal.node.dataset.downloadUrl;
-
         if (typeof title !== 'string') { return; }
-
         delete modal.node.dataset.dictionaryTitle;
 
         void this._updateDictionary(title, downloadUrl);
     }
-
 
     /**
      * @param {MouseEvent} e
