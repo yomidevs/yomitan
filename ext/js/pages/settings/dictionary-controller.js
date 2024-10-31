@@ -209,7 +209,7 @@ class DictionaryEntry {
     /** */
     _onUpdateButtonClick() {
         const downloadUrl = this._updatesAvailable.dataset.downloadUrl;
-        this._dictionaryController.updateDictionary(this.dictionaryTitle, downloadUrl, this._index);
+        this._dictionaryController.updateDictionary(this.dictionaryTitle, downloadUrl);
     }
 
     /** */
@@ -577,14 +577,12 @@ export class DictionaryController {
     /**
      * @param {string} dictionaryTitle
      * @param {string|undefined} downloadUrl
-     * @param {number} index
      */
-    updateDictionary(dictionaryTitle, downloadUrl, index) {
+    updateDictionary(dictionaryTitle, downloadUrl) {
         const modal = this._updateDictionaryModal;
         if (modal === null) { return; }
         modal.node.dataset.downloadUrl = downloadUrl;
         modal.node.dataset.dictionaryTitle = dictionaryTitle;
-        modal.node.dataset.index = `${index}`;
         /** @type {Element} */
         const nameElement = querySelectorNotNull(modal.node, '#dictionary-confirm-update-name');
         nameElement.textContent = dictionaryTitle;
