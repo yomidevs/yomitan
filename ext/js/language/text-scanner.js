@@ -1499,7 +1499,7 @@ export class TextScanner extends EventDispatcher {
      * @param {boolean} passive
      * @param {import('input').Modifier[]} modifiers
      * @param {import('input').ModifierKey[]} modifierKeys
-     * @param {import('text-scanner').InputInfoDetail} [detail]
+     * @param {import('text-scanner').InputInfoDetail?} [detail]
      * @returns {import('text-scanner').InputInfo}
      */
     _createInputInfo(input, pointerType, eventType, passive, modifiers, modifierKeys, detail) {
