@@ -137,11 +137,11 @@ export class DOMTextScanner {
 
             if (nodeType === TEXT_NODE) {
                 lastNode = node;
-                if (!(
-                    forward ?
+                const shouldContinueScanning = forward ?
                     this._seekTextNodeForward(/** @type {Text} */ (node), resetOffset) :
-                    this._seekTextNodeBackward(/** @type {Text} */ (node), resetOffset)
-                )) {
+                    this._seekTextNodeBackward(/** @type {Text} */ (node), resetOffset);
+
+                if (!shouldContinueScanning) {
                     // Length reached
                     break;
                 }
