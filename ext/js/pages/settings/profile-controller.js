@@ -595,6 +595,7 @@ export class ProfileController {
             }
         }
     }
+
     /**
      * @param {import('settings').Profile[]} profiles
      * @returns {string}
