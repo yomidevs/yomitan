@@ -21,7 +21,7 @@ jobs:
         run: npm ci
       - name: Build Legal
         run: npm run license-report:html
-      - uses: lycheeverse/lychee-action@v2.0.0
+      - uses: lycheeverse/lychee-action@v2.0.2
         with:
           fail: true
           jobSummary: false
