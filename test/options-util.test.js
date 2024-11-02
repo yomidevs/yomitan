@@ -565,7 +565,6 @@ function createOptionsUpdatedTestData1() {
     return {
         profiles: [
             {
-                id: 'profile-0',
                 name: 'Default',
                 options: createProfileOptionsUpdatedTestData1(),
                 conditionGroups: [
@@ -645,7 +644,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 53,
+        version: 52,
         global: {
             database: {
                 prefixWildcardsSupported: false,

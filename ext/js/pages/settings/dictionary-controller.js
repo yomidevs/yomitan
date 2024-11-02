@@ -1143,14 +1143,13 @@ export class DictionaryController {
         const {profiles} = options;
 
         /** @type {import('settings-controller.js').ProfilesDictionarySettings} */
-        const profilesDictionarySettings = {};
+        const profilesDictionarySettings = [];
 
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
-            const profile = profiles[i];
-            const dictionaries = profile.options.dictionaries;
+            const dictionaries = profiles[i].options.dictionaries;
             for (let j = 0, jj = dictionaries.length; j < jj; ++j) {
                 if (dictionaries[j].name === dictionaryTitle) {
-                    profilesDictionarySettings[profile.id] = {...dictionaries[j], index: j};
+                    profilesDictionarySettings.push({...dictionaries[j], index: j});
                     break;
                 }
             }
