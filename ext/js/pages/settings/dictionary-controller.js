@@ -1145,12 +1145,11 @@ export class DictionaryController {
         /** @type {import('settings-controller.js').ProfilesDictionarySettings} */
         const profilesDictionarySettings = {};
 
-        for (let i = 0, ii = profiles.length; i < ii; ++i) {
-            const profile = profiles[i];
+        for (const profile of profiles) {
             const dictionaries = profile.options.dictionaries;
-            for (let j = 0, jj = dictionaries.length; j < jj; ++j) {
-                if (dictionaries[j].name === dictionaryTitle) {
-                    profilesDictionarySettings[profile.id] = {...dictionaries[j], index: j};
+            for (let i = 0; i < dictionaries.length; ++i) {
+                if (dictionaries[i].name === dictionaryTitle) {
+                    profilesDictionarySettings[profile.id] = {...dictionaries[i], index: i};
                     break;
                 }
             }
