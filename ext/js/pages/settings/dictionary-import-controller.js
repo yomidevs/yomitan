@@ -668,15 +668,15 @@ export class DictionaryImportController {
         const targets = [];
         const profileCount = optionsFull.profiles.length;
         for (let i = 0; i < profileCount; ++i) {
-            const {options} = optionsFull.profiles[i];
+            const {options, id: profileId} = optionsFull.profiles[i];
             const enabled = profileIndex === i;
             const defaultSettings = DictionaryController.createDefaultDictionarySettings(title, enabled, styles);
             const path1 = `profiles[${i}].options.dictionaries`;
 
-            if (profilesDictionarySettings === null || typeof profilesDictionarySettings[i] === 'undefined') {
+            if (profilesDictionarySettings === null || typeof profilesDictionarySettings[profileId] === 'undefined') {
                 targets.push({action: 'push', path: path1, items: [defaultSettings]});
             } else {
-                const {index, ...currentSettings} = profilesDictionarySettings[i];
+                const {index, ...currentSettings} = profilesDictionarySettings[profileId];
                 targets.push({
                     action: 'splice',
                     path: path1,

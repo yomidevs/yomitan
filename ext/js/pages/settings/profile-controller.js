@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {clone} from '../../core/utilities.js';
+import {clone, generateId} from '../../core/utilities.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {ProfileConditionsUI} from './profile-conditions-ui.js';
 
@@ -184,6 +184,7 @@ export class ProfileController {
         // Create new profile
         const newProfile = clone(profile);
         newProfile.name = this._createCopyName(profile.name, this._profiles, 100);
+        newProfile.id = this._createId(this._profiles);
 
         // Update state
         const index = this._profiles.length;
@@ -593,6 +594,18 @@ export class ProfileController {
                 ++index;
             }
         }
+    }
+    /**
+     * @param {import('settings').Profile[]} profiles
+     * @returns {string}
+     */
+    _createId(profiles) {
+        const ids = new Set(profiles.map((profile) => profile.id));
+        let id = '';
+        while (id === '' || ids.has(id)) {
+            id = generateId(16);
+        }
+        return id;
     }
 
     /**
