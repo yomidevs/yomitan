@@ -16,6 +16,7 @@
  */
 
 import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
+import {normalizeRadicalCharacters} from './CJK-util.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {germanTransforms} from './de/german-transforms.js';
 import {englishTransforms} from './en/english-transforms.js';
@@ -212,6 +213,7 @@ const languageDescriptors = [
             convertHalfWidthCharacters,
             alphabeticToHiragana,
             normalizeCombiningCharacters,
+            normalizeRadicalCharacters,
             alphanumericWidthVariants,
             convertHiraganaToKatakana,
             collapseEmphaticSequences,
@@ -374,6 +376,9 @@ const languageDescriptors = [
         iso639_3: 'yue',
         name: 'Cantonese',
         exampleText: '讀',
+        textPreprocessors: {
+            normalizeRadicalCharacters,
+        },
     },
     {
         iso: 'zh',
@@ -382,6 +387,9 @@ const languageDescriptors = [
         exampleText: '读',
         isTextLookupWorthy: isStringPartiallyChinese,
         readingNormalizer: normalizePinyin,
+        textPreprocessors: {
+            normalizeRadicalCharacters,
+        },
     },
 ];
 
