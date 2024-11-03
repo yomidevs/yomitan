@@ -954,10 +954,13 @@ export class Frontend {
      * @returns {Promise<boolean>}
      */
     async _scanSelectedText(allowEmptyRange, disallowExpandSelection, showEmpty = false) {
+        performance.mark('frontend:scanSelectedText:start');
         const range = this._getFirstSelectionRange(allowEmptyRange);
         if (range === null) { return false; }
         const source = disallowExpandSelection ? TextSourceRange.createLazy(range) : TextSourceRange.create(range);
         await this._textScanner.search(source, {focus: true, restoreSelection: true}, showEmpty);
+        performance.mark('frontend:scanSelectedText:end');
+        performance.measure('frontend:scanSelectedText', 'frontend:scanSelectedText:start', 'frontend:scanSelectedText:end');
         return true;
     }
 

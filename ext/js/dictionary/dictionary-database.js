@@ -587,6 +587,7 @@ export class DictionaryDatabase {
      * @returns {Promise<TResult[]>}
      */
     _findMultiBulk(objectStoreName, indexNames, items, createQuery, predicate, createResult) {
+        performance.mark('findMultiBulk:start');
         return new Promise((resolve, reject) => {
             const itemCount = items.length;
             const indexCount = indexNames.length;
@@ -594,6 +595,8 @@ export class DictionaryDatabase {
             const results = [];
             if (itemCount === 0 || indexCount === 0) {
                 resolve(results);
+                performance.mark('findMultiBulk:end');
+                performance.measure('findMultiBulk', 'findMultiBulk:start', 'findMultiBulk:end');
                 return;
             }
 
@@ -621,6 +624,8 @@ export class DictionaryDatabase {
                 }
                 if (++completeCount >= requiredCompleteCount) {
                     resolve(results);
+                    performance.mark('findMultiBulk:end');
+                    performance.measure('findMultiBulk', 'findMultiBulk:start', 'findMultiBulk:end');
                 }
             };
             performance.mark('findMultiBulk:getAll:start');

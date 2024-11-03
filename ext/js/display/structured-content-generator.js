@@ -18,6 +18,7 @@
 
 import {DisplayContentManager} from '../display/display-content-manager.js';
 import {getLanguageFromText} from '../language/text-utilities.js';
+import {AnkiTemplateRendererContentManager} from '../templates/anki-template-renderer-content-manager.js';
 
 export class StructuredContentGenerator {
     /**
@@ -119,27 +120,39 @@ export class StructuredContentGenerator {
         if (typeof title === 'string') {
             imageContainer.title = title;
         }
-        const canvas = /** @type {HTMLCanvasElement} */ (this._createElement('canvas', 'gloss-image'));
-        if (sizeUnits === 'em' && (hasPreferredWidth || hasPreferredHeight)) {
-            canvas.style.width = `${usedWidth}em`;
-            canvas.style.height = `${usedWidth * invAspectRatio}em`;
-            canvas.width = usedWidth * 14 * 2 * window.devicePixelRatio;
-            canvas.height = usedWidth * invAspectRatio * 14 * 2 * window.devicePixelRatio;
-        } else {
-            canvas.width = usedWidth;
-            canvas.height = usedWidth * invAspectRatio;
-        }
-        imageContainer.appendChild(canvas);
 
         if (this._contentManager !== null) {
+            const image = this._contentManager instanceof DisplayContentManager ?
+                /** @type {HTMLCanvasElement} */ (this._createElement('canvas', 'gloss-image')) :
+                /** @type {HTMLImageElement} */ (this._createElement('img', 'gloss-image'));
+            if (sizeUnits === 'em' && (hasPreferredWidth || hasPreferredHeight)) {
+                image.style.width = `${usedWidth}em`;
+                image.style.height = `${usedWidth * invAspectRatio}em`;
+                image.width = usedWidth * 14 * 2 * window.devicePixelRatio;
+                image.height = usedWidth * invAspectRatio * 14 * 2 * window.devicePixelRatio;
+            } else {
+                image.width = usedWidth;
+                image.height = usedWidth * invAspectRatio;
+            }
+            imageContainer.appendChild(image);
+
             if (this._contentManager instanceof DisplayContentManager) {
                 this._contentManager.loadMedia(
                     path,
                     dictionary,
-                    canvas.transferControlToOffscreen(),
+                    (/** @type {HTMLCanvasElement} */(image)).transferControlToOffscreen(),
                 );
-            } else {
-                // TODO: figure out anki
+            } else if (this._contentManager instanceof AnkiTemplateRendererContentManager) {
+                this._contentManager.loadMedia(
+                    path,
+                    dictionary,
+                    (url) => {
+                        (/** @type {HTMLImageElement} */(image)).src = url;
+                    },
+                    () => {
+                        (/** @type {HTMLImageElement} */(image)).removeAttribute('src');
+                    },
+                );
             }
         }
 

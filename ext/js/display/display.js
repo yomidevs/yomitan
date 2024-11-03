@@ -731,6 +731,7 @@ export class Display extends EventDispatcher {
 
     /** @type {import('display').DirectApiHandler<'displaySetContent'>} */
     _onMessageSetContent({details}) {
+        performance.mark('invokeDisplaySetContent:end');
         this.setContent(details);
     }
 
@@ -784,14 +785,14 @@ export class Display extends EventDispatcher {
     async _onStateChanged() {
         if (this._historyChangeIgnore) { return; }
 
-        performance.mark('display:onStateChanged:start');
+        performance.mark('display:_onStateChanged:start');
 
         /** @type {?import('core').TokenObject} */
         const token = {}; // Unique identifier token
         this._setContentToken = token;
         try {
             // Clear
-            performance.mark('display:clear:start');
+            performance.mark('display:_onStateChanged:clear:start');
             this._closePopups();
             this._closeAllPopupMenus();
             this._eventListeners.removeAllEventListeners();
@@ -801,11 +802,11 @@ export class Display extends EventDispatcher {
             this._dictionaryEntries = [];
             this._dictionaryEntryNodes = [];
             this._elementOverflowController.clearElements();
-            performance.mark('display:clear:end');
-            performance.measure('display:clear', 'display:clear:start', 'display:clear:end');
+            performance.mark('display:_onStateChanged:clear:end');
+            performance.measure('display:_onStateChanged:clear', 'display:_onStateChanged:clear:start', 'display:_onStateChanged:clear:end');
 
             // Prepare
-            performance.mark('display:prepare:start');
+            performance.mark('display:_onStateChanged:prepare:start');
             const urlSearchParams = new URLSearchParams(location.search);
             let type = urlSearchParams.get('type');
             if (type === null && urlSearchParams.get('query') !== null) { type = 'terms'; }
@@ -814,10 +815,10 @@ export class Display extends EventDispatcher {
             this._queryParserVisibleOverride = (fullVisible === null ? null : (fullVisible !== 'false'));
 
             this._historyHasChanged = true;
-            performance.mark('display:prepare:end');
-            performance.measure('display:prepare', 'display:prepare:start', 'display:prepare:end');
+            performance.mark('display:_onStateChanged:prepare:end');
+            performance.measure('display:_onStateChanged:prepare', 'display:_onStateChanged:prepare:start', 'display:_onStateChanged:prepare:end');
 
-            performance.mark('display:setContent:start');
+            performance.mark('display:_onStateChanged:setContent:start');
             // Set content
             switch (type) {
                 case 'terms':
@@ -834,13 +835,13 @@ export class Display extends EventDispatcher {
                     this._clearContent();
                     break;
             }
-            performance.mark('display:setContent:end');
-            performance.measure('display:setContent', 'display:setContent:start', 'display:setContent:end');
+            performance.mark('display:_onStateChanged:setContent:end');
+            performance.measure('display:_onStateChanged:setContent', 'display:_onStateChanged:setContent:start', 'display:_onStateChanged:setContent:end');
         } catch (e) {
             this.onError(toError(e));
         }
-        performance.mark('display:onStateChanged:end');
-        performance.measure('display:onStateChanged', 'display:onStateChanged:start', 'display:onStateChanged:end');
+        performance.mark('display:_onStateChanged:end');
+        performance.measure('display:_onStateChanged', 'display:_onStateChanged:start', 'display:_onStateChanged:end');
     }
 
     /**

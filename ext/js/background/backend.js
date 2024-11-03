@@ -521,6 +521,7 @@ export class Backend {
         const options = this._getProfileOptions(optionsContext, false);
         const {general: {resultOutputMode: mode, maxResults}} = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
+        console.log('xxx');
         const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
         dictionaryEntries.splice(maxResults);
         return {dictionaryEntries, originalTextLength};
@@ -1525,6 +1526,7 @@ export class Backend {
         let i = 0;
         const ii = text.length;
         while (i < ii) {
+            console.log('yyy');
             const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
                 mode,
                 text.substring(i, i + scanLength),

@@ -373,6 +373,7 @@ export class Translator {
      * @returns {Promise<import('translation-internal').DatabaseDeinflection[]>}
      */
     async _getDeinflections(text, options) {
+        performance.mark('translator:getDeinflections:start');
         let deinflections = (
             options.deinflect ?
                 this._getAlgorithmDeinflections(text, options) :
@@ -395,6 +396,8 @@ export class Translator {
         }
         deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length);
 
+        performance.mark('translator:getDeinflections:end');
+        performance.measure('translator:getDeinflections', 'translator:getDeinflections:start', 'translator:getDeinflections:end');
         return deinflections;
     }
 
@@ -406,6 +409,7 @@ export class Translator {
      * @returns {Promise<import('translation-internal').DatabaseDeinflection[]>}
      */
     async _getDictionaryDeinflections(language, deinflections, enabledDictionaryMap, matchType) {
+        performance.mark('translator:getDictionaryDeinflections:start');
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const dictionaryDeinflections = [];
         for (const deinflection of deinflections) {
@@ -436,6 +440,8 @@ export class Translator {
 
         await this._addEntriesToDeinflections(language, dictionaryDeinflections, enabledDictionaryMap, matchType);
 
+        performance.mark('translator:getDictionaryDeinflections:end');
+        performance.measure('translator:getDictionaryDeinflections', 'translator:getDictionaryDeinflections:start', 'translator:getDictionaryDeinflections:end');
         return dictionaryDeinflections;
     }
 

@@ -468,6 +468,7 @@ export class TextScanner extends EventDispatcher {
      */
     async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false, disallowExpandStartOffset = false) {
         try {
+            performance.mark('scanner:_search:start');
             const isAltText = textSource instanceof TextSourceElement;
             if (inputInfo.pointerType === 'touch') {
                 if (isAltText) {
@@ -541,6 +542,8 @@ export class TextScanner extends EventDispatcher {
             } else {
                 this._triggerSearchEmpty(inputInfo);
             }
+            performance.mark('scanner:_search:end');
+            performance.measure('scanner:_search', 'scanner:_search:start', 'scanner:_search:end');
         } catch (error) {
             this.trigger('searchError', {
                 error: error instanceof Error ? error : new Error(`A search error occurred: ${error}`),
@@ -607,6 +610,7 @@ export class TextScanner extends EventDispatcher {
      * @param {MouseEvent} e
      */
     _onMouseMove(e) {
+        performance.mark('scanner:_onMouseMove:start');
         this._scanTimerClear();
         this._lastMouseMove = e;
 
@@ -614,6 +618,8 @@ export class TextScanner extends EventDispatcher {
         if (inputInfo === null) { return; }
 
         void this._searchAtFromMouseMove(e.clientX, e.clientY, inputInfo);
+        performance.mark('scanner:_onMouseMove:end');
+        performance.measure('scanner:_onMouseMove', 'scanner:_onMouseMove:start', 'scanner:_onMouseMove:end');
     }
 
     /**
@@ -1382,6 +1388,7 @@ export class TextScanner extends EventDispatcher {
         if (this._pendingLookup) { return; }
 
         try {
+            performance.mark('scanner:_searchAt:start');
             const sourceInput = inputInfo.input;
             let searchTerms = this._searchTerms;
             let searchKanji = this._searchKanji;
@@ -1411,6 +1418,8 @@ export class TextScanner extends EventDispatcher {
             } else {
                 this._triggerSearchEmpty(inputInfo);
             }
+            performance.mark('scanner:_searchAt:end');
+            performance.measure('scanner:_searchAt', 'scanner:_searchAt:start', 'scanner:_searchAt:end');
         } catch (e) {
             log.error(e);
         } finally {
