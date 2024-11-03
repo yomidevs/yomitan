@@ -101,10 +101,14 @@ export const KANGXI_RADICALS_RANGE = [0x2f00, 0x2fdf];
 /** @type {import('CJK-util').CodepointRange} */
 export const CJK_RADICALS_SUPPLEMENT_RANGE = [0x2e80, 0x2eff];
 
+/** @type {import('CJK-util').CodepointRange} */
+export const CJK_STROKES_RANGE = [0x31c0, 0x31ef];
+
 /** @type {import('CJK-util').CodepointRange[]} */
 export const CJK_RADICALS_RANGES = [
     KANGXI_RADICALS_RANGE,
     CJK_RADICALS_SUPPLEMENT_RANGE,
+    CJK_STROKES_RANGE,
 ];
 
 /**
