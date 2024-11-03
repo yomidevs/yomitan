@@ -201,7 +201,11 @@ type AllTextProcessors = {
             normalizeDiacritics: TextProcessor<'old' | 'new' | 'off'>;
         };
     };
-    yue: Record<string, never>;
+    yue: {
+        pre: {
+            normalizeRadicalCharacters: TextProcessor<boolean>;
+        };
+    };
     zh: {
         pre: {
             normalizeRadicalCharacters: TextProcessor<boolean>;

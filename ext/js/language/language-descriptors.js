@@ -376,6 +376,9 @@ const languageDescriptors = [
         iso639_3: 'yue',
         name: 'Cantonese',
         exampleText: '讀',
+        textPreprocessors: {
+            normalizeRadicalCharacters,
+        },
     },
     {
         iso: 'zh',
