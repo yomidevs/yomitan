@@ -94,3 +94,28 @@ export function isCodePointInRanges(codePoint, ranges) {
     }
     return false;
 }
+
+/** @type {import('CJK-util').CodepointRange} */
+export const KANGXI_RADICALS_RANGE = [0x2f00, 0x2fdf];
+
+/** @type {import('CJK-util').CodepointRange} */
+export const CJK_RADICALS_SUPPLEMENT_RANGE = [0x2e80, 0x2eff];
+
+/** @type {import('CJK-util').CodepointRange[]} */
+export const CJK_RADICALS_RANGES = [
+    KANGXI_RADICALS_RANGE,
+    CJK_RADICALS_SUPPLEMENT_RANGE,
+];
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+export function normalizeRadicals(text) {
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+        const codePoint = text[i].codePointAt(0);
+        result += codePoint && (isCodePointInRanges(codePoint, CJK_RADICALS_RANGES)) ? text[i].normalize('NFKD') : text[i];
+    }
+    return result;
+}

@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {normalizeRadicals} from '../CJK-util.js';
 import {basicTextProcessorOptions} from '../text-processors.js';
 import {convertAlphabeticToKana} from './japanese-wanakana.js';
 import {
@@ -98,4 +99,12 @@ export const normalizeCombiningCharacters = {
     description: 'ド → ド (U+30C8 U+3099 → U+30C9)',
     options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? normalizeCombiningCharactersFunction(str) : str),
+};
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const normalizeRadicalCharacters = {
+    name: 'Normalize radical characters',
+    description: '⼀ → 一 (U+2F00 → U+4E00)',
+    options: basicTextProcessorOptions,
+    process: (str, setting) => (setting ? normalizeRadicals(str) : str),
 };

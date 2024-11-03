@@ -135,6 +135,7 @@ type AllTextProcessors = {
             convertHalfWidthCharacters: TextProcessor<boolean>;
             alphabeticToHiragana: TextProcessor<boolean>;
             normalizeCombiningCharacters: TextProcessor<boolean>;
+            normalizeRadicalCharacters: TextProcessor<boolean>;
             alphanumericWidthVariants: BidirectionalConversionPreprocessor;
             convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
             collapseEmphaticSequences: TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
