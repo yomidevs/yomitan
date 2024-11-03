@@ -384,6 +384,9 @@ const languageDescriptors = [
         exampleText: '读',
         isTextLookupWorthy: isStringPartiallyChinese,
         readingNormalizer: normalizePinyin,
+        textPreprocessors: {
+            normalizeRadicalCharacters,
+        },
     },
 ];
 

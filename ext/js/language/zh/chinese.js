@@ -15,7 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {CJK_IDEOGRAPH_RANGES, CJK_PUNCTUATION_RANGE, FULLWIDTH_CHARACTER_RANGES, isCodePointInRanges} from '../CJK-util.js';
+import {CJK_IDEOGRAPH_RANGES, CJK_PUNCTUATION_RANGE, FULLWIDTH_CHARACTER_RANGES, isCodePointInRanges, normalizeRadicals} from '../CJK-util.js';
+import {basicTextProcessorOptions} from '../text-processors.js';
 
 /** @type {import('CJK-util').CodepointRange} */
 const BOPOMOFO_RANGE = [0x3100, 0x312f];
@@ -73,3 +74,11 @@ export function isCodePointChinese(codePoint) {
 export function normalizePinyin(str) {
     return str.normalize('NFC').toLowerCase().replace(/[\s・:'’-]|\/\//g, '');
 }
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const normalizeRadicalCharacters = {
+    name: 'Normalize radical characters',
+    description: '⼀ → 一 (U+2F00 → U+4E00)',
+    options: basicTextProcessorOptions,
+    process: (str, setting) => (setting ? normalizeRadicals(str) : str),
+};

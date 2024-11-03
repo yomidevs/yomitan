@@ -202,5 +202,9 @@ type AllTextProcessors = {
         };
     };
     yue: Record<string, never>;
-    zh: Record<string, never>;
+    zh: {
+        pre: {
+            normalizeRadicalCharacters: TextProcessor<boolean>;
+        };
+    };
 };
