@@ -259,9 +259,7 @@ export class ProfileController {
         this._updateProfileSelectOptions();
 
         // Update profile index
-        if (settingsProfileIndex === profileIndex) {
-            this._settingsController.profileIndex = profileCurrentNew;
-        } else if (settingsProfileIndex > profileIndex) {
+        if (settingsProfileIndex >= profileIndex) {
             this._settingsController.profileIndex = settingsProfileIndex - 1;
         } else {
             this._settingsController.refreshProfileIndex();
