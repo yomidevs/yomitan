@@ -128,6 +128,7 @@ export class DictionaryImportController {
                 await this._importDictionaries(
                     this._generateFilesFromUrls([url], onProgress),
                     null,
+                    null,
                     importProgressTracker,
                 );
                 void this._recommendedDictionaryQueue.shift();
@@ -252,8 +253,8 @@ export class DictionaryImportController {
     /**
      * @param {import('settings-controller').EventArgument<'importDictionaryFromUrl'>} details
      */
-    _onEventImportDictionaryFromUrl({url, profilesDictionarySettings}) {
-        void this.importFilesFromURLs(url, profilesDictionarySettings);
+    async _onEventImportDictionaryFromUrl({url, profilesDictionarySettings, onImportDone}) {
+        await this.importFilesFromURLs(url, profilesDictionarySettings, onImportDone);
     }
 
     /** */
@@ -312,6 +313,7 @@ export class DictionaryImportController {
         const importProgressTracker = new ImportProgressTracker(this._getFileImportSteps(), fileArray.length);
         void this._importDictionaries(
             this._arrayToAsyncGenerator(fileArray),
+            null,
             null,
             importProgressTracker,
         );
@@ -419,6 +421,7 @@ export class DictionaryImportController {
         void this._importDictionaries(
             this._arrayToAsyncGenerator(files2),
             null,
+            null,
             new ImportProgressTracker(this._getFileImportSteps(), files2.length),
         );
     }
@@ -427,21 +430,23 @@ export class DictionaryImportController {
     async _onImportFromURL() {
         const text = this._importURLText.value.trim();
         if (!text) { return; }
-        await this.importFilesFromURLs(text, null);
+        await this.importFilesFromURLs(text, null, null);
     }
 
     /**
      * @param {string} text
      * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
+     * @param {import('settings-controller').ImportDictionaryDoneCallback} onImportDone
      */
-    async importFilesFromURLs(text, profilesDictionarySettings) {
+    async importFilesFromURLs(text, profilesDictionarySettings, onImportDone) {
         const urls = text.split('\n');
 
         const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), urls.length);
         const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
-        void this._importDictionaries(
+        await this._importDictionaries(
             this._generateFilesFromUrls(urls, onProgress),
             profilesDictionarySettings,
+            onImportDone,
             importProgressTracker,
         );
     }
@@ -524,9 +529,10 @@ export class DictionaryImportController {
     /**
      * @param {AsyncGenerator<File, void, void>} dictionaries
      * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
+     * @param {import('settings-controller').ImportDictionaryDoneCallback} onImportDone
      * @param {ImportProgressTracker} importProgressTracker
      */
-    async _importDictionaries(dictionaries, profilesDictionarySettings, importProgressTracker) {
+    async _importDictionaries(dictionaries, profilesDictionarySettings, onImportDone, importProgressTracker) {
         if (this._modifying) { return; }
 
         const statusFooter = this._statusFooter;
@@ -578,6 +584,7 @@ export class DictionaryImportController {
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
             this._setModifying(false);
             this._triggerStorageChanged();
+            if (onImportDone) { onImportDone(); }
         }
     }
 

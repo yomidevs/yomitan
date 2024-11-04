@@ -122,6 +122,11 @@ class DictionaryEntry {
         this._enabledCheckbox.checked = value;
     }
 
+    /** */
+    hideUpdatesAvailableButton() {
+        this._updatesAvailable.hidden = true;
+    }
+
     /**
      * @returns {Promise<boolean>}
      */
@@ -161,7 +166,8 @@ class DictionaryEntry {
         const bodyNode = e.detail.menu.bodyNode;
         const count = this._dictionaryController.dictionaryOptionCount;
         this._setMenuActionEnabled(bodyNode, 'moveTo', count > 1);
-        this._setMenuActionEnabled(bodyNode, 'delete', !this._dictionaryController.isDictionaryInDeleteQueue(this.dictionaryTitle));
+        const deleteDisabled = this._dictionaryController.isDictionaryInDeleteQueue(this.dictionaryTitle) || this._dictionaryController.isUpdating;
+        this._setMenuActionEnabled(bodyNode, 'delete', !deleteDisabled);
     }
 
     /**
@@ -506,8 +512,12 @@ export class DictionaryController {
         this._extraInfo = null;
         /** @type {boolean} */
         this._isDeleting = false;
+        /** @type {boolean} */
+        this._isUpdating = false;
         /** @type {string[]} */
         this._dictionaryDeleteQueue = [];
+        /** @type {string[]} */
+        this._dictionaryUpdateQueue = [];
     }
 
     /** @type {import('./modal-controller.js').ModalController} */
@@ -518,6 +528,16 @@ export class DictionaryController {
     /** @type {number} */
     get dictionaryOptionCount() {
         return this._dictionaryEntries.length;
+    }
+
+    /** @type {boolean} */
+    get isDeleting() {
+        return this._isDeleting;
+    }
+
+    /** @type {boolean} */
+    get isUpdating() {
+        return this._isUpdating;
     }
 
     /** */
@@ -847,6 +867,7 @@ export class DictionaryController {
         delete modal.node.dataset.dictionaryTitle;
 
         void this._enqueueDictionaryDelete(title);
+        this._hideUpdatesAvailableButtons();
     }
 
     /**
@@ -863,7 +884,26 @@ export class DictionaryController {
         if (typeof title !== 'string') { return; }
         delete modal.node.dataset.dictionaryTitle;
 
-        void this._updateDictionary(title, downloadUrl);
+        void this._enqueueDictionaryUpdate(title, downloadUrl);
+        this._hideUpdatesAvailableButton(title);
+    }
+
+    /**
+     * @param {string} title
+     */
+    _hideUpdatesAvailableButton(title) {
+        for (const entry of this._dictionaryEntries) {
+            if (entry.dictionaryTitle === title) {
+                entry.hideUpdatesAvailableButton();
+            }
+        }
+    }
+
+    /** */
+    _hideUpdatesAvailableButtons() {
+        for (const entry of this._dictionaryEntries) {
+            entry.hideUpdatesAvailableButton();
+        }
     }
 
     /**
@@ -954,7 +994,7 @@ export class DictionaryController {
 
     /** */
     async _checkForUpdates() {
-        if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isDeleting) { return; }
+        if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isDeletingOrUpdating()) { return; }
         let hasUpdates;
         try {
             this._checkingUpdates = true;
@@ -977,7 +1017,7 @@ export class DictionaryController {
 
     /** */
     async _checkIntegrity() {
-        if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isDeleting) { return; }
+        if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isDeletingOrUpdating()) { return; }
 
         try {
             this._checkingIntegrity = true;
@@ -1059,16 +1099,47 @@ export class DictionaryController {
 
     /**
      * @param {string} dictionaryTitle
+     * @returns {boolean}
+     */
+    isDictionaryInUpdateQueue(dictionaryTitle) {
+        return this._dictionaryUpdateQueue.includes(dictionaryTitle);
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    _isDeletingOrUpdating() {
+        return this._isDeleting || this._isUpdating;
+    }
+
+    /**
+     * @param {string} dictionaryTitle
      */
     async _enqueueDictionaryDelete(dictionaryTitle) {
         if (this.isDictionaryInDeleteQueue(dictionaryTitle)) { return; }
         this._dictionaryDeleteQueue.push(dictionaryTitle);
-        if (this._isDeleting) { return; }
+        if (this._isDeletingOrUpdating()) { return; }
         while (this._dictionaryDeleteQueue.length > 0) {
             const title = this._dictionaryDeleteQueue[0];
             if (!title) { continue; }
             await this._deleteDictionary(title);
             void this._dictionaryDeleteQueue.shift();
+        }
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     * @param {string|undefined} downloadUrl
+     */
+    async _enqueueDictionaryUpdate(dictionaryTitle, downloadUrl) {
+        if (this.isDictionaryInUpdateQueue(dictionaryTitle)) { return; }
+        this._dictionaryUpdateQueue.push(dictionaryTitle);
+        if (this._isDeletingOrUpdating()) { return; }
+        while (this._dictionaryUpdateQueue.length > 0) {
+            const title = this._dictionaryUpdateQueue[0];
+            if (!title) { continue; }
+            await this._updateDictionary(title, downloadUrl);
+            void this._dictionaryUpdateQueue.shift();
         }
     }
 
@@ -1132,8 +1203,9 @@ export class DictionaryController {
      * @param {string|undefined} downloadUrl
      */
     async _updateDictionary(dictionaryTitle, downloadUrl) {
-        if (this._checkingIntegrity || this._checkingUpdates || this._isDeleting || this._dictionaries === null) { return; }
+        if (this._checkingIntegrity || this._checkingUpdates || this._isDeletingOrUpdating() || this._dictionaries === null) { return; }
 
+        this._isUpdating = true;
         const dictionaryInfo = this._dictionaries.find((entry) => entry.title === dictionaryTitle);
         if (typeof dictionaryInfo === 'undefined') { throw new Error('Dictionary not found'); }
         downloadUrl = downloadUrl ?? dictionaryInfo.downloadUrl;
@@ -1156,7 +1228,12 @@ export class DictionaryController {
         }
 
         await this._deleteDictionary(dictionaryTitle);
-        this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl, profilesDictionarySettings});
+        /** @type {Promise<void>} */
+        const importPromise = new Promise((resolve) => {
+            this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl, profilesDictionarySettings, onImportDone: resolve});
+        })
+        await importPromise;
+        this._isUpdating = false;
     }
 
     /**
