@@ -208,50 +208,50 @@ export class ProfileController {
     }
 
     /**
-     * @param {number} profileIndex
+     * @param {number} profileIndexToDelete
      */
-    async deleteProfile(profileIndex) {
-        const profile = this._getProfile(profileIndex);
+    async deleteProfile(profileIndexToDelete) {
+        const profile = this._getProfile(profileIndexToDelete);
         if (profile === null || this.profileCount <= 1) { return; }
 
         // Get indices
-        let profileCurrentNew = this._profileCurrent;
-        const settingsProfileIndex = this._settingsController.profileIndex;
+        let profileIndexToSetDefault = this._profileCurrent;
+        const editingProfileIndex = this._settingsController.profileIndex;
 
         // Construct settings modifications
         /** @type {import('settings-modifications').Modification[]} */
         const modifications = [{
             action: 'splice',
             path: 'profiles',
-            start: profileIndex,
+            start: profileIndexToDelete,
             deleteCount: 1,
             items: [],
         }];
-        if (profileCurrentNew >= profileIndex) {
-            profileCurrentNew = Math.min(profileCurrentNew - 1, this._profiles.length - 1);
+        if (profileIndexToSetDefault >= profileIndexToDelete) {
+            profileIndexToSetDefault = Math.min(profileIndexToSetDefault - 1, this._profiles.length - 1);
             modifications.push({
                 action: 'set',
                 path: 'profileCurrent',
-                value: profileCurrentNew,
+                value: profileIndexToSetDefault,
             });
         }
 
         // Update state
-        this._profileCurrent = profileCurrentNew;
+        this._profileCurrent = profileIndexToSetDefault;
 
-        this._profiles.splice(profileIndex, 1);
+        this._profiles.splice(profileIndexToDelete, 1);
 
-        if (profileIndex < this._profileEntryList.length) {
-            const profileEntry = this._profileEntryList[profileIndex];
+        if (profileIndexToDelete < this._profileEntryList.length) {
+            const profileEntry = this._profileEntryList[profileIndexToDelete];
             profileEntry.cleanup();
-            this._profileEntryList.splice(profileIndex, 1);
+            this._profileEntryList.splice(profileIndexToDelete, 1);
 
-            for (let i = profileIndex, ii = this._profileEntryList.length; i < ii; ++i) {
+            for (let i = profileIndexToDelete, ii = this._profileEntryList.length; i < ii; ++i) {
                 this._profileEntryList[i].index = i;
             }
         }
 
-        const profileEntry2 = this._getProfileEntry(profileCurrentNew);
+        const profileEntry2 = this._getProfileEntry(profileIndexToSetDefault);
         if (profileEntry2 !== null) {
             profileEntry2.setIsDefault(true);
         }
@@ -259,8 +259,8 @@ export class ProfileController {
         this._updateProfileSelectOptions();
 
         // Update profile index
-        if (settingsProfileIndex >= profileIndex) {
-            this._settingsController.profileIndex = settingsProfileIndex - 1;
+        if (editingProfileIndex >= profileIndexToDelete) {
+            this._settingsController.profileIndex = editingProfileIndex - 1;
         } else {
             this._settingsController.refreshProfileIndex();
         }
