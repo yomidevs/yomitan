@@ -1118,7 +1118,7 @@ export class DictionaryController {
     async _enqueueDictionaryDelete(dictionaryTitle) {
         if (this.isDictionaryInDeleteQueue(dictionaryTitle)) { return; }
         this._dictionaryDeleteQueue.push(dictionaryTitle);
-        if (this._isDeletingOrUpdating()) { return; }
+        if (this._isDeleting) { return; }
         while (this._dictionaryDeleteQueue.length > 0) {
             const title = this._dictionaryDeleteQueue[0];
             if (!title) { continue; }
@@ -1134,7 +1134,7 @@ export class DictionaryController {
     async _enqueueDictionaryUpdate(dictionaryTitle, downloadUrl) {
         if (this.isDictionaryInUpdateQueue(dictionaryTitle)) { return; }
         this._dictionaryUpdateQueue.push(dictionaryTitle);
-        if (this._isDeletingOrUpdating()) { return; }
+        if (this._isUpdating) { return; }
         while (this._dictionaryUpdateQueue.length > 0) {
             const title = this._dictionaryUpdateQueue[0];
             if (!title) { continue; }
@@ -1203,7 +1203,7 @@ export class DictionaryController {
      * @param {string|undefined} downloadUrl
      */
     async _updateDictionary(dictionaryTitle, downloadUrl) {
-        if (this._checkingIntegrity || this._checkingUpdates || this._isDeletingOrUpdating() || this._dictionaries === null) { return; }
+        if (this._checkingIntegrity || this._checkingUpdates || this._isUpdating || this._dictionaries === null) { return; }
 
         this._isUpdating = true;
         const dictionaryInfo = this._dictionaries.find((entry) => entry.title === dictionaryTitle);
