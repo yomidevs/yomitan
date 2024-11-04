@@ -889,11 +889,11 @@ export class DictionaryController {
     }
 
     /**
-     * @param {string} title
+     * @param {string} dictionaryTitle
      */
-    _hideUpdatesAvailableButton(title) {
+    _hideUpdatesAvailableButton(dictionaryTitle) {
         for (const entry of this._dictionaryEntries) {
-            if (entry.dictionaryTitle === title) {
+            if (entry.dictionaryTitle === dictionaryTitle) {
                 entry.hideUpdatesAvailableButton();
             }
         }
