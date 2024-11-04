@@ -67,6 +67,7 @@ export class SettingsController extends EventDispatcher {
         this._setProfileIndex(value, true);
     }
 
+    /** */
     refreshProfileIndex() {
         this._setProfileIndex(this._profileIndex, true);
     }
