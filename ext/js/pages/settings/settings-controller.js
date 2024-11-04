@@ -67,6 +67,11 @@ export class SettingsController extends EventDispatcher {
         this._setProfileIndex(value, true);
     }
 
+    /** */
+    refreshProfileIndex() {
+        this._setProfileIndex(this._profileIndex, true);
+    }
+
     /** @type {HtmlTemplateCollection} */
     get templates() {
         return this._templates;
