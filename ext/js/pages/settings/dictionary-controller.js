@@ -1231,7 +1231,7 @@ export class DictionaryController {
         /** @type {Promise<void>} */
         const importPromise = new Promise((resolve) => {
             this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl, profilesDictionarySettings, onImportDone: resolve});
-        })
+        });
         await importPromise;
         this._isUpdating = false;
     }
