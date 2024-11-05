@@ -575,7 +575,6 @@ export class DisplayAnki {
     _getFlagName(flag) {
         /** @type {Record<number, string>} */
         const flagNames = {
-            0: 'No Flag',
             1: 'Red',
             2: 'Orange',
             3: 'Green',
@@ -597,14 +596,13 @@ export class DisplayAnki {
     _getFlagColor(flags) {
         /** @type {Record<string, import('display-anki').RGB>} */
         const flagColors = {
-            'No Flag': {red: 0, green: 0, blue: 0},
-            'Red': {red: 248, green: 113, blue: 113},
-            'Orange': {red: 253, green: 186, blue: 116},
-            'Green': {red: 134, green: 239, blue: 172},
-            'Blue': {red: 96, green: 165, blue: 250},
-            'Pink': {red: 240, green: 171, blue: 252},
-            'Turquoise': {red: 94, green: 234, blue: 212},
-            'Purple': {red: 192, green: 132, blue: 252},
+            Red: {red: 248, green: 113, blue: 113},
+            Orange: {red: 253, green: 186, blue: 116},
+            Green: {red: 134, green: 239, blue: 172},
+            Blue: {red: 96, green: 165, blue: 250},
+            Pink: {red: 240, green: 171, blue: 252},
+            Turquoise: {red: 94, green: 234, blue: 212},
+            Purple: {red: 192, green: 132, blue: 252},
         };
 
         const gradientSliceSize = 100 / flags.size;
