@@ -1102,7 +1102,6 @@ export class DictionaryController {
             } else if (task.type === 'update') {
                 await this._updateDictionary(task.dictionaryTitle, task.downloadUrl);
             }
-            // await database update done before running next task
             /** @type {Promise<void>} */
             const databaseUpdatePromise = new Promise((resolve) => {
                 this._onDatabaseUpdateDone = resolve;
