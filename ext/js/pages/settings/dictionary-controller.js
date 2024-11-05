@@ -515,7 +515,7 @@ export class DictionaryController {
         /** @type {boolean} */
         this._isTaskQueueRunning = false;
         /** @type {(() => void) | null} */
-        this._onDatabaseUpdateDone = null;
+        this._onDictionariesUpdate = null;
     }
 
     /** @type {import('./modal-controller.js').ModalController} */
@@ -746,8 +746,9 @@ export class DictionaryController {
         this._dictionaries = dictionaries;
 
         await this._updateEntries();
-        if (this._onDatabaseUpdateDone) {
-            this._onDatabaseUpdateDone();
+
+        if (this._onDictionariesUpdate) {
+            this._onDictionariesUpdate();
         }
     }
 
@@ -1103,11 +1104,11 @@ export class DictionaryController {
                 await this._updateDictionary(task.dictionaryTitle, task.downloadUrl);
             }
             /** @type {Promise<void>} */
-            const databaseUpdatePromise = new Promise((resolve) => {
-                this._onDatabaseUpdateDone = resolve;
+            const dictionariesUpdatePromise = new Promise((resolve) => {
+                this._onDictionariesUpdate = resolve;
             });
-            await databaseUpdatePromise;
-            this._onDatabaseUpdateDone = null;
+            await dictionariesUpdatePromise;
+            this._onDictionariesUpdate = null;
             void this._dictionaryTaskQueue.shift();
         }
         this._isTaskQueueRunning = false;
