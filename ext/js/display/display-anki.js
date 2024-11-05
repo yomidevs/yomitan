@@ -610,7 +610,7 @@ export class DisplayAnki {
         const gradientSliceSize = 100 / flags.size;
         let currentGradientPercent = 0;
 
-        let gradient = 'linear-gradient(to left,';
+        let gradient = 'linear-gradient(to right,';
         for (const flag of flags) {
             const flagRGB = flagColors[flag];
             gradient += 'rgb(' + flagRGB.red + ',' + flagRGB.green + ',' + flagRGB.blue + ') ' + currentGradientPercent + '%,';
