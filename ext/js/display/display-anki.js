@@ -545,12 +545,13 @@ export class DisplayAnki {
             return;
         }
 
+        /** @type {Set<string>} */
         const displayFlags = new Set();
         for (const item of noteInfos) {
             if (item === null) { continue; }
             for (const cardInfo of item.cardsInfo) {
                 if (cardInfo.flags !== 0) {
-                    displayFlags.add(cardInfo.flags);
+                    displayFlags.add(this._getFlagName(cardInfo.flags));
                 }
             }
         }
@@ -559,6 +560,31 @@ export class DisplayAnki {
             flagsIndicator.disabled = false;
             flagsIndicator.hidden = false;
             flagsIndicator.title = `Card flags: ${[...displayFlags].join(', ')}`;
+        }
+    }
+
+    /**
+     * @param {number} flag
+     * @returns {string}
+     */
+    _getFlagName(flag) {
+        /** @type {Record<number, string>} */
+        const flagNames = {
+            0: 'No Flag',
+            1: 'Red',
+            2: 'Orange',
+            3: 'Green',
+            4: 'Blue',
+            5: 'Pink',
+            6: 'Turquoise',
+            7: 'Purple',
+        };
+        if (flag in flagNames) {
+            return flagNames[flag];
+        }
+        return '';
+    }
+
         }
     }
 
