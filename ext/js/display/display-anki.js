@@ -560,6 +560,11 @@ export class DisplayAnki {
             flagsIndicator.disabled = false;
             flagsIndicator.hidden = false;
             flagsIndicator.title = `Card flags: ${[...displayFlags].join(', ')}`;
+            /** @type {HTMLElement} */
+            const flagsIndicatorIcon = querySelectorNotNull(flagsIndicator, '.action-icon');
+            if (flagsIndicatorIcon !== null && flagsIndicator instanceof HTMLElement) {
+                flagsIndicatorIcon.style.background = this._getFlagColor(displayFlags);
+            }
         }
     }
 
@@ -585,7 +590,37 @@ export class DisplayAnki {
         return '';
     }
 
+    /**
+     * @param {Set<string>} flags
+     * @returns {string}
+     */
+    _getFlagColor(flags) {
+        /** @type {Record<string, import('display-anki').RGB>} */
+        const flagColors = {
+            'No Flag': {red: 0, green: 0, blue: 0},
+            'Red': {red: 248, green: 113, blue: 113},
+            'Orange': {red: 253, green: 186, blue: 116},
+            'Green': {red: 134, green: 239, blue: 172},
+            'Blue': {red: 96, green: 165, blue: 250},
+            'Pink': {red: 240, green: 171, blue: 252},
+            'Turquoise': {red: 94, green: 234, blue: 212},
+            'Purple': {red: 192, green: 132, blue: 252},
+        };
+
+        const gradientSliceSize = 100 / flags.size;
+        let currentGradientPercent = 0;
+
+        let gradient = 'linear-gradient(to left,';
+        for (const flag of flags) {
+            const flagRGB = flagColors[flag];
+            gradient += 'rgb(' + flagRGB.red + ',' + flagRGB.green + ',' + flagRGB.blue + ') ' + currentGradientPercent + '%,';
+            gradient += 'rgb(' + flagRGB.red + ',' + flagRGB.green + ',' + flagRGB.blue + ') ' + (currentGradientPercent + gradientSliceSize) + '%,';
+            currentGradientPercent += gradientSliceSize;
         }
+        gradient = gradient.slice(0, -1); // remove trailing comma
+        gradient += ')';
+
+        return gradient;
     }
 
     /**
