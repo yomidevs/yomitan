@@ -672,4 +672,42 @@ export class AnkiConnect {
         }
         return result2;
     }
+
+    /**
+     * @param {unknown} result
+     * @returns {(?import('anki').CardInfo)[]}
+     * @throws {Error}
+     */
+    _normalizeCardInfoArray(result) {
+        if (!Array.isArray(result)) {
+            throw this._createUnexpectedResultError('array', result, '');
+        }
+        /** @type {(?import('anki').CardInfo)[]} */
+        const result2 = [];
+        for (let i = 0, ii = result.length; i < ii; ++i) {
+            const item = /** @type {unknown} */ (result[i]);
+            if (item === null || typeof item !== 'object') {
+                throw this._createError(`Unexpected result type at index ${i}: expected Cards.CardInfo, received ${this._getTypeName(item)}`, result);
+            }
+            const {cardId} = /** @type {{[key: string]: unknown}} */ (item);
+            if (typeof cardId !== 'number') {
+                result2.push(null);
+                continue;
+            }
+            const {note, flags} = /** @type {{[key: string]: unknown}} */ (item);
+            if (typeof note !== 'number') {
+                result2.push(null);
+                continue;
+            }
+
+            /** @type {import('anki').CardInfo} */
+            const item2 = {
+                noteId: note,
+                cardId,
+                flags: typeof flags === 'number' ? flags : 0,
+            };
+            result2.push(item2);
+        }
+        return result2;
+    }
 }
