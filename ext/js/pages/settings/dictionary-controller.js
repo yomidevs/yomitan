@@ -1139,9 +1139,24 @@ export class DictionaryController {
         downloadUrl = downloadUrl ?? dictionaryInfo.downloadUrl;
         if (typeof downloadUrl !== 'string') { throw new Error('Attempted to update dictionary without download URL'); }
 
-        await this._deleteDictionary(dictionaryTitle);
+        const options = await this._settingsController.getOptionsFull();
+        const {profiles} = options;
 
-        this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl});
+        /** @type {import('settings-controller.js').ProfilesDictionarySettings} */
+        const profilesDictionarySettings = {};
+
+        for (const profile of profiles) {
+            const dictionaries = profile.options.dictionaries;
+            for (let i = 0; i < dictionaries.length; ++i) {
+                if (dictionaries[i].name === dictionaryTitle) {
+                    profilesDictionarySettings[profile.id] = {...dictionaries[i], index: i};
+                    break;
+                }
+            }
+        }
+
+        await this._deleteDictionary(dictionaryTitle);
+        this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl, profilesDictionarySettings});
     }
 
     /**

@@ -345,5 +345,7 @@
     ["English", "", "n", "n", 1, ["English definition"], 19, ""],
     ["language", "", "n", "n", 1, ["language definition"], 20, ""],
     ["ＵＳＢ", "ユーエスビー", "n", "n", 1, ["ＵＳＢ definition"], 21, ""],
-    ["마시다", "", "v", "v", 1, ["masida definition"], 22, ""]
+    ["마시다", "", "v", "v", 1, ["masida definition"], 22, ""],
+    ["自重", "じちょう", "n", "n", 1, ["jichou definition"], 23, ""],
+    ["自重", "じじゅう", "n", "n", 2, ["jijuu definition"], 24, ""]
 ]

@@ -35,6 +35,19 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           run_id: ${{ github.event.workflow_run.id }}
           name: master-screenshots-outcome
+      - name: Grab playwright-results-json from PR run
+        uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # pin@v2
+        continue-on-error: true
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          run_id: ${{ github.event.workflow_run.id }}
+          name: playwright-results-json
+
+      - name: Generate summary from playwright-results.json (expected to fail to comment)
+        id: playwright-summary
+        uses: daun/playwright-report-summary@v3
+        with:
+          report-file: playwright-results.json
 
       - name: Load artifacts into environment variables
         id: playwright
@@ -70,18 +83,12 @@ jobs:
         if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && (steps.playwright.outputs.FLAKY != 0 || steps.playwright.outputs.FAILED != 0)
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
-          message: |
-            :warning: Flaky tests or visual differences caused by this PR; please check the playwright report.
-
-            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
+          message: ${{ steps.playwright-summary.outputs.summary }}
 
       - name: "[Comment] Success: No visual differences introduced by this PR"
         uses: mshick/add-pr-comment@dd126dd8c253650d181ad9538d8b4fa218fc31e8 # pin@v2
         if: steps.playwright.outputs.MASTER_SCREENSHOTS_OUTCOME != 'failure' && steps.playwright.outputs.FLAKY == 0 && steps.playwright.outputs.FAILED == 0
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
-          message: |
-            :heavy_check_mark: No visual differences introduced by this PR.
-
-            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}#artifacts">View Playwright Report</a> (note: open the "playwright-report" artifact)
+          message: ${{ steps.playwright-summary.outputs.summary }}
           update-only: true

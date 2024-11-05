@@ -22,10 +22,15 @@ import type * as Core from './core';
 import type * as Settings from './settings';
 import type * as SettingsModifications from './settings-modifications';
 import type {EventNames, EventArgument as BaseEventArgument} from './core';
+import type {Modification} from './settings-modifications';
 
 export type PageExitPrevention = {
     end: () => void;
 };
+
+type ProfileDictionarySettings = Settings.DictionaryOptions & {index: number};
+
+export type ProfilesDictionarySettings = {[profileId: string]: ProfileDictionarySettings} | null;
 
 export type Events = {
     optionsChanged: {
@@ -41,6 +46,7 @@ export type Events = {
     };
     importDictionaryFromUrl: {
         url: string;
+        profilesDictionarySettings: ProfilesDictionarySettings;
     };
     dictionaryEnabled: Record<string, never>;
     scanInputsChanged: {
@@ -57,3 +63,12 @@ export type SettingsModification<THasScope extends boolean> = THasScope extends 
 export type SettingsExtraFields<THasScope extends boolean> = THasScope extends true ? null : SettingsModifications.OptionsScope;
 
 export type ModifyResult = Core.Response<SettingsModifications.ModificationResult>;
+
+export type RecommendedSetting = {
+    modification: Modification;
+    description: string;
+};
+
+export type RecommendedSettingsByLanguage = {
+    [key: string]: RecommendedSetting[];
+};

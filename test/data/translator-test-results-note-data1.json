@@ -35095,5 +35095,463 @@
         "media": {}
       }
     ]
+  },
+  {
+    "name": "Find terms using primary reading 1",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 31,
+          "source": "自重",
+          "rawSource": "自重",
+          "sourceTerm": "自重",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 23,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryAlias": "termsDictAlias",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "自重",
+          "reading": "じちょう",
+          "expressions": [
+            {
+              "sourceTerm": "自重",
+              "expression": "自重",
+              "reading": "じちょう",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "自重",
+                  "furigana": "じちょう"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "jichou definition"
+          ],
+          "glossaryScopedStyles": ".yomitan-glossary ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "自重",
+              "furigana": "じちょう"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "自重"
+        ],
+        "uniqueReadings": [
+          "じちょう"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      },
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 32,
+          "source": "自重",
+          "rawSource": "自重",
+          "sourceTerm": "自重",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 2,
+          "isPrimary": true,
+          "sequence": 24,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryAlias": "termsDictAlias",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "自重",
+          "reading": "じじゅう",
+          "expressions": [
+            {
+              "sourceTerm": "自重",
+              "expression": "自重",
+              "reading": "じじゅう",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "自重",
+                  "furigana": "じじゅう"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "jijuu definition"
+          ],
+          "glossaryScopedStyles": ".yomitan-glossary ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "自重",
+              "furigana": "じじゅう"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "自重"
+        ],
+        "uniqueReadings": [
+          "じじゅう"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
+  },
+  {
+    "name": "Find terms using primary reading 2",
+    "noteDataList": [
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 32,
+          "source": "自重",
+          "rawSource": "自重",
+          "sourceTerm": "自重",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 2,
+          "isPrimary": true,
+          "sequence": 24,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryAlias": "termsDictAlias",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "自重",
+          "reading": "じじゅう",
+          "expressions": [
+            {
+              "sourceTerm": "自重",
+              "expression": "自重",
+              "reading": "じじゅう",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "自重",
+                  "furigana": "じじゅう"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "jijuu definition"
+          ],
+          "glossaryScopedStyles": ".yomitan-glossary ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "自重",
+              "furigana": "じじゅう"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "自重"
+        ],
+        "uniqueReadings": [
+          "じじゅう"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      },
+      {
+        "marker": "{marker}",
+        "definition": {
+          "type": "term",
+          "id": 31,
+          "source": "自重",
+          "rawSource": "自重",
+          "sourceTerm": "自重",
+          "inflectionRuleChainCandidates": [
+            {
+              "source": "algorithm",
+              "inflectionRules": []
+            }
+          ],
+          "score": 1,
+          "isPrimary": true,
+          "sequence": 23,
+          "dictionary": "Test Dictionary 2",
+          "dictionaryAlias": "termsDictAlias",
+          "dictionaryOrder": {
+            "index": 0,
+            "priority": 0
+          },
+          "dictionaryNames": [
+            "Test Dictionary 2"
+          ],
+          "expression": "自重",
+          "reading": "じちょう",
+          "expressions": [
+            {
+              "sourceTerm": "自重",
+              "expression": "自重",
+              "reading": "じちょう",
+              "termTags": [],
+              "frequencies": [],
+              "pitches": [],
+              "furiganaSegments": [
+                {
+                  "text": "自重",
+                  "furigana": "じちょう"
+                }
+              ],
+              "termFrequency": "normal",
+              "wordClasses": [
+                "n"
+              ]
+            }
+          ],
+          "glossary": [
+            "jichou definition"
+          ],
+          "glossaryScopedStyles": ".yomitan-glossary ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "dictScopedStyles": ".yomitan-glossary [data-dictionary=\"Test Dictionary 2\"] ul[data-sc-content='glossary'] {\n    color: #ffff00;\n}",
+          "definitionTags": [
+            {
+              "name": "n",
+              "category": "partOfSpeech",
+              "notes": "noun",
+              "order": 0,
+              "score": 0,
+              "dictionary": "Test Dictionary 2",
+              "redundant": false
+            }
+          ],
+          "termTags": [],
+          "frequencies": [],
+          "frequencyHarmonic": -1,
+          "frequencyAverage": -1,
+          "pitches": [],
+          "phoneticTranscriptions": [],
+          "sourceTermExactMatchCount": 1,
+          "url": "url:",
+          "cloze": {
+            "sentence": "",
+            "prefix": "",
+            "body": "",
+            "bodyKana": "",
+            "suffix": ""
+          },
+          "furiganaSegments": [
+            {
+              "text": "自重",
+              "furigana": "じちょう"
+            }
+          ]
+        },
+        "glossaryLayoutMode": "default",
+        "compactTags": false,
+        "group": false,
+        "merge": false,
+        "modeTermKanji": false,
+        "modeTermKana": false,
+        "modeKanji": false,
+        "compactGlossaries": false,
+        "uniqueExpressions": [
+          "自重"
+        ],
+        "uniqueReadings": [
+          "じちょう"
+        ],
+        "pitches": [],
+        "pitchCount": 0,
+        "phoneticTranscriptions": [],
+        "context": {
+          "query": "query",
+          "fullQuery": "fullQuery",
+          "document": {
+            "title": "title"
+          }
+        },
+        "media": {}
+      }
+    ]
   }
 ]

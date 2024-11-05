@@ -560,6 +560,7 @@
                 "ext/js/dom/css-style-applier.js",
                 "ext/js/language/CJK-util.js",
                 "ext/js/language/ja/japanese.js",
+                "ext/js/language/text-processors.js",
                 "ext/js/language/text-utilities.js",
                 "ext/js/templates/anki-template-renderer-content-manager.js",
                 "ext/js/templates/anki-template-renderer.js",
@@ -686,6 +687,25 @@
                         "description",
                         "homepage",
                         "downloadUrl"
+                    ]
+                }, {
+                    "pathPattern": ".*",
+                    "order": {
+                        "type": "asc"
+                    }
+                }]
+            }
+        },
+        {
+            "files": [
+                "ext/data/recommended-settings.json"
+            ],
+            "rules": {
+                "jsonc/sort-keys": ["error", {
+                    "pathPattern": ".*",
+                    "order": [
+                        "modification",
+                        "description"
                     ]
                 }, {
                     "pathPattern": ".*",

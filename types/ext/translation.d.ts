@@ -69,6 +69,10 @@ export type FindTermsOptions = {
      */
     deinflect: boolean;
     /**
+     * The reading which will be sorted to the top of the results.
+     */
+    primaryReading: string;
+    /**
      * The name of the primary dictionary to search.
      */
     mainDictionary: string;
