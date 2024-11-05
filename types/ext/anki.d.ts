@@ -57,6 +57,7 @@ export type NoteInfo = {
     fields: {[key: string]: NoteFieldInfo};
     modelName: string;
     cards: CardId[];
+    cardsInfo: CardInfo[];
 };
 
 export type NoteFieldInfo = {

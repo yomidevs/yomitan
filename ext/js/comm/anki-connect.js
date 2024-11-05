@@ -666,6 +666,7 @@ export class AnkiConnect {
                 fields: fields2,
                 modelName,
                 cards: cards2,
+                cardsInfo: [],
             };
             result2.push(item2);
         }
