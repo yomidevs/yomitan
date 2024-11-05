@@ -2014,6 +2014,8 @@ export class Display extends EventDispatcher {
                 getSearchContext: this._getSearchContext.bind(this),
                 searchTerms: true,
                 searchKanji: false,
+                searchOnClick: true,
+                searchOnClickOnly: true,
                 textSourceGenerator: this._textSourceGenerator,
             });
             this._contentTextScanner.includeSelector = '.click-scannable,.click-scannable *';
