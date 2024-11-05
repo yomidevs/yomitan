@@ -181,6 +181,17 @@ export class AnkiConnect {
     }
 
     /**
+     * @param {import('anki').CardId[]} cardIds
+     * @returns {Promise<(?import('anki').CardInfo)[]>}
+     */
+    async cardsInfo(cardIds) {
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        const result = await this._invoke('cardsInfo', {cards: cardIds});
+        return this._normalizeCardInfoArray(result);
+    }
+
+    /**
      * @returns {Promise<string[]>}
      */
     async getDeckNames() {

@@ -64,6 +64,12 @@ export type NoteFieldInfo = {
     order: number;
 };
 
+export type CardInfo = {
+    noteId: NoteId;
+    cardId: CardId;
+    flags: number;
+};
+
 export type ApiReflectResult = {
     scopes: string[];
     actions: string[];
