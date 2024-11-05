@@ -253,8 +253,8 @@ export class DictionaryImportController {
     /**
      * @param {import('settings-controller').EventArgument<'importDictionaryFromUrl'>} details
      */
-    async _onEventImportDictionaryFromUrl({url, profilesDictionarySettings, onImportDone}) {
-        await this.importFilesFromURLs(url, profilesDictionarySettings, onImportDone);
+    _onEventImportDictionaryFromUrl({url, profilesDictionarySettings, onImportDone}) {
+        void this.importFilesFromURLs(url, profilesDictionarySettings, onImportDone);
     }
 
     /** */
@@ -443,7 +443,7 @@ export class DictionaryImportController {
 
         const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), urls.length);
         const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
-        await this._importDictionaries(
+        void this._importDictionaries(
             this._generateFilesFromUrls(urls, onProgress),
             profilesDictionarySettings,
             onImportDone,
