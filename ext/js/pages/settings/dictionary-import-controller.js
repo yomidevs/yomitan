@@ -676,7 +676,8 @@ export class DictionaryImportController {
             if (profilesDictionarySettings === null || typeof profilesDictionarySettings[profileId] === 'undefined') {
                 targets.push({action: 'push', path: path1, items: [defaultSettings]});
             } else {
-                const {index, ...currentSettings} = profilesDictionarySettings[profileId];
+                const {index, alias, name, ...currentSettings} = profilesDictionarySettings[profileId];
+                const newAlias = alias === name ? title : alias;
                 targets.push({
                     action: 'splice',
                     path: path1,
@@ -684,6 +685,7 @@ export class DictionaryImportController {
                     items: [{
                         ...currentSettings,
                         name: title,
+                        alias: newAlias,
                     }],
                     deleteCount: 0,
                 });
