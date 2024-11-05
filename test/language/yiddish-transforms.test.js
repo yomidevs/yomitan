@@ -20,7 +20,8 @@ import {LanguageTransformer} from '../../ext/js/language/language-transformer.js
 import {yiddishTransforms} from '../../ext/js/language/yi/yiddish-transforms.js';
 import {testLanguageTransformer} from '../fixtures/language-transformer-test.js';
 
-
+/* Since Yiddish final letters are handled in a text postprocessor after all the transformations have been run, test cases must never use the final form of a letter!
+Otherwise, it will fail even if the rule is correct! */
 const tests = [
     {
         category: 'nouns',
@@ -38,6 +39,11 @@ const tests = [
             {term: 'קאצ', source: 'קעצל', rule: 'n', reasons: ['diminutive']},
             {term: 'מױד', source: 'מײדלעך', rule: 'ns', reasons: ['umlaut_plural']},
             {term: 'מאנ', source: 'מענער', rule: 'ns', reasons: ['umlaut_plural']},
+            {term: 'קויפֿ', source: 'קויפֿסט', rule: 'v', reasons: ['verb_present_singular_to_first_person']},
+            {term: 'קויפֿ', source: 'קויפֿט', rule: 'vpresent', reasons: ['verb_present_singular_to_first_person']},
+            {term: 'קויפֿנ', source: 'קויפֿט', rule: 'vpresent', reasons: ['verb_present_plural_to_first_person']},
+            {term: 'קויפֿנ', source: 'קויפֿטס', rule: 'vpresent', reasons: ['verb_present_plural_to_first_person']},
+            {term: 'קויפֿנ', source: 'קויפֿטס', rule: 'vpresent', reasons: ['verb_present_plural_to_first_person']},
         ],
     },
 ];

@@ -19,39 +19,6 @@ import {suffixInflection} from '../language-transforms.js';
 
 /** @typedef {keyof typeof conditions} Condition */
 
-/*
-TODO
-    Nouns
-        inflectionalSuffixes
-            -s (plural)
-            -es (plural)
-            -n (plural)
-            -en (plural)
-            -t (plural)
-            -ekh (plural)
-            -er (comparative)
-    Verbs
-        Past
-            -t ge- +n
-            -n ge- +n
-            converbs
-        Present
-            inf (dictionary form)
-            1st p. s. +n
-            2nd p. s. -st +n
-                2nd question form -stu +n
-            3rd p. s. -t +n
-            1st p. pl. (dict form)
-            2nd p. pl -t +n
-            3rd p. pl (dict form)
-        Future
-            (dict form)
-        Converbs
-    Adjectives
-        -er
-        -e
-*/
-
 const umlautTable = new Map([
     ['\u05e2', '\u05d0'], // Ayin to Shtumer alef
     ['\u05f2', '\u05f1'], // Tsvey yudn to Vov yud
@@ -63,7 +30,7 @@ const umlautTable = new Map([
  * @returns {string}
  */
 function umlautMutation(str) {
-    const match = (/[עװאאַױוײיִײַיאָ](?!.*[װאאַױוײיִײַיאָע])/).exec(str);
+    const match = (/[\u05E2\u05F0\u05D0\uFB2E\u05F1\u05D5\u05F2\uFB1D\uFB1F\u05D9\uFB2F](?!.*[\u05E2\u05F0\u05D0\uFB2E\u05F1\u05D5\u05F2\uFB1D\uFB1F\u05D9\uFB2F])/).exec(str);
     if (match !== null && [...umlautTable.keys()].includes(str.charAt(match.index))) {
         str = str.substring(0, match.index) + umlautTable.get(str.charAt(match.index)) + str.substring(match.index + 1);
     }
@@ -94,6 +61,15 @@ const conditions = {
     v: {
         name: 'Verb',
         isDictionaryForm: true,
+        subConditions: ['vpast', 'vpresent'],
+    },
+    vpast: {
+        name: 'Verb, past tense',
+        isDictionaryForm: false,
+    },
+    vpresent: {
+        name: 'Verb, present tense',
+        isDictionaryForm: true,
     },
     n: {
         name: 'Noun',
@@ -101,11 +77,11 @@ const conditions = {
         subConditions: ['np', 'ns'],
     },
     np: {
-        name: 'Noun plural',
-        isDictionaryForm: false,
+        name: 'Noun, plural',
+        isDictionaryForm: true,
     },
     ns: {
-        name: 'Noun singular',
+        name: 'Noun, singular',
         isDictionaryForm: true,
     },
     adj: {
@@ -127,29 +103,46 @@ export const yiddishTransforms = {
             name: 'plural',
             description: 'plural form of a noun',
             rules: [
-                suffixInflection('ס', '', ['np'], ['ns']),
-                suffixInflection('ן', '', ['np'], ['ns']),
-                suffixInflection('ים', '', ['np'], ['ns']),
-                suffixInflection('ער', '', ['np'], ['ns']),
+                suffixInflection('\u05E1', '', ['np'], ['ns']), // -s
+                suffixInflection('\u05DF', '', ['np'], ['ns']), // -n
+                suffixInflection('\u05D9\u05DD', '', ['np'], ['ns']), // -im
+                suffixInflection('\u05E2\u05E8', '', ['np'], ['ns']), // -er
             ],
         },
         umlaut_plural: {
             name: 'umlaut_plural',
             description: 'plural form of a umlaut noun',
             rules: [
-                umlautMutationSuffixInflection('ער', '', ['np'], ['ns']),
-                umlautMutationSuffixInflection('לעך', '', ['np'], ['ns']),
+                umlautMutationSuffixInflection('\u05E2\u05E8', '', ['np'], ['ns']), // -er
+                umlautMutationSuffixInflection('\u05DC\u05E2\u05DA', '', ['np'], ['ns']), // -lekh
             ],
         },
         diminutive: {
             name: 'diminutive',
             description: 'diminutive form of a noun',
             rules: [
-                suffixInflection('לעך', '', ['n'], ['n']),
-                suffixInflection('טשיק', '', ['n'], ['n']),
-                suffixInflection('קע', '', ['n'], ['n']),
-                umlautMutationSuffixInflection('ל', '', ['n'], ['n']),
-                umlautMutationSuffixInflection('עלע', '', ['n'], ['n']),
+                suffixInflection('\u05DC\u05E2\u05DA', '', ['n'], ['n']), // -lekh
+                suffixInflection('\u05D8\u05E9\u05D9\u05E7', '', ['n'], ['n']), // -tshik
+                suffixInflection('\u05E7\u05E2', '', ['n'], ['n']), // -ke
+                umlautMutationSuffixInflection('\u05DC', '', ['n'], ['n']), // -l
+                umlautMutationSuffixInflection('\u05E2\u05DC\u05E2', '', ['n'], ['n']), // -ele
+            ],
+        },
+        verb_present_singular_to_first_person: {
+            name: 'verb_present_singular_to_first_person',
+            description: 'Turn the second and third person singular form to first person',
+            rules: [
+                suffixInflection('\u05E1\u05D8', '', ['v'], ['vpresent']), // -st
+                suffixInflection('\u05D8', '', ['v'], ['vpresent']), // -t
+                suffixInflection('\u05E0\u05D3\u05D9\u05E7', '', ['v'], ['vpresent']), // -ndik
+            ],
+        },
+        verb_present_plural_to_first_person: {
+            name: 'verb_present_plural_to_first_person',
+            description: 'Turn the second plural form to first person plural form',
+            rules: [
+                suffixInflection('\u05D8\u05E1', '\u05E0', ['v'], ['vpresent']), // -ts
+                suffixInflection('\u05D8', '\u05E0', ['v'], ['vpresent']), // -t
             ],
         },
     },
