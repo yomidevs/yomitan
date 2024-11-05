@@ -49,6 +49,8 @@ export class DisplayAnki {
         this._errorNotificationEventListeners = null;
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._tagsNotification = null;
+        /** @type {?import('./display-notification.js').DisplayNotification} */
+        this._flagsNotification = null;
         /** @type {?Promise<void>} */
         this._updateSaveButtonsPromise = null;
         /** @type {?import('core').TokenObject} */
@@ -102,6 +104,8 @@ export class DisplayAnki {
         this._menuContainer = querySelectorNotNull(document, '#popup-menus');
         /** @type {(event: MouseEvent) => void} */
         this._onShowTagsBind = this._onShowTags.bind(this);
+        /** @type {(event: MouseEvent) => void} */
+        this._onShowFlagsBind = this._onShowFlags.bind(this);
         /** @type {(event: MouseEvent) => void} */
         this._onNoteSaveBind = this._onNoteSave.bind(this);
         /** @type {(event: MouseEvent) => void} */
@@ -260,6 +264,9 @@ export class DisplayAnki {
         for (const node of element.querySelectorAll('.action-button[data-action=view-tags]')) {
             eventListeners.addEventListener(node, 'click', this._onShowTagsBind);
         }
+        for (const node of element.querySelectorAll('.action-button[data-action=view-flags]')) {
+            eventListeners.addEventListener(node, 'click', this._onShowFlagsBind);
+        }
         for (const node of element.querySelectorAll('.action-button[data-action=save-note]')) {
             eventListeners.addEventListener(node, 'click', this._onNoteSaveBind);
         }
@@ -305,6 +312,16 @@ export class DisplayAnki {
     }
 
     /**
+     * @param {MouseEvent} e
+     */
+    _onShowFlags(e) {
+        e.preventDefault();
+        const element = /** @type {HTMLElement} */ (e.currentTarget);
+        const flags = element.title;
+        this._showFlagsNotification(flags);
+    }
+
+    /**
      * @param {number} index
      * @param {import('display-anki').CreateMode} mode
      * @returns {?HTMLButtonElement}
@@ -321,6 +338,15 @@ export class DisplayAnki {
     _tagsIndicatorFind(index) {
         const entry = this._getEntry(index);
         return entry !== null ? entry.querySelector('.action-button[data-action=view-tags]') : null;
+    }
+
+    /**
+     * @param {number} index
+     * @returns {?HTMLButtonElement}
+     */
+    _flagsIndicatorFind(index) {
+        const entry = this._getEntry(index);
+        return entry !== null ? entry.querySelector('.action-button[data-action=view-flags]') : null;
     }
 
     /**
@@ -459,6 +485,7 @@ export class DisplayAnki {
 
                 if (displayTags !== 'never' && Array.isArray(noteInfos)) {
                     this._setupTagsIndicator(i, noteInfos);
+                    this._setupFlagsIndicator(i, noteInfos);
                 }
             }
 
@@ -533,6 +560,18 @@ export class DisplayAnki {
             flagsIndicator.hidden = false;
             flagsIndicator.title = `Card flags: ${[...displayFlags].join(', ')}`;
         }
+    }
+
+    /**
+     * @param {string} message
+     */
+    _showFlagsNotification(message) {
+        if (this._flagsNotification === null) {
+            this._flagsNotification = this._display.createNotification(true);
+        }
+
+        this._flagsNotification.setContent(message);
+        this._flagsNotification.open();
     }
 
     /**
