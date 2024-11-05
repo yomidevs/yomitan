@@ -509,6 +509,33 @@ export class DisplayAnki {
     }
 
     /**
+     * @param {number} i
+     * @param {(?import('anki').NoteInfo)[]} noteInfos
+     */
+    _setupFlagsIndicator(i, noteInfos) {
+        const flagsIndicator = this._flagsIndicatorFind(i);
+        if (flagsIndicator === null) {
+            return;
+        }
+
+        const displayFlags = new Set();
+        for (const item of noteInfos) {
+            if (item === null) { continue; }
+            for (const cardInfo of item.cardsInfo) {
+                if (cardInfo.flags !== 0) {
+                    displayFlags.add(cardInfo.flags);
+                }
+            }
+        }
+
+        if (displayFlags.size > 0) {
+            flagsIndicator.disabled = false;
+            flagsIndicator.hidden = false;
+            flagsIndicator.title = `Card flags: ${[...displayFlags].join(', ')}`;
+        }
+    }
+
+    /**
      * @param {import('display-anki').CreateMode} mode
      */
     _hotkeySaveAnkiNoteForSelectedEntry(mode) {
