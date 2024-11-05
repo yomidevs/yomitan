@@ -39,6 +39,8 @@ export class TextScanner extends EventDispatcher {
         ignorePoint = null,
         searchTerms = false,
         searchKanji = false,
+        searchOnClick = false,
+        searchOnClickOnly = false,
         textSourceGenerator,
     }) {
         super();
@@ -56,6 +58,10 @@ export class TextScanner extends EventDispatcher {
         this._searchTerms = searchTerms;
         /** @type {boolean} */
         this._searchKanji = searchKanji;
+        /** @type {boolean} */
+        this._searchOnClick = searchOnClick;
+        /** @type {boolean} */
+        this._searchOnClickOnly = searchOnClickOnly;
         /** @type {import('../dom/text-source-generator').TextSourceGenerator} */
         this._textSourceGenerator = textSourceGenerator;
 
@@ -658,6 +664,7 @@ export class TextScanner extends EventDispatcher {
 
         switch (e.button) {
             case 0: // Primary
+                if (this._searchOnClick) { this._resetPreventNextClickScan(); }
                 this._scanTimerClear();
                 this._triggerClear('mousedown');
                 break;
@@ -691,7 +698,31 @@ export class TextScanner extends EventDispatcher {
             return false;
         }
 
+        if (this._searchOnClick) {
+            this._onSearchClick(e);
+            return;
+        }
+
         this._onMouseMove(e);
+    }
+
+    /**
+     * @param {MouseEvent} e
+     */
+    _onSearchClick(e) {
+        const preventNextClickScan = this._preventNextClickScan;
+        this._preventNextClickScan = false;
+        if (this._preventNextClickScanTimer !== null) {
+            clearTimeout(this._preventNextClickScanTimer);
+            this._preventNextClickScanTimer = null;
+        }
+
+        if (preventNextClickScan) { return; }
+
+        const modifiers = getActiveModifiersAndButtons(e);
+        const modifierKeys = getActiveModifiers(e);
+        const inputInfo = this._createInputInfo(null, 'mouse', 'click', false, modifiers, modifierKeys);
+        void this._searchAt(e.clientX, e.clientY, inputInfo);
     }
 
     /** */
@@ -1117,7 +1148,9 @@ export class TextScanner extends EventDispatcher {
         const capture = true;
         /** @type {import('event-listener-collection').AddEventListenerArgs[]} */
         let eventListenerInfos;
-        if (this._arePointerEventsSupported()) {
+        if (this._searchOnClickOnly) {
+            eventListenerInfos = this._getMouseClickOnlyEventListeners(capture);
+        } else if (this._arePointerEventsSupported()) {
             eventListenerInfos = this._getPointerEventListeners(capture);
         } else {
             eventListenerInfos = [...this._getMouseEventListeners(capture)];
@@ -1127,6 +1160,9 @@ export class TextScanner extends EventDispatcher {
             if (this._touchInputEnabled) {
                 eventListenerInfos.push(...this._getTouchEventListeners(capture));
             }
+        }
+        if (this._searchOnClick) {
+            eventListenerInfos.push(...this._getMouseClickOnlyEventListeners2(capture));
         }
 
         eventListenerInfos.push(this._getSelectionChangeCheckUserSelectionListener());
@@ -1192,6 +1228,35 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false, capture}],
             [this._node, 'contextmenu', this._onContextMenu.bind(this), capture],
         ];
+    }
+
+    /**
+     * @param {boolean} capture
+     * @returns {import('event-listener-collection').AddEventListenerArgs[]}
+     */
+    _getMouseClickOnlyEventListeners(capture) {
+        return [
+            [this._node, 'click', this._onClick.bind(this), capture],
+        ];
+    }
+
+    /**
+     * @param {boolean} capture
+     * @returns {import('event-listener-collection').AddEventListenerArgs[]}
+     */
+    _getMouseClickOnlyEventListeners2(capture) {
+        const {documentElement} = document;
+        /** @type {import('event-listener-collection').AddEventListenerArgs[]} */
+        const entries = [
+            [document, 'selectionchange', this._onSelectionChange.bind(this)],
+        ];
+        if (documentElement !== null) {
+            entries.push([documentElement, 'mousedown', this._onSearchClickMouseDown.bind(this), capture]);
+            if (this._touchInputEnabled) {
+                entries.push([documentElement, 'touchstart', this._onSearchClickTouchStart.bind(this), {passive: true, capture}]);
+            }
+        }
+        return entries;
     }
 
     /**
