@@ -870,13 +870,13 @@ export class DictionaryController {
         const modal = /** @type {import('./modal.js').Modal} */ (this._updateDictionaryModal);
         modal.setVisible(false);
 
-        const title = modal.node.dataset.dictionaryTitle;
+        const dictionaryTitle = modal.node.dataset.dictionaryTitle;
         const downloadUrl = modal.node.dataset.downloadUrl;
-        if (typeof title !== 'string') { return; }
+        if (typeof dictionaryTitle !== 'string') { return; }
         delete modal.node.dataset.dictionaryTitle;
 
-        void this._enqueueTask({type: 'update', dictionaryTitle: title, downloadUrl});
-        this._hideUpdatesAvailableButton(title);
+        void this._enqueueTask({type: 'update', dictionaryTitle, downloadUrl});
+        this._hideUpdatesAvailableButton(dictionaryTitle);
     }
 
     /**
