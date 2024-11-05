@@ -166,7 +166,7 @@ class DictionaryEntry {
         const bodyNode = e.detail.menu.bodyNode;
         const count = this._dictionaryController.dictionaryOptionCount;
         this._setMenuActionEnabled(bodyNode, 'moveTo', count > 1);
-        const deleteDisabled = this._dictionaryController.isDictionaryInDeleteQueue(this.dictionaryTitle) || this._dictionaryController.isUpdating;
+        const deleteDisabled = this._dictionaryController.isDictionaryInTaskQueue(this.dictionaryTitle);
         this._setMenuActionEnabled(bodyNode, 'delete', !deleteDisabled);
     }
 
@@ -510,14 +510,10 @@ export class DictionaryController {
         this._allCheckbox = querySelectorNotNull(document, '#all-dictionaries-enabled');
         /** @type {?DictionaryExtraInfo} */
         this._extraInfo = null;
+        /** @type {import('dictionary-controller.js').DictionaryTask[]} */
+        this._dictionaryTaskQueue = [];
         /** @type {boolean} */
-        this._isDeleting = false;
-        /** @type {boolean} */
-        this._isUpdating = false;
-        /** @type {string[]} */
-        this._dictionaryDeleteQueue = [];
-        /** @type {string[]} */
-        this._dictionaryUpdateQueue = [];
+        this._isTaskQueueRunning = false;
     }
 
     /** @type {import('./modal-controller.js').ModalController} */
@@ -528,16 +524,6 @@ export class DictionaryController {
     /** @type {number} */
     get dictionaryOptionCount() {
         return this._dictionaryEntries.length;
-    }
-
-    /** @type {boolean} */
-    get isDeleting() {
-        return this._isDeleting;
-    }
-
-    /** @type {boolean} */
-    get isUpdating() {
-        return this._isUpdating;
     }
 
     /** */
@@ -862,12 +848,12 @@ export class DictionaryController {
         const modal = /** @type {import('./modal.js').Modal} */ (this._deleteDictionaryModal);
         modal.setVisible(false);
 
-        const title = modal.node.dataset.dictionaryTitle;
-        if (typeof title !== 'string') { return; }
+        const dictionaryTitle = modal.node.dataset.dictionaryTitle;
+        if (typeof dictionaryTitle !== 'string') { return; }
         delete modal.node.dataset.dictionaryTitle;
 
-        void this._enqueueDictionaryDelete(title);
-        this._hideUpdatesAvailableButtons();
+        void this._enqueueTask({type: 'delete', dictionaryTitle});
+        this._hideUpdatesAvailableButton(dictionaryTitle);
     }
 
     /**
@@ -884,7 +870,7 @@ export class DictionaryController {
         if (typeof title !== 'string') { return; }
         delete modal.node.dataset.dictionaryTitle;
 
-        void this._enqueueDictionaryUpdate(title, downloadUrl);
+        void this._enqueueTask({type: 'update', dictionaryTitle: title, downloadUrl});
         this._hideUpdatesAvailableButton(title);
     }
 
@@ -896,13 +882,6 @@ export class DictionaryController {
             if (entry.dictionaryTitle === dictionaryTitle) {
                 entry.hideUpdatesAvailableButton();
             }
-        }
-    }
-
-    /** */
-    _hideUpdatesAvailableButtons() {
-        for (const entry of this._dictionaryEntries) {
-            entry.hideUpdatesAvailableButton();
         }
     }
 
@@ -994,7 +973,7 @@ export class DictionaryController {
 
     /** */
     async _checkForUpdates() {
-        if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isDeletingOrUpdating()) { return; }
+        if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isTaskQueueRunning) { return; }
         let hasUpdates;
         try {
             this._checkingUpdates = true;
@@ -1017,7 +996,7 @@ export class DictionaryController {
 
     /** */
     async _checkIntegrity() {
-        if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isDeletingOrUpdating()) { return; }
+        if (this._dictionaries === null || this._checkingIntegrity || this._checkingUpdates || this._isTaskQueueRunning) { return; }
 
         try {
             this._checkingIntegrity = true;
@@ -1093,61 +1072,41 @@ export class DictionaryController {
      * @param {string} dictionaryTitle
      * @returns {boolean}
      */
-    isDictionaryInDeleteQueue(dictionaryTitle) {
-        return this._dictionaryDeleteQueue.includes(dictionaryTitle);
+    isDictionaryInTaskQueue(dictionaryTitle) {
+        return this._dictionaryTaskQueue.some((task) => task.dictionaryTitle === dictionaryTitle);
     }
 
     /**
-     * @param {string} dictionaryTitle
-     * @returns {boolean}
+     * @param {import('dictionary-controller.js').DictionaryTask} task
      */
-    isDictionaryInUpdateQueue(dictionaryTitle) {
-        return this._dictionaryUpdateQueue.includes(dictionaryTitle);
+    _enqueueTask(task) {
+        if (this.isDictionaryInTaskQueue(task.dictionaryTitle)) { return; }
+        this._dictionaryTaskQueue.push(task);
+        void this._runTaskQueue();
     }
 
-    /**
-     * @returns {boolean}
-     */
-    _isDeletingOrUpdating() {
-        return this._isDeleting || this._isUpdating;
-    }
 
-    /**
-     * @param {string} dictionaryTitle
-     */
-    async _enqueueDictionaryDelete(dictionaryTitle) {
-        if (this.isDictionaryInDeleteQueue(dictionaryTitle)) { return; }
-        this._dictionaryDeleteQueue.push(dictionaryTitle);
-        if (this._isDeleting) { return; }
-        while (this._dictionaryDeleteQueue.length > 0) {
-            const title = this._dictionaryDeleteQueue[0];
-            if (!title) { continue; }
-            await this._deleteDictionary(title);
-            void this._dictionaryDeleteQueue.shift();
+    /** */
+    async _runTaskQueue() {
+        if (this._isTaskQueueRunning) { return; }
+        this._isTaskQueueRunning = true;
+        while (this._dictionaryTaskQueue.length > 0) {
+            const task = this._dictionaryTaskQueue[0];
+            if (task.type === 'delete') {
+                await this._deleteDictionary(task.dictionaryTitle);
+            } else if (task.type === 'update') {
+                await this._updateDictionary(task.dictionaryTitle, task.downloadUrl);
+            }
+            void this._dictionaryTaskQueue.shift();
         }
-    }
-
-    /**
-     * @param {string} dictionaryTitle
-     * @param {string|undefined} downloadUrl
-     */
-    async _enqueueDictionaryUpdate(dictionaryTitle, downloadUrl) {
-        if (this.isDictionaryInUpdateQueue(dictionaryTitle)) { return; }
-        this._dictionaryUpdateQueue.push(dictionaryTitle);
-        if (this._isUpdating) { return; }
-        while (this._dictionaryUpdateQueue.length > 0) {
-            const title = this._dictionaryUpdateQueue[0];
-            if (!title) { continue; }
-            await this._updateDictionary(title, downloadUrl);
-            void this._dictionaryUpdateQueue.shift();
-        }
+        this._isTaskQueueRunning = false;
     }
 
     /**
      * @param {string} dictionaryTitle
      */
     async _deleteDictionary(dictionaryTitle) {
-        if (this._isDeleting || this._checkingIntegrity) { return; }
+        if (this._checkingIntegrity) { return; }
 
         const index = this._dictionaryEntries.findIndex((entry) => entry.dictionaryTitle === dictionaryTitle);
         if (index < 0) { return; }
@@ -1160,7 +1119,6 @@ export class DictionaryController {
         const statusLabels = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`${progressSelector} .progress-status`));
         const prevention = this._settingsController.preventPageExit();
         try {
-            this._isDeleting = true;
             this._setButtonsEnabled(false);
 
             /**
@@ -1193,7 +1151,6 @@ export class DictionaryController {
             for (const progress of progressContainers) { progress.hidden = true; }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
             this._setButtonsEnabled(true);
-            this._isDeleting = false;
             this._triggerStorageChanged();
         }
     }
@@ -1203,9 +1160,8 @@ export class DictionaryController {
      * @param {string|undefined} downloadUrl
      */
     async _updateDictionary(dictionaryTitle, downloadUrl) {
-        if (this._checkingIntegrity || this._checkingUpdates || this._isUpdating || this._dictionaries === null) { return; }
+        if (this._checkingIntegrity || this._checkingUpdates || this._dictionaries === null) { return; }
 
-        this._isUpdating = true;
         const dictionaryInfo = this._dictionaries.find((entry) => entry.title === dictionaryTitle);
         if (typeof dictionaryInfo === 'undefined') { throw new Error('Dictionary not found'); }
         downloadUrl = downloadUrl ?? dictionaryInfo.downloadUrl;
@@ -1233,7 +1189,6 @@ export class DictionaryController {
             this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl, profilesDictionarySettings, onImportDone: resolve});
         });
         await importPromise;
-        this._isUpdating = false;
     }
 
     /**
