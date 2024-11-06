@@ -560,8 +560,8 @@ export class DisplayAnki {
             flagsIndicator.disabled = false;
             flagsIndicator.hidden = false;
             flagsIndicator.title = `Card flags: ${[...displayFlags].join(', ')}`;
-            /** @type {HTMLElement} */
-            const flagsIndicatorIcon = querySelectorNotNull(flagsIndicator, '.action-icon');
+            /** @type {HTMLElement | null} */
+            const flagsIndicatorIcon = flagsIndicator.querySelector('.action-icon');
             if (flagsIndicatorIcon !== null && flagsIndicator instanceof HTMLElement) {
                 flagsIndicatorIcon.style.background = this._getFlagColor(displayFlags);
             }
