@@ -717,6 +717,19 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
+     * @param {MouseEvent} e
+     * @returns {boolean|void}
+     */
+    _onContextMenu(e) {
+        if (this._preventNextContextMenu) {
+            this._preventNextContextMenu = false;
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }
+
+    /**
      * @param {TouchEvent|PointerEvent} e
      * @param {number} x
      * @param {number} y
@@ -743,6 +756,19 @@ export class TextScanner extends EventDispatcher {
         if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchPress)) { return; }
 
         void this._searchAtFromTouchStart(x, y, inputInfo);
+    }
+
+    /**
+     * @param {TouchEvent} e
+     */
+    _onTouchEnd(e) {
+        if (this._primaryTouchIdentifier === null) { return; }
+
+        const primaryTouch = this._getTouch(e.changedTouches, this._primaryTouchIdentifier);
+        if (primaryTouch === null) { return; }
+
+        const {clientX, clientY} = primaryTouch;
+        this._onPrimaryTouchEnd(e, clientX, clientY, true);
     }
 
     /**
@@ -1080,9 +1106,11 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'pointercancel', this._onPointerCancel.bind(this), capture],
             [this._node, 'pointerout', this._onPointerOut.bind(this), capture],
             [this._node, 'touchmove', this._onTouchMovePreventScroll.bind(this), {passive: false, capture}],
+            [this._node, 'touchend', this._onTouchEnd.bind(this), capture],
             [this._node, 'mousedown', this._onMouseDown.bind(this), capture],
             [this._node, 'click', this._onClick.bind(this), capture],
             [this._node, 'auxclick', this._onAuxClick.bind(this), capture],
+            [this._node, 'contextmenu', this._onContextMenu.bind(this), capture],
         ];
     }
 
