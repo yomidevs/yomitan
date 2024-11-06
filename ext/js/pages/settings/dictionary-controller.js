@@ -1105,7 +1105,6 @@ export class DictionaryController {
             } else if (task.type === 'update') {
                 await this._updateDictionary(task.dictionaryTitle, task.downloadUrl);
             }
-            console.log('Task done');
             void this._dictionaryTaskQueue.shift();
         }
         this._isTaskQueueRunning = false;
