@@ -71,8 +71,8 @@ export class DisplayAnki {
         this._resultOutputMode = 'split';
         /** @type {import('settings').GlossaryLayoutMode} */
         this._glossaryLayoutMode = 'default';
-        /** @type {import('settings').AnkiDisplayTags} */
-        this._displayTags = 'never';
+        /** @type {import('settings').AnkiDisplayTagsAndFlags} */
+        this._displayTagsAndFlags = 'never';
         /** @type {import('settings').AnkiDuplicateScope} */
         this._duplicateScope = 'collection';
         /** @type {boolean} */
@@ -210,7 +210,7 @@ export class DisplayAnki {
                 duplicateBehavior,
                 suspendNewCards,
                 checkForDuplicates,
-                displayTags,
+                displayTagsAndFlags,
                 kanji,
                 terms,
                 noteGuiMode,
@@ -225,7 +225,7 @@ export class DisplayAnki {
         this._compactTags = compactTags;
         this._resultOutputMode = resultOutputMode;
         this._glossaryLayoutMode = glossaryLayoutMode;
-        this._displayTags = displayTags;
+        this._displayTagsAndFlags = displayTagsAndFlags;
         this._duplicateScope = duplicateScope;
         this._duplicateScopeCheckAllModels = duplicateScopeCheckAllModels;
         this._duplicateBehavior = duplicateBehavior;
@@ -455,7 +455,7 @@ export class DisplayAnki {
      * @param {import('display-anki').DictionaryEntryDetails[]} dictionaryEntryDetails
      */
     _updateSaveButtons(dictionaryEntryDetails) {
-        const displayTags = this._displayTags;
+        const displayTagsAndFlags = this._displayTagsAndFlags;
         for (let i = 0, ii = dictionaryEntryDetails.length; i < ii; ++i) {
             /** @type {?Set<number>} */
             let allNoteIds = null;
@@ -483,7 +483,7 @@ export class DisplayAnki {
                     }
                 }
 
-                if (displayTags !== 'never' && Array.isArray(noteInfos)) {
+                if (displayTagsAndFlags !== 'never' && Array.isArray(noteInfos)) {
                     this._setupTagsIndicator(i, noteInfos);
                     this._setupFlagsIndicator(i, noteInfos);
                 }
@@ -510,7 +510,7 @@ export class DisplayAnki {
                 displayTags.add(tag);
             }
         }
-        if (this._displayTags === 'non-standard') {
+        if (this._displayTagsAndFlags === 'non-standard') {
             for (const tag of this._noteTags) {
                 displayTags.delete(tag);
             }
@@ -858,7 +858,7 @@ export class DisplayAnki {
      * @returns {Promise<import('display-anki').DictionaryEntryDetails[]>}
      */
     async _getDictionaryEntryDetails(dictionaryEntries) {
-        const fetchAdditionalInfo = (this._displayTags !== 'never');
+        const fetchAdditionalInfo = (this._displayTagsAndFlags !== 'never');
 
         const notePromises = [];
         const noteTargets = [];
