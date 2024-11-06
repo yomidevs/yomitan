@@ -717,31 +717,6 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {MouseEvent} e
-     * @returns {boolean|void}
-     */
-    _onContextMenu(e) {
-        if (this._preventNextContextMenu) {
-            this._preventNextContextMenu = false;
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }
-
-    /**
-     * @param {TouchEvent} e
-     */
-    _onTouchStart(e) {
-        if (this._primaryTouchIdentifier !== null || e.changedTouches.length === 0) {
-            return;
-        }
-
-        const {clientX, clientY, identifier} = e.changedTouches[0];
-        this._onPrimaryTouchStart(e, clientX, clientY, identifier);
-    }
-
-    /**
      * @param {TouchEvent|PointerEvent} e
      * @param {number} x
      * @param {number} y
@@ -771,19 +746,6 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
-     * @param {TouchEvent} e
-     */
-    _onTouchEnd(e) {
-        if (this._primaryTouchIdentifier === null) { return; }
-
-        const primaryTouch = this._getTouch(e.changedTouches, this._primaryTouchIdentifier);
-        if (primaryTouch === null) { return; }
-
-        const {clientX, clientY} = primaryTouch;
-        this._onPrimaryTouchEnd(e, clientX, clientY, true);
-    }
-
-    /**
      * @param {TouchEvent|PointerEvent} e
      * @param {number} x
      * @param {number} y
@@ -803,47 +765,6 @@ export class TextScanner extends EventDispatcher {
         if (inputInfo.input.scanOnTouchRelease || (inputInfo.input.scanOnTouchTap && this._touchTapValid)) {
             void this._searchAtFromTouchEnd(x, y, inputInfo);
         }
-    }
-
-    /**
-     * @param {TouchEvent} e
-     */
-    _onTouchCancel(e) {
-        if (this._primaryTouchIdentifier === null) { return; }
-
-        const primaryTouch = this._getTouch(e.changedTouches, this._primaryTouchIdentifier);
-        if (primaryTouch === null) { return; }
-
-        this._onPrimaryTouchEnd(e, 0, 0, false);
-    }
-
-    /**
-     * @param {TouchEvent} e
-     */
-    _onTouchMove(e) {
-        this._touchTapValid = false;
-
-        if (this._primaryTouchIdentifier === null) { return; }
-
-        if (!e.cancelable) {
-            this._onPrimaryTouchEnd(e, 0, 0, false);
-            return;
-        }
-
-        if (!this._preventScroll) { return; }
-
-        const primaryTouch = this._getTouch(e.changedTouches, this._primaryTouchIdentifier);
-        if (primaryTouch === null) { return; }
-
-        const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchMove', e);
-        if (inputInfo === null) { return; }
-
-        const {input} = inputInfo;
-        if (input !== null && input.scanOnTouchMove) {
-            void this._searchAt(primaryTouch.clientX, primaryTouch.clientY, inputInfo);
-        }
-
-        e.preventDefault(); // Disable scroll
     }
 
     /**
