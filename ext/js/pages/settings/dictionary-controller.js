@@ -20,6 +20,7 @@ import * as ajvSchemas0 from '../../../lib/validate-schemas.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
+import {deferPromise} from '../../core/utilities.js';
 import {compareRevisions} from '../../dictionary/dictionary-data-util.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
@@ -887,6 +888,7 @@ export class DictionaryController {
         for (const entry of this._dictionaryEntries) {
             if (entry.dictionaryTitle === dictionaryTitle) {
                 entry.hideUpdatesAvailableButton();
+                break;
             }
         }
     }
@@ -1148,10 +1150,9 @@ export class DictionaryController {
             for (const label of infoLabels) { label.textContent = 'Deleting dictionary...'; }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
 
-            /** @type {Promise<void>} */
-            const dictionariesUpdatePromise = new Promise((resolve) => {
-                this._onDictionariesUpdate = resolve;
-            });
+            /** @type {import('core').DeferredPromiseDetails<void>} */
+            const {promise: dictionariesUpdatePromise, resolve} = deferPromise();
+            this._onDictionariesUpdate = resolve;
             await this._deleteDictionaryInternal(dictionaryTitle, onProgress);
             await this._deleteDictionarySettings(dictionaryTitle);
             await dictionariesUpdatePromise;
@@ -1196,10 +1197,9 @@ export class DictionaryController {
         }
 
         await this._deleteDictionary(dictionaryTitle);
-        /** @type {Promise<void>} */
-        const importPromise = new Promise((resolve) => {
-            this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl, profilesDictionarySettings, onImportDone: resolve});
-        });
+        /** @type {import('core').DeferredPromiseDetails<void>} */
+        const {promise: importPromise, resolve} = deferPromise();
+        this._settingsController.trigger('importDictionaryFromUrl', {url: downloadUrl, profilesDictionarySettings, onImportDone: resolve});
         await importPromise;
     }
 
