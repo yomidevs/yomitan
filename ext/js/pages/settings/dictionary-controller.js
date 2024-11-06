@@ -1177,7 +1177,6 @@ export class DictionaryController {
 
             await this._deleteDictionaryInternal(dictionaryTitle, onProgress);
             await this._deleteDictionarySettings(dictionaryTitle);
-            this._onDictionariesUpdate = null;
         } catch (e) {
             log.error(e);
         } finally {
