@@ -608,17 +608,17 @@ export class DisplayAnki {
         const gradientSliceSize = 100 / flags.size;
         let currentGradientPercent = 0;
 
-        let gradient = 'linear-gradient(to right,';
+        const gradientSlices = [];
         for (const flag of flags) {
             const flagColor = flagColorsDict[flag];
-            gradient += 'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + currentGradientPercent + '%,';
-            gradient += 'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + (currentGradientPercent + gradientSliceSize) + '%,';
+            gradientSlices.push(
+                'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + currentGradientPercent + '%',
+                'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + (currentGradientPercent + gradientSliceSize) + '%',
+            );
             currentGradientPercent += gradientSliceSize;
         }
-        gradient = gradient.slice(0, -1); // remove trailing comma
-        gradient += ')';
 
-        return gradient;
+        return 'linear-gradient(to right,' + gradientSlices.join(',') + ')';
     }
 
     /**
