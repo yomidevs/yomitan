@@ -674,6 +674,7 @@ export class AnkiConnect {
     }
 
     /**
+     * Transforms raw AnkiConnect data into the CardInfo type.
      * @param {unknown} result
      * @returns {(?import('anki').CardInfo)[]}
      * @throws {Error}
