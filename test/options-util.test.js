@@ -81,7 +81,6 @@ function createProfileOptionsTestData1() {
         },
         scanning: {
             middleMouse: true,
-            touchInputEnabled: true,
             selectText: true,
             alphanumeric: true,
             autoHideResults: false,
@@ -329,7 +328,6 @@ function createProfileOptionsUpdatedTestData1() {
             autoPlay: false,
         },
         scanning: {
-            touchInputEnabled: true,
             selectText: true,
             alphanumeric: true,
             autoHideResults: false,
@@ -343,7 +341,6 @@ function createProfileOptionsUpdatedTestData1() {
             enableSearchTags: false,
             layoutAwareScan: false,
             hideDelay: 0,
-            pointerEventsEnabled: false,
             matchTypePrefix: false,
             hidePopupOnCursorExit: false,
             hidePopupOnCursorExitDelay: 0,
@@ -645,7 +642,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 54,
+        version: 55,
         global: {
             database: {
                 prefixWildcardsSupported: false,

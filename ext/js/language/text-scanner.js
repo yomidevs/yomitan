@@ -104,10 +104,6 @@ export class TextScanner extends EventDispatcher {
         this._selectText = false;
         /** @type {number} */
         this._delay = 0;
-        /** @type {boolean} */
-        this._touchInputEnabled = false;
-        /** @type {boolean} */
-        this._pointerEventsEnabled = false;
         /** @type {number} */
         this._scanLength = 1;
         /** @type {boolean} */
@@ -261,8 +257,6 @@ export class TextScanner extends EventDispatcher {
         normalizeCssZoom,
         selectText,
         delay,
-        touchInputEnabled,
-        pointerEventsEnabled,
         scanLength,
         layoutAwareScan,
         preventMiddleMouse,
@@ -285,12 +279,6 @@ export class TextScanner extends EventDispatcher {
         }
         if (typeof delay === 'number') {
             this._delay = delay;
-        }
-        if (typeof touchInputEnabled === 'boolean') {
-            this._touchInputEnabled = touchInputEnabled;
-        }
-        if (typeof pointerEventsEnabled === 'boolean') {
-            this._pointerEventsEnabled = pointerEventsEnabled;
         }
         if (typeof scanLength === 'number') {
             this._scanLength = scanLength;
@@ -586,11 +574,6 @@ export class TextScanner extends EventDispatcher {
      */
     _onSearchClickMouseDown(e) {
         if (e.button !== 0) { return; }
-        this._resetPreventNextClickScan();
-    }
-
-    /** */
-    _onSearchClickTouchStart() {
         this._resetPreventNextClickScan();
     }
 
@@ -1139,13 +1122,6 @@ export class TextScanner extends EventDispatcher {
         this._scanTimerPromise = null;
     }
 
-    /**
-     * @returns {boolean}
-     */
-    _arePointerEventsSupported() {
-        return (this._pointerEventsEnabled && typeof PointerEvent !== 'undefined');
-    }
-
     /** */
     _hookEvents() {
         const capture = true;
@@ -1153,15 +1129,10 @@ export class TextScanner extends EventDispatcher {
         let eventListenerInfos;
         if (this._searchOnClickOnly) {
             eventListenerInfos = this._getMouseClickOnlyEventListeners(capture);
-        } else if (this._arePointerEventsSupported()) {
-            eventListenerInfos = this._getPointerEventListeners(capture);
         } else {
             eventListenerInfos = [...this._getMouseEventListeners(capture)];
             if (this._scanWithoutMousemove) {
                 eventListenerInfos.push(...this._getKeyboardEventListeners(capture));
-            }
-            if (this._touchInputEnabled) {
-                eventListenerInfos.push(...this._getTouchEventListeners(capture));
             }
         }
         if (this._searchOnClick) {
@@ -1222,21 +1193,6 @@ export class TextScanner extends EventDispatcher {
      * @param {boolean} capture
      * @returns {import('event-listener-collection').AddEventListenerArgs[]}
      */
-    _getTouchEventListeners(capture) {
-        return [
-            [this._node, 'auxclick', this._onAuxClick.bind(this), capture],
-            [this._node, 'touchstart', this._onTouchStart.bind(this), {passive: true, capture}],
-            [this._node, 'touchend', this._onTouchEnd.bind(this), capture],
-            [this._node, 'touchcancel', this._onTouchCancel.bind(this), capture],
-            [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false, capture}],
-            [this._node, 'contextmenu', this._onContextMenu.bind(this), capture],
-        ];
-    }
-
-    /**
-     * @param {boolean} capture
-     * @returns {import('event-listener-collection').AddEventListenerArgs[]}
-     */
     _getMouseClickOnlyEventListeners(capture) {
         return [
             [this._node, 'click', this._onClick.bind(this), capture],
@@ -1255,9 +1211,6 @@ export class TextScanner extends EventDispatcher {
         ];
         if (documentElement !== null) {
             entries.push([documentElement, 'mousedown', this._onSearchClickMouseDown.bind(this), capture]);
-            if (this._touchInputEnabled) {
-                entries.push([documentElement, 'touchstart', this._onSearchClickTouchStart.bind(this), {passive: true, capture}]);
-            }
         }
         return entries;
     }

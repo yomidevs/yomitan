@@ -453,8 +453,6 @@
                                 "required": [
                                     "inputs",
                                     "preventMiddleMouse",
-                                    "touchInputEnabled",
-                                    "pointerEventsEnabled",
                                     "selectText",
                                     "alphanumeric",
                                     "autoHideResults",
@@ -675,14 +673,6 @@
                                                 "default": false
                                             }
                                         }
-                                    },
-                                    "touchInputEnabled": {
-                                        "type": "boolean",
-                                        "default": true
-                                    },
-                                    "pointerEventsEnabled": {
-                                        "type": "boolean",
-                                        "default": false
                                     },
                                     "selectText": {
                                         "type": "boolean",
