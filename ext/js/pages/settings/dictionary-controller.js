@@ -1103,12 +1103,6 @@ export class DictionaryController {
             } else if (task.type === 'update') {
                 await this._updateDictionary(task.dictionaryTitle, task.downloadUrl);
             }
-            /** @type {Promise<void>} */
-            const dictionariesUpdatePromise = new Promise((resolve) => {
-                this._onDictionariesUpdate = resolve;
-            });
-            await dictionariesUpdatePromise;
-            this._onDictionariesUpdate = null;
             void this._dictionaryTaskQueue.shift();
         }
         this._isTaskQueueRunning = false;
@@ -1154,8 +1148,14 @@ export class DictionaryController {
             for (const label of infoLabels) { label.textContent = 'Deleting dictionary...'; }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
 
+            /** @type {Promise<void>} */
+            const dictionariesUpdatePromise = new Promise((resolve) => {
+                this._onDictionariesUpdate = resolve;
+            });
             await this._deleteDictionaryInternal(dictionaryTitle, onProgress);
             await this._deleteDictionarySettings(dictionaryTitle);
+            await dictionariesUpdatePromise;
+            this._onDictionariesUpdate = null;
         } catch (e) {
             log.error(e);
         } finally {
