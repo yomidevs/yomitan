@@ -298,7 +298,7 @@ export type AnkiOptions = {
     checkForDuplicates: boolean;
     fieldTemplates: string | null;
     suspendNewCards: boolean;
-    displayTags: AnkiDisplayTags;
+    displayTagsAndFlags: AnkiDisplayTagsAndFlags;
     noteGuiMode: AnkiNoteGuiMode;
     apiKey: string;
     downloadTimeout: number;
@@ -410,7 +410,7 @@ export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
 
 export type AnkiDuplicateBehavior = 'prevent' | 'overwrite' | 'new';
 
-export type AnkiDisplayTags = 'never' | 'always' | 'non-standard';
+export type AnkiDisplayTagsAndFlags = 'never' | 'always' | 'non-standard';
 
 export type AnkiNoteGuiMode = 'browse' | 'edit';
 

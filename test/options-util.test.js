@@ -482,7 +482,7 @@ function createProfileOptionsUpdatedTestData1() {
             duplicateBehavior: 'new',
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
-            displayTags: 'never',
+            displayTagsAndFlags: 'never',
             checkForDuplicates: true,
             fieldTemplates: null,
             suspendNewCards: false,
@@ -645,7 +645,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 53,
+        version: 54,
         global: {
             database: {
                 prefixWildcardsSupported: false,

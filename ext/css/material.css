@@ -278,6 +278,7 @@ body {
 .icon[data-icon=clipboard]               { --icon-image: url(/images/clipboard.svg); }
 .icon[data-icon=key]                     { --icon-image: url(/images/key.svg); }
 .icon[data-icon=tag]                     { --icon-image: url(/images/tag.svg); }
+.icon[data-icon=flag]                    { --icon-image: url(/images/flag.svg); }
 .icon[data-icon=accessibility]           { --icon-image: url(/images/accessibility.svg); }
 .icon[data-icon=connection]              { --icon-image: url(/images/connection.svg); }
 .icon[data-icon=external-link]           { --icon-image: url(/images/external-link.svg); }
