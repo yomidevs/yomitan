@@ -1130,7 +1130,7 @@ export class TextScanner extends EventDispatcher {
         if (this._searchOnClickOnly) {
             eventListenerInfos = this._getMouseClickOnlyEventListeners(capture);
         } else {
-            eventListenerInfos = [...this._getMouseEventListeners(capture)];
+            eventListenerInfos = [...this._getPointerEventListeners(capture), ...this._getMouseEventListeners(capture)];
             if (this._scanWithoutMousemove) {
                 eventListenerInfos.push(...this._getKeyboardEventListeners(capture));
             }
