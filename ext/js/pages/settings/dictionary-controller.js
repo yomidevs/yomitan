@@ -33,14 +33,17 @@ class DictionaryEntry {
      * @param {DocumentFragment} fragment
      * @param {number} index
      * @param {import('dictionary-importer').Summary} dictionaryInfo
+     * @param {string | null} updateDownloadUrl
      */
-    constructor(dictionaryController, fragment, index, dictionaryInfo) {
+    constructor(dictionaryController, fragment, index, dictionaryInfo, updateDownloadUrl) {
         /** @type {DictionaryController} */
         this._dictionaryController = dictionaryController;
         /** @type {number} */
         this._index = index;
         /** @type {import('dictionary-importer').Summary} */
         this._dictionaryInfo = dictionaryInfo;
+        /** @type {string | null} */
+        this._updateDownloadUrl = updateDownloadUrl;
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
         /** @type {?import('dictionary-database').DictionaryCountGroup} */
@@ -87,6 +90,7 @@ class DictionaryEntry {
         this._outdatedButton.hidden = (version >= 3);
         this._priorityInput.dataset.setting = `dictionaries[${index}].priority`;
         this._enabledCheckbox.dataset.setting = `dictionaries[${index}].enabled`;
+        this._showUpdatesAvailableButton();
         this._eventListeners.addEventListener(this._enabledCheckbox, 'settingChanged', this._onEnabledChanged.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
@@ -153,12 +157,28 @@ class DictionaryEntry {
 
         const downloadUrl = latestDownloadUrl ?? currentDownloadUrl;
 
-        this._updatesAvailable.dataset.downloadUrl = downloadUrl;
-        this._updatesAvailable.hidden = false;
+        this._updateDownloadUrl = downloadUrl;
+        this._showUpdatesAvailableButton();
         return true;
     }
 
+    /**
+     * @returns {string | null}
+     */
+    get updateDownloadUrl() {
+        return this._updateDownloadUrl;
+    }
+
     // Private
+
+    /** */
+    _showUpdatesAvailableButton() {
+        if (this._updateDownloadUrl === null || this._dictionaryController.isDictionaryInTaskQueue(this.dictionaryTitle)) {
+            return;
+        }
+        this._updatesAvailable.dataset.downloadUrl = this._updateDownloadUrl;
+        this._updatesAvailable.hidden = false;
+    }
 
     /**
      * @param {import('popup-menu').MenuOpenEvent} e
@@ -767,7 +787,10 @@ export class DictionaryController {
         if (dictionaries === null) { return; }
         this._updateMainDictionarySelectOptions(dictionaries);
 
+        /** @type {Map<string, string | null>} */
+        const dictionaryUpdateDownloadUrlMap = new Map();
         for (const entry of this._dictionaryEntries) {
+            dictionaryUpdateDownloadUrlMap.set(entry.dictionaryTitle, entry.updateDownloadUrl);
             entry.cleanup();
         }
         this._dictionaryEntries = [];
@@ -797,8 +820,9 @@ export class DictionaryController {
         for (let i = 0, ii = dictionaryOptionsArray.length; i < ii; ++i) {
             const {name} = dictionaryOptionsArray[i];
             const dictionaryInfo = dictionaryInfoMap.get(name);
+            const updateDownloadUrl = dictionaryUpdateDownloadUrlMap.get(name) ?? null;
             if (typeof dictionaryInfo === 'undefined') { continue; }
-            this._createDictionaryEntry(i, dictionaryInfo);
+            this._createDictionaryEntry(i, dictionaryInfo, updateDownloadUrl);
         }
     }
 
@@ -1060,11 +1084,12 @@ export class DictionaryController {
     /**
      * @param {number} index
      * @param {import('dictionary-importer').Summary} dictionaryInfo
+     * @param {string|null} updateDownloadUrl
      */
-    _createDictionaryEntry(index, dictionaryInfo) {
+    _createDictionaryEntry(index, dictionaryInfo, updateDownloadUrl) {
         const fragment = this.instantiateTemplateFragment('dictionary');
 
-        const entry = new DictionaryEntry(this, fragment, index, dictionaryInfo);
+        const entry = new DictionaryEntry(this, fragment, index, dictionaryInfo, updateDownloadUrl);
         this._dictionaryEntries.push(entry);
         entry.prepare();
 
