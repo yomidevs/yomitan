@@ -1105,6 +1105,7 @@ export class DictionaryController {
             } else if (task.type === 'update') {
                 await this._updateDictionary(task.dictionaryTitle, task.downloadUrl);
             }
+            console.log('Task done');
             void this._dictionaryTaskQueue.shift();
         }
         this._isTaskQueueRunning = false;
@@ -1150,12 +1151,8 @@ export class DictionaryController {
             for (const label of infoLabels) { label.textContent = 'Deleting dictionary...'; }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
 
-            /** @type {import('core').DeferredPromiseDetails<void>} */
-            const {promise: dictionariesUpdatePromise, resolve} = deferPromise();
-            this._onDictionariesUpdate = resolve;
             await this._deleteDictionaryInternal(dictionaryTitle, onProgress);
             await this._deleteDictionarySettings(dictionaryTitle);
-            await dictionariesUpdatePromise;
             this._onDictionariesUpdate = null;
         } catch (e) {
             log.error(e);
@@ -1219,7 +1216,12 @@ export class DictionaryController {
      */
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
         await new DictionaryWorker().deleteDictionary(dictionaryTitle, onProgress);
+        /** @type {import('core').DeferredPromiseDetails<void>} */
+        const {promise: dictionariesUpdatePromise, resolve} = deferPromise();
+        this._onDictionariesUpdate = resolve;
         void this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'delete');
+        await dictionariesUpdatePromise;
+        this._onDictionariesUpdate = null;
     }
 
     /**
