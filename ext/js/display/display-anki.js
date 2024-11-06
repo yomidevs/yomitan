@@ -574,7 +574,7 @@ export class DisplayAnki {
      */
     _getFlagName(flag) {
         /** @type {Record<number, string>} */
-        const flagNames = {
+        const flagNamesDict = {
             1: 'Red',
             2: 'Orange',
             3: 'Green',
@@ -583,8 +583,8 @@ export class DisplayAnki {
             6: 'Turquoise',
             7: 'Purple',
         };
-        if (flag in flagNames) {
-            return flagNames[flag];
+        if (flag in flagNamesDict) {
+            return flagNamesDict[flag];
         }
         return '';
     }
@@ -595,7 +595,7 @@ export class DisplayAnki {
      */
     _getFlagColor(flags) {
         /** @type {Record<string, import('display-anki').RGB>} */
-        const flagColors = {
+        const flagColorsDict = {
             Red: {red: 248, green: 113, blue: 113},
             Orange: {red: 253, green: 186, blue: 116},
             Green: {red: 134, green: 239, blue: 172},
@@ -610,9 +610,9 @@ export class DisplayAnki {
 
         let gradient = 'linear-gradient(to right,';
         for (const flag of flags) {
-            const flagRGB = flagColors[flag];
-            gradient += 'rgb(' + flagRGB.red + ',' + flagRGB.green + ',' + flagRGB.blue + ') ' + currentGradientPercent + '%,';
-            gradient += 'rgb(' + flagRGB.red + ',' + flagRGB.green + ',' + flagRGB.blue + ') ' + (currentGradientPercent + gradientSliceSize) + '%,';
+            const flagColor = flagColorsDict[flag];
+            gradient += 'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + currentGradientPercent + '%,';
+            gradient += 'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + (currentGradientPercent + gradientSliceSize) + '%,';
             currentGradientPercent += gradientSliceSize;
         }
         gradient = gradient.slice(0, -1); // remove trailing comma
