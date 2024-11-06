@@ -338,6 +338,7 @@ export class OptionsUtil {
 
             scanning: {
                 middleMouse: true,
+                touchInputEnabled: true,
                 selectText: true,
                 alphanumeric: true,
                 autoHideResults: false,
