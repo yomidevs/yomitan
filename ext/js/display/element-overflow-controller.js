@@ -76,7 +76,12 @@ export class ElementOverflowController {
     addElements(entry) {
         if (this._dictionaries.size === 0) { return; }
 
-        const elements = entry.querySelectorAll('.definition-item-inner');
+
+        /** @type {Element[]} */
+        const elements = [
+            ...entry.querySelectorAll('.definition-item-inner'),
+            ...entry.querySelectorAll('.kanji-glyph-data'),
+        ];
         for (const element of elements) {
             const {parentNode} = element;
             if (parentNode === null) { continue; }
@@ -96,7 +101,7 @@ export class ElementOverflowController {
                 element.classList.add('collapsed');
             }
 
-            const button = element.querySelector('.definition-item-expansion-button');
+            const button = element.querySelector('.expansion-button');
             if (button !== null) {
                 this._eventListeners.addEventListener(button, 'click', this._onToggleButtonClickBind, false);
             }
@@ -128,9 +133,15 @@ export class ElementOverflowController {
      */
     _onToggleButtonClick(e) {
         const element = /** @type {Element} */ (e.currentTarget);
-        const container = element.closest('.definition-item-inner');
-        if (container === null) { return; }
-        container.classList.toggle('collapsed');
+        /** @type {(Element | null)[]} */
+        const collapsedElements = [
+            element.closest('.definition-item-inner'),
+            element.closest('.kanji-glyph-data'),
+        ];
+        for (const collapsedElement of collapsedElements) {
+            if (collapsedElement === null) { continue; }
+            collapsedElement.classList.toggle('collapsed');
+        }
     }
 
     /** */

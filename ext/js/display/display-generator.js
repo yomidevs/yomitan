@@ -160,6 +160,7 @@ export class DisplayGenerator {
      */
     createKanjiEntry(dictionaryEntry) {
         const node = this._instantiate('kanji-entry');
+        node.dataset.dictionary = dictionaryEntry.dictionary;
 
         const glyphContainer = this._querySelector(node, '.kanji-glyph');
         const frequencyGroupListContainer = this._querySelector(node, '.frequency-group-list');
