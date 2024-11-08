@@ -6,7 +6,9 @@
         "type": "kanji",
         "character": "打",
         "dictionary": "Test Dictionary 2",
+        "dictionaryIndex": 0,
         "dictionaryAlias": "kanjiDictAlias",
+        "dictionaryPriority": 0,
         "onyomi": [
           "ダ",
           "ダアス"
@@ -151,7 +153,9 @@
         "type": "kanji",
         "character": "込",
         "dictionary": "Test Dictionary 2",
+        "dictionaryIndex": 0,
         "dictionaryAlias": "kanjiDictAlias",
+        "dictionaryPriority": 0,
         "onyomi": [],
         "kunyomi": [
           "-こ.む",
