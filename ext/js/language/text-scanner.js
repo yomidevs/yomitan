@@ -613,6 +613,37 @@ export class TextScanner extends EventDispatcher {
         return false;
     }
 
+    /**
+     * @param {PointerEvent} e
+     * @returns {boolean|void}
+     */
+    _onMouseDown(e) {
+        if (this._preventNextMouseDown) {
+            this._preventNextMouseDown = false;
+            this._preventNextClick = true;
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+
+        switch (e.button) {
+            case 0: // Primary
+                if (this._searchOnClick) { this._resetPreventNextClickScan(); }
+                this._scanTimerClear();
+                this._triggerClear('mousedown');
+                break;
+            case 1: // Middle
+                if (this._preventMiddleMouse) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                break;
+        }
+
+        this._onMousePointerMove(e);
+    }
+
     /** */
     _onMouseOut() {
         this._scanTimerClear();
@@ -840,30 +871,7 @@ export class TextScanner extends EventDispatcher {
      * @returns {boolean|void}
      */
     _onMousePointerDown(e) {
-        if (this._preventNextMouseDown) {
-            this._preventNextMouseDown = false;
-            this._preventNextClick = true;
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-
-        switch (e.button) {
-            case 0: // Primary
-                if (this._searchOnClick) { this._resetPreventNextClickScan(); }
-                this._scanTimerClear();
-                this._triggerClear('mousedown');
-                break;
-            case 1: // Middle
-                if (this._preventMiddleMouse) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                }
-                break;
-        }
-
-        this._onMousePointerMove(e);
+        return this._onMouseDown(e);
     }
 
     /**
@@ -1082,6 +1090,7 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'pointerup', this._onPointerUp.bind(this), capture],
             [this._node, 'pointercancel', this._onPointerCancel.bind(this), capture],
             [this._node, 'pointerout', this._onPointerOut.bind(this), capture],
+            [this._node, 'mousedown', this._onMouseDown.bind(this), capture],
             [this._node, 'touchmove', this._onTouchMovePreventScroll.bind(this), {passive: false, capture}],
             [this._node, 'touchend', this._onTouchEnd.bind(this), capture],
             [this._node, 'auxclick', this._onAuxClick.bind(this), capture],
