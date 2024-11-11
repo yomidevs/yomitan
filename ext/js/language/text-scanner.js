@@ -742,7 +742,6 @@ export class TextScanner extends EventDispatcher {
 
     /**
      * @param {PointerEvent} e
-     * @returns {boolean|void}
      * @returns {void}
      */
     _onPointerOver(e) {
