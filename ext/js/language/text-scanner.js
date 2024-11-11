@@ -929,6 +929,7 @@ export class TextScanner extends EventDispatcher {
         if (!this._preventScroll || !e.cancelable) {
             return;
         }
+        this._touchTapValid = false;
 
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchMove', e);
         if (inputInfo === null || !(inputInfo.input !== null && inputInfo.input.scanOnTouchMove)) { return; }
@@ -961,7 +962,9 @@ export class TextScanner extends EventDispatcher {
     /**
      * @param {PointerEvent} e
      */
-    _onTouchMovePreventScroll(e) {
+    _onTouchMove(e) {
+        this._touchTapValid = false;
+
         if (!this._preventScroll) { return; }
 
         if (e.cancelable) {
@@ -1091,7 +1094,7 @@ export class TextScanner extends EventDispatcher {
             [this._node, 'pointercancel', this._onPointerCancel.bind(this), capture],
             [this._node, 'pointerout', this._onPointerOut.bind(this), capture],
             [this._node, 'mousedown', this._onMouseDown.bind(this), capture],
-            [this._node, 'touchmove', this._onTouchMovePreventScroll.bind(this), {passive: false, capture}],
+            [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false, capture}],
             [this._node, 'touchend', this._onTouchEnd.bind(this), capture],
             [this._node, 'auxclick', this._onAuxClick.bind(this), capture],
             [this._node, 'contextmenu', this._onContextMenu.bind(this), capture],
