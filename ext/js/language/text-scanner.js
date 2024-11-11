@@ -897,14 +897,14 @@ export class TextScanner extends EventDispatcher {
      * @returns {void}
      */
     _onMousePointerCancel() {
-        return this._onMouseOut();
+        this._onMouseOut();
     }
 
     /**
      * @returns {void}
      */
     _onMousePointerOut() {
-        return this._onMouseOut();
+        this._onMouseOut();
     }
 
     /** */
@@ -943,7 +943,7 @@ export class TextScanner extends EventDispatcher {
      */
     _onTouchPointerUp(e) {
         const {clientX, clientY} = e;
-        return this._onPrimaryTouchEnd(e, clientX, clientY, true);
+        this._onPrimaryTouchEnd(e, clientX, clientY, true);
     }
 
     /**
@@ -951,7 +951,7 @@ export class TextScanner extends EventDispatcher {
      * @returns {void}
      */
     _onTouchPointerCancel(e) {
-        return this._onPrimaryTouchEnd(e, 0, 0, false);
+        this._onPrimaryTouchEnd(e, 0, 0, false);
     }
 
     /** */
