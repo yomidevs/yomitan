@@ -20,7 +20,7 @@ jobs:
         continue-on-error: true
         with:
           zipFilePath: yomitan-firefox.zip
-          sourcesZipFilePath: ${{ github.ref_name }}.zip
+          sourcesZipFilePath: yomitan-${{ github.ref_name }}.zip
           extensionId: ${{ secrets.FF_EXTENSION_ID }}
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}
