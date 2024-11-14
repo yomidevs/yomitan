@@ -84,6 +84,11 @@ export type DictionaryGroupedPronunciations = {
     pronunciations: GroupedPronunciation[];
 };
 
+export type PronunciationsInSeveralDictionaries = {
+    dictionaries: string[];
+    pronunciation: DictionaryGroupedPronunciations;
+};
+
 export type TagGroup = {
     tag: Dictionary.Tag;
     headwordIndices: number[];
