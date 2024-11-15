@@ -1200,7 +1200,7 @@ button.action-button:active {
     transition: background-color var(--animation-duration) ease-in-out;
 }
 
-/* Expansion buttons */
+/* Collapse & Expand */
 button.expansion-button {
     --button-content-color: var(--text-color-light4);
     --button-border-color: transparent;
