@@ -101,6 +101,8 @@
     --animation-duration2: calc(2 * var(--animation-duration));
 
     --collapsible-definition-line-count: 3;
+    --collapsible-kanji-glyph-data-line-count: 3;
+    --kanji-glyph-table-header-height: calc((20em / var(--font-size-no-units)) + var(--kanji-glyph-table-cell-padding) * 3);
     --collapsible-definition-test-offset: 0.2em;
     --collpasible-kanji-glyph-data-test-offset: 0.2em;
 
@@ -128,7 +130,7 @@
     --headword-kanji-border-color-popular: var(--headword-kanji-border-color);
     --headword-kanji-border-color-rare: var(--headword-kanji-border-color);
 
-    --kanji-glyph-data-table-cell-padding: 0.36em;
+    --kanji-glyph-table-cell-padding: 0.36em;
 
     --light-border-color: #eeeeee;
     --medium-border-color: #dddddd;
@@ -1224,21 +1226,21 @@ button.expansion-button {
 button.expansion-button:hover+.definition-item-content,
 button.expansion-button:active+.definition-item-content,
 button.expansion-button:focus+.definition-item-content,
-button.expansion-button:hover+.kanji-glyph-data-table,
-button.expansion-button:active+.kanji-glyph-data-table,
-button.expansion-button:focus+.kanji-glyph-data-table {
+button.expansion-button:hover+.kanji-glyph-table,
+button.expansion-button:active+.kanji-glyph-table,
+button.expansion-button:focus+.kanji-glyph-table {
     background-color: var(--accent-color-transparent25);
 }
 button.expansion-button:focus:not(:focus-visible)+.definition-item-content,
-button.expansion-button:focus:not(:focus-visible)+.kanji-glyph-data-table {
+button.expansion-button:focus:not(:focus-visible)+.kanji-glyph-table {
     background-color: transparent;
 }
 button.expansion-button:focus:hover+.definition-item-content,
 button.expansion-button:focus:active+.definition-item-content,
 button.expansion-button:focus:focus-visible+.definition-item-content,
-button.expansion-button:focus:hover+.kanji-glyph-data-table,
-button.expansion-button:focus:active+.kanji-glyph-data-table,
-button.expansion-button:focus:focus-visible+.kanji-glyph-data-table {
+button.expansion-button:focus:hover+.kanji-glyph-table,
+button.expansion-button:focus:active+.kanji-glyph-table,
+button.expansion-button:focus:focus-visible+.kanji-glyph-table {
     background-color: var(--accent-color-transparent25);
 }
 .definition-item-inner.collapsible.collapsed {
@@ -1250,11 +1252,11 @@ button.expansion-button:focus:focus-visible+.kanji-glyph-data-table {
     overflow: hidden;
 }
 .kanji-glyph-data.collapsible.collapsed {
-    max-height: calc((20em / var(--font-size-no-units)) + var(--kanji-glyph-data-table-cell-padding) * 2);
+    max-height: calc(1em * var(--collapsible-kanji-glyph-data-line-count) * var(--line-height) + var(--kanji-glyph-table-header-height));
     overflow: hidden;
 }
-.kanji-glyph-data.collapsible.collapsed-test {
-    max-height: calc((20em / var(--font-size-no-units)) + var(--kanji-glyph-data-table-cell-padding) * 2 + var(--collpasible-kanji-glyph-data-test-offset));
+.kanji-glyph-data.collapse-test {
+    max-height: calc(1em * var(--collapsible-kanji-glyph-data-line-count) * var(--line-height) + var(--kanji-glyph-table-header-height) + var(--collpasible-kanji-glyph-data-test-offset));
     overflow: hidden;
 }
 :not(.collapsible)>button.expansion-button {
@@ -1538,15 +1540,15 @@ button.expansion-button:focus:focus-visible+.kanji-glyph-data-table {
     display: flex;
     flex-flow: row nowrap;
 }
-.kanji-glyph-data-table {
+.kanji-glyph-table {
     border-spacing: 0;
     border-collapse: collapse;
 }
-.kanji-glyph-data-table>tbody>tr>* {
+.kanji-glyph-table>tbody>tr>* {
     border-top: var(--thin-border-size) solid var(--medium-border-color);
     text-align: left;
     vertical-align: top;
-    padding: var(--kanji-glyph-data-table-cell-padding);
+    padding: var(--kanji-glyph-table-cell-padding);
     margin: 0;
 }
 .kanji-info-table {
@@ -1562,11 +1564,11 @@ button.expansion-button:focus:focus-visible+.kanji-glyph-data-table {
 .kanji-info-table>tbody>tr>td {
     text-align: right;
 }
-.kanji-glyph-data-table dl {
+.kanji-glyph-table dl {
     margin-top: 0;
     margin-bottom: 1.4em;
 }
-.kanji-glyph-data-table dd {
+.kanji-glyph-table dd {
     margin-left: 0;
 }
 .kanji-gloss-list {

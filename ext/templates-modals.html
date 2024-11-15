@@ -548,20 +548,30 @@
                 the value can be a unitless integer or decimal number.
             </p>
             <div class="code margin-above">/* Globally set the line count */
-    :root {
-        --collapsible-definition-line-count: 2;
-    }
+:root {
+    --collapsible-definition-line-count: 2;
+}
+:root {
+    --collapsible-kanji-glyph-data-line-count: 2;
+}
 
-    /* Set the line count for a specific dictionary */
-    .definition-item[data-dictionary='JMdict'] {
-        --collapsible-definition-line-count: 2;
-    }
+/* Set the line count for a specific dictionary */
+.definition-item[data-dictionary='JMdict'] {
+    --collapsible-definition-line-count: 2;
+}
+.kanji-entry[data-dictionary='KANJIDIC'] {
+    --collapsible-kanji-glyph-data-line-count: 2;
+}
 
-    /* Spoiler-like functionality, use with <em>Force collapsed</em> mode */
-    .definition-item[data-dictionary='JMdict'] .definition-item-inner.collapsible.collapsed {
-        color: #000000;
-        background-color: #000000;
-    }
+/* Spoiler-like functionality, use with <em>Force collapsed</em> mode */
+.definition-item[data-dictionary='JMdict'] .definition-item-inner.collapsible.collapsed {
+    color: #000000;
+    background-color: #000000;
+}
+.kanji-entry[data-dictionary='KANJIDIC'] .kanji-glyph-data.collapsible.collapsed {
+    color: #000000;
+    background-color: #000000;
+}
     </div>
         </div>
         <div class="modal-footer">
