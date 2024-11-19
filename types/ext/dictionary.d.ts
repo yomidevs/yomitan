@@ -83,9 +83,17 @@ export type KanjiDictionaryEntry = {
      */
     dictionary: string;
     /**
+     * The index of the dictionary in the original list of dictionaries used for the lookup.
+     */
+    dictionaryIndex: number;
+    /**
      * The alias of the dictionary
      */
     dictionaryAlias: string;
+    /**
+     * The priority of the dictionary.
+     */
+    dictionaryPriority: number;
     /**
      * Onyomi readings for the kanji character.
      */

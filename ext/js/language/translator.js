@@ -156,9 +156,13 @@ export class Translator {
         for (const {character, onyomi, kunyomi, tags, definitions, stats, dictionary} of databaseEntries) {
             const expandedStats = await this._expandKanjiStats(stats, dictionary);
             const dictionaryAlias = this._getDictionaryAlias(dictionary, enabledDictionaryMap);
-            const dictionaryEntry = this._createKanjiDictionaryEntry(character, dictionary, dictionaryAlias, onyomi, kunyomi, expandedStats, definitions);
+            const dictionaryEntry = this._createKanjiDictionaryEntry(character, dictionary, dictionaryAlias, onyomi, kunyomi, expandedStats, definitions, enabledDictionaryMap);
             dictionaryEntries.push(dictionaryEntry);
             tagAggregator.addTags(dictionaryEntry.tags, dictionary, tags);
+        }
+
+        if (dictionaryEntries.length > 1) {
+            this._sortKanjiDictionaryEntries(dictionaryEntries);
         }
 
         await this._addKanjiMeta(dictionaryEntries, enabledDictionaryMap);
@@ -1533,14 +1537,18 @@ export class Translator {
      * @param {string[]} kunyomi
      * @param {import('dictionary').KanjiStatGroups} stats
      * @param {string[]} definitions
+     * @param {import('translation').KanjiEnabledDictionaryMap} enabledDictionaryMap
      * @returns {import('dictionary').KanjiDictionaryEntry}
      */
-    _createKanjiDictionaryEntry(character, dictionary, dictionaryAlias, onyomi, kunyomi, stats, definitions) {
+    _createKanjiDictionaryEntry(character, dictionary, dictionaryAlias, onyomi, kunyomi, stats, definitions, enabledDictionaryMap) {
+        const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         return {
             type: 'kanji',
             character,
             dictionary,
+            dictionaryIndex,
             dictionaryAlias,
+            dictionaryPriority,
             onyomi,
             kunyomi,
             tags: [],
@@ -2020,6 +2028,27 @@ export class Translator {
          */
         const compareFunction = (v1, v2) => v1.index - v2.index;
         databaseEntries.sort(compareFunction);
+    }
+
+    /**
+     * @param {import('dictionary').KanjiDictionaryEntry[]} dictionaryEntries
+     */
+    _sortKanjiDictionaryEntries(dictionaryEntries) {
+        /**
+         * @param {import('dictionary').KanjiDictionaryEntry} v1
+         * @param {import('dictionary').KanjiDictionaryEntry} v2
+         * @returns {number}
+         */
+        const compareFunction = (v1, v2) => {
+            // Sort by dictionary priority
+            let i = v2.dictionaryPriority - v1.dictionaryPriority;
+            if (i !== 0) { return i; }
+
+            // Sort by dictionary order
+            i = v1.dictionaryIndex - v2.dictionaryIndex;
+            return i;
+        };
+        dictionaryEntries.sort(compareFunction);
     }
 
     /**
