@@ -1,4 +1,22 @@
 {
+    "cs": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
+        }
+    ],
     "da": [
         {
             "modification": {
@@ -15,6 +33,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "de": [
@@ -33,6 +67,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "el": [
@@ -51,6 +101,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "en": [
@@ -69,6 +135,40 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
+        }
+    ],
+    "eo": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "es": [
@@ -87,6 +187,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "fi": [
@@ -105,6 +221,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "fr": [
@@ -149,6 +281,40 @@
                 ]
             },
             "description": "Separating the l', j', d' from the word."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
+        }
+    ],
+    "hi": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "hu": [
@@ -167,6 +333,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "id": [
@@ -185,6 +367,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "it": [
@@ -203,6 +401,94 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
+        }
+    ],
+    "ko": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
+        }
+    ],
+    "kn": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
+        }
+    ],
+    "la": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
+        }
+    ],
+    "lv": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "mn": [
@@ -221,6 +507,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "nl": [
@@ -239,6 +541,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "pl": [
@@ -257,6 +575,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "pt": [
@@ -275,6 +609,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "ro": [
@@ -293,6 +643,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "ru": [
@@ -311,6 +677,40 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
+        }
+    ],
+    "sga": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "sh": [
@@ -329,6 +729,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "sq": [
@@ -347,6 +763,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "sv": [
@@ -365,6 +797,22 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "tr": [
@@ -383,6 +831,40 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
+        }
+    ],
+    "uk": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.termSpacing",
+                "value": false
+            },
+            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "vi": [
