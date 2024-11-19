@@ -7,14 +7,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "da": [
@@ -41,14 +33,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "de": [
@@ -75,14 +59,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "el": [
@@ -109,14 +85,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "en": [
@@ -143,14 +111,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "eo": [
@@ -161,14 +121,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "es": [
@@ -195,14 +147,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "fi": [
@@ -229,14 +173,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "fr": [
@@ -289,14 +225,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "hi": [
@@ -307,14 +235,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "hu": [
@@ -341,14 +261,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "id": [
@@ -375,14 +287,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "it": [
@@ -409,14 +313,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "ko": [
@@ -427,14 +323,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "kn": [
@@ -445,14 +333,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "la": [
@@ -463,14 +343,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "lv": [
@@ -481,14 +353,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "mn": [
@@ -515,14 +379,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "nl": [
@@ -549,14 +405,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "pl": [
@@ -583,14 +431,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "pt": [
@@ -617,14 +457,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "ro": [
@@ -651,14 +483,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "ru": [
@@ -685,14 +509,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "sga": [
@@ -703,14 +519,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "sh": [
@@ -737,14 +545,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "sq": [
@@ -771,14 +571,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "sv": [
@@ -805,14 +597,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "tr": [
@@ -839,14 +623,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "uk": [
@@ -857,14 +633,6 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
-        },
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.termSpacing",
-                "value": false
-            },
-            "description": "Don't add spaces between parsed words for languages with spaces."
         }
     ],
     "vi": [
