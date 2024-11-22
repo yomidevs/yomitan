@@ -526,44 +526,6 @@ select.profile-select {
     overflow-wrap: break-word;
 }
 
-
-/* Fallback mobile overrides */
-
-/* Treat devices that can't hover as mobile devices */
-@media (hover: none) {
-    #full {
-        display: initial;
-    }
-    #mini {
-        display: none;
-    }
-    body {
-        min-width: 95%;
-        width: max-content;
-        font-size: calc(var(--font-size) * 2);
-        text-align: center;
-    }
-    h3 {
-        font-size: calc(var(--font-size) * 3.4);
-    }
-    .toggle-on, .toggle-off {
-        font-size: calc(var(--font-size) * 4);
-    }
-    .toggle-handle {
-        padding-left: 65px;
-        padding-right: 65px;
-        border-radius: 10px;
-    }
-    .toggle {
-        width: 100%;
-        padding-top: 37.7%;
-    }
-    #extension-info {
-        max-width: 95vw;
-        overflow-wrap: break-word;
-    }
-}
-
 /* Dark mode before themes are applied
    DO NOT use this for normal theming */
 @media (prefers-color-scheme: dark) {
