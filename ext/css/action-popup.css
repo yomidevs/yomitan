@@ -484,12 +484,12 @@ select.profile-select {
 
 /* Action popup size overrides */
 
-:root[data-mode=mini] #mini {
+#mini {
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
 }
-:root[data-mode=mini] #full {
+#full {
     display: none;
 }
 
