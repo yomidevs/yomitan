@@ -75,21 +75,6 @@ label {
     font-weight: normal;
 }
 
-#mini {
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: center;
-}
-#full {
-    display: none;
-}
-:root[data-mode=full] #mini {
-    display: none;
-}
-:root[data-mode=full] #full {
-    display: initial;
-}
-
 
 /* Icons */
 .icon {
@@ -497,7 +482,52 @@ select.profile-select {
     background-color: var(--warning-color);
 }
 
-/* Mobile overrides */
+/* Action popup size overrides */
+
+:root[data-mode=mini] #mini {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+}
+:root[data-mode=mini] #full {
+    display: none;
+}
+
+:root[data-mode=full] #mini {
+    display: none;
+}
+:root[data-mode=full] #full {
+    display: initial;
+}
+
+:root[data-mode=full] body {
+    min-width: 95%;
+    width: max-content;
+    font-size: calc(var(--font-size) * 2);
+    text-align: center;
+}
+:root[data-mode=full] h3 {
+    font-size: calc(var(--font-size) * 3.4);
+}
+:root[data-mode=full] .toggle-on, .toggle-off {
+    font-size: calc(var(--font-size) * 4);
+}
+:root[data-mode=full] .toggle-handle {
+    padding-left: 65px;
+    padding-right: 65px;
+    border-radius: 10px;
+}
+:root[data-mode=full] .toggle {
+    width: 100%;
+    padding-top: 37.7%;
+}
+:root[data-mode=full] #extension-info {
+    max-width: 95vw;
+    overflow-wrap: break-word;
+}
+
+
+/* Fallback mobile overrides */
 
 /* Treat devices that can't hover as mobile devices */
 @media (hover: none) {
