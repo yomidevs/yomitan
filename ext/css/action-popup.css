@@ -16,41 +16,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* Variables */
+
 :root {
     --font-size-no-units: 14;
     --font-size: calc(1px * var(--font-size-no-units));
-
     --line-height-no-units: 20;
     --line-height: calc(var(--line-height-no-units) / var(--font-size-no-units));
-
-    --badge-size: 16px;
-
-    --warning-color: #96751c;
-    --warning-color-light: #edc75e;
-
-    --nav-button-background-image: linear-gradient(#f8f8f8, #e0e0e0);
-    --nav-button-border-color: #cccccc;
-    --nav-button-background-image-focus: linear-gradient(#e8e8e8, #d0d0d0);
-    --nav-button-border-color-focus: #aaaaaa;
-    --nav-button-background-image-active-focus: linear-gradient(#c8c8c8, #e0e0e0);
-    --nav-button-border-color-active-focus: #808080;
-    --nav-button-icon-bg: #333333;
     --background-color: #f8f9fa;
     --text-color: #333333;
-    --svg-filter: 0;
 }
 
 :root[data-theme=dark] {
-    --nav-button-background-image: linear-gradient(#464646, #444444);
-    --nav-button-border-color: #333333;
-    --nav-button-background-image-focus: linear-gradient(#171717, #2f2f2f);
-    --nav-button-border-color-focus: #555555;
-    --nav-button-background-image-active-focus: linear-gradient(#373737, #1f1f1f);
-    --nav-button-border-color-active-focus: #7f7f7f;
-    --nav-button-icon-bg: #fbfbfb;
     --background-color: #1e1e1e;
     --text-color: #cccccc;
-    --svg-filter: invert(100%);
+}
+
+/* Initilization */
+
+body[data-loaded=true] #loading {
+    display: none;
+}
+
+body:not([data-loaded=true]) #action-popup {
+    display: none;
+}
+
+:root[data-mode=full] #action-popup {
+    display: initial;
+}
+
+#action-popup {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
 }
 
 body {
@@ -63,94 +62,12 @@ body {
     background-color: var(--background-color);
 }
 
-h3 {
-    margin: 10px 0;
-    font-family: inherit;
-    font-weight: 500;
-    line-height: 1.1;
-    font-size: 24px;
-    color: var(--text-color);
-}
-label {
-    font-weight: normal;
-}
-
-#mini {
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: center;
-}
-#full {
-    display: none;
-}
-:root[data-mode=full] #mini {
-    display: none;
-}
-:root[data-mode=full] #full {
-    display: initial;
-}
-
-/* Page-specific styles */
-.link-group {
-    flex-flow: row nowrap;
-    align-items: center;
-    line-height: 1.5em;
-    margin: 0 -10px;
-    padding: 0.5em 10px;
-    cursor: pointer;
-    color: var(--text-color);
-    text-decoration: none;
-    background-color: transparent;
-    transition: background-color 0.125s linear 0s;
-    max-width: none;
-}
-.link-group:not([hidden]) {
-    display: flex;
-}
-.link-group:hover,
-.link-group:active {
-    color: var(--text-color);
-    text-decoration: none;
-}
-.link-group:hover>.link-group-label,
-.link-group:active>.link-group-label {
-    text-decoration: underline;
-}
-.link-group:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-.link-group:active {
-    background-color: rgba(0, 0, 0, 0.1);
-}
-.link-group-icon {
-    width: 26px;
-    height: 26px;
-    text-align: center;
-    vertical-align: middle;
-    display: inline-block;
-    margin-right: 0.25em;
-    background-repeat: no-repeat;
-    background-size: contain;
-}
-.link-group-icon>input {
-    margin: 0;
-    padding: 0;
-}
-.link-group-icon[data-icon=chevron] { background-image: url(/images/right-chevron.svg); filter: var(--svg-filter); }
-.link-group-icon[data-icon=cog] { background-image: url(/images/cog.svg); filter: var(--svg-filter); }
-.link-group-icon[data-icon=key] { background-image: url(/images/key.svg); filter: var(--svg-filter); }
-.link-group-icon[data-icon=magnifying-glass] { background-image: url(/images/magnifying-glass.svg); filter: var(--svg-filter); }
-.link-group-icon[data-icon=question-mark-circle] { background-image: url(/images/question-mark-circle.svg); filter: var(--svg-filter); }
-.link-group-icon[data-icon=profile] { background-image: url(/images/profile.svg); filter: var(--svg-filter); }
-
-.link-group-label {
-    vertical-align: middle;
-}
-.link-group-badge {
-    margin-left: 0.5em;
-}
-
 /* Toggle */
+
+body[data-loaded=true] .toggle-group {
+    transition: transform 0.35s;
+}
+
 .toggle>input[type=checkbox] {
     width: 0;
     height: 0;
@@ -183,18 +100,6 @@ label {
     top: 0;
     bottom: 0;
     user-select: none;
-}
-
-body[data-loaded=true] .toggle-group {
-    transition: transform 0.35s;
-}
-
-body[data-loaded=true] #loading {
-    display: none;
-}
-
-body:not([data-loaded=true]) #action-popups {
-    display: none;
 }
 
 .toggle-on,
@@ -293,100 +198,31 @@ input[type=checkbox]~.toggle-group>.toggle-handle:active:focus {
 }
 
 /* Actions */
+
 .action-select-profile {
     position: relative;
 }
 
-.profile-select-container {
-    position: absolute;
-    left: -1px;
-    top: -1px;
-    right: -1px;
-    bottom: -1px;
-}
-
 select.profile-select {
-    left: 0;
-    top: 0;
-    width: 6em;
+    width: 7em;
     height: 100%;
     box-sizing: border-box;
     border: 0;
     margin: 0;
-    /* background-position: right calc(3em / var(--font-size-no-units)) center; */
     cursor: pointer;
     font-size: var(--font-size);
-}
-
-/* Warnings */
-
-.nav-button-warning-badge {
-    pointer-events: none;
-    width: 12px;
-    height: 6px;
-    position: absolute;
-    right: calc(50% - 6px);
-    top: -8px;
-    z-index: 1;
-}
-.nav-button-warning-badge-inner,
-.nav-button-warning-badge-outer {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #edc75e;
-
-    --icon-image: url(/images/material-down-arrow.svg);
-    --icon-size: contain;
-
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center center;
-    -webkit-mask-mode: alpha;
-    -webkit-mask-size: var(--icon-size);
-    -webkit-mask-image: var(--icon-image);
-    mask-repeat: no-repeat;
-    mask-position: center center;
-    mask-mode: alpha;
-    mask-size: var(--icon-size);
-    mask-image: var(--icon-image);
-}
-.nav-button-warning-badge-inner {
-    margin: 1px 2px;
-}
-.nav-button-warning-badge-outer {
-    animation: nav-button-warning-badge-animation ease-in-out 2s alternate infinite;
-}
-@keyframes nav-button-warning-badge-animation {
-    0% { opacity: 1; background-color: #edc75e; }
-    100% { opacity: 1; background-color: #333333; }
-}
-
-.warning-badge {
-    position: relative;
-    width: var(--badge-size);
-    height: var(--badge-size);
-    margin: 0;
-    padding: 0;
-    background-color: var(--warning-color-light);
-    border-radius: 50%;
-    box-shadow: var(--shadow-vertical);
-}
-.warning-badge:not([hidden]) {
-    display: block;
-}
-.warning-badge>.icon {
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--warning-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Action Containers */
+
+h2.action-title {
+    padding: 0;
+    margin: 0;
+    font-size: 1.125em;
+    line-height: 1.5;
+}
 
 .action-icon:hover {
     cursor: pointer;
@@ -407,23 +243,8 @@ select.profile-select {
     position: relative;
 }
 
-.action-item {
-    position: relative;
-    padding: 0.5em;
-}
 .action-item:not([hidden]) {
     display: block;
-}
-.action-item-outer {
-    display: block;
-    width: 100%;
-}
-.action-item-inner {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-end;
-    align-content: stretch;
-    width: 100%;
 }
 
 .action-item-left {
@@ -431,6 +252,8 @@ select.profile-select {
     flex: 1 1 auto;
     align-self: center;
     position: relative;
+    display: flex;
+    justify-content: flex-start;
 }
 .action-item-center {
     padding: var(--action-group-inner-vertical-padding) var(--action-group-inner-horizontal-padding);
@@ -465,19 +288,13 @@ select.profile-select {
     flex: 0 0 auto;
 }
 
-/* Misc */
-
-h2.action-title {
-    padding: 0;
-    margin: 0;
-    font-size: 1.125em;
-    line-height: 1.5;
-}
+/* Tooltip */
 
 .tooltip {
     color: #808080;
     padding: 0;
     margin: 0;
+    margin-top: 0.5em;
 }
 
 .enable-dictionary-tooltip {
@@ -493,20 +310,14 @@ h2.action-title {
 
 /* Treat devices that can't hover as mobile devices */
 @media (hover: none) {
-    #full {
+    #action-popup {
         display: initial;
-    }
-    #mini {
-        display: none;
     }
     body {
         min-width: 95%;
         width: max-content;
         font-size: calc(var(--font-size) * 2);
         text-align: center;
-    }
-    h3 {
-        font-size: calc(var(--font-size) * 3.4);
     }
     .toggle-on, .toggle-off {
         font-size: calc(var(--font-size) * 4);
@@ -523,6 +334,9 @@ h2.action-title {
     #extension-info {
         max-width: 95vw;
         overflow-wrap: break-word;
+    }
+    select.profile-select {
+        font-size: calc(var(--font-size) * 2);
     }
 }
 

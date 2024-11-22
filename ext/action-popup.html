@@ -19,52 +19,45 @@
     <div id="loading">
         Loading...
     </div>
-
-    <div id="action-popups">
-        <div id="mini">
-            <div tabindex="0" class="action-item action-select-profile" hidden>
-                <div class="action-item-inner">
-                    <div class="action-item-left">
-                        <h2 class="action-title">Profile</h2>
+    <div id="action-popup">
+        <div tabindex="0" class="action-container action-select-profile" hidden>
+            <div class="action-item-left">
+                <h2 class="action-title">Profile</h2>
+            </div>
+            <div class="action-item-right">
+                <select class="profile-select" id="profile-select">
+                </select>
+            </div>
+        </div>
+        <div class="action-container">
+            <div class="action-item-center">
+                <label class="toggle">
+                    <input tabindex="0" type="checkbox" class="enable-search">
+                    <div class="toggle-group">
+                        <span class="toggle-on">On</span>
+                        <span class="toggle-off">Off</span>
+                        <span class="toggle-handle"></span>
                     </div>
-                    <div class="action-item-right">
-                        <select class="profile-select" id="profile-select">
-                        </select>
-                    </div>
+                </label>
+                <p class="tooltip">Hover over text to scan</p>
+            </div>
+        </div>
+        <div class="action-container">
+            <button tabindex="0" type="button" class="low-emphasis action-open-settings" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'>
+                <div class="action-icon">
+                    <span class="icon" data-icon="cog"></span>
                 </div>
-            </div>
-            <div tabindex="0" class="action-item">
-                <div class="action-item-inner">
-                    <div class="action-item-center">
-                        <label class="toggle">
-                            <input type="checkbox" class="enable-search">
-                            <div class="toggle-group">
-                                <span class="toggle-on">On</span>
-                                <span class="toggle-off">Off</span>
-                                <span class="toggle-handle"></span>
-                            </div>
-                        </label>
-                        <p class="tooltip">Hover over text to scan</p>
-                    </div>
+            </button>
+            <button tabindex="0" type="button" class="low-emphasis action-open-search" title="Search&#010;Shift+click to open here" data-hotkey='["global:openSearchPage","title","Search ({0})\nShift+click to open here"]'>
+                <div class="action-icon">
+                    <span class="icon" data-icon="magnifying-glass"></span>
                 </div>
-            </div>
-            <div tabindex="0" class="action-container">
-                <button type="button" class="low-emphasis action-open-settings" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'>
-                    <div class="action-icon">
-                        <span class="icon" data-icon="cog"></span>
-                    </div>
-                </button>
-                <button type="button" class="low-emphasis action-open-search" title="Search&#010;Shift+click to open here" data-hotkey='["global:openSearchPage","title","Search ({0})\nShift+click to open here"]'>
-                    <div class="action-icon">
-                        <span class="icon" data-icon="magnifying-glass"></span>
-                    </div>
-                </button>
-                <button type="button" class="low-emphasis action-open-info" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'>
-                    <div class="action-icon">
-                        <span class="icon" data-icon="question-mark-circle"></span>
-                    </div>
-                </button>
-            </div>
+            </button>
+            <button tabindex="0" type="button" class="low-emphasis action-open-info" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'>
+                <div class="action-icon">
+                    <span class="icon" data-icon="question-mark-circle"></span>
+                </div>
+            </button>
         </div>
     </div>
 </body>
