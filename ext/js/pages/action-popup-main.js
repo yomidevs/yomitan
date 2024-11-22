@@ -76,7 +76,6 @@ class DisplayController {
         for (let i = 0; i < profileSelect.length; i++) {
             profileSelect[i].hidden = (profiles.length <= 1);
         }
-        console.log(profiles.length);
 
         this._updateProfileSelect(profiles, profileCurrent);
 
