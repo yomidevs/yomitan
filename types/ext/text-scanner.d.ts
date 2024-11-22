@@ -104,7 +104,7 @@ export type InputInfo = {
     passive: boolean;
     modifiers: Input.Modifier[];
     modifierKeys: Input.ModifierKey[];
-    detail: InputInfoDetail | undefined;
+    detail: InputInfoDetail | undefined | null;
 };
 
 export type InputInfoDetail = {

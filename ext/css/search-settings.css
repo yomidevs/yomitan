@@ -384,12 +384,6 @@ button.icon-button.modal-header-button>.icon-button-inner>.icon {
 .settings-item-children.settings-item-children-group .settings-item-children {
     padding-left: 0;
 }
-:root:not([data-advanced=true]) .advanced-only {
-    display: none;
-}
-:root:not([data-advanced=false]) .basic-only {
-    display: none;
-}
 .settings-item.settings-item-button,
 a.settings-item.settings-item-button {
     cursor: pointer;

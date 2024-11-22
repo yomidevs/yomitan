@@ -83,9 +83,17 @@ export type KanjiDictionaryEntry = {
      */
     dictionary: string;
     /**
+     * The index of the dictionary in the original list of dictionaries used for the lookup.
+     */
+    dictionaryIndex: number;
+    /**
      * The alias of the dictionary
      */
     dictionaryAlias: string;
+    /**
+     * The priority of the dictionary.
+     */
+    dictionaryPriority: number;
     /**
      * Onyomi readings for the kanji character.
      */
@@ -247,6 +255,10 @@ export type TermDictionaryEntry = {
      * The number of primary sources that had an exact text match for the term.
      */
     sourceTermExactMatchCount: number;
+    /**
+     * Whether the term reading matched the primary reading.
+     */
+    matchPrimaryReading: boolean;
     /**
      * The maximum length of the original text for all primary sources.
      */

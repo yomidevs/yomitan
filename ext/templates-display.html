@@ -5,6 +5,9 @@
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
         <div class="actions">
+            <button type="button" class="action-button action-button-collapsible" data-action="view-flags" hidden disabled>
+                <span class="action-icon icon" data-icon="flag"></span>
+            </button>
             <button type="button" class="action-button action-button-collapsible" data-action="view-tags" hidden disabled>
                 <span class="action-icon icon" data-icon="tag"></span>
             </button>
@@ -66,7 +69,7 @@
 </div></template>
 <template id="definition-item-template" data-remove-whitespace-text="true"><li class="definition-item">
     <div class="definition-item-inner">
-        <button type="button" class="definition-item-expansion-button"><div class="definition-item-expansion-button-icon icon" data-icon="double-down-chevron"></div></button>
+        <button type="button" class="expansion-button"><div class="expansion-button-icon icon" data-icon="double-down-chevron"></div></button>
         <div class="definition-item-content">
             <div class="definition-tag-list tag-list"></div>
             <div class="definition-disambiguation-list"></div>
@@ -107,7 +110,7 @@
 <template id="pronunciation-template"><li class="pronunciation"><span class="pronunciation-tag-list tag-list"></span><span class="pronunciation-disambiguation-list"></span><span class="pronunciation-representation-list"><span class="pronunciation-text-container"></span><span class="pronunciation-downstep-notation-container"></span><span class="pronunciation-graph-container"></span></span></li></template>
 
 <!-- Kanji entry -->
-<template id="kanji-entry-template" data-remove-whitespace-text="true"><div class="entry" data-type="kanji">
+<template id="kanji-entry-template" data-remove-whitespace-text="true"><div class="entry kanji-entry" data-type="kanji">
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
         <div class="actions">
@@ -135,24 +138,29 @@
             <div class="entry-body-section-content frequency-group-list"></div>
         </div>
     </div>
-    <table class="kanji-glyph-data"><tbody>
-        <tr>
-            <th scope="col">Meaning</th>
-            <th scope="col">Readings</th>
-            <th scope="col">Statistics</th>
-        </tr>
-        <tr>
-            <td class="kanji-gloss-container"><ol class="kanji-gloss-list"></ol></td>
-            <td class="kanji-readings"><dl class="kanji-readings-chinese"></dl><dl class="kanji-readings-japanese"></dl></td>
-            <td class="kanji-statistics"></td>
-        </tr>
-        <tr><th scope="col" colspan="3">Classifications</th></tr>
-        <tr><td colspan="3" class="kanji-classifications"></td></tr>
-        <tr><th scope="col" colspan="3">Codepoints</th></tr>
-        <tr><td colspan="3" class="kanji-codepoints"></td></tr>
-        <tr><th scope="col" colspan="3">Dictionary Indices</th></tr>
-        <tr><td colspan="3" class="kanji-dictionary-indices"></td></tr>
-    </tbody></table>
+    <div class="kanji-glyph-data">
+        <button type="button" class="expansion-button"><div class="expansion-button-icon icon" data-icon="double-down-chevron"></div></button>
+        <table class="kanji-glyph-table">
+            <tbody>
+                <tr>
+                    <th scope="col">Meaning</th>
+                    <th scope="col">Readings</th>
+                    <th scope="col">Statistics</th>
+                </tr>
+                <tr>
+                    <td class="kanji-gloss-container"><ol class="kanji-gloss-list"></ol></td>
+                    <td class="kanji-readings"><dl class="kanji-readings-chinese"></dl><dl class="kanji-readings-japanese"></dl></td>
+                    <td class="kanji-statistics"></td>
+                </tr>
+                <tr><th scope="col" colspan="3">Classifications</th></tr>
+                <tr><td colspan="3" class="kanji-classifications"></td></tr>
+                <tr><th scope="col" colspan="3">Codepoints</th></tr>
+                <tr><td colspan="3" class="kanji-codepoints"></td></tr>
+                <tr><th scope="col" colspan="3">Dictionary Indices</th></tr>
+                <tr><td colspan="3" class="kanji-dictionary-indices"></td></tr>
+            </tbody>
+        </table>
+    </div>
 </div></template>
 <template id="kanji-info-table-template"><table class="kanji-info-table"><tbody class="kanji-info-table-body"></tbody></table></template>
 <template id="kanji-info-table-item-template"><tr class="kanji-info-table-item"><th scope="col" class="kanji-info-table-item-header"></th><td class="kanji-info-table-item-value"></td></tr></template>

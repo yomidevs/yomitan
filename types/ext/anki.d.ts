@@ -57,11 +57,18 @@ export type NoteInfo = {
     fields: {[key: string]: NoteFieldInfo};
     modelName: string;
     cards: CardId[];
+    cardsInfo: CardInfo[];
 };
 
 export type NoteFieldInfo = {
     value: string;
     order: number;
+};
+
+export type CardInfo = {
+    noteId: NoteId;
+    cardId: CardId;
+    flags: number;
 };
 
 export type ApiReflectResult = {

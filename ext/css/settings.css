@@ -638,18 +638,6 @@ a.heading-link-light {
 .settings-item-children.settings-item-children-group .settings-item-children {
     padding-left: 0;
 }
-:root:not([data-debug=true]) .debug-only {
-    display: none;
-}
-:root:not([data-advanced=true]) .advanced-only {
-    display: none;
-}
-:root:not([data-advanced=false]) .basic-only {
-    display: none;
-}
-:root:not([data-language=ja]):not([data-language=zh]):not([data-language=yue]) .jpzhyue-only {
-    display: none;
-}
 .settings-item.settings-item-button,
 a.settings-item.settings-item-button {
     cursor: pointer;
@@ -2426,7 +2414,7 @@ input[type=number].dictionary-priority {
 #dictionary-import-url-text {
     width: 100%;
     height: 4em;
-    white-space: nowrap;
+    text-wrap: nowrap;
     resize: none;
 }
 

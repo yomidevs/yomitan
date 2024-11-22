@@ -24,6 +24,8 @@ import {clone} from '../core/utilities.js';
 import {anyNodeMatchesSelector, everyNodeMatchesSelector, getActiveModifiers, getActiveModifiersAndButtons, isPointInSelection} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 
+const SCAN_RESOLUTION_EXCLUDED_LANGUAGES = new Set(['ja', 'zh', 'yue', 'ko']);
+
 /**
  * @augments EventDispatcher<import('text-scanner').Events>
  */
@@ -431,12 +433,13 @@ export class TextScanner extends EventDispatcher {
 
     /**
      * @param {import('text-source').TextSource} textSource
-     * @param {import('text-scanner').InputInfoDetail} [inputDetail]
-     * @param {boolean} showEmpty
+     * @param {import('text-scanner').InputInfoDetail?} [inputDetail]
+     * @param {boolean} showEmpty shows a "No results found" popup if no results are found
+     * @param {boolean} disallowExpandStartOffset disallows expanding the start offset of the range
      */
-    async search(textSource, inputDetail, showEmpty = false) {
+    async search(textSource, inputDetail, showEmpty = false, disallowExpandStartOffset = false) {
         const inputInfo = this._createInputInfo(null, 'script', 'script', true, [], [], inputDetail);
-        await this._search(textSource, this._searchTerms, this._searchKanji, inputInfo, showEmpty);
+        await this._search(textSource, this._searchTerms, this._searchKanji, inputInfo, showEmpty, disallowExpandStartOffset);
     }
 
     // Private
@@ -461,8 +464,9 @@ export class TextScanner extends EventDispatcher {
      * @param {boolean} searchKanji
      * @param {import('text-scanner').InputInfo} inputInfo
      * @param {boolean} showEmpty shows a "No results found" popup if no results are found
+     * @param {boolean} disallowExpandStartOffset disallows expanding the start offset of the range
      */
-    async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false) {
+    async _search(textSource, searchTerms, searchKanji, inputInfo, showEmpty = false, disallowExpandStartOffset = false) {
         try {
             const isAltText = textSource instanceof TextSourceElement;
             if (inputInfo.pointerType === 'touch') {
@@ -485,7 +489,8 @@ export class TextScanner extends EventDispatcher {
                 null
             );
 
-            if (this._scanResolution === 'word') {
+            if (this._scanResolution === 'word' && (!disallowExpandStartOffset ||
+            (this._language === null || !SCAN_RESOLUTION_EXCLUDED_LANGUAGES.has(this._language)))) {
                 // Move the start offset to the beginning of the word
                 textSource.setStartOffset(this._scanLength, this._layoutAwareScan, true);
             }
@@ -674,6 +679,8 @@ export class TextScanner extends EventDispatcher {
                 }
                 break;
         }
+
+        this._onMouseMove(e);
     }
 
     /** */
@@ -696,7 +703,10 @@ export class TextScanner extends EventDispatcher {
 
         if (this._searchOnClick) {
             this._onSearchClick(e);
+            return;
         }
+
+        this._onMouseMove(e);
     }
 
     /**
@@ -1557,7 +1567,7 @@ export class TextScanner extends EventDispatcher {
      * @param {boolean} passive
      * @param {import('input').Modifier[]} modifiers
      * @param {import('input').ModifierKey[]} modifierKeys
-     * @param {import('text-scanner').InputInfoDetail} [detail]
+     * @param {import('text-scanner').InputInfoDetail?} [detail]
      * @returns {import('text-scanner').InputInfo}
      */
     _createInputInfo(input, pointerType, eventType, passive, modifiers, modifierKeys, detail) {

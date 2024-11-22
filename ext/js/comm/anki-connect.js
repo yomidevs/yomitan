@@ -181,6 +181,17 @@ export class AnkiConnect {
     }
 
     /**
+     * @param {import('anki').CardId[]} cardIds
+     * @returns {Promise<(?import('anki').CardInfo)[]>}
+     */
+    async cardsInfo(cardIds) {
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        const result = await this._invoke('cardsInfo', {cards: cardIds});
+        return this._normalizeCardInfoArray(result);
+    }
+
+    /**
      * @returns {Promise<string[]>}
      */
     async getDeckNames() {
@@ -655,6 +666,46 @@ export class AnkiConnect {
                 fields: fields2,
                 modelName,
                 cards: cards2,
+                cardsInfo: [],
+            };
+            result2.push(item2);
+        }
+        return result2;
+    }
+
+    /**
+     * Transforms raw AnkiConnect data into the CardInfo type.
+     * @param {unknown} result
+     * @returns {(?import('anki').CardInfo)[]}
+     * @throws {Error}
+     */
+    _normalizeCardInfoArray(result) {
+        if (!Array.isArray(result)) {
+            throw this._createUnexpectedResultError('array', result, '');
+        }
+        /** @type {(?import('anki').CardInfo)[]} */
+        const result2 = [];
+        for (let i = 0, ii = result.length; i < ii; ++i) {
+            const item = /** @type {unknown} */ (result[i]);
+            if (item === null || typeof item !== 'object') {
+                throw this._createError(`Unexpected result type at index ${i}: expected Cards.CardInfo, received ${this._getTypeName(item)}`, result);
+            }
+            const {cardId} = /** @type {{[key: string]: unknown}} */ (item);
+            if (typeof cardId !== 'number') {
+                result2.push(null);
+                continue;
+            }
+            const {note, flags} = /** @type {{[key: string]: unknown}} */ (item);
+            if (typeof note !== 'number') {
+                result2.push(null);
+                continue;
+            }
+
+            /** @type {import('anki').CardInfo} */
+            const item2 = {
+                noteId: note,
+                cardId,
+                flags: typeof flags === 'number' ? flags : 0,
             };
             result2.push(item2);
         }

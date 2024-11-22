@@ -13,6 +13,7 @@
     <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
     <link rel="stylesheet" type="text/css" href="/css/material.css">
     <link rel="stylesheet" type="text/css" href="/css/settings.css">
+    <link rel="stylesheet" type="text/css" href="/css/visibility-modifiers.css">
     <link rel="stylesheet" type="text/css" href="/css/display-pronunciation.css">
     <script src="/js/pages/settings/settings-main.js" type="module"></script>
 </head>
@@ -380,7 +381,7 @@
                 </p>
             </div>
         </div>
-        <div class="settings-item">
+        <div class="settings-item not-jpzhyueko">
             <div class="settings-item-inner settings-item-inner-wrappable">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Scan resolution</div>
@@ -1960,12 +1961,12 @@
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
-                        Show card tags
+                        Show card tags and flags
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
                     </div>
                 </div>
                 <div class="settings-item-right">
-                    <select data-setting="anki.displayTags">
+                    <select data-setting="anki.displayTagsAndFlags">
                         <option value="never">Never</option>
                         <option value="always">Always</option>
                         <option value="non-standard">Non-standard</option>
@@ -1974,10 +1975,10 @@
             </div>
             <div class="settings-item-children more" hidden>
                 <p>
-                    When coming across a word that is already in an Anki deck, a button will appear that shows
-                    the tags the card has. If set to <em>Non-standard</em>, all tags that are included in the
+                    When coming across a word that is already in an Anki deck, two buttons can appear that show
+                    the tags and flags the card has. If set to <em>Non-standard</em>, all tags that are included in the
                     <em>Card tags</em> option will be filtered out from the list. If no tags remain after filtering,
-                    then the button will not be shown.
+                    then the tags button will not be shown. If no flags are found, the flags button will not be shown.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>

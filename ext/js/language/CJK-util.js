@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {basicTextProcessorOptions} from './text-processors.js';
+
 /** @type {import('CJK-util').CodepointRange} */
 const CJK_UNIFIED_IDEOGRAPHS_RANGE = [0x4e00, 0x9fff];
 /** @type {import('CJK-util').CodepointRange} */
@@ -94,3 +96,40 @@ export function isCodePointInRanges(codePoint, ranges) {
     }
     return false;
 }
+
+/** @type {import('CJK-util').CodepointRange} */
+export const KANGXI_RADICALS_RANGE = [0x2f00, 0x2fdf];
+
+/** @type {import('CJK-util').CodepointRange} */
+export const CJK_RADICALS_SUPPLEMENT_RANGE = [0x2e80, 0x2eff];
+
+/** @type {import('CJK-util').CodepointRange} */
+export const CJK_STROKES_RANGE = [0x31c0, 0x31ef];
+
+/** @type {import('CJK-util').CodepointRange[]} */
+export const CJK_RADICALS_RANGES = [
+    KANGXI_RADICALS_RANGE,
+    CJK_RADICALS_SUPPLEMENT_RANGE,
+    CJK_STROKES_RANGE,
+];
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+export function normalizeRadicals(text) {
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+        const codePoint = text[i].codePointAt(0);
+        result += codePoint && (isCodePointInRanges(codePoint, CJK_RADICALS_RANGES)) ? text[i].normalize('NFKD') : text[i];
+    }
+    return result;
+}
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const normalizeRadicalCharacters = {
+    name: 'Normalize radical characters',
+    description: '⼀ → 一 (U+2F00 → U+4E00)',
+    options: basicTextProcessorOptions,
+    process: (str, setting) => (setting ? normalizeRadicals(str) : str),
+};
