@@ -243,10 +243,6 @@ h2.action-title {
     position: relative;
 }
 
-.action-item:not([hidden]) {
-    display: block;
-}
-
 .action-item-left {
     padding: var(--action-group-inner-vertical-padding) var(--action-group-inner-horizontal-padding-half) var(--action-group-inner-vertical-padding) var(--action-group-inner-horizontal-padding);
     flex: 1 1 auto;
@@ -277,7 +273,7 @@ h2.action-title {
     padding-left: 0.5em;
 }
 
-.action-container {
+.action-container:not([hidden]) {
     display: flex;
     justify-content: space-between;
     align-items: center;
