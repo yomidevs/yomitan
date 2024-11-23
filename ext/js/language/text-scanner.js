@@ -489,7 +489,7 @@ export class TextScanner extends EventDispatcher {
                 null
             );
 
-            if (this._scanResolution === 'word' && (!disallowExpandStartOffset ||
+            if (this._scanResolution === 'word' && (!disallowExpandStartOffset &&
             (this._language === null || !SCAN_RESOLUTION_EXCLUDED_LANGUAGES.has(this._language)))) {
                 // Move the start offset to the beginning of the word
                 textSource.setStartOffset(this._scanLength, this._layoutAwareScan, true);
