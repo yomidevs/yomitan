@@ -23,9 +23,6 @@
     --font-size: calc(1px * var(--font-size-no-units));
     --line-height-no-units: 20;
     --line-height: calc(var(--line-height-no-units) / var(--font-size-no-units));
-    --action-group-inner-vertical-padding: 0em;
-    --action-group-inner-horizontal-padding: 1em;
-    --action-group-inner-horizontal-padding-half: calc(var(var(--action-group-inner-horizontal-padding) / 2));
     --background-color: #f8f9fa;
     --text-color: #333333;
 }
