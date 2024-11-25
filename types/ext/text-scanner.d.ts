@@ -34,8 +34,6 @@ export type Options = {
     normalizeCssZoom?: boolean;
     selectText?: boolean;
     delay?: number;
-    touchInputEnabled?: boolean;
-    pointerEventsEnabled?: boolean;
     scanLength?: number;
     layoutAwareScan?: boolean;
     preventMiddleMouse?: boolean;

@@ -179,8 +179,6 @@ export type AudioSourceOptions = {
 export type ScanningOptions = {
     inputs: ScanningInput[];
     preventMiddleMouse: ScanningPreventMiddleMouseOptions;
-    touchInputEnabled: boolean;
-    pointerEventsEnabled: boolean;
     selectText: boolean;
     alphanumeric: boolean;
     autoHideResults: boolean;
