@@ -11,94 +11,54 @@
     <link rel="icon" type="image/png" href="/images/icon48.png" sizes="48x48">
     <link rel="icon" type="image/png" href="/images/icon64.png" sizes="64x64">
     <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
+    <link rel="stylesheet" type="text/css" href="/css/material.css">
     <link rel="stylesheet" type="text/css" href="/css/action-popup.css">
     <script src="/js/pages/action-popup-main.js" type="module"></script>
 </head>
 <body>
-
-<div id="loading">
-    Loading...
-</div>
-
-<div id="action-popups">
-<div id="mini">
-    <label class="toggle">
-        <input type="checkbox" class="enable-search">
-        <div class="toggle-group">
-            <span class="toggle-on">On</span>
-            <span class="toggle-off">Off</span>
-            <span class="toggle-handle"></span>
-        </div>
-    </label>
-    <div class="nav-button-container">
-        <button type="button" class="nav-button action-select-profile" title="Change default profile" hidden>
-            <span class="icon" data-icon="profile"></span>
-            <span class="profile-select-container"><select class="profile-select">
-                <optgroup label="Default Profile" class="profile-select-option-group"></optgroup>
-            </select></span>
-        </button>
-        <a tabindex="0" class="nav-button action-open-settings" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'>
-            <span class="icon" data-icon="cog"></span>
-            <div class="nav-button-warning-badge no-dictionaries-enabled-warning" hidden>
-                <div class="nav-button-warning-badge-outer"></div>
-                <div class="nav-button-warning-badge-inner"></div>
-            </div>
-        </a>
-        <a tabindex="0" class="nav-button action-open-permissions" title="Permissions" hidden>
-            <span class="icon" data-icon="key"></span>
-            <div class="nav-button-warning-badge permissions-required-warning" hidden>
-                <div class="nav-button-warning-badge-outer"></div>
-                <div class="nav-button-warning-badge-inner"></div>
-            </div>
-        </a>
-        <a tabindex="0" class="nav-button action-open-search" title="Search" data-hotkey='["global:openSearchPage","title","Search ({0})\nShift+click to open here"]'>
-            <span class="icon" data-icon="magnifying-glass"></span>
-        </a>
-        <a tabindex="0" class="nav-button action-open-info" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'>
-            <span class="icon" data-icon="question-mark-circle"></span>
-        </a>
+    <div id="loading">
+        Loading...
     </div>
-</div>
-
-<div id="full">
-    <h3 id="extension-info">Yomitan</h3>
-    <label class="toggle">
-        <input type="checkbox" class="enable-search">
-        <div class="toggle-group">
-            <span class="toggle-on">On</span>
-            <span class="toggle-off">Off</span>
-            <span class="toggle-handle"></span>
+    <div id="action-popup">
+        <div tabindex="0" class="action-container action-select-profile" hidden>
+            <div class="action-item-left">
+                <h2 class="action-title">Profile</h2>
+            </div>
+            <div class="action-item-right">
+                <select class="profile-select" id="profile-select">
+                </select>
+            </div>
         </div>
-    </label>
-    <a tabindex="0" class="link-group action-select-profile">
-        <span class="link-group-icon" data-icon="profile"></span>
-        <span class="link-group-label">Profile</span>
-        <span class="profile-select-container"><select class="profile-select">
-            <optgroup label="Default Profile" class="profile-select-option-group"></optgroup>
-        </select></span>
-    </a>
-    <a tabindex="0" class="link-group action-open-settings">
-        <span class="link-group-icon" data-icon="cog"></span>
-        <span class="link-group-label">Settings</span>
-        <span class="link-group-badge">
-            <div class="flex-margin-left warning-badge no-dictionaries-enabled-warning" hidden><span class="icon" data-icon="exclamation-point-short"></span></div>
-        </span>
-    </a>
-    <a tabindex="0" class="link-group action-open-permissions" hidden>
-        <span class="link-group-icon" data-icon="key"></span>
-        <span class="link-group-label">Permissions</span>
-        <span class="link-group-badge">
-            <div class="flex-margin-left warning-badge permissions-required-warning" hidden><span class="icon" data-icon="exclamation-point-short"></span></div>
-        </span>
-    </a>
-    <a tabindex="0" class="link-group action-open-search">
-        <span class="link-group-icon" data-icon="magnifying-glass"></span><span class="link-group-label">Search</span>
-    </a>
-    <a tabindex="0" class="link-group action-open-info">
-        <span class="link-group-icon" data-icon="question-mark-circle"></span><span class="link-group-label">Information</span>
-    </a>
-</div>
-</div>
-
+        <div class="action-container">
+            <div class="action-item-center">
+                <label class="toggle">
+                    <input tabindex="0" type="checkbox" class="enable-search">
+                    <div class="toggle-group">
+                        <span class="toggle-on">On</span>
+                        <span class="toggle-off">Off</span>
+                        <span class="toggle-handle"></span>
+                    </div>
+                </label>
+                <p class="tooltip">Hover over text to scan</p>
+            </div>
+        </div>
+        <div class="action-container">
+            <button tabindex="0" type="button" class="low-emphasis action-open-settings" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'>
+                <div class="action-icon">
+                    <span class="icon" data-icon="cog"></span>
+                </div>
+            </button>
+            <button tabindex="0" type="button" class="low-emphasis action-open-search" title="Search&#010;Shift+click to open here" data-hotkey='["global:openSearchPage","title","Search ({0})\nShift+click to open here"]'>
+                <div class="action-icon">
+                    <span class="icon" data-icon="magnifying-glass"></span>
+                </div>
+            </button>
+            <button tabindex="0" type="button" class="low-emphasis action-open-info" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'>
+                <div class="action-icon">
+                    <span class="icon" data-icon="question-mark-circle"></span>
+                </div>
+            </button>
+        </div>
+    </div>
 </body>
 </html>
