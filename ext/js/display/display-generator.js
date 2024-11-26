@@ -155,6 +155,9 @@ export class DisplayGenerator {
                     if (currentDictionaryInfo.description) {
                         dictionaryContentArray.push('Description: ' + currentDictionaryInfo.description);
                     }
+                    if (currentDictionaryInfo.url) {
+                        dictionaryContentArray.push('URL: ' + currentDictionaryInfo.url);
+                    }
 
                     const totalTerms = currentDictionaryInfo.counts.terms.total;
                     if (totalTerms > 0) {
@@ -210,6 +213,9 @@ export class DisplayGenerator {
             }
             if (currentDictionaryInfo.description) {
                 dictionaryContentArray.push('Description: ' + currentDictionaryInfo.description);
+            }
+            if (currentDictionaryInfo.url) {
+                dictionaryContentArray.push('URL: ' + currentDictionaryInfo.url);
             }
 
             const totalKanji = currentDictionaryInfo.counts.kanji.total;
