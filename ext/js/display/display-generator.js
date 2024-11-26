@@ -66,9 +66,10 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {import('dictionary-importer').Summary[]} dictionaryInfo
      * @returns {HTMLElement}
      */
-    createTermEntry(dictionaryEntry) {
+    createTermEntry(dictionaryEntry, dictionaryInfo) {
         const node = this._instantiate('term-entry');
 
         const headwordsContainer = this._querySelector(node, '.headword-list');
@@ -143,6 +144,25 @@ export class DisplayGenerator {
                 dictionaryTag.dictionaries.push(dictionary);
                 dictionaryTag.name = dictionaryAlias;
                 dictionaryTag.content = [dictionary];
+
+                const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
+                if (currentDictionaryInfo) {
+                    const dictionaryContentArray = [];
+                    dictionaryContentArray.push(currentDictionaryInfo.title);
+                    if (currentDictionaryInfo.author) {
+                        dictionaryContentArray.push('Author: ' + currentDictionaryInfo.author);
+                    }
+                    if (currentDictionaryInfo.description) {
+                        dictionaryContentArray.push('Description: ' + currentDictionaryInfo.description);
+                    }
+
+                    const totalTerms = currentDictionaryInfo.counts.terms.total;
+                    if (totalTerms > 0) {
+                        dictionaryContentArray.push('Term Count: ' + totalTerms.toString());
+                    }
+
+                    dictionaryTag.content = dictionaryContentArray;
+                }
             }
 
             const node2 = this._createTermDefinition(definition, dictionaryTag, headwords, uniqueTerms, uniqueReadings);
