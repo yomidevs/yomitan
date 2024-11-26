@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {CJK_IDEOGRAPH_RANGES, isCodePointInRange, isCodePointInRanges} from '../CJK-util.js';
+import {CJK_COMPATIBILITY, CJK_IDEOGRAPH_RANGES, isCodePointInRange, isCodePointInRanges} from '../CJK-util.js';
 
 
 const HIRAGANA_SMALL_TSU_CODE_POINT = 0x3063;
@@ -617,6 +617,19 @@ export function normalizeCombiningCharacters(text) {
     // i === -1 when first two characters are combined
     if (i === 0) {
         result = text[0] + result;
+    }
+    return result;
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+export function normalizeCJKCompatibilityCharacters(text) {
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+        const codePoint = text[i].codePointAt(0);
+        result += codePoint && isCodePointInRanges(codePoint, [CJK_COMPATIBILITY]) ? text[i].normalize('NFKD') : text[i];
     }
     return result;
 }

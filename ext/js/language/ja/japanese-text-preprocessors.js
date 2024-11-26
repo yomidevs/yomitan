@@ -24,6 +24,7 @@ import {
     convertHalfWidthKanaToFullWidth,
     convertHiraganaToKatakana as convertHiraganaToKatakanaFunction,
     convertKatakanaToHiragana as convertKatakanaToHiraganaFunction,
+    normalizeCJKCompatibilityCharacters as normalizeCJKCompatibilityCharactersFunction,
     normalizeCombiningCharacters as normalizeCombiningCharactersFunction,
 } from './japanese.js';
 
@@ -98,4 +99,12 @@ export const normalizeCombiningCharacters = {
     description: 'ド → ド (U+30C8 U+3099 → U+30C9)',
     options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? normalizeCombiningCharactersFunction(str) : str),
+};
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const normalizeCJKCompatibilityCharacters = {
+    name: 'Normalize CJK Compatibility Characters',
+    description: '㌀ → アパート',
+    options: basicTextProcessorOptions,
+    process: (str, setting) => (setting ? normalizeCJKCompatibilityCharactersFunction(str) : str),
 };
