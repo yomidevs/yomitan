@@ -1536,8 +1536,8 @@ export class OptionsUtil {
     }
 
     /**
+     * - Sorted dictionaries by priority
      * - Removed priority from dictionaries
-     * - Rearranged dictionaries based on priority to keep the same order
      * @type {import('options-util').UpdateFunction}
      */
     async _updateVersion56(options) {
