@@ -105,7 +105,17 @@ function createProfileOptionsTestData1() {
             collapseEmphaticSequences: 'false',
         },
         dictionaries: {
-            'Test Dictionary': {
+            'Test Dictionary 1': {
+                priority: 0,
+                enabled: true,
+                allowSecondarySearches: false,
+            },
+            'Test Dictionary 2': {
+                priority: 1,
+                enabled: true,
+                allowSecondarySearches: false,
+            },
+            'Test Dictionary 3': {
                 priority: 0,
                 enabled: true,
                 allowSecondarySearches: false,
@@ -440,9 +450,26 @@ function createProfileOptionsUpdatedTestData1() {
         },
         dictionaries: [
             {
-                name: 'Test Dictionary',
-                alias: 'Test Dictionary',
-                priority: 0,
+                name: 'Test Dictionary 2',
+                alias: 'Test Dictionary 2',
+                enabled: true,
+                allowSecondarySearches: false,
+                definitionsCollapsible: 'not-collapsible',
+                partsOfSpeechFilter: true,
+                useDeinflections: true,
+            },
+            {
+                name: 'Test Dictionary 1',
+                alias: 'Test Dictionary 1',
+                enabled: true,
+                allowSecondarySearches: false,
+                definitionsCollapsible: 'not-collapsible',
+                partsOfSpeechFilter: true,
+                useDeinflections: true,
+            },
+            {
+                name: 'Test Dictionary 3',
+                alias: 'Test Dictionary 3',
                 enabled: true,
                 allowSecondarySearches: false,
                 definitionsCollapsible: 'not-collapsible',
@@ -642,7 +669,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 55,
+        version: 56,
         global: {
             database: {
                 prefixWildcardsSupported: false,
