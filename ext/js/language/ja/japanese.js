@@ -629,7 +629,7 @@ export function normalizeCJKCompatibilityCharacters(text) {
     let result = '';
     for (let i = 0; i < text.length; i++) {
         const codePoint = text[i].codePointAt(0);
-        result += codePoint && isCodePointInRanges(codePoint, [CJK_COMPATIBILITY]) ? text[i].normalize('NFKD') : text[i];
+        result += codePoint && isCodePointInRange(codePoint, CJK_COMPATIBILITY) ? text[i].normalize('NFKD') : text[i];
     }
     return result;
 }
