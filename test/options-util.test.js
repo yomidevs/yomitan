@@ -442,7 +442,6 @@ function createProfileOptionsUpdatedTestData1() {
             {
                 name: 'Test Dictionary',
                 alias: 'Test Dictionary',
-                priority: 0,
                 enabled: true,
                 allowSecondarySearches: false,
                 definitionsCollapsible: 'not-collapsible',
@@ -642,7 +641,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 55,
+        version: 56,
         global: {
             database: {
                 prefixWildcardsSupported: false,

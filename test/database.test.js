@@ -114,7 +114,7 @@ describe('Database', () => {
 
         const title = testDictionaryIndex.title;
         const titles = new Map([
-            [title, {alias: title, priority: 0, allowSecondarySearches: false}],
+            [title, {alias: title, allowSecondarySearches: false}],
         ]);
 
         // Setup database
@@ -184,7 +184,7 @@ describe('Database', () => {
 
             const title = testDictionaryIndex.title;
             const titles = new Map([
-                [title, {alias: title, priority: 0, allowSecondarySearches: false}],
+                [title, {alias: title, allowSecondarySearches: false}],
             ]);
 
             // Setup database

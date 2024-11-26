@@ -31,7 +31,6 @@ describe('AnkiTemplateRenderer', () => {
                 dictionary: 'dictionary',
                 dictionaryIndex: 0,
                 dictionaryAlias: 'dictionaryAlias',
-                dictionaryPriority: 0,
                 onyomi: [],
                 kunyomi: [],
                 tags: [],

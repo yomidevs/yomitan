@@ -1208,7 +1208,7 @@ export class Translator {
 
         const metas = await this._database.findTermMetaBulk(headwordMapKeys, enabledDictionaryMap);
         for (const {mode, data, dictionary, index} of metas) {
-            const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
+            const {index: dictionaryIndex} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
             const dictionaryAlias = this._getDictionaryAlias(dictionary, enabledDictionaryMap);
             const map2 = headwordReadingMaps[index];
             for (const [reading, targets] of map2.entries()) {
@@ -1226,7 +1226,6 @@ export class Translator {
                                     dictionary,
                                     dictionaryIndex,
                                     dictionaryAlias,
-                                    dictionaryPriority,
                                     hasReading,
                                     frequencyValue,
                                     displayValue,
@@ -1263,7 +1262,6 @@ export class Translator {
                                     dictionary,
                                     dictionaryIndex,
                                     dictionaryAlias,
-                                    dictionaryPriority,
                                     pitches,
                                 ));
                             }
@@ -1293,7 +1291,6 @@ export class Translator {
                                 dictionary,
                                 dictionaryIndex,
                                 dictionaryAlias,
-                                dictionaryPriority,
                                 phoneticTranscriptions,
                             ));
                         }
@@ -1315,7 +1312,7 @@ export class Translator {
 
         const metas = await this._database.findKanjiMetaBulk(kanjiList, enabledDictionaryMap);
         for (const {character, mode, data, dictionary, index} of metas) {
-            const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
+            const {index: dictionaryIndex} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
             const dictionaryAlias = this._getDictionaryAlias(dictionary, enabledDictionaryMap);
             switch (mode) {
                 case 'freq':
@@ -1327,7 +1324,6 @@ export class Translator {
                             dictionary,
                             dictionaryIndex,
                             dictionaryAlias,
-                            dictionaryPriority,
                             character,
                             frequency,
                             displayValue,
@@ -1457,12 +1453,12 @@ export class Translator {
     /**
      * @param {string} dictionary
      * @param {import('translation').TermEnabledDictionaryMap|import('translation').KanjiEnabledDictionaryMap} enabledDictionaryMap
-     * @returns {{index: number, priority: number}}
+     * @returns {{index: number}}
      */
     _getDictionaryOrder(dictionary, enabledDictionaryMap) {
         const info = enabledDictionaryMap.get(dictionary);
-        const {index, priority} = typeof info !== 'undefined' ? info : {index: enabledDictionaryMap.size, priority: 0};
-        return {index, priority};
+        const {index} = typeof info !== 'undefined' ? info : {index: enabledDictionaryMap.size};
+        return {index};
     }
 
     /**
@@ -1518,15 +1514,14 @@ export class Translator {
      * @param {string} dictionary
      * @param {number} dictionaryIndex
      * @param {string} dictionaryAlias
-     * @param {number} dictionaryPriority
      * @param {string} character
      * @param {number} frequency
      * @param {?string} displayValue
      * @param {boolean} displayValueParsed
      * @returns {import('dictionary').KanjiFrequency}
      */
-    _createKanjiFrequency(index, dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, character, frequency, displayValue, displayValueParsed) {
-        return {index, dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, character, frequency, displayValue, displayValueParsed};
+    _createKanjiFrequency(index, dictionary, dictionaryIndex, dictionaryAlias, character, frequency, displayValue, displayValueParsed) {
+        return {index, dictionary, dictionaryIndex, dictionaryAlias, character, frequency, displayValue, displayValueParsed};
     }
 
     /**
@@ -1541,14 +1536,13 @@ export class Translator {
      * @returns {import('dictionary').KanjiDictionaryEntry}
      */
     _createKanjiDictionaryEntry(character, dictionary, dictionaryAlias, onyomi, kunyomi, stats, definitions, enabledDictionaryMap) {
-        const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
+        const {index: dictionaryIndex} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         return {
             type: 'kanji',
             character,
             dictionary,
             dictionaryIndex,
             dictionaryAlias,
-            dictionaryPriority,
             onyomi,
             kunyomi,
             tags: [],
@@ -1614,7 +1608,6 @@ export class Translator {
      * @param {string} dictionary
      * @param {number} dictionaryIndex
      * @param {string} dictionaryAlias
-     * @param {number} dictionaryPriority
      * @param {number} id
      * @param {number} score
      * @param {number[]} sequences
@@ -1623,14 +1616,13 @@ export class Translator {
      * @param {import('dictionary-data').TermGlossaryContent[]} entries
      * @returns {import('dictionary').TermDefinition}
      */
-    _createTermDefinition(index, headwordIndices, dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, id, score, sequences, isPrimary, tags, entries) {
+    _createTermDefinition(index, headwordIndices, dictionary, dictionaryIndex, dictionaryAlias, id, score, sequences, isPrimary, tags, entries) {
         return {
             index,
             headwordIndices,
             dictionary,
             dictionaryIndex,
             dictionaryAlias,
-            dictionaryPriority,
             id,
             score,
             frequencyOrder: 0,
@@ -1647,12 +1639,11 @@ export class Translator {
      * @param {string} dictionary
      * @param {number} dictionaryIndex
      * @param {string} dictionaryAlias
-     * @param {number} dictionaryPriority
      * @param {import('dictionary').Pronunciation[]} pronunciations
      * @returns {import('dictionary').TermPronunciation}
      */
-    _createTermPronunciation(index, headwordIndex, dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, pronunciations) {
-        return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, pronunciations};
+    _createTermPronunciation(index, headwordIndex, dictionary, dictionaryIndex, dictionaryAlias, pronunciations) {
+        return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryAlias, pronunciations};
     }
 
     /**
@@ -1661,15 +1652,14 @@ export class Translator {
      * @param {string} dictionary
      * @param {number} dictionaryIndex
      * @param {string} dictionaryAlias
-     * @param {number} dictionaryPriority
      * @param {boolean} hasReading
      * @param {number} frequency
      * @param {?string} displayValue
      * @param {boolean} displayValueParsed
      * @returns {import('dictionary').TermFrequency}
      */
-    _createTermFrequency(index, headwordIndex, dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, hasReading, frequency, displayValue, displayValueParsed) {
-        return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, hasReading, frequency, displayValue, displayValueParsed};
+    _createTermFrequency(index, headwordIndex, dictionary, dictionaryIndex, dictionaryAlias, hasReading, frequency, displayValue, displayValueParsed) {
+        return {index, headwordIndex, dictionary, dictionaryIndex, dictionaryAlias, hasReading, frequency, displayValue, displayValueParsed};
     }
 
     /**
@@ -1679,7 +1669,6 @@ export class Translator {
      * @param {number} score
      * @param {number} dictionaryIndex
      * @param {string} dictionaryAlias
-     * @param {number} dictionaryPriority
      * @param {number} sourceTermExactMatchCount
      * @param {boolean} matchPrimaryReading
      * @param {number} maxOriginalTextLength
@@ -1687,7 +1676,7 @@ export class Translator {
      * @param {import('dictionary').TermDefinition[]} definitions
      * @returns {import('translation-internal').TermDictionaryEntry}
      */
-    _createTermDictionaryEntry(isPrimary, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, score, dictionaryIndex, dictionaryAlias, dictionaryPriority, sourceTermExactMatchCount, matchPrimaryReading, maxOriginalTextLength, headwords, definitions) {
+    _createTermDictionaryEntry(isPrimary, textProcessorRuleChainCandidates, inflectionRuleChainCandidates, score, dictionaryIndex, dictionaryAlias, sourceTermExactMatchCount, matchPrimaryReading, maxOriginalTextLength, headwords, definitions) {
         return {
             type: 'term',
             isPrimary,
@@ -1697,7 +1686,6 @@ export class Translator {
             frequencyOrder: 0,
             dictionaryIndex,
             dictionaryAlias,
-            dictionaryPriority,
             sourceTermExactMatchCount,
             matchPrimaryReading,
             maxOriginalTextLength,
@@ -1740,7 +1728,7 @@ export class Translator {
         const contentDefinitions = /** @type {import('dictionary-data').TermGlossaryContent[]} */ (definitions);
         const reading = (rawReading.length > 0 ? rawReading : term);
         const matchPrimaryReading = primaryReading.length > 0 && reading === primaryReading;
-        const {index: dictionaryIndex, priority: dictionaryPriority} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
+        const {index: dictionaryIndex} = this._getDictionaryOrder(dictionary, enabledDictionaryMap);
         const dictionaryAlias = this._getDictionaryAlias(dictionary, enabledDictionaryMap);
         const sourceTermExactMatchCount = (isPrimary && deinflectedText === term ? 1 : 0);
         const source = this._createSource(originalText, transformedText, deinflectedText, matchType, matchSource, isPrimary);
@@ -1762,12 +1750,11 @@ export class Translator {
             score,
             dictionaryIndex,
             dictionaryAlias,
-            dictionaryPriority,
             sourceTermExactMatchCount,
             matchPrimaryReading,
             maxOriginalTextLength,
             [this._createTermHeadword(0, term, reading, [source], headwordTagGroups, rules)],
-            [this._createTermDefinition(0, [0], dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, id, score, [sequence], isPrimary, definitionTagGroups, contentDefinitions)],
+            [this._createTermDefinition(0, [0], dictionary, dictionaryIndex, dictionaryAlias, id, score, [sequence], isPrimary, definitionTagGroups, contentDefinitions)],
         );
     }
 
@@ -1797,7 +1784,6 @@ export class Translator {
         // Merge dictionary entry data
         let score = Number.MIN_SAFE_INTEGER;
         let dictionaryIndex = Number.MAX_SAFE_INTEGER;
-        let dictionaryPriority = Number.MIN_SAFE_INTEGER;
         const dictionaryAlias = '';
         let maxOriginalTextLength = 0;
         let isPrimary = false;
@@ -1812,7 +1798,6 @@ export class Translator {
         for (const {dictionaryEntry, headwordIndexMap} of definitionEntries) {
             score = Math.max(score, dictionaryEntry.score);
             dictionaryIndex = Math.min(dictionaryIndex, dictionaryEntry.dictionaryIndex);
-            dictionaryPriority = Math.max(dictionaryPriority, dictionaryEntry.dictionaryPriority);
 
             if (dictionaryEntry.isPrimary) {
                 isPrimary = true;
@@ -1859,7 +1844,6 @@ export class Translator {
             score,
             dictionaryIndex,
             dictionaryAlias,
-            dictionaryPriority,
             sourceTermExactMatchCount,
             matchPrimaryReading,
             maxOriginalTextLength,
@@ -1975,12 +1959,12 @@ export class Translator {
      * @param {number[]} headwordIndexMap
      */
     _addTermDefinitionsFast(definitions, newDefinitions, headwordIndexMap) {
-        for (const {headwordIndices, dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, sequences, id, score, isPrimary, tags, entries} of newDefinitions) {
+        for (const {headwordIndices, dictionary, dictionaryIndex, dictionaryAlias, sequences, id, score, isPrimary, tags, entries} of newDefinitions) {
             const headwordIndicesNew = [];
             for (const headwordIndex of headwordIndices) {
                 headwordIndicesNew.push(headwordIndexMap[headwordIndex]);
             }
-            definitions.push(this._createTermDefinition(definitions.length, headwordIndicesNew, dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, id, score, sequences, isPrimary, tags, entries));
+            definitions.push(this._createTermDefinition(definitions.length, headwordIndicesNew, dictionary, dictionaryIndex, dictionaryAlias, id, score, sequences, isPrimary, tags, entries));
         }
     }
 
@@ -1992,11 +1976,11 @@ export class Translator {
      * @param {TranslatorTagAggregator} tagAggregator
      */
     _addTermDefinitions(definitions, definitionsMap, newDefinitions, headwordIndexMap, tagAggregator) {
-        for (const {headwordIndices, dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, sequences, id, score, isPrimary, tags, entries} of newDefinitions) {
+        for (const {headwordIndices, dictionary, dictionaryIndex, dictionaryAlias, sequences, id, score, isPrimary, tags, entries} of newDefinitions) {
             const key = this._createMapKey([dictionary, ...entries]);
             let definition = definitionsMap.get(key);
             if (typeof definition === 'undefined') {
-                definition = this._createTermDefinition(definitions.length, [], dictionary, dictionaryIndex, dictionaryAlias, dictionaryPriority, id, score, [...sequences], isPrimary, [], [...entries]);
+                definition = this._createTermDefinition(definitions.length, [], dictionary, dictionaryIndex, dictionaryAlias, id, score, [...sequences], isPrimary, [], [...entries]);
                 definitions.push(definition);
                 definitionsMap.set(key, definition);
             } else {
@@ -2040,13 +2024,8 @@ export class Translator {
          * @returns {number}
          */
         const compareFunction = (v1, v2) => {
-            // Sort by dictionary priority
-            let i = v2.dictionaryPriority - v1.dictionaryPriority;
-            if (i !== 0) { return i; }
-
             // Sort by dictionary order
-            i = v1.dictionaryIndex - v2.dictionaryIndex;
-            return i;
+            return v1.dictionaryIndex - v2.dictionaryIndex;
         };
         dictionaryEntries.sort(compareFunction);
     }
@@ -2084,10 +2063,6 @@ export class Translator {
 
             // Sort by frequency order
             i = v1.frequencyOrder - v2.frequencyOrder;
-            if (i !== 0) { return i; }
-
-            // Sort by dictionary priority
-            i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
             // Sort by dictionary order
@@ -2131,10 +2106,6 @@ export class Translator {
         const compareFunction = (v1, v2) => {
             // Sort by frequency order
             let i = v1.frequencyOrder - v2.frequencyOrder;
-            if (i !== 0) { return i; }
-
-            // Sort by dictionary priority
-            i = v2.dictionaryPriority - v1.dictionaryPriority;
             if (i !== 0) { return i; }
 
             // Sort by dictionary order
@@ -2181,12 +2152,8 @@ export class Translator {
          * @returns {number}
          */
         const compare = (v1, v2) => {
-            // Sort by dictionary priority
-            let i = v2.dictionaryPriority - v1.dictionaryPriority;
-            if (i !== 0) { return i; }
-
             // Sory by headword order
-            i = v1.headwordIndex - v2.headwordIndex;
+            let i = v1.headwordIndex - v2.headwordIndex;
             if (i !== 0) { return i; }
 
             // Sort by dictionary order
@@ -2210,12 +2177,8 @@ export class Translator {
          * @returns {number}
          */
         const compare = (v1, v2) => {
-            // Sort by dictionary priority
-            let i = v2.dictionaryPriority - v1.dictionaryPriority;
-            if (i !== 0) { return i; }
-
             // Sort by dictionary order
-            i = v1.dictionaryIndex - v2.dictionaryIndex;
+            let i = v1.dictionaryIndex - v2.dictionaryIndex;
             if (i !== 0) { return i; }
 
             // Default order
