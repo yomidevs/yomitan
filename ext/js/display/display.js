@@ -1451,6 +1451,9 @@ export class Display extends EventDispatcher {
             performance.mark('display:createEntry:end');
             performance.measure('display:createEntry', 'display:createEntry:start', 'display:createEntry:end');
 
+            if (i === 0) {
+                void this._contentManager.executeMediaRequests(); // prioritize loading media for first entry since it is visible
+            }
             ++i;
         }
         if (this._setContentToken !== token) { return; }

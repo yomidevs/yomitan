@@ -40,7 +40,7 @@ type MediaType = ArrayBuffer | string | null;
 
 export type Media<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T>;
 
-export type DrawMedia<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T> & {canvases: OffscreenCanvas[]};
+export type DrawMedia<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T> & {canvasWidth: number, canvasIndexes: number[], generation: number};
 
 export type DatabaseTermEntry = {
     expression: string;
@@ -244,13 +244,19 @@ export type MediaRequest = {
 export type DrawMediaRequest = {
     path: string;
     dictionary: string;
-    canvas: OffscreenCanvas;
+    canvasIndex: number;
+    canvasWidth: number;
+    canvasHeight: number;
+    generation: number;
 };
 
 export type DrawMediaGroupedRequest = {
     path: string;
     dictionary: string;
-    canvases: OffscreenCanvas[];
+    canvasIndexes: number[];
+    canvasWidth: number;
+    canvasHeight: number;
+    generation: number;
 };
 
 export type FindMultiBulkData<TItem = unknown> = {

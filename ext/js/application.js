@@ -190,10 +190,42 @@ export class Application extends EventDispatcher {
      * @param {(application: Application) => (Promise<void>)} mainFunction
      */
     static async main(waitForDom, mainFunction) {
+        /** @type {MessagePort | null} */
+        // If this is Firefox, we don't have a service worker and can't postMessage,
+        // so we temporarily create a SharedWorker in order to establish a MessageChannel
+        // which we can use to postMessage with the backend.
+        // This can only be done in the extension context (aka iframe within popup),
+        // not in the content script context.
+        const backendPort = (!('serviceWorker' in navigator)) && window.location.protocol === new URL(import.meta.url).protocol ?
+            (await new Promise((resolve) => {
+                console.log('loading', new URL('comm/shared-worker-bridge.js', import.meta.url));
+                const sharedWorkerBridge = new SharedWorker(new URL('comm/shared-worker-bridge.js', import.meta.url), {type: 'module'});
+                sharedWorkerBridge.port.onmessage = (event) => {
+                    console.log('application.js received message from shared worker', event.data, event.ports);
+                    if (event.data.action === 'connectToBackend3') {
+                        console.log('got connectToBackend3', event.ports[0]);
+                        resolve(event.ports[0]);
+                    }
+                };
+                console.log('sending connectToBackend1');
+                sharedWorkerBridge.port.postMessage({action: 'connectToBackend1'});
+            })) :
+            null;
+
         const webExtension = new WebExtension();
         log.configure(webExtension.extensionName);
-        const api = new API(webExtension);
+
+        const mediaDrawingWorkerToBackendChannel = new MessageChannel();
+        const mediaDrawingWorker = window.location.protocol === new URL(import.meta.url).protocol ? new Worker(new URL('display/media-drawing-worker.js', import.meta.url), {type: 'module'}) : null;
+        mediaDrawingWorker?.postMessage({action: 'connectToDatabaseWorker'}, [mediaDrawingWorkerToBackendChannel.port2]);
+
+        console.log('hi port', backendPort);
+        const api = new API(webExtension, mediaDrawingWorker, backendPort);
         await waitForBackendReady(webExtension);
+        if (mediaDrawingWorker !== null) {
+            api.connectToDatabaseWorker(mediaDrawingWorkerToBackendChannel.port1);
+        }
+
         const {tabId, frameId} = await api.frameInformationGet();
         const crossFrameApi = new CrossFrameAPI(api, tabId, frameId);
         crossFrameApi.prepare();

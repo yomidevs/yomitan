@@ -207,11 +207,12 @@ export class DictionaryDatabaseProxy {
     }
 
     /**
-     * @param {import('dictionary-database').DrawMediaRequest[]} requests
+     * @param {MessagePort} port
      * @returns {Promise<void>}
      */
-    async drawMedia(requests) {
-        this._offscreen.sendMessageViaPort({action: 'drawMediaOffscreen', params: {requests}}, requests.map((t) => t.canvas));
+    async connectToDatabaseWorker(port) {
+        console.log('connectToDatabaseWorker', port);
+        this._offscreen.sendMessageViaPort({action: 'connectToDatabaseWorker'}, [port]);
     }
 }
 

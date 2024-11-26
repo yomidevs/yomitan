@@ -187,10 +187,10 @@ export class Backend {
             ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)],
         ]);
 
-        /** @type {import('api').SwApiMap} */
-        this._swApiMap = createApiMap([
-            ['drawMedia',             this._onSwApiDrawMedia.bind(this)],
-            ['registerOffscreenPort', this._onSwApiRegisterOffscreenPort.bind(this)],
+        /** @type {import('api').PmApiMap} */
+        this._pmApiMap = createApiMap([
+            ['connectToDatabaseWorker', this._onPmConnectToDatabaseWorker.bind(this)],
+            ['registerOffscreenPort',   this._onPmApiRegisterOffscreenPort.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -246,8 +246,8 @@ export class Backend {
         const onMessage = this._onMessageWrapper.bind(this);
         chrome.runtime.onMessage.addListener(onMessage);
 
-        // This is for receiving messages sent with navigator.serviceWorker, which has the benefit of being able to transfer objects, but doesn't accept callbacks
-        (/** @type {ServiceWorkerGlobalScope & typeof globalThis} */ (globalThis)).addEventListener('message', this._onSwMessage.bind(this));
+        // On Chrome, this is for receiving messages sent with navigator.serviceWorker, which has the benefit of being able to transfer objects, but doesn't accept callbacks
+        (/** @type {ServiceWorkerGlobalScope & typeof globalThis} */ (globalThis)).addEventListener('message', this._onPmMessage.bind(this));
 
         if (this._canObservePermissionsChanges()) {
             const onPermissionsChanged = this._onWebExtensionEventWrapper(this._onPermissionsChanged.bind(this));
@@ -258,13 +258,17 @@ export class Backend {
         chrome.runtime.onInstalled.addListener(this._onInstalled.bind(this));
     }
 
-    /** @type {import('api').SwApiHandler<'drawMedia'>} */
-    async _onSwApiDrawMedia({requests}) {
-        await this._dictionaryDatabase.drawMedia(requests);
+    /** @type {import('api').PmApiHandler<'connectToDatabaseWorker'>} */
+    async _onPmConnectToDatabaseWorker(_params, _source, ports) {
+        console.log('_onPmConnectToDatabaseWorker', ports);
+        if (ports !== null && ports.length > 0) {
+            await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
+        }
     }
 
-    /** @type {import('api').SwApiHandler<'registerOffscreenPort'>} */
-    async _onSwApiRegisterOffscreenPort(_params, ports) {
+    /** @type {import('api').PmApiHandler<'registerOffscreenPort'>} */
+    async _onPmApiRegisterOffscreenPort(_params, _source, ports) {
+        console.log('_onPmApiRegisterOffscreenPort', ports);
         if (ports !== null && ports.length > 0) {
             await this._offscreen?.registerOffscreenPort(ports[0]);
         }
@@ -294,6 +298,23 @@ export class Backend {
             }
             this._clipboardReader.browser = this._environment.getInfo().browser;
 
+            // if this is Firefox and therefore not running in Service Worker, we need to use a SharedWorker to setup a MessageChannel to postMessage with the popup
+            if (self.constructor.name === 'Window') {
+                const sharedWorkerBridge = new SharedWorker(new URL('../comm/shared-worker-bridge.js', import.meta.url), {type: 'module'});
+                sharedWorkerBridge.port.postMessage({action: 'registerBackendPort'});
+                sharedWorkerBridge.port.addEventListener('message', (e) => {
+                    console.log('received message:', e);
+                    const {data} = e;
+                    const {action} = data;
+                    if (action === 'connectToBackend2') {
+                        console.log('received message:', action);
+                        const mc = new MessageChannel();
+                        mc.port1.onmessage = this._onPmMessage.bind(this);
+                        e.ports[0].postMessage({action: 'connectToBackend3'}, [mc.port2]);
+                    }
+                });
+                sharedWorkerBridge.port.start();
+            }
             try {
                 await this._dictionaryDatabase.prepare();
             } catch (e) {
@@ -426,18 +447,21 @@ export class Backend {
      * @returns {boolean}
      */
     _onMessage({action, params}, sender, callback) {
+        console.log(`[${self.constructor.name}] received message`, {action, params, sender});
         return invokeApiMapHandler(this._apiMap, action, params, [sender], callback);
     }
 
     /**
-     * @param {ExtendableMessageEvent} event
+     * @param {ExtendableMessageEvent|MessageEvent} event
      * @returns {boolean}
      */
-    _onSwMessage(event) {
-        /** @type {import('api').SwApiMessageAny} */
+    _onPmMessage(event) {
+        console.log(`[${self.constructor.name}] received PM message`, event);
+        /** @type {import('api').PmApiMessageAny} */
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const message = event.data;
-        return invokeApiMapHandler(this._swApiMap, message.action, message.params, [event.ports], () => {});
+        const source = /** @type {MessagePort} */ (event.source);
+        return invokeApiMapHandler(this._pmApiMap, message.action, message.params, [source, event.ports], () => {});
     }
 
     /**
@@ -521,7 +545,6 @@ export class Backend {
         const options = this._getProfileOptions(optionsContext, false);
         const {general: {resultOutputMode: mode, maxResults}} = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
-        console.log('xxx');
         const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(mode, text, findTermsOptions);
         dictionaryEntries.splice(maxResults);
         return {dictionaryEntries, originalTextLength};

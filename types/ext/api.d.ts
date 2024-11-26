@@ -419,12 +419,34 @@ type ApiMessage<TName extends ApiNames> = {
     params: ApiParams<TName>;
 };
 
-// ServiceWorker API (i.e., API endpoints called via postMessage)
+// postMessage API (i.e., API endpoints called via postMessage, either through ServiceWorker or a MessageChannel port)
 
-type SwApiSurface = {
+type PmApiSurface = {
     drawMedia: {
         params: {
-            requests: DictionaryDatabase.DrawMediaRequest[];
+            requests: DrawMediaRequest[];
+        };
+        return: void;
+    };
+    connectToDatabaseWorker: {
+        params: void;
+        return: void;
+    };
+    drawBufferToCanvases: {
+        params: {
+            buffer: ArrayBuffer;
+            width: number;
+            height: number;
+            canvasIndexes: number[];
+            generation: number;
+        };
+        return: void;
+    };
+    drawDecodedImageToCanvases: {
+        params: {
+            decodedImage: VideoFrame | ImageBitmap;
+            canvasIndexes: number[];
+            generation: number;
         };
         return: void;
     };
@@ -432,31 +454,41 @@ type SwApiSurface = {
         params: void;
         return: void;
     };
+    registerDatabasePort: {
+        params: void;
+        return: void;
+    };
 };
 
-type SwApiExtraArgs = [ports: readonly MessagePort[] | null];
+type DrawMediaRequest = {
+    path: string;
+    dictionary: string;
+    canvas: OffscreenCanvas;
+};
 
-export type SwApiNames = BaseApiNames<SwApiSurface>;
+type PmApiExtraArgs = [ports: readonly MessagePort[] | null];
 
-export type SwApiMap = BaseApiMap<SwApiSurface, SwApiExtraArgs>;
+export type PmApiNames = BaseApiNames<PmApiSurface>;
 
-export type SwApiMapInit = BaseApiMapInit<SwApiSurface, SwApiExtraArgs>;
+export type PmApiMap = BaseApiMap<PmApiSurface, PmApiExtraArgs>;
 
-export type SwApiHandler<TName extends SwApiNames> = BaseApiHandler<SwApiSurface[TName], SwApiExtraArgs>;
+export type PmApiMapInit = BaseApiMapInit<PmApiSurface, PmApiExtraArgs>;
 
-export type SwApiHandlerNoExtraArgs<TName extends SwApiNames> = BaseApiHandler<SwApiSurface[TName], []>;
+export type PmApiHandler<TName extends PmApiNames> = BaseApiHandler<PmApiSurface[TName], PmApiExtraArgs>;
 
-export type SwApiParams<TName extends SwApiNames> = BaseApiParams<SwApiSurface[TName]>;
+export type PmApiHandlerNoExtraArgs<TName extends PmApiNames> = BaseApiHandler<PmApiSurface[TName], []>;
 
-export type SwApiParam<TName extends SwApiNames, TParamName extends BaseApiParamNames<SwApiSurface[TName]>> = BaseApiParam<SwApiSurface[TName], TParamName>;
+export type PmApiParams<TName extends PmApiNames> = BaseApiParams<PmApiSurface[TName]>;
 
-export type SwApiReturn<TName extends SwApiNames> = BaseApiReturn<SwApiSurface[TName]>;
+export type PmApiParam<TName extends PmApiNames, TParamName extends BaseApiParamNames<PmApiSurface[TName]>> = BaseApiParam<PmApiSurface[TName], TParamName>;
 
-export type SwApiParamsAny = BaseApiParamsAny<SwApiSurface>;
+export type PmApiReturn<TName extends PmApiNames> = BaseApiReturn<PmApiSurface[TName]>;
 
-export type SwApiMessageAny = {[name in SwApiNames]: SwApiMessage<name>}[SwApiNames];
+export type PmApiParamsAny = BaseApiParamsAny<PmApiSurface>;
 
-type SwApiMessage<TName extends SwApiNames> = {
+export type PmApiMessageAny = {[name in PmApiNames]: PmApiMessage<name>}[PmApiNames];
+
+type PmApiMessage<TName extends PmApiNames> = {
     action: TName;
-    params: SwApiParams<TName>;
+    params: PmApiParams<TName>;
 };

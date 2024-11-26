@@ -144,10 +144,8 @@ export type ApiMessageAny = {[name in ApiNames]: ApiMessage<name>}[ApiNames];
 // MessageChannel API
 
 type McApiSurface = {
-    drawMediaOffscreen: {
-        params: {
-            requests: DictionaryDatabase.DrawMediaRequest[];
-        };
+    connectToDatabaseWorker: {
+        params: void;
         return: void;
     };
     dummy: {
@@ -155,6 +153,8 @@ type McApiSurface = {
         return: void;
     };
 };
+
+type McApiExtraArgs = [ports: readonly MessagePort[]];
 
 export type McApiMessage<TName extends McApiNames> = (
     McApiParams<TName> extends void ?
@@ -164,11 +164,11 @@ export type McApiMessage<TName extends McApiNames> = (
 
 export type McApiNames = BaseApiNames<McApiSurface>;
 
-export type McApiMap = BaseApiMap<McApiSurface>;
+export type McApiMap = BaseApiMap<McApiSurface, McApiExtraArgs>;
 
-export type McApiMapInit = BaseApiMapInit<McApiSurface>;
+export type McApiMapInit = BaseApiMapInit<McApiSurface, McApiExtraArgs>;
 
-export type McApiHandler<TName extends McApiNames> = BaseApiHandler<McApiSurface[TName]>;
+export type McApiHandler<TName extends McApiNames> = BaseApiHandler<McApiSurface[TName], McApiExtraArgs>;
 
 export type McApiParams<TName extends McApiNames> = BaseApiParams<McApiSurface[TName]>;
 

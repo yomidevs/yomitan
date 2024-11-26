@@ -22,10 +22,18 @@ import {log} from '../core/log.js';
 export class API {
     /**
      * @param {import('../extension/web-extension.js').WebExtension} webExtension
+     * @param {Worker?} mediaDrawingWorker
+     * @param {MessagePort?} backendPort
      */
-    constructor(webExtension) {
+    constructor(webExtension, mediaDrawingWorker = null, backendPort = null) {
         /** @type {import('../extension/web-extension.js').WebExtension} */
         this._webExtension = webExtension;
+
+        /** @type {Worker?} */
+        this._mediaDrawingWorker = mediaDrawingWorker;
+
+        /** @type {MessagePort?} */
+        this._backendPort = backendPort;
     }
 
     /**
@@ -256,12 +264,12 @@ export class API {
     }
 
     /**
-     * @param {import('api').SwApiParam<'drawMedia', 'requests'>} requests
+     * @param {import('api').PmApiParam<'drawMedia', 'requests'>} requests
      * @param {Transferable[]} transferables
      */
     drawMedia(requests, transferables) {
         console.log('drawMedia', requests);
-        this._invokeSw('drawMedia', {requests}, transferables);
+        this._mediaDrawingWorker?.postMessage({action: 'drawMedia', params: {requests}}, transferables);
     }
 
     /**
@@ -378,7 +386,15 @@ export class API {
      * @param {Transferable[]} transferables
      */
     registerOffscreenPort(transferables) {
-        this._invokeSw('registerOffscreenPort', void 0, transferables);
+        this._pmInvoke('registerOffscreenPort', void 0, transferables);
+    }
+
+    /**
+     * @param {MessagePort} port
+     */
+    connectToDatabaseWorker(port) {
+        console.log('connectToDatabaseWorker', port);
+        this._pmInvoke('connectToDatabaseWorker', void 0, [port]);
     }
 
     /**
@@ -424,20 +440,32 @@ export class API {
     }
 
     /**
-     * @template {import('api').SwApiNames} TAction
-     * @template {import('api').SwApiParams<TAction>} TParams
+     * @template {import('api').PmApiNames} TAction
+     * @template {import('api').PmApiParams<TAction>} TParams
      * @param {TAction} action
      * @param {TParams} params
      * @param {Transferable[]} transferables
      */
-    _invokeSw(action, params, transferables) {
-        console.log(`[${self.constructor.name}] ${action}`, params);
-        void navigator.serviceWorker.ready.then((swr) => {
-            if (swr.active !== null) {
-                swr.active.postMessage({action, params}, transferables);
-            } else {
-                log.error(`[${self.constructor.name}] no active service worker`);
+    _pmInvoke(action, params, transferables) {
+        console.log('serviceWorker', 'serviceWorker' in navigator, navigator.serviceWorker);
+        console.log(`[${self.constructor.name}] _pmInvoke ${action}`, params);
+        // on firefox, there is no service worker, so instead we use extension.getBackgroundPage()
+        // unfortunately, there is a bug that prevents us from transfering OffscreenCanvas objects: https://bugzilla.mozilla.org/show_bug.cgi?id=1928874
+        if (!('serviceWorker' in navigator)) {
+            if (this._backendPort === null) {
+                log.error('no backend port available');
+                return;
             }
-        });
+            // console.log('go', this._backendPort, action, params, transferables);
+            this._backendPort.postMessage({action, params}, transferables);
+        } else {
+            void navigator.serviceWorker.ready.then((swr) => {
+                if (swr.active !== null) {
+                    swr.active.postMessage({action, params}, transferables);
+                } else {
+                    log.error(`[${self.constructor.name}] no active service worker`);
+                }
+            });
+        }
     }
 }

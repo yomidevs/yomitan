@@ -44,10 +44,10 @@ export class DictionaryDatabaseWorkerHandler {
      */
     _onMessage(event) {
         console.log(`[${self.constructor.name}] received message`, event);
-        const {action, params} = event.data;
+        const {action} = event.data;
         switch (action) {
-            case 'drawMedia':
-                void this._dictionaryDatabase?.drawMedia(params.items);
+            case 'connectToDatabaseWorker':
+                void this._dictionaryDatabase?.connectToDatabaseWorker(event.ports[0]);
                 break;
         }
     }

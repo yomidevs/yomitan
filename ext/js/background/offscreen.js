@@ -65,7 +65,7 @@ export class Offscreen {
 
         /** @type {import('offscreen').McApiMap} */
         this._mcApiMap = createApiMap([
-            ['drawMediaOffscreen', this._drawMediaHandler.bind(this)],
+            ['connectToDatabaseWorker', this._connectToDatabaseWorkerHandler.bind(this)],
         ]);
 
         /** @type {?Promise<void>} */
@@ -185,23 +185,27 @@ export class Offscreen {
      *
      */
     _createAndRegisterPort() {
-        console.log(`[${self.constructor.name}] prepare; registerPort`);
+        console.log(`[${self.constructor.name}] _createAndRegisterPort`);
         const mc = new MessageChannel();
         mc.port1.onmessage = (/** @type {MessageEvent<import('offscreen').McApiMessageAny>} */e) => {
             console.log(`[${self.constructor.name}] MessageChannel onmessage`, e.data);
-            this._onMcMessage(e.data);
+            this._onMcMessage(e.data, e.ports);
         };
         this._api.registerOffscreenPort([mc.port2]);
     }
 
-    /** @type {import('offscreen').McApiHandler<'drawMediaOffscreen'>} */
-    async _drawMediaHandler(params) {
-        await this._dictionaryDatabase.drawMedia(params.requests);
+    /** @type {import('offscreen').McApiHandler<'connectToDatabaseWorker'>} */
+    async _connectToDatabaseWorkerHandler(_params, ports) {
+        console.log(`[${self.constructor.name}] connectToDatabaseWorker from offscreen`, ports);
+        await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
     }
 
-    /** @param {import('offscreen').McApiMessageAny} obj */
-    _onMcMessage({action, params}) {
+    /**
+     * @param {import('offscreen').McApiMessageAny} obj
+     * @param {readonly MessagePort[]} ports
+     */
+    _onMcMessage({action, params}, ports) {
         console.log(`[${self.constructor.name}] _onMCMessage`, action, params);
-        invokeApiMapHandler(this._mcApiMap, action, params, [], () => {});
+        invokeApiMapHandler(this._mcApiMap, action, params, [ports], () => {});
     }
 }

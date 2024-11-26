@@ -70,7 +70,10 @@ export class DictionaryDatabase {
         this._resvgFontBuffer = null;
     }
 
-    /** */
+    /**
+     *
+     * @param applicationPort
+     */
     async prepare() {
         console.log(self.constructor.name);
         // do not do upgrades in web workers as they are considered to be children of the main thread and are not responsible for database upgrades
@@ -387,18 +390,42 @@ export class DictionaryDatabase {
     }
 
     /**
-     * @param {import('dictionary-database').DrawMediaRequest[]} items
+     * @param {MessagePort} port
      */
-    async drawMedia(items) {
+    async connectToDatabaseWorker(port) {
+        console.log(`[${self.constructor.name}] connecting to database worker`);
+        if (this._worker !== null) {
+            // executes outside of worker
+            this._worker.postMessage({action: 'connectToDatabaseWorker'}, [port]);
+            return;
+        }
+        // executes inside worker
+        port.onmessage = (event) => {
+            console.log(`[${self.constructor.name}] received message from main thread`, event.data);
+            const {action, params} = event.data;
+            switch (action) {
+                case 'drawMedia':
+                    void this.drawMedia(params.requests, port);
+                    break;
+                default:
+                    log.error(`[${self.constructor.name}] unknown action: ${action}`);
+                    break;
+            }
+        };
+    }
+
+    /**
+     * @param {import('dictionary-database').DrawMediaRequest[]} items
+     * @param {MessagePort} source
+     */
+    async drawMedia(items, source) {
         if (this._worker !== null) { // if a worker is available, offload the work to it
-            console.log(`[${self.constructor.name}] sending drawMedia to worker`);
-            // extract canvases to transfer them
-            const transferables = items.map(({canvas}) => canvas);
-            this._worker.postMessage({action: 'drawMedia', params: {items}}, transferables);
+            console.log(`[${self.constructor.name}] sending drawMedia to worker`, items);
+            this._worker.postMessage({action: 'drawMedia', params: {items}}, [source]);
             return;
         }
         // otherwise, you are the worker, so do the work
-        console.log(`[${self.constructor.name}] executing drawMedia`);
+        console.log(`[${self.constructor.name}] executing drawMedia`, items);
 
         performance.mark('drawMedia:start');
 
@@ -406,15 +433,15 @@ export class DictionaryDatabase {
         /** @type {Map<string, import('dictionary-database').DrawMediaGroupedRequest>} */
         const groupedItems = new Map();
         for (const item of items) {
-            const {path, dictionary, canvas} = item;
+            const {path, dictionary, canvasIndex, canvasWidth, canvasHeight, generation} = item;
             const key = `${path}:::${dictionary}`;
             if (!groupedItems.has(key)) {
-                groupedItems.set(key, {path, dictionary, canvases: []});
+                groupedItems.set(key, {path, dictionary, canvasIndexes: [], canvasWidth, canvasHeight, generation});
             }
-            groupedItems.get(key)?.canvases.push(canvas);
+            groupedItems.get(key)?.canvasIndexes.push(canvasIndex);
         }
         const groupedItemsArray = [...groupedItems.values()];
-        // console.log(groupedItemsArray);
+        console.log(groupedItemsArray);
 
         /** @type {import('dictionary-database').FindPredicate<import('dictionary-database').MediaRequest, import('dictionary-database').MediaDataArrayBufferContent>} */
         const predicate = (row, item) => (row.dictionary === item.dictionary);
@@ -429,12 +456,13 @@ export class DictionaryDatabase {
         performance.mark('drawMedia:draw:start');
         for (const m of results) {
             if (m.mediaType === 'image/svg+xml') {
+                console.log('drawing svg', m);
                 performance.mark('drawMedia:draw:svg:start');
                 /** @type {import('@resvg/resvg-wasm').ResvgRenderOptions} */
                 const opts = {
                     fitTo: {
                         mode: 'width',
-                        value: m.canvases[0].width,
+                        value: m.canvasWidth,
                     },
                     font: {
                         fontBuffers: this._resvgFontBuffer !== null ? [this._resvgFontBuffer] : [],
@@ -442,28 +470,32 @@ export class DictionaryDatabase {
                 };
                 const resvgJS = new Resvg(new Uint8Array(m.content), opts);
                 const render = resvgJS.render();
-                const imageData = new ImageData(new Uint8ClampedArray(render.pixels), render.width, render.height);
-                for (const c of m.canvases) {
-                    c.getContext('2d')?.putImageData(imageData, 0, 0);
-                }
+                console.log('sending drawBufferToCanvases');
+                source.postMessage({action: 'drawBufferToCanvases', params: {buffer: render.pixels.buffer, width: render.width, height: render.height, canvasIndexes: m.canvasIndexes, generation: m.generation}}, [render.pixels.buffer]);
                 performance.mark('drawMedia:draw:svg:end');
                 performance.measure('drawMedia:draw:svg', 'drawMedia:draw:svg:start', 'drawMedia:draw:svg:end');
             } else {
                 performance.mark('drawMedia:draw:raster:start');
 
                 // ImageDecoder is slightly faster than Blob/createImageBitmap, but it is not available in Firefox
+                // it looks like it might become available soon though, in preview in 133: https://developer.mozilla.org/en-US/docs/Web/API/ImageDecoder
+                // however, we will need to be careful, because there is no guarentee that a VideoFrame will be possible to transfer cross-process
                 if (typeof ImageDecoder !== 'undefined') {
                     const imageDecoder = new ImageDecoder({type: m.mediaType, data: m.content});
-                    await imageDecoder.decode().then((decodedImage) => {
-                        for (const c of m.canvases) {
-                            c.getContext('2d')?.drawImage(decodedImage.image, 0, 0, c.width, c.height);
-                        }
+                    await imageDecoder.decode().then((decodedImageResult) => {
+                        source.postMessage({action: 'drawDecodedImageToCanvases', params: {decodedImage: decodedImageResult.image, canvasIndexes: m.canvasIndexes, generation: m.generation}}, [decodedImageResult.image]);
                     });
                 } else {
+                    console.log('drawing image', m);
                     const image = new Blob([m.content], {type: m.mediaType});
                     await createImageBitmap(image).then((decodedImage) => {
-                        for (const c of m.canvases) {
-                            c.getContext('2d')?.drawImage(decodedImage, 0, 0, c.width, c.height);
+                        // we need to do a dumb hack where we convert this ImageBitmap to an ImageData by drawing it to a temporary canvas, because Firefox doesn't support transferring ImageBitmaps cross-process
+                        const canvas = new OffscreenCanvas(decodedImage.width, decodedImage.height);
+                        const ctx = canvas.getContext('2d');
+                        if (ctx !== null) {
+                            ctx.drawImage(decodedImage, 0, 0);
+                            const imageData = ctx.getImageData(0, 0, decodedImage.width, decodedImage.height);
+                            source.postMessage({action: 'drawBufferToCanvases', params: {buffer: imageData.data.buffer, width: decodedImage.width, height: decodedImage.height, canvasIndexes: m.canvasIndexes, generation: m.generation}}, [imageData.data.buffer]);
                         }
                     });
                 }
@@ -810,9 +842,9 @@ export class DictionaryDatabase {
      * @param {import('dictionary-database').FindMultiBulkData<import('dictionary-database').DrawMediaGroupedRequest>} data
      * @returns {import('dictionary-database').DrawMedia}
      */
-    _createDrawMedia(row, {itemIndex: index, item: {canvases}}) {
+    _createDrawMedia(row, {itemIndex: index, item: {canvasIndexes, canvasWidth, generation}}) {
         const {dictionary, path, mediaType, width, height, content} = row;
-        return {index, dictionary, path, mediaType, width, height, content, canvases: canvases};
+        return {index, dictionary, path, mediaType, width, height, content, canvasIndexes, canvasWidth, generation};
     }
 
     /**
