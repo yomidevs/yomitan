@@ -1420,7 +1420,7 @@ export class Display extends EventDispatcher {
             const entry = (
                 dictionaryEntry.type === 'term' ?
                 this._displayGenerator.createTermEntry(dictionaryEntry, this._dictionaryInfo) :
-                this._displayGenerator.createKanjiEntry(dictionaryEntry)
+                this._displayGenerator.createKanjiEntry(dictionaryEntry, this._dictionaryInfo)
             );
             entry.dataset.index = `${i}`;
             this._dictionaryEntryNodes.push(entry);

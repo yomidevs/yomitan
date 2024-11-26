@@ -82,7 +82,7 @@ export class DisplayGenerator {
         const {headwords, type, inflectionRuleChainCandidates, definitions, frequencies, pronunciations} = dictionaryEntry;
         const groupedPronunciations = getGroupedPronunciations(dictionaryEntry);
         const pronunciationCount = groupedPronunciations.reduce((i, v) => i + v.pronunciations.length, 0);
-        const groupedFrequencies = groupTermFrequencies(dictionaryEntry);
+        const groupedFrequencies = groupTermFrequencies(dictionaryEntry, dictionaryInfo);
         const termTags = groupTermTags(dictionaryEntry);
 
         /** @type {Set<string>} */
@@ -176,9 +176,10 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+     * @param {import('dictionary-importer').Summary[]} dictionaryInfo
      * @returns {HTMLElement}
      */
-    createKanjiEntry(dictionaryEntry) {
+    createKanjiEntry(dictionaryEntry, dictionaryInfo) {
         const node = this._instantiate('kanji-entry');
         node.dataset.dictionary = dictionaryEntry.dictionary;
 
@@ -195,7 +196,7 @@ export class DisplayGenerator {
 
         this._setTextContent(glyphContainer, dictionaryEntry.character, this._language);
         if (this._language === 'ja') { glyphContainer.style.fontFamily = 'kanji-stroke-orders, sans-serif'; }
-        const groupedFrequencies = groupKanjiFrequencies(dictionaryEntry.frequencies);
+        const groupedFrequencies = groupKanjiFrequencies(dictionaryEntry.frequencies, dictionaryInfo);
 
         const dictionaryTag = this._createDictionaryTag('');
         dictionaryTag.name = dictionaryEntry.dictionaryAlias;
@@ -848,7 +849,7 @@ export class DisplayGenerator {
         body.dataset.count = `${ii}`;
         node.dataset.count = `${ii}`;
         node.dataset.details = dictionary;
-        tag.dataset.details = dictionary;
+        tag.dataset.details = dictionary + '\nFrequency Count: ' + details.freqCount?.toString();
         return node;
     }
 

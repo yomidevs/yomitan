@@ -51,9 +51,10 @@ export function groupTermTags(dictionaryEntry) {
 
 /**
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+ * @param {import('dictionary-importer').Summary[]} dictionaryInfo
  * @returns {import('dictionary-data-util').DictionaryFrequency<import('dictionary-data-util').TermFrequency>[]}
  */
-export function groupTermFrequencies(dictionaryEntry) {
+export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
     const {headwords, frequencies: sourceFrequencies} = dictionaryEntry;
 
     /** @type {import('dictionary-data-util').TermFrequenciesMap1} */
@@ -92,16 +93,19 @@ export function groupTermFrequencies(dictionaryEntry) {
                 values: [...values.values()],
             });
         }
-        results.push({dictionary, frequencies, dictionaryAlias});
+        const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
+        const freqCount = currentDictionaryInfo?.counts.termMeta.freq ?? 0;
+        results.push({dictionary, frequencies, dictionaryAlias, freqCount});
     }
     return results;
 }
 
 /**
  * @param {import('dictionary').KanjiFrequency[]} sourceFrequencies
+ * @param {import('dictionary-importer').Summary[]} dictionaryInfo
  * @returns {import('dictionary-data-util').DictionaryFrequency<import('dictionary-data-util').KanjiFrequency>[]}
  */
-export function groupKanjiFrequencies(sourceFrequencies) {
+export function groupKanjiFrequencies(sourceFrequencies, dictionaryInfo) {
     /** @type {import('dictionary-data-util').KanjiFrequenciesMap1} */
     const map1 = new Map();
     /** @type {Map<string, string>} */
@@ -133,7 +137,9 @@ export function groupKanjiFrequencies(sourceFrequencies) {
                 values: [...values.values()],
             });
         }
-        results.push({dictionary, frequencies, dictionaryAlias});
+        const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
+        const freqCount = currentDictionaryInfo?.counts.kanjiMeta.freq ?? 0;
+        results.push({dictionary, frequencies, dictionaryAlias, freqCount});
     }
     return results;
 }

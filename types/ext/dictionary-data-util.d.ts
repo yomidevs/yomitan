@@ -49,6 +49,7 @@ export type DictionaryFrequency<T = unknown> = {
     dictionary: string;
     dictionaryAlias: string;
     frequencies: T[];
+    freqCount: number;
 };
 
 export type TermFrequency = {
