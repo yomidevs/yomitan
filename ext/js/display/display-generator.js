@@ -201,6 +201,24 @@ export class DisplayGenerator {
         const dictionaryTag = this._createDictionaryTag('');
         dictionaryTag.name = dictionaryEntry.dictionaryAlias;
         dictionaryTag.content = [dictionaryEntry.dictionary];
+        const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionaryEntry.dictionary);
+        if (currentDictionaryInfo) {
+            const dictionaryContentArray = [];
+            dictionaryContentArray.push(currentDictionaryInfo.title);
+            if (currentDictionaryInfo.author) {
+                dictionaryContentArray.push('Author: ' + currentDictionaryInfo.author);
+            }
+            if (currentDictionaryInfo.description) {
+                dictionaryContentArray.push('Description: ' + currentDictionaryInfo.description);
+            }
+
+            const totalKanji = currentDictionaryInfo.counts.kanji.total;
+            if (totalKanji > 0) {
+                dictionaryContentArray.push('Kanji Count: ' + totalKanji.toString());
+            }
+
+            dictionaryTag.content = dictionaryContentArray;
+        }
 
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, true);
         this._appendMultiple(tagContainer, this._createTag.bind(this), [...dictionaryEntry.tags, dictionaryTag]);
