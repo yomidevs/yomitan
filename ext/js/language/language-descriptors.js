@@ -27,6 +27,7 @@ import {
     collapseEmphaticSequences,
     convertHalfWidthCharacters,
     convertHiraganaToKatakana,
+    normalizeCJKCompatibilityCharacters,
     normalizeCombiningCharacters,
 } from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
@@ -213,6 +214,7 @@ const languageDescriptors = [
             convertHalfWidthCharacters,
             alphabeticToHiragana,
             normalizeCombiningCharacters,
+            normalizeCJKCompatibilityCharacters,
             normalizeRadicalCharacters,
             alphanumericWidthVariants,
             convertHiraganaToKatakana,
