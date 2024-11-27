@@ -15,7 +15,8 @@ Scripts can be executed by running `npm run <name>`.
 - `build:serve:firefox-android`
 
   > [!IMPORTANT] > `adb` and `web-ext` are required to be installed on your computer for this command to work!
-  > Builds for Firefox and then uses `web-ext` to serve the extension through `adb` to Firefox for Android. Prepend the environment variables WEB_EXT_TARGET and WEB_EXT_ADB_DEVICE for the command to succeed (example: `WEB_EXT_TARGET="firefox-android" WEB_EXT_ADB_DEVICE="emulator-5554" npm run build:serve:firefox-android`). WEB_EXT_TARGET will be "firefox-android" for vanilla Firefox, and you can find the value for WEB_EXT_ADB_DEVICE by running the command `adb devices`.
+
+  Builds for Firefox and then uses `web-ext` to serve the extension through `adb` to Firefox for Android. Prepend the environment variables WEB_EXT_TARGET and WEB_EXT_ADB_DEVICE for the command to succeed (example: `WEB_EXT_TARGET="firefox-android" WEB_EXT_ADB_DEVICE="emulator-5554" npm run build:serve:firefox-android`). WEB_EXT_TARGET will be "firefox-android" for vanilla Firefox, and you can find the value for WEB_EXT_ADB_DEVICE by running the command `adb devices`.
 
   [Get started debugging Firefox for Android (recommended)](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/#test-and-degug-an-extention)
 
@@ -24,7 +25,8 @@ Scripts can be executed by running `npm run <name>`.
 - `build:serve:kiwi-browser`
 
   > [!IMPORTANT] > `adb` is required to be installed on your computer for this command to work!
-  > Builds for Chromium and then uses `adb` to `push` the built zip file over to `/sdcard/yomitan`. You can then open up Kiwi Browser on the target phone and install the extension through that zip file.
+
+  Builds for Chromium and then uses `adb` to `push` the built zip file over to `/sdcard/yomitan`. You can then open up Kiwi Browser on the target phone and install the extension through that zip file.
 
 - `test`
   Runs all of the tests.
