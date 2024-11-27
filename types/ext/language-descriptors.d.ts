@@ -139,6 +139,7 @@ type AllTextProcessors = {
             alphanumericWidthVariants: BidirectionalConversionPreprocessor;
             convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
             collapseEmphaticSequences: TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
+            convertShinjitai: TextProcessor<boolean>;
         };
     };
     ko: {
