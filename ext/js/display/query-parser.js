@@ -18,6 +18,7 @@
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {log} from '../core/log.js';
+import {trimTrailingWhitespacePlusSpace} from '../data/string-util.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, isStringEntirelyKana} from '../language/ja/japanese.js';
 import {TextScanner} from '../language/text-scanner.js';
@@ -304,7 +305,7 @@ export class QueryParser extends EventDispatcher {
             termNode.className = 'query-parser-term';
             termNode.dataset.offset = `${offset}`;
             for (const {text, reading} of term) {
-                const trimmedText = text.trim();
+                const trimmedText = trimTrailingWhitespacePlusSpace(text);
                 if (reading.length === 0) {
                     termNode.appendChild(document.createTextNode(trimmedText));
                 } else {
