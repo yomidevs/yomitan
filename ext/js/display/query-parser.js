@@ -20,7 +20,7 @@ import {EventDispatcher} from '../core/event-dispatcher.js';
 import {log} from '../core/log.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, isStringEntirelyKana} from '../language/ja/japanese.js';
-import {TextScanner} from '../language/text-scanner.js';
+import {NO_SPACES_LANGUAGES, TextScanner} from '../language/text-scanner.js';
 
 /**
  * @augments EventDispatcher<import('query-parser').Events>
@@ -43,6 +43,8 @@ export class QueryParser extends EventDispatcher {
         this._setTextToken = null;
         /** @type {?string} */
         this._selectedParser = null;
+        /** @type {boolean} */
+        this._shouldInsertSpacesBetweenTerms = false;
         /** @type {import('settings').ParsingReadingMode} */
         this._readingMode = 'none';
         /** @type {number} */
@@ -100,6 +102,9 @@ export class QueryParser extends EventDispatcher {
         }
         if (typeof termSpacing === 'boolean') {
             this._queryParser.dataset.termSpacing = `${termSpacing}`;
+            if (!NO_SPACES_LANGUAGES.has(language)) {
+                this._shouldInsertSpacesBetweenTerms = true;
+            }
         }
         if (typeof readingMode === 'string') {
             this._setReadingMode(readingMode);
@@ -305,6 +310,7 @@ export class QueryParser extends EventDispatcher {
             termNode.dataset.offset = `${offset}`;
             for (const {text, reading} of term) {
                 const trimmedText = text.trim();
+                if (trimmedText.length === 0) { continue; }
                 if (reading.length === 0) {
                     termNode.appendChild(document.createTextNode(trimmedText));
                 } else {
@@ -312,8 +318,14 @@ export class QueryParser extends EventDispatcher {
                     termNode.appendChild(this._createSegment(trimmedText, reading2, offset));
                 }
                 offset += trimmedText.length;
+                if (this._shouldInsertSpacesBetweenTerms) {
+                    termNode.appendChild(document.createTextNode(' '));
+                    offset += 1;
+                }
             }
-            fragment.appendChild(termNode);
+            if (termNode.childNodes.length > 0) {
+                fragment.appendChild(termNode);
+            }
         }
         return fragment;
     }

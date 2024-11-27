@@ -10,6 +10,9 @@
 :root:not([data-language=ja]):not([data-language=zh]):not([data-language=yue]) .jpzhyue-only {
     display: none;
 }
+:root:not([data-language=ja]):not([data-language=zh]):not([data-language=yue]):not([data-language=ko]) .jpzhyueko-only {
+    display: none;
+}
 :root:is([data-language=ja], [data-language=zh], [data-language=yue], [data-language=ko]) .not-jpzhyueko {
     display: none;
 }
