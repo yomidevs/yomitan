@@ -74,7 +74,7 @@ export function readCodePointsBackward(text, position, count) {
  * @param {string} text
  * @returns {string}
  */
-export function trimTrailingWhitespaceMinusSpace(text) {
+export function trimTrailingWhitespacePlusSpace(text) {
     const prevTextLength = text.length;
     const textTrimmed = text.trimEnd();
     return prevTextLength === textTrimmed.length ? textTrimmed : textTrimmed + ' ';
