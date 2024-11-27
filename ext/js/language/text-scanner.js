@@ -24,7 +24,7 @@ import {clone} from '../core/utilities.js';
 import {anyNodeMatchesSelector, everyNodeMatchesSelector, getActiveModifiers, getActiveModifiersAndButtons, isPointInSelection} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
 
-export const NO_SPACES_LANGUAGES = new Set(['ja', 'zh', 'yue', 'ko']);
+const SCAN_RESOLUTION_EXCLUDED_LANGUAGES = new Set(['ja', 'zh', 'yue', 'ko']);
 
 /**
  * @augments EventDispatcher<import('text-scanner').Events>
@@ -478,7 +478,7 @@ export class TextScanner extends EventDispatcher {
             );
 
             if (this._scanResolution === 'word' && !disallowExpandStartOffset &&
-            (this._language === null || !NO_SPACES_LANGUAGES.has(this._language))) {
+            (this._language === null || !SCAN_RESOLUTION_EXCLUDED_LANGUAGES.has(this._language))) {
                 // Move the start offset to the beginning of the word
                 textSource.setStartOffset(this._scanLength, this._layoutAwareScan, true);
             }
