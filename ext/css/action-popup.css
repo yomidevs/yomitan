@@ -298,8 +298,38 @@ select.profile-select {
     color: #f0ad4e;
 }
 
-
 /* Mobile overrides */
+
+:root[data-mode=full] #action-popup {
+    display: initial;
+}
+:root[data-mode=full] body {
+    min-width: 95%;
+    width: max-content;
+    font-size: calc(var(--font-size) * 2);
+    text-align: center;
+}
+:root[data-mode=full] .toggle-on, .toggle-off {
+    font-size: calc(var(--font-size) * 4);
+}
+:root[data-mode=full] .toggle-handle {
+    padding-left: 65px;
+    padding-right: 65px;
+    border-radius: 10px;
+}
+:root[data-mode=full] .toggle {
+    width: 100%;
+    padding-top: 37.7%;
+}
+:root[data-mode=full] #extension-info {
+    max-width: 95vw;
+    overflow-wrap: break-word;
+}
+:root[data-mode=full] select.profile-select {
+    font-size: calc(var(--font-size) * 2);
+}
+
+/* Fallback Mobile overrides */
 
 /* Treat devices that can't hover as mobile devices */
 @media (hover: none) {
