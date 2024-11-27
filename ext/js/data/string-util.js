@@ -68,3 +68,14 @@ export function readCodePointsBackward(text, position, count) {
     }
     return result;
 }
+
+/**
+ * Trims trailing whitespace and adds a space on the end if it needed trimming.
+ * @param {string} text
+ * @returns {string}
+ */
+export function trimTrailingWhitespaceMinusSpace(text) {
+    const prevTextLength = text.length;
+    const textTrimmed = text.trimEnd();
+    return prevTextLength === textTrimmed.length ? textTrimmed : textTrimmed + ' ';
+}

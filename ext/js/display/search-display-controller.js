@@ -20,6 +20,7 @@ import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {trimTrailingWhitespaceMinusSpace} from '../data/string-util.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 
 export class SearchDisplayController {
@@ -237,7 +238,7 @@ export class SearchDisplayController {
         this._searchBackButton.hidden = !showBackButton;
 
         if (this._queryInput.value !== query) {
-            this._queryInput.value = query.trim();
+            this._queryInput.value = trimTrailingWhitespaceMinusSpace(query);
             this._updateSearchHeight(true);
         }
         this._setIntroVisible(!valid, animate);
