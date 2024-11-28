@@ -20,6 +20,7 @@ import {normalizeRadicalCharacters} from './CJK-util.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {germanTransforms} from './de/german-transforms.js';
 import {englishTransforms} from './en/english-transforms.js';
+import {frenchTransforms} from './fr/french-transforms.js';
 import {spanishTransforms} from './es/spanish-transforms.js';
 import {
     alphabeticToHiragana,
@@ -138,6 +139,7 @@ const languageDescriptors = [
         name: 'French',
         exampleText: 'lire',
         textPreprocessors: capitalizationPreprocessors,
+        languageTransforms: frenchTransforms,
     },
     {
         iso: 'grc',
