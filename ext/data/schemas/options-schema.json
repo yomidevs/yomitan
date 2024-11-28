@@ -453,8 +453,6 @@
                                 "required": [
                                     "inputs",
                                     "preventMiddleMouse",
-                                    "touchInputEnabled",
-                                    "pointerEventsEnabled",
                                     "selectText",
                                     "alphanumeric",
                                     "autoHideResults",
@@ -676,14 +674,6 @@
                                             }
                                         }
                                     },
-                                    "touchInputEnabled": {
-                                        "type": "boolean",
-                                        "default": true
-                                    },
-                                    "pointerEventsEnabled": {
-                                        "type": "boolean",
-                                        "default": false
-                                    },
                                     "selectText": {
                                         "type": "boolean",
                                         "default": true
@@ -836,7 +826,6 @@
                                     "required": [
                                         "name",
                                         "alias",
-                                        "priority",
                                         "enabled",
                                         "allowSecondarySearches",
                                         "definitionsCollapsible",
@@ -851,10 +840,6 @@
                                         "alias": {
                                             "type": "string",
                                             "default": ""
-                                        },
-                                        "priority": {
-                                            "type": "number",
-                                            "default": 0
                                         },
                                         "enabled": {
                                             "type": "boolean",

@@ -74,6 +74,9 @@ export const FULLWIDTH_CHARACTER_RANGES = [
 /** @type {import('CJK-util').CodepointRange} */
 export const CJK_PUNCTUATION_RANGE = [0x3000, 0x303f];
 
+/** @type {import('CJK-util').CodepointRange} */
+export const CJK_COMPATIBILITY = [0x3300, 0x33ff];
+
 /**
  * @param {number} codePoint
  * @param {import('CJK-util').CodepointRange} range

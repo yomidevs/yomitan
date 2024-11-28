@@ -566,6 +566,8 @@ export class OptionsUtil {
             this._updateVersion52,
             this._updateVersion53,
             this._updateVersion54,
+            this._updateVersion55,
+            this._updateVersion56,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1518,6 +1520,36 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             profile.options.anki.displayTagsAndFlags = profile.options.anki.displayTags;
             delete profile.options.anki.displayTags;
+        }
+    }
+
+    /**
+     * - Remove scanning.touchInputEnabled
+     * - Remove scanning.pointerEventsEnabled
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion55(options) {
+        for (const profile of options.profiles) {
+            delete profile.options.scanning.touchInputEnabled;
+            delete profile.options.scanning.pointerEventsEnabled;
+        }
+    }
+
+    /**
+     * - Sorted dictionaries by priority
+     * - Removed priority from dictionaries
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion56(options) {
+        for (const {options: profileOptions} of options.profiles) {
+            if (Array.isArray(profileOptions.dictionaries)) {
+                profileOptions.dictionaries.sort((/** @type {{ priority: number; }} */ a, /** @type {{ priority: number; }} */ b) => {
+                    return b.priority - a.priority;
+                });
+                for (const dictionary of profileOptions.dictionaries) {
+                    delete dictionary.priority;
+                }
+            }
         }
     }
 

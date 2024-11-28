@@ -506,8 +506,6 @@ export class Frontend {
             normalizeCssZoom: scanningOptions.normalizeCssZoom,
             selectText: scanningOptions.selectText,
             delay: scanningOptions.delay,
-            touchInputEnabled: scanningOptions.touchInputEnabled,
-            pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
             scanLength: scanningOptions.length,
             layoutAwareScan: scanningOptions.layoutAwareScan,
             matchTypePrefix: scanningOptions.matchTypePrefix,

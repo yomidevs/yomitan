@@ -52,8 +52,6 @@ class DictionaryEntry {
         this._nodes = [...fragment.childNodes];
         /** @type {HTMLInputElement} */
         this._enabledCheckbox = querySelectorNotNull(fragment, '.dictionary-enabled');
-        /** @type {HTMLInputElement} */
-        this._priorityInput = querySelectorNotNull(fragment, '.dictionary-priority');
         /** @type {HTMLButtonElement} */
         this._upButton = querySelectorNotNull(fragment, '#dictionary-move-up');
         /** @type {HTMLButtonElement} */
@@ -88,7 +86,6 @@ class DictionaryEntry {
         this._aliasNode.dataset.setting = `dictionaries[${index}].alias`;
         this._versionNode.textContent = `rev.${revision}`;
         this._outdatedButton.hidden = (version >= 3);
-        this._priorityInput.dataset.setting = `dictionaries[${index}].priority`;
         this._enabledCheckbox.dataset.setting = `dictionaries[${index}].enabled`;
         this._showUpdatesAvailableButton();
         this._eventListeners.addEventListener(this._enabledCheckbox, 'settingChanged', this._onEnabledChanged.bind(this), false);
@@ -681,7 +678,6 @@ export class DictionaryController {
         return {
             name,
             alias: name,
-            priority: 0,
             enabled,
             allowSecondarySearches: false,
             definitionsCollapsible: 'not-collapsible',

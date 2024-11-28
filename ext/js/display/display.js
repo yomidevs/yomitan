@@ -196,6 +196,8 @@ export class Display extends EventDispatcher {
         this._themeController = new ThemeController(document.documentElement);
         /** @type {import('language').LanguageSummary[]} */
         this._languageSummaries = [];
+        /** @type {import('dictionary-importer').Summary[]} */
+        this._dictionaryInfo = [];
 
         /* eslint-disable @stylistic/no-multi-spaces */
         this._hotkeyHandler.registerActions([
@@ -321,6 +323,8 @@ export class Display extends EventDispatcher {
         }
 
         this._languageSummaries = await this._application.api.getLanguageSummaries();
+
+        this._dictionaryInfo = await this._application.api.getDictionaryInfo();
 
         // Prepare
         await this._hotkeyHelpController.prepare(this._application.api);
@@ -457,8 +461,6 @@ export class Display extends EventDispatcher {
                 normalizeCssZoom: scanningOptions.normalizeCssZoom,
                 selectText: scanningOptions.selectText,
                 delay: scanningOptions.delay,
-                touchInputEnabled: scanningOptions.touchInputEnabled,
-                pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
                 scanLength: scanningOptions.length,
                 layoutAwareScan: scanningOptions.layoutAwareScan,
                 preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery,
@@ -1417,8 +1419,8 @@ export class Display extends EventDispatcher {
             const dictionaryEntry = dictionaryEntries[i];
             const entry = (
                 dictionaryEntry.type === 'term' ?
-                this._displayGenerator.createTermEntry(dictionaryEntry) :
-                this._displayGenerator.createKanjiEntry(dictionaryEntry)
+                this._displayGenerator.createTermEntry(dictionaryEntry, this._dictionaryInfo) :
+                this._displayGenerator.createKanjiEntry(dictionaryEntry, this._dictionaryInfo)
             );
             entry.dataset.index = `${i}`;
             this._dictionaryEntryNodes.push(entry);
@@ -2054,8 +2056,6 @@ export class Display extends EventDispatcher {
             normalizeCssZoom: scanningOptions.normalizeCssZoom,
             selectText: false,
             delay: scanningOptions.delay,
-            touchInputEnabled: false,
-            pointerEventsEnabled: false,
             scanLength: scanningOptions.length,
             layoutAwareScan: scanningOptions.layoutAwareScan,
             preventMiddleMouse: false,
