@@ -92,6 +92,9 @@ export const spanishTransforms = {
             description: 'feminine form of an adjective',
             rules: [
                 suffixInflection('a', 'o', ['adj'], ['adj']),
+                suffixInflection('a', '', ['adj'], ['adj']), // encantadora -> encantador, española -> español
+                ...[...'aeio'].map((v) => suffixInflection(`${v}na`, `${addAccent(v)}n`, ['adj'], ['adj'])), // dormilona -> dormilón, chiquitina -> chiquitín
+                ...[...'aeio'].map((v) => suffixInflection(`${v}sa`, `${addAccent(v)}s`, ['adj'], ['adj'])), // francesa -> francés
             ],
         },
         'present indicative': {
@@ -338,9 +341,18 @@ export const spanishTransforms = {
             name: 'progressive',
             description: 'Progressive form of a verb',
             rules: [
+                // regular
                 suffixInflection('ando', 'ar', ['v_ar'], ['v_ar']),
                 suffixInflection('iendo', 'er', ['v_er'], ['v_er']),
                 suffixInflection('iendo', 'ir', ['v_ir'], ['v_ir']),
+                // vowel before the ending (-yendo)
+                suffixInflection('ayendo', 'aer', ['v_er'], ['v_er']), // traer -> trayendo, caer -> cayendo
+                suffixInflection('eyendo', 'eer', ['v_er'], ['v_er']), // leer -> leyendo
+                suffixInflection('uyendo', 'uir', ['v_ir'], ['v_ir']), // huir -> huyendo
+                // irregular
+                wholeWordInflection('oyendo', 'oír', ['v'], ['v']),
+                wholeWordInflection('yendo', 'ir', ['v'], ['v']),
+                // TODO stem-changing verbs
             ],
         },
         'imperative': {
@@ -349,12 +361,15 @@ export const spanishTransforms = {
             rules: [
                 // -ar verbs
                 suffixInflection('a', 'ar', ['v_ar'], ['v_ar']),
+                suffixInflextion('emos', 'ar', ['v_ar'], ['v_ar']),
                 suffixInflection('ad', 'ar', ['v_ar'], ['v_ar']),
                 // -er verbs
                 suffixInflection('e', 'er', ['v_er'], ['v_er']),
+                suffixInflextion('amos', 'ar', ['v_er'], ['v_er']),
                 suffixInflection('ed', 'er', ['v_er'], ['v_er']),
                 // -ir verbs
                 suffixInflection('e', 'ir', ['v_ir'], ['v_ir']),
+                suffixInflextion('amos', 'ar', ['v_ir'], ['v_ir']),
                 suffixInflection('id', 'ir', ['v_ir'], ['v_ir']),
                 // irregular verbs
                 wholeWordInflection('diga', 'decir', ['v'], ['v']),
@@ -367,7 +382,19 @@ export const spanishTransforms = {
                 wholeWordInflection('di', 'decir', ['v'], ['v']),
                 wholeWordInflection('pon', 'poner', ['v'], ['v']),
                 wholeWordInflection('sal', 'salir', ['v'], ['v']),
-                // TODO: negative commands, nosotros & vosotros commands
+                // negative commands
+                // -ar verbs
+                suffixInflection('es', 'ar', ['v_ar'], ['v_ar']),
+                suffixInflection('emos', 'ar', ['v_ar'], ['v_ar']),
+                suffixInflection('éis', 'ar', ['v_ar'], ['v_ar']),
+                // -er verbs
+                suffixInflection('as', 'er', ['v_er'], ['v_er']),
+                suffixInflection('amos', 'er', ['v_er'], ['v_er']),
+                suffixInflection('áis', 'er', ['v_er'], ['v_er']),
+                // -ir verbs
+                suffixInflection('as', 'ir', ['v_ir'], ['v_ir']),
+                suffixInflection('amos', 'ir', ['v_ir'], ['v_ir']),
+                suffixInflection('áis', 'ir', ['v_ir'], ['v_ir']),
             ],
         },
         'conditional': {
