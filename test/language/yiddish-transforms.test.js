@@ -46,12 +46,12 @@ const tests = [
         tests: [
             {term: 'מאנ', source: 'מענער', rule: 'ns', reasons: ['umlaut_plural']}, // mener -> man
             {term: 'טשוואק', source: 'טשוועקעס', rule: 'ns', reasons: ['umlaut_plural']}, // tshvekes -> tshvak
+            {term: 'מױד', source: 'מײדלעך', rule: 'ns', reasons: ['diminutive_and_umlaut', 'plural']}, // meydlekh -> moyd
+            {term: 'דאָקטער', source: 'דאָקטױרים', rule: 'ns', reasons: ['umlaut_plural']}, // doktoyrim -> dokter
+            {term: 'בלומ', source: 'בלימען', rule: 'ns', reasons: ['umlaut_plural']}, // blimen -> blum
+            {term: 'אומשטאנד', source: 'אומשטענדן', rule: 'ns', reasons: ['umlaut_plural']}, // umshtendn -> umshtand
             {term: 'קאצ', source: 'קעצעלע', rule: 'n', reasons: ['diminutive_and_umlaut']}, // ketzele -> katz
             {term: 'קאצ', source: 'קעצל', rule: 'n', reasons: ['diminutive_and_umlaut']}, // ketzl -> katz
-            {term: 'מױד', source: 'מײדלעך', rule: 'ns', reasons: ['diminutive_and_umlaut', 'plural']}, // moyd -> meydlekh
-            {term: 'יסור', source: 'יסורים', rule: 'ns', reasons:['umlaut_plural']}, // yesurim -> yesur (not actually a word lol)
-            {term: 'בלומ', source: 'בלימען', rule: 'ns', reasons:['umlaut_plural']}, // blimen -> blum
-            {term: 'אומשטאנד', source: 'אומשטענדן', rule: 'ns', reasons:['umlaut_plural']}, // umshtendn -> umshtand
         ],
     },
     {

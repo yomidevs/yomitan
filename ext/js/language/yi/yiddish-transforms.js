@@ -19,42 +19,37 @@ import {suffixInflection} from '../language-transforms.js';
 
 /** @typedef {keyof typeof conditions} Condition */
 
-const umlautTable = new Map([
-    ['\u05e2', '\u05d0'], // Ayin to Shtumer alef
-    ['\u05f2', '\u05f1'], // Tsvey yudn to Vov yud
-    ['\u05d9', '\u05d5'], // Yud to Vov
-]);
+const mutations = [
+    {new: '\u05e2', orig: '\ufb2e'}, // Ayin to pasekh alef
+    {new: '\u05e2', orig: '\ufb2f'}, // Ayin to komets alef
+    {new: '\u05e2', orig: '\u05D0'}, // Ayin to shumter alef
+    {new: '\u05f1', orig: '\u05e2'}, // Vov yud to ayin
+    {new: '\u05f2', orig: '\u05f1'}, // Tsvey yudn to Vov yud
+    {new: '\u05d9', orig: '\u05d5'}, // Yud to Vov
+];
 
 /**
- * @param {string} str
- * @returns {string}
- */
-function umlautMutation(str) {
-    const match = (/[\u05E2\u05F0\u05D0\uFB2E\u05F1\u05D5\u05F2\uFB1D\uFB1F\u05D9\uFB2F](?!.*[\u05E2\u05F0\u05D0\uFB2E\u05F1\u05D5\u05F2\uFB1D\uFB1F\u05D9\uFB2F])/).exec(str);
-    if (match !== null && [...umlautTable.keys()].includes(str.charAt(match.index))) {
-        str = str.substring(0, match.index) + umlautTable.get(str.charAt(match.index)) + str.substring(match.index + 1);
-    }
-    return str;
-}
-
-/**
- * @template {string} TCondition
  * @param {string} inflectedSuffix
  * @param {string} deinflectedSuffix
- * @param {TCondition[]} conditionsIn
- * @param {TCondition[]} conditionsOut
- * @returns {import('language-transformer').SuffixRule<TCondition>}
+ * @param {Condition[]} conditionsIn
+ * @param {Condition[]} conditionsOut
+ * @returns {import('language-transformer').SuffixRule<Condition>[]}
  */
 function umlautMutationSuffixInflection(inflectedSuffix, deinflectedSuffix, conditionsIn, conditionsOut) {
     const suffixRegExp = new RegExp(inflectedSuffix + '$');
-    return {
-        type: 'suffix',
-        isInflected: suffixRegExp,
-        deinflected: deinflectedSuffix,
-        deinflect: (text) => umlautMutation(text.slice(0, -inflectedSuffix.length)) + deinflectedSuffix,
-        conditionsIn,
-        conditionsOut,
-    };
+    return mutations.map((mutation) => (
+        {
+            type: 'suffix',
+            isInflected: suffixRegExp,
+            deinflected: deinflectedSuffix,
+            deinflect: (/** @type {string} */ text) => {
+                const match = new RegExp(/[\u05E2\u05F0\u05D0\uFB2E\u05F1\u05D5\u05F2\uFB1D\uFB1F\u05D9\uFB2F](?!.*[\u05E2\u05F0\u05D0\uFB2E\u05F1\u05D5\u05F2\uFB1D\uFB1F\u05D9\uFB2F])/).exec(text.slice(0, -inflectedSuffix.length));
+                return (match?.[0] !== mutation.new) ? '' : text.slice(0, match.index) + mutation.orig + text.slice(match.index + 1, -inflectedSuffix.length) + deinflectedSuffix;
+            },
+            conditionsIn,
+            conditionsOut,
+        }
+    ));
 }
 
 const conditions = {
@@ -117,11 +112,11 @@ export const yiddishTransforms = {
             name: 'umlaut_plural',
             description: 'plural form of a umlaut noun',
             rules: [
-                umlautMutationSuffixInflection('\u05E2\u05E8', '', ['np'], ['ns']), // -er
-                umlautMutationSuffixInflection('\u05E2\u05E1', '', ['np'], ['ns']), // -es
-                umlautMutationSuffixInflection('\u05D9\u05DD', '', ['np'], ['ns']), // -im
-                umlautMutationSuffixInflection('\u05E2\u05DF', '', ['np'], ['ns']), // -en
-                umlautMutationSuffixInflection('\u05DF', '', ['np'], ['ns']), // -n
+                ...umlautMutationSuffixInflection('\u05E2\u05E8', '', ['np'], ['ns']), // -er
+                ...umlautMutationSuffixInflection('\u05E2\u05E1', '', ['np'], ['ns']), // -es
+                ...umlautMutationSuffixInflection('\u05D9\u05DD', '', ['np'], ['ns']), // -im
+                ...umlautMutationSuffixInflection('\u05E2\u05DF', '', ['np'], ['ns']), // -en
+                ...umlautMutationSuffixInflection('\u05DF', '', ['np'], ['ns']), // -n
             ],
         },
         diminutive: {
@@ -138,8 +133,8 @@ export const yiddishTransforms = {
             name: 'diminutive_and_umlaut',
             description: 'diminutive form of a noun with stem umlaut',
             rules: [
-                umlautMutationSuffixInflection('\u05DC', '', ['n'], ['n']), // -l
-                umlautMutationSuffixInflection('\u05E2\u05DC\u05E2', '', ['n'], ['n']), // -ele
+                ...umlautMutationSuffixInflection('\u05DC', '', ['n'], ['n']), // -l
+                ...umlautMutationSuffixInflection('\u05E2\u05DC\u05E2', '', ['n'], ['n']), // -ele
             ],
         },
         verb_present_singular_to_first_person: {
