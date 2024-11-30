@@ -20,25 +20,44 @@ import {LanguageTransformer} from '../../ext/js/language/language-transformer.js
 import {yiddishTransforms} from '../../ext/js/language/yi/yiddish-transforms.js';
 import {testLanguageTransformer} from '../fixtures/language-transformer-test.js';
 
-/* Since Yiddish final letters are handled in a text postprocessor after all the transformations have been run, test cases must never use the final form of a letter!
-Otherwise, it will fail even if the rule is correct! */
+/* Since Yiddish final letters are handled in a text postprocessor after all the transformations have been run, test case terms must never use the final form of a letter!
+Otherwise, it will fail even if the rule is correct! Sources require use of final letters however for plural deinflection */
 const tests = [
     {
         category: 'nouns',
         valid: true,
         tests: [
-            {term: 'גרופּע', source: 'גרופּעס', rule: 'ns', reasons: ['plural']},
-            {term: 'טיש', source: 'טישן', rule: 'ns', reasons: ['plural']},
-            {term: 'פּויער', source: 'פּויערים', rule: 'ns', reasons: ['plural']},
-            {term: 'קינד', source: 'קינדער', rule: 'ns', reasons: ['plural']},
-            {term: 'קינדער', source: 'קינדערלעך', rule: 'n', reasons: ['diminutive']},
-            {term: 'עטיקעט', source: 'עטיקעטקע', rule: 'n', reasons: ['diminutive']},
-            {term: 'עטיקעט', source: 'עטיקעטקע', rule: 'n', reasons: ['diminutive']},
-            {term: 'קליענטעל', source: 'קליענטעלטשיק', rule: 'n', reasons: ['diminutive']},
-            {term: 'קאצ', source: 'קעצעלע', rule: 'n', reasons: ['diminutive']},
-            {term: 'קאצ', source: 'קעצל', rule: 'n', reasons: ['diminutive']},
-            {term: 'מױד', source: 'מײדלעך', rule: 'ns', reasons: ['umlaut_plural']},
-            {term: 'מאנ', source: 'מענער', rule: 'ns', reasons: ['umlaut_plural']},
+            {term: 'גרופּע', source: 'גרופּעס', rule: 'ns', reasons: ['plural']}, // grupes -> gupe
+            {term: 'טיש', source: 'טישן', rule: 'ns', reasons: ['plural']}, // tishn -> tish
+            {term: 'פּויער', source: 'פּויערים', rule: 'ns', reasons: ['plural']}, // poyerim  -> poyer
+            {term: 'קינד', source: 'קינדער', rule: 'ns', reasons: ['plural']}, // kinder -> kind
+            {term: 'בענקל', source: 'בענקלעך', rule: 'ns', reasons: ['plural']}, // benklekh -> benkl
+            {term: 'באַנ', source: 'באַנען', rule: 'ns', reasons: ['plural']}, // banen -> ban
+            {term: 'נודניק', source: 'נודניקעס', rule: 'ns', reasons: ['plural']}, // nudnikes -> nudnik
+            {term: 'חלומ', source: 'חלומות', rule: 'ns', reasons: ['plural']}, // khlomos -> khlom
+            {term: 'עטיקעט', source: 'עטיקעטקע', rule: 'n', reasons: ['diminutive']}, // etiketke -> etiket
+            {term: 'קליענטעל', source: 'קליענטעלטשיק', rule: 'n', reasons: ['diminutive']}, // klienteltshik -> klientel
+            {term: 'קינדער', source: 'קינדערלעך', rule: 'ns', reasons: ['diminutive', 'plural']}, // kinderlekh -> kinder
+        ],
+    },
+    {
+        category: 'umlaut_nouns',
+        valid: true,
+        tests: [
+            {term: 'מאנ', source: 'מענער', rule: 'ns', reasons: ['umlaut_plural']}, // mener -> man
+            {term: 'טשוואק', source: 'טשוועקעס', rule: 'ns', reasons: ['umlaut_plural']}, // tshvekes -> tshvak
+            {term: 'קאצ', source: 'קעצעלע', rule: 'n', reasons: ['diminutive_and_umlaut']}, // ketzele -> katz
+            {term: 'קאצ', source: 'קעצל', rule: 'n', reasons: ['diminutive_and_umlaut']}, // ketzl -> katz
+            {term: 'מױד', source: 'מײדלעך', rule: 'ns', reasons: ['diminutive_and_umlaut', 'plural']}, // moyd -> meydlekh
+            {term: 'יסור', source: 'יסורים', rule: 'ns', reasons:['umlaut_plural']}, // yesurim -> yesur (not actually a word lol)
+            {term: 'בלומ', source: 'בלימען', rule: 'ns', reasons:['umlaut_plural']}, // blimen -> blum
+            {term: 'אומשטאנד', source: 'אומשטענדן', rule: 'ns', reasons:['umlaut_plural']}, // umshtendn -> umshtand
+        ],
+    },
+    {
+        category: 'verbs',
+        valid: true,
+        tests: [
             {term: 'קויפֿ', source: 'קויפֿסט', rule: 'v', reasons: ['verb_present_singular_to_first_person']},
             {term: 'קויפֿ', source: 'קויפֿט', rule: 'vpresent', reasons: ['verb_present_singular_to_first_person']},
             {term: 'קויפֿנ', source: 'קויפֿט', rule: 'vpresent', reasons: ['verb_present_plural_to_first_person']},

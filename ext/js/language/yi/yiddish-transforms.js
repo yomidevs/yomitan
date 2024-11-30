@@ -78,7 +78,7 @@ const conditions = {
     },
     np: {
         name: 'Noun, plural',
-        isDictionaryForm: true,
+        isDictionaryForm: false,
     },
     ns: {
         name: 'Noun, singular',
@@ -105,8 +105,12 @@ export const yiddishTransforms = {
             rules: [
                 suffixInflection('\u05E1', '', ['np'], ['ns']), // -s
                 suffixInflection('\u05DF', '', ['np'], ['ns']), // -n
-                suffixInflection('\u05D9\u05DD', '', ['np'], ['ns']), // -im
+                suffixInflection('\u05D9\u05DD', '', ['np'], ['ns']), // -im, hebrew
                 suffixInflection('\u05E2\u05E8', '', ['np'], ['ns']), // -er
+                suffixInflection('\u05E2\u05DA', '', ['np'], ['ns']), // -ekh
+                suffixInflection('\u05E2\u05DF', '', ['np'], ['ns']), // -en
+                suffixInflection('\u05E2\u05E1', '', ['np'], ['ns']), // -es
+                suffixInflection('\u05D5\u05EA', '', ['np'], ['ns']), // -ot, hebrew
             ],
         },
         umlaut_plural: {
@@ -114,16 +118,26 @@ export const yiddishTransforms = {
             description: 'plural form of a umlaut noun',
             rules: [
                 umlautMutationSuffixInflection('\u05E2\u05E8', '', ['np'], ['ns']), // -er
-                umlautMutationSuffixInflection('\u05DC\u05E2\u05DA', '', ['np'], ['ns']), // -lekh
+                umlautMutationSuffixInflection('\u05E2\u05E1', '', ['np'], ['ns']), // -es
+                umlautMutationSuffixInflection('\u05D9\u05DD', '', ['np'], ['ns']), // -im
+                umlautMutationSuffixInflection('\u05E2\u05DF', '', ['np'], ['ns']), // -en
+                umlautMutationSuffixInflection('\u05DF', '', ['np'], ['ns']), // -n
             ],
         },
         diminutive: {
             name: 'diminutive',
             description: 'diminutive form of a noun',
             rules: [
-                suffixInflection('\u05DC\u05E2\u05DA', '', ['n'], ['n']), // -lekh
                 suffixInflection('\u05D8\u05E9\u05D9\u05E7', '', ['n'], ['n']), // -tshik
                 suffixInflection('\u05E7\u05E2', '', ['n'], ['n']), // -ke
+                suffixInflection('\u05DC', '', ['n'], ['n']), // -l
+                suffixInflection('\u05E2\u05DC\u05E2', '', ['n'], ['n']), // -ele
+            ],
+        },
+        diminutive_and_umlaut: {
+            name: 'diminutive_and_umlaut',
+            description: 'diminutive form of a noun with stem umlaut',
+            rules: [
                 umlautMutationSuffixInflection('\u05DC', '', ['n'], ['n']), // -l
                 umlautMutationSuffixInflection('\u05E2\u05DC\u05E2', '', ['n'], ['n']), // -ele
             ],
