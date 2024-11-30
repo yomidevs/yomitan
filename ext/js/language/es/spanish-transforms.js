@@ -361,15 +361,15 @@ export const spanishTransforms = {
             rules: [
                 // -ar verbs
                 suffixInflection('a', 'ar', ['v_ar'], ['v_ar']),
-                suffixInflextion('emos', 'ar', ['v_ar'], ['v_ar']),
+                suffixInflection('emos', 'ar', ['v_ar'], ['v_ar']),
                 suffixInflection('ad', 'ar', ['v_ar'], ['v_ar']),
                 // -er verbs
                 suffixInflection('e', 'er', ['v_er'], ['v_er']),
-                suffixInflextion('amos', 'ar', ['v_er'], ['v_er']),
+                suffixInflection('amos', 'ar', ['v_er'], ['v_er']),
                 suffixInflection('ed', 'er', ['v_er'], ['v_er']),
                 // -ir verbs
                 suffixInflection('e', 'ir', ['v_ir'], ['v_ir']),
-                suffixInflextion('amos', 'ar', ['v_ir'], ['v_ir']),
+                suffixInflection('amos', 'ar', ['v_ir'], ['v_ir']),
                 suffixInflection('id', 'ir', ['v_ir'], ['v_ir']),
                 // irregular verbs
                 wholeWordInflection('diga', 'decir', ['v'], ['v']),
