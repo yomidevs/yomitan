@@ -108,7 +108,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     fr: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & {
+            apostropheVariants: BidirectionalConversionPreprocessor;
+        };
     };
     grc: {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
