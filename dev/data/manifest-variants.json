@@ -320,6 +320,11 @@
             ]
         },
         {
+            "name": "firefox-android",
+            "inherit": "firefox",
+            "fileName": "yomitan-firefox-android"
+        },
+        {
             "name": "safari",
             "modifications": [
                 {
