@@ -1,7 +1,7 @@
 {
     "manifest": {
         "manifest_version": 3,
-        "name": "Yomitan - Popup Dictionary",
+        "name": "Yomitan Popup Dictionary",
         "version": "$YOMITAN_VERSION",
         "description": "Popup dictionary for language learning",
         "author": {
