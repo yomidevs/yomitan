@@ -186,7 +186,7 @@
                     "path": [
                         "author"
                     ],
-                    "value": "Yomitan"
+                    "value": "Yomidevs"
                 },
                 {
                     "action": "delete",
@@ -332,7 +332,7 @@
                     "path": [
                         "author"
                     ],
-                    "value": "Yomitan"
+                    "value": "Yomidevs"
                 },
                 {
                     "action": "remove",
