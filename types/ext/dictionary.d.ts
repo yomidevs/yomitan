@@ -532,3 +532,27 @@ export type TermSource = {
      */
     isPrimary: boolean;
 };
+
+/**
+ * Dictionaries containing the harmonic mean frequency of specific term-reading pairs.
+ */
+export type AverageFrequencyListTerm = {
+    /**
+     * Contains the average frequency of a term, with all its readings.
+     */
+    [term: string]: {
+        /**
+         * Contains the average frequency of a reading.
+         */
+        [reading: string]: {
+            /**
+             * The current average frequency.
+             */
+            currentAvg: number;
+            /**
+             * The number of dictionary frequencies used to compute the average.
+             */
+            count: number;
+        };
+    };
+};
