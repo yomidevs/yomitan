@@ -590,14 +590,14 @@ export class Display extends EventDispatcher {
         /** @type {import('display').HistoryState} */
         const newState = (
             hasState ?
-            clone(state) :
-            {
-                focusEntry: 0,
-                optionsContext: void 0,
-                url: window.location.href,
-                sentence: {text: query, offset: 0},
-                documentTitle: document.title,
-            }
+                clone(state) :
+                {
+                    focusEntry: 0,
+                    optionsContext: void 0,
+                    url: window.location.href,
+                    sentence: {text: query, offset: 0},
+                    documentTitle: document.title,
+                }
         );
         if (!hasState || updateOptionsContext) {
             newState.optionsContext = clone(this._optionsContext);
@@ -733,6 +733,7 @@ export class Display extends EventDispatcher {
 
     /** @type {import('display').DirectApiHandler<'displaySetContent'>} */
     _onMessageSetContent({details}) {
+        performance.mark('invokeDisplaySetContent:end');
         this.setContent(details);
     }
 
@@ -786,29 +787,28 @@ export class Display extends EventDispatcher {
     async _onStateChanged() {
         if (this._historyChangeIgnore) { return; }
 
-        performance.mark('display:onStateChanged:start');
+        performance.mark('display:_onStateChanged:start');
 
         /** @type {?import('core').TokenObject} */
         const token = {}; // Unique identifier token
         this._setContentToken = token;
         try {
             // Clear
-            performance.mark('display:clear:start');
+            performance.mark('display:_onStateChanged:clear:start');
             this._closePopups();
             this._closeAllPopupMenus();
             this._eventListeners.removeAllEventListeners();
-            this._contentManager.unloadAll();
             this._hideTagNotification(false);
             this._hideInflectionNotification(false);
             this._triggerContentClear();
             this._dictionaryEntries = [];
             this._dictionaryEntryNodes = [];
             this._elementOverflowController.clearElements();
-            performance.mark('display:clear:end');
-            performance.measure('display:clear', 'display:clear:start', 'display:clear:end');
+            performance.mark('display:_onStateChanged:clear:end');
+            performance.measure('display:_onStateChanged:clear', 'display:_onStateChanged:clear:start', 'display:_onStateChanged:clear:end');
 
             // Prepare
-            performance.mark('display:prepare:start');
+            performance.mark('display:_onStateChanged:prepare:start');
             const urlSearchParams = new URLSearchParams(location.search);
             let type = urlSearchParams.get('type');
             if (type === null && urlSearchParams.get('query') !== null) { type = 'terms'; }
@@ -817,10 +817,10 @@ export class Display extends EventDispatcher {
             this._queryParserVisibleOverride = (fullVisible === null ? null : (fullVisible !== 'false'));
 
             this._historyHasChanged = true;
-            performance.mark('display:prepare:end');
-            performance.measure('display:prepare', 'display:prepare:start', 'display:prepare:end');
+            performance.mark('display:_onStateChanged:prepare:end');
+            performance.measure('display:_onStateChanged:prepare', 'display:_onStateChanged:prepare:start', 'display:_onStateChanged:prepare:end');
 
-            performance.mark('display:setContent:start');
+            performance.mark('display:_onStateChanged:setContent:start');
             // Set content
             switch (type) {
                 case 'terms':
@@ -837,13 +837,13 @@ export class Display extends EventDispatcher {
                     this._clearContent();
                     break;
             }
-            performance.mark('display:setContent:end');
-            performance.measure('display:setContent', 'display:setContent:start', 'display:setContent:end');
+            performance.mark('display:_onStateChanged:setContent:end');
+            performance.measure('display:_onStateChanged:setContent', 'display:_onStateChanged:setContent:start', 'display:_onStateChanged:setContent:end');
         } catch (e) {
             this.onError(toError(e));
         }
-        performance.mark('display:onStateChanged:end');
-        performance.measure('display:onStateChanged', 'display:onStateChanged:start', 'display:onStateChanged:end');
+        performance.mark('display:_onStateChanged:end');
+        performance.measure('display:_onStateChanged', 'display:_onStateChanged:start', 'display:_onStateChanged:end');
     }
 
     /**
@@ -856,8 +856,8 @@ export class Display extends EventDispatcher {
             eventType === 'click' ||
             !(typeof historyState === 'object' && historyState !== null) ||
             historyState.cause !== 'queryParser' ?
-            'new' :
-            'overwrite'
+                'new' :
+                'overwrite'
         );
         /** @type {import('display').ContentDetails} */
         const details = {
@@ -1363,7 +1363,10 @@ export class Display extends EventDispatcher {
 
         let {dictionaryEntries} = content;
         if (!Array.isArray(dictionaryEntries)) {
+            performance.mark('display:findDictionaryEntries:start');
             dictionaryEntries = hasEnabledDictionaries && lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, primaryReading, wildcardsEnabled, optionsContext) : [];
+            performance.mark('display:findDictionaryEntries:end');
+            performance.measure('display:findDictionaryEntries', 'display:findDictionaryEntries:start', 'display:findDictionaryEntries:end');
             if (this._setContentToken !== token) { return; }
             content.dictionaryEntries = dictionaryEntries;
             changeHistory = true;
@@ -1398,7 +1401,11 @@ export class Display extends EventDispatcher {
 
         this._dictionaryEntries = dictionaryEntries;
 
+        performance.mark('display:updateNavigationAuto:start');
         this._updateNavigationAuto();
+        performance.mark('display:updateNavigationAuto:end');
+        performance.measure('display:updateNavigationAuto', 'display:updateNavigationAuto:start', 'display:updateNavigationAuto:end');
+
         this._setNoContentVisible(hasEnabledDictionaries && dictionaryEntries.length === 0 && lookup);
         this._setNoDictionariesVisible(!hasEnabledDictionaries);
 
@@ -1408,7 +1415,8 @@ export class Display extends EventDispatcher {
         performance.mark('display:contentUpdate:start');
         this._triggerContentUpdateStart();
 
-        for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
+        let i = 0;
+        for (const dictionaryEntry of dictionaryEntries) {
             performance.mark('display:createEntry:start');
 
             if (i > 0) {
@@ -1416,7 +1424,8 @@ export class Display extends EventDispatcher {
                 if (this._setContentToken !== token) { return; }
             }
 
-            const dictionaryEntry = dictionaryEntries[i];
+            performance.mark('display:createEntryReal:start');
+
             const entry = (
                 dictionaryEntry.type === 'term' ?
                 this._displayGenerator.createTermEntry(dictionaryEntry, this._dictionaryInfo) :
@@ -1426,16 +1435,31 @@ export class Display extends EventDispatcher {
             this._dictionaryEntryNodes.push(entry);
             this._addEntryEventListeners(entry);
             this._triggerContentUpdateEntry(dictionaryEntry, entry, i);
+            performance.mark('display:waitMedia:start');
+            performance.mark('display:waitMedia:end');
+            performance.measure('display:waitMedia', 'display:waitMedia:start', 'display:waitMedia:end');
+            if (this._setContentToken !== token) { return; }
             container.appendChild(entry);
+
             if (focusEntry === i) {
                 this._focusEntry(i, 0, false);
             }
 
             this._elementOverflowController.addElements(entry);
 
+            performance.mark('display:createEntryReal:end');
+            performance.measure('display:createEntryReal', 'display:createEntryReal:start', 'display:createEntryReal:end');
+
             performance.mark('display:createEntry:end');
             performance.measure('display:createEntry', 'display:createEntry:start', 'display:createEntry:end');
+
+            if (i === 0) {
+                void this._contentManager.executeMediaRequests(); // prioritize loading media for first entry since it is visible
+            }
+            ++i;
         }
+        if (this._setContentToken !== token) { return; }
+        void this._contentManager.executeMediaRequests();
 
         if (typeof scrollX === 'number' || typeof scrollY === 'number') {
             let {x, y} = this._windowScroll;
@@ -1734,8 +1758,8 @@ export class Display extends EventDispatcher {
     _relativeTermView(next) {
         return (
             next ?
-            this._history.hasNext() && this._history.forward() :
-            this._history.hasPrevious() && this._history.back()
+                this._history.hasNext() && this._history.forward() :
+                this._history.hasPrevious() && this._history.back()
         );
     }
 
@@ -1820,8 +1844,8 @@ export class Display extends EventDispatcher {
     _isQueryParserVisible() {
         return (
             this._queryParserVisibleOverride !== null ?
-            this._queryParserVisibleOverride :
-            this._queryParserVisible
+                this._queryParserVisibleOverride :
+                this._queryParserVisible
         );
     }
 
@@ -1859,8 +1883,8 @@ export class Display extends EventDispatcher {
             this._childrenSupported &&
             (
                 (isSearchPage) ?
-                (options.scanning.enableOnSearchPage) :
-                (this._depth < options.scanning.popupNestingMaxDepth)
+                    (options.scanning.enableOnSearchPage) :
+                    (this._depth < options.scanning.popupNestingMaxDepth)
             )
         );
 

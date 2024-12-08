@@ -17,14 +17,23 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
+import {log} from '../core/log.js';
 
 export class API {
     /**
      * @param {import('../extension/web-extension.js').WebExtension} webExtension
+     * @param {Worker?} mediaDrawingWorker
+     * @param {MessagePort?} backendPort
      */
-    constructor(webExtension) {
+    constructor(webExtension, mediaDrawingWorker = null, backendPort = null) {
         /** @type {import('../extension/web-extension.js').WebExtension} */
         this._webExtension = webExtension;
+
+        /** @type {Worker?} */
+        this._mediaDrawingWorker = mediaDrawingWorker;
+
+        /** @type {MessagePort?} */
+        this._backendPort = backendPort;
     }
 
     /**
@@ -255,6 +264,15 @@ export class API {
     }
 
     /**
+     * @param {import('api').PmApiParam<'drawMedia', 'requests'>} requests
+     * @param {Transferable[]} transferables
+     */
+    drawMedia(requests, transferables) {
+        console.log('drawMedia', requests);
+        this._mediaDrawingWorker?.postMessage({action: 'drawMedia', params: {requests}}, transferables);
+    }
+
+    /**
      * @param {import('api').ApiParam<'logGenericErrorBackend', 'error'>} error
      * @param {import('api').ApiParam<'logGenericErrorBackend', 'level'>} level
      * @param {import('api').ApiParam<'logGenericErrorBackend', 'context'>} context
@@ -365,6 +383,21 @@ export class API {
     }
 
     /**
+     * @param {Transferable[]} transferables
+     */
+    registerOffscreenPort(transferables) {
+        this._pmInvoke('registerOffscreenPort', void 0, transferables);
+    }
+
+    /**
+     * @param {MessagePort} port
+     */
+    connectToDatabaseWorker(port) {
+        console.log('connectToDatabaseWorker', port);
+        this._pmInvoke('connectToDatabaseWorker', void 0, [port]);
+    }
+
+    /**
      * @returns {Promise<import('api').ApiReturn<'getLanguageSummaries'>>}
      */
     getLanguageSummaries() {
@@ -390,10 +423,10 @@ export class API {
                     if (response !== null && typeof response === 'object') {
                         const {error} = /** @type {import('core').UnknownObject} */ (response);
                         if (typeof error !== 'undefined') {
-                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */ (error)));
+                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */(error)));
                         } else {
                             const {result} = /** @type {import('core').UnknownObject} */ (response);
-                            resolve(/** @type {import('api').ApiReturn<TAction>} */ (result));
+                            resolve(/** @type {import('api').ApiReturn<TAction>} */(result));
                         }
                     } else {
                         const message = response === null ? 'Unexpected null response. You may need to refresh the page.' : `Unexpected response of type ${typeof response}. You may need to refresh the page.`;
@@ -404,5 +437,35 @@ export class API {
                 reject(e);
             }
         });
+    }
+
+    /**
+     * @template {import('api').PmApiNames} TAction
+     * @template {import('api').PmApiParams<TAction>} TParams
+     * @param {TAction} action
+     * @param {TParams} params
+     * @param {Transferable[]} transferables
+     */
+    _pmInvoke(action, params, transferables) {
+        console.log('serviceWorker', 'serviceWorker' in navigator, navigator.serviceWorker);
+        console.log(`[${self.constructor.name}] _pmInvoke ${action}`, params);
+        // on firefox, there is no service worker, so instead we use extension.getBackgroundPage()
+        // unfortunately, there is a bug that prevents us from transfering OffscreenCanvas objects: https://bugzilla.mozilla.org/show_bug.cgi?id=1928874
+        if (!('serviceWorker' in navigator)) {
+            if (this._backendPort === null) {
+                log.error('no backend port available');
+                return;
+            }
+            // console.log('go', this._backendPort, action, params, transferables);
+            this._backendPort.postMessage({action, params}, transferables);
+        } else {
+            void navigator.serviceWorker.ready.then((swr) => {
+                if (swr.active !== null) {
+                    swr.active.postMessage({action, params}, transferables);
+                } else {
+                    log.error(`[${self.constructor.name}] no active service worker`);
+                }
+            });
+        }
     }
 }

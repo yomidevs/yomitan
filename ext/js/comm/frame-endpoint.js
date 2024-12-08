@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {log} from '../core/log.js';
 import {generateId} from '../core/utilities.js';
 
 export class FrameEndpoint {
@@ -69,19 +70,34 @@ export class FrameEndpoint {
         if (this._token !== null) { return; } // Already initialized
 
         const {data} = event;
-        if (typeof data !== 'object' || data === null) { return; } // Invalid message
+        if (typeof data !== 'object' || data === null) {
+            log.error('Invalid message');
+            return;
+        }
 
         const {action} = /** @type {import('core').SerializableObject} */ (data);
-        if (action !== 'frameEndpointConnect') { return; } // Invalid message
+        if (action !== 'frameEndpointConnect') {
+            log.error('Invalid action');
+            return;
+        }
 
         const {params} = /** @type {import('core').SerializableObject} */ (data);
-        if (typeof params !== 'object' || params === null) { return; } // Invalid data
+        if (typeof params !== 'object' || params === null) {
+            log.error('Invalid data');
+            return;
+        }
 
         const {secret} = /** @type {import('core').SerializableObject} */ (params);
-        if (secret !== this._secret) { return; } // Invalid authentication
+        if (secret !== this._secret) {
+            log.error('Invalid authentication');
+            return;
+        }
 
         const {token, hostFrameId} = /** @type {import('core').SerializableObject} */ (params);
-        if (typeof token !== 'string' || typeof hostFrameId !== 'number') { return; } // Invalid target
+        if (typeof token !== 'string' || typeof hostFrameId !== 'number') {
+            log.error('Invalid target');
+            return;
+        }
 
         this._token = token;
 

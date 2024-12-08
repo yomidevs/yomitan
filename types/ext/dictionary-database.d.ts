@@ -36,9 +36,11 @@ export type MediaDataArrayBufferContent = MediaDataBase<ArrayBuffer>;
 
 export type MediaDataStringContent = MediaDataBase<string>;
 
-type MediaType = ArrayBuffer | string;
+type MediaType = ArrayBuffer | string | null;
 
 export type Media<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T>;
+
+export type DrawMedia<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T> & {canvasWidth: number, canvasIndexes: number[], generation: number};
 
 export type DatabaseTermEntry = {
     expression: string;
@@ -237,6 +239,24 @@ export type TermExactRequest = {
 export type MediaRequest = {
     path: string;
     dictionary: string;
+};
+
+export type DrawMediaRequest = {
+    path: string;
+    dictionary: string;
+    canvasIndex: number;
+    canvasWidth: number;
+    canvasHeight: number;
+    generation: number;
+};
+
+export type DrawMediaGroupedRequest = {
+    path: string;
+    dictionary: string;
+    canvasIndexes: number[];
+    canvasWidth: number;
+    canvasHeight: number;
+    generation: number;
 };
 
 export type FindMultiBulkData<TItem = unknown> = {

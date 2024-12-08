@@ -16,10 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {API} from '../comm/api.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
+import {WebExtension} from '../extension/web-extension.js';
 import {Translator} from '../language/translator.js';
 
 /**
@@ -42,32 +44,44 @@ export class Offscreen {
             '#clipboard-rich-content-paste-target',
         );
 
-
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('offscreen').ApiMap} */
         this._apiMap = createApiMap([
-            ['clipboardGetTextOffscreen',    this._getTextHandler.bind(this)],
-            ['clipboardGetImageOffscreen',   this._getImageHandler.bind(this)],
-            ['clipboardSetBrowserOffscreen', this._setClipboardBrowser.bind(this)],
-            ['databasePrepareOffscreen',     this._prepareDatabaseHandler.bind(this)],
-            ['getDictionaryInfoOffscreen',   this._getDictionaryInfoHandler.bind(this)],
-            ['databasePurgeOffscreen',       this._purgeDatabaseHandler.bind(this)],
-            ['databaseGetMediaOffscreen',    this._getMediaHandler.bind(this)],
-            ['translatorPrepareOffscreen',   this._prepareTranslatorHandler.bind(this)],
-            ['findKanjiOffscreen',           this._findKanjiHandler.bind(this)],
-            ['findTermsOffscreen',           this._findTermsHandler.bind(this)],
-            ['getTermFrequenciesOffscreen',  this._getTermFrequenciesHandler.bind(this)],
-            ['clearDatabaseCachesOffscreen', this._clearDatabaseCachesHandler.bind(this)],
+            ['clipboardGetTextOffscreen',      this._getTextHandler.bind(this)],
+            ['clipboardGetImageOffscreen',     this._getImageHandler.bind(this)],
+            ['clipboardSetBrowserOffscreen',   this._setClipboardBrowser.bind(this)],
+            ['databasePrepareOffscreen',       this._prepareDatabaseHandler.bind(this)],
+            ['getDictionaryInfoOffscreen',     this._getDictionaryInfoHandler.bind(this)],
+            ['databasePurgeOffscreen',         this._purgeDatabaseHandler.bind(this)],
+            ['databaseGetMediaOffscreen',      this._getMediaHandler.bind(this)],
+            ['translatorPrepareOffscreen',     this._prepareTranslatorHandler.bind(this)],
+            ['findKanjiOffscreen',             this._findKanjiHandler.bind(this)],
+            ['findTermsOffscreen',             this._findTermsHandler.bind(this)],
+            ['getTermFrequenciesOffscreen',    this._getTermFrequenciesHandler.bind(this)],
+            ['clearDatabaseCachesOffscreen',   this._clearDatabaseCachesHandler.bind(this)],
+            ['createAndRegisterPortOffscreen', this._createAndRegisterPort.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
+        /** @type {import('offscreen').McApiMap} */
+        this._mcApiMap = createApiMap([
+            ['connectToDatabaseWorker', this._connectToDatabaseWorkerHandler.bind(this)],
+        ]);
+
         /** @type {?Promise<void>} */
         this._prepareDatabasePromise = null;
+
+        /**
+         * @type {API}
+         */
+        this._api = new API(new WebExtension());
     }
 
     /** */
     prepare() {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
+        navigator.serviceWorker.addEventListener('controllerchange', this._createAndRegisterPort.bind(this));
+        this._createAndRegisterPort();
     }
 
     /** @type {import('offscreen').ApiHandler<'clipboardGetTextOffscreen'>} */
@@ -130,8 +144,8 @@ export class Offscreen {
         const enabledDictionaryMap = new Map(options.enabledDictionaryMap);
         const excludeDictionaryDefinitions = (
             options.excludeDictionaryDefinitions !== null ?
-            new Set(options.excludeDictionaryDefinitions) :
-            null
+                new Set(options.excludeDictionaryDefinitions) :
+                null
         );
         const textReplacements = options.textReplacements.map((group) => {
             if (group === null) { return null; }
@@ -165,5 +179,33 @@ export class Offscreen {
     /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('offscreen').ApiMessageAny>} */
     _onMessage({action, params}, _sender, callback) {
         return invokeApiMapHandler(this._apiMap, action, params, [], callback);
+    }
+
+    /**
+     *
+     */
+    _createAndRegisterPort() {
+        console.log(`[${self.constructor.name}] _createAndRegisterPort`);
+        const mc = new MessageChannel();
+        mc.port1.onmessage = (/** @type {MessageEvent<import('offscreen').McApiMessageAny>} */e) => {
+            console.log(`[${self.constructor.name}] MessageChannel onmessage`, e.data);
+            this._onMcMessage(e.data, e.ports);
+        };
+        this._api.registerOffscreenPort([mc.port2]);
+    }
+
+    /** @type {import('offscreen').McApiHandler<'connectToDatabaseWorker'>} */
+    async _connectToDatabaseWorkerHandler(_params, ports) {
+        console.log(`[${self.constructor.name}] connectToDatabaseWorker from offscreen`, ports);
+        await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
+    }
+
+    /**
+     * @param {import('offscreen').McApiMessageAny} obj
+     * @param {readonly MessagePort[]} ports
+     */
+    _onMcMessage({action, params}, ports) {
+        console.log(`[${self.constructor.name}] _onMCMessage`, action, params);
+        invokeApiMapHandler(this._mcApiMap, action, params, [ports], () => {});
     }
 }
