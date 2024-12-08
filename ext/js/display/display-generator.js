@@ -73,9 +73,10 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {import('dictionary-importer').Summary[]} dictionaryInfo
      * @returns {HTMLElement}
      */
-    createTermEntry(dictionaryEntry) {
+    createTermEntry(dictionaryEntry, dictionaryInfo) {
         const node = this._instantiate('term-entry');
 
         const headwordsContainer = this._querySelector(node, '.headword-list');
@@ -88,7 +89,7 @@ export class DisplayGenerator {
         const {headwords, type, inflectionRuleChainCandidates, definitions, frequencies, pronunciations} = dictionaryEntry;
         const groupedPronunciations = getGroupedPronunciations(dictionaryEntry);
         const pronunciationCount = groupedPronunciations.reduce((i, v) => i + v.pronunciations.length, 0);
-        const groupedFrequencies = groupTermFrequencies(dictionaryEntry);
+        const groupedFrequencies = groupTermFrequencies(dictionaryEntry, dictionaryInfo);
         const termTags = groupTermTags(dictionaryEntry);
 
         /** @type {Set<string>} */
@@ -156,6 +157,28 @@ export class DisplayGenerator {
                 dictionaryTag.dictionaries.push(dictionary);
                 dictionaryTag.name = dictionaryAlias;
                 dictionaryTag.content = [dictionary];
+
+                const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
+                if (currentDictionaryInfo) {
+                    const dictionaryContentArray = [];
+                    dictionaryContentArray.push(currentDictionaryInfo.title);
+                    if (currentDictionaryInfo.author) {
+                        dictionaryContentArray.push('Author: ' + currentDictionaryInfo.author);
+                    }
+                    if (currentDictionaryInfo.description) {
+                        dictionaryContentArray.push('Description: ' + currentDictionaryInfo.description);
+                    }
+                    if (currentDictionaryInfo.url) {
+                        dictionaryContentArray.push('URL: ' + currentDictionaryInfo.url);
+                    }
+
+                    const totalTerms = currentDictionaryInfo.counts.terms.total;
+                    if (totalTerms > 0) {
+                        dictionaryContentArray.push('Term Count: ' + totalTerms.toString());
+                    }
+
+                    dictionaryTag.content = dictionaryContentArray;
+                }
             }
 
             const node2 = this._createTermDefinition(definition, dictionaryTag, headwords, uniqueTerms, uniqueReadings);
@@ -169,9 +192,10 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+     * @param {import('dictionary-importer').Summary[]} dictionaryInfo
      * @returns {HTMLElement}
      */
-    createKanjiEntry(dictionaryEntry) {
+    createKanjiEntry(dictionaryEntry, dictionaryInfo) {
         const node = this._instantiate('kanji-entry');
         node.dataset.dictionary = dictionaryEntry.dictionary;
 
@@ -188,11 +212,32 @@ export class DisplayGenerator {
 
         this._setTextContent(glyphContainer, dictionaryEntry.character, this._language);
         if (this._language === 'ja') { glyphContainer.style.fontFamily = 'kanji-stroke-orders, sans-serif'; }
-        const groupedFrequencies = groupKanjiFrequencies(dictionaryEntry.frequencies);
+        const groupedFrequencies = groupKanjiFrequencies(dictionaryEntry.frequencies, dictionaryInfo);
 
         const dictionaryTag = this._createDictionaryTag('');
         dictionaryTag.name = dictionaryEntry.dictionaryAlias;
         dictionaryTag.content = [dictionaryEntry.dictionary];
+        const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionaryEntry.dictionary);
+        if (currentDictionaryInfo) {
+            const dictionaryContentArray = [];
+            dictionaryContentArray.push(currentDictionaryInfo.title);
+            if (currentDictionaryInfo.author) {
+                dictionaryContentArray.push('Author: ' + currentDictionaryInfo.author);
+            }
+            if (currentDictionaryInfo.description) {
+                dictionaryContentArray.push('Description: ' + currentDictionaryInfo.description);
+            }
+            if (currentDictionaryInfo.url) {
+                dictionaryContentArray.push('URL: ' + currentDictionaryInfo.url);
+            }
+
+            const totalKanji = currentDictionaryInfo.counts.kanji.total;
+            if (totalKanji > 0) {
+                dictionaryContentArray.push('Kanji Count: ' + totalKanji.toString());
+            }
+
+            dictionaryTag.content = dictionaryContentArray;
+        }
 
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, true);
         this._appendMultiple(tagContainer, this._createTag.bind(this), [...dictionaryEntry.tags, dictionaryTag]);
@@ -840,7 +885,7 @@ export class DisplayGenerator {
         body.dataset.count = `${ii}`;
         node.dataset.count = `${ii}`;
         node.dataset.details = dictionary;
-        tag.dataset.details = dictionary;
+        tag.dataset.details = dictionary + '\nFrequency Count: ' + details.freqCount?.toString();
         return node;
     }
 

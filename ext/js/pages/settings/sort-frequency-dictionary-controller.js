@@ -153,9 +153,35 @@ export class SortFrequencyDictionaryController {
      * @returns {Promise<number>}
      */
     async _getFrequencyOrder(dictionary) {
-        const moreCommonTerms = ['来る', '言う', '出る', '入る', '方', '男', '女', '今', '何', '時'];
-        const lessCommonTerms = ['行なう', '論じる', '過す', '行方', '人口', '猫', '犬', '滝', '理', '暁'];
-        const terms = [...moreCommonTerms, ...lessCommonTerms];
+        const dictionaryInfo = await this._settingsController.application.api.getDictionaryInfo();
+        const dictionaryLang = dictionaryInfo.find(({title}) => title === dictionary)?.sourceLanguage ?? '';
+
+        /** @type {Record<string, string[]>} */
+        const moreCommonTerms = {
+            ja: ['来る', '言う', '出る', '入る', '方', '男', '女', '今', '何', '時'],
+        };
+        /** @type {Record<string, string[]>} */
+        const lessCommonTerms = {
+            ja: ['行なう', '論じる', '過す', '行方', '人口', '猫', '犬', '滝', '理', '暁'],
+        };
+        let langMoreCommonTerms = moreCommonTerms[dictionaryLang];
+        let langLessCommonTerms = lessCommonTerms[dictionaryLang];
+        if (dictionaryLang === '') {
+            langMoreCommonTerms = [];
+            for (const key in moreCommonTerms) {
+                if (Object.hasOwn(moreCommonTerms, key)) {
+                    langMoreCommonTerms.push(...moreCommonTerms[key]);
+                }
+            }
+            langLessCommonTerms = [];
+            for (const key in lessCommonTerms) {
+                if (Object.hasOwn(lessCommonTerms, key)) {
+                    langLessCommonTerms.push(...lessCommonTerms[key]);
+                }
+            }
+        }
+
+        const terms = [...langMoreCommonTerms, ...langLessCommonTerms];
 
         const frequencies = await this._settingsController.application.api.getTermFrequencies(
             terms.map((term) => ({term, reading: null})),
@@ -166,12 +192,12 @@ export class SortFrequencyDictionaryController {
         const termDetails = new Map();
         const moreCommonTermDetails = [];
         const lessCommonTermDetails = [];
-        for (const term of moreCommonTerms) {
+        for (const term of langMoreCommonTerms) {
             const details = {hasValue: false, minValue: Number.MAX_SAFE_INTEGER, maxValue: Number.MIN_SAFE_INTEGER};
             termDetails.set(term, details);
             moreCommonTermDetails.push(details);
         }
-        for (const term of lessCommonTerms) {
+        for (const term of langLessCommonTerms) {
             const details = {hasValue: false, minValue: Number.MAX_SAFE_INTEGER, maxValue: Number.MIN_SAFE_INTEGER};
             termDetails.set(term, details);
             lessCommonTermDetails.push(details);

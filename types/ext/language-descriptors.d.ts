@@ -108,7 +108,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     fr: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & {
+            apostropheVariants: BidirectionalConversionPreprocessor;
+        };
     };
     grc: {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
@@ -135,6 +137,7 @@ type AllTextProcessors = {
             convertHalfWidthCharacters: TextProcessor<boolean>;
             alphabeticToHiragana: TextProcessor<boolean>;
             normalizeCombiningCharacters: TextProcessor<boolean>;
+            normalizeCJKCompatibilityCharacters: TextProcessor<boolean>;
             normalizeRadicalCharacters: TextProcessor<boolean>;
             alphanumericWidthVariants: BidirectionalConversionPreprocessor;
             convertHiraganaToKatakana: BidirectionalConversionPreprocessor;

@@ -179,8 +179,6 @@ export type AudioSourceOptions = {
 export type ScanningOptions = {
     inputs: ScanningInput[];
     preventMiddleMouse: ScanningPreventMiddleMouseOptions;
-    touchInputEnabled: boolean;
-    pointerEventsEnabled: boolean;
     selectText: boolean;
     alphanumeric: boolean;
     autoHideResults: boolean;
@@ -268,7 +266,6 @@ export type DictionariesOptions = DictionaryOptions[];
 export type DictionaryOptions = {
     name: string;
     alias: string;
-    priority: number;
     enabled: boolean;
     allowSecondarySearches: boolean;
     definitionsCollapsible: DictionaryDefinitionsCollapsible;

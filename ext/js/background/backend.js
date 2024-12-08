@@ -2553,7 +2553,6 @@ export class Backend {
             enabledDictionaryMap.set(mainDictionary, {
                 index: enabledDictionaryMap.size,
                 alias: mainDictionary,
-                priority: 0,
                 allowSecondarySearches: false,
                 partsOfSpeechFilter: true,
                 useDeinflections: true,
@@ -2598,11 +2597,10 @@ export class Backend {
         const enabledDictionaryMap = new Map();
         for (const dictionary of options.dictionaries) {
             if (!dictionary.enabled) { continue; }
-            const {name, alias, priority, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
+            const {name, alias, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
             enabledDictionaryMap.set(name, {
                 index: enabledDictionaryMap.size,
                 alias,
-                priority,
                 allowSecondarySearches,
                 partsOfSpeechFilter,
                 useDeinflections,

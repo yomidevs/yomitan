@@ -21,12 +21,14 @@ import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {germanTransforms} from './de/german-transforms.js';
 import {englishTransforms} from './en/english-transforms.js';
 import {spanishTransforms} from './es/spanish-transforms.js';
+import {apostropheVariants} from './fr/french-text-preprocessors.js';
 import {
     alphabeticToHiragana,
     alphanumericWidthVariants,
     collapseEmphaticSequences,
     convertHalfWidthCharacters,
     convertHiraganaToKatakana,
+    normalizeCJKCompatibilityCharacters,
     normalizeCombiningCharacters,
 } from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
@@ -137,7 +139,10 @@ const languageDescriptors = [
         iso639_3: 'fra',
         name: 'French',
         exampleText: 'lire',
-        textPreprocessors: capitalizationPreprocessors,
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            apostropheVariants,
+        },
     },
     {
         iso: 'grc',
@@ -213,6 +218,7 @@ const languageDescriptors = [
             convertHalfWidthCharacters,
             alphabeticToHiragana,
             normalizeCombiningCharacters,
+            normalizeCJKCompatibilityCharacters,
             normalizeRadicalCharacters,
             alphanumericWidthVariants,
             convertHiraganaToKatakana,
