@@ -15,26 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as DictionaryDatabase from './dictionary-database';
-
 /** A callback used when a media file has been loaded. */
 export type OnLoadCallback = (
     /** The URL of the media that was loaded. */
     url: string,
-) => void;
+) => Promise<void>;
 
 /** A callback used when a media file should be unloaded. */
 export type OnUnloadCallback = (
     /** Whether or not the media was fully loaded. */
     fullyLoaded: boolean,
-) => void;
-
-export type CachedMediaDataLoaded = {
-    data: DictionaryDatabase.MediaDataStringContent;
-    url: string;
-};
+) => Promise<void>;
 
 export type LoadMediaDataInfo = {
     onUnload: OnUnloadCallback;
     loaded: boolean;
+};
+
+export type LoadMediaRequest = {
+    /**  The path to the media file in the dictionary. */
+    path: string;
+    /** The name of the dictionary. */
+    dictionary: string;
+    /** The canvas to draw the image onto. */
+    canvas: OffscreenCanvas;
 };
