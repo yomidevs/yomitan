@@ -125,3 +125,7 @@ Yomitan uses several third-party libraries to function.
 | parse5              | 7.1.2             | MIT          | git://github.com/inikulin/parse5.git             |
 | wanakana            | 5.3.1             | MIT          | git+ssh://git@github.com/WaniKani/WanaKana.git   |
 | hangul.js           | 0.2.6             | MIT          | git+https://github.com/e-/Hangul.js.git          |
+
+## Attribution
+
+`button.mp3` is provided by [UNIVERSFIELD](https://pixabay.com/sound-effects/error-8-206492/) and licensed under the [Pixabay Content License](https://pixabay.com/service/license-summary/).
