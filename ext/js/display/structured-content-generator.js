@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {DisplayContentManager} from '../display/display-content-manager.js';
 import {getLanguageFromText} from '../language/text-utilities.js';
+import {AnkiTemplateRendererContentManager} from '../templates/anki-template-renderer-content-manager.js';
 
 export class StructuredContentGenerator {
     /**
@@ -81,13 +83,13 @@ export class StructuredContentGenerator {
         const hasPreferredHeight = (typeof preferredHeight === 'number');
         const invAspectRatio = (
             hasPreferredWidth && hasPreferredHeight ?
-            preferredHeight / preferredWidth :
-            height / width
+                preferredHeight / preferredWidth :
+                height / width
         );
         const usedWidth = (
             hasPreferredWidth ?
-            preferredWidth :
-            (hasPreferredHeight ? preferredHeight / invAspectRatio : width)
+                preferredWidth :
+                (hasPreferredHeight ? preferredHeight / invAspectRatio : width)
         );
 
         const node = /** @type {HTMLAnchorElement} */ (this._createElement('a', 'gloss-image-link'));
@@ -96,23 +98,6 @@ export class StructuredContentGenerator {
 
         const imageContainer = this._createElement('span', 'gloss-image-container');
         node.appendChild(imageContainer);
-
-        const aspectRatioSizer = this._createElement('span', 'gloss-image-sizer');
-        imageContainer.appendChild(aspectRatioSizer);
-
-        const imageBackground = this._createElement('span', 'gloss-image-background');
-        imageContainer.appendChild(imageBackground);
-
-        const image = /** @type {HTMLImageElement} */ (this._createElement('img', 'gloss-image'));
-        image.alt = typeof alt === 'string' ? alt : '';
-        imageContainer.appendChild(image);
-
-        const overlay = this._createElement('span', 'gloss-image-container-overlay');
-        imageContainer.appendChild(overlay);
-
-        const linkText = this._createElement('span', 'gloss-image-link-text');
-        linkText.textContent = 'Image';
-        node.appendChild(linkText);
 
         node.dataset.path = path;
         node.dataset.dictionary = dictionary;
@@ -130,22 +115,45 @@ export class StructuredContentGenerator {
             node.dataset.sizeUnits = sizeUnits;
         }
 
-        imageContainer.style.width = `${usedWidth}em`;
         if (typeof border === 'string') { imageContainer.style.border = border; }
         if (typeof borderRadius === 'string') { imageContainer.style.borderRadius = borderRadius; }
         if (typeof title === 'string') {
             imageContainer.title = title;
         }
 
-        aspectRatioSizer.style.paddingTop = `${invAspectRatio * 100}%`;
-
         if (this._contentManager !== null) {
-            this._contentManager.loadMedia(
-                path,
-                dictionary,
-                (url) => this._setImageData(node, image, imageBackground, url, false),
-                () => this._setImageData(node, image, imageBackground, null, true),
-            );
+            const image = this._contentManager instanceof DisplayContentManager ?
+                /** @type {HTMLCanvasElement} */ (this._createElement('canvas', 'gloss-image')) :
+                /** @type {HTMLImageElement} */ (this._createElement('img', 'gloss-image'));
+            if (sizeUnits === 'em' && (hasPreferredWidth || hasPreferredHeight)) {
+                image.style.width = `${usedWidth}em`;
+                image.style.height = `${usedWidth * invAspectRatio}em`;
+                image.width = usedWidth * 14 * 2 * window.devicePixelRatio;
+                image.height = usedWidth * invAspectRatio * 14 * 2 * window.devicePixelRatio;
+            } else {
+                image.width = usedWidth;
+                image.height = usedWidth * invAspectRatio;
+            }
+            imageContainer.appendChild(image);
+
+            if (this._contentManager instanceof DisplayContentManager) {
+                this._contentManager.loadMedia(
+                    path,
+                    dictionary,
+                    (/** @type {HTMLCanvasElement} */(image)).transferControlToOffscreen(),
+                );
+            } else if (this._contentManager instanceof AnkiTemplateRendererContentManager) {
+                this._contentManager.loadMedia(
+                    path,
+                    dictionary,
+                    (url) => {
+                        (/** @type {HTMLImageElement} */(image)).src = url;
+                    },
+                    () => {
+                        (/** @type {HTMLImageElement} */(image)).removeAttribute('src');
+                    },
+                );
+            }
         }
 
         return node;
@@ -221,27 +229,6 @@ export class StructuredContentGenerator {
             } catch (e) {
                 // DOMException if key is malformed
             }
-        }
-    }
-
-    /**
-     * @param {HTMLAnchorElement} node
-     * @param {HTMLImageElement} image
-     * @param {HTMLElement} imageBackground
-     * @param {?string} url
-     * @param {boolean} unloaded
-     */
-    _setImageData(node, image, imageBackground, url, unloaded) {
-        if (url !== null) {
-            image.src = url;
-            node.href = url;
-            node.dataset.imageLoadState = 'loaded';
-            imageBackground.style.setProperty('--image', `url("${url}")`);
-        } else {
-            image.removeAttribute('src');
-            node.removeAttribute('href');
-            node.dataset.imageLoadState = unloaded ? 'unloaded' : 'load-error';
-            imageBackground.style.removeProperty('--image');
         }
     }
 

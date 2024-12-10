@@ -2,15 +2,7 @@
     {
         "selectors": [".gloss-image-container"],
         "styles": [
-            ["display", "inline-block"],
-            ["white-space", "nowrap"],
-            ["max-width", "100%"],
-            ["max-height", "100vh"],
-            ["position", "relative"],
-            ["vertical-align", "top"],
-            ["line-height", "0"],
-            ["overflow", "hidden"],
-            ["font-size", "1px"]
+            ["display", "inline-block"]
         ]
     },
     {
@@ -93,11 +85,6 @@
     {
         "selectors": [".gloss-image-link[data-has-aspect-ratio=true] .gloss-image"],
         "styles": [
-            ["position", "absolute"],
-            ["left", "0"],
-            ["top", "0"],
-            ["width", "100%"],
-            ["height", "100%"]
         ]
     },
     {
@@ -169,7 +156,6 @@
     {
         "selectors": [".gloss-image-link[data-appearance=monochrome] .gloss-image"],
         "styles": [
-            ["opacity", "0"]
         ]
     },
     {
