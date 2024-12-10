@@ -249,6 +249,7 @@ export class DisplayAnki {
         this._updateDictionaryEntryDetailsToken = null;
         this._dictionaryEntryDetails = null;
         this._hideErrorNotification(false);
+        this._eventListeners.removeAllEventListeners();
     }
 
     /** */
