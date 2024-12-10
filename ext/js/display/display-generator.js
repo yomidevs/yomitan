@@ -159,8 +159,8 @@ export class DisplayGenerator {
                         dictionaryContentArray.push('URL: ' + currentDictionaryInfo.url);
                     }
 
-                    const totalTerms = currentDictionaryInfo.counts.terms.total;
-                    if (totalTerms > 0) {
+                    const totalTerms = currentDictionaryInfo?.counts?.terms?.total;
+                    if (!!totalTerms && totalTerms > 0) {
                         dictionaryContentArray.push('Term Count: ' + totalTerms.toString());
                     }
 
