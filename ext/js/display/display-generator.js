@@ -218,8 +218,8 @@ export class DisplayGenerator {
                 dictionaryContentArray.push('URL: ' + currentDictionaryInfo.url);
             }
 
-            const totalKanji = currentDictionaryInfo.counts.kanji.total;
-            if (totalKanji > 0) {
+            const totalKanji = currentDictionaryInfo?.counts?.kanji?.total;
+            if (!!totalKanji && totalKanji > 0) {
                 dictionaryContentArray.push('Kanji Count: ' + totalKanji.toString());
             }
 
