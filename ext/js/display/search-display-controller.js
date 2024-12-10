@@ -279,6 +279,7 @@ export class SearchDisplayController {
         e.preventDefault();
         this._queryInput.value = '';
         this._queryInput.focus();
+        this._updateSearchHeight(true);
     }
 
     /** */
