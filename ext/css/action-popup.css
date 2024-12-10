@@ -309,7 +309,7 @@ select.profile-select {
     font-size: calc(var(--font-size) * 2);
     text-align: center;
 }
-:root[data-mode=full] .toggle-on, .toggle-off {
+:root[data-mode=full] .toggle-on, :root[data-mode=full] .toggle-off {
     font-size: calc(var(--font-size) * 4);
 }
 :root[data-mode=full] .toggle-handle {
