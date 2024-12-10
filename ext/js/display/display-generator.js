@@ -873,7 +873,7 @@ export class DisplayGenerator {
         body.dataset.count = `${ii}`;
         node.dataset.count = `${ii}`;
         node.dataset.details = dictionary;
-        tag.dataset.details = dictionary + '\nFrequency Count: ' + freqCount?.toString();
+        tag.dataset.details = dictionary + '\nDictionary size: ' + freqCount?.toString() + (kanji ? ' kanji' : ' terms');
         return node;
     }
 
@@ -906,7 +906,7 @@ export class DisplayGenerator {
         node.dataset.readingIsSame = `${reading === term}`;
         node.dataset.dictionary = dictionary;
         node.dataset.details = dictionary;
-        tag.dataset.details = dictionary + '\nFrequency Count: ' + freqCount;
+        tag.dataset.details = dictionary + '\nDictionary size: ' + freqCount + ' terms';
         return node;
     }
 
@@ -930,7 +930,7 @@ export class DisplayGenerator {
         node.dataset.character = character;
         node.dataset.dictionary = dictionary;
         node.dataset.details = dictionary;
-        tag.dataset.details = dictionary + '\nFrequency Count: ' + freqCount;
+        tag.dataset.details = dictionary + '\nDictionary size: ' + freqCount + ' kanji';
 
         return node;
     }
