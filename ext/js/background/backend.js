@@ -259,7 +259,7 @@ export class Backend {
     }
 
     /** @type {import('api').PmApiHandler<'connectToDatabaseWorker'>} */
-    async _onPmConnectToDatabaseWorker(_params, _source, ports) {
+    async _onPmConnectToDatabaseWorker(_params, ports) {
         console.log('_onPmConnectToDatabaseWorker', ports);
         if (ports !== null && ports.length > 0) {
             await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
@@ -267,7 +267,7 @@ export class Backend {
     }
 
     /** @type {import('api').PmApiHandler<'registerOffscreenPort'>} */
-    async _onPmApiRegisterOffscreenPort(_params, _source, ports) {
+    async _onPmApiRegisterOffscreenPort(_params, ports) {
         console.log('_onPmApiRegisterOffscreenPort', ports);
         if (ports !== null && ports.length > 0) {
             await this._offscreen?.registerOffscreenPort(ports[0]);

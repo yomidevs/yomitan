@@ -117,9 +117,9 @@ export class Translator {
         }
         for (const {definitions, frequencies, pronunciations} of dictionaryEntries) {
             this._flagRedundantDefinitionTags(definitions);
-            if (definitions.length > 1) {this._sortTermDictionaryEntryDefinitions(definitions);}
-            if (frequencies.length > 1) {this._sortTermDictionaryEntrySimpleData(frequencies);}
-            if (pronunciations.length > 1) {this._sortTermDictionaryEntrySimpleData(pronunciations);}
+            if (definitions.length > 1) { this._sortTermDictionaryEntryDefinitions(definitions); }
+            if (frequencies.length > 1) { this._sortTermDictionaryEntrySimpleData(frequencies); }
+            if (pronunciations.length > 1) { this._sortTermDictionaryEntrySimpleData(pronunciations); }
         }
         const withUserFacingInflections = this._addUserFacingInflections(language, dictionaryEntries);
         performance.mark('translator:findTerms:end');
@@ -148,7 +148,7 @@ export class Translator {
         }
 
         const databaseEntries = await this._database.findKanjiBulk([...kanjiUnique], enabledDictionaryMap);
-        if (databaseEntries.length === 0) {return [];}
+        if (databaseEntries.length === 0) { return []; }
 
         this._sortDatabaseEntriesByIndex(databaseEntries);
 
@@ -195,11 +195,11 @@ export class Translator {
         /** @type {import('translator').TermFrequencySimple[]} */
         const results = [];
         for (const {mode, data, dictionary, index} of metas) {
-            if (mode !== 'freq') {continue;}
+            if (mode !== 'freq') { continue; }
             let {term, reading} = termReadingList[index];
             const hasReading = (data !== null && typeof data === 'object' && typeof data.reading === 'string');
             if (hasReading && data.reading !== reading) {
-                if (reading !== null) {continue;}
+                if (reading !== null) { continue; }
                 reading = data.reading;
             }
             const frequency = hasReading ? data.frequency : /** @type {import('dictionary-data').GenericFrequencyData} */ (data);
@@ -253,7 +253,7 @@ export class Translator {
         const dictionaryEntries = [];
         const ids = new Set();
         for (const {databaseEntries, originalText, transformedText, deinflectedText, textProcessorRuleChainCandidates, inflectionRuleChainCandidates} of deinflections) {
-            if (databaseEntries.length === 0) {continue;}
+            if (databaseEntries.length === 0) { continue; }
             originalTextLength = Math.max(originalTextLength, originalText.length);
             for (const databaseEntry of databaseEntries) {
                 const {id} = databaseEntry;
@@ -379,7 +379,7 @@ export class Translator {
                 this._getAlgorithmDeinflections(text, options) :
                 [this._createDeinflection(text, text, text, 0, [], [])]
         );
-        if (deinflections.length === 0) {return [];}
+        if (deinflections.length === 0) { return []; }
 
         const {matchType, language, enabledDictionaryMap} = options;
 
@@ -418,11 +418,11 @@ export class Translator {
                 const {dictionary, definitions} = entry;
                 const entryDictionary = enabledDictionaryMap.get(dictionary);
                 const useDeinflections = entryDictionary?.useDeinflections ?? true;
-                if (!useDeinflections) {continue;}
+                if (!useDeinflections) { continue; }
                 for (const definition of definitions) {
                     if (Array.isArray(definition)) {
                         const [formOf, inflectionRules] = definition;
-                        if (!formOf) {continue;}
+                        if (!formOf) { continue; }
 
                         const inflectionRuleChainCandidates = algorithmChains.map(({inflectionRules: algInflections}) => {
                             return {
@@ -510,7 +510,7 @@ export class Translator {
     _getAlgorithmDeinflections(text, options) {
         const {language} = options;
         const processorsForLanguage = this._textProcessors.get(language);
-        if (typeof processorsForLanguage === 'undefined') {throw new Error(`Unsupported language: ${language}`);}
+        if (typeof processorsForLanguage === 'undefined') { throw new Error(`Unsupported language: ${language}`); }
         const {textPreprocessors, textPostprocessors} = processorsForLanguage;
 
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
@@ -564,7 +564,7 @@ export class Translator {
         ]);
 
         for (const [id, textReplacement] of textReplacements.entries()) {
-            if (textReplacement === null) {continue;}
+            if (textReplacement === null) { continue; }
             variantsMap.set(this._applyTextReplacements(text, textReplacement), [['Text Replacement' + ' ' + id]]);
         }
         for (const {id, textProcessor: {process, options}} of textProcessors) {
@@ -755,7 +755,7 @@ export class Translator {
         for (const databaseEntry of databaseEntries) {
             const {dictionaryEntries, ids} = groupedDictionaryEntries[databaseEntry.index];
             const {id} = databaseEntry;
-            if (ids.has(id)) {continue;}
+            if (ids.has(id)) { continue; }
 
             const {term} = databaseEntry;
             const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, term, term, term, [], [], false, enabledDictionaryMap, tagAggregator, primaryReading);
@@ -809,10 +809,10 @@ export class Translator {
             const normalizedReading = typeof readingNormalizer === 'undefined' ? reading : readingNormalizer(reading);
             const key = this._createMapKey([term, normalizedReading]);
             const target = targetMap.get(key);
-            if (typeof target === 'undefined') {continue;}
+            if (typeof target === 'undefined') { continue; }
 
             for (const {ids, dictionaryEntries} of target.groups) {
-                if (ids.has(id)) {continue;}
+                if (ids.has(id)) { continue; }
                 dictionaryEntries.push(dictionaryEntry);
                 ids.add(id);
             }
@@ -820,7 +820,7 @@ export class Translator {
         }
 
         // Search database for additional secondary terms
-        if (termList.length === 0 || secondarySearchDictionaryMap.size === 0) {return;}
+        if (termList.length === 0 || secondarySearchDictionaryMap.size === 0) { return; }
 
         const databaseEntries = await this._database.findTermsExactBulk(termList, secondarySearchDictionaryMap);
         this._sortDatabaseEntriesByIndex(databaseEntries);
@@ -830,7 +830,7 @@ export class Translator {
             const sourceText = termList[index].term;
             const target = targetList[index];
             for (const {ids, dictionaryEntries} of target.groups) {
-                if (ids.has(id)) {continue;}
+                if (ids.has(id)) { continue; }
 
                 const dictionaryEntry = this._createTermDictionaryEntryFromDatabaseEntry(databaseEntry, sourceText, sourceText, sourceText, [], [], false, enabledDictionaryMap, tagAggregator, primaryReading);
                 dictionaryEntries.push(dictionaryEntry);
@@ -886,7 +886,7 @@ export class Translator {
             this._removeTagGroupsWithDictionary(definitions, excludeDictionaryDefinitions);
             this._removeTagGroupsWithDictionary(headwords, excludeDictionaryDefinitions);
 
-            if (!definitionsChanged) {continue;}
+            if (!definitionsChanged) { continue; }
 
             if (definitions.length === 0) {
                 dictionaryEntries.splice(i, 1);
@@ -911,7 +911,7 @@ export class Translator {
             }
         }
 
-        if (removeHeadwordIndices.size === 0) {return;}
+        if (removeHeadwordIndices.size === 0) { return; }
 
         /** @type {Map<number, number>} */
         const indexRemap = new Map();
@@ -975,7 +975,7 @@ export class Translator {
         let changed = false;
         for (let j = array.length - 1; j >= 0; --j) {
             const {dictionary} = array[j];
-            if (!excludeDictionaryDefinitions.has(dictionary)) {continue;}
+            if (!excludeDictionaryDefinitions.has(dictionary)) { continue; }
             array.splice(j, 1);
             changed = true;
         }
@@ -991,7 +991,7 @@ export class Translator {
         let changed = false;
         for (let j = array.length - 1; j >= 0; --j) {
             const {dictionaries} = array[j];
-            if (this._hasAny(excludeDictionaryDefinitions, dictionaries)) {continue;}
+            if (this._hasAny(excludeDictionaryDefinitions, dictionaries)) { continue; }
             array.splice(j, 1);
             changed = true;
         }
@@ -1101,7 +1101,7 @@ export class Translator {
         };
 
         for (const {tags} of tagTargets) {
-            if (tags.length <= 1) {continue;}
+            if (tags.length <= 1) { continue; }
             this._mergeSimilarTags(tags);
             tags.sort(compare);
         }
@@ -1117,7 +1117,7 @@ export class Translator {
             const {category, name} = tag1;
             for (let j = i + 1; j < tagCount; ++j) {
                 const tag2 = tags[j];
-                if (tag2.name !== name || tag2.category !== category) {continue;}
+                if (tag2.name !== name || tag2.category !== category) { continue; }
                 // Merge tag
                 tag1.order = Math.min(tag1.order, tag2.order);
                 tag1.score = Math.max(tag1.score, tag2.score);
@@ -1138,7 +1138,7 @@ export class Translator {
     _getTagNamesWithCategory(tags, category) {
         const results = [];
         for (const tag of tags) {
-            if (tag.category !== category) {continue;}
+            if (tag.category !== category) { continue; }
             results.push(tag.name);
         }
         results.sort();
@@ -1149,7 +1149,7 @@ export class Translator {
      * @param {import('dictionary').TermDefinition[]} definitions
      */
     _flagRedundantDefinitionTags(definitions) {
-        if (definitions.length === 0) {return;}
+        if (definitions.length === 0) { return; }
 
         let lastDictionary = null;
         let lastPartOfSpeech = '';
@@ -1224,7 +1224,7 @@ export class Translator {
                     case 'freq':
                         {
                             const hasReading = (data !== null && typeof data === 'object' && typeof data.reading === 'string');
-                            if (hasReading && data.reading !== reading) {continue;}
+                            if (hasReading && data.reading !== reading) { continue; }
                             const frequency = hasReading ? data.frequency : /** @type {import('dictionary-data').GenericFrequencyData} */ (data);
                             for (const {frequencies, headwordIndex} of targets) {
                                 const {frequency: frequencyValue, displayValue, displayValueParsed} = this._getFrequencyInfo(frequency);
@@ -1244,7 +1244,7 @@ export class Translator {
                         break;
                     case 'pitch':
                         {
-                            if (data.reading !== reading) {continue;}
+                            if (data.reading !== reading) { continue; }
                             /** @type {import('dictionary').PitchAccent[]} */
                             const pitches = [];
                             for (const {position, tags, nasal, devoice} of data.pitches) {
@@ -1362,7 +1362,7 @@ export class Translator {
         const statsGroups = new Map();
         for (let i = 0, ii = statsEntries.length; i < ii; ++i) {
             const databaseInfo = databaseInfos[i];
-            if (typeof databaseInfo === 'undefined') {continue;}
+            if (typeof databaseInfo === 'undefined') { continue; }
 
             const [name, value] = statsEntries[i];
             const {category} = databaseInfo;
@@ -1388,7 +1388,7 @@ export class Translator {
      * @param {import('dictionary').KanjiStat[]} stats
      */
     _sortKanjiStats(stats) {
-        if (stats.length <= 1) {return;}
+        if (stats.length <= 1) { return; }
         const stringComparer = this._stringComparer;
         stats.sort((v1, v2) => {
             const i = v1.order - v2.order;
@@ -1402,7 +1402,7 @@ export class Translator {
      */
     _convertStringToNumber(value) {
         const match = this._numberRegex.exec(value);
-        if (match === null) {return 0;}
+        if (match === null) { return 0; }
         const result = Number.parseFloat(match[0]);
         return Number.isFinite(result) ? result : 0;
     }
@@ -1417,8 +1417,8 @@ export class Translator {
         let displayValueParsed = false;
         if (typeof frequency === 'object' && frequency !== null) {
             const {value: frequencyValue2, displayValue: displayValue2} = frequency;
-            if (typeof frequencyValue2 === 'number') {frequencyValue = frequencyValue2;}
-            if (typeof displayValue2 === 'string') {displayValue = displayValue2;}
+            if (typeof frequencyValue2 === 'number') { frequencyValue = frequencyValue2; }
+            if (typeof displayValue2 === 'string') { displayValue = displayValue2; }
         } else {
             switch (typeof frequency) {
                 case 'number':
@@ -1452,7 +1452,7 @@ export class Translator {
     _getSecondarySearchDictionaryMap(enabledDictionaryMap) {
         const secondarySearchDictionaryMap = new Map();
         for (const [dictionary, details] of enabledDictionaryMap.entries()) {
-            if (!details.allowSecondarySearches) {continue;}
+            if (!details.allowSecondarySearches) { continue; }
             secondarySearchDictionaryMap.set(dictionary, details);
         }
         return secondarySearchDictionaryMap;
@@ -1880,7 +1880,7 @@ export class Translator {
      * @param {import('dictionary').TermSource[]} newSources
      */
     _addUniqueSources(sources, newSources) {
-        if (newSources.length === 0) {return;}
+        if (newSources.length === 0) { return; }
         if (sources.length === 0) {
             sources.push(...newSources);
             return;
@@ -1896,7 +1896,7 @@ export class Translator {
                     source.matchType === matchType &&
                     source.matchSource === matchSource
                 ) {
-                    if (isPrimary) {source.isPrimary = true;}
+                    if (isPrimary) { source.isPrimary = true; }
                     has = true;
                     break;
                 }
@@ -1949,7 +1949,7 @@ export class Translator {
         while (start < end) {
             const mid = Math.floor((start + end) / 2);
             const value = headwordIndices[mid];
-            if (headwordIndex === value) {return;}
+            if (headwordIndex === value) { return; }
             if (headwordIndex > value) {
                 start = mid + 1;
             } else {
@@ -1957,7 +1957,7 @@ export class Translator {
             }
         }
 
-        if (headwordIndex === headwordIndices[start]) {return;}
+        if (headwordIndex === headwordIndices[start]) { return; }
         headwordIndices.splice(start, 0, headwordIndex);
     }
 
@@ -2012,7 +2012,7 @@ export class Translator {
      * @param {import('dictionary-database').TermEntry[]|import('dictionary-database').KanjiEntry[]} databaseEntries
      */
     _sortDatabaseEntriesByIndex(databaseEntries) {
-        if (databaseEntries.length <= 1) {return;}
+        if (databaseEntries.length <= 1) { return; }
         /**
          * @param {import('dictionary-database').TermEntry|import('dictionary-database').KanjiEntry} v1
          * @param {import('dictionary-database').TermEntry|import('dictionary-database').KanjiEntry} v2
@@ -2051,23 +2051,23 @@ export class Translator {
         const compareFunction = (v1, v2) => {
             // Sort by reading match
             let i = (v2.matchPrimaryReading ? 1 : 0) - (v1.matchPrimaryReading ? 1 : 0);
-            if (i !== 0) {return i;}
+            if (i !== 0) { return i; }
 
             // Sort by length of source term
             i = v2.maxOriginalTextLength - v1.maxOriginalTextLength;
-            if (i !== 0) {return i;}
+            if (i !== 0) { return i; }
 
             // Sort by length of the shortest text processing chain
             i = this._getShortestTextProcessingChainLength(v1.textProcessorRuleChainCandidates) - this._getShortestTextProcessingChainLength(v2.textProcessorRuleChainCandidates);
-            if (i !== 0) {return i;}
+            if (i !== 0) { return i; }
 
             // Sort by length of the shortest inflection chain
             i = this._getShortestInflectionChainLength(v1.inflectionRuleChainCandidates) - this._getShortestInflectionChainLength(v2.inflectionRuleChainCandidates);
-            if (i !== 0) {return i;}
+            if (i !== 0) { return i; }
 
             // Sort by how many terms exactly match the source (e.g. for exact kana prioritization)
             i = v2.sourceTermExactMatchCount - v1.sourceTermExactMatchCount;
-            if (i !== 0) {return i;}
+            if (i !== 0) { return i; }
 
             // Sort by frequency order
             i = v1.frequencyOrder - v2.frequencyOrder;
@@ -2075,11 +2075,11 @@ export class Translator {
 
             // Sort by dictionary order
             i = v1.dictionaryIndex - v2.dictionaryIndex;
-            if (i !== 0) {return i;}
+            if (i !== 0) { return i; }
 
             // Sort by term score
             i = v2.score - v1.score;
-            if (i !== 0) {return i;}
+            if (i !== 0) { return i; }
 
             // Sort by headword term text
             const headwords1 = v1.headwords;
@@ -2089,10 +2089,10 @@ export class Translator {
                 const term2 = headwords2[j].term;
 
                 i = term2.length - term1.length;
-                if (i !== 0) {return i;}
+                if (i !== 0) { return i; }
 
                 i = stringComparer.compare(term1, term2);
-                if (i !== 0) {return i;}
+                if (i !== 0) { return i; }
             }
 
             // Sort by definition count
@@ -2118,21 +2118,21 @@ export class Translator {
 
             // Sort by dictionary order
             i = v1.dictionaryIndex - v2.dictionaryIndex;
-            if (i !== 0) {return i;}
+            if (i !== 0) { return i; }
 
             // Sort by term score
             i = v2.score - v1.score;
-            if (i !== 0) {return i;}
+            if (i !== 0) { return i; }
 
             // Sort by definition headword index
             const headwordIndices1 = v1.headwordIndices;
             const headwordIndices2 = v2.headwordIndices;
             const jj = headwordIndices1.length;
             i = headwordIndices2.length - jj;
-            if (i !== 0) {return i;}
+            if (i !== 0) { return i; }
             for (let j = 0; j < jj; ++j) {
                 i = headwordIndices1[j] - headwordIndices2[j];
-                if (i !== 0) {return i;}
+                if (i !== 0) { return i; }
             }
 
             // Sort by original order
@@ -2146,7 +2146,7 @@ export class Translator {
      * @param {import('translation-internal').TermDictionaryEntry[]} dictionaryEntries
      */
     _sortTermDictionaryEntriesById(dictionaryEntries) {
-        if (dictionaryEntries.length <= 1) {return;}
+        if (dictionaryEntries.length <= 1) { return; }
         dictionaryEntries.sort((a, b) => a.definitions[0].id - b.definitions[0].id);
     }
 
@@ -2166,7 +2166,7 @@ export class Translator {
 
             // Sort by dictionary order
             i = v1.dictionaryIndex - v2.dictionaryIndex;
-            if (i !== 0) {return i;}
+            if (i !== 0) { return i; }
 
             // Default order
             i = v1.index - v2.index;
@@ -2212,9 +2212,9 @@ export class Translator {
             let frequencyMin = Number.MAX_SAFE_INTEGER;
             let frequencyMax = Number.MIN_SAFE_INTEGER;
             for (const item of frequencies) {
-                if (item.dictionary !== dictionary) {continue;}
+                if (item.dictionary !== dictionary) { continue; }
                 const {headwordIndex, frequency} = item;
-                if (typeof frequency !== 'number') {continue;}
+                if (typeof frequency !== 'number') { continue; }
                 frequencyMap.set(headwordIndex, frequency);
                 frequencyMin = Math.min(frequencyMin, frequency);
                 frequencyMax = Math.max(frequencyMax, frequency);
@@ -2230,7 +2230,7 @@ export class Translator {
                 const {headwordIndices} = definition;
                 for (const headwordIndex of headwordIndices) {
                     const frequency = frequencyMap.get(headwordIndex);
-                    if (typeof frequency !== 'number') {continue;}
+                    if (typeof frequency !== 'number') { continue; }
                     frequencyMin = Math.min(frequencyMin, frequency);
                     frequencyMax = Math.max(frequencyMax, frequency);
                 }
@@ -2249,7 +2249,7 @@ export class Translator {
      * @returns {number}
      */
     _getShortestTextProcessingChainLength(inflectionRuleChainCandidates) {
-        if (inflectionRuleChainCandidates.length === 0) {return 0;}
+        if (inflectionRuleChainCandidates.length === 0) { return 0; }
         let length = Number.MAX_SAFE_INTEGER;
         for (const candidate of inflectionRuleChainCandidates) {
             length = Math.min(length, candidate.length);
@@ -2262,7 +2262,7 @@ export class Translator {
      * @returns {number}
      */
     _getShortestInflectionChainLength(inflectionRuleChainCandidates) {
-        if (inflectionRuleChainCandidates.length === 0) {return 0;}
+        if (inflectionRuleChainCandidates.length === 0) { return 0; }
         let length = Number.MAX_SAFE_INTEGER;
         for (const {inflectionRules} of inflectionRuleChainCandidates) {
             length = Math.min(length, inflectionRules.length);
@@ -2299,7 +2299,7 @@ export class Translator {
      */
     _hasAny(set, values) {
         for (const value of values) {
-            if (set.has(value)) {return true;}
+            if (set.has(value)) { return true; }
         }
         return false;
     }
@@ -2317,7 +2317,7 @@ class TranslatorTagAggregator {
      * @param {string[]} tagNames
      */
     addTags(tags, dictionary, tagNames) {
-        if (tagNames.length === 0) {return;}
+        if (tagNames.length === 0) { return; }
         const tagGroups = this._getOrCreateTagGroups(tags);
         const tagGroup = this._getOrCreateTagGroup(tagGroups, dictionary);
         this._addUniqueTags(tagGroup, tagNames);
@@ -2340,7 +2340,7 @@ class TranslatorTagAggregator {
      */
     mergeTags(tags, newTags) {
         const newTagGroups = this._tagExpansionTargetMap.get(newTags);
-        if (typeof newTagGroups === 'undefined') {return;}
+        if (typeof newTagGroups === 'undefined') { return; }
         const tagGroups = this._getOrCreateTagGroups(tags);
         for (const {dictionary, tagNames} of newTagGroups) {
             const tagGroup = this._getOrCreateTagGroup(tagGroups, dictionary);
@@ -2368,7 +2368,7 @@ class TranslatorTagAggregator {
      */
     _getOrCreateTagGroup(tagGroups, dictionary) {
         for (const tagGroup of tagGroups) {
-            if (tagGroup.dictionary === dictionary) {return tagGroup;}
+            if (tagGroup.dictionary === dictionary) { return tagGroup; }
         }
         const newTagGroup = {dictionary, tagNames: []};
         tagGroups.push(newTagGroup);
@@ -2382,7 +2382,7 @@ class TranslatorTagAggregator {
     _addUniqueTags(tagGroup, newTagNames) {
         const {tagNames} = tagGroup;
         for (const tagName of newTagNames) {
-            if (tagNames.includes(tagName)) {continue;}
+            if (tagNames.includes(tagName)) { continue; }
             tagNames.push(tagName);
         }
     }
