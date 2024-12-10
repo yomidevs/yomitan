@@ -115,6 +115,7 @@ export class ElementOverflowController {
     /** */
     clearElements() {
         this._elements.length = 0;
+        this._eventListeners.removeAllEventListeners();
         this._windowEventListeners.removeAllEventListeners();
     }
 
