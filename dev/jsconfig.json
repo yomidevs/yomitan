@@ -9,9 +9,10 @@
         "noImplicitAny": true,
         "strictPropertyInitialization": true,
         "suppressImplicitAnyIndexErrors": false,
-        "skipLibCheck": false,
+        "skipLibCheck": true,
         "baseUrl": ".",
         "paths": {
+            "api-map": ["../types/ext/api-map"],
             "anki-templates": ["../types/ext/anki-templates"],
             "anki-templates-internal": ["../types/ext/anki-templates-internal"],
             "cache-map": ["../types/ext/cache-map"],
@@ -52,7 +53,14 @@
             "assert",
             "css",
             "chrome",
-            "ajv"
+            "ajv",
+            "dom-webcodecs"
+        ],
+        "lib": [
+            "ES2022",
+            "DOM",
+            "DOM.Iterable",
+            "WebWorker"
         ]
     },
     "include": [

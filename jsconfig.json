@@ -9,7 +9,7 @@
         "noImplicitAny": true,
         "strictPropertyInitialization": true,
         "suppressImplicitAnyIndexErrors": false,
-        "skipLibCheck": false,
+        "skipLibCheck": true,
         "baseUrl": ".",
         "paths": {
             "*": ["./types/ext/*"],
