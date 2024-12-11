@@ -77,12 +77,12 @@ Since this is a distributed effort, we **highly welcome new contributors**! Feel
 Here are some ways anyone can help:
 
 - Try using the Yomitan dev build. Not only do you get cutting edge features, but you can help uncover bugs and give feedback to developers early on.
-- Document any UI/UX friction in Github Issues. We're looking to make Yomitan more accessible to non-technical users.
+- Document any UI/UX friction in GitHub Issues. We're looking to make Yomitan more accessible to non-technical users.
 - All the issues in `area/bug` older than 2 months need help reproducing. If anything interests you, please try to reproduce it and report your results. We can't easily tell if these issues are one-off, have since been resolved, or are no longer relevant.
 
 > The current active maintainers of Yomitan spend a lot of their time debugging and triaging issues. When someone files a bug report, we need to assess the frequency and severity of the bug. It is extremely helpful if we get multiple reports of people who experience a bug or people who can contribute additional detail to an existing bug report.
 
-If you're looking to code, please let us know what you plan on working on before submitting a Pull Request. This gives the core maintainers an opportunity to provide feedback early on before you dive too deep. You can do this by opening a Github Issue with the proposal.
+If you're looking to code, please let us know what you plan on working on before submitting a Pull Request. This gives the core maintainers an opportunity to provide feedback early on before you dive too deep. You can do this by opening a GitHub Issue with the proposal.
 
 Some contributions we always appreciate:
 
