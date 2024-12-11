@@ -457,10 +457,14 @@ export class DictionaryDatabase {
             } else {
                 performance.mark('drawMedia:draw:raster:start');
 
-                // ImageDecoder is slightly faster than Blob/createImageBitmap, but it is not available in Firefox
-                // it looks like it might become available soon though, in preview in 133: https://developer.mozilla.org/en-US/docs/Web/API/ImageDecoder
-                // however, we will need to be careful, because there is no guarentee that a VideoFrame will be possible to transfer cross-process
-                if (typeof ImageDecoder !== 'undefined') {
+                // ImageDecoder is slightly faster than Blob/createImageBitmap, but
+                // 1) it is not available in Firefox <133
+                // 2) it is available in Firefox >=133, but it's not possible to transfer VideoFrames cross-process
+                //
+                // So the second branch is a fallback for all versions of Firefox and doesn't use ImageDecoder at all
+                // The second branch can eventually be changed to use ImageDecoder when we are okay with dropping support for Firefox <133
+                // The branches can be unified entirely when Firefox implements support for transferring VideoFrames cross-process in postMessage
+                if ('serviceWorker' in navigator) { // this is just a check for chrome, we don't actually use service worker functionality here
                     const imageDecoder = new ImageDecoder({type: m.mediaType, data: m.content});
                     await imageDecoder.decode().then((decodedImageResult) => {
                         source.postMessage({action: 'drawDecodedImageToCanvases', params: {decodedImage: decodedImageResult.image, canvasIndexes: m.canvasIndexes, generation: m.generation}}, [decodedImageResult.image]);
