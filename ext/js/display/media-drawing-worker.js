@@ -122,9 +122,7 @@ export class MediaDrawingWorker {
         const dbPort = ports[0];
         console.log('connectToDatabaseWorker', dbPort);
         this._dbPort = dbPort;
-        dbPort.addEventListener('message', (event) => {
-            /** @type {import('api').PmApiMessageAny} */
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        dbPort.addEventListener('message', (/** @type {MessageEvent<import('api').PmApiMessageAny>} */ event) => {
             const message = event.data;
             return invokeApiMapHandler(this._fromDatabaseApiMap, message.action, message.params, [event.ports], () => {});
         });

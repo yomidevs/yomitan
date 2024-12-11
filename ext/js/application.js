@@ -197,19 +197,15 @@ export class Application extends EventDispatcher {
         // This can only be done in the extension context (aka iframe within popup),
         // not in the content script context.
         const backendPort = (!('serviceWorker' in navigator)) && window.location.protocol === new URL(import.meta.url).protocol ?
-            (await new Promise((resolve) => {
+            (() => {
                 console.log('loading', new URL('comm/shared-worker-bridge.js', import.meta.url));
                 const sharedWorkerBridge = new SharedWorker(new URL('comm/shared-worker-bridge.js', import.meta.url), {type: 'module'});
-                sharedWorkerBridge.port.onmessage = (event) => {
-                    console.log('application.js received message from shared worker', event.data, event.ports);
-                    if (event.data.action === 'connectToBackend3') {
-                        console.log('got connectToBackend3', event.ports[0]);
-                        resolve(event.ports[0]);
-                    }
-                };
+                const backendChannel = new MessageChannel();
                 console.log('sending connectToBackend1');
-                sharedWorkerBridge.port.postMessage({action: 'connectToBackend1'});
-            })) :
+                sharedWorkerBridge.port.postMessage({action: 'connectToBackend1'}, [backendChannel.port1]);
+                sharedWorkerBridge.port.close();
+                return backendChannel.port2;
+            })() :
             null;
 
         const webExtension = new WebExtension();

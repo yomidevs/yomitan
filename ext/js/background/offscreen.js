@@ -187,10 +187,7 @@ export class Offscreen {
     _createAndRegisterPort() {
         console.log(`[${self.constructor.name}] _createAndRegisterPort`);
         const mc = new MessageChannel();
-        mc.port1.onmessage = (/** @type {MessageEvent<import('offscreen').McApiMessageAny>} */e) => {
-            console.log(`[${self.constructor.name}] MessageChannel onmessage`, e.data);
-            this._onMcMessage(e.data, e.ports);
-        };
+        mc.port1.onmessage = this._onMcMessage.bind(this);
         this._api.registerOffscreenPort([mc.port2]);
     }
 
@@ -201,11 +198,11 @@ export class Offscreen {
     }
 
     /**
-     * @param {import('offscreen').McApiMessageAny} obj
-     * @param {readonly MessagePort[]} ports
+     * @param {MessageEvent<import('offscreen').McApiMessageAny>} event
      */
-    _onMcMessage({action, params}, ports) {
+    _onMcMessage(event) {
+        const {action, params} = event.data;
         console.log(`[${self.constructor.name}] _onMCMessage`, action, params);
-        invokeApiMapHandler(this._mcApiMap, action, params, [ports], () => {});
+        invokeApiMapHandler(this._mcApiMap, action, params, [event.ports], () => {});
     }
 }

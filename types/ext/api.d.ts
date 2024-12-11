@@ -419,7 +419,7 @@ type ApiMessage<TName extends ApiNames> = {
     params: ApiParams<TName>;
 };
 
-// postMessage API (i.e., API endpoints called via postMessage, either through ServiceWorker or a MessageChannel port)
+// postMessage API (i.e., API endpoints called via postMessage, either through ServiceWorker on Chrome or a MessageChannel port on Firefox)
 
 type PmApiSurface = {
     drawMedia: {

@@ -15,38 +15,70 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {log} from '../core/log.js';
+
+/**
+ * This serves as a bridge between the application and the backend.
+ * It is designed to have extremely short lifetime on the application side,
+ * as otherwise it will stay alive across extension updates (which only restart
+ * the backend) which can lead to extremely difficult to debug situations where
+ * the bridge is running an old version of the code.
+ *
+ * All it does is broker a handshake between the application and the backend,
+ * where they establish a connection between each other with a MessageChannel.
+ *
+ * # On backend startup
+ *  backend
+ *    ↓↓<"registerBackendPort" via SharedWorker.port.postMessage>↓↓
+ *  bridge: store the port in state
+ *
+ * # On application startup
+ *  application: create a new MessageChannel, bind event listeners to one of the ports, and send the other port to the bridge
+ *    ↓↓<"connectToBackend1" via SharedWorker.port.postMessage>↓↓
+ *  bridge
+ *    ↓↓<"connectToBackend2" via MessageChannel.port.postMessage which is stored in state from backend startup phase>↓↓
+ *  backend: bind event listeners to the other port
+ */
 export class SharedWorkerBridge {
     constructor() {
-        /** @type {number} */
-        this._count = 0;
-
         /** @type {MessagePort?} */
         this._backendPort = null;
+
+        /** @type {import('shared-worker').ApiMap} */
+        this._apiMap = createApiMap([
+            ['registerBackendPort', this._onRegisterBackendPort.bind(this)],
+            ['connectToBackend1', this._onConnectToBackend1.bind(this)],
+        ]);
     }
 
     /**
      *
      */
     prepare() {
-        addEventListener('connect', (/** @type {MessageEvent} */ connectEvent) => {
-            const port = connectEvent.ports[0];
-            port.addEventListener('message', (messageEvent) => {
-                const {data} = messageEvent;
-                const {action} = data;
-                this._count++;
-                if (action === 'registerBackendPort') {
-                    this._backendPort = port;
-                } else if (action === 'connectToBackend1') {
-                    if (this._backendPort !== null) {
-                        this._backendPort.postMessage({action: 'connectToBackend2'}, [port]);
-                    } else {
-                        console.error('SharedWorkerBridge: backend port is not registered');
-                    }
-                }
-                console.log('popup-worker.js received message:', messageEvent.data, this._count);
+        addEventListener('connect', (connectEvent) => {
+            const interlocutorPort = (/** @type {MessageEvent} */ (connectEvent)).ports[0];
+            interlocutorPort.addEventListener('message', (/** @type {MessageEvent<import('shared-worker').ApiMessageAny>} */ event) => {
+                console.log('popup-worker.js received message:', event.data);
+                const message = event.data;
+                return invokeApiMapHandler(this._apiMap, message.action, message.params, [interlocutorPort, event.ports], () => {});
             });
-            port.start();
+            interlocutorPort.start();
         });
+    }
+
+    /** @type {import('shared-worker').ApiHandler<'registerBackendPort'>} */
+    _onRegisterBackendPort(_params, interlocutorPort, _ports) {
+        this._backendPort = interlocutorPort;
+    }
+
+    /** @type {import('shared-worker').ApiHandler<'connectToBackend1'>} */
+    _onConnectToBackend1(_params, _interlocutorPort, ports) {
+        if (this._backendPort !== null) {
+            this._backendPort.postMessage(void 0, [ports[0]]); // connectToBackend2
+        } else {
+            log.error('SharedWorkerBridge: backend port is not registered');
+        }
     }
 }
 

@@ -302,16 +302,10 @@ export class Backend {
             if (self.constructor.name === 'Window') {
                 const sharedWorkerBridge = new SharedWorker(new URL('../comm/shared-worker-bridge.js', import.meta.url), {type: 'module'});
                 sharedWorkerBridge.port.postMessage({action: 'registerBackendPort'});
-                sharedWorkerBridge.port.addEventListener('message', (e) => {
+                sharedWorkerBridge.port.addEventListener('message', (/** @type {MessageEvent} */ e) => {
+                    // connectToBackend2
                     console.log('received message:', e);
-                    const {data} = e;
-                    const {action} = data;
-                    if (action === 'connectToBackend2') {
-                        console.log('received message:', action);
-                        const mc = new MessageChannel();
-                        mc.port1.onmessage = this._onPmMessage.bind(this);
-                        e.ports[0].postMessage({action: 'connectToBackend3'}, [mc.port2]);
-                    }
+                    e.ports[0].onmessage = this._onPmMessage.bind(this);
                 });
                 sharedWorkerBridge.port.start();
             }
@@ -452,16 +446,13 @@ export class Backend {
     }
 
     /**
-     * @param {ExtendableMessageEvent|MessageEvent} event
+     * @param {MessageEvent<import('api').PmApiMessageAny>} event
      * @returns {boolean}
      */
     _onPmMessage(event) {
         console.log(`[${self.constructor.name}] received PM message`, event);
-        /** @type {import('api').PmApiMessageAny} */
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const message = event.data;
-        const source = /** @type {MessagePort} */ (event.source);
-        return invokeApiMapHandler(this._pmApiMap, message.action, message.params, [source, event.ports], () => {});
+        const {action, params} = event.data;
+        return invokeApiMapHandler(this._pmApiMap, action, params, [event.ports], () => {});
     }
 
     /**

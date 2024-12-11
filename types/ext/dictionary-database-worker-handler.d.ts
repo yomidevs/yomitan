@@ -15,19 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DrawMediaRequest} from 'dictionary-database';
-
-export type OnProgressCallback = (...args: unknown[]) => void;
-
 export type MessageToWorker = (
-    DrawMediaMessage
+    ConnectToDatabaseWorker
 );
 
-export type DrawMediaMessage = {
-    action: 'drawMedia';
-    params: DrawMediaMessageParams;
-};
-
-export type DrawMediaMessageParams = {
-    items: DrawMediaRequest[];
+export type ConnectToDatabaseWorker = {
+    action: 'connectToDatabaseWorker';
+    params: null;
 };

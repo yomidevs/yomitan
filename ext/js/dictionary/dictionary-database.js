@@ -17,6 +17,7 @@
  */
 
 import {initWasm, Resvg} from '../../lib/resvg-wasm.js';
+import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {log} from '../core/log.js';
 import {stringReverse} from '../core/utilities.js';
 import {Database} from '../data/database.js';
@@ -68,11 +69,15 @@ export class DictionaryDatabase {
          * @type {Uint8Array?}
          */
         this._resvgFontBuffer = null;
+
+        /** @type {import('dictionary-database').ApiMap} */
+        this._apiMap = createApiMap([
+            ['drawMedia', this._onDrawMedia.bind(this)],
+        ]);
     }
 
     /**
      *
-     * @param applicationPort
      */
     async prepare() {
         console.log(self.constructor.name);
@@ -387,31 +392,6 @@ export class DictionaryDatabase {
         /** @type {import('dictionary-database').FindPredicate<import('dictionary-database').MediaRequest, import('dictionary-database').MediaDataArrayBufferContent>} */
         const predicate = (row, item) => (row.dictionary === item.dictionary);
         return this._findMultiBulk('media', ['path'], items, this._createOnlyQuery4, predicate, this._createMediaBind);
-    }
-
-    /**
-     * @param {MessagePort} port
-     */
-    async connectToDatabaseWorker(port) {
-        console.log(`[${self.constructor.name}] connecting to database worker`);
-        if (this._worker !== null) {
-            // executes outside of worker
-            this._worker.postMessage({action: 'connectToDatabaseWorker'}, [port]);
-            return;
-        }
-        // executes inside worker
-        port.onmessage = (event) => {
-            console.log(`[${self.constructor.name}] received message from main thread`, event.data);
-            const {action, params} = event.data;
-            switch (action) {
-                case 'drawMedia':
-                    void this.drawMedia(params.requests, port);
-                    break;
-                default:
-                    log.error(`[${self.constructor.name}] unknown action: ${action}`);
-                    break;
-            }
-        };
     }
 
     /**
@@ -853,5 +833,30 @@ export class DictionaryDatabase {
      */
     _splitField(field) {
         return typeof field === 'string' && field.length > 0 ? field.split(' ') : [];
+    }
+
+    // Parent-Worker API
+
+    /**
+     * @param {MessagePort} port
+     */
+    async connectToDatabaseWorker(port) {
+        console.log(`[${self.constructor.name}] connecting to database worker`);
+        if (this._worker !== null) {
+            // executes outside of worker
+            this._worker.postMessage({action: 'connectToDatabaseWorker'}, [port]);
+            return;
+        }
+        // executes inside worker
+        port.onmessage = (/** @type {MessageEvent<import('dictionary-database').ApiMessageAny>} */event) => {
+            console.log(`[${self.constructor.name}] received message`, event);
+            const {action, params} = event.data;
+            return invokeApiMapHandler(this._apiMap, action, params, [port], () => {});
+        };
+    }
+
+    /** @type {import('dictionary-database').ApiHandler<'drawMedia'>} */
+    _onDrawMedia(params, port) {
+        void this.drawMedia(params.requests, port);
     }
 }

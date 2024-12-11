@@ -274,3 +274,57 @@ export type CreateResult<TItem = unknown, TRow = unknown, TResult = unknown> = (
 export type DictionarySet = {
     has(value: string): boolean;
 };
+
+/** API for communicating with its own worker */
+
+import type {
+    ApiMap as BaseApiMap,
+    ApiMapInit as BaseApiMapInit,
+    ApiHandler as BaseApiHandler,
+    ApiParams as BaseApiParams,
+    ApiReturn as BaseApiReturn,
+    ApiNames as BaseApiNames,
+    ApiParam as BaseApiParam,
+    ApiParamNames as BaseApiParamNames,
+    ApiParamsAny as BaseApiParamsAny,
+} from './api-map';
+
+type ApiSurface = {
+    drawMedia: {
+        params: {
+            requests: DrawMediaRequest[];
+        };
+        return: void;
+    };
+    dummy: {
+        params: void;
+        return: void;
+    };
+};
+
+type ApiExtraArgs = [port: MessagePort];
+
+export type ApiNames = BaseApiNames<ApiSurface>;
+
+export type ApiMap = BaseApiMap<ApiSurface, ApiExtraArgs>;
+
+export type ApiMapInit = BaseApiMapInit<ApiSurface, ApiExtraArgs>;
+
+export type ApiHandler<TName extends ApiNames> = BaseApiHandler<ApiSurface[TName], ApiExtraArgs>;
+
+export type ApiHandlerNoExtraArgs<TName extends ApiNames> = BaseApiHandler<ApiSurface[TName], []>;
+
+export type ApiParams<TName extends ApiNames> = BaseApiParams<ApiSurface[TName]>;
+
+export type ApiParam<TName extends ApiNames, TParamName extends BaseApiParamNames<ApiSurface[TName]>> = BaseApiParam<ApiSurface[TName], TParamName>;
+
+export type ApiReturn<TName extends ApiNames> = BaseApiReturn<ApiSurface[TName]>;
+
+export type ApiParamsAny = BaseApiParamsAny<ApiSurface>;
+
+export type ApiMessageAny = {[name in ApiNames]: ApiMessage<name>}[ApiNames];
+
+type ApiMessage<TName extends ApiNames> = {
+    action: TName;
+    params: ApiParams<TName>;
+};
