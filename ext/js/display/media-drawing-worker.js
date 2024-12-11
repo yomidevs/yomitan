@@ -53,7 +53,6 @@ export class MediaDrawingWorker {
      *
      */
     async prepare() {
-        console.log(`[${self.constructor.name}] prepare`);
         addEventListener('message', (event) => {
             /** @type {import('api').PmApiMessageAny} */
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -64,7 +63,6 @@ export class MediaDrawingWorker {
 
     /** @type {import('api').PmApiHandler<'drawMedia'>} */
     async _onDrawMedia({requests}) {
-        console.log('drawMedia', requests);
         this._generation++;
         this._canvasesByGeneration.set(this._generation, requests.map((request) => request.canvas));
         this._cleanOldGenerations();
@@ -78,17 +76,14 @@ export class MediaDrawingWorker {
 
     /** @type {import('api').PmApiHandler<'drawBufferToCanvases'>} */
     async _onDrawBufferToCanvases({buffer, width, height, canvasIndexes, generation}) {
-        console.log('drawBufferToCanvases', buffer, width, height, canvasIndexes, generation);
         try {
             const canvases = this._canvasesByGeneration.get(generation);
             if (typeof canvases === 'undefined') {
                 return;
             }
             const imageData = new ImageData(new Uint8ClampedArray(buffer), width, height);
-            console.log('imageData', imageData);
             for (const ci of canvasIndexes) {
                 const c = canvases[ci];
-                console.log('drawing to canvas', c);
                 c.getContext('2d')?.putImageData(imageData, 0, 0);
             }
         } catch (e) {
@@ -98,7 +93,6 @@ export class MediaDrawingWorker {
 
     /** @type {import('api').PmApiHandler<'drawDecodedImageToCanvases'>} */
     async _onDrawDecodedImageToCanvases({decodedImage, canvasIndexes, generation}) {
-        console.log('drawDecodedImageToCanvases', decodedImage, canvasIndexes, generation);
         try {
             const canvases = this._canvasesByGeneration.get(generation);
             if (typeof canvases === 'undefined') {
@@ -106,7 +100,6 @@ export class MediaDrawingWorker {
             }
             for (const ci of canvasIndexes) {
                 const c = canvases[ci];
-                console.log('drawing to canvas', c);
                 c.getContext('2d')?.drawImage(decodedImage, 0, 0, c.width, c.height);
             }
         } catch (e) {
@@ -120,7 +113,6 @@ export class MediaDrawingWorker {
             return;
         }
         const dbPort = ports[0];
-        console.log('connectToDatabaseWorker', dbPort);
         this._dbPort = dbPort;
         dbPort.addEventListener('message', (/** @type {MessageEvent<import('api').PmApiMessageAny>} */ event) => {
             const message = event.data;

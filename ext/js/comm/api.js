@@ -268,7 +268,6 @@ export class API {
      * @param {Transferable[]} transferables
      */
     drawMedia(requests, transferables) {
-        console.log('drawMedia', requests);
         this._mediaDrawingWorker?.postMessage({action: 'drawMedia', params: {requests}}, transferables);
     }
 
@@ -393,7 +392,6 @@ export class API {
      * @param {MessagePort} port
      */
     connectToDatabaseWorker(port) {
-        console.log('connectToDatabaseWorker', port);
         this._pmInvoke('connectToDatabaseWorker', void 0, [port]);
     }
 
@@ -447,10 +445,8 @@ export class API {
      * @param {Transferable[]} transferables
      */
     _pmInvoke(action, params, transferables) {
-        console.log('serviceWorker', 'serviceWorker' in navigator, navigator.serviceWorker);
-        console.log(`[${self.constructor.name}] _pmInvoke ${action}`, params);
-        // on firefox, there is no service worker, so instead we use extension.getBackgroundPage()
-        // unfortunately, there is a bug that prevents us from transfering OffscreenCanvas objects: https://bugzilla.mozilla.org/show_bug.cgi?id=1928874
+        // on firefox, there is no service worker, so we instead use a MessageChannel which is established
+        // via a handshake via a SharedWorker
         if (!('serviceWorker' in navigator)) {
             if (this._backendPort === null) {
                 log.error('no backend port available');

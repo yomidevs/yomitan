@@ -80,7 +80,6 @@ export class DictionaryDatabase {
      *
      */
     async prepare() {
-        console.log(self.constructor.name);
         // do not do upgrades in web workers as they are considered to be children of the main thread and are not responsible for database upgrades
         const upgrade = self.constructor.name !== 'Window' ?
             null :
@@ -161,7 +160,6 @@ export class DictionaryDatabase {
 
         // when we are not a worker ourselves, create a worker which is basically just a wrapper around this class, which we can use to offload some functions to
         if (self.constructor.name === 'Window') {
-            console.log(`[${self.constructor.name}] creating worker`);
             this._worker = new Worker('/js/dictionary/dictionary-database-worker-main.js', {type: 'module'});
             this._worker.addEventListener('error', (event) => {
                 log.log('Worker terminated with error:', event);
@@ -171,7 +169,6 @@ export class DictionaryDatabase {
             });
         } else {
             // when we are the worker, prepare to need to do some SVG work and load appropriate wasm & fonts
-            console.log(`[${self.constructor.name}] loading wasm`);
             await initWasm(fetch('/lib/resvg.wasm'));
 
             const font = await fetch('/fonts/NotoSansJP-Regular.ttf');
@@ -400,13 +397,10 @@ export class DictionaryDatabase {
      */
     async drawMedia(items, source) {
         if (this._worker !== null) { // if a worker is available, offload the work to it
-            console.log(`[${self.constructor.name}] sending drawMedia to worker`, items);
             this._worker.postMessage({action: 'drawMedia', params: {items}}, [source]);
             return;
         }
         // otherwise, you are the worker, so do the work
-        console.log(`[${self.constructor.name}] executing drawMedia`, items);
-
         performance.mark('drawMedia:start');
 
         // merge items with the same path to reduce the number of database queries. collects the canvases into a single array for each path.
@@ -421,7 +415,6 @@ export class DictionaryDatabase {
             groupedItems.get(key)?.canvasIndexes.push(canvasIndex);
         }
         const groupedItemsArray = [...groupedItems.values()];
-        console.log(groupedItemsArray);
 
         /** @type {import('dictionary-database').FindPredicate<import('dictionary-database').MediaRequest, import('dictionary-database').MediaDataArrayBufferContent>} */
         const predicate = (row, item) => (row.dictionary === item.dictionary);
@@ -436,7 +429,6 @@ export class DictionaryDatabase {
         performance.mark('drawMedia:draw:start');
         for (const m of results) {
             if (m.mediaType === 'image/svg+xml') {
-                console.log('drawing svg', m);
                 performance.mark('drawMedia:draw:svg:start');
                 /** @type {import('@resvg/resvg-wasm').ResvgRenderOptions} */
                 const opts = {
@@ -450,7 +442,6 @@ export class DictionaryDatabase {
                 };
                 const resvgJS = new Resvg(new Uint8Array(m.content), opts);
                 const render = resvgJS.render();
-                console.log('sending drawBufferToCanvases');
                 source.postMessage({action: 'drawBufferToCanvases', params: {buffer: render.pixels.buffer, width: render.width, height: render.height, canvasIndexes: m.canvasIndexes, generation: m.generation}}, [render.pixels.buffer]);
                 performance.mark('drawMedia:draw:svg:end');
                 performance.measure('drawMedia:draw:svg', 'drawMedia:draw:svg:start', 'drawMedia:draw:svg:end');
@@ -470,7 +461,6 @@ export class DictionaryDatabase {
                         source.postMessage({action: 'drawDecodedImageToCanvases', params: {decodedImage: decodedImageResult.image, canvasIndexes: m.canvasIndexes, generation: m.generation}}, [decodedImageResult.image]);
                     });
                 } else {
-                    console.log('drawing image', m);
                     const image = new Blob([m.content], {type: m.mediaType});
                     await createImageBitmap(image).then((decodedImage) => {
                         // we need to do a dumb hack where we convert this ImageBitmap to an ImageData by drawing it to a temporary canvas, because Firefox doesn't support transferring ImageBitmaps cross-process
@@ -845,7 +835,6 @@ export class DictionaryDatabase {
      * @param {MessagePort} port
      */
     async connectToDatabaseWorker(port) {
-        console.log(`[${self.constructor.name}] connecting to database worker`);
         if (this._worker !== null) {
             // executes outside of worker
             this._worker.postMessage({action: 'connectToDatabaseWorker'}, [port]);
@@ -853,7 +842,6 @@ export class DictionaryDatabase {
         }
         // executes inside worker
         port.onmessage = (/** @type {MessageEvent<import('dictionary-database').ApiMessageAny>} */event) => {
-            console.log(`[${self.constructor.name}] received message`, event);
             const {action, params} = event.data;
             return invokeApiMapHandler(this._apiMap, action, params, [port], () => {});
         };

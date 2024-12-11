@@ -185,7 +185,6 @@ export class Offscreen {
      *
      */
     _createAndRegisterPort() {
-        console.log(`[${self.constructor.name}] _createAndRegisterPort`);
         const mc = new MessageChannel();
         mc.port1.onmessage = this._onMcMessage.bind(this);
         this._api.registerOffscreenPort([mc.port2]);
@@ -193,7 +192,6 @@ export class Offscreen {
 
     /** @type {import('offscreen').McApiHandler<'connectToDatabaseWorker'>} */
     async _connectToDatabaseWorkerHandler(_params, ports) {
-        console.log(`[${self.constructor.name}] connectToDatabaseWorker from offscreen`, ports);
         await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
     }
 
@@ -202,7 +200,6 @@ export class Offscreen {
      */
     _onMcMessage(event) {
         const {action, params} = event.data;
-        console.log(`[${self.constructor.name}] _onMCMessage`, action, params);
         invokeApiMapHandler(this._mcApiMap, action, params, [event.ports], () => {});
     }
 }

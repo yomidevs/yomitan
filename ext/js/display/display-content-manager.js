@@ -82,7 +82,6 @@ export class DisplayContentManager {
      * Execute media requests
      */
     async executeMediaRequests() {
-        console.log(`[${self.constructor.name}] executeMediaRequests`);
         this._display.application.api.drawMedia(this._loadMediaRequests, this._loadMediaRequests.map(({canvas}) => canvas));
         this._loadMediaRequests = [];
     }

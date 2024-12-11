@@ -260,7 +260,6 @@ export class Backend {
 
     /** @type {import('api').PmApiHandler<'connectToDatabaseWorker'>} */
     async _onPmConnectToDatabaseWorker(_params, ports) {
-        console.log('_onPmConnectToDatabaseWorker', ports);
         if (ports !== null && ports.length > 0) {
             await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
         }
@@ -268,7 +267,6 @@ export class Backend {
 
     /** @type {import('api').PmApiHandler<'registerOffscreenPort'>} */
     async _onPmApiRegisterOffscreenPort(_params, ports) {
-        console.log('_onPmApiRegisterOffscreenPort', ports);
         if (ports !== null && ports.length > 0) {
             await this._offscreen?.registerOffscreenPort(ports[0]);
         }
@@ -304,7 +302,6 @@ export class Backend {
                 sharedWorkerBridge.port.postMessage({action: 'registerBackendPort'});
                 sharedWorkerBridge.port.addEventListener('message', (/** @type {MessageEvent} */ e) => {
                     // connectToBackend2
-                    console.log('received message:', e);
                     e.ports[0].onmessage = this._onPmMessage.bind(this);
                 });
                 sharedWorkerBridge.port.start();
@@ -441,7 +438,6 @@ export class Backend {
      * @returns {boolean}
      */
     _onMessage({action, params}, sender, callback) {
-        console.log(`[${self.constructor.name}] received message`, {action, params, sender});
         return invokeApiMapHandler(this._apiMap, action, params, [sender], callback);
     }
 
@@ -450,7 +446,6 @@ export class Backend {
      * @returns {boolean}
      */
     _onPmMessage(event) {
-        console.log(`[${self.constructor.name}] received PM message`, event);
         const {action, params} = event.data;
         return invokeApiMapHandler(this._pmApiMap, action, params, [event.ports], () => {});
     }
@@ -1540,7 +1535,6 @@ export class Backend {
         let i = 0;
         const ii = text.length;
         while (i < ii) {
-            console.log('yyy');
             const {dictionaryEntries, originalTextLength} = await this._translator.findTerms(
                 mode,
                 text.substring(i, i + scanLength),

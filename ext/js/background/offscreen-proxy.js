@@ -211,7 +211,6 @@ export class DictionaryDatabaseProxy {
      * @returns {Promise<void>}
      */
     async connectToDatabaseWorker(port) {
-        console.log('connectToDatabaseWorker', port);
         this._offscreen.sendMessageViaPort({action: 'connectToDatabaseWorker'}, [port]);
     }
 }

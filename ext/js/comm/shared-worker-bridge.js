@@ -59,9 +59,8 @@ export class SharedWorkerBridge {
         addEventListener('connect', (connectEvent) => {
             const interlocutorPort = (/** @type {MessageEvent} */ (connectEvent)).ports[0];
             interlocutorPort.addEventListener('message', (/** @type {MessageEvent<import('shared-worker').ApiMessageAny>} */ event) => {
-                console.log('popup-worker.js received message:', event.data);
-                const message = event.data;
-                return invokeApiMapHandler(this._apiMap, message.action, message.params, [interlocutorPort, event.ports], () => {});
+                const {action, params} = event.data;
+                return invokeApiMapHandler(this._apiMap, action, params, [interlocutorPort, event.ports], () => {});
             });
             interlocutorPort.start();
         });

@@ -198,10 +198,8 @@ export class Application extends EventDispatcher {
         // not in the content script context.
         const backendPort = (!('serviceWorker' in navigator)) && window.location.protocol === new URL(import.meta.url).protocol ?
             (() => {
-                console.log('loading', new URL('comm/shared-worker-bridge.js', import.meta.url));
                 const sharedWorkerBridge = new SharedWorker(new URL('comm/shared-worker-bridge.js', import.meta.url), {type: 'module'});
                 const backendChannel = new MessageChannel();
-                console.log('sending connectToBackend1');
                 sharedWorkerBridge.port.postMessage({action: 'connectToBackend1'}, [backendChannel.port1]);
                 sharedWorkerBridge.port.close();
                 return backendChannel.port2;
@@ -215,7 +213,6 @@ export class Application extends EventDispatcher {
         const mediaDrawingWorker = window.location.protocol === new URL(import.meta.url).protocol ? new Worker(new URL('display/media-drawing-worker.js', import.meta.url), {type: 'module'}) : null;
         mediaDrawingWorker?.postMessage({action: 'connectToDatabaseWorker'}, [mediaDrawingWorkerToBackendChannel.port2]);
 
-        console.log('hi port', backendPort);
         const api = new API(webExtension, mediaDrawingWorker, backendPort);
         await waitForBackendReady(webExtension);
         if (mediaDrawingWorker !== null) {
