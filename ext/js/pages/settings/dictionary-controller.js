@@ -274,10 +274,10 @@ class DictionaryEntry {
         outdateElement.hidden = (version >= 3);
         countsElement.textContent = this._counts !== null ? JSON.stringify(this._counts, null, 4) : '';
         wildcardSupportedElement.checked = prefixWildcardsSupported;
-        partsOfSpeechFilterSetting.hidden = !counts.terms.total;
+        partsOfSpeechFilterSetting.hidden = !counts?.terms.total;
         partsOfSpeechFilterToggle.dataset.setting = `dictionaries[${this._index}].partsOfSpeechFilter`;
 
-        useDeinflectionsSetting.hidden = !counts.terms.total;
+        useDeinflectionsSetting.hidden = !counts?.terms.total;
         useDeinflectionsToggle.dataset.setting = `dictionaries[${this._index}].useDeinflections`;
 
         this._setupDetails(detailsTableElement);

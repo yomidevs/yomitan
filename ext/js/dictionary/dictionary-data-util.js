@@ -94,7 +94,7 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
             });
         }
         const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
-        const freqCount = currentDictionaryInfo?.counts.termMeta.freq ?? 0;
+        const freqCount = currentDictionaryInfo?.counts?.termMeta.freq ?? 0;
         results.push({dictionary, frequencies, dictionaryAlias, freqCount});
     }
     return results;
@@ -138,7 +138,7 @@ export function groupKanjiFrequencies(sourceFrequencies, dictionaryInfo) {
             });
         }
         const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
-        const freqCount = currentDictionaryInfo?.counts.kanjiMeta.freq ?? 0;
+        const freqCount = currentDictionaryInfo?.counts?.kanjiMeta.freq ?? 0;
         results.push({dictionary, frequencies, dictionaryAlias, freqCount});
     }
     return results;

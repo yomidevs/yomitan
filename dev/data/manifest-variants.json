@@ -1,9 +1,9 @@
 {
     "manifest": {
         "manifest_version": 3,
-        "name": "Yomitan",
+        "name": "Yomitan Popup Dictionary",
         "version": "$YOMITAN_VERSION",
-        "description": "Japanese dictionary with Anki integration",
+        "description": "Popup dictionary for language learning",
         "author": {
             "email": "themoeway@googlegroups.com"
         },
@@ -187,7 +187,7 @@
                     "path": [
                         "author"
                     ],
-                    "value": "TheMoeWay"
+                    "value": "Yomidevs"
                 },
                 {
                     "action": "delete",
@@ -333,7 +333,7 @@
                     "path": [
                         "author"
                     ],
-                    "value": "TheMoeWay"
+                    "value": "Yomidevs"
                 },
                 {
                     "action": "remove",

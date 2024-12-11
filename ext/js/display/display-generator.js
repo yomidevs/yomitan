@@ -172,8 +172,8 @@ export class DisplayGenerator {
                         dictionaryContentArray.push('URL: ' + currentDictionaryInfo.url);
                     }
 
-                    const totalTerms = currentDictionaryInfo.counts.terms.total;
-                    if (totalTerms > 0) {
+                    const totalTerms = currentDictionaryInfo?.counts?.terms?.total;
+                    if (!!totalTerms && totalTerms > 0) {
                         dictionaryContentArray.push('Term Count: ' + totalTerms.toString());
                     }
 
@@ -231,8 +231,8 @@ export class DisplayGenerator {
                 dictionaryContentArray.push('URL: ' + currentDictionaryInfo.url);
             }
 
-            const totalKanji = currentDictionaryInfo.counts.kanji.total;
-            if (totalKanji > 0) {
+            const totalKanji = currentDictionaryInfo?.counts?.kanji?.total;
+            if (!!totalKanji && totalKanji > 0) {
                 dictionaryContentArray.push('Kanji Count: ' + totalKanji.toString());
             }
 
@@ -860,7 +860,7 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createFrequencyGroup(details, kanji) {
-        const {dictionary, dictionaryAlias, frequencies} = details;
+        const {dictionary, dictionaryAlias, frequencies, freqCount} = details;
 
         const node = this._instantiate('frequency-group-item');
         const body = this._querySelector(node, '.tag-body-content');
@@ -875,8 +875,8 @@ export class DisplayGenerator {
             const item = frequencies[i];
             const itemNode = (
                 kanji ?
-                this._createKanjiFrequency(/** @type {import('dictionary-data-util').KanjiFrequency} */ (item), dictionary, dictionaryAlias) :
-                this._createTermFrequency(/** @type {import('dictionary-data-util').TermFrequency} */ (item), dictionary, dictionaryAlias)
+                this._createKanjiFrequency(/** @type {import('dictionary-data-util').KanjiFrequency} */ (item), dictionary, dictionaryAlias, freqCount?.toString()) :
+                this._createTermFrequency(/** @type {import('dictionary-data-util').TermFrequency} */ (item), dictionary, dictionaryAlias, freqCount?.toString())
             );
             itemNode.dataset.index = `${i}`;
             body.appendChild(itemNode);
@@ -885,7 +885,7 @@ export class DisplayGenerator {
         body.dataset.count = `${ii}`;
         node.dataset.count = `${ii}`;
         node.dataset.details = dictionary;
-        tag.dataset.details = dictionary + '\nFrequency Count: ' + details.freqCount?.toString();
+        tag.dataset.details = dictionary + '\nDictionary size: ' + freqCount?.toString() + (kanji ? ' kanji' : ' terms');
         return node;
     }
 
@@ -893,9 +893,10 @@ export class DisplayGenerator {
      * @param {import('dictionary-data-util').TermFrequency} details
      * @param {string} dictionary
      * @param {string} dictionaryAlias
+     * @param {string} freqCount
      * @returns {HTMLElement}
      */
-    _createTermFrequency(details, dictionary, dictionaryAlias) {
+    _createTermFrequency(details, dictionary, dictionaryAlias, freqCount) {
         const {term, reading, values} = details;
         const node = this._instantiate('term-frequency-item');
         const tagLabel = this._querySelector(node, '.tag-label-content');
@@ -917,7 +918,7 @@ export class DisplayGenerator {
         node.dataset.readingIsSame = `${reading === term}`;
         node.dataset.dictionary = dictionary;
         node.dataset.details = dictionary;
-        tag.dataset.details = dictionary;
+        tag.dataset.details = dictionary + '\nDictionary size: ' + freqCount + ' terms';
         return node;
     }
 
@@ -925,9 +926,10 @@ export class DisplayGenerator {
      * @param {import('dictionary-data-util').KanjiFrequency} details
      * @param {string} dictionary
      * @param {string} dictionaryAlias
+     * @param {string} freqCount
      * @returns {HTMLElement}
      */
-    _createKanjiFrequency(details, dictionary, dictionaryAlias) {
+    _createKanjiFrequency(details, dictionary, dictionaryAlias, freqCount) {
         const {character, values} = details;
         const node = this._instantiate('kanji-frequency-item');
         const tagLabel = this._querySelector(node, '.tag-label-content');
@@ -940,7 +942,7 @@ export class DisplayGenerator {
         node.dataset.character = character;
         node.dataset.dictionary = dictionary;
         node.dataset.details = dictionary;
-        tag.dataset.details = dictionary;
+        tag.dataset.details = dictionary + '\nDictionary size: ' + freqCount + ' kanji';
 
         return node;
     }
