@@ -29,8 +29,8 @@ import {base64ToArrayBuffer} from '../data/array-buffer-util.js';
  *   so it must be done in the offscreen page.
  *
  * - Create a worker for image rendering, which both selects the images from the database,
- *   decodes/rasterizes them, and then draws them on OffscreenCanvas objects provided by the
- *   popup.
+ *   decodes/rasterizes them, and then sends (= postMessage transfers) them back to a worker
+ *   in the popup to be rendered onto OffscreenCanvas.
  *
  * - Provide a longer lifetime for the dictionary database. The background service worker can be
  *   terminated by the web browser, which means that when it restarts, it has to go through its

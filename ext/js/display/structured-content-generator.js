@@ -66,7 +66,6 @@ export class StructuredContentGenerator {
             preferredWidth,
             preferredHeight,
             title,
-            alt,
             pixelated,
             imageRendering,
             appearance,

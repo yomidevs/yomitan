@@ -86,7 +86,7 @@
         "no-shadow": ["error", {"builtinGlobals": false}],
         "no-shadow-restricted-names": "error",
         "no-template-curly-in-string": "error",
-        "no-undef": "off",
+        "no-undef": "error",
         "no-undefined": "error",
         "no-underscore-dangle": ["error", {"allowAfterThis": true, "allowAfterSuper": false, "allowAfterThisConstructor": false}],
         "no-unexpected-multiline": "error",
