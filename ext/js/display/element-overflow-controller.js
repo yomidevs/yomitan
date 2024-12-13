@@ -117,7 +117,6 @@ export class ElementOverflowController {
         this._elements.length = 0;
         this._eventListeners.removeAllEventListeners();
         this._windowEventListeners.removeAllEventListeners();
-        this._dictionaries.clear();
     }
 
     // Private
