@@ -41,6 +41,6 @@
             "url": "/ext/data/schemas/recommended-dictionaries-schema.json"
         }
     ],
-    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "typescript.tsdk": "node_modules/typescript/lib",
     "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix"
 }
