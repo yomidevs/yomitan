@@ -551,10 +551,12 @@
         {
             "files": [
                 "ext/js/core/api-map.js",
+                "ext/js/core/event-listener-collection.js",
                 "ext/js/core/extension-error.js",
                 "ext/js/core/json.js",
                 "ext/js/data/anki-note-data-creator.js",
                 "ext/js/dictionary/dictionary-data-util.js",
+                "ext/js/display/display-content-manager.js",
                 "ext/js/display/pronunciation-generator.js",
                 "ext/js/display/structured-content-generator.js",
                 "ext/js/dom/css-style-applier.js",
@@ -575,6 +577,7 @@
         },
         {
             "files": [
+                "ext/js/core/api-map.js",
                 "ext/js/core/event-dispatcher.js",
                 "ext/js/core/extension-error.js",
                 "ext/js/core/json.js",
@@ -582,6 +585,7 @@
                 "ext/js/core/to-error.js",
                 "ext/js/core/utilities.js",
                 "ext/js/data/database.js",
+                "ext/js/dictionary/dictionary-database.js",
                 "ext/js/dictionary/dictionary-importer.js",
                 "ext/js/dictionary/dictionary-worker-handler.js",
                 "ext/js/dictionary/dictionary-worker-main.js",
@@ -623,6 +627,7 @@
                 "ext/js/data/json-schema.js",
                 "ext/js/data/options-util.js",
                 "ext/js/data/permissions-util.js",
+                "ext/js/dictionary/dictionary-database.js",
                 "ext/js/dom/native-simple-dom-parser.js",
                 "ext/js/dom/simple-dom-parser.js",
                 "ext/js/extension/environment.js",

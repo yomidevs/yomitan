@@ -463,6 +463,7 @@ export class DictionaryDatabase {
                     });
                 } else {
                     const image = new Blob([m.content], {type: m.mediaType});
+                    // eslint-disable-next-line no-undef
                     await createImageBitmap(image).then((decodedImage) => {
                         // we need to do a dumb hack where we convert this ImageBitmap to an ImageData by drawing it to a temporary canvas, because Firefox doesn't support transferring ImageBitmaps cross-process
                         const canvas = new OffscreenCanvas(decodedImage.width, decodedImage.height);

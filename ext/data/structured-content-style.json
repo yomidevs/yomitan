@@ -2,7 +2,8 @@
     {
         "selectors": [".gloss-image-container"],
         "styles": [
-            ["display", "inline-block"]
+            ["display", "inline-block"],
+            ["font-size", "1px"]
         ]
     },
     {
@@ -23,81 +24,18 @@
         ]
     },
     {
-        "selectors": [".gloss-image-container-overlay"],
-        "styles": [
-            ["position", "absolute"],
-            ["left", "0"],
-            ["top", "0"],
-            ["width", "100%"],
-            ["height", "100%"],
-            ["display", "table"],
-            ["table-layout", "fixed"],
-            ["white-space", "normal"],
-            ["font-size", "initial"],
-            ["line-height", "initial"],
-            ["color", "initial"]
-        ]
-    },
-    {
-        "selectors": [".gloss-image-link[data-has-image=true][data-image-load-state=load-error] .gloss-image-container-overlay::after"],
-        "styles": [
-            ["content", "'Image failed to load'"],
-            ["display", "table-cell"],
-            ["width", "100%"],
-            ["height", "100%"],
-            ["vertical-align", "middle"],
-            ["text-align", "center"],
-            ["padding", "0.25em"]
-        ]
-    },
-    {
-        "selectors": [".gloss-image-background"],
-        "styles": [
-            ["--image", "none"],
-            ["position", "absolute"],
-            ["left", "0"],
-            ["top", "0"],
-            ["width", "100%"],
-            ["height", "100%"],
-            ["-webkit-mask-repeat", "no-repeat"],
-            ["-webkit-mask-position", "center center"],
-            ["-webkit-mask-mode", "alpha"],
-            ["-webkit-mask-size", "contain"],
-            ["-webkit-mask-image", "var(--image)"],
-            ["mask-repeat", "no-repeat"],
-            ["mask-position", "center center"],
-            ["mask-mode", "alpha"],
-            ["mask-size", "contain"],
-            ["mask-image", "var(--image)"],
-            ["background-color", "currentColor"]
-        ]
-    },
-    {
         "selectors": [".gloss-image"],
         "styles": [
             ["display", "inline-block"],
             ["vertical-align", "top"],
             ["object-fit", "contain"],
             ["border", "none"],
-            ["outline", "none"]
+            ["outline", "none"],
+            ["width", "100%"]
         ]
     },
     {
-        "selectors": [".gloss-image-link[data-has-aspect-ratio=true] .gloss-image"],
-        "styles": [
-        ]
-    },
-    {
-        "selectors": [".gloss-image:not([src])"],
-        "styles": [
-            ["display", "none"]
-        ]
-    },
-    {
-        "selectors": [
-            ".gloss-image-link[data-image-rendering=pixelated] .gloss-image",
-            ".gloss-image-link[data-image-rendering=pixelated] .gloss-image-background"
-        ],
+        "selectors": [".gloss-image-link[data-image-rendering=pixelated] .gloss-image"],
         "styles": [
             ["image-rendering", "auto"],
             ["image-rendering", "-moz-crisp-edges"],
@@ -107,10 +45,7 @@
         ]
     },
     {
-        "selectors": [
-            ".gloss-image-link[data-image-rendering=crisp-edges] .gloss-image",
-            ".gloss-image-link[data-image-rendering=crisp-edges] .gloss-image-background"
-        ],
+        "selectors": [".gloss-image-link[data-image-rendering=crisp-edges] .gloss-image"],
         "styles": [
             ["image-rendering", "auto"],
             ["image-rendering", "-moz-crisp-edges"],
@@ -119,49 +54,9 @@
         ]
     },
     {
-        "selectors": [".gloss-image-link[data-has-aspect-ratio=true] .gloss-image-sizer"],
-        "styles": [
-            ["display", "inline-block"],
-            ["width", "0"],
-            ["vertical-align", "top"],
-            ["font-size", "0"]
-        ]
-    },
-    {
-        "selectors": [".gloss-image-link-text"],
-        "styles": [
-            ["display", "none"],
-            ["line-height", "initial"]
-        ]
-    },
-    {
-        "selectors": [".gloss-image-link-text::before"],
-        "styles": [
-            ["content", "'['"]
-        ]
-    },
-    {
-        "selectors": [".gloss-image-link-text::after"],
-        "styles": [
-            ["content", "']'"]
-        ]
-    },
-    {
-        "selectors": [".gloss-image-description"],
-        "styles": [
-            ["display", "block"],
-            ["white-space", "pre-line"]
-        ]
-    },
-    {
         "selectors": [".gloss-image-link[data-appearance=monochrome] .gloss-image"],
         "styles": [
-        ]
-    },
-    {
-        "selectors": [".gloss-image-link:not([data-appearance=monochrome]) .gloss-image-background"],
-        "styles": [
-            ["display", "none"]
+            ["filter", "grayscale(1)"]
         ]
     },
     {
@@ -259,24 +154,6 @@
         ],
         "styles": [
             ["display", "block"]
-        ]
-    },
-    {
-        "selectors": [
-            ".gloss-image-link[data-collapsed=true] .gloss-image-link-text",
-            ":root[data-glossary-layout-mode=compact] .gloss-image-link[data-collapsible=true] .gloss-image-link-text"
-        ],
-        "styles": [
-            ["display", "inline"]
-        ]
-    },
-    {
-        "selectors": [
-            ".gloss-image-link[data-collapsed=true]~.gloss-image-description",
-            ":root[data-glossary-layout-mode=compact] .gloss-image-description"
-        ],
-        "styles": [
-            ["display", "inline"]
         ]
     },
     {

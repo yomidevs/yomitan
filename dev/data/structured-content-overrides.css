@@ -28,17 +28,9 @@
 .gloss-image-link:hover {
     /* remove-rule */
 }
-.gloss-image-container-overlay {
-    font-size: initial;
-    line-height: initial;
-    color: initial;
-}
 :root[data-browser=firefox] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image,
 :root[data-browser=firefox-mobile] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image {
     /* remove-rule */
-}
-.gloss-image-link-text {
-    line-height: initial;
 }
 .gloss-sc-thead,
 .gloss-sc-tfoot,
