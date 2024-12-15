@@ -49,7 +49,7 @@ export const frenchTransforms = {
                 suffixInflection('a', 'avoir', ['aux'], ['v']),
                 suffixInflection('avons', 'avoir', ['aux'], ['v']),
                 suffixInflection('avez', 'avoir', ['aux'], ['v']),
-                suffixInflection('avont', 'avoir', ['aux'], ['v']),
+                suffixInflection('ont', 'avoir', ['aux'], ['v']),
 
                 // 1er groupe : verbes en -er
                 suffixInflection('e', 'er', ['v'], ['v']),
@@ -1297,10 +1297,16 @@ export const frenchTransforms = {
  // 1er groupe : verbes en -ayer
  suffixInflection('aierai', 'ayer', ['v'], ['v']),
  suffixInflection('aieras', 'ayer', ['v'], ['v']),
- suffixInflection('aiers', 'ayer', ['v'], ['v']),
+ suffixInflection('aiera', 'ayer', ['v'], ['v']),
  suffixInflection('aierons', 'ayer', ['v'], ['v']),
  suffixInflection('aierez', 'ayer', ['v'], ['v']),
  suffixInflection('aieront', 'ayer', ['v'], ['v']),
+ suffixInflection('ayerai', 'ayer', ['v'], ['v']),
+ suffixInflection('ayeras', 'ayer', ['v'], ['v']),
+ suffixInflection('ayera', 'ayer', ['v'], ['v']),
+ suffixInflection('ayerons', 'ayer', ['v'], ['v']),
+ suffixInflection('ayerez', 'ayer', ['v'], ['v']),
+ suffixInflection('ayeront', 'ayer', ['v'], ['v']),
 
  // 1er groupe : verbes en -oyer et uyer
  suffixInflection('oierai', 'oyer', ['v'], ['v']),
@@ -1522,7 +1528,8 @@ suffixInflection('enverront', 'envoyer', ['v'], ['v']),
  suffixInflection('mouvront', 'mouvoir', ['v'], ['v']),
 
  // 3ème groupe : pleuvoir / falloir (verbes impersonnel)
- suffixInflection('pleuvre', 'pleuvoir', ['v'], ['v']),
+ suffixInflection('pleuvra', 'pleuvoir', ['v'], ['v']),
+ suffixInflection('pleuvront', 'pleuvoir', ['v'], ['v']),
  suffixInflection('faudra', 'falloir', ['v'], ['v']),
 
  // 3ème groupe : valoir
@@ -2030,8 +2037,8 @@ suffixInflection('uyez', 'uyer', ['v'], ['v']),
 
  // 2e groupe : haïr (casual conv)
  suffixInflection('hais', 'haïr', ['v'], ['v']),
- suffixInflection('haissons', 'haïr', ['v'], ['v']),
- suffixInflection('haissez', 'haïr', ['v'], ['v']),
+ suffixInflection('haïssons', 'haïr', ['v'], ['v']),
+ suffixInflection('haïssez', 'haïr', ['v'], ['v']),
 
  // 3ème groupe aller
  suffixInflection('va', 'aller', ['v'], ['v']),
@@ -2283,7 +2290,7 @@ suffixInflection('uyez', 'uyer', ['v'], ['v']),
  suffixInflection('lisons', 'lire', ['v'], ['v']),
  suffixInflection('lisez', 'lire', ['v'], ['v']),
 
- // 3ème groupe : verbes en -dire (relire)
+ // 3ème groupe : verbes en -dire (redire)
  suffixInflection('dis', 'dire', ['v'], ['v']),
  suffixInflection('disons', 'dire', ['v'], ['v']),
  suffixInflection('disez', 'dire', ['v'], ['v']),
@@ -2416,11 +2423,11 @@ suffixInflection('èseriez', 'eser', ['v'], ['v']),
 suffixInflection('èseraient', 'eser', ['v'], ['v']),
 
 // 1er groupe : verbes en é(.)er
-suffixInflection('èderais', 'éder', ['v'], ['v']),
-suffixInflection('èderait', 'éder', ['v'], ['v']),
-suffixInflection('èderions', 'éder', ['v'], ['v']),
-suffixInflection('èderiez', 'éder', ['v'], ['v']),
-suffixInflection('èderaient', 'éder', ['v'], ['v']),
+suffixInflection('éderais', 'éder', ['v'], ['v']),
+suffixInflection('éderait', 'éder', ['v'], ['v']),
+suffixInflection('éderions', 'éder', ['v'], ['v']),
+suffixInflection('éderiez', 'éder', ['v'], ['v']),
+suffixInflection('éderaient', 'éder', ['v'], ['v']),
 
 suffixInflection('ébrerais', 'ébrer', ['v'], ['v']),
 suffixInflection('ébrerait', 'ébrer', ['v'], ['v']),
@@ -2569,13 +2576,18 @@ suffixInflection('ayerait', 'ayer', ['v'], ['v']),
 suffixInflection('ayerions', 'ayer', ['v'], ['v']),
 suffixInflection('ayeriez', 'ayer', ['v'], ['v']),
 suffixInflection('ayeraient', 'ayer', ['v'], ['v']),
+suffixInflection('aierais', 'ayer', ['v'], ['v']),
+suffixInflection('aierait', 'ayer', ['v'], ['v']),
+suffixInflection('aierions', 'ayer', ['v'], ['v']),
+suffixInflection('aieriez', 'ayer', ['v'], ['v']),
+suffixInflection('aieraient', 'ayer', ['v'], ['v']),
 
 // 1er groupe : verbes en -oyer et -uyer
-suffixInflection('oyerais', 'oyer', ['v'], ['v']),
-suffixInflection('oyerait', 'oyer', ['v'], ['v']),
-suffixInflection('oyerions', 'oyer', ['v'], ['v']),
-suffixInflection('oyeriez', 'oyer', ['v'], ['v']),
-suffixInflection('oyeraient', 'oyer', ['v'], ['v']),
+suffixInflection('oierais', 'oyer', ['v'], ['v']),
+suffixInflection('oierait', 'oyer', ['v'], ['v']),
+suffixInflection('oierions', 'oyer', ['v'], ['v']),
+suffixInflection('oieriez', 'oyer', ['v'], ['v']),
+suffixInflection('oieraient', 'oyer', ['v'], ['v']),
 
 suffixInflection('uyerais', 'uyer', ['v'], ['v']),
 suffixInflection('uyerait', 'uyer', ['v'], ['v']),
@@ -2607,9 +2619,9 @@ suffixInflection('iraient', 'aller', ['v'], ['v']),
 // 3e groupe : -enir
 suffixInflection('iendrais', 'enir', ['v'], ['v']),
 suffixInflection('iendrait', 'enir', ['v'], ['v']),
-suffixInflection('ienrions', 'enir', ['v'], ['v']),
-suffixInflection('ienriez', 'enir', ['v'], ['v']),
-suffixInflection('iennent', 'enir', ['v'], ['v']),
+suffixInflection('iendrions', 'enir', ['v'], ['v']),
+suffixInflection('iendriez', 'enir', ['v'], ['v']),
+suffixInflection('iendraient', 'enir', ['v'], ['v']),
 
 // 3e groupe : -éir
 suffixInflection('ierais', 'érir', ['v'], ['v']),
@@ -2619,77 +2631,80 @@ suffixInflection('iriez', 'érir', ['v'], ['v']),
 suffixInflection('ièrent', 'érir', ['v'], ['v']),
 
 // 3e groupe : -tir
-suffixInflection('srais', 'tir', ['v'], ['v']),
-suffixInflection('stait', 'tir', ['v'], ['v']),
+suffixInflection('irais', 'tir', ['v'], ['v']),
+suffixInflection('irait', 'tir', ['v'], ['v']),
 suffixInflection('irions', 'tir', ['v'], ['v']),
 suffixInflection('iriez', 'tir', ['v'], ['v']),
 suffixInflection('raient', 'tir', ['v'], ['v']),
 
 // 3e groupe : -êtir
-suffixInflection('êterais', 'êtir', ['v'], ['v']),
-suffixInflection('êterait', 'êtir', ['v'], ['v']),
+suffixInflection('êtirais', 'êtir', ['v'], ['v']),
+suffixInflection('êtirait', 'êtir', ['v'], ['v']),
 suffixInflection('êtirions', 'êtir', ['v'], ['v']),
 suffixInflection('êtiriez', 'êtir', ['v'], ['v']),
 suffixInflection('êtiraient', 'êtir', ['v'], ['v']),
 
 // 3e groupe : -vrir
-suffixInflection('vrais', 'vrir', ['v'], ['v']),
-suffixInflection('vrait', 'vrir', ['v'], ['v']),
-suffixInflection('vrions', 'vrir', ['v'], ['v']),
-suffixInflection('vriez', 'vrir', ['v'], ['v']),
-suffixInflection('vraient', 'vrir', ['v'], ['v']),
+suffixInflection('vrirais', 'vrir', ['v'], ['v']),
+suffixInflection('vrirait', 'vrir', ['v'], ['v']),
+suffixInflection('vririons', 'vrir', ['v'], ['v']),
+suffixInflection('vririez', 'vrir', ['v'], ['v']),
+suffixInflection('vriraient', 'vrir', ['v'], ['v']),
 
 // 3e groupe : -frir
-suffixInflection('freais', 'frir', ['v'], ['v']),
-suffixInflection('freait', 'frir', ['v'], ['v']),
+suffixInflection('frirais', 'frir', ['v'], ['v']),
+suffixInflection('frirait', 'frir', ['v'], ['v']),
 suffixInflection('fririons', 'frir', ['v'], ['v']),
 suffixInflection('fririez', 'frir', ['v'], ['v']),
-suffixInflection('fraient', 'frir', ['v'], ['v']),
+suffixInflection('friraient', 'frir', ['v'], ['v']),
 
 // 3e groupe : -ueillir
 suffixInflection('ueillerais', 'ueillir', ['v'], ['v']),
 suffixInflection('ueillerait', 'ueillir', ['v'], ['v']),
-suffixInflection('ueillirions', 'ueillir', ['v'], ['v']),
-suffixInflection('ueilliriez', 'ueillir', ['v'], ['v']),
+suffixInflection('ueillerions', 'ueillir', ['v'], ['v']),
+suffixInflection('ueilleriez', 'ueillir', ['v'], ['v']),
 suffixInflection('ueilleraient', 'ueillir', ['v'], ['v']),
 
 // 3e groupe : -aillir
-suffixInflection('aillerais', 'aillir', ['v'], ['v']),
-suffixInflection('aillerait', 'aillir', ['v'], ['v']),
+suffixInflection('aillirais', 'aillir', ['v'], ['v']),
+suffixInflection('aillirait', 'aillir', ['v'], ['v']),
 suffixInflection('aillirions', 'aillir', ['v'], ['v']),
 suffixInflection('ailliriez', 'aillir', ['v'], ['v']),
-suffixInflection('ailleraient', 'aillir', ['v'], ['v']),
+suffixInflection('ailliraient', 'aillir', ['v'], ['v']),
 
 // 3e groupe : faillir (exception)
-suffixInflection('faux', 'faillir', ['v'], ['v']),
-suffixInflection('faut', 'faillir', ['v'], ['v']),
+suffixInflection('faillirais', 'faillir', ['v'], ['v']),
+suffixInflection('faillirait', 'faillir', ['v'], ['v']),
+suffixInflection('faillirions', 'faillir', ['v'], ['v']),
+suffixInflection('failliriez', 'faillir', ['v'], ['v']),
+suffixInflection('failliraient', 'faillir', ['v'], ['v']),
 
 // 3e groupe : bouillir
-suffixInflection('bous', 'bouillir', ['v'], ['v']),
-suffixInflection('bout', 'bouillir', ['v'], ['v']),
+suffixInflection('bouillirais', 'bouillir', ['v'], ['v']),
+suffixInflection('bouillirait', 'bouillir', ['v'], ['v']),
 suffixInflection('bouillirions', 'bouillir', ['v'], ['v']),
 suffixInflection('bouilliriez', 'bouillir', ['v'], ['v']),
 suffixInflection('bouilliraient', 'bouillir', ['v'], ['v']),
 
 // 3e groupe : dormir
-suffixInflection('dorais', 'dormir', ['v'], ['v']),
-suffixInflection('dorait', 'dormir', ['v'], ['v']),
+suffixInflection('dormirais', 'dormir', ['v'], ['v']),
+suffixInflection('dormirait', 'dormir', ['v'], ['v']),
 suffixInflection('dormirions', 'dormir', ['v'], ['v']),
 suffixInflection('dormiriez', 'dormir', ['v'], ['v']),
-suffixInflection('doreraient', 'dormir', ['v'], ['v']),
+suffixInflection('dormiraient', 'dormir', ['v'], ['v']),
 
 // 3e groupe : courir
 suffixInflection('courrais', 'courir', ['v'], ['v']),
 suffixInflection('courrait', 'courir', ['v'], ['v']),
-suffixInflection('couririons', 'courir', ['v'], ['v']),
-suffixInflection('couririez', 'courir', ['v'], ['v']),
+suffixInflection('courrions', 'courir', ['v'], ['v']),
+suffixInflection('courriez', 'courir', ['v'], ['v']),
 suffixInflection('courraient', 'courir', ['v'], ['v']),
 
 // 3e groupe : mourir
 suffixInflection('mourrais', 'mourir', ['v'], ['v']),
 suffixInflection('mourrait', 'mourir', ['v'], ['v']),
-suffixInflection('mouririons', 'mourir', ['v'], ['v']),
-suffixInflection('mouririez', 'mourir', ['v'], ['v']),
+suffixInflection('mourrions', 'mourir', ['v'], ['v']),
+suffixInflection('mourriez', 'mourir', ['v'], ['v']),
 suffixInflection('mourraient', 'mourir', ['v'], ['v']),
 
 // 3e groupe : servir
@@ -2713,32 +2728,30 @@ suffixInflection('ouïrions', 'ouïr', ['v'], ['v']),
 suffixInflection('ouïriez', 'ouïr', ['v'], ['v']),
 suffixInflection('ouïraient', 'ouïr', ['v'], ['v']),
 
-// 3e groupe : gésir
-suffixInflection('gisrais', 'gésir', ['v'], ['v']),
-suffixInflection('gisrait', 'gésir', ['v'], ['v']),
-suffixInflection('gésirions', 'gésir', ['v'], ['v']),
-suffixInflection('gésiriez', 'gésir', ['v'], ['v']),
-suffixInflection('gésiraient', 'gésir', ['v'], ['v']),
+// 3e groupe : gésir (rare)
+suffixInflection('gîrais', 'gésir', ['v'], ['v']),
+suffixInflection('gîrait', 'gésir', ['v'], ['v']),
+suffixInflection('gîraient', 'gésir', ['v'], ['v']),
 
 // 3e groupe : cevoir
-suffixInflection('cevois', 'cevoir', ['v'], ['v']),
-suffixInflection('cevoit', 'cevoir', ['v'], ['v']),
-suffixInflection('cevoirions', 'cevoir', ['v'], ['v']),
-suffixInflection('cevoiriez', 'cevoir', ['v'], ['v']),
-suffixInflection('cevoiraient', 'cevoir', ['v'], ['v']),
+suffixInflection('cevrais', 'cevoir', ['v'], ['v']),
+suffixInflection('cevrait', 'cevoir', ['v'], ['v']),
+suffixInflection('cevrions', 'cevoir', ['v'], ['v']),
+suffixInflection('cevriez', 'cevoir', ['v'], ['v']),
+suffixInflection('cevraient', 'cevoir', ['v'], ['v']),
 
 // 3e groupe : voir
 suffixInflection('verrais', 'voir', ['v'], ['v']),
 suffixInflection('verrait', 'voir', ['v'], ['v']),
-suffixInflection('voirions', 'voir', ['v'], ['v']),
-suffixInflection('voiriez', 'voir', ['v'], ['v']),
+suffixInflection('verrions', 'voir', ['v'], ['v']),
+suffixInflection('verriez', 'voir', ['v'], ['v']),
 suffixInflection('verraient', 'voir', ['v'], ['v']),
 
 // 3e groupe : savoir
 suffixInflection('saurais', 'savoir', ['v'], ['v']),
 suffixInflection('saurait', 'savoir', ['v'], ['v']),
-suffixInflection('savoirions', 'savoir', ['v'], ['v']),
-suffixInflection('savoiriez', 'savoir', ['v'], ['v']),
+suffixInflection('saurions', 'savoir', ['v'], ['v']),
+suffixInflection('sauriez', 'savoir', ['v'], ['v']),
 suffixInflection('sauraient', 'savoir', ['v'], ['v']),
 
 // 3e groupe : devoir
@@ -2758,8 +2771,8 @@ suffixInflection('pourraient', 'pouvoir', ['v'], ['v']),
 // 3e groupe : mouvoir
 suffixInflection('mouvrais', 'mouvoir', ['v'], ['v']),
 suffixInflection('mouvrait', 'mouvoir', ['v'], ['v']),
-suffixInflection('mouvoirions', 'mouvoir', ['v'], ['v']),
-suffixInflection('mouvoiriez', 'mouvoir', ['v'], ['v']),
+suffixInflection('mouvrions', 'mouvoir', ['v'], ['v']),
+suffixInflection('mouvriez', 'mouvoir', ['v'], ['v']),
 suffixInflection('mouvraient', 'mouvoir', ['v'], ['v']),
 
 // 3e groupe : pleuvoir / falloir
@@ -2788,11 +2801,11 @@ suffixInflection('seriez', 'seoir', ['v'], ['v']),
 suffixInflection('seraient', 'seoir', ['v'], ['v']),
 
 // 3ème groupe : asseoir (forme en ie et ye)
-suffixInflection('assierais', 'asseoir', ['v'], ['v']),
-suffixInflection('assierait', 'asseoir', ['v'], ['v']),
-suffixInflection('assiérions', 'asseoir', ['v'], ['v']),
-suffixInflection('assiériez', 'asseoir', ['v'], ['v']),
-suffixInflection('assiéraient', 'asseoir', ['v'], ['v']),
+suffixInflection('assoirais', 'asseoir', ['v'], ['v']),
+suffixInflection('assoirait', 'asseoir', ['v'], ['v']),
+suffixInflection('assoirions', 'asseoir', ['v'], ['v']),
+suffixInflection('assoiriez', 'asseoir', ['v'], ['v']),
+suffixInflection('assoiraient', 'asseoir', ['v'], ['v']),
 
 // 3ème groupe : seoir (convenir) / messeoir (ne pas être convenable)
 suffixInflection('siéraient', 'seoir', ['v'], ['v']),
@@ -3533,10 +3546,12 @@ suffixInflection('bûmes', 'boire', ['v'], ['v']),
 suffixInflection('bûtes', 'boire', ['v'], ['v']),
 suffixInflection('burent', 'boire', ['v'], ['v']),
 
-// 3ème groupe : clore
-suffixInflection('clos', 'clore', ['v'], ['v']),
-suffixInflection('clôt', 'clore', ['v'], ['v']),
-suffixInflection('closent', 'clore', ['v'], ['v']), // "closent" pour "ils/elles"
+// 3ème groupe : clore (rare)
+suffixInflection('closis', 'clore', ['v'], ['v']),
+suffixInflection('closit', 'clore', ['v'], ['v']),
+suffixInflection('closîmes', 'clore', ['v'], ['v']),
+suffixInflection('closîtes', 'clore', ['v'], ['v']),
+suffixInflection('closirent', 'clore', ['v'], ['v']),
 
 // 3ème groupe : verbes en -clure
 suffixInflection('clus', 'clure', ['v'], ['v']),
