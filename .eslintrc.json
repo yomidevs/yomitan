@@ -578,7 +578,6 @@
         },
         {
             "files": [
-                "ext/js/core/api-map.js",
                 "ext/js/core/event-dispatcher.js",
                 "ext/js/core/extension-error.js",
                 "ext/js/core/json.js",
