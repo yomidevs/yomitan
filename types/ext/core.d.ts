@@ -22,7 +22,7 @@ export type TypeofResult = 'string' | 'number' | 'bigint' | 'boolean' | 'symbol'
 export type SafeAny = any;
 
 /** This type is used as an explicit way of permitting the `Function` type. */
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-unsafe-function-type
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export type SafeFunction = Function;
 
 /** This type is used as an explicit way of permitting the `any` type. */
