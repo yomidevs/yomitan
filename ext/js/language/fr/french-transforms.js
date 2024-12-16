@@ -644,9 +644,9 @@ export const frenchTransforms = {
         },
 
         // Imparfait de l'indicatif
-        'imperfect': {
-            name: 'imperfect',
-            description: 'Imperfect tense of a verb',
+        'imperfect indicative': {
+            name: 'imperfect indicative',
+            description: 'Imperfect indicative form of a verb',
             rules: [
                 // Auxiliaire être et avoir
                 suffixInflection('étais', 'être', ['v'], ['v']),
@@ -1164,7 +1164,7 @@ export const frenchTransforms = {
         // Futur simple
         'future': {
             name: 'future',
-            description: 'Future tense of a verb',
+            description: 'Future form of a verb',
             rules: [
                 // auxiliaire être
                 suffixInflection('serai', 'être', ['aux'], ['v']),
@@ -2329,9 +2329,9 @@ export const frenchTransforms = {
         },
 
         // Conditionnel
-        'Conditionnal': {
-            name: 'conditionnal',
-            description: 'conditionnal form of a verb',
+        'Conditional': {
+            name: 'conditional',
+            description: 'Conditional form of a verb',
             rules: [
                 // auxiliaire être
                 suffixInflection('serais', 'être', ['aux'], ['v']),
@@ -3056,7 +3056,7 @@ export const frenchTransforms = {
         // Preterite
         'Preterite': {
             name: 'Preterite',
-            description: 'Preterite (past) form of a verb',
+            description: 'Preterite (simple past) form of a verb',
             rules: [
                 // auxiliaire être
                 suffixInflection('fus', 'être', ['aux'], ['v']),
@@ -3666,9 +3666,9 @@ export const frenchTransforms = {
             ],
         },
 
-        'progressive': {
-            name: 'progressive',
-            description: 'progressive form of a verb',
+        'present participle': {
+            name: 'present participle',
+            description: 'Present participle form of a verb',
             rules: [
                 // 1er groupe : verbes en -er
                 suffixInflection('ant', 'er', ['v'], ['v']),
@@ -3717,7 +3717,7 @@ export const frenchTransforms = {
         },
         'present subjunctive': {
             name: 'present subjunctive',
-            description: 'present subjunctive form of a verb',
+            description: 'Present subjunctive form of a verb',
             rules: [
                 // 1er Groupe : Verbes en -er
                 suffixInflection('e', 'er', ['v'], ['v']),
