@@ -81,13 +81,13 @@ export class StructuredContentGenerator {
         const hasPreferredHeight = (typeof preferredHeight === 'number');
         const invAspectRatio = (
             hasPreferredWidth && hasPreferredHeight ?
-            preferredHeight / preferredWidth :
-            height / width
+                preferredHeight / preferredWidth :
+                height / width
         );
         const usedWidth = (
             hasPreferredWidth ?
-            preferredWidth :
-            (hasPreferredHeight ? preferredHeight / invAspectRatio : width)
+                preferredWidth :
+                (hasPreferredHeight ? preferredHeight / invAspectRatio : width)
         );
 
         const node = /** @type {HTMLAnchorElement} */ (this._createElement('a', 'gloss-image-link'));

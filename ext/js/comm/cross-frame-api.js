@@ -106,7 +106,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
                     return;
                 }
             }
-
+            performance.mark(`cross-frame-api:invoke:${action}`);
             try {
                 this._port.postMessage(/** @type {import('cross-frame-api').InvokeMessage} */ ({type: 'invoke', id, data: {action, params}}));
             } catch (e) {
