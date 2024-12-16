@@ -643,6 +643,7 @@
                 "ext/js/language/eo/esperanto-transforms.js",
                 "ext/js/language/es/spanish-transforms.js",
                 "ext/js/language/fr/french-text-preprocessors.js",
+                "ext/js/language/fr/french-transforms.js",
                 "ext/js/language/ja/japanese-text-preprocessors.js",
                 "ext/js/language/ja/japanese-transforms.js",
                 "ext/js/language/ja/japanese-wanakana.js",

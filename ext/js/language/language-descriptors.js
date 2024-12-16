@@ -23,6 +23,7 @@ import {englishTransforms} from './en/english-transforms.js';
 import {esperantoTransforms} from './eo/esperanto-transforms.js';
 import {spanishTransforms} from './es/spanish-transforms.js';
 import {apostropheVariants} from './fr/french-text-preprocessors.js';
+import {frenchTransforms} from './fr/french-transforms.js';
 import {
     alphabeticToHiragana,
     alphanumericWidthVariants,
@@ -145,6 +146,7 @@ const languageDescriptors = [
             ...capitalizationPreprocessors,
             apostropheVariants,
         },
+        languageTransforms: frenchTransforms,
     },
     {
         iso: 'grc',
