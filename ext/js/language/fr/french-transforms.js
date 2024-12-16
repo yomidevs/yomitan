@@ -3835,8 +3835,24 @@ export const frenchTransforms = {
                 suffixInflection('ssiez', 'ir', ['v'], ['v']),
                 suffixInflection('ssent', 'ir', ['v'], ['v']),
 
-                // TODO (add some irregular verbs) ///
+                // TODO (add some irregular verbs) //
             ],
         },
+        /* TODO: Add more tenses (someone better versed on grammar should take a look):
+        *
+        * Currently missing as far as I can tell:
+        * Indicatif:  Passé composé, Passé antérieur, Plus-que-parfait, Futur antérieur
+        * Subjonctif: Passé, Imparfait, Plus-que-parfait
+        * Conditionnel: Passé première/deuxième forme
+        * Impératif: Passé
+        * Participe: Passé
+        * Gérondif: Passé, Présent
+        *
+        * A lot of these are compound tenses (être/avoir + verb) which I don't know if there is a good way to handle
+        * There is also a lot of overlap which can be impossible to distinguish.
+        * Passé composé is probably the most useful one missing currently but it's compound.
+        */
+
+        // TODO: Add gender + better plural de-inflection?
     },
 };
