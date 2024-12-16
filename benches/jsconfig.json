@@ -23,18 +23,11 @@
         },
         "types": [
             "chrome",
-            "dom-webcodecs",
             "firefox-webext-browser",
             "handlebars",
             "jszip",
             "parse5",
             "wanakana"
-        ],
-        "lib": [
-            "ES2022",
-            "DOM",
-            "DOM.Iterable",
-            "WebWorker"
         ]
     },
     "include": [
