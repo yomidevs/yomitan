@@ -30,7 +30,7 @@ export class Database {
     /**
      * @param {string} databaseName
      * @param {number} version
-     * @param {import('database').StructureDefinition<TObjectStoreName>[]?} structure
+     * @param {import('database').StructureDefinition<TObjectStoreName>[]} structure
      */
     async open(databaseName, version, structure) {
         if (this._db !== null) {
@@ -43,9 +43,7 @@ export class Database {
         try {
             this._isOpening = true;
             this._db = await this._open(databaseName, version, (db, transaction, oldVersion) => {
-                if (structure !== null) {
-                    this._upgrade(db, transaction, oldVersion, structure);
-                }
+                this._upgrade(db, transaction, oldVersion, structure);
             });
         } finally {
             this._isOpening = false;
