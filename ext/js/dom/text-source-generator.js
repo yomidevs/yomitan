@@ -406,6 +406,7 @@ export class TextSourceGenerator {
             return document.caretRangeFromPoint(x, y);
         }
 
+        // @ts-expect-error - caretPositionFromPoint is non-standard
         if (typeof document.caretPositionFromPoint === 'function') {
             // Firefox
             return this._caretPositionFromPoint(x, y);
@@ -421,6 +422,7 @@ export class TextSourceGenerator {
      * @returns {?Range}
      */
     _caretPositionFromPoint(x, y) {
+        // @ts-expect-error - caretPositionFromPoint is non-standard
         const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ (document.caretPositionFromPoint)(x, y);
         if (position === null) {
             return null;
@@ -473,6 +475,7 @@ export class TextSourceGenerator {
                     nextElement.style.setProperty('user-select', 'text', 'important');
                 }
 
+                // @ts-expect-error - caretPositionFromPoint is non-standard
                 const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ (document.caretPositionFromPoint)(x, y);
                 if (position === null) {
                     return null;

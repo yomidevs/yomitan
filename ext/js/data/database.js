@@ -43,7 +43,9 @@ export class Database {
         try {
             this._isOpening = true;
             this._db = await this._open(databaseName, version, (db, transaction, oldVersion) => {
-                this._upgrade(db, transaction, oldVersion, structure);
+                if (structure !== null) {
+                    this._upgrade(db, transaction, oldVersion, structure);
+                }
             });
         } finally {
             this._isOpening = false;
