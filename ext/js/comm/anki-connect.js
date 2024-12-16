@@ -479,9 +479,7 @@ export class AnkiConnect {
         if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
             const apiError = /** @type {import('core').SerializableObject} */ (result).error;
             if (typeof apiError !== 'undefined') {
-                // eslint-disable-next-line @typescript-eslint/no-base-to-string
                 const error = new ExtensionError(`Anki error: ${apiError}`);
-                // eslint-disable-next-line @typescript-eslint/no-base-to-string
                 error.data = {action, params, status: response.status, apiError: typeof apiError === 'string' ? apiError : `${apiError}`};
                 throw error;
             }
