@@ -396,9 +396,12 @@
                 "@typescript-eslint/no-unsafe-return": "off",
                 "@typescript-eslint/require-await": "off",
                 "@typescript-eslint/restrict-template-expressions": "off",
+                "@typescript-eslint/prefer-promise-reject-errors": "off",
 
                 "@typescript-eslint/ban-ts-comment": ["error", {"ts-expect-error": {"descriptionFormat": "^ - .+$"}}],
-                "@typescript-eslint/ban-types": ["error", {"types": {"object": true}, "extendDefaults": true}],
+                "@typescript-eslint/no-empty-object-type": "error",
+                "@typescript-eslint/no-unsafe-function-type": "error",
+                "@typescript-eslint/no-wrapper-object-types": "error",
                 "@typescript-eslint/no-explicit-any": "error",
                 "@typescript-eslint/no-shadow": ["error", {"builtinGlobals": false}],
                 "@typescript-eslint/no-this-alias": "error",
@@ -575,6 +578,7 @@
         },
         {
             "files": [
+                "ext/js/core/api-map.js",
                 "ext/js/core/event-dispatcher.js",
                 "ext/js/core/extension-error.js",
                 "ext/js/core/json.js",

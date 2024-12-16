@@ -30,7 +30,7 @@ export class Database {
     /**
      * @param {string} databaseName
      * @param {number} version
-     * @param {import('database').StructureDefinition<TObjectStoreName>[]} structure
+     * @param {import('database').StructureDefinition<TObjectStoreName>[]?} structure
      */
     async open(databaseName, version, structure) {
         if (this._db !== null) {
