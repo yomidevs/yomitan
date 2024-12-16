@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 import {AccessibilityController} from '../accessibility/accessibility-controller.js';
 import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';

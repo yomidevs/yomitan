@@ -390,10 +390,10 @@ export class API {
                     if (response !== null && typeof response === 'object') {
                         const {error} = /** @type {import('core').UnknownObject} */ (response);
                         if (typeof error !== 'undefined') {
-                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */ (error)));
+                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */(error)));
                         } else {
                             const {result} = /** @type {import('core').UnknownObject} */ (response);
-                            resolve(/** @type {import('api').ApiReturn<TAction>} */ (result));
+                            resolve(/** @type {import('api').ApiReturn<TAction>} */(result));
                         }
                     } else {
                         const message = response === null ? 'Unexpected null response. You may need to refresh the page.' : `Unexpected response of type ${typeof response}. You may need to refresh the page.`;

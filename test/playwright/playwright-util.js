@@ -25,7 +25,7 @@ export const root = path.join(dirname, '..', '..');
 
 export const test = base.extend({
     // eslint-disable-next-line no-empty-pattern
-    context: async ({}, use) => {
+    context: async ({}, /** @type {(r: import('playwright').BrowserContext) => Promise<void>} */ use) => {
         const pathToExtension = path.join(root, 'ext');
         const context = await chromium.launchPersistentContext('', {
             // Disabled: headless: false,

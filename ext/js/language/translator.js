@@ -76,6 +76,7 @@ export class Translator {
      * @returns {Promise<{dictionaryEntries: import('dictionary').TermDictionaryEntry[], originalTextLength: number}>} An object containing dictionary entries and the length of the original source text.
      */
     async findTerms(mode, text, options) {
+        performance.mark('translator:findTerms:start');
         const {enabledDictionaryMap, excludeDictionaryDefinitions, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language, primaryReading} = options;
         const tagAggregator = new TranslatorTagAggregator();
         let {dictionaryEntries, originalTextLength} = await this._findTermsInternal(text, options, tagAggregator, primaryReading);
@@ -120,8 +121,9 @@ export class Translator {
             if (frequencies.length > 1) { this._sortTermDictionaryEntrySimpleData(frequencies); }
             if (pronunciations.length > 1) { this._sortTermDictionaryEntrySimpleData(pronunciations); }
         }
-
         const withUserFacingInflections = this._addUserFacingInflections(language, dictionaryEntries);
+        performance.mark('translator:findTerms:end');
+        performance.measure('translator:findTerms', 'translator:findTerms:start', 'translator:findTerms:end');
 
         return {dictionaryEntries: withUserFacingInflections, originalTextLength};
     }
@@ -371,10 +373,11 @@ export class Translator {
      * @returns {Promise<import('translation-internal').DatabaseDeinflection[]>}
      */
     async _getDeinflections(text, options) {
+        performance.mark('translator:getDeinflections:start');
         let deinflections = (
             options.deinflect ?
-            this._getAlgorithmDeinflections(text, options) :
-            [this._createDeinflection(text, text, text, 0, [], [])]
+                this._getAlgorithmDeinflections(text, options) :
+                [this._createDeinflection(text, text, text, 0, [], [])]
         );
         if (deinflections.length === 0) { return []; }
 
@@ -393,6 +396,8 @@ export class Translator {
         }
         deinflections = deinflections.filter((deinflection) => deinflection.databaseEntries.length);
 
+        performance.mark('translator:getDeinflections:end');
+        performance.measure('translator:getDeinflections', 'translator:getDeinflections:start', 'translator:getDeinflections:end');
         return deinflections;
     }
 
@@ -404,6 +409,7 @@ export class Translator {
      * @returns {Promise<import('translation-internal').DatabaseDeinflection[]>}
      */
     async _getDictionaryDeinflections(language, deinflections, enabledDictionaryMap, matchType) {
+        performance.mark('translator:getDictionaryDeinflections:start');
         /** @type {import('translation-internal').DatabaseDeinflection[]} */
         const dictionaryDeinflections = [];
         for (const deinflection of deinflections) {
@@ -434,6 +440,8 @@ export class Translator {
 
         await this._addEntriesToDeinflections(language, dictionaryDeinflections, enabledDictionaryMap, matchType);
 
+        performance.mark('translator:getDictionaryDeinflections:end');
+        performance.measure('translator:getDictionaryDeinflections', 'translator:getDictionaryDeinflections:start', 'translator:getDictionaryDeinflections:end');
         return dictionaryDeinflections;
     }
 
@@ -2213,8 +2221,8 @@ export class Translator {
             }
             dictionaryEntry.frequencyOrder = (
                 frequencyMin <= frequencyMax ?
-                (ascending ? frequencyMin : -frequencyMax) :
-                (ascending ? Number.MAX_SAFE_INTEGER : 0)
+                    (ascending ? frequencyMin : -frequencyMax) :
+                    (ascending ? Number.MAX_SAFE_INTEGER : 0)
             );
             for (const definition of definitions) {
                 frequencyMin = Number.MAX_SAFE_INTEGER;
@@ -2228,8 +2236,8 @@ export class Translator {
                 }
                 definition.frequencyOrder = (
                     frequencyMin <= frequencyMax ?
-                    (ascending ? frequencyMin : -frequencyMax) :
-                    (ascending ? Number.MAX_SAFE_INTEGER : 0)
+                        (ascending ? frequencyMin : -frequencyMax) :
+                        (ascending ? Number.MAX_SAFE_INTEGER : 0)
                 );
             }
             frequencyMap.clear();

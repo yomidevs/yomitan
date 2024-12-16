@@ -1,7 +1,7 @@
 {
     "test": {
         "include": [
-            "../**/json.test.js"
+            "test/json.test.js"
         ]
     }
 }
