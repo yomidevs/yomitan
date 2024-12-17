@@ -835,7 +835,7 @@ export class DictionaryController {
         this._dictionaryEntries.map((dictionaryEntry) => dictionaryEntry.cleanup());
 
         const dictionaryOptionsArray = options.dictionaries;
-        for (let i = 0, ii = dictionaryOptionsArray.length; i < ii; ++i) {
+        for (let i = 0; i < dictionaryOptionsArray.length; i++) {
             const {name} = dictionaryOptionsArray[i];
             /** @type {import('dictionary-importer').Summary | undefined} */
             const dictionaryInfo = dictionaries.find((dictionary) => dictionary.title === name);
