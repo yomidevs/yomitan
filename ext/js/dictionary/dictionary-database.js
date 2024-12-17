@@ -402,7 +402,7 @@ export class DictionaryDatabase {
             return;
         }
         // otherwise, you are the worker, so do the work
-        performance.mark('drawMedia:start');
+        safePerformance.mark('drawMedia:start');
 
         // merge items with the same path to reduce the number of database queries. collects the canvases into a single array for each path.
         /** @type {Map<string, import('dictionary-database').DrawMediaGroupedRequest>} */
@@ -424,10 +424,10 @@ export class DictionaryDatabase {
         // move all svgs to front to have a hotter loop
         results.sort((a, _b) => (a.mediaType === 'image/svg+xml' ? -1 : 1));
 
-        performance.mark('drawMedia:draw:start');
+        safePerformance.mark('drawMedia:draw:start');
         for (const m of results) {
             if (m.mediaType === 'image/svg+xml') {
-                performance.mark('drawMedia:draw:svg:start');
+                safePerformance.mark('drawMedia:draw:svg:start');
                 /** @type {import('@resvg/resvg-wasm').ResvgRenderOptions} */
                 const opts = {
                     fitTo: {
@@ -441,10 +441,10 @@ export class DictionaryDatabase {
                 const resvgJS = new Resvg(new Uint8Array(m.content), opts);
                 const render = resvgJS.render();
                 source.postMessage({action: 'drawBufferToCanvases', params: {buffer: render.pixels.buffer, width: render.width, height: render.height, canvasIndexes: m.canvasIndexes, generation: m.generation}}, [render.pixels.buffer]);
-                performance.mark('drawMedia:draw:svg:end');
-                performance.measure('drawMedia:draw:svg', 'drawMedia:draw:svg:start', 'drawMedia:draw:svg:end');
+                safePerformance.mark('drawMedia:draw:svg:end');
+                safePerformance.measure('drawMedia:draw:svg', 'drawMedia:draw:svg:start', 'drawMedia:draw:svg:end');
             } else {
-                performance.mark('drawMedia:draw:raster:start');
+                safePerformance.mark('drawMedia:draw:raster:start');
 
                 // ImageDecoder is slightly faster than Blob/createImageBitmap, but
                 // 1) it is not available in Firefox <133
@@ -473,15 +473,15 @@ export class DictionaryDatabase {
                         }
                     });
                 }
-                performance.mark('drawMedia:draw:raster:end');
-                performance.measure('drawMedia:draw:raster', 'drawMedia:draw:raster:start', 'drawMedia:draw:raster:end');
+                safePerformance.mark('drawMedia:draw:raster:end');
+                safePerformance.measure('drawMedia:draw:raster', 'drawMedia:draw:raster:start', 'drawMedia:draw:raster:end');
             }
         }
-        performance.mark('drawMedia:draw:end');
-        performance.measure('drawMedia:draw', 'drawMedia:draw:start', 'drawMedia:draw:end');
+        safePerformance.mark('drawMedia:draw:end');
+        safePerformance.measure('drawMedia:draw', 'drawMedia:draw:start', 'drawMedia:draw:end');
 
-        performance.mark('drawMedia:end');
-        performance.measure('drawMedia', 'drawMedia:start', 'drawMedia:end');
+        safePerformance.mark('drawMedia:end');
+        safePerformance.measure('drawMedia', 'drawMedia:start', 'drawMedia:end');
     }
 
     /**
@@ -620,8 +620,8 @@ export class DictionaryDatabase {
              */
             const onGetAll = (item) => (rows, data) => {
                 if (typeof item === 'object' && item !== null && 'path' in item) {
-                    performance.mark(`findMultiBulk:onGetAll:${item.path}:end`);
-                    performance.measure(`findMultiBulk:onGetAll:${item.path}`, `findMultiBulk:onGetAll:${item.path}:start`, `findMultiBulk:onGetAll:${item.path}:end`);
+                    safePerformance.mark(`findMultiBulk:onGetAll:${item.path}:end`);
+                    safePerformance.measure(`findMultiBulk:onGetAll:${item.path}`, `findMultiBulk:onGetAll:${item.path}:start`, `findMultiBulk:onGetAll:${item.path}:end`);
                 }
                 for (const row of rows) {
                     if (predicate(row, data.item)) {
@@ -630,11 +630,11 @@ export class DictionaryDatabase {
                 }
                 if (++completeCount >= requiredCompleteCount) {
                     resolve(results);
-                    performance.mark('findMultiBulk:end');
-                    performance.measure('findMultiBulk', 'findMultiBulk:start', 'findMultiBulk:end');
+                    safePerformance.mark('findMultiBulk:end');
+                    safePerformance.measure('findMultiBulk', 'findMultiBulk:start', 'findMultiBulk:end');
                 }
             };
-            performance.mark('findMultiBulk:getAll:start');
+            safePerformance.mark('findMultiBulk:getAll:start');
             for (let i = 0; i < itemCount; ++i) {
                 const item = items[i];
                 const query = createQuery(item);
@@ -642,13 +642,13 @@ export class DictionaryDatabase {
                     /** @type {import('dictionary-database').FindMultiBulkData<TItem>} */
                     const data = {item, itemIndex: i, indexIndex: j};
                     if (typeof item === 'object' && item !== null && 'path' in item) {
-                        performance.mark(`findMultiBulk:onGetAll:${item.path}:start`);
+                        safePerformance.mark(`findMultiBulk:onGetAll:${item.path}:start`);
                     }
                     this._db.getAll(indexList[j], query, onGetAll(item), reject, data);
                 }
             }
-            performance.mark('findMultiBulk:getAll:end');
-            performance.measure('findMultiBulk:getAll', 'findMultiBulk:getAll:start', 'findMultiBulk:getAll:end');
+            safePerformance.mark('findMultiBulk:getAll:end');
+            safePerformance.measure('findMultiBulk:getAll', 'findMultiBulk:getAll:start', 'findMultiBulk:getAll:end');
         });
     }
 
