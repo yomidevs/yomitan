@@ -836,17 +836,11 @@ export class DictionaryController {
             entry.cleanup();
         }
 
-        /** @type {Map<string, import('dictionary-importer').Summary>} */
-        const dictionaryInfoMap = new Map();
-        for (const dictionary of dictionaries) {
-            dictionaryInfoMap.set(dictionary.title, dictionary);
-        }
-
         const dictionaryOptionsArray = options.dictionaries;
         for (let i = 0, ii = dictionaryOptionsArray.length; i < ii; ++i) {
             const {name} = dictionaryOptionsArray[i];
             /** @type {import('dictionary-importer').Summary | undefined} */
-            const dictionaryInfo = dictionaryInfoMap.get(name);
+            const dictionaryInfo = dictionaries.find((dictionary) => dictionary.title === name);
             if (typeof dictionaryInfo === 'undefined') { continue; }
             const updateDownloadUrl = dictionaryInfo.downloadUrl ?? null;
             this._createDictionaryEntry(i, dictionaryInfo, updateDownloadUrl);
