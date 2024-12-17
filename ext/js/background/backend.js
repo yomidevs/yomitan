@@ -1330,30 +1330,37 @@ export class Backend {
             this._clipboardMonitor.stop();
         }
 
-        try {
-            if (chrome.contextMenus) {
-                if (options.general.enableContextMenuScanSelected) {
-                    chrome.contextMenus.create({
-                        id: 'yomitan_lookup',
-                        title: 'Lookup in Yomitan',
-                        contexts: ['selection'],
-                    }, () => this._checkLastError(chrome.runtime.lastError));
-                    chrome.contextMenus.onClicked.addListener((info) => {
-                        if (info.selectionText) {
-                            this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
-                        }
-                    });
-                } else {
-                    chrome.contextMenus.remove('yomitan_lookup', () => this._checkLastError(chrome.runtime.lastError));
-                }
-            }
-        } catch (e) {
-            log.error(e);
-        }
+        this._setupContextMenu(options);
 
         void this._accessibilityController.update(this._getOptionsFull(false));
 
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
+    }
+
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
+    _setupContextMenu(options) {
+        try {
+            if (!chrome.contextMenus) { return; }
+
+            if (options.general.enableContextMenuScanSelected) {
+                chrome.contextMenus.create({
+                    id: 'yomitan_lookup',
+                    title: 'Lookup in Yomitan',
+                    contexts: ['selection'],
+                }, () => this._checkLastError(chrome.runtime.lastError));
+                chrome.contextMenus.onClicked.addListener((info) => {
+                    if (info.selectionText) {
+                        this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
+                    }
+                });
+            } else {
+                chrome.contextMenus.remove('yomitan_lookup', () => this._checkLastError(chrome.runtime.lastError));
+            }
+        } catch (e) {
+            log.error(e);
+        }
     }
 
     /**
