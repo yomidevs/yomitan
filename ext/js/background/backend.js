@@ -1372,7 +1372,20 @@ export class Backend {
             this._clipboardMonitor.stop();
         }
 
+        this._setupContextMenu(options);
+
+        void this._accessibilityController.update(this._getOptionsFull(false));
+
+        this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
+    }
+
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
+    _setupContextMenu(options) {
         try {
+            if (!chrome.contextMenus) { return; }
+
             if (options.general.enableContextMenuScanSelected) {
                 chrome.contextMenus.create({
                     id: 'yomitan_lookup',
@@ -1390,10 +1403,6 @@ export class Backend {
         } catch (e) {
             log.error(e);
         }
-
-        void this._accessibilityController.update(this._getOptionsFull(false));
-
-        this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
     }
 
     /**
