@@ -20,17 +20,14 @@ import {log} from './log.js';
 /**
  * This class safely handles performance methods.
  */
-class SafePerformance extends Performance {
-    constructor() {
-        super();
-    }
+class SafePerformance {
+    constructor() {}
 
     /**
      * @param {string} markName
      * @param {PerformanceMarkOptions} [markOptions]
      * @returns {PerformanceMark | undefined}
      */
-    // @ts-expect-error - ts does not allow return types of overridden methods to be broader and this function must not error
     mark(markName, markOptions) {
         try {
             // eslint-disable-next-line no-restricted-syntax
@@ -47,7 +44,6 @@ class SafePerformance extends Performance {
      * @param {string} [endMark]
      * @returns {PerformanceMeasure | undefined}
      */
-    // @ts-expect-error - ts does not allow return types of overridden methods to be broader and this function must not error
     measure(measureName, startOrMeasureOptions, endMark) {
         try {
             // eslint-disable-next-line no-restricted-syntax
@@ -55,6 +51,14 @@ class SafePerformance extends Performance {
         } catch (e) {
             log.error(e);
         }
+    }
+
+    /**
+     * @returns {DOMHighResTimeStamp}
+     */
+    now() {
+        // eslint-disable-next-line no-restricted-syntax
+        return performance.now();
     }
 }
 
