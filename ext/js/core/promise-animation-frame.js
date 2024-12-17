@@ -51,7 +51,7 @@ export function promiseAnimationFrame(timeout) {
                 cancelAnimationFrame(frameRequest);
                 frameRequest = null;
             }
-            resolve({time: performance.now(), timeout: true});
+            resolve({time: safePerformance.now(), timeout: true});
         };
 
         frameRequest = requestAnimationFrame(onFrame);

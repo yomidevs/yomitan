@@ -302,7 +302,7 @@ export class Popup extends EventDispatcher {
         await this._show(sourceRects, writingMode);
 
         if (displayDetails !== null) {
-            performance.mark('invokeDisplaySetContent:start');
+            safePerformance.mark('invokeDisplaySetContent:start');
             void this._invokeSafe('displaySetContent', {details: displayDetails});
         }
     }

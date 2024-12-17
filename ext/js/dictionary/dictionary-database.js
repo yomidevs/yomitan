@@ -17,6 +17,7 @@
  */
 
 import {log} from '../core/log.js';
+import {safePerformance} from '../core/safe-performance.js';
 import {stringReverse} from '../core/utilities.js';
 import {Database} from '../data/database.js';
 
@@ -455,7 +456,7 @@ export class DictionaryDatabase {
      * @returns {Promise<TResult[]>}
      */
     _findMultiBulk(objectStoreName, indexNames, items, createQuery, predicate, createResult) {
-        performance.mark('findMultiBulk:start');
+        safePerformance.mark('findMultiBulk:start');
         return new Promise((resolve, reject) => {
             const itemCount = items.length;
             const indexCount = indexNames.length;
@@ -463,8 +464,8 @@ export class DictionaryDatabase {
             const results = [];
             if (itemCount === 0 || indexCount === 0) {
                 resolve(results);
-                performance.mark('findMultiBulk:end');
-                performance.measure('findMultiBulk', 'findMultiBulk:start', 'findMultiBulk:end');
+                safePerformance.mark('findMultiBulk:end');
+                safePerformance.measure('findMultiBulk', 'findMultiBulk:start', 'findMultiBulk:end');
                 return;
             }
 

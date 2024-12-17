@@ -24,6 +24,7 @@ import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
+import {safePerformance} from '../core/safe-performance.js';
 import {toError} from '../core/to-error.js';
 import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
 import {setProfile} from '../data/profiles-util.js';
@@ -733,7 +734,7 @@ export class Display extends EventDispatcher {
 
     /** @type {import('display').DirectApiHandler<'displaySetContent'>} */
     _onMessageSetContent({details}) {
-        performance.mark('invokeDisplaySetContent:end');
+        safePerformance.mark('invokeDisplaySetContent:end');
         this.setContent(details);
     }
 
@@ -787,14 +788,14 @@ export class Display extends EventDispatcher {
     async _onStateChanged() {
         if (this._historyChangeIgnore) { return; }
 
-        performance.mark('display:onStateChanged:start');
+        safePerformance.mark('display:onStateChanged:start');
 
         /** @type {?import('core').TokenObject} */
         const token = {}; // Unique identifier token
         this._setContentToken = token;
         try {
             // Clear
-            performance.mark('display:clear:start');
+            safePerformance.mark('display:clear:start');
             this._closePopups();
             this._closeAllPopupMenus();
             this._eventListeners.removeAllEventListeners();
@@ -805,11 +806,11 @@ export class Display extends EventDispatcher {
             this._dictionaryEntries = [];
             this._dictionaryEntryNodes = [];
             this._elementOverflowController.clearElements();
-            performance.mark('display:clear:end');
-            performance.measure('display:clear', 'display:clear:start', 'display:clear:end');
+            safePerformance.mark('display:clear:end');
+            safePerformance.measure('display:clear', 'display:clear:start', 'display:clear:end');
 
             // Prepare
-            performance.mark('display:prepare:start');
+            safePerformance.mark('display:prepare:start');
             const urlSearchParams = new URLSearchParams(location.search);
             let type = urlSearchParams.get('type');
             if (type === null && urlSearchParams.get('query') !== null) { type = 'terms'; }
@@ -818,10 +819,10 @@ export class Display extends EventDispatcher {
             this._queryParserVisibleOverride = (fullVisible === null ? null : (fullVisible !== 'false'));
 
             this._historyHasChanged = true;
-            performance.mark('display:_onStateChanged:prepare:end');
-            performance.measure('display:_onStateChanged:prepare', 'display:_onStateChanged:prepare:start', 'display:_onStateChanged:prepare:end');
+            safePerformance.mark('display:_onStateChanged:prepare:end');
+            safePerformance.measure('display:_onStateChanged:prepare', 'display:_onStateChanged:prepare:start', 'display:_onStateChanged:prepare:end');
 
-            performance.mark('display:_onStateChanged:setContent:start');
+            safePerformance.mark('display:_onStateChanged:setContent:start');
             // Set content
             switch (type) {
                 case 'terms':
@@ -838,13 +839,13 @@ export class Display extends EventDispatcher {
                     this._clearContent();
                     break;
             }
-            performance.mark('display:_onStateChanged:setContent:end');
-            performance.measure('display:_onStateChanged:setContent', 'display:_onStateChanged:setContent:start', 'display:_onStateChanged:setContent:end');
+            safePerformance.mark('display:_onStateChanged:setContent:end');
+            safePerformance.measure('display:_onStateChanged:setContent', 'display:_onStateChanged:setContent:start', 'display:_onStateChanged:setContent:end');
         } catch (e) {
             this.onError(toError(e));
         }
-        performance.mark('display:_onStateChanged:end');
-        performance.measure('display:_onStateChanged', 'display:_onStateChanged:start', 'display:_onStateChanged:end');
+        safePerformance.mark('display:_onStateChanged:end');
+        safePerformance.measure('display:_onStateChanged', 'display:_onStateChanged:start', 'display:_onStateChanged:end');
     }
 
     /**
@@ -1327,7 +1328,7 @@ export class Display extends EventDispatcher {
         const hasEnabledDictionaries = this._options ? this._options.dictionaries.some(({enabled}) => enabled) : false;
 
         // Set query
-        performance.mark('display:setQuery:start');
+        safePerformance.mark('display:setQuery:start');
         let query = urlSearchParams.get('query');
         if (query === null) { query = ''; }
         let queryFull = urlSearchParams.get('full');
@@ -1340,8 +1341,8 @@ export class Display extends EventDispatcher {
             queryOffset = Number.isFinite(queryOffset) ? Math.max(0, Math.min(queryFull.length - query.length, queryOffset)) : 0;
         }
         this._setQuery(query, queryFull, queryOffset);
-        performance.mark('display:setQuery:end');
-        performance.measure('display:setQuery', 'display:setQuery:start', 'display:setQuery:end');
+        safePerformance.mark('display:setQuery:end');
+        safePerformance.measure('display:setQuery', 'display:setQuery:start', 'display:setQuery:end');
 
         let {state, content} = this._history;
         let changeHistory = false;
@@ -1364,10 +1365,10 @@ export class Display extends EventDispatcher {
 
         let {dictionaryEntries} = content;
         if (!Array.isArray(dictionaryEntries)) {
-            performance.mark('display:findDictionaryEntries:start');
+            safePerformance.mark('display:findDictionaryEntries:start');
             dictionaryEntries = hasEnabledDictionaries && lookup && query.length > 0 ? await this._findDictionaryEntries(type === 'kanji', query, primaryReading, wildcardsEnabled, optionsContext) : [];
-            performance.mark('display:findDictionaryEntries:end');
-            performance.measure('display:findDictionaryEntries', 'display:findDictionaryEntries:start', 'display:findDictionaryEntries:end');
+            safePerformance.mark('display:findDictionaryEntries:end');
+            safePerformance.measure('display:findDictionaryEntries', 'display:findDictionaryEntries:start', 'display:findDictionaryEntries:end');
             if (this._setContentToken !== token) { return; }
             content.dictionaryEntries = dictionaryEntries;
             changeHistory = true;
@@ -1402,10 +1403,10 @@ export class Display extends EventDispatcher {
 
         this._dictionaryEntries = dictionaryEntries;
 
-        performance.mark('display:updateNavigationAuto:start');
+        safePerformance.mark('display:updateNavigationAuto:start');
         this._updateNavigationAuto();
-        performance.mark('display:updateNavigationAuto:end');
-        performance.measure('display:updateNavigationAuto', 'display:updateNavigationAuto:start', 'display:updateNavigationAuto:end');
+        safePerformance.mark('display:updateNavigationAuto:end');
+        safePerformance.measure('display:updateNavigationAuto', 'display:updateNavigationAuto:start', 'display:updateNavigationAuto:end');
 
         this._setNoContentVisible(hasEnabledDictionaries && dictionaryEntries.length === 0 && lookup);
         this._setNoDictionariesVisible(!hasEnabledDictionaries);
@@ -1413,11 +1414,11 @@ export class Display extends EventDispatcher {
         const container = this._container;
         container.textContent = '';
 
-        performance.mark('display:contentUpdate:start');
+        safePerformance.mark('display:contentUpdate:start');
         this._triggerContentUpdateStart();
 
         for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
-            performance.mark('display:createEntry:start');
+            safePerformance.mark('display:createEntry:start');
 
             if (i > 0) {
                 await promiseTimeout(1);
@@ -1441,8 +1442,8 @@ export class Display extends EventDispatcher {
 
             this._elementOverflowController.addElements(entry);
 
-            performance.mark('display:createEntry:end');
-            performance.measure('display:createEntry', 'display:createEntry:start', 'display:createEntry:end');
+            safePerformance.mark('display:createEntry:end');
+            safePerformance.measure('display:createEntry', 'display:createEntry:start', 'display:createEntry:end');
         }
 
         if (typeof scrollX === 'number' || typeof scrollY === 'number') {
@@ -1454,8 +1455,8 @@ export class Display extends EventDispatcher {
         }
 
         this._triggerContentUpdateComplete();
-        performance.mark('display:contentUpdate:end');
-        performance.measure('display:contentUpdate', 'display:contentUpdate:start', 'display:contentUpdate:end');
+        safePerformance.mark('display:contentUpdate:end');
+        safePerformance.measure('display:contentUpdate', 'display:contentUpdate:start', 'display:contentUpdate:end');
     }
 
     /** */
