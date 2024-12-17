@@ -16,13 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ThemeController } from '../app/theme-controller.js';
-import { EventDispatcher } from '../core/event-dispatcher.js';
-import { EventListenerCollection } from '../core/event-listener-collection.js';
-import { log } from '../core/log.js';
-import { clone } from '../core/utilities.js';
-import { anyNodeMatchesSelector, everyNodeMatchesSelector, getActiveModifiers, getActiveModifiersAndButtons, isPointInSelection } from '../dom/document-util.js';
-import { TextSourceElement } from '../dom/text-source-element.js';
+import {ThemeController} from '../app/theme-controller.js';
+import {EventDispatcher} from '../core/event-dispatcher.js';
+import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {log} from '../core/log.js';
+import {safePerformance} from '../core/safe-performance.js';
+import {clone} from '../core/utilities.js';
+import {anyNodeMatchesSelector, everyNodeMatchesSelector, getActiveModifiers, getActiveModifiersAndButtons, isPointInSelection} from '../dom/document-util.js';
+import {TextSourceElement} from '../dom/text-source-element.js';
 
 const SCAN_RESOLUTION_EXCLUDED_LANGUAGES = new Set(['ja', 'zh', 'yue', 'ko']);
 

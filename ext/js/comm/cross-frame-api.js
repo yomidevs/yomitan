@@ -22,6 +22,7 @@ import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {log} from '../core/log.js';
+import {safePerformance} from '../core/safe-performance.js';
 
 /**
  * @augments EventDispatcher<import('cross-frame-api').CrossFrameAPIPortEvents>
