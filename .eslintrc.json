@@ -79,6 +79,10 @@
             {
                 "message": "Avoid using Response.json(), prefer readResponseJson.",
                 "selector": "MemberExpression[property.name=json]"
+            },
+            {
+                "message": "Avoid using performance, prefer safePerformance.",
+                "selector": "MemberExpression[object.name=performance]"
             }
         ],
         "no-self-compare": "error",
