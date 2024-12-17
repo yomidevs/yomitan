@@ -1331,7 +1331,7 @@ export class Backend {
         }
 
         try {
-            if (options.general.enableContextMenuScanSelected) {
+            if (options.general.enableContextMenuScanSelected && chrome.contextMenus) {
                 chrome.contextMenus.create({
                     id: 'yomitan_lookup',
                     title: 'Lookup in Yomitan',
