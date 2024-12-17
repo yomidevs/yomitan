@@ -53,7 +53,7 @@ body:not([data-loaded=true]) #action-popup {
 }
 
 body {
-    padding: 10px;
+    padding: 5px;
     margin: 0;
     font-family: 'Segoe UI', Tahoma, sans-serif;
     font-size: var(--font-size);
@@ -254,12 +254,15 @@ h2.action-title {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    gap: 0.25em;
+    padding: 5px;
 }
 
 .action-container button {
     flex: 0 0 auto;
+}
+
+.action-container.action-buttons {
+    gap: 0.25em;
 }
 
 /* Actions */
@@ -287,7 +290,7 @@ select.profile-select {
     color: #808080;
     padding: 0;
     margin: 0;
-    margin-top: 0.5em;
+    margin-top: 0.25em;
 }
 
 .enable-dictionary-tooltip {

@@ -13,3 +13,6 @@
 :root:is([data-language=ja], [data-language=zh], [data-language=yue], [data-language=ko]) .not-jpzhyueko {
     display: none;
 }
+:root:not([data-language=ja]) .jp-only {
+    display: none;
+}

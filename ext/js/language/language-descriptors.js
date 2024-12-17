@@ -20,8 +20,10 @@ import {normalizeRadicalCharacters} from './CJK-util.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {germanTransforms} from './de/german-transforms.js';
 import {englishTransforms} from './en/english-transforms.js';
+import {esperantoTransforms} from './eo/esperanto-transforms.js';
 import {spanishTransforms} from './es/spanish-transforms.js';
 import {apostropheVariants} from './fr/french-text-preprocessors.js';
+import {frenchTransforms} from './fr/french-transforms.js';
 import {
     alphabeticToHiragana,
     alphanumericWidthVariants,
@@ -109,6 +111,7 @@ const languageDescriptors = [
         name: 'Esperanto',
         exampleText: 'legi',
         textPreprocessors: capitalizationPreprocessors,
+        languageTransforms: esperantoTransforms,
     },
     {
         iso: 'es',
@@ -143,6 +146,7 @@ const languageDescriptors = [
             ...capitalizationPreprocessors,
             apostropheVariants,
         },
+        languageTransforms: frenchTransforms,
     },
     {
         iso: 'grc',
