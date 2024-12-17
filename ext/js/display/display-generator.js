@@ -17,6 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
+import {safePerformance} from '../core/safe-performance.js';
 import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji} from '../language/ja/japanese.js';
@@ -111,23 +112,23 @@ export class DisplayGenerator {
         node.dataset.groupedFrequencyCount = `${groupedFrequencies.length}`;
         node.dataset.primaryMatchTypes = [...primaryMatchTypes].join(' ');
 
-        performance.mark('displayGenerator:createTermEntry:createTermHeadword:start');
+        safePerformance.mark('displayGenerator:createTermEntry:createTermHeadword:start');
         for (let i = 0, ii = headwords.length; i < ii; ++i) {
             const node2 = this._createTermHeadword(headwords[i], i, pronunciations);
             node2.dataset.index = `${i}`;
             headwordsContainer.appendChild(node2);
         }
         headwordsContainer.dataset.count = `${headwords.length}`;
-        performance.mark('displayGenerator:createTermEntry:createTermHeadword:end');
-        performance.measure('displayGenerator:createTermEntry:createTermHeadword', 'displayGenerator:createTermEntry:createTermHeadword:start', 'displayGenerator:createTermEntry:createTermHeadword:end');
+        safePerformance.mark('displayGenerator:createTermEntry:createTermHeadword:end');
+        safePerformance.measure('displayGenerator:createTermEntry:createTermHeadword', 'displayGenerator:createTermEntry:createTermHeadword:start', 'displayGenerator:createTermEntry:createTermHeadword:end');
 
-        performance.mark('displayGenerator:createTermEntry:promises:start');
+        safePerformance.mark('displayGenerator:createTermEntry:promises:start');
         this._appendMultiple(inflectionRuleChainsContainer, this._createInflectionRuleChain.bind(this), inflectionRuleChainCandidates);
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations);
         this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
-        performance.mark('displayGenerator:createTermEntry:promises:end');
-        performance.measure('displayGenerator:createTermEntry:promises', 'displayGenerator:createTermEntry:promises:start', 'displayGenerator:createTermEntry:promises:end');
+        safePerformance.mark('displayGenerator:createTermEntry:promises:end');
+        safePerformance.measure('displayGenerator:createTermEntry:promises', 'displayGenerator:createTermEntry:promises:start', 'displayGenerator:createTermEntry:promises:end');
 
         for (const term of uniqueTerms) {
             headwordTagsContainer.appendChild(this._createSearchTag(term));

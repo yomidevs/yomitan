@@ -79,6 +79,10 @@
             {
                 "message": "Avoid using Response.json(), prefer readResponseJson.",
                 "selector": "MemberExpression[property.name=json]"
+            },
+            {
+                "message": "Avoid using performance, prefer safePerformance.",
+                "selector": "MemberExpression[object.name=performance]"
             }
         ],
         "no-self-compare": "error",
@@ -582,6 +586,7 @@
                 "ext/js/core/extension-error.js",
                 "ext/js/core/json.js",
                 "ext/js/core/log.js",
+                "ext/js/core/safe-performance.js",
                 "ext/js/core/to-error.js",
                 "ext/js/core/utilities.js",
                 "ext/js/data/database.js",
@@ -619,6 +624,7 @@
                 "ext/js/core/log-utilities.js",
                 "ext/js/core/log.js",
                 "ext/js/core/object-utilities.js",
+                "ext/js/core/safe-performance.js",
                 "ext/js/core/to-error.js",
                 "ext/js/core/utilities.js",
                 "ext/js/data/anki-util.js",
