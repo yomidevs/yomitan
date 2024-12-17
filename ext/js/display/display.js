@@ -788,7 +788,7 @@ export class Display extends EventDispatcher {
     async _onStateChanged() {
         if (this._historyChangeIgnore) { return; }
 
-        safePerformance.mark('display:onStateChanged:start');
+        safePerformance.mark('display:_onStateChanged:start');
 
         /** @type {?import('core').TokenObject} */
         const token = {}; // Unique identifier token
@@ -810,7 +810,7 @@ export class Display extends EventDispatcher {
             safePerformance.measure('display:clear', 'display:clear:start', 'display:clear:end');
 
             // Prepare
-            safePerformance.mark('display:prepare:start');
+            safePerformance.mark('display:_onStateChanged:prepare:start');
             const urlSearchParams = new URLSearchParams(location.search);
             let type = urlSearchParams.get('type');
             if (type === null && urlSearchParams.get('query') !== null) { type = 'terms'; }
