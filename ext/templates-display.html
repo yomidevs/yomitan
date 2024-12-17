@@ -105,9 +105,25 @@
 </span></span></template>
 
 <!-- Pitch accent -->
-<template id="pronunciation-group-template"><li class="pronunciation-group"><span class="pronunciation-group-tag-list tag-list"></span><ul class="pronunciation-list"></ul></li></template>
-<template id="pronunciation-disambiguation-template"><span class="pronunciation-disambiguation"></span></template>
-<template id="pronunciation-template"><li class="pronunciation"><span class="pronunciation-tag-list tag-list"></span><span class="pronunciation-disambiguation-list"></span><span class="pronunciation-representation-list"><span class="pronunciation-text-container"></span><span class="pronunciation-downstep-notation-container"></span><span class="pronunciation-graph-container"></span></span></li></template>
+<template id="pronunciation-group-template">
+    <li class="pronunciation-group">
+        <ul class="pronunciation-list"></ul>
+        <span class="pronunciation-group-tag-list tag-list"></span>
+    </li>
+</template>
+<template id="pronunciation-disambiguation-template">
+    <span class="pronunciation-disambiguation"></span>
+</template>
+<template id="pronunciation-template">
+    <li class="pronunciation">
+        <span class="pronunciation-tag-list tag-list"></span>
+        <span class="pronunciation-disambiguation-list"></span>
+        <span class="pronunciation-representation-list">
+        <span class="pronunciation-text-container"></span>
+        <span class="pronunciation-downstep-notation-container"></span>
+        <span class="pronunciation-graph-container"></span></span>
+    </li>
+</template>
 
 <!-- Kanji entry -->
 <template id="kanji-entry-template" data-remove-whitespace-text="true"><div class="entry kanji-entry" data-type="kanji">

@@ -17,7 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
+import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective, groupByPronunciation} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji} from '../language/ja/japanese.js';
 import {getLanguageFromText} from '../language/text-utilities.js';
@@ -124,7 +124,8 @@ export class DisplayGenerator {
         performance.mark('displayGenerator:createTermEntry:promises:start');
         this._appendMultiple(inflectionRuleChainsContainer, this._createInflectionRuleChain.bind(this), inflectionRuleChainCandidates);
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
-        this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations);
+        const dictionariesGroupedByPronunciation = groupByPronunciation(groupedPronunciations);
+        this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciationByPronunciation.bind(this), dictionariesGroupedByPronunciation);
         this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
         performance.mark('displayGenerator:createTermEntry:promises:end');
         performance.measure('displayGenerator:createTermEntry:promises', 'displayGenerator:createTermEntry:promises:start', 'displayGenerator:createTermEntry:promises:end');
@@ -710,36 +711,31 @@ export class DisplayGenerator {
     }
 
     /**
-     * @param {import('dictionary-data-util').DictionaryGroupedPronunciations} details
+     * @param {import('dictionary-data-util').PronunciationsInSeveralDictionaries} details
      * @returns {HTMLElement}
      */
-    _createGroupedPronunciation(details) {
-        const {dictionary, dictionaryAlias, pronunciations} = details;
+    _createGroupedPronunciationByPronunciation({pronunciation, dictionaries}) {
+        const container = document.createElement('div');
+        container.classList.add('grouped-pronunciation-container');
 
         const node = this._instantiate('pronunciation-group');
-        node.dataset.dictionary = dictionary;
-        node.dataset.pronunciationsMulti = 'true';
-        node.dataset.pronunciationsCount = `${pronunciations.length}`;
 
-        const n1 = this._querySelector(node, '.pronunciation-group-tag-list');
-        const tag = this._createTag(this._createTagData(dictionaryAlias, 'pronunciation-dictionary'));
-        tag.dataset.details = dictionary;
-        n1.appendChild(tag);
-
-        let hasTags = false;
-        for (const {pronunciation: {tags}} of pronunciations) {
-            if (tags.length > 0) {
-                hasTags = true;
-                break;
-            }
+        const tagListNode = this._querySelector(node, '.pronunciation-group-tag-list');
+        for (const dictionary of dictionaries) {
+            const tag = this._createTag(this._createTagData(dictionary, 'pronunciation-dictionary'));
+            tag.dataset.details = dictionary;
+            tagListNode.appendChild(tag);
         }
 
-        const n = this._querySelector(node, '.pronunciation-list');
-        n.dataset.hasTags = `${hasTags}`;
-        this._appendMultiple(n, this._createPronunciation.bind(this), pronunciations);
+        const pronunciationListNode = this._querySelector(node, '.pronunciation-list');
 
-        return node;
+        this._appendMultiple(pronunciationListNode, this._createPronunciation.bind(this), [pronunciation]);
+
+        container.appendChild(node);
+
+        return container;
     }
+
 
     /**
      * @param {import('dictionary-data-util').GroupedPronunciation} details
@@ -1120,14 +1116,20 @@ export class DisplayGenerator {
      * @returns {?string}
      */
     _getPronunciationCategories(reading, termPronunciations, wordClasses, headwordIndex) {
-        if (termPronunciations.length === 0) { return null; }
+        if (termPronunciations.length === 0) {
+            return null;
+        }
         const isVerbOrAdjective = isNonNounVerbOrAdjective(wordClasses);
         /** @type {Set<import('japanese-util').PitchCategory>} */
         const categories = new Set();
         for (const termPronunciation of termPronunciations) {
-            if (termPronunciation.headwordIndex !== headwordIndex) { continue; }
+            if (termPronunciation.headwordIndex !== headwordIndex) {
+                continue;
+            }
             for (const pronunciation of termPronunciation.pronunciations) {
-                if (pronunciation.type !== 'pitch-accent') { continue; }
+                if (pronunciation.type !== 'pitch-accent') {
+                    continue;
+                }
                 const category = getPitchCategory(reading, pronunciation.position, isVerbOrAdjective);
                 if (category !== null) {
                     categories.add(category);

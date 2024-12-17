@@ -352,18 +352,18 @@ export function compareRevisions(current, latest) {
  */
 function findExistingGroupedPronunciation(reading, pronunciation, groupedPronunciationList) {
     const existingGroupedPronunciation = groupedPronunciationList.find((groupedPronunciation) => {
-        return groupedPronunciation.reading === reading && arePronunciationsEquivalent(groupedPronunciation, pronunciation);
+        return groupedPronunciation.reading === reading && arePronunciationsEquivalent(groupedPronunciation.pronunciation, pronunciation);
     });
 
     return existingGroupedPronunciation || null;
 }
 
 /**
- * @param {import('dictionary-data-util').GroupedPronunciationInternal} groupedPronunciation
+ * @param {import('dictionary').Pronunciation} pronunciation1
  * @param {import('dictionary').Pronunciation} pronunciation2
  * @returns {boolean}
  */
-function arePronunciationsEquivalent({pronunciation: pronunciation1}, pronunciation2) {
+function arePronunciationsEquivalent(pronunciation1, pronunciation2) {
     if (
         pronunciation1.type !== pronunciation2.type ||
         !areTagListsEqual(pronunciation1.tags, pronunciation2.tags)
@@ -468,4 +468,34 @@ function getSetIntersection(set1, set2) {
  */
 function createMapKey(array) {
     return JSON.stringify(array);
+}
+
+
+/**
+ * @param {import('dictionary-data-util').DictionaryGroupedPronunciations[]} groupedPronunciations
+ * @returns {import('dictionary-data-util').PronunciationsInSeveralDictionaries[]}
+ */
+export function groupByPronunciation(groupedPronunciations) {
+    const groupedList = [];
+
+    for (const dictionaryGroup of groupedPronunciations) {
+        const {dictionary, pronunciations} = dictionaryGroup;
+
+        for (const pronunciation of pronunciations) {
+            const existingEntry = groupedList.find((entry) => arePronunciationsEquivalent(entry.pronunciation.pronunciation, pronunciation.pronunciation));
+
+            if (existingEntry) {
+                if (!existingEntry.dictionaries.includes(dictionary)) {
+                    existingEntry.dictionaries.push(dictionary);
+                }
+            } else {
+                groupedList.push({
+                    pronunciation,
+                    dictionaries: [dictionary],
+                });
+            }
+        }
+    }
+
+    return groupedList;
 }
