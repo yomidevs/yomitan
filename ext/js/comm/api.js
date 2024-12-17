@@ -452,7 +452,6 @@ export class API {
                 log.error('no backend port available');
                 return;
             }
-            // console.log('go', this._backendPort, action, params, transferables);
             this._backendPort.postMessage({action, params}, transferables);
         } else {
             void navigator.serviceWorker.ready.then((swr) => {

@@ -77,12 +77,12 @@ export class DictionaryDatabase {
     }
 
     /**
-     *
+     * do upgrades for the IndexedDB schema (basically limited to adding new stores when needed)
      */
     async prepare() {
         // do not do upgrades in web workers as they are considered to be children of the main thread and are not responsible for database upgrades
-        const upgrade = self.constructor.name !== 'Window' ?
-            null :
+        const isWorker = self.constructor.name !== 'Window';
+        const upgrade =
             /** @type {import('database').StructureDefinition<import('dictionary-database').ObjectStoreName>[]?} */
             ([
                 /** @type {import('database').StructureDefinition<import('dictionary-database').ObjectStoreName>} */
@@ -155,11 +155,11 @@ export class DictionaryDatabase {
         await this._db.open(
             this._dbName,
             60,
-            upgrade,
+            isWorker ? null : upgrade,
         );
 
         // when we are not a worker ourselves, create a worker which is basically just a wrapper around this class, which we can use to offload some functions to
-        if (self.constructor.name === 'Window') {
+        if (!isWorker) {
             this._worker = new Worker('/js/dictionary/dictionary-database-worker-main.js', {type: 'module'});
             this._worker.addEventListener('error', (event) => {
                 log.log('Worker terminated with error:', event);
@@ -418,10 +418,7 @@ export class DictionaryDatabase {
 
         /** @type {import('dictionary-database').FindPredicate<import('dictionary-database').MediaRequest, import('dictionary-database').MediaDataArrayBufferContent>} */
         const predicate = (row, item) => (row.dictionary === item.dictionary);
-        // performance.mark('drawMedia:findMultiBulk:start');
         const results = await this._findMultiBulk('media', ['path'], groupedItemsArray, this._createOnlyQuery5, predicate, this._createDrawMediaBind);
-        // performance.mark('drawMedia:findMultiBulk:end');
-        // performance.measure('drawMedia:findMultiBulk', 'drawMedia:findMultiBulk:start', 'drawMedia:findMultiBulk:end');
 
         // move all svgs to front to have a hotter loop
         results.sort((a, _b) => (a.mediaType === 'image/svg+xml' ? -1 : 1));
@@ -637,7 +634,6 @@ export class DictionaryDatabase {
                 }
             };
             performance.mark('findMultiBulk:getAll:start');
-            // console.log('?');
             for (let i = 0; i < itemCount; ++i) {
                 const item = items[i];
                 const query = createQuery(item);
