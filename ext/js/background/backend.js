@@ -1331,19 +1331,21 @@ export class Backend {
         }
 
         try {
-            if (options.general.enableContextMenuScanSelected && chrome.contextMenus) {
-                chrome.contextMenus.create({
-                    id: 'yomitan_lookup',
-                    title: 'Lookup in Yomitan',
-                    contexts: ['selection'],
-                }, () => this._checkLastError(chrome.runtime.lastError));
-                chrome.contextMenus.onClicked.addListener((info) => {
-                    if (info.selectionText) {
-                        this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
-                    }
-                });
-            } else {
-                chrome.contextMenus.remove('yomitan_lookup', () => this._checkLastError(chrome.runtime.lastError));
+            if (chrome.contextMenus) {
+                if (options.general.enableContextMenuScanSelected) {
+                    chrome.contextMenus.create({
+                        id: 'yomitan_lookup',
+                        title: 'Lookup in Yomitan',
+                        contexts: ['selection'],
+                    }, () => this._checkLastError(chrome.runtime.lastError));
+                    chrome.contextMenus.onClicked.addListener((info) => {
+                        if (info.selectionText) {
+                            this._sendMessageAllTabsIgnoreResponse({action: 'frontendScanSelectedText'});
+                        }
+                    });
+                } else {
+                    chrome.contextMenus.remove('yomitan_lookup', () => this._checkLastError(chrome.runtime.lastError));
+                }
             }
         } catch (e) {
             log.error(e);
