@@ -795,19 +795,18 @@ export class Display extends EventDispatcher {
         this._setContentToken = token;
         try {
             // Clear
-            safePerformance.mark('display:clear:start');
+            safePerformance.mark('display:_onStateChanged:clear:start');
             this._closePopups();
             this._closeAllPopupMenus();
             this._eventListeners.removeAllEventListeners();
-            this._contentManager.unloadAll();
             this._hideTagNotification(false);
             this._hideInflectionNotification(false);
             this._triggerContentClear();
             this._dictionaryEntries = [];
             this._dictionaryEntryNodes = [];
             this._elementOverflowController.clearElements();
-            safePerformance.mark('display:clear:end');
-            safePerformance.measure('display:clear', 'display:clear:start', 'display:clear:end');
+            safePerformance.mark('display:_onStateChanged:clear:end');
+            safePerformance.measure('display:_onStateChanged:clear', 'display:_onStateChanged:clear:start', 'display:_onStateChanged:clear:end');
 
             // Prepare
             safePerformance.mark('display:_onStateChanged:prepare:start');
@@ -1417,7 +1416,8 @@ export class Display extends EventDispatcher {
         safePerformance.mark('display:contentUpdate:start');
         this._triggerContentUpdateStart();
 
-        for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
+        let i = 0;
+        for (const dictionaryEntry of dictionaryEntries) {
             safePerformance.mark('display:createEntry:start');
 
             if (i > 0) {
@@ -1425,7 +1425,8 @@ export class Display extends EventDispatcher {
                 if (this._setContentToken !== token) { return; }
             }
 
-            const dictionaryEntry = dictionaryEntries[i];
+            safePerformance.mark('display:createEntryReal:start');
+
             const entry = (
                 dictionaryEntry.type === 'term' ?
                 this._displayGenerator.createTermEntry(dictionaryEntry, this._dictionaryInfo) :
@@ -1435,16 +1436,31 @@ export class Display extends EventDispatcher {
             this._dictionaryEntryNodes.push(entry);
             this._addEntryEventListeners(entry);
             this._triggerContentUpdateEntry(dictionaryEntry, entry, i);
+            safePerformance.mark('display:waitMedia:start');
+            safePerformance.mark('display:waitMedia:end');
+            safePerformance.measure('display:waitMedia', 'display:waitMedia:start', 'display:waitMedia:end');
+            if (this._setContentToken !== token) { return; }
             container.appendChild(entry);
+
             if (focusEntry === i) {
                 this._focusEntry(i, 0, false);
             }
 
             this._elementOverflowController.addElements(entry);
 
+            safePerformance.mark('display:createEntryReal:end');
+            safePerformance.measure('display:createEntryReal', 'display:createEntryReal:start', 'display:createEntryReal:end');
+
             safePerformance.mark('display:createEntry:end');
             safePerformance.measure('display:createEntry', 'display:createEntry:start', 'display:createEntry:end');
+
+            if (i === 0) {
+                void this._contentManager.executeMediaRequests(); // prioritize loading media for first entry since it is visible
+            }
+            ++i;
         }
+        if (this._setContentToken !== token) { return; }
+        void this._contentManager.executeMediaRequests();
 
         if (typeof scrollX === 'number' || typeof scrollY === 'number') {
             let {x, y} = this._windowScroll;

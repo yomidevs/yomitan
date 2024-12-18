@@ -26,9 +26,11 @@ import {parseJson} from '../dev/json.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
+import {setupStubs} from './utilities/database.js';
 
 const dirname = pathDirname(fileURLToPath(import.meta.url));
 
+setupStubs();
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
 
 /**

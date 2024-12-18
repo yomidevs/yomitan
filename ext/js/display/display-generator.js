@@ -43,6 +43,13 @@ export class DisplayGenerator {
         this._language = 'ja';
     }
 
+    /** @type {import('./display-content-manager.js').DisplayContentManager} */
+    get contentManager() { return this._contentManager; }
+
+    set contentManager(contentManager) {
+        this._contentManager = contentManager;
+    }
+
     /** */
     async prepare() {
         await this._templates.loadFromFiles(['/templates-display.html']);

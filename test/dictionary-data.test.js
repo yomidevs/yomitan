@@ -22,13 +22,17 @@ import {describe} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {createTranslatorTest} from './fixtures/translator-test.js';
 import {createTestAnkiNoteData, getTemplateRenderResults} from './utilities/anki.js';
+import {setupStubs} from './utilities/database.js';
 import {createFindKanjiOptions, createFindTermsOptions} from './utilities/translator.js';
+
+setupStubs();
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
 describe('Dictionary data', () => {
+    console.log('test');
     const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
     /** @type {import('test/translator').TranslatorTestInputs} */
     const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));

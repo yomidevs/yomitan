@@ -558,10 +558,12 @@
         {
             "files": [
                 "ext/js/core/api-map.js",
+                "ext/js/core/event-listener-collection.js",
                 "ext/js/core/extension-error.js",
                 "ext/js/core/json.js",
                 "ext/js/data/anki-note-data-creator.js",
                 "ext/js/dictionary/dictionary-data-util.js",
+                "ext/js/display/display-content-manager.js",
                 "ext/js/display/pronunciation-generator.js",
                 "ext/js/display/structured-content-generator.js",
                 "ext/js/dom/css-style-applier.js",
@@ -582,6 +584,7 @@
         },
         {
             "files": [
+                "ext/js/core/api-map.js",
                 "ext/js/core/event-dispatcher.js",
                 "ext/js/core/extension-error.js",
                 "ext/js/core/json.js",

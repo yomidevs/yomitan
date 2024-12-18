@@ -10869,7 +10869,6 @@
             "dictionary": "Test Dictionary 2",
             "dictionaryIndex": 0,
             "dictionaryAlias": "termsDictAlias",
-
             "hasReading": true,
             "frequency": 10,
             "displayValue": null,
@@ -19650,7 +19649,7 @@
     ]
   },
   {
-    "name": "Find term using primary reading 1",
+    "name": "Find terms using primary reading 1",
     "originalTextLength": 2,
     "dictionaryEntries": [
       {
@@ -19814,10 +19813,9 @@
     ]
   },
   {
-    "name": "Find term using primary reading 2",
+    "name": "Find terms using primary reading 2",
     "originalTextLength": 2,
     "dictionaryEntries": [
-
       {
         "type": "term",
         "isPrimary": true,

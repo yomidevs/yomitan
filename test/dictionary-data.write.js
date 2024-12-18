@@ -21,7 +21,10 @@ import path from 'path';
 import {parseJson} from '../dev/json.js';
 import {createTranslatorTest} from './fixtures/translator-test.js';
 import {createTestAnkiNoteData, getTemplateRenderResults} from './utilities/anki.js';
+import {setupStubs} from './utilities/database.js';
 import {createFindKanjiOptions, createFindTermsOptions} from './utilities/translator.js';
+
+setupStubs();
 
 /**
  * @param {string} fileName

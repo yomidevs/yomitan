@@ -21,7 +21,10 @@ import path from 'path';
 import {bench, describe} from 'vitest';
 import {parseJson} from '../dev/json.js';
 import {createTranslatorContext} from '../test/fixtures/translator-test.js';
+import {setupStubs} from '../test/utilities/database.js';
 import {createFindKanjiOptions, createFindTermsOptions} from '../test/utilities/translator.js';
+
+setupStubs();
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';

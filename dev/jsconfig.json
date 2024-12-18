@@ -53,7 +53,14 @@
             "assert",
             "css",
             "chrome",
-            "ajv"
+            "ajv",
+            "dom-webcodecs"
+        ],
+        "lib": [
+            "ES2022",
+            "DOM",
+            "DOM.Iterable",
+            "WebWorker"
         ]
     },
     "include": [
