@@ -139,7 +139,6 @@ export class ElementOverflowController {
      */
     _onToggleButtonClick(e) {
         const element = /** @type {Element} */ (e.currentTarget);
-
         /** @type {(Element | null)[]} */
         const collapsedElements = [
             element.closest('.definition-item-inner'),
