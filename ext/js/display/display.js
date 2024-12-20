@@ -309,11 +309,6 @@ export class Display extends EventDispatcher {
         return this._frameVisible;
     }
 
-    /** @type {number} */
-    get scrollY() {
-        return this._windowScroll.y;
-    }
-
     /** */
     async prepare() {
         // Theme
@@ -387,10 +382,13 @@ export class Display extends EventDispatcher {
     }
 
     /**
-     * @param {number} y
+     * @param {Element} element
      */
-    setScrollY(y) {
-        this._windowScroll.toY(y);
+    scrollUpToElementTop(element) {
+        const top = this._getElementTop(element);
+        if (this._windowScroll.y > top) {
+            this._windowScroll.toY(top);
+        }
     }
 
     /**
@@ -1638,7 +1636,7 @@ export class Display extends EventDispatcher {
                 node = definitionNodes[definitionIndex];
             }
         }
-        let target = (index === 0 && definitionIndex <= 0) || node === null ? 0 : this.getElementTop(node);
+        let target = (index === 0 && definitionIndex <= 0) || node === null ? 0 : this._getElementTop(node);
 
         if (target !== 0) {
             if (this._aboveStickyHeader !== null) {
@@ -1773,7 +1771,7 @@ export class Display extends EventDispatcher {
      * @param {Element} element
      * @returns {number}
      */
-    getElementTop(element) {
+    _getElementTop(element) {
         const elementRect = element.getBoundingClientRect();
         const documentRect = this._contentScrollBodyElement.getBoundingClientRect();
         return elementRect.top - documentRect.top;

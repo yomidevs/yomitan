@@ -139,7 +139,6 @@ export class ElementOverflowController {
      */
     _onToggleButtonClick(e) {
         const element = /** @type {Element} */ (e.currentTarget);
-        const entryTop = this._display.getElementTop(element);
 
         /** @type {(Element | null)[]} */
         const collapsedElements = [
@@ -149,8 +148,8 @@ export class ElementOverflowController {
         for (const collapsedElement of collapsedElements) {
             if (collapsedElement === null) { continue; }
             const collapsed = collapsedElement.classList.toggle('collapsed');
-            if (collapsed && this._display.scrollY > entryTop) {
-                this._display.setScrollY(entryTop);
+            if (collapsed) {
+                this._display.scrollUpToElementTop(element);
             }
         }
     }
