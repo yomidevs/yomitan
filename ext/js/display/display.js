@@ -174,7 +174,7 @@ export class Display extends EventDispatcher {
         /** @type {OptionToggleHotkeyHandler} */
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         /** @type {ElementOverflowController} */
-        this._elementOverflowController = new ElementOverflowController();
+        this._elementOverflowController = new ElementOverflowController(this);
         /** @type {boolean} */
         this._frameVisible = (pageType === 'search');
         /** @type {HTMLElement} */
@@ -378,6 +378,16 @@ export class Display extends EventDispatcher {
         void this._onStateChanged();
         if (this._frameEndpoint !== null) {
             this._frameEndpoint.signal();
+        }
+    }
+
+    /**
+     * @param {Element} element
+     */
+    scrollUpToElementTop(element) {
+        const top = this._getElementTop(element);
+        if (this._windowScroll.y > top) {
+            this._windowScroll.toY(top);
         }
     }
 
