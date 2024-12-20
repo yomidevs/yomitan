@@ -174,7 +174,7 @@ export class Display extends EventDispatcher {
         /** @type {OptionToggleHotkeyHandler} */
         this._optionToggleHotkeyHandler = new OptionToggleHotkeyHandler(this);
         /** @type {ElementOverflowController} */
-        this._elementOverflowController = new ElementOverflowController();
+        this._elementOverflowController = new ElementOverflowController(this);
         /** @type {boolean} */
         this._frameVisible = (pageType === 'search');
         /** @type {HTMLElement} */
@@ -309,6 +309,11 @@ export class Display extends EventDispatcher {
         return this._frameVisible;
     }
 
+    /** @type {number} */
+    get scrollY() {
+        return this._windowScroll.y;
+    }
+
     /** */
     async prepare() {
         // Theme
@@ -379,6 +384,13 @@ export class Display extends EventDispatcher {
         if (this._frameEndpoint !== null) {
             this._frameEndpoint.signal();
         }
+    }
+
+    /**
+     * @param {number} y
+     */
+    setScrollY(y) {
+        this._windowScroll.toY(y);
     }
 
     /**
@@ -1626,7 +1638,7 @@ export class Display extends EventDispatcher {
                 node = definitionNodes[definitionIndex];
             }
         }
-        let target = (index === 0 && definitionIndex <= 0) || node === null ? 0 : this._getElementTop(node);
+        let target = (index === 0 && definitionIndex <= 0) || node === null ? 0 : this.getElementTop(node);
 
         if (target !== 0) {
             if (this._aboveStickyHeader !== null) {
@@ -1761,7 +1773,7 @@ export class Display extends EventDispatcher {
      * @param {Element} element
      * @returns {number}
      */
-    _getElementTop(element) {
+    getElementTop(element) {
         const elementRect = element.getBoundingClientRect();
         const documentRect = this._contentScrollBodyElement.getBoundingClientRect();
         return elementRect.top - documentRect.top;
