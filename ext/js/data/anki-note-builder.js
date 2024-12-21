@@ -98,12 +98,12 @@ export class AnkiNoteBuilder {
             const {value, errors: fieldErrors, requirements: fieldRequirements} = formattedFieldValues[i];
             noteFields[fieldName] = value;
 
-            // Make field blank if URL if starts with chrome-extension or moz-extension
+            // Make URL field blank if URL source is Yomitan
             const internalFieldName = fields[i][1];
             if (internalFieldName === '{url}') {
                 const urlPrefix = '<a href="';
                 const url = value.replace(urlPrefix, '');
-                if (url.startsWith('chrome-extension') || url.startsWith('moz-extension')) {
+                if (!['http:', 'https:', 'ws:', 'wss:', 'ftp:', 'data:', 'file:'].includes(new URL(url).protocol)) {
                     noteFields[fieldName] = '';
                 }
             }
