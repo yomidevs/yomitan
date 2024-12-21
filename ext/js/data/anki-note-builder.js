@@ -97,6 +97,17 @@ export class AnkiNoteBuilder {
             const fieldName = fields[i][0];
             const {value, errors: fieldErrors, requirements: fieldRequirements} = formattedFieldValues[i];
             noteFields[fieldName] = value;
+
+            // Make field blank if URL if starts with chrome-extension or moz-extension
+            const internalFieldName = fields[i][1];
+            if (internalFieldName === '{url}') {
+                const urlPrefix = '<a href="';
+                const url = value.replace(urlPrefix, '');
+                if (url.startsWith('chrome-extension') || url.startsWith('moz-extension')) {
+                    noteFields[fieldName] = '';
+                }
+            }
+
             allErrors.push(...fieldErrors);
             for (const requirement of fieldRequirements) {
                 const key = JSON.stringify(requirement);
