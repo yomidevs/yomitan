@@ -125,14 +125,16 @@ export class StructuredContentGenerator {
                 /** @type {HTMLCanvasElement} */ (this._createElement('canvas', 'gloss-image')) :
                 /** @type {HTMLImageElement} */ (this._createElement('img', 'gloss-image'));
             if (sizeUnits === 'em' && (hasPreferredWidth || hasPreferredHeight)) {
+                const emSize = 14; // We could Number.parseFloat(getComputedStyle(document.documentElement).fontSize); here for more accuracy but it would cause a layout and be extremely slow; possible improvement would be to calculate and cache the value
+                const scaleFactor = 2 * window.devicePixelRatio;
                 image.style.width = `${usedWidth}em`;
                 image.style.height = `${usedWidth * invAspectRatio}em`;
-                image.width = usedWidth * 14 * 2 * window.devicePixelRatio;
-                image.height = usedWidth * invAspectRatio * 14 * 2 * window.devicePixelRatio;
+                image.width = usedWidth * emSize * scaleFactor;
             } else {
                 image.width = usedWidth;
-                image.height = usedWidth * invAspectRatio;
             }
+            image.height = image.width * invAspectRatio;
+
             imageContainer.appendChild(image);
 
             if (this._contentManager instanceof DisplayContentManager) {

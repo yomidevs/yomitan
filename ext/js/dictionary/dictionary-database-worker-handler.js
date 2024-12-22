@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
- * Copyright (C) 2021-2022  Yomichan Authors
+ * Copyright (C) 2024  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +47,8 @@ export class DictionaryDatabaseWorkerHandler {
             case 'connectToDatabaseWorker':
                 void this._dictionaryDatabase?.connectToDatabaseWorker(event.ports[0]);
                 break;
+            default:
+                log.error(`Unknown action: ${action}`);
         }
     }
 }

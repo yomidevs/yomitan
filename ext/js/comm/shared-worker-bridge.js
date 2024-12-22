@@ -19,7 +19,9 @@ import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {log} from '../core/log.js';
 
 /**
- * This serves as a bridge between the application and the backend.
+ * This serves as a bridge between the application and the backend on Firefox
+ * where we don't have service workers.
+ *
  * It is designed to have extremely short lifetime on the application side,
  * as otherwise it will stay alive across extension updates (which only restart
  * the backend) which can lead to extremely difficult to debug situations where

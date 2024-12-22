@@ -454,9 +454,9 @@ export class API {
             }
             this._backendPort.postMessage({action, params}, transferables);
         } else {
-            void navigator.serviceWorker.ready.then((swr) => {
-                if (swr.active !== null) {
-                    swr.active.postMessage({action, params}, transferables);
+            void navigator.serviceWorker.ready.then((serviceWorkerRegistration) => {
+                if (serviceWorkerRegistration.active !== null) {
+                    serviceWorkerRegistration.active.postMessage({action, params}, transferables);
                 } else {
                     log.error(`[${self.constructor.name}] no active service worker`);
                 }

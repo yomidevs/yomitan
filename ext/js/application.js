@@ -190,13 +190,15 @@ export class Application extends EventDispatcher {
      * @param {(application: Application) => (Promise<void>)} mainFunction
      */
     static async main(waitForDom, mainFunction) {
+        const supportsServiceWorker = 'serviceWorker' in navigator; // Basically, all browsers except Firefox. But it's possible Firefox will support it in the future, so we check in this fashion to be future-proof.
+        const inExtensionContext = window.location.protocol === new URL(import.meta.url).protocol; // This code runs both in content script as well as in the iframe, so we need to differentiate the situation
         /** @type {MessagePort | null} */
         // If this is Firefox, we don't have a service worker and can't postMessage,
         // so we temporarily create a SharedWorker in order to establish a MessageChannel
         // which we can use to postMessage with the backend.
         // This can only be done in the extension context (aka iframe within popup),
         // not in the content script context.
-        const backendPort = (!('serviceWorker' in navigator)) && window.location.protocol === new URL(import.meta.url).protocol ?
+        const backendPort = !supportsServiceWorker && inExtensionContext ?
             (() => {
                 const sharedWorkerBridge = new SharedWorker(new URL('comm/shared-worker-bridge.js', import.meta.url), {type: 'module'});
                 const backendChannel = new MessageChannel();
@@ -210,7 +212,7 @@ export class Application extends EventDispatcher {
         log.configure(webExtension.extensionName);
 
         const mediaDrawingWorkerToBackendChannel = new MessageChannel();
-        const mediaDrawingWorker = window.location.protocol === new URL(import.meta.url).protocol ? new Worker(new URL('display/media-drawing-worker.js', import.meta.url), {type: 'module'}) : null;
+        const mediaDrawingWorker = inExtensionContext ? new Worker(new URL('display/media-drawing-worker.js', import.meta.url), {type: 'module'}) : null;
         mediaDrawingWorker?.postMessage({action: 'connectToDatabaseWorker'}, [mediaDrawingWorkerToBackendChannel.port2]);
 
         const api = new API(webExtension, mediaDrawingWorker, backendPort);
