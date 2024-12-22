@@ -102,8 +102,8 @@ export class AnkiNoteBuilder {
             const internalFieldName = fields[i][1];
             if (internalFieldName === '{url}') {
                 const urlPrefix = '<a href="';
-                const url = value.replace(urlPrefix, '');
-                if (window.location.protocol === new URL(url).protocol) {
+                const url = value.slice(urlPrefix.length);
+                if (new URL(import.meta.url).protocol === new URL(url).protocol) {
                     noteFields[fieldName] = '';
                 }
             }
