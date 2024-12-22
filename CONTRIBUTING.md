@@ -101,3 +101,42 @@ run by `npm test` and the continuous integration process.
 - [.htmlvalidate.json](.htmlvalidate.json) rules are used for HTML files.
 
 In addition, the [Markdown All in One VSCode extension](https://github.com/yzhang-gh/vscode-markdown) is used for formatting markdown files and automatically updating the table of contents.
+
+## Commit Signing
+
+We highly recommend signing your commits in git.
+
+While it's possible to use GPG for this, we recommend using SSH keys for your signing. Furthermore, if you have appropriate hardware support (which most modern machines do), we recommend storing the key in a hardware TPM so it's impossible for malware to steal it off your machine.
+
+### Understanding why
+
+GitHub already requires a key when you connect to it for basic git operations (pull, push, etc.). They call this the "authentication key" and it is an SSH key. You presumably already have one of these if you have ever used GitHub for anything before.
+
+The commit signing key is different, and is used for signing the contents of a commit. This is important because it gives us much more useful git history where we actually have guarentees about who wrote what parts of the code. With no commit signing, it is easy with someone with push access to include commits with fake author names etc., which can be quite troubling when trying to figure out what has happened during a security incident. (See [this article](https://withblue.ink/2020/05/17/how-and-why-to-sign-git-commits.html) for more.)
+
+### Creating the SSH key for signing
+
+- On Mac, you can use [secretive](https://github.com/maxgoedjen/secretive) to have Secure Enclave-backed SSH operations.
+- On Linux, you can use [ssh-tpm-agent](https://github.com/Foxboron/ssh-tpm-agent) to use your hardware TPM for SSH operations.
+- On any OS, you can use a [YubiKey for SSH operations](https://developers.yubico.com/SSH/Securing_SSH_with_FIDO2.html). A YubiKey is arguably slightly more secure than a normal TPM, especially if you get a YubiKey bio, but in our threat model we consider them to be equivalent so there is no need to buy one if you already have a TPM.
+- As a last resort if you're on old hardware and also don't have money to buy a YubiKey, you can create the SSH key on disk as opposed to in a TPM, but it's much more exposed to malware and supply chain attacks (e.g., a malcious npm package that steals SSH keys etc).
+
+When generating the signing key, we recommend requiring user verification (i.e., entering a PIN or presenting a biometric). However for the "authentication key" (the normal SSH key you use to do non-signed operations with GitHub (like pulls)), we do not consider it as important to have user verification as many of those operations are not very sensitive, and it can be annoying to present your verification factor when just doing a pull. Of course it doesn't hurt to have extra user verification security-wise as it's also used for pushes, but the malicious things that could be pushed would be limited since at most the attacker could remove some signed commits, but not create any.
+
+### Exposing your SSH key to git for commit signing
+
+Once you have set up your SSH key (either using the above hardware-backed methods for optimal security, or just a normal on-disk key if you don't have a TPM available in your hardware), you can expose it to git for signing operations as follows:
+
+```
+git config --global gpg.format ssh
+git config --global user.signingkey /path/to/key
+git config --global commit.gpgsign true
+```
+
+(Confusingly the option names have 'gpg' in them, but rest assured GPG is not involved once you switch the format to SSH with the first command.)
+
+### Registering your SSH key with GitHub
+
+Go to [https://github.com/settings/keys](https://github.com/settings/keys) and click "Add new SSH key". On the following page, make sure to change "Key type" to "Signing key". Then paste the public key into the textbox.
+
+With this, you are done and your commits should be signed (which you can see on the GitHub interface with the "Verified" green mark next to your commits).
