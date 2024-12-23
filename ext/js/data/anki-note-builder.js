@@ -81,6 +81,11 @@ export class AnkiNoteBuilder {
             }
         }
 
+        // Make URL field blank if URL source is Yomitan
+        if (URL.canParse(context.url) && new URL(context.url).protocol === new URL(import.meta.url).protocol) {
+            context.url = '';
+        }
+
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fields) {
