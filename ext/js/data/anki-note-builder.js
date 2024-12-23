@@ -81,6 +81,11 @@ export class AnkiNoteBuilder {
             }
         }
 
+        // Make URL field blank if URL source is Yomitan
+        if (URL.canParse(context.url) && new URL(context.url).protocol === new URL(import.meta.url).protocol) {
+            context.url = '';
+        }
+
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fields) {
@@ -97,17 +102,6 @@ export class AnkiNoteBuilder {
             const fieldName = fields[i][0];
             const {value, errors: fieldErrors, requirements: fieldRequirements} = formattedFieldValues[i];
             noteFields[fieldName] = value;
-
-            // Make URL field blank if URL source is Yomitan
-            const internalFieldName = fields[i][1];
-            if (internalFieldName === '{url}') {
-                const urlPrefix = '<a href="';
-                const url = value.slice(urlPrefix.length);
-                if (new URL(import.meta.url).protocol === new URL(url).protocol) {
-                    noteFields[fieldName] = '';
-                }
-            }
-
             allErrors.push(...fieldErrors);
             for (const requirement of fieldRequirements) {
                 const key = JSON.stringify(requirement);
