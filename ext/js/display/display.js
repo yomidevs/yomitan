@@ -799,6 +799,7 @@ export class Display extends EventDispatcher {
             this._closePopups();
             this._closeAllPopupMenus();
             this._eventListeners.removeAllEventListeners();
+            this._contentManager.unloadAll();
             this._hideTagNotification(false);
             this._hideInflectionNotification(false);
             this._triggerContentClear();
@@ -1436,9 +1437,6 @@ export class Display extends EventDispatcher {
             this._dictionaryEntryNodes.push(entry);
             this._addEntryEventListeners(entry);
             this._triggerContentUpdateEntry(dictionaryEntry, entry, i);
-            safePerformance.mark('display:waitMedia:start');
-            safePerformance.mark('display:waitMedia:end');
-            safePerformance.measure('display:waitMedia', 'display:waitMedia:start', 'display:waitMedia:end');
             if (this._setContentToken !== token) { return; }
             container.appendChild(entry);
 
