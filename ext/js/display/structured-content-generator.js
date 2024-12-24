@@ -116,6 +116,7 @@ export class StructuredContentGenerator {
 
         if (typeof border === 'string') { imageContainer.style.border = border; }
         if (typeof borderRadius === 'string') { imageContainer.style.borderRadius = borderRadius; }
+        imageContainer.style.width = `${usedWidth}em`;
         if (typeof title === 'string') {
             imageContainer.title = title;
         }
@@ -131,7 +132,7 @@ export class StructuredContentGenerator {
                 image.style.height = `${usedWidth * invAspectRatio}em`;
                 image.width = usedWidth * emSize * scaleFactor;
             } else {
-                image.width = usedWidth;
+                image.width = width;
             }
             image.height = image.width * invAspectRatio;
 
