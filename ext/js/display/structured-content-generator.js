@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {DisplayContentManager} from '../display/display-content-manager.js';
 import {getLanguageFromText} from '../language/text-utilities.js';
+import {AnkiTemplateRendererContentManager} from '../templates/anki-template-renderer-content-manager.js';
 
 export class StructuredContentGenerator {
     /**
@@ -64,7 +66,6 @@ export class StructuredContentGenerator {
             preferredWidth,
             preferredHeight,
             title,
-            alt,
             pixelated,
             imageRendering,
             appearance,
@@ -97,23 +98,6 @@ export class StructuredContentGenerator {
         const imageContainer = this._createElement('span', 'gloss-image-container');
         node.appendChild(imageContainer);
 
-        const aspectRatioSizer = this._createElement('span', 'gloss-image-sizer');
-        imageContainer.appendChild(aspectRatioSizer);
-
-        const imageBackground = this._createElement('span', 'gloss-image-background');
-        imageContainer.appendChild(imageBackground);
-
-        const image = /** @type {HTMLImageElement} */ (this._createElement('img', 'gloss-image'));
-        image.alt = typeof alt === 'string' ? alt : '';
-        imageContainer.appendChild(image);
-
-        const overlay = this._createElement('span', 'gloss-image-container-overlay');
-        imageContainer.appendChild(overlay);
-
-        const linkText = this._createElement('span', 'gloss-image-link-text');
-        linkText.textContent = 'Image';
-        node.appendChild(linkText);
-
         node.dataset.path = path;
         node.dataset.dictionary = dictionary;
         node.dataset.imageLoadState = 'not-loaded';
@@ -130,22 +114,47 @@ export class StructuredContentGenerator {
             node.dataset.sizeUnits = sizeUnits;
         }
 
-        imageContainer.style.width = `${usedWidth}em`;
         if (typeof border === 'string') { imageContainer.style.border = border; }
         if (typeof borderRadius === 'string') { imageContainer.style.borderRadius = borderRadius; }
         if (typeof title === 'string') {
             imageContainer.title = title;
         }
 
-        aspectRatioSizer.style.paddingTop = `${invAspectRatio * 100}%`;
-
         if (this._contentManager !== null) {
-            this._contentManager.loadMedia(
-                path,
-                dictionary,
-                (url) => this._setImageData(node, image, imageBackground, url, false),
-                () => this._setImageData(node, image, imageBackground, null, true),
-            );
+            const image = this._contentManager instanceof DisplayContentManager ?
+                /** @type {HTMLCanvasElement} */ (this._createElement('canvas', 'gloss-image')) :
+                /** @type {HTMLImageElement} */ (this._createElement('img', 'gloss-image'));
+            if (sizeUnits === 'em' && (hasPreferredWidth || hasPreferredHeight)) {
+                const emSize = 14; // We could Number.parseFloat(getComputedStyle(document.documentElement).fontSize); here for more accuracy but it would cause a layout and be extremely slow; possible improvement would be to calculate and cache the value
+                const scaleFactor = 2 * window.devicePixelRatio;
+                image.style.width = `${usedWidth}em`;
+                image.style.height = `${usedWidth * invAspectRatio}em`;
+                image.width = usedWidth * emSize * scaleFactor;
+            } else {
+                image.width = usedWidth;
+            }
+            image.height = image.width * invAspectRatio;
+
+            imageContainer.appendChild(image);
+
+            if (this._contentManager instanceof DisplayContentManager) {
+                this._contentManager.loadMedia(
+                    path,
+                    dictionary,
+                    (/** @type {HTMLCanvasElement} */(image)).transferControlToOffscreen(),
+                );
+            } else if (this._contentManager instanceof AnkiTemplateRendererContentManager) {
+                this._contentManager.loadMedia(
+                    path,
+                    dictionary,
+                    (url) => {
+                        (/** @type {HTMLImageElement} */(image)).src = url;
+                    },
+                    () => {
+                        (/** @type {HTMLImageElement} */(image)).removeAttribute('src');
+                    },
+                );
+            }
         }
 
         return node;
@@ -221,27 +230,6 @@ export class StructuredContentGenerator {
             } catch (e) {
                 // DOMException if key is malformed
             }
-        }
-    }
-
-    /**
-     * @param {HTMLAnchorElement} node
-     * @param {HTMLImageElement} image
-     * @param {HTMLElement} imageBackground
-     * @param {?string} url
-     * @param {boolean} unloaded
-     */
-    _setImageData(node, image, imageBackground, url, unloaded) {
-        if (url !== null) {
-            image.src = url;
-            node.href = url;
-            node.dataset.imageLoadState = 'loaded';
-            imageBackground.style.setProperty('--image', `url("${url}")`);
-        } else {
-            image.removeAttribute('src');
-            node.removeAttribute('href');
-            node.dataset.imageLoadState = unloaded ? 'unloaded' : 'load-error';
-            imageBackground.style.removeProperty('--image');
         }
     }
 
