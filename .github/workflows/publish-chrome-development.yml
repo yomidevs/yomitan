@@ -21,6 +21,7 @@ jobs:
       releaseUploadUrl: ${{ steps.getZipAsset.outputs.releaseUploadUrl }}
     permissions:
       actions: write
+      contents: write
     steps:
       - name: Get the next attempt number
         id: getNextAttemptNumber
