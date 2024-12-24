@@ -3,6 +3,7 @@
         "selectors": [".gloss-image-container"],
         "styles": [
             ["display", "inline-block"],
+            ["overflow", "hidden"],
             ["font-size", "1px"]
         ]
     },
