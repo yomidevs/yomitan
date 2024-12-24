@@ -19,6 +19,7 @@
 /* Glossary images */
 .gloss-image-container {
     display: inline-block;
+    font-size: calc(1em / var(--font-size-no-units));
 }
 .gloss-image-link[data-background=true]>.gloss-image-container {
     background-color: var(--gloss-image-background-color);
