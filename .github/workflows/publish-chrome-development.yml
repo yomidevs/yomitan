@@ -100,6 +100,14 @@ jobs:
           extensionId: ${{ secrets.G_DEVELOPMENT_EXTENSION_ID }}
           apiAccessToken: ${{ steps.fetchAccessToken.outputs.accessToken }}
 
+  release-crx:
+    runs-on: ubuntu-latest
+    environment: cd
+    permissions:
+      actions: write
+      contents: write
+
+    steps:
       - name: Sign Chrome crx for offline distribution
         uses: cardinalby/webext-buildtools-chrome-crx-action@v2
         with:
