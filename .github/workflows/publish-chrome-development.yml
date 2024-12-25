@@ -129,3 +129,4 @@ jobs:
           upload_url: ${{ inputs.upload_url }}
           asset_path: yomitan-chrome-dev.crx
           asset_name: yomitan-chrome-dev.crx
+          asset_content_type: application/x-chrome-extension
