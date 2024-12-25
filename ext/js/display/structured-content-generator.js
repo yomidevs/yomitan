@@ -116,6 +116,7 @@ export class StructuredContentGenerator {
 
         if (typeof border === 'string') { imageContainer.style.border = border; }
         if (typeof borderRadius === 'string') { imageContainer.style.borderRadius = borderRadius; }
+        imageContainer.style.width = `${usedWidth}em`;
         if (typeof title === 'string') {
             imageContainer.title = title;
         }
@@ -124,16 +125,12 @@ export class StructuredContentGenerator {
             const image = this._contentManager instanceof DisplayContentManager ?
                 /** @type {HTMLCanvasElement} */ (this._createElement('canvas', 'gloss-image')) :
                 /** @type {HTMLImageElement} */ (this._createElement('img', 'gloss-image'));
-            if (sizeUnits === 'em' && (hasPreferredWidth || hasPreferredHeight)) {
-                const emSize = 14; // We could Number.parseFloat(getComputedStyle(document.documentElement).fontSize); here for more accuracy but it would cause a layout and be extremely slow; possible improvement would be to calculate and cache the value
-                const scaleFactor = 2 * window.devicePixelRatio;
-                image.style.width = `${usedWidth}em`;
-                image.style.height = `${usedWidth * invAspectRatio}em`;
-                image.width = usedWidth * emSize * scaleFactor;
-            } else {
-                image.width = usedWidth;
-            }
+            image.width = width;
             image.height = image.width * invAspectRatio;
+
+            // Anki will not render images correctly without specifying to use 100% width and height
+            image.style.width = '100%';
+            image.style.height = '100%';
 
             imageContainer.appendChild(image);
 
