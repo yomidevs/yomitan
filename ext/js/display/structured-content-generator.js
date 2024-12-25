@@ -128,6 +128,10 @@ export class StructuredContentGenerator {
             image.width = width;
             image.height = image.width * invAspectRatio;
 
+            // Anki will not render images correctly without specifying to use 100% width and height
+            image.style.width = '100%';
+            image.style.height = '100%';
+
             imageContainer.appendChild(image);
 
             if (this._contentManager instanceof DisplayContentManager) {
