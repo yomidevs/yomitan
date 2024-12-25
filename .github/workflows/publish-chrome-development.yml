@@ -108,6 +108,11 @@ jobs:
       contents: write
 
     steps:
+      - uses: robinraju/release-downloader@a96f54c1b5f5e09e47d9504526e96febd949d4c2 # pin@v1.11
+        with:
+          tag: ${{ github.ref_name }}
+          fileName: "*"
+
       - name: Sign Chrome crx for offline distribution
         uses: cardinalby/webext-buildtools-chrome-crx-action@v2
         with:
