@@ -28,10 +28,6 @@
 .gloss-image-link:hover {
     /* remove-rule */
 }
-:root[data-browser=firefox] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image,
-:root[data-browser=firefox-mobile] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image {
-    /* remove-rule */
-}
 .gloss-sc-thead,
 .gloss-sc-tfoot,
 .gloss-sc-th {
