@@ -94,21 +94,25 @@
     outline: none;
     width: 100%;
 }
-.gloss-image-link[data-image-rendering=pixelated] .gloss-image {
+.gloss-image-link[data-image-rendering=pixelated] .gloss-image,
+.gloss-image-link[data-image-rendering=pixelated] .gloss-image-background {
     image-rendering: auto;
     image-rendering: -moz-crisp-edges;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
 }
-.gloss-image-link[data-image-rendering=crisp-edges] .gloss-image {
+.gloss-image-link[data-image-rendering=crisp-edges] .gloss-image,
+.gloss-image-link[data-image-rendering=crisp-edges] .gloss-image-background {
     image-rendering: auto;
     image-rendering: -moz-crisp-edges;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
 }
 :root[data-browser=firefox] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image,
-:root[data-browser=firefox-mobile] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image {
+:root[data-browser=firefox] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image-background,
+:root[data-browser=firefox-mobile] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image,
+:root[data-browser=firefox-mobile] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image-background {
     image-rendering: auto;
 }
 .gloss-image-link[data-has-aspect-ratio=true] .gloss-image-sizer {
@@ -134,6 +138,9 @@
 
 .gloss-image-link[data-appearance=monochrome] .gloss-image {
     filter: grayscale(1);
+}
+.gloss-image-link:not([data-appearance=monochrome]) .gloss-image-background {
+    display: none;
 }
 
 .gloss-image-link[data-size-units=em] .gloss-image-container {
