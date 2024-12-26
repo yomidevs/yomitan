@@ -98,6 +98,9 @@ export class StructuredContentGenerator {
         const imageContainer = this._createElement('span', 'gloss-image-container');
         node.appendChild(imageContainer);
 
+        const imageBackground = this._createElement('span', 'gloss-image-background');
+        imageContainer.appendChild(imageBackground);
+
         node.dataset.path = path;
         node.dataset.dictionary = dictionary;
         node.dataset.imageLoadState = 'not-loaded';

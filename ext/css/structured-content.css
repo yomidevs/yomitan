@@ -39,6 +39,26 @@
 .gloss-image-link[href]:hover {
     cursor: pointer;
 }
+.gloss-image-background {
+    --image: none;
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--text-color);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center center;
+    -webkit-mask-mode: alpha;
+    -webkit-mask-size: contain;
+    -webkit-mask-image: var(--image);
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    mask-mode: alpha;
+    mask-size: contain;
+    mask-image: var(--image);
+}
 .gloss-image {
     display: inline-block;
     vertical-align: top;
