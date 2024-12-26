@@ -19,6 +19,11 @@
 /* Glossary images */
 .gloss-image-container {
     display: inline-block;
+    max-width: 100%;
+    max-height: 100vh;
+    position: relative;
+    vertical-align: top;
+    line-height: 0;
     font-size: calc(1em / var(--font-size-no-units));
     overflow: hidden;
 }
@@ -38,6 +43,28 @@
 }
 .gloss-image-link[href]:hover {
     cursor: pointer;
+}
+.gloss-image-container-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    font-size: calc(1em * var(--font-size-no-units));
+    line-height: var(--line-height);
+    display: table;
+    table-layout: fixed;
+    white-space: normal;
+    color: var(--text-color-light3);
+}
+.gloss-image-link[data-has-image=true][data-image-load-state=load-error] .gloss-image-container-overlay::after {
+    content: 'Image failed to load';
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    text-align: center;
+    padding: 0.25em;
 }
 .gloss-image-background {
     --image: none;
@@ -84,6 +111,26 @@
 :root[data-browser=firefox-mobile] .gloss-image-link[data-image-rendering=crisp-edges] .gloss-image {
     image-rendering: auto;
 }
+.gloss-image-link[data-has-aspect-ratio=true] .gloss-image-sizer {
+    display: inline-block;
+    width: 0;
+    vertical-align: top;
+    font-size: 0;
+}
+.gloss-image-link-text {
+    display: none;
+    line-height: var(--line-height);
+}
+.gloss-image-link-text::before {
+    content: '[';
+}
+.gloss-image-link-text::after {
+    content: ']';
+}
+.gloss-image-description {
+    display: block;
+    white-space: pre-line;
+}
 
 .gloss-image-link[data-appearance=monochrome] .gloss-image {
     filter: grayscale(1);
@@ -124,6 +171,14 @@
 :root[data-glossary-layout-mode=compact] .gloss-image-link[data-collapsible=true]:hover .gloss-image-container,
 :root[data-glossary-layout-mode=compact] .gloss-image-link[data-collapsible=true]:focus .gloss-image-container {
     display: block;
+}
+.gloss-image-link[data-collapsed=true] .gloss-image-link-text,
+:root[data-glossary-layout-mode=compact] .gloss-image-link[data-collapsible=true] .gloss-image-link-text {
+    display: inline;
+}
+.gloss-image-link[data-collapsed=true]~.gloss-image-description,
+:root[data-glossary-layout-mode=compact] .gloss-image-description {
+    display: inline;
 }
 
 

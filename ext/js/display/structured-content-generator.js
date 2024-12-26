@@ -101,6 +101,13 @@ export class StructuredContentGenerator {
         const imageBackground = this._createElement('span', 'gloss-image-background');
         imageContainer.appendChild(imageBackground);
 
+        const overlay = this._createElement('span', 'gloss-image-container-overlay');
+        imageContainer.appendChild(overlay);
+
+        const linkText = this._createElement('span', 'gloss-image-link-text');
+        linkText.textContent = 'Image';
+        node.appendChild(linkText);
+
         node.dataset.path = path;
         node.dataset.dictionary = dictionary;
         node.dataset.imageLoadState = 'not-loaded';
@@ -148,10 +155,10 @@ export class StructuredContentGenerator {
                     path,
                     dictionary,
                     (url) => {
-                        (/** @type {HTMLImageElement} */(image)).src = url;
+                        this._setImageData(node, /** @type {HTMLImageElement} */ (image), imageBackground, url, false);
                     },
                     () => {
-                        (/** @type {HTMLImageElement} */(image)).removeAttribute('src');
+                        this._setImageData(node, /** @type {HTMLImageElement} */ (image), imageBackground, null, true);
                     },
                 );
             }
@@ -230,6 +237,27 @@ export class StructuredContentGenerator {
             } catch (e) {
                 // DOMException if key is malformed
             }
+        }
+    }
+
+    /**
+     * @param {HTMLAnchorElement} node
+     * @param {HTMLImageElement} image
+     * @param {HTMLElement} imageBackground
+     * @param {?string} url
+     * @param {boolean} unloaded
+     */
+    _setImageData(node, image, imageBackground, url, unloaded) {
+        if (url !== null) {
+            image.src = url;
+            node.href = url;
+            node.dataset.imageLoadState = 'loaded';
+            imageBackground.style.setProperty('--image', `url("${url}")`);
+        } else {
+            image.removeAttribute('src');
+            node.removeAttribute('href');
+            node.dataset.imageLoadState = unloaded ? 'unloaded' : 'load-error';
+            imageBackground.style.removeProperty('--image');
         }
     }
 
