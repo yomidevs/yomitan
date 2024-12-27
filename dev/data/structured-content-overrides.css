@@ -64,3 +64,12 @@
 .gloss-sc-summary {
     /* remove-rule */
 }
+.gloss-image-background {
+    background-color: currentColor;
+}
+.gloss-image-link:not([data-appearance=monochrome]) .gloss-image-background {
+    display: none;
+}
+.gloss-image-link[data-appearance=monochrome] .gloss-image {
+    opacity: 0;
+}
