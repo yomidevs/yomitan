@@ -41,8 +41,6 @@
 }
 .gloss-image-link:hover {
     color: var(--accent-color-dark);
-}
-.gloss-image-link[href]:hover {
     cursor: pointer;
 }
 .gloss-image-container-overlay {
