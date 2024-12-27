@@ -19,6 +19,7 @@
 /* Glossary images */
 .gloss-image-container {
     display: inline-block;
+    white-space: nowrap;
     max-width: 100%;
     max-height: 100vh;
     position: relative;
@@ -92,7 +93,13 @@
     object-fit: contain;
     border: none;
     outline: none;
+}
+.gloss-image-link[data-has-aspect-ratio=true] .gloss-image {
+    position: absolute;
+    left: 0;
+    top: 0;
     width: 100%;
+    height: 100%;
 }
 .gloss-image-link[data-image-rendering=pixelated] .gloss-image,
 .gloss-image-link[data-image-rendering=pixelated] .gloss-image-background {
@@ -137,9 +144,9 @@
 }
 
 .gloss-image-link[data-appearance=monochrome] .gloss-image {
-    filter: grayscale(1);
+    filter: grayscale(1) opacity(0.5) drop-shadow(0 0 0 var(--text-color)) saturate(1000%) brightness(1000%);
 }
-.gloss-image-link:not([data-appearance=monochrome]) .gloss-image-background {
+.gloss-image-background {
     display: none;
 }
 

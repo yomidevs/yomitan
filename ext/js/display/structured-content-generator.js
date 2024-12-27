@@ -98,6 +98,9 @@ export class StructuredContentGenerator {
         const imageContainer = this._createElement('span', 'gloss-image-container');
         node.appendChild(imageContainer);
 
+        const aspectRatioSizer = this._createElement('span', 'gloss-image-sizer');
+        imageContainer.appendChild(aspectRatioSizer);
+
         const imageBackground = this._createElement('span', 'gloss-image-background');
         imageContainer.appendChild(imageBackground);
 
@@ -119,6 +122,8 @@ export class StructuredContentGenerator {
         if (typeof sizeUnits === 'string' && (hasPreferredWidth || hasPreferredHeight)) {
             node.dataset.sizeUnits = sizeUnits;
         }
+
+        aspectRatioSizer.style.paddingTop = `${invAspectRatio * 100}%`;
 
         if (typeof border === 'string') { imageContainer.style.border = border; }
         if (typeof borderRadius === 'string') { imageContainer.style.borderRadius = borderRadius; }
