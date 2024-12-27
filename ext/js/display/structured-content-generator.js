@@ -169,7 +169,7 @@ export class StructuredContentGenerator {
                             monochromeSvgFilter.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" id="svg"><defs><filter id="' + filterId + '" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="' + matrixFilter + '"/></filter></defs></svg>';
                             image.style.filter = 'url(#' + filterId + ')';
                             this._contentManager.addSvgFilter(filterId);
-                            imageContainer.appendChild(monochromeSvgFilter);
+                            document.body.appendChild(monochromeSvgFilter);
                         }
                     }
                 }
