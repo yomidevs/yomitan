@@ -280,3 +280,18 @@ export function getColorInfo(cssColor) {
             m4 ? Math.max(0, Math.min(1, Number.parseFloat(m4))) : 1,
     ];
 }
+
+/**
+ * Generates an svg filter matrix for filtering to an absolute color value using feColorMatrix
+ * Example usage: `<feColorMatrix type="matrix" values="' + generateSvgFilterMatrix(colors) + '"/>`
+ * @param {number[]} colors The color and alpha values as [r, g, b, a]. The color component values range from [0, 255], and the alpha ranges from [0, 1].
+ * @returns {string}
+ */
+export function generateSvgFilterMatrix(colors) {
+    const matrix = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]];
+    matrix[0][3] = colors[0] / 255;
+    matrix[1][3] = colors[1] / 255;
+    matrix[2][3] = colors[2] / 255;
+    matrix[3][3] = colors[3];
+    return matrix.flat().join(' ');
+}
