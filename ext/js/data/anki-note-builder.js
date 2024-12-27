@@ -88,7 +88,7 @@ export class AnkiNoteBuilder {
                 context.url = '';
             }
         } catch (e) {
-            allErrors.push(new ExtensionError('Failed to parse URL'));
+            // Ignore
         }
 
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
