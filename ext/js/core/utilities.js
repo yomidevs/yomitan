@@ -262,3 +262,21 @@ export function deferPromise() {
 export function promiseTimeout(delay) {
     return delay <= 0 ? Promise.resolve() : new Promise((resolve) => { setTimeout(resolve, delay); });
 }
+
+/**
+ * Decomposes a CSS color string into its RGBA values.
+ * @param {string} cssColor The color value to decompose. This value is expected to be in the form RGB(r, g, b) or RGBA(r, g, b, a).
+ * @returns {?number[]} The color and alpha values as [r, g, b, a]. The color component values range from [0, 255], and the alpha ranges from [0, 1].
+ */
+export function getColorInfo(cssColor) {
+    const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);
+    if (m === null) { return null; }
+
+    const m4 = m[4];
+    return [
+        Number.parseInt(m[1], 10),
+        Number.parseInt(m[2], 10),
+        Number.parseInt(m[3], 10),
+            m4 ? Math.max(0, Math.min(1, Number.parseFloat(m4))) : 1,
+    ];
+}
