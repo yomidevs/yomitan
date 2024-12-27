@@ -462,7 +462,7 @@ export class DictionaryDatabase {
                 } else {
                     const image = new Blob([m.content], {type: m.mediaType});
                     // eslint-disable-next-line no-undef
-                    await createImageBitmap(image).then((decodedImage) => {
+                    await createImageBitmap(image, {resizeWidth: m.canvasWidth, resizeHeight: m.canvasHeight, resizeQuality: 'high'}).then((decodedImage) => {
                         // we need to do a dumb hack where we convert this ImageBitmap to an ImageData by drawing it to a temporary canvas, because Firefox doesn't support transferring ImageBitmaps cross-process
                         const canvas = new OffscreenCanvas(decodedImage.width, decodedImage.height);
                         const ctx = canvas.getContext('2d');
@@ -815,9 +815,9 @@ export class DictionaryDatabase {
      * @param {import('dictionary-database').FindMultiBulkData<import('dictionary-database').DrawMediaGroupedRequest>} data
      * @returns {import('dictionary-database').DrawMedia}
      */
-    _createDrawMedia(row, {itemIndex: index, item: {canvasIndexes, canvasWidth, generation}}) {
+    _createDrawMedia(row, {itemIndex: index, item: {canvasIndexes, canvasWidth, canvasHeight, generation}}) {
         const {dictionary, path, mediaType, width, height, content} = row;
-        return {index, dictionary, path, mediaType, width, height, content, canvasIndexes, canvasWidth, generation};
+        return {index, dictionary, path, mediaType, width, height, content, canvasIndexes, canvasWidth, canvasHeight, generation};
     }
 
     /**

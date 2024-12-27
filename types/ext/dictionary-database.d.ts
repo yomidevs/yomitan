@@ -40,7 +40,7 @@ type MediaType = ArrayBuffer | string | null;
 
 export type Media<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T>;
 
-export type DrawMedia<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T> & {canvasWidth: number, canvasIndexes: number[], generation: number};
+export type DrawMedia<T extends MediaType = ArrayBuffer> = {index: number} & MediaDataBase<T> & {canvasWidth: number, canvasHeight: number, canvasIndexes: number[], generation: number};
 
 export type DatabaseTermEntry = {
     expression: string;

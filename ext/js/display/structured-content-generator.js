@@ -98,6 +98,12 @@ export class StructuredContentGenerator {
         const imageContainer = this._createElement('span', 'gloss-image-container');
         node.appendChild(imageContainer);
 
+        const imageBackground = this._createElement('span', 'gloss-image-background');
+        imageContainer.appendChild(imageBackground);
+
+        const overlay = this._createElement('span', 'gloss-image-container-overlay');
+        imageContainer.appendChild(overlay);
+
         node.dataset.path = path;
         node.dataset.dictionary = dictionary;
         node.dataset.imageLoadState = 'not-loaded';
@@ -125,7 +131,15 @@ export class StructuredContentGenerator {
             const image = this._contentManager instanceof DisplayContentManager ?
                 /** @type {HTMLCanvasElement} */ (this._createElement('canvas', 'gloss-image')) :
                 /** @type {HTMLImageElement} */ (this._createElement('img', 'gloss-image'));
-            image.width = width;
+            if (sizeUnits === 'em' && (hasPreferredWidth || hasPreferredHeight)) {
+                const emSize = 14; // We could Number.parseFloat(getComputedStyle(document.documentElement).fontSize); here for more accuracy but it would cause a layout and be extremely slow; possible improvement would be to calculate and cache the value
+                const scaleFactor = 2 * window.devicePixelRatio;
+                image.style.width = `${usedWidth}em`;
+                image.style.height = `${usedWidth * invAspectRatio}em`;
+                image.width = usedWidth * emSize * scaleFactor;
+            } else {
+                image.width = usedWidth;
+            }
             image.height = image.width * invAspectRatio;
 
             // Anki will not render images correctly without specifying to use 100% width and height
@@ -145,10 +159,10 @@ export class StructuredContentGenerator {
                     path,
                     dictionary,
                     (url) => {
-                        (/** @type {HTMLImageElement} */(image)).src = url;
+                        this._setImageData(node, /** @type {HTMLImageElement} */ (image), imageBackground, url, false);
                     },
                     () => {
-                        (/** @type {HTMLImageElement} */(image)).removeAttribute('src');
+                        this._setImageData(node, /** @type {HTMLImageElement} */ (image), imageBackground, null, true);
                     },
                 );
             }
@@ -227,6 +241,27 @@ export class StructuredContentGenerator {
             } catch (e) {
                 // DOMException if key is malformed
             }
+        }
+    }
+
+    /**
+     * @param {HTMLAnchorElement} node
+     * @param {HTMLImageElement} image
+     * @param {HTMLElement} imageBackground
+     * @param {?string} url
+     * @param {boolean} unloaded
+     */
+    _setImageData(node, image, imageBackground, url, unloaded) {
+        if (url !== null) {
+            image.src = url;
+            node.href = url;
+            node.dataset.imageLoadState = 'loaded';
+            imageBackground.style.setProperty('--image', `url("${url}")`);
+        } else {
+            image.removeAttribute('src');
+            node.removeAttribute('href');
+            node.dataset.imageLoadState = unloaded ? 'unloaded' : 'load-error';
+            imageBackground.style.removeProperty('--image');
         }
     }
 
