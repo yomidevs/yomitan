@@ -156,7 +156,6 @@ export class StructuredContentGenerator {
 
             if (this._contentManager instanceof DisplayContentManager) {
                 if (appearance === 'monochrome') {
-                    const monochromeSvgFilter = this._createElement('span', 'monochrome-svg-filter');
                     const cssColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color');
                     const targetColor = getColorInfo(cssColor);
                     if (targetColor) {
@@ -164,10 +163,11 @@ export class StructuredContentGenerator {
                         if (this._contentManager.svgFilterExists(filterId)) {
                             image.style.filter = 'url(#' + filterId + ')';
                         } else {
-                            const matrixFilter = generateSvgFilterMatrix(targetColor);
-                            // eslint-disable-next-line no-unsanitized/property
-                            monochromeSvgFilter.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" id="svg"><defs><filter id="' + filterId + '" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="' + matrixFilter + '"/></filter></defs></svg>';
+                            const monochromeSvgFilter = this._createElement('span', 'monochrome-svg-filter');
+                            this._createFilterSvg(monochromeSvgFilter, filterId, targetColor);
+
                             image.style.filter = 'url(#' + filterId + ')';
+
                             this._contentManager.addSvgFilter(filterId);
                             document.body.appendChild(monochromeSvgFilter);
                         }
@@ -288,6 +288,29 @@ export class StructuredContentGenerator {
             node.dataset.imageLoadState = unloaded ? 'unloaded' : 'load-error';
             imageBackground.style.removeProperty('--image');
         }
+    }
+
+    /**
+     * @param {HTMLElement} parentNode
+     * @param {string} filterId
+     * @param {number[]} targetColor
+     */
+    _createFilterSvg(parentNode, filterId, targetColor) {
+        const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        parentNode.appendChild(svgElement);
+
+        const svgDefs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        svgElement.appendChild(svgDefs);
+
+        const svgFilter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+        svgFilter.setAttribute('id', filterId);
+        svgFilter.setAttribute('color-interpolation-filters', 'sRGB');
+        svgDefs.appendChild(svgFilter);
+
+        const svgColorMatrix = document.createElementNS('http://www.w3.org/2000/svg', 'feColorMatrix');
+        svgColorMatrix.setAttribute('type', 'matrix');
+        svgColorMatrix.setAttribute('values', generateSvgFilterMatrix(targetColor));
+        svgFilter.appendChild(svgColorMatrix);
     }
 
     /**
