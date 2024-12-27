@@ -163,7 +163,7 @@ export class StructuredContentGenerator {
                         if (document.getElementById(filterId)) {
                             image.style.filter = 'url(#' + filterId + ')';
                         } else {
-                            const monochromeSvgFilter = this._createElement('span', 'monochrome-svg-filter');
+                            const monochromeSvgFilter = document.querySelector('.monochrome-svg-filter') ?? this._createElement('span', 'monochrome-svg-filter');
                             this._createFilterSvg(monochromeSvgFilter, filterId, targetColor);
 
                             image.style.filter = 'url(#' + filterId + ')';
@@ -290,7 +290,7 @@ export class StructuredContentGenerator {
     }
 
     /**
-     * @param {HTMLElement} parentNode
+     * @param {Element} parentNode
      * @param {string} filterId
      * @param {number[]} targetColor
      */
