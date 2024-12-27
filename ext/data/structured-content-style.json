@@ -77,8 +77,7 @@
             ["mask-mode", "alpha"],
             ["mask-size", "contain"],
             ["mask-image", "var(--image)"],
-            ["background-color", "currentColor"],
-            ["display", "initial"]
+            ["background-color", "currentColor"]
         ]
     },
     {
