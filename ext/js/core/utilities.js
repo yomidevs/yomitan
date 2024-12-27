@@ -265,12 +265,12 @@ export function promiseTimeout(delay) {
 
 /**
  * Decomposes a CSS color string into its RGBA values.
- * @param {string} cssColor The color value to decompose. This value is expected to be in the form RGB(r, g, b) or RGBA(r, g, b, a).
+ * @param {string} cssColor The color value to decompose. This value is expected to be in the form RGB(r, g, b), RGBA(r, g, b, a), or #rrggbb.
  * @returns {?number[]} The color and alpha values as [r, g, b, a]. The color component values range from [0, 255], and the alpha ranges from [0, 1].
  */
 export function getColorInfo(cssColor) {
     const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);
-    if (m === null) { return null; }
+    if (m === null) { return getColorInfoHex(cssColor); }
 
     const m4 = m[4];
     return [
@@ -278,6 +278,22 @@ export function getColorInfo(cssColor) {
         Number.parseInt(m[2], 10),
         Number.parseInt(m[3], 10),
             m4 ? Math.max(0, Math.min(1, Number.parseFloat(m4))) : 1,
+    ];
+}
+
+/**
+ * Decomposes a CSS hex color string into its RGBA values.
+ * @param {string} cssColorHex The color value to decompose. This value is expected to be in the form #rrggbb.
+ * @returns {?number[]} The color and alpha values as [r, g, b, a]. The color component values range from [0, 255], and the alpha ranges from [0, 1].
+ */
+function getColorInfoHex(cssColorHex) {
+    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(cssColorHex);
+    if (m === null) { return null; }
+    return [
+        Number.parseInt(m[1], 16),
+        Number.parseInt(m[2], 16),
+        Number.parseInt(m[3], 16),
+        1,
     ];
 }
 
