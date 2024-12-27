@@ -10,6 +10,7 @@
     },
     "type": "module",
     "scripts": {
+        "anki:css-json:write": "node ./dev/bin/generate-css-json.js --dryRun --all",
         "bench": "vitest bench",
         "build": "node ./dev/bin/build.js",
         "build:libs": "node ./dev/bin/build-libs.js",
