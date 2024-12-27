@@ -19,6 +19,7 @@
 /* Glossary images */
 .gloss-image-container {
     display: inline-block;
+    white-space: nowrap;
     max-width: 100%;
     max-height: 100vh;
     position: relative;
@@ -85,6 +86,7 @@
     mask-mode: alpha;
     mask-size: contain;
     mask-image: var(--image);
+    display: none;
 }
 .gloss-image {
     display: inline-block;
@@ -92,7 +94,13 @@
     object-fit: contain;
     border: none;
     outline: none;
+}
+.gloss-image-link[data-has-aspect-ratio=true] .gloss-image {
+    position: absolute;
+    left: 0;
+    top: 0;
     width: 100%;
+    height: 100%;
 }
 .gloss-image-link[data-image-rendering=pixelated] .gloss-image,
 .gloss-image-link[data-image-rendering=pixelated] .gloss-image-background {
@@ -137,10 +145,10 @@
 }
 
 .gloss-image-link[data-appearance=monochrome] .gloss-image {
-    filter: grayscale(1);
-}
-.gloss-image-link:not([data-appearance=monochrome]) .gloss-image-background {
-    display: none;
+    /* Workaround for coloring monochrome gloss images due to issues with masking using a canvas without loading extra media */
+    /* drop-shadow with 0.01px blur is at minimum required for Firefox to render the shadow when used on a canvas */
+    --shadow-settings: 0 0 0.01px var(--text-color);
+    filter: grayscale(1) opacity(0.5) drop-shadow(var(--shadow-settings)) drop-shadow(var(--shadow-settings)) saturate(1000%) brightness(1000%);
 }
 
 .gloss-image-link[data-size-units=em] .gloss-image-container {
