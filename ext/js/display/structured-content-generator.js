@@ -111,6 +111,21 @@ export class StructuredContentGenerator {
         linkText.textContent = 'Image';
         node.appendChild(linkText);
 
+        if (this._contentManager instanceof DisplayContentManager) {
+            node.addEventListener('click', () => {
+                /** @type {HTMLCanvasElement | null} */
+                const canvasElement = imageContainer.querySelector('.gloss-image');
+                if (canvasElement) {
+                    canvasElement.toBlob((blob) => {
+                        if (blob) {
+                            const blobUrl = URL.createObjectURL(blob);
+                            window.open(blobUrl, '_blank')?.focus();
+                        }
+                    });
+                }
+            });
+        }
+
         node.dataset.path = path;
         node.dataset.dictionary = dictionary;
         node.dataset.imageLoadState = 'not-loaded';
