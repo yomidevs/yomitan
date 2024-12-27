@@ -66,6 +66,7 @@
 }
 .gloss-image-background {
     background-color: currentColor;
+    display: initial;
 }
 .gloss-image-link:not([data-appearance=monochrome]) .gloss-image-background {
     display: none;

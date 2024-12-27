@@ -77,7 +77,8 @@
             ["mask-mode", "alpha"],
             ["mask-size", "contain"],
             ["mask-image", "var(--image)"],
-            ["background-color", "currentColor"]
+            ["background-color", "currentColor"],
+            ["display", "initial"]
         ]
     },
     {
@@ -174,14 +175,8 @@
     {
         "selectors": [".gloss-image-link[data-appearance=monochrome] .gloss-image"],
         "styles": [
-            ["filter", "grayscale(1) opacity(0.5) drop-shadow(0 0 0 var(--text-color)) saturate(1000%) brightness(1000%)"],
+            ["filter", "grayscale(1) opacity(0.5) drop-shadow(0 0 0.01px var(--text-color)) saturate(1000%) brightness(1000%)"],
             ["opacity", "0"]
-        ]
-    },
-    {
-        "selectors": [".gloss-image-background"],
-        "styles": [
-            ["display", "none"]
         ]
     },
     {
