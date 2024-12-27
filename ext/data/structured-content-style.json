@@ -172,11 +172,10 @@
         ]
     },
     {
-        "selectors": [".gloss-image-link[data-appearance=monochrome] .gloss-image"],
+        "selectors": [".monochrome-svg-filter>svg"],
         "styles": [
-            ["--shadow-settings", "0 0 0.01px var(--text-color)"],
-            ["filter", "grayscale(1) opacity(0.5) drop-shadow(var(--shadow-settings)) drop-shadow(var(--shadow-settings)) saturate(1000%) brightness(1000%)"],
-            ["opacity", "0"]
+            ["width", "0"],
+            ["height", "0"]
         ]
     },
     {
@@ -340,6 +339,12 @@
         "selectors": [".gloss-image-link:not([data-appearance=monochrome]) .gloss-image-background"],
         "styles": [
             ["display", "none"]
+        ]
+    },
+    {
+        "selectors": [".gloss-image-link[data-appearance=monochrome] .gloss-image"],
+        "styles": [
+            ["opacity", "0"]
         ]
     }
 ]
