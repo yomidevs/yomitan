@@ -144,11 +144,9 @@
     white-space: pre-line;
 }
 
-.gloss-image-link[data-appearance=monochrome] .gloss-image {
-    /* Workaround for coloring monochrome gloss images due to issues with masking using a canvas without loading extra media */
-    /* drop-shadow with 0.01px blur is at minimum required for Firefox to render the shadow when used on a canvas */
-    --shadow-settings: 0 0 0.01px var(--text-color);
-    filter: grayscale(1) opacity(0.5) drop-shadow(var(--shadow-settings)) drop-shadow(var(--shadow-settings)) saturate(1000%) brightness(1000%);
+.monochrome-svg-filter>svg {
+    width: 0;
+    height: 0;
 }
 
 .gloss-image-link[data-size-units=em] .gloss-image-container {

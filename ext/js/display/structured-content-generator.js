@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {generateSvgFilterMatrix, getColorInfo} from '../core/utilities.js';
 import {DisplayContentManager} from '../display/display-content-manager.js';
 import {getLanguageFromText} from '../language/text-utilities.js';
 import {AnkiTemplateRendererContentManager} from '../templates/anki-template-renderer-content-manager.js';
@@ -154,6 +155,19 @@ export class StructuredContentGenerator {
             imageContainer.appendChild(image);
 
             if (this._contentManager instanceof DisplayContentManager) {
+                if (appearance === 'monochrome') {
+                    const monochromeSvgFilter = this._createElement('span', 'monochrome-svg-filter');
+                    const cssColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color');
+                    const targetColor = getColorInfo(cssColor);
+                    if (targetColor) {
+                        const filterId = 'monochrome-svg-filter-' + targetColor.join('');
+                        // eslint-disable-next-line no-unsanitized/property
+                        monochromeSvgFilter.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" id="svg"><defs><filter id="' + filterId + '" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="' + generateSvgFilterMatrix(targetColor) + '"/></filter></defs></svg>';
+                        image.style.filter = 'url(#' + filterId + ')';
+                        imageContainer.appendChild(monochromeSvgFilter);
+                    }
+                }
+
                 this._contentManager.loadMedia(
                     path,
                     dictionary,
