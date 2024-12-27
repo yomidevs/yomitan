@@ -113,15 +113,8 @@ export class StructuredContentGenerator {
 
         if (this._contentManager instanceof DisplayContentManager) {
             node.addEventListener('click', () => {
-                /** @type {HTMLCanvasElement | null} */
-                const canvasElement = imageContainer.querySelector('.gloss-image');
-                if (canvasElement) {
-                    canvasElement.toBlob((blob) => {
-                        if (blob) {
-                            const blobUrl = URL.createObjectURL(blob);
-                            window.open(blobUrl, '_blank')?.focus();
-                        }
-                    });
+                if (this._contentManager instanceof DisplayContentManager) {
+                    void this._contentManager.openMediaInTab(path, dictionary, window);
                 }
             });
         }
