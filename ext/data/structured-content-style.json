@@ -25,12 +25,6 @@
         ]
     },
     {
-        "selectors": [".gloss-image-link[href]:hover"],
-        "styles": [
-            ["cursor", "pointer"]
-        ]
-    },
-    {
         "selectors": [".gloss-image-container-overlay"],
         "styles": [
             ["position", "absolute"],
