@@ -160,7 +160,7 @@ export class StructuredContentGenerator {
                     const targetColor = getColorInfo(cssColor);
                     if (targetColor) {
                         const filterId = 'monochrome-svg-filter-' + targetColor.join('');
-                        if (this._contentManager.svgFilterExists(filterId)) {
+                        if (document.getElementById(filterId)) {
                             image.style.filter = 'url(#' + filterId + ')';
                         } else {
                             const monochromeSvgFilter = this._createElement('span', 'monochrome-svg-filter');
@@ -168,7 +168,6 @@ export class StructuredContentGenerator {
 
                             image.style.filter = 'url(#' + filterId + ')';
 
-                            this._contentManager.addSvgFilter(filterId);
                             document.body.appendChild(monochromeSvgFilter);
                         }
                     }

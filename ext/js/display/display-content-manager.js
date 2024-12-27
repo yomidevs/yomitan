@@ -35,24 +35,6 @@ export class DisplayContentManager {
         this._eventListeners = new EventListenerCollection();
         /** @type {import('display-content-manager').LoadMediaRequest[]} */
         this._loadMediaRequests = [];
-        /** @type {string[]} */
-        this._svgFilters = [];
-    }
-
-
-    /**
-     * @param {string} svgId
-     * @returns {boolean}
-     */
-    svgFilterExists(svgId) {
-        return this._svgFilters.includes(svgId);
-    }
-
-    /**
-     * @param {string} svgId
-     */
-    addSvgFilter(svgId) {
-        this._svgFilters.push(svgId);
     }
 
     /** @type {import('display-content-manager').LoadMediaRequest[]} */
@@ -79,8 +61,6 @@ export class DisplayContentManager {
         this._eventListeners.removeAllEventListeners();
 
         this._loadMediaRequests = [];
-
-        this._svgFilters = [];
     }
 
     /**
