@@ -10,108 +10,41 @@ on:
   merge_group:
 
 jobs:
-  js:
-    name: JavaScript
+  tests:
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: JavaScript
+            test: test:js
+          - name: TypeScript (main)
+            test: test:ts:main
+          - name: TypeScript (dev)
+            test: test:ts:dev
+          - name: TypeScript (test)
+            test: test:ts:test
+          - name: TypeScript (bench)
+            test: test:ts:bench
+          - name: CSS
+            test: test:css
+          - name: HTML
+            test: test:html
+          - name: Markdown
+            test: test:md
+          - name: JSON
+            test: test:json
+          - name: Unit Tests
+            test: test:unit
+          - name: Unit Tests (options)
+            test: test:unit:options
+
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
 
-      - name: Test JavaScript
-        run: npm run test:js
-
-  ts-main:
-    name: TypeScript (main)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-
-      - name: Test TypeScript (main)
-        run: npm run test:ts:main
-
-  ts-dev:
-    name: TypeScript (dev)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-
-      - name: Test TypeScript (dev)
-        run: npm run test:ts:dev
-
-  ts-test:
-    name: TypeScript (test)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-
-      - name: Test TypeScript (test)
-        run: npm run test:ts:test
-
-  ts-bench:
-    name: TypeScript (bench)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-
-      - name: Test TypeScript (bench)
-        run: npm run test:ts:bench
-
-  css:
-    name: CSS
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-
-      - name: Test CSS
-        run: npm run test:css
-
-  html:
-    name: HTML
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-
-      - name: Test HTML
-        run: npm run test:html
-
-  markdown:
-    name: Markdown
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-
-      - name: Test Markdown
-        run: npm run test:md
-
-  json:
-    name: JSON
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-
-      - name: Test JSON
-        run: npm run test:json
-
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-
-      - name: Run unit tests
-        run: npm run test:unit
-
-      - name: Run unit tests (options)
-        run: npm run test:unit:options
+      - name: Run ${{ matrix.name }} tests
+        run: npm run ${{ matrix.test }}
 
   test-build:
     name: Test Build
