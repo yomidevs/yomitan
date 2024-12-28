@@ -17,6 +17,7 @@
  */
 
 import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {base64ToArrayBuffer} from '../data/array-buffer-util.js';
 
 /**
  * The content manager which is used when generating HTML display content.
@@ -84,6 +85,19 @@ export class DisplayContentManager {
     async executeMediaRequests() {
         this._display.application.api.drawMedia(this._loadMediaRequests, this._loadMediaRequests.map(({canvas}) => canvas));
         this._loadMediaRequests = [];
+    }
+
+    /**
+     * @param {string} path
+     * @param {string} dictionary
+     * @param {Window} window
+     */
+    async openMediaInTab(path, dictionary, window) {
+        const data = await this._display.application.api.getMedia([{path, dictionary}]);
+        const buffer = base64ToArrayBuffer(data[0].content);
+        const blob = new Blob([buffer], {type: data[0].mediaType});
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank')?.focus();
     }
 
     /**

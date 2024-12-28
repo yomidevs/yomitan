@@ -3,6 +3,14 @@
 This file documents the scripts available in the [package.json](../../package.json) file.
 Scripts can be executed by running `npm run <name>`.
 
+- `anki:css-json:write`
+
+  Writes Anki structured content styling json for use when sending stuctured content dictionaries to Anki.
+
+  CSS rules are taken from `ext/css/structured-content.css` and converted into json.
+
+  CSS rule overrides and exclusions can be set in `dev/data/structured-content-overrides.css`.
+
 - `bench`
   Runs performance benchmarks.
 

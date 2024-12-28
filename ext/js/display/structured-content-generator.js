@@ -108,6 +108,18 @@ export class StructuredContentGenerator {
         const overlay = this._createElement('span', 'gloss-image-container-overlay');
         imageContainer.appendChild(overlay);
 
+        const linkText = this._createElement('span', 'gloss-image-link-text');
+        linkText.textContent = 'Image';
+        node.appendChild(linkText);
+
+        if (this._contentManager instanceof DisplayContentManager) {
+            node.addEventListener('click', () => {
+                if (this._contentManager instanceof DisplayContentManager) {
+                    void this._contentManager.openMediaInTab(path, dictionary, window);
+                }
+            });
+        }
+
         node.dataset.path = path;
         node.dataset.dictionary = dictionary;
         node.dataset.imageLoadState = 'not-loaded';
