@@ -60,7 +60,7 @@
     },
     "devDependencies": {
         "@codspeed/vitest-plugin": "^3.1.0",
-        "@playwright/test": "^1.44.1",
+        "@playwright/test": "^1.49.1",
         "@stylistic/eslint-plugin": "^1.6.3",
         "@stylistic/stylelint-plugin": "^2.1.2",
         "@types/assert": "^1.5.10",
@@ -80,7 +80,7 @@
         "ajv": "^8.17.1",
         "css": "^3.0.0",
         "dotenv": "^16.4.5",
-        "esbuild": "^0.21.4",
+        "esbuild": "^0.24.2",
         "eslint": "^8.57.1",
         "eslint-plugin-eslint-comments": "^3.2.0",
         "eslint-plugin-header": "^3.1.1",
