@@ -90,13 +90,13 @@ test('visual', async ({page, extensionId}) => {
     /**
      * @param {number} doc_number
      * @param {number} test_number
-     * @param {import('@playwright/test').ElementHandle<Node>} el
+     * @param {import('@playwright/test').Locator} test_locator
      * @param {{x: number, y: number}} offset
      */
-    const screenshot = async (doc_number, test_number, el, offset) => {
+    const screenshot = async (doc_number, test_number, test_locator, offset) => {
         const test_name = 'doc' + doc_number + '-test' + test_number;
 
-        const box = (await el.boundingBox()) || {x: 0, y: 0, width: 0, height: 0};
+        const box = (await test_locator.boundingBox()) || {x: 0, y: 0, width: 0, height: 0};
 
         // Find the popup frame if it exists
         let popup_frame = page.frames().find((f) => f.url().includes('popup.html'));
@@ -110,13 +110,10 @@ test('visual', async ({page, extensionId}) => {
         if (typeof popup_frame === 'undefined') {
             popup_frame = await frame_attached; // Wait for popup to be attached
         }
-        try {
-            // Some tests don't have a popup, so don't fail if it's not there
-            // TODO: check if the popup is expected to be there
-            await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement()).waitForElementState('visible', {timeout: 500});
-        } catch (error) {
-            console.log(test_name + ' has no popup');
-        }
+
+        const expectedState = (await test_locator.locator('..').getAttribute('data-expected-result')) === 'failure' ? 'hidden' : 'visible';
+        await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement()).waitForElementState(expectedState, {timeout: 50});
+
 
         await page.bringToFront(); // Bring the page to the foreground so the screenshot doesn't hang; for some reason the frames result in page being in the background
         await expect.soft(page).toHaveScreenshot(test_name + '.png');
@@ -130,8 +127,8 @@ test('visual', async ({page, extensionId}) => {
     await page.setViewportSize({width: 1000, height: 1800});
     await page.keyboard.down('Shift');
     let i = 1;
-    for (const el of await page.locator('div > *:nth-child(1)').elementHandles()) {
-        await screenshot(1, i, el, {x: 6, y: 6});
+    for (const test_locator of await page.locator('div > *:nth-child(1)').all()) {
+        await screenshot(1, i, test_locator, {x: 6, y: 6});
         i++;
     }
 
@@ -140,8 +137,8 @@ test('visual', async ({page, extensionId}) => {
     await page.setViewportSize({width: 1000, height: 4500});
     await page.keyboard.down('Shift');
     i = 1;
-    for (const el of await page.locator('.hovertarget').elementHandles()) {
-        await screenshot(2, i, el, {x: 15, y: 15});
+    for (const test_locator of await page.locator('.hovertarget').all()) {
+        await screenshot(2, i, test_locator, {x: 15, y: 15});
         i++;
     }
 });
