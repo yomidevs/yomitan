@@ -52,7 +52,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           run_id: ${{ github.event.workflow_run.id }}
           name: playwright-report
-          dry-run: true
+          dry_run: true
 
       - name: Store playwright-report ID
         id: playwright-report-artifact-id
