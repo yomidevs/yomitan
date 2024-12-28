@@ -53,14 +53,16 @@ jobs:
         id: playwright
         run: |
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "PLAYWRIGHT_OUTPUT<<$EOF" >> $GITHUB_OUTPUT
-          cat ./playwright-output >> $GITHUB_OUTPUT
-          echo "$EOF" >> $GITHUB_OUTPUT
-          echo "MASTER_SCREENSHOTS_OUTCOME<<$EOF" >> $GITHUB_OUTPUT
-          cat ./master-screenshots-outcome >> $GITHUB_OUTPUT
-          echo "$EOF" >> $GITHUB_OUTPUT
-          echo "FAILED=$(grep -c '^ *[0-9] failed$' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
-          echo "FLAKY=$(grep -c '^ *[0-9] flaky$' $GITHUB_OUTPUT)" >> $GITHUB_OUTPUT
+          {
+            echo "PLAYWRIGHT_OUTPUT<<$EOF";
+            cat ./playwright-output;
+            echo "$EOF";
+            echo "MASTER_SCREENSHOTS_OUTCOME<<$EOF";
+            cat ./master-screenshots-outcome;
+            echo "$EOF";
+            echo "FAILED=$(grep -c '^ *[0-9] failed$' ./playwright-output)";
+            echo "FLAKY=$(grep -c '^ *[0-9] flaky$' ./playwright-output)"
+          } >> "$GITHUB_OUTPUT"
 
       # this is required because github.event.workflow_run.pull_requests is not available for PRs from forks
       - name: "Get PR information"
