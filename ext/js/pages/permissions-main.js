@@ -113,8 +113,6 @@ await Application.main(true, async (application) => {
     /** @type {HTMLInputElement} */
     const permissionCheckbox2 = querySelectorNotNull(document, '#permission-checkbox-allow-file-url-access');
     /** @type {HTMLInputElement[]} */
-    // This collection is actually used, not sure why this eslint-disable is needed.
-    // eslint-disable-next-line sonarjs/no-unused-collection
     const permissionsCheckboxes = [permissionCheckbox1, permissionCheckbox2];
 
     const permissions = await Promise.all([
