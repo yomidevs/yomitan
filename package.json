@@ -16,9 +16,16 @@
         "build:libs": "node ./dev/bin/build-libs.js",
         "build:serve:firefox-android": "node ./dev/bin/build.js --target firefox-android && web-ext run -s ./builds/yomitan-firefox-android",
         "build:serve:kiwi-browser": "node ./dev/bin/build.js --target chrome-dev && adb shell mkdir -p /sdcard/yomitan && adb push ./builds/yomitan-chrome-dev.zip /sdcard/yomitan/yomitan-kiwi-browser.zip",
+
+
+        "//WARNING": "These are convenience functions for running from CLI but are NOT called from CI because they are not parallel. Make sure you update CI scripts if you update these.",
         "test": "npm run test:js && npm run test:ts && npm run test:css && npm run test:html && npm run test:unit && npm run test:unit:options && npm run test:json && npm run test:md && npm run test:build",
         "test:fast": "npm run test:js && npm run test:ts && npm run test:unit && npm run test:json:format",
         "test:static-analysis": "npm run test:js && npm run test:ts && npm run test:css && npm run test:html && npm run test:md",
+        "test:ts": "npm run test:ts:main && npm run test:ts:dev && npm run test:ts:test && npm run test:ts:bench",
+        "//END-WARNING": "",
+
+
         "test:js": "npx eslint . --ignore-pattern '**/*.json'",
         "test:json": "npm run test:json:format && npm run test:json:types",
         "test:json:format": "npx eslint '**/*.json'",
@@ -27,7 +34,6 @@
         "test:html": "npx html-validate \"ext/**/*.html\" \"test/**/*.html\" \"dev/**/*.html\"",
         "test:md": "prettier . --check",
         "test:md:write": "prettier . --write",
-        "test:ts": "npm run test:ts:main && npm run test:ts:dev && npm run test:ts:test && npm run test:ts:bench",
         "test:ts:main": "npx tsc --noEmit --project jsconfig.json",
         "test:ts:dev": "npx tsc --noEmit --project dev/jsconfig.json",
         "test:ts:test": "npx tsc --noEmit --project test/jsconfig.json",

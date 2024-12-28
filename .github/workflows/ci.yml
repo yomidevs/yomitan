@@ -10,8 +10,8 @@ on:
   merge_group:
 
 jobs:
-  static-analysis:
-    name: Static Analysis
+  setup:
+    name: Setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,47 +28,138 @@ jobs:
       - name: Build third-party libraries
         run: npm run build:libs
 
-      - name: Run static analysis tests
-        run: npm run test:static-analysis
+      - name: Upload workspace
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace
+          path: .
 
-  static-analysis-json:
-    name: Static Analysis (JSON)
+  js:
+    needs: setup
+    name: JavaScript
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - name: Download workspace
+        uses: actions/download-artifact@v4
         with:
-          node-version-file: "package.json"
+          name: workspace
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Test JavaScript
+        run: npm run test:js
 
-      - name: Build third-party libraries
-        run: npm run build:libs
+  ts-main:
+    needs: setup
+    name: TypeScript (main)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace
 
-      - name: Run static analysis tests
+      - name: Test TypeScript (main)
+        run: npm run test:ts:main
+
+  ts-dev:
+    needs: setup
+    name: TypeScript
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - name: Test TypeScript (dev)
+        run: npm run test:ts:dev
+
+  ts-test:
+    needs: setup
+    name: TypeScript
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - name: Test TypeScript (test)
+        run: npm run test:ts:test
+
+  ts-bench:
+    needs: setup
+    name: TypeScript
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - name: Test TypeScript (bench)
+        run: npm run test:ts:bench
+
+  css:
+    needs: setup
+    name: CSS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - name: Test CSS
+        run: npm run test:css
+
+  html:
+    needs: setup
+    name: HTML
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - name: Test HTML
+        run: npm run test:html
+
+  markdown:
+    needs: setup
+    name: Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - name: Test Markdown
+        run: npm run test:md
+
+  json:
+    needs: setup
+    name: JSON
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - name: Test JSON
         run: npm run test:json
 
   unit-tests:
+    needs: setup
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - name: Download workspace
+        uses: actions/download-artifact@v4
         with:
-          node-version-file: "package.json"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build third-party libraries
-        run: npm run build:libs
+          name: workspace
 
       - name: Run unit tests
         run: npm run test:unit
@@ -77,22 +168,14 @@ jobs:
         run: npm run test:unit:options
 
   test-build:
+    needs: setup
     name: Test Build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - name: Download workspace
+        uses: actions/download-artifact@v4
         with:
-          node-version-file: "package.json"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Libs
-        run: npm run build:libs
+          name: workspace
 
       - name: Build Legal
         run: npm run license-report:html
@@ -106,3 +189,14 @@ jobs:
           file: ext/manifest.json
           schema: "https://json.schemastore.org/chrome-manifest.json"
           fixSchemas: true
+
+  bench:
+    needs: setup
+    name: Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+    - name: Run Benchmarks
+      uses: CodSpeedHQ/action@513a19673a831f139e8717bf45ead67e47f00044 # v3.2
+      with:
+        token: ${{ secrets.CODSPEED_TOKEN }}
+        run: npm run bench
