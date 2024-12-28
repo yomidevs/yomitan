@@ -1,0 +1,25 @@
+name: Setup
+description: Setup the workspace for the CI
+runs:
+  using: "composite"
+  steps:
+    - name: Setup node
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: "package.json"
+
+    - name: Restore dependencies
+      id: restore-dependencies
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: js-depend-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+    - name: Install dependencies
+      if: steps.restore-dependencies.outputs.cache-hit != 'true'
+      shell: bash
+      run: npm ci
+
+    - name: Build third-party libraries
+      shell: bash
+      run: npm run build:libs
