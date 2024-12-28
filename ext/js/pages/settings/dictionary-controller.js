@@ -832,7 +832,9 @@ export class DictionaryController {
         const dictionaries = this._dictionaries;
         if (dictionaries === null) { return; }
 
-        this._dictionaryEntries.map((dictionaryEntry) => dictionaryEntry.cleanup());
+        for (const dictionaryEntry of this._dictionaryEntries) {
+            dictionaryEntry.cleanup();
+        }
 
         const dictionaryOptionsArray = options.dictionaries;
         for (let i = 0; i < dictionaryOptionsArray.length; i++) {

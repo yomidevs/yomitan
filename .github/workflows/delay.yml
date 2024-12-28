@@ -39,6 +39,5 @@ jobs:
           inputs: |
             {
               "attemptNumber": "${{ github.event.inputs.attemptNumber }}",
-              "maxAttempts": "${{ github.event.inputs.maxAttempts }}",
-              "environment": "${{ github.event.inputs.environment }}"
+              "maxAttempts": "${{ github.event.inputs.maxAttempts }}"
             }

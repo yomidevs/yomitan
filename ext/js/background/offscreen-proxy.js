@@ -22,11 +22,15 @@ import {base64ToArrayBuffer} from '../data/array-buffer-util.js';
 
 /**
  * This class is responsible for creating and communicating with an offscreen document.
- * This offscreen document is used to solve two issues:
+ * This offscreen document is used to solve three issues:
  *
  * - Provide clipboard access for the `ClipboardReader` class in the context of a MV3 extension.
  *   The background service workers doesn't have access a webpage to read the clipboard from,
  *   so it must be done in the offscreen page.
+ *
+ * - Create a worker for image rendering, which both selects the images from the database,
+ *   decodes/rasterizes them, and then sends (= postMessage transfers) them back to a worker
+ *   in the popup to be rendered onto OffscreenCanvas.
  *
  * - Provide a longer lifetime for the dictionary database. The background service worker can be
  *   terminated by the web browser, which means that when it restarts, it has to go through its
@@ -55,6 +59,9 @@ export class OffscreenProxy {
         this._webExtension = webExtension;
         /** @type {?Promise<void>} */
         this._creatingOffscreen = null;
+
+        /** @type {?MessagePort} */
+        this._currentOffscreenPort = null;
     }
 
     /**
@@ -62,6 +69,7 @@ export class OffscreenProxy {
      */
     async prepare() {
         if (await this._hasOffscreenDocument()) {
+            void this.sendMessagePromise({action: 'createAndRegisterPortOffscreen'});
             return;
         }
         if (this._creatingOffscreen) {
@@ -133,6 +141,30 @@ export class OffscreenProxy {
         }
         return response.result;
     }
+
+    /**
+     * @param {MessagePort} port
+     */
+    async registerOffscreenPort(port) {
+        if (this._currentOffscreenPort) {
+            this._currentOffscreenPort.close();
+        }
+        this._currentOffscreenPort = port;
+    }
+
+    /**
+     * When you need to transfer Transferable objects, you can use this method which uses postMessage over the MessageChannel port established with the offscreen document.
+     * @template {import('offscreen').McApiNames} TMessageType
+     * @param {import('offscreen').McApiMessage<TMessageType>} message
+     * @param {Transferable[]} transfers
+     */
+    sendMessageViaPort(message, transfers) {
+        if (this._currentOffscreenPort !== null) {
+            this._currentOffscreenPort.postMessage(message, transfers);
+        } else {
+            void this.sendMessagePromise({action: 'createAndRegisterPortOffscreen'});
+        }
+    }
 }
 
 export class DictionaryDatabaseProxy {
@@ -172,6 +204,14 @@ export class DictionaryDatabaseProxy {
     async getMedia(targets) {
         const serializedMedia = /** @type {import('dictionary-database').Media<string>[]} */ (await this._offscreen.sendMessagePromise({action: 'databaseGetMediaOffscreen', params: {targets}}));
         return serializedMedia.map((m) => ({...m, content: base64ToArrayBuffer(m.content)}));
+    }
+
+    /**
+     * @param {MessagePort} port
+     * @returns {Promise<void>}
+     */
+    async connectToDatabaseWorker(port) {
+        this._offscreen.sendMessageViaPort({action: 'connectToDatabaseWorker'}, [port]);
     }
 }
 

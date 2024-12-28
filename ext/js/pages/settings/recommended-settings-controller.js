@@ -111,11 +111,11 @@ export class RecommendedSettingsController {
             }
             void this._settingsController.modifyProfileSettings(modifications).then(
                 (results) => {
-                    results.map((result) => {
+                    for (const result of results) {
                         if (Object.hasOwn(result, 'error')) {
                             log.error(new Error(`Failed to apply recommended setting: ${JSON.stringify(result)}`));
                         }
-                    });
+                    }
                 },
             );
             void this._settingsController.refresh();

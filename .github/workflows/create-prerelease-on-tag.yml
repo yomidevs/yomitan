@@ -36,7 +36,7 @@ jobs:
         id: hash
         run: |
           cd builds
-          echo "hashes=$(sha256sum * | base64 -w0)" >> "$GITHUB_OUTPUT"
+          echo "hashes=$(sha256sum -- * | base64 -w0)" >> "$GITHUB_OUTPUT"
 
       - name: Release
         id: release
@@ -52,6 +52,7 @@ jobs:
           workflow: publish-chrome-development
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: false
+          inputs: '{ "upload_url": "${{ steps.release.outputs.upload_url }}" }'
 
       - name: Dispatch publish-firefox-development
         uses: aurelien-baudet/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7 # pin@v2

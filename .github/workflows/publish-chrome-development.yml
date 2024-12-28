@@ -10,6 +10,9 @@ on:
         description: "Max attempts"
         required: false
         default: "10"
+      upload_url:
+        description: "The upload_url from the release created by create-prerelease-on-tag.yml"
+        required: true
 permissions:
   contents: read
 jobs:
@@ -18,9 +21,9 @@ jobs:
     environment: cd
     outputs:
       result: ${{ steps.webStorePublish.outcome }}
-      releaseUploadUrl: ${{ steps.getZipAsset.outputs.releaseUploadUrl }}
     permissions:
       actions: write
+      contents: write
     steps:
       - name: Get the next attempt number
         id: getNextAttemptNumber
@@ -95,3 +98,34 @@ jobs:
         with:
           extensionId: ${{ secrets.G_DEVELOPMENT_EXTENSION_ID }}
           apiAccessToken: ${{ steps.fetchAccessToken.outputs.accessToken }}
+
+  release-crx:
+    runs-on: ubuntu-latest
+    environment: cd
+    permissions:
+      actions: write
+      contents: write
+
+    steps:
+      - uses: robinraju/release-downloader@a96f54c1b5f5e09e47d9504526e96febd949d4c2 # pin@v1.11
+        with:
+          tag: ${{ github.ref_name }}
+          fileName: "*"
+
+      - name: Sign Chrome crx for offline distribution
+        uses: cardinalby/webext-buildtools-chrome-crx-action@v2
+        with:
+          zipFilePath: 'yomitan-chrome-dev.zip'
+          crxFilePath: 'yomitan-chrome-dev.crx'
+          privateKey: ${{ secrets.CHROME_CRX_PRIVATE_KEY }}
+
+      - name: Upload offline crx release asset
+        id: uploadReleaseAsset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ inputs.upload_url }}
+          asset_path: yomitan-chrome-dev.crx
+          asset_name: yomitan-chrome-dev.crx
+          asset_content_type: application/x-chrome-extension
