@@ -54,6 +54,14 @@ jobs:
           name: playwright-report
           dry-run: true
 
+      - name: Store playwright-report ID
+        id: playwright-report-artifact-id
+        env:
+          ARTIFACTS_JSON: ${{ steps.playwright-report.outputs.artifacts }}
+        run: |
+          ID=$(echo "$ARTIFACTS_JSON" | jq -r '.[0].id');
+          echo "id=$ID" >> "$GITHUB_OUTPUT"
+
       - name: Generate summary from playwright-results.json (expected to fail to comment)
         id: playwright-summary
         uses: daun/playwright-report-summary@v3
@@ -114,7 +122,7 @@ jobs:
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
-            :warning: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/artifacts/${{ steps.playwright-report.outputs.artifacts[0].id}}">Visual changes detected by playwright; please check the report to verify if they are desirable.</a>
+            :warning: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/artifacts/${{ steps.playwright-report-artifact-id.outputs.id }}">Visual changes detected by playwright; please check the report to verify if they are desirable.</a>
 
       - name: "[Comment] Success (but flaky): No visual differences introduced by this PR (but flaky tests detected)"
         uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
@@ -122,7 +130,7 @@ jobs:
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
-            :heavy_check_mark: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/artifacts/${{ steps.playwright-report.outputs.artifacts[0].id}}">No visual changes detected by playwright, but flaky tests were detected; please try to fix the tests.</a>
+            :heavy_check_mark: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/artifacts/${{ steps.playwright-report-artifact-id.outputs.id }}">No visual changes detected by playwright, but flaky tests were detected; please try to fix the tests.</a>
 
       - name: "[Comment] Success: No visual differences introduced by this PR"
         uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
@@ -130,5 +138,5 @@ jobs:
         with:
           issue: ${{ steps.source-run-info.outputs.pullRequestNumber }}
           message: |
-            :heavy_check_mark: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/artifacts/${{ steps.playwright-report.outputs.artifacts[0].id}}">No visual changes detected by playwright.</a>
+            :heavy_check_mark: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/artifacts/${{ steps.playwright-report-artifact-id.outputs.id }}">No visual changes detected by playwright.</a>
           update-only: true
