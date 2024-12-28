@@ -36,7 +36,7 @@ jobs:
         id: hash
         run: |
           cd builds
-          echo "hashes=$(sha256sum * | base64 -w0)" >> "$GITHUB_OUTPUT"
+          echo "hashes=$(sha256sum -- * | base64 -w0)" >> "$GITHUB_OUTPUT"
 
       - name: Release
         id: release
