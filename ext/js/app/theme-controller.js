@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {getColorInfo} from '../core/utilities.js';
+
 /**
  * This class is used to control theme attributes on DOM elements.
  */
@@ -188,7 +190,7 @@ export class ThemeController {
     _addColor(target, cssColor) {
         if (typeof cssColor !== 'string') { return; }
 
-        const color = this._getColorInfo(cssColor);
+        const color = getColorInfo(cssColor);
         if (color === null) { return; }
 
         const a = color[3];
@@ -198,23 +200,5 @@ export class ThemeController {
         for (let i = 0; i < 3; ++i) {
             target[i] = target[i] * aInv + color[i] * a;
         }
-    }
-
-    /**
-     * Decomposes a CSS color string into its RGBA values.
-     * @param {string} cssColor The color value to decompose. This value is expected to be in the form RGB(r, g, b) or RGBA(r, g, b, a).
-     * @returns {?number[]} The color and alpha values as [r, g, b, a]. The color component values range from [0, 255], and the alpha ranges from [0, 1].
-     */
-    _getColorInfo(cssColor) {
-        const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);
-        if (m === null) { return null; }
-
-        const m4 = m[4];
-        return [
-            Number.parseInt(m[1], 10),
-            Number.parseInt(m[2], 10),
-            Number.parseInt(m[3], 10),
-            m4 ? Math.max(0, Math.min(1, Number.parseFloat(m4))) : 1,
-        ];
     }
 }

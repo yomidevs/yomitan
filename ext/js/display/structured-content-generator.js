@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {generateSvgFilterMatrix, getColorInfo} from '../core/utilities.js';
 import {DisplayContentManager} from '../display/display-content-manager.js';
 import {getLanguageFromText} from '../language/text-utilities.js';
 import {AnkiTemplateRendererContentManager} from '../templates/anki-template-renderer-content-manager.js';
@@ -166,6 +167,24 @@ export class StructuredContentGenerator {
             imageContainer.appendChild(image);
 
             if (this._contentManager instanceof DisplayContentManager) {
+                if (appearance === 'monochrome') {
+                    const cssColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color');
+                    const targetColor = getColorInfo(cssColor);
+                    if (targetColor) {
+                        const filterId = 'monochrome-svg-filter-' + targetColor.join('');
+                        if (document.getElementById(filterId)) {
+                            image.style.filter = 'url(#' + filterId + ')';
+                        } else {
+                            const monochromeSvgFilter = document.querySelector('.monochrome-svg-filter') ?? this._createElement('span', 'monochrome-svg-filter');
+                            this._createFilterSvg(monochromeSvgFilter, filterId, targetColor);
+
+                            image.style.filter = 'url(#' + filterId + ')';
+
+                            document.body.appendChild(monochromeSvgFilter);
+                        }
+                    }
+                }
+
                 this._contentManager.loadMedia(
                     path,
                     dictionary,
@@ -280,6 +299,29 @@ export class StructuredContentGenerator {
             node.dataset.imageLoadState = unloaded ? 'unloaded' : 'load-error';
             imageBackground.style.removeProperty('--image');
         }
+    }
+
+    /**
+     * @param {Element} parentNode
+     * @param {string} filterId
+     * @param {number[]} targetColor
+     */
+    _createFilterSvg(parentNode, filterId, targetColor) {
+        const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        parentNode.appendChild(svgElement);
+
+        const svgDefs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        svgElement.appendChild(svgDefs);
+
+        const svgFilter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+        svgFilter.setAttribute('id', filterId);
+        svgFilter.setAttribute('color-interpolation-filters', 'sRGB');
+        svgDefs.appendChild(svgFilter);
+
+        const svgColorMatrix = document.createElementNS('http://www.w3.org/2000/svg', 'feColorMatrix');
+        svgColorMatrix.setAttribute('type', 'matrix');
+        svgColorMatrix.setAttribute('values', generateSvgFilterMatrix(targetColor));
+        svgFilter.appendChild(svgColorMatrix);
     }
 
     /**

@@ -262,3 +262,52 @@ export function deferPromise() {
 export function promiseTimeout(delay) {
     return delay <= 0 ? Promise.resolve() : new Promise((resolve) => { setTimeout(resolve, delay); });
 }
+
+/**
+ * Decomposes a CSS color string into its RGBA values.
+ * @param {string} cssColor The color value to decompose. This value is expected to be in the form RGB(r, g, b), RGBA(r, g, b, a), or #rrggbb.
+ * @returns {?number[]} The color and alpha values as [r, g, b, a]. The color component values range from [0, 255], and the alpha ranges from [0, 1].
+ */
+export function getColorInfo(cssColor) {
+    const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);
+    if (m === null) { return getColorInfoHex(cssColor); }
+
+    const m4 = m[4];
+    return [
+        Number.parseInt(m[1], 10),
+        Number.parseInt(m[2], 10),
+        Number.parseInt(m[3], 10),
+            m4 ? Math.max(0, Math.min(1, Number.parseFloat(m4))) : 1,
+    ];
+}
+
+/**
+ * Decomposes a CSS hex color string into its RGBA values.
+ * @param {string} cssColorHex The color value to decompose. This value is expected to be in the form #rrggbb.
+ * @returns {?number[]} The color and alpha values as [r, g, b, a]. The color component values range from [0, 255], and the alpha ranges from [0, 1].
+ */
+function getColorInfoHex(cssColorHex) {
+    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(cssColorHex);
+    if (m === null) { return null; }
+    return [
+        Number.parseInt(m[1], 16),
+        Number.parseInt(m[2], 16),
+        Number.parseInt(m[3], 16),
+        1,
+    ];
+}
+
+/**
+ * Generates an svg filter matrix for filtering to an absolute color value using feColorMatrix
+ * Example usage: `<feColorMatrix type="matrix" values="' + generateSvgFilterMatrix(colors) + '"/>`
+ * @param {number[]} colors The color and alpha values as [r, g, b, a]. The color component values range from [0, 255], and the alpha ranges from [0, 1].
+ * @returns {string}
+ */
+export function generateSvgFilterMatrix(colors) {
+    const matrix = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]];
+    matrix[0][3] = colors[0] / 255;
+    matrix[1][3] = colors[1] / 255;
+    matrix[2][3] = colors[2] / 255;
+    matrix[3][3] = colors[3];
+    return matrix.flat().join(' ');
+}

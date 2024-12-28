@@ -561,6 +561,7 @@
                 "ext/js/core/event-listener-collection.js",
                 "ext/js/core/extension-error.js",
                 "ext/js/core/json.js",
+                "ext/js/core/utilities.js",
                 "ext/js/data/anki-note-data-creator.js",
                 "ext/js/data/array-buffer-util.js",
                 "ext/js/dictionary/dictionary-data-util.js",
