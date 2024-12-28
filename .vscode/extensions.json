@@ -3,6 +3,6 @@
         "dbaeumer.vscode-eslint",
         "html-validate.vscode-html-validate",
         "stylelint.vscode-stylelint",
-        "codeandstuff.package-json-upgrade",
+        "codeandstuff.package-json-upgrade"
     ]
 }

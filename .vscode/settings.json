@@ -5,14 +5,14 @@
             "source.addMissingImports": "explicit",
             "source.organizeImports": "explicit",
             "source.fixAll.eslint": "explicit"
-        },
+        }
     },
     "[typescript]": {
         "editor.codeActionsOnSave": {
             "source.addMissingImports": "never",
             "source.organizeImports": "never",
             "source.fixAll.eslint": "explicit"
-        },
+        }
     },
     "eslint.format.enable": true,
     "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,

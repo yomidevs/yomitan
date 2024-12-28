@@ -722,6 +722,15 @@ export default [
     },
     {
         files: [
+            '.vscode/launch.json',
+        ],
+
+        rules: {
+            'jsonc/no-comments': 'off',
+        },
+    },
+    {
+        files: [
             'ext/data/schemas/options-schema.json',
         ],
 
