@@ -586,7 +586,7 @@ export class ProfileController {
         let i = 0;
         while (true) {
             const newName = `${prefix}${space}${index}${suffix}`;
-            if (i++ >= maxUniqueAttempts || profiles.findIndex((profile) => profile.name === newName) < 0) {
+            if (i++ >= maxUniqueAttempts || !profiles.some((profile) => profile.name === newName)) {
                 return newName;
             }
             if (typeof index !== 'number') {

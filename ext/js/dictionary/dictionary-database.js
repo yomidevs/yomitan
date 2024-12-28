@@ -454,14 +454,12 @@ export class DictionaryDatabase {
                 // The second branch can eventually be changed to use ImageDecoder when we are okay with dropping support for Firefox <133
                 // The branches can be unified entirely when Firefox implements support for transferring VideoFrames cross-process in postMessage
                 if ('serviceWorker' in navigator) { // this is just a check for chrome, we don't actually use service worker functionality here
-                    // eslint-disable-next-line no-undef
                     const imageDecoder = new ImageDecoder({type: m.mediaType, data: m.content});
                     await imageDecoder.decode().then((decodedImageResult) => {
                         source.postMessage({action: 'drawDecodedImageToCanvases', params: {decodedImage: decodedImageResult.image, canvasIndexes: m.canvasIndexes, generation: m.generation}}, [decodedImageResult.image]);
                     });
                 } else {
                     const image = new Blob([m.content], {type: m.mediaType});
-                    // eslint-disable-next-line no-undef
                     await createImageBitmap(image, {resizeWidth: m.canvasWidth, resizeHeight: m.canvasHeight, resizeQuality: 'high'}).then((decodedImage) => {
                         // we need to do a dumb hack where we convert this ImageBitmap to an ImageData by drawing it to a temporary canvas, because Firefox doesn't support transferring ImageBitmaps cross-process
                         const canvas = new OffscreenCanvas(decodedImage.width, decodedImage.height);

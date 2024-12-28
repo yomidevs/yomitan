@@ -96,7 +96,7 @@ The generated `ext/manfiest.json` should not be committed.
 Linting rules are defined for a few types of files, and validation is performed as part of the standard tests
 run by `npm test` and the continuous integration process.
 
-- [.eslintrc.json](.eslintrc.json) rules are used for JavaScript files.
+- [eslint.config.js](eslint.config.js) rules are used for JavaScript files.
 - [.stylelintrc.json](.stylelintrc.json) rules are used for CSS files.
 - [.htmlvalidate.json](.htmlvalidate.json) rules are used for HTML files.
 

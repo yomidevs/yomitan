@@ -5,7 +5,6 @@
         {"path": "jsconfig.json", "ignore": true},
         {"path": ".stylelintrc.json", "ignore": true},
         {"path": ".htmlvalidate.json", "ignore": true},
-        {"path": ".eslintrc.json", "ignore": true},
         {"path": ".vscode/settings.json", "ignore": true},
         {"path": ".vscode/extensions.json", "ignore": true},
         {"path": ".vscode/launch.json", "ignore": true},

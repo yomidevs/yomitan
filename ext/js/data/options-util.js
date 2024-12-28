@@ -1035,7 +1035,7 @@ export class OptionsUtil {
             const terminationCharacters = profile.options.sentenceParsing.terminationCharacters;
             const newAdditions = [];
             for (const character of additions) {
-                if (terminationCharacters.findIndex((value) => (value.character1 === character && value.character2 === null)) < 0) {
+                if (!terminationCharacters.some((value) => (value.character1 === character && value.character2 === null))) {
                     newAdditions.push(character);
                 }
             }
