@@ -30,6 +30,7 @@ export function setupStubs() {
     function Worker() {
         return {
             addEventListener: () => {},
+            terminate: () => {},
         };
     }
     vi.stubGlobal('Worker', Worker);
