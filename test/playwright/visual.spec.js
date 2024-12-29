@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {readFileSync} from 'fs';
 import path from 'path';
 import {pathToFileURL} from 'url';
 import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
@@ -95,71 +96,68 @@ test('settings', async ({page, extensionId}) => {
     });
 });
 
-test('popup', async ({page, extensionId}) => {
-    // Open settings
-    console.log('Open settings');
-    await page.goto(`chrome-extension://${extensionId}/settings.html`);
+test.describe('popup', () => {
+    test.beforeEach(async ({page, extensionId}) => {
+        // Open settings
+        console.log('Open settings');
+        await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
-    await expect(page.locator('id=dictionaries')).toBeVisible();
+        await expect(page.locator('id=dictionaries')).toBeVisible();
 
-    // Load in test dictionary
-    const dictionary = await createDictionaryArchiveData(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1');
-    await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
-        name: 'valid-dictionary1.zip',
-        mimeType: 'application/x-zip',
-        buffer: Buffer.from(dictionary),
+        // Load in test dictionary
+        const dictionary = await createDictionaryArchiveData(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1');
+        await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
+            name: 'valid-dictionary1.zip',
+            mimeType: 'application/x-zip',
+            buffer: Buffer.from(dictionary),
+        });
+        await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 1 * 60 * 1000});
+
+        console.log('Open popup-tests.html');
+        await page.goto(pathToFileURL(popupTestsPath).toString());
+        await page.setViewportSize({width: 1000, height: 4500});
+        await expect(page.locator('id=footer')).toBeVisible();
+        await page.keyboard.down('Shift');
     });
-    await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 1 * 60 * 1000});
+    const popupTestsPath = path.join(root, 'test/data/html/popup-tests.html');
+    const numberOfTests = (readFileSync(popupTestsPath, 'utf8').match(/hovertarget/g) || []).length;
+    for (let i = 1; i <= numberOfTests; i++) {
+        test(`test${i}`, async ({page}) => {
+            const test_name = 'doc2-test' + i;
+            console.log(test_name);
 
-    /**
-     * @param {number} doc_number
-     * @param {number} test_number
-     * @param {import('@playwright/test').Locator} hovertarget_locator
-     * @param {{x: number, y: number}} offset
-     */
-    const screenshot = async (doc_number, test_number, hovertarget_locator, offset) => {
-        const test_name = 'doc' + doc_number + '-test' + test_number;
-        console.log(test_name);
+            // Find the test element
+            const test_locator = page.locator('.hovertarget').nth(i - 1);
 
-        const box = (await hovertarget_locator.boundingBox()) || {x: 0, y: 0, width: 0, height: 0};
+            const box = (await test_locator.boundingBox()) || {x: 0, y: 0, width: 0, height: 0};
 
-        // Find the popup frame if it exists
-        let popup_frame = page.frames().find((f) => f.url().includes('popup.html'));
+            const expectedState = (await test_locator.locator('..').getAttribute('data-expected-result')) === 'failure' ? 'hidden' : 'visible';
 
-        // Otherwise prepare for it to be attached
-        let frame_attached;
-        if (typeof popup_frame === 'undefined') {
-            frame_attached = page.waitForEvent('frameattached');
-        }
-        await page.mouse.move(box.x + offset.x, box.y + offset.y, {steps: 10}); // Hover over the test
-        if (typeof popup_frame === 'undefined') {
-            popup_frame = await frame_attached; // Wait for popup to be attached
-        }
+            try {
+                const frame_attached = page.waitForEvent('frameattached', {timeout: 5000});
+                await page.mouse.move(box.x - 5, box.y - 5); // Hover near the test
+                await page.mouse.move(box.x + 15, box.y + 15, {steps: 10}); // Hover over the test
+                if (expectedState === 'visible') {
+                    const popup_frame = await frame_attached;
+                    await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement())
+                        .waitForElementState(expectedState, {timeout: 500});
+                } else {
+                    expect(
+                        await Promise.race([
+                            frame_attached,
+                            new Promise((resolve) => {
+                                setTimeout(() => resolve('timeout'), 2000);
+                            }),
+                        ]),
+                    ).toStrictEqual('timeout');
+                }
+            } catch (error) {
+                console.warn(test_name, 'unexpected popup state', error);
+            }
 
-        try {
-            const expectedState = (await hovertarget_locator.locator('..').getAttribute('data-expected-result')) === 'failure' ? 'hidden' : 'visible';
-            await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement()).waitForElementState(expectedState, {timeout: 500});
-        } catch (error) {
-            console.warn(test_name, 'unexpected popup state');
-        }
-
-        console.log(test_name, 'taking screenshot');
-        await page.bringToFront(); // Bring the page to the foreground so the screenshot doesn't hang; for some reason the frames result in page being in the background
-        await expect.soft(page).toHaveScreenshot(test_name + '.png');
-
-        console.log(test_name, 'clicking away and waiting');
-        await page.mouse.click(0, 0); // Click away so popup disappears
-        await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement()).waitForElementState('hidden'); // Wait for popup to disappear
-    };
-
-    console.log('Open popup-tests.html');
-    await page.goto(pathToFileURL(path.join(root, 'test/data/html/popup-tests.html')).toString());
-    await page.setViewportSize({width: 1000, height: 4500});
-    await expect(page.locator('id=footer')).toBeVisible();
-    await page.keyboard.down('Shift');
-    let i = 1;
-    for (const test_locator of await page.locator('.hovertarget').all()) {
-        await screenshot(2, i, test_locator, {x: 15, y: 15});
-        i++;
+            console.log(test_name, 'taking screenshot');
+            await page.bringToFront(); // Bring the page to the foreground so the screenshot doesn't hang; for some reason the frames result in page being in the background
+            await expect.soft(page).toHaveScreenshot(test_name + '.png');
+        });
     }
 });
