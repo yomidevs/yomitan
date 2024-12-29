@@ -276,10 +276,10 @@ export function sanitizeCSS(css) {
     try {
         sanitizer = new CSSStyleSheet();
     } catch (e) {
-        log.log("Failed to sanitize dictionary styles")
+        log.log('Failed to sanitize dictionary styles');
         log.warn(e);
         return css;
     }
     sanitizer.replaceSync(css);
-    return Array.from(sanitizer.cssRules).map(rule => rule.cssText || '').join('\n');
+    return [...sanitizer.cssRules].map((rule) => rule.cssText || '').join('\n');
 }
