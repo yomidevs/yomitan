@@ -200,6 +200,10 @@ export class DictionaryDatabase {
         if (this._db.isOpen()) {
             this._db.close();
         }
+        if (this._worker !== null) {
+            this._worker.terminate();
+            this._worker = null;
+        }
         let result = false;
         try {
             await Database.deleteDatabase(this._dbName);
