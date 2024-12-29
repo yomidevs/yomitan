@@ -840,7 +840,6 @@ button.action-button:active {
 .entry {
     padding: 0;
     position: relative;
-    overflow: hidden;
     content-visibility: auto;
     contain-intrinsic-size: auto 500px;
 }
@@ -857,6 +856,18 @@ button.action-button:active {
     display: none;
 }
 .entry-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--background-color);
+    padding: 5px;
+    border-bottom: 2px var(--light-border-color) solid;
+    min-height: 45px;
+}
+.entry-header::after {
+    content: "";
+    display: table;
+    clear: both;
 }
 
 /* Inflections */
@@ -912,6 +923,9 @@ button.action-button:active {
     display: block;
     float: left;
     margin-right: var(--headword-list-end-space);
+}
+.headword-list-details {
+    float: left;
 }
 .headword-list-tag-list {
     display: inline-block;
@@ -1230,6 +1244,7 @@ button.action-button:active {
     display: flex;
     flex-flow: row nowrap;
     padding: 5px 10px;
+    height: 100%;
 }
 .definition-item-content {
     width: 100%;
@@ -1313,6 +1328,9 @@ button.expansion-button:focus:focus-visible+.kanji-glyph-table {
 .definition-tag-list {
     display: flex;
     margin-bottom: 2px;
+    position: sticky;
+    top: 60px;
+    z-index: 1;
 }
 
 .headword-extras {

@@ -719,6 +719,7 @@ export class DisplayGenerator {
         const n1 = this._querySelector(node, '.pronunciation-group-tag-list');
         const tag = this._createTag(this._createTagData(dictionaryAlias, 'pronunciation-dictionary'));
         tag.dataset.details = dictionary;
+        console.log('node', node);
         const tagLabel = this._querySelector(node, '.tag-label-content');
         this._setTextContent(tagLabel, dictionary);
         n1.appendChild(tag);
