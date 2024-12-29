@@ -262,3 +262,13 @@ export function deferPromise() {
 export function promiseTimeout(delay) {
     return delay <= 0 ? Promise.resolve() : new Promise((resolve) => { setTimeout(resolve, delay); });
 }
+
+/**
+ * @param {string} css
+ * @returns {string}
+ */
+export function sanitizeCSS(css) {
+    const sanitizer = new CSSStyleSheet();
+    sanitizer.replaceSync(css);
+    return Array.from(sanitizer.cssRules).map(rule => rule.cssText || '').join('\n');
+}
