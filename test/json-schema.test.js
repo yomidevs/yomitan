@@ -17,7 +17,6 @@
  */
 
 import {describe, expect, test} from 'vitest';
-import {parseJson} from '../dev/json.js';
 import {JsonSchema} from '../ext/js/data/json-schema.js';
 
 /**
@@ -47,45 +46,35 @@ function createProxy(schema, value) {
     return new JsonSchema(schema).createProxy(value);
 }
 
-/**
- * @template [T=unknown]
- * @param {T} value
- * @returns {T}
- */
-function clone(value) {
-    return parseJson(JSON.stringify(value));
-}
 
-
-/** */
-function testValidate1() {
+describe('JsonSchema', () => {
     describe('Validate1', () => {
         /** @type {import('ext/json-schema').Schema} */
         const schema = {
             allOf: [
                 {
-                    type: 'number'
+                    type: 'number',
                 },
                 {
                     anyOf: [
                         {minimum: 10, maximum: 100},
-                        {minimum: -100, maximum: -10}
-                    ]
+                        {minimum: -100, maximum: -10},
+                    ],
                 },
                 {
                     oneOf: [
                         {multipleOf: 3},
-                        {multipleOf: 5}
-                    ]
+                        {multipleOf: 5},
+                    ],
                 },
                 {
                     not: {
                         anyOf: [
-                            {multipleOf: 20}
-                        ]
-                    }
-                }
-            ]
+                            {multipleOf: 20},
+                        ],
+                    },
+                },
+            ],
         };
 
         /**
@@ -118,10 +107,7 @@ function testValidate1() {
             }
         });
     });
-}
 
-/** */
-function testValidate2() {
     describe('Validate2', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{schema: import('ext/json-schema').Schema, inputs: {expected: boolean, value: unknown}[]}[]} */
@@ -129,7 +115,7 @@ function testValidate2() {
             // String tests
             {
                 schema: {
-                    type: 'string'
+                    type: 'string',
                 },
                 inputs: [
                     {expected: false, value: null},
@@ -137,97 +123,97 @@ function testValidate2() {
                     {expected: false, value: 0},
                     {expected: false, value: {}},
                     {expected: false, value: []},
-                    {expected: true,  value: ''}
-                ]
+                    {expected: true,  value: ''},
+                ],
             },
             {
                 schema: {
                     type: 'string',
-                    minLength: 2
+                    minLength: 2,
                 },
                 inputs: [
                     {expected: false, value: ''},
                     {expected: false,  value: '1'},
                     {expected: true,  value: '12'},
-                    {expected: true,  value: '123'}
-                ]
+                    {expected: true,  value: '123'},
+                ],
             },
             {
                 schema: {
                     type: 'string',
-                    maxLength: 2
+                    maxLength: 2,
                 },
                 inputs: [
                     {expected: true,  value: ''},
                     {expected: true,  value: '1'},
                     {expected: true,  value: '12'},
-                    {expected: false, value: '123'}
-                ]
+                    {expected: false, value: '123'},
+                ],
             },
             {
                 schema: {
                     type: 'string',
-                    pattern: 'test'
+                    pattern: 'test',
                 },
                 inputs: [
                     {expected: false, value: ''},
                     {expected: true,  value: 'test'},
                     {expected: false, value: 'TEST'},
                     {expected: true,  value: 'ABCtestDEF'},
-                    {expected: false, value: 'ABCTESTDEF'}
-                ]
+                    {expected: false, value: 'ABCTESTDEF'},
+                ],
             },
             {
                 schema: {
                     type: 'string',
-                    pattern: '^test$'
+                    pattern: '^test$',
                 },
                 inputs: [
                     {expected: false, value: ''},
                     {expected: true,  value: 'test'},
                     {expected: false, value: 'TEST'},
                     {expected: false, value: 'ABCtestDEF'},
-                    {expected: false, value: 'ABCTESTDEF'}
-                ]
+                    {expected: false, value: 'ABCTESTDEF'},
+                ],
             },
             {
                 schema: {
                     type: 'string',
                     pattern: '^test$',
-                    patternFlags: 'i'
+                    patternFlags: 'i',
                 },
                 inputs: [
                     {expected: false, value: ''},
                     {expected: true,  value: 'test'},
                     {expected: true,  value: 'TEST'},
                     {expected: false, value: 'ABCtestDEF'},
-                    {expected: false, value: 'ABCTESTDEF'}
-                ]
+                    {expected: false, value: 'ABCTESTDEF'},
+                ],
             },
             {
                 schema: {
                     type: 'string',
-                    pattern: '*'
+                    pattern: '*',
                 },
                 inputs: [
-                    {expected: false, value: ''}
-                ]
+                    {expected: false, value: ''},
+                ],
             },
             {
                 schema: {
                     type: 'string',
                     pattern: '.',
-                    patternFlags: '?'
+                    patternFlags: '?',
                 },
                 inputs: [
-                    {expected: false, value: ''}
-                ]
+                    {expected: false, value: ''},
+                ],
             },
 
             // Const tests
             {
                 schema: {
-                    const: 32
+                    const: 32,
                 },
                 inputs: [
                     {expected: true,  value: 32},
@@ -235,12 +221,12 @@ function testValidate2() {
                     {expected: false, value: '32'},
                     {expected: false, value: null},
                     {expected: false, value: {a: 'b'}},
-                    {expected: false, value: [1, 2, 3]}
-                ]
+                    {expected: false, value: [1, 2, 3]},
+                ],
             },
             {
                 schema: {
-                    const: '32'
+                    const: '32',
                 },
                 inputs: [
                     {expected: false, value: 32},
@@ -248,12 +234,12 @@ function testValidate2() {
                     {expected: true,  value: '32'},
                     {expected: false, value: null},
                     {expected: false, value: {a: 'b'}},
-                    {expected: false, value: [1, 2, 3]}
-                ]
+                    {expected: false, value: [1, 2, 3]},
+                ],
             },
             {
                 schema: {
-                    const: null
+                    const: null,
                 },
                 inputs: [
                     {expected: false, value: 32},
@@ -261,12 +247,12 @@ function testValidate2() {
                     {expected: false, value: '32'},
                     {expected: true,  value: null},
                     {expected: false, value: {a: 'b'}},
-                    {expected: false, value: [1, 2, 3]}
-                ]
+                    {expected: false, value: [1, 2, 3]},
+                ],
             },
             {
                 schema: {
-                    const: {a: 'b'}
+                    const: {a: 'b'},
                 },
                 inputs: [
                     {expected: false, value: 32},
@@ -274,12 +260,12 @@ function testValidate2() {
                     {expected: false, value: '32'},
                     {expected: false, value: null},
                     {expected: false, value: {a: 'b'}},
-                    {expected: false, value: [1, 2, 3]}
-                ]
+                    {expected: false, value: [1, 2, 3]},
+                ],
             },
             {
                 schema: {
-                    const: [1, 2, 3]
+                    const: [1, 2, 3],
                 },
                 inputs: [
                     {expected: false, value: 32},
@@ -287,15 +273,15 @@ function testValidate2() {
                     {expected: false,  value: '32'},
                     {expected: false, value: null},
                     {expected: false, value: {a: 'b'}},
-                    {expected: false, value: [1, 2, 3]}
-                ]
+                    {expected: false, value: [1, 2, 3]},
+                ],
             },
 
             // Array contains tests
             {
                 schema: {
                     type: 'array',
-                    contains: {const: 32}
+                    contains: {const: 32},
                 },
                 inputs: [
                     {expected: false, value: []},
@@ -304,119 +290,119 @@ function testValidate2() {
                     {expected: true,  value: [1, 32, 1]},
                     {expected: false, value: [33]},
                     {expected: false, value: [1, 33]},
-                    {expected: false, value: [1, 33, 1]}
-                ]
+                    {expected: false, value: [1, 33, 1]},
+                ],
             },
 
             // Number limits tests
             {
                 schema: {
                     type: 'number',
-                    minimum: 0
+                    minimum: 0,
                 },
                 inputs: [
                     {expected: false, value: -1},
                     {expected: true,  value: 0},
-                    {expected: true,  value: 1}
-                ]
+                    {expected: true,  value: 1},
+                ],
             },
             {
                 schema: {
                     type: 'number',
-                    exclusiveMinimum: 0
+                    exclusiveMinimum: 0,
                 },
                 inputs: [
                     {expected: false, value: -1},
                     {expected: false, value: 0},
-                    {expected: true,  value: 1}
-                ]
+                    {expected: true,  value: 1},
+                ],
             },
             {
                 schema: {
                     type: 'number',
-                    maximum: 0
+                    maximum: 0,
                 },
                 inputs: [
                     {expected: true,  value: -1},
                     {expected: true,  value: 0},
-                    {expected: false, value: 1}
-                ]
+                    {expected: false, value: 1},
+                ],
             },
             {
                 schema: {
                     type: 'number',
-                    exclusiveMaximum: 0
+                    exclusiveMaximum: 0,
                 },
                 inputs: [
                     {expected: true,  value: -1},
                     {expected: false, value: 0},
-                    {expected: false, value: 1}
-                ]
+                    {expected: false, value: 1},
+                ],
             },
 
             // Integer limits tests
             {
                 schema: {
                     type: 'integer',
-                    minimum: 0
+                    minimum: 0,
                 },
                 inputs: [
                     {expected: false, value: -1},
                     {expected: true,  value: 0},
-                    {expected: true,  value: 1}
-                ]
+                    {expected: true,  value: 1},
+                ],
             },
             {
                 schema: {
                     type: 'integer',
-                    exclusiveMinimum: 0
+                    exclusiveMinimum: 0,
                 },
                 inputs: [
                     {expected: false, value: -1},
                     {expected: false, value: 0},
-                    {expected: true,  value: 1}
-                ]
+                    {expected: true,  value: 1},
+                ],
             },
             {
                 schema: {
                     type: 'integer',
-                    maximum: 0
+                    maximum: 0,
                 },
                 inputs: [
                     {expected: true,  value: -1},
                     {expected: true,  value: 0},
-                    {expected: false, value: 1}
-                ]
+                    {expected: false, value: 1},
+                ],
             },
             {
                 schema: {
                     type: 'integer',
-                    exclusiveMaximum: 0
+                    exclusiveMaximum: 0,
                 },
                 inputs: [
                     {expected: true,  value: -1},
                     {expected: false, value: 0},
-                    {expected: false, value: 1}
-                ]
+                    {expected: false, value: 1},
+                ],
             },
             {
                 schema: {
                     type: 'integer',
-                    multipleOf: 2
+                    multipleOf: 2,
                 },
                 inputs: [
                     {expected: true,  value: -2},
                     {expected: false, value: -1},
                     {expected: true,  value: 0},
                     {expected: false, value: 1},
-                    {expected: true,  value: 2}
-                ]
+                    {expected: true,  value: 2},
+                ],
             },
 
             // Numeric type tests
             {
                 schema: {
-                    type: 'number'
+                    type: 'number',
                 },
                 inputs: [
                     {expected: true,  value: 0},
@@ -425,12 +411,12 @@ function testValidate2() {
                     {expected: false, value: '0'},
                     {expected: false, value: null},
                     {expected: false, value: []},
-                    {expected: false, value: {}}
-                ]
+                    {expected: false, value: {}},
+                ],
             },
             {
                 schema: {
-                    type: 'integer'
+                    type: 'integer',
                 },
                 inputs: [
                     {expected: true,  value: 0},
@@ -439,8 +425,8 @@ function testValidate2() {
                     {expected: false, value: '0'},
                     {expected: false, value: null},
                     {expected: false, value: []},
-                    {expected: false, value: {}}
-                ]
+                    {expected: false, value: {}},
+                ],
             },
 
             // Reference tests
@@ -448,10 +434,10 @@ function testValidate2() {
                 schema: {
                     definitions: {
                         example: {
-                            type: 'number'
-                        }
+                            type: 'number',
+                        },
                     },
-                    $ref: '#/definitions/example'
+                    $ref: '#/definitions/example',
                 },
                 inputs: [
                     {expected: true,  value: 0},
@@ -460,17 +446,17 @@ function testValidate2() {
                     {expected: false, value: '0'},
                     {expected: false, value: null},
                     {expected: false, value: []},
-                    {expected: false, value: {}}
-                ]
+                    {expected: false, value: {}},
+                ],
             },
             {
                 schema: {
                     definitions: {
                         example: {
-                            type: 'integer'
-                        }
+                            type: 'integer',
+                        },
                     },
-                    $ref: '#/definitions/example'
+                    $ref: '#/definitions/example',
                 },
                 inputs: [
                     {expected: true,  value: 0},
@@ -479,8 +465,8 @@ function testValidate2() {
                     {expected: false, value: '0'},
                     {expected: false, value: null},
                     {expected: false, value: []},
-                    {expected: false, value: {}}
-                ]
+                    {expected: false, value: {}},
+                ],
             },
             {
                 schema: {
@@ -490,12 +476,12 @@ function testValidate2() {
                             additionalProperties: false,
                             properties: {
                                 test: {
-                                    $ref: '#/definitions/example'
-                                }
-                            }
-                        }
+                                    $ref: '#/definitions/example',
+                                },
+                            },
+                        },
                     },
-                    $ref: '#/definitions/example'
+                    $ref: '#/definitions/example',
                 },
                 inputs: [
                     {expected: false, value: 0},
@@ -513,24 +499,20 @@ function testValidate2() {
                     {expected: false, value: {test: []}},
                     {expected: true,  value: {test: {}}},
                     {expected: true,  value: {test: {test: {}}}},
-                    {expected: true,  value: {test: {test: {test: {}}}}}
-                ]
-            }
+                    {expected: true,  value: {test: {test: {test: {}}}}},
+                ],
+            },
         ];
         /* eslint-enable @stylistic/no-multi-spaces */
 
         describe.each(data)('Schema %#', ({schema, inputs}) => {
-            test.each(inputs)(`schemaValidate(${schema}, $value) -> $expected`, ({expected, value}) => {
+            test.each(inputs)(`schemaValidate(${JSON.stringify(schema)}, $value) -> $expected`, ({expected, value}) => {
                 const actual = schemaValidate(schema, value);
                 expect(actual).toStrictEqual(expected);
             });
         });
     });
-}
 
-
-/** */
-function testGetValidValueOrDefault1() {
     describe('GetValidValueOrDefault1', () => {
         /** @type {{schema: import('ext/json-schema').Schema, inputs: [value: unknown, expected: unknown][]}[]} */
         const data = [
@@ -542,49 +524,49 @@ function testGetValidValueOrDefault1() {
                     properties: {
                         test: {
                             type: 'string',
-                            default: 'default'
-                        }
+                            default: 'default',
+                        },
                     },
-                    additionalProperties: false
+                    additionalProperties: false,
                 },
                 inputs: [
                     [
                         void 0,
-                        {test: 'default'}
+                        {test: 'default'},
                     ],
                     [
                         null,
-                        {test: 'default'}
+                        {test: 'default'},
                     ],
                     [
                         0,
-                        {test: 'default'}
+                        {test: 'default'},
                     ],
                     [
                         '',
-                        {test: 'default'}
+                        {test: 'default'},
                     ],
                     [
                         [],
-                        {test: 'default'}
+                        {test: 'default'},
                     ],
                     [
                         {},
-                        {test: 'default'}
+                        {test: 'default'},
                     ],
                     [
                         {test: 'value'},
-                        {test: 'value'}
+                        {test: 'value'},
                     ],
                     [
                         {test2: 'value2'},
-                        {test: 'default'}
+                        {test: 'default'},
                     ],
                     [
                         {test: 'value', test2: 'value2'},
-                        {test: 'value'}
-                    ]
-                ]
+                        {test: 'value'},
+                    ],
+                ],
             },
 
             // Test value defaulting on objects with additionalProperties=true
@@ -595,29 +577,29 @@ function testGetValidValueOrDefault1() {
                     properties: {
                         test: {
                             type: 'string',
-                            default: 'default'
-                        }
+                            default: 'default',
+                        },
                     },
-                    additionalProperties: true
+                    additionalProperties: true,
                 },
                 inputs: [
                     [
                         {},
-                        {test: 'default'}
+                        {test: 'default'},
                     ],
                     [
                         {test: 'value'},
-                        {test: 'value'}
+                        {test: 'value'},
                     ],
                     [
                         {test2: 'value2'},
-                        {test: 'default', test2: 'value2'}
+                        {test: 'default', test2: 'value2'},
                     ],
                     [
                         {test: 'value', test2: 'value2'},
-                        {test: 'value', test2: 'value2'}
-                    ]
-                ]
+                        {test: 'value', test2: 'value2'},
+                    ],
+                ],
             },
 
             // Test value defaulting on objects with additionalProperties={schema}
@@ -628,48 +610,48 @@ function testGetValidValueOrDefault1() {
                     properties: {
                         test: {
                             type: 'string',
-                            default: 'default'
-                        }
+                            default: 'default',
+                        },
                     },
                     additionalProperties: {
                         type: 'number',
-                        default: 10
-                    }
+                        default: 10,
+                    },
                 },
                 inputs: [
                     [
                         {},
-                        {test: 'default'}
+                        {test: 'default'},
                     ],
                     [
                         {test: 'value'},
-                        {test: 'value'}
+                        {test: 'value'},
                     ],
                     [
                         {test2: 'value2'},
-                        {test: 'default', test2: 10}
+                        {test: 'default', test2: 10},
                     ],
                     [
                         {test: 'value', test2: 'value2'},
-                        {test: 'value', test2: 10}
+                        {test: 'value', test2: 10},
                     ],
                     [
                         {test2: 2},
-                        {test: 'default', test2: 2}
+                        {test: 'default', test2: 2},
                     ],
                     [
                         {test: 'value', test2: 2},
-                        {test: 'value', test2: 2}
+                        {test: 'value', test2: 2},
                     ],
                     [
                         {test: 'value', test2: 2, test3: null},
-                        {test: 'value', test2: 2, test3: 10}
+                        {test: 'value', test2: 2, test3: 10},
                     ],
                     [
                         {test: 'value', test2: 2, test3: void 0},
-                        {test: 'value', test2: 2, test3: 10}
-                    ]
-                ]
+                        {test: 'value', test2: 2, test3: 10},
+                    ],
+                ],
             },
 
             // Test value defaulting where hasOwnProperty is false
@@ -680,24 +662,24 @@ function testGetValidValueOrDefault1() {
                     properties: {
                         test: {
                             type: 'string',
-                            default: 'default'
-                        }
-                    }
+                            default: 'default',
+                        },
+                    },
                 },
                 inputs: [
                     [
                         {},
-                        {test: 'default'}
+                        {test: 'default'},
                     ],
                     [
                         {test: 'value'},
-                        {test: 'value'}
+                        {test: 'value'},
                     ],
                     [
                         Object.create({test: 'value'}),
-                        {test: 'default'}
-                    ]
-                ]
+                        {test: 'default'},
+                    ],
+                ],
             },
             {
                 schema: {
@@ -706,24 +688,24 @@ function testGetValidValueOrDefault1() {
                     properties: {
                         toString: /** @type {import('ext/json-schema').SchemaObject} */ ({
                             type: 'string',
-                            default: 'default'
-                        })
-                    }
+                            default: 'default',
+                        }),
+                    },
                 },
                 inputs: [
                     [
                         {},
-                        {toString: 'default'}
+                        {toString: 'default'},
                     ],
                     [
                         {toString: 'value'},
-                        {toString: 'value'}
+                        {toString: 'value'},
                     ],
                     [
                         Object.create({toString: 'value'}),
-                        {toString: 'default'}
-                    ]
-                ]
+                        {toString: 'default'},
+                    ],
+                ],
             },
 
             // Test enum
@@ -735,28 +717,28 @@ function testGetValidValueOrDefault1() {
                         test: {
                             type: 'string',
                             default: 'value1',
-                            enum: ['value1', 'value2', 'value3']
-                        }
-                    }
+                            enum: ['value1', 'value2', 'value3'],
+                        },
+                    },
                 },
                 inputs: [
                     [
                         {test: 'value1'},
-                        {test: 'value1'}
+                        {test: 'value1'},
                     ],
                     [
                         {test: 'value2'},
-                        {test: 'value2'}
+                        {test: 'value2'},
                     ],
                     [
                         {test: 'value3'},
-                        {test: 'value3'}
+                        {test: 'value3'},
                     ],
                     [
                         {test: 'value4'},
-                        {test: 'value1'}
-                    ]
-                ]
+                        {test: 'value1'},
+                    ],
+                ],
             },
 
             // Test valid vs invalid default
@@ -768,16 +750,16 @@ function testGetValidValueOrDefault1() {
                         test: {
                             type: 'integer',
                             default: 2,
-                            minimum: 1
-                        }
-                    }
+                            minimum: 1,
+                        },
+                    },
                 },
                 inputs: [
                     [
                         {test: -1},
-                        {test: 2}
-                    ]
-                ]
+                        {test: 2},
+                    ],
+                ],
             },
             {
                 schema: {
@@ -787,16 +769,16 @@ function testGetValidValueOrDefault1() {
                         test: {
                             type: 'integer',
                             default: 1,
-                            minimum: 2
-                        }
-                    }
+                            minimum: 2,
+                        },
+                    },
                 },
                 inputs: [
                     [
                         {test: -1},
-                        {test: -1}
-                    ]
-                ]
+                        {test: -1},
+                    ],
+                ],
             },
 
             // Test references
@@ -805,29 +787,29 @@ function testGetValidValueOrDefault1() {
                     definitions: {
                         example: {
                             type: 'number',
-                            default: 0
-                        }
+                            default: 0,
+                        },
                     },
-                    $ref: '#/definitions/example'
+                    $ref: '#/definitions/example',
                 },
                 inputs: [
                     [
                         1,
-                        1
+                        1,
                     ],
                     [
                         null,
-                        0
+                        0,
                     ],
                     [
                         'test',
-                        0
+                        0,
                     ],
                     [
                         {test: 'value'},
-                        0
-                    ]
-                ]
+                        0,
+                    ],
+                ],
             },
             {
                 schema: {
@@ -837,58 +819,54 @@ function testGetValidValueOrDefault1() {
                             additionalProperties: false,
                             properties: {
                                 test: {
-                                    $ref: '#/definitions/example'
-                                }
-                            }
-                        }
+                                    $ref: '#/definitions/example',
+                                },
+                            },
+                        },
                     },
-                    $ref: '#/definitions/example'
+                    $ref: '#/definitions/example',
                 },
                 inputs: [
                     [
                         1,
-                        {}
+                        {},
                     ],
                     [
                         null,
-                        {}
+                        {},
                     ],
                     [
                         'test',
-                        {}
+                        {},
                     ],
                     [
                         {},
-                        {}
+                        {},
                     ],
                     [
                         {test: {}},
-                        {test: {}}
+                        {test: {}},
                     ],
                     [
                         {test: 'value'},
-                        {test: {}}
+                        {test: {}},
                     ],
                     [
                         {test: {test: {}}},
-                        {test: {test: {}}}
-                    ]
-                ]
-            }
+                        {test: {test: {}}},
+                    ],
+                ],
+            },
         ];
 
         describe.each(data)('Schema %#', ({schema, inputs}) => {
-            test.each(inputs)(`getValidValueOrDefault(${schema}, %o) -> %o`, (value, expected) => {
+            test.each(inputs)(`getValidValueOrDefault(${JSON.stringify(schema)}, %o) -> %o`, (value, expected) => {
                 const actual = getValidValueOrDefault(schema, value);
                 expect(actual).toStrictEqual(expected);
             });
         });
     });
-}
 
-
-/** */
-function testProxy1() {
     describe('Proxy1', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{schema: import('ext/json-schema').Schema, tests: {error: boolean, value?: import('ext/json-schema').Value, action: (value: import('core').SafeAny) => void}[]}[]} */
@@ -902,17 +880,17 @@ function testProxy1() {
                     properties: {
                         test: {
                             type: 'string',
-                            default: 'default'
-                        }
-                    }
+                            default: 'default',
+                        },
+                    },
                 },
                 tests: [
                     {error: false, value: {test: 'default'}, action: (value) => { value.test = 'string'; }},
                     {error: true,  value: {test: 'default'}, action: (value) => { value.test = null; }},
                     {error: true,  value: {test: 'default'}, action: (value) => { delete value.test; }},
                     {error: true,  value: {test: 'default'}, action: (value) => { value.test2 = 'string'; }},
-                    {error: false, value: {test: 'default'}, action: (value) => { delete value.test2; }}
-                ]
+                    {error: false, value: {test: 'default'}, action: (value) => { delete value.test2; }},
+                ],
             },
             {
                 schema: {
@@ -922,17 +900,17 @@ function testProxy1() {
                     properties: {
                         test: {
                             type: 'string',
-                            default: 'default'
-                        }
-                    }
+                            default: 'default',
+                        },
+                    },
                 },
                 tests: [
                     {error: false, value: {test: 'default'}, action: (value) => { value.test = 'string'; }},
                     {error: true,  value: {test: 'default'}, action: (value) => { value.test = null; }},
                     {error: true,  value: {test: 'default'}, action: (value) => { delete value.test; }},
                     {error: false, value: {test: 'default'}, action: (value) => { value.test2 = 'string'; }},
-                    {error: false, value: {test: 'default'}, action: (value) => { delete value.test2; }}
-                ]
+                    {error: false, value: {test: 'default'}, action: (value) => { delete value.test2; }},
+                ],
             },
             {
                 schema: {
@@ -952,13 +930,13 @@ function testProxy1() {
                                     properties: {
                                         test3: {
                                             type: 'string',
-                                            default: 'default'
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                            default: 'default',
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
                 tests: [
                     {error: false, action: (value) => { value.test1.test2.test3 = 'string'; }},
@@ -967,8 +945,8 @@ function testProxy1() {
                     {error: true,  action: (value) => { value.test1.test2 = null; }},
                     {error: true,  action: (value) => { value.test1 = null; }},
                     {error: true,  action: (value) => { value.test4 = 'string'; }},
-                    {error: false, action: (value) => { delete value.test4; }}
-                ]
+                    {error: false, action: (value) => { delete value.test4; }},
+                ],
             },
 
             // Array tests
@@ -977,20 +955,24 @@ function testProxy1() {
                     type: 'array',
                     items: {
                         type: 'string',
-                        default: 'default'
-                    }
+                        default: 'default',
+                    },
                 },
                 tests: [
                     {error: false, value: ['default'], action: (value) => { value[0] = 'string'; }},
                     {error: true,  value: ['default'], action: (value) => { value[0] = null; }},
                     {error: false, value: ['default'], action: (value) => { delete value[0]; }},
                     {error: false, value: ['default'], action: (value) => { value[1] = 'string'; }},
-                    {error: false, value: ['default'], action: (value) => {
-                        value[1] = 'string';
-                        if (value.length !== 2) { throw new Error(`Invalid length; expected=2; actual=${value.length}`); }
-                        if (typeof value.push !== 'function') { throw new Error(`Invalid push; expected=function; actual=${typeof value.push}`); }
-                    }}
-                ]
+                    {
+                        error: false,
+                        value: ['default'],
+                        action: (value) => {
+                            value[1] = 'string';
+                            if (value.length !== 2) { throw new Error(`Invalid length; expected=2; actual=${value.length}`); }
+                            if (typeof value.push !== 'function') { throw new Error(`Invalid push; expected=function; actual=${typeof value.push}`); }
+                        },
+                    },
+                ],
             },
 
             // Reference tests
@@ -1002,12 +984,12 @@ function testProxy1() {
                             additionalProperties: false,
                             properties: {
                                 test: {
-                                    $ref: '#/definitions/example'
-                                }
-                            }
-                        }
+                                    $ref: '#/definitions/example',
+                                },
+                            },
+                        },
                     },
-                    $ref: '#/definitions/example'
+                    $ref: '#/definitions/example',
                 },
                 tests: [
                     {error: false, value: {}, action: (value) => { value.test = {}; }},
@@ -1016,16 +998,16 @@ function testProxy1() {
                     {error: true,  value: {}, action: (value) => { value.test = null; }},
                     {error: true,  value: {}, action: (value) => { value.test = 'string'; }},
                     {error: true,  value: {}, action: (value) => { value.test = {}; value.test.test = 'string'; }},
-                    {error: true,  value: {}, action: (value) => { value.test = {test: 'string'}; }}
-                ]
-            }
+                    {error: true,  value: {}, action: (value) => { value.test = {test: 'string'}; }},
+                ],
+            },
         ];
         /* eslint-enable @stylistic/no-multi-spaces */
 
         describe.each(data)('Schema %#', ({schema, tests}) => {
             test.each(tests)('proxy %#', ({error, value, action}) => {
                 if (typeof value === 'undefined') { value = getValidValueOrDefault(schema, void 0); }
-                value = clone(value);
+                value = structuredClone(value);
                 expect(schemaValidate(schema, value)).toBe(true);
                 const valueProxy = createProxy(schema, value);
                 if (error) {
@@ -1039,7 +1021,7 @@ function testProxy1() {
         for (const {schema, tests} of data) {
             for (let {error, value, action} of tests) {
                 if (typeof value === 'undefined') { value = getValidValueOrDefault(schema, void 0); }
-                value = clone(value);
+                value = structuredClone(value);
                 expect(schemaValidate(schema, value)).toBe(true);
                 const valueProxy = createProxy(schema, value);
                 if (error) {
@@ -1050,16 +1032,4 @@ function testProxy1() {
             }
         }
     });
-}
-
-
-/** */
-function main() {
-    testValidate1();
-    testValidate2();
-    testGetValidValueOrDefault1();
-    testProxy1();
-}
-
-
-main();
+});

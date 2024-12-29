@@ -81,7 +81,7 @@ export class PermissionsOriginController {
 
         let any = false;
         const excludeOrigins = new Set([
-            '<all_urls>'
+            '<all_urls>',
         ]);
         const fragment = document.createDocumentFragment();
         for (const origin of originsSet) {
@@ -114,19 +114,19 @@ export class PermissionsOriginController {
 
         const {origin} = node.dataset;
         if (typeof origin !== 'string') { return; }
-        this._setOriginPermissionEnabled(origin, value);
+        void this._setOriginPermissionEnabled(origin, value);
     }
 
     /**
      * @param {string} origin
      */
     _onOriginMenuClose(origin) {
-        this._setOriginPermissionEnabled(origin, false);
+        void this._setOriginPermissionEnabled(origin, false);
     }
 
     /** */
     _onAddButtonClick() {
-        this._addOrigin();
+        void this._addOrigin();
     }
 
     /** */

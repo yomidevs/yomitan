@@ -18,6 +18,7 @@
 import type * as Api from './api';
 
 export type DatabaseUpdateType = 'dictionary';
+
 export type DatabaseUpdateCause = 'purge' | 'delete' | 'import';
 
 export type MecabParseResults = [
@@ -31,3 +32,10 @@ export type TabInfo = {
 };
 
 export type FindTabsPredicate = (tabInfo: TabInfo) => boolean | Promise<boolean>;
+
+export type CanAddResults = {
+    canAddArray: {note: import('anki').Note, isDuplicate: boolean}[];
+    cannotAddArray: import('anki').Note[];
+};
+
+export type Mode = 'existingOrNewTab' | 'newTab' | 'popup';

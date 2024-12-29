@@ -1,0 +1,637 @@
+{
+    "afb": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-afb-en",
+                "description": "Gulf Arabic to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-afb-en.zip"
+            }
+        ]
+    },
+    "ang": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-ang-en",
+                "description": "Old English to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ang-en.zip"
+            }
+        ]
+    },
+    "ar": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-ar-en",
+                "description": "Arabic to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ar-en.zip"
+            }
+        ]
+    },
+    "cs": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-cs-en",
+                "description": "Czech to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-cs-en.zip"
+            }
+        ]
+    },
+    "de": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-de-en",
+                "description": "German to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-de-en.zip"
+            }
+        ]
+    },
+    "el": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-el-en",
+                "description": "Greek to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-el-en.zip"
+            }
+        ]
+    },
+    "en": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-en-en",
+                "description": "English to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-en-en.zip"
+            }
+        ]
+    },
+    "enm": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-enm-en",
+                "description": "Middle English to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-enm-en.zip"
+            }
+        ]
+    },
+    "eo": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-eo-en",
+                "description": "Esperanto to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-eo-en.zip"
+            }
+        ]
+    },
+    "es": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-es-en",
+                "description": "Spanish to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-es-en.zip"
+            }
+        ]
+    },
+    "fa": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-fa-en",
+                "description": "Persian  to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-fa-en.zip"
+            }
+        ]
+    },
+    "fi": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-fi-en",
+                "description": "Finnish to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-fi-en.zip"
+            }
+        ]
+    },
+    "fr": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-fr-en",
+                "description": "French to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-fr-en.zip"
+            }
+        ]
+    },
+    "grc": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-grc-en",
+                "description": "Ancient Greek to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-grc-en.zip"
+            }
+        ]
+    },
+    "hi": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-hi-en",
+                "description": "Hindi to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-hi-en.zip"
+            }
+        ]
+    },
+    "hu": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-hu-en",
+                "description": "Hungarian to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-hu-en.zip"
+            }
+        ]
+    },
+    "id": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-id-en",
+                "description": "Indonesian to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-id-en.zip"
+            }
+        ]
+    },
+    "it": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-it-en",
+                "description": "Italian to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-it-en.zip"
+            }
+        ]
+    },
+    "ja": {
+        "frequency": [
+            {
+                "name": "BCCWJ",
+                "description": "Based on the Balanced Corpus of Contemporary Written Japanese covering books, magazines, newspapers, blogs, forums, textbooks, and legal documents among others.",
+                "homepage": "https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#bccwj-suw-luw-combined",
+                "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/BCCWJ_SUW_LUW_combined.zip"
+            },
+            {
+                "name": "JPDB",
+                "description": "A frequency dictionary based on the corpus from the online Japanese dictionary and SRS system at https://jpdb.io.",
+                "homepage": "https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#jpdb-v22-frequency",
+                "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/JPDB_v2.2_Frequency_Kana.zip"
+            }
+        ],
+        "grammar": [],
+        "kanji": [
+            {
+                "name": "KANJIDIC",
+                "description": "An English dictionary with readings, meanings, stroke order diagrams, frequency, grade level, JLPT level and frequency of kanji characters.",
+                "homepage": "https://github.com/yomidevs/jmdict-yomitan?tab=readme-ov-file#kanjidic-for-yomitan",
+                "downloadUrl": "https://github.com/yomidevs/jmdict-yomitan/releases/latest/download/KANJIDIC_english.zip"
+            }
+        ],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "Jitendex",
+                "description": "A free and openly licensed Japanese-to-English dictionary with example sentences, usage notes, etymology notes, cross references, antonyms, definition notes.",
+                "homepage": "https://jitendex.org",
+                "downloadUrl": "https://github.com/stephenmk/stephenmk.github.io/releases/latest/download/jitendex-yomitan.zip"
+            }
+        ]
+    },
+    "km": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-km-en",
+                "description": "Khmer to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-km-en.zip"
+            }
+        ]
+    },
+    "kn": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-kn-en",
+                "description": "Kannada to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-kn-en.zip"
+            }
+        ]
+    },
+    "ko": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-ko-en",
+                "description": "Korean to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ko-en.zip"
+            }
+        ]
+    },
+    "la": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-la-en",
+                "description": "Latin to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-la-en.zip"
+            }
+        ]
+    },
+    "lv": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-lv-en",
+                "description": "Latvian to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-lv-en.zip"
+            }
+        ]
+    },
+    "mn": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-mn-en",
+                "description": "Mongolian to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-mn-en.zip"
+            }
+        ]
+    },
+    "nl": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-nl-en",
+                "description": "Dutch to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-nl-en.zip"
+            }
+        ]
+    },
+    "pl": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-pl-en",
+                "description": "Polish to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-pl-en.zip"
+            }
+        ]
+    },
+    "pt": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-pt-en",
+                "description": "Portuguese to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-pt-en.zip"
+            }
+        ]
+    },
+    "ro": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-ro-en",
+                "description": "Romanian to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ro-en.zip"
+            }
+        ]
+    },
+    "ru": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-ru-en",
+                "description": "Russian to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ru-en.zip"
+            }
+        ]
+    },
+    "scn": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-scn-en",
+                "description": "Sicillian to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-scn-en.zip"
+            }
+        ]
+    },
+    "sga": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-sga-en",
+                "description": "Old Irish to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-sga-en.zip"
+            }
+        ]
+    },
+    "sh": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-sh-en",
+                "description": "Serbo-Croatian to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-sh-en.zip"
+            }
+        ]
+    },
+    "sq": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-sq-en",
+                "description": "Albanian to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-sq-en.zip"
+            }
+        ]
+    },
+    "sv": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-sv-en",
+                "description": "Swedish to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-sv-en.zip"
+            }
+        ]
+    },
+    "th": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-th-en",
+                "description": "Thai to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-th-en.zip"
+            }
+        ]
+    },
+    "tl": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-tl-en",
+                "description": "Tagalog to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-tl-en.zip"
+            }
+        ]
+    },
+    "tr": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-tr-en",
+                "description": "Turkish to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-tr-en.zip"
+            }
+        ]
+    },
+    "uk": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-uk-en",
+                "description": "Ukranian to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-uk-en.zip"
+            }
+        ]
+    },
+    "vi": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-vi-en",
+                "description": "Vietnamese to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-vi-en.zip"
+            }
+        ]
+    },
+    "yue": {
+        "frequency": [
+            {
+                "name": "Words.hk Frequency",
+                "description": "Frequency list of Cantonese terms and honzi provided by words.hk.",
+                "homepage": "https://github.com/MarvNC/wordshk-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2024-09-17/YUE.Freq.Words.hk.Frequency.zip"
+            }
+        ],
+        "grammar": [],
+        "kanji": [
+            {
+                "name": "Words.hk 粵典 漢字",
+                "description": "A free and open Cantonese dictionary with definitions and example sentences in Cantonese and English.",
+                "homepage": "https://github.com/MarvNC/wordshk-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2024-09-17/Words.hk.Honzi.2024-09-16.zip"
+            }
+        ],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "Words.hk 粵典",
+                "description": "A free and open Cantonese dictionary with definitions and example sentences in Cantonese and English.",
+                "homepage": "https://github.com/MarvNC/wordshk-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/wordshk-yomitan/releases/download/2024-09-17/Words.hk.2024-09-16.zip"
+            }
+        ]
+    },
+    "zh": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [
+            {
+                "name": "CC-CEDICT",
+                "description": "A free and open Chinese-English dictionary provided by the CC-CEDICT project.",
+                "homepage": "https://github.com/MarvNC/cc-cedict-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.Hanzi.zip"
+            }
+        ],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "CC-CEDICT",
+                "description": "A free and open Chinese-English dictionary provided by the CC-CEDICT project.",
+                "homepage": "https://github.com/MarvNC/cc-cedict-yomitan",
+                "downloadUrl": "https://github.com/MarvNC/cc-cedict-yomitan/releases/latest/download/CC-CEDICT.zip"
+            },
+            {
+                "name": "kty-zh-en",
+                "description": "Chinese to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-zh-en.zip"
+            }
+        ]
+    }
+}

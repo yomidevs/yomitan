@@ -28,7 +28,10 @@ function prepareWindow(window) {
 
     // Define innerText setter as an alias for textContent setter
     Object.defineProperty(window.HTMLDivElement.prototype, 'innerText', {
-        set(value) { this.textContent = value; }
+        /** @returns {string} */
+        get() { return this.textContent; },
+        /** @param {string} value */
+        set(value) { this.textContent = value; },
     });
 
     // Placeholder for feature detection
@@ -43,10 +46,13 @@ function prepareWindow(window) {
 export async function setupDomTest(htmlFilePath) {
     const html = typeof htmlFilePath === 'string' ? fs.readFileSync(htmlFilePath, {encoding: 'utf8'}) : '<!DOCTYPE html>';
     const env = builtinEnvironments.jsdom;
-    const {teardown} = await env.setup(global, {jsdom: {html}});
+    const environment = await env.setup(global, {jsdom: {html}});
     const window = /** @type {import('jsdom').DOMWindow} */ (/** @type {unknown} */ (global.window));
     prepareWindow(window);
-    return {window, teardown};
+    return {
+        window,
+        teardown: (global) => environment.teardown(global),
+    };
 }
 
 /**
@@ -59,14 +65,14 @@ export function createDomTest(htmlFilePath) {
         // eslint-disable-next-line no-empty-pattern
         window: async ({}, use) => {
             const env = builtinEnvironments.jsdom;
-            const {teardown} = await env.setup(global, {jsdom: {html}});
+            const environment = await env.setup(global, {jsdom: {html}});
             const window = /** @type {import('jsdom').DOMWindow} */ (/** @type {unknown} */ (global.window));
             prepareWindow(window);
             try {
                 await use(window);
             } finally {
-                teardown(global);
+                await environment.teardown(global);
             }
-        }
+        },
     });
 }

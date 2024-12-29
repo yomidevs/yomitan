@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {isObject} from '../../core/utilities.js';
+import {isObjectNotArray} from '../../core/object-utilities.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {HotkeyUtil} from '../../input/hotkey-util.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
@@ -133,7 +133,7 @@ export class ExtensionKeyboardShortcutController {
      */
     _onResetClick(e) {
         e.preventDefault();
-        this._resetAllCommands();
+        void this._resetAllCommands();
     }
 
     /**
@@ -141,7 +141,7 @@ export class ExtensionKeyboardShortcutController {
      */
     _onClearClick(e) {
         e.preventDefault();
-        this._clearAllCommands();
+        void this._clearAllCommands();
     }
 
     /**
@@ -149,7 +149,7 @@ export class ExtensionKeyboardShortcutController {
      */
     _getCommands() {
         return new Promise((resolve, reject) => {
-            if (!(isObject(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
+            if (!(isObjectNotArray(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
                 resolve([]);
                 return;
             }
@@ -317,7 +317,7 @@ class ExtensionKeyboardShortcutHotkeyEntry {
      */
     _onInputFieldChange(e) {
         const {key, modifiers} = e;
-        this._tryUpdateInput(key, modifiers, false);
+        void this._tryUpdateInput(key, modifiers, false);
     }
 
     /** */
@@ -331,10 +331,10 @@ class ExtensionKeyboardShortcutHotkeyEntry {
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'clearInput':
-                this._tryUpdateInput(null, [], true);
+                void this._tryUpdateInput(null, [], true);
                 break;
             case 'resetInput':
-                this._resetInput();
+                void this._resetInput();
                 break;
         }
     }
@@ -353,7 +353,7 @@ class ExtensionKeyboardShortcutHotkeyEntry {
      * @param {boolean} updateInput
      */
     async _tryUpdateInput(key, modifiers, updateInput) {
-        let okay = (key === null ? (modifiers.length === 0) : (modifiers.length !== 0));
+        let okay = (key === null ? (modifiers.length === 0) : (modifiers.length > 0));
         if (okay) {
             try {
                 await this._parent.updateCommand(this._name, key, modifiers);

@@ -15,11 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type CodepointRange = [
-    minInclusive: number,
-    maxInclusive: number,
-];
-
 export type FuriganaGroup = {
     isKana: boolean;
     text: string;

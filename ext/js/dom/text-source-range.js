@@ -17,7 +17,7 @@
  */
 
 import {toError} from '../core/to-error.js';
-import {DocumentUtil} from './document-util.js';
+import {convertMultipleRectZoomCoordinates, convertRectZoomCoordinates, getElementWritingMode, getNodesInRange, offsetDOMRects} from './document-util.js';
 import {DOMTextScanner} from './dom-text-scanner.js';
 
 /**
@@ -42,8 +42,9 @@ export class TextSourceRange {
      * @param {?DOMRect} cachedSourceRect A cached `DOMRect` representing the rect of the `imposterSourceElement`,
      *   which can be used after the imposter element is removed from the page.
      *   Must not be `null` if imposterElement is specified.
+     * @param {boolean} disallowExpandSelection
      */
-    constructor(range, rangeStartOffset, content, imposterElement, imposterSourceElement, cachedRects, cachedSourceRect) {
+    constructor(range, rangeStartOffset, content, imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, disallowExpandSelection) {
         /** @type {Range} */
         this._range = range;
         /** @type {number} */
@@ -58,6 +59,8 @@ export class TextSourceRange {
         this._cachedRects = cachedRects;
         /** @type {?DOMRect} */
         this._cachedSourceRect = cachedSourceRect;
+        /** @type {boolean} */
+        this._disallowExpandSelection = disallowExpandSelection;
     }
 
     /**
@@ -104,7 +107,8 @@ export class TextSourceRange {
             this._imposterElement,
             this._imposterSourceElement,
             this._cachedRects,
-            this._cachedSourceRect
+            this._cachedSourceRect,
+            this._disallowExpandSelection,
         );
     }
 
@@ -134,6 +138,7 @@ export class TextSourceRange {
      * @returns {number} The actual number of codepoints that were read.
      */
     setEndOffset(length, fromEnd, layoutAwareScan) {
+        if (this._disallowExpandSelection) { return 0; }
         let node;
         let offset;
         if (fromEnd) {
@@ -145,19 +150,24 @@ export class TextSourceRange {
         }
         const state = new DOMTextScanner(node, offset, !layoutAwareScan, layoutAwareScan).seek(length);
         this._range.setEnd(state.node, state.offset);
-        this._content = (fromEnd ? this._content + state.content : state.content);
+        const expandedContent = fromEnd ? this._content + state.content : state.content;
+        this._content = expandedContent;
         return length - state.remainder;
     }
 
+
     /**
-     * Moves the start offset of the text by a set amount of unicode codepoints.
+     * Moves the start offset of the text backwards by a set amount of unicode codepoints.
      * @param {number} length The maximum number of codepoints to move by.
      * @param {boolean} layoutAwareScan Whether or not HTML layout information should be used to generate
      *   the string content when scanning.
+     * @param {boolean} stopAtWordBoundary Whether to stop at whitespace characters.
      * @returns {number} The actual number of codepoints that were read.
      */
-    setStartOffset(length, layoutAwareScan) {
-        const state = new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan).seek(-length);
+    setStartOffset(length, layoutAwareScan, stopAtWordBoundary = false) {
+        if (this._disallowExpandSelection) { return 0; }
+        let state = new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan, stopAtWordBoundary);
+        state = state.seek(-length);
         this._range.setStart(state.node, state.offset);
         this._rangeStartOffset = this._range.startOffset;
         this._content = state.content + this._content;
@@ -170,7 +180,7 @@ export class TextSourceRange {
      */
     getRects() {
         if (this._isImposterDisconnected()) { return this._getCachedRects(); }
-        return DocumentUtil.convertMultipleRectZoomCoordinates(this._range.getClientRects(), this._range.startContainer);
+        return convertMultipleRectZoomCoordinates(this._range.getClientRects(), this._range.startContainer);
     }
 
     /**
@@ -181,7 +191,7 @@ export class TextSourceRange {
     getWritingMode() {
         let node = this._isImposterDisconnected() ? this._imposterSourceElement : this._range.startContainer;
         if (node !== null && node.nodeType !== Node.ELEMENT_NODE) { node = node.parentElement; }
-        return DocumentUtil.getElementWritingMode(/** @type {?Element} */ (node));
+        return getElementWritingMode(/** @type {?Element} */ (node));
     }
 
     /**
@@ -243,7 +253,7 @@ export class TextSourceRange {
      * @returns {Node[]} The nodes in the range.
      */
     getNodesInRange() {
-        return DocumentUtil.getNodesInRange(this._range);
+        return getNodesInRange(this._range);
     }
 
     /**
@@ -252,7 +262,16 @@ export class TextSourceRange {
      * @returns {TextSourceRange} A new instance of the class corresponding to the range.
      */
     static create(range) {
-        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null);
+        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, false);
+    }
+
+    /**
+     * Creates a new instance for a given range without expanding the search.
+     * @param {Range} range The source range.
+     * @returns {TextSourceRange} A new instance of the class corresponding to the range.
+     */
+    static createLazy(range) {
+        return new TextSourceRange(range, range.startOffset, range.toString(), null, null, null, null, true);
     }
 
     /**
@@ -263,9 +282,9 @@ export class TextSourceRange {
      * @returns {TextSourceRange} A new instance of the class corresponding to the range.
      */
     static createFromImposter(range, imposterElement, imposterSourceElement) {
-        const cachedRects = DocumentUtil.convertMultipleRectZoomCoordinates(range.getClientRects(), range.startContainer);
-        const cachedSourceRect = DocumentUtil.convertRectZoomCoordinates(imposterSourceElement.getBoundingClientRect(), imposterSourceElement);
-        return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect);
+        const cachedRects = convertMultipleRectZoomCoordinates(range.getClientRects(), range.startContainer);
+        const cachedSourceRect = convertRectZoomCoordinates(imposterSourceElement.getBoundingClientRect(), imposterSourceElement);
+        return new TextSourceRange(range, range.startOffset, range.toString(), imposterElement, imposterSourceElement, cachedRects, cachedSourceRect, false);
     }
 
     /**
@@ -289,11 +308,11 @@ export class TextSourceRange {
         ) {
             throw new Error('Cached rects not valid for this instance');
         }
-        const sourceRect = DocumentUtil.convertRectZoomCoordinates(this._imposterSourceElement.getBoundingClientRect(), this._imposterSourceElement);
-        return DocumentUtil.offsetDOMRects(
+        const sourceRect = convertRectZoomCoordinates(this._imposterSourceElement.getBoundingClientRect(), this._imposterSourceElement);
+        return offsetDOMRects(
             this._cachedRects,
             sourceRect.left - this._cachedSourceRect.left,
-            sourceRect.top - this._cachedSourceRect.top
+            sourceRect.top - this._cachedSourceRect.top,
         );
     }
 }

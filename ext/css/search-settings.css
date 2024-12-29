@@ -1,0 +1,489 @@
+:root {
+    --padding: 10px;
+    --padding-negative: calc(var(--padding) * -1);
+    --content-width: 700px;
+    --shadow-vertical: 0 1px 4px 0 var(--shadow-color), 0 2px 2px 0 var(--shadow-color);
+    --shadow-left: -1px 0 4px 0 var(--shadow-color), -2px 0 2px 0 var(--shadow-color);
+    --settings-group-horizontal-margin: 0;
+    --settings-group-inner-vertical-padding: 0.85em;
+    --settings-group-inner-horizontal-padding: 1.5em;
+    --settings-group-inner-horizontal-padding-half: calc(var(--settings-group-inner-horizontal-padding) * 0.5);
+    --settings-group-inner-horizontal-padding-half-wrappable: var(--settings-group-inner-horizontal-padding-half);
+    --settings-group-inner-horizontal-padding-fourth: calc(var(--settings-group-inner-horizontal-padding) * 0.25);
+    --settings-group-border-radius: 0.3em;
+    --settings-group-right-max-height: 40px;
+    --settings-group-wrap: nowrap;
+    --show-preview-label-height: 40px;
+
+    --font-size-no-units: 14;
+    --font-size: calc(1px * var(--font-size-no-units));
+    --font-size-small: 12px;
+    --outline-item-height: 40px;
+    --outline-item-icon-size: 32px;
+    --input-short-width: calc(var(--input-width-large) / 2 - var(--padding) / 2);
+    --input-short-height: 24px;
+    --input-medium-width: calc(var(--input-width-large) * 0.75);
+    --fab-button-size: 56px;
+    --fab-button-padding: 16px;
+    --modal-width: 600px;
+    --modal-height: 400px;
+    --modal-width-small: 400px;
+    --modal-height-small: 200px;
+    --modal-width-medium: 600px;
+    --modal-height-medium: 400px;
+    --modal-transition-offset: -64px;
+    --badge-size: 16px;
+
+    --link-color: var(--accent-color);
+    --link-color-hover: var(--accent-color-dark);
+    --separator-color1: #cccccc;
+    --separator-color2: #eeeeee;
+    --outline-item-background-color: rgba(13, 13, 13, 0);
+    --outline-item-background-color-hover: rgba(13, 13, 13, 0.15);
+    --warning-color: #96751c;
+    --warning-color-light: #edc75e;
+    --dim-background-color: rgba(0, 0, 0, 0.5);
+    --content-dimmer-color: rgba(0, 0, 0, 0.1);
+    --advanced-color: #6640be;
+    --advanced-color-lighter: hsl(258, 50%, 75%);
+    --advanced-color-transparent25: rgba(102, 64, 190, 0.5);
+
+    --modal-padding-horizontal: 1em;
+    --modal-padding-vertical: 0.625em;
+    --modal-padding-vertical-half: calc(var(--modal-padding-vertical) * 0.5);
+    --modal-button-spacing: 0.625em;
+}
+:root:not([data-loaded=true]) {
+    --animation-duration: 0s;
+}
+:root[data-theme=dark] {
+    --separator-color1: #333333;
+    --separator-color2: #222222;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    overscroll-behavior: contain;
+    background-color: var(--dim-background-color);
+    outline: none;
+    z-index: 10000;
+    opacity: 1;
+    visibility: visible;
+    transition:
+        opacity var(--animation-duration2) ease-out,
+        visibility 0s linear;
+}
+.modal[hidden] {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity var(--animation-duration2) ease-in,
+        visibility 0s linear var(--animation-duration2);
+}
+.modal[hidden]:not(.hidden-animating) {
+    display: none;
+}
+.modal-content {
+    max-width: 100%;
+    max-height: 100%;
+    width: var(--modal-width);
+    height: var(--modal-height);
+    background-color: var(--background-color-light);
+    flex: 0 1 auto;
+    border-radius: 0.5em;
+    transform: translate(0, 0);
+    transition:
+        transform var(--animation-duration2) ease-out,
+        width var(--animation-duration2) ease-in-out,
+        height var(--animation-duration2) ease-in-out,
+        border-radius var(--animation-duration2) ease-in-out;
+    box-shadow: var(--shadow-vertical);
+    display: flex;
+    flex-flow: column nowrap;
+    overflow: hidden;
+}
+.modal[hidden] .modal-content {
+    pointer-events: none;
+}
+.modal-content.modal-content-small {
+    width: var(--modal-width-small);
+    min-height: var(--modal-height-small);
+    height: auto;
+    max-height: 100%;
+}
+.modal-content.modal-content-medium {
+    width: var(--modal-width-medium);
+    min-height: var(--modal-height-medium);
+    height: auto;
+    max-height: 100%;
+}
+.modal-content.modal-content-full {
+    width: var(--content-width);
+    height: 100%;
+    transform: translate(0, 0);
+    border-radius: 0;
+}
+.modal[hidden] .modal-content {
+    transform: translate(0, var(--modal-transition-offset));
+    transition:
+        transform 0s linear var(--animation-duration2),
+        width var(--animation-duration2) ease-in-out,
+        height var(--animation-duration2) ease-in-out,
+        border-radius var(--animation-duration2) ease-in-out;
+}
+.modal-header {
+    flex: 0 0 auto;
+    padding: var(--modal-padding-vertical) var(--modal-padding-horizontal) var(--modal-padding-vertical-half);
+    display: flex;
+    width: 100%;
+    align-items: center;
+    box-sizing: border-box;
+}
+.modal-title {
+    font-size: 1.125em;
+    flex: 1 1 auto;
+}
+.modal-footer {
+    flex: 0 0 auto;
+    padding: var(--modal-padding-vertical-half) var(--modal-padding-horizontal) var(--modal-padding-vertical);
+    margin-right: calc(var(--modal-button-spacing) * -1);
+    margin-top: calc(var(--modal-button-spacing) * -1);
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-end;
+    justify-items: flex-end;
+    justify-content: flex-end;
+}
+.modal-footer>* {
+    margin-right: var(--modal-button-spacing);
+    margin-top: var(--modal-button-spacing);
+}
+.modal-body {
+    flex: 1 1 auto;
+    overflow: auto;
+    padding: var(--modal-padding-vertical-half) var(--modal-padding-horizontal);
+}
+.modal-body-addon {
+    flex: 0 0 auto;
+    padding: var(--modal-padding-vertical-half) var(--modal-padding-horizontal);
+}
+.modal-body>.settings-item,
+.modal-settings-group>.settings-item {
+    margin-left: calc(var(--modal-padding-horizontal) * -1);
+}
+.modal-body .settings-item {
+    margin-right: calc(var(--modal-padding-horizontal) * -1);
+}
+.modal-body .settings-item+.settings-item {
+    border-top: none;
+}
+.modal-body .settings-item-left {
+    padding-left: var(--modal-padding-horizontal);
+    padding-top: var(--settings-group-inner-horizontal-padding-fourth);
+    padding-bottom: var(--settings-group-inner-horizontal-padding-fourth);
+}
+.modal-body .settings-item-right {
+    padding-right: var(--modal-padding-horizontal);
+    padding-top: var(--settings-group-inner-horizontal-padding-fourth);
+    padding-bottom: var(--settings-group-inner-horizontal-padding-fourth);
+}
+.modal-body .settings-item-children {
+    padding-left: var(--modal-padding-horizontal);
+    padding-right: var(--modal-padding-horizontal);
+    padding-bottom: var(--settings-group-inner-horizontal-padding-fourth);
+}
+
+.modal.modal-left {
+    display: flex;
+    flex-flow: row nowrap;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    pointer-events: none;
+}
+.modal-content-container {
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content-container>.modal-content,
+.modal-content-container>.modal-content-dimmer {
+    pointer-events: auto;
+}
+
+.modal-content-container>.modal-content-dimmer {
+    background: var(--custom-css-modal-background);
+    width: var(--custom-css-dim-size);
+    height: 100%;
+    margin-right: calc(100% - var(--custom-css-dim-size));
+    position: absolute;
+}
+
+.modal-header-button-container {
+    margin-top: calc(-1 * var(--modal-padding-vertical-half));
+    margin-bottom: calc(-1 * var(--modal-padding-vertical-half));
+}
+.modal-header-button-group {
+    display: block;
+    position: relative;
+    width: var(--icon-button-size);
+    height: var(--icon-button-size);
+}
+.modal-header-button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+button.icon-button.modal-header-button {
+    --button-content-color: var(--button-default-icon-color-light);
+    --button-hover-content-color: var(--button-default-icon-color);
+    --button-active-content-color: var(--button-default-icon-color);
+}
+button.icon-button.modal-header-button>.icon-button-inner>.icon {
+    transition: background-color var(--animation-duration) ease-in-out;
+}
+.modal-header-button[data-modal-action=expand],
+.modal-header-button[data-modal-action=collapse] {
+    visibility: visible;
+    opacity: 1;
+    z-index: 1;
+    transition:
+        opacity var(--animation-duration2) ease-in-out 0s,
+        visibility 0s ease-in-out 0s;
+}
+.modal-content.modal-content-full .modal-header-button[data-modal-action=expand],
+.modal-content:not(.modal-content-full) .modal-header-button[data-modal-action=collapse] {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition:
+        opacity var(--animation-duration2) ease-in-out 0s,
+        visibility 0s ease-in-out var(--animation-duration2);
+}
+
+.modal-separator-line {
+    border-top: var(--thin-border-size) solid var(--separator-color1);
+    margin: 0 calc(var(--modal-padding-horizontal) * -1);
+}
+.modal-separator-line-light {
+    border-top: var(--thin-border-size) solid var(--separator-color2);
+    margin: 0 calc(var(--modal-padding-horizontal) * -1);
+}
+
+/* Settings styles */
+.settings-group {
+    margin: 0 var(--settings-group-horizontal-margin);
+    padding: 0;
+    box-sizing: border-box;
+    background-color: var(--background-color-light);
+    box-shadow: var(--shadow-vertical);
+    border-radius: var(--settings-group-border-radius);
+    overflow-x: hidden;
+}
+.settings-group.settings-group-top-margin {
+    margin-top: 1.0125em;
+}
+.settings-item {
+    position: relative;
+}
+.settings-item:not([hidden]) {
+    display: block;
+}
+.settings-item-outer {
+    display: block;
+    width: 100%;
+}
+.settings-item-inner {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-content: stretch;
+    width: 100%;
+}
+.settings-item-inner.settings-item-inner-wrappable {
+    flex-wrap: var(--settings-group-wrap);
+}
+.settings-item-left {
+    padding: var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding-half) var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding);
+    flex: 1 1 auto;
+    align-self: center;
+    position: relative;
+}
+.settings-item-left:last-child {
+    padding-right: var(--settings-group-inner-horizontal-padding);
+}
+.settings-item-right {
+    padding: var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding) var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding-half);
+    flex: 0 1 auto;
+    align-self: stretch;
+    max-height: var(--settings-group-right-max-height);
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    align-content: center;
+    justify-content: flex-end;
+}
+.settings-item-inner.settings-item-inner-wrappable>.settings-item-left {
+    padding-right: var(--settings-group-inner-horizontal-padding-half-wrappable);
+}
+.settings-item-inner.settings-item-inner-wrappable>.settings-item-right {
+    padding-left: var(--settings-group-inner-horizontal-padding-half-wrappable);
+}
+.settings-item-center {
+    padding: var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding) var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding);
+    flex: 0 1 100%;
+    align-self: flex-start;
+    text-align: center;
+}
+.settings-item+.settings-item {
+    border-top: var(--thin-border-size) solid var(--separator-color2);
+}
+.settings-item-description {
+    color: var(--text-color-light2);
+}
+.settings-item-right.open-panel-button-container {
+    padding: 0.25em 1em 0.25em 0.75em;
+    max-height: calc(var(--settings-group-right-max-height) + var(--settings-group-inner-vertical-padding) * 2);
+}
+.settings-item-children {
+    padding: 0em var(--settings-group-inner-horizontal-padding-half) var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding);
+    margin-top: 0;
+}
+.settings-item-children.settings-item-children-group {
+    padding: 0 0 0 calc(var(--settings-group-inner-horizontal-padding) + var(--settings-group-inner-horizontal-padding));
+}
+.settings-item-children.settings-item-children-group .settings-item {
+    border-top: var(--thin-border-size) solid var(--separator-color2);
+}
+.settings-item-children.settings-item-children-group .settings-item-left {
+    padding-left: 0;
+}
+.settings-item-children.settings-item-children-group .settings-item-inner.settings-item-inner-wrappable>.settings-item-left:not(:last-child) {
+    padding-right: calc(var(--settings-group-inner-horizontal-padding-half-wrappable) * 2);
+}
+.settings-item-children.settings-item-children-group .settings-item-inner.settings-item-inner-wrappable>.settings-item-right {
+    padding-left: 0;
+}
+.settings-item-children.settings-item-children-group .settings-item-children {
+    padding-left: 0;
+}
+.settings-item.settings-item-button,
+a.settings-item.settings-item-button {
+    cursor: pointer;
+    color: var(--text-color);
+    text-decoration: none;
+    background-color: transparent;
+    transition: background-color var(--animation-duration) ease-in-out;
+}
+.settings-item.settings-item-button>.settings-item-inner,
+.settings-item.settings-item-button>.settings-item-inner>.settings-item-left,
+.settings-item.settings-item-button>.settings-item-inner>.settings-item-right {
+    margin-top: 0;
+}
+.settings-item.settings-item-button:hover,
+.settings-item.settings-item-button:active {
+    background-color: var(--background-color);
+}
+.settings-item.settings-item-button .icon-button>.icon-button-inner>.icon {
+    transition: background-color var(--animation-duration) ease-in-out;
+}
+.settings-item.settings-item-button:hover .icon-button>.icon-button-inner>.icon,
+.settings-item.settings-item-button:active .icon-button>.icon-button-inner>.icon {
+    background-color: var(--accent-color);
+}
+.settings-item-invalid-indicator {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0.5em;
+    background-color: var(--danger-color);
+}
+.settings-item[data-invalid=true] .settings-item-invalid-indicator {
+    display: block;
+}
+
+
+/* Settings item groups */
+.settings-item-group {
+    margin-right: var(--padding-negative);
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    align-content: center;
+    justify-content: flex-end;
+}
+.settings-item-group.settings-item-group-wrap {
+    flex-wrap: wrap;
+}
+.settings-item-group-item {
+    flex: 0 1 auto;
+    padding-right: var(--padding);
+}
+.settings-item-group-item-label {
+    font-size: var(--font-size-small);
+    line-height: 1;
+}
+input[type=text].short-width,
+input[type=number].short-width,
+select.short-width {
+    width: var(--input-short-width);
+}
+input[type=text].medium-width,
+input[type=number].medium-width,
+select.medium-width {
+    width: var(--input-medium-width);
+}
+input[type=text].short-height,
+input[type=number].short-height,
+select.short-height {
+    height: var(--input-short-height);
+    margin-top: calc(var(--settings-group-right-max-height) - var(--input-short-height) - var(--font-size-small));
+    line-height: var(--line-height);
+}
+.settings-item-button-group-container {
+    max-height: none;
+    width: 100%;
+}
+.settings-item-button-group {
+    display: flex;
+    width: 100%;
+    flex-flow: row wrap;
+    max-height: none;
+    justify-content: flex-start;
+    margin-top: var(--padding-negative);
+    margin-right: var(--padding-negative);
+}
+.settings-item-button-group-item {
+    flex: 0 1 auto;
+    padding-top: var(--padding);
+    padding-right: var(--padding);
+}
+.settings-item-progress-report {
+    display: none;
+    font-weight: bold;
+    color: #4169e1;
+}
+.settings-item-error-report {
+    display: none;
+    font-weight: bold;
+    color: #8b0000;
+}

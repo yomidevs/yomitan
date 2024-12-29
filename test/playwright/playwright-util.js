@@ -20,19 +20,20 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export const root = path.join(dirname, '..', '..');
 
 export const test = base.extend({
     // eslint-disable-next-line no-empty-pattern
-    context: async ({}, use) => {
+    context: async ({}, /** @type {(r: import('playwright').BrowserContext) => Promise<void>} */ use) => {
         const pathToExtension = path.join(root, 'ext');
         const context = await chromium.launchPersistentContext('', {
-            // headless: false,
+            // Disabled: headless: false,
             args: [
                 '--headless=new',
                 `--disable-extensions-except=${pathToExtension}`,
-                `--load-extension=${pathToExtension}`
-            ]
+                `--load-extension=${pathToExtension}`,
+            ],
         });
         await use(context);
         await context.close();
@@ -45,37 +46,45 @@ export const test = base.extend({
 
         const extensionId = background.url().split('/')[2];
         await use(extensionId);
-    }
+    },
 });
+
 export const expect = test.expect;
 
-export const mockModelFieldNames = [
-    'Word',
-    'Reading',
-    'Audio',
-    'Sentence'
-];
-
-/** @type {{[key: string]: string|undefined}} */
-export const mockModelFieldsToAnkiValues = {
-    'Word': '{expression}',
-    'Reading': '{furigana-plain}',
-    'Sentence': '{clipboard-text}',
-    'Audio': '{audio}'
-};
+/**
+ * @returns {Map<string, string>}
+ */
+export function getMockModelFields() {
+    return new Map([
+        ['Word', '{expression}'],
+        ['Reading', '{furigana-plain}'],
+        ['Sentence', '{clipboard-text}'],
+        ['Audio', '{audio}'],
+    ]);
+}
 
 /**
  * @param {import('playwright').Route} route
- * @returns {Promise<void>|undefined}
+ * @returns {Promise<void>}
  */
-export const mockAnkiRouteHandler = (route) => {
-    const reqBody = route.request().postDataJSON();
-    const respBody = ankiRouteResponses[reqBody.action];
-    if (!respBody) {
-        return route.abort();
+export async function mockAnkiRouteHandler(route) {
+    try {
+        /** @type {unknown} */
+        const requestJson = route.request().postDataJSON();
+        if (typeof requestJson !== 'object' || requestJson === null) {
+            throw new Error(`Invalid request type: ${typeof requestJson}`);
+        }
+        const body = getResponseBody(/** @type {import('core').SerializableObject} */ (requestJson).action);
+        const responseJson = {
+            status: 200,
+            contentType: 'text/json',
+            body: JSON.stringify(body),
+        };
+        await route.fulfill(responseJson);
+    } catch {
+        return await route.abort();
     }
-    route.fulfill(respBody);
-};
+}
 
 /**
  * @param {import('playwright').Page} page
@@ -86,38 +95,53 @@ export const writeToClipboardFromPage = async (page, text) => {
     await page.evaluate(`navigator.clipboard.writeText('${text}')`);
 };
 
-export const expectedAddNoteBody = {
-    'action': 'addNote',
-    'params':
-    {
-        'note': {
-            'fields': {
-                'Word': '読む', 'Reading': '読[よ]む', 'Audio': '[sound:mock_audio.mp3]', 'Sentence': '読むの例文'
+/**
+ * @returns {Record<string, unknown>}
+ */
+export function getExpectedAddNoteBody() {
+    return {
+        version: 2,
+        action: 'addNote',
+        params: {
+            note: {
+                fields: {
+                    Word: '読む',
+                    Reading: '読[よ]む',
+                    Audio: '[sound:mock_audio.mp3]',
+                    Sentence: '読むの例文',
+                },
+                tags: ['yomitan'],
+                deckName: 'Mock Deck',
+                modelName: 'Mock Model',
+                options: {
+                    allowDuplicate: true,
+                    duplicateScope: 'collection',
+                    duplicateScopeOptions: {
+                        deckName: null,
+                        checkChildren: false,
+                        checkAllModels: false,
+                    },
+                },
             },
-            'tags': ['yomitan'],
-            'deckName': 'Mock Deck',
-            'modelName': 'Mock Model',
-            'options': {
-                'allowDuplicate': false, 'duplicateScope': 'collection', 'duplicateScopeOptions': {
-                    'deckName': null, 'checkChildren': false, 'checkAllModels': false
-                }
-            }
-        }
-    }, 'version': 2
-};
+        },
+    };
+}
 
-const baseAnkiResp = {
-    status: 200,
-    contentType: 'text/json'
-};
-
-/** @type {{[key: string]: import('core').SerializableObject}} */
-const ankiRouteResponses = {
-    'version': Object.assign({body: JSON.stringify(6)}, baseAnkiResp),
-    'deckNames': Object.assign({body: JSON.stringify(['Mock Deck'])}, baseAnkiResp),
-    'modelNames': Object.assign({body: JSON.stringify(['Mock Model'])}, baseAnkiResp),
-    'modelFieldNames': Object.assign({body: JSON.stringify(mockModelFieldNames)}, baseAnkiResp),
-    'canAddNotes': Object.assign({body: JSON.stringify([true, true])}, baseAnkiResp),
-    'storeMediaFile': Object.assign({body: JSON.stringify('mock_audio.mp3')}, baseAnkiResp),
-    'addNote': Object.assign({body: JSON.stringify(102312488912)}, baseAnkiResp)
-};
+/**
+ * @param {unknown} action
+ * @returns {unknown}
+ * @throws {Error}
+ */
+function getResponseBody(action) {
+    switch (action) {
+        case 'version': return 6;
+        case 'deckNames': return ['Mock Deck'];
+        case 'modelNames': return ['Mock Model'];
+        case 'modelFieldNames': return [...getMockModelFields().keys()];
+        case 'canAddNotes': return [true, true];
+        case 'storeMediaFile': return 'mock_audio.mp3';
+        case 'addNote': return 102312488912;
+        case 'multi': return [];
+        default: throw new Error(`Unknown action: ${action}`);
+    }
+}

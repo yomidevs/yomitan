@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DocumentUtil} from '../dom/document-util.js';
+import {computeZoomScale, isPointInAnyRect} from '../dom/document-util.js';
 import {TextSourceRange} from '../dom/text-source-range.js';
 
 /**
@@ -62,7 +62,7 @@ export class GoogleDocsUtil {
             const style = document.createElement('style');
             style.textContent = [
                 '.kix-canvas-tile-content{pointer-events:none!important;}',
-                '.kix-canvas-tile-content svg>g>rect{pointer-events:all!important;}'
+                '.kix-canvas-tile-content svg>g>rect{pointer-events:all!important;}',
             ].join('\n');
             const parent = document.head || document.documentElement;
             if (parent !== null) {
@@ -86,6 +86,8 @@ export class GoogleDocsUtil {
         const content = document.createTextNode(text);
         const svgText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         const transform = element.getAttribute('transform') || '';
+        // Using getAttribute instead of dataset because element is an SVG element
+        // eslint-disable-next-line unicorn/prefer-dom-node-dataset
         const font = element.getAttribute('data-font-css') || '';
         const elementX = element.getAttribute('x');
         const elementY = element.getAttribute('y');
@@ -124,7 +126,7 @@ export class GoogleDocsUtil {
      */
     _getRangeWithPoint(textNode, x, y, normalizeCssZoom) {
         if (normalizeCssZoom) {
-            const scale = DocumentUtil.computeZoomScale(textNode);
+            const scale = computeZoomScale(textNode);
             x /= scale;
             y /= scale;
         }
@@ -135,7 +137,7 @@ export class GoogleDocsUtil {
             const mid = Math.floor((start + end) / 2);
             range.setStart(textNode, mid);
             range.setEnd(textNode, end);
-            if (DocumentUtil.isPointInAnyRect(x, y, range.getClientRects())) {
+            if (isPointInAnyRect(x, y, range.getClientRects(), null)) {
                 start = mid;
             } else {
                 end = mid;

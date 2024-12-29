@@ -9,7 +9,7 @@
         "noImplicitAny": true,
         "strictPropertyInitialization": true,
         "suppressImplicitAnyIndexErrors": false,
-        "skipLibCheck": false,
+        "skipLibCheck": true,
         "baseUrl": ".",
         "paths": {
             "*": ["../types/ext/*"],
@@ -18,15 +18,23 @@
             "test/*": ["../types/test/*"],
             "rollup/parseAst": ["../types/other/rollup-parse-ast"],
             "ext/json-schema": ["../types/ext/json-schema"],
-            "json-schema": ["json-schema"]
+            "json-schema": ["json-schema"],
+            "chai": ["../node_modules/@vitest/expect/dist/chai.d.cts"]
         },
         "types": [
             "chrome",
+            "dom-webcodecs",
             "firefox-webext-browser",
             "handlebars",
             "jszip",
             "parse5",
             "wanakana"
+        ],
+        "lib": [
+            "ES2022",
+            "DOM",
+            "DOM.Iterable",
+            "WebWorker"
         ]
     },
     "include": [
@@ -40,6 +48,7 @@
     ],
     "exclude": [
         "../node_modules",
-        "../dev/lib"
+        "../dev/lib",
+        "../ext/lib"
     ]
 }

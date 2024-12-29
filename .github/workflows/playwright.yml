@@ -10,24 +10,23 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
       - name: Remove all fonts
         run: rm -rf /usr/share/fonts
 
       - uses: actions/checkout@v4
 
       - name: Install CJK fonts
-        uses: awalsh128/cache-apt-pkgs-action@44c33b32f808cdddd5ac0366d70595ed63661ed8 # v1.3.1
+        uses: awalsh128/cache-apt-pkgs-action@a6c3917cc929dd0345bfb2d3feaf9101823370ad # v1.4.2
         with:
           packages: fonts-ipafont-mincho
           execute_install_scripts: true
 
-      - uses: actions/setup-node@v4
-        with:
-          cache: "npm"
-          node-version-file: "package.json"
-
-      - name: Install dependencies
-        run: npm ci
+      - uses: ./.github/actions/setup
 
       - name: Build
         run: npm run build
@@ -47,17 +46,17 @@ jobs:
       - name: Grab latest dictionaries from dictionaries branch
         uses: actions/checkout@v4
         with:
-          repository: themoeway/yomitan # so that this works on forks
+          repository: yomidevs/yomitan # so that this works on forks
           ref: dictionaries
           path: dictionaries
 
       - name: Grab latest screenshots from master branch
-        uses: dawidd6/action-download-artifact@e7466d1a7587ed14867642c2ca74b5bcc1e19a2d # pin@v2
+        uses: dawidd6/action-download-artifact@80620a5d27ce0ae443b965134db88467fc607b43 # pin@v2
         continue-on-error: true
         id: master-screenshots
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          repo: themoeway/yomitan # so that this works on forks
+          repo: yomidevs/yomitan # so that this works on forks
           name: playwright-screenshots
           branch: master
           workflow: playwright.yml
@@ -100,4 +99,10 @@ jobs:
         with:
           name: playwright-output
           path: playwright-output
+        if: github.event_name == 'pull_request'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-json
+          path: playwright-results.json
         if: github.event_name == 'pull_request'

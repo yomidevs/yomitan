@@ -21,21 +21,24 @@ import path from 'path';
 import {parseJson} from '../dev/json.js';
 import {createTranslatorTest} from './fixtures/translator-test.js';
 import {createTestAnkiNoteData, getTemplateRenderResults} from './utilities/anki.js';
+import {setupStubs} from './utilities/database.js';
 import {createFindKanjiOptions, createFindTermsOptions} from './utilities/translator.js';
+
+setupStubs();
 
 /**
  * @param {string} fileName
  * @param {unknown} content
  */
 function writeJson(fileName, content) {
-    writeFileSync(fileName, JSON.stringify(content, null, 2));
+    writeFileSync(fileName, JSON.stringify(content, null, 2) + '\n');
 }
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
-test('Write dictionary data expected data', async ({window, translator, expect}) => {
+test('Write dictionary data expected data', async ({window, translator, styles, expect}) => {
     // The window property needs to be referenced for it to be initialized.
     // It is needed for DOM access for structured content.
     void window;
@@ -64,8 +67,8 @@ test('Write dictionary data expected data', async ({window, translator, expect})
                     const {mode, text} = data;
                     const options = createFindTermsOptions(dictionaryName, optionsPresets, data.options);
                     const {dictionaryEntries, originalTextLength} = await translator.findTerms(mode, text, options);
-                    const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, mode, template, null) : null;
-                    const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, mode)) : null;
+                    const renderResults = mode !== 'simple' ? await getTemplateRenderResults(dictionaryEntries, mode, template, null, styles) : null;
+                    const noteDataList = mode !== 'simple' ? dictionaryEntries.map((dictionaryEntry) => createTestAnkiNoteData(dictionaryEntry, mode, styles)) : null;
                     actualResults1.push({name, originalTextLength, dictionaryEntries});
                     actualResults2.push({name, noteDataList});
                     actualResults3.push({name, results: renderResults});

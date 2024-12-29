@@ -8,17 +8,19 @@ jobs:
     runs-on: ubuntu-latest
     environment: cd
     steps:
-      - uses: robinraju/release-downloader@368754b9c6f47c345fcfbf42bcb577c2f0f5f395 # pin@v1.9
+      - uses: robinraju/release-downloader@a96f54c1b5f5e09e47d9504526e96febd949d4c2 # pin@v1.11
         with:
           tag: ${{ github.ref_name }}
+          zipBall: true
           fileName: "*"
 
       - name: Deploy to Firefox Addons
         id: addonsDeploy
-        uses: cardinalby/webext-buildtools-firefox-addons-action@924ad87df7e4af50a654c164ad9e498dce260ffa # pin@v1.0.9
+        uses: cardinalby/webext-buildtools-firefox-addons-action@987e338100095280ec8daf942e5640aeb55d3647 # pin@v1.0.10
         continue-on-error: true
         with:
           zipFilePath: yomitan-firefox.zip
+          sourcesZipFilePath: yomitan-${{ github.ref_name }}.zip
           extensionId: ${{ secrets.FF_EXTENSION_ID }}
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}

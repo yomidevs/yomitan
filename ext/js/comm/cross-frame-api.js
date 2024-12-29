@@ -21,7 +21,8 @@ import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
+import {safePerformance} from '../core/safe-performance.js';
 
 /**
  * @augments EventDispatcher<import('cross-frame-api').CrossFrameAPIPortEvents>
@@ -94,7 +95,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
                 responseTimeout,
                 action,
                 ack: false,
-                timer: null
+                timer: null,
             };
             this._activeInvocations.set(id, invocation);
 
@@ -106,7 +107,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
                     return;
                 }
             }
-
+            safePerformance.mark(`cross-frame-api:invoke:${action}`);
             try {
                 this._port.postMessage(/** @type {import('cross-frame-api').InvokeMessage} */ ({type: 'invoke', id, data: {action, params}}));
             } catch (e) {
@@ -248,7 +249,7 @@ export class CrossFrameAPIPort extends EventDispatcher {
             params,
             [],
             (data) => this._sendResult(id, data),
-            () => this._sendError(id, new Error(`Unknown action: ${action}`))
+            () => this._sendError(id, new Error(`Unknown action: ${action}`)),
         );
     }
 
@@ -311,6 +312,20 @@ export class CrossFrameAPI {
         this._tabId = tabId;
         /** @type {?number} */
         this._frameId = frameId;
+    }
+
+    /**
+     * @type {?number}
+     */
+    get tabId() {
+        return this._tabId;
+    }
+
+    /**
+     * @type {?number}
+     */
+    get frameId() {
+        return this._frameId;
     }
 
     /** */
@@ -410,6 +425,7 @@ export class CrossFrameAPI {
         }
         return await this._createCommPort(otherTabId, otherFrameId);
     }
+
     /**
      * @param {number} otherTabId
      * @param {number} otherFrameId

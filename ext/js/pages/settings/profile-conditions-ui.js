@@ -18,7 +18,7 @@
 
 import {EventDispatcher} from '../../core/event-dispatcher.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {DocumentUtil} from '../../dom/document-util.js';
+import {normalizeModifier} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
 
@@ -65,9 +65,9 @@ export class ProfileConditionsUI extends EventDispatcher {
                         ['lessThan',           {displayName: '<',      type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
                         ['greaterThan',        {displayName: '>',      type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
                         ['lessThanOrEqual',    {displayName: '\u2264', type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
-                        ['greaterThanOrEqual', {displayName: '\u2265', type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}]
-                    ])
-                }
+                        ['greaterThanOrEqual', {displayName: '\u2265', type: 'integer', defaultValue: '0', validate: validateInteger, normalize: normalizeInteger}],
+                    ]),
+                },
             ],
             [
                 'url',
@@ -76,9 +76,9 @@ export class ProfileConditionsUI extends EventDispatcher {
                     defaultOperator: 'matchDomain',
                     operators: new Map([
                         ['matchDomain', {displayName: 'Matches Domain', type: 'string', defaultValue: 'example.com',   resetDefaultOnChange: true, validate: this._validateDomains.bind(this), normalize: this._normalizeDomains.bind(this)}],
-                        ['matchRegExp', {displayName: 'Matches RegExp', type: 'string', defaultValue: 'example\\.com', resetDefaultOnChange: true, validate: this._validateRegExp.bind(this)}]
-                    ])
-                }
+                        ['matchRegExp', {displayName: 'Matches RegExp', type: 'string', defaultValue: 'example\\.com', resetDefaultOnChange: true, validate: this._validateRegExp.bind(this)}],
+                    ]),
+                },
             ],
             [
                 'modifierKeys',
@@ -89,9 +89,9 @@ export class ProfileConditionsUI extends EventDispatcher {
                         ['are',        {displayName: 'Are',            type: 'modifierKeys', defaultValue: ''}],
                         ['areNot',     {displayName: 'Are Not',        type: 'modifierKeys', defaultValue: ''}],
                         ['include',    {displayName: 'Include',        type: 'modifierKeys', defaultValue: ''}],
-                        ['notInclude', {displayName: 'Don\'t Include', type: 'modifierKeys', defaultValue: ''}]
-                    ])
-                }
+                        ['notInclude', {displayName: 'Don\'t Include', type: 'modifierKeys', defaultValue: ''}],
+                    ]),
+                },
             ],
             [
                 'flags',
@@ -102,15 +102,15 @@ export class ProfileConditionsUI extends EventDispatcher {
                         ['are',        {displayName: 'Are',            type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}],
                         ['areNot',     {displayName: 'Are Not',        type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}],
                         ['include',    {displayName: 'Include',        type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}],
-                        ['notInclude', {displayName: 'Don\'t Include', type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}]
-                    ])
-                }
-            ]
+                        ['notInclude', {displayName: 'Don\'t Include', type: 'string', defaultValue: '', validate: validateFlags, normalize: normalizeFlags}],
+                    ]),
+                },
+            ],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
         /** @type {Set<string>} */
         this._validFlags = new Set([
-            'clipboard'
+            'clipboard',
         ]);
     }
 
@@ -225,7 +225,7 @@ export class ProfileConditionsUI extends EventDispatcher {
             defaultValue = '',
             resetDefaultOnChange = false,
             validate = null,
-            normalize = null
+            normalize = null,
         } = (typeof info === 'undefined' ? {} : info);
 
         return {
@@ -234,7 +234,7 @@ export class ProfileConditionsUI extends EventDispatcher {
             defaultValue,
             resetDefaultOnChange,
             validate,
-            normalize
+            normalize,
         };
     }
 
@@ -266,12 +266,12 @@ export class ProfileConditionsUI extends EventDispatcher {
             this._children[i].index = i;
         }
 
-        this.settingsController.modifyGlobalSettings([{
+        void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
             path: this.getPath('conditionGroups'),
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
 
         this._triggerConditionGroupCountChanged(this._children.length);
@@ -327,18 +327,18 @@ export class ProfileConditionsUI extends EventDispatcher {
     _onAddConditionGroupButtonClick() {
         /** @type {import('settings').ProfileConditionGroup} */
         const conditionGroup = {
-            conditions: [this.getDefaultCondition()]
+            conditions: [this.getDefaultCondition()],
         };
         const index = this._children.length;
 
         this._addConditionGroup(conditionGroup, index);
 
-        this.settingsController.modifyGlobalSettings([{
+        void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
             path: this.getPath('conditionGroups'),
             start: index,
             deleteCount: 0,
-            items: [conditionGroup]
+            items: [conditionGroup],
         }]);
 
         this._triggerConditionGroupCountChanged(this._children.length);
@@ -543,12 +543,12 @@ class ProfileConditionGroupUI {
             this._children[i].index = i;
         }
 
-        this.settingsController.modifyGlobalSettings([{
+        void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
             path: this.getPath('conditions'),
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
 
         if (this._children.length === 0) {
@@ -581,12 +581,12 @@ class ProfileConditionGroupUI {
 
         this._addCondition(condition, index);
 
-        this.settingsController.modifyGlobalSettings([{
+        void this.settingsController.modifyGlobalSettings([{
             action: 'splice',
             path: this.getPath('conditions'),
             start: index,
             deleteCount: 0,
-            items: [condition]
+            items: [condition],
         }]);
     }
 
@@ -714,7 +714,7 @@ class ProfileConditionUI {
         const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
         const type = ProfileConditionsUI.normalizeProfileConditionType(element.value);
         if (type === null) { return; }
-        this._setType(type);
+        void this._setType(type);
     }
 
     /**
@@ -725,7 +725,7 @@ class ProfileConditionUI {
         const type = ProfileConditionsUI.normalizeProfileConditionType(this._typeInput.value);
         if (type === null) { return; }
         const operator = element.value;
-        this._setOperator(type, operator);
+        void this._setOperator(type, operator);
     }
 
     /**
@@ -740,7 +740,7 @@ class ProfileConditionUI {
         if (okay) {
             const normalizedValue = this._normalizeValue(value, normalize);
             node.value = normalizedValue;
-            this.settingsController.setGlobalSetting(this.getPath('value'), normalizedValue);
+            void this.settingsController.setGlobalSetting(this.getPath('value'), normalizedValue);
         }
     }
 
@@ -754,7 +754,7 @@ class ProfileConditionUI {
         this._value = modifiers;
         if (okay) {
             const normalizedValue = this._normalizeValue(modifiers, normalize);
-            this.settingsController.setGlobalSetting(this.getPath('value'), normalizedValue);
+            void this.settingsController.setGlobalSetting(this.getPath('value'), normalizedValue);
         }
     }
 
@@ -782,7 +782,7 @@ class ProfileConditionUI {
                 this._parent.removeSelf();
                 break;
             case 'resetValue':
-                this._resetValue();
+                void this._resetValue();
                 break;
         }
     }
@@ -941,7 +941,7 @@ class ProfileConditionUI {
         /** @type {import('input').Modifier[]} */
         const results = [];
         for (const item of modifiersString.split(/[,;\s]+/)) {
-            const modifier = DocumentUtil.normalizeModifier(item.trim().toLowerCase());
+            const modifier = normalizeModifier(item.trim().toLowerCase());
             if (modifier !== null) { results.push(modifier); }
         }
         return results;
@@ -971,7 +971,7 @@ class ProfileConditionUI {
         await this.settingsController.modifyGlobalSettings([
             {action: 'set', path: this.getPath('type'), value: type},
             {action: 'set', path: this.getPath('operator'), value: operator},
-            {action: 'set', path: this.getPath('value'), value: defaultValue}
+            {action: 'set', path: this.getPath('value'), value: defaultValue},
         ]);
     }
 

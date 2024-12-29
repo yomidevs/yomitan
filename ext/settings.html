@@ -13,23 +13,26 @@
     <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
     <link rel="stylesheet" type="text/css" href="/css/material.css">
     <link rel="stylesheet" type="text/css" href="/css/settings.css">
+    <link rel="stylesheet" type="text/css" href="/css/visibility-modifiers.css">
     <link rel="stylesheet" type="text/css" href="/css/display-pronunciation.css">
+    <script src="/js/pages/settings/settings-main.js" type="module"></script>
 </head>
-<body>
+<body hidden>
 
 <!-- Main content -->
-<div class="content-outer"><div class="content">
+<div class="content-outer"><div class="content scrollbar">
 <div class="content-left">
-    <div class="sidebar"><div class="sidebar-inner">
+    <div class="sidebar"><div class="sidebar-inner scrollbar">
         <div class="sidebar-body">
             <a href="#!profile"          class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="profile"></span></span><span class="outline-item-label">Profile</span></a>
             <a href="#!dictionaries"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-enabled-warning" hidden><div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div></span></span><span class="outline-item-label">Dictionaries</span></a>
             <a href="#!general"          class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="cog"></span></span><span class="outline-item-label">General</span></a>
             <a href="#!scanning"         class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="scanning"></span></span><span class="outline-item-label">Scanning</span></a>
-            <a href="#!popup"            class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup"></span></span><span class="outline-item-label">Popup</span></a>
-            <a href="#!popup-appearance" class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="palette"></span></span><span class="outline-item-label">Appearance</span></a>
+            <a href="#!popup"            class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup"></span></span><span class="outline-item-label">Popup Behavior</span></a>
+            <a href="#!appearance"       class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="palette"></span></span><span class="outline-item-label">Appearance</span></a>
+            <a href="#!result-display"   class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="monitor"></span></span><span class="outline-item-label">Result Display</span></a>
             <a href="#!popup-size"       class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup-size"></span></span><span class="outline-item-label">Position &amp; Size</span></a>
-            <a href="#!window"           class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="window"></span></span><span class="outline-item-label">Window</span></a>
+            <a href="#!window"           class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="window"></span></span><span class="outline-item-label">Search Window</span></a>
             <a href="#!audio"            class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="speaker"></span></span><span class="outline-item-label">Audio</span></a>
             <a href="#!text-parsing"     class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="text-parsing"></span></span><span class="outline-item-label">Text Parsing</span></a>
             <a href="#!translation"      class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="translation"></span></span><span class="outline-item-label">Translation</span></a>
@@ -38,7 +41,7 @@
             <a href="#!shortcuts"        class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="keyboard"></span></span><span class="outline-item-label">Shortcuts</span></a>
             <a href="#!backup"           class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="backup"></span></span><span class="outline-item-label">Backup</span></a>
             <a href="#!accessibility"    class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="accessibility"></span></span><span class="outline-item-label">Accessibility</span></a>
-            <a href="#!security"         class="button outline-item advanced-only"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="lock"></span></span><span class="outline-item-label">Security</span></a>
+            <a href="#!security"         class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="lock"></span></span><span class="outline-item-label">Security</span></a>
         </div>
         <div class="sidebar-bottom">
             <label class="button outline-item"><span class="outline-item-left">
@@ -50,6 +53,15 @@
                     }'
                 ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </span><span class="outline-item-label">Advanced</span></label>
+            <label class="button outline-item advanced-only"><span class="outline-item-left">
+                <label class="toggle debug-toggle"><input id="debug-checkbox" type="checkbox" data-setting="general.showDebug"
+                    data-transform='{
+                        "type": "setAttribute",
+                        "selector": ":root",
+                        "attribute": "data-debug"
+                    }'
+                ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </span><span class="outline-item-label">Debug</span></label>
             <a href="/info.html" class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="question-mark"></span></span><span class="outline-item-label">About Yomitan</span></a>
         </div>
     </div></div>
@@ -86,7 +98,7 @@
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Default profile</div>
-                <div class="settings-item-description">Switch the primary profile that is used for scanning.</div>
+                <div class="settings-item-description">Switch the default profile that is used for scanning.</div>
             </div>
             <div class="settings-item-right">
                 <select id="profile-active-select"></select>
@@ -111,6 +123,66 @@
         </div></div>
     </div>
 
+        <!-- General -->
+        <div class="heading-container">
+            <div class="heading-container-icon"><span class="icon" data-icon="cog"></span></div>
+            <div class="heading-container-left"><h2 id="general"><a href="#!general">General</a></h2></div>
+        </div>
+        <div class="settings-group">
+            <div class="settings-item"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Enable Yomitan</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div></div>
+            <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Language
+                    </div>
+                    <div class="settings-item-description">
+                        Language of the text that is being looked up.
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select id="language-select" data-setting="general.language"
+                    data-transform='{
+                        "type": "setAttribute",
+                        "selector": ":root",
+                        "attribute": "data-language"
+                    }'
+                    ></select>
+                </div>
+            </div></div>
+            <div class="settings-item"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Show the <a href="/welcome.html" target="_blank" rel="noopener">welcome guide</a> on browser startup</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.showGuide"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div></div>
+            <div class="settings-item advanced-only"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Show "Lookup in Yomitan" in right-click menu</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.enableContextMenuScanSelected"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div></div>
+            <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Maximum number of results</div>
+                    <div class="settings-item-description">Adjust the maximum number of results shown for lookups.</div>
+                </div>
+                <div class="settings-item-right">
+                    <input type="number" min="1" data-setting="general.maxResults">
+                </div>
+            </div></div>
+        </div>
+
     <!-- Dictionaries -->
     <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="book"></span></div>
@@ -130,6 +202,16 @@
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
             </div>
         </div></div>
+        <div class="settings-item">
+            <div class="settings-item settings-item-button" data-modal-action="show,recommended-dictionaries"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Get recommended dictionaries&hellip;</div>
+                </div>
+                <div class="settings-item-right open-panel-button-container">
+                    <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+                </div>
+            </div></div>
+        </div>
         <div class="settings-item">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
@@ -158,140 +240,6 @@
             </div>
         </div>
         <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Persistent storage</div>
-                    <div class="settings-item-description">
-                        Enable to help prevent the browser from unexpectedly clearing the database.
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" id="storage-persistent-checkbox"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    Web browsers will sometimes clear stored data if the device is running low on storage space.
-                    This can result in the imported dictionaries being deleted unexpectedly, causing Yomitan to stop functioning.
-                    Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.
-                </p>
-                <p data-show-for-browser="firefox firefox-mobile" class="storage-use-invalid" hidden>
-                    On Firefox and Firefox for Android, the storage information feature may be hidden behind a browser flag.
-
-                    To enable this flag, open <a href="about:config" target="_blank" rel="noopener">about:config</a> and search for
-                    <strong>dom.storageManager.enabled</strong>.
-
-                    Setting its value to <strong>true</strong> should allow storage information to be calculated.
-                </p>
-                <p data-show-for-browser="firefox-mobile">
-                    It may not be possible to enable Persistent Storage on Firefox for Android.
-                </p>
-                <p data-show-for-browser="chrome edge">
-                    Chromium-based browsers should not need to enable this setting since the Yomitan extension has
-                    the <code>unlimitedStorage</code> permission, which should prevent data deletion.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
-                </p>
-                <p>
-                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- General -->
-    <div class="heading-container">
-        <div class="heading-container-icon"><span class="icon" data-icon="cog"></span></div>
-        <div class="heading-container-left"><h2 id="general"><a href="#!general">General</a></h2></div>
-    </div>
-    <div class="settings-group">
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Enable content scanning</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="general.enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Show the <a href="/welcome.html" target="_blank" rel="noopener">welcome guide</a> on browser startup</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="general.showGuide"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item">
-            <div class="settings-item-inner settings-item-inner-wrappable">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Result grouping mode</div>
-                    <div class="settings-item-description">
-                        Change how related results are grouped.
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <select data-setting="general.resultOutputMode"
-                        data-transform='{
-                            "type": "setVisibility",
-                            "selector": "#main-dictionary-container",
-                            "condition": {"op": "===", "value": "merge"}
-                        }'
-                    >
-                        <option value="split">No grouping</option>
-                        <option value="group">Group term-reading pairs</option>
-                        <option value="merge">Group related terms</option>
-                    </select>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <ul>
-                    <li>
-                        <strong>No grouping</strong> -
-                        Every definition will be listed as a separate entry.
-                    </li>
-                    <li>
-                        <strong>Group term-reading pairs</strong> -
-                        Definitions for the same term with the same reading will be grouped together.
-                    </li>
-                    <li>
-                        <p>
-                            <strong>Group related terms</strong> -
-                            Related terms that share the same definitions will be grouped together.
-                        </p>
-                        <p>
-                            The <em>Primary dictionary</em> option should be assigned to a dictionary which contains related term information,
-                            and configuring the <em>Secondary dictionaries</em> will allow definitions for the related terms to be
-                            included from other dictionaries.
-                        </p>
-                        <p class="warning-text">
-                            Not all dictionaries are able to be selected as the <em>Primary dictionary</em>.
-                        </p>
-                    </li>
-                </ul>
-                <p>
-                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-            <div class="settings-item-children settings-item-children-group" id="main-dictionary-container" hidden>
-                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-                    <div class="settings-item-left">
-                        <div class="settings-item-label">Primary dictionary</div>
-                    </div>
-                    <div class="settings-item-right">
-                        <select data-setting="general.mainDictionary"></select>
-                    </div>
-                </div></div>
-                <div class="settings-item settings-item-button" data-modal-action="show,secondary-search-dictionaries"><div class="settings-item-inner">
-                    <div class="settings-item-left">
-                        <div class="settings-item-label">Secondary dictionaries&hellip;</div>
-                    </div>
-                    <div class="settings-item-right open-panel-button-container">
-                        <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
-                    </div>
-                </div></div>
-            </div>
-        </div>
-        <div class="settings-item advanced-only">
             <div class="settings-item-inner settings-item-inner-wrappable">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Frequency sorting dictionary</div>
@@ -314,7 +262,7 @@
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
                 </p>
             </div>
-            <div class="settings-item-children settings-item-children-group" id="sort-frequency-dictionary-order-container" hidden>
+            <div class="settings-item-children settings-item-children-group advanced-only" id="sort-frequency-dictionary-order-container" hidden>
                 <div class="settings-item">
                     <div class="settings-item-inner settings-item-inner-wrappable">
                         <div class="settings-item-left">
@@ -358,15 +306,45 @@
                 </div>
             </div>
         </div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Maximum number of results</div>
-                <div class="settings-item-description">Adjust the maximum number of results shown for lookups.</div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Persistent storage</div>
+                    <div class="settings-item-description">
+                        Enable to help prevent the browser from unexpectedly clearing the database.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" id="storage-persistent-checkbox"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
             </div>
-            <div class="settings-item-right">
-                <input type="number" min="1" data-setting="general.maxResults">
+            <div class="settings-item-children more" hidden>
+                <p>
+                    Web browsers will sometimes clear stored data if the device is running low on storage space.
+                    This can result in the imported dictionaries being deleted unexpectedly, causing Yomitan to stop functioning.
+                    Enabling persistent storage tells the browser that the data should not be deleted in those circumstances.
+                </p>
+                <p data-show-for-browser="firefox firefox-mobile" class="storage-use-invalid" hidden>
+                    On Firefox and Firefox for Android, the storage information feature may be hidden behind a browser flag.
+
+                    To enable this flag, open <a href="about:config" target="_blank" rel="noopener">about:config</a> and search for
+                    <strong>dom.storageManager.enabled</strong>.
+
+                    Setting its value to <strong>true</strong> should allow storage information to be calculated.
+                </p>
+                <p data-show-for-browser="firefox-mobile">
+                    It may not be possible to enable Persistent Storage on Firefox for Android.
+                </p>
+                <p data-show-for-browser="chrome edge">
+                    Chromium-based browsers should not need to enable this setting since the Yomitan extension has
+                    the <code>unlimitedStorage</code> permission, which should prevent data deletion.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
             </div>
-        </div></div>
+        </div>
     </div>
 
     <!-- Scanning -->
@@ -403,6 +381,33 @@
                 </p>
             </div>
         </div>
+        <div class="settings-item not-jpzhyueko">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Scan resolution</div>
+                    <div class="settings-item-description">
+                        Start the lookup scan at the word or character of the cursor position.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select data-setting="scanning.scanResolution">
+                        <option value="character">Character</option>
+                        <option value="word">Word</option>
+                    </select>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    The scan resolution determines where the scan starts when the cursor is moved.
+                    The <code>Character</code> option will start scanning at the cursor's current position,
+                    while the <code>Word</code> option will start scanning at the beginning of the word.
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Scan using middle mouse button</div>
@@ -420,67 +425,22 @@
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
             </div>
         </div></div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Auto-hide search popup</div>
-                    <div class="settings-item-description">When no definitions are found after scanning text, the popup will be hidden.</div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="scanning.autoHideResults"
-                        data-transform='{
-                            "type": "setVisibility",
-                            "selector": "#auto-hide-search-popup-options",
-                            "condition": {"op": "===", "value": true}
-                        }'
-                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children settings-item-children-group" id="auto-hide-search-popup-options" hidden>
-                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-                    <div class="settings-item-left">
-                        <div class="settings-item-label">Delay <span class="light">(in milliseconds)</span></div>
-                    </div>
-                    <div class="settings-item-right">
-                        <input type="number" data-setting="scanning.hideDelay" min="0">
-                    </div>
-                </div></div>
-            </div>
-        </div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Hide popup on cursor exit</div>
-                    <div class="settings-item-description">When the cursor exits the popup, the popup will be hidden.</div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="scanning.hidePopupOnCursorExit"
-                        data-transform='{
-                            "type": "setVisibility",
-                            "selector": "#hide-popup-on-cursor-exit-options",
-                            "condition": {"op": "===", "value": true}
-                        }'
-                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children settings-item-children-group" id="hide-popup-on-cursor-exit-options" hidden>
-                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-                    <div class="settings-item-left">
-                        <div class="settings-item-label">Delay <span class="light">(in milliseconds)</span></div>
-                    </div>
-                    <div class="settings-item-right">
-                        <input type="number" data-setting="scanning.hidePopupOnCursorExitDelay" min="0">
-                    </div>
-                </div></div>
-            </div>
-        </div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Scan delay <span class="light">(in milliseconds)</span></div>
                 <div class="settings-item-description">Change the delay before scanning occurs when no modifier key is required.</div>
             </div>
             <div class="settings-item-right">
                 <input type="number" data-setting="scanning.delay" min="0">
+            </div>
+        </div></div>
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Scan without mouse move</div>
+                <div class="settings-item-description">Allow scanning words under the pointer without the pointer being in motion.</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" data-setting="scanning.scanWithoutMousemove"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
@@ -491,9 +451,10 @@
                 <label class="toggle"><input type="checkbox" data-setting="scanning.selectText"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
+        <div class="settings-item jpzhyue-only"><div class="settings-item-inner">
             <div class="settings-item-left">
-                <div class="settings-item-label">Search text with non-Japanese characters</div>
+                <div class="settings-item-label">Search text with non-Japanese, Chinese, or Cantonese characters</div>
+                <div class="settings-item-description">Only applies when language is set to Japanese, Chinese, or Cantonese.</div>
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" data-setting="scanning.alphanumeric"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -575,47 +536,14 @@
             <div class="settings-item-left">
                 <div class="settings-item-label">Text scan length</div>
                 <div class="settings-item-description">Change how many characters are read when scanning for terms.</div>
+                <div class="warning-text margin-above">
+                    <strong>Setting this value too high (100+) may impact performance.</strong>
+                </div>
             </div>
             <div class="settings-item-right">
                 <input type="number" data-setting="scanning.length" min="1" step="1">
             </div>
         </div></div>
-        <div class="settings-item advanced-only">
-            <div class="settings-item-inner settings-item-inner-wrappable">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Support inputs for devices with touch screens
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right flex-row-wrap">
-                    <div class="settings-item-group settings-item-group-wrap">
-                        <label class="settings-item-group-item flex-label no-wrap">
-                            <label class="checkbox"><input type="checkbox" data-setting="scanning.touchInputEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                            <span>Touch inputs</span>
-                        </label>
-                        <label class="settings-item-group-item flex-label no-wrap">
-                            <label class="checkbox"><input type="checkbox" data-setting="scanning.pointerEventsEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                            <span>Pointer inputs</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    To enable text scanning when using devices with a touch screen, either the <em>Touch inputs</em> or the <em>Pointer inputs</em> option must be enabled.
-                    <em>Touch inputs</em> supports generic touches on a touch screen device, but do not distinguish between touch and pen inputs.
-                    <em>Pointer inputs</em> supports supports the detection pen devices, but may not work on all devices.
-                    If both options are enabled, <em>Pointer inputs</em> takes precedence.
-                </p>
-                <p>
-                    The <em>Pointer inputs</em> option is only visible when the <em>Advanced</em> option is enabled.
-                </p>
-                <p>
-                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
         <div class="settings-item settings-item-button advanced-only" data-modal-action="show,input-action-prevention"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure input action prevention&hellip;</div>
@@ -626,16 +554,16 @@
         </div></div>
     </div>
 
-    <!-- Popup -->
+    <!-- Popup Behavior -->
     <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="popup"></span></div>
-        <div class="heading-container-left"><h2 id="popup"><a href="#!popup">Popup</a></h2></div>
+        <div class="heading-container-left"><h2 id="popup"><a href="#!popup">Popup Behavior</a></h2></div>
     </div>
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Allow scanning search page content</div>
-                <div class="settings-item-description">Text on the search page can be scanned for definitions, which will open a popup.</div>
+                <div class="settings-item-description">Text on the <a href="/search.html" target="_blank" rel="noopener">search page</a> can be scanned for definitions, which will open a popup.</div>
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" data-setting="scanning.enableOnSearchPage"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -667,6 +595,60 @@
                     </div>
                     <div class="settings-item-right">
                         <label class="toggle"><input type="checkbox" data-setting="scanning.enableOnPopupExpressions"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    </div>
+                </div></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Auto-hide search popup</div>
+                    <div class="settings-item-description">When an existing popup is present, upon scanning again, hide the existing popup even if no definitions are found when scanning again.</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="scanning.autoHideResults"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#auto-hide-search-popup-options",
+                            "condition": {"op": "===", "value": true}
+                        }'
+                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children settings-item-children-group" id="auto-hide-search-popup-options" hidden>
+                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Delay <span class="light">(in milliseconds)</span></div>
+                    </div>
+                    <div class="settings-item-right">
+                        <input type="number" data-setting="scanning.hideDelay" min="0">
+                    </div>
+                </div></div>
+            </div>
+        </div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Hide popup on cursor exit</div>
+                    <div class="settings-item-description">When the cursor exits the popup, the popup will be hidden.</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="scanning.hidePopupOnCursorExit"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#hide-popup-on-cursor-exit-options",
+                            "condition": {"op": "===", "value": true}
+                        }'
+                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children settings-item-children-group" id="hide-popup-on-cursor-exit-options" hidden>
+                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Delay <span class="light">(in milliseconds)</span></div>
+                    </div>
+                    <div class="settings-item-right">
+                        <input type="number" data-setting="scanning.hidePopupOnCursorExitDelay" min="0">
                     </div>
                 </div></div>
             </div>
@@ -709,22 +691,23 @@
         </div>
     </div>
 
-    <!-- Popup Appearance -->
+    <!-- Appearance -->
     <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="palette"></span></div>
-        <div class="heading-container-left"><h2 id="popup-appearance"><a href="#!popup-appearance">Popup Appearance</a></h2></div>
+        <div class="heading-container-left"><h2 id="appearance"><a href="#!appearance">Appearance</a></h2></div>
     </div>
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Theme</div>
-                <div class="settings-item-description">Adjust the style of the popup.</div>
+                <div class="settings-item-description">Adjust the style of Yomitan.</div>
             </div>
             <div class="settings-item-right">
                 <div class="settings-item-group">
                     <div class="settings-item-group-item">
                         <div class="settings-item-group-item-label">Body</div>
                         <select data-setting="general.popupTheme" class="short-width short-height">
+                            <option value="site">Auto</option>
                             <option value="light">Light</option>
                             <option value="dark">Dark</option>
                             <option value="browser">Browser</option>
@@ -737,6 +720,7 @@
                             <option value="light">Light</option>
                             <option value="dark">Dark</option>
                             <option value="browser">Browser</option>
+                            <option value="none">None</option>
                         </select>
                     </div>
                 </div>
@@ -766,6 +750,59 @@
                                 <option value="bottom">Bottom</option>
                             </select>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Font family</div>
+                    <div class="settings-item-description">
+                        Change the font family used in Yomitan.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <div class="settings-item-group">
+                        <input type="text" class="font-family-input" spellcheck="false" autocomplete="off" data-setting="general.fontFamily">
+                    </div>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <div>
+                    The font family can be changed to any font installed on your system.<br>
+                    You can input things such as <code>sans-serif</code>, <code>serif</code>, or <code>monospace</code>.<br>
+                    If you want to specify one or multiple specific fonts, you can type them in manually separated by commas,
+                    for example <pre><code>"Noto Sans JP", "Meiryo", sans-serif</code></pre>
+                </div>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Font size</div>
+                    <div class="settings-item-description">Change the font size used in popups, in pixels.</div>
+                </div>
+                <div class="settings-item-right">
+                    <div class="settings-item-group">
+                        <input type="number" class="short-width short-height" data-setting="general.fontSize" min="1">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Line height</div>
+                    <div class="settings-item-description">Change the space between lines of text in popups. This will usually be a decimal number between 1 and 2.</div>
+                </div>
+                <div class="settings-item-right">
+                    <div class="settings-item-group">
+                        <input type="text" class="short-width short-height" data-setting="general.lineHeight">
                     </div>
                 </div>
             </div>
@@ -818,7 +855,7 @@
                 <label class="toggle"><input type="checkbox" data-setting="scanning.enableSearchTags"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner">
+        <div class="settings-item debug-only"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Show debug information</div>
                 <div class="settings-item-description">A menu option to log debugging information will be shown in the search results.</div>
@@ -827,7 +864,7 @@
                 <label class="toggle"><input type="checkbox" data-setting="general.debugInfo"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner">
+        <div class="settings-item advanced-only jpzhyue-only"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Term display style</div>
                 <div class="settings-item-description">Change how terms and their readings are displayed.</div>
@@ -837,6 +874,22 @@
                     <option value="ruby">Term furigana</option>
                     <option value="ruby-and-reading">Term furigana and reading</option>
                     <option value="term-and-reading">Plain term and reading</option>
+                    <option value="term-only">Plain term</option>
+                </select>
+            </div>
+        </div></div>
+        <div class="settings-item advanced-only jp-only"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Reading mode</div>
+                <div class="settings-item-description">Change what type of furigana is displayed for parsed text. Japanese only.</div>
+            </div>
+            <div class="settings-item-right">
+                <select data-setting="parsing.readingMode" lang="ja">
+                    <option value="none">None</option>
+                    <option value="hiragana">ひらがな</option>
+                    <option value="katakana">カタカナ</option>
+                    <option value="romaji">Romaji</option>
+                    <option value="dictionary-reading">Dictionary reading</option>
                 </select>
             </div>
         </div></div>
@@ -875,12 +928,15 @@
                 </div>
             </div>
         </div>
-        <div class="settings-item advanced-only">
+        <div class="settings-item">
             <div class="settings-item-inner settings-item-inner-wrappable">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
                         Pitch accent display styles
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                    <div class="settings-item-description">
+                        Japanese only.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                     </div>
                 </div>
                 <div class="settings-item-right flex-row-wrap">
@@ -947,7 +1003,7 @@
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
             </div>
         </div></div>
-        <div class="settings-item settings-item-button" data-modal-action="show,custom-css"><div class="settings-item-inner">
+        <div class="settings-item settings-item-button advanced-only" data-modal-action="show,custom-css"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure custom CSS&hellip;</div>
             </div>
@@ -955,6 +1011,85 @@
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
             </div>
         </div></div>
+    </div>
+
+    <!-- Result Display -->
+    <div class="heading-container">
+        <div class="heading-container-icon"><span class="icon" data-icon="monitor"></span></div>
+        <div class="heading-container-left"><h2 id="result-display"><a href="#!result-display">Result Display</a></h2></div>
+    </div>
+    <div class="settings-group">
+        <div class="settings-item">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Result grouping mode</div>
+                    <div class="settings-item-description">
+                        Change how related results are grouped.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select data-setting="general.resultOutputMode"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#main-dictionary-container",
+                            "condition": {"op": "===", "value": "merge"}
+                        }'
+                    >
+                        <option value="split">No grouping</option>
+                        <option value="group">Group term-reading pairs</option>
+                        <option value="merge">Group related terms</option>
+                    </select>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <ul>
+                    <li>
+                        <strong>No grouping</strong> -
+                        Every definition will be listed as a separate entry.
+                    </li>
+                    <li>
+                        <strong>Group term-reading pairs</strong> -
+                        Definitions for the same term with the same reading will be grouped together.
+                    </li>
+                    <li>
+                        <p>
+                            <strong>Group related terms</strong> -
+                            Related terms that share the same definitions will be grouped together.
+                        </p>
+                        <p>
+                            The <em>Primary dictionary</em> option should be assigned to a dictionary which contains related term information,
+                            and configuring the <em>Secondary dictionaries</em> will allow definitions for the related terms to be
+                            included from other dictionaries.
+                        </p>
+                        <p class="warning-text">
+                            Not all dictionaries are able to be selected as the <em>Primary dictionary</em>.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+            <div class="settings-item-children settings-item-children-group" id="main-dictionary-container" hidden>
+                <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Primary dictionary</div>
+                    </div>
+                    <div class="settings-item-right">
+                        <select data-setting="general.mainDictionary"></select>
+                    </div>
+                </div></div>
+                <div class="settings-item settings-item-button" data-modal-action="show,secondary-search-dictionaries"><div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Secondary dictionaries&hellip;</div>
+                    </div>
+                    <div class="settings-item-right open-panel-button-container">
+                        <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+                    </div>
+                </div></div>
+            </div>
+        </div>
     </div>
 
     <!-- Popup Position & Size -->
@@ -1142,13 +1277,24 @@
         </div></div>
     </div>
 
-    <!-- Window -->
+    <!-- Search Window -->
     <div class="heading-container advanced-only">
         <div class="heading-container-icon"><span class="icon" data-icon="window"></span></div>
-        <div class="heading-container-left"><h2 id="window"><a href="#!window">Window</a></h2></div>
+        <div class="heading-container-left"><h2 id="window"><a href="#!window">Search Window</a></h2></div>
         <div class="heading-container-right"><a tabindex="0" class="heading-link-light" id="test-window-open-link">Open&hellip;</a></div>
     </div>
     <div class="settings-group advanced-only">
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Sticky search header</div>
+                    <div class="settings-item-description">Search header stays on the page when scrolling down.</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.stickySearchHeader"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+        </div>
         <div class="settings-item">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
@@ -1353,7 +1499,7 @@
         </div>
     </div>
     <div class="settings-group">
-        <div class="settings-item">
+        <div class="settings-item advanced-only">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Parse sentences using Yomitan's internal parser</div>
@@ -1378,7 +1524,7 @@
                 </p>
             </div>
         </div>
-        <div class="settings-item advanced-only" data-hide-for-browser="firefox-mobile">
+        <div class="settings-item advanced-only jp-only" data-hide-for-browser="firefox-mobile">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-invalid-indicator"></div>
@@ -1386,7 +1532,7 @@
                         Parse sentences using <a href="https://en.wikipedia.org/wiki/MeCab" target="_blank" rel="noopener noreferrer">MeCab</a>
                     </div>
                     <div class="settings-item-description">
-                        Sentence words are parsed using a third-party program.
+                        Sentence words are parsed using a third-party program. Japanese only.
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                     </div>
                 </div>
@@ -1401,7 +1547,7 @@
                 </p>
                 <p>
                     In order for Yomitan to use it, both MeCab and a native messaging component must be installed.
-                    A setup guide can be found <a href="https://github.com/themoeway/yomitan-mecab-installer/blob/master/README.md" target="_blank" rel="noopener noreferrer">here</a>.
+                    A setup guide can be found <a href="https://github.com/yomidevs/yomitan-mecab-installer/blob/master/README.md" target="_blank" rel="noopener noreferrer">here</a>.
                 </p>
                 <div class="margin-above flex-row-nowrap">
                     <button type="button" id="test-mecab-button">Test</button>
@@ -1418,21 +1564,6 @@
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" data-setting="parsing.termSpacing"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Reading mode</div>
-                <div class="settings-item-description">Change what type of furigana is displayed for parsed text.</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="parsing.readingMode" lang="ja">
-                    <option value="none">None</option>
-                    <option value="hiragana">ひらがな</option>
-                    <option value="katakana">カタカナ</option>
-                    <option value="romaji">Romaji</option>
-                    <option value="dictionary-reading">Dictionary reading</option>
-                </select>
             </div>
         </div></div>
         <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
@@ -1479,35 +1610,6 @@
         <div class="heading-container">
             <div class="heading-container-icon"><span class="icon" data-icon="translation"></span></div>
             <div class="heading-container-left"><h2 id="translation"><a href="#!translation">Translation</a></h2></div>
-            <div class="heading-container-right"><a tabindex="0" class="more-toggle more-only heading-link-light" data-parent-distance="3">Info&hellip;</a></div>
-        </div>
-        <div class="heading-description more" hidden>
-            <p>
-                The following options are used during the translation process to create alternate versions of the input text to search for.
-                This can be helpful when the input text doesn't exactly match the term or expression found in the database.
-            </p>
-            <p>
-                The conversion options below are listed in the order that the conversions are applied to the input text.
-                Most of the conversions have three possible values:
-            </p>
-            <ul>
-                <li>
-                    <strong>Disabled</strong> -
-                    This conversion will never be applied to the input text.
-                </li>
-                <li>
-                    <strong>Enabled</strong> -
-                    This conversion will always be applied to the input text.
-                </li>
-                <li>
-                    <strong>Use both variants</strong> -
-                    The translator will check the database for two variations: the raw input text and the converted input text.
-                    When multiple options use variants, the translator will search for combinations of the converted text.
-                </li>
-            </ul>
-            <p>
-                <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-            </p>
         </div>
     </div>
     <div class="settings-group advanced-only">
@@ -1531,84 +1633,6 @@
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
             </div>
         </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Convert half width characters to full width</div>
-                <div class="settings-item-description" lang="ja">ﾖﾐﾀﾝ&#x3000;&rarr;&#x3000;ヨミタン</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.convertHalfWidthCharacters">
-                    <option value="false">Disabled</option>
-                    <option value="true">Enabled</option>
-                    <option value="variant">Use both variants</option>
-                </select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Convert numeric characters to full width</div>
-                <div class="settings-item-description" lang="ja">1234&#x3000;&rarr;&#x3000;１２３４</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.convertNumericCharacters">
-                    <option value="false">Disabled</option>
-                    <option value="true">Enabled</option>
-                    <option value="variant">Use both variants</option>
-                </select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Convert alphabetic characters to hiragana</div>
-                <div class="settings-item-description" lang="ja">yomitan&#x3000;&rarr;&#x3000;よみたん</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.convertAlphabeticCharacters">
-                    <option value="false">Disabled</option>
-                    <option value="true">Enabled</option>
-                    <option value="variant">Use both variants</option>
-                </select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Convert hiragana to katakana</div>
-                <div class="settings-item-description" lang="ja">よみたん&#x3000;&rarr;&#x3000;ヨミタン</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.convertHiraganaToKatakana">
-                    <option value="false">Disabled</option>
-                    <option value="true">Enabled</option>
-                    <option value="variant">Use both variants</option>
-                </select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Convert katakana to hiragana</div>
-                <div class="settings-item-description" lang="ja">ヨミタン&#x3000;&rarr;&#x3000;よみたん</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.convertKatakanaToHiragana">
-                    <option value="false">Disabled</option>
-                    <option value="true">Enabled</option>
-                    <option value="variant">Use both variants</option>
-                </select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Collapse emphatic character sequences</div>
-                <div class="settings-item-description" lang="ja">すっっごーーい&#x3000;&rarr;&#x3000;すっごーい / すごい</div>
-            </div>
-            <div class="settings-item-right">
-                <select data-setting="translation.collapseEmphaticSequences">
-                    <option value="false">Disabled</option>
-                    <option value="true">Collapse into single character</option>
-                    <option value="full">Remove all characters</option>
-                </select>
-            </div>
-        </div></div>
     </div>
 
     <!-- Anki -->
@@ -1623,6 +1647,8 @@
                 Yomitan supports automatic flashcard creation for <a href="https://apps.ankiweb.net/" target="_blank" rel="noopener noreferrer">Anki</a>,
                 a free application designed to assist in remembering information.
                 This feature requires installation of the <a href="https://foosoft.net/projects/anki-connect/" target="_blank" rel="noopener noreferrer">AnkiConnect</a> plugin.
+                <br>
+                See the <a href="https://yomitan.wiki/anki/" target="_blank" rel="noopener noreferrer">Yomitan wiki</a> for a setup guide.
             </p>
             <p>
                 <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -1657,7 +1683,7 @@
             <div class="settings-item-children" data-show-for-os="mac">
                 <p class="warning-text">
                     <strong>Notice for macOS users:</strong>
-                    If Yomitan has issues connecting to AnkiConnect, it may be necessary to adjust adjust some system settings.
+                    If Yomitan has issues connecting to AnkiConnect, it may be necessary to adjust some system settings.
                     See <a href="https://foosoft.net/projects/anki-connect/#notes-for-mac-os-x-users" target="_blank" rel="noopener noreferrer">this link</a> for details.
                 </p>
             </div>
@@ -1712,7 +1738,6 @@
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Check for card duplicates</div>
-                    <div class="settings-item-description">When a card is detected as a duplicate, the add buttons will be disabled.</div>
                 </div>
                 <div class="settings-item-right">
                     <label class="toggle"><input type="checkbox" data-setting="anki.checkForDuplicates"
@@ -1777,6 +1802,31 @@
                         </p>
                         <p>
                             <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item-inner settings-item-inner-wrappable">
+                        <div class="settings-item-left">
+                            <div class="settings-item-label">
+                                When a duplicate is detected
+                            </div>
+                        </div>
+                        <div class="settings-item-right">
+                            <select data-setting="anki.duplicateBehavior">
+                                <option value="prevent">Prevent adding</option>
+                                <option value="overwrite">Allow overwriting</option>
+                                <option value="new">Allow adding</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="settings-item-children" id="anki-overwrite-warning" hidden>
+                        <p class="danger-text">
+                            Overwriting a card can result in the loss of data.
+                        </p>
+                        <p class="warning-text">
+                            Duplicate cards of a different note type cannot be overwritten.
+                            If there are multiple duplicate cards, the first card found will be overwritten.
                         </p>
                     </div>
                 </div>
@@ -1880,12 +1930,12 @@
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
-                        Show card tags
+                        Show card tags and flags
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
                     </div>
                 </div>
                 <div class="settings-item-right">
-                    <select data-setting="anki.displayTags">
+                    <select data-setting="anki.displayTagsAndFlags">
                         <option value="never">Never</option>
                         <option value="always">Always</option>
                         <option value="non-standard">Non-standard</option>
@@ -1894,10 +1944,10 @@
             </div>
             <div class="settings-item-children more" hidden>
                 <p>
-                    When coming across a word that is already in an Anki deck, a button will appear that shows
-                    the tags the card has. If set to <em>Non-standard</em>, all tags that are included in the
+                    When coming across a word that is already in an Anki deck, two buttons can appear that show
+                    the tags and flags the card has. If set to <em>Non-standard</em>, all tags that are included in the
                     <em>Card tags</em> option will be filtered out from the list. If no tags remain after filtering,
-                    then the button will not be shown.
+                    then the tags button will not be shown. If no flags are found, the flags button will not be shown.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -1915,6 +1965,14 @@
         <div class="settings-item settings-item-button advanced-only" data-modal-action="show,anki-card-templates"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure Anki card templates&hellip;</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></div>
+        <div class="settings-item settings-item-button advanced-only" data-modal-action="show,generate-anki-notes" id="generate-anki-notes-main-settings-entry"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Generate Anki Notes (Experimental)&hellip;</div>
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
@@ -1965,7 +2023,7 @@
                 <label class="toggle"><input type="checkbox" class="permissions-toggle" data-permissions-setting="clipboard.enableSearchPageMonitor" data-required-permissions="clipboardRead"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Maximum clipboard text search length</div>
                 <div class="settings-item-description">Limit the number of characters used when searching clipboard text.</div>
@@ -2091,7 +2149,7 @@
 
                     <br><br>
 
-                    See <a href="https://github.com/themoeway/yomichan-data-exporter" target="_blank" rel="noopener noreferrer">yomichan-data-exporter</a> for
+                    See <a href="https://github.com/yomidevs/yomichan-data-exporter" target="_blank" rel="noopener noreferrer">yomichan-data-exporter</a> for
                     instructions to export your data from older Yomichan installations.
                 </div>
             </div>
@@ -2168,12 +2226,20 @@
     </div>
 
     <!-- Security -->
-    <div class="heading-container advanced-only">
+    <div class="heading-container">
         <div class="heading-container-icon"><span class="icon" data-icon="lock"></span></div>
         <div class="heading-container-left"><h2 id="security"><a href="#!security">Security</a></h2></div>
     </div>
-    <div class="settings-group advanced-only">
-        <div class="settings-item">
+    <div class="settings-group">
+        <a href="/permissions.html" rel="noopener" class="settings-item settings-item-button"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Configure Yomitan Permissions</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></a>
+        <div class="settings-item advanced-only">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
@@ -2197,7 +2263,7 @@
                 </p>
             </div>
         </div>
-        <div class="settings-item">
+        <div class="settings-item advanced-only">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
@@ -2270,1690 +2336,6 @@
 </div></div>
 
 <div id="popup-menus"></div>
-
-
-<!-- Profile modals -->
-<div id="profiles-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Profiles</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <div class="profile-entry-header">
-            <div class="profile-entry-cell"></div>
-            <div class="profile-entry-cell"><span class="profile-entry-header-text">Default</span></div>
-            <div class="profile-entry-cell"><span class="profile-entry-header-text">Name</span></div>
-            <div class="profile-entry-cell"><span class="profile-entry-header-text">Conditions</span></div>
-            <div class="profile-entry-cell"></div>
-        </div>
-        <div class="profile-entry-list generic-list" id="profile-entry-list"></div>
-        <div class="profile-add-button-container">
-            <button type="button" class="low-emphasis" id="profile-add-button">Add</button>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="profile-conditions-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Profile Conditions</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Conditions for profile <em id="profile-conditions-profile-name"></em>:
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <a tabindex="0" class="more-toggle more-only" data-parent-distance="3">Info&hellip;</a>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    Profile usage conditions are used to automatically select certain profiles based on context.
-                    For example, different profiles can be used depending on the nested level of the popup, or based on the website's URL.
-                </p>
-                <p>
-                    Conditions are organized into groups corresponding to the order in which they are checked.
-                    If all of the conditions in any group of a profile are met, then that profile will be used for that context.
-                </p>
-                <p>
-                    If no conditions are specified, the profile will only be used if it is selected as the default profile.
-                </p>
-                <p>
-                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a>
-                </p>
-            </div>
-        </div>
-        <div class="profile-condition-groups" id="profile-condition-groups"></div>
-        <div class="profile-condition-group-list-info">
-            <div class="profile-condition-groups-empty-info"><em>No conditions set up.</em></div>
-            <div class="profile-condition-group-list-info-space"></div>
-            <button type="button" class="low-emphasis" id="profile-add-condition-group">Add Group</button>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="profile-copy-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header">
-        <div class="modal-title">Copy Profile</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <p>Select which profile to copy options from:</p>
-        <select class="form-control" id="profile-copy-source-select"></select>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" id="profile-copy-confirm-button">Copy Profile</button>
-    </div>
-</div></div>
-
-<div id="profile-remove-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Confirm Profile Deletion</div></div>
-    <div class="modal-body">
-        <p>
-            Are you sure you want to delete the profile <em id="profile-remove-name"></em>?
-        </p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" class="danger" id="profile-remove-confirm-button">Remove Profile</button>
-    </div>
-</div></div>
-
-
-<!-- Profile templates -->
-<template id="profile-entry-template"><div class="profile-entry generic-list-entry">
-    <div class="profile-entry-cell generic-list-index-prefix"></div>
-    <div class="profile-entry-cell"><label class="radio"><input type="radio" class="profile-entry-is-default-radio" name="profile-entry-default-radio"><span class="radio-body"><span class="radio-border"></span><span class="radio-dot"></span></span></label></div>
-    <div class="profile-entry-cell"><input class="profile-entry-name-input" type="text" autocomplete="off" placeholder="Profile name"></div>
-    <div class="profile-entry-cell"><a tabindex="0" class="profile-entry-condition-count-link"><span class="profile-entry-condition-count">0</span></a></div>
-    <div class="profile-entry-cell input-height-icon-button-container"><button type="button" class="icon-button profile-entry-menu-button" data-menu="profile-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button></div>
-</div></template>
-
-<template id="profile-condition-group-template"><div class="profile-condition-group">
-    <div class="profile-condition-list"></div>
-    <div class="profile-condition-list-info">
-        <div class="profile-condition-group-separator-label">or</div>
-        <div class="profile-condition-list-info-space"></div>
-        <button type="button" class="profile-condition-add-button low-emphasis">Add</button>
-    </div>
-</div></template>
-
-<template id="profile-condition-template"><div class="profile-condition">
-    <div class="profile-condition-prefix"></div>
-    <div class="profile-condition-inner">
-        <select class="profile-condition-type"><optgroup label="Type"></optgroup></select>
-        <select class="profile-condition-operator"><optgroup label="Operator"></optgroup></select>
-        <div class="profile-condition-input-container">
-            <input type="text" class="profile-condition-input" autocomplete="off" spellcheck="false">
-            <div class="input-height-icon-button-container mouse-button-container" hidden>
-                <button type="button" class="icon-button profile-condition-mouse-button mouse-button"><span class="icon-button-inner"><span class="icon" data-icon="mouse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="profile-condition-menu-button-container input-height-icon-button-container">
-        <button type="button" class="icon-button profile-condition-menu-button" data-menu="profile-condition-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
-    </div>
-</div></template>
-
-<template id="profile-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="moveUp">Move up</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveDown">Move down</button>
-    <button type="button" class="popup-menu-item" data-menu-action="copyFrom">Copy from&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="editConditions">Edit conditions&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="duplicate">Duplicate</button>
-    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
-</div></div></div></template>
-
-<template id="profile-condition-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="resetValue">Reset value</button>
-    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
-    <button type="button" class="popup-menu-item" data-menu-action="deleteGroup">Delete group</button>
-</div></div></div></template>
-
-
-<!-- Dictionary modals -->
-<div id="dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Dictionaries</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Enable support for prefix wildcard searches
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="global.database.prefixWildcardsSupported" data-scope="global"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    In order for dictionaries to support searches using prefix wildcards on the search page,
-                    some additional data must be stored in the database.
-                    Enabling this option will include this extra data for any new dictionaries that are imported.
-                </p>
-                <p class="warning-text">
-                    This option will not change any dictionaries that are already imported;
-                    they must be re-imported for the option to take effect.
-                </p>
-                <p>
-                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a>
-                </p>
-            </div>
-        </div>
-
-        <div class="warning-text margin-above no-dictionaries-installed-warning" hidden>
-            No dictionaries have been installed yet.
-            Visit the <a href="https://github.com/themoeway/yomitan/blob/master/docs/dictionaries.md#dictionaries" target="_blank" rel="noopener noreferrer">Yomitan homepage</a>
-            for a list of free dictionaries or click the <em>Import</em> button below to select a dictionary file to import.
-        </div>
-        <div id="dictionary-error" class="danger-text margin-above" hidden></div>
-        <div id="dictionary-list" class="dictionary-list generic-list" data-count="0">
-            <div class="dictionary-item-top"></div>
-            <label class="dictionary-item-top toggle dictionary-item-enabled-toggle-container"><input type="checkbox" id="all-dictionaries-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            <div class="dictionary-item-top dictionary-item-title-container">All</div>
-            <div class="dictionary-item-top">Priority</div>
-            <div class="dictionary-item-top dictionary-item-button-height"></div>
-        </div>
-
-        <div hidden><input type="file" id="dictionary-import-file-input" accept=".zip,application/zip" multiple></div>
-    </div>
-    <div class="modal-body-addon dictionary-delete-progress" hidden>
-        <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
-        <div class="progress-bar-track"><div class="progress-bar danger"></div></div>
-    </div>
-    <div class="modal-body-addon dictionary-import-progress" hidden>
-        <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
-        <div class="progress-bar-track"><div class="progress-bar"></div></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis danger dictionary-database-mutating-input" id="dictionary-delete-all-button">Delete All</button>
-        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-check-integrity">Check Integrity</button>
-        <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-file-button">Import</button>
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="dictionary-confirm-delete-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Confirm Dictionary Deletion</div></div>
-    <div class="modal-body">
-        <p>Are you sure you want to delete the dictionary:</p>
-        <p><strong id="dictionary-confirm-delete-name"></strong>?</p>
-        <p class="danger-text">This action cannot be undone.</p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-delete-button">Delete</button>
-    </div>
-</div></div>
-
-<div id="dictionary-confirm-delete-all-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Confirm Dictionary Deletion</div></div>
-    <div class="modal-body">
-        <p>Are you sure you want to delete <strong>all dictionaries</strong>?</p>
-        <p class="danger-text">This action cannot be undone.</p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-delete-all-button">Delete</button>
-    </div>
-</div></div>
-
-<div id="secondary-search-dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Secondary Search Dictionaries</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <p>
-            These dictionaries will be used to search for definitions of the related terms when the grouping mode is
-            <em>Group related terms</em>.
-        </p>
-        <div id="secondary-search-dictionary-list" class="secondary-search-dictionary-list"></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="collapsible-dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Collapsible Dictionaries</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body-addon">
-        <p>
-            Dictionary definitions can be collapsed if they exceed a certain line count,
-            which may be useful for dictionaries with long definitions.
-            The appearance can be customized using custom CSS.
-            <a tabindex="0" data-modal-action="show,collapsible-dictionaries-info">More&hellip;</a>
-        </p>
-    </div>
-    <div class="modal-body">
-        <div id="collapsible-dictionary-list" class="collapsible-dictionary-list"></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="collapsible-dictionaries-info-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Collapsible Dictionary Info</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <p>
-            Dictionary definitions can be collapsed if they exceed a certain line count,
-            which may be useful for dictionaries with long definitions.
-            There are five different modes:
-        </p>
-        <ul>
-            <li>
-                <strong>Not collapsible</strong> -
-                Definitions will not be collapsed.
-            </li>
-            <li>
-                <strong>Collapsed</strong> -
-                Definitions will show a collapse button if their size exceeds the max height,
-                and they will be collapsed by default.
-            </li>
-            <li>
-                <strong>Expanded</strong> -
-                Definitions will show a collapse button if their size exceeds the max height,
-                and they will be expanded by default.
-            </li>
-            <li>
-                <strong>Force collapsed</strong> -
-                Definitions will always show a collapse button,
-                and they will be collapsed by default.
-            </li>
-            <li>
-                <strong>Force expanded</strong> -
-                Definitions will always show a collapse button,
-                and they will be expanded by default.
-            </li>
-        </ul>
-        <p>
-            By default, the number of lines shown for a definition is 3.
-            This can be configured by adjusting the <a tabindex="0" data-modal-action="show,custom-css">custom CSS</a>;
-            the value can be a unitless integer or decimal number.
-        </p>
-        <div class="code margin-above">/* Globally set the line count */
-:root {
-    --collapsible-definition-line-count: 2;
-}
-
-/* Set the line count for a specific dictionary */
-.definition-item[data-dictionary='JMdict'] {
-    --collapsible-definition-line-count: 2;
-}
-
-/* Spoiler-like functionality, use with <em>Force collapsed</em> mode */
-.definition-item[data-dictionary='JMdict'] .definition-item-inner.collapsible.collapsed {
-    color: #000000;
-    background-color: #000000;
-}
-</div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="dictionary-details-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title"><strong class="dictionary-title"></strong> <span class="light dictionary-version"></span></div>
-    </div>
-    <div class="modal-body">
-        <div class="settings-item dictionary-outdated-notification" hidden><div class="settings-item-children danger-text">
-            This dictionary is outdated and may not support new extension features.
-            Re-import the dictionary to enable support for the latest features.
-        </div></div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Prefix wildcard searches supported
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" class="dictionary-prefix-wildcard-searches-supported" disabled><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p class="warning-text">
-                    Changing this value requires the dictionary to be re-imported.
-                </p>
-                <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
-            </div>
-        </div>
-        <div class="settings-item dictionary-parts-of-speech-filter-setting" hidden>
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Part of speech filtering
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" class="dictionary-parts-of-speech-filter-toggle"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                When deinflecting words, only dictionary entries whose POS matches that expected by the deinflector will be shown.
-                <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
-            </div>
-        </div>
-        <hr>
-        <div class="settings-item dictionary-use-deinflections-setting" hidden>
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Use deinflections
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" class="dictionary-use-deinflections-toggle"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                Deinflections from this dictionary will be used.
-                <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
-            </div>
-        </div>
-        <hr>
-        <div class="settings-item"><div class="settings-item-children">
-            <div class="dictionary-details-table"></div>
-            <div class="dictionary-counts"></div>
-        </div></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="dictionary-extra-data-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">
-            <strong class="dictionary-title">Unassociated Data</strong> <span class="light dictionary-total-count"></span>
-        </div>
-    </div>
-    <div class="modal-body">
-        <p class="warning-text">
-            The database contains extra data which is not associated with any installed dictionary.
-            Purging the database can fix this issue.
-        </p>
-        <div class="dictionary-counts"></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="dictionary-move-location-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Move Dictionary Options</div></div>
-    <div class="modal-body">
-        <p>Input the location the dictionary <strong class="dictionary-title"></strong> should be moved to:</p>
-        <div class="margin-above">
-            <input type="number" id="dictionary-move-location" min="1" step="1">
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" data-modal-action="hide" id="dictionary-move-button">Move</button>
-    </div>
-</div></div>
-
-
-<!-- Dictionary templates -->
-<template id="dictionary-template">
-    <div class="dictionary-list-index generic-list-index-prefix"></div>
-    <label class="toggle dictionary-item-enabled-toggle-container"><input type="checkbox" class="dictionary-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-    <div class="dictionary-item-title-container">
-        <span>
-            <strong class="dictionary-title"></strong> <span class="light dictionary-version"></span>
-        </span>
-        <button type="button" class="dictionary-outdated-button" hidden>
-            <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
-        </button>
-        <button type="button" class="dictionary-integrity-button" hidden>
-            <div class="badge info-badge badge-small-icon"><span class="icon" data-icon="checkmark"></span></div>
-        </button>
-    </div>
-    <input type="number" step="1" class="short-height dictionary-priority">
-    <button type="button" class="icon-button dictionary-menu-button" data-menu="dictionary-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
-</template>
-
-<template id="dictionary-details-entry-template"><div class="dictionary-details-entry">
-    <span class="dictionary-details-entry-label"></span>
-    <span class="dictionary-details-entry-info"></span>
-</div></template>
-
-<template id="dictionary-extra-template">
-    <div class="dictionary-item-bottom"></div>
-    <div class="dictionary-item-bottom"></div>
-    <div class="dictionary-item-bottom dictionary-item-title-container">
-        <span>
-            <strong class="dictionary-title">Unassociated Data</strong> <span class="light dictionary-total-count"></span>
-        </span>
-        <button type="button" class="dictionary-integrity-button">
-            <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
-        </button>
-    </div>
-    <div class="dictionary-item-bottom"></div>
-    <div class="dictionary-item-bottom dictionary-item-button-height"></div>
-</template>
-
-<template id="dictionary-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="showDetails">Details&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveUp">Move up</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveDown">Move down</button>
-    <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to&hellip;</button>
-    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
-</div></div></div></template>
-
-<template id="secondary-search-dictionary-template"><div class="secondary-search-dictionary-item horizontal-flex">
-    <label class="toggle"><input type="checkbox" class="dictionary-allow-secondary-searches"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-    <span class="horizontal-flex-fill"><strong class="dictionary-title"></strong> <span class="light dictionary-version"></span></span>
-</div></template>
-
-<template id="collapsible-dictionary-item-template"><div class="collapsible-dictionary-item">
-    <div class="collapsible-dictionary-cell">
-        <span class="dictionary-info-label"><strong class="dictionary-title"></strong> <span class="light dictionary-version"></span></span>
-    </div>
-    <div class="collapsible-dictionary-cell">
-        <select class="definitions-collapsible medium-width">
-            <option value="not-collapsible">Not collapsible</option>
-            <option value="collapsed">Collapsed</option>
-            <option value="expanded">Expanded</option>
-            <option value="force-collapsed">Force collapsed</option>
-            <option value="force-expanded">Force expanded</option>
-        </select>
-    </div>
-</div></template>
-
-
-<!-- Custom CSS modal -->
-<div id="custom-css-modal" class="modal modal-left" tabindex="-1" role="dialog" hidden><div class="modal-content-container1">
-    <div class="modal-content-container2 modal-content-dimmer"><div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title">Custom CSS</div>
-            <div class="modal-header-button-container">
-                <div class="modal-header-button-group">
-                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-                </div>
-            </div>
-        </div>
-        <div class="modal-body custom-popup-css-container">
-            <div class="custom-popup-css-header">Popup CSS</div>
-            <textarea class="no-wrap" autocomplete="off" spellcheck="false" id="custom-popup-css" data-setting="general.customPopupCss" data-tab-action="indent,4"></textarea>
-            <div class="custom-popup-css-header margin-above">Popup outer CSS</div>
-            <textarea class="no-wrap" autocomplete="off" spellcheck="false" id="custom-popup-outer-css" data-setting="general.customPopupOuterCss" data-tab-action="indent,4"></textarea>
-        </div>
-        <div class="modal-footer">
-            <button type="button" data-modal-action="hide">Close</button>
-        </div>
-    </div></div>
-    <div class="modal-content-container1-fade"></div>
-</div></div>
-
-
-<!-- Audio sources modal -->
-<div id="audio-sources-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Audio Sources</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        When searching for audio, the sources are checked in order until the first
-                        valid source is found. This allows for selecting a fallback source if the
-                        first choice is not available.
-                    </div>
-                </div>
-            </div>
-            <div class="settings-item-children">
-                <div id="audio-source-list" class="generic-list"></div>
-                <div id="audio-source-list-empty">
-                    No audio sources enabled
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" id="audio-source-add" class="low-emphasis">Add</button>
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="audio-source-help-custom-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header">
-        <div class="modal-title">Audio Source - Custom URL</div>
-    </div>
-    <div class="modal-body">
-        <p>
-            A custom URL can be used to play audio from any URL.
-            The replacement tags <code data-select-on-click="">{term}</code> and <code data-select-on-click="">{reading}</code>
-            can be used to specify which term and reading is being looked up.<br>
-        </p>
-        <p>
-            Example:<br>
-            <a tabindex="0" data-select-on-click="">http://localhost/audio.mp3?term={term}&amp;reading={reading}</a>
-        </p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="audio-source-help-custom-json-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header">
-        <div class="modal-title">Audio Source - Custom URL (JSON)</div>
-    </div>
-    <div class="modal-body">
-        <p>
-            A custom URL to a JSON file which lists one or more audio URLs for a given term.
-            The format of the JSON file is described in <a href="/data/schemas/custom-audio-list-schema.json" target="_blank" rel="noopener noreferrer">this schema file</a>.
-        </p>
-        <p>
-            Example:<br>
-            <a tabindex="0" data-select-on-click="">http://localhost/audio.json?term={term}&amp;reading={reading}</a>
-        </p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="audio-source-help-text-to-speech-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header">
-        <div class="modal-title">Audio Source - Text-to-speech</div>
-    </div>
-    <div class="modal-body">
-        <p>
-            A synthesized voice will speak the given text, using either the term text or the reading.
-        </p>
-        <div class="horizontal-flex margin-above">
-            <input type="text" value="よみたん" id="text-to-speech-voice-test-text" autocomplete="off" lang="ja">
-            <button type="button" id="text-to-speech-voice-test">Test</button>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-
-<!-- Audio templates -->
-<template id="audio-source-template"><div class="audio-source">
-    <div class="audio-source-index generic-list-index-prefix"></div>
-    <div class="audio-source-inner">
-        <select class="audio-source-type-select">
-            <option value="jpod101">JapanesePod101</option>
-            <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
-            <option value="jisho">Jisho.org</option>
-            <option value="text-to-speech">Text-to-speech</option>
-            <option value="text-to-speech-reading">Text-to-speech (Kana reading)</option>
-            <option value="custom">Custom URL</option>
-            <option value="custom-json">Custom URL (JSON)</option>
-        </select>
-        <div class="audio-source-parameter-container" data-field="url" hidden>
-            <span class="audio-source-parameter-label">URL:</span>
-            <input type="text" class="audio-source-parameter">
-        </div>
-        <div class="audio-source-parameter-container" data-field="voice" hidden>
-            <span class="audio-source-parameter-label">Voice:</span>
-            <select class="audio-source-parameter"></select>
-        </div>
-    </div>
-    <button type="button" class="icon-button audio-source-menu-button" data-menu="audio-source-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
-</div></template>
-
-<template id="audio-source-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="help">Help</button>
-    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
-</div></div></div></template>
-
-
-<!-- Scanning inputs modal -->
-<div id="scanning-inputs-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Scanning Inputs</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <div>
-            <p>
-                Scanning inputs are used to define when text scanning should occur.
-                <a tabindex="0" class="more-toggle more-only" data-parent-distance="2">More&hellip;</a>
-            </p>
-            <div class="margin-above more" hidden>
-                <p>
-                    Text scanning is performed when a pointer is moved and certain inputs are either pressed or not pressed.
-                    The <em>Required inputs</em> field is used to define which inputs <em>must</em> be pressed, and
-                    the <em>Excluded inputs</em> field is used to define which inputs <em>must not</em> be pressed.
-                    If the <em>Required inputs</em> field is empty, text will be scanned whenever the pointer is moved.
-                </p>
-                <p>
-                    The <em>Input types</em> group is used to define which types of pointer input that the
-                    keyboard and button inputs are applied to.
-                    Supported pointer types include the mouse cursor, touchscreen touches, and pen devices.
-                    When using the <em>Pen</em> option, the defined inputs will correspond to buttons on the pen device.
-                </p>
-                <p>
-                    Some additional scanning and search options can be configured by clicking the menu button and selecting
-                    <em>Show advanced options</em>.
-                </p>
-                <ul>
-                    <li>To assign keyboard keys, select the input field and press modifier keys on the keyboard.</li>
-                    <li>To assign mouse or pen buttons, click on the button with the mouse icon using the desired button.</li>
-                    <li>
-                        To clear inputs, select the input field and press the <em>Escape</em> button,
-                        or use the <em>Clear inputs</em> menu option.
-                    </li>
-                </ul>
-                <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a></p>
-            </div>
-        </div>
-        <div class="scan-input-list generic-list margin-above" id="scan-input-list"></div>
-        <div class="warning-text margin-above generic-list-empty-indicator">
-            No scanning inputs have been defined yet.
-            Click the <em>Add</em> button to add a new input.
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" id="scan-input-add">Add</button>
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-
-<!-- Scanning inputs templates -->
-<template id="scan-input-template"><div class="scan-input" data-show-advanced="false">
-    <div class="scan-input-grid">
-        <div class="scan-input-index-cell generic-list-index-prefix"></div>
-        <div class="scan-input-menu-button-cell">
-            <div class="input-height-icon-button-container">
-                <button type="button" class="icon-button scanning-input-menu-button" data-menu="scanning-inputs-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
-            </div>
-        </div>
-
-        <div class="scan-input-prefix-cell" data-property="include"><span>Required inputs:</span></div>
-        <div class="scan-input-content-cell input-group" data-property="include">
-            <input type="text" class="scan-input-field" autocomplete="off" spellcheck="false" placeholder="No inputs" data-property="include">
-            <button type="button" class="input-suffix input-suffix-icon-button light-icon mouse-button" data-property="include"><span class="icon" data-icon="mouse"></span></button>
-        </div>
-
-        <div class="scan-input-prefix-cell" data-property="exclude"><span>Excluded inputs:</span></div>
-        <div class="scan-input-content-cell input-group" data-property="exclude">
-            <input type="text" class="scan-input-field" autocomplete="off" spellcheck="false" placeholder="No inputs" data-property="exclude">
-            <button type="button" class="input-suffix input-suffix-icon-button light-icon mouse-button" data-property="exclude"><span class="icon" data-icon="mouse"></span></button>
-        </div>
-
-        <div class="scan-input-prefix-cell scan-input-options-cell" data-property="types"><span>Input types:</span></div>
-        <div class="scan-input-content-cell scan-input-options-cell" data-property="types">
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.mouse"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Mouse</span>
-            </label>
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.touch"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Touch</span>
-            </label>
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.pen"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Pen</span>
-            </label>
-        </div>
-
-        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="search-options"><span>Search types:</span></div>
-        <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="search-options">
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.searchTerms"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Search for terms</span>
-            </label>
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.searchKanji"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Search for kanji</span>
-            </label>
-        </div>
-
-        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-options"><span>Touch options:</span></div>
-        <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="touch-options">
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchPress"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on touch press</span>
-            </label>
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchRelease"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on touch release</span>
-            </label>
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnTouchMove"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on touch move</span>
-            </label>
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.preventTouchScrolling"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Prevent touch scrolling</span>
-            </label>
-        </div>
-
-        <div class="scan-input-prefix-cell scan-input-options-cell scan-input-advanced-only" data-property="pen-options"><span>Pen options:</span></div>
-        <div class="scan-input-content-cell scan-input-options-cell scan-input-advanced-only" data-property="pen-options">
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenPress"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on pen press</span>
-            </label>
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenRelease"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on pen release</span>
-            </label>
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenMove"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on pen move (while touched)</span>
-            </label>
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on pen hover (before touched)</span>
-            </label>
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenReleaseHover"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Scan on pen hover (after touched)</span>
-            </label>
-            <label class="scan-input-checkbox-item">
-                <label class="checkbox"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.preventPenScrolling"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Prevent pen scrolling</span>
-            </label>
-        </div>
-    </div>
-</div></template>
-
-<template id="scanning-inputs-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="showAdvanced">Show advanced options</button>
-    <button type="button" class="popup-menu-item" data-menu-action="hideAdvanced">Hide advanced options</button>
-    <button type="button" class="popup-menu-item" data-menu-action="clearInputs">Clear inputs</button>
-    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
-</div></div></div></template>
-
-
-<!-- Input action prevention modal -->
-<div id="input-action-prevention-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Input Action Prevention</div></div>
-    <div class="modal-body">
-        <div>
-            Prevent middle mouse button actions on:
-            <a tabindex="0" class="more-toggle more-only" data-parent-distance="2">(?)</a>
-        </div>
-        <div class="more" hidden>
-            <p>
-                This option is used to disable the default action of the middle mouse button in different contexts.
-                This can be useful for preventing the scroll action that the middle mouse button is typically mapped to,
-                which is otherwise difficult to disable inside extension pages via other means.
-            </p>
-            <p>
-                <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-            </p>
-        </div>
-        <div class="input-prevention-option-list">
-            <label class="input-prevention-option-list-item">
-                <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onWebPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Webpages</span>
-            </label>
-            <label class="input-prevention-option-list-item">
-                <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onPopupPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Popups</span>
-            </label>
-            <label class="input-prevention-option-list-item">
-                <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onSearchPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Search page</span>
-            </label>
-            <label class="input-prevention-option-list-item">
-                <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onSearchQuery"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>Search query</span>
-            </label>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-
-<!-- Anki cards modal -->
-<div id="anki-cards-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Anki Cards</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div>
-        <div class="tabs-container">
-            <div class="tabs">
-                <label class="tab">
-                    <input type="radio" name="anki-card-primary-type" data-value="terms" data-anki-card-menu="anki-card-terms-field-menu" checked>
-                    <div class="tab-inner"><span class="tab-label">Terms</span></div>
-                </label>
-                <label class="tab">
-                    <input type="radio" name="anki-card-primary-type" data-value="kanji" data-anki-card-menu="anki-card-kanji-field-menu">
-                    <div class="tab-inner"><span class="tab-label">Kanji</span></div>
-                </label>
-            </div>
-            <div class="tabs-right" hidden>
-                <button type="button" class="icon-button" data-menu-position="below left" id="anki-card-primary-type-menu-button"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
-            </div>
-        </div>
-        <div class="modal-separator-line"></div>
-    </div>
-    <div class="modal-body anki-card" id="anki-card-primary" data-anki-card-type="terms" data-anki-card-menu="anki-card-terms-field-menu">
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Deck</div>
-            </div>
-            <div class="settings-item-right">
-                <select class="anki-card-deck"></select>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Model</div>
-            </div>
-            <div class="settings-item-right">
-                <select class="anki-card-model"></select>
-            </div>
-        </div></div>
-        <div class="anki-card-fields">
-            <div class="anki-card-field-name-header" data-persistent="true">Field</div>
-            <div class="anki-card-field-input-header" data-persistent="true">Value</div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="show,anki-cards-info">Help</button>
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="anki-cards-info-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-full">
-    <div class="modal-header">
-        <div class="modal-title">Anki Card Information</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <p>
-            Anki card fields can be populated with information about a term or kanji character by using field markers.
-            When a card is being generated, field markers are replaced with information about the term or kanji by using the installed dictionaries.
-            Several preset markers are available, which are described below.
-            Markers can be customized by adjusting the <a tabindex="0" data-modal-action="show,anki-card-templates">Anki card templates</a>.
-        </p>
-        <p>
-            Anki requires the first field in a model to be unique for a card;
-            therefore, it is recommended to use <code class="anki-field-marker">{expression}</code> as the marker for the first field of term cards,
-            or <code class="anki-field-marker">{character}</code> for kanji cards.
-        </p>
-        <table class="anki-field-marker-info-table margin-above">
-            <tbody>
-                <tr class="anki-field-marker-info-table-heading">
-                    <td>Marker (for terms)</td>
-                    <td>Description</td>
-                </tr>
-
-                <tr>
-                    <td><code class="anki-field-marker">{audio}</code></td>
-                    <td>Audio sample of a native speaker's pronunciation in MP3 format, if available.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{cloze-body-kana}</code></td>
-                    <td>Kana reading for <code class="anki-field-marker">{cloze-body}</code>.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{conjugation}</code></td>
-                    <td>Conjugation path from the raw inflected term to the source term.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{expression}</code></td>
-                    <td>Term expressed using kanji. If kanji expression is not available, kana is used.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{furigana}</code></td>
-                    <td>
-                        Term expressed as kanji with furigana displayed above it.
-                        Example: <ruby>日本語<rt>にほんご</rt></ruby>.
-                    </td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{furigana-plain}</code></td>
-                    <td>
-                        Term expressed as kanji with furigana displayed next to it in brackets.
-                        Example: 日本語[にほんご].
-                    </td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{glossary}</code></td>
-                    <td>List of definitions for the term.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{glossary-brief}</code></td>
-                    <td>List of definitions for the term in a more compact format.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{glossary-no-dictionary}</code></td>
-                    <td>List of definitions for the term, except the dictionary tag is omitted.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{part-of-speech}</code></td>
-                    <td>Part of speech information for the term.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{pitch-accents}</code></td>
-                    <td>List of pitch accent downstep notations for the term.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{pitch-accent-graphs}</code></td>
-                    <td>List of pitch accent graphs for the term.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{pitch-accent-positions}</code></td>
-                    <td>List of accent downstep positions for the term as a number.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{pitch-accent-categories}</code></td>
-                    <td>List of pitch accent categories for the term (e.g. heiban, kifuku, atamadaka, odaka, nakadaka).</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{reading}</code></td>
-                    <td>Kana reading for the term, or empty for terms where the expression is the reading.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{tags}</code></td>
-                    <td>Grammar and usage tags providing information about the term.</td>
-                </tr>
-
-                <tr class="anki-field-marker-info-table-heading">
-                    <td>Marker (for kanji)</td>
-                    <td>Description</td>
-                </tr>
-
-                <tr>
-                    <td><code class="anki-field-marker">{character}</code></td>
-                    <td>Unicode glyph representing the current kanji.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{glossary}</code></td>
-                    <td>List of definitions for the kanji.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{kunyomi}</code></td>
-                    <td>Kunyomi (Japanese reading) for the kanji, expressed as katakana.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{onyomi}</code></td>
-                    <td>Onyomi (Chinese reading) for the kanji, expressed as hiragana.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{stroke-count}</code></td>
-                    <td>Number of strokes that the kanji character has.</td>
-                </tr>
-
-                <tr class="anki-field-marker-info-table-heading">
-                    <td>Marker (for both)</td>
-                    <td>Description</td>
-                </tr>
-
-                <tr>
-                    <td><code class="anki-field-marker">{clipboard-image}</code></td>
-                    <td>An image which is stored in the system clipboard, if available.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{clipboard-text}</code></td>
-                    <td>Text which is stored in the system clipboard, if available.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{cloze-body}</code></td>
-                    <td>Original inflected term as it appeared before being reduced to dictionary form by Yomitan.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{cloze-prefix}</code></td>
-                    <td>Fragment of the containing <code class="anki-field-marker">{sentence}</code> starting at the beginning of <code class="anki-field-marker">{sentence}</code> until the beginning of <code class="anki-field-marker">{cloze-body}</code>.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{cloze-suffix}</code></td>
-                    <td>Fragment of the containing <code class="anki-field-marker">{sentence}</code> starting at the end of <code class="anki-field-marker">{cloze-body}</code> until the end of <code class="anki-field-marker">{sentence}</code>.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{dictionary}</code></td>
-                    <td>Name of the dictionary from which the card is being created.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{document-title}</code></td>
-                    <td>Title of the web page that the term or kanji appeared in.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{frequencies}</code></td>
-                    <td>
-                        Frequency information for the term or kanji.
-                    </td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{frequency-harmonic-rank}</code></td>
-                    <td>
-                        The harmonic mean of frequency data for the current term or kanji.<br>
-                        Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term or kanji usage.
-                    </td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{frequency-harmonic-occurrence}</code></td>
-                    <td>
-                        The harmonic mean of frequency data for the current term or kanji.<br>
-                        Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term or kanji usage.
-                    </td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{frequency-average-rank}</code></td>
-                    <td>
-                        The average of frequency data for the current term or kanji.<br>
-                        Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term or kanji usage.
-                    </td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{frequency-average-occurrence}</code></td>
-                    <td>
-                        The average of frequency data for the current term or kanji.<br>
-                        Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term or kanji usage.
-                    </td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{screenshot}</code></td>
-                    <td>Screenshot of the web page taken at the time the term or kanji was added.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{search-query}</code></td>
-                    <td>The full search query shown on the search page.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{selection-text}</code></td>
-                    <td>The selected text on the search page or popup.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{sentence}</code></td>
-                    <td>Sentence, quote, or phrase that the term or kanji appears in from the source content.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{sentence-furigana}</code></td>
-                    <td>Sentence, quote, or phrase that the term or kanji appears in from the source content, with furigana added.</td>
-                </tr>
-                <tr>
-                    <td><code class="anki-field-marker">{url}</code></td>
-                    <td>Address of the web page in which the term or kanji appeared in.</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-
-<!-- Anki card templates -->
-<template id="anki-card-field-template"><div class="anki-card-field-name-container"><span class="anki-card-field-name"></span></div>
-<div class="anki-card-field-value-container input-group">
-    <input type="text" class="anki-card-field-value" autocomplete="off">
-    <button type="button" class="anki-card-field-value-menu-button input-suffix input-suffix-icon-button light-icon" data-menu-position="v-center left"><span class="icon" data-icon="material-down-arrow"></span></button>
-</div></template>
-
-<template id="anki-card-terms-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
-
-<template id="anki-card-kanji-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
-
-<template id="anki-card-all-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
-
-
-<!-- Anki field template modals -->
-<div id="anki-card-templates-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-full">
-    <div class="modal-header"><div class="modal-title">Anki Card Templates</div></div>
-    <div class="modal-body anki-card-templates-layout">
-        <div class="anki-card-templates-info">
-            <p>
-                Anki card fields are formatted using the <a href="https://handlebarsjs.com/" target="_blank" rel="noopener noreferrer">Handlebars.js</a>
-                template rendering engine.
-                Advanced users can modify these templates for full control over what information is included in Anki cards.
-            </p>
-            <p>
-                Consider copy-pasting the source into a code editor that supports syntax highlighting for easier editing.
-            </p>
-        </div>
-        <textarea autocomplete="off" spellcheck="false" id="anki-card-templates-textarea" class="no-wrap margin-above" data-tab-action="indent,4"></textarea>
-        <div id="anki-card-templates-compile-result" class="code danger-text margin-above" hidden></div>
-        <div class="anki-card-templates-test-container margin-above">
-            <p>
-                Card templates can be tested using the inputs below.
-            </p>
-            <div class="anki-card-templates-test-table margin-above">
-                <div class="anki-card-templates-test-table-header">Scanned text</div>
-                <div class="anki-card-templates-test-table-header">Card field</div>
-                <div></div>
-                <input type="text" id="anki-card-templates-test-text-input" class="form-control" value="読め" placeholder="Preview text" autocomplete="off" lang="ja">
-                <div class="anki-card-templates-test-input-container input-group">
-                    <input type="text" id="anki-card-templates-test-field-input" value="{expression}" placeholder="{marker}" autocomplete="off" spellcheck="false">
-                    <button type="button" class="input-suffix input-suffix-icon-button light-icon" id="anki-card-templates-test-field-menu-button" data-menu="anki-card-all-field-menu" data-menu-position="below left"><span class="icon" data-icon="material-down-arrow"></span></button>
-                </div>
-                <button type="button" id="anki-card-templates-test-render-button">Test</button>
-            </div>
-        </div>
-        <div class="code margin-above" id="anki-card-templates-render-result"><em>Card render result</em></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="danger" id="anki-card-templates-reset-button">Reset Templates</button>
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="anki-card-templates-reset-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Reset Anki Card Templates</div></div>
-    <div class="modal-body">
-        <p class="danger-text">
-            Are you sure you want to reset the card templates to their default value?
-            Any changes you made will be lost.
-        </p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" class="danger" id="anki-card-templates-reset-button-confirm">Reset Templates</button>
-    </div>
-</div></div>
-
-
-<!-- Import/export modals -->
-<div id="settings-import-error-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Import Error</div></div>
-    <div class="modal-body">
-        <p>An error occurred while trying to import the settings file:</p>
-        <p class="danger-text" id="settings-import-error-message"></p>
-        <p>Additional info can be found in the developer console.</p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="settings-import-warning-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Import Security Warning</div></div>
-    <div class="modal-body">
-        <p>
-            Settings file contains settings which may pose a security risk.
-            Only import settings from sources you trust.
-        </p>
-        <ul class="danger-text" id="settings-import-warning-message"></ul>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" class="danger settings-import-warning-import-button">Import</button>
-        <button type="button" class="settings-import-warning-import-button" data-import-sanitize="true">Sanitize and Import</button>
-    </div>
-</div></div>
-
-<div id="settings-reset-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Reset Settings</div></div>
-    <div class="modal-body">
-        <p class="danger-text">
-            You are about to reset all Yomitan settings back to their default values.
-            This will delete all custom profiles you may have created.
-            <strong>This action cannot be undone.</strong>
-        </p>
-        <p>
-            Consider making a backup using the <em>Export Settings</em> button before resetting
-            if you want to be able to revert.
-        </p>
-        <p>
-            Dictionary data will not be deleted, but any installed dictionaries
-            will need to be re-enabled.
-        </p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" class="danger" id="settings-reset-confirm-button">Reset All Settings</button>
-    </div>
-</div></div>
-
-
-<!-- Translation modals -->
-<div id="translation-text-replacement-patterns-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Custom Text Replacement Patterns</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
-            Text replacement patterns are used to modify or remove text that matches certain patterns.
-            Patterns are defined using
-            <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions" target="_blank" rel="noreferrer noopener">regular expression syntax</a>,
-            and the replacement text can use certain
-            <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#Specifying_a_string_as_a_parameter" target="_blank" rel="noreferrer noopener">special replacement patterns</a>.
-        </div></div></div></div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">
-                    Search original text
-                </div>
-                <div class="settings-item-description">
-                    The original unmodified text will also be searched for definitions.
-                </div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="translation.textReplacements.searchOriginal"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Text replacement patterns</div>
-                </div>
-            </div>
-            <div class="settings-item-children">
-                <div id="translation-text-replacement-list" class="generic-list"></div>
-                <div class="generic-list-empty-indicator"><em>None defined</em></div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" id="translation-text-replacement-add" class="low-emphasis">Add</button>
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-
-<!-- Translation templates -->
-<template id="translation-text-replacement-entry-template"><div class="translation-text-replacement-entry">
-    <div class="translation-text-replacement-index generic-list-index-prefix"></div>
-    <div class="translation-text-replacement-pattern-label">Pattern:</div>
-    <div class="translation-text-replacement-replacement-label">Replacement:</div>
-    <div class="translation-text-replacement-pattern-container">
-        <input type="text" class="translation-text-replacement-pattern code">
-        <label class="translation-text-replacement-checkbox-container">
-            <label class="checkbox"><input type="checkbox" class="translation-text-replacement-checkbox translation-text-replacement-pattern-ignore-case"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-            <span class="translation-text-replacement-checkbox-label">Ignore case</span>
-        </label>
-    </div>
-    <div class="translation-text-replacement-replacement-container">
-        <input type="text" class="translation-text-replacement-replacement code">
-    </div>
-    <button type="button" class="icon-button translation-text-replacement-button" data-menu="translation-text-replacement-entry-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
-
-    <div class="translation-text-replacement-test-label translation-text-replacement-test-node">Test Input:</div>
-    <div class="translation-text-replacement-test-container translation-text-replacement-test-node">
-        <input type="text" class="translation-text-replacement-test-input" lang="ja">
-        <div class="translation-text-replacement-test-label-inner">Output:</div>
-        <input type="text" class="translation-text-replacement-test-output" lang="ja" readonly>
-    </div>
-</div></template>
-
-<template id="translation-text-replacement-entry-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="showTest">Test</button>
-    <button type="button" class="popup-menu-item" data-menu-action="hideTest">Hide test</button>
-    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
-</div></div></div></template>
-
-
-<!-- Sentence parsing modal -->
-<div id="sentence-termination-characters-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Sentence Termination Characters</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <p>
-            Sentences are terminated by punctuation and quotation marks, which can both be configured below.
-        </p>
-        <table class="sentence-termination-character-list-table" id="sentence-termination-character-list-table" hidden>
-            <thead><tr>
-                <td>#</td>
-                <td>Enabled</td>
-                <td>Type</td>
-                <td>Character 1</td>
-                <td>Character 2</td>
-                <td>Include character in sentence</td>
-                <td></td>
-            </tr></thead>
-            <tbody class="sentence-termination-character-list generic-list" id="sentence-termination-character-list"></tbody>
-        </table>
-        <div id="sentence-termination-character-list-empty" hidden>
-            No terminators defined.
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis danger" id="sentence-termination-character-list-reset">Reset</button>
-        <button type="button" class="low-emphasis" id="sentence-termination-character-list-add">Add</button>
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-
-<!-- Sentence parsing templates -->
-<template id="sentence-termination-character-entry-template"><tr class="sentence-termination-character-entry">
-    <td class="generic-list-index-prefix"></td>
-    <td>
-        <label class="toggle"><input type="checkbox" class="sentence-termination-character-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-    </td>
-    <td>
-        <select class="sentence-termination-character-type">
-            <option value="terminator">Terminator</option>
-            <option value="quote">Quote</option>
-        </select>
-    </td>
-    <td>
-        <input type="text" class="sentence-termination-character-input1" maxlength="1" lang="ja">
-    </td>
-    <td>
-        <input type="text" class="sentence-termination-character-input2" maxlength="1" lang="ja">
-        <div class="sentence-termination-character-input2-alt">&mdash;</div>
-    </td>
-    <td>
-        <div class="sentence-termination-character-include-list">
-            <label class="sentence-termination-character-include">
-                <label class="checkbox"><input type="checkbox" class="sentence-termination-character-include-at-start"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>At start</span>
-            </label>
-            <label class="sentence-termination-character-include">
-                <label class="checkbox"><input type="checkbox" class="sentence-termination-character-include-at-end"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                <span>At end</span>
-            </label>
-        </div>
-    </td>
-    <td>
-        <button type="button" class="icon-button sentence-termination-character-entry-button" data-menu="sentence-termination-character-entry-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
-    </td>
-</tr></template>
-
-<template id="sentence-termination-character-entry-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
-</div></div></div></template>
-
-
-<!-- Keyboard shortcuts modal -->
-<div id="keyboard-shortcuts-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-full">
-    <div class="modal-header">
-        <div class="modal-title">Keyboard Shortcuts</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <div class="hotkey-list generic-list" id="hotkey-list"></div>
-        <div class="hotkey-list-empty" id="hotkey-list-empty" hidden>
-            No keyboard shortcuts defined.
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis danger" data-modal-action="show,keyboard-shortcuts-reset">Reset</button>
-        <button type="button" class="low-emphasis" id="hotkey-list-add">Add</button>
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="extension-keyboard-shortcuts-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
-    <div class="modal-header">
-        <div class="modal-title">Native Keyboard Shortcuts</div>
-        <div class="modal-header-button-container">
-            <div class="modal-header-button-group">
-                <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-            </div>
-        </div>
-    </div>
-    <div class="modal-body">
-        <div>
-            <p data-show-for-browser="chrome edge">
-                The native keyboard shortcuts are listed below,
-                but cannot be configured from within the extension on this browser.
-                To configure these shortcuts:
-            </p>
-
-            <p data-show-for-browser="firefox">
-                The native keyboard shortcuts can be configured below on this browser,
-                or by doing the following:
-            </p>
-
-            <ul data-show-for-browser="chrome">
-                <li>Open <a tabindex="0" data-special-url="chrome://extensions/shortcuts">chrome://extensions/shortcuts</a> in a new tab.</li>
-                <li>Find the <em>Yomitan</em> section and configure the shortcuts.</li>
-            </ul>
-
-            <ul data-show-for-browser="edge">
-                <li>Open <a tabindex="0" data-special-url="edge://extensions/shortcuts">edge://extensions/shortcuts</a> in a new tab.</li>
-                <li>Find the <em>Yomitan</em> section and configure the shortcuts.</li>
-            </ul>
-
-            <ul data-show-for-browser="firefox">
-                <li>Open the extensions page (<a tabindex="0" data-select-on-click="">about:addons</a>)</li>
-                <li>Click the button on the right with the gear icon, then click <em>Manage Extension Shortcuts</em>.</li>
-                <li>Find the <em>Yomitan</em> section and configure the shortcuts.</li>
-            </ul>
-        </div>
-        <div class="modal-separator-line"></div>
-        <div class="modal-settings-group" id="extension-hotkey-list"></div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis danger" id="extension-hotkey-list-reset-all">Reset All</button>
-        <button type="button" class="low-emphasis danger" id="extension-hotkey-list-clear-all">Clear All</button>
-        <button type="button" data-modal-action="hide">Close</button>
-    </div>
-</div></div>
-
-<div id="keyboard-shortcuts-reset-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-    <div class="modal-header"><div class="modal-title">Confirm Keyboard Shortcuts Reset</div></div>
-    <div class="modal-body">
-        Are you sure you want to reset all keyboard shortcuts to their defaults?
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-        <button type="button" class="danger" id="hotkey-list-reset" data-modal-action="hide">Reset All</button>
-    </div>
-</div></div>
-
-<!-- Keyboard shortcuts templates -->
-<template id="hotkey-list-item-template"><div class="hotkey-list-item"><div class="hotkey-list-item-grid">
-    <div class="hotkey-list-item-index-cell generic-list-index-prefix"></div>
-    <div class="hotkey-list-item-button-cell">
-        <div class="input-height-icon-button-container">
-            <button type="button" class="icon-button hotkey-list-item-button" data-menu="hotkey-list-item-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
-        </div>
-    </div>
-
-    <div class="hotkey-list-item-input-label-cell">Input:</div>
-    <div class="hotkey-list-item-input-cell">
-        <input type="text" class="hotkey-list-item-input" autocomplete="off" spellcheck="false" placeholder="No input" data-property="include">
-        <div class="hotkey-list-item-enabled-button-container input-group">
-            <button type="button" class="hotkey-list-item-enabled-button input-button">
-                <label class="hotkey-list-item-enabled-button-label button-inner-label">
-                    <span class="checkbox"><input type="checkbox" class="hotkey-list-item-enabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></span>
-                    <span>Enabled</span>
-                </label>
-            </button>
-            <button type="button" class="hotkey-list-item-scopes-button input-suffix input-suffix-icon-button light-icon" data-menu="hotkey-list-item-scopes-menu" data-menu-position="below left"><span class="icon" data-icon="material-down-arrow"></span></button>
-        </div>
-    </div>
-
-    <div class="hotkey-list-item-action-label-cell">Action:</div>
-    <div class="hotkey-list-item-action-cell">
-        <select class="hotkey-list-item-action">
-            <option value="">None</option>
-            <option value="close">Close</option>
-            <option value="focusSearchBox">Focus search box</option>
-            <option value="nextEntry">Go to next entry</option>
-            <option value="previousEntry">Go to previous entry</option>
-            <option value="lastEntry">Go to last entry</option>
-            <option value="firstEntry">Go to first entry</option>
-            <option value="nextEntryDifferentDictionary">Go to next dictionary</option>
-            <option value="previousEntryDifferentDictionary">Go to previous dictionary</option>
-            <option value="historyBackward">Navigate backward in history</option>
-            <option value="historyForward">Navigate forward in history</option>
-            <option value="addNoteKanji">Add kanji note</option>
-            <option value="addNoteTermKanji">Add term note</option>
-            <option value="addNoteTermKana">Add term note (reading)</option>
-            <option value="viewNote">View note</option>
-            <option value="playAudio">Play audio</option>
-            <option value="playAudioFromSource">Play audio from source</option>
-            <option value="copyHostSelection">Copy host window selection</option>
-            <option value="scanSelectedText">Scan selected text</option>
-            <option value="scanTextAtCaret">Scan text at caret</option>
-            <option value="toggleOption">Toggle option</option>
-        </select>
-        <div class="hotkey-list-item-action-argument-container"></div>
-    </div>
-</div></div></template>
-
-<template id="extension-hotkey-list-item-template"><div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
-    <div class="settings-item-left">
-        <div class="settings-item-label"></div>
-    </div>
-    <div class="settings-item-right">
-        <div class="flex-row-nowrap">
-            <input type="text">
-            <button type="button" class="icon-button extension-hotkey-list-item-button" data-menu="extension-hotkey-list-item-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
-        </div>
-    </div>
-</div></div></template>
-
-<template id="hotkey-list-item-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="clearInputs">Clear input</button>
-    <button type="button" class="popup-menu-item" data-menu-action="resetInput">Reset input</button>
-    <button type="button" class="popup-menu-item" data-menu-action="resetArgument">Reset argument</button>
-    <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
-</div></div></div></template>
-
-<template id="hotkey-list-item-scopes-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="web"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
-        <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="web"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-        <span>Web</span>
-    </label></button>
-    <button type="button" class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="popup"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
-        <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="popup"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-        <span>Popup</span>
-    </label></button>
-    <button type="button" class="popup-menu-item hotkey-scope-popup-menu-item" data-menu-action="toggleScope" data-scope="search"><label class="hotkey-scope-popup-menu-item-label button-inner-label">
-        <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="search"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-        <span>Search</span>
-    </label></button>
-</div></div></div></template>
-
-<template id="extension-hotkey-list-item-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="clearInput">Clear input</button>
-    <button type="button" class="popup-menu-item" data-menu-action="resetInput">Reset input</button>
-</div></div></div></template>
-
-<template id="hotkey-argument-move-offset-template"><div class="flex-row-nowrap">
-    <span class="hotkey-argument-label">Count:</span>
-    <input type="number" step="1" min="1" class="hotkey-argument-input">
-</div></template>
-
-<template id="hotkey-argument-setting-path-template"><div class="flex-row-nowrap">
-    <span class="hotkey-argument-label">Path:</span>
-    <input type="text" class="hotkey-argument-input horizontal-flex-fill" spellcheck="false" autocomplete="off">
-</div></template>
-
-<template id="hotkey-argument-audio-source-template"><div class="flex-row-nowrap">
-    <span class="hotkey-argument-label">Source:</span>
-    <select class="audio-source-select hotkey-argument-input horizontal-flex-fill">
-        <option value="jpod101">JapanesePod101</option>
-        <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
-        <option value="jisho">Jisho.org</option>
-        <option value="text-to-speech">Text-to-speech</option>
-        <option value="text-to-speech-reading">Text-to-speech (Kana reading)</option>
-        <option value="custom">Custom</option>
-    </select>
-</div></template>
-
-
-<!-- Scripts -->
-<script src="/js/pages/settings/settings-main.js" type="module"></script>
 
 </body>
 </html>

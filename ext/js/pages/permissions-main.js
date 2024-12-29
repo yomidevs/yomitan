@@ -43,14 +43,14 @@ async function setupEnvironmentInfo(api) {
  * @returns {Promise<boolean>}
  */
 async function isAllowedIncognitoAccess() {
-    return await new Promise((resolve) => chrome.extension.isAllowedIncognitoAccess(resolve));
+    return await new Promise((resolve) => { chrome.extension.isAllowedIncognitoAccess(resolve); });
 }
 
 /**
  * @returns {Promise<boolean>}
  */
 async function isAllowedFileSchemeAccess() {
-    return await new Promise((resolve) => chrome.extension.isAllowedFileSchemeAccess(resolve));
+    return await new Promise((resolve) => { chrome.extension.isAllowedFileSchemeAccess(resolve); });
 }
 
 /**
@@ -86,7 +86,18 @@ function setupPermissionsToggles() {
     }
 }
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
+    const modalController = new ModalController([]);
+    await modalController.prepare();
+
+    const settingsController = new SettingsController(application);
+    await settingsController.prepare();
+
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    await settingsDisplayController.prepare();
+
+    document.body.hidden = false;
+
     const documentFocusController = new DocumentFocusController();
     documentFocusController.prepare();
 
@@ -95,7 +106,7 @@ await Application.main(async (application) => {
 
     setupPermissionsToggles();
 
-    setupEnvironmentInfo(application.api);
+    void setupEnvironmentInfo(application.api);
 
     /** @type {HTMLInputElement} */
     const permissionCheckbox1 = querySelectorNotNull(document, '#permission-checkbox-allow-in-private-windows');
@@ -106,32 +117,23 @@ await Application.main(async (application) => {
 
     const permissions = await Promise.all([
         isAllowedIncognitoAccess(),
-        isAllowedFileSchemeAccess()
+        isAllowedFileSchemeAccess(),
     ]);
 
     for (let i = 0, ii = permissions.length; i < ii; ++i) {
         permissionsCheckboxes[i].checked = permissions[i];
     }
 
-    const modalController = new ModalController();
-    modalController.prepare();
-
-    const settingsController = new SettingsController(application);
-    await settingsController.prepare();
-
     const permissionsToggleController = new PermissionsToggleController(settingsController);
-    permissionsToggleController.prepare();
+    void permissionsToggleController.prepare();
 
     const permissionsOriginController = new PermissionsOriginController(settingsController);
-    permissionsOriginController.prepare();
+    void permissionsOriginController.prepare();
 
     const persistentStorageController = new PersistentStorageController(application);
-    persistentStorageController.prepare();
+    void persistentStorageController.prepare();
 
     await promiseTimeout(100);
 
     document.documentElement.dataset.loaded = 'true';
-
-    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
-    settingsDisplayController.prepare();
 });

@@ -19,8 +19,7 @@
 import {describe, expect, test} from 'vitest';
 import {CacheMap} from '../ext/js/general/cache-map.js';
 
-/** */
-function testConstructor() {
+describe('CacheMap', () => {
     describe('constructor', () => {
         const shouldThrow = [-1, 1.5, Number.NaN, Number.POSITIVE_INFINITY];
         const shouldNotThrow = [0, 1, Number.MAX_VALUE];
@@ -32,17 +31,14 @@ function testConstructor() {
             expect(() => new CacheMap(param)).toThrowError();
         });
     });
-}
 
-/** */
-function testApi() {
     describe('api', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         const data = [
             {
                 maxSize: 1,
                 expectedSize: 0,
-                calls: []
+                calls: [],
             },
             {
                 maxSize: 10,
@@ -52,8 +48,8 @@ function testApi() {
                     {func: 'has', args: ['a1-b-c'],     returnValue: false},
                     {func: 'set', args: ['a1-b-c', 32], returnValue: void 0},
                     {func: 'get', args: ['a1-b-c'],     returnValue: 32},
-                    {func: 'has', args: ['a1-b-c'],     returnValue: true}
-                ]
+                    {func: 'has', args: ['a1-b-c'],     returnValue: true},
+                ],
             },
             {
                 maxSize: 10,
@@ -64,8 +60,8 @@ function testApi() {
                     {func: 'set', args: ['a1-b-c', 64], returnValue: void 0},
                     {func: 'get', args: ['a1-b-c'],     returnValue: 64},
                     {func: 'set', args: ['a2-b-c', 96], returnValue: void 0},
-                    {func: 'get', args: ['a2-b-c'],     returnValue: 96}
-                ]
+                    {func: 'get', args: ['a2-b-c'],     returnValue: 96},
+                ],
             },
             {
                 maxSize: 2,
@@ -85,9 +81,9 @@ function testApi() {
                     {func: 'set', args: ['a3-b-c', 3], returnValue: void 0},
                     {func: 'has', args: ['a1-b-c'],    returnValue: false},
                     {func: 'has', args: ['a2-b-c'],    returnValue: true},
-                    {func: 'has', args: ['a3-b-c'],    returnValue: true}
-                ]
-            }
+                    {func: 'has', args: ['a3-b-c'],    returnValue: true},
+                ],
+            },
         ];
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -111,14 +107,4 @@ function testApi() {
             expect(cache.size).toStrictEqual(expectedSize);
         });
     });
-}
-
-
-/** */
-function main() {
-    testConstructor();
-    testApi();
-}
-
-
-main();
+});

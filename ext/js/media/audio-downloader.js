@@ -19,17 +19,27 @@
 import {RequestBuilder} from '../background/request-builder.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {readResponseJson} from '../core/json.js';
+import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {JsonSchema} from '../data/json-schema.js';
-import {arrayBufferToBase64} from '../data/sandbox/array-buffer-util.js';
 import {NativeSimpleDOMParser} from '../dom/native-simple-dom-parser.js';
 import {SimpleDOMParser} from '../dom/simple-dom-parser.js';
 import {isStringEntirelyKana} from '../language/ja/japanese.js';
 
+/** @type {RequestInit} */
+const DEFAULT_REQUEST_INIT_PARAMS = {
+    method: 'GET',
+    mode: 'cors',
+    cache: 'default',
+    credentials: 'omit',
+    redirect: 'follow',
+    referrerPolicy: 'no-referrer',
+};
+
 export class AudioDownloader {
     /**
-     * @param {{requestBuilder: RequestBuilder}} details
+     * @param {RequestBuilder} requestBuilder
      */
-    constructor({requestBuilder}) {
+    constructor(requestBuilder) {
         /** @type {RequestBuilder} */
         this._requestBuilder = requestBuilder;
         /** @type {?JsonSchema} */
@@ -37,26 +47,31 @@ export class AudioDownloader {
         /** @type {Map<import('settings').AudioSourceType, import('audio-downloader').GetInfoHandler>} */
         this._getInfoHandlers = new Map(/** @type {[name: import('settings').AudioSourceType, handler: import('audio-downloader').GetInfoHandler][]} */ ([
             ['jpod101', this._getInfoJpod101.bind(this)],
-            ['jpod101-alternate', this._getInfoJpod101Alternate.bind(this)],
+            ['language-pod-101', this._getInfoLanguagePod101.bind(this)],
             ['jisho', this._getInfoJisho.bind(this)],
+            ['lingua-libre', this._getInfoLinguaLibre.bind(this)],
+            ['wiktionary', this._getInfoWiktionary.bind(this)],
             ['text-to-speech', this._getInfoTextToSpeech.bind(this)],
             ['text-to-speech-reading', this._getInfoTextToSpeechReading.bind(this)],
             ['custom', this._getInfoCustom.bind(this)],
-            ['custom-json', this._getInfoCustomJson.bind(this)]
+            ['custom-json', this._getInfoCustomJson.bind(this)],
         ]));
+        /** @type {Intl.DisplayNames} */
+        this._regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
     }
 
     /**
      * @param {import('audio').AudioSourceInfo} source
      * @param {string} term
      * @param {string} reading
+     * @param {import('language').LanguageSummary} languageSummary
      * @returns {Promise<import('audio-downloader').Info[]>}
      */
-    async getTermAudioInfoList(source, term, reading) {
+    async getTermAudioInfoList(source, term, reading, languageSummary) {
         const handler = this._getInfoHandlers.get(source.type);
         if (typeof handler === 'function') {
             try {
-                return await handler(term, reading, source);
+                return await handler(term, reading, source, languageSummary);
             } catch (e) {
                 // NOP
             }
@@ -70,12 +85,14 @@ export class AudioDownloader {
      * @param {string} term
      * @param {string} reading
      * @param {?number} idleTimeout
+     * @param {import('language').LanguageSummary} languageSummary
      * @returns {Promise<import('audio-downloader').AudioBinaryBase64>}
      */
-    async downloadTermAudio(sources, preferredAudioIndex, term, reading, idleTimeout) {
+    async downloadTermAudio(sources, preferredAudioIndex, term, reading, idleTimeout, languageSummary) {
         const errors = [];
-        for (const source of sources) {
-            let infoList = await this.getTermAudioInfoList(source, term, reading);
+        const requiredAudioSources = this._getRequiredAudioSources(languageSummary.iso, sources);
+        for (const source of [...sources, ...requiredAudioSources]) {
+            let infoList = await this.getTermAudioInfoList(source, term, reading, languageSummary);
             if (typeof preferredAudioIndex === 'number') {
                 infoList = (preferredAudioIndex >= 0 && preferredAudioIndex < infoList.length ? [infoList[preferredAudioIndex]] : []);
             }
@@ -98,6 +115,32 @@ export class AudioDownloader {
     }
 
     // Private
+
+    /**
+     * @param {string} language
+     * @param {import('audio').AudioSourceInfo[]} sources
+     * @returns {import('audio').AudioSourceInfo[]}
+     */
+    _getRequiredAudioSources(language, sources) {
+        /** @type {Set<import('settings').AudioSourceType>} */
+        const requiredSources = language === 'ja' ?
+            new Set([
+                'jpod101',
+                'language-pod-101',
+                'jisho',
+            ]) :
+            new Set([
+                'lingua-libre',
+                'language-pod-101',
+                'wiktionary',
+            ]);
+
+        for (const {type} of sources) {
+            requiredSources.delete(type);
+        }
+
+        return [...requiredSources].map((type) => ({type, url: '', voice: ''}));
+    }
 
     /**
      * @param {string} url
@@ -128,29 +171,29 @@ export class AudioDownloader {
     }
 
     /** @type {import('audio-downloader').GetInfoHandler} */
-    async _getInfoJpod101Alternate(term, reading) {
-        const fetchUrl = 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post';
+    async _getInfoLanguagePod101(term, reading, _details, languageSummary) {
+        const {name: language} = languageSummary;
+
+        const fetchUrl = this._getLanguagePod101FetchUrl(language);
         const data = new URLSearchParams({
             post: 'dictionary_reference',
             match_type: 'exact',
             search_query: term,
-            vulgar: 'true'
+            vulgar: 'true',
         });
         const response = await this._requestBuilder.fetchAnonymous(fetchUrl, {
+            ...DEFAULT_REQUEST_INIT_PARAMS,
             method: 'POST',
-            mode: 'cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: data
+            body: data,
         });
         const responseText = await response.text();
 
         const dom = this._createSimpleDOMParser(responseText);
+        /** @type {Set<string>} */
+        const urls = new Set();
         for (const row of dom.getElementsByClassName('dc-result-row')) {
             try {
                 const audio = dom.getElementByTagName('audio', row);
@@ -162,33 +205,107 @@ export class AudioDownloader {
                 let url = dom.getAttribute(source, 'src');
                 if (url === null) { continue; }
 
-                const htmlReadings = dom.getElementsByClassName('dc-vocab_kana');
-                if (htmlReadings.length === 0) { continue; }
-
-                const htmlReading = dom.getTextContent(htmlReadings[0]);
-                if (htmlReading && (reading === term || reading === htmlReading)) {
-                    url = this._normalizeUrl(url, response.url);
-                    return [{type: 'url', url}];
-                }
+                if (!this._validateLanguagePod101Row(language, dom, row, term, reading)) { continue; }
+                url = this._normalizeUrl(url, response.url);
+                urls.add(url);
             } catch (e) {
                 // NOP
             }
         }
+        return [...urls].map((url) => ({type: 'url', url}));
+    }
 
-        throw new Error('Failed to find audio URL');
+    /**
+     * @param {string} language
+     * @param {import('simple-dom-parser').ISimpleDomParser} dom
+     * @param {import('simple-dom-parser').Element} row
+     * @param {string} term
+     * @param {string} reading
+     * @returns {boolean}
+     */
+    _validateLanguagePod101Row(language, dom, row, term, reading) {
+        switch (language) {
+            case 'Japanese': {
+                const htmlReadings = dom.getElementsByClassName('dc-vocab_kana', row);
+                if (htmlReadings.length === 0) { return false; }
+
+                const htmlReading = dom.getTextContent(htmlReadings[0]);
+                if (!htmlReading) { return false; }
+                if (reading !== term && reading !== htmlReading) { return false; }
+            } break;
+            default: {
+                const vocab = dom.getElementsByClassName('dc-vocab', row);
+                if (vocab.length === 0) { return false; }
+
+                if (term !== dom.getTextContent(vocab[0])) { return false; }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param {string} language
+     * @returns {string}
+     */
+    _getLanguagePod101FetchUrl(language) {
+        const podOrClass = this._getLanguagePod101PodOrClass(language);
+        const lowerCaseLanguage = language.toLowerCase();
+        return `https://www.${lowerCaseLanguage}${podOrClass}101.com/learningcenter/reference/dictionary_post`;
+    }
+
+    /**
+     * - https://languagepod101.com/
+     * @param {string} language
+     * @returns {'pod'|'class'}
+     * @throws {Error}
+     */
+    _getLanguagePod101PodOrClass(language) {
+        switch (language) {
+            case 'Afrikaans':
+            case 'Arabic':
+            case 'Bulgarian':
+            case 'Dutch':
+            case 'Filipino':
+            case 'Finnish':
+            case 'French':
+            case 'German':
+            case 'Greek':
+            case 'Hebrew':
+            case 'Hindi':
+            case 'Hungarian':
+            case 'Indonesian':
+            case 'Italian':
+            case 'Japanese':
+            case 'Persian':
+            case 'Polish':
+            case 'Portuguese':
+            case 'Romanian':
+            case 'Russian':
+            case 'Spanish':
+            case 'Swahili':
+            case 'Swedish':
+            case 'Thai':
+            case 'Urdu':
+            case 'Vietnamese':
+                return 'pod';
+            case 'Cantonese':
+            case 'Chinese':
+            case 'Czech':
+            case 'Danish':
+            case 'English':
+            case 'Korean':
+            case 'Norwegian':
+            case 'Turkish':
+                return 'class';
+            default:
+                throw new Error('Invalid language for LanguagePod101');
+        }
     }
 
     /** @type {import('audio-downloader').GetInfoHandler} */
     async _getInfoJisho(term, reading) {
         const fetchUrl = `https://jisho.org/search/${term}`;
-        const response = await this._requestBuilder.fetchAnonymous(fetchUrl, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
+        const response = await this._requestBuilder.fetchAnonymous(fetchUrl, DEFAULT_REQUEST_INIT_PARAMS);
         const responseText = await response.text();
 
         const dom = this._createSimpleDOMParser(responseText);
@@ -209,6 +326,98 @@ export class AudioDownloader {
         }
 
         throw new Error('Failed to find audio URL');
+    }
+
+    /** @type {import('audio-downloader').GetInfoHandler} */
+    async _getInfoLinguaLibre(term, _reading, _details, languageSummary) {
+        if (typeof languageSummary !== 'object' || languageSummary === null) {
+            throw new Error('Invalid arguments');
+        }
+        const {iso639_3} = languageSummary;
+        const searchCategory = `incategory:"Lingua_Libre_pronunciation-${iso639_3}"`;
+        const searchString = `-${term}.wav`;
+        const fetchUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&list=search&srsearch=intitle:/${searchString}/i+${searchCategory}&srnamespace=6&origin=*`;
+
+        /**
+         * @param {string} filename
+         * @param {string} fileUser
+         * @returns {boolean}
+         */
+        const validateFilename = (filename, fileUser) => {
+            const validFilenameTest = new RegExp(`^File:LL-Q\\d+\\s+\\(${iso639_3}\\)-${fileUser}-${term}\\.wav$`, 'i');
+            return validFilenameTest.test(filename);
+        };
+
+        return await this._getInfoWikimediaCommons(fetchUrl, validateFilename);
+    }
+
+    /** @type {import('audio-downloader').GetInfoHandler} */
+    async _getInfoWiktionary(term, _reading, _details, languageSummary) {
+        if (typeof languageSummary !== 'object' || languageSummary === null) {
+            throw new Error('Invalid arguments');
+        }
+        const {iso} = languageSummary;
+        const searchString = `${iso}(-[a-zA-Z]{2})?-${term}[0123456789]*.ogg`;
+        const fetchUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&list=search&srsearch=intitle:/${searchString}/i&srnamespace=6&origin=*`;
+
+        /**
+         * @param {string} filename
+         * @returns {boolean}
+         */
+        const validateFilename = (filename) => {
+            const validFilenameTest = new RegExp(`^File:${iso}(-\\w\\w)?-${term}\\d*\\.ogg$`, 'i');
+            return validFilenameTest.test(filename);
+        };
+
+        /**
+         * @param {string} filename
+         * @param {string} fileUser
+         * @returns {string}
+         */
+        const displayName = (filename, fileUser) => {
+            const match = filename.match(new RegExp(`^File:${iso}(-\\w\\w)-${term}`, 'i'));
+            if (match === null) {
+                return fileUser;
+            }
+            const region = match[1].substring(1).toUpperCase();
+            const regionName = this._regionNames.of(region);
+            return `(${regionName}) ${fileUser}`;
+        };
+
+        return await this._getInfoWikimediaCommons(fetchUrl, validateFilename, displayName);
+    }
+
+    /**
+     * @param {string} fetchUrl
+     * @param {(filename: string, fileUser: string) => boolean} validateFilename
+     * @param {(filename: string, fileUser: string) => string} [displayName]
+     * @returns {Promise<import('audio-downloader').Info1[]>}
+     */
+    async _getInfoWikimediaCommons(fetchUrl, validateFilename, displayName = (_filename, fileUser) => fileUser) {
+        const response = await this._requestBuilder.fetchAnonymous(fetchUrl, DEFAULT_REQUEST_INIT_PARAMS);
+
+        /** @type {import('audio-downloader').WikimediaCommonsLookupResponse} */
+        const lookupResponse = await readResponseJson(response);
+        const lookupResults = lookupResponse.query.search;
+
+        const fetchFileInfos = lookupResults.map(async ({title}) => {
+            const fileInfoURL = `https://commons.wikimedia.org/w/api.php?action=query&format=json&titles=${title}&prop=imageinfo&iiprop=user|url&origin=*`;
+            const response2 = await this._requestBuilder.fetchAnonymous(fileInfoURL, DEFAULT_REQUEST_INIT_PARAMS);
+            /** @type {import('audio-downloader').WikimediaCommonsFileResponse} */
+            const fileResponse = await readResponseJson(response2);
+            const fileResults = fileResponse.query.pages;
+            const results = [];
+            for (const page of Object.values(fileResults)) {
+                const fileUrl = page.imageinfo[0].url;
+                const fileUser = page.imageinfo[0].user;
+                if (validateFilename(title, fileUser)) {
+                    results.push({type: 'url', url: fileUrl, name: displayName(title, fileUser)});
+                }
+            }
+            return /** @type {import('audio-downloader').Info1[]} */ (results);
+        });
+
+        return (await Promise.all(fetchFileInfos)).flat();
     }
 
     /** @type {import('audio-downloader').GetInfoHandler} */
@@ -259,14 +468,7 @@ export class AudioDownloader {
         }
         url = this._getCustomUrl(term, reading, url);
 
-        const response = await this._requestBuilder.fetchAnonymous(url, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
+        const response = await this._requestBuilder.fetchAnonymous(url, DEFAULT_REQUEST_INIT_PARAMS);
 
         if (!response.ok) {
             throw new Error(`Invalid response: ${response.status}`);
@@ -304,7 +506,17 @@ export class AudioDownloader {
             throw new Error('No custom URL defined');
         }
         const data = {term, reading};
-        return url.replace(/\{([^}]*)\}/g, (m0, m1) => (Object.prototype.hasOwnProperty.call(data, m1) ? `${data[/** @type {'term'|'reading'} */ (m1)]}` : m0));
+        /**
+         * @param {string} m0
+         * @param {string} m1
+         * @returns {string}
+         */
+        const replacer = (m0, m1) => (
+            Object.prototype.hasOwnProperty.call(data, m1) ?
+            `${data[/** @type {'term'|'reading'} */ (m1)]}` :
+            m0
+        );
+        return url.replace(/\{([^}]*)\}/g, replacer);
     }
 
     /**
@@ -335,13 +547,8 @@ export class AudioDownloader {
         }
 
         const response = await this._requestBuilder.fetchAnonymous(url, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer',
-            signal
+            ...DEFAULT_REQUEST_INIT_PARAMS,
+            signal,
         });
 
         if (!response.ok) {
@@ -419,12 +626,8 @@ export class AudioDownloader {
     async _getCustomAudioListSchema() {
         const url = chrome.runtime.getURL('/data/schemas/custom-audio-list-schema.json');
         const response = await fetch(url, {
-            method: 'GET',
+            ...DEFAULT_REQUEST_INIT_PARAMS,
             mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
         });
         return await readResponseJson(response);
     }

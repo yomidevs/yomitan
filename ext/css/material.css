@@ -136,7 +136,7 @@
     --background-color-light: #0a0a0a;
     --background-color-dark1: #333333;
 
-    --shadow-color: rgba(255, 255, 255, 0.185);
+    --shadow-color: rgba(105, 105, 105, 0.185);
     --shadow-color-off: rgba(255, 255, 255, 0);
     --shadow-color-light: rgba(255, 255, 255, 0.085);
 
@@ -210,7 +210,9 @@ body {
 .danger-text {
     color: var(--danger-color);
 }
-
+.success-text {
+    color: var(--success-color);
+}
 
 /* Icons */
 .icon {
@@ -268,14 +270,18 @@ body {
 .icon[data-icon=question-mark-thick]     { --icon-image: url(/images/question-mark-thick.svg); }
 .icon[data-icon=left-chevron]            { --icon-image: url(/images/left-chevron.svg); }
 .icon[data-icon=right-chevron]           { --icon-image: url(/images/right-chevron.svg); }
+.icon[data-icon=up-chevron]              { --icon-image: url(/images/up-chevron.svg); }
+.icon[data-icon=down-chevron]            { --icon-image: url(/images/down-chevron.svg); }
 .icon[data-icon=double-down-chevron]     { --icon-image: url(/images/double-down-chevron.svg); }
 .icon[data-icon=plus-thick]              { --icon-image: url(/images/plus-thick.svg); }
 .icon[data-icon=clipboard]               { --icon-image: url(/images/clipboard.svg); }
 .icon[data-icon=key]                     { --icon-image: url(/images/key.svg); }
 .icon[data-icon=tag]                     { --icon-image: url(/images/tag.svg); }
+.icon[data-icon=flag]                    { --icon-image: url(/images/flag.svg); }
 .icon[data-icon=accessibility]           { --icon-image: url(/images/accessibility.svg); }
 .icon[data-icon=connection]              { --icon-image: url(/images/connection.svg); }
 .icon[data-icon=external-link]           { --icon-image: url(/images/external-link.svg); }
+.icon[data-icon=monitor]                 { --icon-image: url(/images/monitor.svg); }
 .icon[data-icon=material-down-arrow] {
     --icon-image: url(/images/material-down-arrow.svg);
     --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1);
@@ -1235,7 +1241,7 @@ button.icon-button>.icon-button-inner {
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: 101;
+    z-index: 1001;
     outline: none;
     overflow: hidden;
 }

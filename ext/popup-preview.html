@@ -13,6 +13,7 @@
     <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
     <link rel="stylesheet" type="text/css" href="/css/popup-preview.css">
     <link rel="stylesheet" type="text/css" href="/css/popup-outer.css" id="popup-outer-css">
+    <script src="/js/pages/settings/popup-preview-frame-main.js" type="module"></script>
 </head>
 <body>
 
@@ -20,12 +21,9 @@
     <div class="top-options">
         <div class="top-options-left">
             <div class="example-text-container">
-                <input type="text" class="example-text example-text-input" id="example-text-input" value="読め" lang="ja" hidden>
-                <span class="example-text" id="example-text">読め</span>
+                <input type="text" class="example-text example-text-input" id="example-text-input" hidden>
+                <span class="example-text" id="example-text"></span>
             </div>
-        </div>
-        <div class="top-options-right">
-            <label class="theme-button"><input type="checkbox" id="theme-dark-checkbox"><span>dark</span></label>
         </div>
     </div>
     <div class="popup-placeholder"><div class="placeholder-info">
@@ -33,9 +31,6 @@
         If you see this message, make sure you have a dictionary installed.
     </div></div>
 </div></div>
-
-<!-- Scripts -->
-<script src="/js/pages/settings/popup-preview-frame-main.js" type="module"></script>
 
 </body>
 </html>

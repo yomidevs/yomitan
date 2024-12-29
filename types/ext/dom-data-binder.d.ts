@@ -38,20 +38,12 @@ export type SetValuesDetails<T = unknown> = {
 
 export type OnErrorCallback<T = unknown> = (error: Error, stale: boolean, element: Element, metadata: T) => void;
 
-export type ConstructorDetails<T = unknown> = {
-    selector: string;
-    createElementMetadata: CreateElementMetadataCallback<T>;
-    compareElementMetadata: CompareElementMetadataCallback<T>;
-    getValues: GetValuesCallback<T>;
-    setValues: SetValuesCallback<T>;
-    onError?: OnErrorCallback<T> | null;
-};
-
 export type ElementObserver<T = unknown> = {
     element: Element;
     type: NormalizedElementType;
     value: unknown;
     hasValue: boolean;
+    eventType: EventType;
     onChange: null | (() => void);
     metadata: T;
 };
@@ -62,7 +54,9 @@ export type SettingChangedEventData = {
 
 export type SettingChangedEvent = CustomEvent<SettingChangedEventData>;
 
-export type NormalizedElementType = 'textarea' | 'select' | 'text' | 'checkbox' | 'number' | null;
+export type NormalizedElementType = 'textarea' | 'select' | 'text' | 'checkbox' | 'number' | 'element';
+
+export type EventType = 'change';
 
 export type UpdateTaskValue = {all: boolean};
 

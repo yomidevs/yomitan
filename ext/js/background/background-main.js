@@ -16,15 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {log} from '../core/log.js';
 import {WebExtension} from '../extension/web-extension.js';
 import {Backend} from './backend.js';
 
 /** Entry point. */
 async function main() {
     const webExtension = new WebExtension();
+    log.configure(webExtension.extensionName);
 
     const backend = new Backend(webExtension);
     await backend.prepare();
 }
 
-main();
+void main();

@@ -17,14 +17,23 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
+import {log} from '../core/log.js';
 
 export class API {
     /**
      * @param {import('../extension/web-extension.js').WebExtension} webExtension
+     * @param {Worker?} mediaDrawingWorker
+     * @param {MessagePort?} backendPort
      */
-    constructor(webExtension) {
+    constructor(webExtension, mediaDrawingWorker = null, backendPort = null) {
         /** @type {import('../extension/web-extension.js').WebExtension} */
         this._webExtension = webExtension;
+
+        /** @type {Worker?} */
+        this._mediaDrawingWorker = mediaDrawingWorker;
+
+        /** @type {MessagePort?} */
+        this._backendPort = backendPort;
     }
 
     /**
@@ -96,6 +105,14 @@ export class API {
     }
 
     /**
+     * @param {import('api').ApiParam<'updateAnkiNote', 'noteWithId'>} noteWithId
+     * @returns {Promise<import('api').ApiReturn<'updateAnkiNote'>>}
+     */
+    updateAnkiNote(noteWithId) {
+        return this._invoke('updateAnkiNote', {noteWithId});
+    }
+
+    /**
      * @param {import('api').ApiParam<'getAnkiNoteInfo', 'notes'>} notes
      * @param {import('api').ApiParam<'getAnkiNoteInfo', 'fetchAdditionalInfo'>} fetchAdditionalInfo
      * @returns {Promise<import('api').ApiReturn<'getAnkiNoteInfo'>>}
@@ -118,13 +135,13 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'noteView', 'noteId'>} noteId
-     * @param {import('api').ApiParam<'noteView', 'mode'>} mode
-     * @param {import('api').ApiParam<'noteView', 'allowFallback'>} allowFallback
-     * @returns {Promise<import('api').ApiReturn<'noteView'>>}
+     * @param {import('api').ApiParam<'viewNotes', 'noteIds'>} noteIds
+     * @param {import('api').ApiParam<'viewNotes', 'mode'>} mode
+     * @param {import('api').ApiParam<'viewNotes', 'allowFallback'>} allowFallback
+     * @returns {Promise<import('api').ApiReturn<'viewNotes'>>}
      */
-    noteView(noteId, mode, allowFallback) {
-        return this._invoke('noteView', {noteId, mode, allowFallback});
+    viewNotes(noteIds, mode, allowFallback) {
+        return this._invoke('viewNotes', {noteIds, mode, allowFallback});
     }
 
     /**
@@ -139,10 +156,11 @@ export class API {
      * @param {import('api').ApiParam<'getTermAudioInfoList', 'source'>} source
      * @param {import('api').ApiParam<'getTermAudioInfoList', 'term'>} term
      * @param {import('api').ApiParam<'getTermAudioInfoList', 'reading'>} reading
+     * @param {import('api').ApiParam<'getTermAudioInfoList', 'languageSummary'>} languageSummary
      * @returns {Promise<import('api').ApiReturn<'getTermAudioInfoList'>>}
      */
-    getTermAudioInfoList(source, term, reading) {
-        return this._invoke('getTermAudioInfoList', {source, term, reading});
+    getTermAudioInfoList(source, term, reading, languageSummary) {
+        return this._invoke('getTermAudioInfoList', {source, term, reading, languageSummary});
     }
 
     /**
@@ -210,13 +228,6 @@ export class API {
     }
 
     /**
-     * @returns {Promise<import('api').ApiReturn<'getDisplayTemplatesHtml'>>}
-     */
-    getDisplayTemplatesHtml() {
-        return this._invoke('getDisplayTemplatesHtml', void 0);
-    }
-
-    /**
      * @returns {Promise<import('api').ApiReturn<'getZoom'>>}
      */
     getZoom() {
@@ -253,13 +264,21 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'log', 'error'>} error
-     * @param {import('api').ApiParam<'log', 'level'>} level
-     * @param {import('api').ApiParam<'log', 'context'>} context
-     * @returns {Promise<import('api').ApiReturn<'log'>>}
+     * @param {import('api').PmApiParam<'drawMedia', 'requests'>} requests
+     * @param {Transferable[]} transferables
      */
-    log(error, level, context) {
-        return this._invoke('log', {error, level, context});
+    drawMedia(requests, transferables) {
+        this._mediaDrawingWorker?.postMessage({action: 'drawMedia', params: {requests}}, transferables);
+    }
+
+    /**
+     * @param {import('api').ApiParam<'logGenericErrorBackend', 'error'>} error
+     * @param {import('api').ApiParam<'logGenericErrorBackend', 'level'>} level
+     * @param {import('api').ApiParam<'logGenericErrorBackend', 'context'>} context
+     * @returns {Promise<import('api').ApiReturn<'logGenericErrorBackend'>>}
+     */
+    logGenericErrorBackend(error, level, context) {
+        return this._invoke('logGenericErrorBackend', {error, level, context});
     }
 
     /**
@@ -328,11 +347,12 @@ export class API {
     }
 
     /**
-     * @param {import('api').ApiParam<'textHasJapaneseCharacters', 'text'>} text
-     * @returns {Promise<import('api').ApiReturn<'textHasJapaneseCharacters'>>}
+     * @param {import('api').ApiParam<'isTextLookupWorthy', 'text'>} text
+     * @param {import('api').ApiParam<'isTextLookupWorthy', 'language'>} language
+     * @returns {Promise<import('api').ApiReturn<'isTextLookupWorthy'>>}
      */
-    textHasJapaneseCharacters(text) {
-        return this._invoke('textHasJapaneseCharacters', {text});
+    isTextLookupWorthy(text, language) {
+        return this._invoke('isTextLookupWorthy', {text, language});
     }
 
     /**
@@ -361,6 +381,27 @@ export class API {
         return this._invoke('openCrossFramePort', {targetTabId, targetFrameId});
     }
 
+    /**
+     * @param {Transferable[]} transferables
+     */
+    registerOffscreenPort(transferables) {
+        this._pmInvoke('registerOffscreenPort', void 0, transferables);
+    }
+
+    /**
+     * @param {MessagePort} port
+     */
+    connectToDatabaseWorker(port) {
+        this._pmInvoke('connectToDatabaseWorker', void 0, [port]);
+    }
+
+    /**
+     * @returns {Promise<import('api').ApiReturn<'getLanguageSummaries'>>}
+     */
+    getLanguageSummaries() {
+        return this._invoke('getLanguageSummaries', void 0);
+    }
+
     // Utilities
 
     /**
@@ -380,13 +421,13 @@ export class API {
                     if (response !== null && typeof response === 'object') {
                         const {error} = /** @type {import('core').UnknownObject} */ (response);
                         if (typeof error !== 'undefined') {
-                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */ (error)));
+                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */(error)));
                         } else {
                             const {result} = /** @type {import('core').UnknownObject} */ (response);
-                            resolve(/** @type {import('api').ApiReturn<TAction>} */ (result));
+                            resolve(/** @type {import('api').ApiReturn<TAction>} */(result));
                         }
                     } else {
-                        const message = response === null ? 'Unexpected null response' : `Unexpected response of type ${typeof response}`;
+                        const message = response === null ? 'Unexpected null response. You may need to refresh the page.' : `Unexpected response of type ${typeof response}. You may need to refresh the page.`;
                         reject(new Error(`${message} (${JSON.stringify(data)})`));
                     }
                 });
@@ -394,5 +435,32 @@ export class API {
                 reject(e);
             }
         });
+    }
+
+    /**
+     * @template {import('api').PmApiNames} TAction
+     * @template {import('api').PmApiParams<TAction>} TParams
+     * @param {TAction} action
+     * @param {TParams} params
+     * @param {Transferable[]} transferables
+     */
+    _pmInvoke(action, params, transferables) {
+        // on firefox, there is no service worker, so we instead use a MessageChannel which is established
+        // via a handshake via a SharedWorker
+        if (!('serviceWorker' in navigator)) {
+            if (this._backendPort === null) {
+                log.error('no backend port available');
+                return;
+            }
+            this._backendPort.postMessage({action, params}, transferables);
+        } else {
+            void navigator.serviceWorker.ready.then((serviceWorkerRegistration) => {
+                if (serviceWorkerRegistration.active !== null) {
+                    serviceWorkerRegistration.active.postMessage({action, params}, transferables);
+                } else {
+                    log.error(`[${self.constructor.name}] no active service worker`);
+                }
+            });
+        }
     }
 }

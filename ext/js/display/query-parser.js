@@ -17,7 +17,8 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
-import {log} from '../core/logger.js';
+import {log} from '../core/log.js';
+import {trimTrailingWhitespacePlusSpace} from '../data/string-util.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, isStringEntirelyKana} from '../language/ja/japanese.js';
 import {TextScanner} from '../language/text-scanner.js';
@@ -27,9 +28,11 @@ import {TextScanner} from '../language/text-scanner.js';
  */
 export class QueryParser extends EventDispatcher {
     /**
-     * @param {import('display').QueryParserConstructorDetails} details
+     * @param {import('../comm/api.js').API} api
+     * @param {import('../dom/text-source-generator').TextSourceGenerator} textSourceGenerator
+     * @param {import('display').GetSearchContextCallback} getSearchContext
      */
-    constructor({api, getSearchContext, textSourceGenerator}) {
+    constructor(api, textSourceGenerator, getSearchContext) {
         super();
         /** @type {import('../comm/api.js').API} */
         this._api = api;
@@ -65,7 +68,7 @@ export class QueryParser extends EventDispatcher {
             searchTerms: true,
             searchKanji: false,
             searchOnClick: true,
-            textSourceGenerator
+            textSourceGenerator,
         });
         /** @type {?(import('../language/ja/japanese-wanakana.js'))} */
         this._japaneseWanakanaModule = null;
@@ -90,7 +93,7 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('display').QueryParserOptions} display
      */
-    setOptions({selectedParser, termSpacing, readingMode, useInternalParser, useMecabParser, scanning}) {
+    setOptions({selectedParser, termSpacing, readingMode, useInternalParser, useMecabParser, language, scanning}) {
         let selectedParserChanged = false;
         if (selectedParser === null || typeof selectedParser === 'string') {
             selectedParserChanged = (this._selectedParser !== selectedParser);
@@ -113,12 +116,15 @@ export class QueryParser extends EventDispatcher {
             if (typeof scanLength === 'number') {
                 this._scanLength = scanLength;
             }
+            this._textScanner.language = language;
             this._textScanner.setOptions(scanning);
         }
         this._textScanner.setEnabled(true);
         if (selectedParserChanged && this._parseResults.length > 0) {
             this._renderParseResult();
         }
+
+        this._queryParser.lang = language;
     }
 
     /**
@@ -128,6 +134,9 @@ export class QueryParser extends EventDispatcher {
         this._text = text;
         this._setPreview(text);
 
+        if (this._useInternalParser === false && this._useMecabParser === false) {
+            return;
+        }
         /** @type {?import('core').TokenObject} */
         const token = {};
         this._setTextToken = token;
@@ -150,7 +159,7 @@ export class QueryParser extends EventDispatcher {
     /**
      * @param {import('text-scanner').EventArgument<'searchSuccess'>} details
      */
-    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext}) {
+    _onSearchSuccess({type, dictionaryEntries, sentence, inputInfo, textSource, optionsContext, pageTheme}) {
         this.trigger('searched', {
             textScanner: this._textScanner,
             type,
@@ -159,7 +168,8 @@ export class QueryParser extends EventDispatcher {
             inputInfo,
             textSource,
             optionsContext,
-            sentenceOffset: this._getSentenceOffset(textSource)
+            sentenceOffset: this._getSentenceOffset(textSource),
+            pageTheme: pageTheme,
         });
     }
 
@@ -205,9 +215,9 @@ export class QueryParser extends EventDispatcher {
             path: 'parsing.selectedParser',
             value,
             scope: 'profile',
-            optionsContext
+            optionsContext,
         };
-        this._api.modifySettings([modification], 'search');
+        void this._api.modifySettings([modification], 'search');
     }
 
     /**
@@ -295,13 +305,14 @@ export class QueryParser extends EventDispatcher {
             termNode.className = 'query-parser-term';
             termNode.dataset.offset = `${offset}`;
             for (const {text, reading} of term) {
+                const trimmedText = trimTrailingWhitespacePlusSpace(text);
                 if (reading.length === 0) {
-                    termNode.appendChild(document.createTextNode(text));
+                    termNode.appendChild(document.createTextNode(trimmedText));
                 } else {
-                    const reading2 = this._convertReading(text, reading);
-                    termNode.appendChild(this._createSegment(text, reading2, offset));
+                    const reading2 = this._convertReading(trimmedText, reading);
+                    termNode.appendChild(this._createSegment(trimmedText, reading2, offset));
                 }
-                offset += text.length;
+                offset += trimmedText.length;
             }
             fragment.appendChild(termNode);
         }
@@ -410,6 +421,6 @@ export class QueryParser extends EventDispatcher {
     _loadJapaneseWanakanaModule() {
         if (this._japaneseWanakanaModuleImport !== null) { return; }
         this._japaneseWanakanaModuleImport = import('../language/ja/japanese-wanakana.js');
-        this._japaneseWanakanaModuleImport.then((value) => { this._japaneseWanakanaModule = value; });
+        void this._japaneseWanakanaModuleImport.then((value) => { this._japaneseWanakanaModule = value; });
     }
 }

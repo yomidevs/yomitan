@@ -16,14 +16,17 @@
  */
 
 export type Transform = {
+    id: string;
     name: string;
     rules: Rule[];
-    suffixHeuristic: RegExp;
+    heuristic: RegExp;
+    description?: string;
 };
 
 export type Rule = {
-    suffixIn: string;
-    suffixOut: string;
+    type: 'suffix' | 'prefix' | 'wholeWord' | 'other';
+    isInflected: RegExp;
+    deinflect: (inflectedWord: string) => string;
     conditionsIn: number;
     conditionsOut: number;
 };
@@ -37,6 +40,15 @@ export type TransformedText = {
 export type Trace = TraceFrame[];
 
 export type TraceFrame = {
+    text: string;
     transform: string;
     ruleIndex: number;
+};
+
+export type ConditionTypeToConditionFlagsMap = Map<string, number>;
+
+export type LanguageTransformDescriptorInternal = {
+    transforms: Transform[];
+    conditionTypeToConditionFlagsMap: ConditionTypeToConditionFlagsMap;
+    partOfSpeechToConditionFlagsMap: ConditionTypeToConditionFlagsMap;
 };

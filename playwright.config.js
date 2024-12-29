@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 // @ts-check
 import {defineConfig, devices} from '@playwright/test';
-
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -36,7 +36,7 @@ export default defineConfig({
          * Maximum time expect() should wait for the condition to be met.
          * For example in `await expect(locator).toHaveText();`
          */
-        timeout: 5000
+        timeout: 5000,
     },
     /* Run tests in files in parallel */
     fullyParallel: true,
@@ -47,7 +47,10 @@ export default defineConfig({
     /* Opt out of parallel tests on CI. */
     workers: process.env.CI ? 1 : void 0,
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-    reporter: 'html',
+    reporter: [
+        ['html'],
+        ['json', {outputFile: 'playwright-results.json'}],
+    ],
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {
         /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
@@ -56,7 +59,7 @@ export default defineConfig({
         // baseURL: 'http://localhost:3000',
 
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-        trace: 'on-first-retry'
+        trace: 'on-first-retry',
     },
 
     /* Configure projects for major browsers */
@@ -64,17 +67,20 @@ export default defineConfig({
         {
             name: 'playwright setup',
             testMatch: /global\.setup\.js/,
-            teardown: 'playwright teardown'
+            teardown: 'playwright teardown',
         },
         {
             name: 'playwright teardown',
-            testMatch: /global\.teardown\.js/
+            testMatch: /global\.teardown\.js/,
         },
         {
             name: 'chromium',
-            use: {...devices['Desktop Chrome']},
-            dependencies: ['playwright setup']
-        }
+            use: {
+                ...devices['Desktop Chrome'],
+                channel: 'chromium',
+            },
+            dependencies: ['playwright setup'],
+        },
 
         // {
         //   name: 'firefox',
@@ -105,7 +111,7 @@ export default defineConfig({
         //   name: 'Google Chrome',
         //   use: { channel: 'chrome' },
         // },
-    ]
+    ],
 
     /* Folder for test artifacts such as screenshots, videos, traces, etc. */
     // outputDir: 'test-results/',
@@ -116,4 +122,3 @@ export default defineConfig({
     //   port: 3000,
     // },
 });
-

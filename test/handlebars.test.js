@@ -18,16 +18,32 @@
 import {describe, test} from 'vitest';
 import {Handlebars} from '../ext/lib/handlebars.js';
 
+/**
+ * @param {string} template
+ * @returns {import('handlebars').TemplateDelegate<unknown>}
+ */
+function compile(template) {
+    return Handlebars.compile(template);
+}
+
+/**
+ * @param {string} template
+ * @returns {import('handlebars').TemplateDelegate<unknown>}
+ */
+function compileAST(template) {
+    return Handlebars.compileAST(template);
+}
+
 describe('Handlebars', () => {
     test('compile vs compileAST 1', ({expect}) => {
         const template = '{{~test1~}}';
 
         const data = {
-            test1: '<div style="font-size: 4em;">Test</div>'
+            test1: '<div style="font-size: 4em;">Test</div>',
         };
 
-        const instance1 = Handlebars.compile(template);
-        const instance2 = Handlebars.compileAST(template);
+        const instance1 = compile(template);
+        const instance2 = compileAST(template);
 
         const result1 = instance1(data);
         const result2 = instance2(data);
@@ -40,12 +56,12 @@ describe('Handlebars', () => {
 
         const data = {
             test1: {
-                test2: '<div style="font-size: 4em;">Test</div>'
-            }
+                test2: '<div style="font-size: 4em;">Test</div>',
+            },
         };
 
-        const instance1 = Handlebars.compile(template);
-        const instance2 = Handlebars.compileAST(template);
+        const instance1 = compile(template);
+        const instance2 = compileAST(template);
 
         const result1 = instance1(data);
         const result2 = instance2(data);

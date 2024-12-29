@@ -9,37 +9,105 @@
         "noImplicitAny": true,
         "strictPropertyInitialization": true,
         "suppressImplicitAnyIndexErrors": false,
-        "skipLibCheck": false,
+        "skipLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "anki-templates": ["../types/ext/anki-templates"],
-            "anki-templates-internal": ["../types/ext/anki-templates-internal"],
-            "cache-map": ["../types/ext/cache-map"],
-            "core": ["../types/ext/core"],
-            "css-style-applier": ["../types/ext/css-style-applier"],
-            "database": ["../types/ext/database"],
-            "dictionary": ["../types/ext/dictionary"],
-            "dictionary-data": ["../types/ext/dictionary-data"],
-            "dictionary-data-util": ["../types/ext/dictionary-data-util"],
-            "dictionary-database": ["../types/ext/dictionary-database"],
-            "dictionary-importer": ["../types/ext/dictionary-importer"],
-            "dictionary-importer-media-loader": ["../types/ext/dictionary-importer-media-loader"],
-            "dynamic-property": ["../types/ext/dynamic-property"],
-            "error": ["../types/ext/error"],
-            "event-listener-collection": ["../types/ext/event-listener-collection"],
-            "japanese-util": ["../types/ext/japanese-util"],
-            "ext/json-schema": ["../types/ext/json-schema"],
-            "language-transformer": ["../types/ext/language-transformer"],
-            "language-transformer-internal": ["../types/ext/language-transformer-internal"],
-            "log": ["../types/ext/log"],
-            "settings": ["../types/ext/settings"],
-            "structured-content": ["../types/ext/structured-content"],
-            "translator": ["../types/ext/translator"],
-            "translation": ["../types/ext/translation"],
-            "translation-internal": ["../types/ext/translation-internal"],
-            "dev/*": ["../types/dev/*"],
-            "rollup/parseAst": ["../types/other/rollup-parse-ast"],
-            "chai": ["../node_modules/@vitest/expect/dist/chai.d.cts"]
+            "api-map": [
+                "../types/ext/api-map"
+            ],
+            "anki-templates": [
+                "../types/ext/anki-templates"
+            ],
+            "anki-templates-internal": [
+                "../types/ext/anki-templates-internal"
+            ],
+            "cache-map": [
+                "../types/ext/cache-map"
+            ],
+            "core": [
+                "../types/ext/core"
+            ],
+            "css-style-applier": [
+                "../types/ext/css-style-applier"
+            ],
+            "database": [
+                "../types/ext/database"
+            ],
+            "dictionary": [
+                "../types/ext/dictionary"
+            ],
+            "dictionary-data": [
+                "../types/ext/dictionary-data"
+            ],
+            "dictionary-data-util": [
+                "../types/ext/dictionary-data-util"
+            ],
+            "dictionary-database": [
+                "../types/ext/dictionary-database"
+            ],
+            "dictionary-importer": [
+                "../types/ext/dictionary-importer"
+            ],
+            "dictionary-importer-media-loader": [
+                "../types/ext/dictionary-importer-media-loader"
+            ],
+            "dynamic-property": [
+                "../types/ext/dynamic-property"
+            ],
+            "error": [
+                "../types/ext/error"
+            ],
+            "event-listener-collection": [
+                "../types/ext/event-listener-collection"
+            ],
+            "japanese-util": [
+                "../types/ext/japanese-util"
+            ],
+            "language": [
+                "../types/ext/language"
+            ],
+            "language-descriptors": [
+                "../types/ext/language-descriptors"
+            ],
+            "CJK-util": [
+                "../types/ext/CJK-util"
+            ],
+            "ext/json-schema": [
+                "../types/ext/json-schema"
+            ],
+            "language-transformer": [
+                "../types/ext/language-transformer"
+            ],
+            "language-transformer-internal": [
+                "../types/ext/language-transformer-internal"
+            ],
+            "log": [
+                "../types/ext/log"
+            ],
+            "settings": [
+                "../types/ext/settings"
+            ],
+            "structured-content": [
+                "../types/ext/structured-content"
+            ],
+            "translator": [
+                "../types/ext/translator"
+            ],
+            "translation": [
+                "../types/ext/translation"
+            ],
+            "translation-internal": [
+                "../types/ext/translation-internal"
+            ],
+            "dev/*": [
+                "../types/dev/*"
+            ],
+            "rollup/parseAst": [
+                "../types/other/rollup-parse-ast"
+            ],
+            "chai": [
+                "../node_modules/@vitest/expect/dist/chai.d.cts"
+            ]
         },
         "types": [
             "node",
@@ -49,7 +117,14 @@
             "assert",
             "css",
             "chrome",
-            "ajv"
+            "ajv",
+            "dom-webcodecs"
+        ],
+        "lib": [
+            "ES2022",
+            "DOM",
+            "DOM.Iterable",
+            "WebWorker"
         ]
     },
     "include": [
@@ -61,7 +136,7 @@
         "../ext/js/data/database.js",
         "../ext/js/data/json-schema.js",
         "../ext/js/general/cache-map.js",
-        "../ext/js/data/sandbox/anki-note-data-creator.js",
+        "../ext/js/data/anki-note-data-creator.js",
         "../ext/js/general/cache-map.js",
         "../ext/js/general/regex-util.js",
         "../ext/js/general/text-source-map.js",
@@ -69,7 +144,7 @@
         "../ext/js/dictionary/dictionary-importer.js",
         "../ext/js/dictionary/dictionary-database.js",
         "../ext/js/dictionary/dictionary-data-util.js",
-        "../ext/js/language/sandbox/japanese-util.js",
+        "../ext/js/language/japanese-util.js",
         "../ext/js/language/translator.js",
         "../ext/js/media/media-util.js",
         "../types/dev/**/*.ts",

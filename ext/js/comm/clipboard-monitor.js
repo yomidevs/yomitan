@@ -17,16 +17,15 @@
  */
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
-import {isStringPartiallyJapanese} from '../language/ja/japanese.js';
 
 /**
  * @augments EventDispatcher<import('clipboard-monitor').Events>
  */
 export class ClipboardMonitor extends EventDispatcher {
     /**
-     * @param {{clipboardReader: import('clipboard-monitor').ClipboardReaderLike}} details
+     * @param {import('clipboard-monitor').ClipboardReaderLike} clipboardReader
      */
-    constructor({clipboardReader}) {
+    constructor(clipboardReader) {
         super();
         /** @type {import('clipboard-monitor').ClipboardReaderLike} */
         this._clipboardReader = clipboardReader;
@@ -71,7 +70,7 @@ export class ClipboardMonitor extends EventDispatcher {
                 text !== this._previousText
             ) {
                 this._previousText = text;
-                if (canChange && isStringPartiallyJapanese(text)) {
+                if (canChange) {
                     this.trigger('change', {text});
                 }
             }
@@ -82,7 +81,7 @@ export class ClipboardMonitor extends EventDispatcher {
 
         this._timerToken = token;
 
-        intervalCallback();
+        void intervalCallback();
     }
 
     /**

@@ -14,11 +14,12 @@
     <link rel="stylesheet" type="text/css" href="/css/material.css">
     <link rel="stylesheet" type="text/css" href="/css/settings.css">
     <link rel="stylesheet" type="text/css" href="/css/permissions.css">
+    <script src="/js/pages/permissions-main.js" type="module"></script>
 </head>
-<body>
+<body hidden>
 
 <!-- Main content -->
-<div class="content-outer"><div class="content">
+<div class="content-outer"><div class="content scrollbar">
 <div class="content-left"></div>
 <div class="content-center">
 
@@ -73,6 +74,14 @@
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
+                <div class="settings-item-label"><code>contextMenus</code></div>
+                <div class="settings-item-description">
+                    Yomitan adds a context menu interface that lets you look up highlighted words.
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
                 <div class="settings-item-label"><code>clipboardWrite</code></div>
                 <div class="settings-item-description">
                     Yomitan supports simulating the <code>Ctrl+C</code> (copy to clipboard) keyboard shortcut
@@ -115,8 +124,11 @@
                     <p>
                         When enabled, Yomitan is able to scan text and show definitions in private/incognito web browser windows.
                     </p>
-                    <p>
+                    <p data-hide-for-browser="firefox firefox-mobile">
                         This option can be configured from the web browser's <a tabindex="0" class="extension-settings-link" data-special-url="chrome://extensions/?id={id}">extension settings pages</a>.
+                    </p>
+                    <p data-show-for-browser="firefox firefox-mobile">
+                        This option can be configured from the web browser's extension settings pages. From your browser's address bar, go to <code>about:addons</code> and navigate to the settings for Yomitan.
                     </p>
                 </div>
             </div>
@@ -226,20 +238,6 @@
         <button type="button" class="low-emphasis" data-modal-action="hide">Close</button>
     </div>
 </div></div>
-
-<template id="permissions-origin-template">
-    <div class="permissions-origin-index generic-list-index-prefix"></div>
-    <input type="text" class="permissions-origin-input horizontal-flex-fill" autocomplete="off" spellcheck="false" readonly>
-    <button type="button" class="icon-button permissions-origin-menu-button permissions-origin-button" data-menu="permissions-origin-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
-</template>
-
-<template id="permissions-origin-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
-    <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
-</div></div></div></template>
-
-
-<!-- Scripts -->
-<script src="/js/pages/permissions-main.js" type="module"></script>
 
 </body>
 </html>

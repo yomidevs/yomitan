@@ -21,7 +21,7 @@ import {CrossFrameAPI} from './comm/cross-frame-api.js';
 import {createApiMap, invokeApiMapHandler} from './core/api-map.js';
 import {EventDispatcher} from './core/event-dispatcher.js';
 import {ExtensionError} from './core/extension-error.js';
-import {log} from './core/logger.js';
+import {log} from './core/log.js';
 import {deferPromise} from './core/utilities.js';
 import {WebExtension} from './extension/web-extension.js';
 
@@ -52,6 +52,41 @@ if (checkChromeNotAvailable()) {
 }
 
 /**
+ * @param {WebExtension} webExtension
+ */
+async function waitForBackendReady(webExtension) {
+    const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
+    /** @type {import('application').ApiMap} */
+    const apiMap = createApiMap([['applicationBackendReady', () => { resolve(); }]]);
+    /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
+    const onMessage = ({action, params}, _sender, callback) => invokeApiMapHandler(apiMap, action, params, [], callback);
+    chrome.runtime.onMessage.addListener(onMessage);
+    try {
+        await webExtension.sendMessagePromise({action: 'requestBackendReadySignal'});
+        await promise;
+    } finally {
+        chrome.runtime.onMessage.removeListener(onMessage);
+    }
+}
+
+/**
+ * @returns {Promise<void>}
+ */
+function waitForDomContentLoaded() {
+    return new Promise((resolve) => {
+        if (document.readyState !== 'loading') {
+            resolve();
+            return;
+        }
+        const onDomContentLoaded = () => {
+            document.removeEventListener('DOMContentLoaded', onDomContentLoaded);
+            resolve();
+        };
+        document.addEventListener('DOMContentLoaded', onDomContentLoaded);
+    });
+}
+
+/**
  * The Yomitan class is a core component through which various APIs are handled and invoked.
  * @augments EventDispatcher<import('application').Events>
  */
@@ -63,27 +98,8 @@ export class Application extends EventDispatcher {
      */
     constructor(api, crossFrameApi) {
         super();
-
         /** @type {WebExtension} */
         this._webExtension = new WebExtension();
-
-        /** @type {string} */
-        this._extensionName = 'Yomitan';
-        try {
-            const manifest = chrome.runtime.getManifest();
-            this._extensionName = `${manifest.name} v${manifest.version}`;
-        } catch (e) {
-            // NOP
-        }
-
-        /** @type {?string} */
-        this._extensionUrlBase = null;
-        try {
-            this._extensionUrlBase = this._webExtension.getUrl('/');
-        } catch (e) {
-            // NOP
-        }
-
         /** @type {?boolean} */
         this._isBackground = null;
         /** @type {API} */
@@ -92,7 +108,6 @@ export class Application extends EventDispatcher {
         this._crossFrame = crossFrameApi;
         /** @type {boolean} */
         this._isReady = false;
-
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {import('application').ApiMap} */
         this._apiMap = createApiMap([
@@ -100,7 +115,7 @@ export class Application extends EventDispatcher {
             ['applicationGetUrl',          this._onMessageGetUrl.bind(this)],
             ['applicationOptionsUpdated',  this._onMessageOptionsUpdated.bind(this)],
             ['applicationDatabaseUpdated', this._onMessageDatabaseUpdated.bind(this)],
-            ['applicationZoomChanged',     this._onMessageZoomChanged.bind(this)]
+            ['applicationZoomChanged',     this._onMessageZoomChanged.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -116,7 +131,6 @@ export class Application extends EventDispatcher {
      * @type {API}
      */
     get api() {
-        if (this._api === null) { throw new Error('Not prepared'); }
         return this._api;
     }
 
@@ -126,8 +140,21 @@ export class Application extends EventDispatcher {
      * @type {CrossFrameAPI}
      */
     get crossFrame() {
-        if (this._crossFrame === null) { throw new Error('Not prepared'); }
         return this._crossFrame;
+    }
+
+    /**
+     * @type {?number}
+     */
+    get tabId() {
+        return this._crossFrame.tabId;
+    }
+
+    /**
+     * @type {?number}
+     */
+    get frameId() {
+        return this._crossFrame.frameId;
     }
 
     /**
@@ -135,7 +162,7 @@ export class Application extends EventDispatcher {
      */
     prepare() {
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-        log.on('log', this._onForwardLog.bind(this));
+        log.on('logGenericError', this._onLogGenericError.bind(this));
     }
 
     /**
@@ -145,16 +172,7 @@ export class Application extends EventDispatcher {
     ready() {
         if (this._isReady) { return; }
         this._isReady = true;
-        this._webExtension.sendMessagePromise({action: 'applicationReady'});
-    }
-
-    /**
-     * Checks whether or not a URL is an extension URL.
-     * @param {string} url The URL to check.
-     * @returns {boolean} `true` if the URL is an extension URL, `false` otherwise.
-     */
-    isExtensionUrl(url) {
-        return this._extensionUrlBase !== null && url.startsWith(this._extensionUrlBase);
+        void this._webExtension.sendMessagePromise({action: 'applicationReady'});
     }
 
     /** */
@@ -168,41 +186,53 @@ export class Application extends EventDispatcher {
     }
 
     /**
+     * @param {boolean} waitForDom
      * @param {(application: Application) => (Promise<void>)} mainFunction
      */
-    static async main(mainFunction) {
+    static async main(waitForDom, mainFunction) {
+        const supportsServiceWorker = 'serviceWorker' in navigator; // Basically, all browsers except Firefox. But it's possible Firefox will support it in the future, so we check in this fashion to be future-proof.
+        const inExtensionContext = window.location.protocol === new URL(import.meta.url).protocol; // This code runs both in content script as well as in the iframe, so we need to differentiate the situation
+        /** @type {MessagePort | null} */
+        // If this is Firefox, we don't have a service worker and can't postMessage,
+        // so we temporarily create a SharedWorker in order to establish a MessageChannel
+        // which we can use to postMessage with the backend.
+        // This can only be done in the extension context (aka iframe within popup),
+        // not in the content script context.
+        const backendPort = !supportsServiceWorker && inExtensionContext ?
+            (() => {
+                const sharedWorkerBridge = new SharedWorker(new URL('comm/shared-worker-bridge.js', import.meta.url), {type: 'module'});
+                const backendChannel = new MessageChannel();
+                sharedWorkerBridge.port.postMessage({action: 'connectToBackend1'}, [backendChannel.port1]);
+                sharedWorkerBridge.port.close();
+                return backendChannel.port2;
+            })() :
+            null;
+
         const webExtension = new WebExtension();
-        const api = new API(webExtension);
-        await this.waitForBackendReady(webExtension);
-        const {tabId = null, frameId = null} = await api.frameInformationGet();
+        log.configure(webExtension.extensionName);
+
+        const mediaDrawingWorkerToBackendChannel = new MessageChannel();
+        const mediaDrawingWorker = inExtensionContext ? new Worker(new URL('display/media-drawing-worker.js', import.meta.url), {type: 'module'}) : null;
+        mediaDrawingWorker?.postMessage({action: 'connectToDatabaseWorker'}, [mediaDrawingWorkerToBackendChannel.port2]);
+
+        const api = new API(webExtension, mediaDrawingWorker, backendPort);
+        await waitForBackendReady(webExtension);
+        if (mediaDrawingWorker !== null) {
+            api.connectToDatabaseWorker(mediaDrawingWorkerToBackendChannel.port1);
+        }
+
+        const {tabId, frameId} = await api.frameInformationGet();
         const crossFrameApi = new CrossFrameAPI(api, tabId, frameId);
         crossFrameApi.prepare();
         const application = new Application(api, crossFrameApi);
         application.prepare();
+        if (waitForDom) { await waitForDomContentLoaded(); }
         try {
             await mainFunction(application);
         } catch (error) {
             log.error(error);
         } finally {
             application.ready();
-        }
-    }
-
-    /**
-     * @param {WebExtension} webExtension
-     */
-    static async waitForBackendReady(webExtension) {
-        const {promise, resolve} = /** @type {import('core').DeferredPromiseDetails<void>} */ (deferPromise());
-        /** @type {import('application').ApiMap} */
-        const apiMap = createApiMap([['applicationBackendReady', () => { resolve(); }]]);
-        /** @type {import('extension').ChromeRuntimeOnMessageCallback<import('application').ApiMessageAny>} */
-        const onMessage = ({action, params}, _sender, callback) => invokeApiMapHandler(apiMap, action, params, [], callback);
-        chrome.runtime.onMessage.addListener(onMessage);
-        try {
-            await webExtension.sendMessagePromise({action: 'requestBackendReadySignal'});
-            await promise;
-        } finally {
-            chrome.runtime.onMessage.removeListener(onMessage);
         }
     }
 
@@ -248,12 +278,11 @@ export class Application extends EventDispatcher {
     }
 
     /**
-     * @param {{error: unknown, level: import('log').LogLevel, context?: import('log').LogContext}} params
+     * @param {import('log').Events['logGenericError']} params
      */
-    async _onForwardLog({error, level, context}) {
+    async _onLogGenericError({error, level, context}) {
         try {
-            const api = /** @type {API} */ (this._api);
-            await api.log(ExtensionError.serialize(error), level, context);
+            await this._api.logGenericErrorBackend(ExtensionError.serialize(error), level, context);
         } catch (e) {
             // NOP
         }

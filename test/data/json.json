@@ -5,9 +5,10 @@
         {"path": "jsconfig.json", "ignore": true},
         {"path": ".stylelintrc.json", "ignore": true},
         {"path": ".htmlvalidate.json", "ignore": true},
-        {"path": ".eslintrc.json", "ignore": true},
         {"path": ".vscode/settings.json", "ignore": true},
         {"path": ".vscode/extensions.json", "ignore": true},
+        {"path": ".vscode/launch.json", "ignore": true},
+        {"path": ".github/actionlint-matcher.json", "ignore": true},
         {"path": "dev/jsconfig.json", "ignore": true},
         {"path": "ext/manifest.json", "ignore": true},
         {"path": "test/data/dictionaries/invalid-dictionary1/index.json", "ignore": true},
@@ -23,6 +24,8 @@
         {"path": "test/data/dictionaries/invalid-dictionary6/index.json", "ignore": true},
         {"path": "test/jsconfig.json", "ignore": true},
         {"path": "test/data/vitest.write.config.json", "ignore": true},
+        {"path": "test/data/vitest.options.config.json", "ignore": true},
+        {"path": "test/data/vitest.json.config.json", "ignore": true},
         {"path": "benches/jsconfig.json", "ignore": true},
 
         {
@@ -91,9 +94,14 @@
             "type": "AjvSchema"
         },
         {
-            "path": "ext/data/language/japanese-transforms.json",
-            "typeFile": "types/ext/language-transformer.d.ts",
-            "type": "LanguageTransformDescriptor"
+            "path": "ext/data/schemas/recommended-dictionaries-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
+        },
+        {
+            "path": "ext/data/schemas/recommended-settings-schema.json",
+            "typeFile": "types/test/json.d.ts",
+            "type": "AjvSchema"
         },
         {
             "path": "test/data/translator-test-inputs.json",
@@ -183,6 +191,18 @@
             "typeFile": "types/ext/dictionary-data.d.ts",
             "type": "TermMetaArray",
             "schema": "ext/data/schemas/dictionary-term-meta-bank-v3-schema.json"
+        },
+        {
+            "path": "ext/data/recommended-dictionaries.json",
+            "typeFile": "types/ext/dictionary-recommended.d.ts",
+            "type": "RecommendedDictionaries",
+            "schema": "ext/data/schemas/recommended-dictionaries-schema.json"
+        },
+        {
+            "path": "ext/data/recommended-settings.json",
+            "typeFile": "types/ext/settings-controller.d.ts",
+            "type": "RecommendedSettingsByLanguage",
+            "schema": "ext/data/schemas/recommended-settings-schema.json"
         }
     ]
 }

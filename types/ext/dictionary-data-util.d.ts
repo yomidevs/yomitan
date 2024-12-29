@@ -47,7 +47,9 @@ export type TermFrequenciesMap3 = Map<string, FrequencyData>;
 
 export type DictionaryFrequency<T = unknown> = {
     dictionary: string;
+    dictionaryAlias: string;
     frequencies: T[];
+    freqCount: number;
 };
 
 export type TermFrequency = {
@@ -79,6 +81,7 @@ export type GroupedPronunciation = {
 
 export type DictionaryGroupedPronunciations = {
     dictionary: string;
+    dictionaryAlias: string;
     pronunciations: GroupedPronunciation[];
 };
 

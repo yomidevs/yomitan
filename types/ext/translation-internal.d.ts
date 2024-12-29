@@ -18,6 +18,7 @@
 import type * as DictionaryDatabase from './dictionary-database';
 import type * as Dictionary from './dictionary';
 import type * as Translation from './translation';
+import type * as Language from './language';
 
 export type TextDeinflectionOptions = [
     textReplacements: Translation.FindTermsTextReplacement[] | null,
@@ -39,11 +40,46 @@ export type TextDeinflectionOptionsArrays = [
     emphatic: [collapseEmphatic: boolean, collapseEmphaticFull: boolean][],
 ];
 
+export type TextProcessorRuleChainCandidate = string[];
+
+export type VariantAndTextProcessorRuleChainCandidatesMap = Map<string, TextProcessorRuleChainCandidate[]>;
+
+export type TermDictionaryEntry = Omit<Dictionary.TermDictionaryEntry, 'inflectionRuleChainCandidates'> & {
+    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
+    textProcessorRuleChainCandidates: TextProcessorRuleChainCandidate[];
+};
+
+export type InflectionRuleChainCandidate = {
+    source: Dictionary.InflectionSource;
+    inflectionRules: string[];
+};
+
 export type DatabaseDeinflection = {
     originalText: string;
     transformedText: string;
     deinflectedText: string;
     conditions: number;
-    inflectionRuleChainCandidates: Dictionary.InflectionRuleChainCandidate[];
+    textProcessorRuleChainCandidates: TextProcessorRuleChainCandidate[];
+    inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
     databaseEntries: DictionaryDatabase.TermEntry[];
 };
+
+export type DictionaryEntryGroup = {
+    ids: Set<number>;
+    dictionaryEntries: TermDictionaryEntry[];
+};
+
+export type TextProcessorMap = Map<
+    string,
+    {
+        textPreprocessors: Language.TextProcessorWithId<unknown>[];
+        textPostprocessors: Language.TextProcessorWithId<unknown>[];
+    }
+>;
+
+export type ReadingNormalizerMap = Map<
+    string,
+    Language.ReadingNormalizer
+>;
+
+export type TextCache = Map<string, Map<string, Map<unknown, string>>>;

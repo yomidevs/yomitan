@@ -30,6 +30,10 @@ export type GetRangeFromPointOptions = {
      * Whether or not zoom coordinates should be normalized.
      */
     normalizeCssZoom: boolean;
+    /**
+     * ISO-639 code of the language.
+     */
+    language: string | null;
 };
 
 export type ToNumberConstraints = {

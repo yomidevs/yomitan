@@ -26,6 +26,7 @@ import type * as DictionaryDatabase from './dictionary-database';
 import type * as DictionaryImporter from './dictionary-importer';
 import type * as Environment from './environment';
 import type * as Extension from './extension';
+import type * as Language from './language';
 import type * as Log from './log';
 import type * as Settings from './settings';
 import type * as SettingsModifications from './settings-modifications';
@@ -47,6 +48,7 @@ import type {
 export type FindTermsDetails = {
     matchType?: Translation.FindTermsMatchType;
     deinflect?: boolean;
+    primaryReading?: string;
 };
 
 export type ParseTextResultItem = {
@@ -168,6 +170,12 @@ type ApiSurface = {
         };
         return: Anki.NoteId | null;
     };
+    updateAnkiNote: {
+        params: {
+            noteWithId: Anki.NoteWithId;
+        };
+        return: null;
+    };
     getAnkiNoteInfo: {
         params: {
             notes: Anki.Note[];
@@ -193,9 +201,9 @@ type ApiSurface = {
             errors: Core.SerializedError[];
         };
     };
-    noteView: {
+    viewNotes: {
         params: {
-            noteId: Anki.NoteId;
+            noteIds: Anki.NoteId[];
             mode: Settings.AnkiNoteGuiMode;
             allowFallback: boolean;
         };
@@ -212,6 +220,7 @@ type ApiSurface = {
             source: Audio.AudioSourceInfo;
             term: string;
             reading: string;
+            languageSummary: Language.LanguageSummary;
         };
         return: AudioDownloader.Info[];
     };
@@ -260,10 +269,6 @@ type ApiSurface = {
         params: void;
         return: string;
     };
-    getDisplayTemplatesHtml: {
-        params: void;
-        return: string;
-    };
     getZoom: {
         params: void;
         return: {
@@ -288,7 +293,7 @@ type ApiSurface = {
         };
         return: DictionaryDatabase.MediaDataStringContent[];
     };
-    log: {
+    logGenericErrorBackend: {
         params: {
             error: Core.SerializedError;
             level: Log.LogLevel;
@@ -347,9 +352,10 @@ type ApiSurface = {
         params: void;
         return: true;
     };
-    textHasJapaneseCharacters: {
+    isTextLookupWorthy: {
         params: {
             text: string;
+            language: string;
         };
         return: boolean;
     };
@@ -380,6 +386,10 @@ type ApiSurface = {
         params: void;
         return: boolean;
     };
+    getLanguageSummaries: {
+        params: void;
+        return: Language.LanguageSummary[];
+    };
 };
 
 type ApiExtraArgs = [sender: chrome.runtime.MessageSender];
@@ -407,4 +417,78 @@ export type ApiMessageAny = {[name in ApiNames]: ApiMessage<name>}[ApiNames];
 type ApiMessage<TName extends ApiNames> = {
     action: TName;
     params: ApiParams<TName>;
+};
+
+// postMessage API (i.e., API endpoints called via postMessage, either through ServiceWorker on Chrome or a MessageChannel port on Firefox)
+
+type PmApiSurface = {
+    drawMedia: {
+        params: {
+            requests: DrawMediaRequest[];
+        };
+        return: void;
+    };
+    connectToDatabaseWorker: {
+        params: void;
+        return: void;
+    };
+    drawBufferToCanvases: {
+        params: {
+            buffer: ArrayBuffer;
+            width: number;
+            height: number;
+            canvasIndexes: number[];
+            generation: number;
+        };
+        return: void;
+    };
+    drawDecodedImageToCanvases: {
+        params: {
+            decodedImage: VideoFrame | ImageBitmap;
+            canvasIndexes: number[];
+            generation: number;
+        };
+        return: void;
+    };
+    registerOffscreenPort: {
+        params: void;
+        return: void;
+    };
+    registerDatabasePort: {
+        params: void;
+        return: void;
+    };
+};
+
+type DrawMediaRequest = {
+    path: string;
+    dictionary: string;
+    canvas: OffscreenCanvas;
+};
+
+type PmApiExtraArgs = [ports: readonly MessagePort[] | null];
+
+export type PmApiNames = BaseApiNames<PmApiSurface>;
+
+export type PmApiMap = BaseApiMap<PmApiSurface, PmApiExtraArgs>;
+
+export type PmApiMapInit = BaseApiMapInit<PmApiSurface, PmApiExtraArgs>;
+
+export type PmApiHandler<TName extends PmApiNames> = BaseApiHandler<PmApiSurface[TName], PmApiExtraArgs>;
+
+export type PmApiHandlerNoExtraArgs<TName extends PmApiNames> = BaseApiHandler<PmApiSurface[TName], []>;
+
+export type PmApiParams<TName extends PmApiNames> = BaseApiParams<PmApiSurface[TName]>;
+
+export type PmApiParam<TName extends PmApiNames, TParamName extends BaseApiParamNames<PmApiSurface[TName]>> = BaseApiParam<PmApiSurface[TName], TParamName>;
+
+export type PmApiReturn<TName extends PmApiNames> = BaseApiReturn<PmApiSurface[TName]>;
+
+export type PmApiParamsAny = BaseApiParamsAny<PmApiSurface>;
+
+export type PmApiMessageAny = {[name in PmApiNames]: PmApiMessage<name>}[PmApiNames];
+
+type PmApiMessage<TName extends PmApiNames> = {
+    action: TName;
+    params: PmApiParams<TName>;
 };

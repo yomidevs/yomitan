@@ -7,7 +7,7 @@
                     "${title}",
                     {
                         "index": 0,
-                        "priority": 0
+                        "alias": "kanjiDictAlias"
                     }
                 ]
             ],
@@ -21,12 +21,7 @@
             "sortFrequencyDictionary": null,
             "sortFrequencyDictionaryOrder": "descending",
             "removeNonJapaneseCharacters": true,
-            "convertHalfWidthCharacters": "false",
-            "convertNumericCharacters": "false",
-            "convertAlphabeticCharacters": "false",
-            "convertHiraganaToKatakana": "false",
-            "convertKatakanaToHiragana": "false",
-            "collapseEmphaticSequences": "false",
+            "language": "ja",
             "textReplacements": [
                 null
             ],
@@ -35,7 +30,7 @@
                     "${title}",
                     {
                         "index": 0,
-                        "priority": 0,
+                        "alias": "termsDictAlias",
                         "allowSecondarySearches": false,
                         "partsOfSpeechFilter": true,
                         "useDeinflections": true
@@ -196,7 +191,7 @@
                         null,
                         [
                             {
-                                "pattern": "\\(([^)]*)(?:\\)|$)",
+                                "pattern": "\\(([^)]*)(?:\\))",
                                 "flags": "g",
                                 "replacement": ""
                             }
@@ -219,7 +214,7 @@
                         null,
                         [
                             {
-                                "pattern": "\\(([^)]*)(?:\\)|$)",
+                                "pattern": "\\(([^)]*)(?:\\))",
                                 "flags": "g",
                                 "replacement": "$1"
                             }
@@ -361,7 +356,7 @@
             "options": "default"
         },
         {
-            "name": "Test text transformations - convertNumericCharacters",
+            "name": "Test text preprocessors - convertNumericCharacters",
             "func": "findTerms",
             "mode": "split",
             "text": "39",
@@ -369,13 +364,38 @@
                 "default",
                 {
                     "type": "terms",
-                    "convertNumericCharacters": "true",
                     "removeNonJapaneseCharacters": false
                 }
             ]
         },
         {
-            "name": "Test text transformations - convertAlphabeticCharacters",
+            "name": "Test text preprocessors - alphabeticWidthVariants 1",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "Ｅｎｇｌｉｓｈ",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
+        },
+        {
+            "name": "Test text preprocessors - alphabeticWidthVariants 2",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "USB",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
+        },
+        {
+            "name": "Test text preprocessors - alphabeticToHiragana",
             "func": "findTerms",
             "mode": "split",
             "text": "utsu",
@@ -383,61 +403,138 @@
                 "default",
                 {
                     "type": "terms",
-                    "convertAlphabeticCharacters": "true",
                     "removeNonJapaneseCharacters": false
                 }
             ]
         },
         {
-            "name": "Test text transformations - convertKatakanaToHiragana",
+            "name": "Test text preprocessors - convertKatakanaToHiragana",
             "func": "findTerms",
             "mode": "split",
             "text": "ウツ",
             "options": [
                 "default",
                 {
-                    "type": "terms",
-                    "convertKatakanaToHiragana": "true"
+                    "type": "terms"
                 }
             ]
         },
         {
-            "name": "Test text transformations - convertHiraganaToKatakana",
+            "name": "Test text preprocessors - convertHiraganaToKatakana",
             "func": "findTerms",
             "mode": "split",
             "text": "てきすと",
             "options": [
                 "default",
                 {
-                    "type": "terms",
-                    "convertHiraganaToKatakana": "true"
+                    "type": "terms"
                 }
             ]
         },
         {
-            "name": "Test text transformations - convertHalfWidthCharacters, convertKatakanaToHiragana",
+            "name": "Test text preprocessors - convertHalfWidthCharacters, convertKatakanaToHiragana",
             "func": "findTerms",
             "mode": "split",
             "text": "ｳﾂ",
             "options": [
                 "default",
                 {
-                    "type": "terms",
-                    "convertHalfWidthCharacters": "true",
-                    "convertKatakanaToHiragana": "true"
+                    "type": "terms"
                 }
             ]
         },
         {
-            "name": "Test text transformations - collapseEmphaticSequences",
+            "name": "Test text preprocessors - collapseEmphaticSequences",
             "func": "findTerms",
             "mode": "split",
             "text": "すっっごーーい",
             "options": [
                 "default",
                 {
+                    "type": "terms"
+                }
+            ]
+        },
+        {
+            "name": "Test text preprocessors - capitalizeFirstLetter",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "english",
+            "options": [
+                "default",
+                {
                     "type": "terms",
-                    "collapseEmphaticSequences": "full"
+                    "language": "en",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
+        },
+        {
+            "name": "Test text preprocessors - decapitalize",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "LANGUAGE",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "language": "en",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
+        },
+        {
+            "name": "Test text postprocessing",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "마시거나",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "language": "ko",
+                    "removeNonJapaneseCharacters": false
+                }
+            ]
+        },
+        {
+            "name": "Test search resolution - word",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "english example",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "language": "en",
+                    "removeNonJapaneseCharacters": false,
+                    "searchResolution": "word"
+                }
+            ]
+        },
+        {
+            "name": "Find terms using primary reading 1",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "自重",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "primaryReading": "じちょう"
+                }
+            ]
+        },
+        {
+            "name": "Find terms using primary reading 2",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "自重",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "primaryReading": "じじゅう"
                 }
             ]
         }

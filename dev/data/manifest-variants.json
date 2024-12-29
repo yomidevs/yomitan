@@ -1,9 +1,9 @@
 {
     "manifest": {
         "manifest_version": 3,
-        "name": "Yomitan",
+        "name": "Yomitan Popup Dictionary",
         "version": "$YOMITAN_VERSION",
-        "description": "Japanese dictionary with Anki integration",
+        "description": "Popup dictionary for language learning",
         "author": {
             "email": "themoeway@googlegroups.com"
         },
@@ -64,7 +64,8 @@
             "unlimitedStorage",
             "declarativeNetRequest",
             "scripting",
-            "offscreen"
+            "offscreen",
+            "contextMenus"
         ],
         "optional_permissions": [
             "clipboardRead",
@@ -101,7 +102,8 @@
                 "resources": [
                     "popup.html",
                     "template-renderer.html",
-                    "js/*"
+                    "js/*",
+                    "lib/resvg.wasm"
                 ],
                 "matches": [
                     "<all_urls>"
@@ -109,7 +111,7 @@
             }
         ],
         "content_security_policy": {
-            "extension_pages": "default-src 'self'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *",
+            "extension_pages": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *",
             "sandbox": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'unsafe-inline'"
         }
     },
@@ -185,7 +187,7 @@
                     "path": [
                         "author"
                     ],
-                    "value": "TheMoeWay"
+                    "value": "Yomidevs"
                 },
                 {
                     "action": "delete",
@@ -237,7 +239,7 @@
                         "content_security_policy",
                         "extension_pages"
                     ],
-                    "value": "default-src 'self'; script-src 'self'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
+                    "value": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; img-src blob: 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
                 },
                 {
                     "action": "set",
@@ -308,7 +310,7 @@
                         "gecko",
                         "update_url"
                     ],
-                    "value": "https://raw.githubusercontent.com/themoeway/yomitan/metadata/updates.json"
+                    "value": "https://raw.githubusercontent.com/yomidevs/yomitan/metadata/updates.json"
                 }
             ],
             "excludeFiles": [
@@ -319,6 +321,11 @@
             ]
         },
         {
+            "name": "firefox-android",
+            "inherit": "firefox",
+            "fileName": "yomitan-firefox-android"
+        },
+        {
             "name": "safari",
             "modifications": [
                 {
@@ -326,7 +333,7 @@
                     "path": [
                         "author"
                     ],
-                    "value": "TheMoeWay"
+                    "value": "Yomidevs"
                 },
                 {
                     "action": "remove",
@@ -369,6 +376,14 @@
                 "offscreen.html",
                 "js/background/offscreen.js",
                 "js/background/offscreen-main.js"
+            ]
+        },
+        {
+            "name": "edge",
+            "inherit": "base",
+            "fileName": "yomitan-edge.zip",
+            "excludeFiles": [
+                "background.html"
             ]
         }
     ]

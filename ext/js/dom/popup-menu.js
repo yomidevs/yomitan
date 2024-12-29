@@ -89,7 +89,7 @@ export class PopupMenu extends EventDispatcher {
         this._sourceElement.dispatchEvent(new CustomEvent('menuOpen', {
             bubbles: false,
             cancelable: false,
-            detail
+            detail,
         }));
     }
 
@@ -219,8 +219,8 @@ export class PopupMenu extends EventDispatcher {
             (bottom - top) * ((-vertical + 1) * -0.5)
         );
 
-        x = Math.max(0.0, Math.min(containerNodeRect.width - menuRect.width, x));
-        y = Math.max(0.0, Math.min(containerNodeRect.height - menuRect.height, y));
+        x = Math.max(0, Math.min(containerNodeRect.width - menuRect.width, x));
+        y = Math.max(0, Math.min(containerNodeRect.height - menuRect.height, y));
 
         menu.style.left = `${x}px`;
         menu.style.top = `${y}px`;
@@ -257,7 +257,7 @@ export class PopupMenu extends EventDispatcher {
             altKey,
             ctrlKey,
             metaKey,
-            shiftKey
+            shiftKey,
         };
         const result = this._sourceElement.dispatchEvent(new CustomEvent('menuClose', {bubbles: false, cancelable, detail}));
         if (cancelable && !result) { return false; }
@@ -280,5 +280,5 @@ Object.defineProperty(PopupMenu, 'openMenus', {
     configurable: false,
     enumerable: true,
     writable: false,
-    value: new Set()
+    value: new Set(),
 });

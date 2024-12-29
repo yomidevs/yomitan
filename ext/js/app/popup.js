@@ -21,9 +21,11 @@ import {DynamicProperty} from '../core/dynamic-property.js';
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {ExtensionError} from '../core/extension-error.js';
+import {safePerformance} from '../core/safe-performance.js';
 import {deepEqual} from '../core/utilities.js';
-import {DocumentUtil} from '../dom/document-util.js';
+import {addFullscreenChangeEventListener, computeZoomScale, convertRectZoomCoordinates, getFullscreenElement} from '../dom/document-util.js';
 import {loadStyle} from '../dom/style-util.js';
+import {checkPopupPreviewURL} from '../pages/settings/popup-preview-controller.js';
 import {ThemeController} from './theme-controller.js';
 
 /**
@@ -32,16 +34,13 @@ import {ThemeController} from './theme-controller.js';
  */
 export class Popup extends EventDispatcher {
     /**
-     * Creates a new instance.
-     * @param {import('popup').PopupConstructorDetails} details The details used to construct the new instance.
+     * @param {import('../application.js').Application} application The main application instance.
+     * @param {string} id The identifier of the popup.
+     * @param {number} depth The depth of the popup.
+     * @param {number} frameId The frameId of the host frame.
+     * @param {boolean} childrenSupported Whether or not the popup is able to show child popups.
      */
-    constructor({
-        application,
-        id,
-        depth,
-        frameId,
-        childrenSupported
-    }) {
+    constructor(application, id, depth, frameId, childrenSupported) {
         super();
         /** @type {import('../application.js').Application} */
         this._application = application;
@@ -68,7 +67,7 @@ export class Popup extends EventDispatcher {
         /** @type {?import('settings').OptionsContext} */
         this._optionsContext = null;
         /** @type {number} */
-        this._contentScale = 1.0;
+        this._contentScale = 1;
         /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
@@ -304,7 +303,8 @@ export class Popup extends EventDispatcher {
         await this._show(sourceRects, writingMode);
 
         if (displayDetails !== null) {
-            this._invokeSafe('displaySetContent', {details: displayDetails});
+            safePerformance.mark('invokeDisplaySetContent:start');
+            void this._invokeSafe('displaySetContent', {details: displayDetails});
         }
     }
 
@@ -332,7 +332,9 @@ export class Popup extends EventDispatcher {
     async setContentScale(scale) {
         this._contentScale = scale;
         this._frame.style.fontSize = `${scale}px`;
-        await this._invokeSafe('displaySetContentScale', {scale});
+        if (this._frameClient !== null && this._frameClient.isConnected() && this._frame.contentWindow !== null) {
+            await this._invokeSafe('displaySetContentScale', {scale});
+        }
     }
 
     /**
@@ -427,7 +429,7 @@ export class Popup extends EventDispatcher {
                     if (injectPromise !== this._injectPromise) { return; }
                     this._injectPromiseComplete = true;
                 },
-                () => {}
+                () => {},
             );
         }
         return injectPromise;
@@ -492,7 +494,7 @@ export class Popup extends EventDispatcher {
             parentFrameId: this._frameId,
             childrenSupported: this._childrenSupported,
             scale: this._contentScale,
-            optionsContext: this._optionsContext
+            optionsContext: this._optionsContext,
         };
         await this._invokeSafe('displayConfigure', configureParams);
     }
@@ -594,7 +596,7 @@ export class Popup extends EventDispatcher {
             return;
         }
 
-        DocumentUtil.addFullscreenChangeEventListener(this._onFullscreenChanged.bind(this), this._fullscreenEventListeners);
+        addFullscreenChangeEventListener(this._onFullscreenChanged.bind(this), this._fullscreenEventListeners);
     }
 
     /**
@@ -662,7 +664,7 @@ export class Popup extends EventDispatcher {
         if (this._visibleValue === value) { return; }
         this._visibleValue = value;
         this._frame.style.setProperty('visibility', value ? 'visible' : 'hidden', 'important');
-        this._invokeSafe('displayVisibilityChanged', {value});
+        void this._invokeSafe('displayVisibilityChanged', {value});
     }
 
     /**
@@ -702,7 +704,7 @@ export class Popup extends EventDispatcher {
         return /** @type {import('display').DirectApiReturn<TName>} */ (await this._application.crossFrame.invoke(
             this._frameClient.frameId,
             'displayPopupMessage1',
-            /** @type {import('display').DirectApiFrameClientMessageAny} */ (wrappedMessage)
+            /** @type {import('display').DirectApiFrameClientMessageAny} */ (wrappedMessage),
         ));
     }
 
@@ -722,22 +724,25 @@ export class Popup extends EventDispatcher {
     }
 
     /**
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
+     * @template {import('display').WindowApiNames} TName
+     * @param {TName} action
+     * @param {import('display').WindowApiParams<TName>} params
      */
-    _invokeWindow(action, params = {}) {
+    _invokeWindow(action, params) {
         const contentWindow = this._frame.contentWindow;
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
 
-        const message = this._frameClient.createMessage({action, params});
-        contentWindow.postMessage(message, this._targetOrigin);
+        /** @type {import('display').WindowApiMessage<TName>} */
+        const message = {action, params};
+        const messageWrapper = this._frameClient.createMessage(message);
+        contentWindow.postMessage(messageWrapper, this._targetOrigin);
     }
 
     /**
      * @returns {void}
      */
     _onExtensionUnloaded() {
-        this._invokeWindow('displayExtensionUnloaded');
+        this._invokeWindow('displayExtensionUnloaded', void 0);
     }
 
     /**
@@ -748,7 +753,7 @@ export class Popup extends EventDispatcher {
         if (defaultParent !== null && defaultParent.tagName.toLowerCase() === 'frameset') {
             defaultParent = document.documentElement;
         }
-        const fullscreenElement = DocumentUtil.getFullscreenElement();
+        const fullscreenElement = getFullscreenElement();
         if (
             fullscreenElement === null ||
             fullscreenElement.shadowRoot ||
@@ -777,7 +782,7 @@ export class Popup extends EventDispatcher {
     _getPosition(sourceRects, writingMode, viewport) {
         sourceRects = this._convertSourceRectsCoordinateSpace(sourceRects);
         const contentScale = this._contentScale;
-        const scaleRatio = this._frameSizeContentScale === null ? 1.0 : contentScale / this._frameSizeContentScale;
+        const scaleRatio = this._frameSizeContentScale === null ? 1 : contentScale / this._frameSizeContentScale;
         this._frameSizeContentScale = contentScale;
         const frameRect = this._frame.getBoundingClientRect();
         const frameWidth = Math.max(frameRect.width * scaleRatio, this._initialWidth * contentScale);
@@ -837,7 +842,7 @@ export class Popup extends EventDispatcher {
             frameWidth,
             viewport.left,
             viewport.right,
-            true
+            true,
         );
         const [top, height, below] = this._getConstrainedPositionBinary(
             sourceRect.top - verticalOffset,
@@ -845,7 +850,7 @@ export class Popup extends EventDispatcher {
             frameHeight,
             viewport.top,
             viewport.bottom,
-            preferBelow
+            preferBelow,
         );
         return {left, top, width, height, after, below};
     }
@@ -868,7 +873,7 @@ export class Popup extends EventDispatcher {
             frameWidth,
             viewport.left,
             viewport.right,
-            preferRight
+            preferRight,
         );
         const [top, height, below] = this._getConstrainedPosition(
             sourceRect.bottom - verticalOffset,
@@ -876,7 +881,7 @@ export class Popup extends EventDispatcher {
             frameHeight,
             viewport.top,
             viewport.bottom,
-            true
+            true,
         );
         return {left, top, width, height, after, below};
     }
@@ -984,7 +989,7 @@ export class Popup extends EventDispatcher {
                     left,
                     top,
                     right: left + width,
-                    bottom: top + height
+                    bottom: top + height,
                 };
             } else {
                 const scale = visualViewport.scale;
@@ -992,7 +997,7 @@ export class Popup extends EventDispatcher {
                     left: 0,
                     top: 0,
                     right: Math.max(left + width, width * scale),
-                    bottom: Math.max(top + height, height * scale)
+                    bottom: Math.max(top + height, height * scale),
                 };
             }
         }
@@ -1001,7 +1006,7 @@ export class Popup extends EventDispatcher {
             left: 0,
             top: 0,
             right: window.innerWidth,
-            bottom: window.innerHeight
+            bottom: window.innerHeight,
         };
     }
 
@@ -1014,6 +1019,10 @@ export class Popup extends EventDispatcher {
         const {general} = options;
         this._themeController.theme = general.popupTheme;
         this._themeController.outerTheme = general.popupOuterTheme;
+        this._themeController.siteOverride = checkPopupPreviewURL(optionsContext.url);
+        if (this._themeController.outerTheme === 'site' && this._themeController.siteOverride && ['dark', 'light'].includes(this._themeController.theme)) {
+            this._themeController.outerTheme = this._themeController.theme;
+        }
         this._initialWidth = general.popupWidth;
         this._initialHeight = general.popupHeight;
         this._horizontalOffset = general.popupHorizontalOffset;
@@ -1028,7 +1037,7 @@ export class Popup extends EventDispatcher {
         this._useSecureFrameUrl = general.useSecurePopupFrameUrl;
         this._useShadowDom = general.usePopupShadowDom;
         this._customOuterCss = general.customPopupOuterCss;
-        this.updateTheme();
+        void this.updateTheme();
     }
 
     /**
@@ -1091,7 +1100,7 @@ export class Popup extends EventDispatcher {
      * @returns {DOMRect} The rectangle of the frame.
      */
     _getFrameBoundingClientRect() {
-        return DocumentUtil.convertRectZoomCoordinates(this._frame.getBoundingClientRect(), this._container);
+        return convertRectZoomCoordinates(this._frame.getBoundingClientRect(), this._container);
     }
 
     /**
@@ -1100,7 +1109,7 @@ export class Popup extends EventDispatcher {
      * @returns {import('popup').Rect[]} Either an updated list of rectangles, or `sourceRects` if no change is required.
      */
     _convertSourceRectsCoordinateSpace(sourceRects) {
-        let scale = DocumentUtil.computeZoomScale(this._container);
+        let scale = computeZoomScale(this._container);
         if (scale === 1) { return sourceRects; }
         scale = 1 / scale;
         const sourceRects2 = [];
@@ -1121,7 +1130,7 @@ export class Popup extends EventDispatcher {
             left: rect.left * scale,
             top: rect.top * scale,
             right: rect.right * scale,
-            bottom: rect.bottom * scale
+            bottom: rect.bottom * scale,
         };
     }
 }
@@ -1133,6 +1142,8 @@ class PopupError extends ExtensionError {
      */
     constructor(message, source) {
         super(message);
+        /** @type {string} */
+        this.name = 'PopupError';
         /** @type {Popup} */
         this._source = source;
     }

@@ -47,6 +47,8 @@ export class AudioController extends EventDispatcher {
         this._voiceTestTextInput = querySelectorNotNull(document, '#text-to-speech-voice-test-text');
         /** @type {import('audio-controller').VoiceInfo[]} */
         this._voices = [];
+        /** @type {string} */
+        this._language = 'ja';
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
@@ -97,7 +99,7 @@ export class AudioController extends EventDispatcher {
             path: 'audio.sources',
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
     }
 
@@ -121,12 +123,18 @@ export class AudioController extends EventDispatcher {
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
     _onOptionsChanged({options}) {
+        const {
+            general: {language},
+            audio: {sources},
+        } = options;
+
+        this._language = language;
+
         for (const entry of this._audioSourceEntries) {
             entry.cleanup();
         }
         this._audioSourceEntries = [];
 
-        const {sources} = options.audio;
         for (let i = 0, ii = sources.length; i < ii; ++i) {
             this._createAudioSourceEntry(i, sources[i]);
         }
@@ -134,7 +142,7 @@ export class AudioController extends EventDispatcher {
 
     /** */
     _onAddAudioSource() {
-        this._addAudioSource();
+        void this._addAudioSource();
     }
 
     /** */
@@ -144,8 +152,8 @@ export class AudioController extends EventDispatcher {
             const text = input.value || '';
             const voiceUri = input.dataset.voice;
             const audio = this._audioSystem.createTextToSpeechAudio(text, typeof voiceUri === 'string' ? voiceUri : '');
-            audio.volume = 1.0;
-            audio.play();
+            audio.volume = 1;
+            void audio.play();
         } catch (e) {
             // NOP
         }
@@ -158,7 +166,7 @@ export class AudioController extends EventDispatcher {
             [...speechSynthesis.getVoices()].map((voice, index) => ({
                 voice,
                 isJapanese: this._languageTagIsJapanese(voice.lang),
-                index
+                index,
             })) :
             []
         );
@@ -216,19 +224,27 @@ export class AudioController extends EventDispatcher {
      * @returns {import('settings').AudioSourceType}
      */
     _getUnusedAudioSourceType() {
-        /** @type {import('settings').AudioSourceType[]} */
-        const typesAvailable = [
-            'jpod101',
-            'jpod101-alternate',
-            'jisho',
-            'custom'
-        ];
+        const typesAvailable = this._getAvailableAudioSourceTypes();
         for (const type of typesAvailable) {
             if (!this._audioSourceEntries.some((entry) => entry.type === type)) {
                 return type;
             }
         }
         return typesAvailable[0];
+    }
+
+    /**
+     * @returns {import('settings').AudioSourceType[]}
+     */
+    _getAvailableAudioSourceTypes() {
+        /** @type {import('settings').AudioSourceType[]} */
+        const generalAudioSources = ['language-pod-101', 'lingua-libre', 'wiktionary', 'text-to-speech', 'custom'];
+        if (this._language === 'ja') {
+            /** @type {import('settings').AudioSourceType[]} */
+            const japaneseAudioSources = ['jpod101', 'jisho'];
+            return [...japaneseAudioSources, ...generalAudioSources];
+        }
+        return generalAudioSources;
     }
 
     /** */
@@ -243,7 +259,7 @@ export class AudioController extends EventDispatcher {
             path: 'audio.sources',
             start: index,
             deleteCount: 0,
-            items: [source]
+            items: [source],
         }]);
     }
 }
@@ -352,7 +368,7 @@ class AudioSourceEntry {
         const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
         const value = this._normalizeAudioSourceType(element.value);
         if (value === null) { return; }
-        this._setType(value);
+        void this._setType(value);
     }
 
     /**
@@ -360,7 +376,7 @@ class AudioSourceEntry {
      */
     _onUrlInputChange(e) {
         const element = /** @type {HTMLInputElement} */ (e.currentTarget);
-        this._setUrl(element.value);
+        void this._setUrl(element.value);
     }
 
     /**
@@ -368,7 +384,7 @@ class AudioSourceEntry {
      */
     _onVoiceSelectChange(e) {
         const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
-        this._setVoice(element.value);
+        void this._setVoice(element.value);
     }
 
     /**
@@ -403,7 +419,7 @@ class AudioSourceEntry {
                 this._showHelp(this._type);
                 break;
             case 'remove':
-                this._parent.removeSource(this);
+                void this._parent.removeSource(this);
                 break;
         }
     }
@@ -486,8 +502,10 @@ class AudioSourceEntry {
     _normalizeAudioSourceType(value) {
         switch (value) {
             case 'jpod101':
-            case 'jpod101-alternate':
+            case 'language-pod-101':
             case 'jisho':
+            case 'lingua-libre':
+            case 'wiktionary':
             case 'text-to-speech':
             case 'text-to-speech-reading':
             case 'custom':

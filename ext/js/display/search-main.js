@@ -19,6 +19,9 @@
 import {Application} from '../application.js';
 import {DocumentFocusController} from '../dom/document-focus-controller.js';
 import {HotkeyHandler} from '../input/hotkey-handler.js';
+import {ModalController} from '../pages/settings/modal-controller.js';
+import {SettingsController} from '../pages/settings/settings-controller.js';
+import {SettingsDisplayController} from '../pages/settings/settings-display-controller.js';
 import {DisplayAnki} from './display-anki.js';
 import {DisplayAudio} from './display-audio.js';
 import {Display} from './display.js';
@@ -26,7 +29,7 @@ import {SearchActionPopupController} from './search-action-popup-controller.js';
 import {SearchDisplayController} from './search-display-controller.js';
 import {SearchPersistentStateController} from './search-persistent-state-controller.js';
 
-await Application.main(async (application) => {
+await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController('#search-textbox');
     documentFocusController.prepare();
 
@@ -36,12 +39,10 @@ await Application.main(async (application) => {
     const searchActionPopupController = new SearchActionPopupController(searchPersistentStateController);
     searchActionPopupController.prepare();
 
-    const {tabId, frameId} = await application.api.frameInformationGet();
-
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 
-    const display = new Display(application, tabId, frameId, 'search', documentFocusController, hotkeyHandler);
+    const display = new Display(application, 'search', documentFocusController, hotkeyHandler);
     await display.prepare();
 
     const displayAudio = new DisplayAudio(display);
@@ -50,8 +51,21 @@ await Application.main(async (application) => {
     const displayAnki = new DisplayAnki(display, displayAudio);
     displayAnki.prepare();
 
-    const searchDisplayController = new SearchDisplayController(tabId, frameId, display, displayAudio, searchPersistentStateController);
+    const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
     await searchDisplayController.prepare();
+
+    const modalController = new ModalController([]);
+    await modalController.prepare();
+
+    const settingsController = new SettingsController(application);
+    await settingsController.prepare();
+
+    const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
+    await settingsDisplayController.prepare();
+
+    document.body.hidden = false;
+
+    documentFocusController.focusElement();
 
     display.initializeState();
 

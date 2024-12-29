@@ -20,12 +20,15 @@ import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {bench, describe} from 'vitest';
 import {parseJson} from '../dev/json.js';
-import {createFindKanjiOptions, createFindTermsOptions} from '../test/utilities/translator.js';
 import {createTranslatorContext} from '../test/fixtures/translator-test.js';
+import {setupStubs} from '../test/utilities/database.js';
+import {createFindKanjiOptions, createFindTermsOptions} from '../test/utilities/translator.js';
+
+setupStubs();
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dictionaryName = 'Test Dictionary 2';
-const translator = await createTranslatorContext(path.join(dirname, '..', 'test', 'data/dictionaries/valid-dictionary1'), dictionaryName);
+const {translator} = await createTranslatorContext(path.join(dirname, '..', 'test', 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
 describe('Translator', () => {
     const testInputsFilePath = path.join(dirname, '..', 'test', 'data/translator-test-inputs.json');
@@ -33,19 +36,10 @@ describe('Translator', () => {
     const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));
 
     const findKanjiTests = tests.filter((data) => data.options === 'kanji');
-    const findTermTests = tests.filter((data) => data.options === 'default');
-    const findTermWithTextTransformationsTests = tests.filter((data) => data.options !== 'kanji' && data.options !== 'default');
+    const findTermTests = tests.filter((data) => data.options !== 'kanji');
 
-    bench(`Translator.prototype.findTerms - no text transformations  (n=${findTermTests.length})`, async () => {
+    bench(`Translator.prototype.findTerms - (n=${findTermTests.length})`, async () => {
         for (const data of /** @type {import('test/translator').TestInputFindTerm[]} */ (findTermTests)) {
-            const {mode, text} = data;
-            const options = createFindTermsOptions(dictionaryName, optionsPresets, data.options);
-            await translator.findTerms(mode, text, options);
-        }
-    });
-
-    bench(`Translator.prototype.findTerms - text transformations  (n=${findTermWithTextTransformationsTests.length})`, async () => {
-        for (const data of /** @type {import('test/translator').TestInputFindTerm[]} */ (findTermWithTextTransformationsTests)) {
             const {mode, text} = data;
             const options = createFindTermsOptions(dictionaryName, optionsPresets, data.options);
             await translator.findTerms(mode, text, options);

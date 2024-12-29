@@ -16,6 +16,38 @@
  */
 
 export type ModifierKey = 'alt' | 'ctrl' | 'meta' | 'shift';
+
 export type ModifierMouseButton = 'mouse0' | 'mouse1' | 'mouse2' | 'mouse3' | 'mouse4' | 'mouse5';
+
 export type Modifier = ModifierKey | ModifierMouseButton;
+
 export type ModifierType = 'key' | 'mouse';
+
+export type PointerType = (
+    'pen' |
+    'mouse' |
+    'touch' |
+    'script'
+);
+
+export type PointerEventType = (
+    'mouseMove' |
+    'pointerOver' |
+    'pointerDown' |
+    'pointerMove' |
+    'pointerUp' |
+    'touchStart' |
+    'touchEnd' |
+    'touchMove' |
+    'click' |
+    'script'
+);
+
+/**
+ * An enum representing the pen pointer state.
+ * - `0` - Not active.
+ * - `1` - Hovering.
+ * - `2` - Touching.
+ * - `3` - Hovering after touching.
+ */
+export type PenPointerState = 0 | 1 | 2 | 3;

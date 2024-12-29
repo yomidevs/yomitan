@@ -19,8 +19,7 @@
 import {describe, expect, test} from 'vitest';
 import {HotkeyUtil} from '../ext/js/input/hotkey-util.js';
 
-/** */
-function testCommandConversions() {
+describe('HotkeyUtil', () => {
     describe('CommandConversions', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{os: import('environment').OperatingSystem, command: string, expectedCommand: string, expectedInput: {key: string, modifiers: import('input').Modifier[]}}[]} */
@@ -38,7 +37,7 @@ function testCommandConversions() {
 
             {os: 'linux', command: 'Ctrl+Alt+Shift+F1',    expectedCommand: 'Ctrl+Alt+Shift+F1',    expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']}},
             {os: 'linux', command: 'MacCtrl+Alt+Shift+F1', expectedCommand: 'Ctrl+Alt+Shift+F1',    expectedInput: {key: 'F1', modifiers: ['ctrl', 'alt', 'shift']}},
-            {os: 'linux', command: 'Command+Alt+Shift+F1', expectedCommand: 'Command+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['meta', 'alt', 'shift']}}
+            {os: 'linux', command: 'Command+Alt+Shift+F1', expectedCommand: 'Command+Alt+Shift+F1', expectedInput: {key: 'F1', modifiers: ['meta', 'alt', 'shift']}},
         ];
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -53,10 +52,7 @@ function testCommandConversions() {
             });
         }
     });
-}
 
-/** */
-function testDisplayNames() {
     describe('DisplayNames', () => {
         /* eslint-disable @stylistic/no-multi-spaces */
         /** @type {{os: import('environment').OperatingSystem, key: ?string, modifiers: import('input').Modifier[], expected: string}[]} */
@@ -135,7 +131,7 @@ function testDisplayNames() {
             {os: 'unknown', key: 'F1',   modifiers: ['meta'], expected: 'Meta + F1'},
             {os: 'unknown', key: null,   modifiers: ['mouse1'], expected: 'Mouse 1'},
             {os: 'unknown', key: 'KeyF', modifiers: ['mouse1'], expected: 'Mouse 1 + F'},
-            {os: 'unknown', key: 'F1',   modifiers: ['mouse1'], expected: 'Mouse 1 + F1'}
+            {os: 'unknown', key: 'F1',   modifiers: ['mouse1'], expected: 'Mouse 1 + F1'},
         ];
         /* eslint-enable @stylistic/no-multi-spaces */
 
@@ -147,34 +143,21 @@ function testDisplayNames() {
             expect(displayName).toStrictEqual(expected);
         });
     });
-}
 
-/** */
-function testSortModifiers() {
     describe('SortModifiers', () => {
         /** @type {{modifiers: import('input').Modifier[], expected: import('input').Modifier[]}[]} */
         const data = [
             {modifiers: [], expected: []},
-            {modifiers: ['shift', 'alt', 'ctrl', 'mouse4', 'meta', 'mouse1', 'mouse0'], expected: ['meta', 'ctrl', 'alt', 'shift', 'mouse0', 'mouse1', 'mouse4']}
+            {modifiers: ['shift', 'alt', 'ctrl', 'mouse4', 'meta', 'mouse1', 'mouse0'], expected: ['meta', 'ctrl', 'alt', 'shift', 'mouse0', 'mouse1', 'mouse4']},
         ];
 
         const hotkeyUtil = new HotkeyUtil();
         for (const {modifiers, expected} of data) {
-            test(`[${modifiers}] -> [${expected}]`, () => {
+            test(`[${modifiers.join(',')}] -> [${expected.join(',')}]`, () => {
                 const modifiers2 = hotkeyUtil.sortModifiers(modifiers);
                 expect(modifiers2).toStrictEqual(modifiers);
                 expect(modifiers2).toStrictEqual(expected);
             });
         }
     });
-}
-
-
-/** */
-function main() {
-    testCommandConversions();
-    testDisplayNames();
-    testSortModifiers();
-}
-
-main();
+});

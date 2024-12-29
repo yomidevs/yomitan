@@ -33,7 +33,7 @@ export class DisplayAudio {
         /** @type {AudioSystem} */
         this._audioSystem = new AudioSystem();
         /** @type {number} */
-        this._playbackVolume = 1.0;
+        this._playbackVolume = 1;
         /** @type {boolean} */
         this._autoPlay = false;
         /** @type {?import('core').Timeout} */
@@ -55,12 +55,14 @@ export class DisplayAudio {
         /** @type {Map<import('settings').AudioSourceType, string>} */
         this._audioSourceTypeNames = new Map([
             ['jpod101', 'JapanesePod101'],
-            ['jpod101-alternate', 'JapanesePod101 (Alternate)'],
+            ['language-pod-101', 'LanguagePod101'],
             ['jisho', 'Jisho.org'],
+            ['lingua-libre', 'Lingua Libre'],
+            ['wiktionary', 'Wiktionary'],
             ['text-to-speech', 'Text-to-speech'],
             ['text-to-speech-reading', 'Text-to-speech (Kana reading)'],
             ['custom', 'Custom URL'],
-            ['custom-json', 'Custom URL (JSON)']
+            ['custom-json', 'Custom URL (JSON)'],
         ]);
         /** @type {(event: MouseEvent) => void} */
         this._onAudioPlayButtonClickBind = this._onAudioPlayButtonClick.bind(this);
@@ -85,10 +87,10 @@ export class DisplayAudio {
         /* eslint-disable @stylistic/no-multi-spaces */
         this._display.hotkeyHandler.registerActions([
             ['playAudio',           this._onHotkeyActionPlayAudio.bind(this)],
-            ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)]
+            ['playAudioFromSource', this._onHotkeyActionPlayAudioFromSource.bind(this)],
         ]);
         this._display.registerDirectMessageHandlers([
-            ['displayAudioClearAutoPlayTimer', this._onMessageClearAutoPlayTimer.bind(this)]
+            ['displayAudioClearAutoPlayTimer', this._onMessageClearAutoPlayTimer.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
@@ -164,16 +166,15 @@ export class DisplayAudio {
      * @param {import('display').EventArgument<'optionsUpdated'>} details
      */
     _onOptionsUpdated({options}) {
-        const {enabled, autoPlay, volume, sources} = options.audio;
+        const {
+            general: {language},
+            audio: {enabled, autoPlay, volume, sources},
+        } = options;
         this._autoPlay = enabled && autoPlay;
-        this._playbackVolume = Number.isFinite(volume) ? Math.max(0.0, Math.min(1.0, volume / 100.0)) : 1.0;
+        this._playbackVolume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume / 100)) : 1;
 
         /** @type {Set<import('settings').AudioSourceType>} */
-        const requiredAudioSources = new Set([
-            'jpod101',
-            'jpod101-alternate',
-            'jisho'
-        ]);
+        const requiredAudioSources = this._getRequiredAudioSources(language);
         /** @type {Map<string, import('display-audio').AudioSource[]>} */
         const nameMap = new Map();
         this._audioSources.length = 0;
@@ -186,9 +187,27 @@ export class DisplayAudio {
         }
 
         const data = document.documentElement.dataset;
-        data.audioEnabled = `${enabled && sources.length > 0}`;
+        data.audioEnabled = enabled.toString();
 
         this._cache.clear();
+    }
+
+    /**
+     * @param {string} language
+     * @returns {Set<import('settings').AudioSourceType>}
+     */
+    _getRequiredAudioSources(language) {
+        return language === 'ja' ?
+            new Set([
+                'jpod101',
+                'language-pod-101',
+                'jisho',
+            ]) :
+            new Set([
+                'lingua-libre',
+                'language-pod-101',
+                'wiktionary',
+            ]);
     }
 
     /** */
@@ -225,7 +244,7 @@ export class DisplayAudio {
 
         const callback = () => {
             this._autoPlayAudioTimer = null;
-            this.playAudio(0, 0);
+            void this.playAudio(0, 0);
         };
 
         if (this._autoPlayAudioDelay > 0) {
@@ -248,7 +267,7 @@ export class DisplayAudio {
 
     /** */
     _onHotkeyActionPlayAudio() {
-        this.playAudio(this._display.selectedIndex, 0);
+        void this.playAudio(this._display.selectedIndex, 0);
     }
 
     /**
@@ -256,7 +275,7 @@ export class DisplayAudio {
      */
     _onHotkeyActionPlayAudioFromSource(source) {
         if (!(typeof source === 'string' || typeof source === 'undefined' || source === null)) { return; }
-        this.playAudio(this._display.selectedIndex, 0, source);
+        void this.playAudio(this._display.selectedIndex, 0, source);
     }
 
     /** @type {import('display').DirectApiHandler<'displayAudioClearAutoPlayTimer'>} */
@@ -297,7 +316,7 @@ export class DisplayAudio {
             downloadable,
             name,
             nameIndex,
-            nameUnique: (nameIndex === 0)
+            nameUnique: (nameIndex === 0),
         };
 
         entries.push(source);
@@ -317,7 +336,7 @@ export class DisplayAudio {
         if (e.shiftKey) {
             this._showAudioMenu(button, dictionaryEntryIndex, headwordIndex);
         } else {
-            this.playAudio(dictionaryEntryIndex, headwordIndex);
+            void this.playAudio(dictionaryEntryIndex, headwordIndex);
         }
     }
 
@@ -348,7 +367,7 @@ export class DisplayAudio {
                 if (shiftKey) {
                     e.preventDefault();
                 }
-                this._playAudioFromSource(dictionaryEntryIndex, headwordIndex, item);
+                void this._playAudioFromSource(dictionaryEntryIndex, headwordIndex, item);
                 break;
             case 'setPrimaryAudio':
                 e.preventDefault();
@@ -369,7 +388,7 @@ export class DisplayAudio {
         if (typeof cacheEntry === 'undefined' && create) {
             cacheEntry = {
                 sourceMap: new Map(),
-                primaryCardAudio: null
+                primaryCardAudio: null,
             };
             this._cache.set(key, cacheEntry);
         }
@@ -389,7 +408,7 @@ export class DisplayAudio {
                 if (indexNumber >= 0 && indexNumber < this._audioSources.length) {
                     return {
                         source: this._audioSources[indexNumber],
-                        subIndex: typeof subIndex === 'string' ? Number.parseInt(subIndex, 10) : null
+                        subIndex: typeof subIndex === 'string' ? Number.parseInt(subIndex, 10) : null,
                     };
                 }
             }
@@ -514,8 +533,10 @@ export class DisplayAudio {
             !canToggleOff ||
             primaryCardAudio === null ||
             primaryCardAudio.index !== index ||
-            primaryCardAudio.subIndex !== subIndex
-        ) ? {index: index, subIndex} : null;
+            primaryCardAudio.subIndex !== subIndex ?
+            {index: index, subIndex} :
+            null
+        );
         cacheEntry.primaryCardAudio = primaryCardAudio;
 
         if (menu !== null) {
@@ -532,7 +553,7 @@ export class DisplayAudio {
         if (headwordNode !== null) {
             const {index} = headwordNode.dataset;
             if (typeof index === 'string') {
-                const headwordIndex = parseInt(index, 10);
+                const headwordIndex = Number.parseInt(index, 10);
                 if (Number.isFinite(headwordIndex)) { return headwordIndex; }
             }
         }
@@ -615,7 +636,7 @@ export class DisplayAudio {
         const result = {
             audio: null,
             index: -1,
-            cacheUpdated: false
+            cacheUpdated: false,
         };
         for (let i = start; i < end; ++i) {
             const item = infoList[i];
@@ -675,7 +696,8 @@ export class DisplayAudio {
      */
     async _getTermAudioInfoList(source, term, reading) {
         const sourceData = this._getSourceData(source);
-        const infoList = await this._display.application.api.getTermAudioInfoList(sourceData, term, reading);
+        const languageSummary = this._display.getLanguageSummary();
+        const infoList = await this._display.application.api.getTermAudioInfoList(sourceData, term, reading, languageSummary);
         return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
     }
 

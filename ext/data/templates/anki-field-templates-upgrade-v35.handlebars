@@ -1,0 +1,33 @@
+{{<<<<<<<}}
+{{#*inline "glossary-brief"}}
+    {{~> glossary brief=true ~}}
+{{/inline}}
+{{=======}}
+{{#*inline "glossary-brief"}}
+    {{~> glossary brief=true ~}}
+{{/inline}}
+
+{{~#*inline "glossary-first"~}}
+    <div style="text-align: left;">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                {{~#with definition.definitions.[0]~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/with~}}
+            {{~else~}}
+                {{~#with definition.definitions.[0]~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/with~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+
+{{#*inline "glossary-first-no-dictionary"}}
+    {{~> glossary-first noDictionaryTag=true ~}}
+{{/inline}}
+
+{{#*inline "glossary-first-brief"}}
+    {{~> glossary-first brief=true ~}}
+{{/inline}}
+{{>>>>>>>}}

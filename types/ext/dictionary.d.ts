@@ -83,6 +83,14 @@ export type KanjiDictionaryEntry = {
      */
     dictionary: string;
     /**
+     * The index of the dictionary in the original list of dictionaries used for the lookup.
+     */
+    dictionaryIndex: number;
+    /**
+     * The alias of the dictionary
+     */
+    dictionaryAlias: string;
+    /**
      * Onyomi readings for the kanji character.
      */
     onyomi: string[];
@@ -171,9 +179,9 @@ export type KanjiFrequency = {
      */
     dictionaryIndex: number;
     /**
-     * The priority of the dictionary.
+     * The alias of the dictionary
      */
-    dictionaryPriority: number;
+    dictionaryAlias: string;
     /**
      * The kanji character for the frequency.
      */
@@ -208,6 +216,10 @@ export type TermDictionaryEntry = {
      */
     isPrimary: boolean;
     /**
+     * Ways that a looked-up word might be transformed into this term.
+     */
+    textProcessorRuleChainCandidates: textProcessorRuleChainCandidate[];
+    /**
      * Ways that a looked-up word might be an inflected form of this term.
      */
     inflectionRuleChainCandidates: InflectionRuleChainCandidate[];
@@ -224,17 +236,21 @@ export type TermDictionaryEntry = {
      */
     dictionaryIndex: number;
     /**
-     * The priority of the dictionary.
+     * The alias of the dictionary
      */
-    dictionaryPriority: number;
+    dictionaryAlias: string;
     /**
      * The number of primary sources that had an exact text match for the term.
      */
     sourceTermExactMatchCount: number;
     /**
-     * The maximum length of the transformed text for all primary sources.
+     * Whether the term reading matched the primary reading.
      */
-    maxTransformedTextLength: number;
+    matchPrimaryReading: boolean;
+    /**
+     * The maximum length of the original text for all primary sources.
+     */
+    maxOriginalTextLength: number;
     /**
      * Headwords for the entry.
      */
@@ -258,7 +274,14 @@ export type InflectionRuleChainCandidate = {
     inflectionRules: InflectionRuleChain;
 };
 
-export type InflectionRuleChain = string[];
+type textProcessorRuleChainCandidate = string[];
+
+export type InflectionRuleChain = InflectionRule[];
+
+export type InflectionRule = {
+    name: string;
+    description?: string;
+};
 
 export type InflectionSource = 'algorithm' | 'dictionary' | 'both';
 
@@ -313,9 +336,9 @@ export type TermDefinition = {
      */
     dictionaryIndex: number;
     /**
-     * The priority of the dictionary.
+     * The alias of the dictionary
      */
-    dictionaryPriority: number;
+    dictionaryAlias: string;
     /**
      * Database ID for the definition.
      */
@@ -370,9 +393,9 @@ export type TermPronunciation = {
      */
     dictionaryIndex: number;
     /**
-     * The priority of the dictionary.
+     * The alias of the dictionary
      */
-    dictionaryPriority: number;
+    dictionaryAlias: string;
     /**
      * The pronunciations for the term.
      */
@@ -448,9 +471,9 @@ export type TermFrequency = {
      */
     dictionaryIndex: number;
     /**
-     * The priority of the dictionary.
+     * The alias of the dictionary
      */
-    dictionaryPriority: number;
+    dictionaryAlias: string;
     /**
      * Whether or not the frequency had an explicit reading specified.
      */

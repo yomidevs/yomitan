@@ -23,29 +23,18 @@ import type * as StructuredContent from './structured-content';
 
 export type OnProgressCallback = (data: ProgressData) => void;
 
-/**
- * An enum representing the import step.
- * - `-2` `-1` - Dictionary import is uninitialized.
- * - `0` - Load dictionary archive and validate index step.
- * - `1` - Load schemas and get archive files step.
- * - `2` - Load and validate dictionary data step.
- * - `3` - Format dictionary data and extended data support step.
- * - `4` - Resolve async requirements and import media step.
- * - `5` - Add dictionary descriptor and import data step.
- */
-export type ImportStep = -2 | -1 | 0 | 1 | 2 | 3 | 4 | 5;
+export type ImportStep = {label: string, callback?: () => void};
 
-export type ImportStepCount = 6;
+export type ImportSteps = ImportStep[];
 
 export type ProgressData = {
-    stepIndex: ImportStep;
-    stepCount: ImportStepCount;
     index: number;
     count: number;
+    nextStep?: boolean;
 };
 
 export type ImportResult = {
-    result: Summary;
+    result: Summary | null;
     errors: Error[];
 };
 
@@ -60,12 +49,24 @@ export type Summary = {
     version: number;
     importDate: number;
     prefixWildcardsSupported: boolean;
-    counts: SummaryCounts;
+    counts?: SummaryCounts;
+    styles: string;
+    isUpdatable?: boolean;
+    indexUrl?: string;
+    downloadUrl?: string;
     author?: string;
     url?: string;
     description?: string;
     attribution?: string;
+    sourceLanguage?: string;
+    targetLanguage?: string;
     frequencyMode?: 'occurrence-based' | 'rank-based';
+};
+
+export type SummaryDetails = {
+    prefixWildcardsSupported: boolean;
+    counts: SummaryCounts;
+    styles: string;
 };
 
 export type SummaryCounts = {

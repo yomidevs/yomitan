@@ -79,7 +79,7 @@ export class SortFrequencyDictionaryController {
     /** */
     _onSortFrequencyDictionarySelectChange() {
         const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
-        this._setSortFrequencyDictionaryValue(value !== '' ? value : null);
+        void this._setSortFrequencyDictionaryValue(value !== '' ? value : null);
     }
 
     /** */
@@ -87,14 +87,14 @@ export class SortFrequencyDictionaryController {
         const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionaryOrderSelect);
         const value2 = this._normalizeSortFrequencyDictionaryOrder(value);
         if (value2 === null) { return; }
-        this._setSortFrequencyDictionaryOrderValue(value2);
+        void this._setSortFrequencyDictionaryOrderValue(value2);
     }
 
     /** */
     _onSortFrequencyDictionaryOrderAutoButtonClick() {
         const {value} = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
         if (value === '') { return; }
-        this._autoUpdateOrder(value);
+        void this._autoUpdateOrder(value);
     }
 
     /**
@@ -107,11 +107,12 @@ export class SortFrequencyDictionaryController {
         option.textContent = 'None';
         fragment.appendChild(option);
         for (const {title, counts} of dictionaries) {
-            if (this._dictionaryHasNoFrequencies(counts)) { continue; }
-            option = document.createElement('option');
-            option.value = title;
-            option.textContent = title;
-            fragment.appendChild(option);
+            if (counts && counts.termMeta && counts.termMeta.freq > 0) {
+                option = document.createElement('option');
+                option.value = title;
+                option.textContent = title;
+                fragment.appendChild(option);
+            }
         }
         const select = /** @type {HTMLSelectElement} */ (this._sortFrequencyDictionarySelect);
         select.textContent = '';
@@ -152,25 +153,51 @@ export class SortFrequencyDictionaryController {
      * @returns {Promise<number>}
      */
     async _getFrequencyOrder(dictionary) {
-        const moreCommonTerms = ['来る', '言う', '出る', '入る', '方', '男', '女', '今', '何', '時'];
-        const lessCommonTerms = ['行なう', '論じる', '過す', '行方', '人口', '猫', '犬', '滝', '理', '暁'];
-        const terms = [...moreCommonTerms, ...lessCommonTerms];
+        const dictionaryInfo = await this._settingsController.application.api.getDictionaryInfo();
+        const dictionaryLang = dictionaryInfo.find(({title}) => title === dictionary)?.sourceLanguage ?? '';
+
+        /** @type {Record<string, string[]>} */
+        const moreCommonTerms = {
+            ja: ['来る', '言う', '出る', '入る', '方', '男', '女', '今', '何', '時'],
+        };
+        /** @type {Record<string, string[]>} */
+        const lessCommonTerms = {
+            ja: ['行なう', '論じる', '過す', '行方', '人口', '猫', '犬', '滝', '理', '暁'],
+        };
+        let langMoreCommonTerms = moreCommonTerms[dictionaryLang];
+        let langLessCommonTerms = lessCommonTerms[dictionaryLang];
+        if (dictionaryLang === '') {
+            langMoreCommonTerms = [];
+            for (const key in moreCommonTerms) {
+                if (Object.hasOwn(moreCommonTerms, key)) {
+                    langMoreCommonTerms.push(...moreCommonTerms[key]);
+                }
+            }
+            langLessCommonTerms = [];
+            for (const key in lessCommonTerms) {
+                if (Object.hasOwn(lessCommonTerms, key)) {
+                    langLessCommonTerms.push(...lessCommonTerms[key]);
+                }
+            }
+        }
+
+        const terms = [...langMoreCommonTerms, ...langLessCommonTerms];
 
         const frequencies = await this._settingsController.application.api.getTermFrequencies(
             terms.map((term) => ({term, reading: null})),
-            [dictionary]
+            [dictionary],
         );
 
         /** @type {Map<string, {hasValue: boolean, minValue: number, maxValue: number}>} */
         const termDetails = new Map();
         const moreCommonTermDetails = [];
         const lessCommonTermDetails = [];
-        for (const term of moreCommonTerms) {
+        for (const term of langMoreCommonTerms) {
             const details = {hasValue: false, minValue: Number.MAX_SAFE_INTEGER, maxValue: Number.MIN_SAFE_INTEGER};
             termDetails.set(term, details);
             moreCommonTermDetails.push(details);
         }
-        for (const term of lessCommonTerms) {
+        for (const term of langLessCommonTerms) {
             const details = {hasValue: false, minValue: Number.MAX_SAFE_INTEGER, maxValue: Number.MIN_SAFE_INTEGER};
             termDetails.set(term, details);
             lessCommonTermDetails.push(details);
@@ -193,17 +220,6 @@ export class SortFrequencyDictionaryController {
             }
         }
         return Math.sign(result);
-    }
-
-    /**
-     * @param {import('dictionary-importer').SummaryCounts} counts
-     * @returns {boolean}
-     */
-    _dictionaryHasNoFrequencies(counts) {
-        if (typeof counts !== 'object' || counts === null) { return false; }
-        const {termMeta} = counts;
-        if (typeof termMeta !== 'object' || termMeta === null) { return false; }
-        return termMeta.freq <= 0;
     }
 
     /**

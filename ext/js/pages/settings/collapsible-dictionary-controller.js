@@ -99,7 +99,7 @@ export class CollapsibleDictionaryController {
 
     /** */
     _onDefinitionsCollapsibleChange() {
-        this._updateAllSelectFresh();
+        void this._updateAllSelectFresh();
     }
 
     /**
@@ -109,7 +109,7 @@ export class CollapsibleDictionaryController {
         const {value} = /** @type {HTMLSelectElement} */ (e.currentTarget);
         const value2 = this._normalizeDictionaryDefinitionsCollapsible(value);
         if (value2 === null) { return; }
-        this._setDefinitionsCollapsibleAll(value2);
+        void this._setDefinitionsCollapsibleAll(value2);
     }
 
     /** */
@@ -153,12 +153,10 @@ export class CollapsibleDictionaryController {
         nameNode.textContent = dictionary;
 
         /** @type {HTMLElement} */
-        const versionNode = querySelectorNotNull(node, '.dictionary-version');
+        const versionNode = querySelectorNotNull(node, '.dictionary-revision');
         versionNode.textContent = version;
 
-        /** @type {HTMLSelectElement} */
-        const select = querySelectorNotNull(node, '.definitions-collapsible');
-        return select;
+        return querySelectorNotNull(node, '.definitions-collapsible');
     }
 
     /** */

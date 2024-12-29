@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {DocumentUtil} from '../../dom/document-util.js';
+import {convertElementValueToNumber, normalizeModifierKey} from '../../dom/document-util.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js';
 import {KeyboardMouseInputField} from './keyboard-mouse-input-field.js';
@@ -59,16 +59,19 @@ export class KeyboardShortcutController {
             ['previousEntryDifferentDictionary', {scopes: new Set(['popup', 'search'])}],
             ['historyBackward',                  {scopes: new Set(['popup', 'search'])}],
             ['historyForward',                   {scopes: new Set(['popup', 'search'])}],
+            ['profilePrevious',                  {scopes: new Set(['popup', 'search', 'web'])}],
+            ['profileNext',                      {scopes: new Set(['popup', 'search', 'web'])}],
             ['addNoteKanji',                     {scopes: new Set(['popup', 'search'])}],
             ['addNoteTermKanji',                 {scopes: new Set(['popup', 'search'])}],
             ['addNoteTermKana',                  {scopes: new Set(['popup', 'search'])}],
-            ['viewNote',                         {scopes: new Set(['popup', 'search'])}],
+            ['viewNotes',                        {scopes: new Set(['popup', 'search'])}],
             ['playAudio',                        {scopes: new Set(['popup', 'search'])}],
             ['playAudioFromSource',              {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-audio-source', default: 'jpod101'}}],
             ['copyHostSelection',                {scopes: new Set(['popup'])}],
             ['scanSelectedText',                 {scopes: new Set(['web'])}],
+            ['scanTextAtSelection',              {scopes: new Set(['web'])}],
             ['scanTextAtCaret',                  {scopes: new Set(['web'])}],
-            ['toggleOption',                     {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-setting-path', default: ''}}]
+            ['toggleOption',                     {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-setting-path', default: ''}}],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
@@ -102,7 +105,7 @@ export class KeyboardShortcutController {
             path: 'inputs.hotkeys',
             start: hotkeys.length,
             deleteCount: 0,
-            items: [terminationCharacterEntry]
+            items: [terminationCharacterEntry],
         }]);
 
         await this._updateOptions();
@@ -125,7 +128,7 @@ export class KeyboardShortcutController {
             path: 'inputs.hotkeys',
             start: index,
             deleteCount: 1,
-            items: []
+            items: [],
         }]);
 
         await this._updateOptions();
@@ -183,7 +186,7 @@ export class KeyboardShortcutController {
         const listContainer = /** @type {HTMLElement} */ (this._listContainer);
         listContainer.appendChild(fragment);
         listContainer.hidden = (hotkeys.length === 0);
-        /** @type {HTMLElement} */ (this._emptyIndicator).hidden = (hotkeys.length !== 0);
+        /** @type {HTMLElement} */ (this._emptyIndicator).hidden = (hotkeys.length > 0);
     }
 
     /**
@@ -191,7 +194,7 @@ export class KeyboardShortcutController {
      */
     _onAddClick(e) {
         e.preventDefault();
-        this._addNewEntry();
+        void this._addNewEntry();
     }
 
     /**
@@ -199,7 +202,7 @@ export class KeyboardShortcutController {
      */
     _onResetClick(e) {
         e.preventDefault();
-        this._reset();
+        void this._reset();
     }
 
     /** */
@@ -211,7 +214,7 @@ export class KeyboardShortcutController {
             key: null,
             modifiers: [],
             scopes: ['popup', 'search'],
-            enabled: true
+            enabled: true,
         };
         await this.addEntry(newEntry);
     }
@@ -350,16 +353,16 @@ class KeyboardShortcutHotkeyEntry {
     _onMenuClose(e) {
         switch (e.detail.action) {
             case 'delete':
-                this._delete();
+                void this._delete();
                 break;
             case 'clearInputs':
                 /** @type {KeyboardMouseInputField} */ (this._inputField).clearInputs();
                 break;
             case 'resetInput':
-                this._resetInput();
+                void this._resetInput();
                 break;
             case 'resetArgument':
-                this._resetArgument();
+                void this._resetArgument();
                 break;
         }
     }
@@ -400,11 +403,11 @@ class KeyboardShortcutHotkeyEntry {
         /** @type {import('input').ModifierKey[]} */
         const modifiers2 = [];
         for (const modifier of modifiers) {
-            const modifier2 = DocumentUtil.normalizeModifierKey(modifier);
+            const modifier2 = normalizeModifierKey(modifier);
             if (modifier2 === null) { continue; }
             modifiers2.push(modifier2);
         }
-        this._setKeyAndModifiers(key, modifiers2);
+        void this._setKeyAndModifiers(key, modifiers2);
     }
 
     /**
@@ -414,7 +417,7 @@ class KeyboardShortcutHotkeyEntry {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         const scope = this._normalizeScope(node.dataset.scope);
         if (scope === null) { return; }
-        this._setScopeEnabled(scope, node.checked);
+        void this._setScopeEnabled(scope, node.checked);
     }
 
     /**
@@ -423,7 +426,7 @@ class KeyboardShortcutHotkeyEntry {
     _onActionSelectChange(e) {
         const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
         const value = node.value;
-        this._setAction(value);
+        void this._setAction(value);
     }
 
     /**
@@ -435,15 +438,15 @@ class KeyboardShortcutHotkeyEntry {
         let value = this._getArgumentInputValue(node);
         switch (template) {
             case 'hotkey-argument-move-offset':
-                value = `${DocumentUtil.convertElementValueToNumber(value, node)}`;
+                value = `${convertElementValueToNumber(value, node)}`;
                 break;
         }
-        this._setArgument(value);
+        void this._setArgument(value);
     }
 
     /** */
     async _delete() {
-        this._parent.deleteEntry(this._index);
+        void this._parent.deleteEntry(this._index);
     }
 
     /**
@@ -457,13 +460,13 @@ class KeyboardShortcutHotkeyEntry {
             {
                 action: 'set',
                 path: `${this._basePath}.key`,
-                value: key
+                value: key,
             },
             {
                 action: 'set',
                 path: `${this._basePath}.modifiers`,
-                value: modifiers
-            }
+                value: modifiers,
+            },
         ]);
     }
 
@@ -487,7 +490,7 @@ class KeyboardShortcutHotkeyEntry {
         await this._modifyProfileSettings([{
             action: 'set',
             path: `${this._basePath}.scopes`,
-            value: scopes
+            value: scopes,
         }]);
 
         this._updateScopesButton();
@@ -577,18 +580,18 @@ class KeyboardShortcutHotkeyEntry {
             {
                 action: 'set',
                 path: `${this._basePath}.action`,
-                value: this._data.action
+                value: this._data.action,
             },
             {
                 action: 'set',
                 path: `${this._basePath}.argument`,
-                value: this._data.argument
+                value: this._data.argument,
             },
             {
                 action: 'set',
                 path: `${this._basePath}.scopes`,
-                value: this._data.scopes
-            }
+                value: this._data.scopes,
+            },
         ]);
 
         this._updateScopesButton();
@@ -607,12 +610,12 @@ class KeyboardShortcutHotkeyEntry {
             this._setArgumentInputValue(node, value);
         }
 
-        this._updateArgumentInputValidity();
+        void this._updateArgumentInputValidity();
 
         await this._modifyProfileSettings([{
             action: 'set',
             path: `${this._basePath}.argument`,
-            value
+            value,
         }]);
     }
 
@@ -702,7 +705,7 @@ class KeyboardShortcutHotkeyEntry {
             if (inputNode !== null) {
                 this._setArgumentInputValue(inputNode, argument);
                 this._argumentInput = inputNode;
-                this._updateArgumentInputValidity();
+                void this._updateArgumentInputValidity();
                 this._argumentEventListeners.addEventListener(inputNode, 'change', this._onArgumentValueChange.bind(this, template), false);
             }
             if (this._argumentContainer !== null) {

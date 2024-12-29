@@ -24,15 +24,6 @@ import {parseJson} from './json.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/**
- * @template [T=unknown]
- * @param {T} value
- * @returns {T}
- */
-function clone(value) {
-    return parseJson(JSON.stringify(value));
-}
-
 
 export class ManifestUtil {
     constructor() {
@@ -70,7 +61,7 @@ export class ManifestUtil {
             }
         }
 
-        return clone(this._manifest);
+        return structuredClone(this._manifest);
     }
 
     /**
@@ -108,7 +99,7 @@ export class ManifestUtil {
         const {stdout, stderr, status} = childProcess.spawnSync(command, args, {
             cwd: dirname,
             stdio: 'pipe',
-            shell: false
+            shell: false,
         });
         if (status !== 0) {
             const message = stderr.toString('utf8').trim();
@@ -189,7 +180,7 @@ export class ManifestUtil {
                             const {start, deleteCount, items} = modification;
                             /** @type {unknown[]} */
                             const value = this._getObjectProperties(manifest, path2, path2.length);
-                            const itemsNew = items.map((v) => clone(v));
+                            const itemsNew = items.map((v) => structuredClone(v));
                             value.splice(start, deleteCount, ...itemsNew);
                         }
                         break;
@@ -229,7 +220,7 @@ export class ManifestUtil {
                             const {items} = modification;
                             /** @type {unknown[]} */
                             const value = this._getObjectProperties(manifest, path2, path2.length);
-                            const itemsNew = items.map((v) => clone(v));
+                            const itemsNew = items.map((v) => structuredClone(v));
                             value.push(...itemsNew);
                         }
                         break;
@@ -335,11 +326,10 @@ export class ManifestUtil {
      * @returns {import('dev/manifest').Manifest}
      */
     _createVariantManifest(manifest, variant) {
-        let modifiedManifest = clone(manifest);
+        let modifiedManifest = structuredClone(manifest);
         for (const {modifications} of this._getInheritanceChain(variant)) {
             modifiedManifest = this._applyModifications(modifiedManifest, modifications);
         }
         return modifiedManifest;
     }
 }
-

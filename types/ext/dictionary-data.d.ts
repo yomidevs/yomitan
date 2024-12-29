@@ -25,10 +25,15 @@ export type Index = {
     title: string;
     revision: string;
     sequenced?: boolean;
+    isUpdatable?: true;
+    indexUrl?: string;
+    downloadUrl?: string;
     author?: string;
     url?: string;
     description?: string;
     attribution?: string;
+    sourceLanguage?: string;
+    targetLanguage?: string;
     frequencyMode?: 'occurrence-based' | 'rank-based';
     tagMeta?: IndexTagMeta;
 };
@@ -102,9 +107,13 @@ export type TermGlossaryContent = (
 );
 
 export type TermGlossaryString = string;
+
 export type TermGlossaryText = {type: 'text', text: string};
+
 export type TermGlossaryImage = {type: 'image'} & TermImage;
+
 export type TermGlossaryStructuredContent = {type: 'structured-content', content: StructuredContent.Content};
+
 export type TermGlossaryDeinflection = [
     uninflected: string,
     inflectionRuleChain: string[],

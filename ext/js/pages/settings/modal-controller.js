@@ -16,18 +16,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {HtmlTemplateCollection} from '../../dom/html-template-collection.js';
 import {Modal} from './modal.js';
 
 export class ModalController {
-    constructor() {
+    /**
+     * @param {string[]} templateNames
+     */
+    constructor(templateNames) {
         /** @type {Modal[]} */
         this._modals = [];
         /** @type {Map<string|Element, Modal>} */
         this._modalMap = new Map();
+        /** @type {HtmlTemplateCollection} */
+        this._templates = new HtmlTemplateCollection();
+        /** @type {string[]} */
+        this._templateNames = templateNames;
     }
 
     /** */
-    prepare() {
+    async prepare() {
+        if (this._templateNames.length > 0) {
+            await this._templates.loadFromFiles(['/templates-modals.html']);
+            for (const name of this._templateNames) {
+                const template = this._templates.getTemplateContent(name);
+                document.body.appendChild(template);
+            }
+        }
+
         const idSuffix = '-modal';
         for (const node of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.modal'))) {
             let {id} = node;

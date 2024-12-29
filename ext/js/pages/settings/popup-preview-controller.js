@@ -38,7 +38,7 @@ export class PopupPreviewController {
     }
 
     /** */
-    async prepare() {
+    prepare() {
         if (new URLSearchParams(location.search).get('popup-preview') === 'false') { return; }
 
         this._customCss.addEventListener('input', this._onCustomCssChange.bind(this), false);
@@ -47,6 +47,15 @@ export class PopupPreviewController {
         this._customOuterCss.addEventListener('settingChanged', this._onCustomOuterCssChange.bind(this), false);
         this._frame.addEventListener('load', this._onFrameLoad.bind(this), false);
         this._settingsController.on('optionsContextChanged', this._onOptionsContextChange.bind(this));
+        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+        this._settingsController.on('dictionaryEnabled', this._onOptionsContextChange.bind(this));
+        const languageSelect = querySelectorNotNull(document, '#language-select');
+        languageSelect.addEventListener(
+            /** @type {string} */ ('settingChanged'),
+            /** @type {EventListener} */ (this._onLanguageSelectChanged.bind(this)),
+            false,
+        );
+
 
         this._frame.src = '/popup-preview.html';
     }
@@ -63,27 +72,57 @@ export class PopupPreviewController {
     /** */
     _onCustomCssChange() {
         const css = /** @type {HTMLTextAreaElement} */ (this._customCss).value;
-        this._invoke('PopupPreviewFrame.setCustomCss', {css});
+        this._invoke('setCustomCss', {css});
     }
 
     /** */
     _onCustomOuterCssChange() {
         const css = /** @type {HTMLTextAreaElement} */ (this._customOuterCss).value;
-        this._invoke('PopupPreviewFrame.setCustomOuterCss', {css});
+        this._invoke('setCustomOuterCss', {css});
     }
 
     /** */
     _onOptionsContextChange() {
         const optionsContext = this._settingsController.getOptionsContext();
-        this._invoke('PopupPreviewFrame.updateOptionsContext', {optionsContext});
+        this._invoke('updateOptionsContext', {optionsContext});
+    }
+
+    /** */
+    _onDictionaryEnabled() {
+        this._invoke('updateSearch', {});
     }
 
     /**
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
+     * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
+     */
+    _onOptionsChanged({options}) {
+        this._invoke('setLanguageExampleText', {language: options.general.language});
+    }
+
+    /**
+     * @param {import('dom-data-binder').SettingChangedEvent} settingChangedEvent
+     */
+    _onLanguageSelectChanged(settingChangedEvent) {
+        const {value} = settingChangedEvent.detail;
+        if (typeof value !== 'string') { return; }
+        this._invoke('setLanguageExampleText', {language: value});
+    }
+
+    /**
+     * @template {import('popup-preview-frame').ApiNames} TName
+     * @param {TName} action
+     * @param {import('popup-preview-frame').ApiParams<TName>} params
      */
     _invoke(action, params) {
         if (this._frame === null || this._frame.contentWindow === null) { return; }
         this._frame.contentWindow.postMessage({action, params}, this._targetOrigin);
     }
+}
+
+/**
+ * @param {string | undefined} url
+ * @returns {boolean}
+ */
+export function checkPopupPreviewURL(url) {
+    return !!(url && url.includes('popup-preview.html') && !['http:', 'https:', 'ws:', 'wss:', 'ftp:', 'data:', 'file:'].includes(new URL(url).protocol));
 }

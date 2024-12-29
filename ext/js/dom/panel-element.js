@@ -23,9 +23,10 @@ import {EventDispatcher} from '../core/event-dispatcher.js';
  */
 export class PanelElement extends EventDispatcher {
     /**
-     * @param {import('panel-element').ConstructorDetails} details
+     * @param {HTMLElement} node
+     * @param {number} closingAnimationDuration
      */
-    constructor({node, closingAnimationDuration}) {
+    constructor(node, closingAnimationDuration) {
         super();
         /** @type {HTMLElement} */
         this._node = node;
@@ -89,16 +90,14 @@ export class PanelElement extends EventDispatcher {
      * @param {(details: import('core').EventArgument<import('panel-element').Events, TName>) => void} callback
      */
     on(eventName, callback) {
-        if (eventName === 'visibilityChanged') {
-            if (this._mutationObserver === null) {
-                this._visible = this.isVisible();
-                this._mutationObserver = new MutationObserver(this._onMutation.bind(this));
-                this._mutationObserver.observe(this._node, {
-                    attributes: true,
-                    attributeFilter: ['hidden'],
-                    attributeOldValue: true
-                });
-            }
+        if (eventName === 'visibilityChanged' && this._mutationObserver === null) {
+            this._visible = this.isVisible();
+            this._mutationObserver = new MutationObserver(this._onMutation.bind(this));
+            this._mutationObserver.observe(this._node, {
+                attributes: true,
+                attributeFilter: ['hidden'],
+                attributeOldValue: true,
+            });
         }
         super.on(eventName, callback);
     }
@@ -111,11 +110,9 @@ export class PanelElement extends EventDispatcher {
      */
     off(eventName, callback) {
         const result = super.off(eventName, callback);
-        if (eventName === 'visibilityChanged' && !this.hasListeners(eventName)) {
-            if (this._mutationObserver !== null) {
-                this._mutationObserver.disconnect();
-                this._mutationObserver = null;
-            }
+        if (eventName === 'visibilityChanged' && !this.hasListeners(eventName) && this._mutationObserver !== null) {
+            this._mutationObserver.disconnect();
+            this._mutationObserver = null;
         }
         return result;
     }

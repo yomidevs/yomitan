@@ -51,6 +51,7 @@ export type CreateDetails = {
     context: Context;
     /** Media data. */
     media?: AnkiTemplates.Media;
+    dictionaryStylesMap: Map<string, string>;
 };
 
 export type CachedValue<T = unknown> = {

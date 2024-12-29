@@ -18,6 +18,7 @@
 
 import Ajv from 'ajv';
 import {readFileSync} from 'fs';
+import {fileURLToPath} from 'url';
 import {JsonSchema} from '../ext/js/data/json-schema.js';
 import {DataError} from './data-error.js';
 import {parseJson} from './json.js';
@@ -30,9 +31,9 @@ class JsonSchemaAjv {
         const ajv = new Ajv({
             meta: false,
             strictTuples: false,
-            allowUnionTypes: true
+            allowUnionTypes: true,
         });
-        const metaSchemaPath = require.resolve('ajv/dist/refs/json-schema-draft-07.json');
+        const metaSchemaPath = fileURLToPath(import.meta.resolve('ajv/dist/refs/json-schema-draft-07.json'));
         /** @type {import('ajv').AnySchemaObject} */
         const metaSchema = parseJson(readFileSync(metaSchemaPath, {encoding: 'utf8'}));
         ajv.addMetaSchema(metaSchema);

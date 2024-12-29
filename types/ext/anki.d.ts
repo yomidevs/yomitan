@@ -22,6 +22,8 @@ export type NoteId = number;
 
 export type CardId = number;
 
+export type NoteWithId = Note & {id: NoteId};
+
 export type Note = {
     fields: NoteFields;
     tags: string[];
@@ -55,11 +57,18 @@ export type NoteInfo = {
     fields: {[key: string]: NoteFieldInfo};
     modelName: string;
     cards: CardId[];
+    cardsInfo: CardInfo[];
 };
 
 export type NoteFieldInfo = {
     value: string;
     order: number;
+};
+
+export type CardInfo = {
+    noteId: NoteId;
+    cardId: CardId;
+    flags: number;
 };
 
 export type ApiReflectResult = {

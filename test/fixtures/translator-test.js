@@ -17,21 +17,14 @@
  */
 
 import {IDBKeyRange, indexedDB} from 'fake-indexeddb';
-import {readFileSync} from 'fs';
-import {fileURLToPath} from 'node:url';
-import {dirname, join} from 'path';
 import {expect, vi} from 'vitest';
-import {parseJson} from '../../dev/json.js';
-import {createDictionaryArchive} from '../../dev/util.js';
+import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
 import {DictionaryDatabase} from '../../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../../ext/js/dictionary/dictionary-importer.js';
 import {Translator} from '../../ext/js/language/translator.js';
 import {chrome, fetch} from '../mocks/common.js';
 import {DictionaryImporterMediaLoader} from '../mocks/dictionary-importer-media-loader.js';
 import {createDomTest} from './dom-test.js';
-
-const extDir = join(dirname(fileURLToPath(import.meta.url)), '../../ext');
-const languageTransformDescriptorPath = join(extDir, 'data/language/japanese-transforms.json');
 
 vi.stubGlobal('indexedDB', indexedDB);
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
@@ -41,12 +34,11 @@ vi.stubGlobal('chrome', chrome);
 /**
  * @param {string} dictionaryDirectory
  * @param {string} dictionaryName
- * @returns {Promise<Translator>}
+ * @returns {Promise<{translator: Translator, styles: string}>}
  */
 export async function createTranslatorContext(dictionaryDirectory, dictionaryName) {
     // Dictionary
-    const testDictionary = createDictionaryArchive(dictionaryDirectory, dictionaryName);
-    const testDictionaryContent = await testDictionary.generateAsync({type: 'arraybuffer'});
+    const testDictionaryData = await createDictionaryArchiveData(dictionaryDirectory, dictionaryName);
 
     // Setup database
     const dictionaryImporterMediaLoader = new DictionaryImporterMediaLoader();
@@ -54,37 +46,41 @@ export async function createTranslatorContext(dictionaryDirectory, dictionaryNam
     const dictionaryDatabase = new DictionaryDatabase();
     await dictionaryDatabase.prepare();
 
-    const {errors} = await dictionaryImporter.importDictionary(
+    const {errors, result} = await dictionaryImporter.importDictionary(
         dictionaryDatabase,
-        testDictionaryContent,
-        {prefixWildcardsSupported: true}
+        testDictionaryData,
+        {prefixWildcardsSupported: true},
     );
 
     expect(errors.length).toEqual(0);
+    expect(result).not.toBeNull();
+
+    const styles = result?.styles ?? '';
 
     // Setup translator
-    const translator = new Translator({database: dictionaryDatabase});
-    /** @type {import('language-transformer').LanguageTransformDescriptor} */
-    const deinflectionReasons = parseJson(readFileSync(languageTransformDescriptorPath, {encoding: 'utf8'}));
-    translator.prepare(deinflectionReasons);
+    const translator = new Translator(dictionaryDatabase);
+    translator.prepare();
 
-    return translator;
+    return {translator, styles};
 }
 
 /**
  * @param {string|undefined} htmlFilePath
  * @param {string} dictionaryDirectory
  * @param {string} dictionaryName
- * @returns {Promise<import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator}>>}
+ * @returns {Promise<import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator, styles: string}>>}
  */
 export async function createTranslatorTest(htmlFilePath, dictionaryDirectory, dictionaryName) {
     const test = createDomTest(htmlFilePath);
-    const translator = await createTranslatorContext(dictionaryDirectory, dictionaryName);
-    /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator}>} */
+    const {translator, styles} = await createTranslatorContext(dictionaryDirectory, dictionaryName);
+    /** @type {import('vitest').TestAPI<{window: import('jsdom').DOMWindow, translator: Translator, styles: string}>} */
+    // eslint-disable-next-line sonarjs/prefer-immediate-return
     const result = test.extend({
         window: async ({window}, use) => { await use(window); },
         // eslint-disable-next-line no-empty-pattern
-        translator: async ({}, use) => { await use(translator); }
+        translator: async ({}, use) => { await use(translator); },
+        // eslint-disable-next-line no-empty-pattern
+        styles: async ({}, use) => { await use(styles); },
     });
     return result;
 }

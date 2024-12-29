@@ -18,7 +18,8 @@
 
 import {EventDispatcher} from '../../core/event-dispatcher.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {generateId, isObject} from '../../core/utilities.js';
+import {isObjectNotArray} from '../../core/object-utilities.js';
+import {generateId} from '../../core/utilities.js';
 import {OptionsUtil} from '../../data/options-util.js';
 import {getAllPermissions} from '../../data/permissions-util.js';
 import {HtmlTemplateCollection} from '../../dom/html-template-collection.js';
@@ -44,7 +45,6 @@ export class SettingsController extends EventDispatcher {
         this._pageExitPreventionEventListeners = new EventListenerCollection();
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
-        this._templates.load(document);
     }
 
     /** @type {import('../../application.js').Application} */
@@ -68,7 +68,18 @@ export class SettingsController extends EventDispatcher {
     }
 
     /** */
+    refreshProfileIndex() {
+        this._setProfileIndex(this._profileIndex, true);
+    }
+
+    /** @type {HtmlTemplateCollection} */
+    get templates() {
+        return this._templates;
+    }
+
+    /** */
     async prepare() {
+        await this._templates.loadFromFiles(['/templates-settings.html']);
         this._application.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         if (this._canObservePermissionsChanges()) {
             chrome.permissions.onAdded.addListener(this._onPermissionsChanged.bind(this));
@@ -195,6 +206,7 @@ export class SettingsController extends EventDispatcher {
      */
     preventPageExit() {
         /** @type {import('settings-controller').PageExitPrevention} */
+        // eslint-disable-next-line sonarjs/prefer-object-literal
         const obj = {};
         obj.end = this._endPreventPageExit.bind(this, obj);
         if (this._pageExitPreventionEventListeners.size === 0) {
@@ -226,8 +238,7 @@ export class SettingsController extends EventDispatcher {
     async getDefaultOptions() {
         const optionsUtil = new OptionsUtil();
         await optionsUtil.prepare();
-        const optionsFull = optionsUtil.getDefault();
-        return optionsFull;
+        return optionsUtil.getDefault();
     }
 
     // Private
@@ -239,7 +250,7 @@ export class SettingsController extends EventDispatcher {
     _setProfileIndex(value, canUpdateProfileIndex) {
         this._profileIndex = value;
         this.trigger('optionsContextChanged', {});
-        this._onOptionsUpdatedInternal(canUpdateProfileIndex);
+        void this._onOptionsUpdatedInternal(canUpdateProfileIndex);
     }
 
     /**
@@ -247,7 +258,7 @@ export class SettingsController extends EventDispatcher {
      */
     _onOptionsUpdated({source}) {
         if (source === this._source) { return; }
-        this._onOptionsUpdatedInternal(true);
+        void this._onOptionsUpdatedInternal(true);
     }
 
     /**
@@ -332,7 +343,7 @@ export class SettingsController extends EventDispatcher {
 
     /** */
     _onPermissionsChanged() {
-        this._triggerPermissionsChanged();
+        void this._triggerPermissionsChanged();
     }
 
     /** */
@@ -348,6 +359,6 @@ export class SettingsController extends EventDispatcher {
      * @returns {boolean}
      */
     _canObservePermissionsChanges() {
-        return isObject(chrome.permissions) && isObject(chrome.permissions.onAdded) && isObject(chrome.permissions.onRemoved);
+        return isObjectNotArray(chrome.permissions) && isObjectNotArray(chrome.permissions.onAdded) && isObjectNotArray(chrome.permissions.onRemoved);
     }
 }

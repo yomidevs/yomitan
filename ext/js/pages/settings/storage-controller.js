@@ -62,19 +62,19 @@ export class StorageController {
         storageRefreshButton.addEventListener('click', this._onStorageRefreshButtonClick.bind(this), false);
         this._persistentStorageController.application.on('storageChanged', this._onStorageChanged.bind(this));
 
-        this._updateStats();
+        void this._updateStats();
     }
 
     // Private
 
     /** */
     _onStorageRefreshButtonClick() {
-        this._updateStats();
+        void this._updateStats();
     }
 
     /** */
     _onStorageChanged() {
-        this._updateStats();
+        void this._updateStats();
     }
 
     /** */

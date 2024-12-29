@@ -18,24 +18,20 @@
 
 import * as wanakana from '../../../lib/wanakana.js';
 import {Frontend} from '../../app/frontend.js';
+import {ThemeController} from '../../app/theme-controller.js';
+import {createApiMap, invokeApiMapHandler} from '../../core/api-map.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {TextSourceRange} from '../../dom/text-source-range.js';
 
 export class PopupPreviewFrame {
     /**
      * @param {import('../../application.js').Application} application
-     * @param {number} tabId
-     * @param {number} frameId
      * @param {import('../../app/popup-factory.js').PopupFactory} popupFactory
      * @param {import('../../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
      */
-    constructor(application, tabId, frameId, popupFactory, hotkeyHandler) {
+    constructor(application, popupFactory, hotkeyHandler) {
         /** @type {import('../../application.js').Application} */
         this._application = application;
-        /** @type {number} */
-        this._tabId = tabId;
-        /** @type {number} */
-        this._frameId = frameId;
         /** @type {import('../../app/popup-factory.js').PopupFactory} */
         this._popupFactory = popupFactory;
         /** @type {import('../../input/hotkey-handler.js').HotkeyHandler} */
@@ -58,30 +54,33 @@ export class PopupPreviewFrame {
         this._exampleTextInput = querySelectorNotNull(document, '#example-text-input');
         /** @type {string} */
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+        /** @type {import('language').LanguageSummary[]} */
+        this._languageSummaries = [];
+        /** @type {boolean} */
+        this._wanakanaBound = false;
+        /** @type {ThemeController} */
+        this._themeController = new ThemeController(document.documentElement);
 
         /* eslint-disable @stylistic/no-multi-spaces */
-        /** @type {Map<string, (params: import('core').SerializableObjectAny) => void>} */
-        this._windowMessageHandlers = new Map(/** @type {[key: string, handler: (params: import('core').SerializableObjectAny) => void][]} */ ([
-            ['PopupPreviewFrame.setText',              this._onSetText.bind(this)],
-            ['PopupPreviewFrame.setCustomCss',         this._setCustomCss.bind(this)],
-            ['PopupPreviewFrame.setCustomOuterCss',    this._setCustomOuterCss.bind(this)],
-            ['PopupPreviewFrame.updateOptionsContext', this._updateOptionsContext.bind(this)]
-        ]));
+        /** @type {import('popup-preview-frame').ApiMap} */
+        this._windowMessageHandlers = createApiMap([
+            ['setText',                this._onSetText.bind(this)],
+            ['setCustomCss',           this._setCustomCss.bind(this)],
+            ['setCustomOuterCss',      this._setCustomOuterCss.bind(this)],
+            ['updateOptionsContext',   this._updateOptionsContext.bind(this)],
+            ['setLanguageExampleText', this._setLanguageExampleText.bind(this)],
+            ['updateSearch',           this._updateSearch.bind(this)],
+        ]);
         /* eslint-enable @stylistic/no-multi-spaces */
     }
 
     /** */
     async prepare() {
-        if (this._exampleTextInput !== null && typeof wanakana !== 'undefined') {
-            wanakana.bind(this._exampleTextInput);
-        }
-
         window.addEventListener('message', this._onMessage.bind(this), false);
 
+        this._themeController.prepare();
+
         // Setup events
-        /** @type {HTMLInputElement} */
-        const darkThemeCheckbox = querySelectorNotNull(document, '#theme-dark-checkbox');
-        darkThemeCheckbox.addEventListener('change', this._onThemeDarkCheckboxChanged.bind(this), false);
         this._exampleText.addEventListener('click', this._onExampleTextClick.bind(this), false);
         this._exampleTextInput.addEventListener('blur', this._onExampleTextInputBlur.bind(this), false);
         this._exampleTextInput.addEventListener('input', this._onExampleTextInputInput.bind(this), false);
@@ -91,11 +90,13 @@ export class PopupPreviewFrame {
         this._apiOptionsGetOld = this._application.api.optionsGet.bind(this._application.api);
         this._application.api.optionsGet = this._apiOptionsGet.bind(this);
 
+        this._languageSummaries = await this._application.api.getLanguageSummaries();
+        const options = await this._application.api.optionsGet({current: true});
+        void this._setLanguageExampleText({language: options.general.language});
+
         // Overwrite frontend
         this._frontend = new Frontend({
             application: this._application,
-            tabId: this._tabId,
-            frameId: this._frameId,
             popupFactory: this._popupFactory,
             depth: 0,
             parentPopupId: null,
@@ -105,7 +106,7 @@ export class PopupPreviewFrame {
             pageType: 'web',
             allowRootFramePopupProxy: false,
             childrenSupported: false,
-            hotkeyHandler: this._hotkeyHandler
+            hotkeyHandler: this._hotkeyHandler,
         });
         this._frontend.setOptionsContextOverride(this._optionsContext);
         await this._frontend.prepare();
@@ -117,7 +118,7 @@ export class PopupPreviewFrame {
         }
 
         // Update search
-        this._updateSearch();
+        void this._updateSearch();
     }
 
     // Private
@@ -139,6 +140,9 @@ export class PopupPreviewFrame {
         options.general.popupHorizontalTextPosition = 'below';
         options.general.popupVerticalTextPosition = 'before';
         options.scanning.selectText = false;
+        this._themeController.theme = options.general.popupTheme;
+        this._themeController.siteOverride = true;
+        this._themeController.updateTheme();
         return options;
     }
 
@@ -158,33 +162,13 @@ export class PopupPreviewFrame {
     }
 
     /**
-     * @param {MessageEvent<{action: string, params: import('core').SerializableObject}>} e
+     * @param {MessageEvent<import('popup-preview-frame.js').ApiMessageAny>} event
      */
-    _onMessage(e) {
-        if (e.origin !== this._targetOrigin) { return; }
-
-        const {action, params} = e.data;
-        const handler = this._windowMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return; }
-
-        handler(params);
-    }
-
-    /**
-     * @param {Event} e
-     */
-    _onThemeDarkCheckboxChanged(e) {
-        const element = /** @type {HTMLInputElement} */ (e.currentTarget);
-        document.documentElement.classList.toggle('dark', element.checked);
-        if (this._themeChangeTimeout !== null) {
-            clearTimeout(this._themeChangeTimeout);
-        }
-        this._themeChangeTimeout = setTimeout(() => {
-            this._themeChangeTimeout = null;
-            const popup = /** @type {Frontend} */ (this._frontend).popup;
-            if (popup === null) { return; }
-            popup.updateTheme();
-        }, 300);
+    _onMessage(event) {
+        if (event.origin !== this._targetOrigin) { return; }
+        const {action, params} = event.data;
+        const callback = () => {}; // NOP
+        invokeApiMapHandler(this._windowMessageHandlers, action, params, [], callback);
     }
 
     /** */
@@ -211,9 +195,7 @@ export class PopupPreviewFrame {
         this._setText(element.value, false);
     }
 
-    /**
-     * @param {{text: string}} details
-     */
+    /** @type {import('popup-preview-frame').ApiHandler<'setText'>} */
     _onSetText({text}) {
         this._setText(text, true);
     }
@@ -231,7 +213,7 @@ export class PopupPreviewFrame {
 
         this._exampleText.textContent = text;
         if (this._frontend === null) { return; }
-        this._updateSearch();
+        void this._updateSearch();
     }
 
     /**
@@ -244,29 +226,23 @@ export class PopupPreviewFrame {
         node.classList.toggle('placeholder-info-visible', visible);
     }
 
-    /**
-     * @param {{css: string}} details
-     */
+    /** @type {import('popup-preview-frame').ApiHandler<'setCustomCss'>} */
     _setCustomCss({css}) {
         if (this._frontend === null) { return; }
         const popup = this._frontend.popup;
         if (popup === null) { return; }
-        popup.setCustomCss(css);
+        void popup.setCustomCss(css);
     }
 
-    /**
-     * @param {{css: string}} details
-     */
+    /** @type {import('popup-preview-frame').ApiHandler<'setCustomOuterCss'>} */
     _setCustomOuterCss({css}) {
         if (this._frontend === null) { return; }
         const popup = this._frontend.popup;
         if (popup === null) { return; }
-        popup.setCustomOuterCss(css, false);
+        void popup.setCustomOuterCss(css, false);
     }
 
-    /**
-     * @param {{optionsContext: import('settings').OptionsContext}} details
-     */
+    /** @type {import('popup-preview-frame').ApiHandler<'updateOptionsContext'>} */
     async _updateOptionsContext(details) {
         const {optionsContext} = details;
         this._optionsContext = optionsContext;
@@ -274,6 +250,25 @@ export class PopupPreviewFrame {
         this._frontend.setOptionsContextOverride(optionsContext);
         await this._frontend.updateOptions();
         await this._updateSearch();
+    }
+
+    /** @type {import('popup-preview-frame').ApiHandler<'setLanguageExampleText'>} */
+    _setLanguageExampleText({language}) {
+        const activeLanguage = /** @type {import('language').LanguageSummary} */ (this._languageSummaries.find(({iso}) => iso === language));
+
+        if (this._exampleTextInput !== null) {
+            if (language === 'ja') {
+                wanakana.bind(this._exampleTextInput);
+                this._wanakanaBound = true;
+            } else if (this._wanakanaBound) {
+                wanakana.unbind(this._exampleTextInput);
+                this._wanakanaBound = false;
+            }
+        }
+
+        this._exampleTextInput.lang = language;
+        this._exampleTextInput.value = activeLanguage.exampleText;
+        this._exampleTextInput.dispatchEvent(new Event('input'));
     }
 
     /** */
@@ -302,5 +297,7 @@ export class PopupPreviewFrame {
         }
 
         this._setInfoVisible(!this._popupShown);
+
+        this._themeController.updateTheme();
     }
 }

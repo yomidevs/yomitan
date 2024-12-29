@@ -18,13 +18,12 @@ jobs:
     environment: cd
     outputs:
       result: ${{ steps.webStorePublish.outcome }}
-      releaseUploadUrl: ${{ steps.getZipAsset.outputs.releaseUploadUrl }}
     permissions:
       actions: write
     steps:
       - name: Get the next attempt number
         id: getNextAttemptNumber
-        uses: cardinalby/js-eval-action@b34865f1d9cfdf35356013627474857cfe0d5091 # pin@v1.0.7
+        uses: cardinalby/js-eval-action@e905fd3681d757e992c976f61c2784dcb4060e13 # pin@v1.0.9
         env:
           attemptNumber: ${{ github.event.inputs.attemptNumber }}
           maxAttempts: ${{ github.event.inputs.maxAttempts }}
@@ -38,14 +37,14 @@ jobs:
               return attempt < max ? attempt + 1 : '';
             }
 
-      - uses: robinraju/release-downloader@368754b9c6f47c345fcfbf42bcb577c2f0f5f395 # pin@v1.9
+      - uses: robinraju/release-downloader@a96f54c1b5f5e09e47d9504526e96febd949d4c2 # pin@v1.11
         with:
           tag: ${{ github.ref_name }}
           fileName: "*"
 
       - name: Fetch Google API access token
         id: fetchAccessToken
-        uses: cardinalby/google-api-fetch-token-action@24c99245e2a2494cc4c4b1037203d319a184b15b # pin@v1.0.3
+        uses: cardinalby/google-api-fetch-token-action@f455422472a558d48d939e77a65cdcec38e707b5 # pin@v1.0.4
         with:
           clientId: ${{ secrets.G_CLIENT_ID }}
           clientSecret: ${{ secrets.G_CLIENT_SECRET }}
@@ -54,7 +53,7 @@ jobs:
       - name: Upload to Google Web Store
         id: webStoreUpload
         continue-on-error: true
-        uses: cardinalby/webext-buildtools-chrome-webstore-upload-action@8db7a005529498d95d3e2e0166f6f4050d2b96a5 # pin@v1.0.10
+        uses: cardinalby/webext-buildtools-chrome-webstore-upload-action@3d829e042b559c35f7fb71676cbaf6031892a313 # v1.0.11
         with:
           zipFilePath: yomitan-chrome.zip
           extensionId: ${{ secrets.G_STABLE_EXTENSION_ID }}
@@ -65,7 +64,7 @@ jobs:
       # Schedule a next attempt if store refused to accept new version because it
       # still has a previous one in review
       - name: Start the next attempt with the delay
-        uses: aurelien-baudet/workflow-dispatch@93e95b157d791ae7f42aef8f8a0d3d723eba1c31 # pin@v2
+        uses: aurelien-baudet/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7 # pin@v2
         if: |
           steps.getNextAttemptNumber.outputs.result &&
           steps.webStoreUpload.outputs.inReviewError == 'true'

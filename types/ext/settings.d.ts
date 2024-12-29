@@ -27,6 +27,7 @@ export type OptionsContext1 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
+    pointerType?: Input.PointerType;
 };
 
 export type OptionsContext2 = {
@@ -37,6 +38,7 @@ export type OptionsContext2 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
+    pointerType?: Input.PointerType;
 };
 
 export type OptionsContext3 = {
@@ -47,6 +49,7 @@ export type OptionsContext3 = {
     flags?: OptionsContextFlag[];
     modifiers?: Input.Modifier[];
     modifierKeys?: Input.ModifierKey[];
+    pointerType?: Input.PointerType;
 };
 
 export type OptionsContext = OptionsContext1 | OptionsContext2 | OptionsContext3;
@@ -67,6 +70,7 @@ export type GlobalDatabaseOptions = {
 };
 
 export type Profile = {
+    id: string;
     name: string;
     conditionGroups: ProfileConditionGroup[];
     options: ProfileOptions;
@@ -101,10 +105,14 @@ export type ProfileOptions = {
 
 export type GeneralOptions = {
     enable: boolean;
+    language: string;
     resultOutputMode: ResultOutputMode;
     debugInfo: boolean;
     maxResults: number;
     showAdvanced: boolean;
+    fontFamily: string;
+    fontSize: number;
+    lineHeight: string;
     popupDisplayMode: PopupDisplayMode;
     popupWidth: number;
     popupHeight: number;
@@ -118,6 +126,7 @@ export type GeneralOptions = {
     popupScaleRelativeToPageZoom: boolean;
     popupScaleRelativeToVisualViewport: boolean;
     showGuide: boolean;
+    enableContextMenuScanSelected: boolean;
     compactTags: boolean;
     glossaryLayoutMode: GlossaryLayoutMode;
     mainDictionary: string;
@@ -140,6 +149,7 @@ export type GeneralOptions = {
     termDisplayMode: TermDisplayMode;
     sortFrequencyDictionary: string | null;
     sortFrequencyDictionaryOrder: SortFrequencyDictionaryOrder;
+    stickySearchHeader: boolean;
 };
 
 export type PopupWindowOptions = {
@@ -169,8 +179,6 @@ export type AudioSourceOptions = {
 export type ScanningOptions = {
     inputs: ScanningInput[];
     preventMiddleMouse: ScanningPreventMiddleMouseOptions;
-    touchInputEnabled: boolean;
-    pointerEventsEnabled: boolean;
     selectText: boolean;
     alphanumeric: boolean;
     autoHideResults: boolean;
@@ -188,6 +196,8 @@ export type ScanningOptions = {
     hidePopupOnCursorExit: boolean;
     hidePopupOnCursorExitDelay: number;
     normalizeCssZoom: boolean;
+    scanWithoutMousemove: boolean;
+    scanResolution: string;
 };
 
 export type ScanningInput = {
@@ -210,6 +220,7 @@ export type ScanningInputOptions = {
     scanOnTouchMove: boolean;
     scanOnTouchPress: boolean;
     scanOnTouchRelease: boolean;
+    scanOnTouchTap: boolean;
     scanOnPenMove: boolean;
     scanOnPenHover: boolean;
     scanOnPenReleaseHover: boolean;
@@ -229,7 +240,7 @@ export type ScanningPreventMiddleMouseOptions = {
 export type TranslationOptions = {
     convertHalfWidthCharacters: TranslationConvertType;
     convertNumericCharacters: TranslationConvertType;
-    convertAlphabeticCharacters: TranslationConvertType;
+    alphabeticToHiragana: TranslationConvertType;
     convertHiraganaToKatakana: TranslationConvertType;
     convertKatakanaToHiragana: TranslationConvertType;
     collapseEmphaticSequences: TranslationCollapseEmphaticSequences;
@@ -254,12 +265,13 @@ export type DictionariesOptions = DictionaryOptions[];
 
 export type DictionaryOptions = {
     name: string;
-    priority: number;
+    alias: string;
     enabled: boolean;
     allowSecondarySearches: boolean;
     definitionsCollapsible: DictionaryDefinitionsCollapsible;
     partsOfSpeechFilter: boolean;
     useDeinflections: boolean;
+    styles?: string;
 };
 
 export type ParsingOptions = {
@@ -279,10 +291,11 @@ export type AnkiOptions = {
     kanji: AnkiNoteOptions;
     duplicateScope: AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
+    duplicateBehavior: AnkiDuplicateBehavior;
     checkForDuplicates: boolean;
     fieldTemplates: string | null;
     suspendNewCards: boolean;
-    displayTags: AnkiDisplayTags;
+    displayTagsAndFlags: AnkiDisplayTagsAndFlags;
     noteGuiMode: AnkiNoteGuiMode;
     apiKey: string;
     downloadTimeout: number;
@@ -349,25 +362,39 @@ export type PreventMiddleMouseOptions = {
 };
 
 export type ResultOutputMode = 'group' | 'merge' | 'split';
+
 export type PopupDisplayMode = 'default' | 'full-width';
+
 export type PopupHorizontalTextPosition = 'below' | 'above';
+
 export type PopupVerticalTextPosition = 'default' | 'before' | 'after' | 'left' | 'right';
+
 export type GlossaryLayoutMode = 'default' | 'compact';
-export type PopupTheme = 'light' | 'dark' | 'browser';
-export type PopupOuterTheme = 'light' | 'dark' | 'browser' | 'site';
+
+export type PopupTheme = 'light' | 'dark' | 'browser' | 'site';
+
+export type PopupOuterTheme = 'light' | 'dark' | 'browser' | 'site' | 'none';
+
 export type PopupCurrentIndicatorMode = 'none' | 'asterisk' | 'triangle' | 'bar-left' | 'bar-right' | 'dot-left' | 'dot-right';
+
 export type PopupActionBarVisibility = 'auto' | 'always';
+
 export type PopupActionBarLocation = 'left' | 'right' | 'top' | 'bottom';
+
 export type FrequencyDisplayMode = 'tags' | 'tags-grouped' | 'split-tags' | 'split-tags-grouped' | 'inline-list' | 'list';
-export type TermDisplayMode = 'ruby' | 'ruby-and-reading' | 'term-and-reading';
+
+export type TermDisplayMode = 'ruby' | 'ruby-and-reading' | 'term-and-reading' | 'term-only';
+
 export type SortFrequencyDictionaryOrder = 'ascending' | 'descending';
 
 export type PopupWindowType = 'normal' | 'popup';
+
 export type PopupWindowState = 'normal' | 'maximized' | 'fullscreen';
 
-export type AudioSourceType = 'jpod101' | 'jpod101-alternate' | 'jisho' | 'text-to-speech' | 'text-to-speech-reading' | 'custom' | 'custom-json';
+export type AudioSourceType = 'jpod101' | 'language-pod-101' | 'jisho' | 'lingua-libre' | 'wiktionary' | 'text-to-speech' | 'text-to-speech-reading' | 'custom' | 'custom-json';
 
 export type TranslationConvertType = 'false' | 'true' | 'variant';
+
 export type TranslationCollapseEmphaticSequences = 'false' | 'true' | 'full';
 
 export type DictionaryDefinitionsCollapsible = 'not-collapsible' | 'expanded' | 'collapsed' | 'force-collapsed' | 'force-expanded';
@@ -375,11 +402,17 @@ export type DictionaryDefinitionsCollapsible = 'not-collapsible' | 'expanded' | 
 export type ParsingReadingMode = 'hiragana' | 'katakana' | 'romaji' | 'dictionary-reading' | 'none';
 
 export type AnkiScreenshotFormat = 'png' | 'jpeg';
+
 export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
-export type AnkiDisplayTags = 'never' | 'always' | 'non-standard';
+
+export type AnkiDuplicateBehavior = 'prevent' | 'overwrite' | 'new';
+
+export type AnkiDisplayTagsAndFlags = 'never' | 'always' | 'non-standard';
+
 export type AnkiNoteGuiMode = 'browse' | 'edit';
 
 export type SentenceTerminationCharacterMode = 'custom' | 'custom-no-newlines' | 'newlines' | 'none';
 
 export type InputsHotkeyModifier = 'alt' | 'ctrl' | 'shift' | 'meta';
+
 export type InputsHotkeyScope = 'popup' | 'search' | 'web';

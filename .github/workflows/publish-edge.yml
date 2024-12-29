@@ -1,0 +1,24 @@
+name: publish-edge
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  upload-on-webstore:
+    runs-on: ubuntu-latest
+    environment: cd
+    outputs:
+      result: ${{ steps.webStorePublish.outcome }}
+    steps:
+      - uses: robinraju/release-downloader@a96f54c1b5f5e09e47d9504526e96febd949d4c2 # pin@v1.11
+        with:
+          tag: ${{ github.ref_name }}
+          fileName: "*"
+
+      - name: Publish on Microsoft Edge Addons
+        uses: wdzeng/edge-addon@v2
+        id: webStorePublish
+        with:
+          product-id: 18e6c4cd-6383-4f38-95e9-92a629f60817
+          zip-path: yomitan-edge.zip
+          client-id: ${{ secrets.EDGE_CLIENT_ID }}
+          api-key: ${{ secrets.EDGE_API_KEY }}

@@ -46,6 +46,9 @@ export type DictionaryEntryModeDetails = {
     requirements: AnkiNoteBuilder.Requirement[];
     canAdd: boolean;
     valid: boolean;
+    /**
+     * Anki IDs of duplicate notes. May contain INVALID_NOTE_ID for notes whose ID could not be found.
+     */
     noteIds: Anki.NoteId[] | null;
     noteInfos?: (Anki.NoteInfo | null)[];
     ankiError: Error | null;
@@ -55,4 +58,10 @@ export type CreateNoteResult = {
     note: Anki.Note;
     errors: Error[];
     requirements: AnkiNoteBuilder.Requirement[];
+};
+
+export type RGB = {
+    red: number;
+    green: number;
+    blue: number;
 };

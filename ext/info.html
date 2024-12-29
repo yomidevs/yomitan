@@ -13,17 +13,38 @@
     <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
     <link rel="stylesheet" type="text/css" href="/css/material.css">
     <link rel="stylesheet" type="text/css" href="/css/settings.css">
+    <script src="/js/pages/info-main.js" type="module"></script>
 </head>
-<body>
+<body hidden>
 
 <!-- Main content -->
-<div class="content-outer"><div class="content">
+<div class="content-outer"><div class="content scrollbar">
 <div class="content-left"></div>
 <div class="content-center">
 
     <span tabindex="-1" id="content-scroll-focus"></span>
 
     <h1>Yomitan Info</h1>
+
+    <h2>Need help?</h2>
+    <div class="settings-group">
+        <a href="/quick-start-guide.html" rel="noopener" class="settings-item settings-item-button"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Check out the Quick Start Guide</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></a>
+        <a href="https://yomitan.wiki/" rel="noopener noreferrer" class="settings-item settings-item-button"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Read the wiki for more information</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></a>
+    </div>
 
     <h2 id="general">General</h2>
     <div class="settings-group">
@@ -45,10 +66,13 @@
     <div class="settings-group">
         <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
             <ul>
-                <li>Information and downloadable dictionaries: <a href="https://github.com/themoeway/yomitan#yomitan" rel="noreferrer noopener">Homepage</a></li>
-                <li>Support and source code: <a href="https://github.com/themoeway/yomitan" rel="noreferrer noopener">Github</a></li>
-                <li>Release notes: <a href="https://github.com/themoeway/yomitan/releases" rel="noreferrer noopener" data-href-format="https://github.com/themoeway/yomitan/releases/tag/{version}" id="release-notes-this-version-link">This version</a> | <a href="https://github.com/themoeway/yomitan/releases" rel="noreferrer noopener">All versions</a></li>
-                <li>More extension information: <a href="/permissions.html">Permissions</a> | <a href="/legal.html">Licenses</a> | <a href="/issues.html">Issues</a></li>
+                <li>Information and user guide: <a href="https://yomitan.wiki" rel="noreferrer noopener">Homepage</a></li>
+                <li>Recommended dictionaries: <a href="https://yomitan.wiki/dictionaries/">Yomitan Dictionaries</a></li>
+                <li>Source code: <a href="https://github.com/yomidevs/yomitan" rel="noreferrer noopener">GitHub</a></li>
+                <li>Release notes: <a href="https://github.com/yomidevs/yomitan/releases" rel="noreferrer noopener" data-href-format="https://github.com/yomidevs/yomitan/releases/tag/{version}" id="release-notes-this-version-link">This version</a> | <a href="https://github.com/yomidevs/yomitan/releases" rel="noreferrer noopener">All versions</a></li>
+                <li>Bugs? Report them here: <a href="https://github.com/yomidevs/yomitan/issues/new/choose" rel="noreferrer noopener">GitHub Issues</a></li>
+                <li>More extension information: <a href="https://yomitan.wiki/privacy/">Permissions</a> | <a href="/legal.html">Licenses</a> | <a href="/issues.html">Issues</a></li>
+                <li>Enjoying Yomitan? Help us by leaving a review on the Firefox/Chrome/Edge store! <a href="https://addons.mozilla.org/en-US/firefox/addon/yomitan/">Firefox</a> | <a href="https://chromewebstore.google.com/detail/yomitan/likgccmbimhjbgkjambclfkhldnlhbnn">Chrome</a> | <a href="https://microsoftedge.microsoft.com/addons/detail/yomitan/idelnfbbmikgfiejhgmddlbkfgiifnnn">Edge</a></li>
             </ul>
         </div></div></div></div>
     </div>
@@ -58,9 +82,6 @@
 </div>
 <div class="content-right"></div>
 </div></div>
-
-<!-- Scripts -->
-<script src="/js/pages/info-main.js" type="module"></script>
 
 </body>
 </html>

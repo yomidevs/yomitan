@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {DisplayContentManager} from '../../ext/js/display/display-content-manager';
-import type {HotkeyHelpController} from '../../ext/js/input/hotkey-help-controller';
-import type {TextSourceGenerator} from '../../ext/js/dom/text-source-generator';
-import type {API} from '../../ext/js/comm/api';
 import type * as Dictionary from './dictionary';
 import type * as Extension from './extension';
 import type * as Settings from './settings';
@@ -99,6 +95,8 @@ export type HistoryState = {
     url?: string;
     /** The originating document title of the content. */
     documentTitle?: string;
+    /** Computed theme of the page */
+    pageTheme?: 'dark' | 'light';
 };
 
 /**
@@ -127,18 +125,13 @@ export type SearchMode = null | 'popup' | 'action-popup';
 
 export type GetSearchContextCallback = TextScannerTypes.GetSearchContextCallbackSync;
 
-export type QueryParserConstructorDetails = {
-    api: API;
-    getSearchContext: GetSearchContextCallback;
-    textSourceGenerator: TextSourceGenerator;
-};
-
 export type QueryParserOptions = {
     selectedParser: string | null;
     termSpacing: boolean;
     readingMode: Settings.ParsingReadingMode;
     useInternalParser: boolean;
     useMecabParser: boolean;
+    language: string;
     scanning: TextScannerTypes.Options;
 };
 
@@ -169,11 +162,6 @@ export type Events = {
 };
 
 export type EventArgument<TName extends EventNames<Events>> = BaseEventArgument<Events, TName>;
-
-export type DisplayGeneratorConstructorDetails = {
-    contentManager: DisplayContentManager;
-    hotkeyHelpController?: HotkeyHelpController | null;
-};
 
 // Direct API
 

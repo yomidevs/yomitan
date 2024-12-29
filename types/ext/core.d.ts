@@ -22,7 +22,7 @@ export type TypeofResult = 'string' | 'number' | 'bigint' | 'boolean' | 'symbol'
 export type SafeAny = any;
 
 /** This type is used as an explicit way of permitting the `Function` type. */
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export type SafeFunction = Function;
 
 /** This type is used as an explicit way of permitting the `any` type. */
@@ -30,9 +30,6 @@ export type RejectionReason = SafeAny;
 
 /** This type is used as an explicit way of permitting the `object` type. */
 export type SerializableObject = {[key: string]: unknown};
-
-/** This type is used as an explicit way of permitting the `object` type. */
-export type SerializableObjectAny = {[key: string]: SafeAny};
 
 /** This type is used as an explicit way of permitting the `object` type. */
 export type UnknownObject = {[key: string | symbol]: unknown};

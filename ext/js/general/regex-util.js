@@ -23,13 +23,12 @@ const matchReplacementPattern = /\$(?:\$|&|`|'|(\d\d?)|<([^>]*)>)/g;
  * Applies string.replace using a regular expression and replacement string as arguments.
  * A source map of the changes is also maintained.
  * @param {string} text A string of the text to replace.
- * @param {import('./text-source-map.js').TextSourceMap} sourceMap An instance of `TextSourceMap` which corresponds to `text`.
  * @param {RegExp} pattern A regular expression to use as the replacement.
  * @param {string} replacement A replacement string that follows the format of the standard
  *   JavaScript regular expression replacement string.
  * @returns {string} A new string with the pattern replacements applied and the source map updated.
  */
-export function applyTextReplacement(text, sourceMap, pattern, replacement) {
+export function applyTextReplacement(text, pattern, replacement) {
     const isGlobal = pattern.global;
     if (isGlobal) { pattern.lastIndex = 0; }
     for (let loop = true; loop; loop = isGlobal) {
@@ -44,13 +43,6 @@ export function applyTextReplacement(text, sourceMap, pattern, replacement) {
 
         text = `${text.substring(0, index)}${actualReplacement}${text.substring(index + matchText.length)}`;
         pattern.lastIndex += delta;
-
-        if (actualReplacementLength > 0) {
-            sourceMap.insert(index, ...(new Array(actualReplacementLength).fill(0)));
-            sourceMap.combine(index - 1 + actualReplacementLength, matchText.length);
-        } else {
-            sourceMap.combine(index, matchText.length);
-        }
     }
     return text;
 }
@@ -65,7 +57,13 @@ export function applyTextReplacement(text, sourceMap, pattern, replacement) {
 export function applyMatchReplacement(replacement, match) {
     const pattern = matchReplacementPattern;
     pattern.lastIndex = 0;
-    return replacement.replace(pattern, (g0, g1, g2) => {
+    /**
+     * @param {string} g0
+     * @param {string} g1
+     * @param {string} g2
+     * @returns {string}
+     */
+    const replacer = (g0, g1, g2) => {
         if (typeof g1 !== 'undefined') {
             const matchIndex = Number.parseInt(g1, 10);
             if (matchIndex >= 1 && matchIndex <= match.length) {
@@ -87,5 +85,6 @@ export function applyMatchReplacement(replacement, match) {
             }
         }
         return g0;
-    });
+    };
+    return replacement.replace(pattern, replacer);
 }

@@ -25,7 +25,14 @@ export class SelectorObserver {
      * Creates a new instance.
      * @param {import('selector-observer').ConstructorDetails<T>} details The configuration for the object.
      */
-    constructor({selector, ignoreSelector = null, onAdded = null, onRemoved = null, onChildrenUpdated = null, isStale = null}) {
+    constructor({
+        selector,
+        ignoreSelector = null,
+        onAdded = null,
+        onRemoved = null,
+        onChildrenUpdated = null,
+        isStale = null,
+    }) {
         /** @type {string} */
         this._selector = selector;
         /** @type {?string} */
@@ -77,7 +84,7 @@ export class SelectorObserver {
         this._mutationObserver.observe(element, {
             attributes: !!attributes,
             childList: true,
-            subtree: true
+            subtree: true,
         });
 
         const {parentNode} = element;
@@ -85,7 +92,7 @@ export class SelectorObserver {
             type: 'childList',
             target: parentNode !== null ? parentNode : element,
             addedNodes: [element],
-            removedNodes: []
+            removedNodes: [],
         }]);
     }
 
@@ -170,7 +177,7 @@ export class SelectorObserver {
 
         if (
             this._onChildrenUpdated !== null &&
-            (addedNodes.length !== 0 || addedNodes.length !== 0)
+            (removedNodes.length > 0 || addedNodes.length > 0)
         ) {
             for (let node = /** @type {?Node} */ (target); node !== null; node = node.parentNode) {
                 const observer = this._elementMap.get(node);

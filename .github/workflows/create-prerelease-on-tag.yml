@@ -22,11 +22,12 @@ jobs:
         with:
           node-version-file: "package.json"
 
+      # intentially do not use cache to keep the build more comprehensible and sandboxed
       - name: Install dependencies
         run: npm ci
 
       - name: Build Legal
-        run: npm run license-report
+        run: npm run license-report:html
 
       - name: Build
         run: npm run-script build -- --all --version ${{ github.ref_name }}
@@ -36,25 +37,26 @@ jobs:
         id: hash
         run: |
           cd builds
-          echo "hashes=$(sha256sum * | base64 -w0)" >> "$GITHUB_OUTPUT"
+          echo "hashes=$(sha256sum -- * | base64 -w0)" >> "$GITHUB_OUTPUT"
 
       - name: Release
         id: release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v0.1.15
+        uses: softprops/action-gh-release@01570a1f39cb168c169c802c3bceb9e93fb10974 # pin@v2
         with:
           generate_release_notes: true
           prerelease: true
           files: builds/*
 
       - name: Dispatch publish-chrome-development
-        uses: aurelien-baudet/workflow-dispatch@93e95b157d791ae7f42aef8f8a0d3d723eba1c31 # pin@v2
+        uses: aurelien-baudet/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7 # pin@v2
         with:
           workflow: publish-chrome-development
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: false
+          inputs: '{ "upload_url": "${{ steps.release.outputs.upload_url }}" }'
 
       - name: Dispatch publish-firefox-development
-        uses: aurelien-baudet/workflow-dispatch@93e95b157d791ae7f42aef8f8a0d3d723eba1c31 # pin@v2
+        uses: aurelien-baudet/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7 # pin@v2
         with:
           workflow: publish-firefox-development
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -67,7 +69,7 @@ jobs:
       actions: read # To read the workflow path.
       id-token: write # To sign the provenance.
       contents: write # To add assets to a release.
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.9.0
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
     with:
       base64-subjects: "${{ needs.build.outputs.hashes }}"
       upload-assets: true

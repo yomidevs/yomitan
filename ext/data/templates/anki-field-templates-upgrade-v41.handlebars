@@ -1,0 +1,129 @@
+{{<<<<<<<}}
+{{~#*inline "glossary"~}}
+    <div style="text-align: left;">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~#unless (op "&&" selectedDictionary (op "!=" selectedDictionary definition.dictionary))~}}
+                {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+            {{~/unless~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                <ol>
+                    {{~#each definition.definitions~}}
+                        {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                            <li>
+                                {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                            </li>
+                        {{~/unless~}}
+                    {{~/each~}}
+                </ol>
+            {{~else~}}
+                {{~#each definition.definitions~}}
+                    {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                        {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                    {{~/unless~}}
+                {{~/each~}}
+            {{~/if~}}
+        {{~else if (op "===" definition.type "kanji")~}}
+            {{~#if (op ">" definition.glossary.length 1)~}}
+                <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
+            {{~else~}}
+                {{~#each definition.glossary~}}{{.}}{{~/each~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+{{=======}}
+{{~#*inline "glossary"~}}
+    <div style="text-align: left;" class="yomitan-glossary">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~#unless (op "&&" selectedDictionary (op "!=" selectedDictionary definition.dictionary))~}}
+                {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+                {{~#if definition.glossaryScopedStyles~}}
+                    <style>{{{definition.glossaryScopedStyles}}}</style>
+                {{~/if~}}
+            {{~/unless~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                <ol>
+                    {{~#each definition.definitions~}}
+                        {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                            <li data-dictionary="{{dictionary}}">
+                                {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                            </li>
+                            {{~#if dictScopedStyles~}}
+                                <style>{{{dictScopedStyles}}}</style>
+                            {{~/if~}}
+                        {{~/unless~}}
+                    {{~/each~}}
+                </ol>
+            {{~else~}}
+                {{~#each definition.definitions~}}
+                    {{~#unless (op "&&" ../selectedDictionary (op "!=" ../selectedDictionary dictionary))~}}
+                        {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                        {{~#if glossaryScopedStyles~}}
+                            <style>{{{glossaryScopedStyles}}}</style>
+                        {{~/if~}}
+                    {{~/unless~}}
+                {{~/each~}}
+            {{~/if~}}
+        {{~else if (op "===" definition.type "kanji")~}}
+            {{~#if (op ">" definition.glossary.length 1)~}}
+                <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
+            {{~else~}}
+                {{~#each definition.glossary~}}{{.}}{{~/each~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{~#*inline "glossary-first"~}}
+    <div style="text-align: left;">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                {{~#with definition.definitions.[0]~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/with~}}
+            {{~else~}}
+                {{~#with definition.definitions.[0]~}}{{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}{{~/with~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+{{=======}}
+{{~#*inline "glossary-first"~}}
+    <div style="text-align: left;" class="yomitan-glossary">
+    {{~#scope~}}
+        {{~#if (op "===" definition.type "term")~}}
+            {{~> glossary-single definition brief=brief noDictionaryTag=noDictionaryTag ~}}
+            {{~#if definition.glossaryScopedStyles~}}
+                <style>{{{definition.glossaryScopedStyles}}}</style>
+            {{~/if~}}
+        {{~else if (op "||" (op "===" definition.type "termGrouped") (op "===" definition.type "termMerged"))~}}
+            {{~#if (op ">" definition.definitions.length 1)~}}
+                {{~#with definition.definitions.[0]~}}
+                    {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                    {{~#if glossaryScopedStyles~}}
+                        <style>{{{glossaryScopedStyles}}}</style>
+                    {{~/if~}}
+                {{~/with~}}
+            {{~else~}}
+                {{~#with definition.definitions.[0]~}}
+                    {{~> glossary-single . brief=../brief noDictionaryTag=../noDictionaryTag ~}}
+                    {{~#if glossaryScopedStyles~}}
+                        <style>{{{glossaryScopedStyles}}}</style>
+                    {{~/if~}}
+                {{~/with~}}
+            {{~/if~}}
+        {{~/if~}}
+    {{~/scope~}}
+    </div>
+{{~/inline~}}
+{{>>>>>>>}}

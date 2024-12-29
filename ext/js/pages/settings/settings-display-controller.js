@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {DocumentUtil} from '../../dom/document-util.js';
+import {ThemeController} from '../../app/theme-controller.js';
+import {isInputElementFocused} from '../../dom/document-util.js';
 import {PopupMenu} from '../../dom/popup-menu.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {SelectorObserver} from '../../dom/selector-observer.js';
@@ -39,10 +40,17 @@ export class SettingsDisplayController {
         this._onMoreToggleClickBind = this._onMoreToggleClick.bind(this);
         /** @type {(event: MouseEvent) => void} */
         this._onMenuButtonClickBind = this._onMenuButtonClick.bind(this);
+        /** @type {ThemeController} */
+        this._themeController = new ThemeController(document.documentElement);
+        /** @type {HTMLSelectElement | null}*/
+        this._themeDropdown = document.querySelector('[data-setting="general.popupTheme"]');
     }
 
     /** */
-    prepare() {
+    async prepare() {
+        this._themeController.prepare();
+        await this._setTheme();
+
         const onFabButtonClick = this._onFabButtonClick.bind(this);
         for (const fabButton of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.fab-button'))) {
             fabButton.addEventListener('click', onFabButtonClick, false);
@@ -70,20 +78,41 @@ export class SettingsDisplayController {
         const moreSelectorObserver = new SelectorObserver({
             selector: '.more-toggle',
             onAdded: this._onMoreSetup.bind(this),
-            onRemoved: this._onMoreCleanup.bind(this)
+            onRemoved: this._onMoreCleanup.bind(this),
         });
         moreSelectorObserver.observe(document.documentElement, false);
 
         const menuSelectorObserver = new SelectorObserver({
             selector: '[data-menu]',
             onAdded: this._onMenuSetup.bind(this),
-            onRemoved: this._onMenuCleanup.bind(this)
+            onRemoved: this._onMenuCleanup.bind(this),
         });
         menuSelectorObserver.observe(document.documentElement, false);
 
         window.addEventListener('keydown', this._onKeyDown.bind(this), false);
         window.addEventListener('popstate', this._onPopState.bind(this), false);
         this._updateScrollTarget();
+
+        if (this._themeDropdown) {
+            this._themeDropdown.addEventListener('change', this._updateTheme.bind(this), false);
+        }
+    }
+
+    /** */
+    async _setTheme() {
+        this._themeController.theme = (await this._settingsController.getOptions()).general.popupTheme;
+        this._themeController.siteOverride = true;
+        this._themeController.updateTheme();
+    }
+
+    /** */
+    async _updateTheme() {
+        const theme = this._themeDropdown?.value;
+        if (theme === 'site' || theme === 'light' || theme === 'dark' || theme === 'browser') {
+            this._themeController.theme = theme;
+        }
+        this._themeController.siteOverride = true;
+        this._themeController.updateTheme();
     }
 
     // Private
@@ -184,7 +213,7 @@ export class SettingsDisplayController {
     _onKeyDown(e) {
         switch (e.code) {
             case 'Escape':
-                if (!DocumentUtil.isInputElementFocused()) {
+                if (!isInputElementFocused()) {
                     this._closeTopMenuOrModal();
                     e.preventDefault();
                 }
@@ -290,7 +319,7 @@ export class SettingsDisplayController {
      */
     _getMoreContainer(link) {
         const v = link.dataset.parentDistance;
-        const distance = v ? parseInt(v, 10) : 1;
+        const distance = v ? Number.parseInt(v, 10) : 1;
         if (Number.isNaN(distance)) { return null; }
 
         /** @type {?Element} */
@@ -338,7 +367,7 @@ export class SettingsDisplayController {
 
         let indent = '\t';
         if (args.length > 1) {
-            const count = parseInt(args[1], 10);
+            const count = Number.parseInt(args[1], 10);
             indent = (Number.isFinite(count) && count >= 0 ? ' '.repeat(count) : args[1]);
         }
 

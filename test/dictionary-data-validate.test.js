@@ -19,19 +19,19 @@
 import {fileURLToPath} from 'node:url';
 import path from 'path';
 import {describe, it} from 'vitest';
+import {createDictionaryArchiveData} from '../dev/dictionary-archive-util.js';
 import * as dictionaryValidate from '../dev/dictionary-validate.js';
-import {createDictionaryArchive} from '../dev/util.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * @param {string} dictionary
  * @param {string} [dictionaryName]
- * @returns {import('jszip')}
+ * @returns {Promise<ArrayBuffer>}
  */
-function createTestDictionaryArchive(dictionary, dictionaryName) {
+async function createTestDictionaryArchiveData(dictionary, dictionaryName) {
     const dictionaryDirectory = path.join(dirname, 'data', 'dictionaries', dictionary);
-    return createDictionaryArchive(dictionaryDirectory, dictionaryName);
+    return await createDictionaryArchiveData(dictionaryDirectory, dictionaryName);
 }
 
 describe('Dictionary validation', () => {
@@ -42,17 +42,18 @@ describe('Dictionary validation', () => {
         {name: 'invalid-dictionary3', valid: false},
         {name: 'invalid-dictionary4', valid: false},
         {name: 'invalid-dictionary5', valid: false},
-        {name: 'invalid-dictionary6', valid: false}
+        {name: 'invalid-dictionary6', valid: false},
     ];
     const schemas = dictionaryValidate.getSchemas();
     describe.each(testCases)('Test dictionary $name', ({name, valid}) => {
         it(`should be ${valid ? 'valid' : 'invalid'}`, async ({expect}) => {
-            const archive = createTestDictionaryArchive(name);
-            if (valid) {
-                await expect(dictionaryValidate.validateDictionary(null, archive, schemas)).resolves.not.toThrow();
-            } else {
-                await expect(dictionaryValidate.validateDictionary(null, archive, schemas)).rejects.toThrow();
-            }
+            const archive = await createTestDictionaryArchiveData(name);
+            const promise = dictionaryValidate.validateDictionary(null, archive, schemas);
+            await (
+                valid ?
+                expect(promise).resolves.not.toThrow() :
+                expect(promise).rejects.toThrow()
+            );
         });
     });
 });

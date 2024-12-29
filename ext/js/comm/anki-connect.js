@@ -18,6 +18,7 @@
 
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
+import {isObjectNotArray} from '../core/object-utilities.js';
 import {getRootDeckName} from '../data/anki-util.js';
 
 /**
@@ -130,6 +131,35 @@ export class AnkiConnect {
 
     /**
      * @param {import('anki').Note[]} notes
+     * @returns {Promise<?((number | null)[] | null)>}
+     */
+    async addNotes(notes) {
+        if (!this._enabled) { return null; }
+        await this._checkVersion();
+        const result = await this._invoke('addNotes', {notes});
+        if (result !== null && !Array.isArray(result)) {
+            throw this._createUnexpectedResultError('(number | null)[] | null', result);
+        }
+        return result;
+    }
+
+    /**
+     * @param {import('anki').Note} noteWithId
+     * @returns {Promise<null>}
+     */
+    async updateNoteFields(noteWithId) {
+        if (!this._enabled) { return null; }
+        await this._checkVersion();
+        const result = await this._invoke('updateNoteFields', {note: noteWithId});
+        if (result !== null) {
+            throw this._createUnexpectedResultError('null', result);
+        }
+        return result;
+    }
+
+
+    /**
+     * @param {import('anki').Note[]} notes
      * @returns {Promise<boolean[]>}
      */
     async canAddNotes(notes) {
@@ -148,6 +178,17 @@ export class AnkiConnect {
         await this._checkVersion();
         const result = await this._invoke('notesInfo', {notes: noteIds});
         return this._normalizeNoteInfoArray(result);
+    }
+
+    /**
+     * @param {import('anki').CardId[]} cardIds
+     * @returns {Promise<(?import('anki').CardInfo)[]>}
+     */
+    async cardsInfo(cardIds) {
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        const result = await this._invoke('cardsInfo', {cards: cardIds});
+        return this._normalizeCardInfoArray(result);
     }
 
     /**
@@ -198,6 +239,14 @@ export class AnkiConnect {
      */
     async guiBrowseNote(noteId) {
         return await this.guiBrowse(`nid:${noteId}`);
+    }
+
+    /**
+     * @param {import('anki').NoteId[]} noteIds
+     * @returns {Promise<import('anki').CardId[]>}
+     */
+    async guiBrowseNotes(noteIds) {
+        return await this.guiBrowse(`nid:${noteIds.join(',')}`);
     }
 
     /**
@@ -329,7 +378,7 @@ export class AnkiConnect {
         const resultActions2 = /** @type {string[]} */ (this._normalizeArray(resultActions, -1, 'string', ', field scopes'));
         return {
             scopes: resultScopes2,
-            actions: resultActions2
+            actions: resultActions2,
         };
     }
 
@@ -397,11 +446,11 @@ export class AnkiConnect {
                 cache: 'default',
                 credentials: 'omit',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 redirect: 'follow',
                 referrerPolicy: 'no-referrer',
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
             });
         } catch (e) {
             const error = new ExtensionError('Anki connection failure');
@@ -430,7 +479,9 @@ export class AnkiConnect {
         if (typeof result === 'object' && result !== null && !Array.isArray(result)) {
             const apiError = /** @type {import('core').SerializableObject} */ (result).error;
             if (typeof apiError !== 'undefined') {
+                // eslint-disable-next-line @typescript-eslint/no-base-to-string
                 const error = new ExtensionError(`Anki error: ${apiError}`);
+                // eslint-disable-next-line @typescript-eslint/no-base-to-string
                 error.data = {action, params, status: response.status, apiError: typeof apiError === 'string' ? apiError : `${apiError}`};
                 throw error;
             }
@@ -597,15 +648,15 @@ export class AnkiConnect {
             if (typeof modelName !== 'string') {
                 throw this._createError(`Unexpected result type at index ${i}, field modelName: expected string, received ${this._getTypeName(modelName)}`, result);
             }
-            if (typeof fields !== 'object' || fields === null) {
-                throw this._createError(`Unexpected result type at index ${i}, field fields: expected string, received ${this._getTypeName(fields)}`, result);
+            if (!isObjectNotArray(fields)) {
+                throw this._createError(`Unexpected result type at index ${i}, field fields: expected object, received ${this._getTypeName(fields)}`, result);
             }
             const tags2 = /** @type {string[]} */ (this._normalizeArray(tags, -1, 'string', ', field tags'));
             const cards2 = /** @type {number[]} */ (this._normalizeArray(cards, -1, 'number', ', field cards'));
             /** @type {{[key: string]: import('anki').NoteFieldInfo}} */
             const fields2 = {};
             for (const [key, fieldInfo] of Object.entries(fields)) {
-                if (typeof fieldInfo !== 'object' || fieldInfo === null) { continue; }
+                if (!isObjectNotArray(fieldInfo)) { continue; }
                 const {value, order} = fieldInfo;
                 if (typeof value !== 'string' || typeof order !== 'number') { continue; }
                 fields2[key] = {value, order};
@@ -616,7 +667,47 @@ export class AnkiConnect {
                 tags: tags2,
                 fields: fields2,
                 modelName,
-                cards: cards2
+                cards: cards2,
+                cardsInfo: [],
+            };
+            result2.push(item2);
+        }
+        return result2;
+    }
+
+    /**
+     * Transforms raw AnkiConnect data into the CardInfo type.
+     * @param {unknown} result
+     * @returns {(?import('anki').CardInfo)[]}
+     * @throws {Error}
+     */
+    _normalizeCardInfoArray(result) {
+        if (!Array.isArray(result)) {
+            throw this._createUnexpectedResultError('array', result, '');
+        }
+        /** @type {(?import('anki').CardInfo)[]} */
+        const result2 = [];
+        for (let i = 0, ii = result.length; i < ii; ++i) {
+            const item = /** @type {unknown} */ (result[i]);
+            if (item === null || typeof item !== 'object') {
+                throw this._createError(`Unexpected result type at index ${i}: expected Cards.CardInfo, received ${this._getTypeName(item)}`, result);
+            }
+            const {cardId} = /** @type {{[key: string]: unknown}} */ (item);
+            if (typeof cardId !== 'number') {
+                result2.push(null);
+                continue;
+            }
+            const {note, flags} = /** @type {{[key: string]: unknown}} */ (item);
+            if (typeof note !== 'number') {
+                result2.push(null);
+                continue;
+            }
+
+            /** @type {import('anki').CardInfo} */
+            const item2 = {
+                noteId: note,
+                cardId,
+                flags: typeof flags === 'number' ? flags : 0,
             };
             result2.push(item2);
         }

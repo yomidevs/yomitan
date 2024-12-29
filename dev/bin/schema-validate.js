@@ -27,7 +27,7 @@ function main() {
     if (args.length < 2) {
         console.log([
             'Usage:',
-            '  node schema-validate [--ajv] <schema-file-name> <data-file-names>...'
+            '  node schema-validate [--ajv] <schema-file-name> <data-file-names>...',
         ].join('\n'));
         return;
     }
@@ -43,15 +43,18 @@ function main() {
     const schema = parseJson(schemaSource);
 
     for (const dataFileName of args.slice(1)) {
+        // eslint-disable-next-line no-restricted-syntax
         const start = performance.now();
         try {
             console.log(`Validating ${dataFileName}...`);
             const dataSource = fs.readFileSync(dataFileName, {encoding: 'utf8'});
             const data = parseJson(dataSource);
             createJsonSchema(mode, schema).validate(data);
+            // eslint-disable-next-line no-restricted-syntax
             const end = performance.now();
             console.log(`No issues detected (${((end - start) / 1000).toFixed(2)}s)`);
         } catch (e) {
+            // eslint-disable-next-line no-restricted-syntax
             const end = performance.now();
             console.log(`Encountered an error (${((end - start) / 1000).toFixed(2)}s)`);
             console.warn(e);

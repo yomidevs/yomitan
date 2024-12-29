@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {FindTermsMatchType, FindTermsSortOrder, FindTermsVariantMode, FindTermsEmphaticSequencesMode, FindKanjiDictionary, FindTermDictionary} from '../ext/translation';
-import type {SearchResolution} from 'settings';
+import type {FindTermsMatchType, FindTermsSortOrder, FindKanjiDictionary, FindTermDictionary} from '../ext/translation';
+import type {SearchResolution} from '../ext/settings';
 import type {FindTermsMode} from 'translator';
 import type {DictionaryEntry} from 'dictionary';
 import type {NoteData} from 'anki-templates';
@@ -44,16 +44,12 @@ export type FindTermsOptionsPreset = {
     sortFrequencyDictionary?: string | null;
     sortFrequencyDictionaryOrder?: FindTermsSortOrder;
     removeNonJapaneseCharacters?: boolean;
-    convertHalfWidthCharacters?: FindTermsVariantMode;
-    convertNumericCharacters?: FindTermsVariantMode;
-    convertAlphabeticCharacters?: FindTermsVariantMode;
-    convertHiraganaToKatakana?: FindTermsVariantMode;
-    convertKatakanaToHiragana?: FindTermsVariantMode;
-    collapseEmphaticSequences?: FindTermsEmphaticSequencesMode;
+    primaryReading?: string;
     textReplacements?: (FindTermsTextReplacement[] | null)[];
     enabledDictionaryMap?: [key: string, value: FindTermDictionary][];
     excludeDictionaryDefinitions?: string[] | null;
     searchResolution?: SearchResolution;
+    language?: string;
 };
 
 export type OptionsType = OptionsPreset['type'];
