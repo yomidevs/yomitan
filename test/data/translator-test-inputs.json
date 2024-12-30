@@ -7,8 +7,7 @@
                     "${title}",
                     {
                         "index": 0,
-                        "alias": "kanjiDictAlias",
-                        "priority": 0
+                        "alias": "kanjiDictAlias"
                     }
                 ]
             ],
@@ -32,7 +31,6 @@
                     {
                         "index": 0,
                         "alias": "termsDictAlias",
-                        "priority": 0,
                         "allowSecondarySearches": false,
                         "partsOfSpeechFilter": true,
                         "useDeinflections": true
@@ -511,6 +509,32 @@
                     "language": "en",
                     "removeNonJapaneseCharacters": false,
                     "searchResolution": "word"
+                }
+            ]
+        },
+        {
+            "name": "Find terms using primary reading 1",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "自重",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "primaryReading": "じちょう"
+                }
+            ]
+        },
+        {
+            "name": "Find terms using primary reading 2",
+            "func": "findTerms",
+            "mode": "split",
+            "text": "自重",
+            "options": [
+                "default",
+                {
+                    "type": "terms",
+                    "primaryReading": "じじゅう"
                 }
             ]
         }

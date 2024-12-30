@@ -453,8 +453,6 @@
                                 "required": [
                                     "inputs",
                                     "preventMiddleMouse",
-                                    "touchInputEnabled",
-                                    "pointerEventsEnabled",
                                     "selectText",
                                     "alphanumeric",
                                     "autoHideResults",
@@ -462,7 +460,6 @@
                                     "hideDelay",
                                     "length",
                                     "deepDomScan",
-                                    "scanAltText",
                                     "popupNestingMaxDepth",
                                     "enablePopupSearch",
                                     "enableOnPopupExpressions",
@@ -677,14 +674,6 @@
                                             }
                                         }
                                     },
-                                    "touchInputEnabled": {
-                                        "type": "boolean",
-                                        "default": true
-                                    },
-                                    "pointerEventsEnabled": {
-                                        "type": "boolean",
-                                        "default": false
-                                    },
                                     "selectText": {
                                         "type": "boolean",
                                         "default": true
@@ -715,10 +704,6 @@
                                     "deepDomScan": {
                                         "type": "boolean",
                                         "default": false
-                                    },
-                                    "scanAltText": {
-                                        "type": "boolean",
-                                        "default": true
                                     },
                                     "popupNestingMaxDepth": {
                                         "type": "integer",
@@ -841,7 +826,6 @@
                                     "required": [
                                         "name",
                                         "alias",
-                                        "priority",
                                         "enabled",
                                         "allowSecondarySearches",
                                         "definitionsCollapsible",
@@ -856,10 +840,6 @@
                                         "alias": {
                                             "type": "string",
                                             "default": ""
-                                        },
-                                        "priority": {
-                                            "type": "number",
-                                            "default": 0
                                         },
                                         "enabled": {
                                             "type": "boolean",
@@ -932,7 +912,7 @@
                                     "checkForDuplicates",
                                     "fieldTemplates",
                                     "suspendNewCards",
-                                    "displayTags",
+                                    "displayTagsAndFlags",
                                     "noteGuiMode",
                                     "apiKey",
                                     "downloadTimeout"
@@ -1051,7 +1031,7 @@
                                         "type": "boolean",
                                         "default": false
                                     },
-                                    "displayTags": {
+                                    "displayTagsAndFlags": {
                                         "type": "string",
                                         "enum": ["never", "always", "non-standard"],
                                         "default": "never"

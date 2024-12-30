@@ -18,6 +18,7 @@
 
 import {EventDispatcher} from '../core/event-dispatcher.js';
 import {log} from '../core/log.js';
+import {trimTrailingWhitespacePlusSpace} from '../data/string-util.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana, isStringEntirelyKana} from '../language/ja/japanese.js';
 import {TextScanner} from '../language/text-scanner.js';
@@ -133,6 +134,9 @@ export class QueryParser extends EventDispatcher {
         this._text = text;
         this._setPreview(text);
 
+        if (this._useInternalParser === false && this._useMecabParser === false) {
+            return;
+        }
         /** @type {?import('core').TokenObject} */
         const token = {};
         this._setTextToken = token;
@@ -301,13 +305,14 @@ export class QueryParser extends EventDispatcher {
             termNode.className = 'query-parser-term';
             termNode.dataset.offset = `${offset}`;
             for (const {text, reading} of term) {
+                const trimmedText = trimTrailingWhitespacePlusSpace(text);
                 if (reading.length === 0) {
-                    termNode.appendChild(document.createTextNode(text));
+                    termNode.appendChild(document.createTextNode(trimmedText));
                 } else {
-                    const reading2 = this._convertReading(text, reading);
-                    termNode.appendChild(this._createSegment(text, reading2, offset));
+                    const reading2 = this._convertReading(trimmedText, reading);
+                    termNode.appendChild(this._createSegment(trimmedText, reading2, offset));
                 }
-                offset += text.length;
+                offset += trimmedText.length;
             }
             fragment.appendChild(termNode);
         }

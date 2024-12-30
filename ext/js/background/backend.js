@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 import {AccessibilityController} from '../accessibility/accessibility-controller.js';
 import {AnkiConnect} from '../comm/anki-connect.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
@@ -72,7 +71,6 @@ export class Backend {
             this._translator = new Translator(this._dictionaryDatabase);
             /** @type {ClipboardReader|ClipboardReaderProxy} */
             this._clipboardReader = new ClipboardReader(
-                // eslint-disable-next-line no-undef
                 (typeof document === 'object' && document !== null ? document : null),
                 '#clipboard-paste-target',
                 '#clipboard-rich-content-paste-target',
@@ -187,6 +185,12 @@ export class Backend {
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
             ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)],
         ]);
+
+        /** @type {import('api').PmApiMap} */
+        this._pmApiMap = createApiMap([
+            ['connectToDatabaseWorker', this._onPmConnectToDatabaseWorker.bind(this)],
+            ['registerOffscreenPort',   this._onPmApiRegisterOffscreenPort.bind(this)],
+        ]);
         /* eslint-enable @stylistic/no-multi-spaces */
 
         /** @type {Map<string, (params?: import('core').SerializableObject) => void>} */
@@ -241,6 +245,9 @@ export class Backend {
         const onMessage = this._onMessageWrapper.bind(this);
         chrome.runtime.onMessage.addListener(onMessage);
 
+        // On Chrome, this is for receiving messages sent with navigator.serviceWorker, which has the benefit of being able to transfer objects, but doesn't accept callbacks
+        (/** @type {ServiceWorkerGlobalScope & typeof globalThis} */ (globalThis)).addEventListener('message', this._onPmMessage.bind(this));
+
         if (this._canObservePermissionsChanges()) {
             const onPermissionsChanged = this._onWebExtensionEventWrapper(this._onPermissionsChanged.bind(this));
             chrome.permissions.onAdded.addListener(onPermissionsChanged);
@@ -248,6 +255,20 @@ export class Backend {
         }
 
         chrome.runtime.onInstalled.addListener(this._onInstalled.bind(this));
+    }
+
+    /** @type {import('api').PmApiHandler<'connectToDatabaseWorker'>} */
+    async _onPmConnectToDatabaseWorker(_params, ports) {
+        if (ports !== null && ports.length > 0) {
+            await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
+        }
+    }
+
+    /** @type {import('api').PmApiHandler<'registerOffscreenPort'>} */
+    async _onPmApiRegisterOffscreenPort(_params, ports) {
+        if (ports !== null && ports.length > 0) {
+            await this._offscreen?.registerOffscreenPort(ports[0]);
+        }
     }
 
     /**
@@ -274,6 +295,16 @@ export class Backend {
             }
             this._clipboardReader.browser = this._environment.getInfo().browser;
 
+            // if this is Firefox and therefore not running in Service Worker, we need to use a SharedWorker to setup a MessageChannel to postMessage with the popup
+            if (self.constructor.name === 'Window') {
+                const sharedWorkerBridge = new SharedWorker(new URL('../comm/shared-worker-bridge.js', import.meta.url), {type: 'module'});
+                sharedWorkerBridge.port.postMessage({action: 'registerBackendPort'});
+                sharedWorkerBridge.port.addEventListener('message', (/** @type {MessageEvent} */ e) => {
+                    // connectToBackend2
+                    e.ports[0].onmessage = this._onPmMessage.bind(this);
+                });
+                sharedWorkerBridge.port.start();
+            }
             try {
                 await this._dictionaryDatabase.prepare();
             } catch (e) {
@@ -407,6 +438,15 @@ export class Backend {
      */
     _onMessage({action, params}, sender, callback) {
         return invokeApiMapHandler(this._apiMap, action, params, [sender], callback);
+    }
+
+    /**
+     * @param {MessageEvent<import('api').PmApiMessageAny>} event
+     * @returns {boolean}
+     */
+    _onPmMessage(event) {
+        const {action, params} = event.data;
+        return invokeApiMapHandler(this._pmApiMap, action, params, [event.ports], () => {});
     }
 
     /**
@@ -613,7 +653,7 @@ export class Backend {
             }
 
             const noteIds = isDuplicate ? duplicateNoteIds[originalIndices.indexOf(i)] : null;
-            const noteInfos = (fetchAdditionalInfo && noteIds !== null && noteIds.length > 0) ? await this._anki.notesInfo(noteIds) : [];
+            const noteInfos = (fetchAdditionalInfo && noteIds !== null && noteIds.length > 0) ? await this._notesCardsInfo(noteIds) : [];
 
             const info = {
                 canAdd: valid,
@@ -626,6 +666,27 @@ export class Backend {
         }
 
         return results;
+    }
+
+    /**
+     * @param {number[]} noteIds
+     * @returns {Promise<(?import('anki').NoteInfo)[]>}
+     */
+    async _notesCardsInfo(noteIds) {
+        const notesInfo = await this._anki.notesInfo(noteIds);
+        /** @type {number[]} */
+        // @ts-expect-error - ts is not smart enough to realize that filtering !!x removes null and undefined
+        const cardIds = notesInfo.flatMap((x) => x?.cards).filter((x) => !!x);
+        const cardsInfo = await this._anki.cardsInfo(cardIds);
+        for (let i = 0; i < notesInfo.length; i++) {
+            if (notesInfo[i] !== null) {
+                const cardInfo = cardsInfo.find((x) => x?.noteId === notesInfo[i]?.noteId);
+                if (cardInfo) {
+                    notesInfo[i]?.cardsInfo.push(cardInfo);
+                }
+            }
+        }
+        return notesInfo;
     }
 
     /** @type {import('api').ApiHandler<'injectAnkiNoteMedia'>} */
@@ -1310,7 +1371,20 @@ export class Backend {
             this._clipboardMonitor.stop();
         }
 
+        this._setupContextMenu(options);
+
+        void this._accessibilityController.update(this._getOptionsFull(false));
+
+        this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
+    }
+
+    /**
+     * @param {import('settings').ProfileOptions} options
+     */
+    _setupContextMenu(options) {
         try {
+            if (!chrome.contextMenus) { return; }
+
             if (options.general.enableContextMenuScanSelected) {
                 chrome.contextMenus.create({
                     id: 'yomitan_lookup',
@@ -1328,10 +1402,6 @@ export class Backend {
         } catch (e) {
             log.error(e);
         }
-
-        void this._accessibilityController.update(this._getOptionsFull(false));
-
-        this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
     }
 
     /**
@@ -1463,7 +1533,9 @@ export class Backend {
         /** @type {import('translator').FindTermsMode} */
         const mode = 'simple';
         const options = this._getProfileOptions(optionsContext, false);
-        const details = {matchType: /** @type {import('translation').FindTermsMatchType} */ ('exact'), deinflect: true};
+
+        /** @type {import('api').FindTermsDetails} */
+        const details = {matchType: 'exact', deinflect: true};
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
         /** @type {import('api').ParseTextLine[]} */
         const results = [];
@@ -2455,9 +2527,10 @@ export class Backend {
      * @returns {import('translation').FindTermsOptions} An options object.
      */
     _getTranslatorFindTermsOptions(mode, details, options) {
-        let {matchType, deinflect} = details;
+        let {matchType, deinflect, primaryReading} = details;
         if (typeof matchType !== 'string') { matchType = /** @type {import('translation').FindTermsMatchType} */ ('exact'); }
         if (typeof deinflect !== 'boolean') { deinflect = true; }
+        if (typeof primaryReading !== 'string') { primaryReading = ''; }
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
             general: {mainDictionary, sortFrequencyDictionary, sortFrequencyDictionaryOrder, language},
@@ -2473,7 +2546,6 @@ export class Backend {
             enabledDictionaryMap.set(mainDictionary, {
                 index: enabledDictionaryMap.size,
                 alias: mainDictionary,
-                priority: 0,
                 allowSecondarySearches: false,
                 partsOfSpeechFilter: true,
                 useDeinflections: true,
@@ -2484,6 +2556,7 @@ export class Backend {
         return {
             matchType,
             deinflect,
+            primaryReading,
             mainDictionary,
             sortFrequencyDictionary,
             sortFrequencyDictionaryOrder,
@@ -2517,11 +2590,10 @@ export class Backend {
         const enabledDictionaryMap = new Map();
         for (const dictionary of options.dictionaries) {
             if (!dictionary.enabled) { continue; }
-            const {name, alias, priority, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
+            const {name, alias, allowSecondarySearches, partsOfSpeechFilter, useDeinflections} = dictionary;
             enabledDictionaryMap.set(name, {
                 index: enabledDictionaryMap.size,
                 alias,
-                priority,
                 allowSecondarySearches,
                 partsOfSpeechFilter,
                 useDeinflections,

@@ -563,6 +563,11 @@ export class OptionsUtil {
             this._updateVersion49,
             this._updateVersion50,
             this._updateVersion51,
+            this._updateVersion52,
+            this._updateVersion53,
+            this._updateVersion54,
+            this._updateVersion55,
+            this._updateVersion56,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1030,7 +1035,7 @@ export class OptionsUtil {
             const terminationCharacters = profile.options.sentenceParsing.terminationCharacters;
             const newAdditions = [];
             for (const character of additions) {
-                if (terminationCharacters.findIndex((value) => (value.character1 === character && value.character2 === null)) < 0) {
+                if (!terminationCharacters.some((value) => (value.character1 === character && value.character2 === null))) {
                     newAdditions.push(character);
                 }
             }
@@ -1484,6 +1489,67 @@ export class OptionsUtil {
     async _updateVersion51(options) {
         for (const profile of options.profiles) {
             profile.options.scanning.scanResolution = 'character';
+        }
+    }
+
+    /**
+     * - Remove scanning.scanAltText
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion52(options) {
+        for (const profile of options.profiles) {
+            delete profile.options.scanning.scanAltText;
+        }
+    }
+
+    /**
+     * - Added profile id
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion53(options) {
+        for (let i = 0; i < options.profiles.length; i++) {
+            options.profiles[i].id = `profile-${i}`;
+        }
+    }
+
+    /**
+     * - Renamed anki.displayTags to anki.displayTagsAndFlags
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion54(options) {
+        for (const profile of options.profiles) {
+            profile.options.anki.displayTagsAndFlags = profile.options.anki.displayTags;
+            delete profile.options.anki.displayTags;
+        }
+    }
+
+    /**
+     * - Remove scanning.touchInputEnabled
+     * - Remove scanning.pointerEventsEnabled
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion55(options) {
+        for (const profile of options.profiles) {
+            delete profile.options.scanning.touchInputEnabled;
+            delete profile.options.scanning.pointerEventsEnabled;
+        }
+    }
+
+    /**
+     * - Sorted dictionaries by priority
+     * - Removed priority from dictionaries
+     * @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion56(options) {
+        for (const {options: profileOptions} of options.profiles) {
+            if (Array.isArray(profileOptions.dictionaries)) {
+                profileOptions.dictionaries.sort((/** @type {{ priority: number; }} */ a, /** @type {{ priority: number; }} */ b) => {
+                    return b.priority - a.priority;
+                });
+                for (const dictionary of profileOptions.dictionaries) {
+                    delete dictionary.priority;
+                }
+            }
         }
     }
 

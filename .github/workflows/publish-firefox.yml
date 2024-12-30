@@ -11,6 +11,7 @@ jobs:
       - uses: robinraju/release-downloader@a96f54c1b5f5e09e47d9504526e96febd949d4c2 # pin@v1.11
         with:
           tag: ${{ github.ref_name }}
+          zipBall: true
           fileName: "*"
 
       - name: Deploy to Firefox Addons
@@ -19,6 +20,7 @@ jobs:
         continue-on-error: true
         with:
           zipFilePath: yomitan-firefox.zip
+          sourcesZipFilePath: yomitan-${{ github.ref_name }}.zip
           extensionId: ${{ secrets.FF_EXTENSION_ID }}
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}

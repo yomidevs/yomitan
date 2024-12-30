@@ -242,6 +242,7 @@ export function deferPromise() {
     let resolve;
     /** @type {((reason?: import('core').RejectionReason) => void)|undefined} */
     let reject;
+    /** @type {Promise<T>} */
     const promise = new Promise((resolve2, reject2) => {
         resolve = resolve2;
         reject = reject2;

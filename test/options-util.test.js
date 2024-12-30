@@ -81,7 +81,6 @@ function createProfileOptionsTestData1() {
         },
         scanning: {
             middleMouse: true,
-            touchInputEnabled: true,
             selectText: true,
             alphanumeric: true,
             autoHideResults: false,
@@ -106,7 +105,17 @@ function createProfileOptionsTestData1() {
             collapseEmphaticSequences: 'false',
         },
         dictionaries: {
-            'Test Dictionary': {
+            'Test Dictionary 1': {
+                priority: 0,
+                enabled: true,
+                allowSecondarySearches: false,
+            },
+            'Test Dictionary 2': {
+                priority: 1,
+                enabled: true,
+                allowSecondarySearches: false,
+            },
+            'Test Dictionary 3': {
                 priority: 0,
                 enabled: true,
                 allowSecondarySearches: false,
@@ -329,7 +338,6 @@ function createProfileOptionsUpdatedTestData1() {
             autoPlay: false,
         },
         scanning: {
-            touchInputEnabled: true,
             selectText: true,
             alphanumeric: true,
             autoHideResults: false,
@@ -343,12 +351,10 @@ function createProfileOptionsUpdatedTestData1() {
             enableSearchTags: false,
             layoutAwareScan: false,
             hideDelay: 0,
-            pointerEventsEnabled: false,
             matchTypePrefix: false,
             hidePopupOnCursorExit: false,
             hidePopupOnCursorExitDelay: 0,
             normalizeCssZoom: true,
-            scanAltText: true,
             preventMiddleMouse: {
                 onWebPages: false,
                 onPopupPages: false,
@@ -444,9 +450,26 @@ function createProfileOptionsUpdatedTestData1() {
         },
         dictionaries: [
             {
-                name: 'Test Dictionary',
-                alias: 'Test Dictionary',
-                priority: 0,
+                name: 'Test Dictionary 2',
+                alias: 'Test Dictionary 2',
+                enabled: true,
+                allowSecondarySearches: false,
+                definitionsCollapsible: 'not-collapsible',
+                partsOfSpeechFilter: true,
+                useDeinflections: true,
+            },
+            {
+                name: 'Test Dictionary 1',
+                alias: 'Test Dictionary 1',
+                enabled: true,
+                allowSecondarySearches: false,
+                definitionsCollapsible: 'not-collapsible',
+                partsOfSpeechFilter: true,
+                useDeinflections: true,
+            },
+            {
+                name: 'Test Dictionary 3',
+                alias: 'Test Dictionary 3',
                 enabled: true,
                 allowSecondarySearches: false,
                 definitionsCollapsible: 'not-collapsible',
@@ -483,7 +506,7 @@ function createProfileOptionsUpdatedTestData1() {
             duplicateBehavior: 'new',
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
-            displayTags: 'never',
+            displayTagsAndFlags: 'never',
             checkForDuplicates: true,
             fieldTemplates: null,
             suspendNewCards: false,
@@ -566,6 +589,7 @@ function createOptionsUpdatedTestData1() {
     return {
         profiles: [
             {
+                id: 'profile-0',
                 name: 'Default',
                 options: createProfileOptionsUpdatedTestData1(),
                 conditionGroups: [
@@ -645,7 +669,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 51,
+        version: 56,
         global: {
             database: {
                 prefixWildcardsSupported: false,

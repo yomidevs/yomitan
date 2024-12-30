@@ -373,10 +373,9 @@ export class DictionaryImporter {
      * @returns {ExtensionError}
      */
     _formatAjvSchemaError(schema, fileName) {
-        const e2 = new ExtensionError(`Dictionary has invalid data in '${fileName}'`);
-        e2.data = schema.errors;
-
-        return e2;
+        const e = new ExtensionError(`Dictionary has invalid data in '${fileName}' '${JSON.stringify(schema.errors)}'`);
+        e.data = schema.errors;
+        return e;
     }
 
     /**
@@ -815,8 +814,16 @@ export class DictionaryImporter {
         const results = [];
         for (const file of files) {
             const content = await this._getData(file, new TextWriter());
-            /** @type {unknown} */
-            const entries = parseJson(content);
+            let entries;
+
+            try {
+                /** @type {unknown} */
+                entries = parseJson(content);
+            } catch (error) {
+                if (error instanceof Error) {
+                    throw new Error(error.message + ` in '${file.filename}'`);
+                }
+            }
 
             startIndex = progressData.index;
             this._progress();

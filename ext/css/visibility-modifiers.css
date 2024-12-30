@@ -1,0 +1,18 @@
+:root:not([data-debug=true]) .debug-only {
+    display: none;
+}
+:root:not([data-advanced=true]) .advanced-only {
+    display: none;
+}
+:root:not([data-advanced=false]) .basic-only {
+    display: none;
+}
+:root:not([data-language=ja]):not([data-language=zh]):not([data-language=yue]) .jpzhyue-only {
+    display: none;
+}
+:root:is([data-language=ja], [data-language=zh], [data-language=yue], [data-language=ko]) .not-jpzhyueko {
+    display: none;
+}
+:root:not([data-language=ja]) .jp-only {
+    display: none;
+}

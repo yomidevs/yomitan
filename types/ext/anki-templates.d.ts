@@ -162,7 +162,6 @@ export type KanjiFrequency = {
     dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
-        priority: number;
     };
     character: string;
     frequency: number | string;
@@ -184,7 +183,6 @@ export type TermDictionaryEntry = {
     readonly dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
-        priority: number;
     };
     readonly dictionaryNames: string[];
     readonly expression: string | string[];
@@ -246,7 +244,6 @@ export type TermFrequency = {
     dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
-        priority: number;
     };
     expression: string;
     reading: string;
@@ -261,7 +258,6 @@ export type TermPitchAccent = {
     dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
-        priority: number;
     };
     expression: string;
     reading: string;
@@ -280,7 +276,6 @@ export type TermPhoneticTranscription = {
     dictionaryAlias: string;
     dictionaryOrder: {
         index: number;
-        priority: number;
     };
     expression: string;
     reading: string;

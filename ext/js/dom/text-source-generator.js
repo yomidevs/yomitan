@@ -66,7 +66,7 @@ export class TextSourceGenerator {
         source = source.clone();
         const startLength = source.setStartOffset(extent, layoutAwareScan);
         const endLength = source.setEndOffset(extent * 2 - startLength, true, layoutAwareScan);
-        const text = source.text();
+        const text = [...source.text()];
         const textLength = text.length;
         const textEndAnchor = textLength - endLength;
 
@@ -173,7 +173,7 @@ export class TextSourceGenerator {
 
         // Result
         return {
-            text: text.substring(cursorStart, cursorEnd),
+            text: text.slice(cursorStart, cursorEnd).join(''),
             offset: startLength - cursorStart,
         };
     }
@@ -204,7 +204,10 @@ export class TextSourceGenerator {
                 case 'SELECT':
                     return TextSourceElement.create(element);
                 case 'INPUT':
-                    if (/** @type {HTMLInputElement} */ (element).type === 'text') {
+                    if (
+                        /** @type {HTMLInputElement} */ (element).type === 'text' ||
+                        /** @type {HTMLInputElement} */ (element).type === 'search'
+                    ) {
                         imposterSourceElement = element;
                         [imposter, imposterContainer] = this._createImposter(/** @type {HTMLInputElement} */ (element), false);
                     }
@@ -403,7 +406,6 @@ export class TextSourceGenerator {
             return document.caretRangeFromPoint(x, y);
         }
 
-        // @ts-expect-error - caretPositionFromPoint is non-standard
         if (typeof document.caretPositionFromPoint === 'function') {
             // Firefox
             return this._caretPositionFromPoint(x, y);
@@ -419,7 +421,6 @@ export class TextSourceGenerator {
      * @returns {?Range}
      */
     _caretPositionFromPoint(x, y) {
-        // @ts-expect-error - caretPositionFromPoint is non-standard
         const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ (document.caretPositionFromPoint)(x, y);
         if (position === null) {
             return null;
@@ -472,7 +473,6 @@ export class TextSourceGenerator {
                     nextElement.style.setProperty('user-select', 'text', 'important');
                 }
 
-                // @ts-expect-error - caretPositionFromPoint is non-standard
                 const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ (document.caretPositionFromPoint)(x, y);
                 if (position === null) {
                     return null;

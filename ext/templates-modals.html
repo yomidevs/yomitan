@@ -1,0 +1,1517 @@
+<!DOCTYPE html><html><head><title>Templates</title></head><body>
+
+<template id="shared-modals-template">
+    <div id="dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+    <div class="modal-header">
+            <div class="modal-title">Dictionaries</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div id="dictionaries-modal-body" class="modal-body">
+            <div class="settings-item">
+                <div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">
+                            Enable support for prefix wildcard searches
+                            <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                        </div>
+                    </div>
+                    <div class="settings-item-right">
+                        <label class="toggle"><input type="checkbox" data-setting="global.database.prefixWildcardsSupported" data-scope="global"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    </div>
+                </div>
+                <div class="settings-item-children more" hidden>
+                    <p>
+                        In order for dictionaries to support searches using prefix wildcards on the search page,
+                        some additional data must be stored in the database.
+                        Enabling this option will include this extra data for any new dictionaries that are imported.
+                    </p>
+                    <p class="warning-text">
+                        This option will not change any dictionaries that are already imported;
+                        they must be re-imported for the option to take effect.
+                    </p>
+                    <p>
+                        <a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="warning-text margin-above no-dictionaries-installed-warning" hidden>
+                No dictionaries have been installed yet.
+                Visit the <a href="https://github.com/yomidevs/yomitan/blob/master/docs/dictionaries.md#dictionaries" target="_blank" rel="noopener noreferrer">Yomitan homepage</a>
+                for a list of free dictionaries or click the <em>Import</em> button below to select a dictionary file to import.
+            </div>
+            <div id="dictionary-error" class="danger-text margin-above" hidden></div>
+            <div id="dictionary-list" class="dictionary-list generic-list" data-count="0">
+                <div class="dictionary-item-top"></div>
+                <label class="dictionary-item-top toggle dictionary-item-enabled-toggle-container"><input type="checkbox" id="all-dictionaries-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                <div class="dictionary-item-top dictionary-item-title-container">All</div>
+                <div class="dictionary-item-top dictionary-item-button-height"></div>
+                <div class="dictionary-item-top dictionary-item-button-height"></div>
+                <div class="dictionary-item-top dictionary-item-button-height"></div>
+            </div>
+
+            <div hidden><input type="file" id="dictionary-import-file-input" accept=".zip,application/zip" multiple></div>
+        </div>
+        <div class="modal-body-addon dictionary-delete-progress" hidden>
+            <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
+            <div class="progress-bar-track"><div class="progress-bar danger"></div></div>
+        </div>
+        <div class="modal-body-addon dictionary-import-progress" hidden>
+            <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
+            <div class="progress-bar-track"><div class="progress-bar"></div></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis danger dictionary-database-mutating-input" id="dictionary-delete-all-button">Delete All</button>
+            <button type="button" class="low-emphasis dictionary-database-mutating-input debug-only" id="dictionary-check-integrity">Check Integrity</button>
+            <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-check-updates">Check for Updates</button>
+            <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-button">Import</button>
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="dictionary-import-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-medium">
+        <div class="modal-header"><div class="modal-title">Import Dictionaries</div></div>
+        <div class="modal-body">
+            <div id="dictionary-drop-file-zone">
+                <div id="dictionary-drag-drop-text">
+                    <span class="icon" data-icon="book"></span>
+                    <h1>Drag and drop dictionaries (.zip)</h1>
+                    <h5>or click here to upload</h5>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide" class="basic-only">Close</button>
+        </div>
+        <div class="modal-body advanced-only">
+            <p>Import dictionaries from URLs:</p>
+            <textarea type="text" id="dictionary-import-url-text"></textarea>
+        </div>
+        <div class="modal-footer advanced-only">
+            <button type="button" data-modal-action="hide" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-url-button">Import from URLs</button>
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="dictionary-confirm-delete-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Confirm Dictionary Deletion</div></div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete the dictionary:</p>
+            <p><strong id="dictionary-confirm-delete-name"></strong>?</p>
+            <p class="danger-text">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-delete-button">Delete</button>
+        </div>
+    </div></div>
+
+    <div id="dictionary-confirm-delete-all-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Confirm Dictionary Deletion</div></div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete <strong>all dictionaries</strong>?</p>
+            <p class="danger-text">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-delete-all-button">Delete</button>
+        </div>
+    </div></div>
+
+    <div id="dictionary-confirm-update-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Confirm Dictionary Update</div></div>
+        <div class="modal-body">
+            <p>Are you sure you want to update the dictionary:</p>
+            <p><strong id="dictionary-confirm-update-name"></strong>?</p>
+            <section>
+                Updating a dictionary involves:
+                <ul>
+                    <li>Deleting the installed version</li>
+                    <li>Downloading the latest version </li>
+                    <li>Importing the latest version</li>
+                </ul>
+                <p class="warning-text">Especially for large dictionaries, this process can take a while, and downloading will use your network.</p>
+            </section>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger" data-modal-action="hide" id="dictionary-confirm-update-button">Update</button>
+        </div>
+    </div></div>
+
+    <div id="secondary-search-dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Secondary Search Dictionaries</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p>
+                These dictionaries will be used to search for definitions of the related terms when the grouping mode is
+                <em>Group related terms</em>.
+            </p>
+            <div id="secondary-search-dictionary-list" class="secondary-search-dictionary-list"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="dictionary-details-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title"><strong class="dictionary-title"></strong> <span class="light dictionary-revision"></span></div>
+        </div>
+        <div class="modal-body">
+            <div class="settings-item dictionary-outdated-notification" hidden><div class="settings-item-children danger-text">
+                This dictionary is outdated and may not support new extension features.
+                Re-import the dictionary to enable support for the latest features.
+            </div></div>
+            <div class="settings-item">
+                <div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">
+                            Prefix wildcard searches supported
+                            <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                        </div>
+                    </div>
+                    <div class="settings-item-right">
+                        <label class="toggle"><input type="checkbox" class="dictionary-prefix-wildcard-searches-supported" disabled><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    </div>
+                </div>
+                <div class="settings-item-children more" hidden>
+                    <p class="warning-text">
+                        Changing this value requires the dictionary to be re-imported.
+                    </p>
+                    <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
+                </div>
+            </div>
+            <div class="settings-item dictionary-parts-of-speech-filter-setting" hidden>
+                <div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">
+                            Part of speech filtering
+                            <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                        </div>
+                    </div>
+                    <div class="settings-item-right">
+                        <label class="toggle"><input type="checkbox" class="dictionary-parts-of-speech-filter-toggle"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    </div>
+                </div>
+                <div class="settings-item-children more" hidden>
+                    When deinflecting words, only dictionary entries whose POS matches that expected by the deinflector will be shown.
+                    <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
+                </div>
+            </div>
+            <div class="settings-item dictionary-use-deinflections-setting" hidden>
+                <div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">
+                            Use deinflections
+                            <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                        </div>
+                    </div>
+                    <div class="settings-item-right">
+                        <label class="toggle"><input type="checkbox" class="dictionary-use-deinflections-toggle"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    </div>
+                </div>
+                <div class="settings-item-children more" hidden>
+                    Deinflections from this dictionary will be used.
+                    <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a></p>
+                </div>
+            </div>
+            <hr>
+            <div class="settings-item"><div class="settings-item-children">
+                <div class="dictionary-details-table"></div>
+                <div class="dictionary-counts"></div>
+            </div></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="dictionary-extra-data-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">
+                <strong class="dictionary-title">Unassociated Data</strong> <span class="light dictionary-total-count"></span>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p class="warning-text">
+                The database contains extra data which is not associated with any installed dictionary.
+                Purging the database can fix this issue.
+            </p>
+            <div class="dictionary-counts"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="dictionary-move-location-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Move Dictionary Options</div></div>
+        <div class="modal-body">
+            <p>Input the location the dictionary <strong class="dictionary-title"></strong> should be moved to:</p>
+            <div class="margin-above">
+                <input type="number" id="dictionary-move-location" min="1" step="1">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" data-modal-action="hide" id="dictionary-move-button">Move</button>
+        </div>
+    </div></div>
+
+    <div id="dictionary-set-alias-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Rename</div></div>
+        <div class="modal-body">
+            <p>Input the display name for <strong class="dictionary-title"></strong> dictionary:</p>
+            <div class="margin-above">
+                <input type="text" id="dictionary-alias-input">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" id="dictionary-reset-alias-button">Reset</button>
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" data-modal-action="hide" id="dictionary-set-alias-button">Save</button>
+        </div>
+    </div></div>
+
+    <div id="recommended-dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Recommended Dictionaries</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p>
+                For non-English dictionaries, please refer to the list of available
+                <a href="https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md#downloads" target="_blank"> Kaikki dictionaries</a>.
+            </p>
+            <div id="recommended-term-dictionaries" hidden>
+                <h1 class="modal-title">Term Dictionaries</h1>
+                <div class="recommended-dictionary-list"></div>
+            </div>
+            <div id="recommended-kanji-dictionaries" hidden>
+                <h1 class="modal-title">Kanji Dictionaries</h1>
+                <div class="recommended-dictionary-list"></div>
+            </div>
+            <div id="recommended-frequency-dictionaries" hidden>
+                <h1 class="modal-title">Frequency Dictionaries</h1>
+                <div class="recommended-dictionary-list"></div>
+            </div>
+            <div id="recommended-grammar-dictionaries" hidden>
+                <h1 class="modal-title">Grammar Dictionaries</h1>
+                <div class="recommended-dictionary-list"></div>
+            </div>
+            <div id="recommended-pronunciation-dictionaries" hidden>
+                <h1 class="modal-title">Pronunciation Dictionaries</h1>
+                <div class="recommended-dictionary-list"></div>
+            </div>
+        </div>
+        <div class="modal-body-addon dictionary-delete-progress" hidden>
+            <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
+            <div class="progress-bar-track"><div class="progress-bar danger"></div></div>
+        </div>
+        <div class="modal-body-addon dictionary-import-progress" hidden>
+            <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
+            <div class="progress-bar-track"><div class="progress-bar"></div></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <!-- Recommended settings modal -->
+    <div id="recommended-settings-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Recommended settings</div>
+        </div>
+        <div class="modal-body">
+            <span>We recommend the following settings for your selected language</span>
+            <div id="recommended-settings-body">
+                <div class="settings-item">
+                    <div class="settings-item-inner">
+                        <div class="settings-item-left">
+                            <div class="settings-item-label"><strong>Recommendations</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="recommended-settings-list"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" id="recommended-settings-apply-button">Apply</button>
+        </div>
+    </div></div>
+</template>
+
+<template id="settings-modals-template">
+    <div id="profiles-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Profiles</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="profile-entry-header">
+                <div class="profile-entry-cell"></div>
+                <div class="profile-entry-cell"><span class="profile-entry-header-text">Default</span></div>
+                <div class="profile-entry-cell"><span class="profile-entry-header-text">Name</span></div>
+                <div class="profile-entry-cell"><span class="profile-entry-header-text">Conditions</span></div>
+                <div class="profile-entry-cell"></div>
+            </div>
+            <div class="profile-entry-list generic-list" id="profile-entry-list"></div>
+            <div class="profile-add-button-container">
+                <button type="button" class="low-emphasis" id="profile-add-button">Add</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="profile-conditions-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Profile Conditions</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="settings-item">
+                <div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">
+                            Conditions for profile <em id="profile-conditions-profile-name"></em>:
+                        </div>
+                    </div>
+                    <div class="settings-item-right">
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="3">Info&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-children more" hidden>
+                    <p>
+                        Profile usage conditions are used to automatically select certain profiles based on context.
+                        For example, different profiles can be used depending on the nested level of the popup, or based on the website's URL.
+                    </p>
+                    <p>
+                        Conditions are organized into groups corresponding to the order in which they are checked.
+                        If all of the conditions in any group of a profile are met, then that profile will be used for that context.
+                    </p>
+                    <p>
+                        If no conditions are specified, the profile will only be used if it is selected as the default profile.
+                    </p>
+                    <p>
+                        <a tabindex="0" class="more-toggle" data-parent-distance="3">Hide&hellip;</a>
+                    </p>
+                </div>
+            </div>
+            <div class="profile-condition-groups" id="profile-condition-groups"></div>
+            <div class="profile-condition-group-list-info">
+                <div class="profile-condition-groups-empty-info"><em>No conditions set up.</em></div>
+                <div class="profile-condition-group-list-info-space"></div>
+                <button type="button" class="low-emphasis" id="profile-add-condition-group">Add Group</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="profile-copy-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header">
+            <div class="modal-title">Copy Profile</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p>Select which profile to copy options from:</p>
+            <select class="form-control" id="profile-copy-source-select"></select>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" id="profile-copy-confirm-button">Copy Profile</button>
+        </div>
+    </div></div>
+
+    <div id="profile-remove-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Confirm Profile Deletion</div></div>
+        <div class="modal-body">
+            <p>
+                Are you sure you want to delete the profile <em id="profile-remove-name"></em>?
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger" id="profile-remove-confirm-button">Remove Profile</button>
+        </div>
+    </div></div>
+
+    <div id="collapsible-dictionaries-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Collapsible Dictionaries</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body-addon">
+            <p>
+                Dictionary definitions can be collapsed if they exceed a certain line count,
+                which may be useful for dictionaries with long definitions.
+                The appearance can be customized using custom CSS.
+                <a tabindex="0" data-modal-action="show,collapsible-dictionaries-info">More&hellip;</a>
+            </p>
+        </div>
+        <div class="modal-body">
+            <div id="collapsible-dictionary-list" class="collapsible-dictionary-list"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="collapsible-dictionaries-info-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Collapsible Dictionary Info</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p>
+                Dictionary definitions can be collapsed if they exceed a certain line count,
+                which may be useful for dictionaries with long definitions.
+                There are five different modes:
+            </p>
+            <ul>
+                <li>
+                    <strong>Not collapsible</strong> -
+                    Definitions will not be collapsed.
+                </li>
+                <li>
+                    <strong>Collapsed</strong> -
+                    Definitions will show a collapse button if their size exceeds the max height,
+                    and they will be collapsed by default.
+                </li>
+                <li>
+                    <strong>Expanded</strong> -
+                    Definitions will show a collapse button if their size exceeds the max height,
+                    and they will be expanded by default.
+                </li>
+                <li>
+                    <strong>Force collapsed</strong> -
+                    Definitions will always show a collapse button,
+                    and they will be collapsed by default.
+                </li>
+                <li>
+                    <strong>Force expanded</strong> -
+                    Definitions will always show a collapse button,
+                    and they will be expanded by default.
+                </li>
+            </ul>
+            <p>
+                By default, the number of lines shown for a definition is 3.
+                This can be configured by adjusting the <a tabindex="0" data-modal-action="show,custom-css">custom CSS</a>;
+                the value can be a unitless integer or decimal number.
+            </p>
+            <div class="code margin-above">/* Globally set the line count */
+:root {
+    --collapsible-definition-line-count: 2;
+}
+:root {
+    --collapsible-kanji-glyph-data-line-count: 2;
+}
+
+/* Set the line count for a specific dictionary */
+.definition-item[data-dictionary='JMdict'] {
+    --collapsible-definition-line-count: 2;
+}
+.kanji-entry[data-dictionary='KANJIDIC'] {
+    --collapsible-kanji-glyph-data-line-count: 2;
+}
+
+/* Spoiler-like functionality, use with <em>Force collapsed</em> mode */
+.definition-item[data-dictionary='JMdict'] .definition-item-inner.collapsible.collapsed {
+    color: #000000;
+    background-color: #000000;
+}
+.kanji-entry[data-dictionary='KANJIDIC'] .kanji-glyph-data.collapsible.collapsed {
+    color: #000000;
+    background-color: #000000;
+}
+    </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <!-- Custom CSS modal -->
+    <div id="custom-css-modal" class="modal modal-left" tabindex="-1" role="dialog" hidden>
+        <div class="modal-content-container">
+            <div class="modal-content-dimmer"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Custom CSS</div>
+                    <div class="modal-header-button-container">
+                        <div class="modal-header-button-group">
+                            <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                            <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-body custom-popup-css-container">
+                    <div class="custom-popup-css-header">Popup CSS</div>
+                    <textarea class="no-wrap" autocomplete="off" spellcheck="false" id="custom-popup-css" data-setting="general.customPopupCss" data-tab-action="indent,4"></textarea>
+                    <div class="custom-popup-css-header margin-above">Popup outer CSS</div>
+                    <textarea class="no-wrap" autocomplete="off" spellcheck="false" id="custom-popup-outer-css" data-setting="general.customPopupOuterCss" data-tab-action="indent,4"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-modal-action="hide">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio sources modal -->
+    <div id="audio-sources-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Audio Sources</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="settings-item">
+                <div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">
+                            When searching for audio, the sources are checked in order until the first
+                            valid source is found. This allows for selecting a fallback source if the
+                            first choice is not available.
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-item-children">
+                    <div id="audio-source-list" class="generic-list"></div>
+                    <div id="audio-source-list-empty">
+                        No audio sources enabled
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="audio-source-add" class="low-emphasis">Add</button>
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="audio-source-help-custom-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header">
+            <div class="modal-title">Audio Source - Custom URL</div>
+        </div>
+        <div class="modal-body">
+            <p>
+                A custom URL can be used to play audio from any URL.
+                The replacement tags <code data-select-on-click="">{term}</code> and <code data-select-on-click="">{reading}</code>
+                can be used to specify which term and reading is being looked up.<br>
+            </p>
+            <p>
+                Example:<br>
+                <a tabindex="0" data-select-on-click="">http://localhost/audio.mp3?term={term}&amp;reading={reading}</a>
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="audio-source-help-custom-json-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header">
+            <div class="modal-title">Audio Source - Custom URL (JSON)</div>
+        </div>
+        <div class="modal-body">
+            <p>
+                A custom URL to a JSON file which lists one or more audio URLs for a given term.
+                The format of the JSON file is described in <a href="/data/schemas/custom-audio-list-schema.json" target="_blank" rel="noopener noreferrer">this schema file</a>.
+            </p>
+            <p>
+                Example:<br>
+                <a tabindex="0" data-select-on-click="">http://localhost/audio.json?term={term}&amp;reading={reading}</a>
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="audio-source-help-text-to-speech-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header">
+            <div class="modal-title">Audio Source - Text-to-speech</div>
+        </div>
+        <div class="modal-body">
+            <p>
+                A synthesized voice will speak the given text, using either the term text or the reading.
+            </p>
+            <p class="warning-text">
+                ⚠️ Note: Audio generated with text-to-speech cannot be captured for use in Anki card creation.
+            </p>
+            <div class="horizontal-flex margin-above">
+                <input type="text" value="よみたん" id="text-to-speech-voice-test-text" autocomplete="off" lang="ja">
+                <button type="button" id="text-to-speech-voice-test">Test</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+
+    <!-- Scanning inputs modal -->
+    <div id="scanning-inputs-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Scanning Inputs</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div>
+                <p>
+                    Scanning inputs are used to define when text scanning should occur.
+                    <a tabindex="0" class="more-toggle more-only" data-parent-distance="2">More&hellip;</a>
+                </p>
+                <div class="margin-above more" hidden>
+                    <p>
+                        Text scanning is performed when a pointer is moved and certain inputs are either pressed or not pressed.
+                        The <em>Required inputs</em> field is used to define which inputs <em>must</em> be pressed, and
+                        the <em>Excluded inputs</em> field is used to define which inputs <em>must not</em> be pressed.
+                        If the <em>Required inputs</em> field is empty, text will be scanned whenever the pointer is moved.
+                    </p>
+                    <p>
+                        The <em>Input types</em> group is used to define which types of pointer input that the
+                        keyboard and button inputs are applied to.
+                        Supported pointer types include the mouse cursor, touchscreen touches, and pen devices.
+                        When using the <em>Pen</em> option, the defined inputs will correspond to buttons on the pen device.
+                    </p>
+                    <p>
+                        Some additional scanning and search options can be configured by clicking the menu button and selecting
+                        <em>Show advanced options</em>.
+                    </p>
+                    <ul>
+                        <li>To assign keyboard keys, select the input field and press modifier keys on the keyboard.</li>
+                        <li>To assign mouse or pen buttons, click on the button with the mouse icon using the desired button.</li>
+                        <li>
+                            To clear inputs, select the input field and press the <em>Escape</em> button,
+                            or use the <em>Clear inputs</em> menu option.
+                        </li>
+                    </ul>
+                    <p><a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a></p>
+                </div>
+            </div>
+            <div class="scan-input-list generic-list margin-above" id="scan-input-list"></div>
+            <div class="warning-text margin-above generic-list-empty-indicator">
+                No scanning inputs have been defined yet.
+                Click the <em>Add</em> button to add a new input.
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" id="scan-input-add">Add</button>
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+
+    <!-- Input action prevention modal -->
+    <div id="input-action-prevention-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Input Action Prevention</div></div>
+        <div class="modal-body">
+            <div>
+                Prevent middle mouse button actions on:
+                <a tabindex="0" class="more-toggle more-only" data-parent-distance="2">(?)</a>
+            </div>
+            <div class="more" hidden>
+                <p>
+                    This option is used to disable the default action of the middle mouse button in different contexts.
+                    This can be useful for preventing the scroll action that the middle mouse button is typically mapped to,
+                    which is otherwise difficult to disable inside extension pages via other means.
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+            <div class="input-prevention-option-list">
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onWebPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Webpages</span>
+                </label>
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onPopupPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Popups</span>
+                </label>
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onSearchPages"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Search page</span>
+                </label>
+                <label class="input-prevention-option-list-item">
+                    <label class="checkbox"><input type="checkbox" data-setting="scanning.preventMiddleMouse.onSearchQuery"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Search query</span>
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+
+    <!-- Anki cards modal -->
+    <div id="anki-cards-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Anki Cards</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="tabs-container">
+                <div class="tabs">
+                    <label class="tab">
+                        <input type="radio" name="anki-card-primary-type" data-value="terms" data-anki-card-menu="anki-card-terms-field-menu" checked>
+                        <div class="tab-inner"><span class="tab-label">Terms</span></div>
+                    </label>
+                    <label class="tab">
+                        <input type="radio" name="anki-card-primary-type" data-value="kanji" data-anki-card-menu="anki-card-kanji-field-menu">
+                        <div class="tab-inner"><span class="tab-label">Kanji</span></div>
+                    </label>
+                </div>
+                <div class="tabs-right" hidden>
+                    <button type="button" class="icon-button" data-menu-position="below left" id="anki-card-primary-type-menu-button"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+                </div>
+            </div>
+            <div class="modal-separator-line"></div>
+        </div>
+        <div class="modal-body anki-card" id="anki-card-primary" data-anki-card-type="terms" data-anki-card-menu="anki-card-terms-field-menu">
+            <div class="settings-item"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Deck</div>
+                </div>
+                <div class="settings-item-right">
+                    <select class="anki-card-deck"></select>
+                </div>
+            </div></div>
+            <div class="settings-item"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Model</div>
+                </div>
+                <div class="settings-item-right">
+                    <select class="anki-card-model"></select>
+                </div>
+            </div></div>
+            <div class="anki-card-fields">
+                <div class="anki-card-field-name-header" data-persistent="true">Field</div>
+                <div class="anki-card-field-input-header" data-persistent="true">Value</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="show,anki-cards-info">Help</button>
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="anki-cards-info-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-full">
+        <div class="modal-header">
+            <div class="modal-title">Anki Card Information</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p>
+                Anki card fields can be populated with information about a term or kanji character by using field markers.
+                When a card is being generated, field markers are replaced with information about the term or kanji by using the installed dictionaries.
+                Several preset markers are available, which are described below.
+                Markers can be customized by adjusting the <a tabindex="0" data-modal-action="show,anki-card-templates">Anki card templates</a>.
+            </p>
+            <p>
+                Anki requires the first field in a model to be unique for a card;
+                therefore, it is recommended to use <code class="anki-field-marker">{expression}</code> as the marker for the first field of term cards,
+                or <code class="anki-field-marker">{character}</code> for kanji cards.
+            </p>
+            <table class="anki-field-marker-info-table margin-above">
+                <tbody>
+                    <tr class="anki-field-marker-info-table-heading">
+                        <td>Marker (for terms)</td>
+                        <td>Description</td>
+                    </tr>
+
+                    <tr>
+                        <td><code class="anki-field-marker">{audio}</code></td>
+                        <td>Audio of the term's pronunciation from one of the audio sources (if available).</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{cloze-body-kana}</code></td>
+                        <td>Kana reading for <code class="anki-field-marker">{cloze-body}</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{conjugation}</code></td>
+                        <td>Conjugation path from the raw inflected term to the source term.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{expression}</code></td>
+                        <td>Term expressed using kanji. If kanji expression is not available, kana is used.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{furigana}</code></td>
+                        <td>
+                            Term expressed as kanji with furigana displayed above it.
+                            Example: <ruby>日本語<rt>にほんご</rt></ruby>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{furigana-plain}</code></td>
+                        <td>
+                            Term expressed as kanji with furigana displayed next to it in brackets.
+                            Example: 日本語[にほんご].
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{glossary}</code></td>
+                        <td>List of definitions for the term.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{glossary-brief}</code></td>
+                        <td>List of definitions for the term in a more compact format.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{glossary-no-dictionary}</code></td>
+                        <td>List of definitions for the term, except the dictionary tag is omitted.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{glossary-first}</code></td>
+                        <td>First definition for the term.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{glossary-first-brief}</code></td>
+                        <td>First definition for the term in a more compact format.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{glossary-first-no-dictionary}</code></td>
+                        <td>First definition for the term, except the dictionary tag is omitted.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{part-of-speech}</code></td>
+                        <td>Part of speech information for the term.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{phonetic-transcriptions}</code></td>
+                        <td>List of phonetic transcriptions for the term.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{pitch-accents}</code></td>
+                        <td>List of pitch accent downstep notations for the term.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{pitch-accent-graphs}</code></td>
+                        <td>List of pitch accent graphs for the term.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{pitch-accent-graphs-jj}</code></td>
+                        <td>List of pitch accent graphs for the term (styled after Jidoujisho).</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{pitch-accent-positions}</code></td>
+                        <td>List of accent downstep positions for the term as a number.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{pitch-accent-categories}</code></td>
+                        <td>List of pitch accent categories for the term (e.g. heiban, kifuku, atamadaka, odaka, nakadaka).</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{reading}</code></td>
+                        <td>Kana reading for the term, or empty for terms where the expression is the reading.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{single-glossary-DICT-NAME}</code></td>
+                        <td>
+                            Same as <code class="anki-field-marker">{glossary}</code>, but with entries from only a single dictionary.
+                            The dictionary name will likely be modified, use the options from the ▼ dropdown.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{single-glossary-DICT-NAME-brief}</code></td>
+                        <td>
+                            See <code class="anki-field-marker">{single-glossary-DICT-NAME}</code> and <code class="anki-field-marker">{glossary-brief}</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{single-glossary-DICT-NAME-no-dictionary}</code></td>
+                        <td>
+                            See <code class="anki-field-marker">{single-glossary-DICT-NAME}</code> and <code class="anki-field-marker">{glossary-no-dictionary}</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{tags}</code></td>
+                        <td>Grammar and usage tags providing information about the term.</td>
+                    </tr>
+
+                    <tr class="anki-field-marker-info-table-heading">
+                        <td>Marker (for kanji)</td>
+                        <td>Description</td>
+                    </tr>
+
+                    <tr>
+                        <td><code class="anki-field-marker">{character}</code></td>
+                        <td>Unicode glyph representing the current kanji.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{glossary}</code></td>
+                        <td>List of definitions for the kanji.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{kunyomi}</code></td>
+                        <td>Kunyomi (Japanese reading) for the kanji, expressed as hiragana.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{onyomi}</code></td>
+                        <td>Onyomi (Chinese reading) for the kanji, expressed as katakana.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{onyomi-hiragana}</code></td>
+                        <td>Onyomi (Chinese reading) for the kanji, expressed as hiragana.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{stroke-count}</code></td>
+                        <td>Number of strokes that the kanji character has.</td>
+                    </tr>
+
+                    <tr class="anki-field-marker-info-table-heading">
+                        <td>Marker (for both)</td>
+                        <td>Description</td>
+                    </tr>
+
+                    <tr>
+                        <td><code class="anki-field-marker">{clipboard-image}</code></td>
+                        <td>An image which is stored in the system clipboard, if available.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{clipboard-text}</code></td>
+                        <td>Text which is stored in the system clipboard, if available.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{cloze-body}</code></td>
+                        <td>Original inflected term as it appeared before being reduced to dictionary form by Yomitan.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{cloze-prefix}</code></td>
+                        <td>Fragment of the containing <code class="anki-field-marker">{sentence}</code> starting at the beginning of <code class="anki-field-marker">{sentence}</code> until the beginning of <code class="anki-field-marker">{cloze-body}</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{cloze-suffix}</code></td>
+                        <td>Fragment of the containing <code class="anki-field-marker">{sentence}</code> starting at the end of <code class="anki-field-marker">{cloze-body}</code> until the end of <code class="anki-field-marker">{sentence}</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{dictionary}</code></td>
+                        <td>Original name of the dictionary from which the card is being created.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{dictionary-alias}</code></td>
+                        <td>Display name of the dictionary from which the card is being created.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{document-title}</code></td>
+                        <td>Title of the web page that the term or kanji appeared in.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{frequencies}</code></td>
+                        <td>
+                            Frequency information for the term or kanji.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{frequency-harmonic-rank}</code></td>
+                        <td>
+                            The harmonic mean of frequency data for the current term or kanji.<br>
+                            Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term or kanji usage.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{frequency-harmonic-occurrence}</code></td>
+                        <td>
+                            The harmonic mean of frequency data for the current term or kanji.<br>
+                            Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term or kanji usage.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{frequency-average-rank}</code></td>
+                        <td>
+                            The average of frequency data for the current term or kanji.<br>
+                            Defaults to rank 9999999 when frequency data is not found, indicating extremely low rank-based term or kanji usage.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{frequency-average-occurrence}</code></td>
+                        <td>
+                            The average of frequency data for the current term or kanji.<br>
+                            Defaults to 0 occurrences when frequency data is not found, the lowest possible occurrence-based term or kanji usage.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{screenshot}</code></td>
+                        <td>Screenshot of the web page taken at the time the term or kanji was added.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{search-query}</code></td>
+                        <td>The full search query shown on the search page.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{popup-selection-text}</code></td>
+                        <td>The selected text on the search page or popup.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{sentence}</code></td>
+                        <td>Sentence, quote, or phrase that the term or kanji appears in from the source content.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{sentence-furigana}</code></td>
+                        <td>Sentence, quote, or phrase that the term or kanji appears in from the source content, with furigana added.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{url}</code></td>
+                        <td>Address of the web page in which the term or kanji appeared in.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+
+    <!-- Anki field template modals -->
+    <div id="anki-card-templates-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-full">
+        <div class="modal-header"><div class="modal-title">Anki Card Templates</div></div>
+        <div class="modal-body anki-card-templates-layout">
+            <div class="anki-card-templates-info">
+                <p>
+                    Anki card fields are formatted using the <a href="https://handlebarsjs.com/" target="_blank" rel="noopener noreferrer">Handlebars.js</a>
+                    template rendering engine.
+                    Advanced users can modify these templates for full control over what information is included in Anki cards.
+                </p>
+                <p>
+                    Consider copy-pasting the source into a code editor that supports syntax highlighting for easier editing.
+                </p>
+            </div>
+            <textarea autocomplete="off" spellcheck="false" id="anki-card-templates-textarea" class="no-wrap margin-above" data-tab-action="indent,4"></textarea>
+            <div id="anki-card-templates-compile-result" class="code danger-text margin-above" hidden></div>
+            <div class="anki-card-templates-test-container margin-above">
+                <p>
+                    Card templates can be tested using the inputs below.
+                </p>
+                <div class="anki-card-templates-test-table margin-above">
+                    <div class="anki-card-templates-test-table-header">Scanned text</div>
+                    <div class="anki-card-templates-test-table-header">Card field</div>
+                    <div></div>
+                    <input type="text" id="anki-card-templates-test-text-input" class="form-control" value="読め" placeholder="Preview text" autocomplete="off" lang="ja">
+                    <div class="anki-card-templates-test-input-container input-group">
+                        <input type="text" id="anki-card-templates-test-field-input" value="{expression}" placeholder="{marker}" autocomplete="off" spellcheck="false">
+                        <button type="button" class="input-suffix input-suffix-icon-button light-icon" id="anki-card-templates-test-field-menu-button" data-menu="anki-card-all-field-menu" data-menu-position="below left"><span class="icon" data-icon="material-down-arrow"></span></button>
+                    </div>
+                    <button type="button" id="anki-card-templates-test-render-button">Test</button>
+                </div>
+            </div>
+            <div class="code margin-above" id="anki-card-templates-render-result"><em>Card render result</em></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="danger" id="anki-card-templates-reset-button">Reset Templates</button>
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="anki-card-templates-reset-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Reset Anki Card Templates</div></div>
+        <div class="modal-body">
+            <p class="danger-text">
+                Are you sure you want to reset the card templates to their default value?
+                Any changes you made will be lost.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger" id="anki-card-templates-reset-button-confirm">Reset Templates</button>
+        </div>
+    </div></div>
+
+    <!-- Generate anki deck modal -->
+    <div id="generate-anki-notes-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-full">
+        <div class="modal-header"><div class="modal-title">Anki Note Generator</div></div>
+        <div class="modal-body generate-anki-notes-layout">
+            <div class="generate-anki-notes-info">
+                <p class="warning-text">
+                    WARNING: This feature is experimental!
+                </p>
+                <p>
+                    Enter a newline separated list of terms below to send notes directly to an Anki deck or export to an Anki deck file in <code>Notes in plain text (.txt)</code> format.
+                </p>
+                <p>
+                    For more information check the <a href="https://yomitan.wiki/anki/#anki-note-generation">documentation</a>.
+                </p>
+            </div>
+            <textarea autocomplete="off" spellcheck="false" id="generate-anki-notes-textarea" class="no-wrap margin-above" data-tab-action="indent,4"></textarea>
+            <div class="generate-anki-notes-test-container margin-above">
+                <p>
+                    Active Anki deck: <code id="generate-anki-notes-active-deck"></code><br>
+                    Active Anki model: <code id="generate-anki-notes-active-model"></code>
+                </p>
+                <div class="generate-anki-notes-test-table margin-above">
+                    <div class="generate-anki-notes-test-table-header">Test word</div>
+                    <div></div>
+                    <input type="text" id="generate-anki-notes-test-text-input" class="form-control" value="読め" placeholder="Preview text" autocomplete="off" lang="ja">
+                    <button type="button" id="generate-anki-notes-test-render-button">Preview Card</button>
+                </div>
+            </div>
+            <div class="code margin-above" id="generate-anki-notes-render-result"><em>Card render result</em></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" id="generate-anki-notes-send-to-anki-button">Send to Anki</button>
+            <button type="button" class="low-emphasis" id="generate-anki-notes-export-button">Export to File</button>
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="generate-anki-notes-send-to-anki-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Send Notes to Anki</div></div>
+        <div class="modal-body">
+            <p>
+                Are you sure you want to send <strong id="generate-anki-notes-send-wordcount"></strong> terms to <code id="generate-anki-notes-active-deck-confirm"></code>? This action cannot be undone.
+            </p>
+            <div class="settings-item margin-above"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Add media to notes
+                    </div>
+                    <div class="settings-item-description">
+                        Adding media increases processing time.
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" id="generate-anki-notes-add-media"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div></div>
+            <div class="settings-item margin-above"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Prevent sending duplicate notes
+                    </div>
+                    <div class="settings-item-description">
+                        Checking for duplicates increases processing time.
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" id="generate-anki-notes-disallow-duplicates"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div></div>
+        </div>
+        <div class="modal-body-addon generate-anki-notes-progress" hidden>
+            <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
+            <div class="progress-bar-track"><div class="progress-bar"></div></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide" id="generate-anki-notes-send-to-anki-cancel-button">Cancel</button>
+            <button type="button" class="danger" id="generate-anki-notes-send-button-confirm">Send to Anki</button>
+        </div>
+    </div></div>
+
+    <div id="generate-anki-notes-export-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Export Notes to File</div></div>
+        <div class="modal-body">
+            <p>
+                Are you sure you want to export <strong id="generate-anki-notes-export-wordcount"></strong> terms to <code>Notes in plain text (.txt)</code> format?
+            </p>
+        </div>
+        <div class="modal-body-addon generate-anki-notes-progress" hidden>
+            <div class="progress-labels"><div class="progress-info"></div><div class="progress-status"></div></div>
+            <div class="progress-bar-track"><div class="progress-bar"></div></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide" id="generate-anki-notes-export-cancel-button">Cancel</button>
+            <button type="button" class="danger" id="generate-anki-notes-export-button-confirm">Export to File</button>
+        </div>
+    </div></div>
+
+
+    <!-- Import/export modals -->
+    <div id="settings-import-error-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Import Error</div></div>
+        <div class="modal-body">
+            <p>An error occurred while trying to import the settings file:</p>
+            <p class="danger-text" id="settings-import-error-message"></p>
+            <p>Additional info can be found in the developer console.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="settings-import-warning-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Import Security Warning</div></div>
+        <div class="modal-body">
+            <p>
+                Settings file contains settings which may pose a security risk.
+                Only import settings from sources you trust.
+            </p>
+            <ul class="danger-text" id="settings-import-warning-message"></ul>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger settings-import-warning-import-button">Import</button>
+            <button type="button" class="settings-import-warning-import-button" data-import-sanitize="true">Sanitize and Import</button>
+        </div>
+    </div></div>
+
+    <div id="settings-reset-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Reset Settings</div></div>
+        <div class="modal-body">
+            <p class="danger-text">
+                You are about to reset all Yomitan settings back to their default values.
+                This will delete all custom profiles you may have created.
+                <strong>This action cannot be undone.</strong>
+            </p>
+            <p>
+                Consider making a backup using the <em>Export Settings</em> button before resetting
+                if you want to be able to revert.
+            </p>
+            <p>
+                Dictionary data will not be deleted, but any installed dictionaries
+                will need to be re-enabled.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger" id="settings-reset-confirm-button">Reset All Settings</button>
+        </div>
+    </div></div>
+
+
+    <!-- Translation modals -->
+    <div id="translation-text-replacement-patterns-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Custom Text Replacement Patterns</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
+                Text replacement patterns are used to modify or remove text that matches certain patterns.
+                Patterns are defined using
+                <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions" target="_blank" rel="noreferrer noopener">regular expression syntax</a>,
+                and the replacement text can use certain
+                <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#Specifying_a_string_as_a_parameter" target="_blank" rel="noreferrer noopener">special replacement patterns</a>.
+            </div></div></div></div>
+            <div class="settings-item"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Search original text
+                    </div>
+                    <div class="settings-item-description">
+                        The original unmodified text will also be searched for definitions.
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="translation.textReplacements.searchOriginal"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div></div>
+            <div class="settings-item">
+                <div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Text replacement patterns</div>
+                    </div>
+                </div>
+                <div class="settings-item-children">
+                    <div id="translation-text-replacement-list" class="generic-list"></div>
+                    <div class="generic-list-empty-indicator"><em>None defined</em></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="translation-text-replacement-add" class="low-emphasis">Add</button>
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+
+    <!-- Sentence parsing modal -->
+    <div id="sentence-termination-characters-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Sentence Termination Characters</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <p>
+                Sentences are terminated by punctuation and quotation marks, which can both be configured below.
+            </p>
+            <table class="sentence-termination-character-list-table" id="sentence-termination-character-list-table" hidden>
+                <thead><tr>
+                    <td>#</td>
+                    <td>Enabled</td>
+                    <td>Type</td>
+                    <td>Character 1</td>
+                    <td>Character 2</td>
+                    <td>Include character in sentence</td>
+                    <td></td>
+                </tr></thead>
+                <tbody class="sentence-termination-character-list generic-list" id="sentence-termination-character-list"></tbody>
+            </table>
+            <div id="sentence-termination-character-list-empty" hidden>
+                No terminators defined.
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis danger" id="sentence-termination-character-list-reset">Reset</button>
+            <button type="button" class="low-emphasis" id="sentence-termination-character-list-add">Add</button>
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+
+    <!-- Keyboard shortcuts modal -->
+    <div id="keyboard-shortcuts-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-full">
+        <div class="modal-header">
+            <div class="modal-title">Keyboard Shortcuts</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="hotkey-list generic-list" id="hotkey-list"></div>
+            <div class="hotkey-list-empty" id="hotkey-list-empty" hidden>
+                No keyboard shortcuts defined.
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis danger" data-modal-action="show,keyboard-shortcuts-reset">Reset</button>
+            <button type="button" class="low-emphasis" id="hotkey-list-add">Add</button>
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="extension-keyboard-shortcuts-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Native Keyboard Shortcuts</div>
+            <div class="modal-header-button-container">
+                <div class="modal-header-button-group">
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div>
+                <p data-show-for-browser="chrome edge">
+                    The native keyboard shortcuts are listed below,
+                    but cannot be configured from within the extension on this browser.
+                    To configure these shortcuts:
+                </p>
+
+                <p data-show-for-browser="firefox">
+                    The native keyboard shortcuts can be configured below on this browser,
+                    or by doing the following:
+                </p>
+
+                <ul data-show-for-browser="chrome">
+                    <li>Open <a tabindex="0" data-special-url="chrome://extensions/shortcuts">chrome://extensions/shortcuts</a> in a new tab.</li>
+                    <li>Find the <em>Yomitan</em> section and configure the shortcuts.</li>
+                </ul>
+
+                <ul data-show-for-browser="edge">
+                    <li>Open <a tabindex="0" data-special-url="edge://extensions/shortcuts">edge://extensions/shortcuts</a> in a new tab.</li>
+                    <li>Find the <em>Yomitan</em> section and configure the shortcuts.</li>
+                </ul>
+
+                <ul data-show-for-browser="firefox">
+                    <li>Open the extensions page (<a tabindex="0" data-select-on-click="">about:addons</a>)</li>
+                    <li>Click the button on the right with the gear icon, then click <em>Manage Extension Shortcuts</em>.</li>
+                    <li>Find the <em>Yomitan</em> section and configure the shortcuts.</li>
+                </ul>
+            </div>
+            <div class="modal-separator-line"></div>
+            <div class="modal-settings-group" id="extension-hotkey-list"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis danger" id="extension-hotkey-list-reset-all">Reset All</button>
+            <button type="button" class="low-emphasis danger" id="extension-hotkey-list-clear-all">Clear All</button>
+            <button type="button" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+    <div id="keyboard-shortcuts-reset-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Confirm Keyboard Shortcuts Reset</div></div>
+        <div class="modal-body">
+            Are you sure you want to reset all keyboard shortcuts to their defaults?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger" id="hotkey-list-reset" data-modal-action="hide">Reset All</button>
+        </div>
+    </div></div>
+</template>
+
+</body></html>

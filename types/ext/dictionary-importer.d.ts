@@ -49,7 +49,7 @@ export type Summary = {
     version: number;
     importDate: number;
     prefixWildcardsSupported: boolean;
-    counts: SummaryCounts;
+    counts?: SummaryCounts;
     styles: string;
     isUpdatable?: boolean;
     indexUrl?: string;

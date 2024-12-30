@@ -26,9 +26,11 @@ import {parseJson} from '../dev/json.js';
 import {DictionaryDatabase} from '../ext/js/dictionary/dictionary-database.js';
 import {DictionaryImporter} from '../ext/js/dictionary/dictionary-importer.js';
 import {DictionaryImporterMediaLoader} from './mocks/dictionary-importer-media-loader.js';
+import {setupStubs} from './utilities/database.js';
 
 const dirname = pathDirname(fileURLToPath(import.meta.url));
 
+setupStubs();
 vi.stubGlobal('IDBKeyRange', IDBKeyRange);
 
 /**
@@ -114,7 +116,7 @@ describe('Database', () => {
 
         const title = testDictionaryIndex.title;
         const titles = new Map([
-            [title, {alias: title, priority: 0, allowSecondarySearches: false}],
+            [title, {alias: title, allowSecondarySearches: false}],
         ]);
 
         // Setup database
@@ -184,7 +186,7 @@ describe('Database', () => {
 
             const title = testDictionaryIndex.title;
             const titles = new Map([
-                [title, {alias: title, priority: 0, allowSecondarySearches: false}],
+                [title, {alias: title, allowSecondarySearches: false}],
             ]);
 
             // Setup database

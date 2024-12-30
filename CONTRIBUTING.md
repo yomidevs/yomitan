@@ -1,6 +1,6 @@
 # Issues and Features
 
-Issues reported on [GitHub](https://github.com/themoeway/yomitan/issues) should include information about:
+Issues reported on [GitHub](https://github.com/yomidevs/yomitan/issues) should include information about:
 
 - What the problem, question, or request is.
 - What browser is being used.
@@ -29,6 +29,14 @@ After installing these, the development environment can be set up by running `np
 Unit tests, integration tests, and various other tests can be executed by running `npm test`.
 Other individual tests can be looked up in the [package.json](package.json) file, and the source for specific tests
 can be found in the [test](test) directory
+
+### Playwright
+
+Steps to run [playwright](https://playwright.dev/) tests locally:
+
+1. Run `npx playwright install` to install the headless browsers
+2. Copy the dictionary test data located in the `dictionaries` branch to a directory named `dictionaries` via `git clone --branch dictionaries git@github.com:yomidevs/yomitan.git dictionaries` ([source](https://github.com/yomidevs/yomitan/blob/086e043856ad54cf13cb65f9ba4c63afe8a22cc3/.github/workflows/playwright.yml#L52-L57)).
+3. Now you can run `npx playwright test`. The first run might produce some benign errors complaining about `Error: A snapshot doesn't exist at ...writing actual.`, but subsequent runs should succeed.
 
 ## Building
 
@@ -88,7 +96,7 @@ The generated `ext/manfiest.json` should not be committed.
 Linting rules are defined for a few types of files, and validation is performed as part of the standard tests
 run by `npm test` and the continuous integration process.
 
-- [.eslintrc.json](.eslintrc.json) rules are used for JavaScript files.
+- [eslint.config.js](eslint.config.js) rules are used for JavaScript files.
 - [.stylelintrc.json](.stylelintrc.json) rules are used for CSS files.
 - [.htmlvalidate.json](.htmlvalidate.json) rules are used for HTML files.
 

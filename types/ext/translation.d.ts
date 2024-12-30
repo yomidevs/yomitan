@@ -48,10 +48,6 @@ export type FindKanjiDictionary = {
      * The alias of the dictionary
      */
     alias: string;
-    /**
-     * The priority of the dictionary
-     */
-    priority: number;
 };
 
 // Terms
@@ -68,6 +64,10 @@ export type FindTermsOptions = {
      * Whether or not deinflection should be performed.
      */
     deinflect: boolean;
+    /**
+     * The reading which will be sorted to the top of the results.
+     */
+    primaryReading: string;
     /**
      * The name of the primary dictionary to search.
      */
@@ -148,10 +148,6 @@ export type FindTermDictionary = {
      * The alias of the dictionary
      */
     alias: string;
-    /**
-     * The priority of the dictionary
-     */
-    priority: number;
     /**
      * Whether or not secondary term searches are allowed for this dictionary.
      */

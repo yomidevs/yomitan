@@ -49,6 +49,8 @@ export class DisplayAnki {
         this._errorNotificationEventListeners = null;
         /** @type {?import('./display-notification.js').DisplayNotification} */
         this._tagsNotification = null;
+        /** @type {?import('./display-notification.js').DisplayNotification} */
+        this._flagsNotification = null;
         /** @type {?Promise<void>} */
         this._updateSaveButtonsPromise = null;
         /** @type {?import('core').TokenObject} */
@@ -69,8 +71,8 @@ export class DisplayAnki {
         this._resultOutputMode = 'split';
         /** @type {import('settings').GlossaryLayoutMode} */
         this._glossaryLayoutMode = 'default';
-        /** @type {import('settings').AnkiDisplayTags} */
-        this._displayTags = 'never';
+        /** @type {import('settings').AnkiDisplayTagsAndFlags} */
+        this._displayTagsAndFlags = 'never';
         /** @type {import('settings').AnkiDuplicateScope} */
         this._duplicateScope = 'collection';
         /** @type {boolean} */
@@ -102,6 +104,8 @@ export class DisplayAnki {
         this._menuContainer = querySelectorNotNull(document, '#popup-menus');
         /** @type {(event: MouseEvent) => void} */
         this._onShowTagsBind = this._onShowTags.bind(this);
+        /** @type {(event: MouseEvent) => void} */
+        this._onShowFlagsBind = this._onShowFlags.bind(this);
         /** @type {(event: MouseEvent) => void} */
         this._onNoteSaveBind = this._onNoteSave.bind(this);
         /** @type {(event: MouseEvent) => void} */
@@ -206,7 +210,7 @@ export class DisplayAnki {
                 duplicateBehavior,
                 suspendNewCards,
                 checkForDuplicates,
-                displayTags,
+                displayTagsAndFlags,
                 kanji,
                 terms,
                 noteGuiMode,
@@ -221,7 +225,7 @@ export class DisplayAnki {
         this._compactTags = compactTags;
         this._resultOutputMode = resultOutputMode;
         this._glossaryLayoutMode = glossaryLayoutMode;
-        this._displayTags = displayTags;
+        this._displayTagsAndFlags = displayTagsAndFlags;
         this._duplicateScope = duplicateScope;
         this._duplicateScopeCheckAllModels = duplicateScopeCheckAllModels;
         this._duplicateBehavior = duplicateBehavior;
@@ -245,6 +249,7 @@ export class DisplayAnki {
         this._updateDictionaryEntryDetailsToken = null;
         this._dictionaryEntryDetails = null;
         this._hideErrorNotification(false);
+        this._eventListeners.removeAllEventListeners();
     }
 
     /** */
@@ -259,6 +264,9 @@ export class DisplayAnki {
         const eventListeners = this._eventListeners;
         for (const node of element.querySelectorAll('.action-button[data-action=view-tags]')) {
             eventListeners.addEventListener(node, 'click', this._onShowTagsBind);
+        }
+        for (const node of element.querySelectorAll('.action-button[data-action=view-flags]')) {
+            eventListeners.addEventListener(node, 'click', this._onShowFlagsBind);
         }
         for (const node of element.querySelectorAll('.action-button[data-action=save-note]')) {
             eventListeners.addEventListener(node, 'click', this._onNoteSaveBind);
@@ -305,6 +313,16 @@ export class DisplayAnki {
     }
 
     /**
+     * @param {MouseEvent} e
+     */
+    _onShowFlags(e) {
+        e.preventDefault();
+        const element = /** @type {HTMLElement} */ (e.currentTarget);
+        const flags = element.title;
+        this._showFlagsNotification(flags);
+    }
+
+    /**
      * @param {number} index
      * @param {import('display-anki').CreateMode} mode
      * @returns {?HTMLButtonElement}
@@ -321,6 +339,15 @@ export class DisplayAnki {
     _tagsIndicatorFind(index) {
         const entry = this._getEntry(index);
         return entry !== null ? entry.querySelector('.action-button[data-action=view-tags]') : null;
+    }
+
+    /**
+     * @param {number} index
+     * @returns {?HTMLButtonElement}
+     */
+    _flagsIndicatorFind(index) {
+        const entry = this._getEntry(index);
+        return entry !== null ? entry.querySelector('.action-button[data-action=view-flags]') : null;
     }
 
     /**
@@ -429,7 +456,7 @@ export class DisplayAnki {
      * @param {import('display-anki').DictionaryEntryDetails[]} dictionaryEntryDetails
      */
     _updateSaveButtons(dictionaryEntryDetails) {
-        const displayTags = this._displayTags;
+        const displayTagsAndFlags = this._displayTagsAndFlags;
         for (let i = 0, ii = dictionaryEntryDetails.length; i < ii; ++i) {
             /** @type {?Set<number>} */
             let allNoteIds = null;
@@ -457,8 +484,9 @@ export class DisplayAnki {
                     }
                 }
 
-                if (displayTags !== 'never' && Array.isArray(noteInfos)) {
+                if (displayTagsAndFlags !== 'never' && Array.isArray(noteInfos)) {
                     this._setupTagsIndicator(i, noteInfos);
+                    this._setupFlagsIndicator(i, noteInfos);
                 }
             }
 
@@ -483,7 +511,7 @@ export class DisplayAnki {
                 displayTags.add(tag);
             }
         }
-        if (this._displayTags === 'non-standard') {
+        if (this._displayTagsAndFlags === 'non-standard') {
             for (const tag of this._noteTags) {
                 displayTags.delete(tag);
             }
@@ -506,6 +534,104 @@ export class DisplayAnki {
 
         this._tagsNotification.setContent(message);
         this._tagsNotification.open();
+    }
+
+    /**
+     * @param {number} i
+     * @param {(?import('anki').NoteInfo)[]} noteInfos
+     */
+    _setupFlagsIndicator(i, noteInfos) {
+        const flagsIndicator = this._flagsIndicatorFind(i);
+        if (flagsIndicator === null) {
+            return;
+        }
+
+        /** @type {Set<string>} */
+        const displayFlags = new Set();
+        for (const item of noteInfos) {
+            if (item === null) { continue; }
+            for (const cardInfo of item.cardsInfo) {
+                if (cardInfo.flags !== 0) {
+                    displayFlags.add(this._getFlagName(cardInfo.flags));
+                }
+            }
+        }
+
+        if (displayFlags.size > 0) {
+            flagsIndicator.disabled = false;
+            flagsIndicator.hidden = false;
+            flagsIndicator.title = `Card flags: ${[...displayFlags].join(', ')}`;
+            /** @type {HTMLElement | null} */
+            const flagsIndicatorIcon = flagsIndicator.querySelector('.action-icon');
+            if (flagsIndicatorIcon !== null && flagsIndicator instanceof HTMLElement) {
+                flagsIndicatorIcon.style.background = this._getFlagColor(displayFlags);
+            }
+        }
+    }
+
+    /**
+     * @param {number} flag
+     * @returns {string}
+     */
+    _getFlagName(flag) {
+        /** @type {Record<number, string>} */
+        const flagNamesDict = {
+            1: 'Red',
+            2: 'Orange',
+            3: 'Green',
+            4: 'Blue',
+            5: 'Pink',
+            6: 'Turquoise',
+            7: 'Purple',
+        };
+        if (flag in flagNamesDict) {
+            return flagNamesDict[flag];
+        }
+        return '';
+    }
+
+    /**
+     * @param {Set<string>} flags
+     * @returns {string}
+     */
+    _getFlagColor(flags) {
+        /** @type {Record<string, import('display-anki').RGB>} */
+        const flagColorsDict = {
+            Red: {red: 248, green: 113, blue: 113},
+            Orange: {red: 253, green: 186, blue: 116},
+            Green: {red: 134, green: 239, blue: 172},
+            Blue: {red: 96, green: 165, blue: 250},
+            Pink: {red: 240, green: 171, blue: 252},
+            Turquoise: {red: 94, green: 234, blue: 212},
+            Purple: {red: 192, green: 132, blue: 252},
+        };
+
+        const gradientSliceSize = 100 / flags.size;
+        let currentGradientPercent = 0;
+
+        const gradientSlices = [];
+        for (const flag of flags) {
+            const flagColor = flagColorsDict[flag];
+            gradientSlices.push(
+                'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + currentGradientPercent + '%',
+                'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + (currentGradientPercent + gradientSliceSize) + '%',
+            );
+            currentGradientPercent += gradientSliceSize;
+        }
+
+        return 'linear-gradient(to right,' + gradientSlices.join(',') + ')';
+    }
+
+    /**
+     * @param {string} message
+     */
+    _showFlagsNotification(message) {
+        if (this._flagsNotification === null) {
+            this._flagsNotification = this._display.createNotification(true);
+        }
+
+        this._flagsNotification.setContent(message);
+        this._flagsNotification.open();
     }
 
     /**
@@ -733,7 +859,7 @@ export class DisplayAnki {
      * @returns {Promise<import('display-anki').DictionaryEntryDetails[]>}
      */
     async _getDictionaryEntryDetails(dictionaryEntries) {
-        const fetchAdditionalInfo = (this._displayTags !== 'never');
+        const fetchAdditionalInfo = (this._displayTagsAndFlags !== 'never');
 
         const notePromises = [];
         const noteTargets = [];

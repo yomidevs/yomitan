@@ -54,8 +54,8 @@ await Application.main(true, async (application) => {
     const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
     await searchDisplayController.prepare();
 
-    const modalController = new ModalController();
-    modalController.prepare();
+    const modalController = new ModalController([]);
+    await modalController.prepare();
 
     const settingsController = new SettingsController(application);
     await settingsController.prepare();

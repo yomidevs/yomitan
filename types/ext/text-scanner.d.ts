@@ -34,14 +34,11 @@ export type Options = {
     normalizeCssZoom?: boolean;
     selectText?: boolean;
     delay?: number;
-    touchInputEnabled?: boolean;
-    pointerEventsEnabled?: boolean;
     scanLength?: number;
     layoutAwareScan?: boolean;
     preventMiddleMouse?: boolean;
     matchTypePrefix?: boolean;
     sentenceParsingOptions?: SentenceParsingOptions;
-    scanAltText?: boolean;
     scanWithoutMousemove?: boolean;
     scanResolution?: string;
 };
@@ -105,7 +102,7 @@ export type InputInfo = {
     passive: boolean;
     modifiers: Input.Modifier[];
     modifierKeys: Input.ModifierKey[];
-    detail: InputInfoDetail | undefined;
+    detail: InputInfoDetail | undefined | null;
 };
 
 export type InputInfoDetail = {

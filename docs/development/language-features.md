@@ -6,7 +6,7 @@ Improving Yomitan's features for the language(s) you are interested in is pretty
 
 <img align="right" src="../../img/language-dropdown.png">
 
-If your language is not already available in the Language dropdown, here is how you can add it with just a few lines. As an example, we'll use [PR #913](https://github.com/themoeway/yomitan/pull/913/files), where a first-time contributor added Dutch.
+If your language is not already available in the Language dropdown, here is how you can add it with just a few lines. As an example, we'll use [PR #913](https://github.com/yomidevs/yomitan/pull/913/files), where a first-time contributor added Dutch.
 
 ```js
 // language-descriptors.js
@@ -414,4 +414,4 @@ In certain languages, dictionary entries may contain readings as a key to read w
 
 ## Stuck?
 
-If you have any questions, please feel free to open a Discussion on Github, or find us on [TheMoeWay Discord](https://discord.gg/UGNPMDE7zC) at [#yomitan-development](https://discord.com/channels/617136488840429598/1081538711742844980).
+If you have any questions, please feel free to open a Discussion on GitHub, or find us on the [Yomitan Discord](https://discord.gg/YkQrXW6TXF).
