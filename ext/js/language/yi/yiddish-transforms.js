@@ -106,6 +106,12 @@ export const yiddishTransforms = {
                 suffixInflection('\u05E2\u05DF', '', ['np'], ['ns']), // -en
                 suffixInflection('\u05E2\u05E1', '', ['np'], ['ns']), // -es
                 suffixInflection('\u05D5\u05EA', '', ['np'], ['ns']), // -ot, hebrew
+                suffixInflection('\u05E0\u05E1', '', ['np'], ['ns']), // -ns
+                suffixInflection('\u05E2\u05E8\u05E2\u05DF', '', ['np'], ['ns']), // -eren
+                suffixInflection('\u05E2\u05E0\u05E2\u05E1', '', ['np'], ['ns']), // -enes
+                suffixInflection('\u05E2\u05E0\u05E1', '', ['np'], ['ns']), // -ens
+                suffixInflection('\u05E2\u05E8\u05E1', '', ['np'], ['ns']), // -ers
+                suffixInflection('\u05E1\u05E2\u05E8', '', ['np'], ['ns']), // -ser
             ],
         },
         umlaut_plural: {
@@ -117,6 +123,9 @@ export const yiddishTransforms = {
                 ...umlautMutationSuffixInflection('\u05D9\u05DD', '', ['np'], ['ns']), // -im
                 ...umlautMutationSuffixInflection('\u05E2\u05DF', '', ['np'], ['ns']), // -en
                 ...umlautMutationSuffixInflection('\u05DF', '', ['np'], ['ns']), // -n
+                ...umlautMutationSuffixInflection('\u05E1', '', ['np'], ['ns']), // -s
+                ...umlautMutationSuffixInflection('\u05E2\u05DA', '', ['np'], ['ns']), // -ekh
+                ...umlautMutationSuffixInflection('\u05E2\u05E8\u05E1', '', ['np'], ['ns']), // -ers
             ],
         },
         diminutive: {

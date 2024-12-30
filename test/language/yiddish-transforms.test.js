@@ -38,6 +38,12 @@ const tests = [
             {term: 'עטיקעט', source: 'עטיקעטקע', rule: 'n', reasons: ['diminutive']}, // etiketke -> etiket
             {term: 'קליענטעל', source: 'קליענטעלטשיק', rule: 'n', reasons: ['diminutive']}, // klienteltshik -> klientel
             {term: 'קינדער', source: 'קינדערלעך', rule: 'ns', reasons: ['diminutive', 'plural']}, // kinderlekh -> kinder
+            {term: 'ליפ', source: 'ליפענעס', rule: 'ns', reasons: ['plural']}, // lipenes -> lip
+            {term: 'אײ', source: 'אײערען', rule: 'ns', reasons: ['plural']}, // eyeren -> ey
+            {term: 'זאָק', source: 'זאָקענס', rule: 'ns', reasons: ['plural']}, // zokens -> zok
+            {term: 'בוך', source: 'בוךערס', rule: 'ns', reasons: ['plural']}, // bukhers -> bukh
+            {term: 'קוכן', source: 'קוכןסער', rule: 'ns', reasons: ['plural']}, // kukhnser -> kukh
+            {term: 'קעניג', source: 'קעניגנס', rule: 'ns', reasons: ['plural']}, // kenigns -> kenig
         ],
     },
     {
@@ -52,6 +58,10 @@ const tests = [
             {term: 'אומשטאנד', source: 'אומשטענדן', rule: 'ns', reasons: ['umlaut_plural']}, // umshtendn -> umshtand
             {term: 'קאצ', source: 'קעצעלע', rule: 'n', reasons: ['diminutive_and_umlaut']}, // ketzele -> katz
             {term: 'קאצ', source: 'קעצל', rule: 'n', reasons: ['diminutive_and_umlaut']}, // ketzl -> katz
+            {term: 'באַרג', source: 'בערגן', rule: 'ns', reasons: ['umlaut_plural']}, // bergn -> barg
+            {term: 'בױמ', source: 'בײמערס', rule: 'ns', reasons: ['umlaut_plural']}, // beymers -> boim
+            {term: 'קאפּ', source: 'קעפּער', rule: 'ns', reasons: ['umlaut_plural']}, // keper -> kop
+            {term: 'קאפּ', source: 'קעפּער', rule: 'ns', reasons: ['umlaut_plural']}, // kep -> kop
         ],
     },
     {
