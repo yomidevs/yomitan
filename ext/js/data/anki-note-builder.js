@@ -17,7 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {deferPromise} from '../core/utilities.js';
+import {deferPromise, sanitizeCSS} from '../core/utilities.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana} from '../language/ja/japanese.js';
 import {cloneFieldMarkerPattern, getRootDeckName} from './anki-util.js';
 
@@ -192,7 +192,7 @@ export class AnkiNoteBuilder {
         for (const dictionary of dictionaries) {
             const {name, styles} = dictionary;
             if (typeof styles === 'string') {
-                styleMap.set(name, styles);
+                styleMap.set(name, sanitizeCSS(styles));
             }
         }
         return styleMap;
