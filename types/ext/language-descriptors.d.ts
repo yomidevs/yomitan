@@ -204,6 +204,16 @@ type AllTextProcessors = {
             normalizeDiacritics: TextProcessor<'old' | 'new' | 'off'>;
         };
     };
+    yi: {
+        pre: {
+            combineYiddishLigatures: TextProcessor<boolean>;
+            removeYiddishDiacritics: TextProcessor<boolean>;
+        };
+        post: {
+            convertFinalLetters: TextProcessor<boolean>;
+            convertYiddishLigatures: BidirectionalConversionPreprocessor;
+        };
+    };
     yue: {
         pre: {
             normalizeRadicalCharacters: TextProcessor<boolean>;
