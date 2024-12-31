@@ -36,14 +36,6 @@ jobs:
           run_id: ${{ github.event.workflow_run.id }}
           name: master-screenshots-outcome
 
-      - name: Grab playwright-results-json from PR run
-        uses: dawidd6/action-download-artifact@80620a5d27ce0ae443b965134db88467fc607b43 # v7
-        continue-on-error: true
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          run_id: ${{ github.event.workflow_run.id }}
-          name: playwright-results-json
-
       - name: Dry-run grab playwright-report from PR run so we have its ID
         uses: dawidd6/action-download-artifact@80620a5d27ce0ae443b965134db88467fc607b43 # v7
         id: playwright-report
@@ -62,12 +54,6 @@ jobs:
           ID=$(echo "$ARTIFACTS_JSON" | jq -r '.[0].id');
           echo "id=$ID" >> "$GITHUB_OUTPUT"
 
-      - name: Generate summary from playwright-results.json (expected to fail to comment)
-        id: playwright-summary
-        uses: daun/playwright-report-summary@v3
-        with:
-          report-file: playwright-results.json
-
       - name: Load artifacts into environment variables
         id: playwright
         run: |
@@ -79,8 +65,8 @@ jobs:
             echo "MASTER_SCREENSHOTS_OUTCOME<<$EOF";
             cat ./master-screenshots-outcome;
             echo "$EOF";
-            echo "FAILED=$(grep -c '^ *[0-9] failed$' ./playwright-output)";
-            echo "FLAKY=$(grep -c '^ *[0-9] flaky$' ./playwright-output)"
+            echo "FAILED=$(jq -r '.stats.unexpected' playwright-results.json)";
+            echo "FLAKY=$(jq -r '.stats.flaky' playwright-results.json)";
           } >> "$GITHUB_OUTPUT"
 
       # this is required because github.event.workflow_run.pull_requests is not available for PRs from forks
