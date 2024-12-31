@@ -125,6 +125,13 @@ const languageDescriptors = [
         languageTransforms: spanishTransforms,
     },
     {
+        iso: 'et',
+        iso639_3: 'est',
+        name: 'Estonian',
+        exampleText: 'lugema',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'fa',
         iso639_3: 'fas',
         name: 'Persian',

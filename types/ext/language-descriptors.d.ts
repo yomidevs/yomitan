@@ -99,6 +99,9 @@ type AllTextProcessors = {
     es: {
         pre: CapitalizationPreprocessors;
     };
+    et: {
+        pre: CapitalizationPreprocessors;
+    };
     fa: {
         pre: {
             removeArabicScriptDiacritics: TextProcessor<boolean>;
