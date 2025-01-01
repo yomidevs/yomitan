@@ -36,66 +36,75 @@ test('welcome', async ({page, extensionId}) => {
     // Take a screenshot of the welcome page
     await expect.soft(page).toHaveScreenshot('welcome-page.png');
 });
-test('settings', async ({page, extensionId}) => {
-    // Open settings
-    console.log('Open settings');
-    await page.goto(`chrome-extension://${extensionId}/settings.html`);
+test.describe('settings', () => {
+    test('local load of jmdict_english', async ({page, extensionId}) => {
+        // Open settings
+        console.log('Open settings');
+        await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
-    await expect(page.locator('id=dictionaries')).toBeVisible();
+        await expect(page.locator('id=dictionaries')).toBeVisible();
 
-    // Get the locator for the disk usage indicator so we can later mask it out of the screenshot
-    const storage_locator = page.locator('.storage-use-finite >> xpath=..');
+        // Get the locator for the disk usage indicator so we can later mask it out of the screenshot
+        const storage_locator = page.locator('.storage-use-finite >> xpath=..');
 
-    // Take a simple screenshot of the settings page
-    await expect.soft(page).toHaveScreenshot('settings-fresh.png', {mask: [storage_locator]});
+        // Take a simple screenshot of the settings page
+        await expect.soft(page).toHaveScreenshot('settings-fresh.png', {mask: [storage_locator]});
 
-    // Load in jmdict_english.zip
-    console.log('Load in jmdict_english.zip');
-    await page.locator('input[id="dictionary-import-file-input"]').setInputFiles(path.join(root, 'dictionaries/jmdict_english.zip'));
-    await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
+        // Load in jmdict_english.zip
+        console.log('Load in jmdict_english.zip');
+        await page.locator('input[id="dictionary-import-file-input"]').setInputFiles(path.join(root, 'dictionaries/jmdict_english.zip'));
+        await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 
-    // Take a screenshot of the settings page with jmdict loaded
-    await expect.soft(page).toHaveScreenshot('settings-jmdict-loaded.png', {mask: [storage_locator]});
+        // Take a screenshot of the settings page with jmdict loaded
+        await expect.soft(page).toHaveScreenshot('settings-jmdict-loaded.png', {mask: [storage_locator]});
+    });
+    test('remote load and delete of jmdict_swedish', async ({page, extensionId}) => {
+        // Open settings
+        console.log('Open settings');
+        await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
-    // Enable advanced settings
-    // Wait for the advanced settings to be visible
-    await page.locator('input#advanced-checkbox').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
+        // Enable advanced settings
+        // Wait for the advanced settings to be visible
+        await page.locator('input#advanced-checkbox').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
 
-    // Import jmdict_swedish.zip from a URL
-    console.log('Load in jmdict_swedish.zip');
-    await page.locator('.settings-item[data-modal-action="show,dictionaries"]').click();
-    await page.locator('button[id="dictionary-import-button"]').click();
-    await page.locator('textarea[id="dictionary-import-url-text"]').fill('https://github.com/yomidevs/yomitan/raw/dictionaries/jmdict_swedish.zip');
-    await page.locator('button[id="dictionary-import-url-button"]').click();
-    await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (2 installed, 2 enabled)', {timeout: 5 * 60 * 1000});
+        // Import jmdict_swedish.zip from a URL
+        console.log('Load in jmdict_swedish.zip');
+        await page.locator('.settings-item[data-modal-action="show,dictionaries"]').click();
+        await page.locator('button[id="dictionary-import-button"]').click();
+        await page.locator('textarea[id="dictionary-import-url-text"]').fill('https://github.com/yomidevs/yomitan/raw/dictionaries/jmdict_swedish.zip');
+        await page.locator('button[id="dictionary-import-url-button"]').click();
+        await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 
-    // Delete the jmdict_swedish dictionary
-    await page.locator('button.dictionary-menu-button').nth(1).click();
-    await page.locator('button.popup-menu-item[data-menu-action="delete"]').click();
-    await page.locator('#dictionary-confirm-delete-button').click();
-    await page.locator('#dictionaries-modal button[data-modal-action="hide"]').getByText('Close').click();
-    await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
+        // Delete the jmdict_swedish dictionary
+        await page.locator('button.dictionary-menu-button').nth(0).click();
+        await page.locator('button.popup-menu-item[data-menu-action="delete"]').click();
+        await page.locator('#dictionary-confirm-delete-button').click();
+        await page.locator('#dictionaries-modal button[data-modal-action="hide"]').getByText('Close').click();
+        await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (0 installed, 0 enabled)', {timeout: 5 * 60 * 1000});
 
-    // Get page height by getting the footer and adding height and y position as other methods of calculation don't work for some reason
-    const footer = /** @type {import('@playwright/test').ElementHandle<HTMLElement>} */ (await page.locator('.footer-padding').elementHandle());
-    expect(footer).not.toBe(null);
-    const boundingBox = /** @type {NonNullable<Awaited<ReturnType<import('@playwright/test').ElementHandle<HTMLElement>['boundingBox']>>>} */ (await footer.boundingBox());
-    expect(boundingBox).not.toBe(null);
-    const pageHeight = Math.ceil(boundingBox.y + boundingBox.height);
+        // Get page height by getting the footer and adding height and y position as other methods of calculation don't work for some reason
+        const footer = /** @type {import('@playwright/test').ElementHandle<HTMLElement>} */ (await page.locator('.footer-padding').elementHandle());
+        expect(footer).not.toBe(null);
+        const boundingBox = /** @type {NonNullable<Awaited<ReturnType<import('@playwright/test').ElementHandle<HTMLElement>['boundingBox']>>>} */ (await footer.boundingBox());
+        expect(boundingBox).not.toBe(null);
+        const pageHeight = Math.ceil(boundingBox.y + boundingBox.height);
 
-    await page.setViewportSize({width: 1280, height: pageHeight});
+        await page.setViewportSize({width: 1280, height: pageHeight});
 
-    // Wait for any animations or changes to complete
-    console.log('Waiting for animations to complete');
-    await page.waitForTimeout(500);
+        // Wait for any animations or changes to complete
+        console.log('Waiting for animations to complete');
+        await page.waitForTimeout(500);
 
-    // Take a full page screenshot of the settings page with advanced settings enabled
-    await expect.soft(page).toHaveScreenshot('settings-fresh-full-advanced.png', {
-        fullPage: true,
-        mask: [storage_locator],
+        // Get the locator for the disk usage indicator so we can later mask it out of the screenshot
+        const storage_locator = page.locator('.storage-use-finite >> xpath=..');
+
+        // Take a full page screenshot of the settings page with advanced settings enabled
+        await expect.soft(page).toHaveScreenshot('settings-fresh-full-advanced.png', {
+            fullPage: true,
+            mask: [storage_locator],
+        });
     });
 });
-
 test.describe('popup', () => {
     test.beforeEach(async ({page, extensionId}) => {
         // Open settings
@@ -123,6 +132,7 @@ test.describe('popup', () => {
     const numberOfTests = (readFileSync(popupTestsPath, 'utf8').match(/hovertarget/g) || []).length;
     for (let i = 1; i <= numberOfTests; i++) {
         test(`test${i}`, async ({page}) => {
+            const frame_attached = page.waitForEvent('frameattached', {timeout: 10000});
             const test_name = 'doc2-test' + i;
             console.log(test_name);
 
@@ -138,7 +148,6 @@ test.describe('popup', () => {
             const expectedState = (await testcase_locator.getAttribute('data-expected-result')) === 'failure' ? 'hidden' : 'visible';
 
             try {
-                const frame_attached = page.waitForEvent('frameattached', {timeout: 5000});
                 await page.mouse.move(box.x - 5, box.y - 5); // Hover near the test
                 await page.mouse.move(box.x + 15, box.y + 15); // Hover over the test
                 if (expectedState === 'visible') {
