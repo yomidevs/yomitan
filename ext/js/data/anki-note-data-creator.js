@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {addScopeToCss} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../dictionary/dictionary-data-util.js';
 import {distributeFurigana, distributeFuriganaInflected} from '../language/ja/japanese.js';
 
@@ -598,18 +599,6 @@ function addDictionaryScopeToCss(css, dictionaryTitle) {
 
     return addScopeToCss(css, `[data-dictionary="${escapedTitle}"]`);
 }
-
-/**
- * @param {string} css
- * @param {string} scopeSelector
- * @returns {string}
- */
-function addScopeToCss(css, scopeSelector) {
-    const regex = /([^\r\n,{}]+)(\s*[,{])/g;
-    const replacement = `${scopeSelector} $1$2`;
-    return css.replace(regex, replacement);
-}
-
 
 /**
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
