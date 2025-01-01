@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {log} from './log.js';
-
 
 /**
  * Converts any string into a form that can be passed into the RegExp constructor.
@@ -271,15 +269,7 @@ export function promiseTimeout(delay) {
  * @returns {string}
  */
 export function sanitizeCSS(css) {
-    let sanitizer;
-    // As of 2023/03/xx, all latest browser versions support this but some forks may lag behind
-    try {
-        sanitizer = new CSSStyleSheet();
-    } catch (e) {
-        log.log('Failed to sanitize dictionary styles');
-        log.warn(e);
-        return css;
-    }
+    const sanitizer = new CSSStyleSheet();
     sanitizer.replaceSync(css);
     return [...sanitizer.cssRules].map((rule) => rule.cssText || '').join('\n');
 }
