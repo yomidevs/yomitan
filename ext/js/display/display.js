@@ -26,7 +26,7 @@ import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {safePerformance} from '../core/safe-performance.js';
 import {toError} from '../core/to-error.js';
-import {clone, deepEqual, promiseTimeout} from '../core/utilities.js';
+import {addScopeToCss, clone, deepEqual, promiseTimeout} from '../core/utilities.js';
 import {setProfile} from '../data/profiles-util.js';
 import {PopupMenu} from '../dom/popup-menu.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
@@ -1254,26 +1254,12 @@ export class Display extends EventDispatcher {
         let customCss = customPopupCss;
         for (const {name, enabled, styles = ''} of dictionaries) {
             if (enabled) {
-                customCss += '\n' + this._addScopeToCss(styles, name);
+                const escapedTitle = name.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+                customCss += '\n' + addScopeToCss(styles, `[data-dictionary="${escapedTitle}"]`);
             }
         }
         this.setCustomCss(customCss);
         return customCss;
-    }
-
-    /**
-     * @param {string} css
-     * @param {string} dictionaryTitle
-     * @returns {string}
-     */
-    _addScopeToCss(css, dictionaryTitle) {
-        const escapedTitle = dictionaryTitle
-            .replace(/\\/g, '\\\\')
-            .replace(/"/g, '\\"');
-
-        const regex = /([^\r\n,{}]+)(\s*[,{])/g;
-        const replacement = `[data-dictionary="${escapedTitle}"] $1$2`;
-        return css.replace(regex, replacement);
     }
 
     /**

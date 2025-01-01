@@ -273,3 +273,12 @@ export function sanitizeCSS(css) {
     sanitizer.replaceSync(css);
     return [...sanitizer.cssRules].map((rule) => rule.cssText || '').join('\n');
 }
+
+/**
+ * @param {string} css
+ * @param {string} scopeSelector
+ * @returns {string}
+ */
+export function addScopeToCss(css, scopeSelector) {
+    return scopeSelector + ' {' + css + '\n}';
+}
