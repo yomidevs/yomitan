@@ -4,6 +4,11 @@
 <template id="term-entry-template" data-remove-whitespace-text="true"><div class="entry" data-type="term">
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
+        <div class="headword-list"></div>
+        <div class="headword-list-details">
+            <div class="headword-list-tag-list tag-list"></div>
+            <ul class="inflection-rule-chains"></ul>
+        </div>
         <div class="actions">
             <button type="button" class="action-button action-button-collapsible" data-action="view-flags" hidden disabled>
                 <span class="action-icon icon" data-icon="flag"></span>
@@ -31,11 +36,6 @@
             <button type="button" class="action-button action-button-collapsible" data-action="menu" data-menu-position="left below h-cover v-cover">
                 <span class="action-icon icon" data-icon="kebab-menu"></span>
             </button>
-        </div>
-        <div class="headword-list"></div>
-        <div class="headword-list-details">
-            <div class="headword-list-tag-list tag-list"></div>
-            <ul class="inflection-rule-chains"></ul>
         </div>
     </div>
     <div class="entry-body">
@@ -105,10 +105,36 @@
 </span></span></template>
 
 <!-- Pitch accent -->
-<template id="pronunciation-group-template"><li class="pronunciation-group"><span class="pronunciation-group-tag-list tag-list"></span><ul class="pronunciation-list"></ul></li></template>
-<template id="pronunciation-disambiguation-template"><span class="pronunciation-disambiguation"></span></template>
-<template id="pronunciation-template"><li class="pronunciation"><span class="pronunciation-tag-list tag-list"></span><span class="pronunciation-disambiguation-list"></span><span class="pronunciation-representation-list"><span class="pronunciation-text-container"></span><span class="pronunciation-downstep-notation-container"></span><span class="pronunciation-graph-container"></span></span></li></template>
-
+<template id="pronunciation-group-template">
+    <li class="pronunciation-group">
+        <span class="pronunciation-group-tag-list tag-list">
+            <span class="tag tag-has-body" data-category="pronunciation-dictionary">
+                <span class="tag-label">
+                    <span class="tag-label-content"></span>
+                </span>
+                <span class="tag-body">
+                    <span class="tag-body-content">
+                        <ul class="pronunciation-list"></ul>
+                    </span>
+                </span>
+            </span>
+        </span>
+    </li>
+</template>
+<template id="pronunciation-disambiguation-template">
+    <span class="pronunciation-disambiguation"></span>
+</template>
+<template id="pronunciation-template">
+    <li class="pronunciation">
+        <span class="pronunciation-tag-list tag-list"></span>
+        <span class="pronunciation-disambiguation-list"></span>
+        <span class="pronunciation-representation-list">
+            <span class="pronunciation-text-container"></span>
+            <span class="pronunciation-downstep-notation-container"></span>
+            <span class="pronunciation-graph-container"></span>
+        </span>
+    </li>
+</template>
 <!-- Kanji entry -->
 <template id="kanji-entry-template" data-remove-whitespace-text="true"><div class="entry kanji-entry" data-type="kanji">
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>

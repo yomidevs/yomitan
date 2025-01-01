@@ -19,9 +19,6 @@
 iframe.yomitan-popup {
     all: initial;
     font-size: 1px;
-    background-color: #ffffff;
-    border: 1em solid #999999;
-    box-shadow: 0 0 10em rgba(0, 0, 0, 0.5);
     position: fixed;
     resize: none;
     visibility: hidden;

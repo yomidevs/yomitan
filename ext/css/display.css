@@ -149,6 +149,7 @@
     --tag-part-of-speech-background-color: #565656;
     --tag-search-background-color: #8a8a91;
     --tag-pronunciation-dictionary-background-color: #6640be;
+    --tag-inflection-color: rgba(0, 0, 0, 0.05);
 
     --sidebar-background-color: #f8f9fa;
 
@@ -217,6 +218,7 @@
     --tag-part-of-speech-background-color: #565656;
     --tag-search-background-color: #69696e;
     --tag-pronunciation-dictionary-background-color: #6640be;
+    --tag-inflection-color: rgba(255, 255, 255, 0.05);
 
     --sidebar-background-color: #282828;
 
@@ -263,7 +265,6 @@
     background-color: transparent;
 }
 body {
-    overflow: hidden;
 }
 ol, ul {
     margin-top: 0;
@@ -374,6 +375,11 @@ a:has(rt) {
 .content {
     flex: 1 1 auto;
     position: relative;
+    background-color: color-mix(in oklab, var(--background-color), transparent 2%);
+    border-radius: 8px;
+    border: 1px solid color-mix(in oklab, var(--background-color), transparent 40%);
+    box-shadow: 0 0 3px color-mix(in oklab, var(--text-color), transparent 60%);
+    margin: 3px;
 }
 .content-scroll {
     position: absolute;
@@ -383,10 +389,10 @@ a:has(rt) {
     bottom: 0;
     display: flex;
     flex-flow: column nowrap;
-    overflow-x: hidden;
-    overflow-y: scroll;
     align-items: stretch;
     justify-content: flex-start;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .content-body {
     flex: 1 1 auto;
@@ -432,7 +438,6 @@ a:has(rt) {
     height: 100%;
     display: flex;
     flex-flow: row nowrap;
-    overflow: hidden;
     align-items: stretch;
     align-content: stretch;
     justify-content: center;
@@ -626,10 +631,10 @@ button.sidebar-button.sidebar-button-highlight {
 .actions {
     display: flex;
     flex-flow: row nowrap;
-    float: right;
-    margin: -0.25em;
     position: relative;
     z-index: 1;
+    margin-left: auto;
+    float: right;
 }
 .actions::after {
     clear: both;
@@ -743,9 +748,10 @@ button.action-button:active {
     border-right: none;
     font-size: 1em;
     min-height: var(--tag-height);
-    margin: calc(1em / var(--font-size-no-units)) 0.375em calc(1em / var(--font-size-no-units)) 0;
 }
 .tag-label {
+    flex-grow: 1;
+
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
@@ -813,6 +819,8 @@ button.action-button:active {
 }
 .tag[data-category=dictionary] {
     --tag-color: var(--tag-dictionary-background-color);
+    flex-grow: 1;
+    width: 100%;
 }
 .tag[data-category=frequency] {
     --tag-color: var(--tag-frequency-background-color);
@@ -830,30 +838,54 @@ button.action-button:active {
 
 /* Entries */
 .entry {
-    padding: var(--entry-vertical-padding) var(--entry-horizontal-padding);
+    padding: 0;
     position: relative;
-    contain-intrinsic-height: auto 500px;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
 }
 .entry+.entry {
-    border-top: var(--thin-border-size) solid var(--light-border-color);
+    border-top: 4px solid var(--light-border-color);
 }
 .entry-body {
     clear: both;
 }
-.entry[data-definition-count='0'] .entry-body-section[data-section-type=definitions],
-.entry[data-frequency-count='0'] .entry-body-section[data-section-type=frequencies],
-.entry[data-pronunciation-count='0'] .entry-body-section[data-section-type=pronunciations] {
+.entry-body-section {
+    padding: 0 10px;
+}
+.entry[data-definition-count='0'] .entry-body-section[data-section-type=definitions] {
     display: none;
 }
-
+.entry-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--background-color);
+    padding: 5px;
+    border-bottom: 2px var(--light-border-color) solid;
+    min-height: 45px;
+}
+.entry-header::after {
+    content: "";
+    display: table;
+    clear: both;
+}
 
 /* Inflections */
 .inflection-rule-chains {
+    display: contents;
     padding-inline-start: 0;
     list-style-type: none;
 }
 .inflection-rule-chain {
-    color: var(--reason-text-color);
+    display: inline-block;
+    color: var(--text-color-light1);
+    text-decoration: underline dotted;
+    border: 1px solid var(--dark-border-color);
+    padding: 0 calc(3em / var(--font-size-no-units));
+    margin: calc(1em / var(--font-size-no-units));
+    background: var(--tag-inflection-color);
+    border-radius: 3px;
+    vertical-align: -2px;
 }
 .inflection-rule-chain:empty {
     display: none;
@@ -888,8 +920,15 @@ button.action-button:active {
 
 /* Headwords */
 .headword-list {
-    display: inline;
+    display: block;
+    float: left;
     margin-right: var(--headword-list-end-space);
+}
+.headword-list-details {
+    float: left;
+}
+.headword-list-tag-list {
+    display: inline-block;
 }
 .headword {
     --headword-current-text-color: var(--headword-text-color);
@@ -917,12 +956,6 @@ button.action-button:active {
 .headword-details {
     display: inline;
 }
-.headword-list-details {
-    display: inline;
-}
-.headword-list-tag-list {
-    display: inline;
-}
 .headword-text-container {
     display: inline-block;
     margin-left: calc(-1 * var(--headword-reading-space));
@@ -940,6 +973,7 @@ button.action-button:active {
 .headword-term {
     color: var(--headword-current-text-color);
     font-size: var(--headword-font-size);
+    line-height: 1.15;
 }
 .headword-reading {
     color: var(--headword-current-reading-text-color);
@@ -961,9 +995,6 @@ button.action-button:active {
     color: var(--headword-current-kanji-text-color);
     text-decoration: none;
     cursor: pointer;
-}
-:root[data-result-output-mode=merge] .headword-list-details {
-    display: block;
 }
 :root[data-term-display-mode=ruby-and-reading] .headword-term-outer::after,
 :root[data-term-display-mode=term-and-reading] .headword-term-outer::after {
@@ -1139,19 +1170,21 @@ button.action-button:active {
 
 /* Definitions */
 .definition-list {
-    margin: 0;
-    padding: 0 0 0 var(--list-padding1);
-    list-style-type: decimal;
+    margin: 0 -10px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 2px;
 }
 .definition-list[data-count='0'],
 .definition-list[data-count='1'] {
     padding-left: 0;
-    list-style-type: none;
 }
 .gloss-list {
     margin: 0;
     padding: 0 0 0 var(--list-padding2);
     list-style-type: circle;
+    line-height: 1;
 }
 .gloss-list[data-count='0'],
 .gloss-list[data-count='1'] {
@@ -1165,6 +1198,12 @@ button.action-button:active {
 .gloss-content {
     display: block;
     white-space: pre-line;
+    line-height: 1.1;
+}
+.gloss-content br {
+    content: "";
+    display: block;
+    padding-top: 0.4em;
 }
 .definition-disambiguation-list {
     color: var(--text-color-light3);
@@ -1187,12 +1226,25 @@ button.action-button:active {
     display: none;
 }
 .definition-item {
-    display: list-item;
+    display: block;
     position: relative;
+}
+.definition-list[data-count='1'] .definition-item, .definition-list[data-count='2'] .definition-item{
+    flex-grow: 1;
+}
+.definition-item-inner.collapsible.collapsed {
+    max-height: calc(1em * var(--collapsible-definition-line-count) * var(--line-height));
+    overflow: hidden;
+}
+.definition-item-inner.collapse-test {
+    max-height: calc(1em * var(--collapsible-definition-line-count) * var(--line-height) + var(--collapsible-definition-test-offset));
+    overflow: hidden;
 }
 .definition-item-inner {
     display: flex;
     flex-flow: row nowrap;
+    padding: 5px 10px;
+    height: 100%;
 }
 .definition-item-content {
     width: 100%;
@@ -1273,13 +1325,31 @@ button.expansion-button:focus:focus-visible+.kanji-glyph-table {
 .collapsible:not(.collapsed)>button.expansion-button>.expansion-button-icon {
     transform: rotate(180deg);
 }
+.definition-tag-list {
+    display: flex;
+    margin-bottom: 2px;
+    position: sticky;
+    top: 60px;
+    z-index: 1;
+}
+
+.headword-extras {
+    display: contents;
+}
+.frequency-group-item, .pronunciation-group-tag-list, .inflection-rule-chain {
+    margin-right: calc(1em / var(--font-size-no-units));
+}
 
 /* Frequencies */
+.frequency-group-list {
+    display: contents;
+}
 .frequency-group-item {
-    display: inline;
+    display: inline-block;
 }
 .frequency-item {
-    display: inline;
+    display: inline-block;
+    padding: calc(1em / var(--font-size-no-units)) 0;
 }
 .frequency-disambiguation {
     color: var(--text-color-light3);
@@ -1296,6 +1366,9 @@ button.expansion-button:focus:focus-visible+.kanji-glyph-table {
     white-space: pre-wrap;
     display: inline;
     color: var(--text-color-light3);
+}
+.frequency-value {
+    white-space: nowrap;
 }
 .entry[data-unique-term-count='1'] .frequency-item[data-has-reading=false] .frequency-disambiguation,
 .entry[data-unique-reading-count='1'][data-unique-term-count='1'] .frequency-disambiguation,
@@ -1416,85 +1489,32 @@ button.expansion-button:focus:focus-visible+.kanji-glyph-table {
     font-weight: normal;
     opacity: 0.75;
 }
-:root[data-frequency-display-mode=list] .frequency-group-list {
-    list-style-type: decimal;
-    padding: 0 0 0 var(--list-padding1);
-}
-:root[data-frequency-display-mode=list] .frequency-group-item {
-    display: list-item;
-}
-:root[data-frequency-display-mode=list] .frequency-group-item::marker {
-    color: var(--text-color-light3);
-}
-:root[data-frequency-display-mode=list] .frequency-group-tag {
-    display: block;
-    min-height: auto;
-}
-:root[data-frequency-display-mode=list] .frequency-group-tag>.tag-label {
-    display: inline-flex;
-}
-:root[data-frequency-display-mode=list] .frequency-list {
-    list-style-type: circle;
-    padding: 0 0 0 var(--list-padding2);
-}
-:root[data-frequency-display-mode=list] .frequency-item {
-    display: list-item;
-}
-:root[data-frequency-display-mode=list] .frequency-item::marker {
-    color: var(--text-color-light3);
-}
-:root[data-frequency-display-mode=list] .frequency-group-list[data-count='1'] {
-    list-style-type: none;
-    padding-left: 0;
-}
-:root[data-frequency-display-mode=list] .frequency-group-list[data-count='1']>.frequency-group-item {
-    display: inline;
-}
-:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1']>.frequency-group-tag>.tag-body {
-    display: inline-flex;
-}
-:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1']>.frequency-group-tag>.tag-body>.frequency-body {
-    display: inline;
-}
-:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1'] .frequency-list {
-    list-style-type: none;
-    padding-left: 0;
-}
-:root[data-frequency-display-mode=list] .frequency-group-item[data-count='1'] .frequency-item {
-    display: inline;
-}
 
 
 /* Pitch accent styles */
 .pronunciation-group-list {
+    display: contents;
     margin: 0;
-    padding: 0 0 0 var(--list-padding1);
-    list-style-type: decimal;
+    padding: 0;
+    list-style: none;
 }
-.pronunciation-group-list[data-count='0'],
-.pronunciation-group-list[data-count='1'] {
-    padding-left: 0;
-    list-style-type: none;
+.pronunciation-group {
+    display: inline-flex;
 }
 .pronunciation-list {
-    margin: 0;
-    padding: 0 0 0 var(--list-padding2);
-    list-style-type: circle;
+    padding: 0;
     display: block;
-}
-.pronunciation-list[data-count='0'],
-.pronunciation-list[data-count='1'] {
-    padding-left: 0;
-    list-style-type: none;
-    display: inline;
-}
-.pronunciation-group::marker,
-.pronunciation::marker {
-    color: var(--text-color-light3);
+    list-style: none;
+    display: flex;
 }
 .pronunciation {
     display: list-item;
     line-height: 1.5;
+    margin: calc(1em / var(--font-size-no-units)) calc(3em / var(--font-size-no-units)) calc(1em / var(--font-size-no-units)) 0;
+}
+.pronunciation + .pronunciation {
+    border-left: calc(1em / var(--font-size-no-units)) solid var(--tag-color);
+    padding-left: calc(3em / var(--font-size-no-units));
 }
 .pronunciation-list[data-count='0'] .pronunciation,
 .pronunciation-list[data-count='1'] .pronunciation {
@@ -1522,8 +1542,6 @@ button.expansion-button:focus:focus-visible+.kanji-glyph-table {
 .pronunciation-graph-container {
     margin-left: 0.25em;
 }
-
-
 /* Kanji */
 .kanji-glyph-container {
     display: block;
@@ -1589,9 +1607,6 @@ button.expansion-button:focus:focus-visible+.kanji-glyph-table {
     white-space: pre-line;
 }
 .kanji-tag-list {
-    position: relative;
-}
-.entry[data-type=kanji] .entry-body-section[data-section-type=frequencies] {
     position: relative;
 }
 
