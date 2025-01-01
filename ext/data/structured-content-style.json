@@ -252,7 +252,8 @@
     {
         "selectors": [
             ".entry:nth-last-of-type(1):not(:nth-of-type(1)) .gloss-image-link[data-collapsed=true] .gloss-image-container",
-            ":root[data-glossary-layout-mode=compact] .entry:nth-last-of-type(1):not(:nth-of-type(1)) .gloss-image-link[data-collapsible=true] .gloss-image-container"
+            ":root[data-glossary-layout-mode=compact] .entry:nth-last-of-type(1):not(:nth-of-type(1)) .gloss-image-link[data-collapsible=true] .gloss-image-container",
+            ":root[data-glossary-layout-mode=compact] .definition-item:nth-last-of-type(1) .gloss-image-link[data-collapsible=true] .gloss-image-container"
         ],
         "styles": [
             ["bottom", "100%"],
