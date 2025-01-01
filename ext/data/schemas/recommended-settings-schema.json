@@ -1,5 +1,5 @@
 {
-    "$id": "recommendedSetttings",
+    "$id": "recommendedSettings",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "description": "Contains data for recommended default options overrides by language.",
     "type": "object",
