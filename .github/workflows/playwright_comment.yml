@@ -35,6 +35,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           run_id: ${{ github.event.workflow_run.id }}
           name: master-screenshots-outcome
+        if: github.event_name == 'pull_request'
 
       - name: Grab playwright-results-json from PR run
         uses: dawidd6/action-download-artifact@80620a5d27ce0ae443b965134db88467fc607b43 # v7
@@ -71,7 +72,7 @@ jobs:
             cat ./playwright-output;
             echo "$EOF";
             echo "MASTER_SCREENSHOTS_OUTCOME<<$EOF";
-            cat ./master-screenshots-outcome;
+            [ -f ./master-screenshots-outcome ] && cat ./master-screenshots-outcome;
             echo "$EOF";
             echo "FAILED=$(jq -r '.stats.unexpected' playwright-results.json)";
             echo "FLAKY=$(jq -r '.stats.flaky' playwright-results.json)";
