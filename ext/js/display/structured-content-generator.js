@@ -366,11 +366,12 @@ export class StructuredContentGenerator {
                 break;
         }
         if (hasStyle) {
-            const {style, title} = /** @type {import('structured-content').StyledElement} */ (content);
+            const {style, title, open} = /** @type {import('structured-content').StyledElement} */ (content);
             if (typeof style === 'object' && style !== null) {
                 this._setStructuredContentElementStyle(node, style);
             }
             if (typeof title === 'string') { node.title = title; }
+            if (typeof open === 'boolean' && open) { node.setAttribute('open', ''); }
         }
         if (hasChildren) {
             this._appendStructuredContent(node, content.content, dictionary, language);
