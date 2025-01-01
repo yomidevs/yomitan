@@ -50,7 +50,9 @@ jobs:
           ref: dictionaries
           path: dictionaries
 
-      - name: Grab latest screenshots from master branch
+      ### [PR] master-screenshots
+
+      - name: "[PR] Grab latest screenshots from master branch"
         uses: dawidd6/action-download-artifact@80620a5d27ce0ae443b965134db88467fc607b43 # pin@v2
         continue-on-error: true
         id: master-screenshots
@@ -62,15 +64,28 @@ jobs:
           workflow: playwright.yml
           workflow_conclusion: success
           path: test/playwright/__screenshots__/
+        if: github.event_name == 'pull_request'
 
-      - name: "[PR] Generate new screenshots & compare against master"
+      - name: "[PR] Store steps.master-screenshots.outcome in a file"
+        run: echo ${{ steps.master-screenshots.outcome }} > ./master-screenshots-outcome
+        if: github.event_name == 'pull_request'
+
+      - name: "[PR] Upload master-screenshots-outcome"
+        uses: actions/upload-artifact@v4
+        with:
+          name: master-screenshots-outcome-${{ matrix.shardIndex }}
+          path: master-screenshots-outcome
+        if: github.event_name == 'pull_request'
+
+      ### actual tests
+      - name: "[PR] Run tests & compare against master"
         id: playwright
         run: |
           npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} 2>&1 | tee ./playwright-output || true
         continue-on-error: true
         if: github.event_name == 'pull_request' && steps.master-screenshots.outcome != 'failure'
 
-      - name: "[Push] Generate new authoritative screenshots for master"
+      - name: "[Push] Run tests & save screenshots"
         id: playwright-master
         run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} -u 2>&1 | tee ./playwright-output
         if: github.event_name == 'push'
@@ -88,14 +103,6 @@ jobs:
           name: blob-report-${{ matrix.shardIndex }}
           path: blob-report
           retention-days: 1
-
-      - name: "[PR] Store steps.master-screenshots.outcome in a file"
-        run: echo ${{ steps.master-screenshots.outcome }} > ./master-screenshots-outcome
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: master-screenshots-outcome-${{ matrix.shardIndex }}
-          path: master-screenshots-outcome
 
       - uses: actions/upload-artifact@v4
         with:
@@ -150,26 +157,30 @@ jobs:
           name: playwright-screenshots
           path: test/playwright/__screenshots__/
 
-      ### master-screenshots-outcome
-      - name: Download master-screenshots-outcome files
+      ### [PR] master-screenshots-outcome
+      - name: '[PR] Download master-screenshots-outcome files'
         uses: actions/download-artifact@v4
         with:
           path: master-screenshots-outcomes
           pattern: master-screenshots-outcome-*
           merge-multiple: true
+        if: github.event_name == 'pull_request'
 
-      - name: Check if any shard failed to download master screenshots
+      - name: '[PR] Calculate if any shard failed to download master screenshots'
         run: |
           if grep -q "failure" master-screenshots-outcomes/*; then
             echo "failure" > master-screenshots-outcome
           else
             echo "success" > master-screenshots-outcome
           fi
+        if: github.event_name == 'pull_request'
 
-      - uses: actions/upload-artifact@v4
+      - name: '[PR] Upload master-screenshots-outcome'
+        uses: actions/upload-artifact@v4
         with:
           name: master-screenshots-outcome
           path: master-screenshots-outcome
+        if: github.event_name == 'pull_request'
 
       ### playwright-output
       - name: Download playwright-output files
