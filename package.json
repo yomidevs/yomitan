@@ -83,7 +83,7 @@
         "@types/node": "22.10.2",
         "@types/zip.js": "^2.0.33",
         "@vitest/coverage-v8": "2.1.8",
-        "@vitest/eslint-plugin": "^1.1.21",
+        "@vitest/eslint-plugin": "^1.1.22",
         "ajv": "^8.17.1",
         "css": "^3.0.0",
         "dotenv": "^16.4.7",
@@ -112,7 +112,7 @@
         "stylelint-config-recommended": "^14.0.1",
         "ts-json-schema-generator": "^2.3.0",
         "typescript": "^5.7.2",
-        "typescript-eslint": "^8.18.2",
+        "typescript-eslint": "^8.19.0",
         "vitest": "^2.1.8"
     },
     "dependencies": {
