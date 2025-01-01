@@ -91,20 +91,17 @@ jobs:
 
       - name: "[PR] Store steps.master-screenshots.outcome in a file"
         run: echo ${{ steps.master-screenshots.outcome }} > ./master-screenshots-outcome
-        if: github.event_name == 'pull_request'
 
       - uses: actions/upload-artifact@v4
         with:
           name: master-screenshots-outcome-${{ matrix.shardIndex }}
           path: master-screenshots-outcome
-        if: github.event_name == 'pull_request'
 
       - uses: actions/upload-artifact@v4
         with:
           name: playwright-output-${{ matrix.shardIndex }}
           path: playwright-output
           retention-days: 1
-        if: github.event_name == 'pull_request'
 
   playwright:
     timeout-minutes: 60
