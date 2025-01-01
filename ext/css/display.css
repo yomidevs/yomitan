@@ -832,6 +832,7 @@ button.action-button:active {
 .entry {
     padding: var(--entry-vertical-padding) var(--entry-horizontal-padding);
     position: relative;
+    content-visibility: auto;
     contain-intrinsic-height: auto 500px;
 }
 .entry+.entry {
