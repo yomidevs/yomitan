@@ -66,6 +66,8 @@ test('anki add', async ({context, page, extensionId}) => {
     // Open settings
     await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
+    await expect(page.locator('id=dictionaries')).toBeVisible();
+
     // Load in test dictionary
     const dictionary = await createDictionaryArchiveData(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1');
     await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
