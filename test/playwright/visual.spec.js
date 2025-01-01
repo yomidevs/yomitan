@@ -115,7 +115,7 @@ test.describe('popup', () => {
 
         console.log('Open popup-tests.html');
         await page.goto(pathToFileURL(popupTestsPath).toString());
-        await page.setViewportSize({width: 1000, height: 4500});
+        await page.setViewportSize({width: 700, height: 500});
         await expect(page.locator('id=footer')).toBeVisible();
         await page.keyboard.down('Shift');
     });
@@ -127,26 +127,30 @@ test.describe('popup', () => {
             console.log(test_name);
 
             // Find the test element
-            const test_locator = page.locator('.hovertarget').nth(i - 1);
+            const hovertarget_locator = page.locator('.hovertarget').nth(i - 1);
 
-            const box = (await test_locator.boundingBox()) || {x: 0, y: 0, width: 0, height: 0};
+            const testcase_locator = hovertarget_locator.locator('..');
 
-            const expectedState = (await test_locator.locator('..').getAttribute('data-expected-result')) === 'failure' ? 'hidden' : 'visible';
+            await testcase_locator.scrollIntoViewIfNeeded();
+
+            const box = (await hovertarget_locator.boundingBox()) || {x: 0, y: 0, width: 0, height: 0};
+
+            const expectedState = (await testcase_locator.getAttribute('data-expected-result')) === 'failure' ? 'hidden' : 'visible';
 
             try {
                 const frame_attached = page.waitForEvent('frameattached', {timeout: 5000});
                 await page.mouse.move(box.x - 5, box.y - 5); // Hover near the test
-                await page.mouse.move(box.x + 15, box.y + 15, {steps: 10}); // Hover over the test
+                await page.mouse.move(box.x + 15, box.y + 15); // Hover over the test
                 if (expectedState === 'visible') {
                     const popup_frame = await frame_attached;
                     await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement())
-                        .waitForElementState(expectedState, {timeout: 500});
+                        .waitForElementState(expectedState, {timeout: 1000});
                 } else {
                     expect(
                         await Promise.race([
                             frame_attached,
                             new Promise((resolve) => {
-                                setTimeout(() => resolve('timeout'), 2000);
+                                setTimeout(() => resolve('timeout'), 1000);
                             }),
                         ]),
                     ).toStrictEqual('timeout');
