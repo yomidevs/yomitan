@@ -36,6 +36,14 @@ jobs:
           run_id: ${{ github.event.workflow_run.id }}
           name: master-screenshots-outcome
 
+      - name: Grab playwright-results-json from PR run
+        uses: dawidd6/action-download-artifact@80620a5d27ce0ae443b965134db88467fc607b43 # v7
+        continue-on-error: true
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          run_id: ${{ github.event.workflow_run.id }}
+          name: playwright-results-json
+
       - name: Dry-run grab playwright-report from PR run so we have its ID
         uses: dawidd6/action-download-artifact@80620a5d27ce0ae443b965134db88467fc607b43 # v7
         id: playwright-report
