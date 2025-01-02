@@ -48,7 +48,7 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 	exit 1
 fi
 
-git tag $TAG
+git tag -s $TAG
 
 echo -e -n "${YELLOW}Do you want to push the tag ${TAG} to the remote repository (which will cause a pre-release to get created)? (y/n): ${NC}"
 read -p "" -n 1 -r
