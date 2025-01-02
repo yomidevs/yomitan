@@ -119,6 +119,10 @@
                                     "type": "string",
                                     "description": "Hover text for the element."
                                 },
+                                "open": {
+                                    "type": "boolean",
+                                    "description": "Whether or not the details element is open by default."
+                                },
                                 "lang": {
                                     "type": "string",
                                     "description": "Defines the language of an element in the format defined by RFC 5646."
