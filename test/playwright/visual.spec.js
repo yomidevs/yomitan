@@ -149,7 +149,7 @@ test.describe('popup', () => {
 
             try {
                 await page.mouse.move(box.x - 5, box.y - 5); // Hover near the test
-                await page.mouse.move(box.x + 15, box.y + 15); // Hover over the test
+                await page.mouse.move(box.x + 15, box.y + 15, {steps: 10}); // Hover over the test
                 if (expectedState === 'visible') {
                     const popup_frame = await frame_attached;
                     await (await /** @type {import('@playwright/test').Frame} */ (popup_frame).frameElement())
