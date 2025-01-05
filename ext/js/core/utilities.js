@@ -293,6 +293,10 @@ export function addScopeToCss(css, scopeSelector) {
  */
 export function addScopeToCssLegacy(css, scopeSelector) {
     const stylesheet = new CSSStyleSheet();
+    // nodejs must fall back to the normal version of the function
+    if (typeof stylesheet.replaceSync === 'undefined') {
+        return addScopeToCss(css, scopeSelector);
+    }
     stylesheet.replaceSync(css);
     const newCSSRules = [];
     for (const cssRule of stylesheet.cssRules) {
