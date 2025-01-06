@@ -273,6 +273,13 @@ const languageDescriptors = [
         textPreprocessors: capitalizationPreprocessors,
     },
     {
+        iso: 'mt',
+        iso639_3: 'mlt',
+        name: 'Maltese',
+        exampleText: 'kiteb',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'nl',
         iso639_3: 'nld',
         name: 'Dutch',
