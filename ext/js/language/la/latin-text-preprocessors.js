@@ -25,9 +25,15 @@ export const processDiphtongs = {
             case 'off':
                 return str;
             case 'direct':
-                return str.replace(/æ/g, 'ae').replace(/Æ/g, 'AE').replace(/œ/g, 'oe').replace(/Œ/g, 'OE');
+                return str.replace(/æ/g, 'ae')
+                    .replace(/Æ/g, 'AE')
+                    .replace(/œ/g, 'oe')
+                    .replace(/Œ/g, 'OE');
             case 'inverse':
-                return str.replace(/ae/g, 'æ').replace(/AE/g, 'Æ').replace(/oe/g, 'œ').replace(/OE/g, 'Œ');
+                return str.replace(/ae/g, 'æ')
+                    .replace(/AE/g, 'Æ')
+                    .replace(/oe/g, 'œ')
+                    .replace(/OE/g, 'Œ');
         }
     },
 };
