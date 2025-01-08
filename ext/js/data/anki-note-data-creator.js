@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {addScopeToCss} from '../core/utilities.js';
+import {addScopeToCssLegacy} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../dictionary/dictionary-data-util.js';
 import {distributeFurigana, distributeFuriganaInflected} from '../language/ja/japanese.js';
 
@@ -584,7 +584,7 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
  * @returns {string}
  */
 function addGlossaryScopeToCss(css) {
-    return addScopeToCss(css, '.yomitan-glossary');
+    return addScopeToCssLegacy(css, '.yomitan-glossary');
 }
 
 /**
@@ -597,7 +597,7 @@ function addDictionaryScopeToCss(css, dictionaryTitle) {
         .replace(/\\/g, '\\\\')
         .replace(/"/g, '\\"');
 
-    return addScopeToCss(css, `[data-dictionary="${escapedTitle}"]`);
+    return addScopeToCssLegacy(css, `[data-dictionary="${escapedTitle}"]`);
 }
 
 /**
