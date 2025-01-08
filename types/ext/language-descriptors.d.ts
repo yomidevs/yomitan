@@ -131,7 +131,7 @@ type AllTextProcessors = {
     la: {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor & {
             processDiphtongAE: BidirectionalConversionPreprocessor;
-        }
+        };
     };
     lo: Record<string, never>;
     lv: {
