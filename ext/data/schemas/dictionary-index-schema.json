@@ -23,6 +23,10 @@
             "type": "string",
             "description": "Revision of the dictionary. This value is displayed, and used to check for dictionary updates."
         },
+        "minimumYomitanVersion": {
+            "type": "string",
+            "description": "Minimum version of Yomitan that is compatible with this dictionary."
+        },
         "sequenced": {
             "type": "boolean",
             "default": false,

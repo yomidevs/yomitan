@@ -24,6 +24,7 @@ import {
     ZipReader as ZipReader0,
     configure,
 } from '../../lib/zip.js';
+import {compareRevisions} from 'dictionary-data-util.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {toError} from '../core/to-error.js';
@@ -328,7 +329,16 @@ export class DictionaryImporter {
             styles,
         };
 
-        const {author, url, description, attribution, frequencyMode, isUpdatable, sourceLanguage, targetLanguage} = index;
+        const {minimumYomitanVersion, author, url, description, attribution, frequencyMode, isUpdatable, sourceLanguage, targetLanguage} = index;
+        if (typeof minimumYomitanVersion === 'string') {
+            const {version} = chrome.runtime.getManifest();
+            if (version === "0.0.0.0") {
+                // Running a development version of Yomitan
+            } else if (compareRevisions(version, minimumYomitanVersion)) {
+                throw new Error(`Dictionary is incompatible with this version of Yomitan (${version}; minimum required: ${minimumYomitanVersion})`);
+            }
+            summary.minimumYomitanVersion = minimumYomitanVersion;
+        }
         if (typeof author === 'string') { summary.author = author; }
         if (typeof url === 'string') { summary.url = url; }
         if (typeof description === 'string') { summary.description = description; }

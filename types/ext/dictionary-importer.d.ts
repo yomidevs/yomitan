@@ -46,6 +46,7 @@ export type Summary = {
     title: string;
     revision: string;
     sequenced: boolean;
+    minimumYomitanVersion?: string;
     version: number;
     importDate: number;
     prefixWildcardsSupported: boolean;
