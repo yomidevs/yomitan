@@ -37,7 +37,7 @@ import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
 import {disassembleHangul, reassembleHangul} from './ko/korean-text-processors.js';
 import {koreanTransforms} from './ko/korean-transforms.js';
-import {processDiphtongAE} from './la/latin-text-preprocessors.js';
+import {processDiphtongs} from './la/latin-text-preprocessors.js';
 import {latinTransforms} from './la/latin-transforms.js';
 import {removeRussianDiacritics, yoToE} from './ru/russian-text-preprocessors.js';
 import {oldIrishTransforms} from './sga/old-irish-transforms.js';
@@ -207,7 +207,7 @@ const languageDescriptors = [
         textPreprocessors: {
             ...capitalizationPreprocessors,
             removeAlphabeticDiacritics,
-            processDiphtongAE,
+            processDiphtongs,
         },
         languageTransforms: latinTransforms,
     },

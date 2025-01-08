@@ -16,20 +16,18 @@
  */
 
 /** @type {import('language').BidirectionalConversionPreprocessor} */
-export const processDiphtongAE = {
+export const processDiphtongs = {
     name: 'Convert æ to ae',
-    description: 'æ → ae, Æ → AE, ae → æ, AE → Æ',
+    description: 'æ → ae, Æ → AE, œ → oe, Œ → OE',
     options: ['off', 'direct', 'inverse'],
     process: (str, setting) => {
         switch (setting) {
             case 'off':
                 return str;
             case 'direct':
-                return str.replace(/æ/g, 'ae').replace(/Æ/g, 'AE');
+                return str.replace(/æ/g, 'ae').replace(/Æ/g, 'AE').replace(/œ/g, 'oe').replace(/Œ/g, 'OE');
             case 'inverse':
-                return str.replace(/ae/g, 'æ').replace(/AE/g, 'Æ');
+                return str.replace(/ae/g, 'æ').replace(/AE/g, 'Æ').replace(/oe/g, 'œ').replace(/OE/g, 'Œ');
         }
     },
-
-
 };
