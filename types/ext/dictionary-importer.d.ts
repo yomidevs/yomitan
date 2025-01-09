@@ -40,6 +40,7 @@ export type ImportResult = {
 
 export type ImportDetails = {
     prefixWildcardsSupported: boolean;
+    yomitanVersion: string;
 };
 
 export type Summary = {
@@ -68,6 +69,7 @@ export type SummaryDetails = {
     prefixWildcardsSupported: boolean;
     counts: SummaryCounts;
     styles: string;
+    yomitanVersion: string;
 };
 
 export type SummaryCounts = {
