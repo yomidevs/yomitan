@@ -49,7 +49,7 @@ export async function createTranslatorContext(dictionaryDirectory, dictionaryNam
     const {errors, result} = await dictionaryImporter.importDictionary(
         dictionaryDatabase,
         testDictionaryData,
-        {prefixWildcardsSupported: true},
+        {prefixWildcardsSupported: true, yomitanVersion: "0.0.0.0"},
     );
 
     expect(errors.length).toEqual(0);
