@@ -68,6 +68,7 @@ export type InputOptions = {
     scanOnPenRelease: boolean;
     preventTouchScrolling: boolean;
     preventPenScrolling: boolean;
+    minimumTouchTime: number;
 };
 
 export type SentenceParsingOptions = {
@@ -93,6 +94,7 @@ export type InputConfig = {
     scanOnPenRelease: boolean;
     preventTouchScrolling: boolean;
     preventPenScrolling: boolean;
+    minimumTouchTime: number;
 };
 
 export type InputInfo = {

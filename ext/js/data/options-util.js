@@ -568,6 +568,7 @@ export class OptionsUtil {
             this._updateVersion54,
             this._updateVersion55,
             this._updateVersion56,
+            this._updateVersion57,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -642,6 +643,7 @@ export class OptionsUtil {
             scanOnPenPress: true,
             scanOnPenRelease: false,
             preventTouchScrolling: true,
+            minimumTouchTime: 0,
         });
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.general.usePopupWindow = false;
@@ -1549,6 +1551,18 @@ export class OptionsUtil {
                 for (const dictionary of profileOptions.dictionaries) {
                     delete dictionary.priority;
                 }
+            }
+        }
+    }
+
+    /**
+     *  - Added scanning.inputs[].options.minimumTouchTime.
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion57(options) {
+        for (const profile of options.profiles) {
+            for (const input of profile.options.scanning.inputs) {
+                input.options.minimumTouchTime = 0;
             }
         }
     }
