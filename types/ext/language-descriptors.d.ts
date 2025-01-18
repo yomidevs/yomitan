@@ -214,7 +214,7 @@ type AllTextProcessors = {
     };
     cy: {
         pre:  CapitalizationPreprocessors; 
-    }
+    };
     yi: {
         pre: {
             combineYiddishLigatures: TextProcessor<boolean>;
