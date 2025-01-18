@@ -401,6 +401,13 @@ const languageDescriptors = [
         },
     },
     {
+        iso: 'cy',
+        iso639_3: 'cym',
+        name: 'Welsh',
+        exampleText: 'ddarllen',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'yi',
         iso639_3: 'yid',
         name: 'Yiddish',

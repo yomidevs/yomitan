@@ -212,6 +212,9 @@ type AllTextProcessors = {
             normalizeDiacritics: TextProcessor<'old' | 'new' | 'off'>;
         };
     };
+    cy: {
+        pre:  CapitalizationPreprocessors; 
+    }
     yi: {
         pre: {
             combineYiddishLigatures: TextProcessor<boolean>;
