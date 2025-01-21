@@ -228,6 +228,7 @@ export type ScanningInputOptions = {
     scanOnPenRelease: boolean;
     preventTouchScrolling: boolean;
     preventPenScrolling: boolean;
+    minimumTouchTime: number;
 };
 
 export type ScanningPreventMiddleMouseOptions = {

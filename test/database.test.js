@@ -122,7 +122,7 @@ describe('Database', () => {
         // Setup database
         const dictionaryDatabase = new DictionaryDatabase();
         /** @type {import('dictionary-importer').ImportDetails} */
-        const defaultImportDetails = {prefixWildcardsSupported: false};
+        const defaultImportDetails = {prefixWildcardsSupported: false, yomitanVersion: '0.0.0.0'};
 
         // Database not open
         await expect.soft(dictionaryDatabase.deleteDictionary(title, 1000, () => {})).rejects.toThrow('Database not open');
@@ -167,7 +167,7 @@ describe('Database', () => {
                 const testDictionarySource = await createTestDictionaryArchiveData(name);
 
                 /** @type {import('dictionary-importer').ImportDetails} */
-                const detaultImportDetails = {prefixWildcardsSupported: false};
+                const detaultImportDetails = {prefixWildcardsSupported: false, yomitanVersion: '0.0.0.0'};
                 await expect.soft(createDictionaryImporter(expect).importDictionary(dictionaryDatabase, testDictionarySource, detaultImportDetails)).rejects.toThrow('Dictionary has invalid data');
                 await dictionaryDatabase.close();
             });
@@ -199,7 +199,7 @@ describe('Database', () => {
             const {result: importDictionaryResult, errors: importDictionaryErrors} = await dictionaryImporter.importDictionary(
                 dictionaryDatabase,
                 testDictionarySource,
-                {prefixWildcardsSupported: true},
+                {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'},
             );
 
             if (importDictionaryResult) {
@@ -324,7 +324,7 @@ describe('Database', () => {
 
                 // Import data
                 const dictionaryImporter = createDictionaryImporter(expect);
-                await dictionaryImporter.importDictionary(dictionaryDatabase, testDictionarySource, {prefixWildcardsSupported: true});
+                await dictionaryImporter.importDictionary(dictionaryDatabase, testDictionarySource, {prefixWildcardsSupported: true, yomitanVersion: '0.0.0.0'});
 
                 // Clear
                 switch (clearMethod) {

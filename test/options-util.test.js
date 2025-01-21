@@ -387,6 +387,7 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnPenRelease: false,
                         preventTouchScrolling: true,
                         preventPenScrolling: true,
+                        minimumTouchTime: 0,
                     },
                 },
                 {
@@ -412,6 +413,7 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnPenRelease: false,
                         preventTouchScrolling: true,
                         preventPenScrolling: true,
+                        minimumTouchTime: 0,
                     },
                 },
                 {
@@ -437,6 +439,7 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnPenRelease: false,
                         preventTouchScrolling: true,
                         preventPenScrolling: true,
+                        minimumTouchTime: 0,
                     },
                 },
             ],
@@ -669,7 +672,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 56,
+        version: 57,
         global: {
             database: {
                 prefixWildcardsSupported: false,

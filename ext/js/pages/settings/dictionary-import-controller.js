@@ -555,6 +555,7 @@ export class DictionaryImportController {
             const optionsFull = await this._settingsController.getOptionsFull();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
+                yomitanVersion: chrome.runtime.getManifest().version,
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {

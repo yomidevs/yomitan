@@ -2069,6 +2069,7 @@ export class Display extends EventDispatcher {
                     scanOnPenRelease: false,
                     preventTouchScrolling: false,
                     preventPenScrolling: false,
+                    minimumTouchTime: 0,
                 },
             }],
             deepContentScan: scanningOptions.deepDomScan,

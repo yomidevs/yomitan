@@ -219,6 +219,7 @@ export class ScanInputsController {
                 scanOnPenRelease: false,
                 preventTouchScrolling: true,
                 preventPenScrolling: true,
+                minimumTouchTime: 0,
             },
         };
     }
@@ -391,6 +392,10 @@ class ScanInputField {
         for (const typeCheckbox of /** @type {NodeListOf<HTMLElement>} */ (this._node.querySelectorAll('.scan-input-settings-checkbox'))) {
             const {property} = typeCheckbox.dataset;
             typeCheckbox.dataset.setting = `scanning.inputs[${index}].${property}`;
+        }
+        for (const typeInput of /** @type {NodeListOf<HTMLElement>} */ (this._node.querySelectorAll('.scan-input-settings-input'))) {
+            const {property} = typeInput.dataset;
+            typeInput.dataset.setting = `scanning.inputs[${index}].${property}`;
         }
     }
 
