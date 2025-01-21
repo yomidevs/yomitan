@@ -144,6 +144,8 @@ export class TextScanner extends EventDispatcher {
 
         /** @type {boolean} */
         this._touchTapValid = false;
+        /** @type {number} */
+        this._touchPressTime = 0;
         /** @type {?number} */
         this._primaryTouchIdentifier = null;
         /** @type {boolean} */
@@ -723,6 +725,7 @@ export class TextScanner extends EventDispatcher {
         this._preventNextMouseDown = false;
         this._preventNextClick = false;
         this._touchTapValid = true;
+        this._touchPressTime = Date.now();
 
         const languageNotNull = this._language !== null ? this._language : '';
         const selection = window.getSelection();
@@ -760,6 +763,7 @@ export class TextScanner extends EventDispatcher {
      * @param {boolean} allowSearch
      */
     _onPrimaryTouchEnd(e, x, y, allowSearch) {
+        const touchReleaseTime = Date.now();
         this._primaryTouchIdentifier = null;
         this._preventScroll = false;
         this._preventNextClick = false;
@@ -770,6 +774,7 @@ export class TextScanner extends EventDispatcher {
 
         const inputInfo = this._getMatchingInputGroupFromEvent('touch', 'touchEnd', e);
         if (inputInfo === null || inputInfo.input === null) { return; }
+        if (touchReleaseTime - this._touchPressTime < inputInfo.input.minimumTouchTime) { return; }
         if (inputInfo.input.scanOnTouchRelease || (inputInfo.input.scanOnTouchTap && this._touchTapValid)) {
             void this._searchAtFromTouchEnd(x, y, inputInfo);
         }
@@ -1493,6 +1498,7 @@ export class TextScanner extends EventDispatcher {
             scanOnPenRelease: this._getInputBoolean(options.scanOnPenRelease),
             preventTouchScrolling: this._getInputBoolean(options.preventTouchScrolling),
             preventPenScrolling: this._getInputBoolean(options.preventPenScrolling),
+            minimumTouchTime: this._getInputNumber(options.minimumTouchTime),
         };
     }
 
@@ -1526,6 +1532,14 @@ export class TextScanner extends EventDispatcher {
      */
     _getInputBoolean(value) {
         return typeof value === 'boolean' && value;
+    }
+
+    /**
+     * @param {unknown} value
+     * @returns {number}
+     */
+    _getInputNumber(value) {
+        return typeof value === 'number' ? value : -1;
     }
 
     /**

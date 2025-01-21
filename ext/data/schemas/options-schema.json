@@ -499,7 +499,8 @@
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
                                                     "preventTouchScrolling": false,
-                                                    "preventPenScrolling": false
+                                                    "preventPenScrolling": false,
+                                                    "minimumTouchTime": 0
                                                 }
                                             },
                                             {
@@ -524,7 +525,8 @@
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
                                                     "preventTouchScrolling": true,
-                                                    "preventPenScrolling": true
+                                                    "preventPenScrolling": true,
+                                                    "minimumTouchTime": 0
                                                 }
                                             }
                                         ],
@@ -583,7 +585,8 @@
                                                         "scanOnPenPress",
                                                         "scanOnPenRelease",
                                                         "preventTouchScrolling",
-                                                        "preventPenScrolling"
+                                                        "preventPenScrolling",
+                                                        "minimumTouchTime"
                                                     ],
                                                     "properties": {
                                                         "showAdvanced": {
@@ -641,6 +644,10 @@
                                                         "preventPenScrolling": {
                                                             "type": "boolean",
                                                             "default": true
+                                                        },
+                                                        "minimumTouchTime": {
+                                                            "type": "number",
+                                                            "default": 0
                                                         }
                                                     }
                                                 }
