@@ -213,7 +213,7 @@ type AllTextProcessors = {
         };
     };
     cy: {
-        pre:  CapitalizationPreprocessors; 
+        pre: CapitalizationPreprocessors;
     };
     yi: {
         pre: {
