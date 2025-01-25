@@ -692,6 +692,7 @@ export class DictionaryImportController {
                     start: index,
                     items: [{
                         ...currentSettings,
+                        styles,
                         name: title,
                         alias: newAlias,
                     }],
