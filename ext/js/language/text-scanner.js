@@ -1344,7 +1344,16 @@ export class TextScanner extends EventDispatcher {
      * @param {import('text-scanner').InputInfo} inputInfo
      */
     async _searchAtFromTouchEnd(x, y, inputInfo) {
+        const textSourceCurrentPrevious = this._textSourceCurrent !== null ? this._textSourceCurrent.clone() : null;
+
         await this._searchAt(x, y, inputInfo);
+
+        if (
+            this._textSourceCurrent !== null &&
+            !(textSourceCurrentPrevious !== null && this._textSourceCurrent.hasSameStart(textSourceCurrentPrevious))
+        ) {
+            this._preventNextMouseDown = true;
+        }
     }
 
     /**
