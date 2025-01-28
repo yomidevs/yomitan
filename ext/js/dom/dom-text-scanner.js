@@ -152,13 +152,14 @@ export class DOMTextScanner {
                     break;
                 }
                 lastNode = node;
-                const initialNodeAtBeginningOfNodeGoingBackwards = node === this._initialNode && this._offset === 0 && !forward;
-                const initialNodeAtEndOfNodeGoingForwards = node === this._initialNode && this._offset === node.childNodes.length && forward;
                 this._offset = 0;
+                const isInitialNode = node === this._initialNode;
                 ({enterable, newlines} = DOMTextScanner.getElementSeekInfo(/** @type {Element} */ (node)));
-                if (newlines > this._newlines && generateLayoutContent) {
+                if (!isInitialNode && newlines > this._newlines && generateLayoutContent) {
                     this._newlines = newlines;
                 }
+                const initialNodeAtBeginningOfNodeGoingBackwards = node === this._initialNode && this._offset === 0 && !forward;
+                const initialNodeAtEndOfNodeGoingForwards = node === this._initialNode && this._offset === node.childNodes.length && forward;
                 if (initialNodeAtBeginningOfNodeGoingBackwards || initialNodeAtEndOfNodeGoingForwards) {
                     enterable = false;
                 }
