@@ -131,7 +131,7 @@ export class DOMTextScanner {
         let lastNode = /** @type {Node} */ (node);
         let resetOffset = this._resetOffset;
         let newlines = 0;
-    seekLoop:
+        seekLoop:
         while (node !== null) {
             let enterable = false;
             const nodeType = node.nodeType;
