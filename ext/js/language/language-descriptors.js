@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {removeSyriacScriptDiacritics} from './aii/assyrian-neo-aramaic-text-preprocessors.js';
 import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
 import {normalizeRadicalCharacters} from './CJK-util.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
@@ -58,6 +59,15 @@ const capitalizationPreprocessors = {
 
 /** @type {import('language-descriptors').LanguageDescriptorAny[]} */
 const languageDescriptors = [
+    {
+        iso: 'aii',
+        iso639_3: 'aii',
+        name: 'Assyrian Neo-Aramaic',
+        exampleText: 'ܟܵܬܹܒ݂',
+        textPreprocessors: {
+            removeSyriacScriptDiacritics,
+        },
+    },
     {
         iso: 'ar',
         iso639_3: 'ara',
