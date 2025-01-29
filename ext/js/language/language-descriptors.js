@@ -17,6 +17,7 @@
 
 import {removeSyriacScriptDiacritics} from './aii/assyrian-neo-aramaic-text-preprocessors.js';
 import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
+import {arabicTransforms} from './ar/arabic-transforms.js';
 import {normalizeRadicalCharacters} from './CJK-util.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {germanTransforms} from './de/german-transforms.js';
@@ -76,6 +77,7 @@ const languageDescriptors = [
         textPreprocessors: {
             removeArabicScriptDiacritics,
         },
+        languageTransforms: arabicTransforms,
     },
     {
         iso: 'cs',
