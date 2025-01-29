@@ -475,6 +475,7 @@ a:has(rt) {
     background-color: var(--sidebar-background-color);
     display: flex;
     flex-flow: column nowrap;
+    align-items: center;
 }
 :root[data-popup-action-bar-location=top] .content-outer,
 :root[data-popup-action-bar-location=bottom] .content-outer {
@@ -577,6 +578,11 @@ button.sidebar-button.sidebar-button-highlight {
     --button-content-color: var(--accent-color);
     --button-hover-content-color: var(--accent-color);
     --button-active-content-color: var(--accent-color);
+}
+
+.vertical-text {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
 }
 
 

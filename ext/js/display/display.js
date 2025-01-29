@@ -199,6 +199,8 @@ export class Display extends EventDispatcher {
         this._languageSummaries = [];
         /** @type {import('dictionary-importer').Summary[]} */
         this._dictionaryInfo = [];
+        /** @type {HTMLElement} */
+        this._profileLanguage = querySelectorNotNull(document, '#profile-language');
 
         /* eslint-disable @stylistic/no-multi-spaces */
         this._hotkeyHandler.registerActions([
@@ -443,6 +445,17 @@ export class Display extends EventDispatcher {
         await this.updateOptions();
     }
 
+    /**
+     * @param {import('settings').ProfileOptions} currentProfile
+     */
+    async _updateCurrentProfileDisplay(currentProfile) {
+        if (currentProfile.general.popupActionBarLocation === 'left' || currentProfile.general.popupActionBarLocation === 'right') {
+            this._profileLanguage.classList.add('vertical-text');
+        } else {
+            this._profileLanguage.classList.remove('vertical-text');
+        }
+    }
+
     /** */
     async updateOptions() {
         const options = await this._application.api.optionsGet(this.getOptionsContext());
@@ -484,6 +497,7 @@ export class Display extends EventDispatcher {
 
         void this._updateNestedFrontend(options);
         this._updateContentTextScanner(options);
+        await this._updateCurrentProfileDisplay(options);
 
         this.trigger('optionsUpdated', {options});
     }

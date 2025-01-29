@@ -34,6 +34,8 @@ export class DisplayProfileSelection {
         this._profileButton = querySelectorNotNull(document, '#profile-button');
         /** @type {HTMLElement} */
         const profilePanelElement = querySelectorNotNull(document, '#profile-panel');
+        /** @type {HTMLElement} */
+        this._profileLanguage = querySelectorNotNull(document, '#profile-language');
         /** @type {PanelElement} */
         this._profilePanel = new PanelElement(profilePanelElement, 375); // Milliseconds; includes buffer
         /** @type {boolean} */
@@ -49,6 +51,7 @@ export class DisplayProfileSelection {
         this._display.application.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         this._profileButton.addEventListener('click', this._onProfileButtonClick.bind(this), false);
         this._profileListNeedsUpdate = true;
+        await this._updateProfileLanguage();
     }
 
     // Private
@@ -85,6 +88,17 @@ export class DisplayProfileSelection {
         }
     }
 
+    /**
+     *
+     */
+    async _updateProfileLanguage() { // call this somewhere that gets updated when popActionBarLocation gets called?
+        const {profileCurrent, profiles} = await this._display.application.api.optionsGetFull();
+        const currentProfile = profiles[profileCurrent];
+        this._profileLanguage.textContent = currentProfile.name;
+        // ? currentprofile popactionbarlocation only changes on reload
+        // this._profileLanguage.textContent = currentProfile.options.general.popupActionBarLocation;
+    }
+
     /** */
     async _updateProfileList() {
         this._profileListNeedsUpdate = false;
@@ -109,6 +123,7 @@ export class DisplayProfileSelection {
         }
         this._profileList.textContent = '';
         this._profileList.appendChild(fragment);
+        await this._updateProfileLanguage();
     }
 
     /**
@@ -136,5 +151,6 @@ export class DisplayProfileSelection {
         };
         await this._display.application.api.modifySettings([modification], this._source);
         this._setProfilePanelVisible(false);
+        await this._updateProfileLanguage();
     }
 }
