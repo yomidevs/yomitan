@@ -131,6 +131,7 @@ export class DOMTextScanner {
         let lastNode = /** @type {Node} */ (node);
         let resetOffset = this._resetOffset;
         let newlines = 0;
+        seekLoop:
         while (node !== null) {
             let enterable = false;
             const nodeType = node.nodeType;
@@ -142,7 +143,7 @@ export class DOMTextScanner {
                     this._seekTextNodeBackward(/** @type {Text} */ (node), resetOffset);
 
                 if (!shouldContinueScanning) {
-                    // Length reached
+                    // Length reached or reached a word boundary
                     break;
                 }
             } else if (nodeType === ELEMENT_NODE) {
@@ -154,8 +155,9 @@ export class DOMTextScanner {
                 const initialNodeAtBeginningOfNodeGoingBackwards = node === this._initialNode && this._offset === 0 && !forward;
                 const initialNodeAtEndOfNodeGoingForwards = node === this._initialNode && this._offset === node.childNodes.length && forward;
                 this._offset = 0;
+                const isInitialNode = node === this._initialNode;
                 ({enterable, newlines} = DOMTextScanner.getElementSeekInfo(/** @type {Element} */ (node)));
-                if (newlines > this._newlines && generateLayoutContent) {
+                if (!isInitialNode && newlines > this._newlines && generateLayoutContent) {
                     this._newlines = newlines;
                 }
                 if (initialNodeAtBeginningOfNodeGoingBackwards || initialNodeAtEndOfNodeGoingForwards) {
@@ -172,6 +174,10 @@ export class DOMTextScanner {
                 ({newlines} = DOMTextScanner.getElementSeekInfo(/** @type {Element} */ (exitedNode)));
                 if (newlines > this._newlines && generateLayoutContent) {
                     this._newlines = newlines;
+                }
+                if (newlines > 0 && this._stopAtWordBoundary && !forward) {
+                    // Element nodes are considered word boundaries when scanning backwards
+                    break seekLoop;
                 }
             }
 
@@ -285,14 +291,10 @@ export class DOMTextScanner {
             case 2:
             case 3:
                 if (this._newlines > 0) {
-                    if (this._content.length > 0) {
-                        const useNewlineCount = Math.min(this._remainder, this._newlines);
-                        this._content += '\n'.repeat(useNewlineCount);
-                        this._remainder -= useNewlineCount;
-                        this._newlines -= useNewlineCount;
-                    } else {
-                        this._newlines = 0;
-                    }
+                    const useNewlineCount = Math.min(this._remainder, this._newlines);
+                    this._content += '\n'.repeat(useNewlineCount);
+                    this._remainder -= useNewlineCount;
+                    this._newlines -= useNewlineCount;
                     this._lineHasContent = false;
                     this._lineHasWhitespace = false;
                     if (this._remainder <= 0) {
@@ -341,14 +343,10 @@ export class DOMTextScanner {
             case 2:
             case 3:
                 if (this._newlines > 0) {
-                    if (this._content.length > 0) {
-                        const useNewlineCount = Math.min(this._remainder, this._newlines);
-                        this._content = '\n'.repeat(useNewlineCount) + this._content;
-                        this._remainder -= useNewlineCount;
-                        this._newlines -= useNewlineCount;
-                    } else {
-                        this._newlines = 0;
-                    }
+                    const useNewlineCount = Math.min(this._remainder, this._newlines);
+                    this._content = '\n'.repeat(useNewlineCount) + this._content;
+                    this._remainder -= useNewlineCount;
+                    this._newlines -= useNewlineCount;
                     this._lineHasContent = false;
                     this._lineHasWhitespace = false;
                     if (this._remainder <= 0) {
