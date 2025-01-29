@@ -369,6 +369,20 @@
             }
         ]
     },
+    "mt": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-mt-en",
+                "description": "Maltese to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-mt-en.zip"
+            }
+        ]
+    },
     "nl": {
         "frequency": [],
         "grammar": [],
