@@ -71,6 +71,11 @@ type AlphabeticDiacriticsProcessor = {
  * Any new language should be added to this object.
  */
 type AllTextProcessors = {
+    aii: {
+        pre: {
+            removeSyriacScriptDiacritics: TextProcessor<boolean>;
+        };
+    };
     ar: {
         pre: {
             removeArabicScriptDiacritics: TextProcessor<boolean>;
