@@ -235,6 +235,22 @@ const tests = [
             {term: 'vivir', source: 'vivan', rule: 'v', reasons: ['present subjunctive']},
         ],
     },
+    {
+        category: 'participle',
+        valid: true,
+        tests: [
+            {term: 'escuchar', source: 'escuchado', rule: 'v', reasons: ['participle']},
+        ],
+    },
+    {
+        category: 'reflexive',
+        valid: true,
+        tests: [
+            {term: 'lavar', source: 'lavarse', rule: 'v', reasons: ['reflexive']},
+            {term: 'lavarse', source: 'lavarte', rule: 'v', reasons: ['pronoun substitution']},
+            {term: 'lavarse', source: 'me lavar', rule: 'v', reasons: ['pronominal']},
+        ],
+    },
 
 ];
 

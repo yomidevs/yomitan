@@ -129,9 +129,9 @@ This kind of text processing is to a degree interdependent with the dictionaries
 
 <img align="right" src="../../img/deinflection-example-simple.png">
 
-Deinflection is the process of converting a word to its base or dictionary form. For example, "running" would be deinflected to "run". This is useful for finding the word in the dictionary, as well as helping the user understand the grammar (morphology) of the language.
+Deinflection is the process of converting a word to its base or dictionary form. For example, "running" should be deinflected to "run". This is useful for finding the word in the dictionary, as well as helping the user understand the grammar (morphology) of the language.
 
-These grammatical rules are located in files such as `english-transforms.js`.
+These grammatical rules are located in files such as `english-transforms.js`. We recommend reading through this file as an example.
 
 > Not all the grammatical rules of a language can or need to be implemented in the transforms file. Even a little bit goes a long way, and you can always add more rules later. For every couple rules you add, write some tests in the respective file ([see the writing tests section below](#writing-deinflection-tests)). This will help you verify that your rules are correct, and make sure nothing is accidentally broken along the way.
 
@@ -156,7 +156,7 @@ export type TransformMapObject<TCondition> = {
 ```
 
 - `language` is the ISO code of the language
-- `conditions` are an object containing parts of speech and grammatical forms that are used to check which deinflections make sense. They are referenced by the deinflection rules.
+- `conditions` are an object containing parts of speech and grammatical forms that are used to check which deinflections should execute. They are referenced by the deinflection rules.
 - `transforms` are the actual deinflection rules
 - `TCondition` is an optional generic parameter that can be passed to `LanguageTransformDescriptor`. You can learn more about it at the end of this section.
 
@@ -188,7 +188,7 @@ For the input string "cats", the following strings will be looked up:
 
 If the dictionary contains an entry for `cat`, it will successfully match the 2nd looked up string, (as shown in the image). Note the 🧩 symbol and the `plural` rule.
 
-However, this rule will also match the word "reads", and show the verb "read" from the dictionary, marked as being `plural`. This makes no sense, and we can use conditions to prevent it. Let's add a condition and use it in the rule.
+However, this rule will also match the word "reads", and show the verb "read" from the dictionary, marked as being `plural`. This makes no sense (e.g. "I have many reads" is not a sensible sentence), and we can use conditions to prevent it. Let's add a condition and use it in the rule.
 
 ```js
 conditions: {
@@ -327,6 +327,10 @@ Now, we may want to verify that `boss` really does not deinflect to `bo`. You ca
 Here, by setting `valid` to `false`, we are telling the test function to fail this test case if only `boss` deinflects to `bo` with the `ns` condition under a double `plural` rule.
 
 You can also optionally pass a `preprocess` helper function to `testLanguageTransformer`. Refer to the language transforms test files for its specific use case.
+
+#### Testing manually
+
+If you want to test manually, make sure to reload the extension between changes to reflect your code changes. See the [CONTRIBUTING.md](../../CONTRIBUTING.md#loading-an-unpacked-build-into-chromium-browsers) doc for more info.
 
 #### Opting in autocompletion
 
