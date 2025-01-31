@@ -30,6 +30,57 @@ const tests = [
         ],
     },
     {
+        category: 'noun prefixes',
+        valid: true,
+        tests: [
+            {term: 'بيت', source: 'ببيت', rule: 'n_d', reasons: ['NPref-Bi']},
+            {term: 'بيت', source: 'وببيت', rule: 'n_d', reasons: ['NPref-Bi']},
+            {term: 'بيت', source: 'فببيت', rule: 'n_d', reasons: ['NPref-Bi']},
+
+            {term: 'بيت', source: 'كبيت', rule: 'n_d', reasons: ['NPref-Ka']},
+            {term: 'بيت', source: 'وكبيت', rule: 'n_d', reasons: ['NPref-Ka']},
+            {term: 'بيت', source: 'فكبيت', rule: 'n_d', reasons: ['NPref-Ka']},
+
+            {term: 'بيت', source: 'لبيت', rule: 'n_d', reasons: ['NPref-Li']},
+            {term: 'بيت', source: 'ولبيت', rule: 'n_d', reasons: ['NPref-Li']},
+            {term: 'بيت', source: 'فلبيت', rule: 'n_d', reasons: ['NPref-Li']},
+
+            {term: 'بيت', source: 'البيت', rule: 'n_d', reasons: ['NPref-Al']},
+            {term: 'بيت', source: 'والبيت', rule: 'n_d', reasons: ['NPref-Al']},
+            {term: 'بيت', source: 'فالبيت', rule: 'n_d', reasons: ['NPref-Al']},
+
+            {term: 'بيت', source: 'بالبيت', rule: 'n_d', reasons: ['NPref-BiAl']},
+            {term: 'بيت', source: 'وبالبيت', rule: 'n_d', reasons: ['NPref-BiAl']},
+            {term: 'بيت', source: 'فبالبيت', rule: 'n_d', reasons: ['NPref-BiAl']},
+
+            {term: 'بيت', source: 'كالبيت', rule: 'n_d', reasons: ['NPref-KaAl']},
+            {term: 'بيت', source: 'وكالبيت', rule: 'n_d', reasons: ['NPref-KaAl']},
+            {term: 'بيت', source: 'فكالبيت', rule: 'n_d', reasons: ['NPref-KaAl']},
+
+            {term: 'بيت', source: 'للبيت', rule: 'n_d', reasons: ['NPref-Lil']},
+            {term: 'بيت', source: 'وللبيت', rule: 'n_d', reasons: ['NPref-Lil']},
+            {term: 'بيت', source: 'فللبيت', rule: 'n_d', reasons: ['NPref-Lil']},
+
+            {term: 'ليل', source: 'لليل', rule: 'n_d', reasons: ['NPref-LiAl']},
+            {term: 'ليل', source: 'ولليل', rule: 'n_d', reasons: ['NPref-LiAl']},
+            {term: 'ليل', source: 'فلليل', rule: 'n_d', reasons: ['NPref-LiAl']},
+        ],
+    },
+    {
+        category: 'invalid noun prefixes',
+        valid: false,
+        tests: [{term: 'ليل', source: 'للليل', rule: 'n_d', reasons: ['NPref-Lil']}],
+    },
+    {
+        category: 'invalid chains (noun)',
+        valid: false,
+        tests: [
+            {term: 'بيت', source: 'بوبيت', rule: 'n_d', reasons: ['NPref-Wa', 'NPref-Bi']},
+            {term: 'بيت', source: 'كببيت', rule: 'n_d', reasons: ['NPref-Bi', 'NPref-Ka']},
+            {term: 'بيت', source: 'كلبيت', rule: 'n_d', reasons: ['NPref-Li', 'NPref-Ka']},
+        ],
+    },
+    {
         category: 'perfect verb result clause particle (would have)',
         valid: true,
         tests: [{term: 'فعل', source: 'لفعل', rule: 'pv_d', reasons: ['PVPref-La']}],
@@ -127,7 +178,7 @@ const tests = [
         ],
     },
     {
-        category: 'invalid chains',
+        category: 'invalid chains (verb)',
         valid: false,
         tests: [
             {term: 'سمع', source: 'ووسمع', rule: 'pv_d', reasons: ['Pref-Wa', 'Pref-Wa']},

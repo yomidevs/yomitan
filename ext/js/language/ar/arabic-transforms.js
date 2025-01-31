@@ -147,7 +147,7 @@ export const arabicTransforms = {
         // General
         'Pref-Wa': {
             name: 'and',
-            description: 'Conjunction',
+            description: 'and (و); and, so (ف)',
             rules: [
                 prefixInflection('و', '', ['pv_a'], ['pv_s', 'pv_d']),
                 prefixInflection('ف', '', ['pv_a'], ['pv_s', 'pv_d']),
@@ -164,7 +164,7 @@ export const arabicTransforms = {
                 prefixInflection('فب', '', ['n_a'], ['n_s', 'n_d']),
             ],
         },
-        'NPref-ka': {
+        'NPref-Ka': {
             name: 'like, such as',
             description: 'like, such as',
             rules: [
@@ -200,7 +200,7 @@ export const arabicTransforms = {
                 prefixInflection('فبال', '', ['n_a'], ['n_s', 'n_d']),
             ],
         },
-        'NPref-kaAl': {
+        'NPref-KaAl': {
             name: 'like/such as + the',
             description: 'like/such as + the',
             rules: [
