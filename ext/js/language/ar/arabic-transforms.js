@@ -17,10 +17,49 @@
 
 import {prefixInflection, suffixInflection} from '../language-transforms.js';
 
+/**
+ * @template {string} TCondition
+ * @param {string} inflectedPrefix
+ * @param {string} deinflectedPrefix
+ * @param {string} initialStemSegment
+ * @param {TCondition[]} conditionsIn
+ * @param {TCondition[]} conditionsOut
+ * @returns {import('language-transformer').Rule<TCondition>}
+ */
+export function conditionalPrefixInflection(
+    inflectedPrefix,
+    deinflectedPrefix,
+    initialStemSegment,
+    conditionsIn,
+    conditionsOut,
+) {
+    const prefixRegExp = new RegExp('^' + inflectedPrefix + initialStemSegment);
+    return {
+        type: 'prefix',
+        isInflected: prefixRegExp,
+        deinflect: (text) => deinflectedPrefix + text.slice(inflectedPrefix.length),
+        conditionsIn,
+        conditionsOut,
+    };
+}
+
 /** @typedef {keyof typeof conditions} Condition */
 const conditions = {
     n: {
         name: 'Noun',
+        isDictionaryForm: true,
+        subConditions: ['n_a', 'n_s', 'n_d'],
+    },
+    n_a: {
+        name: 'Noun with Affixes',
+        isDictionaryForm: false,
+    },
+    n_s: {
+        name: 'Noun with Suffix only',
+        isDictionaryForm: false,
+    },
+    n_d: {
+        name: 'Noun Dictionary Form',
         isDictionaryForm: true,
     },
     v: {
@@ -31,14 +70,14 @@ const conditions = {
     pv: {
         name: 'Perfect Verb',
         isDictionaryForm: false,
-        subConditions: ['pv_p', 'pv_s', 'pv_d'],
+        subConditions: ['pv_a', 'pv_s', 'pv_d'],
     },
-    pv_p: {
-        name: 'Perfect Verb with Prefix',
+    pv_a: {
+        name: 'Perfect Verb with Affixes',
         isDictionaryForm: false,
     },
     pv_s: {
-        name: 'Perfect Verb with Suffix',
+        name: 'Perfect Verb with Suffix only',
         isDictionaryForm: false,
     },
     pv_d: {
@@ -78,23 +117,97 @@ export const arabicTransforms = {
     language: 'ar',
     conditions,
     transforms: {
-        // Prefixes
+        // General
         'Pref-Wa': {
             name: 'and',
             description: 'Conjunction',
             rules: [
-                prefixInflection('و', '', ['pv_p'], ['pv_s', 'pv_d']),
-                prefixInflection('ف', '', ['pv_p'], ['pv_s', 'pv_d']),
+                prefixInflection('و', '', ['pv_a'], ['pv_s', 'pv_d']),
+                prefixInflection('ف', '', ['pv_a'], ['pv_s', 'pv_d']),
             ],
         },
 
+        // Noun
+        'NPref-Bi': {
+            name: 'by, with',
+            description: 'by, with',
+            rules: [
+                prefixInflection('ب', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('وب', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('فب', '', ['n_a'], ['n_s', 'n_d']),
+            ],
+        },
+        'NPref-ka': {
+            name: 'like, such as',
+            description: 'like, such as',
+            rules: [
+                prefixInflection('ك', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('وك', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('فك', '', ['n_a'], ['n_s', 'n_d']),
+            ],
+        },
+        'NPref-Li': {
+            name: 'for, to; indeed, truly',
+            description: 'for, to (لِ); indeed, truly (لَ)',
+            rules: [
+                prefixInflection('ل', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('ول', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('فل', '', ['n_a'], ['n_s', 'n_d']),
+            ],
+        },
+        'NPref-Al': {
+            name: 'the',
+            description: 'the',
+            rules: [
+                prefixInflection('ال', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('وال', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('فال', '', ['n_a'], ['n_s', 'n_d']),
+            ],
+        },
+        'NPref-BiAl': {
+            name: 'by/with + the',
+            description: 'by/with + the',
+            rules: [
+                prefixInflection('بال', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('وبال', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('فبال', '', ['n_a'], ['n_s', 'n_d']),
+            ],
+        },
+        'NPref-kaAl': {
+            name: 'like/such as + the',
+            description: 'like/such as + the',
+            rules: [
+                prefixInflection('كال', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('وكال', '', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('فكال', '', ['n_a'], ['n_s', 'n_d']),
+            ],
+        },
+        'NPref-Lil': {
+            name: 'for/to + the',
+            description: 'for/to + the',
+            rules: [
+                conditionalPrefixInflection('لل', '', '[^ل]', ['n_a'], ['n_s', 'n_d']),
+                conditionalPrefixInflection('ولل', '', '[^ل]', ['n_a'], ['n_s', 'n_d']),
+                conditionalPrefixInflection('فلل', '', '[^ل]', ['n_a'], ['n_s', 'n_d']),
+            ],
+        },
+        'NPref-LiAl': {
+            name: 'for/to + the',
+            description: 'for/to + the, assimilated with initial ل',
+            rules: [
+                prefixInflection('لل', 'ل', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('ولل', 'ل', ['n_a'], ['n_s', 'n_d']),
+                prefixInflection('فلل', 'ل', ['n_a'], ['n_s', 'n_d']),
+            ],
+        },
+
+        // Perfect Verb
         'PVPref-La': {
             name: 'would have',
             description: 'Result clause particle (if ... I would have ...)',
-            rules: [prefixInflection('ل', '', ['pv_p'], ['pv_s', 'pv_d'])],
+            rules: [prefixInflection('ل', '', ['pv_a'], ['pv_s', 'pv_d'])],
         },
 
-        // Suffixes
         'PVSuff-ah': {
             name: 'Perfect Tense',
             description: 'Perfect Verb + D.O pronoun',
