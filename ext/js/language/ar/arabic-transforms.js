@@ -26,7 +26,7 @@ import {prefixInflection, suffixInflection} from '../language-transforms.js';
  * @param {TCondition[]} conditionsOut
  * @returns {import('language-transformer').Rule<TCondition>}
  */
-export function conditionalPrefixInflection(
+function conditionalPrefixInflection(
     inflectedPrefix,
     deinflectedPrefix,
     initialStemSegment,
@@ -38,6 +38,33 @@ export function conditionalPrefixInflection(
         type: 'prefix',
         isInflected: prefixRegExp,
         deinflect: (text) => deinflectedPrefix + text.slice(inflectedPrefix.length),
+        conditionsIn,
+        conditionsOut,
+    };
+}
+
+/**
+ * @template {string} TCondition
+ * @param {string} inflectedSuffix
+ * @param {string} deinflectedSuffix
+ * @param {string} finalStemSegment
+ * @param {TCondition[]} conditionsIn
+ * @param {TCondition[]} conditionsOut
+ * @returns {import('language-transformer').SuffixRule<TCondition>}
+ */
+function conditionalSuffixInflection(
+    inflectedSuffix,
+    deinflectedSuffix,
+    finalStemSegment,
+    conditionsIn,
+    conditionsOut,
+) {
+    const suffixRegExp = new RegExp(finalStemSegment + inflectedSuffix + '$');
+    return {
+        type: 'suffix',
+        isInflected: suffixRegExp,
+        deinflected: deinflectedSuffix,
+        deinflect: (text) => text.slice(0, -inflectedSuffix.length) + deinflectedSuffix,
         conditionsIn,
         conditionsOut,
     };
@@ -186,9 +213,9 @@ export const arabicTransforms = {
             name: 'for/to + the',
             description: 'for/to + the',
             rules: [
-                conditionalPrefixInflection('لل', '', '[^ل]', ['n_a'], ['n_s', 'n_d']),
-                conditionalPrefixInflection('ولل', '', '[^ل]', ['n_a'], ['n_s', 'n_d']),
-                conditionalPrefixInflection('فلل', '', '[^ل]', ['n_a'], ['n_s', 'n_d']),
+                conditionalPrefixInflection('لل', '', '(?!ل)', ['n_a'], ['n_s', 'n_d']),
+                conditionalPrefixInflection('ولل', '', '(?!ل)', ['n_a'], ['n_s', 'n_d']),
+                conditionalPrefixInflection('فلل', '', '(?!ل)', ['n_a'], ['n_s', 'n_d']),
             ],
         },
         'NPref-LiAl': {
@@ -229,33 +256,33 @@ export const arabicTransforms = {
             name: 'Perfect Tense',
             description: 'Perfect Verb suffixes assimilating with ن',
             rules: [
-                suffixInflection('ن', '', condInN, condOutN),
-                suffixInflection('نا', '', condInN, condOutN),
+                // Stem doesn't end in ن
+                conditionalSuffixInflection('ن', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('نا', '', '(?<!ن)', condInN, condOutN),
 
-                suffixInflection('نه', '', condInN, condOutN),
-                suffixInflection('نهما', '', condInN, condOutN),
-                suffixInflection('نهم', '', condInN, condOutN),
-                suffixInflection('نها', '', condInN, condOutN),
-                suffixInflection('نهن', '', condInN, condOutN),
-                suffixInflection('نك', '', condInN, condOutN),
-                suffixInflection('نكما', '', condInN, condOutN),
-                suffixInflection('نكم', '', condInN, condOutN),
-                suffixInflection('نكن', '', condInN, condOutN),
-                suffixInflection('نني', '', condInN, condOutN),
-                suffixInflection('ننا', '', condInN, condOutN),
+                conditionalSuffixInflection('نه', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('نهما', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('نهم', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('نها', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('نهن', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('نك', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('نكما', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('نكم', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('نكن', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('نني', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('ننا', '', '(?<!ن)', condInN, condOutN),
 
-                suffixInflection('ناه', '', condInN, condOutN),
-                suffixInflection('ناهما', '', condInN, condOutN),
-                suffixInflection('ناهم', '', condInN, condOutN),
-                suffixInflection('ناها', '', condInN, condOutN),
-                suffixInflection('ناهن', '', condInN, condOutN),
-                suffixInflection('ناك', '', condInN, condOutN),
-                suffixInflection('ناكما', '', condInN, condOutN),
-                suffixInflection('ناكم', '', condInN, condOutN),
-                suffixInflection('ناكن', '', condInN, condOutN),
+                conditionalSuffixInflection('ناه', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('ناهما', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('ناهم', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('ناها', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('ناهن', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('ناك', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('ناكما', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('ناكم', '', '(?<!ن)', condInN, condOutN),
+                conditionalSuffixInflection('ناكن', '', '(?<!ن)', condInN, condOutN),
 
                 // Suffixes assimilated with stems ending in ن
-                // suffixInflection('ن', 'ن', condInN, condOutN),
                 suffixInflection('نا', 'ن', condInN, condOutN),
 
                 suffixInflection('نه', 'ن', condInN, condOutN),
@@ -285,10 +312,9 @@ export const arabicTransforms = {
             name: 'Perfect Tense',
             description: 'Perfect Verb suffixes assimilating with ت',
             rules: [
+                // This can either be 3rd p. f. singular, or 1st/2nd p. singular
+                // The former doesn't assimilate, the latter do, so the below accounts for both
                 suffixInflection('ت', '', condInT, condOutT),
-                suffixInflection('تما', '', condInT, condOutT),
-                suffixInflection('تم', '', condInT, condOutT),
-                suffixInflection('تن', '', condInT, condOutT),
 
                 suffixInflection('ته', '', condInT, condOutT),
                 suffixInflection('تهما', '', condInT, condOutT),
@@ -302,32 +328,36 @@ export const arabicTransforms = {
                 suffixInflection('تني', '', condInT, condOutT),
                 suffixInflection('تنا', '', condInT, condOutT),
 
-                suffixInflection('تماه', '', condInT, condOutT),
-                suffixInflection('تماهما', '', condInT, condOutT),
-                suffixInflection('تماهم', '', condInT, condOutT),
-                suffixInflection('تماها', '', condInT, condOutT),
-                suffixInflection('تماهن', '', condInT, condOutT),
-                suffixInflection('تماني', '', condInT, condOutT),
-                suffixInflection('تمانا', '', condInT, condOutT),
+                // Stem doesn't end in ت
+                conditionalSuffixInflection('تما', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تم', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تن', '', '(?<!ت)', condInT, condOutT),
 
-                suffixInflection('تموه', '', condInT, condOutT),
-                suffixInflection('تموهما', '', condInT, condOutT),
-                suffixInflection('تموهم', '', condInT, condOutT),
-                suffixInflection('تموها', '', condInT, condOutT),
-                suffixInflection('تموهن', '', condInT, condOutT),
-                suffixInflection('تموني', '', condInT, condOutT),
-                suffixInflection('تمونا', '', condInT, condOutT),
+                conditionalSuffixInflection('تماه', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تماهما', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تماهم', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تماها', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تماهن', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تماني', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تمانا', '', '(?<!ت)', condInT, condOutT),
 
-                suffixInflection('تنه', '', condInT, condOutT),
-                suffixInflection('تنهما', '', condInT, condOutT),
-                suffixInflection('تنهم', '', condInT, condOutT),
-                suffixInflection('تنها', '', condInT, condOutT),
-                suffixInflection('تنهن', '', condInT, condOutT),
-                suffixInflection('تنني', '', condInT, condOutT),
-                suffixInflection('تننا', '', condInT, condOutT),
+                conditionalSuffixInflection('تموه', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تموهما', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تموهم', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تموها', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تموهن', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تموني', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تمونا', '', '(?<!ت)', condInT, condOutT),
+
+                conditionalSuffixInflection('تنه', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تنهما', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تنهم', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تنها', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تنهن', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تنني', '', '(?<!ت)', condInT, condOutT),
+                conditionalSuffixInflection('تننا', '', '(?<!ت)', condInT, condOutT),
 
                 // Suffixes assimilated with stems ending in ت
-                // suffixInflection('ت', 'ت', condInT, condOutT),
                 suffixInflection('تما', 'ت', condInT, condOutT),
                 suffixInflection('تم', 'ت', condInT, condOutT),
                 suffixInflection('تن', 'ت', condInT, condOutT),
