@@ -170,7 +170,13 @@ type AllTextProcessors = {
     mt: {
         pre: CapitalizationPreprocessors;
     };
+    nb: {
+        pre: CapitalizationPreprocessors;
+    };
     nl: {
+        pre: CapitalizationPreprocessors;
+    };
+    nn: {
         pre: CapitalizationPreprocessors;
     };
     pl: {

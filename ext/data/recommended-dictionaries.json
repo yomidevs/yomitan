@@ -397,6 +397,20 @@
             }
         ]
     },
+    "nb": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-nb-en",
+                "description": "Norwegian Bokmål to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-nb-en.zip"
+            }
+        ]
+    },
     "nl": {
         "frequency": [],
         "grammar": [],
@@ -408,6 +422,20 @@
                 "description": "Dutch to English dictionary created from Wiktionary data.",
                 "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
                 "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-nl-en.zip"
+            }
+        ]
+    },
+    "nn": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-nn-en",
+                "description": "Norwegian Nynorsk to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-nn-en.zip"
             }
         ]
     },
