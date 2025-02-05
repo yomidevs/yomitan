@@ -510,6 +510,13 @@ a:has(rt) {
     flex-flow: row nowrap;
 }
 
+:root[data-popup-action-bar-location=right] .sidebar-profile-name,
+:root[data-popup-action-bar-location=left] .sidebar-profile-name {
+    writing-mode: vertical-rl;
+    text-orientation: vertical;
+    letter-spacing: 2px;
+}
+
 
 /* Sidebar buttons */
 button.sidebar-button {
@@ -578,12 +585,6 @@ button.sidebar-button.sidebar-button-highlight {
     --button-content-color: var(--accent-color);
     --button-hover-content-color: var(--accent-color);
     --button-active-content-color: var(--accent-color);
-}
-
-.vertical-text {
-    writing-mode: vertical-rl;
-    text-orientation: vertical;
-    letter-spacing: 2px;
 }
 
 /* Search page */

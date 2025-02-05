@@ -488,8 +488,6 @@ export class Display extends EventDispatcher {
         this._updateContentTextScanner(options);
 
         this.trigger('optionsUpdated', {options});
-
-        await this._updateCurrentProfileDisplay(options);
     }
 
     /**
@@ -2282,20 +2280,6 @@ export class Display extends EventDispatcher {
     _setStickyHeader(options) {
         if (this._searchHeader && options) {
             this._searchHeader.classList.toggle('sticky-header', options.general.stickySearchHeader);
-        }
-    }
-
-    /**
-     * @param {import('settings').ProfileOptions} currentProfile
-     */
-    async _updateCurrentProfileDisplay(currentProfile) {
-        if (!this._profileName) {
-            return;
-        }
-        if (currentProfile.general.popupActionBarLocation === 'left' || currentProfile.general.popupActionBarLocation === 'right') {
-            this._profileName.classList.add('vertical-text');
-        } else {
-            this._profileName.classList.remove('vertical-text');
         }
     }
 }
