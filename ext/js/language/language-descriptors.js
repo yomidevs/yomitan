@@ -292,15 +292,6 @@ const languageDescriptors = [
         textPreprocessors: capitalizationPreprocessors,
     },
     {
-        iso: 'nb',
-        iso639_3: 'nor',
-        name: 'Norwegian Bokmål',
-        exampleText: 'lese',
-        textPreprocessors: {
-            ...capitalizationPreprocessors,
-        },
-    },
-    {
         iso: 'nl',
         iso639_3: 'nld',
         name: 'Dutch',
@@ -308,9 +299,9 @@ const languageDescriptors = [
         textPreprocessors: capitalizationPreprocessors,
     },
     {
-        iso: 'nn',
+        iso: 'no',
         iso639_3: 'nor',
-        name: 'Norwegian Nynorsk',
+        name: 'Norwegian',
         exampleText: 'lese',
         textPreprocessors: {
             ...capitalizationPreprocessors,
