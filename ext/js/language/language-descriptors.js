@@ -293,7 +293,7 @@ const languageDescriptors = [
     },
     {
         iso: 'nb',
-        iso639_3: 'nob',
+        iso639_3: 'nor',
         name: 'Norwegian Bokmål',
         exampleText: 'lese',
         textPreprocessors: {
@@ -309,7 +309,7 @@ const languageDescriptors = [
     },
     {
         iso: 'nn',
-        iso639_3: 'nno',
+        iso639_3: 'nor',
         name: 'Norwegian Nynorsk',
         exampleText: 'lese',
         textPreprocessors: {
