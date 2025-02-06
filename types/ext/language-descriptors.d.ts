@@ -173,6 +173,9 @@ type AllTextProcessors = {
     nl: {
         pre: CapitalizationPreprocessors;
     };
+    no: {
+        pre: CapitalizationPreprocessors;
+    };
     pl: {
         pre: CapitalizationPreprocessors;
     };
