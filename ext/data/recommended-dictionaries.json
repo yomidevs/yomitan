@@ -17,7 +17,13 @@
         "frequency": [],
         "grammar": [],
         "kanji": [],
-        "pronunciation": [],
+        "pronunciation": [
+            {
+                "name": "kty-aii-en-ipa",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-aii-en-ipa.zip"
+            }
+        ],
         "terms": [
             {
                 "name": "kty-aii-en",
@@ -45,7 +51,13 @@
         "frequency": [],
         "grammar": [],
         "kanji": [],
-        "pronunciation": [],
+        "pronunciation": [
+            {
+                "name": "kty-ar-en-ipa",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ar-en-ipa.zip"
+            }
+        ],
         "terms": [
             {
                 "name": "kty-ar-en",
@@ -387,7 +399,13 @@
         "frequency": [],
         "grammar": [],
         "kanji": [],
-        "pronunciation": [],
+        "pronunciation": [
+            {
+                "name": "kty-mt-en-ipa",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-mt-en-ipa.zip"
+            }
+        ],
         "terms": [
             {
                 "name": "kty-mt-en",
