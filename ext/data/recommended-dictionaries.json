@@ -20,6 +20,7 @@
         "pronunciation": [
             {
                 "name": "kty-aii-en-ipa",
+                "description": "Assyrian Neo-Aramaic IPA dictionary created from Wiktionary data.",
                 "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
                 "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-aii-en-ipa.zip"
             }
@@ -54,6 +55,7 @@
         "pronunciation": [
             {
                 "name": "kty-ar-en-ipa",
+                "description": "Arabic IPA dictionary created from Wiktionary data.",
                 "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
                 "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ar-en-ipa.zip"
             }
@@ -402,6 +404,7 @@
         "pronunciation": [
             {
                 "name": "kty-mt-en-ipa",
+                "description": "Maltese IPA dictionary created from Wiktionary data.",
                 "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
                 "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-mt-en-ipa.zip"
             }
