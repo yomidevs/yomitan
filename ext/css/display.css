@@ -1945,6 +1945,12 @@ button.footer-notification-close-button {
     padding-left: 1.5em;
     list-style: disc;
 }
+.anki-note-error-info {
+    color: var(--danger-color);
+}
+.anki-note-error-header {
+    font-weight: bold;
+}
 
 
 /* Conditional styles */
