@@ -31,8 +31,11 @@ import {ObjectPropertyAccessor} from '../../general/object-property-accessor.js'
 export class AnkiController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
+     * @param {import('../../application.js').Application} application
      */
-    constructor(settingsController) {
+    constructor(settingsController, application) {
+        /** @type {import('../../application.js').Application} */
+        this._application = application;
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
         /** @type {AnkiConnect} */
@@ -181,7 +184,7 @@ export class AnkiController {
 
         this._updateDuplicateOverwriteWarning(anki.duplicateBehavior);
 
-        this._setupFieldMenus(dictionaries);
+        void this._setupFieldMenus(dictionaries);
     }
 
     /** */
@@ -309,7 +312,7 @@ export class AnkiController {
     /**
      * @param {import('settings').DictionariesOptions} dictionaries
      */
-    _setupFieldMenus(dictionaries) {
+    async _setupFieldMenus(dictionaries) {
         /** @type {[types: import('dictionary').DictionaryEntryType[], templateName: string][]} */
         const fieldMenuTargets = [
             [['term'], 'anki-card-terms-field-menu'],
@@ -339,7 +342,8 @@ export class AnkiController {
                 markers.push(...getStandardFieldMarkers(type));
             }
             if (types.includes('term')) {
-                markers.push(...getDynamicFieldMarkers(dictionaries));
+                const dictionaryInfo = await this._application.api.getDictionaryInfo();
+                markers.push(...getDynamicFieldMarkers(dictionaries, dictionaryInfo));
             }
             markers = [...new Set(markers.sort())];
 
