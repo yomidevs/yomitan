@@ -110,7 +110,8 @@ export function getDynamicTemplates(options, dictionaryInfo) {
     for (const dictionary of options.dictionaries) {
         const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary.name);
         if (!dictionary.enabled) { continue; }
-        if (currentDictionaryInfo?.counts?.terms.total === 0) { continue; }
+        const totalTerms = currentDictionaryInfo?.counts?.terms?.total;
+        if (!!totalTerms && totalTerms > 0) { continue; }
         dynamicTemplates += `
 {{#*inline "single-glossary-${getKebabCase(dictionary.name)}"}}
     {{~> glossary selectedDictionary='${escapeDictName(dictionary.name)}'}}
@@ -138,7 +139,8 @@ export function getDynamicFieldMarkers(dictionaries, dictionaryInfo) {
     for (const dictionary of dictionaries) {
         const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary.name);
         if (!dictionary.enabled) { continue; }
-        if (currentDictionaryInfo?.counts?.terms.total === 0) { continue; }
+        const totalTerms = currentDictionaryInfo?.counts?.terms?.total;
+        if (!!totalTerms && totalTerms > 0) { continue; }
         markers.push(`single-glossary-${getKebabCase(dictionary.name)}`);
     }
     return markers;
