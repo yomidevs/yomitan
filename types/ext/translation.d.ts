@@ -48,10 +48,6 @@ export type FindKanjiDictionary = {
      * The alias of the dictionary
      */
     alias: string;
-    /**
-     * The priority of the dictionary
-     */
-    priority: number;
 };
 
 // Terms
@@ -152,10 +148,6 @@ export type FindTermDictionary = {
      * The alias of the dictionary
      */
     alias: string;
-    /**
-     * The priority of the dictionary
-     */
-    priority: number;
     /**
      * Whether or not secondary term searches are allowed for this dictionary.
      */

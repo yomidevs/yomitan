@@ -20,12 +20,26 @@ import Ajv from 'ajv';
 import standaloneCode from 'ajv/dist/standalone/index.js';
 import esbuild from 'esbuild';
 import fs from 'fs';
+import {createRequire} from 'module';
 import path from 'path';
 import {fileURLToPath} from 'url';
 import {parseJson} from './json.js';
 
+const require = createRequire(import.meta.url);
+
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const extDir = path.join(dirname, '..', 'ext');
+
+/**
+ * @param {string} out
+ */
+async function copyWasm(out) {
+    // copy from node modules '@resvg/resvg-wasm/index_bg.wasm' to out
+    const resvgWasmPath = path.dirname(require.resolve('@resvg/resvg-wasm'));
+    const wasmPath = path.join(resvgWasmPath, 'index_bg.wasm');
+    fs.copyFileSync(wasmPath, path.join(out, 'resvg.wasm'));
+}
+
 
 /**
  * @param {string} scriptPath
@@ -79,4 +93,6 @@ export async function buildLibs() {
     const patchedModuleCode = "// @ts-nocheck\nimport {ucs2length} from './ucs2length.js';" + moduleCode.replaceAll('require("ajv/dist/runtime/ucs2length").default', 'ucs2length');
 
     fs.writeFileSync(path.join(extDir, 'lib/validate-schemas.js'), patchedModuleCode);
+
+    await copyWasm(path.join(extDir, 'lib'));
 }

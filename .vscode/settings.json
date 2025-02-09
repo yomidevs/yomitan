@@ -5,18 +5,20 @@
             "source.addMissingImports": "explicit",
             "source.organizeImports": "explicit",
             "source.fixAll.eslint": "explicit"
-        },
+        }
     },
     "[typescript]": {
         "editor.codeActionsOnSave": {
             "source.addMissingImports": "never",
             "source.organizeImports": "never",
             "source.fixAll.eslint": "explicit"
-        },
+        }
     },
     "eslint.format.enable": true,
     "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
     "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+    "javascript.format.enable": false,
+    "typescript.format.enable": false,
     "javascript.preferences.importModuleSpecifierEnding": "js",
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
@@ -39,5 +41,6 @@
             "url": "/ext/data/schemas/recommended-dictionaries-schema.json"
         }
     ],
-    "typescript.tsdk": "node_modules\\typescript\\lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix"
 }

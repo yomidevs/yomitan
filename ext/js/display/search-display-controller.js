@@ -237,7 +237,7 @@ export class SearchDisplayController {
         this._searchBackButton.hidden = !showBackButton;
 
         if (this._queryInput.value !== query) {
-            this._queryInput.value = query;
+            this._queryInput.value = query.trimEnd();
             this._updateSearchHeight(true);
         }
         this._setIntroVisible(!valid, animate);
@@ -279,6 +279,7 @@ export class SearchDisplayController {
         e.preventDefault();
         this._queryInput.value = '';
         this._queryInput.focus();
+        this._updateSearchHeight(true);
     }
 
     /** */

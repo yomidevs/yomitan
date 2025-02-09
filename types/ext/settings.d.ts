@@ -70,6 +70,7 @@ export type GlobalDatabaseOptions = {
 };
 
 export type Profile = {
+    id: string;
     name: string;
     conditionGroups: ProfileConditionGroup[];
     options: ProfileOptions;
@@ -178,8 +179,6 @@ export type AudioSourceOptions = {
 export type ScanningOptions = {
     inputs: ScanningInput[];
     preventMiddleMouse: ScanningPreventMiddleMouseOptions;
-    touchInputEnabled: boolean;
-    pointerEventsEnabled: boolean;
     selectText: boolean;
     alphanumeric: boolean;
     autoHideResults: boolean;
@@ -229,6 +228,7 @@ export type ScanningInputOptions = {
     scanOnPenRelease: boolean;
     preventTouchScrolling: boolean;
     preventPenScrolling: boolean;
+    minimumTouchTime: number;
 };
 
 export type ScanningPreventMiddleMouseOptions = {
@@ -267,7 +267,6 @@ export type DictionariesOptions = DictionaryOptions[];
 export type DictionaryOptions = {
     name: string;
     alias: string;
-    priority: number;
     enabled: boolean;
     allowSecondarySearches: boolean;
     definitionsCollapsible: DictionaryDefinitionsCollapsible;
@@ -297,7 +296,7 @@ export type AnkiOptions = {
     checkForDuplicates: boolean;
     fieldTemplates: string | null;
     suspendNewCards: boolean;
-    displayTags: AnkiDisplayTags;
+    displayTagsAndFlags: AnkiDisplayTagsAndFlags;
     noteGuiMode: AnkiNoteGuiMode;
     apiKey: string;
     downloadTimeout: number;
@@ -409,7 +408,7 @@ export type AnkiDuplicateScope = 'collection' | 'deck' | 'deck-root';
 
 export type AnkiDuplicateBehavior = 'prevent' | 'overwrite' | 'new';
 
-export type AnkiDisplayTags = 'never' | 'always' | 'non-standard';
+export type AnkiDisplayTagsAndFlags = 'never' | 'always' | 'non-standard';
 
 export type AnkiNoteGuiMode = 'browse' | 'edit';
 

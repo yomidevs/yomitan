@@ -59,3 +59,9 @@ export type CreateNoteResult = {
     errors: Error[];
     requirements: AnkiNoteBuilder.Requirement[];
 };
+
+export type RGB = {
+    red: number;
+    green: number;
+    blue: number;
+};

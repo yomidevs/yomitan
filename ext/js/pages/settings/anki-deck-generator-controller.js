@@ -434,7 +434,7 @@ export class AnkiDeckGeneratorController {
             query: sentenceText,
             fullQuery: sentenceText,
         };
-        const template = this._getAnkiTemplate(options);
+        const template = await this._getAnkiTemplate(options);
         const deckOptionsFields = options.anki.terms.fields;
         const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
         const fields = [];
@@ -512,12 +512,13 @@ export class AnkiDeckGeneratorController {
 
     /**
      * @param {import('settings').ProfileOptions} options
-     * @returns {string}
+     * @returns {Promise<string>}
      */
-    _getAnkiTemplate(options) {
+    async _getAnkiTemplate(options) {
         let staticTemplates = options.anki.fieldTemplates;
         if (typeof staticTemplates !== 'string') { staticTemplates = this._defaultFieldTemplates; }
-        const dynamicTemplates = getDynamicTemplates(options);
+        const dictionaryInfo = await this._application.api.getDictionaryInfo();
+        const dynamicTemplates = getDynamicTemplates(options, dictionaryInfo);
         return staticTemplates + '\n' + dynamicTemplates;
     }
 
@@ -550,7 +551,7 @@ export class AnkiDeckGeneratorController {
         let tsv = '';
         for (const key in noteFields) {
             if (Object.prototype.hasOwnProperty.call(noteFields, key)) {
-                tsv += noteFields[key].replaceAll('\t', '&nbsp;&nbsp;&nbsp;').replaceAll('\n', '') + '\t';
+                tsv += noteFields[key].replaceAll('\t', '&nbsp;&nbsp;&nbsp;').replaceAll('\n', '').replaceAll('\r', '') + '\t';
             }
         }
         return tsv;

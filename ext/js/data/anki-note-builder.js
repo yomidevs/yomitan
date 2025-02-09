@@ -17,7 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
-import {deferPromise} from '../core/utilities.js';
+import {deferPromise, sanitizeCSS} from '../core/utilities.js';
 import {convertHiraganaToKatakana, convertKatakanaToHiragana} from '../language/ja/japanese.js';
 import {cloneFieldMarkerPattern, getRootDeckName} from './anki-util.js';
 
@@ -79,6 +79,16 @@ export class AnkiNoteBuilder {
             for (const error of errors) {
                 allErrors.push(ExtensionError.deserialize(error));
             }
+        }
+
+        // Make URL field blank if URL source is Yomitan
+        try {
+            const url = new URL(context.url);
+            if (url.protocol === new URL(import.meta.url).protocol) {
+                context.url = '';
+            }
+        } catch (e) {
+            // Ignore
         }
 
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
@@ -182,7 +192,7 @@ export class AnkiNoteBuilder {
         for (const dictionary of dictionaries) {
             const {name, styles} = dictionary;
             if (typeof styles === 'string') {
-                styleMap.set(name, styles);
+                styleMap.set(name, sanitizeCSS(styles));
             }
         }
         return styleMap;

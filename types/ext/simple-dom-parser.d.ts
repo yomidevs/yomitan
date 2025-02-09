@@ -24,7 +24,6 @@ export type {
 /**
  * This type is used as a generic reference to an element object from a generic DOM API.
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
 export type Element = object;
 
 export type ISimpleDomParser = {

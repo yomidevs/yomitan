@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 /**
  * Converts any string into a form that can be passed into the RegExp constructor.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
@@ -261,4 +262,56 @@ export function deferPromise() {
  */
 export function promiseTimeout(delay) {
     return delay <= 0 ? Promise.resolve() : new Promise((resolve) => { setTimeout(resolve, delay); });
+}
+
+/**
+ * @param {string} css
+ * @returns {string}
+ */
+export function sanitizeCSS(css) {
+    const sanitizer = new CSSStyleSheet();
+    sanitizer.replaceSync(css);
+    return [...sanitizer.cssRules].map((rule) => rule.cssText || '').join('\n');
+}
+
+/**
+ * @param {string} css
+ * @param {string} scopeSelector
+ * @returns {string}
+ */
+export function addScopeToCss(css, scopeSelector) {
+    return scopeSelector + ' {' + css + '\n}';
+}
+
+/**
+ * Older browser versions do not support nested css and cannot use the normal `addScopeToCss`.
+ * All major web browsers should be fine but Anki is still distributing Chromium 112 on some platforms as of Anki version 24.11.
+ * Chromium 120+ is required for full support.
+ * @param {string} css
+ * @param {string} scopeSelector
+ * @returns {string}
+ */
+export function addScopeToCssLegacy(css, scopeSelector) {
+    const stylesheet = new CSSStyleSheet();
+    // nodejs must fall back to the normal version of the function
+    if (typeof stylesheet.replaceSync === 'undefined') {
+        return addScopeToCss(css, scopeSelector);
+    }
+    stylesheet.replaceSync(css);
+    const newCSSRules = [];
+    for (const cssRule of stylesheet.cssRules) {
+        // ignore non-style rules
+        if (!(cssRule instanceof CSSStyleRule)) {
+            continue;
+        }
+
+        const newSelectors = [];
+        for (const selector of cssRule.selectorText.split(',')) {
+            newSelectors.push(scopeSelector + ' ' + selector);
+        }
+        const newRule = cssRule.cssText.replace(cssRule.selectorText, newSelectors.join(', '));
+        newCSSRules.push(newRule);
+    }
+    stylesheet.replaceSync(newCSSRules.join('\n'));
+    return [...stylesheet.cssRules].map((rule) => rule.cssText || '').join('\n');
 }

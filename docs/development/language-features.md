@@ -414,4 +414,4 @@ In certain languages, dictionary entries may contain readings as a key to read w
 
 ## Stuck?
 
-If you have any questions, please feel free to open a Discussion on Github, or find us on the [Yomitan Discord](https://discord.gg/YkQrXW6TXF).
+If you have any questions, please feel free to open a Discussion on GitHub, or find us on the [Yomitan Discord](https://discord.gg/YkQrXW6TXF).

@@ -166,7 +166,8 @@ export class TextSourceRange {
      */
     setStartOffset(length, layoutAwareScan, stopAtWordBoundary = false) {
         if (this._disallowExpandSelection) { return 0; }
-        const state = new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan, stopAtWordBoundary).seek(-length);
+        let state = new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan, stopAtWordBoundary);
+        state = state.seek(-length);
         this._range.setStart(state.node, state.offset);
         this._rangeStartOffset = this._range.startOffset;
         this._content = state.content + this._content;

@@ -83,6 +83,10 @@ export type KanjiDictionaryEntry = {
      */
     dictionary: string;
     /**
+     * The index of the dictionary in the original list of dictionaries used for the lookup.
+     */
+    dictionaryIndex: number;
+    /**
      * The alias of the dictionary
      */
     dictionaryAlias: string;
@@ -179,10 +183,6 @@ export type KanjiFrequency = {
      */
     dictionaryAlias: string;
     /**
-     * The priority of the dictionary.
-     */
-    dictionaryPriority: number;
-    /**
      * The kanji character for the frequency.
      */
     character: string;
@@ -239,10 +239,6 @@ export type TermDictionaryEntry = {
      * The alias of the dictionary
      */
     dictionaryAlias: string;
-    /**
-     * The priority of the dictionary.
-     */
-    dictionaryPriority: number;
     /**
      * The number of primary sources that had an exact text match for the term.
      */
@@ -344,10 +340,6 @@ export type TermDefinition = {
      */
     dictionaryAlias: string;
     /**
-     * The priority of the dictionary.
-     */
-    dictionaryPriority: number;
-    /**
      * Database ID for the definition.
      */
     id: number;
@@ -404,10 +396,6 @@ export type TermPronunciation = {
      * The alias of the dictionary
      */
     dictionaryAlias: string;
-    /**
-     * The priority of the dictionary.
-     */
-    dictionaryPriority: number;
     /**
      * The pronunciations for the term.
      */
@@ -486,10 +474,6 @@ export type TermFrequency = {
      * The alias of the dictionary
      */
     dictionaryAlias: string;
-    /**
-     * The priority of the dictionary.
-     */
-    dictionaryPriority: number;
     /**
      * Whether or not the frequency had an explicit reading specified.
      */

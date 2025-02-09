@@ -11,7 +11,7 @@
                 </div>
             </div>
         </div>
-        <div class="modal-body">
+        <div id="dictionaries-modal-body" class="modal-body">
             <div class="settings-item">
                 <div class="settings-item-inner">
                     <div class="settings-item-left">
@@ -50,7 +50,6 @@
                 <div class="dictionary-item-top"></div>
                 <label class="dictionary-item-top toggle dictionary-item-enabled-toggle-container"><input type="checkbox" id="all-dictionaries-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
                 <div class="dictionary-item-top dictionary-item-title-container">All</div>
-                <div class="dictionary-item-top advanced-only">Priority</div>
                 <div class="dictionary-item-top dictionary-item-button-height"></div>
                 <div class="dictionary-item-top dictionary-item-button-height"></div>
                 <div class="dictionary-item-top dictionary-item-button-height"></div>
@@ -335,6 +334,30 @@
             <button type="button" data-modal-action="hide">Close</button>
         </div>
     </div></div>
+
+    <!-- Recommended settings modal -->
+    <div id="recommended-settings-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Recommended settings</div>
+        </div>
+        <div class="modal-body">
+            <span>We recommend the following settings for your selected language</span>
+            <div id="recommended-settings-body">
+                <div class="settings-item">
+                    <div class="settings-item-inner">
+                        <div class="settings-item-left">
+                            <div class="settings-item-label"><strong>Recommendations</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="recommended-settings-list"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" id="recommended-settings-apply-button">Apply</button>
+        </div>
+    </div></div>
 </template>
 
 <template id="settings-modals-template">
@@ -524,20 +547,30 @@
                 the value can be a unitless integer or decimal number.
             </p>
             <div class="code margin-above">/* Globally set the line count */
-    :root {
-        --collapsible-definition-line-count: 2;
-    }
+:root {
+    --collapsible-definition-line-count: 2;
+}
+:root {
+    --collapsible-kanji-glyph-data-line-count: 2;
+}
 
-    /* Set the line count for a specific dictionary */
-    .definition-item[data-dictionary='JMdict'] {
-        --collapsible-definition-line-count: 2;
-    }
+/* Set the line count for a specific dictionary */
+.definition-item[data-dictionary='JMdict'] {
+    --collapsible-definition-line-count: 2;
+}
+.kanji-entry[data-dictionary='KANJIDIC'] {
+    --collapsible-kanji-glyph-data-line-count: 2;
+}
 
-    /* Spoiler-like functionality, use with <em>Force collapsed</em> mode */
-    .definition-item[data-dictionary='JMdict'] .definition-item-inner.collapsible.collapsed {
-        color: #000000;
-        background-color: #000000;
-    }
+/* Spoiler-like functionality, use with <em>Force collapsed</em> mode */
+.definition-item[data-dictionary='JMdict'] .definition-item-inner.collapsible.collapsed {
+    color: #000000;
+    background-color: #000000;
+}
+.kanji-entry[data-dictionary='KANJIDIC'] .kanji-glyph-data.collapsible.collapsed {
+    color: #000000;
+    background-color: #000000;
+}
     </div>
         </div>
         <div class="modal-footer">
@@ -655,6 +688,9 @@
         <div class="modal-body">
             <p>
                 A synthesized voice will speak the given text, using either the term text or the reading.
+            </p>
+            <p class="warning-text">
+                ⚠️ Note: Audio generated with text-to-speech cannot be captured for use in Anki card creation.
             </p>
             <div class="horizontal-flex margin-above">
                 <input type="text" value="よみたん" id="text-to-speech-voice-test-text" autocomplete="off" lang="ja">

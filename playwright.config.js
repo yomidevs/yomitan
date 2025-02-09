@@ -47,10 +47,7 @@ export default defineConfig({
     /* Opt out of parallel tests on CI. */
     workers: process.env.CI ? 1 : void 0,
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-    reporter: [
-        ['html'],
-        ['json', {outputFile: 'playwright-results.json'}],
-    ],
+    reporter: process.env.CI ? 'blob' : 'html',
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {
         /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
@@ -75,7 +72,10 @@ export default defineConfig({
         },
         {
             name: 'chromium',
-            use: {...devices['Desktop Chrome']},
+            use: {
+                ...devices['Desktop Chrome'],
+                channel: 'chromium',
+            },
             dependencies: ['playwright setup'],
         },
 

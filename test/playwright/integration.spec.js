@@ -66,6 +66,8 @@ test('anki add', async ({context, page, extensionId}) => {
     // Open settings
     await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
+    await expect(page.locator('id=dictionaries')).toBeVisible();
+
     // Load in test dictionary
     const dictionary = await createDictionaryArchiveData(path.join(root, 'test/data/dictionaries/valid-dictionary1'), 'valid-dictionary1');
     await page.locator('input[id="dictionary-import-file-input"]').setInputFiles({
@@ -73,7 +75,7 @@ test('anki add', async ({context, page, extensionId}) => {
         mimeType: 'application/x-zip',
         buffer: Buffer.from(dictionary),
     });
-    await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
+    await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 1 * 60 * 1000});
 
     // Connect to anki
     await page.locator('.toggle', {has: page.locator('[data-setting="anki.enable"]')}).click();

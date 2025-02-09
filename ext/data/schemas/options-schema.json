@@ -453,8 +453,6 @@
                                 "required": [
                                     "inputs",
                                     "preventMiddleMouse",
-                                    "touchInputEnabled",
-                                    "pointerEventsEnabled",
                                     "selectText",
                                     "alphanumeric",
                                     "autoHideResults",
@@ -501,7 +499,8 @@
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
                                                     "preventTouchScrolling": false,
-                                                    "preventPenScrolling": false
+                                                    "preventPenScrolling": false,
+                                                    "minimumTouchTime": 0
                                                 }
                                             },
                                             {
@@ -526,7 +525,8 @@
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
                                                     "preventTouchScrolling": true,
-                                                    "preventPenScrolling": true
+                                                    "preventPenScrolling": true,
+                                                    "minimumTouchTime": 0
                                                 }
                                             }
                                         ],
@@ -585,7 +585,8 @@
                                                         "scanOnPenPress",
                                                         "scanOnPenRelease",
                                                         "preventTouchScrolling",
-                                                        "preventPenScrolling"
+                                                        "preventPenScrolling",
+                                                        "minimumTouchTime"
                                                     ],
                                                     "properties": {
                                                         "showAdvanced": {
@@ -643,6 +644,10 @@
                                                         "preventPenScrolling": {
                                                             "type": "boolean",
                                                             "default": true
+                                                        },
+                                                        "minimumTouchTime": {
+                                                            "type": "number",
+                                                            "default": 0
                                                         }
                                                     }
                                                 }
@@ -675,14 +680,6 @@
                                                 "default": false
                                             }
                                         }
-                                    },
-                                    "touchInputEnabled": {
-                                        "type": "boolean",
-                                        "default": true
-                                    },
-                                    "pointerEventsEnabled": {
-                                        "type": "boolean",
-                                        "default": false
                                     },
                                     "selectText": {
                                         "type": "boolean",
@@ -836,7 +833,6 @@
                                     "required": [
                                         "name",
                                         "alias",
-                                        "priority",
                                         "enabled",
                                         "allowSecondarySearches",
                                         "definitionsCollapsible",
@@ -851,10 +847,6 @@
                                         "alias": {
                                             "type": "string",
                                             "default": ""
-                                        },
-                                        "priority": {
-                                            "type": "number",
-                                            "default": 0
                                         },
                                         "enabled": {
                                             "type": "boolean",
@@ -927,7 +919,7 @@
                                     "checkForDuplicates",
                                     "fieldTemplates",
                                     "suspendNewCards",
-                                    "displayTags",
+                                    "displayTagsAndFlags",
                                     "noteGuiMode",
                                     "apiKey",
                                     "downloadTimeout"
@@ -1046,7 +1038,7 @@
                                         "type": "boolean",
                                         "default": false
                                     },
-                                    "displayTags": {
+                                    "displayTagsAndFlags": {
                                         "type": "string",
                                         "enum": ["never", "always", "non-standard"],
                                         "default": "never"

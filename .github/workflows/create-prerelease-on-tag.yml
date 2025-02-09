@@ -22,6 +22,7 @@ jobs:
         with:
           node-version-file: "package.json"
 
+      # intentially do not use cache to keep the build more comprehensible and sandboxed
       - name: Install dependencies
         run: npm ci
 
@@ -36,11 +37,11 @@ jobs:
         id: hash
         run: |
           cd builds
-          echo "hashes=$(sha256sum * | base64 -w0)" >> "$GITHUB_OUTPUT"
+          echo "hashes=$(sha256sum -- * | base64 -w0)" >> "$GITHUB_OUTPUT"
 
       - name: Release
         id: release
-        uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191 # pin@v2
+        uses: softprops/action-gh-release@01570a1f39cb168c169c802c3bceb9e93fb10974 # pin@v2
         with:
           generate_release_notes: true
           prerelease: true
@@ -52,6 +53,7 @@ jobs:
           workflow: publish-chrome-development
           token: ${{ secrets.GITHUB_TOKEN }}
           wait-for-completion: false
+          inputs: '{ "upload_url": "${{ steps.release.outputs.upload_url }}" }'
 
       - name: Dispatch publish-firefox-development
         uses: aurelien-baudet/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7 # pin@v2

@@ -131,6 +131,10 @@ export type StyledElement = {
      */
     title?: string;
     /**
+     * Whether or not the details element is open by default.
+     */
+    open?: boolean;
+    /**
      * Defines the language of an element in the format defined by RFC 5646.
      */
     lang?: string;
