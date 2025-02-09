@@ -833,8 +833,9 @@ export class DisplayAnki {
      * @returns {Promise<string>}
      */
     async _getAnkiFieldTemplates(options) {
+        const dictionaryInfo = await this._display.application.api.getDictionaryInfo();
         const staticTemplates = await this._getStaticAnkiFieldTemplates(options);
-        const dynamicTemplates = getDynamicTemplates(options);
+        const dynamicTemplates = getDynamicTemplates(options, dictionaryInfo);
         return staticTemplates + dynamicTemplates;
     }
 
@@ -935,6 +936,12 @@ export class DisplayAnki {
         if (context === null) { throw new Error('Note context not initialized'); }
         const modeOptions = this._modeOptions.get(mode);
         if (typeof modeOptions === 'undefined') { throw new Error(`Unsupported note type: ${mode}`); }
+        if (!this._ankiFieldTemplates) {
+            const options = this._display.getOptions();
+            if (options) {
+                await this._updateAnkiFieldTemplates(options);
+            }
+        }
         const template = this._ankiFieldTemplates;
         if (typeof template !== 'string') { throw new Error('Invalid template'); }
         const {deck: deckName, model: modelName} = modeOptions;
