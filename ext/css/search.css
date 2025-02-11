@@ -18,8 +18,7 @@
 
 /* Variables */
 :root {
-    --main-content-horizontal-padding: 0.72em;
-    --entry-horizontal-padding: 0;
+    --query-horizontal-padding: 0;
 
     --padding: calc(10em / var(--font-size-no-units));
     --content-width-search: 700;
