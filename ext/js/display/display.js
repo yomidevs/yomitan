@@ -199,8 +199,6 @@ export class Display extends EventDispatcher {
         this._languageSummaries = [];
         /** @type {import('dictionary-importer').Summary[]} */
         this._dictionaryInfo = [];
-        /** @type {?HTMLElement} */
-        this._profileName = document.querySelector('#profile-name');
 
         /* eslint-disable @stylistic/no-multi-spaces */
         this._hotkeyHandler.registerActions([
