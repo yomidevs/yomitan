@@ -17,6 +17,9 @@
 
 import {suffixInflection, wholeWordInflection} from '../language-transforms.js';
 
+/** @typedef {keyof typeof conditions} Condition */
+const REFLEXIVE_PATTERN = /\b(me|te|se|nos|os)\s+(\w+)(ar|er|ir)\b/g;
+
 const ACCENTS = new Map([
     ['a', 'á'],
     ['e', 'é'],
@@ -616,6 +619,67 @@ export const spanishTransforms = {
                 wholeWordInflection('fuéramos', 'ir', ['v'], ['v']),
                 wholeWordInflection('fuerais', 'ir', ['v'], ['v']),
                 wholeWordInflection('fueran', 'ir', ['v'], ['v']),
+            ],
+        },
+        'participle': {
+            name: 'participle',
+            description: 'Participle form of a verb',
+            rules: [
+                // -ar verbs
+                suffixInflection('ado', 'ar', ['adj'], ['v_ar']),
+                // -er verbs
+                suffixInflection('ido', 'er', ['adj'], ['v_er']),
+                // -ir verbs
+                suffixInflection('ido', 'ir', ['adj'], ['v_ir']),
+                // irregular verbs
+                wholeWordInflection('dicho', 'decir', ['adj'], ['v']),
+                wholeWordInflection('escrito', 'escribir', ['adj'], ['v']),
+                wholeWordInflection('hecho', 'hacer', ['adj'], ['v']),
+                wholeWordInflection('muerto', 'morir', ['adj'], ['v']),
+                wholeWordInflection('puesto', 'poner', ['adj'], ['v']),
+                wholeWordInflection('roto', 'romper', ['adj'], ['v']),
+                wholeWordInflection('visto', 'ver', ['adj'], ['v']),
+                wholeWordInflection('vuelto', 'volver', ['adj'], ['v']),
+            ],
+        },
+        'reflexive': {
+            name: 'reflexive',
+            description: 'Reflexive form of a verb',
+            rules: [
+                suffixInflection('arse', 'ar', ['v_ar'], ['v_ar']),
+                suffixInflection('erse', 'er', ['v_er'], ['v_er']),
+                suffixInflection('irse', 'ir', ['v_ir'], ['v_ir']),
+            ],
+        },
+        'pronoun substitution': {
+            name: 'pronoun substitution',
+            description: 'Substituted pronoun of a reflexive verb',
+            rules: [
+                suffixInflection('arme', 'arse', ['v_ar'], ['v_ar']),
+                suffixInflection('arte', 'arse', ['v_ar'], ['v_ar']),
+                suffixInflection('arnos', 'arse', ['v_er'], ['v_er']),
+                suffixInflection('erme', 'erse', ['v_er'], ['v_er']),
+                suffixInflection('erte', 'erse', ['v_er'], ['v_er']),
+                suffixInflection('ernos', 'erse', ['v_er'], ['v_er']),
+                suffixInflection('irme', 'irse', ['v_ir'], ['v_ir']),
+                suffixInflection('irte', 'irse', ['v_ir'], ['v_ir']),
+                suffixInflection('irnos', 'irse', ['v_ir'], ['v_ir']),
+            ],
+        },
+        'pronominal': {
+            // me despertar -> despertarse
+            name: 'pronominal',
+            description: 'Pronominal form of a verb',
+            rules: [
+                {
+                    type: 'other',
+                    isInflected: new RegExp(REFLEXIVE_PATTERN),
+                    deinflect: (term) => {
+                        return term.replace(REFLEXIVE_PATTERN, (_match, _pronoun, verb, ending) => `${verb}${ending}se`);
+                    },
+                    conditionsIn: ['v'],
+                    conditionsOut: ['v'],
+                },
             ],
         },
     },
