@@ -59,12 +59,13 @@ export class DisplayProfileSelection {
     /**
      * @param {{source: string}} details
      */
-    _onOptionsUpdated({source}) {
+    async _onOptionsUpdated({source}) {
         if (source === this._source) { return; }
         this._profileListNeedsUpdate = true;
         if (this._profilePanel.isVisible()) {
             void this._updateProfileList();
         }
+        await this._updateCurrentProfileName();
     }
 
     /**
@@ -122,7 +123,6 @@ export class DisplayProfileSelection {
         }
         this._profileList.textContent = '';
         this._profileList.appendChild(fragment);
-        await this._updateCurrentProfileName();
     }
 
     /**
