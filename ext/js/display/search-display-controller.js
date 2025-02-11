@@ -81,6 +81,8 @@ export class SearchDisplayController {
             ['searchDisplayControllerSetMode', this._onMessageSetMode.bind(this)],
             ['searchDisplayControllerUpdateSearchQuery', this._onExternalSearchUpdate.bind(this)],
         ]);
+        /** @type {HTMLElement} */
+        this._profileName = querySelectorNotNull(document, '#profile-name');
     }
 
     /** */
@@ -398,6 +400,15 @@ export class SearchDisplayController {
     /** */
     _onModeChange() {
         this._updateClipboardMonitorEnabled();
+    }
+
+    /**
+     *
+     */
+    async _updateCurrentProfileName() {
+        const {profileCurrent, profiles} = await this._display.application.api.optionsGetFull();
+        const currentProfile = profiles[profileCurrent];
+        this._profileName.textContent = currentProfile.name;
     }
 
     /**
