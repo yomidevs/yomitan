@@ -88,11 +88,12 @@ export class DisplayProfileSelection {
         }
     }
 
-    /**
-     *
-     */
+    /** */
     async _updateCurrentProfileName() {
         const {profileCurrent, profiles} = await this._display.application.api.optionsGetFull();
+        if (profiles.length === 1) {
+            return;
+        }
         const currentProfile = profiles[profileCurrent];
         this._profileName.textContent = currentProfile.name;
     }
