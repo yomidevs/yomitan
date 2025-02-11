@@ -93,6 +93,7 @@ export class DisplayProfileSelection {
     async _updateCurrentProfileName() {
         const {profileCurrent, profiles} = await this._display.application.api.optionsGetFull();
         if (profiles.length === 1) {
+            this._profileButton.style.display = 'none';
             return;
         }
         const currentProfile = profiles[profileCurrent];
