@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024  Yomitan Authors
+ * Copyright (C) 2024-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {testLanguageTransformer} from '../fixtures/language-transformer-test.js';
 import {LanguageTransformer} from '../../ext/js/language/language-transformer.js';
 import {tagalogTransforms} from '../../ext/js/language/tl/tagalog-transforms.js';
+import {testLanguageTransformer} from '../fixtures/language-transformer-test.js';
 
 
 const tests = [
