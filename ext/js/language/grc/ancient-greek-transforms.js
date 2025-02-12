@@ -17,9 +17,6 @@
 
 import {suffixInflection} from '../language-transforms.js';
 
-
-// TODO: -ne suffix (estne, nonne)?
-
 const conditions = {
     v: {
         name: 'Verb',
