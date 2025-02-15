@@ -247,6 +247,7 @@ export class Backend {
 
         // On Chrome, this is for receiving messages sent with navigator.serviceWorker, which has the benefit of being able to transfer objects, but doesn't accept callbacks
         (/** @type {ServiceWorkerGlobalScope & typeof globalThis} */ (globalThis)).addEventListener('message', this._onPmMessage.bind(this));
+        (/** @type {ServiceWorkerGlobalScope & typeof globalThis} */ (globalThis)).addEventListener('messageerror', this._onPmMessageError.bind(this));
 
         if (this._canObservePermissionsChanges()) {
             const onPermissionsChanged = this._onWebExtensionEventWrapper(this._onPermissionsChanged.bind(this));
@@ -259,6 +260,7 @@ export class Backend {
 
     /** @type {import('api').PmApiHandler<'connectToDatabaseWorker'>} */
     async _onPmConnectToDatabaseWorker(_params, ports) {
+        console.log('Backend: _onPmConnectToDatabaseWorker');
         if (ports !== null && ports.length > 0) {
             await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
         }
@@ -303,6 +305,7 @@ export class Backend {
                     // connectToBackend2
                     e.ports[0].onmessage = this._onPmMessage.bind(this);
                 });
+                sharedWorkerBridge.port.addEventListener('messageerror', this._onPmMessageError.bind(this));
                 sharedWorkerBridge.port.start();
             }
             try {
@@ -450,6 +453,16 @@ export class Backend {
     }
 
     /**
+     * @param {MessageEvent<import('api').PmApiMessageAny>} event
+     */
+    _onPmMessageError(event) {
+        const error = new ExtensionError('Backend: Error receiving message via postMessage');
+        error.data = event;
+        log.error(error);
+    }
+
+
+    /**
      * @param {chrome.tabs.ZoomChangeInfo} event
      */
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
@@ -527,6 +540,7 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'termsFind'>} */
     async _onApiTermsFind({text, details, optionsContext}) {
+        console.log('Backend: _onApiTermsFind');
         const options = this._getProfileOptions(optionsContext, false);
         const {general: {resultOutputMode: mode, maxResults}} = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);
