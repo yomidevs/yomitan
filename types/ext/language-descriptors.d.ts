@@ -121,7 +121,9 @@ type AllTextProcessors = {
         };
     };
     grc: {
-        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
+        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor & {
+            convertLatinToGreek: TextProcessor<boolean>;
+        }
     };
     hi: Record<string, never>;
     hu: {

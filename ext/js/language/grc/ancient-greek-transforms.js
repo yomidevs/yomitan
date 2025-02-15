@@ -26,6 +26,10 @@ const conditions = {
         name: 'Noun',
         isDictionaryForm: true,
     },
+    adj: {
+        name: 'Adjective',
+        isDictionaryForm: true,
+    },
 };
 
 /** @type {import('language-transformer').LanguageTransformDescriptor<keyof typeof conditions>} */
@@ -33,6 +37,8 @@ export const ancientGreekTransforms = {
     language: 'grc',
     conditions,
     transforms: {
+        // inflections
+        // verbs
         '3rd person singular present active indicative': {
             name: '3rd person singular present active indicative',
             rules: [
@@ -40,12 +46,70 @@ export const ancientGreekTransforms = {
                 suffixInflection('ει', 'εω', [], ['v']),
             ],
         },
+
+        // nouns
         'accusative singular': {
             name: 'accusative singular',
             rules: [
                 suffixInflection('ον', 'ος', [], ['n']),
             ],
         },
+        'genitive singular': {
+            name: 'genitive singular',
+            rules: [
+                suffixInflection('ου', 'ος', [], ['n']),
+            ]
+        },
+        'dative singular': {
+            name: 'dative singular',
+            rules: [
+                suffixInflection('ω', 'ος', [], ['n']),
+            ],
+        },
+        'vocative singular': {
+            name: 'vocative singular',
+            rules: [
+                suffixInflection('ε', 'ος', [], ['n']),
+            ],
+        },
+        'nominative plural': {
+            name: 'nominative plural',
+            rules: [
+                suffixInflection('οι', 'ος', [], ['n']),
+            ],
+        },
+        'genitive plural': {
+            name: 'genitive plural',
+            rules: [
+                suffixInflection('ων', 'ος', [], ['n']),
+            ],
+        },
+        'dative plural': {
+            name: 'dative plural',
+            rules: [
+                suffixInflection('οις', 'ος', [], ['n']),
+            ],
+        },
+        'accusative plural': {
+            name: 'accusative plural',
+            rules: [
+                suffixInflection('ους', 'ος', [], ['n']),
+            ],
+        },
+        'vocative plural': {
+            name: 'vocative plural',
+            rules: [
+                suffixInflection('οι', 'ος', [], ['n']),
+            ],
+        },
+        // adjectives
+        'accusative singular masculine': {
+            name: 'accusative singular masculine',
+            rules: [
+                suffixInflection('ον', 'ος', [], ['adj']),
+            ],
+        },
+        // word formation
         'nominalization': {
             name: 'nominalization',
             rules: [

@@ -25,6 +25,7 @@ import {esperantoTransforms} from './eo/esperanto-transforms.js';
 import {spanishTransforms} from './es/spanish-transforms.js';
 import {apostropheVariants} from './fr/french-text-preprocessors.js';
 import {frenchTransforms} from './fr/french-transforms.js';
+import {convertLatinToGreek} from './grc/ancient-greek-processors.js';
 import {ancientGreekTransforms} from './grc/ancient-greek-transforms.js';
 import {
     alphabeticToHiragana,
@@ -178,6 +179,7 @@ const languageDescriptors = [
         textPreprocessors: {
             ...capitalizationPreprocessors,
             removeAlphabeticDiacritics,
+            convertLatinToGreek,
         },
         languageTransforms: ancientGreekTransforms,
     },

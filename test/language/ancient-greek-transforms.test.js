@@ -34,9 +34,24 @@ const tests = [
         category: 'nouns',
         valid: true,
         tests: [
-            {term: 'ἄνθρωπος', source: 'ἄνθρωπον', rule: 'n', reasons: ['accusative singular']},
+            {term: 'ανθρωπος', source: 'ανθρωπον', rule: 'n', reasons: ['accusative singular']},
+            {term: 'ανθρωπος', source: 'ανθρωπου', rule: 'n', reasons: ['genitive singular']},
+            {term: 'ανθρωπος', source: 'ανθρωπε', rule: 'n', reasons: ['vocative singular']},
+            {term: 'ανθρωπος', source: 'ανθρωπω', rule: 'n', reasons: ['dative singular']},
+            {term: 'ανθρωπος', source: 'ανθρωποι', rule: 'n', reasons: ['nominative plural']},
+            {term: 'ανθρωπος', source: 'ανθρωποις', rule: 'n', reasons: ['dative plural']},
+            {term: 'ανθρωπος', source: 'ανθρωπους', rule: 'n', reasons: ['accusative plural']},
+            {term: 'ανθρωπος', source: 'ανθρωπων', rule: 'n', reasons: ['genitive plural']},
+            {term: 'ανθρωπος', source: 'ανθρωποι', rule: 'n', reasons: ['vocative plural']},
         ],
     },
+    {
+        category: 'adjectives',
+        valid: true,
+        tests: [
+            {term: 'καλος', source: 'καλον', rule: 'adj', reasons: ['accusative singular masculine']},
+        ],
+    }
 ];
 /* eslint-enable @stylistic/no-multi-spaces */
 
