@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -476,6 +476,7 @@ a:has(rt) {
     background-color: var(--sidebar-background-color);
     display: flex;
     flex-flow: column nowrap;
+    align-items: center;
 }
 :root[data-popup-action-bar-location=top] .content-outer,
 :root[data-popup-action-bar-location=bottom] .content-outer {
@@ -508,6 +509,13 @@ a:has(rt) {
 :root[data-popup-action-bar-location=top] .content-sidebar-bottom,
 :root[data-popup-action-bar-location=bottom] .content-sidebar-bottom {
     flex-flow: row nowrap;
+}
+
+:root[data-popup-action-bar-location=right] #profile-name,
+:root[data-popup-action-bar-location=left] #profile-name {
+    writing-mode: vertical-rl;
+    text-orientation: vertical;
+    letter-spacing: 2px;
 }
 
 
