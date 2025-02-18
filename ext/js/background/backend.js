@@ -1373,6 +1373,8 @@ export class Backend {
 
         this._setupContextMenu(options);
 
+        this._attachOmniboxListener();
+
         void this._accessibilityController.update(this._getOptionsFull(false));
 
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
@@ -1402,6 +1404,14 @@ export class Backend {
         } catch (e) {
             log.error(e);
         }
+    }
+
+    /** */
+    _attachOmniboxListener() {
+        chrome.omnibox.onInputEntered.addListener((text) => {
+            const newURL = 'search.html?query=' + encodeURIComponent(text);
+            void chrome.tabs.create({url: newURL});
+        });
     }
 
     /**
