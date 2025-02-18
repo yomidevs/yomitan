@@ -34,7 +34,7 @@
             "type": "module"
         },
         "omnibox": {
-            "keyword": "Yomitan"
+            "keyword": "yomi"
         },
         "content_scripts": [
             {
