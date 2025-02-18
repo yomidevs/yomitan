@@ -42,6 +42,8 @@ export class DisplayProfileSelection {
         this._eventListeners = new EventListenerCollection();
         /** @type {string} */
         this._source = generateId(16);
+        /** @type {HTMLElement} */
+        this._profileName = querySelectorNotNull(document, '#profile-name');
     }
 
     /** */
@@ -49,6 +51,7 @@ export class DisplayProfileSelection {
         this._display.application.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         this._profileButton.addEventListener('click', this._onProfileButtonClick.bind(this), false);
         this._profileListNeedsUpdate = true;
+        await this._updateCurrentProfileName();
     }
 
     // Private
@@ -56,12 +59,13 @@ export class DisplayProfileSelection {
     /**
      * @param {{source: string}} details
      */
-    _onOptionsUpdated({source}) {
+    async _onOptionsUpdated({source}) {
         if (source === this._source) { return; }
         this._profileListNeedsUpdate = true;
         if (this._profilePanel.isVisible()) {
             void this._updateProfileList();
         }
+        await this._updateCurrentProfileName();
     }
 
     /**
@@ -83,6 +87,17 @@ export class DisplayProfileSelection {
         if (visible && this._profileListNeedsUpdate) {
             void this._updateProfileList();
         }
+    }
+
+    /** */
+    async _updateCurrentProfileName() {
+        const {profileCurrent, profiles} = await this._display.application.api.optionsGetFull();
+        if (profiles.length === 1) {
+            this._profileButton.style.display = 'none';
+            return;
+        }
+        const currentProfile = profiles[profileCurrent];
+        this._profileName.textContent = currentProfile.name;
     }
 
     /** */
@@ -136,5 +151,6 @@ export class DisplayProfileSelection {
         };
         await this._display.application.api.modifySettings([modification], this._source);
         this._setProfilePanelVisible(false);
+        await this._updateCurrentProfileName();
     }
 }
