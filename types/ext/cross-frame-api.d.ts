@@ -80,7 +80,7 @@ export type CrossFrameCommunicationPortDetails = {
     otherFrameId: number;
 };
 
-type ApiSurface = {
+export interface ApiSurface {
     displayPopupMessage1: {
         params: DisplayDirectApiFrameClientMessageAny;
         return: DisplayDirectApiReturnAny;
@@ -234,7 +234,13 @@ type ApiSurface = {
         params: RequestFrameInfoResponseParams;
         return: RequestFrameInfoResponseReturn;
     };
-};
+    popupFactoryIsPointerOver: {
+        params: {
+            id: string;
+        };
+        return: boolean;
+    };
+}
 
 export type ApiNames = BaseApiNames<ApiSurface>;
 

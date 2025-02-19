@@ -295,6 +295,15 @@ export class PopupProxy extends EventDispatcher {
         return this._invokeSafe('popupFactorySetFrameSize', {id: this._id, width, height}, false);
     }
 
+    /**
+     * Checks if the pointer is over this popup.
+     * @returns {Promise<boolean>} Whether the pointer is over the popup
+     */
+    isPointerOver() {
+        console.log('PROXY');
+        return this._invokeSafe('popupFactoryIsPointerOver', {id: this._id}, false);
+    }
+
     // Private
 
     /**
