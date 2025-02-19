@@ -96,8 +96,8 @@ export type Events = {
         useWebExtensionApi: boolean;
         inShadow: boolean;
     };
-    framePointerOver: Record<string, never>;
-    framePointerOut: Record<string, never>;
+    mouseOver: Record<string, never>;
+    mouseOut: Record<string, never>;
     offsetNotFound: Record<string, never>;
 };
 

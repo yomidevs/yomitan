@@ -111,6 +111,8 @@ export class Popup extends EventDispatcher {
         this._frame.style.height = '0';
         /** @type {boolean} */
         this._frameConnected = false;
+        /** @type {boolean} */
+        this._isPointerOverPopup = false;
 
         /** @type {HTMLElement} */
         this._container = this._frame;
@@ -385,8 +387,7 @@ export class Popup extends EventDispatcher {
      * @returns {Promise<import('popup').ValidSize>} The size and whether or not it is valid.
      */
     async getFrameSize() {
-        const {width, height} = this._getFrameBoundingClientRect();
-        return {width, height, valid: true};
+        return {width: this._frame.offsetWidth, height: this._frame.offsetHeight, valid: true};
     }
 
     /**
@@ -400,20 +401,52 @@ export class Popup extends EventDispatcher {
         return true;
     }
 
+    /**
+     * Returns whether the pointer is currently over this popup.
+     * @returns {boolean}
+     */
+    isPointerOver() {
+        console.log(`Popup ${this._id}: isPointerOver() called, returning ${this._isPointerOverPopup}`);
+        return this._isPointerOverPopup;
+    }
+
     // Private functions
 
     /**
      * @returns {void}
      */
     _onFrameMouseOver() {
-        this.trigger('framePointerOver', {});
+        console.log(`Popup ${this._id}: Mouse over event triggered`);
+        this._isPointerOverPopup = true;
+        console.log(`Popup ${this._id}: _isPointerOverPopup set to true`);
+        this.trigger('mouseOver', {});
+
+        // Clear all child popups when parent is moused over
+        let currentChild = this.child;
+        while (currentChild !== null) {
+            console.log(`Popup ${this._id}: Clearing child popup ${currentChild.id}`);
+            currentChild.hide(false);
+            currentChild = currentChild.child;
+        }
     }
 
     /**
      * @returns {void}
      */
     _onFrameMouseOut() {
-        this.trigger('framePointerOut', {});
+        console.log(`Popup ${this._id}: Mouse out event triggered`);
+        this._isPointerOverPopup = false;
+        console.log(`Popup ${this._id}: _isPointerOverPopup set to false`);
+        this.trigger('mouseOut', {});
+        console.log(`Popup ${this._id}: Triggered mouseOut event`);
+
+        // Propagate mouseOut event up through the entire hierarchy
+        let currentParent = this.parent;
+        while (currentParent !== null) {
+            console.log(`Popup ${this._id}: Propagating mouseOut to ancestor ${currentParent.id}`);
+            currentParent.trigger('mouseOut', {});
+            currentParent = currentParent.parent;
+        }
     }
 
     /**
@@ -459,10 +492,12 @@ export class Popup extends EventDispatcher {
 
         const useSecurePopupFrameUrl = this._useSecureFrameUrl;
 
+        console.log(`Popup ${this._id}: Starting frame injection`);
         await this._setUpContainer(this._useShadowDom);
 
         /** @type {import('frame-client').SetupFrameFunction} */
         const setupFrame = (frame) => {
+            console.log(`Popup ${this._id}: Setting up frame`);
             frame.removeAttribute('src');
             frame.removeAttribute('srcdoc');
             this._observeFullscreen(true);
@@ -485,6 +520,15 @@ export class Popup extends EventDispatcher {
         this._frameClient = frameClient;
         await frameClient.connect(this._frame, this._targetOrigin, this._frameId, setupFrame);
         this._frameConnected = true;
+        console.log(`Popup ${this._id}: Frame connected`);
+
+        // Reattach mouse event listeners after frame injection
+        console.log(`Popup ${this._id}: Attaching mouse event listeners`);
+        const boundMouseOver = this._onFrameMouseOver.bind(this);
+        const boundMouseOut = this._onFrameMouseOut.bind(this);
+        this._frame.addEventListener('mouseover', boundMouseOver);
+        this._frame.addEventListener('mouseout', boundMouseOut);
+        console.log(`Popup ${this._id}: Mouse event listeners attached`);
 
         // Configure
         /** @type {import('display').DirectApiParams<'displayConfigure'>} */
@@ -497,6 +541,7 @@ export class Popup extends EventDispatcher {
             optionsContext: this._optionsContext,
         };
         await this._invokeSafe('displayConfigure', configureParams);
+        console.log(`Popup ${this._id}: Frame injection complete`);
     }
 
     /**

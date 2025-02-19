@@ -424,7 +424,7 @@ export class Frontend {
      */
     _onPopupFramePointerOver() {
         this._isPointerOverPopup = true;
-        this._stopClearSelectionDelayed();
+        console.log('Popup pointer over event');
     }
 
     /**
@@ -432,9 +432,12 @@ export class Frontend {
      */
     _onPopupFramePointerOut() {
         this._isPointerOverPopup = false;
-        const scanningOptions = /** @type {import('settings').ProfileOptions} */ (this._options).scanning;
-        if (scanningOptions.hidePopupOnCursorExit) {
-            this._clearSelectionDelayed(scanningOptions.hidePopupOnCursorExitDelay, false, false);
+        console.log('Popup pointer out event');
+        if (!this._options) { return; }
+        const {scanning: {hidePopupOnCursorExit, hidePopupOnCursorExitDelay}} = this._options;
+        if (hidePopupOnCursorExit) {
+            console.log('Hide on cursor exit is enabled, delay:', hidePopupOnCursorExitDelay);
+            void this._clearSelectionDelayed(hidePopupOnCursorExitDelay, false, false);
         }
     }
 
@@ -457,18 +460,79 @@ export class Frontend {
     }
 
     /**
+     * Checks if the pointer is over any popup in the hierarchy (parent or child popups).
+     * @returns {Promise<boolean>}
+     * @private
+     */
+    async _isPointerOverAnyPopup() {
+        if (this._isPointerOverPopup) {
+            console.log('Found hover in current popup');
+            return true;
+        }
+
+        let childPopup = this._popup?.child;
+        console.log('Checking child popups in hierarchy:', childPopup ? `Child popup ${childPopup.id} found` : 'No child popup');
+        while (childPopup !== null && childPopup !== undefined) {
+            try {
+                console.log(`Checking if child popup ${childPopup.id} is being hovered`);
+                const isOver = await childPopup.isPointerOver();
+                console.log(`Child popup ${childPopup.id} hover state:`, isOver);
+                if (isOver) {
+                    console.log(`Found hover in child popup ${childPopup.id}`);
+                    return true;
+                }
+                childPopup = childPopup.child;
+                console.log('Moving to next child:', childPopup ? `Child popup ${childPopup.id} found` : 'No more children');
+            } catch (e) {
+                console.warn('Error checking child popup pointer state:', e);
+            }
+        }
+
+        let parentPopup = this._popup?.parent;
+        console.log('Checking parent popups in hierarchy:', parentPopup ? `Parent popup ${parentPopup.id} found` : 'No parent popup');
+        while (parentPopup !== null && parentPopup !== undefined) {
+            try {
+                console.log(`Checking if parent popup ${parentPopup.id} is being hovered`);
+                const isOver = await parentPopup.isPointerOver();
+                console.log(`Parent popup ${parentPopup.id} hover state:`, isOver);
+                if (isOver) {
+                    console.log(`Found hover in parent popup ${parentPopup.id}`);
+                    return true;
+                }
+                parentPopup = parentPopup.parent;
+                console.log('Moving to next parent:', parentPopup ? `Parent popup ${parentPopup.id} found` : 'No more parents');
+            } catch (e) {
+                console.warn('Error checking parent popup pointer state:', e);
+            }
+        }
+
+        console.log('No popup in hierarchy is being hovered');
+        return false;
+    }
+
+    /**
      * @param {number} delay
      * @param {boolean} restart
      * @param {boolean} passive
      */
-    _clearSelectionDelayed(delay, restart, passive) {
+    async _clearSelectionDelayed(delay, restart, passive) {
         if (!this._textScanner.hasSelection()) { return; }
+
+        console.log('Entered clearSelectionDelayed');
+
+        // Add a small delay to allow mouseover events to be processed
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // Always check if pointer is over any popup before clearing
+        if (await this._isPointerOverAnyPopup()) { return; }
+        console.log('Pointer is not over any popup, clearing selection');
+
         if (delay > 0) {
             if (this._clearSelectionTimer !== null && !restart) { return; } // Already running
             this._stopClearSelectionDelayed();
-            this._clearSelectionTimer = setTimeout(() => {
+            this._clearSelectionTimer = setTimeout(async () => {
                 this._clearSelectionTimer = null;
-                if (this._isPointerOverPopup) { return; }
+                if (await this._isPointerOverAnyPopup()) { return; }
                 this._clearSelection(passive);
             }, delay);
         } else {
@@ -595,8 +659,8 @@ export class Frontend {
         this._popupEventListeners.removeAllEventListeners();
         this._popup = popup;
         if (popup !== null) {
-            this._popupEventListeners.on(popup, 'framePointerOver', this._onPopupFramePointerOver.bind(this));
-            this._popupEventListeners.on(popup, 'framePointerOut', this._onPopupFramePointerOut.bind(this));
+            this._popupEventListeners.on(popup, 'mouseOver', this._onPopupFramePointerOver.bind(this));
+            this._popupEventListeners.on(popup, 'mouseOut', this._onPopupFramePointerOut.bind(this));
         }
         this._isPointerOverPopup = false;
     }
