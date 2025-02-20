@@ -2036,3 +2036,59 @@ button.footer-notification-close-button {
 :root[data-popup-display-mode=full-width] .frame-resizer-container {
     display: none;
 }
+
+.similar-words-container {
+    margin-top: 1em;
+    border-top: 1px solid #e0e0e0;
+}
+
+.similar-words-container [data-layout="flex"] {
+    display: flex;
+    align-items: center;
+}
+
+.similar-words-container .tag-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2em 0.5em;
+    border-radius: 3px;
+    font-size: 0.9em;
+    margin-right: 0.5em;
+}
+
+.similar-words-container .similar-word-entry:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.similar-words-container .similar-word-entry {
+    transition: background-color 0.2s ease;
+    padding: 0.3em;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .similar-words-container {
+        border-top-color: #404040;
+    }
+
+    .similar-words-container .similar-word-entry:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+}
+
+/* Similar Words Section */
+.similar-words-container {
+    background-color: rgba(58, 45, 78, 0.05);
+    border-left: 3px solid #584578;
+    border-radius: 4px;
+    padding: 0.5em;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .similar-words-container {
+        background-color: rgba(58, 45, 78, 0.1);
+    }
+}
