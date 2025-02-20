@@ -391,6 +391,7 @@
                                     "enabled",
                                     "volume",
                                     "autoPlay",
+                                    "playFallbackSound",
                                     "sources"
                                 ],
                                 "properties": {
@@ -407,6 +408,10 @@
                                     "autoPlay": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "playFallbackSound": {
+                                        "type": "boolean",
+                                        "default": true
                                     },
                                     "sources": {
                                         "type": "array",

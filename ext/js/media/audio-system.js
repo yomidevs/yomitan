@@ -27,6 +27,8 @@ export class AudioSystem extends EventDispatcher {
         super();
         /** @type {?HTMLAudioElement} */
         this._fallbackAudio = null;
+        /** @type {?boolean} */
+        this._playFallbackSound = null;
     }
 
     /**
@@ -43,11 +45,14 @@ export class AudioSystem extends EventDispatcher {
     }
 
     /**
+     * @param {boolean} playFallbackSound
      * @returns {HTMLAudioElement}
      */
-    getFallbackAudio() {
-        if (this._fallbackAudio === null) {
-            this._fallbackAudio = new Audio('/data/audio/button.mp3');
+    getFallbackAudio(playFallbackSound) {
+        if (this._fallbackAudio === null || this._playFallbackSound !== playFallbackSound) {
+            // audio handler expects audio url to always be present, empty string must be used instead of `new Audio()`
+            this._fallbackAudio = playFallbackSound ? new Audio('/data/audio/button.mp3') : new Audio('');
+            this._playFallbackSound = playFallbackSound;
         }
         return this._fallbackAudio;
     }
