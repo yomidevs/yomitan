@@ -51,7 +51,7 @@ const tests = [
         tests: [
             {term: 'καλος', source: 'καλον', rule: 'adj', reasons: ['accusative singular masculine']},
         ],
-    }
+    },
 ];
 /* eslint-enable @stylistic/no-multi-spaces */
 

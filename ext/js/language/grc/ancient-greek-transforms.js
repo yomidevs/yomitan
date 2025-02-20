@@ -58,7 +58,7 @@ export const ancientGreekTransforms = {
             name: 'genitive singular',
             rules: [
                 suffixInflection('ου', 'ος', [], ['n']),
-            ]
+            ],
         },
         'dative singular': {
             name: 'dative singular',
