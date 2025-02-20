@@ -167,6 +167,7 @@ export type AudioOptions = {
     enabled: boolean;
     volume: number;
     autoPlay: boolean;
+    playFallbackSound: boolean;
     sources: AudioSourceOptions[];
 };
 
