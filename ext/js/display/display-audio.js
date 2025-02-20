@@ -36,6 +36,8 @@ export class DisplayAudio {
         this._playbackVolume = 1;
         /** @type {boolean} */
         this._autoPlay = false;
+        /** @type {boolean} */
+        this._playFallbackSound = true;
         /** @type {?import('core').Timeout} */
         this._autoPlayAudioTimer = null;
         /** @type {number} */
@@ -168,9 +170,10 @@ export class DisplayAudio {
     _onOptionsUpdated({options}) {
         const {
             general: {language},
-            audio: {enabled, autoPlay, volume, sources},
+            audio: {enabled, autoPlay, playFallbackSound, volume, sources},
         } = options;
         this._autoPlay = enabled && autoPlay;
+        this._playFallbackSound = playFallbackSound;
         this._playbackVolume = Number.isFinite(volume) ? Math.max(0, Math.min(1, volume / 100)) : 1;
 
         /** @type {Set<import('settings').AudioSourceType>} */
@@ -451,7 +454,7 @@ export class DisplayAudio {
                 const sourceIndex = sources.indexOf(source);
                 title = `From source ${1 + sourceIndex}: ${source.name}`;
             } else {
-                audio = this._audioSystem.getFallbackAudio();
+                audio = this._audioSystem.getFallbackAudio(this._playFallbackSound);
                 title = 'Could not find audio';
             }
 
