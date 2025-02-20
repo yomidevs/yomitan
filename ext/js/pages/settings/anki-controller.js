@@ -805,7 +805,7 @@ class AnkiCardController {
             } else {
                 /** @type {HTMLSelectElement} */
                 const overwriteSelect = querySelectorNotNull(content, '.anki-card-field-overwrite');
-                overwriteSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName, 'overwriteBehavior']);
+                overwriteSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName, 'overwriteMode']);
             }
 
             /** @type {HTMLInputElement} */

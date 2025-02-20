@@ -319,10 +319,10 @@ export type AnkiNoteFields = {
 
 export type AnkiNoteField = {
     value: string;
-    overwriteBehavior: AnkiNoteFieldOverwriteBehavior;
+    overwriteMode: AnkiNoteFieldOverwriteMode;
 };
 
-export type AnkiNoteFieldOverwriteBehavior = 'coalesce' | 'overwrite' | 'append' | 'prepend' | 'skip';
+export type AnkiNoteFieldOverwriteMode = 'coalesce' | 'overwrite' | 'append' | 'prepend' | 'skip';
 
 export type SentenceParsingOptions = {
     scanExtent: number;

@@ -987,7 +987,7 @@
                                                             "type": "string",
                                                             "default": ""
                                                         },
-                                                        "overwriteBehavior": {
+                                                        "overwriteMode": {
                                                             "type": "string",
                                                             "enum": ["coalesce", "skip", "append", "prepend", "overwrite"],
                                                             "default": "coalesce"
@@ -1022,7 +1022,7 @@
                                                             "type": "string",
                                                             "default": ""
                                                         },
-                                                        "overwriteBehavior": {
+                                                        "overwriteMode": {
                                                             "type": "string",
                                                             "enum": ["coalesce", "skip", "append", "prepend", "overwrite"],
                                                             "default": "coalesce"

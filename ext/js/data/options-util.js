@@ -1569,7 +1569,7 @@ export class OptionsUtil {
     }
 
     /**
-     *  - Added overwritingBehavior to anki.fields
+     *  - Added overwriteMode to anki.fields
      *  @type {import('options-util').UpdateFunction}
      */
     async _updateVersion58(options) {
@@ -1577,7 +1577,7 @@ export class OptionsUtil {
             for (const type of ['terms', 'kanji']) {
                 const fields = profile.options.anki[type].fields;
                 for (const [field, value] of Object.entries(fields)) {
-                    fields[field] = {value, overwritingBehavior: 'coalesce'};
+                    fields[field] = {value, overwriteMode: 'coalesce'};
                 }
             }
         }

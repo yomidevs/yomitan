@@ -724,9 +724,9 @@ export class DisplayAnki {
         /** @type {import('anki').NoteFields} */
         const noteFields = {};
         for (const [field, newValue] of Object.entries(newValues)) {
-            const overwriteBehavior = fieldOptions[field].overwriteBehavior;
+            const overwriteMode = fieldOptions[field].overwriteMode;
             const existingValue = existingFields[field].value;
-            noteFields[field] = this._getOverwrittenField(existingValue, newValue, overwriteBehavior);
+            noteFields[field] = this._getOverwrittenField(existingValue, newValue, overwriteMode);
         }
         return {
             ...note,
@@ -738,11 +738,11 @@ export class DisplayAnki {
     /**
      * @param {string} existingValue
      * @param {string} newValue
-     * @param {import('settings').AnkiNoteFieldOverwriteBehavior} overwriteBehavior
+     * @param {import('settings').AnkiNoteFieldOverwriteMode} overwriteMode
      * @returns {string}
      */
-    _getOverwrittenField(existingValue, newValue, overwriteBehavior) {
-        switch (overwriteBehavior) {
+    _getOverwrittenField(existingValue, newValue, overwriteMode) {
+        switch (overwriteMode) {
             case 'overwrite':
                 return newValue;
             case 'skip':

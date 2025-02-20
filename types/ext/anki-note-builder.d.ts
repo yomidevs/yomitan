@@ -49,7 +49,7 @@ export type Field = [
     name: string,
     {
         value: string;
-        overwriteBehavior: Settings.AnkiNoteFieldOverwriteBehavior;
+        overwriteMode: Settings.AnkiNoteFieldOverwriteMode;
     },
 ];
 

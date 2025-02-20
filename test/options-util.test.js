@@ -497,7 +497,7 @@ function createProfileOptionsUpdatedTestData1() {
                 model: '',
                 fields: {
                     expression: {
-                        overwritingBehavior: 'coalesce',
+                        overwriteMode: 'coalesce',
                         value: '{popup-selection-text}',
                     },
                 },
@@ -507,7 +507,7 @@ function createProfileOptionsUpdatedTestData1() {
                 model: '',
                 fields: {
                     expression: {
-                        overwritingBehavior: 'coalesce',
+                        overwriteMode: 'coalesce',
                         value: '{popup-selection-text}',
                     },
                 },
