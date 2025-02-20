@@ -77,18 +77,11 @@ export class AnkiController {
         this._validateFieldsToken = null;
         /** @type {?HTMLInputElement} */
         this._ankiEnableCheckbox = document.querySelector('[data-setting="anki.enable"]');
-        /** @type {import('settings').AnkiDuplicateBehavior} */
-        this._ankiDuplicateBehavior = 'prevent';
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._settingsController;
-    }
-
-    /** @type {import('settings').AnkiDuplicateBehavior} */
-    get ankiDuplicateBehavior() {
-        return this._ankiDuplicateBehavior;
     }
 
     /** */
@@ -272,8 +265,9 @@ export class AnkiController {
      * @param {import('settings').AnkiDuplicateBehavior} behavior
      */
     _updateDuplicateBehavior(behavior) {
-        this._ankiDuplicateBehavior = behavior;
         this._duplicateOverwriteWarning.hidden = behavior !== 'overwrite';
+        if (this._ankiCardPrimary === null) { return; }
+        this._ankiCardPrimary.dataset.ankiDuplicateBehavior = behavior;
     }
 
     /**
@@ -779,7 +773,6 @@ class AnkiCardController {
 
     /** */
     _setupFields() {
-        const hideOverwritingOptions = this._ankiController.ankiDuplicateBehavior !== 'overwrite';
         this._fieldEventListeners.removeAllEventListeners();
 
         const totalFragment = document.createDocumentFragment();
@@ -799,14 +792,9 @@ class AnkiCardController {
             const valueContainer = querySelectorNotNull(content, '.anki-card-field-value-container');
             valueContainer.dataset.index = `${index}`;
 
-            if (hideOverwritingOptions) {
-                const overwriteContainer = querySelectorNotNull(content, '.anki-card-field-overwrite-container');
-                content.removeChild(overwriteContainer);
-            } else {
-                /** @type {HTMLSelectElement} */
-                const overwriteSelect = querySelectorNotNull(content, '.anki-card-field-overwrite');
-                overwriteSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName, 'overwriteMode']);
-            }
+            /** @type {HTMLSelectElement} */
+            const overwriteSelect = querySelectorNotNull(content, '.anki-card-field-overwrite');
+            overwriteSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName, 'overwriteMode']);
 
             /** @type {HTMLInputElement} */
             const inputField = querySelectorNotNull(content, '.anki-card-field-value');
@@ -842,12 +830,6 @@ class AnkiCardController {
         const ELEMENT_NODE = Node.ELEMENT_NODE;
         const container = this._ankiCardFieldsContainer;
         if (container !== null) {
-            if (hideOverwritingOptions) {
-                const overwriteContainer = container.querySelector('.anki-card-field-overwrite-container');
-                if (overwriteContainer !== null) {
-                    container.removeChild(overwriteContainer);
-                }
-            }
             const childNodesFrozen = [...container.childNodes];
             for (const node of childNodesFrozen) {
                 if (node.nodeType === ELEMENT_NODE && node instanceof HTMLElement && node.dataset.persistent === 'true') { continue; }
