@@ -929,7 +929,10 @@ class AnkiCardController {
         const fields = {};
         for (let i = 0, ii = fieldNames.length; i < ii; ++i) {
             const fieldName = fieldNames[i];
-            fields[fieldName].value = this._getDefaultFieldValue(fieldName, i, this._dictionaryEntryType, oldFields);
+            fields[fieldName] = {
+                value: this._getDefaultFieldValue(fieldName, i, this._dictionaryEntryType, oldFields),
+                overwriteMode: 'coalesce',
+            }
         }
 
         /** @type {import('settings-modifications').Modification[]} */
