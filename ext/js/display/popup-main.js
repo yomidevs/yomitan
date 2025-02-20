@@ -16,14 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Application} from '../application.js';
-import {DocumentFocusController} from '../dom/document-focus-controller.js';
-import {HotkeyHandler} from '../input/hotkey-handler.js';
-import {DisplayAnki} from './display-anki.js';
-import {DisplayAudio} from './display-audio.js';
-import {DisplayProfileSelection} from './display-profile-selection.js';
-import {DisplayResizer} from './display-resizer.js';
-import {Display} from './display.js';
+import { Application } from '../application.js';
+import { DocumentFocusController } from '../dom/document-focus-controller.js';
+import { HotkeyHandler } from '../input/hotkey-handler.js';
+import { ModalController } from '../pages/settings/modal-controller.js';
+import { SettingsController } from '../pages/settings/settings-controller.js';
+import { DisplayAnki } from './display-anki.js';
+import { DisplayAudio } from './display-audio.js';
+import { DisplayProfileSelection } from './display-profile-selection.js';
+import { DisplayResizer } from './display-resizer.js';
+import { Display } from './display.js';
 
 await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController();
@@ -32,7 +34,13 @@ await Application.main(true, async (application) => {
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 
-    const display = new Display(application, 'popup', documentFocusController, hotkeyHandler);
+    const modalController = new ModalController([]);
+    await modalController.prepare();
+
+    const settingsController = new SettingsController(application);
+    await settingsController.prepare();
+
+    const display = new Display(application, 'popup', documentFocusController, hotkeyHandler, settingsController);
     await display.prepare();
 
     const displayAudio = new DisplayAudio(display);
