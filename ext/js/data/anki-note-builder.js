@@ -93,7 +93,7 @@ export class AnkiNoteBuilder {
 
         const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
         const formattedFieldValuePromises = [];
-        for (const [, fieldValue] of fields) {
+        for (const [, {value: fieldValue}] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template);
             formattedFieldValuePromises.push(formattedFieldValuePromise);
         }

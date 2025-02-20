@@ -981,8 +981,18 @@
                                             "fields": {
                                                 "type": "object",
                                                 "additionalProperties": {
-                                                    "type": "string",
-                                                    "default": ""
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "value:": {
+                                                            "type": "string",
+                                                            "default": ""
+                                                        },
+                                                        "overwriteBehavior": {
+                                                            "type": "string",
+                                                            "enum": ["coalesce", "skip", "append", "prepend", "overwrite"],
+                                                            "default": "coalesce"
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -1006,8 +1016,18 @@
                                             "fields": {
                                                 "type": "object",
                                                 "additionalProperties": {
-                                                    "type": "string",
-                                                    "default": ""
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "value:": {
+                                                            "type": "string",
+                                                            "default": ""
+                                                        },
+                                                        "overwriteBehavior": {
+                                                            "type": "string",
+                                                            "enum": ["coalesce", "skip", "append", "prepend", "overwrite"],
+                                                            "default": "coalesce"
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }

@@ -496,14 +496,20 @@ function createProfileOptionsUpdatedTestData1() {
                 deck: '',
                 model: '',
                 fields: {
-                    expression: '{popup-selection-text}',
+                    expression: {
+                        overwritingBehavior: 'coalesce',
+                        value: '{popup-selection-text}',
+                    },
                 },
             },
             kanji: {
                 deck: '',
                 model: '',
                 fields: {
-                    expression: '{popup-selection-text}',
+                    expression: {
+                        overwritingBehavior: 'coalesce',
+                        value: '{popup-selection-text}',
+                    },
                 },
             },
             duplicateBehavior: 'new',
@@ -672,7 +678,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 57,
+        version: 58,
         global: {
             database: {
                 prefixWildcardsSupported: false,

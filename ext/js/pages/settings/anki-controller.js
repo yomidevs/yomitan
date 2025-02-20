@@ -77,11 +77,18 @@ export class AnkiController {
         this._validateFieldsToken = null;
         /** @type {?HTMLInputElement} */
         this._ankiEnableCheckbox = document.querySelector('[data-setting="anki.enable"]');
+        /** @type {import('settings').AnkiDuplicateBehavior} */
+        this._ankiDuplicateBehavior = 'prevent';
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
     get settingsController() {
         return this._settingsController;
+    }
+
+    /** @type {import('settings').AnkiDuplicateBehavior} */
+    get ankiDuplicateBehavior() {
+        return this._ankiDuplicateBehavior;
     }
 
     /** */
@@ -182,7 +189,7 @@ export class AnkiController {
         this._selectorObserver.disconnect();
         this._selectorObserver.observe(document.documentElement, true);
 
-        this._updateDuplicateOverwriteWarning(anki.duplicateBehavior);
+        this._updateDuplicateBehavior(anki.duplicateBehavior);
 
         void this._setupFieldMenus(dictionaries);
     }
@@ -257,14 +264,15 @@ export class AnkiController {
      */
     _onDuplicateBehaviorSelectChange(e) {
         const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
-        const behavior = node.value;
-        this._updateDuplicateOverwriteWarning(behavior);
+        const behavior = /** @type {import('settings').AnkiDuplicateBehavior} */ (node.value);
+        this._updateDuplicateBehavior(behavior);
     }
 
     /**
-     * @param {string} behavior
+     * @param {import('settings').AnkiDuplicateBehavior} behavior
      */
-    _updateDuplicateOverwriteWarning(behavior) {
+    _updateDuplicateBehavior(behavior) {
+        this._ankiDuplicateBehavior = behavior;
         this._duplicateOverwriteWarning.hidden = behavior !== 'overwrite';
     }
 
@@ -771,12 +779,13 @@ class AnkiCardController {
 
     /** */
     _setupFields() {
+        const hideOverwritingOptions = this._ankiController.ankiDuplicateBehavior !== 'overwrite';
         this._fieldEventListeners.removeAllEventListeners();
 
         const totalFragment = document.createDocumentFragment();
         this._fieldEntries = [];
         let index = 0;
-        for (const [fieldName, fieldValue] of Object.entries(this._fields)) {
+        for (const [fieldName, {value: fieldValue}] of Object.entries(this._fields)) {
             const content = this._settingsController.instantiateTemplateFragment('anki-card-field');
 
             /** @type {HTMLElement} */
@@ -790,10 +799,19 @@ class AnkiCardController {
             const valueContainer = querySelectorNotNull(content, '.anki-card-field-value-container');
             valueContainer.dataset.index = `${index}`;
 
+            if (hideOverwritingOptions) {
+                const overwriteContainer = querySelectorNotNull(content, '.anki-card-field-overwrite-container');
+                content.removeChild(overwriteContainer);
+            } else {
+                /** @type {HTMLSelectElement} */
+                const overwriteSelect = querySelectorNotNull(content, '.anki-card-field-overwrite');
+                overwriteSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName, 'overwriteBehavior']);
+            }
+
             /** @type {HTMLInputElement} */
             const inputField = querySelectorNotNull(content, '.anki-card-field-value');
             inputField.value = fieldValue;
-            inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName]);
+            inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName, 'value']);
             void this._validateFieldPermissions(inputField, index, false);
 
             this._fieldEventListeners.addEventListener(inputField, 'change', this._onFieldChange.bind(this, index), false);
@@ -824,6 +842,10 @@ class AnkiCardController {
         const ELEMENT_NODE = Node.ELEMENT_NODE;
         const container = this._ankiCardFieldsContainer;
         if (container !== null) {
+            if (hideOverwritingOptions) {
+                const overwriteHeader = querySelectorNotNull(container, '.anki-card-field-overwrite-header');
+                container.removeChild(overwriteHeader);
+            }
             const childNodesFrozen = [...container.childNodes];
             for (const node of childNodesFrozen) {
                 if (node.nodeType === ELEMENT_NODE && node instanceof HTMLElement && node.dataset.persistent === 'true') { continue; }
@@ -905,7 +927,7 @@ class AnkiCardController {
         const fields = {};
         for (let i = 0, ii = fieldNames.length; i < ii; ++i) {
             const fieldName = fieldNames[i];
-            fields[fieldName] = this._getDefaultFieldValue(fieldName, i, this._dictionaryEntryType, oldFields);
+            fields[fieldName].value = this._getDefaultFieldValue(fieldName, i, this._dictionaryEntryType, oldFields);
         }
 
         /** @type {import('settings-modifications').Modification[]} */
@@ -1002,7 +1024,7 @@ class AnkiCardController {
             oldFields !== null &&
             Object.prototype.hasOwnProperty.call(oldFields, fieldName)
         ) {
-            return oldFields[fieldName];
+            return oldFields[fieldName].value;
         }
 
         if (index === 0) {

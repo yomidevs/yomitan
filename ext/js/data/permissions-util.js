@@ -134,7 +134,7 @@ export function hasRequiredPermissionsForOptions(permissions, options) {
             options.anki.kanji.fields,
         ];
         for (const fields of fieldsList) {
-            for (const fieldValue of Object.values(fields)) {
+            for (const {value: fieldValue} of Object.values(fields)) {
                 const markers = getFieldMarkers(fieldValue);
                 for (const marker of markers) {
                     if (ankiFieldMarkerMayUseClipboard(marker)) {

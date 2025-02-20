@@ -1591,12 +1591,18 @@ select.profile-condition-operator {
     align-items: center;
     width: 100%;
     margin-top: 0.5em;
+    gap: 0.5em;
 }
+.anki-card-fields:has(.anki-card-field-overwrite-header) {
+    grid-template-columns: auto 1fr 1fr;
+}
+
 .anki-card-field-name-header {
     font-weight: bold;
     margin-right: 1em;
 }
-.anki-card-field-input-header {
+.anki-card-field-input-header,
+.anki-card-field-overwrite-header {
     font-weight: bold;
 }
 .anki-card-field-name-container {
@@ -1605,7 +1611,6 @@ select.profile-condition-operator {
     align-self: stretch;
     align-items: center;
     margin-top: 0.25em;
-    margin-right: 0.25em;
     padding: 0 0.25em;
 }
 .anki-card-field-name-container[data-invalid=true],
