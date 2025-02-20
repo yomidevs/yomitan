@@ -28,7 +28,7 @@ function createTestFields(type) {
     /** @type {import('anki-note-builder').Field[]} */
     const fields = [];
     for (const marker of getStandardFieldMarkers(type)) {
-        fields.push([marker, `{${marker}}`]);
+        fields.push([marker, {value: `{${marker}}`, overwriteMode: 'coalesce'}]);
     }
     return fields;
 }

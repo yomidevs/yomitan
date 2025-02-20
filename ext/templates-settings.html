@@ -281,11 +281,30 @@
 </div></div></div></template>
 
 <!-- Anki card -->
-<template id="anki-card-field-template"><div class="anki-card-field-name-container"><span class="anki-card-field-name"></span></div>
-<div class="anki-card-field-value-container input-group">
-    <input type="text" class="anki-card-field-value" autocomplete="off">
-    <button type="button" class="anki-card-field-value-menu-button input-suffix input-suffix-icon-button light-icon" data-menu-position="v-center left"><span class="icon" data-icon="material-down-arrow"></span></button>
-</div></template>
+<template id="anki-card-field-template">
+    <div class="anki-card-field-name-container">
+        <span class="anki-card-field-name"></span>
+    </div>
+    <div class="anki-card-field-value-container input-group">
+        <input type="text" class="anki-card-field-value" autocomplete="off">
+        <button
+            type="button"
+            class="anki-card-field-value-menu-button input-suffix input-suffix-icon-button light-icon"
+            data-menu-position="v-center left"
+        >
+            <span class="icon" data-icon="material-down-arrow"></span>
+        </button>
+    </div>
+    <div class="anki-card-field-overwrite-container">
+        <select class="anki-card-field-overwrite">
+            <option value="coalesce">Fill Empty</option>
+            <option value="skip">Skip</option>
+            <option value="append">Append</option>
+            <option value="prepend">Prepend</option>
+            <option value="overwrite">Overwrite</option>
+        </select>
+    </div>
+</template>
 <template id="anki-card-terms-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
 <template id="anki-card-kanji-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
 <template id="anki-card-all-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>

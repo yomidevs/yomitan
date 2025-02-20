@@ -47,7 +47,10 @@ export type CreateNoteDetails = {
 
 export type Field = [
     name: string,
-    value: string,
+    {
+        value: string;
+        overwriteMode: Settings.AnkiNoteFieldOverwriteMode;
+    },
 ];
 
 export type CreateNoteResult = {

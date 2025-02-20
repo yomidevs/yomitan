@@ -678,9 +678,12 @@ export class DisplayAnki {
 
             const error = this._getAddNoteRequirementsError(requirements, outputRequirements);
             if (error !== null) { allErrors.push(error); }
-            await (button.dataset.overwrite ?
-                this._updateAnkiNote(note, allErrors, button, dictionaryEntryIndex) :
-                this._addNewAnkiNote(note, allErrors, button, dictionaryEntryIndex));
+            if (button.dataset.overwrite) {
+                const overwrittenNote = await this._getOverwrittenNote(note, dictionaryEntryIndex, mode);
+                await this._updateAnkiNote(overwrittenNote, allErrors);
+            } else {
+                await this._addNewAnkiNote(note, allErrors, button, dictionaryEntryIndex);
+            }
         } catch (e) {
             allErrors.push(toError(e));
         } finally {
@@ -691,6 +694,65 @@ export class DisplayAnki {
             this._showErrorNotification(allErrors);
         } else {
             this._hideErrorNotification(true);
+        }
+    }
+
+    /**
+     * @param {import('anki').Note} note
+     * @param {number} dictionaryEntryIndex
+     * @param {import('display-anki').CreateMode} mode
+     * @returns {Promise<import('anki').NoteWithId | null>}
+     */
+    async _getOverwrittenNote(note, dictionaryEntryIndex, mode) {
+        const dictionaryEntries = this._display.dictionaryEntries;
+        const allEntryDetails = await this._getDictionaryEntryDetails(dictionaryEntries);
+        const relevantEntryDetails = allEntryDetails[dictionaryEntryIndex];
+        const relevantModeDetails = relevantEntryDetails.modeMap.get(mode);
+        if (typeof relevantModeDetails === 'undefined') { return null; }
+        const {noteIds, noteInfos} = relevantModeDetails;
+        if (noteIds === null || typeof noteInfos === 'undefined') { return null; }
+        const overwriteId = noteIds.find((id) => id !== INVALID_NOTE_ID);
+        if (typeof overwriteId === 'undefined') { return null; }
+        const overwriteInfo = noteInfos.find((info) => info !== null && info.noteId === overwriteId);
+        if (!overwriteInfo) { return null; }
+        const existingFields = overwriteInfo.fields;
+        const fieldOptions = this._modeOptions.get(mode)?.fields;
+        if (!fieldOptions) { return null; }
+
+        const newValues = note.fields;
+
+        /** @type {import('anki').NoteFields} */
+        const noteFields = {};
+        for (const [field, newValue] of Object.entries(newValues)) {
+            const overwriteMode = fieldOptions[field].overwriteMode;
+            const existingValue = existingFields[field].value;
+            noteFields[field] = this._getOverwrittenField(existingValue, newValue, overwriteMode);
+        }
+        return {
+            ...note,
+            fields: noteFields,
+            id: overwriteId,
+        };
+    }
+
+    /**
+     * @param {string} existingValue
+     * @param {string} newValue
+     * @param {import('settings').AnkiNoteFieldOverwriteMode} overwriteMode
+     * @returns {string}
+     */
+    _getOverwrittenField(existingValue, newValue, overwriteMode) {
+        switch (overwriteMode) {
+            case 'overwrite':
+                return newValue;
+            case 'skip':
+                return existingValue;
+            case 'append':
+                return existingValue + newValue;
+            case 'prepend':
+                return newValue + existingValue;
+            case 'coalesce':
+                return existingValue || newValue;
         }
     }
 
@@ -730,26 +792,13 @@ export class DisplayAnki {
     }
 
     /**
-     * @param {import('anki').Note} note
+     * @param {import('anki').NoteWithId | null} noteWithId
      * @param {Error[]} allErrors
-     * @param {HTMLButtonElement} button
-     * @param {number} dictionaryEntryIndex
      */
-    async _updateAnkiNote(note, allErrors, button, dictionaryEntryIndex) {
-        const dictionaryEntries = this._display.dictionaryEntries;
-        const allEntryDetails = await this._getDictionaryEntryDetails(dictionaryEntries);
-        const relevantEntryDetails = allEntryDetails[dictionaryEntryIndex];
-        const mode = this._getValidCreateMode(button.dataset.mode);
-        if (mode === null) { return; }
-        const relevantModeDetails = relevantEntryDetails.modeMap.get(mode);
-        if (typeof relevantModeDetails === 'undefined') { return; }
-        const {noteIds} = relevantModeDetails;
-        if (noteIds === null) { return; }
-        const overwriteTarget = noteIds.find((id) => id !== INVALID_NOTE_ID);
-        if (typeof overwriteTarget === 'undefined') { return; }
+    async _updateAnkiNote(noteWithId, allErrors) {
+        if (noteWithId === null) { return; }
 
         try {
-            const noteWithId = {...note, id: overwriteTarget};
             await this._display.application.api.updateAnkiNote(noteWithId);
         } catch (e) {
             allErrors.length = 0;
@@ -860,7 +909,7 @@ export class DisplayAnki {
      * @returns {Promise<import('display-anki').DictionaryEntryDetails[]>}
      */
     async _getDictionaryEntryDetails(dictionaryEntries) {
-        const fetchAdditionalInfo = (this._displayTagsAndFlags !== 'never');
+        const fetchAdditionalInfo = (this._displayTagsAndFlags !== 'never') || this._duplicateBehavior === 'overwrite';
 
         const notePromises = [];
         const noteTargets = [];
