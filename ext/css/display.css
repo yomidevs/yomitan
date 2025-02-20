@@ -59,6 +59,7 @@
     --main-content-horizontal-padding: 0em;
     --entry-horizontal-padding: 0.72em;
     --entry-vertical-padding: 0.72em;
+    --query-horizontal-padding: 0.72em;
 
     --sidebar-width-no-units: 40;
     --sidebar-width: calc(1em * (var(--sidebar-width-no-units) / var(--font-size-no-units)));
@@ -615,8 +616,8 @@ button.sidebar-button.sidebar-button-highlight {
 }
 #query-parser-container {
     overflow-y: auto;
-    padding-left: var(--entry-horizontal-padding);
-    padding-right: var(--entry-horizontal-padding);
+    padding-left: var(--query-horizontal-padding);
+    padding-right: var(--query-horizontal-padding);
     padding-bottom: 0.25em;
     border-bottom: var(--headword-thin-border-size) solid var(--light-border-color);
 }
