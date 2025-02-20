@@ -74,7 +74,8 @@
                             "sentenceParsing",
                             "inputs",
                             "clipboard",
-                            "accessibility"
+                            "accessibility",
+                            "openAi"
                         ],
                         "properties": {
                             "general": {
@@ -268,11 +269,11 @@
                                     },
                                     "showPitchAccentDownstepNotation": {
                                         "type": "boolean",
-                                        "default": true
+                                        "default": false
                                     },
                                     "showPitchAccentPositionNotation": {
                                         "type": "boolean",
-                                        "default": true
+                                        "default": false
                                     },
                                     "showPitchAccentGraph": {
                                         "type": "boolean",
@@ -280,15 +281,15 @@
                                     },
                                     "showIframePopupsInRootFrame": {
                                         "type": "boolean",
-                                        "default": true
+                                        "default": false
                                     },
                                     "useSecurePopupFrameUrl": {
                                         "type": "boolean",
-                                        "default": true
+                                        "default": false
                                     },
                                     "usePopupShadowDom": {
                                         "type": "boolean",
-                                        "default": true
+                                        "default": false
                                     },
                                     "usePopupWindow": {
                                         "type": "boolean",
@@ -312,7 +313,7 @@
                                     "frequencyDisplayMode": {
                                         "type": "string",
                                         "enum": ["tags", "tags-grouped", "split-tags", "split-tags-grouped", "inline-list", "list"],
-                                        "default": "split-tags-grouped"
+                                        "default": "split-tags"
                                     },
                                     "termDisplayMode": {
                                         "type": "string",
@@ -320,13 +321,13 @@
                                         "default": "ruby"
                                     },
                                     "sortFrequencyDictionary": {
-                                        "type": ["string", "null"],
+                                        "type": "string",
                                         "default": null
                                     },
                                     "sortFrequencyDictionaryOrder": {
                                         "type": "string",
                                         "enum": ["ascending", "descending"],
-                                        "default": "descending"
+                                        "default": "ascending"
                                     },
                                     "stickySearchHeader": {
                                         "type": "boolean",
@@ -1250,6 +1251,20 @@
                                     "forceGoogleDocsHtmlRendering": {
                                         "type": "boolean",
                                         "default": false
+                                    }
+                                }
+                            },
+                            "openAi": {
+                                "type": "object",
+                                "required": ["apiKey", "model"],
+                                "properties": {
+                                    "apiKey": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "model": {
+                                        "type": "string",
+                                        "default": "gpt-4o-mini"
                                     }
                                 }
                             }

@@ -42,6 +42,7 @@
             <a href="#!backup"           class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="backup"></span></span><span class="outline-item-label">Backup</span></a>
             <a href="#!accessibility"    class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="accessibility"></span></span><span class="outline-item-label">Accessibility</span></a>
             <a href="#!security"         class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="lock"></span></span><span class="outline-item-label">Security</span></a>
+            <a href="#!openai"           class="button outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="translation"></span></span><span class="outline-item-label">OpenAI Integration</span></a>
         </div>
         <div class="sidebar-bottom">
             <label class="button outline-item"><span class="outline-item-left">
@@ -2282,6 +2283,61 @@
                     the <code>iframe</code>'s <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-src" target="_blank" rel="noopener noreferrer"><code>src</code></a>
                     attribute. This results in the extension URL not being exposed to the underling web page, and thus making it harder
                     to detect the presence of Yomitan.
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- OpenAI Integration -->
+    <div class="heading-container">
+        <div class="heading-container-icon"><span class="icon" data-icon="translation"></span></div>
+        <div class="heading-container-left"><h2 id="openai"><a href="#!openai">OpenAI Integration</a></h2></div>
+    </div>
+    <div class="settings-group">
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        API Key
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                    <div class="settings-item-description">Your OpenAI API key for generating similar words.</div>
+                </div>
+                <div class="settings-item-right">
+                    <input type="text" class="text-input" data-setting="openAi.apiKey" placeholder="sk-...">
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    Enter your OpenAI API key to enable the generation of similar words. The key is used securely and only for this purpose.
+                    You can get an API key from the <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">OpenAI dashboard</a>.
+                </p>
+                <p>
+                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Model
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                    <div class="settings-item-description">The OpenAI model to use for generating similar words.</div>
+                </div>
+                <div class="settings-item-right">
+                    <select data-setting="openAi.model">
+                        <option value="gpt-4o-mini">gpt-4o-mini</option>
+                    </select>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    Select the OpenAI model to use for generating similar words. The gpt-4o-mini model is optimized for this task.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
