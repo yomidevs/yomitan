@@ -932,7 +932,7 @@ class AnkiCardController {
             fields[fieldName] = {
                 value: this._getDefaultFieldValue(fieldName, i, this._dictionaryEntryType, oldFields),
                 overwriteMode: 'coalesce',
-            }
+            };
         }
 
         /** @type {import('settings-modifications').Modification[]} */
