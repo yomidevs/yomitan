@@ -35,43 +35,43 @@ function latinToGreek(latin) {
     latin = removeAlphabeticDiacritics.process(latin, true);
 
     const singleMap = {
-        'a': 'α',
-        'b': 'β',
-        'g': 'γ',
-        'd': 'δ',
-        'e': 'ε',
-        'z': 'ζ',
-        'ē': 'η',
-        'i': 'ι',
-        'k': 'κ',
-        'l': 'λ',
-        'm': 'μ',
-        'n': 'ν',
-        'x': 'ξ',
-        'o': 'ο',
-        'p': 'π',
-        'r': 'ρ',
-        's': 'σ',
-        't': 'τ',
-        'u': 'υ',
-        'ō': 'ω'
+        a: 'α',
+        b: 'β',
+        g: 'γ',
+        d: 'δ',
+        e: 'ε',
+        z: 'ζ',
+        ē: 'η',
+        i: 'ι',
+        k: 'κ',
+        l: 'λ',
+        m: 'μ',
+        n: 'ν',
+        x: 'ξ',
+        o: 'ο',
+        p: 'π',
+        r: 'ρ',
+        s: 'σ',
+        t: 'τ',
+        u: 'υ',
+        ō: 'ω',
     };
 
     const doubleMap = {
-        'th': 'θ',
-        'ph': 'φ',
-        'ch': 'χ',
-        'ps': 'ψ',
-    }
+        th: 'θ',
+        ph: 'φ',
+        ch: 'χ',
+        ps: 'ψ',
+    };
 
     let result = latin.toLowerCase();
 
-    for (let [latin, greek] of Object.entries(doubleMap)) {
+    for (const [latin, greek] of Object.entries(doubleMap)) {
         result = result.replace(new RegExp(latin, 'g'), greek);
     }
 
     // Handle basic character replacements
-    for (let [latin, greek] of Object.entries(singleMap)) {
+    for (const [latin, greek] of Object.entries(singleMap)) {
         result = result.replace(new RegExp(latin, 'g'), greek);
     }
 
