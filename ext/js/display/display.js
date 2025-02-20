@@ -52,8 +52,9 @@ export class Display extends EventDispatcher {
      * @param {import('display').DisplayPageType} pageType
      * @param {import('../dom/document-focus-controller.js').DocumentFocusController} documentFocusController
      * @param {import('../input/hotkey-handler.js').HotkeyHandler} hotkeyHandler
+     * @param {import('../pages/settings/settings-controller').SettingsController} settingsController
      */
-    constructor(application, pageType, documentFocusController, hotkeyHandler) {
+    constructor(application, pageType, documentFocusController, hotkeyHandler, settingsController) {
         super();
         /** @type {import('../application.js').Application} */
         this._application = application;
@@ -63,6 +64,8 @@ export class Display extends EventDispatcher {
         this._documentFocusController = documentFocusController;
         /** @type {import('../input/hotkey-handler.js').HotkeyHandler} */
         this._hotkeyHandler = hotkeyHandler;
+        /** @type {import('../pages/settings/settings-controller').SettingsController} */
+        this._settingsController = settingsController;
         /** @type {HTMLElement} */
         this._container = querySelectorNotNull(document, '#dictionary-entries');
         /** @type {import('dictionary').DictionaryEntry[]} */
@@ -86,7 +89,32 @@ export class Display extends EventDispatcher {
         /** @type {HotkeyHelpController} */
         this._hotkeyHelpController = new HotkeyHelpController();
         /** @type {DisplayGenerator} */
-        this._displayGenerator = new DisplayGenerator(this._contentManager, this._hotkeyHelpController);
+        this._displayGenerator = new DisplayGenerator(this._contentManager, this._hotkeyHelpController, this._settingsController);
+
+        // Listen for similar words updates
+        this._displayGenerator._similarWordsGenerator.on('similarWordsUpdated', ({term, reading, similarWords}) => {
+            // Find the dictionary entry that matches this term/reading
+            const entry = this._dictionaryEntries.find(e => {
+                if (e.type !== 'term') return false;
+                const firstHeadword = e.headwords[0];
+                return firstHeadword.term === term && (!reading || firstHeadword.reading === reading);
+            });
+
+            if (entry && entry.type === 'term') {
+                // Update the entry with new similar words
+                entry.similarWords = similarWords;
+
+                // Find and update the corresponding DOM element
+                const index = this._dictionaryEntries.indexOf(entry);
+                if (index >= 0) {
+                    const oldNode = this._dictionaryEntryNodes[index];
+                    const newNode = this._displayGenerator.createTermEntry(entry, this._dictionaryInfo);
+                    oldNode.replaceWith(newNode);
+                    this._dictionaryEntryNodes[index] = newNode;
+                }
+            }
+        });
+
         /** @type {import('display').DirectApiMap} */
         this._directApiMap = new Map();
         /** @type {import('api-map').ApiMap<import('display').WindowApiSurface>} */ // import('display').WindowApiMap

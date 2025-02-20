@@ -18,6 +18,28 @@
 
 import type * as DictionaryData from './dictionary-data';
 
+/**
+ * Represents a word that is similar to a dictionary term.
+ */
+export type SimilarWord = {
+    /**
+     * The text of the similar word.
+     */
+    term: string;
+    /**
+     * Reading of the similar word, if different from the term.
+     */
+    reading?: string;
+    /**
+     * A score between 0 and 1 indicating how similar this word is to the main term.
+     */
+    similarity: number;
+    /**
+     * The type of similarity relationship.
+     */
+    type: 'synonym' | 'antonym' | 'related';
+};
+
 // Common
 
 /**
@@ -267,6 +289,10 @@ export type TermDictionaryEntry = {
      * Frequencies for the entry.
      */
     frequencies: TermFrequency[];
+    /**
+     * Similar words for the entry.
+     */
+    similarWords: SimilarWord[];
 };
 
 export type InflectionRuleChainCandidate = {

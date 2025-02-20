@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {fetchJson, fetchText} from '../core/fetch-utilities.js';
-import {parseJson} from '../core/json.js';
-import {isObjectNotArray} from '../core/object-utilities.js';
-import {escapeRegExp} from '../core/utilities.js';
-import {TemplatePatcher} from '../templates/template-patcher.js';
-import {JsonSchema} from './json-schema.js';
+import { fetchJson, fetchText } from '../core/fetch-utilities.js';
+import { parseJson } from '../core/json.js';
+import { isObjectNotArray } from '../core/object-utilities.js';
+import { escapeRegExp } from '../core/utilities.js';
+import { TemplatePatcher } from '../templates/template-patcher.js';
+import { JsonSchema } from './json-schema.js';
 
 // Some type safety rules are disabled for this file since it deals with upgrading an older format
 // of the options object to a newer format. SafeAny is used for much of this, since every single
