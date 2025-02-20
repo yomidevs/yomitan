@@ -843,8 +843,10 @@ class AnkiCardController {
         const container = this._ankiCardFieldsContainer;
         if (container !== null) {
             if (hideOverwritingOptions) {
-                const overwriteHeader = querySelectorNotNull(container, '.anki-card-field-overwrite-header');
-                container.removeChild(overwriteHeader);
+                const overwriteContainer = container.querySelector('.anki-card-field-overwrite-container');
+                if (overwriteContainer !== null) {
+                    container.removeChild(overwriteContainer);
+                }
             }
             const childNodesFrozen = [...container.childNodes];
             for (const node of childNodesFrozen) {
