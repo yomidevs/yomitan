@@ -391,6 +391,7 @@
                                     "enabled",
                                     "volume",
                                     "autoPlay",
+                                    "playFallbackSound",
                                     "sources"
                                 ],
                                 "properties": {
@@ -407,6 +408,10 @@
                                     "autoPlay": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "playFallbackSound": {
+                                        "type": "boolean",
+                                        "default": true
                                     },
                                     "sources": {
                                         "type": "array",
@@ -981,8 +986,18 @@
                                             "fields": {
                                                 "type": "object",
                                                 "additionalProperties": {
-                                                    "type": "string",
-                                                    "default": ""
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "value:": {
+                                                            "type": "string",
+                                                            "default": ""
+                                                        },
+                                                        "overwriteMode": {
+                                                            "type": "string",
+                                                            "enum": ["coalesce", "skip", "append", "prepend", "overwrite"],
+                                                            "default": "coalesce"
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -1006,8 +1021,18 @@
                                             "fields": {
                                                 "type": "object",
                                                 "additionalProperties": {
-                                                    "type": "string",
-                                                    "default": ""
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "value:": {
+                                                            "type": "string",
+                                                            "default": ""
+                                                        },
+                                                        "overwriteMode": {
+                                                            "type": "string",
+                                                            "enum": ["coalesce", "skip", "append", "prepend", "overwrite"],
+                                                            "default": "coalesce"
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }

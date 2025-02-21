@@ -569,6 +569,8 @@ export class OptionsUtil {
             this._updateVersion55,
             this._updateVersion56,
             this._updateVersion57,
+            this._updateVersion58,
+            this._updateVersion59,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1563,6 +1565,31 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             for (const input of profile.options.scanning.inputs) {
                 input.options.minimumTouchTime = 0;
+            }
+        }
+    }
+
+    /**
+     *  - Added audio.options.playFallbackSound
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion58(options) {
+        for (const profile of options.profiles) {
+            profile.options.audio.playFallbackSound = true;
+        }
+    }
+
+    /**
+     *  - Added overwriteMode to anki.fields
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion59(options) {
+        for (const profile of options.profiles) {
+            for (const type of ['terms', 'kanji']) {
+                const fields = profile.options.anki[type].fields;
+                for (const [field, value] of Object.entries(fields)) {
+                    fields[field] = {value, overwriteMode: 'coalesce'};
+                }
             }
         }
     }
