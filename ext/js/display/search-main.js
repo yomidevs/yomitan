@@ -16,18 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Application } from '../application.js';
-import { DocumentFocusController } from '../dom/document-focus-controller.js';
-import { HotkeyHandler } from '../input/hotkey-handler.js';
-import { ModalController } from '../pages/settings/modal-controller.js';
-import { SettingsController } from '../pages/settings/settings-controller.js';
-import { SettingsDisplayController } from '../pages/settings/settings-display-controller.js';
-import { DisplayAnki } from './display-anki.js';
-import { DisplayAudio } from './display-audio.js';
-import { Display } from './display.js';
-import { SearchActionPopupController } from './search-action-popup-controller.js';
-import { SearchDisplayController } from './search-display-controller.js';
-import { SearchPersistentStateController } from './search-persistent-state-controller.js';
+import {Application} from '../application.js';
+import {DocumentFocusController} from '../dom/document-focus-controller.js';
+import {HotkeyHandler} from '../input/hotkey-handler.js';
+import {ModalController} from '../pages/settings/modal-controller.js';
+import {SettingsController} from '../pages/settings/settings-controller.js';
+import {SettingsDisplayController} from '../pages/settings/settings-display-controller.js';
+import {DisplayAnki} from './display-anki.js';
+import {DisplayAudio} from './display-audio.js';
+import {Display} from './display.js';
+import {SearchActionPopupController} from './search-action-popup-controller.js';
+import {SearchDisplayController} from './search-display-controller.js';
+import {SearchPersistentStateController} from './search-persistent-state-controller.js';
 
 await Application.main(true, async (application) => {
     const documentFocusController = new DocumentFocusController('#search-textbox');
@@ -41,9 +41,6 @@ await Application.main(true, async (application) => {
 
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
-
-    const modalController = new ModalController([]);
-    await modalController.prepare();
 
     const settingsController = new SettingsController(application);
     await settingsController.prepare();
@@ -59,6 +56,9 @@ await Application.main(true, async (application) => {
 
     const searchDisplayController = new SearchDisplayController(display, displayAudio, searchPersistentStateController);
     await searchDisplayController.prepare();
+
+    const modalController = new ModalController([]);
+    await modalController.prepare();
 
     const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
     await settingsDisplayController.prepare();

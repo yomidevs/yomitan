@@ -2039,7 +2039,10 @@ button.footer-notification-close-button {
 
 .similar-words-container {
     margin-top: 1em;
-    border-top: 1px solid #e0e0e0;
+    padding: 0.5em;
+    background-color: rgba(58, 45, 78, 0.05);
+    border-left: 3px solid #584578;
+    border-radius: 4px;
 }
 
 .similar-words-container [data-layout="flex"] {
@@ -2056,39 +2059,13 @@ button.footer-notification-close-button {
     margin-right: 0.5em;
 }
 
-.similar-words-container .similar-word-entry:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    cursor: pointer;
-    border-radius: 4px;
-}
-
 .similar-words-container .similar-word-entry {
     transition: background-color 0.2s ease;
     padding: 0.3em;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .similar-words-container {
-        border-top-color: #404040;
-    }
-
-    .similar-words-container .similar-word-entry:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-}
-
-/* Similar Words Section */
-.similar-words-container {
-    background-color: rgba(58, 45, 78, 0.05);
-    border-left: 3px solid #584578;
+.similar-words-container .similar-word-entry:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    cursor: pointer;
     border-radius: 4px;
-    padding: 0.5em;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .similar-words-container {
-        background-color: rgba(58, 45, 78, 0.1);
-    }
 }

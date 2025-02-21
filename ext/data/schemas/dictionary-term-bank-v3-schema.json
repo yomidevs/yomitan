@@ -396,32 +396,6 @@
                     "default": "disc"
                 }
             }
-        },
-        "similarWord": {
-            "type": "object",
-            "description": "Information about a word that is similar to the main term.",
-            "required": ["term", "similarity", "type"],
-            "properties": {
-                "term": {
-                    "type": "string",
-                    "description": "The text of the similar word."
-                },
-                "reading": {
-                    "type": "string",
-                    "description": "Reading of the similar word, if different from the term."
-                },
-                "similarity": {
-                    "type": "number",
-                    "description": "A score between 0 and 1 indicating how similar this word is to the main term.",
-                    "minimum": 0,
-                    "maximum": 1
-                },
-                "type": {
-                    "type": "string",
-                    "description": "The type of similarity relationship.",
-                    "enum": ["synonym", "antonym", "related"]
-                }
-            }
         }
     },
     "type": "array",
@@ -429,8 +403,8 @@
     "items": {
         "type": "array",
         "description": "Information about a single term.",
-        "minItems": 9,
-        "maxItems": 9,
+        "minItems": 8,
+        "maxItems": 8,
         "additionalItems": false,
         "items": [
             {
@@ -613,14 +587,6 @@
             {
                 "type": "string",
                 "description": "String of space-separated tags for the term. An empty string is treated as no tags."
-            },
-            {
-                "type": "array",
-                "description": "Array of similar words for the term.",
-                "items": {
-                    "$ref": "#/definitions/similarWord"
-                },
-                "default": []
             }
         ]
     }

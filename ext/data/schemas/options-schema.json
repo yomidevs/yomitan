@@ -269,11 +269,11 @@
                                     },
                                     "showPitchAccentDownstepNotation": {
                                         "type": "boolean",
-                                        "default": false
+                                        "default": true
                                     },
                                     "showPitchAccentPositionNotation": {
                                         "type": "boolean",
-                                        "default": false
+                                        "default": true
                                     },
                                     "showPitchAccentGraph": {
                                         "type": "boolean",
@@ -281,15 +281,15 @@
                                     },
                                     "showIframePopupsInRootFrame": {
                                         "type": "boolean",
-                                        "default": false
+                                        "default": true
                                     },
                                     "useSecurePopupFrameUrl": {
                                         "type": "boolean",
-                                        "default": false
+                                        "default": true
                                     },
                                     "usePopupShadowDom": {
                                         "type": "boolean",
-                                        "default": false
+                                        "default": true
                                     },
                                     "usePopupWindow": {
                                         "type": "boolean",
@@ -313,7 +313,7 @@
                                     "frequencyDisplayMode": {
                                         "type": "string",
                                         "enum": ["tags", "tags-grouped", "split-tags", "split-tags-grouped", "inline-list", "list"],
-                                        "default": "split-tags"
+                                        "default": "split-tags-grouped"
                                     },
                                     "termDisplayMode": {
                                         "type": "string",
@@ -321,13 +321,13 @@
                                         "default": "ruby"
                                     },
                                     "sortFrequencyDictionary": {
-                                        "type": "string",
+                                        "type": ["string", "null"],
                                         "default": null
                                     },
                                     "sortFrequencyDictionaryOrder": {
                                         "type": "string",
                                         "enum": ["ascending", "descending"],
-                                        "default": "ascending"
+                                        "default": "descending"
                                     },
                                     "stickySearchHeader": {
                                         "type": "boolean",

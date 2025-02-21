@@ -16,42 +16,42 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Application } from '../../application.js';
-import { DocumentFocusController } from '../../dom/document-focus-controller.js';
-import { querySelectorNotNull } from '../../dom/query-selector.js';
-import { ExtensionContentController } from '../common/extension-content-controller.js';
-import { AnkiController } from './anki-controller.js';
-import { AnkiDeckGeneratorController } from './anki-deck-generator-controller.js';
-import { AnkiTemplatesController } from './anki-templates-controller.js';
-import { AudioController } from './audio-controller.js';
-import { BackupController } from './backup-controller.js';
-import { CollapsibleDictionaryController } from './collapsible-dictionary-controller.js';
-import { DictionaryController } from './dictionary-controller.js';
-import { DictionaryImportController } from './dictionary-import-controller.js';
-import { ExtensionKeyboardShortcutController } from './extension-keyboard-shortcuts-controller.js';
-import { GenericSettingController } from './generic-setting-controller.js';
-import { KeyboardShortcutController } from './keyboard-shortcuts-controller.js';
-import { LanguagesController } from './languages-controller.js';
-import { MecabController } from './mecab-controller.js';
-import { ModalController } from './modal-controller.js';
-import { NestedPopupsController } from './nested-popups-controller.js';
-import { OpenAiController } from './openai-controller.js';
-import { PermissionsToggleController } from './permissions-toggle-controller.js';
-import { PersistentStorageController } from './persistent-storage-controller.js';
-import { PopupPreviewController } from './popup-preview-controller.js';
-import { PopupWindowController } from './popup-window-controller.js';
-import { ProfileController } from './profile-controller.js';
-import { RecommendedSettingsController } from './recommended-settings-controller.js';
-import { ScanInputsController } from './scan-inputs-controller.js';
-import { ScanInputsSimpleController } from './scan-inputs-simple-controller.js';
-import { SecondarySearchDictionaryController } from './secondary-search-dictionary-controller.js';
-import { SentenceTerminationCharactersController } from './sentence-termination-characters-controller.js';
-import { SettingsController } from './settings-controller.js';
-import { SettingsDisplayController } from './settings-display-controller.js';
-import { SortFrequencyDictionaryController } from './sort-frequency-dictionary-controller.js';
-import { StatusFooter } from './status-footer.js';
-import { StorageController } from './storage-controller.js';
-import { TranslationTextReplacementsController } from './translation-text-replacements-controller.js';
+import {Application} from '../../application.js';
+import {DocumentFocusController} from '../../dom/document-focus-controller.js';
+import {querySelectorNotNull} from '../../dom/query-selector.js';
+import {ExtensionContentController} from '../common/extension-content-controller.js';
+import {AnkiController} from './anki-controller.js';
+import {AnkiDeckGeneratorController} from './anki-deck-generator-controller.js';
+import {AnkiTemplatesController} from './anki-templates-controller.js';
+import {AudioController} from './audio-controller.js';
+import {BackupController} from './backup-controller.js';
+import {CollapsibleDictionaryController} from './collapsible-dictionary-controller.js';
+import {DictionaryController} from './dictionary-controller.js';
+import {DictionaryImportController} from './dictionary-import-controller.js';
+import {ExtensionKeyboardShortcutController} from './extension-keyboard-shortcuts-controller.js';
+import {GenericSettingController} from './generic-setting-controller.js';
+import {KeyboardShortcutController} from './keyboard-shortcuts-controller.js';
+import {LanguagesController} from './languages-controller.js';
+import {MecabController} from './mecab-controller.js';
+import {ModalController} from './modal-controller.js';
+import {NestedPopupsController} from './nested-popups-controller.js';
+import {OpenAiController} from './openai-controller.js';
+import {PermissionsToggleController} from './permissions-toggle-controller.js';
+import {PersistentStorageController} from './persistent-storage-controller.js';
+import {PopupPreviewController} from './popup-preview-controller.js';
+import {PopupWindowController} from './popup-window-controller.js';
+import {ProfileController} from './profile-controller.js';
+import {RecommendedSettingsController} from './recommended-settings-controller.js';
+import {ScanInputsController} from './scan-inputs-controller.js';
+import {ScanInputsSimpleController} from './scan-inputs-simple-controller.js';
+import {SecondarySearchDictionaryController} from './secondary-search-dictionary-controller.js';
+import {SentenceTerminationCharactersController} from './sentence-termination-characters-controller.js';
+import {SettingsController} from './settings-controller.js';
+import {SettingsDisplayController} from './settings-display-controller.js';
+import {SortFrequencyDictionaryController} from './sort-frequency-dictionary-controller.js';
+import {StatusFooter} from './status-footer.js';
+import {StorageController} from './storage-controller.js';
+import {TranslationTextReplacementsController} from './translation-text-replacements-controller.js';
 
 /**
  * @param {GenericSettingController} genericSettingController
