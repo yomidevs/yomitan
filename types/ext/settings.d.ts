@@ -128,6 +128,7 @@ export type GeneralOptions = {
     showGuide: boolean;
     enableContextMenuScanSelected: boolean;
     compactTags: boolean;
+    averageFrequency: boolean;
     glossaryLayoutMode: GlossaryLayoutMode;
     mainDictionary: string;
     popupTheme: PopupTheme;
