@@ -1373,6 +1373,8 @@ export class Backend {
 
         this._setupContextMenu(options);
 
+        this._attachOmniboxListener();
+
         void this._accessibilityController.update(this._getOptionsFull(false));
 
         this._sendMessageAllTabsIgnoreResponse({action: 'applicationOptionsUpdated', params: {source}});
@@ -1399,6 +1401,18 @@ export class Backend {
             } else {
                 chrome.contextMenus.remove('yomitan_lookup', () => this._checkLastError(chrome.runtime.lastError));
             }
+        } catch (e) {
+            log.error(e);
+        }
+    }
+
+    /** */
+    _attachOmniboxListener() {
+        try {
+            chrome.omnibox.onInputEntered.addListener((text) => {
+                const newURL = 'search.html?query=' + encodeURIComponent(text);
+                void chrome.tabs.create({url: newURL});
+            });
         } catch (e) {
             log.error(e);
         }

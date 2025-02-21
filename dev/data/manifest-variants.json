@@ -33,6 +33,9 @@
             "service_worker": "sw.js",
             "type": "module"
         },
+        "omnibox": {
+            "keyword": "yomi"
+        },
         "content_scripts": [
             {
                 "run_at": "document_idle",
