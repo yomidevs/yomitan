@@ -273,7 +273,9 @@ export class AnkiTemplatesController {
                     deckName: '',
                     modelName: '',
                     fields: [
-                        ['field', field],
+                        [
+                            'field', {value: field},
+                        ],
                     ],
                     resultOutputMode,
                     glossaryLayoutMode,

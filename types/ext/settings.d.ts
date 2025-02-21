@@ -315,8 +315,15 @@ export type AnkiNoteOptions = {
 };
 
 export type AnkiNoteFields = {
-    [key: string]: string;
+    [key: string]: AnkiNoteField;
 };
+
+export type AnkiNoteField = {
+    value: string;
+    overwriteMode: AnkiNoteFieldOverwriteMode;
+};
+
+export type AnkiNoteFieldOverwriteMode = 'coalesce' | 'overwrite' | 'append' | 'prepend' | 'skip';
 
 export type SentenceParsingOptions = {
     scanExtent: number;
