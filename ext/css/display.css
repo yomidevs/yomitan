@@ -2037,3 +2037,36 @@ button.footer-notification-close-button {
 :root[data-popup-display-mode=full-width] .frame-resizer-container {
     display: none;
 }
+
+.similar-words-container {
+    margin-top: 1em;
+    padding: 0.5em;
+    background-color: rgba(58, 45, 78, 0.05);
+    border-left: 3px solid #584578;
+    border-radius: 4px;
+}
+
+.similar-words-container [data-layout="flex"] {
+    display: flex;
+    align-items: center;
+}
+
+.similar-words-container .tag-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2em 0.5em;
+    border-radius: 3px;
+    font-size: 0.9em;
+    margin-right: 0.5em;
+}
+
+.similar-words-container .similar-word-entry {
+    transition: background-color 0.2s ease;
+    padding: 0.3em;
+}
+
+.similar-words-container .similar-word-entry:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    border-radius: 4px;
+}

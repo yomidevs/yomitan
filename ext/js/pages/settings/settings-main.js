@@ -35,6 +35,7 @@ import {LanguagesController} from './languages-controller.js';
 import {MecabController} from './mecab-controller.js';
 import {ModalController} from './modal-controller.js';
 import {NestedPopupsController} from './nested-popups-controller.js';
+import {OpenAiController} from './openai-controller.js';
 import {PermissionsToggleController} from './permissions-toggle-controller.js';
 import {PersistentStorageController} from './persistent-storage-controller.js';
 import {PopupPreviewController} from './popup-preview-controller.js';
@@ -177,6 +178,9 @@ await Application.main(true, async (application) => {
 
     const recommendedSettingsController = new RecommendedSettingsController(settingsController);
     preparePromises.push(recommendedSettingsController.prepare());
+
+    const openAiController = new OpenAiController(settingsController);
+    preparePromises.push(openAiController.prepare());
 
     await Promise.all(preparePromises);
 

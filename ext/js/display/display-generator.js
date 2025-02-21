@@ -23,22 +23,30 @@ import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji} from '../language/ja/japanese.js';
 import {getLanguageFromText} from '../language/text-utilities.js';
 import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationText} from './pronunciation-generator.js';
+import {SimilarWordsGenerator} from './similar-words-generator.js';
 import {StructuredContentGenerator} from './structured-content-generator.js';
 
 export class DisplayGenerator {
     /**
      * @param {import('./display-content-manager.js').DisplayContentManager} contentManager
      * @param {?import('../input/hotkey-help-controller.js').HotkeyHelpController} hotkeyHelpController
+     * @param {import('../pages/settings/settings-controller').SettingsController} settingsController
      */
-    constructor(contentManager, hotkeyHelpController) {
+    constructor(contentManager, hotkeyHelpController, settingsController) {
         /** @type {import('./display-content-manager.js').DisplayContentManager} */
         this._contentManager = contentManager;
         /** @type {?import('../input/hotkey-help-controller.js').HotkeyHelpController} */
         this._hotkeyHelpController = hotkeyHelpController;
+        /** @type {import('../pages/settings/settings-controller').SettingsController} */
+        this._settingsController = settingsController;
         /** @type {HtmlTemplateCollection} */
         this._templates = new HtmlTemplateCollection();
+        /** @type {Document} */
+        this._document = document;
         /** @type {StructuredContentGenerator} */
-        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
+        this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, this._document);
+        /** @type {SimilarWordsGenerator} */
+        this._similarWordsGenerator = new SimilarWordsGenerator(this._settingsController);
         /** @type {string} */
         this._language = 'ja';
     }
@@ -187,6 +195,10 @@ export class DisplayGenerator {
             definitionsContainer.appendChild(node2);
         }
         definitionsContainer.dataset.count = `${definitions.length}`;
+
+        // Add similar words box
+        const similarWordsContainer = this._createSimilarWordsBox(dictionaryEntry);
+        node.appendChild(similarWordsContainer);
 
         return node;
     }
@@ -1162,5 +1174,26 @@ export class DisplayGenerator {
      */
     _querySelector(element, selector) {
         return /** @type {T} */ (element.querySelector(selector));
+    }
+
+    /**
+     * Creates a structured content element for the similar words box
+     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @returns {HTMLElement}
+     */
+    _createSimilarWordsBox(dictionaryEntry) {
+        // Get term and reading from the first headword
+        const firstHeadword = dictionaryEntry.headwords[0];
+        const content = this._similarWordsGenerator.createSimilarWordsContent(
+            dictionaryEntry.similarWords || [],
+            firstHeadword.term,
+            firstHeadword.reading
+        );
+        const container = this._document.createElement('div');
+        container.className = 'similar-words-container';
+        // Use the first definition's dictionary if available, otherwise empty string
+        const dictionary = dictionaryEntry.definitions[0]?.dictionary || '';
+        this._structuredContentGenerator.appendStructuredContent(container, content, dictionary);
+        return container;
     }
 }

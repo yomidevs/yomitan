@@ -101,6 +101,7 @@ export type ProfileOptions = {
     inputs: InputsOptions;
     clipboard: ClipboardOptions;
     accessibility: AccessibilityOptions;
+    openAi: OpenAiOptions;
 };
 
 export type GeneralOptions = {
@@ -425,3 +426,8 @@ export type SentenceTerminationCharacterMode = 'custom' | 'custom-no-newlines' |
 export type InputsHotkeyModifier = 'alt' | 'ctrl' | 'shift' | 'meta';
 
 export type InputsHotkeyScope = 'popup' | 'search' | 'web';
+
+export type OpenAiOptions = {
+    apiKey: string;
+    model: string;
+};
