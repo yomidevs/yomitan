@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher} from '../core/event-dispatcher.js';
+import { EventDispatcher } from '../core/event-dispatcher.js';
 
 /**
  * This class represents a popup that is hosted in a new native window.
@@ -267,7 +267,7 @@ export class PopupWindow extends EventDispatcher {
      * @returns {Promise<boolean>}
      */
     async isPointerOver() {
-        console.log('USELESS');
+
         return false;
     }
 
