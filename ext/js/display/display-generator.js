@@ -17,6 +17,7 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
+import {safePerformance} from '../core/safe-performance.js';
 import {getDisambiguations, getGroupedPronunciations, getTermFrequency, groupKanjiFrequencies, groupTermFrequencies, groupTermTags, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
 import {HtmlTemplateCollection} from '../dom/html-template-collection.js';
 import {distributeFurigana, getKanaMorae, getPitchCategory, isCodePointKanji} from '../language/ja/japanese.js';
@@ -40,6 +41,13 @@ export class DisplayGenerator {
         this._structuredContentGenerator = new StructuredContentGenerator(this._contentManager, document);
         /** @type {string} */
         this._language = 'ja';
+    }
+
+    /** @type {import('./display-content-manager.js').DisplayContentManager} */
+    get contentManager() { return this._contentManager; }
+
+    set contentManager(contentManager) {
+        this._contentManager = contentManager;
     }
 
     /** */
@@ -66,9 +74,10 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {import('dictionary-importer').Summary[]} dictionaryInfo
      * @returns {HTMLElement}
      */
-    createTermEntry(dictionaryEntry) {
+    createTermEntry(dictionaryEntry, dictionaryInfo) {
         const node = this._instantiate('term-entry');
 
         const headwordsContainer = this._querySelector(node, '.headword-list');
@@ -81,7 +90,7 @@ export class DisplayGenerator {
         const {headwords, type, inflectionRuleChainCandidates, definitions, frequencies, pronunciations} = dictionaryEntry;
         const groupedPronunciations = getGroupedPronunciations(dictionaryEntry);
         const pronunciationCount = groupedPronunciations.reduce((i, v) => i + v.pronunciations.length, 0);
-        const groupedFrequencies = groupTermFrequencies(dictionaryEntry);
+        const groupedFrequencies = groupTermFrequencies(dictionaryEntry, dictionaryInfo);
         const termTags = groupTermTags(dictionaryEntry);
 
         /** @type {Set<string>} */
@@ -110,17 +119,23 @@ export class DisplayGenerator {
         node.dataset.groupedFrequencyCount = `${groupedFrequencies.length}`;
         node.dataset.primaryMatchTypes = [...primaryMatchTypes].join(' ');
 
+        safePerformance.mark('displayGenerator:createTermEntry:createTermHeadword:start');
         for (let i = 0, ii = headwords.length; i < ii; ++i) {
             const node2 = this._createTermHeadword(headwords[i], i, pronunciations);
             node2.dataset.index = `${i}`;
             headwordsContainer.appendChild(node2);
         }
         headwordsContainer.dataset.count = `${headwords.length}`;
+        safePerformance.mark('displayGenerator:createTermEntry:createTermHeadword:end');
+        safePerformance.measure('displayGenerator:createTermEntry:createTermHeadword', 'displayGenerator:createTermEntry:createTermHeadword:start', 'displayGenerator:createTermEntry:createTermHeadword:end');
 
+        safePerformance.mark('displayGenerator:createTermEntry:promises:start');
         this._appendMultiple(inflectionRuleChainsContainer, this._createInflectionRuleChain.bind(this), inflectionRuleChainCandidates);
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(groupedPronunciationsContainer, this._createGroupedPronunciation.bind(this), groupedPronunciations);
         this._appendMultiple(headwordTagsContainer, this._createTermTag.bind(this), termTags, headwords.length);
+        safePerformance.mark('displayGenerator:createTermEntry:promises:end');
+        safePerformance.measure('displayGenerator:createTermEntry:promises', 'displayGenerator:createTermEntry:promises:start', 'displayGenerator:createTermEntry:promises:end');
 
         for (const term of uniqueTerms) {
             headwordTagsContainer.appendChild(this._createSearchTag(term));
@@ -143,6 +158,28 @@ export class DisplayGenerator {
                 dictionaryTag.dictionaries.push(dictionary);
                 dictionaryTag.name = dictionaryAlias;
                 dictionaryTag.content = [dictionary];
+
+                const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
+                if (currentDictionaryInfo) {
+                    const dictionaryContentArray = [];
+                    dictionaryContentArray.push(currentDictionaryInfo.title);
+                    if (currentDictionaryInfo.author) {
+                        dictionaryContentArray.push('Author: ' + currentDictionaryInfo.author);
+                    }
+                    if (currentDictionaryInfo.description) {
+                        dictionaryContentArray.push('Description: ' + currentDictionaryInfo.description);
+                    }
+                    if (currentDictionaryInfo.url) {
+                        dictionaryContentArray.push('URL: ' + currentDictionaryInfo.url);
+                    }
+
+                    const totalTerms = currentDictionaryInfo?.counts?.terms?.total;
+                    if (!!totalTerms && totalTerms > 0) {
+                        dictionaryContentArray.push('Term Count: ' + totalTerms.toString());
+                    }
+
+                    dictionaryTag.content = dictionaryContentArray;
+                }
             }
 
             const node2 = this._createTermDefinition(definition, dictionaryTag, headwords, uniqueTerms, uniqueReadings);
@@ -156,10 +193,12 @@ export class DisplayGenerator {
 
     /**
      * @param {import('dictionary').KanjiDictionaryEntry} dictionaryEntry
+     * @param {import('dictionary-importer').Summary[]} dictionaryInfo
      * @returns {HTMLElement}
      */
-    createKanjiEntry(dictionaryEntry) {
+    createKanjiEntry(dictionaryEntry, dictionaryInfo) {
         const node = this._instantiate('kanji-entry');
+        node.dataset.dictionary = dictionaryEntry.dictionary;
 
         const glyphContainer = this._querySelector(node, '.kanji-glyph');
         const frequencyGroupListContainer = this._querySelector(node, '.frequency-group-list');
@@ -174,11 +213,32 @@ export class DisplayGenerator {
 
         this._setTextContent(glyphContainer, dictionaryEntry.character, this._language);
         if (this._language === 'ja') { glyphContainer.style.fontFamily = 'kanji-stroke-orders, sans-serif'; }
-        const groupedFrequencies = groupKanjiFrequencies(dictionaryEntry.frequencies);
+        const groupedFrequencies = groupKanjiFrequencies(dictionaryEntry.frequencies, dictionaryInfo);
 
         const dictionaryTag = this._createDictionaryTag('');
         dictionaryTag.name = dictionaryEntry.dictionaryAlias;
         dictionaryTag.content = [dictionaryEntry.dictionary];
+        const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionaryEntry.dictionary);
+        if (currentDictionaryInfo) {
+            const dictionaryContentArray = [];
+            dictionaryContentArray.push(currentDictionaryInfo.title);
+            if (currentDictionaryInfo.author) {
+                dictionaryContentArray.push('Author: ' + currentDictionaryInfo.author);
+            }
+            if (currentDictionaryInfo.description) {
+                dictionaryContentArray.push('Description: ' + currentDictionaryInfo.description);
+            }
+            if (currentDictionaryInfo.url) {
+                dictionaryContentArray.push('URL: ' + currentDictionaryInfo.url);
+            }
+
+            const totalKanji = currentDictionaryInfo?.counts?.kanji?.total;
+            if (!!totalKanji && totalKanji > 0) {
+                dictionaryContentArray.push('Kanji Count: ' + totalKanji.toString());
+            }
+
+            dictionaryTag.content = dictionaryContentArray;
+        }
 
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, true);
         this._appendMultiple(tagContainer, this._createTag.bind(this), [...dictionaryEntry.tags, dictionaryTag]);
@@ -440,7 +500,6 @@ export class DisplayGenerator {
         this._appendMultiple(tagListContainer, this._createTag.bind(this), [...tags, dictionaryTag]);
         this._appendMultiple(onlyListContainer, this._createTermDisambiguation.bind(this), disambiguations);
         this._appendMultiple(entriesContainer, this._createTermDefinitionEntry.bind(this), entries, dictionary);
-
         return node;
     }
 
@@ -802,7 +861,7 @@ export class DisplayGenerator {
      * @returns {HTMLElement}
      */
     _createFrequencyGroup(details, kanji) {
-        const {dictionary, dictionaryAlias, frequencies} = details;
+        const {dictionary, dictionaryAlias, frequencies, freqCount} = details;
 
         const node = this._instantiate('frequency-group-item');
         const body = this._querySelector(node, '.tag-body-content');
@@ -817,8 +876,8 @@ export class DisplayGenerator {
             const item = frequencies[i];
             const itemNode = (
                 kanji ?
-                this._createKanjiFrequency(/** @type {import('dictionary-data-util').KanjiFrequency} */ (item), dictionary, dictionaryAlias) :
-                this._createTermFrequency(/** @type {import('dictionary-data-util').TermFrequency} */ (item), dictionary, dictionaryAlias)
+                this._createKanjiFrequency(/** @type {import('dictionary-data-util').KanjiFrequency} */ (item), dictionary, dictionaryAlias, freqCount?.toString()) :
+                this._createTermFrequency(/** @type {import('dictionary-data-util').TermFrequency} */ (item), dictionary, dictionaryAlias, freqCount?.toString())
             );
             itemNode.dataset.index = `${i}`;
             body.appendChild(itemNode);
@@ -827,7 +886,7 @@ export class DisplayGenerator {
         body.dataset.count = `${ii}`;
         node.dataset.count = `${ii}`;
         node.dataset.details = dictionary;
-        tag.dataset.details = dictionary;
+        tag.dataset.details = dictionary + '\nDictionary size: ' + freqCount?.toString() + (kanji ? ' kanji' : ' terms');
         return node;
     }
 
@@ -835,9 +894,10 @@ export class DisplayGenerator {
      * @param {import('dictionary-data-util').TermFrequency} details
      * @param {string} dictionary
      * @param {string} dictionaryAlias
+     * @param {string} freqCount
      * @returns {HTMLElement}
      */
-    _createTermFrequency(details, dictionary, dictionaryAlias) {
+    _createTermFrequency(details, dictionary, dictionaryAlias, freqCount) {
         const {term, reading, values} = details;
         const node = this._instantiate('term-frequency-item');
         const tagLabel = this._querySelector(node, '.tag-label-content');
@@ -859,7 +919,7 @@ export class DisplayGenerator {
         node.dataset.readingIsSame = `${reading === term}`;
         node.dataset.dictionary = dictionary;
         node.dataset.details = dictionary;
-        tag.dataset.details = dictionary;
+        tag.dataset.details = dictionary + '\nDictionary size: ' + freqCount + ' terms';
         return node;
     }
 
@@ -867,9 +927,10 @@ export class DisplayGenerator {
      * @param {import('dictionary-data-util').KanjiFrequency} details
      * @param {string} dictionary
      * @param {string} dictionaryAlias
+     * @param {string} freqCount
      * @returns {HTMLElement}
      */
-    _createKanjiFrequency(details, dictionary, dictionaryAlias) {
+    _createKanjiFrequency(details, dictionary, dictionaryAlias, freqCount) {
         const {character, values} = details;
         const node = this._instantiate('kanji-frequency-item');
         const tagLabel = this._querySelector(node, '.tag-label-content');
@@ -882,7 +943,7 @@ export class DisplayGenerator {
         node.dataset.character = character;
         node.dataset.dictionary = dictionary;
         node.dataset.details = dictionary;
-        tag.dataset.details = dictionary;
+        tag.dataset.details = dictionary + '\nDictionary size: ' + freqCount + ' kanji';
 
         return node;
     }
@@ -932,7 +993,7 @@ export class DisplayGenerator {
     _appendKanjiLinks(container, text) {
         let part = '';
         for (const c of text) {
-            if (isCodePointKanji(/** @type {number} */ (c.codePointAt(0)))) {
+            if (isCodePointKanji(/** @type {number} */(c.codePointAt(0)))) {
                 if (part.length > 0) {
                     container.appendChild(document.createTextNode(part));
                     part = '';
@@ -963,7 +1024,7 @@ export class DisplayGenerator {
         const {ELEMENT_NODE} = Node;
         if (Array.isArray(detailsArray)) {
             for (const details of detailsArray) {
-                const item = createItem(details, /** @type {TExtraArg} */ (arg));
+                const item = createItem(details, /** @type {TExtraArg} */(arg));
                 if (item === null) { continue; }
                 container.appendChild(item);
                 if (item.nodeType === ELEMENT_NODE) {

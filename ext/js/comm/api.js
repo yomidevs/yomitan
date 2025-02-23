@@ -17,14 +17,23 @@
  */
 
 import {ExtensionError} from '../core/extension-error.js';
+import {log} from '../core/log.js';
 
 export class API {
     /**
      * @param {import('../extension/web-extension.js').WebExtension} webExtension
+     * @param {Worker?} mediaDrawingWorker
+     * @param {MessagePort?} backendPort
      */
-    constructor(webExtension) {
+    constructor(webExtension, mediaDrawingWorker = null, backendPort = null) {
         /** @type {import('../extension/web-extension.js').WebExtension} */
         this._webExtension = webExtension;
+
+        /** @type {Worker?} */
+        this._mediaDrawingWorker = mediaDrawingWorker;
+
+        /** @type {MessagePort?} */
+        this._backendPort = backendPort;
     }
 
     /**
@@ -255,6 +264,14 @@ export class API {
     }
 
     /**
+     * @param {import('api').PmApiParam<'drawMedia', 'requests'>} requests
+     * @param {Transferable[]} transferables
+     */
+    drawMedia(requests, transferables) {
+        this._mediaDrawingWorker?.postMessage({action: 'drawMedia', params: {requests}}, transferables);
+    }
+
+    /**
      * @param {import('api').ApiParam<'logGenericErrorBackend', 'error'>} error
      * @param {import('api').ApiParam<'logGenericErrorBackend', 'level'>} level
      * @param {import('api').ApiParam<'logGenericErrorBackend', 'context'>} context
@@ -365,6 +382,20 @@ export class API {
     }
 
     /**
+     * @param {Transferable[]} transferables
+     */
+    registerOffscreenPort(transferables) {
+        this._pmInvoke('registerOffscreenPort', void 0, transferables);
+    }
+
+    /**
+     * @param {MessagePort} port
+     */
+    connectToDatabaseWorker(port) {
+        this._pmInvoke('connectToDatabaseWorker', void 0, [port]);
+    }
+
+    /**
      * @returns {Promise<import('api').ApiReturn<'getLanguageSummaries'>>}
      */
     getLanguageSummaries() {
@@ -390,10 +421,10 @@ export class API {
                     if (response !== null && typeof response === 'object') {
                         const {error} = /** @type {import('core').UnknownObject} */ (response);
                         if (typeof error !== 'undefined') {
-                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */ (error)));
+                            reject(ExtensionError.deserialize(/** @type {import('core').SerializedError} */(error)));
                         } else {
                             const {result} = /** @type {import('core').UnknownObject} */ (response);
-                            resolve(/** @type {import('api').ApiReturn<TAction>} */ (result));
+                            resolve(/** @type {import('api').ApiReturn<TAction>} */(result));
                         }
                     } else {
                         const message = response === null ? 'Unexpected null response. You may need to refresh the page.' : `Unexpected response of type ${typeof response}. You may need to refresh the page.`;
@@ -404,5 +435,32 @@ export class API {
                 reject(e);
             }
         });
+    }
+
+    /**
+     * @template {import('api').PmApiNames} TAction
+     * @template {import('api').PmApiParams<TAction>} TParams
+     * @param {TAction} action
+     * @param {TParams} params
+     * @param {Transferable[]} transferables
+     */
+    _pmInvoke(action, params, transferables) {
+        // on firefox, there is no service worker, so we instead use a MessageChannel which is established
+        // via a handshake via a SharedWorker
+        if (!('serviceWorker' in navigator)) {
+            if (this._backendPort === null) {
+                log.error('no backend port available');
+                return;
+            }
+            this._backendPort.postMessage({action, params}, transferables);
+        } else {
+            void navigator.serviceWorker.ready.then((serviceWorkerRegistration) => {
+                if (serviceWorkerRegistration.active !== null) {
+                    serviceWorkerRegistration.active.postMessage({action, params}, transferables);
+                } else {
+                    log.error(`[${self.constructor.name}] no active service worker`);
+                }
+            });
+        }
     }
 }

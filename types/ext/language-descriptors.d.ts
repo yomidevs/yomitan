@@ -71,6 +71,11 @@ type AlphabeticDiacriticsProcessor = {
  * Any new language should be added to this object.
  */
 type AllTextProcessors = {
+    aii: {
+        pre: {
+            removeSyriacScriptDiacritics: TextProcessor<boolean>;
+        };
+    };
     ar: {
         pre: {
             removeArabicScriptDiacritics: TextProcessor<boolean>;
@@ -99,6 +104,9 @@ type AllTextProcessors = {
     es: {
         pre: CapitalizationPreprocessors;
     };
+    et: {
+        pre: CapitalizationPreprocessors;
+    };
     fa: {
         pre: {
             removeArabicScriptDiacritics: TextProcessor<boolean>;
@@ -108,7 +116,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     fr: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & {
+            apostropheVariants: BidirectionalConversionPreprocessor;
+        };
     };
     grc: {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
@@ -124,7 +134,9 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
     la: {
-        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
+        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor & {
+            processDiphtongs: BidirectionalConversionPreprocessor;
+        };
     };
     lo: Record<string, never>;
     lv: {
@@ -135,6 +147,8 @@ type AllTextProcessors = {
             convertHalfWidthCharacters: TextProcessor<boolean>;
             alphabeticToHiragana: TextProcessor<boolean>;
             normalizeCombiningCharacters: TextProcessor<boolean>;
+            normalizeCJKCompatibilityCharacters: TextProcessor<boolean>;
+            normalizeRadicalCharacters: TextProcessor<boolean>;
             alphanumericWidthVariants: BidirectionalConversionPreprocessor;
             convertHiraganaToKatakana: BidirectionalConversionPreprocessor;
             collapseEmphaticSequences: TextProcessor<[collapseEmphatic: boolean, collapseEmphaticFull: boolean]>;
@@ -153,7 +167,13 @@ type AllTextProcessors = {
     mn: {
         pre: CapitalizationPreprocessors;
     };
+    mt: {
+        pre: CapitalizationPreprocessors;
+    };
     nl: {
+        pre: CapitalizationPreprocessors;
+    };
+    no: {
         pre: CapitalizationPreprocessors;
     };
     pl: {
@@ -200,6 +220,27 @@ type AllTextProcessors = {
             normalizeDiacritics: TextProcessor<'old' | 'new' | 'off'>;
         };
     };
-    yue: Record<string, never>;
-    zh: Record<string, never>;
+    cy: {
+        pre: CapitalizationPreprocessors;
+    };
+    yi: {
+        pre: {
+            combineYiddishLigatures: TextProcessor<boolean>;
+            removeYiddishDiacritics: TextProcessor<boolean>;
+        };
+        post: {
+            convertFinalLetters: TextProcessor<boolean>;
+            convertYiddishLigatures: BidirectionalConversionPreprocessor;
+        };
+    };
+    yue: {
+        pre: {
+            normalizeRadicalCharacters: TextProcessor<boolean>;
+        };
+    };
+    zh: {
+        pre: {
+            normalizeRadicalCharacters: TextProcessor<boolean>;
+        };
+    };
 };

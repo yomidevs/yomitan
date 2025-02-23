@@ -13,6 +13,27 @@
             }
         ]
     },
+    "aii": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [
+            {
+                "name": "kty-aii-en-ipa",
+                "description": "Assyrian Neo-Aramaic IPA dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-aii-en-ipa.zip"
+            }
+        ],
+        "terms": [
+            {
+                "name": "kty-aii-en",
+                "description": "Assyrian Neo-Aramaic to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-aii-en.zip"
+            }
+        ]
+    },
     "ang": {
         "frequency": [],
         "grammar": [],
@@ -31,7 +52,14 @@
         "frequency": [],
         "grammar": [],
         "kanji": [],
-        "pronunciation": [],
+        "pronunciation": [
+            {
+                "name": "kty-ar-en-ipa",
+                "description": "Arabic IPA dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ar-en-ipa.zip"
+            }
+        ],
         "terms": [
             {
                 "name": "kty-ar-en",
@@ -262,8 +290,8 @@
             {
                 "name": "JPDB",
                 "description": "A frequency dictionary based on the corpus from the online Japanese dictionary and SRS system at https://jpdb.io.",
-                "homepage": "https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#jpdb-v21-frequency",
-                "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/JPDB_v2.1_kana_display_only.zip"
+                "homepage": "https://github.com/Kuuuube/yomitan-dictionaries?tab=readme-ov-file#jpdb-v22-frequency",
+                "downloadUrl": "https://github.com/Kuuuube/yomitan-dictionaries/releases/download/yomitan-permalink/JPDB_v2.2_Frequency_Kana.zip"
             }
         ],
         "grammar": [],
@@ -369,6 +397,27 @@
             }
         ]
     },
+    "mt": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [
+            {
+                "name": "kty-mt-en-ipa",
+                "description": "Maltese IPA dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-mt-en-ipa.zip"
+            }
+        ],
+        "terms": [
+            {
+                "name": "kty-mt-en",
+                "description": "Maltese to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-mt-en.zip"
+            }
+        ]
+    },
     "nl": {
         "frequency": [],
         "grammar": [],
@@ -380,6 +429,26 @@
                 "description": "Dutch to English dictionary created from Wiktionary data.",
                 "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
                 "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-nl-en.zip"
+            }
+        ]
+    },
+    "no": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-nb-en",
+                "description": "Norwegian Bokmål to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-nb-en.zip"
+            },
+            {
+                "name": "kty-nn-en",
+                "description": "Norwegian Nynorsk to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-nn-en.zip"
             }
         ]
     },

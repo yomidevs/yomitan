@@ -20,6 +20,7 @@ import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {log} from '../core/log.js';
 import {promiseAnimationFrame} from '../core/promise-animation-frame.js';
+import {safePerformance} from '../core/safe-performance.js';
 import {setProfile} from '../data/profiles-util.js';
 import {addFullscreenChangeEventListener, getFullscreenElement} from '../dom/document-util.js';
 import {TextSourceElement} from '../dom/text-source-element.js';
@@ -224,7 +225,7 @@ export class Frontend {
      */
     async setTextSource(textSource) {
         this._textScanner.setCurrentTextSource(null);
-        await this._textScanner.search(textSource);
+        await this._textScanner.search(textSource, null, false, true);
     }
 
     /**
@@ -506,8 +507,6 @@ export class Frontend {
             normalizeCssZoom: scanningOptions.normalizeCssZoom,
             selectText: scanningOptions.selectText,
             delay: scanningOptions.delay,
-            touchInputEnabled: scanningOptions.touchInputEnabled,
-            pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
             scanLength: scanningOptions.length,
             layoutAwareScan: scanningOptions.layoutAwareScan,
             matchTypePrefix: scanningOptions.matchTypePrefix,
@@ -524,7 +523,7 @@ export class Frontend {
                 excludeSelectors.push('.source-text', '.source-text *');
             }
             this._textScanner.excludeSelector = excludeSelectors.join(',');
-            this._textScanner.touchEventExcludeSelector = 'gloss-link, gloss-link *, tag, tag *, inflection';
+            this._textScanner.touchEventExcludeSelector = '.gloss-link, .gloss-link *, .tag, .tag *, .inflection';
         }
 
         this._updateContentScale();
@@ -954,10 +953,13 @@ export class Frontend {
      * @returns {Promise<boolean>}
      */
     async _scanSelectedText(allowEmptyRange, disallowExpandSelection, showEmpty = false) {
+        safePerformance.mark('frontend:scanSelectedText:start');
         const range = this._getFirstSelectionRange(allowEmptyRange);
         if (range === null) { return false; }
         const source = disallowExpandSelection ? TextSourceRange.createLazy(range) : TextSourceRange.create(range);
         await this._textScanner.search(source, {focus: true, restoreSelection: true}, showEmpty);
+        safePerformance.mark('frontend:scanSelectedText:end');
+        safePerformance.measure('frontend:scanSelectedText', 'frontend:scanSelectedText:start', 'frontend:scanSelectedText:end');
         return true;
     }
 

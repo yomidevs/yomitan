@@ -1,4 +1,2 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
+echo "Husky pre-commit hook"
 npx lint-staged

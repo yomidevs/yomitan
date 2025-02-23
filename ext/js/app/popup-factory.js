@@ -188,7 +188,7 @@ export class PopupFactory {
             promises.push(promise);
         }
 
-        /** @type {undefined|unknown} */
+        /** @type {undefined|Error} */
         let error = void 0;
         /** @type {{popup: import('popup').PopupAny, token: string}[]} */
         const results = [];

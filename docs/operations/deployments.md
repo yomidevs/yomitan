@@ -1,6 +1,6 @@
 # Deployments
 
-We deploy yomitan to the Firefox and Chrome webstore via two channels -- the dev build and the stable build. We do this via a series of Github Actions.
+We deploy yomitan to the Firefox and Chrome webstore via two channels -- the dev build and the stable build. We do this via a series of GitHub Actions.
 
 Only collaborators with deployment permissions are allowed to deploy.
 

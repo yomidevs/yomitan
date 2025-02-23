@@ -42,6 +42,7 @@ function createTestFields(type) {
  */
 export function createTestAnkiNoteData(dictionaryEntry, mode, styles = '') {
     const marker = '{marker}';
+    /** @type {Map<string, string>} */
     const dictionaryStylesMap = new Map();
     if (styles !== '') {
         dictionaryStylesMap.set('Test Dictionary 2', styles);
@@ -104,6 +105,7 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
             query: 'query',
             fullQuery: 'fullQuery',
         };
+        /** @type {Map<string, string>} */
         const dictionaryStylesMap = new Map();
         if (styles) {
             dictionaryStylesMap.set('Test Dictionary 2', styles);

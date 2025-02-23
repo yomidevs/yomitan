@@ -24,6 +24,7 @@ import {
     ZipReader as ZipReader0,
     configure,
 } from '../../lib/zip.js';
+import {compareRevisions} from './dictionary-data-util.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {toError} from '../core/to-error.js';
@@ -180,8 +181,9 @@ export class DictionaryImporter {
             }
         }
 
+        const yomitanVersion = details.yomitanVersion;
         /** @type {import('dictionary-importer').SummaryDetails} */
-        const summaryDetails = {prefixWildcardsSupported, counts, styles};
+        const summaryDetails = {prefixWildcardsSupported, counts, styles, yomitanVersion};
 
         const summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
         await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
@@ -328,7 +330,15 @@ export class DictionaryImporter {
             styles,
         };
 
-        const {author, url, description, attribution, frequencyMode, isUpdatable, sourceLanguage, targetLanguage} = index;
+        const {minimumYomitanVersion, author, url, description, attribution, frequencyMode, isUpdatable, sourceLanguage, targetLanguage} = index;
+        if (typeof minimumYomitanVersion === 'string') {
+            if (details.yomitanVersion === '0.0.0.0') {
+                // Running a development version of Yomitan
+            } else if (compareRevisions(details.yomitanVersion, minimumYomitanVersion)) {
+                throw new Error(`Dictionary is incompatible with this version of Yomitan (${details.yomitanVersion}; minimum required: ${minimumYomitanVersion})`);
+            }
+            summary.minimumYomitanVersion = minimumYomitanVersion;
+        }
         if (typeof author === 'string') { summary.author = author; }
         if (typeof url === 'string') { summary.url = url; }
         if (typeof description === 'string') { summary.description = description; }
@@ -373,10 +383,9 @@ export class DictionaryImporter {
      * @returns {ExtensionError}
      */
     _formatAjvSchemaError(schema, fileName) {
-        const e2 = new ExtensionError(`Dictionary has invalid data in '${fileName}'`);
-        e2.data = schema.errors;
-
-        return e2;
+        const e = new ExtensionError(`Dictionary has invalid data in '${fileName}' '${JSON.stringify(schema.errors)}'`);
+        e.data = schema.errors;
+        return e;
     }
 
     /**

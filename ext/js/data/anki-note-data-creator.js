@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {addScopeToCssLegacy} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../dictionary/dictionary-data-util.js';
 import {distributeFurigana, distributeFuriganaInflected} from '../language/ja/japanese.js';
 
@@ -398,14 +399,13 @@ function convertKanjiStat({name, category, content, order, score, dictionary, va
 function getKanjiFrequencies(dictionaryEntry) {
     /** @type {import('anki-templates').KanjiFrequency[]} */
     const results = [];
-    for (const {index, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, character, frequency, displayValue} of dictionaryEntry.frequencies) {
+    for (const {index, dictionary, dictionaryAlias, dictionaryIndex, character, frequency, displayValue} of dictionaryEntry.frequencies) {
         results.push({
             index,
             dictionary,
             dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority,
             },
             character,
             frequency: displayValue !== null ? displayValue : frequency,
@@ -429,7 +429,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
         case 'merge': type = 'termMerged'; break;
     }
 
-    const {inflectionRuleChainCandidates, score, dictionaryIndex, dictionaryPriority, sourceTermExactMatchCount, definitions} = dictionaryEntry;
+    const {inflectionRuleChainCandidates, score, dictionaryIndex, sourceTermExactMatchCount, definitions} = dictionaryEntry;
 
     let {url} = context;
     if (typeof url !== 'string') { url = ''; }
@@ -466,7 +466,6 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
         get dictionaryAlias() { return getCachedValue(dictionaryAliases)[0]; },
         dictionaryOrder: {
             index: dictionaryIndex,
-            priority: dictionaryPriority,
         },
         get dictionaryNames() { return getCachedValue(dictionaryNames); },
         get expression() {
@@ -585,7 +584,7 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
  * @returns {string}
  */
 function addGlossaryScopeToCss(css) {
-    return addScopeToCss(css, '.yomitan-glossary');
+    return addScopeToCssLegacy(css, '.yomitan-glossary');
 }
 
 /**
@@ -598,20 +597,8 @@ function addDictionaryScopeToCss(css, dictionaryTitle) {
         .replace(/\\/g, '\\\\')
         .replace(/"/g, '\\"');
 
-    return addScopeToCss(css, `[data-dictionary="${escapedTitle}"]`);
+    return addScopeToCssLegacy(css, `[data-dictionary="${escapedTitle}"]`);
 }
-
-/**
- * @param {string} css
- * @param {string} scopeSelector
- * @returns {string}
- */
-function addScopeToCss(css, scopeSelector) {
-    const regex = /([^\r\n,{}]+)(\s*[,{])/g;
-    const replacement = `${scopeSelector} $1$2`;
-    return css.replace(regex, replacement);
-}
-
 
 /**
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
@@ -620,7 +607,7 @@ function addScopeToCss(css, scopeSelector) {
 function getTermFrequencies(dictionaryEntry) {
     const results = [];
     const {headwords} = dictionaryEntry;
-    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue} of dictionaryEntry.frequencies) {
+    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, hasReading, frequency, displayValue} of dictionaryEntry.frequencies) {
         const {term, reading} = headwords[headwordIndex];
         results.push({
             index: results.length,
@@ -629,7 +616,6 @@ function getTermFrequencies(dictionaryEntry) {
             dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority,
             },
             expression: term,
             reading,
@@ -647,7 +633,7 @@ function getTermFrequencies(dictionaryEntry) {
 function getTermPitches(dictionaryEntry) {
     const results = [];
     const {headwords} = dictionaryEntry;
-    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, pronunciations} of dictionaryEntry.pronunciations) {
+    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, pronunciations} of dictionaryEntry.pronunciations) {
         const {term, reading} = headwords[headwordIndex];
         const pitches = getPronunciationsOfType(pronunciations, 'pitch-accent');
         const cachedPitches = createCachedValue(getTermPitchesInner.bind(null, pitches));
@@ -658,7 +644,6 @@ function getTermPitches(dictionaryEntry) {
             dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority,
             },
             expression: term,
             reading,
@@ -691,7 +676,7 @@ function getTermPitchesInner(pitches) {
 function getTermPhoneticTranscriptions(dictionaryEntry) {
     const results = [];
     const {headwords} = dictionaryEntry;
-    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, pronunciations} of dictionaryEntry.pronunciations) {
+    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, pronunciations} of dictionaryEntry.pronunciations) {
         const {term, reading} = headwords[headwordIndex];
         const phoneticTranscriptions = getPronunciationsOfType(pronunciations, 'phonetic-transcription');
         const termPhoneticTranscriptions = getTermPhoneticTranscriptionsInner(phoneticTranscriptions);
@@ -702,7 +687,6 @@ function getTermPhoneticTranscriptions(dictionaryEntry) {
             dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority,
             },
             expression: term,
             reading,
@@ -767,7 +751,7 @@ function getTermExpressions(dictionaryEntry) {
 function getTermExpressionFrequencies(dictionaryEntry, i) {
     const results = [];
     const {headwords, frequencies} = dictionaryEntry;
-    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, hasReading, frequency, displayValue} of frequencies) {
+    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, hasReading, frequency, displayValue} of frequencies) {
         if (headwordIndex !== i) { continue; }
         const {term, reading} = headwords[headwordIndex];
         results.push({
@@ -777,7 +761,6 @@ function getTermExpressionFrequencies(dictionaryEntry, i) {
             dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority,
             },
             expression: term,
             reading,
@@ -796,7 +779,7 @@ function getTermExpressionFrequencies(dictionaryEntry, i) {
 function getTermExpressionPitches(dictionaryEntry, i) {
     const results = [];
     const {headwords, pronunciations: termPronunciations} = dictionaryEntry;
-    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, dictionaryPriority, pronunciations} of termPronunciations) {
+    for (const {headwordIndex, dictionary, dictionaryAlias, dictionaryIndex, pronunciations} of termPronunciations) {
         if (headwordIndex !== i) { continue; }
         const {term, reading} = headwords[headwordIndex];
         const pitches = getPronunciationsOfType(pronunciations, 'pitch-accent');
@@ -808,7 +791,6 @@ function getTermExpressionPitches(dictionaryEntry, i) {
             dictionaryAlias,
             dictionaryOrder: {
                 index: dictionaryIndex,
-                priority: dictionaryPriority,
             },
             expression: term,
             reading,
@@ -968,18 +950,19 @@ function getCloze(dictionaryEntry, context) {
     }
     if (typeof text !== 'string') { text = ''; }
     if (typeof offset !== 'number') { offset = 0; }
+    const textChars = [...text];
 
     const textSegments = [];
-    for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, text.substring(offset, offset + originalText.length))) {
+    for (const {text: text2, reading: reading2} of distributeFuriganaInflected(term, reading, textChars.slice(offset, offset + originalText.length).join(''))) {
         textSegments.push(reading2.length > 0 ? reading2 : text2);
     }
 
     return {
-        sentence: text,
-        prefix: text.substring(0, offset),
-        body: text.substring(offset, offset + originalText.length),
+        sentence: textChars.join(''),
+        prefix: textChars.slice(0, offset).join(''),
+        body: textChars.slice(offset, offset + originalText.length).join(''),
         bodyKana: textSegments.join(''),
-        suffix: text.substring(offset + originalText.length),
+        suffix: textChars.slice(offset + originalText.length).join(''),
     };
 }
 

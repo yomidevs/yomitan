@@ -127,6 +127,8 @@ export class DictionaryImportController {
                 const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
                 await this._importDictionaries(
                     this._generateFilesFromUrls([url], onProgress),
+                    null,
+                    null,
                     importProgressTracker,
                 );
                 void this._recommendedDictionaryQueue.shift();
@@ -208,6 +210,10 @@ export class DictionaryImportController {
     _renderRecommendedDictionaryGroup(recommendedDictionaries, dictionariesList, installedDictionaryNames, installedDictionaryDownloadUrls) {
         const dictionariesListParent = dictionariesList.parentElement;
         dictionariesList.innerHTML = '';
+        // Hide section if no dictionaries are available
+        if (dictionariesListParent) {
+            dictionariesListParent.hidden = recommendedDictionaries.length === 0;
+        }
         for (const dictionary of recommendedDictionaries) {
             if (dictionariesList) {
                 if (dictionariesListParent) {
@@ -247,8 +253,8 @@ export class DictionaryImportController {
     /**
      * @param {import('settings-controller').EventArgument<'importDictionaryFromUrl'>} details
      */
-    _onEventImportDictionaryFromUrl({url}) {
-        void this.importFilesFromURLs(url);
+    _onEventImportDictionaryFromUrl({url, profilesDictionarySettings, onImportDone}) {
+        void this.importFilesFromURLs(url, profilesDictionarySettings, onImportDone);
     }
 
     /** */
@@ -307,6 +313,8 @@ export class DictionaryImportController {
         const importProgressTracker = new ImportProgressTracker(this._getFileImportSteps(), fileArray.length);
         void this._importDictionaries(
             this._arrayToAsyncGenerator(fileArray),
+            null,
+            null,
             importProgressTracker,
         );
     }
@@ -412,6 +420,8 @@ export class DictionaryImportController {
         node.value = '';
         void this._importDictionaries(
             this._arrayToAsyncGenerator(files2),
+            null,
+            null,
             new ImportProgressTracker(this._getFileImportSteps(), files2.length),
         );
     }
@@ -420,19 +430,23 @@ export class DictionaryImportController {
     async _onImportFromURL() {
         const text = this._importURLText.value.trim();
         if (!text) { return; }
-        await this.importFilesFromURLs(text);
+        await this.importFilesFromURLs(text, null, null);
     }
 
     /**
      * @param {string} text
+     * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
+     * @param {import('settings-controller').ImportDictionaryDoneCallback} onImportDone
      */
-    async importFilesFromURLs(text) {
+    async importFilesFromURLs(text, profilesDictionarySettings, onImportDone) {
         const urls = text.split('\n');
 
         const importProgressTracker = new ImportProgressTracker(this._getUrlImportSteps(), urls.length);
         const onProgress = importProgressTracker.onProgress.bind(importProgressTracker);
         void this._importDictionaries(
             this._generateFilesFromUrls(urls, onProgress),
+            profilesDictionarySettings,
+            onImportDone,
             importProgressTracker,
         );
     }
@@ -514,9 +528,11 @@ export class DictionaryImportController {
 
     /**
      * @param {AsyncGenerator<File, void, void>} dictionaries
+     * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
+     * @param {import('settings-controller').ImportDictionaryDoneCallback} onImportDone
      * @param {ImportProgressTracker} importProgressTracker
      */
-    async _importDictionaries(dictionaries, importProgressTracker) {
+    async _importDictionaries(dictionaries, profilesDictionarySettings, onImportDone, importProgressTracker) {
         if (this._modifying) { return; }
 
         const statusFooter = this._statusFooter;
@@ -539,6 +555,7 @@ export class DictionaryImportController {
             const optionsFull = await this._settingsController.getOptionsFull();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported,
+                yomitanVersion: chrome.runtime.getManifest().version,
             };
 
             for (let i = 0; i < importProgressTracker.dictionaryCount; ++i) {
@@ -553,6 +570,7 @@ export class DictionaryImportController {
                     ...errors,
                     ...(await this._importDictionaryFromZip(
                         file,
+                        profilesDictionarySettings,
                         importDetails,
                         onProgress,
                     ) ?? []),
@@ -567,6 +585,7 @@ export class DictionaryImportController {
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
             this._setModifying(false);
             this._triggerStorageChanged();
+            if (onImportDone) { onImportDone(); }
         }
     }
 
@@ -609,18 +628,19 @@ export class DictionaryImportController {
 
     /**
      * @param {File} file
+     * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
      * @param {import('dictionary-importer').ImportDetails} importDetails
      * @param {import('dictionary-worker').ImportProgressCallback} onProgress
      * @returns {Promise<Error[] | undefined>}
      */
-    async _importDictionaryFromZip(file, importDetails, onProgress) {
+    async _importDictionaryFromZip(file, profilesDictionarySettings, importDetails, onProgress) {
         const archiveContent = await this._readFile(file);
         const {result, errors} = await new DictionaryWorker().importDictionary(archiveContent, importDetails, onProgress);
         if (!result) {
             return errors;
         }
 
-        const errors2 = await this._addDictionarySettings(result);
+        const errors2 = await this._addDictionarySettings(result, profilesDictionarySettings);
 
         await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
 
@@ -634,9 +654,10 @@ export class DictionaryImportController {
 
     /**
      * @param {import('dictionary-importer').Summary} summary
+     * @param {import('settings-controller').ProfilesDictionarySettings} profilesDictionarySettings
      * @returns {Promise<Error[]>}
      */
-    async _addDictionarySettings(summary) {
+    async _addDictionarySettings(summary, profilesDictionarySettings) {
         const {title, sequenced, styles} = summary;
         let optionsFull;
         // Workaround Firefox bug sometimes causing getOptionsFull to fail
@@ -655,11 +676,29 @@ export class DictionaryImportController {
         const targets = [];
         const profileCount = optionsFull.profiles.length;
         for (let i = 0; i < profileCount; ++i) {
-            const {options} = optionsFull.profiles[i];
+            const {options, id: profileId} = optionsFull.profiles[i];
             const enabled = profileIndex === i;
-            const value = DictionaryController.createDefaultDictionarySettings(title, enabled, styles);
+            const defaultSettings = DictionaryController.createDefaultDictionarySettings(title, enabled, styles);
             const path1 = `profiles[${i}].options.dictionaries`;
-            targets.push({action: 'push', path: path1, items: [value]});
+
+            if (profilesDictionarySettings === null || typeof profilesDictionarySettings[profileId] === 'undefined') {
+                targets.push({action: 'push', path: path1, items: [defaultSettings]});
+            } else {
+                const {index, alias, name, ...currentSettings} = profilesDictionarySettings[profileId];
+                const newAlias = alias === name ? title : alias;
+                targets.push({
+                    action: 'splice',
+                    path: path1,
+                    start: index,
+                    items: [{
+                        ...currentSettings,
+                        styles,
+                        name: title,
+                        alias: newAlias,
+                    }],
+                    deleteCount: 0,
+                });
+            }
 
             if (sequenced && options.general.mainDictionary === '') {
                 const path2 = `profiles[${i}].options.general.mainDictionary`;

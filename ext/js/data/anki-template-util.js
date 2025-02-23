@@ -102,12 +102,16 @@ export function getStandardFieldMarkers(type) {
 
 /**
  * @param {import('settings').ProfileOptions} options
+ * @param {import('dictionary-importer').Summary[]} dictionaryInfo
  * @returns {string}
  */
-export function getDynamicTemplates(options) {
+export function getDynamicTemplates(options, dictionaryInfo) {
     let dynamicTemplates = '\n';
     for (const dictionary of options.dictionaries) {
+        const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary.name);
         if (!dictionary.enabled) { continue; }
+        const totalTerms = currentDictionaryInfo?.counts?.terms?.total;
+        if (!totalTerms || totalTerms === 0) { continue; }
         dynamicTemplates += `
 {{#*inline "single-glossary-${getKebabCase(dictionary.name)}"}}
     {{~> glossary selectedDictionary='${escapeDictName(dictionary.name)}'}}
@@ -127,12 +131,16 @@ export function getDynamicTemplates(options) {
 
 /**
  * @param {import('settings').DictionariesOptions} dictionaries
+ * @param {import('dictionary-importer').Summary[]} dictionaryInfo
  * @returns {string[]} The list of field markers.
  */
-export function getDynamicFieldMarkers(dictionaries) {
+export function getDynamicFieldMarkers(dictionaries, dictionaryInfo) {
     const markers = [];
     for (const dictionary of dictionaries) {
+        const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary.name);
         if (!dictionary.enabled) { continue; }
+        const totalTerms = currentDictionaryInfo?.counts?.terms?.total;
+        if (!totalTerms || totalTerms === 0) { continue; }
         markers.push(`single-glossary-${getKebabCase(dictionary.name)}`);
     }
     return markers;

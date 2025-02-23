@@ -34,8 +34,6 @@ export type Options = {
     normalizeCssZoom?: boolean;
     selectText?: boolean;
     delay?: number;
-    touchInputEnabled?: boolean;
-    pointerEventsEnabled?: boolean;
     scanLength?: number;
     layoutAwareScan?: boolean;
     preventMiddleMouse?: boolean;
@@ -70,6 +68,7 @@ export type InputOptions = {
     scanOnPenRelease: boolean;
     preventTouchScrolling: boolean;
     preventPenScrolling: boolean;
+    minimumTouchTime: number;
 };
 
 export type SentenceParsingOptions = {
@@ -95,6 +94,7 @@ export type InputConfig = {
     scanOnPenRelease: boolean;
     preventTouchScrolling: boolean;
     preventPenScrolling: boolean;
+    minimumTouchTime: number;
 };
 
 export type InputInfo = {
@@ -104,7 +104,7 @@ export type InputInfo = {
     passive: boolean;
     modifiers: Input.Modifier[];
     modifierKeys: Input.ModifierKey[];
-    detail: InputInfoDetail | undefined;
+    detail: InputInfoDetail | undefined | null;
 };
 
 export type InputInfoDetail = {

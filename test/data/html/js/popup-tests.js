@@ -30,4 +30,16 @@ HtmlTestUtilities.runMain(() => {
         if (!(iframeWithSrcdoc instanceof HTMLIFrameElement)) { continue; }
         iframeWithSrcdoc.srcdoc = HtmlTestUtilities.dataUrlToContent(src).content;
     }
+
+    const testCases = document.querySelectorAll('test-case[data-expected-result="failure"]');
+    for (const testCase of testCases) {
+        const description = testCase.querySelector('test-description');
+        if (description) {
+            const dangerSpan = document.createElement('span');
+            dangerSpan.className = 'danger';
+            dangerSpan.textContent = 'This element is expected to not work.';
+            description.appendChild(document.createElement('br'));
+            description.appendChild(dangerSpan);
+        }
+    }
 });

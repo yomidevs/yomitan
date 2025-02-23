@@ -17,7 +17,7 @@
  */
 
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
-import {clone} from '../../core/utilities.js';
+import {clone, generateId} from '../../core/utilities.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {ProfileConditionsUI} from './profile-conditions-ui.js';
 
@@ -184,6 +184,7 @@ export class ProfileController {
         // Create new profile
         const newProfile = clone(profile);
         newProfile.name = this._createCopyName(profile.name, this._profiles, 100);
+        newProfile.id = generateId(16);
 
         // Update state
         const index = this._profiles.length;
@@ -258,8 +259,10 @@ export class ProfileController {
         this._updateProfileSelectOptions();
 
         // Update profile index
-        if (settingsProfileIndex === profileIndex) {
-            this._settingsController.profileIndex = profileCurrentNew;
+        if (settingsProfileIndex >= profileIndex) {
+            this._settingsController.profileIndex = settingsProfileIndex - 1;
+        } else {
+            this._settingsController.refreshProfileIndex();
         }
 
         // Modify settings
@@ -583,7 +586,7 @@ export class ProfileController {
         let i = 0;
         while (true) {
             const newName = `${prefix}${space}${index}${suffix}`;
-            if (i++ >= maxUniqueAttempts || profiles.findIndex((profile) => profile.name === newName) < 0) {
+            if (i++ >= maxUniqueAttempts || !profiles.some((profile) => profile.name === newName)) {
                 return newName;
             }
             if (typeof index !== 'number') {

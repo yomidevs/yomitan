@@ -15,11 +15,10 @@ jobs:
           fileName: "*"
 
       - name: Publish on Microsoft Edge Addons
-        uses: wdzeng/edge-addon@v1
+        uses: wdzeng/edge-addon@v2
         id: webStorePublish
         with:
           product-id: 18e6c4cd-6383-4f38-95e9-92a629f60817
           zip-path: yomitan-edge.zip
           client-id: ${{ secrets.EDGE_CLIENT_ID }}
-          client-secret: ${{ secrets.EDGE_CLIENT_SECRET }}
-          access-token-url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
+          api-key: ${{ secrets.EDGE_API_KEY }}

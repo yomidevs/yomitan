@@ -13,6 +13,7 @@
     <link rel="icon" type="image/png" href="/images/icon128.png" sizes="128x128">
     <link rel="stylesheet" type="text/css" href="/css/material.css">
     <link rel="stylesheet" type="text/css" href="/css/settings.css">
+    <link rel="stylesheet" type="text/css" href="/css/visibility-modifiers.css">
     <link rel="stylesheet" type="text/css" href="/css/display-pronunciation.css">
     <script src="/js/pages/settings/settings-main.js" type="module"></script>
 </head>
@@ -305,7 +306,7 @@
                 </div>
             </div>
         </div>
-        <div class="settings-item">
+        <div class="settings-item advanced-only">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Persistent storage</div>
@@ -380,7 +381,7 @@
                 </p>
             </div>
         </div>
-        <div class="settings-item">
+        <div class="settings-item not-jpzhyueko">
             <div class="settings-item-inner settings-item-inner-wrappable">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Scan resolution</div>
@@ -543,42 +544,6 @@
                 <input type="number" data-setting="scanning.length" min="1" step="1">
             </div>
         </div></div>
-        <div class="settings-item advanced-only">
-            <div class="settings-item-inner settings-item-inner-wrappable">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Support inputs for devices with touch screens
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right flex-row-wrap">
-                    <div class="settings-item-group settings-item-group-wrap">
-                        <label class="settings-item-group-item flex-label no-wrap">
-                            <label class="checkbox"><input type="checkbox" data-setting="scanning.touchInputEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                            <span>Touch inputs</span>
-                        </label>
-                        <label class="settings-item-group-item flex-label no-wrap">
-                            <label class="checkbox"><input type="checkbox" data-setting="scanning.pointerEventsEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                            <span>Pointer inputs</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    To enable text scanning when using devices with a touch screen, either the <em>Touch inputs</em> or the <em>Pointer inputs</em> option must be enabled.
-                    <em>Touch inputs</em> supports generic touches on a touch screen device, but do not distinguish between touch and pen inputs.
-                    <em>Pointer inputs</em> supports supports the detection pen devices, but may not work on all devices.
-                    If both options are enabled, <em>Pointer inputs</em> takes precedence.
-                </p>
-                <p>
-                    The <em>Pointer inputs</em> option is only visible when the <em>Advanced</em> option is enabled.
-                </p>
-                <p>
-                    <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
         <div class="settings-item settings-item-button advanced-only" data-modal-action="show,input-action-prevention"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure input action prevention&hellip;</div>
@@ -598,7 +563,7 @@
         <div class="settings-item"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Allow scanning search page content</div>
-                <div class="settings-item-description">Text on the search page can be scanned for definitions, which will open a popup.</div>
+                <div class="settings-item-description">Text on the <a href="/search.html" target="_blank" rel="noopener">search page</a> can be scanned for definitions, which will open a popup.</div>
             </div>
             <div class="settings-item-right">
                 <label class="toggle"><input type="checkbox" data-setting="scanning.enableOnSearchPage"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
@@ -899,7 +864,7 @@
                 <label class="toggle"><input type="checkbox" data-setting="general.debugInfo"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner">
+        <div class="settings-item advanced-only jpzhyue-only"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Term display style</div>
                 <div class="settings-item-description">Change how terms and their readings are displayed.</div>
@@ -913,10 +878,10 @@
                 </select>
             </div>
         </div></div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+        <div class="settings-item advanced-only jp-only"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Reading mode</div>
-                <div class="settings-item-description">Change what type of furigana is displayed for parsed text.</div>
+                <div class="settings-item-description">Change what type of furigana is displayed for parsed text. Japanese only.</div>
             </div>
             <div class="settings-item-right">
                 <select data-setting="parsing.readingMode" lang="ja">
@@ -968,7 +933,10 @@
                 <div class="settings-item-left">
                     <div class="settings-item-label">
                         Pitch accent display styles
-                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                    <div class="settings-item-description">
+                        Japanese only.
+                        <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                     </div>
                 </div>
                 <div class="settings-item-right flex-row-wrap">
@@ -1565,7 +1533,7 @@
                 </p>
             </div>
         </div>
-        <div class="settings-item advanced-only" data-hide-for-browser="firefox-mobile">
+        <div class="settings-item advanced-only jp-only" data-hide-for-browser="firefox-mobile">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-invalid-indicator"></div>
@@ -1573,7 +1541,7 @@
                         Parse sentences using <a href="https://en.wikipedia.org/wiki/MeCab" target="_blank" rel="noopener noreferrer">MeCab</a>
                     </div>
                     <div class="settings-item-description">
-                        Sentence words are parsed using a third-party program.
+                        Sentence words are parsed using a third-party program. Japanese only.
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
                     </div>
                 </div>
@@ -1688,6 +1656,8 @@
                 Yomitan supports automatic flashcard creation for <a href="https://apps.ankiweb.net/" target="_blank" rel="noopener noreferrer">Anki</a>,
                 a free application designed to assist in remembering information.
                 This feature requires installation of the <a href="https://foosoft.net/projects/anki-connect/" target="_blank" rel="noopener noreferrer">AnkiConnect</a> plugin.
+                <br>
+                See the <a href="https://yomitan.wiki/anki/" target="_blank" rel="noopener noreferrer">Yomitan wiki</a> for a setup guide.
             </p>
             <p>
                 <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
@@ -1969,12 +1939,12 @@
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">
-                        Show card tags
+                        Show card tags and flags
                         <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">(?)</a>
                     </div>
                 </div>
                 <div class="settings-item-right">
-                    <select data-setting="anki.displayTags">
+                    <select data-setting="anki.displayTagsAndFlags">
                         <option value="never">Never</option>
                         <option value="always">Always</option>
                         <option value="non-standard">Non-standard</option>
@@ -1983,10 +1953,10 @@
             </div>
             <div class="settings-item-children more" hidden>
                 <p>
-                    When coming across a word that is already in an Anki deck, a button will appear that shows
-                    the tags the card has. If set to <em>Non-standard</em>, all tags that are included in the
+                    When coming across a word that is already in an Anki deck, two buttons can appear that show
+                    the tags and flags the card has. If set to <em>Non-standard</em>, all tags that are included in the
                     <em>Card tags</em> option will be filtered out from the list. If no tags remain after filtering,
-                    then the button will not be shown.
+                    then the tags button will not be shown. If no flags are found, the flags button will not be shown.
                 </p>
                 <p>
                     <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
