@@ -536,23 +536,21 @@ export type TermSource = {
 /**
  * Dictionaries containing the harmonic mean frequency of specific term-reading pairs.
  */
-export type AverageFrequencyListTerm = {
+export type AverageFrequencyListGroup = Map<string, AverageFrequencyListTerm>;
+/**
+ * Contains the average frequency of a term, with all its readings.
+ */
+export type AverageFrequencyListTerm = Map<string, AverageFrequencyListReading>;
+/**
+ * The number of dictionary frequencies used to compute the average.
+ */
+export type AverageFrequencyListReading = {
     /**
-     * Contains the average frequency of a term, with all its readings.
+     * The current average frequency.
      */
-    [term: string]: {
-        /**
-         * Contains the average frequency of a reading.
-         */
-        [reading: string]: {
-            /**
-             * The current average frequency.
-             */
-            currentAvg: number;
-            /**
-             * The number of dictionary frequencies used to compute the average.
-             */
-            count: number;
-        };
-    };
+    currentAvg: number;
+    /**
+     * The number of dictionary frequencies used to compute the average.
+     */
+    count: number;
 };

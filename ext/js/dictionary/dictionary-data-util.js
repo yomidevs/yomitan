@@ -55,17 +55,18 @@ export function groupTermTags(dictionaryEntry) {
  * @returns {import('dictionary-data-util').DictionaryFrequency<import('dictionary-data-util').TermFrequency>[]}
  */
 export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
-    const {headwords, frequencies: sourceFrequencies} = dictionaryEntry;
+    const { headwords, frequencies: sourceFrequencies } = dictionaryEntry;
 
     /** @type {import('dictionary-data-util').TermFrequenciesMap1} */
     const map1 = new Map();
     /** @type {Map<string, string>} */
     const aliasMap = new Map();
-    for (const {headwordIndex, dictionary, dictionaryAlias, hasReading, frequency, displayValue} of sourceFrequencies) {
-        const {term, reading} = headwords[headwordIndex];
+
+    for (const { headwordIndex, dictionary, dictionaryAlias, hasReading, frequency, displayValue } of sourceFrequencies) {
+        const { term, reading } = headwords[headwordIndex];
 
         let map2 = map1.get(dictionary);
-        if (typeof map2 === 'undefined') {
+        if (!map2) {
             map2 = new Map();
             map1.set(dictionary, map2);
             aliasMap.set(dictionary, dictionaryAlias);
@@ -74,70 +75,102 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
         const readingKey = hasReading ? reading : null;
         const key = createMapKey([term, readingKey]);
         let frequencyData = map2.get(key);
-        if (typeof frequencyData === 'undefined') {
-            frequencyData = {term, reading: readingKey, values: new Map()};
+        if (!frequencyData) {
+            frequencyData = { term, reading: readingKey, values: new Map() };
             map2.set(key, frequencyData);
         }
 
-        frequencyData.values.set(createMapKey([frequency, displayValue]), {frequency, displayValue});
+        frequencyData.values.set(createMapKey([frequency, displayValue]), { frequency, displayValue });
     }
 
     const results = [];
 
-    /** @type {import('dictionary').AverageFrequencyListTerm} */
-    const averages = {};
+    /** @type {import('dictionary').AverageFrequencyListGroup} */
+    const averages = new Map();
     for (const [dictionary, map2] of map1.entries()) {
         const frequencies = [];
         const dictionaryAlias = aliasMap.get(dictionary) ?? dictionary;
-        for (let {term, reading, values} of map2.values()) {
+
+        for (let { term, reading, values } of map2.values()) {
             frequencies.push({
                 term,
                 reading,
                 values: [...values.values()],
             });
+
             const valuesArray = [...values.values()];
-            if (reading === null) { reading = ''; }
-            let {currentAvg, count} = averages[term]?.[reading] ?? {currentAvg: 1, count: 0};
-            if (valuesArray[0].frequency === null) { continue; }
+            if (reading === null) reading = '';
 
-            currentAvg = (count / (currentAvg)) + (1 / (valuesArray[0].frequency));
-            currentAvg = (count + 1) / currentAvg;
-            count += 1;
+            let termMap = averages.get(term);
+            if (!termMap) {
+                termMap = new Map();
+                averages.set(term, termMap);
+            }
 
-            averages[term] = {
-                ...averages[term],
-                [reading]: {
-                    currentAvg, count,
-                },
-            };
+            let frequencyData = termMap.get(reading) ?? { currentAvg: 1, count: 0 };
+
+            if (valuesArray[0].frequency === null) continue;
+
+            frequencyData.currentAvg = (frequencyData.count / frequencyData.currentAvg) + (1 / valuesArray[0].frequency);
+            frequencyData.currentAvg = (frequencyData.count + 1) / frequencyData.currentAvg;
+            frequencyData.count += 1;
+
+            termMap.set(reading, frequencyData);
         }
-        const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
+
+        const currentDictionaryInfo = dictionaryInfo.find(({ title }) => title === dictionary);
         const freqCount = currentDictionaryInfo?.counts?.termMeta.freq ?? 0;
-        results.push({dictionary, frequencies, dictionaryAlias, freqCount});
+        results.push({ dictionary, frequencies, dictionaryAlias, freqCount });
     }
 
-    for (const currentTerm of Object.keys(averages)) {
-        const readingArray = Object.keys(averages[currentTerm]);
+    // Merge readings if one is null and there's only two readings
+    for (const currentTerm of averages.keys()) {
+        const readingsMap = averages.get(currentTerm);
+        if (!readingsMap) continue; // Skip if readingsMap is undefined
+
+        const readingArray = Array.from(readingsMap.keys());
         const nullIndex = readingArray.indexOf('');
+
         if (readingArray.length === 2 && nullIndex >= 0) {
-            const avg1 = averages[currentTerm][readingArray[0]].currentAvg;
-            const count1 = averages[currentTerm][readingArray[0]].count;
-            const avg2 = averages[currentTerm][readingArray[1]].currentAvg;
-            const count2 = averages[currentTerm][readingArray[1]].count;
+            const key1 = readingArray[0];
+            const key2 = readingArray[1];
+
+            const value1 = readingsMap.get(key1);
+            const value2 = readingsMap.get(key2);
+
+            if (!value1 || !value2) continue; // Skip if any value is undefined
+
+            const avg1 = value1.currentAvg;
+            const count1 = value1.count;
+            const avg2 = value2.currentAvg;
+            const count2 = value2.count;
 
             const newcount = count1 + count2;
             const newavg = newcount / (count1 / avg1 + count2 / avg2);
 
-            averages[currentTerm][readingArray[nullIndex === 0 ? 1 : 0]] = {currentAvg: newavg, count: newcount};
-            delete averages[currentTerm][''];
+            const validKey = nullIndex === 0 ? key2 : key1;
+            readingsMap.set(validKey, { currentAvg: newavg, count: newcount });
+            readingsMap.delete('');
         }
     }
 
-    const avgFrequencies = Object.keys(averages).flatMap((termName) => Object.keys(averages[termName]).map((readingName) => ({term: termName, reading: readingName, values: [{frequency: Math.round(averages[termName][readingName].currentAvg), displayValue: Math.round(averages[termName][readingName].currentAvg).toString()}]})));
-    results.push({dictionary: 'Average', frequencies: avgFrequencies, dictionaryAlias: 'Average'});
+    // Convert averages Map back to array format
+    const avgFrequencies = [...averages.entries()].flatMap(([termName, termMap]) =>
+        [...termMap.entries()].map(([readingName, data]) => ({
+            term: termName,
+            reading: readingName,
+            values: [{
+                frequency: Math.round(data.currentAvg),
+                displayValue: Math.round(data.currentAvg).toString(),
+            }],
+        }))
+    );
+
+    results.push({ dictionary: 'Average', frequencies: avgFrequencies, dictionaryAlias: 'Average', freqCount: 99999});
 
     return results;
 }
+
 
 /**
  * @param {import('dictionary').KanjiFrequency[]} sourceFrequencies
