@@ -48,16 +48,26 @@ export const ancientGreekTransforms = {
         },
 
         // nouns
+        // {term: 'σκια', source: 'σκιαν', rule: 'n', reasons: ['accusative singular']},
+        // {term: 'σκια', source: 'σκιας', rule: 'n', reasons: ['genitive singular']},
+        // {term: 'σκια', source: 'σκιαι', rule: 'n', reasons: ['nominative plural']},
+        // {term: 'σκια', source: 'σκιων', rule: 'n', reasons: ['genitive plural']},
+        // {term: 'σκια', source: 'σκιαις', rule: 'n', reasons: ['dative plural']},
+        // {term: 'σκια', source: 'σκιας', rule: 'n', reasons: ['accusative plural']},
+        // {term: 'σκια', source: 'σκιαι', rule: 'n', reasons: ['vocative plural']},
+
         'accusative singular': {
             name: 'accusative singular',
             rules: [
                 suffixInflection('ον', 'ος', [], ['n']),
+                suffixInflection('αν', 'α', [], ['n']),
             ],
         },
         'genitive singular': {
             name: 'genitive singular',
             rules: [
                 suffixInflection('ου', 'ος', [], ['n']),
+                suffixInflection('ας', 'α', [], ['n']),
             ],
         },
         'dative singular': {
@@ -76,30 +86,35 @@ export const ancientGreekTransforms = {
             name: 'nominative plural',
             rules: [
                 suffixInflection('οι', 'ος', [], ['n']),
+                suffixInflection('αι', 'α', [], ['n']),
             ],
         },
         'genitive plural': {
             name: 'genitive plural',
             rules: [
                 suffixInflection('ων', 'ος', [], ['n']),
+                suffixInflection('ων', 'α', [], ['n']),
             ],
         },
         'dative plural': {
             name: 'dative plural',
             rules: [
                 suffixInflection('οις', 'ος', [], ['n']),
+                suffixInflection('αις', 'α', [], ['n']),
             ],
         },
         'accusative plural': {
             name: 'accusative plural',
             rules: [
                 suffixInflection('ους', 'ος', [], ['n']),
+                suffixInflection('ας', 'α', [], ['n']),
             ],
         },
         'vocative plural': {
             name: 'vocative plural',
             rules: [
                 suffixInflection('οι', 'ος', [], ['n']),
+                suffixInflection('αι', 'α', [], ['n']),
             ],
         },
         // adjectives
