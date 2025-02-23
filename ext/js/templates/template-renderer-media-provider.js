@@ -165,7 +165,7 @@ export class TemplateRendererMediaProvider {
         if (Array.isArray(textFurigana)) {
             for (const entry of textFurigana) {
                 if (entry.text !== text || entry.readingMode !== readingMode) { continue; }
-                return entry.details;
+                return entry.detailsHtml;
             }
         }
         this._addRequirement({
@@ -185,11 +185,11 @@ export class TemplateRendererMediaProvider {
     _getTextFuriganaPlain(media, text, namedArgs) {
         if (typeof text !== 'string') { return null; }
         const readingMode = this._normalizeReadingMode(namedArgs.readingMode);
-        const {textFuriganaPlain} = media;
-        if (Array.isArray(textFuriganaPlain)) {
-            for (const entry of textFuriganaPlain) {
+        const {textFurigana} = media;
+        if (Array.isArray(textFurigana)) {
+            for (const entry of textFurigana) {
                 if (entry.text !== text || entry.readingMode !== readingMode) { continue; }
-                return entry.details;
+                return entry.detailsPlain;
             }
         }
         this._addRequirement({

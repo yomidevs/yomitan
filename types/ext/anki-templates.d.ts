@@ -34,7 +34,6 @@ export type Media = {
     clipboardText?: MediaObject;
     popupSelectionText?: MediaObject;
     textFurigana?: TextFuriganaSegment[];
-    textFuriganaPlain?: TextFuriganaSegment[];
     dictionaryMedia?: DictionaryMedia;
 };
 
@@ -51,7 +50,8 @@ export type MediaSimpleType = (
 export type TextFuriganaSegment = {
     text: string;
     readingMode: TextFuriganaReadingMode;
-    details: MediaObject;
+    detailsHtml: MediaObject;
+    detailsPlain: MediaObject;
 };
 
 export type TextFuriganaReadingMode = 'hiragana' | 'katakana' | null;

@@ -402,8 +402,6 @@ export class AnkiNoteBuilder {
         let injectPopupSelectionText = false;
         /** @type {import('anki-note-builder').TextFuriganaDetails[]} */
         const textFuriganaDetails = [];
-        /** @type {import('anki-note-builder').TextFuriganaDetails[]} */
-        const textFuriganaPlainDetails = [];
         /** @type {import('api').InjectAnkiNoteMediaDictionaryMediaDetails[]} */
         const dictionaryMediaDetails = [];
         for (const requirement of requirements) {
@@ -415,15 +413,10 @@ export class AnkiNoteBuilder {
                 case 'clipboardText': injectClipboardText = true; break;
                 case 'popupSelectionText': injectPopupSelectionText = true; break;
                 case 'textFurigana':
-                    {
-                        const {text, readingMode} = requirement;
-                        textFuriganaDetails.push({text, readingMode});
-                    }
-                    break;
                 case 'textFuriganaPlain':
                     {
                         const {text, readingMode} = requirement;
-                        textFuriganaPlainDetails.push({text, readingMode});
+                        textFuriganaDetails.push({text, readingMode});
                     }
                     break;
                 case 'dictionaryMedia':
@@ -467,14 +460,6 @@ export class AnkiNoteBuilder {
                 textFuriganaPromise = this._getTextFurigana(textFuriganaDetails, optionsContext, scanLength);
             }
         }
-        let textFuriganaPlainPromise = null;
-        if (textFuriganaPlainDetails.length > 0) {
-            const textParsingOptions = mediaOptions.textParsing;
-            if (typeof textParsingOptions === 'object' && textParsingOptions !== null) {
-                const {optionsContext, scanLength} = textParsingOptions;
-                textFuriganaPlainPromise = this._getTextFuriganaPlain(textFuriganaPlainDetails, optionsContext, scanLength);
-            }
-        }
 
         // Inject media
         const popupSelectionText = injectPopupSelectionText ? this._getPopupSelectionText() : null;
@@ -488,7 +473,6 @@ export class AnkiNoteBuilder {
         );
         const {audioFileName, screenshotFileName, clipboardImageFileName, clipboardText, dictionaryMedia: dictionaryMediaArray, errors} = injectedMedia;
         const textFurigana = textFuriganaPromise !== null ? await textFuriganaPromise : [];
-        const textFuriganaPlain = textFuriganaPlainPromise !== null ? await textFuriganaPlainPromise : [];
 
         // Format results
         /** @type {import('anki-templates').DictionaryMedia} */
@@ -509,7 +493,6 @@ export class AnkiNoteBuilder {
             clipboardText: (typeof clipboardText === 'string' ? {value: clipboardText} : void 0),
             popupSelectionText: (typeof popupSelectionText === 'string' ? {value: popupSelectionText} : void 0),
             textFurigana,
-            textFuriganaPlain,
             dictionaryMedia,
         };
         return {media, errors};
@@ -540,8 +523,9 @@ export class AnkiNoteBuilder {
                 break;
             }
             if (data !== null) {
-                const value = this._createFuriganaHtml(data, readingMode);
-                results.push({text, readingMode, details: {value}});
+                const valueHtml = this._createFuriganaHtml(data, readingMode);
+                const valuePlain = this._createFuriganaPlain(data, readingMode);
+                results.push({text, readingMode, detailsHtml: {value: valueHtml}, detailsPlain: {value: valuePlain}});
             }
         }
         return results;
@@ -567,30 +551,6 @@ export class AnkiNoteBuilder {
             result += '</span>';
         }
         return result;
-    }
-
-    /**
-     * @param {import('anki-note-builder').TextFuriganaDetails[]} entries
-     * @param {import('settings').OptionsContext} optionsContext
-     * @param {number} scanLength
-     * @returns {Promise<import('anki-templates').TextFuriganaSegment[]>}
-     */
-    async _getTextFuriganaPlain(entries, optionsContext, scanLength) {
-        const results = [];
-        for (const {text, readingMode} of entries) {
-            const parseResults = await this._api.parseText(text, optionsContext, scanLength, true, false);
-            let data = null;
-            for (const {source, content} of parseResults) {
-                if (source !== 'scanning-parser') { continue; }
-                data = content;
-                break;
-            }
-            if (data !== null) {
-                const value = this._createFuriganaPlain(data, readingMode);
-                results.push({text, readingMode, details: {value}});
-            }
-        }
-        return results;
     }
 
     /**
