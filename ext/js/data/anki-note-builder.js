@@ -604,12 +604,13 @@ export class AnkiNoteBuilder {
             for (const {text, reading} of term) {
                 if (reading.length > 0) {
                     const reading2 = this._convertReading(reading, readingMode);
-                    result += `${text}[${reading2}]`;
+                    result += ` ${text}[${reading2}]`;
                 } else {
                     result += text;
                 }
             }
         }
+        result = result.substring(1);
         return result;
     }
 
