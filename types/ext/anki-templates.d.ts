@@ -34,6 +34,7 @@ export type Media = {
     clipboardText?: MediaObject;
     popupSelectionText?: MediaObject;
     textFurigana?: TextFuriganaSegment[];
+    textFuriganaPlain?: TextFuriganaSegment[];
     dictionaryMedia?: DictionaryMedia;
 };
 

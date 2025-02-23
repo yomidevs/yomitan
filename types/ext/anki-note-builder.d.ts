@@ -77,7 +77,7 @@ export type RequirementGeneric = {
 };
 
 export type RequirementTextFurigana = {
-    type: 'textFurigana';
+    type: 'textFurigana' | 'textFuriganaPlain';
     text: string;
     readingMode: AnkiTemplates.TextFuriganaReadingMode;
 };

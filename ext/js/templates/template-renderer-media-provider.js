@@ -103,6 +103,7 @@ export class TemplateRendererMediaProvider {
             case 'clipboardText': return this._getSimpleMediaData(media, 'clipboardText');
             case 'popupSelectionText': return this._getSimpleMediaData(media, 'popupSelectionText');
             case 'textFurigana': return this._getTextFurigana(media, args[1], namedArgs);
+            case 'textFuriganaPlain': return this._getTextFuriganaPlain(media, args[1], namedArgs);
             case 'dictionaryMedia': return this._getDictionaryMedia(media, args[1], namedArgs);
             default: return null;
         }
@@ -169,6 +170,30 @@ export class TemplateRendererMediaProvider {
         }
         this._addRequirement({
             type: 'textFurigana',
+            text,
+            readingMode,
+        });
+        return null;
+    }
+
+    /**
+     * @param {import('anki-templates').Media} media
+     * @param {unknown} text
+     * @param {import('core').SerializableObject} namedArgs
+     * @returns {?import('anki-templates').MediaObject}
+     */
+    _getTextFuriganaPlain(media, text, namedArgs) {
+        if (typeof text !== 'string') { return null; }
+        const readingMode = this._normalizeReadingMode(namedArgs.readingMode);
+        const {textFuriganaPlain} = media;
+        if (Array.isArray(textFuriganaPlain)) {
+            for (const entry of textFuriganaPlain) {
+                if (entry.text !== text || entry.readingMode !== readingMode) { continue; }
+                return entry.details;
+            }
+        }
+        this._addRequirement({
+            type: 'textFuriganaPlain',
             text,
             readingMode,
         });
