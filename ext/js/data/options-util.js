@@ -571,6 +571,7 @@ export class OptionsUtil {
             this._updateVersion57,
             this._updateVersion58,
             this._updateVersion59,
+            this._updateVersion60,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1591,6 +1592,17 @@ export class OptionsUtil {
                     fields[field] = {value, overwriteMode: 'coalesce'};
                 }
             }
+        }
+    }
+
+    /**
+     *  - Replaced audio.playFallbackSound with audio.fallbackSoundType
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion60(options) {
+        for (const profile of options.profiles) {
+            profile.options.audio.fallbackSoundType = profile.options.audio.playFallbackSound ? 'click' : 'none';
+            delete profile.options.audio.playFallbackSound;
         }
     }
 

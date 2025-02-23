@@ -391,7 +391,7 @@
                                     "enabled",
                                     "volume",
                                     "autoPlay",
-                                    "playFallbackSound",
+                                    "fallbackSoundType",
                                     "sources"
                                 ],
                                 "properties": {
@@ -409,9 +409,10 @@
                                         "type": "boolean",
                                         "default": false
                                     },
-                                    "playFallbackSound": {
-                                        "type": "boolean",
-                                        "default": true
+                                    "fallbackSoundType": {
+                                        "type": "string",
+                                        "enum": ["none", "click", "bloop"],
+                                        "default": "click"
                                     },
                                     "sources": {
                                         "type": "array",
