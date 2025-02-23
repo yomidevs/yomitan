@@ -1969,11 +1969,11 @@ button.footer-notification-close-button {
     display: none;
 }
 
-:root[data-average-frequency=false] .frequency-group-item:not([data-details='Average']) {
+:root[data-average-frequency=true] .frequency-group-item:not([data-details='Average']) {
     display: none;
 }
 
-:root[data-average-frequency=true] .frequency-group-item[data-details='Average'] {
+:root[data-average-frequency=false] .frequency-group-item[data-details='Average'] {
     display: none;
 }
 
