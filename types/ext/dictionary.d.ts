@@ -537,10 +537,12 @@ export type TermSource = {
  * Dictionaries containing the harmonic mean frequency of specific term-reading pairs.
  */
 export type AverageFrequencyListGroup = Map<string, AverageFrequencyListTerm>;
+
 /**
  * Contains the average frequency of a term, with all its readings.
  */
 export type AverageFrequencyListTerm = Map<string, AverageFrequencyListReading>;
+
 /**
  * The number of dictionary frequencies used to compute the average.
  */
