@@ -77,10 +77,12 @@ export type RequirementGeneric = {
 };
 
 export type RequirementTextFurigana = {
-    type: 'textFurigana' | 'textFuriganaPlain';
+    type: 'textFurigana';
     text: string;
     readingMode: AnkiTemplates.TextFuriganaReadingMode;
 };
+
+export type TextFuriganaFormats = 'furiganaHtml' | 'furiganaPlain';
 
 export type RequirementDictionaryMedia = {
     type: 'dictionaryMedia';

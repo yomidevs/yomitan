@@ -413,7 +413,6 @@ export class AnkiNoteBuilder {
                 case 'clipboardText': injectClipboardText = true; break;
                 case 'popupSelectionText': injectPopupSelectionText = true; break;
                 case 'textFurigana':
-                case 'textFuriganaPlain':
                     {
                         const {text, readingMode} = requirement;
                         textFuriganaDetails.push({text, readingMode});
