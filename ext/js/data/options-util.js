@@ -571,6 +571,7 @@ export class OptionsUtil {
             this._updateVersion57,
             this._updateVersion58,
             this._updateVersion59,
+            this._updateVersion60,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1592,6 +1593,14 @@ export class OptionsUtil {
                 }
             }
         }
+    }
+
+    /**
+     *  - Added sentence-furigana-plain handlebar
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion60(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v60.handlebars');
     }
 
     /**
