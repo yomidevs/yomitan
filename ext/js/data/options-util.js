@@ -572,6 +572,7 @@ export class OptionsUtil {
             this._updateVersion58,
             this._updateVersion59,
             this._updateVersion60,
+            this._updateVersion61,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1604,6 +1605,14 @@ export class OptionsUtil {
             profile.options.audio.fallbackSoundType = profile.options.audio.playFallbackSound ? 'click' : 'none';
             delete profile.options.audio.playFallbackSound;
         }
+    }
+
+    /**
+     *  - Added sentence-furigana-plain handlebar
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion61(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v61.handlebars');
     }
 
     /**

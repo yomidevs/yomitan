@@ -522,8 +522,9 @@ export class AnkiNoteBuilder {
                 break;
             }
             if (data !== null) {
-                const value = this._createFuriganaHtml(data, readingMode);
-                results.push({text, readingMode, details: {value}});
+                const valueHtml = this._createFuriganaHtml(data, readingMode);
+                const valuePlain = this._createFuriganaPlain(data, readingMode);
+                results.push({text, readingMode, detailsHtml: {value: valueHtml}, detailsPlain: {value: valuePlain}});
             }
         }
         return results;
@@ -548,6 +549,27 @@ export class AnkiNoteBuilder {
             }
             result += '</span>';
         }
+        return result;
+    }
+
+    /**
+     * @param {import('api').ParseTextLine[]} data
+     * @param {?import('anki-templates').TextFuriganaReadingMode} readingMode
+     * @returns {string}
+     */
+    _createFuriganaPlain(data, readingMode) {
+        let result = '';
+        for (const term of data) {
+            for (const {text, reading} of term) {
+                if (reading.length > 0) {
+                    const reading2 = this._convertReading(reading, readingMode);
+                    result += ` ${text}[${reading2}]`;
+                } else {
+                    result += text;
+                }
+            }
+        }
+        result = result.substring(1);
         return result;
     }
 

@@ -63,6 +63,7 @@ export function getStandardFieldMarkers(type) {
                 'popup-selection-text',
                 'sentence',
                 'sentence-furigana',
+                'sentence-furigana-plain',
                 'tags',
                 'url',
             ];
@@ -91,6 +92,7 @@ export function getStandardFieldMarkers(type) {
                 'popup-selection-text',
                 'sentence',
                 'sentence-furigana',
+                'sentence-furigana-plain',
                 'stroke-count',
                 'tags',
                 'url',
