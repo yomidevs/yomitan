@@ -87,6 +87,7 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
     /** @type {import('dictionary').AverageFrequencyListGroup} */
     const averages = new Map();
     for (const [dictionary, map2] of map1.entries()) {
+        /** @type {import('dictionary-data-util').TermFrequency[]} */
         const frequencies = [];
         const dictionaryAlias = aliasMap.get(dictionary) ?? dictionary;
         for (const {term, reading, values} of map2.values()) {
@@ -120,6 +121,16 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
         results.push({dictionary, frequencies, dictionaryAlias, freqCount});
     }
 
+    results.push({dictionary: 'Average', frequencies: makeAverageFrequencyArray(averages), dictionaryAlias: 'Average', freqCount: 99999});
+
+    return results;
+}
+
+/**
+ * @param {import('dictionary').AverageFrequencyListGroup} averages
+ * @returns {import('dictionary-data-util').TermFrequency[]}
+ */
+function makeAverageFrequencyArray(averages) {
     // Merge readings if one is null and there's only two readings
     for (const currentTerm of averages.keys()) {
         const readingsMap = averages.get(currentTerm);
@@ -152,7 +163,7 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
     }
 
     // Convert averages Map back to array format
-    const avgFrequencies = [...averages.entries()].flatMap(([termName, termMap]) => [...termMap.entries()].map(([readingName, data]) => ({
+    return [...averages.entries()].flatMap(([termName, termMap]) => [...termMap.entries()].map(([readingName, data]) => ({
         term: termName,
         reading: readingName,
         values: [{
@@ -160,10 +171,6 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
             displayValue: Math.round(data.currentAvg).toString(),
         }],
     })));
-
-    results.push({dictionary: 'Average', frequencies: avgFrequencies, dictionaryAlias: 'Average', freqCount: 99999});
-
-    return results;
 }
 
 /**
