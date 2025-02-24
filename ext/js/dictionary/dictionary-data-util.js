@@ -143,6 +143,7 @@ function makeAverageFrequencyData(termFrequency, averageTerm) {
  */
 function makeAverageFrequencyArray(averages) {
     // Merge readings if one is null and there's only two readings
+    // More than one non-null reading cannot be merged since it cannot be determined which reading to merge with
     for (const currentTerm of averages.keys()) {
         const readingsMap = averages.get(currentTerm);
         if (!readingsMap) { continue; } // Skip if readingsMap is undefined
