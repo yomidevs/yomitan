@@ -184,6 +184,7 @@ export class Backend {
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
             ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)],
+            ['heartbeat',                    this._onApiHeartbeat.bind(this)],
         ]);
 
         /** @type {import('api').PmApiMap} */
@@ -1043,6 +1044,11 @@ export class Backend {
     /** @type {import('api').ApiHandler<'getLanguageSummaries'>} */
     _onApiGetLanguageSummaries() {
         return getLanguageSummaries();
+    }
+
+    /** @type {import('api').ApiHandler<'heartbeat'>} */
+    _onApiHeartbeat() {
+        return void 0;
     }
 
     // Command handlers
