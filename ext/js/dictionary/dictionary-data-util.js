@@ -121,7 +121,7 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
         results.push({dictionary, frequencies, dictionaryAlias, freqCount});
     }
 
-    results.push({dictionary: 'Average', frequencies: makeAverageFrequencyArray(averages), dictionaryAlias: 'Average', freqCount: 99999});
+    results.push({dictionary: 'Average', frequencies: makeAverageFrequencyArray(averages), dictionaryAlias: 'Average', freqCount: 1});
 
     return results;
 }
