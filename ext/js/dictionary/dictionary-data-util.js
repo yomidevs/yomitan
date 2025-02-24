@@ -61,12 +61,11 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
     const map1 = new Map();
     /** @type {Map<string, string>} */
     const aliasMap = new Map();
-
     for (const {headwordIndex, dictionary, dictionaryAlias, hasReading, frequency, displayValue} of sourceFrequencies) {
         const {term, reading} = headwords[headwordIndex];
 
         let map2 = map1.get(dictionary);
-        if (!map2) {
+        if (typeof map2 === 'undefined') {
             map2 = new Map();
             map1.set(dictionary, map2);
             aliasMap.set(dictionary, dictionaryAlias);
@@ -75,7 +74,7 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
         const readingKey = hasReading ? reading : null;
         const key = createMapKey([term, readingKey]);
         let frequencyData = map2.get(key);
-        if (!frequencyData) {
+        if (typeof frequencyData === 'undefined') {
             frequencyData = {term, reading: readingKey, values: new Map()};
             map2.set(key, frequencyData);
         }
@@ -90,7 +89,6 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
     for (const [dictionary, map2] of map1.entries()) {
         const frequencies = [];
         const dictionaryAlias = aliasMap.get(dictionary) ?? dictionary;
-
         for (let {term, reading, values} of map2.values()) {
             frequencies.push({
                 term,
@@ -117,7 +115,6 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
 
             termMap.set(reading, frequencyData);
         }
-
         const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
         const freqCount = currentDictionaryInfo?.counts?.termMeta.freq ?? 0;
         results.push({dictionary, frequencies, dictionaryAlias, freqCount});
@@ -168,7 +165,6 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
 
     return results;
 }
-
 
 /**
  * @param {import('dictionary').KanjiFrequency[]} sourceFrequencies
