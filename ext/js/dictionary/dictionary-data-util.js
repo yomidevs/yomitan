@@ -100,11 +100,9 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
             const valuesArray = [...values.values()];
             const newReading = reading ?? '';
 
-            let termMap = averages.get(term);
-            if (!termMap) {
-                termMap = new Map();
-                averages.set(term, termMap);
-            }
+            const averageTerm = averages.get(term);
+            /** @type {import('dictionary').AverageFrequencyListTerm} */
+            const termMap = typeof averageTerm === 'undefined' ? new Map() : averageTerm;
 
             const frequencyData = termMap.get(newReading) ?? {currentAvg: 1, count: 0};
 
@@ -115,6 +113,7 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
             frequencyData.count += 1;
 
             termMap.set(newReading, frequencyData);
+            averages.set(term, termMap);
         }
         const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
         const freqCount = currentDictionaryInfo?.counts?.termMeta.freq ?? 0;
