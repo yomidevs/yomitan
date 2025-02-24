@@ -102,6 +102,7 @@
                                     "showGuide",
                                     "enableContextMenuScanSelected",
                                     "compactTags",
+                                    "averageFrequency",
                                     "glossaryLayoutMode",
                                     "mainDictionary",
                                     "popupTheme",
@@ -233,6 +234,10 @@
                                         "default": true
                                     },
                                     "compactTags": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "averageFrequency": {
                                         "type": "boolean",
                                         "default": false
                                     },
