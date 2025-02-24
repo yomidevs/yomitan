@@ -167,9 +167,11 @@ export type AudioOptions = {
     enabled: boolean;
     volume: number;
     autoPlay: boolean;
-    playFallbackSound: boolean;
+    fallbackSoundType: FallbackSoundType;
     sources: AudioSourceOptions[];
 };
+
+export type FallbackSoundType = 'none' | 'click' | 'bloop';
 
 export type AudioSourceOptions = {
     type: AudioSourceType;
