@@ -76,7 +76,7 @@ function createProfileOptionsTestData1() {
             sources: ['jpod101', 'text-to-speech', 'custom', 'jpod101-alternate'],
             volume: 100,
             autoPlay: false,
-            playFallbackSound: true,
+            fallbackSoundType: 'click',
             customSourceUrl: 'http://localhost/audio.mp3?term={expression}&reading={reading}',
             textToSpeechVoice: 'example-voice',
         },
@@ -337,7 +337,7 @@ function createProfileOptionsUpdatedTestData1() {
             ],
             volume: 100,
             autoPlay: false,
-            playFallbackSound: true,
+            fallbackSoundType: 'click',
         },
         scanning: {
             selectText: true,
@@ -680,7 +680,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 60,
+        version: 61,
         global: {
             database: {
                 prefixWildcardsSupported: false,
