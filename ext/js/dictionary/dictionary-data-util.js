@@ -89,7 +89,7 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
     for (const [dictionary, map2] of map1.entries()) {
         const frequencies = [];
         const dictionaryAlias = aliasMap.get(dictionary) ?? dictionary;
-        for (let {term, reading, values} of map2.values()) {
+        for (const {term, reading, values} of map2.values()) {
             frequencies.push({
                 term,
                 reading,
@@ -97,7 +97,8 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
             });
 
             const valuesArray = [...values.values()];
-            if (reading === null) { reading = ''; }
+            let newReading = reading;
+            if (newReading === null) { newReading = ''; }
 
             let termMap = averages.get(term);
             if (!termMap) {
@@ -105,7 +106,7 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
                 averages.set(term, termMap);
             }
 
-            const frequencyData = termMap.get(reading) ?? {currentAvg: 1, count: 0};
+            const frequencyData = termMap.get(newReading) ?? {currentAvg: 1, count: 0};
 
             if (valuesArray[0].frequency === null) { continue; }
 
@@ -113,7 +114,7 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
             frequencyData.currentAvg = (frequencyData.count + 1) / frequencyData.currentAvg;
             frequencyData.count += 1;
 
-            termMap.set(reading, frequencyData);
+            termMap.set(newReading, frequencyData);
         }
         const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
         const freqCount = currentDictionaryInfo?.counts?.termMeta.freq ?? 0;
