@@ -97,8 +97,7 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
             });
 
             const valuesArray = [...values.values()];
-            let newReading = reading;
-            if (newReading === null) { newReading = ''; }
+            const newReading = reading ?? '';
 
             let termMap = averages.get(term);
             if (!termMap) {
