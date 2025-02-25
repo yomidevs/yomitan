@@ -74,7 +74,8 @@
                             "sentenceParsing",
                             "inputs",
                             "clipboard",
-                            "accessibility"
+                            "accessibility",
+                            "openAi"
                         ],
                         "properties": {
                             "general": {
@@ -1281,6 +1282,20 @@
                                     "forceGoogleDocsHtmlRendering": {
                                         "type": "boolean",
                                         "default": false
+                                    }
+                                }
+                            },
+                            "openAi": {
+                                "type": "object",
+                                "required": ["apiKey", "model"],
+                                "properties": {
+                                    "apiKey": {
+                                        "type": "string",
+                                        "default": ""
+                                    },
+                                    "model": {
+                                        "type": "string",
+                                        "default": "gpt-4o-mini"
                                     }
                                 }
                             }

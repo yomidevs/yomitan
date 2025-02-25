@@ -42,7 +42,10 @@ await Application.main(true, async (application) => {
     const hotkeyHandler = new HotkeyHandler();
     hotkeyHandler.prepare(application.crossFrame);
 
-    const display = new Display(application, 'search', documentFocusController, hotkeyHandler);
+    const settingsController = new SettingsController(application);
+    await settingsController.prepare();
+
+    const display = new Display(application, 'search', documentFocusController, hotkeyHandler, settingsController);
     await display.prepare();
 
     const displayAudio = new DisplayAudio(display);
@@ -56,9 +59,6 @@ await Application.main(true, async (application) => {
 
     const modalController = new ModalController([]);
     await modalController.prepare();
-
-    const settingsController = new SettingsController(application);
-    await settingsController.prepare();
 
     const settingsDisplayController = new SettingsDisplayController(settingsController, modalController);
     await settingsDisplayController.prepare();
