@@ -34,6 +34,26 @@ const tests = [
         category: 'nouns',
         valid: true,
         tests: [
+            // 1st declension, feminine
+            {term: 'σκια', source: 'σκιας', rule: 'n', reasons: ['genitive singular']},
+            {term: 'σκια', source: 'σκιαν', rule: 'n', reasons: ['accusative singular']},
+            {term: 'σκια', source: 'σκιαι', rule: 'n', reasons: ['nominative plural']},
+            {term: 'σκια', source: 'σκιων', rule: 'n', reasons: ['genitive plural']},
+            {term: 'σκια', source: 'σκιαις', rule: 'n', reasons: ['dative plural']},
+            {term: 'σκια', source: 'σκιας', rule: 'n', reasons: ['accusative plural']},
+            {term: 'σκια', source: 'σκιαι', rule: 'n', reasons: ['vocative plural']},
+
+            // 1st declension, masculine
+            {term: 'νεανιας', source: 'νεανιου', rule: 'n', reasons: ['genitive singular']},
+            {term: 'νεανιας', source: 'νεανια', rule: 'n', reasons: ['dative singular']},
+            {term: 'νεανιας', source: 'νεανιαν', rule: 'n', reasons: ['accusative singular']},
+            {term: 'νεανιας', source: 'νεανια', rule: 'n', reasons: ['vocative singular']},
+            {term: 'νεανιας', source: 'νεανιαι', rule: 'n', reasons: ['nominative plural']},
+            {term: 'νεανιας', source: 'νεανιων', rule: 'n', reasons: ['genitive plural']},
+            {term: 'νεανιας', source: 'νεανιαις', rule: 'n', reasons: ['dative plural']},
+            {term: 'νεανιας', source: 'νεανιαι', rule: 'n', reasons: ['vocative plural']},
+
+            // 2nd declension, masculine
             {term: 'ανθρωπος', source: 'ανθρωπου', rule: 'n', reasons: ['genitive singular']},
             {term: 'ανθρωπος', source: 'ανθρωπω', rule: 'n', reasons: ['dative singular']},
             {term: 'ανθρωπος', source: 'ανθρωπον', rule: 'n', reasons: ['accusative singular']},
@@ -44,13 +64,8 @@ const tests = [
             {term: 'ανθρωπος', source: 'ανθρωπους', rule: 'n', reasons: ['accusative plural']},
             {term: 'ανθρωπος', source: 'ανθρωποι', rule: 'n', reasons: ['vocative plural']},
 
-            {term: 'σκια', source: 'σκιαν', rule: 'n', reasons: ['accusative singular']},
-            {term: 'σκια', source: 'σκιας', rule: 'n', reasons: ['genitive singular']},
-            {term: 'σκια', source: 'σκιαι', rule: 'n', reasons: ['nominative plural']},
-            {term: 'σκια', source: 'σκιων', rule: 'n', reasons: ['genitive plural']},
-            {term: 'σκια', source: 'σκιαις', rule: 'n', reasons: ['dative plural']},
-            {term: 'σκια', source: 'σκιας', rule: 'n', reasons: ['accusative plural']},
-            {term: 'σκια', source: 'σκιαι', rule: 'n', reasons: ['vocative plural']},
+            // word formation
+            {term: 'πονεω', source: 'πονος', rule: 'v', reasons: ['nominalization']},
         ],
     },
     {

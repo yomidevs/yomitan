@@ -46,40 +46,35 @@ export const ancientGreekTransforms = {
                 suffixInflection('ει', 'εω', [], ['v']),
             ],
         },
-
         // nouns
-        // {term: 'σκια', source: 'σκιαν', rule: 'n', reasons: ['accusative singular']},
-        // {term: 'σκια', source: 'σκιας', rule: 'n', reasons: ['genitive singular']},
-        // {term: 'σκια', source: 'σκιαι', rule: 'n', reasons: ['nominative plural']},
-        // {term: 'σκια', source: 'σκιων', rule: 'n', reasons: ['genitive plural']},
-        // {term: 'σκια', source: 'σκιαις', rule: 'n', reasons: ['dative plural']},
-        // {term: 'σκια', source: 'σκιας', rule: 'n', reasons: ['accusative plural']},
-        // {term: 'σκια', source: 'σκιαι', rule: 'n', reasons: ['vocative plural']},
-
-        'accusative singular': {
-            name: 'accusative singular',
-            rules: [
-                suffixInflection('ον', 'ος', [], ['n']),
-                suffixInflection('αν', 'α', [], ['n']),
-            ],
-        },
         'genitive singular': {
             name: 'genitive singular',
             rules: [
                 suffixInflection('ου', 'ος', [], ['n']),
                 suffixInflection('ας', 'α', [], ['n']),
+                suffixInflection('ου', 'ας', [], ['n']),
             ],
         },
         'dative singular': {
             name: 'dative singular',
             rules: [
                 suffixInflection('ω', 'ος', [], ['n']),
+                suffixInflection('α', 'ας', [], ['n']),
+            ],
+        },
+        'accusative singular': {
+            name: 'accusative singular',
+            rules: [
+                suffixInflection('ον', 'ος', [], ['n']),
+                suffixInflection('αν', 'α', [], ['n']),
+                suffixInflection('αν', 'ας', [], ['n']),
             ],
         },
         'vocative singular': {
             name: 'vocative singular',
             rules: [
                 suffixInflection('ε', 'ος', [], ['n']),
+                suffixInflection('α', 'ας', [], ['n']),
             ],
         },
         'nominative plural': {
@@ -87,6 +82,7 @@ export const ancientGreekTransforms = {
             rules: [
                 suffixInflection('οι', 'ος', [], ['n']),
                 suffixInflection('αι', 'α', [], ['n']),
+                suffixInflection('αι', 'ας', [], ['n']),
             ],
         },
         'genitive plural': {
@@ -94,6 +90,7 @@ export const ancientGreekTransforms = {
             rules: [
                 suffixInflection('ων', 'ος', [], ['n']),
                 suffixInflection('ων', 'α', [], ['n']),
+                suffixInflection('ων', 'ας', [], ['n']),
             ],
         },
         'dative plural': {
@@ -101,6 +98,7 @@ export const ancientGreekTransforms = {
             rules: [
                 suffixInflection('οις', 'ος', [], ['n']),
                 suffixInflection('αις', 'α', [], ['n']),
+                suffixInflection('αις', 'ας', [], ['n']),
             ],
         },
         'accusative plural': {
@@ -115,6 +113,7 @@ export const ancientGreekTransforms = {
             rules: [
                 suffixInflection('οι', 'ος', [], ['n']),
                 suffixInflection('αι', 'α', [], ['n']),
+                suffixInflection('αι', 'ας', [], ['n']),
             ],
         },
         // adjectives
