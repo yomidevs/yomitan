@@ -56,6 +56,7 @@ function createProfileOptionsTestData1() {
             popupScaleRelativeToVisualViewport: true,
             showGuide: true,
             compactTags: false,
+            averageFrequency: false,
             compactGlossaries: false,
             mainDictionary: '',
             popupTheme: 'default',
@@ -76,7 +77,7 @@ function createProfileOptionsTestData1() {
             sources: ['jpod101', 'text-to-speech', 'custom', 'jpod101-alternate'],
             volume: 100,
             autoPlay: false,
-            playFallbackSound: true,
+            fallbackSoundType: 'click',
             customSourceUrl: 'http://localhost/audio.mp3?term={expression}&reading={reading}',
             textToSpeechVoice: 'example-voice',
         },
@@ -288,6 +289,7 @@ function createProfileOptionsUpdatedTestData1() {
             showGuide: true,
             enableContextMenuScanSelected: true,
             compactTags: false,
+            averageFrequency: false,
             glossaryLayoutMode: 'default',
             mainDictionary: '',
             popupTheme: 'light',
@@ -337,7 +339,7 @@ function createProfileOptionsUpdatedTestData1() {
             ],
             volume: 100,
             autoPlay: false,
-            playFallbackSound: true,
+            fallbackSoundType: 'click',
         },
         scanning: {
             selectText: true,
@@ -680,7 +682,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 59,
+        version: 62,
         global: {
             database: {
                 prefixWildcardsSupported: false,

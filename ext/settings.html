@@ -1090,6 +1090,15 @@
                 </div></div>
             </div>
         </div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Average frequencies</div>
+                <div class="settings-item-description">Compress frequency tags into one "Average" frequency tag based on the harmonic mean.</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" data-setting="general.averageFrequency"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
     </div>
 
     <!-- Popup Position & Size -->
@@ -1461,15 +1470,23 @@
                 <label class="toggle"><input type="checkbox" data-setting="audio.autoPlay"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </div>
         </div></div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Enable audio fallback sound</div>
-                <div class="settings-item-description">Play sound when Yomitan fails to fetch audio.</div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Audio fallback sound</div>
+                    <div class="settings-item-description">
+                        The sound to play when Yomitan fails to fetch audio.
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select data-setting="audio.fallbackSoundType">
+                        <option value="none">None</option>
+                        <option value="click">Click</option>
+                        <option value="bloop">Bloop</option>
+                    </select>
+                </div>
             </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="audio.playFallbackSound"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
+        </div>
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Audio volume</div>

@@ -82,6 +82,8 @@ export type RequirementTextFurigana = {
     readingMode: AnkiTemplates.TextFuriganaReadingMode;
 };
 
+export type TextFuriganaFormats = 'furiganaHtml' | 'furiganaPlain';
+
 export type RequirementDictionaryMedia = {
     type: 'dictionaryMedia';
     dictionary: string;

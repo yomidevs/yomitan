@@ -571,6 +571,9 @@ export class OptionsUtil {
             this._updateVersion57,
             this._updateVersion58,
             this._updateVersion59,
+            this._updateVersion60,
+            this._updateVersion61,
+            this._updateVersion62,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1591,6 +1594,35 @@ export class OptionsUtil {
                     fields[field] = {value, overwriteMode: 'coalesce'};
                 }
             }
+        }
+    }
+
+    /**
+     *  - Replaced audio.playFallbackSound with audio.fallbackSoundType
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion60(options) {
+        for (const profile of options.profiles) {
+            profile.options.audio.fallbackSoundType = profile.options.audio.playFallbackSound ? 'click' : 'none';
+            delete profile.options.audio.playFallbackSound;
+        }
+    }
+
+    /**
+     *  - Added sentence-furigana-plain handlebar
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion61(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v61.handlebars');
+    }
+
+    /**
+     *  - Added options.general.averageFrequency
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion62(options) {
+        for (const profile of options.profiles) {
+            profile.options.general.averageFrequency = false;
         }
     }
 

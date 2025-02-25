@@ -1,0 +1,9 @@
+{{#*inline "sentence-furigana-plain"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFuriganaPlain" definition.cloze.sentence)~}}
+            {{{getMedia "textFuriganaPlain" definition.cloze.sentence escape=false}}}
+        {{~else~}}
+            {{{definition.cloze.sentence}}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}

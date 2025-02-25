@@ -128,6 +128,7 @@ export type GeneralOptions = {
     showGuide: boolean;
     enableContextMenuScanSelected: boolean;
     compactTags: boolean;
+    averageFrequency: boolean;
     glossaryLayoutMode: GlossaryLayoutMode;
     mainDictionary: string;
     popupTheme: PopupTheme;
@@ -167,9 +168,11 @@ export type AudioOptions = {
     enabled: boolean;
     volume: number;
     autoPlay: boolean;
-    playFallbackSound: boolean;
+    fallbackSoundType: FallbackSoundType;
     sources: AudioSourceOptions[];
 };
+
+export type FallbackSoundType = 'none' | 'click' | 'bloop';
 
 export type AudioSourceOptions = {
     type: AudioSourceType;
