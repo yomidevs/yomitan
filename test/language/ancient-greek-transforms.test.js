@@ -64,6 +64,15 @@ const tests = [
             {term: 'ανθρωπος', source: 'ανθρωπους', rule: 'n', reasons: ['accusative plural']},
             {term: 'ανθρωπος', source: 'ανθρωποι', rule: 'n', reasons: ['vocative plural']},
 
+            // 2nd declension, neuter
+            {term: 'δωρον', source: 'δωρου', rule: 'n', reasons: ['genitive singular']},
+            {term: 'δωρον', source: 'δωρω', rule: 'n', reasons: ['dative singular']},
+            {term: 'δωρον', source: 'δωρα', rule: 'n', reasons: ['nominative plural']},
+            {term: 'δωρον', source: 'δωρων', rule: 'n', reasons: ['genitive plural']},
+            {term: 'δωρον', source: 'δωροις', rule: 'n', reasons: ['dative plural']},
+            {term: 'δωρον', source: 'δωρα', rule: 'n', reasons: ['accusative plural']},
+            {term: 'δωρον', source: 'δωρα', rule: 'n', reasons: ['vocative plural']},
+
             // word formation
             {term: 'πονεω', source: 'πονος', rule: 'v', reasons: ['nominalization']},
         ],

@@ -53,6 +53,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('ου', 'ος', [], ['n']),
                 suffixInflection('ας', 'α', [], ['n']),
                 suffixInflection('ου', 'ας', [], ['n']),
+                suffixInflection('ου', 'ον', [], ['n']),
             ],
         },
         'dative singular': {
@@ -60,6 +61,7 @@ export const ancientGreekTransforms = {
             rules: [
                 suffixInflection('ω', 'ος', [], ['n']),
                 suffixInflection('α', 'ας', [], ['n']),
+                suffixInflection('ω', 'ον', [], ['n']),
             ],
         },
         'accusative singular': {
@@ -83,6 +85,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('οι', 'ος', [], ['n']),
                 suffixInflection('αι', 'α', [], ['n']),
                 suffixInflection('αι', 'ας', [], ['n']),
+                suffixInflection('α', 'ον', [], ['n']),
             ],
         },
         'genitive plural': {
@@ -91,6 +94,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('ων', 'ος', [], ['n']),
                 suffixInflection('ων', 'α', [], ['n']),
                 suffixInflection('ων', 'ας', [], ['n']),
+                suffixInflection('ων', 'ον', [], ['n']),
             ],
         },
         'dative plural': {
@@ -99,6 +103,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('οις', 'ος', [], ['n']),
                 suffixInflection('αις', 'α', [], ['n']),
                 suffixInflection('αις', 'ας', [], ['n']),
+                suffixInflection('οις', 'ον', [], ['n']),
             ],
         },
         'accusative plural': {
@@ -106,6 +111,7 @@ export const ancientGreekTransforms = {
             rules: [
                 suffixInflection('ους', 'ος', [], ['n']),
                 suffixInflection('ας', 'α', [], ['n']),
+                suffixInflection('α', 'ον', [], ['n']),
             ],
         },
         'vocative plural': {
@@ -114,6 +120,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('οι', 'ος', [], ['n']),
                 suffixInflection('αι', 'α', [], ['n']),
                 suffixInflection('αι', 'ας', [], ['n']),
+                suffixInflection('α', 'ον', [], ['n']),
             ],
         },
         // adjectives
