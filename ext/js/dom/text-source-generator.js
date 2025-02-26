@@ -401,18 +401,29 @@ export class TextSourceGenerator {
      * @returns {?Range}
      */
     _caretRangeFromPoint(x, y) {
-        if (typeof document.caretRangeFromPoint === 'function') {
-            // Chrome, Edge
-            return document.caretRangeFromPoint(x, y);
-        }
-
         if (typeof document.caretPositionFromPoint === 'function') {
             // Firefox
+            // 128+ Chrome, Edge
             return this._caretPositionFromPoint(x, y);
+        }
+
+        if (typeof document.caretRangeFromPoint === 'function') {
+            // Fallback Chrome, Edge
+            return document.caretRangeFromPoint(x, y);
         }
 
         // No support
         return null;
+    }
+
+    /**
+     * @param {Element | ShadowRoot} element
+     * @returns {(ShadowRoot)[]}
+     */
+    _findShadowRoots(element) {
+        const allElements = [element, ...element.querySelectorAll('*')];
+        const filteredShadowRoots = allElements.filter((e) => !!e.shadowRoot);
+        return filteredShadowRoots.flatMap((e) => [e.shadowRoot, ...this._findShadowRoots(e.shadowRoot)]);
     }
 
     /**
@@ -421,7 +432,8 @@ export class TextSourceGenerator {
      * @returns {?Range}
      */
     _caretPositionFromPoint(x, y) {
-        const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ (document.caretPositionFromPoint)(x, y);
+        const shadowRoots = this._findShadowRoots(document.body);
+        const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ document.caretPositionFromPoint(x, y, {shadowRoots: shadowRoots});
         if (position === null) {
             return null;
         }
