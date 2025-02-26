@@ -450,7 +450,7 @@ export class TextSourceGenerator {
      */
     _caretPositionFromPoint(x, y) {
         const shadowRoots = this._findShadowRoots(document.body);
-        const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ document.caretPositionFromPoint(x, y, {shadowRoots: shadowRoots});
+        const position = shadowRoots.length > 0 ? document.caretPositionFromPoint(x, y, {shadowRoots: shadowRoots}) : document.caretPositionFromPoint(x, y);
         if (position === null) {
             return null;
         }
