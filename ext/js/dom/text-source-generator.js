@@ -452,7 +452,9 @@ export class TextSourceGenerator {
         const documentCaretPositionFromPoint = document.caretPositionFromPoint(x, y);
         const documentCaretPositionOffsetNode = documentCaretPositionFromPoint?.offsetNode;
 
-        const shadowRoots = documentCaretPositionOffsetNode instanceof Element ? this._findShadowRoots(documentCaretPositionOffsetNode) : [];
+        // nodeName `#text` indicates we have already drilled down as far as required to scan the text
+        const shadowRootSearchRequired = documentCaretPositionOffsetNode instanceof Element && documentCaretPositionOffsetNode.nodeName !== '#text';
+        const shadowRoots = shadowRootSearchRequired ? this._findShadowRoots(documentCaretPositionOffsetNode) : [];
 
         const position = shadowRoots.length > 0 ? document.caretPositionFromPoint(x, y, {shadowRoots: shadowRoots}) : documentCaretPositionFromPoint;
         if (position === null) {
