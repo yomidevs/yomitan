@@ -417,13 +417,30 @@ export class TextSourceGenerator {
     }
 
     /**
-     * @param {Element | ShadowRoot} element
-     * @returns {(ShadowRoot)[]}
+     * @param {Element | ShadowRoot} inputElement
+     * @returns {ShadowRoot[]}
      */
-    _findShadowRoots(element) {
-        const allElements = [element, ...element.querySelectorAll('*')];
-        const filteredShadowRoots = allElements.filter((e) => !!e.shadowRoot);
-        return filteredShadowRoots.flatMap((e) => [e.shadowRoot, ...this._findShadowRoots(e.shadowRoot)]);
+    _findShadowRoots(inputElement) {
+        const allElements = [inputElement, ...inputElement.querySelectorAll('*')];
+        /** @type {Element[]} */
+        const shadowRootContainingElements = [];
+        for (const element of allElements) {
+            if (!(element instanceof ShadowRoot) && !!element.shadowRoot) {
+                shadowRootContainingElements.push(element);
+            }
+        }
+        /** @type {ShadowRoot[]} */
+        const shadowRoots = [];
+        for (const element of shadowRootContainingElements) {
+            if (element.shadowRoot) {
+                shadowRoots.push(element.shadowRoot);
+                const nestedShadowRoots = this._findShadowRoots(element.shadowRoot);
+                if (nestedShadowRoots) {
+                    shadowRoots.push(...nestedShadowRoots);
+                }
+            }
+        }
+        return shadowRoots;
     }
 
     /**
