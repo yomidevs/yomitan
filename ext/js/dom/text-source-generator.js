@@ -449,8 +449,12 @@ export class TextSourceGenerator {
      * @returns {?Range}
      */
     _caretPositionFromPoint(x, y) {
-        const shadowRoots = this._findShadowRoots(document.body);
-        const position = shadowRoots.length > 0 ? document.caretPositionFromPoint(x, y, {shadowRoots: shadowRoots}) : document.caretPositionFromPoint(x, y);
+        const documentCaretPositionFromPoint = document.caretPositionFromPoint(x, y);
+        const documentCaretPositionOffsetNode = documentCaretPositionFromPoint?.offsetNode;
+
+        const shadowRoots = documentCaretPositionOffsetNode instanceof Element ? this._findShadowRoots(documentCaretPositionOffsetNode) : [];
+
+        const position = shadowRoots.length > 0 ? document.caretPositionFromPoint(x, y, {shadowRoots: shadowRoots}) : documentCaretPositionFromPoint;
         if (position === null) {
             return null;
         }
