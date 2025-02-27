@@ -25,8 +25,22 @@ const tests = [
         category: 'verbs',
         valid: true,
         tests: [
+
+            {term: 'λύω',   source: 'λύεις',   rule: 'v',   reasons: ['2nd person singular present active indicative']},
             {term: 'λύω',   source: 'λύει',    rule: 'v',   reasons: ['3rd person singular present active indicative']},
+            {term: 'λύω',   source: 'λύομεν',  rule: 'v',   reasons: ['1st person plural present active indicative']},
+            {term: 'λύω',   source: 'λύετε',   rule: 'v',   reasons: ['2nd person plural present active indicative']},
+            {term: 'λύω',   source: 'λύουσι',  rule: 'v',   reasons: ['3rd person plural present active indicative']},
+            {term: 'λύω',   source: 'λύουσιν',  rule: 'v',   reasons: ['3rd person plural present active indicative']},
+
+
+            {term: 'φιλεω', source: 'φιλεις',  rule: 'v',   reasons: ['2nd person singular present active indicative']},
             {term: 'φιλεω', source: 'φιλει',   rule: 'v',   reasons: ['3rd person singular present active indicative']},
+            {term: 'φιλεω', source: 'φιλεομεν', rule: 'v',   reasons: ['1st person plural present active indicative']},
+            {term: 'φιλεω', source: 'φιλεετε', rule: 'v',   reasons: ['2nd person plural present active indicative']},
+            {term: 'φιλεω', source: 'φιλεουσι', rule: 'v',   reasons: ['3rd person plural present active indicative']},
+            {term: 'φιλεω', source: 'φιλεουσιν', rule: 'v',   reasons: ['3rd person plural present active indicative']},
+
             {term: 'γεωργεω', source: 'γεωργος', rule: 'v',   reasons: ['nominalization']},
         ],
     },

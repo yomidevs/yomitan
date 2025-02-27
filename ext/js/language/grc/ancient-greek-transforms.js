@@ -39,11 +39,37 @@ export const ancientGreekTransforms = {
     transforms: {
         // inflections
         // verbs
+        '2nd person singular present active indicative': {
+            name: '2nd person singular present active indicative',
+            rules: [
+                suffixInflection('εις', 'ω', [], ['v']),
+                suffixInflection('εις', 'εω', [], ['v']),
+            ],
+        },
         '3rd person singular present active indicative': {
             name: '3rd person singular present active indicative',
             rules: [
                 suffixInflection('ει', 'ω', [], ['v']),
                 suffixInflection('ει', 'εω', [], ['v']),
+            ],
+        },
+        '1st person plural present active indicative': {
+            name: '1st person plural present active indicative',
+            rules: [
+                suffixInflection('ομεν', 'ω', [], ['v']),
+            ],
+        },
+        '2nd person plural present active indicative': {
+            name: '2nd person plural present active indicative',
+            rules: [
+                suffixInflection('ετε', 'ω', [], ['v']),
+            ],
+        },
+        '3rd person plural present active indicative': {
+            name: '3rd person plural present active indicative',
+            rules: [
+                suffixInflection('ουσι', 'ω', [], ['v']),
+                suffixInflection('ουσιν', 'ω', [], ['v']),
             ],
         },
         // nouns
