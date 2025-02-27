@@ -297,12 +297,12 @@
     </div>
     <div class="anki-card-field-overwrite-container">
         <select class="anki-card-field-overwrite">
-            <option value="coalesce">Merge (prefer existing)</option>
-            <option value="coalesce-new">Merge (prefer new)</option>
-            <option value="skip">Skip</option>
-            <option value="append">Append</option>
-            <option value="prepend">Prepend</option>
-            <option value="overwrite">Overwrite</option>
+            <option value="skip" title="Keep existing value">Skip</option>
+            <option value="prepend" title="Insert new value before existing">Prepend</option>
+            <option value="append" title="Insert new value after existing">Append</option>
+            <option value="coalesce" title="Overwrite if existing value is empty">Fill if empty</option>
+            <option class="warning-text" value="coalesce-new" title="Overwrite if new value is not empty">Overwrite if available</option>
+            <option class="danger-text" value="overwrite" title="Overwrite with new value, even if empty">Overwrite</option>
         </select>
     </div>
 </template>
