@@ -505,9 +505,7 @@ export class AnkiDeckGeneratorController {
      * @returns {Array<string>}
      */
     _findAllPaths(obj) {
-        // @ts-expect-error - Recursive function to find object keys deeply nested in objects and arrays. Essentially impossible to type correctly.
-        // eslint-disable-next-line unicorn/no-array-reduce, @typescript-eslint/no-unsafe-argument
-        return Object.entries(obj).reduce((acc, [key, value]) => (key === 'path' ? [...acc, value] : (typeof value === 'object' ? [...acc, ...this._findAllPaths(value)] : acc)), []);
+        return JSON.stringify(obj).match(/(?<="path":").*?(?=")/g) ?? [];
     }
 
     /**
