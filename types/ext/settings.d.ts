@@ -326,7 +326,7 @@ export type AnkiNoteField = {
     overwriteMode: AnkiNoteFieldOverwriteMode;
 };
 
-export type AnkiNoteFieldOverwriteMode = 'coalesce' | 'overwrite' | 'append' | 'prepend' | 'skip';
+export type AnkiNoteFieldOverwriteMode = 'coalesce' | 'coalesce-new' | 'overwrite' | 'append' | 'prepend' | 'skip';
 
 export type SentenceParsingOptions = {
     scanExtent: number;

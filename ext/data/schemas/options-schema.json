@@ -1000,7 +1000,7 @@
                                                         },
                                                         "overwriteMode": {
                                                             "type": "string",
-                                                            "enum": ["coalesce", "skip", "append", "prepend", "overwrite"],
+                                                            "enum": ["coalesce", "coalesce-new", "skip", "append", "prepend", "overwrite"],
                                                             "default": "coalesce"
                                                         }
                                                     }
@@ -1035,7 +1035,7 @@
                                                         },
                                                         "overwriteMode": {
                                                             "type": "string",
-                                                            "enum": ["coalesce", "skip", "append", "prepend", "overwrite"],
+                                                            "enum": ["coalesce", "coalesce-new", "skip", "append", "prepend", "overwrite"],
                                                             "default": "coalesce"
                                                         }
                                                     }
