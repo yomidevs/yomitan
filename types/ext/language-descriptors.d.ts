@@ -120,6 +120,9 @@ type AllTextProcessors = {
             apostropheVariants: BidirectionalConversionPreprocessor;
         };
     };
+    ga: {
+        pre: CapitalizationPreprocessors;
+    };
     grc: {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor & {
             convertLatinToGreek: TextProcessor<boolean>;

@@ -25,6 +25,7 @@ import {esperantoTransforms} from './eo/esperanto-transforms.js';
 import {spanishTransforms} from './es/spanish-transforms.js';
 import {apostropheVariants} from './fr/french-text-preprocessors.js';
 import {frenchTransforms} from './fr/french-transforms.js';
+import {irishTransforms} from './ga/irish-transforms.js';
 import {convertLatinToGreek} from './grc/ancient-greek-processors.js';
 import {ancientGreekTransforms} from './grc/ancient-greek-transforms.js';
 import {
@@ -170,6 +171,14 @@ const languageDescriptors = [
             apostropheVariants,
         },
         languageTransforms: frenchTransforms,
+    },
+    {
+        iso: 'ga',
+        iso639_3: 'gle',
+        name: 'Irish',
+        exampleText: 'léigh',
+        textPreprocessors: capitalizationPreprocessors,
+        languageTransforms: irishTransforms,
     },
     {
         iso: 'grc',
