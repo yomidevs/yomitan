@@ -505,7 +505,7 @@
                                                     "scanOnTouchPress": false,
                                                     "scanOnTouchRelease": false,
                                                     "scanOnPenMove": true,
-                                                    "scanOnPenHover": true,
+                                                    "scanOnPenHover": false,
                                                     "scanOnPenReleaseHover": false,
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
@@ -531,7 +531,7 @@
                                                     "scanOnTouchPress": false,
                                                     "scanOnTouchRelease": false,
                                                     "scanOnPenMove": true,
-                                                    "scanOnPenHover": true,
+                                                    "scanOnPenHover": false,
                                                     "scanOnPenReleaseHover": false,
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
@@ -634,7 +634,7 @@
                                                         },
                                                         "scanOnPenHover": {
                                                             "type": "boolean",
-                                                            "default": true
+                                                            "default": false
                                                         },
                                                         "scanOnPenReleaseHover": {
                                                             "type": "boolean",

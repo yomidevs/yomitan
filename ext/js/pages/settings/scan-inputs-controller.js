@@ -213,7 +213,7 @@ export class ScanInputsController {
                 scanOnTouchPress: false,
                 scanOnTouchRelease: false,
                 scanOnPenMove: true,
-                scanOnPenHover: true,
+                scanOnPenHover: false,
                 scanOnPenReleaseHover: false,
                 scanOnPenPress: true,
                 scanOnPenRelease: false,
