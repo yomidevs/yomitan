@@ -17,6 +17,7 @@
 
 import {API} from '../comm/api.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {WebExtension} from '../extension/web-extension.js';
 
@@ -59,15 +60,22 @@ export class MediaDrawingWorker {
             const message = event.data;
             return invokeApiMapHandler(this._fromApplicationApiMap, message.action, message.params, [event.ports], () => {});
         });
+        addEventListener('messageerror', (event) => {
+            const error = new ExtensionError('MediaDrawingWorker: Error receiving message from application');
+            error.data = event;
+            log.error(error);
+        });
     }
 
     /** @type {import('api').PmApiHandler<'drawMedia'>} */
     async _onDrawMedia({requests}) {
+        console.log('MediaDrawingWorker: drawMedia', requests);
         this._generation++;
         this._canvasesByGeneration.set(this._generation, requests.map((request) => request.canvas));
         this._cleanOldGenerations();
         const newRequests = requests.map((request, index) => ({...request, canvas: null, generation: this._generation, canvasIndex: index, canvasWidth: request.canvas.width, canvasHeight: request.canvas.height}));
         if (this._dbPort !== null) {
+            console.log('MediaDrawingWorker: sending drawMedia to database worker', newRequests, this._dbPort);
             this._dbPort.postMessage({action: 'drawMedia', params: {requests: newRequests}});
         } else {
             log.error('no database port available');
@@ -115,10 +123,17 @@ export class MediaDrawingWorker {
         const dbPort = ports[0];
         this._dbPort = dbPort;
         dbPort.addEventListener('message', (/** @type {MessageEvent<import('api').PmApiMessageAny>} */ event) => {
+            console.log('MediaDrawingWorker: message from database worker', event.data);
             const message = event.data;
             return invokeApiMapHandler(this._fromDatabaseApiMap, message.action, message.params, [event.ports], () => {});
         });
+        dbPort.addEventListener('messageerror', (event) => {
+            const error = new ExtensionError('MediaDrawingWorker: Error receiving message from database worker');
+            error.data = event;
+            log.error(error);
+        });
         dbPort.start();
+        console.log('MediaDrawingWorker: connected to database worker');
     }
 
     /**
