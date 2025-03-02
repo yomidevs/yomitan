@@ -57,6 +57,14 @@ const tests = [
             {term: 'σκια', source: 'σκιας', rule: 'n', reasons: ['accusative plural']},
             {term: 'σκια', source: 'σκιαι', rule: 'n', reasons: ['vocative plural']},
 
+            {term: 'φωνη', source: 'φωνης', rule: 'n', reasons: ['genitive singular']},
+            {term: 'φωνη', source: 'φωνην', rule: 'n', reasons: ['accusative singular']},
+            {term: 'φωνη', source: 'φωναι', rule: 'n', reasons: ['nominative plural']},
+            {term: 'φωνη', source: 'φωνων', rule: 'n', reasons: ['genitive plural']},
+            {term: 'φωνη', source: 'φωναις', rule: 'n', reasons: ['dative plural']},
+            {term: 'φωνη', source: 'φωνας', rule: 'n', reasons: ['accusative plural']},
+            {term: 'φωνη', source: 'φωναι', rule: 'n', reasons: ['vocative plural']},
+
             // 1st declension, masculine
             {term: 'νεανιας', source: 'νεανιου', rule: 'n', reasons: ['genitive singular']},
             {term: 'νεανιας', source: 'νεανια', rule: 'n', reasons: ['dative singular']},
