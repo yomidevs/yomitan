@@ -644,7 +644,7 @@ export class OptionsUtil {
             searchTerms: true,
             searchKanji: true,
             scanOnTouchMove: false,
-            scanOnPenHover: true,
+            scanOnPenHover: false,
             scanOnPenPress: true,
             scanOnPenRelease: false,
             preventTouchScrolling: true,

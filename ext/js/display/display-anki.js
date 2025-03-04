@@ -753,6 +753,8 @@ export class DisplayAnki {
                 return newValue + existingValue;
             case 'coalesce':
                 return existingValue || newValue;
+            case 'coalesce-new':
+                return newValue || existingValue;
         }
     }
 
