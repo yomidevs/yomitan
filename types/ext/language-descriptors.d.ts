@@ -192,7 +192,7 @@ type AllTextProcessors = {
     };
     ru: {
         pre: CapitalizationPreprocessors & {
-            yoToE: TextProcessor<boolean>;
+            yoToE: BidirectionalConversionPreprocessor;
             removeRussianDiacritics: TextProcessor<boolean>;
         };
     };
