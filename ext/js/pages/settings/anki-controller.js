@@ -1021,10 +1021,18 @@ class AnkiCardController {
         const markers = getStandardFieldMarkers(dictionaryEntryType);
         const markerAliases = new Map([
             ['expression', ['phrase', 'term', 'word']],
+            ['reading', ['expression-reading', 'term-reading', 'word-reading']],
+            ['furigana', ['expression-furigana', 'term-furigana', 'word-furigana']],
             ['glossary', ['definition', 'meaning']],
-            ['audio', ['sound']],
+            ['audio', ['sound', 'word-audio', 'term-audio', 'expression-audio']],
             ['dictionary', ['dict']],
-            ['pitch-accents', ['pitch']],
+            ['pitch-accents', ['pitch', 'pitch-accent', 'pitch-pattern']],
+            ['sentence', ['example-sentence']],
+            ['frequency-harmonic-rank', ['freq', 'frequency', 'freq-sort', 'freqency-sort']],
+            ['popup-selection-text', ['selection']],
+            ['pitch-accent-positions', ['pitch-position']],
+            ['pitch-accent-categories', ['pitch-categories']],
+            ['popup-selection-text', ['selection-text']],
         ]);
 
         const hyphenPattern = /-/g;
