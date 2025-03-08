@@ -1836,6 +1836,7 @@
                         <div class="settings-item-left">
                             <div class="settings-item-label">
                                 When a duplicate is detected
+                                <a tabindex="0" class="more-toggle more-only warning-text" id="anki-overwrite-warning" data-parent-distance="4">(?)</a>
                             </div>
                         </div>
                         <div class="settings-item-right">
@@ -1846,13 +1847,16 @@
                             </select>
                         </div>
                     </div>
-                    <div class="settings-item-children" id="anki-overwrite-warning" hidden>
+                    <div class="settings-item-children more" hidden>
                         <ul class="warning-text">
                             <li class="danger-text">Overwriting a card can result in the loss of data.</li>
                             <li>Duplicate cards of a different note type cannot be overwritten.</li>
                             <li>If there are multiple duplicate cards, the first card found will be overwritten.</li>
                             <li>You can customize overwriting for each field in the <code>Configure Anki card format&hellip;</code> menu.</li>
                         </ul>
+                        <p>
+                            <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                        </p>
                     </div>
                 </div>
             </div>
