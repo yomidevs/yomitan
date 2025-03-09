@@ -501,6 +501,11 @@ export class AnkiDeckGeneratorController {
     }
 
     /**
+     * Extracts all values of json keys named `path` which contain a string value.
+     * Example json snippet containing a path:
+     * ...","path":"example-dictionary/svg/example-media.svg","...
+     * The path can be found in many different positions in the structure of the definition json.
+     * It is most reliable to flatten it to a string and use regex.
      * @param {object} obj
      * @returns {Array<string>}
      */
