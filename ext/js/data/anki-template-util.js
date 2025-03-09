@@ -152,7 +152,7 @@ export function getDynamicFieldMarkers(dictionaries, dictionaryInfo) {
  * @param {string} str
  * @returns {string}
  */
-function getKebabCase(str) {
+export function getKebabCase(str) {
     return str
         .replace(/[\s_\u3000]/g, '-')
         .replace(/[^\p{L}\p{N}-]/gu, '')
