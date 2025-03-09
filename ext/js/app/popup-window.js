@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {EventDispatcher} from '../core/event-dispatcher.js';
+import { EventDispatcher } from '../core/event-dispatcher.js';
 
 /**
  * This class represents a popup that is hosted in a new native window.
@@ -260,6 +260,14 @@ export class PopupWindow extends EventDispatcher {
      * @returns {Promise<boolean>} `true` if the size assignment was successful, `false` otherwise.
      */
     async setFrameSize(_width, _height) {
+        return false;
+    }
+
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async isPointerOver() {
+
         return false;
     }
 
