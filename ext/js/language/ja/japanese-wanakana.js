@@ -27,10 +27,11 @@ function convertAlphabeticPartToKana(text) {
 
 /**
  * @param {string} text
+ * @param {object} options
  * @returns {string}
  */
-export function convertToKana(text) {
-    return wanakana.toKana(text);
+export function convertToKana(text, options) {
+    return wanakana.toKana(text, options);
 }
 
 /**

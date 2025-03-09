@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {convertToKana} from '../language/ja/japanese-wanakana.js';
 
 export class SearchDisplayController {
     /**
@@ -61,8 +61,6 @@ export class SearchDisplayController {
         this._queryInputEventsSetup = false;
         /** @type {boolean} */
         this._wanakanaEnabled = false;
-        /** @type {boolean} */
-        this._wanakanaBound = false;
         /** @type {boolean} */
         this._introVisible = true;
         /** @type {?import('core').Timeout} */
@@ -243,9 +241,23 @@ export class SearchDisplayController {
         this._setIntroVisible(!valid, animate);
     }
 
-    /** */
-    _onSearchInput() {
+    /**
+     * @param {KeyboardEvent} e
+     */
+    _onSearchInput(e) {
         this._updateSearchHeight(true);
+
+        const element = /** @type {HTMLTextAreaElement} */ (e.currentTarget);
+        this._searchTextKanaConversion(element, e);
+    }
+
+    /**
+     * @param {HTMLTextAreaElement} element
+     * @param {KeyboardEvent} event
+     */
+    _searchTextKanaConversion(element, event) {
+        if (!this._wanakanaEnabled || event.isComposing) { return; }
+        element.value = convertToKana(element.value, {IMEMode: true});
     }
 
     /**
@@ -438,17 +450,6 @@ export class SearchDisplayController {
         this._queryInputEvents.addEventListener(input, 'keydown', this._onSearchKeydown.bind(this), false);
 
         this._wanakanaEnabled = enabled;
-        if (enabled) {
-            if (!this._wanakanaBound) {
-                wanakana.bind(input);
-                this._wanakanaBound = true;
-            }
-        } else {
-            if (this._wanakanaBound) {
-                wanakana.unbind(input);
-                this._wanakanaBound = false;
-            }
-        }
 
         this._queryInputEvents.addEventListener(input, 'input', this._onSearchInput.bind(this), false);
         this._queryInputEventsSetup = true;
