@@ -36,7 +36,7 @@ export function createAnkiNoteData(marker, {
     media,
     dictionaryStylesMap,
 }) {
-    const definition = createCachedValue(getDefinition.bind(null, dictionaryEntry, context, resultOutputMode, dictionaryStylesMap));
+    const definition = createCachedValue(getDefinition.bind(null, dictionaryEntry, context, resultOutputMode, dictionaryStylesMap, glossaryLayoutMode));
     const uniqueExpressions = createCachedValue(getUniqueExpressions.bind(null, dictionaryEntry));
     const uniqueReadings = createCachedValue(getUniqueReadings.bind(null, dictionaryEntry));
     const context2 = createCachedValue(getPublicContext.bind(null, context));
@@ -314,12 +314,13 @@ function getPitchCount(cachedPitches) {
  * @param {import('anki-templates-internal').Context} context
  * @param {import('settings').ResultOutputMode} resultOutputMode
  * @param {Map<string, string>} dictionaryStylesMap
+ * @param {import('settings').GlossaryLayoutMode} glossaryLayoutMode
  * @returns {import('anki-templates').DictionaryEntry}
  */
-function getDefinition(dictionaryEntry, context, resultOutputMode, dictionaryStylesMap) {
+function getDefinition(dictionaryEntry, context, resultOutputMode, dictionaryStylesMap, glossaryLayoutMode) {
     switch (dictionaryEntry.type) {
         case 'term':
-            return getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionaryStylesMap);
+            return getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionaryStylesMap, glossaryLayoutMode);
         case 'kanji':
             return getKanjiDefinition(dictionaryEntry, context);
         default:
@@ -419,9 +420,10 @@ function getKanjiFrequencies(dictionaryEntry) {
  * @param {import('anki-templates-internal').Context} context
  * @param {import('settings').ResultOutputMode} resultOutputMode
  * @param {Map<string, string>} dictionaryStylesMap
+ * @param {import('settings').GlossaryLayoutMode} glossaryLayoutMode
  * @returns {import('anki-templates').TermDictionaryEntry}
  */
-function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionaryStylesMap) {
+function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionaryStylesMap, glossaryLayoutMode) {
     /** @type {import('anki-templates').TermDictionaryEntryType} */
     let type = 'term';
     switch (resultOutputMode) {
@@ -438,7 +440,7 @@ function getTermDefinition(dictionaryEntry, context, resultOutputMode, dictionar
 
     const dictionaryAliases = createCachedValue(getTermDictionaryAliases.bind(null, dictionaryEntry));
     const dictionaryNames = createCachedValue(getTermDictionaryNames.bind(null, dictionaryEntry));
-    const commonInfo = createCachedValue(getTermDictionaryEntryCommonInfo.bind(null, dictionaryEntry, type, dictionaryStylesMap));
+    const commonInfo = createCachedValue(getTermDictionaryEntryCommonInfo.bind(null, dictionaryEntry, type, dictionaryStylesMap, glossaryLayoutMode));
     const termTags = createCachedValue(getTermTags.bind(null, dictionaryEntry, type));
     const expressions = createCachedValue(getTermExpressions.bind(null, dictionaryEntry));
     const frequencies = createCachedValue(getTermFrequencies.bind(null, dictionaryEntry));
@@ -523,9 +525,10 @@ function getTermDictionaryAliases(dictionaryEntry) {
  * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
  * @param {import('anki-templates').TermDictionaryEntryType} type
  * @param {Map<string, string>} dictionaryStylesMap
+ * @param {import('settings').GlossaryLayoutMode} glossaryLayoutMode
  * @returns {import('anki-templates').TermDictionaryEntryCommonInfo}
  */
-function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStylesMap) {
+function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStylesMap, glossaryLayoutMode) {
     const merged = (type === 'termMerged');
     const hasDefinitions = (type !== 'term');
 
@@ -552,6 +555,9 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
             glossaryScopedStyles = addGlossaryScopeToCss(dictionaryStyles);
             dictScopedStyles = addGlossaryScopeToCss(addDictionaryScopeToCss(dictionaryStyles, dictionary));
         }
+        if (glossaryLayoutMode === 'compact') {
+            dictScopedStyles += addGlossaryScopeToCss(getCompactGlossStyles());
+        }
         const definitionTags2 = [];
         for (const tag of tags) {
             definitionTags.push(convertTag(tag));
@@ -577,6 +583,28 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
         definitionTags,
         definitions: hasDefinitions ? definitions : void 0,
     };
+}
+
+/**
+ * @returns {string}
+ */
+function getCompactGlossStyles() {
+    return `ul[data-sc-content="glossary"] > li:not(:first-child)::before {
+  white-space: pre-wrap;
+  content: ' | ';
+  display: inline;
+  color: #777777;
+}
+
+ul[data-sc-content="glossary"] > li {
+  display: inline;
+}
+
+ul[data-sc-content="glossary"] {
+  display: inline;
+  list-style: none;
+  padding-left: 0;
+}`;
 }
 
 /**
