@@ -62,8 +62,6 @@ export class SearchDisplayController {
         /** @type {boolean} */
         this._wanakanaEnabled = false;
         /** @type {boolean} */
-        this._wanakanaBound = false;
-        /** @type {boolean} */
         this._introVisible = true;
         /** @type {?import('core').Timeout} */
         this._introAnimationTimer = null;
@@ -258,7 +256,7 @@ export class SearchDisplayController {
      * @param {KeyboardEvent} event
      */
     _searchTextKanaConversion(element, event) {
-        if (!this._wanakanaBound || event.isComposing) { return; }
+        if (!this._wanakanaEnabled || event.isComposing) { return; }
         element.value = convertToKana(element.value, {IMEMode: true});
     }
 
@@ -452,15 +450,6 @@ export class SearchDisplayController {
         this._queryInputEvents.addEventListener(input, 'keydown', this._onSearchKeydown.bind(this), false);
 
         this._wanakanaEnabled = enabled;
-        if (enabled) {
-            if (!this._wanakanaBound) {
-                this._wanakanaBound = true;
-            }
-        } else {
-            if (this._wanakanaBound) {
-                this._wanakanaBound = false;
-            }
-        }
 
         this._queryInputEvents.addEventListener(input, 'input', this._onSearchInput.bind(this), false);
         this._queryInputEventsSetup = true;
