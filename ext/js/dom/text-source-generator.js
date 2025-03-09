@@ -401,18 +401,46 @@ export class TextSourceGenerator {
      * @returns {?Range}
      */
     _caretRangeFromPoint(x, y) {
-        if (typeof document.caretRangeFromPoint === 'function') {
-            // Chrome, Edge
-            return document.caretRangeFromPoint(x, y);
-        }
-
         if (typeof document.caretPositionFromPoint === 'function') {
             // Firefox
+            // 128+ Chrome, Edge
             return this._caretPositionFromPoint(x, y);
+        }
+
+        if (typeof document.caretRangeFromPoint === 'function') {
+            // Fallback Chrome, Edge
+            return document.caretRangeFromPoint(x, y);
         }
 
         // No support
         return null;
+    }
+
+    /**
+     * @param {Element | ShadowRoot} inputElement
+     * @returns {ShadowRoot[]}
+     */
+    _findShadowRoots(inputElement) {
+        const allElements = [inputElement, ...inputElement.querySelectorAll('*')];
+        /** @type {Element[]} */
+        const shadowRootContainingElements = [];
+        for (const element of allElements) {
+            if (!(element instanceof ShadowRoot) && !!element.shadowRoot) {
+                shadowRootContainingElements.push(element);
+            }
+        }
+        /** @type {ShadowRoot[]} */
+        const shadowRoots = [];
+        for (const element of shadowRootContainingElements) {
+            if (element.shadowRoot) {
+                shadowRoots.push(element.shadowRoot);
+                const nestedShadowRoots = this._findShadowRoots(element.shadowRoot);
+                if (nestedShadowRoots) {
+                    shadowRoots.push(...nestedShadowRoots);
+                }
+            }
+        }
+        return shadowRoots;
     }
 
     /**
@@ -421,7 +449,14 @@ export class TextSourceGenerator {
      * @returns {?Range}
      */
     _caretPositionFromPoint(x, y) {
-        const position = /** @type {(x: number, y: number) => ?{offsetNode: Node, offset: number}} */ (document.caretPositionFromPoint)(x, y);
+        const documentCaretPositionFromPoint = document.caretPositionFromPoint(x, y);
+        const documentCaretPositionOffsetNode = documentCaretPositionFromPoint?.offsetNode;
+
+        // nodeName `#text` indicates we have already drilled down as far as required to scan the text
+        const shadowRootSearchRequired = documentCaretPositionOffsetNode instanceof Element && documentCaretPositionOffsetNode.nodeName !== '#text';
+        const shadowRoots = shadowRootSearchRequired ? this._findShadowRoots(documentCaretPositionOffsetNode) : [];
+
+        const position = shadowRoots.length > 0 ? document.caretPositionFromPoint(x, y, {shadowRoots: shadowRoots}) : documentCaretPositionFromPoint;
         if (position === null) {
             return null;
         }
