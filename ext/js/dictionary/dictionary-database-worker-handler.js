@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {DictionaryDatabase} from './dictionary-database.js';
 
@@ -35,6 +36,11 @@ export class DictionaryDatabaseWorkerHandler {
             log.error(e);
         }
         self.addEventListener('message', this._onMessage.bind(this), false);
+        self.addEventListener('messageerror', (event) => {
+            const error = new ExtensionError('DictionaryDatabaseWorkerHandler: Error receiving message from main thread');
+            error.data = event;
+            log.error(error);
+        });
     }
     // Private
 
