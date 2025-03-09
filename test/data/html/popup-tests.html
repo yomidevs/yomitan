@@ -55,22 +55,24 @@
         </div>
     </test-case>
 
-    <test-case data-shadow-mode="open" data-expected-result="failure">
+    <test-case data-shadow-mode="open">
         <test-description>Content inside of an open shadow DOM.</test-description>
-        <div class="template-content-container hovertarget"></div>
-        <template>
+        <div class="fullscreen-element container">
+            <div class="template-content-container hovertarget"></div>
             <link rel="stylesheet" href="test-stylesheet.css">
-            <div class="fullscreen-element container">
-                <div class="container-inner">
-                    <div>
-                        ありがとう
-                    </div>
-                    <div>
-                        <a href="#" class="fullscreen-link">Toggle fullscreen</a>
+            <template>
+                <div class="container">
+                    <div class="container-inner">
+                        <div>
+                            ありがとう
+                        </div>
                     </div>
                 </div>
+            </template>
+            <div>
+                <a href="#" class="fullscreen-link">Toggle fullscreen</a>
             </div>
-        </template>
+        </div>
     </test-case>
 
     <test-case data-shadow-mode="closed" data-expected-result="failure">
