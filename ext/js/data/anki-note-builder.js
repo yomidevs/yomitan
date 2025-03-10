@@ -569,7 +569,7 @@ export class AnkiNoteBuilder {
                 }
             }
         }
-        result = result.substring(1);
+        result = result.trimStart();
         return result;
     }
 
