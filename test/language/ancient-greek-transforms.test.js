@@ -41,7 +41,12 @@ const tests = [
             {term: 'φιλεω', source: 'φιλεουσι', rule: 'v',   reasons: ['3rd person plural present active indicative']},
             {term: 'φιλεω', source: 'φιλεουσιν', rule: 'v',   reasons: ['3rd person plural present active indicative']},
 
-            {term: 'γεωργεω', source: 'γεωργος', rule: 'v',   reasons: ['nominalization']},
+            {term: 'δεχομαι', source: 'δεχῃ', rule: 'v', reasons: ['2nd person singular present middle indicative']},
+            {term: 'δεχομαι', source: 'δεχει', rule: 'v', reasons: ['2nd person singular present middle indicative']},
+            {term: 'δεχομαι', source: 'δεχεται', rule: 'v', reasons: ['3rd person singular present middle indicative']},
+            {term: 'δεχομαι', source: 'δεχομεθα', rule: 'v', reasons: ['1st person plural present middle indicative']},
+            {term: 'δεχομαι', source: 'δεχεσθε', rule: 'v', reasons: ['2nd person plural present middle indicative']},
+            {term: 'δεχομαι', source: 'δεχονται', rule: 'v', reasons: ['3rd person plural present middle indicative']},
         ],
     },
     {
@@ -96,6 +101,7 @@ const tests = [
             {term: 'δωρον', source: 'δωρα', rule: 'n', reasons: ['vocative plural']},
 
             // word formation
+            {term: 'γεωργεω', source: 'γεωργος', rule: 'v',   reasons: ['nominalization']},
             {term: 'πονεω', source: 'πονος', rule: 'v', reasons: ['nominalization']},
         ],
     },

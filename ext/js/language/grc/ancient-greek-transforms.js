@@ -38,7 +38,7 @@ export const ancientGreekTransforms = {
     conditions,
     transforms: {
         // inflections
-        // verbs
+        // verbs - active voice
         '2nd person singular present active indicative': {
             name: '2nd person singular present active indicative',
             rules: [
@@ -70,6 +70,38 @@ export const ancientGreekTransforms = {
             rules: [
                 suffixInflection('ουσι', 'ω', [], ['v']),
                 suffixInflection('ουσιν', 'ω', [], ['v']),
+            ],
+        },
+        // verbs - middle voice
+        '2nd person singular present middle indicative': {
+            name: '2nd person singular present middle indicative',
+            rules: [
+                suffixInflection('ῃ', 'ομαι', [], ['v']),
+                suffixInflection('ει', 'ομαι', [], ['v']),
+            ],
+        },
+        '3rd person singular present middle indicative': {
+            name: '3rd person singular present middle indicative',
+            rules: [
+                suffixInflection('εται', 'ομαι', [], ['v']),
+            ],
+        },
+        '1st person plural present middle indicative': {
+            name: '1st person plural present middle indicative',
+            rules: [
+                suffixInflection('ομεθα', 'ομαι', [], ['v']),
+            ],
+        },
+        '2nd person plural present middle indicative': {
+            name: '2nd person plural present middle indicative',
+            rules: [
+                suffixInflection('εσθε', 'ομαι', [], ['v']),
+            ],
+        },
+        '3rd person plural present middle indicative': {
+            name: '3rd person plural present middle indicative',
+            rules: [
+                suffixInflection('ονται', 'ομαι', [], ['v']),
             ],
         },
         // nouns
