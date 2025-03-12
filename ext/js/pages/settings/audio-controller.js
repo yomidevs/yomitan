@@ -104,6 +104,34 @@ export class AudioController extends EventDispatcher {
     }
 
     /**
+     * @param {number} currentIndex
+     * @param {number} targetIndex
+     */
+    async moveAudioSourceOptions(currentIndex, targetIndex) {
+        const options = await this._settingsController.getOptions();
+        const optionsContext = this._settingsController.getOptionsContext();
+        const {audio} = options;
+        if (
+            currentIndex < 0 || currentIndex >= audio.sources.length ||
+            targetIndex < 0 || targetIndex >= audio.sources.length ||
+            currentIndex === targetIndex
+        ) {
+            return;
+        }
+
+        const item = audio.sources.splice(currentIndex, 1)[0];
+        audio.sources.splice(targetIndex, 0, item);
+
+        await this._settingsController.modifyProfileSettings([{
+            action: 'set',
+            path: 'audio.sources',
+            value: audio.sources,
+        }]);
+
+        this._onOptionsChanged({options, optionsContext});
+    }
+
+    /**
      * @returns {import('audio-controller').VoiceInfo[]}
      */
     getVoices() {
@@ -292,6 +320,10 @@ class AudioSourceEntry {
         this._urlInput = querySelectorNotNull(this._node, '.audio-source-parameter-container[data-field=url] .audio-source-parameter');
         /** @type {HTMLSelectElement} */
         this._voiceSelect = querySelectorNotNull(this._node, '.audio-source-parameter-container[data-field=voice] .audio-source-parameter');
+        /** @type {HTMLButtonElement} */
+        this._upButton = querySelectorNotNull(this._node, '#audio-source-move-up');
+        /** @type {HTMLButtonElement} */
+        this._downButton = querySelectorNotNull(this._node, '#audio-source-move-down');
     }
 
     /** @type {number} */
@@ -323,6 +355,8 @@ class AudioSourceEntry {
         this._eventListeners.addEventListener(this._voiceSelect, 'change', this._onVoiceSelectChange.bind(this), false);
         this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this), false);
+        this._eventListeners.addEventListener(this._upButton, 'click', (() => { this._move(-1); }).bind(this), false);
+        this._eventListeners.addEventListener(this._downButton, 'click', (() => { this._move(1); }).bind(this), false);
         this._eventListeners.on(this._parent, 'voicesUpdated', this._onVoicesUpdated.bind(this));
         this._onVoicesUpdated();
     }
@@ -359,6 +393,13 @@ class AudioSourceEntry {
         this._voiceSelect.textContent = '';
         this._voiceSelect.appendChild(fragment);
         this._voiceSelect.value = this._voice;
+    }
+
+    /**
+     * @param {number} offset
+     */
+    _move(offset) {
+        void this._parent.moveAudioSourceOptions(this._index, this._index + offset);
     }
 
     /**
