@@ -61,6 +61,11 @@ export class AudioController extends EventDispatcher {
         return this._modalController;
     }
 
+    /** @type {number} */
+    get audioSourceCount() {
+        return this._audioSourceEntries.length;
+    }
+
     /** */
     async prepare() {
         this._audioSystem.prepare();
@@ -68,6 +73,11 @@ export class AudioController extends EventDispatcher {
         this._audioSourceContainer.textContent = '';
         /** @type {HTMLButtonElement} */
         const testButton = querySelectorNotNull(document, '#text-to-speech-voice-test');
+
+        /** @type {HTMLButtonElement} */
+        const audioSourceMoveButton = querySelectorNotNull(document, '#audio-source-move-button');
+
+        audioSourceMoveButton.addEventListener('click', this._onAudioSourceMoveButtonClick.bind(this), false);
 
         this._audioSourceAddButton.addEventListener('click', this._onAddAudioSource.bind(this), false);
 
@@ -290,6 +300,23 @@ export class AudioController extends EventDispatcher {
             items: [source],
         }]);
     }
+
+    /** */
+    _onAudioSourceMoveButtonClick() {
+        const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('audio-source-move-location'));
+        const index = modal.node.dataset.index ?? '';
+        const indexNumber = Number.parseInt(index, 10);
+        if (Number.isNaN(indexNumber)) { return; }
+
+        /** @type {HTMLInputElement} */
+        const targetStringInput = querySelectorNotNull(document, '#audio-source-move-location');
+        const targetString = targetStringInput.value;
+        const target = Number.parseInt(targetString, 10) - 1;
+
+        if (!Number.isFinite(target) || !Number.isFinite(indexNumber) || indexNumber === target) { return; }
+
+        void this.moveAudioSourceOptions(indexNumber, target);
+    }
 }
 
 class AudioSourceEntry {
@@ -459,6 +486,9 @@ class AudioSourceEntry {
             case 'help':
                 this._showHelp(this._type);
                 break;
+            case 'moveTo':
+                this._showMoveToModal();
+                break;
             case 'remove':
                 void this._parent.removeSource(this);
                 break;
@@ -525,6 +555,21 @@ class AudioSourceEntry {
                 this._showModal('audio-source-help-text-to-speech');
                 break;
         }
+    }
+
+    /** */
+    _showMoveToModal() {
+        const modal = this._parent.modalController.getModal('audio-source-move-location');
+        if (modal === null) { return; }
+        const count = this._parent.audioSourceCount;
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#audio-source-move-location');
+
+        modal.node.dataset.index = `${this._index}`;
+        input.value = `${this._index + 1}`;
+        input.max = `${count}`;
+
+        modal.setVisible(true);
     }
 
     /**
