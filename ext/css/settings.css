@@ -1424,6 +1424,11 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
 .audio-source-parameter {
     flex: 1 1 auto;
 }
+.audio-source-parameter,
+input.audio-source-parameter {
+    width: var(--input-width);
+}
+
 
 .profile-add-button-container {
     display: flex;
