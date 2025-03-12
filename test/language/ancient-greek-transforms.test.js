@@ -41,7 +41,12 @@ const tests = [
             {term: 'φιλεω', source: 'φιλεουσι', rule: 'v',   reasons: ['3rd person plural present active indicative']},
             {term: 'φιλεω', source: 'φιλεουσιν', rule: 'v',   reasons: ['3rd person plural present active indicative']},
 
-            {term: 'γεωργεω', source: 'γεωργος', rule: 'v',   reasons: ['nominalization']},
+            {term: 'δεχομαι', source: 'δεχῃ', rule: 'v', reasons: ['2nd person singular present middle indicative']},
+            {term: 'δεχομαι', source: 'δεχει', rule: 'v', reasons: ['2nd person singular present middle indicative']},
+            {term: 'δεχομαι', source: 'δεχεται', rule: 'v', reasons: ['3rd person singular present middle indicative']},
+            {term: 'δεχομαι', source: 'δεχομεθα', rule: 'v', reasons: ['1st person plural present middle indicative']},
+            {term: 'δεχομαι', source: 'δεχεσθε', rule: 'v', reasons: ['2nd person plural present middle indicative']},
+            {term: 'δεχομαι', source: 'δεχονται', rule: 'v', reasons: ['3rd person plural present middle indicative']},
         ],
     },
     {
@@ -56,6 +61,14 @@ const tests = [
             {term: 'σκια', source: 'σκιαις', rule: 'n', reasons: ['dative plural']},
             {term: 'σκια', source: 'σκιας', rule: 'n', reasons: ['accusative plural']},
             {term: 'σκια', source: 'σκιαι', rule: 'n', reasons: ['vocative plural']},
+
+            {term: 'φωνη', source: 'φωνης', rule: 'n', reasons: ['genitive singular']},
+            {term: 'φωνη', source: 'φωνην', rule: 'n', reasons: ['accusative singular']},
+            {term: 'φωνη', source: 'φωναι', rule: 'n', reasons: ['nominative plural']},
+            {term: 'φωνη', source: 'φωνων', rule: 'n', reasons: ['genitive plural']},
+            {term: 'φωνη', source: 'φωναις', rule: 'n', reasons: ['dative plural']},
+            {term: 'φωνη', source: 'φωνας', rule: 'n', reasons: ['accusative plural']},
+            {term: 'φωνη', source: 'φωναι', rule: 'n', reasons: ['vocative plural']},
 
             // 1st declension, masculine
             {term: 'νεανιας', source: 'νεανιου', rule: 'n', reasons: ['genitive singular']},
@@ -88,6 +101,7 @@ const tests = [
             {term: 'δωρον', source: 'δωρα', rule: 'n', reasons: ['vocative plural']},
 
             // word formation
+            {term: 'γεωργεω', source: 'γεωργος', rule: 'v',   reasons: ['nominalization']},
             {term: 'πονεω', source: 'πονος', rule: 'v', reasons: ['nominalization']},
         ],
     },

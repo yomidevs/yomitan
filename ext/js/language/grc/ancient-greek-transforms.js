@@ -38,7 +38,7 @@ export const ancientGreekTransforms = {
     conditions,
     transforms: {
         // inflections
-        // verbs
+        // verbs - active voice
         '2nd person singular present active indicative': {
             name: '2nd person singular present active indicative',
             rules: [
@@ -72,6 +72,38 @@ export const ancientGreekTransforms = {
                 suffixInflection('ουσιν', 'ω', [], ['v']),
             ],
         },
+        // verbs - middle voice
+        '2nd person singular present middle indicative': {
+            name: '2nd person singular present middle indicative',
+            rules: [
+                suffixInflection('ῃ', 'ομαι', [], ['v']),
+                suffixInflection('ει', 'ομαι', [], ['v']),
+            ],
+        },
+        '3rd person singular present middle indicative': {
+            name: '3rd person singular present middle indicative',
+            rules: [
+                suffixInflection('εται', 'ομαι', [], ['v']),
+            ],
+        },
+        '1st person plural present middle indicative': {
+            name: '1st person plural present middle indicative',
+            rules: [
+                suffixInflection('ομεθα', 'ομαι', [], ['v']),
+            ],
+        },
+        '2nd person plural present middle indicative': {
+            name: '2nd person plural present middle indicative',
+            rules: [
+                suffixInflection('εσθε', 'ομαι', [], ['v']),
+            ],
+        },
+        '3rd person plural present middle indicative': {
+            name: '3rd person plural present middle indicative',
+            rules: [
+                suffixInflection('ονται', 'ομαι', [], ['v']),
+            ],
+        },
         // nouns
         'genitive singular': {
             name: 'genitive singular',
@@ -80,6 +112,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('ας', 'α', [], ['n']),
                 suffixInflection('ου', 'ας', [], ['n']),
                 suffixInflection('ου', 'ον', [], ['n']),
+                suffixInflection('ης', 'η', [], ['n']),
             ],
         },
         'dative singular': {
@@ -96,6 +129,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('ον', 'ος', [], ['n']),
                 suffixInflection('αν', 'α', [], ['n']),
                 suffixInflection('αν', 'ας', [], ['n']),
+                suffixInflection('ην', 'η', [], ['n']),
             ],
         },
         'vocative singular': {
@@ -103,6 +137,7 @@ export const ancientGreekTransforms = {
             rules: [
                 suffixInflection('ε', 'ος', [], ['n']),
                 suffixInflection('α', 'ας', [], ['n']),
+                suffixInflection('η', 'η', [], ['n']),
             ],
         },
         'nominative plural': {
@@ -112,6 +147,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('αι', 'α', [], ['n']),
                 suffixInflection('αι', 'ας', [], ['n']),
                 suffixInflection('α', 'ον', [], ['n']),
+                suffixInflection('αι', 'η', [], ['n']),
             ],
         },
         'genitive plural': {
@@ -121,6 +157,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('ων', 'α', [], ['n']),
                 suffixInflection('ων', 'ας', [], ['n']),
                 suffixInflection('ων', 'ον', [], ['n']),
+                suffixInflection('ων', 'η', [], ['n']),
             ],
         },
         'dative plural': {
@@ -130,6 +167,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('αις', 'α', [], ['n']),
                 suffixInflection('αις', 'ας', [], ['n']),
                 suffixInflection('οις', 'ον', [], ['n']),
+                suffixInflection('αις', 'η', [], ['n']),
             ],
         },
         'accusative plural': {
@@ -138,6 +176,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('ους', 'ος', [], ['n']),
                 suffixInflection('ας', 'α', [], ['n']),
                 suffixInflection('α', 'ον', [], ['n']),
+                suffixInflection('ας', 'η', [], ['n']),
             ],
         },
         'vocative plural': {
@@ -147,6 +186,7 @@ export const ancientGreekTransforms = {
                 suffixInflection('αι', 'α', [], ['n']),
                 suffixInflection('αι', 'ας', [], ['n']),
                 suffixInflection('α', 'ον', [], ['n']),
+                suffixInflection('αι', 'η', [], ['n']),
             ],
         },
         // adjectives
