@@ -61,6 +61,11 @@ export class AudioController extends EventDispatcher {
         return this._modalController;
     }
 
+    /** @type {number} */
+    get audioSourceCount() {
+        return this._audioSourceEntries.length;
+    }
+
     /** */
     async prepare() {
         this._audioSystem.prepare();
@@ -68,6 +73,11 @@ export class AudioController extends EventDispatcher {
         this._audioSourceContainer.textContent = '';
         /** @type {HTMLButtonElement} */
         const testButton = querySelectorNotNull(document, '#text-to-speech-voice-test');
+
+        /** @type {HTMLButtonElement} */
+        const audioSourceMoveButton = querySelectorNotNull(document, '#audio-source-move-button');
+
+        audioSourceMoveButton.addEventListener('click', this._onAudioSourceMoveButtonClick.bind(this), false);
 
         this._audioSourceAddButton.addEventListener('click', this._onAddAudioSource.bind(this), false);
 
@@ -101,6 +111,34 @@ export class AudioController extends EventDispatcher {
             deleteCount: 1,
             items: [],
         }]);
+    }
+
+    /**
+     * @param {number} currentIndex
+     * @param {number} targetIndex
+     */
+    async moveAudioSourceOptions(currentIndex, targetIndex) {
+        const options = await this._settingsController.getOptions();
+        const optionsContext = this._settingsController.getOptionsContext();
+        const {audio} = options;
+        if (
+            currentIndex < 0 || currentIndex >= audio.sources.length ||
+            targetIndex < 0 || targetIndex >= audio.sources.length ||
+            currentIndex === targetIndex
+        ) {
+            return;
+        }
+
+        const item = audio.sources.splice(currentIndex, 1)[0];
+        audio.sources.splice(targetIndex, 0, item);
+
+        await this._settingsController.modifyProfileSettings([{
+            action: 'set',
+            path: 'audio.sources',
+            value: audio.sources,
+        }]);
+
+        this._onOptionsChanged({options, optionsContext});
     }
 
     /**
@@ -262,6 +300,23 @@ export class AudioController extends EventDispatcher {
             items: [source],
         }]);
     }
+
+    /** */
+    _onAudioSourceMoveButtonClick() {
+        const modal = /** @type {import('./modal.js').Modal} */ (this._modalController.getModal('audio-source-move-location'));
+        const index = modal.node.dataset.index ?? '';
+        const indexNumber = Number.parseInt(index, 10);
+        if (Number.isNaN(indexNumber)) { return; }
+
+        /** @type {HTMLInputElement} */
+        const targetStringInput = querySelectorNotNull(document, '#audio-source-move-location');
+        const targetString = targetStringInput.value;
+        const target = Number.parseInt(targetString, 10) - 1;
+
+        if (!Number.isFinite(target) || !Number.isFinite(indexNumber) || indexNumber === target) { return; }
+
+        void this.moveAudioSourceOptions(indexNumber, target);
+    }
 }
 
 class AudioSourceEntry {
@@ -292,6 +347,10 @@ class AudioSourceEntry {
         this._urlInput = querySelectorNotNull(this._node, '.audio-source-parameter-container[data-field=url] .audio-source-parameter');
         /** @type {HTMLSelectElement} */
         this._voiceSelect = querySelectorNotNull(this._node, '.audio-source-parameter-container[data-field=voice] .audio-source-parameter');
+        /** @type {HTMLButtonElement} */
+        this._upButton = querySelectorNotNull(this._node, '#audio-source-move-up');
+        /** @type {HTMLButtonElement} */
+        this._downButton = querySelectorNotNull(this._node, '#audio-source-move-down');
     }
 
     /** @type {number} */
@@ -323,6 +382,8 @@ class AudioSourceEntry {
         this._eventListeners.addEventListener(this._voiceSelect, 'change', this._onVoiceSelectChange.bind(this), false);
         this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
         this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this), false);
+        this._eventListeners.addEventListener(this._upButton, 'click', (() => { this._move(-1); }).bind(this), false);
+        this._eventListeners.addEventListener(this._downButton, 'click', (() => { this._move(1); }).bind(this), false);
         this._eventListeners.on(this._parent, 'voicesUpdated', this._onVoicesUpdated.bind(this));
         this._onVoicesUpdated();
     }
@@ -359,6 +420,13 @@ class AudioSourceEntry {
         this._voiceSelect.textContent = '';
         this._voiceSelect.appendChild(fragment);
         this._voiceSelect.value = this._voice;
+    }
+
+    /**
+     * @param {number} offset
+     */
+    _move(offset) {
+        void this._parent.moveAudioSourceOptions(this._index, this._index + offset);
     }
 
     /**
@@ -417,6 +485,9 @@ class AudioSourceEntry {
         switch (e.detail.action) {
             case 'help':
                 this._showHelp(this._type);
+                break;
+            case 'moveTo':
+                this._showMoveToModal();
                 break;
             case 'remove':
                 void this._parent.removeSource(this);
@@ -484,6 +555,21 @@ class AudioSourceEntry {
                 this._showModal('audio-source-help-text-to-speech');
                 break;
         }
+    }
+
+    /** */
+    _showMoveToModal() {
+        const modal = this._parent.modalController.getModal('audio-source-move-location');
+        if (modal === null) { return; }
+        const count = this._parent.audioSourceCount;
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(modal.node, '#audio-source-move-location');
+
+        modal.node.dataset.index = `${this._index}`;
+        input.value = `${this._index + 1}`;
+        input.max = `${count}`;
+
+        modal.setVisible(true);
     }
 
     /**
