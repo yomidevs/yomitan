@@ -220,6 +220,9 @@ export class Application extends EventDispatcher {
         if (mediaDrawingWorker !== null) {
             api.connectToDatabaseWorker(mediaDrawingWorkerToBackendChannel.port1);
         }
+        setInterval(() => {
+            void api.heartbeat();
+        }, 20 * 1000);
 
         const {tabId, frameId} = await api.frameInformationGet();
         const crossFrameApi = new CrossFrameAPI(api, tabId, frameId);

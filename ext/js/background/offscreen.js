@@ -19,6 +19,8 @@
 import {API} from '../comm/api.js';
 import {ClipboardReader} from '../comm/clipboard-reader.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {ExtensionError} from '../core/extension-error.js';
+import {log} from '../core/log.js';
 import {arrayBufferToBase64} from '../data/array-buffer-util.js';
 import {DictionaryDatabase} from '../dictionary/dictionary-database.js';
 import {WebExtension} from '../extension/web-extension.js';
@@ -187,6 +189,7 @@ export class Offscreen {
     _createAndRegisterPort() {
         const mc = new MessageChannel();
         mc.port1.onmessage = this._onMcMessage.bind(this);
+        mc.port1.onmessageerror = this._onMcMessageError.bind(this);
         this._api.registerOffscreenPort([mc.port2]);
     }
 
@@ -201,5 +204,14 @@ export class Offscreen {
     _onMcMessage(event) {
         const {action, params} = event.data;
         invokeApiMapHandler(this._mcApiMap, action, params, [event.ports], () => {});
+    }
+
+    /**
+     * @param {MessageEvent<import('offscreen').McApiMessageAny>} event
+     */
+    _onMcMessageError(event) {
+        const error = new ExtensionError('Offscreen: Error receiving message via postMessage');
+        error.data = event;
+        log.error(error);
     }
 }
