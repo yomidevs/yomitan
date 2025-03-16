@@ -261,7 +261,6 @@ export class Backend {
 
     /** @type {import('api').PmApiHandler<'connectToDatabaseWorker'>} */
     async _onPmConnectToDatabaseWorker(_params, ports) {
-        console.log('Backend: _onPmConnectToDatabaseWorker');
         if (ports !== null && ports.length > 0) {
             await this._dictionaryDatabase.connectToDatabaseWorker(ports[0]);
         }
@@ -541,7 +540,6 @@ export class Backend {
 
     /** @type {import('api').ApiHandler<'termsFind'>} */
     async _onApiTermsFind({text, details, optionsContext}) {
-        console.log('Backend: _onApiTermsFind');
         const options = this._getProfileOptions(optionsContext, false);
         const {general: {resultOutputMode: mode, maxResults}} = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions(mode, details, options);

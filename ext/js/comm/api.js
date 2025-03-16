@@ -409,7 +409,6 @@ export class API {
      * @param {MessagePort} port
      */
     connectToDatabaseWorker(port) {
-        console.log('pmInvoke connectToDatabaseWorker');
         this._pmInvoke('connectToDatabaseWorker', void 0, [port]);
     }
 

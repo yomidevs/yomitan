@@ -403,11 +403,9 @@ export class DictionaryDatabase {
      */
     async drawMedia(items, source) {
         if (this._worker !== null) { // if a worker is available, offload the work to it
-            console.log('offloading to worker');
             this._worker.postMessage({action: 'drawMedia', params: {items}}, [source]);
             return;
         }
-        console.log('doing work in worker');
         // otherwise, you are the worker, so do the work
         safePerformance.mark('drawMedia:start');
 
@@ -841,12 +839,10 @@ export class DictionaryDatabase {
     async connectToDatabaseWorker(port) {
         if (this._worker !== null) {
             // executes outside of worker
-            console.log('connecting to worker');
             this._worker.postMessage({action: 'connectToDatabaseWorker'}, [port]);
             return;
         }
         // executes inside worker
-        console.log('connected to worker');
         port.onmessage = (/** @type {MessageEvent<import('dictionary-database').ApiMessageAny>} */event) => {
             const {action, params} = event.data;
             return invokeApiMapHandler(this._apiMap, action, params, [port], () => {});
