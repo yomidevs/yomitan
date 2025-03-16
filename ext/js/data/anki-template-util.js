@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024  Yomitan Authors
+ * Copyright (C) 2024-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,6 +63,7 @@ export function getStandardFieldMarkers(type) {
                 'popup-selection-text',
                 'sentence',
                 'sentence-furigana',
+                'sentence-furigana-plain',
                 'tags',
                 'url',
             ];
@@ -91,6 +92,7 @@ export function getStandardFieldMarkers(type) {
                 'popup-selection-text',
                 'sentence',
                 'sentence-furigana',
+                'sentence-furigana-plain',
                 'stroke-count',
                 'tags',
                 'url',
@@ -150,7 +152,7 @@ export function getDynamicFieldMarkers(dictionaries, dictionaryInfo) {
  * @param {string} str
  * @returns {string}
  */
-function getKebabCase(str) {
+export function getKebabCase(str) {
     return str
         .replace(/[\s_\u3000]/g, '-')
         .replace(/[^\p{L}\p{N}-]/gu, '')

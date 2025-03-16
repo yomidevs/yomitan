@@ -102,6 +102,7 @@
                                     "showGuide",
                                     "enableContextMenuScanSelected",
                                     "compactTags",
+                                    "averageFrequency",
                                     "glossaryLayoutMode",
                                     "mainDictionary",
                                     "popupTheme",
@@ -233,6 +234,10 @@
                                         "default": true
                                     },
                                     "compactTags": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "averageFrequency": {
                                         "type": "boolean",
                                         "default": false
                                     },
@@ -391,6 +396,7 @@
                                     "enabled",
                                     "volume",
                                     "autoPlay",
+                                    "fallbackSoundType",
                                     "sources"
                                 ],
                                 "properties": {
@@ -407,6 +413,11 @@
                                     "autoPlay": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "fallbackSoundType": {
+                                        "type": "string",
+                                        "enum": ["none", "click", "bloop"],
+                                        "default": "click"
                                     },
                                     "sources": {
                                         "type": "array",
@@ -494,7 +505,7 @@
                                                     "scanOnTouchPress": false,
                                                     "scanOnTouchRelease": false,
                                                     "scanOnPenMove": true,
-                                                    "scanOnPenHover": true,
+                                                    "scanOnPenHover": false,
                                                     "scanOnPenReleaseHover": false,
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
@@ -520,7 +531,7 @@
                                                     "scanOnTouchPress": false,
                                                     "scanOnTouchRelease": false,
                                                     "scanOnPenMove": true,
-                                                    "scanOnPenHover": true,
+                                                    "scanOnPenHover": false,
                                                     "scanOnPenReleaseHover": false,
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
@@ -623,7 +634,7 @@
                                                         },
                                                         "scanOnPenHover": {
                                                             "type": "boolean",
-                                                            "default": true
+                                                            "default": false
                                                         },
                                                         "scanOnPenReleaseHover": {
                                                             "type": "boolean",
@@ -981,8 +992,18 @@
                                             "fields": {
                                                 "type": "object",
                                                 "additionalProperties": {
-                                                    "type": "string",
-                                                    "default": ""
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "value:": {
+                                                            "type": "string",
+                                                            "default": ""
+                                                        },
+                                                        "overwriteMode": {
+                                                            "type": "string",
+                                                            "enum": ["coalesce", "coalesce-new", "skip", "append", "prepend", "overwrite"],
+                                                            "default": "coalesce"
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -1006,8 +1027,18 @@
                                             "fields": {
                                                 "type": "object",
                                                 "additionalProperties": {
-                                                    "type": "string",
-                                                    "default": ""
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "value:": {
+                                                            "type": "string",
+                                                            "default": ""
+                                                        },
+                                                        "overwriteMode": {
+                                                            "type": "string",
+                                                            "enum": ["coalesce", "coalesce-new", "skip", "append", "prepend", "overwrite"],
+                                                            "default": "coalesce"
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }

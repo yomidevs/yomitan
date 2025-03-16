@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,7 @@ import {testDictionaryFiles} from '../dictionary-validate.js';
 async function main() {
     const dictionaryFileNames = process.argv.slice(2);
     if (dictionaryFileNames.length === 0) {
-        console.log([
-            'Usage:',
-            '  node dictionary-validate [--ajv] <dictionary-file-names>...',
-        ].join('\n'));
+
         return;
     }
 

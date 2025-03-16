@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ function createTestFields(type) {
     /** @type {import('anki-note-builder').Field[]} */
     const fields = [];
     for (const marker of getStandardFieldMarkers(type)) {
-        fields.push([marker, `{${marker}}`]);
+        fields.push([marker, {value: `{${marker}}`, overwriteMode: 'coalesce'}]);
     }
     return fields;
 }

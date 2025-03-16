@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024  Yomitan Authors
+ * Copyright (C) 2024-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -120,8 +120,13 @@ type AllTextProcessors = {
             apostropheVariants: BidirectionalConversionPreprocessor;
         };
     };
+    ga: {
+        pre: CapitalizationPreprocessors;
+    };
     grc: {
-        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
+        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor & {
+            convertLatinToGreek: TextProcessor<boolean>;
+        };
     };
     hi: Record<string, never>;
     hu: {
@@ -187,7 +192,7 @@ type AllTextProcessors = {
     };
     ru: {
         pre: CapitalizationPreprocessors & {
-            yoToE: TextProcessor<boolean>;
+            yoToE: BidirectionalConversionPreprocessor;
             removeRussianDiacritics: TextProcessor<boolean>;
         };
     };

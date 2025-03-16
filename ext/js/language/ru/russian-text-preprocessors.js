@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024  Yomitan Authors
+ * Copyright (C) 2024-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,12 +27,19 @@ export const removeRussianDiacritics = {
     },
 };
 
-/** @type {import('language').TextProcessor<boolean>} */
+/** @type {import('language').BidirectionalConversionPreprocessor} */
 export const yoToE = {
-    name: 'Yo to E',
-    description: 'ё → е, Ё → Е',
-    options: basicTextProcessorOptions,
+    name: 'Convert "ё" to "е"',
+    description: 'ё → е, Ё → Е and vice versa',
+    options: ['off', 'direct', 'inverse'],
     process: (str, setting) => {
-        return setting ? str.replace(/ё/g, 'е').replace(/Ё/g, 'Е') : str;
+        switch (setting) {
+            case 'off':
+                return str;
+            case 'direct':
+                return str.replace(/ё/g, 'е').replace(/Ё/g, 'Е');
+            case 'inverse':
+                return str.replace(/е/g, 'ё').replace(/Е/g, 'Ё');
+        }
     },
 };

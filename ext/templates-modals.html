@@ -702,6 +702,20 @@
         </div>
     </div></div>
 
+    <div id="audio-source-move-location-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Move Audio Source Options</div></div>
+        <div class="modal-body">
+            <p>Input the location the audio source should be moved to:</p>
+            <div class="margin-above">
+                <input type="number" id="audio-source-move-location" min="1" step="1">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" data-modal-action="hide" id="audio-source-move-button">Move</button>
+        </div>
+    </div></div>
+
 
     <!-- Scanning inputs modal -->
     <div id="scanning-inputs-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
@@ -853,6 +867,7 @@
             <div class="anki-card-fields">
                 <div class="anki-card-field-name-header" data-persistent="true">Field</div>
                 <div class="anki-card-field-input-header" data-persistent="true">Value</div>
+                <div class="anki-card-field-overwrite-header" data-persistent="true">Overwrite</div>
             </div>
         </div>
         <div class="modal-footer">
@@ -1120,6 +1135,10 @@
                     <tr>
                         <td><code class="anki-field-marker">{sentence-furigana}</code></td>
                         <td>Sentence, quote, or phrase that the term or kanji appears in from the source content, with furigana added.</td>
+                    </tr>
+                    <tr>
+                        <td><code class="anki-field-marker">{sentence-furigana-plain}</code></td>
+                        <td>Sentence, quote, or phrase that the term or kanji appears in from the source content, with furigana added in brackets.</td>
                     </tr>
                     <tr>
                         <td><code class="anki-field-marker">{url}</code></td>

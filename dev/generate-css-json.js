@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2021-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -153,7 +153,7 @@ export function generateRules(cssFilePath, overridesCssFilePath) {
         if (typeof declarations !== 'undefined') {
             for (const declaration of declarations) {
                 if (declaration.type !== 'declaration') {
-                    console.log(declaration);
+
                     continue;
                 }
                 const {property, value} = /** @type {css.Declaration} */ (declaration);

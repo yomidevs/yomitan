@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -56,6 +56,7 @@ function createProfileOptionsTestData1() {
             popupScaleRelativeToVisualViewport: true,
             showGuide: true,
             compactTags: false,
+            averageFrequency: false,
             compactGlossaries: false,
             mainDictionary: '',
             popupTheme: 'default',
@@ -76,6 +77,7 @@ function createProfileOptionsTestData1() {
             sources: ['jpod101', 'text-to-speech', 'custom', 'jpod101-alternate'],
             volume: 100,
             autoPlay: false,
+            fallbackSoundType: 'click',
             customSourceUrl: 'http://localhost/audio.mp3?term={expression}&reading={reading}',
             textToSpeechVoice: 'example-voice',
         },
@@ -287,6 +289,7 @@ function createProfileOptionsUpdatedTestData1() {
             showGuide: true,
             enableContextMenuScanSelected: true,
             compactTags: false,
+            averageFrequency: false,
             glossaryLayoutMode: 'default',
             mainDictionary: '',
             popupTheme: 'light',
@@ -336,6 +339,7 @@ function createProfileOptionsUpdatedTestData1() {
             ],
             volume: 100,
             autoPlay: false,
+            fallbackSoundType: 'click',
         },
         scanning: {
             selectText: true,
@@ -381,7 +385,7 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnTouchPress: false,
                         scanOnTouchRelease: false,
                         scanOnPenMove: true,
-                        scanOnPenHover: true,
+                        scanOnPenHover: false,
                         scanOnPenReleaseHover: false,
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
@@ -407,7 +411,7 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnTouchPress: false,
                         scanOnTouchRelease: false,
                         scanOnPenMove: true,
-                        scanOnPenHover: true,
+                        scanOnPenHover: false,
                         scanOnPenReleaseHover: false,
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
@@ -433,7 +437,7 @@ function createProfileOptionsUpdatedTestData1() {
                         scanOnTouchPress: false,
                         scanOnTouchRelease: false,
                         scanOnPenMove: true,
-                        scanOnPenHover: true,
+                        scanOnPenHover: false,
                         scanOnPenReleaseHover: false,
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
@@ -496,14 +500,20 @@ function createProfileOptionsUpdatedTestData1() {
                 deck: '',
                 model: '',
                 fields: {
-                    expression: '{popup-selection-text}',
+                    expression: {
+                        overwriteMode: 'coalesce',
+                        value: '{popup-selection-text}',
+                    },
                 },
             },
             kanji: {
                 deck: '',
                 model: '',
                 fields: {
-                    expression: '{popup-selection-text}',
+                    expression: {
+                        overwriteMode: 'coalesce',
+                        value: '{popup-selection-text}',
+                    },
                 },
             },
             duplicateBehavior: 'new',
@@ -672,7 +682,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 57,
+        version: 62,
         global: {
             database: {
                 prefixWildcardsSupported: false,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,10 @@ export type CreateNoteDetails = {
 
 export type Field = [
     name: string,
-    value: string,
+    {
+        value: string;
+        overwriteMode: Settings.AnkiNoteFieldOverwriteMode;
+    },
 ];
 
 export type CreateNoteResult = {
@@ -78,6 +81,8 @@ export type RequirementTextFurigana = {
     text: string;
     readingMode: AnkiTemplates.TextFuriganaReadingMode;
 };
+
+export type TextFuriganaFormats = 'furiganaHtml' | 'furiganaPlain';
 
 export type RequirementDictionaryMedia = {
     type: 'dictionaryMedia';

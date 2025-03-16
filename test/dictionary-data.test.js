@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ const dictionaryName = 'Test Dictionary 2';
 const test = await createTranslatorTest(void 0, path.join(dirname, 'data/dictionaries/valid-dictionary1'), dictionaryName);
 
 describe('Dictionary data', () => {
-    console.log('test');
+
     const testInputsFilePath = path.join(dirname, 'data/translator-test-inputs.json');
     /** @type {import('test/translator').TranslatorTestInputs} */
     const {optionsPresets, tests} = parseJson(readFileSync(testInputsFilePath, {encoding: 'utf8'}));

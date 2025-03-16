@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -83,21 +83,106 @@ export function groupTermFrequencies(dictionaryEntry, dictionaryInfo) {
     }
 
     const results = [];
+
+    /** @type {import('dictionary').AverageFrequencyListGroup} */
+    const averages = new Map();
     for (const [dictionary, map2] of map1.entries()) {
+        /** @type {import('dictionary-data-util').TermFrequency[]} */
         const frequencies = [];
         const dictionaryAlias = aliasMap.get(dictionary) ?? dictionary;
         for (const {term, reading, values} of map2.values()) {
-            frequencies.push({
+            const termFrequency = {
                 term,
                 reading,
                 values: [...values.values()],
-            });
+            };
+            frequencies.push(termFrequency);
+
+            const averageFrequencyData = makeAverageFrequencyData(termFrequency, averages.get(term));
+            if (averageFrequencyData) {
+                averages.set(term, averageFrequencyData);
+            }
         }
         const currentDictionaryInfo = dictionaryInfo.find(({title}) => title === dictionary);
         const freqCount = currentDictionaryInfo?.counts?.termMeta.freq ?? 0;
         results.push({dictionary, frequencies, dictionaryAlias, freqCount});
     }
+
+    results.push({dictionary: 'Average', frequencies: makeAverageFrequencyArray(averages), dictionaryAlias: 'Average', freqCount: 1});
+
     return results;
+}
+
+/**
+ * @param {import('dictionary-data-util').TermFrequency} termFrequency
+ * @param {import('dictionary').AverageFrequencyListTerm | undefined} averageTerm
+ * @returns {import('dictionary').AverageFrequencyListTerm | undefined}
+ */
+function makeAverageFrequencyData(termFrequency, averageTerm) {
+    const valuesArray = [...termFrequency.values.values()];
+    const newReading = termFrequency.reading ?? '';
+
+    /** @type {import('dictionary').AverageFrequencyListTerm} */
+    const termMap = typeof averageTerm === 'undefined' ? new Map() : averageTerm;
+
+    const frequencyData = termMap.get(newReading) ?? {currentAvg: 1, count: 0};
+
+    if (valuesArray[0].frequency === null) { return; }
+
+    frequencyData.currentAvg = frequencyData.count / frequencyData.currentAvg + 1 / valuesArray[0].frequency;
+    frequencyData.currentAvg = (frequencyData.count + 1) / frequencyData.currentAvg;
+    frequencyData.count += 1;
+
+    termMap.set(newReading, frequencyData);
+    return termMap;
+}
+
+/**
+ * @param {import('dictionary').AverageFrequencyListGroup} averages
+ * @returns {import('dictionary-data-util').TermFrequency[]}
+ */
+function makeAverageFrequencyArray(averages) {
+    // Merge readings if one is null and there's only two readings
+    // More than one non-null reading cannot be merged since it cannot be determined which reading to merge with
+    for (const currentTerm of averages.keys()) {
+        const readingsMap = averages.get(currentTerm);
+        if (!readingsMap) { continue; } // Skip if readingsMap is undefined
+
+        const readingArray = [...readingsMap.keys()];
+        const nullIndex = readingArray.indexOf('');
+
+        if (readingArray.length === 2 && nullIndex >= 0) {
+            const key1 = readingArray[0];
+            const key2 = readingArray[1];
+
+            const value1 = readingsMap.get(key1);
+            const value2 = readingsMap.get(key2);
+
+            if (!value1 || !value2) { continue; } // Skip if any value is undefined
+
+            const avg1 = value1.currentAvg;
+            const count1 = value1.count;
+            const avg2 = value2.currentAvg;
+            const count2 = value2.count;
+
+            const newcount = count1 + count2;
+            const newavg = newcount / (count1 / avg1 + count2 / avg2);
+
+            const validKey = nullIndex === 0 ? key2 : key1;
+            readingsMap.set(validKey, {currentAvg: newavg, count: newcount});
+            readingsMap.delete('');
+        }
+    }
+
+    // Convert averages Map back to array format
+    return [...averages.entries()].flatMap(([termName, termMap]) => [...termMap.entries()].map(([readingName, data]) => ({
+        term: termName,
+        reading: readingName,
+        values: [{
+            frequency: Math.round(data.currentAvg),
+            displayValue: Math.round(data.currentAvg).toString(),
+        }],
+    })));
 }
 
 /**

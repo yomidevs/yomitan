@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -134,16 +134,16 @@ export async function testDictionaryFiles(mode, dictionaryFileNames) {
         // eslint-disable-next-line no-restricted-syntax
         const start = performance.now();
         try {
-            console.log(`Validating ${dictionaryFileName}...`);
+
             const source = fs.readFileSync(dictionaryFileName);
             await validateDictionary(mode, source.buffer, schemas);
             // eslint-disable-next-line no-restricted-syntax
             const end = performance.now();
-            console.log(`No issues detected (${((end - start) / 1000).toFixed(2)}s)`);
+
         } catch (e) {
             // eslint-disable-next-line no-restricted-syntax
             const end = performance.now();
-            console.log(`Encountered an error (${((end - start) / 1000).toFixed(2)}s)`);
+
             console.warn(e);
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ test('anki add', async ({context, page, extensionId}) => {
     await page.locator('select.anki-card-model').selectOption('Mock Model');
     const mockFields = getMockModelFields();
     for (const [modelField, value] of mockFields) {
-        await page.locator(`[data-setting="anki.terms.fields.${modelField}"]`).fill(value);
+        await page.locator(`[data-setting="anki.terms.fields.${modelField}.value"]`).fill(value);
     }
     await page.locator('#anki-cards-modal > div > div.modal-footer > button:nth-child(2)').click();
     await writeToClipboardFromPage(page, '読むの例文');

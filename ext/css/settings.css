@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -1424,6 +1424,15 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
 .audio-source-parameter {
     flex: 1 1 auto;
 }
+.audio-source-parameter,
+input.audio-source-parameter {
+    width: var(--input-width);
+}
+
+#audio-source-move-up>span.icon-button-inner,
+#audio-source-move-down>span.icon-button-inner {
+    width: 26px;
+}
 
 .profile-add-button-container {
     display: flex;
@@ -1591,7 +1600,9 @@ select.profile-condition-operator {
     align-items: center;
     width: 100%;
     margin-top: 0.5em;
+    gap: 0.5em;
 }
+
 .anki-card-field-name-header {
     font-weight: bold;
     margin-right: 1em;
@@ -1599,13 +1610,17 @@ select.profile-condition-operator {
 .anki-card-field-input-header {
     font-weight: bold;
 }
+.anki-card-field-overwrite-header {
+    display: none;
+    font-weight: bold;
+}
+
 .anki-card-field-name-container {
     display: flex;
     flex-flow: row nowrap;
     align-self: stretch;
     align-items: center;
     margin-top: 0.25em;
-    margin-right: 0.25em;
     padding: 0 0.25em;
 }
 .anki-card-field-name-container[data-invalid=true],
@@ -1620,6 +1635,21 @@ select.profile-condition-operator {
     width: 100%;
     margin-top: 0.25em;
 }
+.anki-card-field-overwrite-container {
+    display: none;
+}
+
+#anki-card-primary[data-anki-duplicate-behavior='overwrite'] .anki-card-fields {
+    grid-template-columns: auto 1fr 1fr;
+}
+#anki-card-primary[data-anki-duplicate-behavior='overwrite'] .anki-card-field-overwrite-header {
+    display: block;
+}
+#anki-card-primary[data-anki-duplicate-behavior='overwrite'] .anki-card-field-overwrite-container {
+    display: block;
+}
+
+
 input.anki-card-field-value {
     flex: 1 1 auto;
     border-top-right-radius: 0;
@@ -2646,6 +2676,8 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 
 /* Treat devices that can't hover as mobile devices */
 @media (hover: none) {
+    #audio-source-move-up>span.icon-button-inner,
+    #audio-source-move-down>span.icon-button-inner,
     #dictionary-move-up>span.icon-button-inner,
     #dictionary-move-down>span.icon-button-inner {
         width: 36px;

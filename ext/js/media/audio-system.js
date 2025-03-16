@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,8 @@ export class AudioSystem extends EventDispatcher {
         super();
         /** @type {?HTMLAudioElement} */
         this._fallbackAudio = null;
+        /** @type {?import('settings').FallbackSoundType} */
+        this._fallbackSoundType = null;
     }
 
     /**
@@ -43,11 +45,24 @@ export class AudioSystem extends EventDispatcher {
     }
 
     /**
+     * @param {import('settings').FallbackSoundType} fallbackSoundType
      * @returns {HTMLAudioElement}
      */
-    getFallbackAudio() {
-        if (this._fallbackAudio === null) {
-            this._fallbackAudio = new Audio('/data/audio/button.mp3');
+    getFallbackAudio(fallbackSoundType) {
+        if (this._fallbackAudio === null || this._fallbackSoundType !== fallbackSoundType) {
+            this._fallbackSoundType = fallbackSoundType;
+            switch (fallbackSoundType) {
+                case 'click':
+                    this._fallbackAudio = new Audio('/data/audio/fallback-click.mp3');
+                    break;
+                case 'bloop':
+                    this._fallbackAudio = new Audio('/data/audio/fallback-bloop.mp3');
+                    break;
+                case 'none':
+                    // audio handler expects audio url to always be present, empty string must be used instead of `new Audio()`
+                    this._fallbackAudio = new Audio('');
+                    break;
+            }
         }
         return this._fallbackAudio;
     }
