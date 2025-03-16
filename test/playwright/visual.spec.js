@@ -29,7 +29,7 @@ test.beforeEach(async ({context}) => {
 
 test('welcome', async ({page, extensionId}) => {
     // Open welcome page
-    console.log('Open welcome page');
+
     await page.goto(`chrome-extension://${extensionId}/welcome.html`);
     await expect(page.getByText('Welcome to Yomitan!')).toBeVisible();
 
@@ -39,7 +39,7 @@ test('welcome', async ({page, extensionId}) => {
 test.describe('settings', () => {
     test('local load of jmdict_english', async ({page, extensionId}) => {
         // Open settings
-        console.log('Open settings');
+
         await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
         await expect(page.locator('id=dictionaries')).toBeVisible();
@@ -51,7 +51,7 @@ test.describe('settings', () => {
         await expect.soft(page).toHaveScreenshot('settings-fresh.png', {mask: [storage_locator]});
 
         // Load in jmdict_english.zip
-        console.log('Load in jmdict_english.zip');
+
         await page.locator('input[id="dictionary-import-file-input"]').setInputFiles(path.join(root, 'dictionaries/jmdict_english.zip'));
         await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 5 * 60 * 1000});
 
@@ -60,7 +60,7 @@ test.describe('settings', () => {
     });
     test('remote load and delete of jmdict_swedish', async ({page, extensionId}) => {
         // Open settings
-        console.log('Open settings');
+
         await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
         // Enable advanced settings
@@ -68,7 +68,7 @@ test.describe('settings', () => {
         await page.locator('input#advanced-checkbox').evaluate((/** @type {HTMLInputElement} */ element) => element.click());
 
         // Import jmdict_swedish.zip from a URL
-        console.log('Load in jmdict_swedish.zip');
+
         await page.locator('.settings-item[data-modal-action="show,dictionaries"]').click();
         await page.locator('button[id="dictionary-import-button"]').click();
         await page.locator('textarea[id="dictionary-import-url-text"]').fill('https://github.com/yomidevs/yomitan/raw/dictionaries/jmdict_swedish.zip');
@@ -92,7 +92,7 @@ test.describe('settings', () => {
         await page.setViewportSize({width: 1280, height: pageHeight});
 
         // Wait for any animations or changes to complete
-        console.log('Waiting for animations to complete');
+
         await page.waitForTimeout(500);
 
         // Get the locator for the disk usage indicator so we can later mask it out of the screenshot
@@ -108,7 +108,7 @@ test.describe('settings', () => {
 test.describe('popup', () => {
     test.beforeEach(async ({page, extensionId}) => {
         // Open settings
-        console.log('Open settings');
+
         await page.goto(`chrome-extension://${extensionId}/settings.html`);
 
         await expect(page.locator('id=dictionaries')).toBeVisible();
@@ -122,7 +122,7 @@ test.describe('popup', () => {
         });
         await expect(page.locator('id=dictionaries')).toHaveText('Dictionaries (1 installed, 1 enabled)', {timeout: 1 * 60 * 1000});
 
-        console.log('Open popup-tests.html');
+
         await page.goto(pathToFileURL(popupTestsPath).toString());
         await page.setViewportSize({width: 700, height: 500});
         await expect(page.locator('id=footer')).toBeVisible();
@@ -134,7 +134,7 @@ test.describe('popup', () => {
         test(`test${i}`, async ({page}) => {
             const frame_attached = page.waitForEvent('frameattached', {timeout: 10000});
             const test_name = 'doc2-test' + i;
-            console.log(test_name);
+
 
             // Find the test element
             const hovertarget_locator = page.locator('.hovertarget').nth(i - 1);
@@ -168,7 +168,7 @@ test.describe('popup', () => {
                 console.warn(test_name, 'unexpected popup state', error);
             }
 
-            console.log(test_name, 'taking screenshot');
+
             await page.bringToFront(); // Bring the page to the foreground so the screenshot doesn't hang; for some reason the frames result in page being in the background
             await expect.soft(page).toHaveScreenshot(test_name + '.png');
         });

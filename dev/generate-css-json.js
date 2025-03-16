@@ -153,7 +153,7 @@ export function generateRules(cssFilePath, overridesCssFilePath) {
         if (typeof declarations !== 'undefined') {
             for (const declaration of declarations) {
                 if (declaration.type !== 'declaration') {
-                    console.log(declaration);
+
                     continue;
                 }
                 const {property, value} = /** @type {css.Declaration} */ (declaration);

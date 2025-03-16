@@ -45,7 +45,7 @@ class Logger extends EventDispatcher {
      */
     log(message, ...optionalParams) {
         /* eslint-disable no-console */
-        console.log(message, ...optionalParams);
+
         /* eslint-enable no-console */
     }
 
@@ -133,7 +133,7 @@ class Logger extends EventDispatcher {
 
         /* eslint-disable no-console */
         switch (level) {
-            case 'log': console.log(message); break;
+            case 'log':  break;
             case 'warn': console.warn(message); break;
             case 'error': console.error(message); break;
         }

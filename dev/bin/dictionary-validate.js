@@ -22,10 +22,7 @@ import {testDictionaryFiles} from '../dictionary-validate.js';
 async function main() {
     const dictionaryFileNames = process.argv.slice(2);
     if (dictionaryFileNames.length === 0) {
-        console.log([
-            'Usage:',
-            '  node dictionary-validate [--ajv] <dictionary-file-names>...',
-        ].join('\n'));
+
         return;
     }
 
