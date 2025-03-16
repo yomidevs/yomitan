@@ -53,8 +53,9 @@ body {
     height: 100%;
     overflow: hidden;
 }
-#content-scroll {
-    padding: var(--search-scroll-container-horizontal-padding);
+.search-header {
+    padding-left: var(--search-scroll-container-horizontal-padding);
+    padding-right: var(--search-scroll-container-horizontal-padding);
 }
 h1 {
     font-size: 2em;
