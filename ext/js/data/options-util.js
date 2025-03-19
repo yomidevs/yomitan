@@ -574,6 +574,7 @@ export class OptionsUtil {
             this._updateVersion60,
             this._updateVersion61,
             this._updateVersion62,
+            this._updateVersion63,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1624,6 +1625,14 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             profile.options.general.averageFrequency = false;
         }
+    }
+
+    /**
+     *  - Added selectable tags to phonetic transcriptions handlebar
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion63(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v63.handlebars');
     }
 
     /**
