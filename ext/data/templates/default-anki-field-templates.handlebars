@@ -312,7 +312,7 @@
         <ul>
             {{~#each definition.phoneticTranscriptions~}}
                 {{~#each phoneticTranscriptions~}}
-                    <li class="pronunciation">
+                    <li class="pronunciation" data-pronunciation-type="phonetic-transcription">
                         {{~set "any" false~}}
                         {{~#each tags~}}
                             {{~#if (get "any")}}, {{else}}<i>({{/if~}}
