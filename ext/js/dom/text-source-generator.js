@@ -404,7 +404,12 @@ export class TextSourceGenerator {
         if (typeof document.caretPositionFromPoint === 'function') {
             // Firefox
             // 128+ Chrome, Edge
-            return this._caretPositionFromPoint(x, y);
+            const caretPositionFromPointResult = this._caretPositionFromPoint(x, y);
+            // Older Chromium based browsers (such as Kiwi) pretend to support `caretPositionFromPoint` but it doesn't work
+            // Allow falling through if `caretPositionFromPointResult` is null to let `caretRangeFromPoint` be used in these cases
+            if (caretPositionFromPointResult) {
+                return caretPositionFromPointResult;
+            }
         }
 
         if (typeof document.caretRangeFromPoint === 'function') {
