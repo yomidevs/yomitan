@@ -507,10 +507,10 @@ export class AudioDownloader {
             throw new Error('No custom URL defined');
         }
         const data = {
-	    term,
+            term,
             reading,
-            language: languageSummary.iso
-	};
+            language: languageSummary.iso,
+        };
         /**
          * @param {string} m0
          * @param {string} m1
