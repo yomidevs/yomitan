@@ -121,7 +121,6 @@ class DictionaryEntry {
         for (const [key, value] of Object.entries(counts)) {
             if (value !== this._dictionaryInfo.counts[key].total) {
                 countsMismatch = true;
-                console.log('hit');
             }
         }
         this._integrityButtonWarning.hidden = !countsMismatch;
