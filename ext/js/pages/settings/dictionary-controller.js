@@ -299,6 +299,7 @@ class DictionaryEntry {
             sourceLanguage: 'Source Language',
             targetLanguage: 'Target Language',
             terms: 'Term Count',
+            termMeta: 'Term Meta Count',
             kanji: 'Kanji Count',
             kanjiMeta: 'Kanji Meta Count',
             tagMeta: 'Tag Count',
