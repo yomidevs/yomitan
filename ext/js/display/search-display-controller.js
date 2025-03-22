@@ -51,6 +51,8 @@ export class SearchDisplayController {
         this._wanakanaEnableCheckbox = querySelectorNotNull(document, '#wanakana-enable');
         /** @type {HTMLInputElement} */
         this._stickyHeaderEnableCheckbox = querySelectorNotNull(document, '#sticky-header-enable');
+        /** @type {HTMLElement} */
+        this._profileSelectContainer = querySelectorNotNull(document, '#search-option-profile-select');
         /** @type {HTMLSelectElement} */
         this._profileSelect = querySelectorNotNull(document, '#profile-select');
         /** @type {HTMLElement} */
@@ -673,6 +675,8 @@ export class SearchDisplayController {
         while (optionGroup.firstChild) {
             optionGroup.removeChild(optionGroup.firstChild);
         }
+
+        this._profileSelectContainer.hidden = profiles.length <= 1;
 
         const fragment = document.createDocumentFragment();
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
