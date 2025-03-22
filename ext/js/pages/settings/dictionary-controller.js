@@ -113,16 +113,23 @@ class DictionaryEntry {
     }
 
     /**
-     * @param {import('dictionary-database').DictionaryCountGroup} counts
+     * @param {import('dictionary-database').DictionaryCountGroup} databaseCounts
      */
-    setCounts(counts) {
-        this._databaseCounts = counts;
+    setCounts(databaseCounts) {
+        this._databaseCounts = databaseCounts;
         let countsMismatch = false;
-        for (const [key, value] of Object.entries(counts)) {
-            if (value !== this._dictionaryInfo.counts[key].total) {
+
+        if (!this._dictionaryInfo.counts) {
+            log.warn('Check Integrity count not compare dictionary counts of ' + this._dictionaryInfo.title);
+            return;
+        }
+
+        for (const value of Object.values(this._zipCounts(databaseCounts, this._dictionaryInfo.counts))) {
+            if (value[0] !== value[1]) {
                 countsMismatch = true;
             }
         }
+
         this._integrityButtonWarning.hidden = !countsMismatch;
         this._integrityButtonCheck.hidden = countsMismatch;
     }
@@ -224,6 +231,22 @@ class DictionaryEntry {
     updateAliasSettings(alias) {
         this._aliasNode.textContent = alias;
         this._aliasNode.dispatchEvent(new CustomEvent('change', {bubbles: true}));
+    }
+
+    /**
+     * @param {import('dictionary-database').DictionaryCountGroup} databaseCounts
+     * @param {import('dictionary-importer').SummaryCounts} summaryCounts
+     * @returns {Record<string, [number, number]>}
+     */
+    _zipCounts(databaseCounts, summaryCounts) {
+        return {
+            terms: [databaseCounts.terms, summaryCounts?.terms?.total],
+            termMeta: [databaseCounts.termMeta, summaryCounts?.termMeta?.total],
+            kanji: [databaseCounts.kanji, summaryCounts?.kanji?.total],
+            kanjiMeta: [databaseCounts.kanjiMeta, summaryCounts?.kanjiMeta?.total],
+            tagMeta: [databaseCounts.tagMeta, summaryCounts?.tagMeta?.total],
+            media: [databaseCounts.media, summaryCounts?.media?.total],
+        };
     }
 
     /**
