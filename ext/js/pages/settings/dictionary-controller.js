@@ -435,14 +435,14 @@ class DictionaryEntry {
 
 class DictionaryExtraInfo {
     /**
-     * @param {DictionaryController} parent
+     * @param {DictionaryController} dictionaryController
      * @param {import('dictionary-database').DictionaryCountGroup} totalCounts
      * @param {import('dictionary-database').DictionaryCountGroup} remainders
      * @param {number} totalRemainder
      */
-    constructor(parent, totalCounts, remainders, totalRemainder) {
+    constructor(dictionaryController, totalCounts, remainders, totalRemainder) {
         /** @type {DictionaryController} */
-        this._parent = parent;
+        this._dictionaryController = dictionaryController;
         /** @type {import('dictionary-database').DictionaryCountGroup} */
         this._totalCounts = totalCounts;
         /** @type {import('dictionary-database').DictionaryCountGroup} */
@@ -459,7 +459,7 @@ class DictionaryExtraInfo {
      * @param {HTMLElement} container
      */
     prepare(container) {
-        const fragment = this._parent.instantiateTemplateFragment('dictionary-extra');
+        const fragment = this._dictionaryController.instantiateTemplateFragment('dictionary-extra');
         for (const node of fragment.childNodes) {
             this._nodes.push(node);
         }
@@ -494,7 +494,7 @@ class DictionaryExtraInfo {
 
     /** */
     _showDetails() {
-        const modal = this._parent.modalController.getModal('dictionary-extra-data');
+        const modal = this._dictionaryController.modalController.getModal('dictionary-extra-data');
         if (modal === null) { return; }
 
         const titleNode = modal.node.querySelector('.dictionary-total-count');
