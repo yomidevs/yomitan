@@ -465,7 +465,7 @@ class DictionaryExtraInfo {
         }
 
         /** @type {HTMLButtonElement} */
-        const dictionaryIntegrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button-check');
+        const dictionaryIntegrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button-warning');
 
         const titleNode = fragment.querySelector('.dictionary-total-count');
         this._setTitle(titleNode);
