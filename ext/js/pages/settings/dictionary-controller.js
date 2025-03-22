@@ -121,6 +121,7 @@ class DictionaryEntry {
         for (const [key, value] of Object.entries(counts)) {
             if (value !== this._dictionaryInfo.counts[key].total) {
                 countsMismatch = true;
+                console.log('hit');
             }
         }
         this._integrityButtonWarning.hidden = countsMismatch;
@@ -264,8 +265,6 @@ class DictionaryEntry {
         const versionElement = querySelectorNotNull(modal.node, '.dictionary-revision');
         /** @type {HTMLElement} */
         const outdateElement = querySelectorNotNull(modal.node, '.dictionary-outdated-notification');
-        /** @type {HTMLElement} */
-        const countsElement = querySelectorNotNull(modal.node, '.dictionary-counts');
         /** @type {HTMLInputElement} */
         const wildcardSupportedElement = querySelectorNotNull(modal.node, '.dictionary-prefix-wildcard-searches-supported');
         /** @type {HTMLElement} */
@@ -282,7 +281,6 @@ class DictionaryEntry {
         titleElement.textContent = title;
         versionElement.textContent = `rev.${revision}`;
         outdateElement.hidden = (version >= 3);
-        countsElement.textContent = this._databaseCounts !== null ? JSON.stringify(this._databaseCounts, null, 4) : '';
         wildcardSupportedElement.checked = prefixWildcardsSupported;
         partsOfSpeechFilterSetting.hidden = !counts?.terms.total;
         partsOfSpeechFilterToggle.dataset.setting = `dictionaries[${this._index}].partsOfSpeechFilter`;
@@ -320,7 +318,7 @@ class DictionaryEntry {
         let any = false;
         for (const [key, label] of /** @type {([keyof (typeof this._dictionaryInfo & typeof this._dictionaryInfo.counts), string])[]} */ (Object.entries(targets))) {
             const info = dictionaryInfo[key];
-            const displayText = ((_info) => {
+            let displayText = ((_info) => {
                 if (typeof _info === 'string') { return _info; }
                 if (_info && typeof _info === 'object' && 'total' in _info) {
                     return _info.total ? `${_info.total}` : false;
@@ -338,6 +336,9 @@ class DictionaryEntry {
             const infoElement = querySelectorNotNull(details, '.dictionary-details-entry-info');
 
             labelElement.textContent = `${label}:`;
+            if (this._databaseCounts) {
+                displayText = 'Expected: ' + displayText + ' (Database: ' + this._databaseCounts[key] + ')';
+            }
             infoElement.textContent = displayText;
             fragment.appendChild(details);
 
@@ -473,11 +474,6 @@ class DictionaryExtraInfo {
         const modal = this._parent.modalController.getModal('dictionary-extra-data');
         if (modal === null) { return; }
 
-        /** @type {HTMLElement} */
-        const dictionaryCounts = querySelectorNotNull(modal.node, '.dictionary-counts');
-
-        const info = {counts: this._totalCounts, remainders: this._remainders};
-        dictionaryCounts.textContent = JSON.stringify(info, null, 4);
         const titleNode = modal.node.querySelector('.dictionary-total-count');
         this._setTitle(titleNode);
 

@@ -2405,16 +2405,6 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     display: table-cell;
     white-space: pre-line;
 }
-.dictionary-counts {
-    width: 100%;
-    box-sizing: border-box;
-    font-size: inherit;
-    max-height: 10em;
-    line-height: 1.25;
-    font-family: 'Courier New', Courier, monospace;
-    white-space: pre;
-    overflow: auto;
-}
 
 #dictionary-alias-input {
     width: 100%;
