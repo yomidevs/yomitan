@@ -1367,7 +1367,9 @@ export class Display extends EventDispatcher {
             safePerformance.mark('display:findDictionaryEntries:end');
             safePerformance.measure('display:findDictionaryEntries', 'display:findDictionaryEntries:start', 'display:findDictionaryEntries:end');
             if (this._setContentToken !== token) { return; }
-            content.dictionaryEntries = dictionaryEntries;
+            if (lookup) {
+                content.dictionaryEntries = dictionaryEntries;
+            }
             changeHistory = true;
         }
 
