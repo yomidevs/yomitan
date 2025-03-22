@@ -67,7 +67,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="low-emphasis danger dictionary-database-mutating-input" id="dictionary-delete-all-button">Delete All</button>
-            <button type="button" class="low-emphasis dictionary-database-mutating-input debug-only" id="dictionary-check-integrity">Check Integrity</button>
+            <button type="button" class="low-emphasis dictionary-database-mutating-input advanced-only" id="dictionary-check-integrity">Check Integrity</button>
             <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-check-updates">Check for Updates</button>
             <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-button">Import</button>
             <button type="button" data-modal-action="hide">Close</button>
@@ -231,7 +231,6 @@
             <hr>
             <div class="settings-item"><div class="settings-item-children">
                 <div class="dictionary-details-table"></div>
-                <div class="dictionary-counts"></div>
             </div></div>
         </div>
         <div class="modal-footer">
@@ -250,7 +249,9 @@
                 The database contains extra data which is not associated with any installed dictionary.
                 Purging the database can fix this issue.
             </p>
-            <div class="dictionary-counts"></div>
+            <div class="settings-item"><div class="settings-item-children">
+                <div class="dictionary-details-table"></div>
+            </div></div>
         </div>
         <div class="modal-footer">
             <button type="button" data-modal-action="hide">Close</button>

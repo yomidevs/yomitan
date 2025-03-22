@@ -47,7 +47,7 @@ class DictionaryEntry {
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
         /** @type {?import('dictionary-database').DictionaryCountGroup} */
-        this._counts = null;
+        this._databaseCounts = null;
         /** @type {ChildNode[]} */
         this._nodes = [...fragment.childNodes];
         /** @type {HTMLInputElement} */
@@ -61,7 +61,9 @@ class DictionaryEntry {
         /** @type {HTMLButtonElement} */
         this._outdatedButton = querySelectorNotNull(fragment, '.dictionary-outdated-button');
         /** @type {HTMLButtonElement} */
-        this._integrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button');
+        this._integrityButtonCheck = querySelectorNotNull(fragment, '.dictionary-integrity-button-check');
+        /** @type {HTMLButtonElement} */
+        this._integrityButtonWarning = querySelectorNotNull(fragment, '.dictionary-integrity-button-warning');
         /** @type {HTMLButtonElement} */
         this._updatesAvailable = querySelectorNotNull(fragment, '.dictionary-update-available');
         /** @type {HTMLElement} */
@@ -94,7 +96,8 @@ class DictionaryEntry {
         this._eventListeners.addEventListener(this._upButton, 'click', (() => { this._move(-1); }).bind(this), false);
         this._eventListeners.addEventListener(this._downButton, 'click', (() => { this._move(1); }).bind(this), false);
         this._eventListeners.addEventListener(this._outdatedButton, 'click', this._onOutdatedButtonClick.bind(this), false);
-        this._eventListeners.addEventListener(this._integrityButton, 'click', this._onIntegrityButtonClick.bind(this), false);
+        this._eventListeners.addEventListener(this._integrityButtonCheck, 'click', this._onIntegrityButtonClick.bind(this), false);
+        this._eventListeners.addEventListener(this._integrityButtonWarning, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._updatesAvailable, 'click', this._onUpdateButtonClick.bind(this), false);
     }
 
@@ -110,11 +113,25 @@ class DictionaryEntry {
     }
 
     /**
-     * @param {import('dictionary-database').DictionaryCountGroup} counts
+     * @param {import('dictionary-database').DictionaryCountGroup} databaseCounts
      */
-    setCounts(counts) {
-        this._counts = counts;
-        this._integrityButton.hidden = false;
+    setCounts(databaseCounts) {
+        this._databaseCounts = databaseCounts;
+        let countsMismatch = false;
+
+        if (!this._dictionaryInfo.counts) {
+            log.warn('Check Integrity count not compare dictionary counts of ' + this._dictionaryInfo.title);
+            return;
+        }
+
+        for (const value of Object.values(this._zipCounts(databaseCounts, this._dictionaryInfo.counts))) {
+            if (value[0] !== value[1]) {
+                countsMismatch = true;
+            }
+        }
+
+        this._integrityButtonWarning.hidden = !countsMismatch;
+        this._integrityButtonCheck.hidden = countsMismatch;
     }
 
     /**
@@ -217,6 +234,22 @@ class DictionaryEntry {
     }
 
     /**
+     * @param {import('dictionary-database').DictionaryCountGroup} databaseCounts
+     * @param {import('dictionary-importer').SummaryCounts} summaryCounts
+     * @returns {Record<string, [number, number]>}
+     */
+    _zipCounts(databaseCounts, summaryCounts) {
+        return {
+            terms: [databaseCounts.terms, summaryCounts?.terms?.total],
+            termMeta: [databaseCounts.termMeta, summaryCounts?.termMeta?.total],
+            kanji: [databaseCounts.kanji, summaryCounts?.kanji?.total],
+            kanjiMeta: [databaseCounts.kanjiMeta, summaryCounts?.kanjiMeta?.total],
+            tagMeta: [databaseCounts.tagMeta, summaryCounts?.tagMeta?.total],
+            media: [databaseCounts.media, summaryCounts?.media?.total],
+        };
+    }
+
+    /**
      * @param {import('dom-data-binder').SettingChangedEvent} e
      */
     _onEnabledChanged(e) {
@@ -254,8 +287,6 @@ class DictionaryEntry {
         const versionElement = querySelectorNotNull(modal.node, '.dictionary-revision');
         /** @type {HTMLElement} */
         const outdateElement = querySelectorNotNull(modal.node, '.dictionary-outdated-notification');
-        /** @type {HTMLElement} */
-        const countsElement = querySelectorNotNull(modal.node, '.dictionary-counts');
         /** @type {HTMLInputElement} */
         const wildcardSupportedElement = querySelectorNotNull(modal.node, '.dictionary-prefix-wildcard-searches-supported');
         /** @type {HTMLElement} */
@@ -272,7 +303,6 @@ class DictionaryEntry {
         titleElement.textContent = title;
         versionElement.textContent = `rev.${revision}`;
         outdateElement.hidden = (version >= 3);
-        countsElement.textContent = this._counts !== null ? JSON.stringify(this._counts, null, 4) : '';
         wildcardSupportedElement.checked = prefixWildcardsSupported;
         partsOfSpeechFilterSetting.hidden = !counts?.terms.total;
         partsOfSpeechFilterToggle.dataset.setting = `dictionaries[${this._index}].partsOfSpeechFilter`;
@@ -311,7 +341,7 @@ class DictionaryEntry {
         let any = false;
         for (const [key, label] of /** @type {([keyof (typeof this._dictionaryInfo & typeof this._dictionaryInfo.counts), string])[]} */ (Object.entries(targets))) {
             const info = dictionaryInfo[key];
-            const displayText = ((_info) => {
+            let displayText = ((_info) => {
                 if (typeof _info === 'string') { return _info; }
                 if (_info && typeof _info === 'object' && 'total' in _info) {
                     return _info.total ? `${_info.total}` : false;
@@ -329,6 +359,9 @@ class DictionaryEntry {
             const infoElement = querySelectorNotNull(details, '.dictionary-details-entry-info');
 
             labelElement.textContent = `${label}:`;
+            if (this._databaseCounts && this._databaseCounts[key]) {
+                displayText = 'Expected: ' + displayText + ' (Database: ' + this._databaseCounts[key] + ')';
+            }
             infoElement.textContent = displayText;
             fragment.appendChild(details);
 
@@ -402,14 +435,14 @@ class DictionaryEntry {
 
 class DictionaryExtraInfo {
     /**
-     * @param {DictionaryController} parent
+     * @param {DictionaryController} dictionaryController
      * @param {import('dictionary-database').DictionaryCountGroup} totalCounts
      * @param {import('dictionary-database').DictionaryCountGroup} remainders
      * @param {number} totalRemainder
      */
-    constructor(parent, totalCounts, remainders, totalRemainder) {
+    constructor(dictionaryController, totalCounts, remainders, totalRemainder) {
         /** @type {DictionaryController} */
-        this._parent = parent;
+        this._dictionaryController = dictionaryController;
         /** @type {import('dictionary-database').DictionaryCountGroup} */
         this._totalCounts = totalCounts;
         /** @type {import('dictionary-database').DictionaryCountGroup} */
@@ -426,13 +459,13 @@ class DictionaryExtraInfo {
      * @param {HTMLElement} container
      */
     prepare(container) {
-        const fragment = this._parent.instantiateTemplateFragment('dictionary-extra');
+        const fragment = this._dictionaryController.instantiateTemplateFragment('dictionary-extra');
         for (const node of fragment.childNodes) {
             this._nodes.push(node);
         }
 
         /** @type {HTMLButtonElement} */
-        const dictionaryIntegrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button');
+        const dictionaryIntegrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button-warning');
 
         const titleNode = fragment.querySelector('.dictionary-total-count');
         this._setTitle(titleNode);
@@ -461,18 +494,58 @@ class DictionaryExtraInfo {
 
     /** */
     _showDetails() {
-        const modal = this._parent.modalController.getModal('dictionary-extra-data');
+        const modal = this._dictionaryController.modalController.getModal('dictionary-extra-data');
         if (modal === null) { return; }
 
-        /** @type {HTMLElement} */
-        const dictionaryCounts = querySelectorNotNull(modal.node, '.dictionary-counts');
-
-        const info = {counts: this._totalCounts, remainders: this._remainders};
-        dictionaryCounts.textContent = JSON.stringify(info, null, 4);
         const titleNode = modal.node.querySelector('.dictionary-total-count');
         this._setTitle(titleNode);
 
+        /** @type {HTMLElement} */
+        const detailsTableElement = querySelectorNotNull(modal.node, '.dictionary-details-table');
+        this._setupDetails(detailsTableElement);
+
         modal.setVisible(true);
+    }
+
+    /**
+     * @param {Element} detailsTable
+     * @returns {boolean}
+     */
+    _setupDetails(detailsTable) {
+        /** @type {Partial<Record<keyof (typeof this._totalCounts), string>>} */
+        const targets = {
+            terms: 'Term Count',
+            termMeta: 'Term Meta Count',
+            kanji: 'Kanji Count',
+            kanjiMeta: 'Kanji Meta Count',
+            tagMeta: 'Tag Count',
+            media: 'Media Count',
+        };
+
+        const fragment = document.createDocumentFragment();
+        let any = false;
+        for (const [key, label] of (Object.entries(targets))) {
+            if (!this._remainders[key]) {
+                continue;
+            }
+            const details = /** @type {HTMLElement} */ (this._dictionaryController.instantiateTemplate('dictionary-details-entry'));
+            details.dataset.type = key;
+
+            /** @type {HTMLElement} */
+            const labelElement = querySelectorNotNull(details, '.dictionary-details-entry-label');
+            /** @type {HTMLElement} */
+            const infoElement = querySelectorNotNull(details, '.dictionary-details-entry-info');
+
+            labelElement.textContent = `${label}:`;
+            infoElement.textContent = this._remainders[key].toString();
+            fragment.appendChild(details);
+
+            any = true;
+        }
+
+        detailsTable.textContent = '';
+        detailsTable.appendChild(fragment);
+        return any;
     }
 
     /**
