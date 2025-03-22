@@ -359,7 +359,7 @@ class DictionaryEntry {
             const infoElement = querySelectorNotNull(details, '.dictionary-details-entry-info');
 
             labelElement.textContent = `${label}:`;
-            if (this._databaseCounts) {
+            if (this._databaseCounts && this._databaseCounts[key]) {
                 displayText = 'Expected: ' + displayText + ' (Database: ' + this._databaseCounts[key] + ')';
             }
             infoElement.textContent = displayText;
