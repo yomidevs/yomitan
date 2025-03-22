@@ -90,8 +90,6 @@ export class SettingsDisplayController {
         menuSelectorObserver.observe(document.documentElement, false);
 
         window.addEventListener('keydown', this._onKeyDown.bind(this), false);
-        window.addEventListener('popstate', this._onPopState.bind(this), false);
-        this._updateScrollTarget();
 
         if (this._themeDropdown) {
             this._themeDropdown.addEventListener('change', this._updateTheme.bind(this), false);
@@ -202,11 +200,6 @@ export class SettingsDisplayController {
         e.preventDefault();
     }
 
-    /** */
-    _onPopState() {
-        this._updateScrollTarget();
-    }
-
     /**
      * @param {KeyboardEvent} e
      */
@@ -297,20 +290,6 @@ export class SettingsDisplayController {
                 this._indentInput(e, node, args);
                 break;
         }
-    }
-
-    /** */
-    _updateScrollTarget() {
-        const hash = window.location.hash;
-        if (!hash.startsWith('#!')) { return; }
-
-        const content = this._contentNode;
-        const target = document.getElementById(hash.substring(2));
-        if (content === null || target === null) { return; }
-
-        const rect1 = content.getBoundingClientRect();
-        const rect2 = target.getBoundingClientRect();
-        content.scrollTop += rect2.top - rect1.top;
     }
 
     /**
