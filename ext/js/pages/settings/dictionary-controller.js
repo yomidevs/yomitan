@@ -47,7 +47,7 @@ class DictionaryEntry {
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
         /** @type {?import('dictionary-database').DictionaryCountGroup} */
-        this._counts = null;
+        this._databaseCounts = null;
         /** @type {ChildNode[]} */
         this._nodes = [...fragment.childNodes];
         /** @type {HTMLInputElement} */
@@ -116,7 +116,7 @@ class DictionaryEntry {
      * @param {import('dictionary-database').DictionaryCountGroup} counts
      */
     setCounts(counts) {
-        this._counts = counts;
+        this._databaseCounts = counts;
         let countsMismatch = false;
         for (const [key, value] of Object.entries(counts)) {
             if (value !== this._dictionaryInfo.counts[key].total) {
@@ -282,7 +282,7 @@ class DictionaryEntry {
         titleElement.textContent = title;
         versionElement.textContent = `rev.${revision}`;
         outdateElement.hidden = (version >= 3);
-        countsElement.textContent = this._counts !== null ? JSON.stringify(this._counts, null, 4) : '';
+        countsElement.textContent = this._databaseCounts !== null ? JSON.stringify(this._databaseCounts, null, 4) : '';
         wildcardSupportedElement.checked = prefixWildcardsSupported;
         partsOfSpeechFilterSetting.hidden = !counts?.terms.total;
         partsOfSpeechFilterToggle.dataset.setting = `dictionaries[${this._index}].partsOfSpeechFilter`;
