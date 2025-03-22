@@ -61,7 +61,9 @@ class DictionaryEntry {
         /** @type {HTMLButtonElement} */
         this._outdatedButton = querySelectorNotNull(fragment, '.dictionary-outdated-button');
         /** @type {HTMLButtonElement} */
-        this._integrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button');
+        this._integrityButtonCheck = querySelectorNotNull(fragment, '.dictionary-integrity-button-check');
+        /** @type {HTMLButtonElement} */
+        this._integrityButtonWarning = querySelectorNotNull(fragment, '.dictionary-integrity-button-warning');
         /** @type {HTMLButtonElement} */
         this._updatesAvailable = querySelectorNotNull(fragment, '.dictionary-update-available');
         /** @type {HTMLElement} */
@@ -94,7 +96,8 @@ class DictionaryEntry {
         this._eventListeners.addEventListener(this._upButton, 'click', (() => { this._move(-1); }).bind(this), false);
         this._eventListeners.addEventListener(this._downButton, 'click', (() => { this._move(1); }).bind(this), false);
         this._eventListeners.addEventListener(this._outdatedButton, 'click', this._onOutdatedButtonClick.bind(this), false);
-        this._eventListeners.addEventListener(this._integrityButton, 'click', this._onIntegrityButtonClick.bind(this), false);
+        this._eventListeners.addEventListener(this._integrityButtonCheck, 'click', this._onIntegrityButtonClick.bind(this), false);
+        this._eventListeners.addEventListener(this._integrityButtonWarning, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._updatesAvailable, 'click', this._onUpdateButtonClick.bind(this), false);
     }
 
@@ -114,7 +117,17 @@ class DictionaryEntry {
      */
     setCounts(counts) {
         this._counts = counts;
-        this._integrityButton.hidden = false;
+        let countsMismatch = false;
+        for (const [key, value] of Object.entries(counts)) {
+            if (value !== this._dictionaryInfo.counts[key].total) {
+                countsMismatch = true;
+            }
+        }
+        if (countsMismatch) {
+            this._integrityButtonWarning.hidden = false;
+        } else {
+            this._integrityButtonCheck.hidden = false;
+        }
     }
 
     /**
@@ -431,7 +444,7 @@ class DictionaryExtraInfo {
         }
 
         /** @type {HTMLButtonElement} */
-        const dictionaryIntegrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button');
+        const dictionaryIntegrityButton = querySelectorNotNull(fragment, '.dictionary-integrity-button-check');
 
         const titleNode = fragment.querySelector('.dictionary-total-count');
         this._setTitle(titleNode);
