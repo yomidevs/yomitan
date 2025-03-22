@@ -124,8 +124,8 @@ class DictionaryEntry {
                 console.log('hit');
             }
         }
-        this._integrityButtonWarning.hidden = countsMismatch;
-        this._integrityButtonCheck.hidden = !countsMismatch;
+        this._integrityButtonWarning.hidden = !countsMismatch;
+        this._integrityButtonCheck.hidden = countsMismatch;
     }
 
     /**
