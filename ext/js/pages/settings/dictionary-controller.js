@@ -500,7 +500,52 @@ class DictionaryExtraInfo {
         const titleNode = modal.node.querySelector('.dictionary-total-count');
         this._setTitle(titleNode);
 
+        /** @type {HTMLElement} */
+        const detailsTableElement = querySelectorNotNull(modal.node, '.dictionary-details-table');
+        this._setupDetails(detailsTableElement);
+
         modal.setVisible(true);
+    }
+
+    /**
+     * @param {Element} detailsTable
+     * @returns {boolean}
+     */
+    _setupDetails(detailsTable) {
+        /** @type {Partial<Record<keyof (typeof this._totalCounts), string>>} */
+        const targets = {
+            terms: 'Term Count',
+            termMeta: 'Term Meta Count',
+            kanji: 'Kanji Count',
+            kanjiMeta: 'Kanji Meta Count',
+            tagMeta: 'Tag Count',
+            media: 'Media Count',
+        };
+
+        const fragment = document.createDocumentFragment();
+        let any = false;
+        for (const [key, label] of (Object.entries(targets))) {
+            if (!this._remainders[key]) {
+                continue;
+            }
+            const details = /** @type {HTMLElement} */ (this._dictionaryController.instantiateTemplate('dictionary-details-entry'));
+            details.dataset.type = key;
+
+            /** @type {HTMLElement} */
+            const labelElement = querySelectorNotNull(details, '.dictionary-details-entry-label');
+            /** @type {HTMLElement} */
+            const infoElement = querySelectorNotNull(details, '.dictionary-details-entry-info');
+
+            labelElement.textContent = `${label}:`;
+            infoElement.textContent = this._remainders[key].toString();
+            fragment.appendChild(details);
+
+            any = true;
+        }
+
+        detailsTable.textContent = '';
+        detailsTable.appendChild(fragment);
+        return any;
     }
 
     /**
