@@ -123,11 +123,8 @@ class DictionaryEntry {
                 countsMismatch = true;
             }
         }
-        if (countsMismatch) {
-            this._integrityButtonWarning.hidden = false;
-        } else {
-            this._integrityButtonCheck.hidden = false;
-        }
+        this._integrityButtonWarning.hidden = countsMismatch;
+        this._integrityButtonCheck.hidden = !countsMismatch;
     }
 
     /**
