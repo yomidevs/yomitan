@@ -22,7 +22,7 @@ import {createApiMap, invokeApiMapHandler} from '../../core/api-map.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {TextSourceRange} from '../../dom/text-source-range.js';
-import {convertToKana} from '../../language/ja/japanese-wanakana.js';
+import {convertToKanaIME} from '../../language/ja/japanese-wanakana.js';
 
 export class PopupPreviewFrame {
     /**
@@ -281,7 +281,7 @@ export class PopupPreviewFrame {
      */
     _searchTextKanaConversion(element, event) {
         if (event.isComposing) { return; }
-        element.value = convertToKana(element.value, {IMEMode: true});
+        convertToKanaIME(element);
     }
 
     /** */
