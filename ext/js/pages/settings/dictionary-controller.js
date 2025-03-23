@@ -34,8 +34,9 @@ class DictionaryEntry {
      * @param {number} index
      * @param {import('dictionary-importer').Summary} dictionaryInfo
      * @param {string | null} updateDownloadUrl
+     * @param {import('dictionary-database').DictionaryCountGroup|null} dictionaryDatabaseCounts
      */
-    constructor(dictionaryController, fragment, index, dictionaryInfo, updateDownloadUrl) {
+    constructor(dictionaryController, fragment, index, dictionaryInfo, updateDownloadUrl, dictionaryDatabaseCounts) {
         /** @type {DictionaryController} */
         this._dictionaryController = dictionaryController;
         /** @type {number} */
@@ -47,7 +48,7 @@ class DictionaryEntry {
         /** @type {EventListenerCollection} */
         this._eventListeners = new EventListenerCollection();
         /** @type {?import('dictionary-database').DictionaryCountGroup} */
-        this._databaseCounts = null;
+        this._databaseCounts = dictionaryDatabaseCounts;
         /** @type {ChildNode[]} */
         this._nodes = [...fragment.childNodes];
         /** @type {HTMLInputElement} */
@@ -99,6 +100,8 @@ class DictionaryEntry {
         this._eventListeners.addEventListener(this._integrityButtonCheck, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButtonWarning, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._updatesAvailable, 'click', this._onUpdateButtonClick.bind(this), false);
+
+        this.setCounts(this._databaseCounts);
     }
 
     /** */
@@ -113,9 +116,12 @@ class DictionaryEntry {
     }
 
     /**
-     * @param {import('dictionary-database').DictionaryCountGroup} databaseCounts
+     * @param {import('dictionary-database').DictionaryCountGroup?} databaseCounts
      */
     setCounts(databaseCounts) {
+        if (!databaseCounts) {
+            return;
+        }
         this._databaseCounts = databaseCounts;
         let countsMismatch = false;
 
@@ -132,6 +138,13 @@ class DictionaryEntry {
 
         this._integrityButtonWarning.hidden = !countsMismatch;
         this._integrityButtonCheck.hidden = countsMismatch;
+    }
+
+    /**
+     * @returns {import('dictionary-database').DictionaryCountGroup | null}
+     */
+    get databaseCounts() {
+        return this._databaseCounts;
     }
 
     /**
@@ -894,7 +907,7 @@ export class DictionaryController {
             const dictionaryInfo = dictionaryInfoMap.get(name);
             const updateDownloadUrl = dictionaryUpdateDownloadUrlMap.get(name) ?? null;
             if (typeof dictionaryInfo === 'undefined') { continue; }
-            this._createDictionaryEntry(i, dictionaryInfo, updateDownloadUrl);
+            this._createDictionaryEntry(i, dictionaryInfo, updateDownloadUrl, null);
         }
     }
 
@@ -912,8 +925,11 @@ export class DictionaryController {
 
         /** @type {Map<string, string | null>} */
         const dictionaryUpdateDownloadUrlMap = new Map();
+        /** @type {Map<string, import('dictionary-database').DictionaryCountGroup | null>} */
+        const dictionaryDatabaseCountsMap = new Map();
         for (const entry of this._dictionaryEntries) {
             dictionaryUpdateDownloadUrlMap.set(entry.dictionaryTitle, entry.updateDownloadUrl);
+            dictionaryDatabaseCountsMap.set(entry.dictionaryTitle, entry.databaseCounts);
             entry.cleanup();
         }
 
@@ -924,7 +940,8 @@ export class DictionaryController {
             const dictionaryInfo = dictionaries.find((dictionary) => dictionary.title === name);
             if (typeof dictionaryInfo === 'undefined') { continue; }
             const updateDownloadUrl = dictionaryUpdateDownloadUrlMap.get(name) ?? null;
-            this._createDictionaryEntry(i, dictionaryInfo, updateDownloadUrl);
+            const dictionaryDatabaseCounts = dictionaryDatabaseCountsMap.get(name) ?? null;
+            this._createDictionaryEntry(i, dictionaryInfo, updateDownloadUrl, dictionaryDatabaseCounts);
         }
         this._dictionaryModalBody.scroll({top: dictionariesModalBodyScrollY});
     }
@@ -1188,11 +1205,12 @@ export class DictionaryController {
      * @param {number} index
      * @param {import('dictionary-importer').Summary} dictionaryInfo
      * @param {string|null} updateDownloadUrl
+     * @param {import('dictionary-database').DictionaryCountGroup|null} dictionaryDatabaseCounts
      */
-    _createDictionaryEntry(index, dictionaryInfo, updateDownloadUrl) {
+    _createDictionaryEntry(index, dictionaryInfo, updateDownloadUrl, dictionaryDatabaseCounts) {
         const fragment = this.instantiateTemplateFragment('dictionary');
 
-        const entry = new DictionaryEntry(this, fragment, index, dictionaryInfo, updateDownloadUrl);
+        const entry = new DictionaryEntry(this, fragment, index, dictionaryInfo, updateDownloadUrl, dictionaryDatabaseCounts);
         this._dictionaryEntries.push(entry);
         entry.prepare();
 
