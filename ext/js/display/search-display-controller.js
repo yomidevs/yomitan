@@ -259,7 +259,7 @@ export class SearchDisplayController {
      */
     _searchTextKanaConversion(element, event) {
         if (!this._wanakanaEnabled || event.isComposing) { return; }
-        element.value = convertToKana(element.value, {IMEMode: true});
+        element.value = convertToKana(element.value);
     }
 
     /**

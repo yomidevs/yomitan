@@ -281,7 +281,7 @@ export class PopupPreviewFrame {
      */
     _searchTextKanaConversion(element, event) {
         if (event.isComposing) { return; }
-        element.value = convertToKana(element.value, {IMEMode: true});
+        element.value = convertToKana(element.value);
     }
 
     /** */
