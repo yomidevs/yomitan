@@ -910,13 +910,20 @@ export class DictionaryController {
             dictionaryEntry.cleanup();
         }
 
+        /** @type {Map<string, string | null>} */
+        const dictionaryUpdateDownloadUrlMap = new Map();
+        for (const entry of this._dictionaryEntries) {
+            dictionaryUpdateDownloadUrlMap.set(entry.dictionaryTitle, entry.updateDownloadUrl);
+            entry.cleanup();
+        }
+
         const dictionaryOptionsArray = options.dictionaries;
         for (let i = 0; i < dictionaryOptionsArray.length; i++) {
             const {name} = dictionaryOptionsArray[i];
             /** @type {import('dictionary-importer').Summary | undefined} */
             const dictionaryInfo = dictionaries.find((dictionary) => dictionary.title === name);
             if (typeof dictionaryInfo === 'undefined') { continue; }
-            const updateDownloadUrl = dictionaryInfo.downloadUrl ?? null;
+            const updateDownloadUrl = dictionaryUpdateDownloadUrlMap.get(name) ?? null;
             this._createDictionaryEntry(i, dictionaryInfo, updateDownloadUrl);
         }
         this._dictionaryModalBody.scroll({top: dictionariesModalBodyScrollY});
