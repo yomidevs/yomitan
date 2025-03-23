@@ -141,6 +141,13 @@ class DictionaryEntry {
     }
 
     /**
+     * @returns {import('dictionary-database').DictionaryCountGroup | null}
+     */
+    get databaseCounts() {
+        return this._databaseCounts;
+    }
+
+    /**
      * @param {boolean} value
      */
     setEnabled(value) {
@@ -922,7 +929,7 @@ export class DictionaryController {
         const dictionaryDatabaseCountsMap = new Map();
         for (const entry of this._dictionaryEntries) {
             dictionaryUpdateDownloadUrlMap.set(entry.dictionaryTitle, entry.updateDownloadUrl);
-            dictionaryDatabaseCountsMap.set(entry.dictionaryTitle, entry._databaseCounts);
+            dictionaryDatabaseCountsMap.set(entry.dictionaryTitle, entry.databaseCounts);
             entry.cleanup();
         }
 
