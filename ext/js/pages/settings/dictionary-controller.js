@@ -183,6 +183,14 @@ class DictionaryEntry {
         return this._updateDownloadUrl;
     }
 
+    /**
+     * @param {string} alias
+     */
+    updateAliasSettings(alias) {
+        this._aliasNode.textContent = alias;
+        this._aliasNode.dispatchEvent(new CustomEvent('change', {bubbles: true}));
+    }
+
     // Private
 
     /** */
@@ -223,14 +231,6 @@ class DictionaryEntry {
                 this._showRenameModal();
                 break;
         }
-    }
-
-    /**
-     * @param {string} alias
-     */
-    updateAliasSettings(alias) {
-        this._aliasNode.textContent = alias;
-        this._aliasNode.dispatchEvent(new CustomEvent('change', {bubbles: true}));
     }
 
     /**
