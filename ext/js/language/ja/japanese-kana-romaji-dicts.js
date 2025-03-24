@@ -543,7 +543,6 @@ export const HIRAGANA_TO_ROMAJI = {
     // Double letters - these **must** always be matched last or they will break previous maches
     っq: 'qq',
     っv: 'vv',
-    っl: 'll',
     っx: 'xx',
     っk: 'kk',
     っg: 'gg',
