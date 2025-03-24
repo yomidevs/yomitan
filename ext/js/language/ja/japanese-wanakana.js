@@ -22,6 +22,18 @@ import {convertHiraganaToKatakana} from './japanese.js';
  * @param {string} text
  * @returns {string}
  */
+export function convertToHiragana(text) {
+    let newText = text.toLowerCase();
+    for (const [romaji, kana] of Object.entries(ROMAJI_TO_HIRAGANA)) {
+        newText = newText.replaceAll(romaji, kana);
+    }
+    return newText;
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
 export function convertToKana(text) {
     let newText = text;
     for (const [romaji, kana] of Object.entries(ROMAJI_TO_HIRAGANA)) {
@@ -68,7 +80,7 @@ export function convertAlphabeticToKana(text) {
             c = 0x2d; // '-'
         } else {
             if (part.length > 0) {
-                result += convertToKana(part.toLowerCase()); // lowercase to only convert to hiragana
+                result += convertToHiragana(part);
                 part = '';
             }
             result += char;
@@ -78,7 +90,7 @@ export function convertAlphabeticToKana(text) {
     }
 
     if (part.length > 0) {
-        result += convertToKana(part.toLowerCase()); // lowercase to only convert to hiragana
+        result += convertToHiragana(part);
     }
     return result;
 }
