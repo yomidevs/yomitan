@@ -162,8 +162,14 @@ describe('Japanese utility functions', () => {
     describe('convertToKanaIME', () => {
         /** @type {[input: [string, number], expected: import('language.js').KanaIMEOutput][]} */
         const data = [
-            [['KATAKANA', 8], {kanaString: 'カタカナ', newSelectionStart: 4}],
-            [['hiragana', 8], {kanaString: 'ひらがな', newSelectionStart: 4}],
+            // Note: `|` represents the text cursor (newSelectionStart) position in the following comments
+            [['KATAKANA', 8], {kanaString: 'カタカナ', newSelectionStart: 4}], // KATAKANA| -> カタカナ|
+            [['hiragana', 8], {kanaString: 'ひらがな', newSelectionStart: 4}], // hiragana| -> ひらがな|
+            [['n', 1], {kanaString: 'n', newSelectionStart: 1}], // n| -> n|
+            [['nn', 2], {kanaString: 'ん', newSelectionStart: 1}], // nn| -> ん|
+            [['nn', 1], {kanaString: 'n|ん', newSelectionStart: 1}], // n|n -> n|ん
+            [['nの', 1], {kanaString: 'nの', newSelectionStart: 1}], // n|の -> n|の
+            [['ttttttttttsu', 12], {kanaString: 'っっっっっっっっっつ', newSelectionStart: 10}], // ttttttttttsu| -> っっっっっっっっっつ|
         ];
 
         test.each(data)('%s -> %o', (dataValue, expected) => {
