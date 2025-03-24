@@ -20,7 +20,7 @@ import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
-import {convertToKana} from '../language/ja/japanese-wanakana.js';
+import {convertToKanaIME} from '../language/ja/japanese-wanakana.js';
 
 export class SearchDisplayController {
     /**
@@ -259,7 +259,7 @@ export class SearchDisplayController {
      */
     _searchTextKanaConversion(element, event) {
         if (!this._wanakanaEnabled || event.isComposing) { return; }
-        element.value = convertToKana(element.value);
+        convertToKanaIME(element);
     }
 
     /**
