@@ -27,7 +27,7 @@ export function convertToHiragana(text) {
     for (const [romaji, kana] of Object.entries(ROMAJI_TO_HIRAGANA)) {
         newText = newText.replaceAll(romaji, kana);
     }
-    return newText;
+    return fillSokuonGaps(newText);
 }
 
 /**
@@ -74,7 +74,17 @@ export function convertToKana(text) {
         // Uppercase text converts to katakana
         newText = newText.replaceAll(romaji.toUpperCase(), convertHiraganaToKatakana(kana));
     }
-    return newText;
+    return fillSokuonGaps(newText);
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ *   Fills gaps in sokuons that replaceAll using ROMAJI_TO_HIRAGANA will miss due to it not running iteratively
+ *   Example: `ttttttttttsu` -> `っっっっっっっっっつ` would become `ttttttttttsu` -> `っtっtっtっtっつ` without filling the gaps
+ */
+function fillSokuonGaps(text) {
+    return text.replaceAll(/っ[a-z](?=っ)/g, 'っっ').replaceAll(/ッ[A-Z](?=ッ)/g, 'ッッ');
 }
 
 /**
