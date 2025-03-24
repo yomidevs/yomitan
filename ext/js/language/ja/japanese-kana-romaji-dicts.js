@@ -527,18 +527,18 @@ export const HIRAGANA_TO_ROMAJI = {
     ゑ: 'we',
     を: 'wo',
 
-    // Length 1 Small
-    ゃ: 'xya',
-    ゅ: 'xyu',
-    ょ: 'xyo',
-    ゎ: 'xwa',
-    ぁ: 'xa',
-    ぃ: 'xi',
-    ぅ: 'xu',
-    ぇ: 'xe',
-    ぉ: 'xo',
-    ヵ: 'xka',
-    ヶ: 'xke',
+    // Length 1 Small - Even though these are usually represented with `x` or `l` prepending them, in romaji it makes the most sense to not do that
+    ゃ: 'ya',
+    ゅ: 'yu',
+    ょ: 'yo',
+    ゎ: 'wa',
+    ぁ: 'a',
+    ぃ: 'i',
+    ぅ: 'u',
+    ぇ: 'e',
+    ぉ: 'o',
+    ヵ: 'ka',
+    ヶ: 'ke',
 
     // Double letters - these **must** always be matched last or they will break previous maches
     っq: 'qq',
