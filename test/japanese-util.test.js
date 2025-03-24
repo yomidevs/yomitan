@@ -159,6 +159,18 @@ describe('Japanese utility functions', () => {
         });
     });
 
+    describe('convertToKanaIME', () => {
+        /** @type {[input: [string, number], expected: import('language.js').KanaIMEOutput][]} */
+        const data = [
+            [['KATAKANA', 8], {kanaString: 'カタカナ', newSelectionStart: 4}],
+            [['hiragana', 8], {kanaString: 'ひらがな', newSelectionStart: 4}],
+        ];
+
+        test.each(data)('%s -> %o', (dataValue, expected) => {
+            expect(jpw.convertToKanaIME(dataValue[0], dataValue[1])).toStrictEqual(expected);
+        });
+    });
+
     describe('convertToRomaji', () => {
         /** @type {[string: string, expected: string][]} */
         const data = [
