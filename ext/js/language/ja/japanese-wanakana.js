@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {HIRAGANA_TO_ROMAJI, ROMAJI_TO_HIRAGANA} from './japanese-kana-romaji-dicts.js';
 import {convertHiraganaToKatakana} from './japanese.js';
-import {HIRAGANA_TO_ROMAJI, ROMAJI_TO_HIRAGANA} from './romaji-to-kana-dicts.js';
 
 /**
  * @param {string} text
