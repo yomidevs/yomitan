@@ -31,11 +31,13 @@ export function convertToHiragana(text) {
 }
 
 /**
- * @param {HTMLTextAreaElement} textarea
+ * @param {string} text
+ * @param {number} selectionStart
+ * @returns {import('language.js').KanaIMEOutput}
  */
-export function convertToKanaIME(textarea) {
-    const prevSelectionStart = textarea.selectionStart;
-    const prevLength = textarea.value.length;
+export function convertToKanaIME(text, selectionStart) {
+    const prevSelectionStart = selectionStart;
+    const prevLength = text.length;
     let kanaString = '';
 
     // If the user starts typing a single `n`, hide it from the converter. (This only applies when using the converter as an IME)
@@ -48,18 +50,17 @@ export function convertToKanaIME(textarea) {
     // `nとあ|` also converts to `んとあ|` The user's text cursor is two characters away from the `n`.
     // `なno|` will still convert to `なの` instead of `なんお` without issue since the `no` -> `の` conversion will be found before `n` -> `ん` and `o` -> `お`.
     // `nn|` will still convert to `ん` instead of `んん` since `nn` -> `ん` will be found before `n` -> `ん`.
-    if (textarea.value[prevSelectionStart - 1] === 'n' && textarea.value[prevSelectionStart - 2] !== 'n') {
-        const beforeN = textarea.value.slice(0, prevSelectionStart - 1);
-        const afterN = textarea.value.slice(prevSelectionStart);
+    if (text[prevSelectionStart - 1] === 'n' && text[prevSelectionStart - 2] !== 'n') {
+        const beforeN = text.slice(0, prevSelectionStart - 1);
+        const afterN = text.slice(prevSelectionStart);
         kanaString = convertToKana(beforeN) + 'n' + convertToKana(afterN);
     } else {
-        kanaString = convertToKana(textarea.value);
+        kanaString = convertToKana(text);
     }
 
     const selectionOffset = kanaString.length - prevLength;
 
-    textarea.value = kanaString;
-    textarea.setSelectionRange(prevSelectionStart + selectionOffset, prevSelectionStart + selectionOffset);
+    return {kanaString, newSelectionStart: prevSelectionStart + selectionOffset};
 }
 
 /**

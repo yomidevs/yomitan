@@ -259,7 +259,9 @@ export class SearchDisplayController {
      */
     _searchTextKanaConversion(element, event) {
         if (!this._wanakanaEnabled || event.isComposing) { return; }
-        convertToKanaIME(element);
+        const {kanaString, newSelectionStart} = convertToKanaIME(element.value, element.selectionStart);
+        element.value = kanaString;
+        element.setSelectionRange(newSelectionStart, newSelectionStart);
     }
 
     /**
