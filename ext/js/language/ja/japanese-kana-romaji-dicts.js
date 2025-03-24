@@ -561,6 +561,9 @@ export const HIRAGANA_TO_ROMAJI = {
     っw: 'ww',
     っc: 'cc',
 
-    // xtsu is weird, we dont want to use it unless absolutely required
-    っ: 'xtsu',
+    // `っん` is a special case
+    っn: 'n',
+
+    // single `っ` is weird, some converters just remove it, some leave the `っ` in kana, some replace with `xtsu` or `ltsu`
+    っ: '',
 };
