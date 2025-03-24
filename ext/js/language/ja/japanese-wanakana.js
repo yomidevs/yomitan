@@ -23,14 +23,6 @@ import {ROMAJI_TO_HIRAGANA} from './romaji-to-kana-dicts.js';
  * @param {string} text
  * @returns {string}
  */
-function convertAlphabeticPartToKana(text) {
-    return wanakana.toHiragana(text);
-}
-
-/**
- * @param {string} text
- * @returns {string}
- */
 export function convertToKana(text) {
     let newText = text;
     for (const [romaji, kana] of Object.entries(ROMAJI_TO_HIRAGANA)) {
@@ -72,7 +64,7 @@ export function convertAlphabeticToKana(text) {
             c = 0x2d; // '-'
         } else {
             if (part.length > 0) {
-                result += convertAlphabeticPartToKana(part);
+                result += convertToKana(part.toLowerCase());
                 part = '';
             }
             result += char;
@@ -82,7 +74,7 @@ export function convertAlphabeticToKana(text) {
     }
 
     if (part.length > 0) {
-        result += convertAlphabeticPartToKana(part);
+        result += convertToKana(part.toLowerCase());
     }
     return result;
 }
