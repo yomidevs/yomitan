@@ -168,6 +168,8 @@ describe('Japanese utility functions', () => {
             ['ヒラガナ', 'hiragana'],
             ['カタカナかたかな', 'katakanakatakana'],
             ['ヒラガナひらがな', 'hiraganahiragana'],
+            ['っかっきっくっけっこ', 'kkakkikkukkekko'],
+            ['ッカッキックッケッコ', 'kkakkikkukkekko'],
             ['chikaraちからチカラ力', 'chikarachikarachikara力'],
             ['katakana', 'katakana'],
             ['hiragana', 'hiragana'],
