@@ -191,6 +191,8 @@ describe('Japanese utility functions', () => {
             ['chikaraちからチカラ力', 'chikarachikarachikara力'],
             ['katakana', 'katakana'],
             ['hiragana', 'hiragana'],
+            ['っつ', 'ttsu'],
+            ['っっっっっっっっっつ', 'ttsu'],
         ];
 
         test.each(data)('%s -> %o', (string, expected) => {
