@@ -16,7 +16,8 @@
  */
 
 import * as wanakana from '../../../lib/wanakana.js';
-import {ROMAJI_TO_HIRAGANA, ROMAJI_TO_KATAKANA} from './romaji-to-kana-dicts.js';
+import {convertHiraganaToKatakana} from './japanese.js';
+import {ROMAJI_TO_HIRAGANA} from './romaji-to-kana-dicts.js';
 
 /**
  * @param {string} text
@@ -34,9 +35,8 @@ export function convertToKana(text) {
     let newText = text;
     for (const [romaji, kana] of Object.entries(ROMAJI_TO_HIRAGANA)) {
         newText = newText.replaceAll(romaji, kana);
-    }
-    for (const [romaji, kana] of Object.entries(ROMAJI_TO_KATAKANA)) {
-        newText = newText.replaceAll(romaji, kana);
+        // Uppercase text converts to katakana
+        newText = newText.replaceAll(romaji.toUpperCase(), convertHiraganaToKatakana(kana).toUpperCase());
     }
     return newText;
 }
