@@ -15,9 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../../lib/wanakana.js';
 import {convertHiraganaToKatakana} from './japanese.js';
-import {ROMAJI_TO_HIRAGANA} from './romaji-to-kana-dicts.js';
+import {HIRAGANA_TO_ROMAJI, ROMAJI_TO_HIRAGANA} from './romaji-to-kana-dicts.js';
 
 /**
  * @param {string} text
@@ -38,7 +37,12 @@ export function convertToKana(text) {
  * @returns {string}
  */
 export function convertToRomaji(text) {
-    return wanakana.toRomaji(text);
+    let newText = text;
+    for (const [kana, romaji] of Object.entries(HIRAGANA_TO_ROMAJI)) {
+        newText = newText.replaceAll(kana, romaji);
+        newText = newText.replaceAll(convertHiraganaToKatakana(kana), romaji);
+    }
+    return newText;
 }
 
 /**
