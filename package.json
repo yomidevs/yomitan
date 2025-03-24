@@ -122,7 +122,6 @@
         "dexie-export-import": "^4.1.2",
         "hangul-js": "^0.2.6",
         "parse5": "^7.1.2",
-        "wanakana": "^5.3.1",
         "yomitan-handlebars": "git+https://github.com/yomidevs/yomitan-handlebars.git#12aff5e3550954d7d3a98a5917ff7d579f3cce25"
     },
     "lint-staged": {
