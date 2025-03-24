@@ -36,7 +36,26 @@ export function convertToHiragana(text) {
 export function convertToKanaIME(textarea) {
     const prevSelectionStart = textarea.selectionStart;
     const prevLength = textarea.value.length;
-    const kanaString = convertToKana(textarea.value);
+    let kanaString = '';
+
+    // If the user starts typing a single `n`, hide it from the converter. (This only applies when using the converter as an IME)
+    // The converter must only allow the n to become ん when the user's text cursor is at least one character ahead of it.
+    // If `n` occurs directly behind the user's text cursor, it should be hidden from the converter.
+    // Examples (`|` shall be the user's text cursor):
+    // `たn|` does not convert to `たん|`. The `n` should be hidden from the converter and `た` should only be sent.
+    // `n|の` also does not convert to `ん|の`. Even though the cursor is not at the end of the line, the `n` should still be hidden since it is directly behind the user's text cursor.
+    // `たnt|` does convert to `たんt|`. The user's text cursor is one character ahead of the `n` so it does not need to be hidden and can be converted.
+    // `nとあ|` also converts to `んとあ|` The user's text cursor is two characters away from the `n`.
+    // `なno|` will still convert to `なの` instead of `なんお` without issue since the `no` -> `の` conversion will be found before `n` -> `ん` and `o` -> `お`.
+    // `nn|` will still convert to `ん` instead of `んん` since `nn` -> `ん` will be found before `n` -> `ん`.
+    if (textarea.value[prevSelectionStart - 1] === 'n' && textarea.value[prevSelectionStart - 2] !== 'n') {
+        const beforeN = textarea.value.slice(0, prevSelectionStart - 1);
+        const afterN = textarea.value.slice(prevSelectionStart);
+        kanaString = convertToKana(beforeN) + 'n' + convertToKana(afterN);
+    } else {
+        kanaString = convertToKana(textarea.value);
+    }
+
     const selectionOffset = kanaString.length - prevLength;
 
     textarea.value = kanaString;
