@@ -26,8 +26,7 @@
             "firefox-webext-browser",
             "handlebars",
             "jszip",
-            "parse5",
-            "wanakana"
+            "parse5"
         ],
         "lib": [
             "ES2022",

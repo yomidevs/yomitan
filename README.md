@@ -123,7 +123,6 @@ Yomitan uses several third-party libraries to function.
 | dexie-export-import | 4.0.7             | Apache-2.0   | git+https://github.com/dexie/Dexie.js.git        |
 | yomitan-handlebars  | 1.0.0             | MIT          | n/a                                              |
 | parse5              | 7.1.2             | MIT          | git://github.com/inikulin/parse5.git             |
-| wanakana            | 5.3.1             | MIT          | git+ssh://git@github.com/WaniKani/WanaKana.git   |
 | hangul.js           | 0.2.6             | MIT          | git+https://github.com/e-/Hangul.js.git          |
 
 ## Attribution

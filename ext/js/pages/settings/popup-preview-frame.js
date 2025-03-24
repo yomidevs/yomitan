@@ -281,7 +281,9 @@ export class PopupPreviewFrame {
      */
     _searchTextKanaConversion(element, event) {
         if (event.isComposing) { return; }
-        convertToKanaIME(element);
+        const {kanaString, newSelectionStart} = convertToKanaIME(element.value, element.selectionStart);
+        element.value = kanaString;
+        element.setSelectionRange(newSelectionStart, newSelectionStart);
     }
 
     /** */
