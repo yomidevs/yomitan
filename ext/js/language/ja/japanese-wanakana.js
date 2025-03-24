@@ -64,7 +64,7 @@ export function convertAlphabeticToKana(text) {
             c = 0x2d; // '-'
         } else {
             if (part.length > 0) {
-                result += convertToKana(part.toLowerCase());
+                result += convertToKana(part.toLowerCase()); // lowercase to only convert to hiragana
                 part = '';
             }
             result += char;
@@ -74,7 +74,7 @@ export function convertAlphabeticToKana(text) {
     }
 
     if (part.length > 0) {
-        result += convertToKana(part.toLowerCase());
+        result += convertToKana(part.toLowerCase()); // lowercase to only convert to hiragana
     }
     return result;
 }
