@@ -33,7 +33,7 @@ export function convertToHiragana(text) {
 /**
  * @param {string} text
  * @param {number} selectionStart
- * @returns {import('language.js').KanaIMEOutput}
+ * @returns {import('language').KanaIMEOutput}
  */
 export function convertToKanaIME(text, selectionStart) {
     const prevSelectionStart = selectionStart;
