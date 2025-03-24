@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Mozc's default Romaji to Hiragana list referenced to create ROMAJI_TO_HIRAGANA
+// https://github.com/google/mozc/blob/035668c3452fa98ac09462fd2cf556948964aad7/src/data/preedit/romanji-hiragana.tsv
 export const ROMAJI_TO_HIRAGANA = {
     // Double letters - these **must** always be matched first or further down matches may cause inserting `っ` from double letters to require extra logic
     // There **must** be an entry for every accepted double letter
