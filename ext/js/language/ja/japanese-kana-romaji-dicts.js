@@ -523,13 +523,13 @@ export const HIRAGANA_TO_ROMAJI = {
     れ: 're',
     ろ: 'ro',
     わ: 'wa',
+    ゐ: 'wi',
+    ゑ: 'we',
     を: 'wo',
 
     // Length 1 Small
     ゃ: 'xya',
-    ゐ: 'wyi',
     ゅ: 'xyu',
-    ゑ: 'wye',
     ょ: 'xyo',
     ゎ: 'xwa',
     ぁ: 'xa',
