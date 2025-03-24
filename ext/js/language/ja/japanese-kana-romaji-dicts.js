@@ -210,6 +210,7 @@ export const ROMAJI_TO_HIRAGANA = {
     who: 'うぉ',
 
     // Length 2
+    nn: 'ん',
     va: 'ゔぁ',
     vi: 'ゔぃ',
     vu: 'ゔ',
@@ -219,7 +220,6 @@ export const ROMAJI_TO_HIRAGANA = {
     fi: 'ふぃ',
     fe: 'ふぇ',
     fo: 'ふぉ',
-    nn: 'ん',
     xn: 'ん',
     wu: 'う',
     xa: 'ぁ',
