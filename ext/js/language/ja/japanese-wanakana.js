@@ -36,7 +36,7 @@ export function convertToHiragana(text) {
 export function convertToKanaIME(textarea) {
     const prevSelectionStart = textarea.selectionStart;
     const prevLength = textarea.value.length;
-    const kanaString = convertToKana(textarea.value, {IMEMode: true});
+    const kanaString = convertToKana(textarea.value);
     const selectionOffset = kanaString.length - prevLength;
 
     textarea.value = kanaString;
