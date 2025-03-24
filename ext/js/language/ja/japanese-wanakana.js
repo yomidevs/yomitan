@@ -26,6 +26,19 @@ function convertAlphabeticPartToKana(text) {
 }
 
 /**
+ * @param {HTMLTextAreaElement} textarea
+ */
+export function convertToKanaIME(textarea) {
+    const prevSelectionStart = textarea.selectionStart;
+    const prevLength = textarea.value.length;
+    const kanaString = convertToKana(textarea.value, {IMEMode: true});
+    const selectionOffset = kanaString.length - prevLength;
+
+    textarea.value = kanaString;
+    textarea.setSelectionRange(prevSelectionStart + selectionOffset, prevSelectionStart + selectionOffset);
+}
+
+/**
  * @param {string} text
  * @param {object} options
  * @returns {string}
