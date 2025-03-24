@@ -167,7 +167,7 @@ describe('Japanese utility functions', () => {
             [['hiragana', 8], {kanaString: 'ひらがな', newSelectionStart: 4}], // hiragana| -> ひらがな|
             [['n', 1], {kanaString: 'n', newSelectionStart: 1}], // n| -> n|
             [['nn', 2], {kanaString: 'ん', newSelectionStart: 1}], // nn| -> ん|
-            [['nn', 1], {kanaString: 'n|ん', newSelectionStart: 1}], // n|n -> n|ん
+            [['nn', 1], {kanaString: 'nん', newSelectionStart: 1}], // n|n -> n|ん
             [['nの', 1], {kanaString: 'nの', newSelectionStart: 1}], // n|の -> n|の
             [['ttttttttttsu', 12], {kanaString: 'っっっっっっっっっつ', newSelectionStart: 10}], // ttttttttttsu| -> っっっっっっっっっつ|
         ];
