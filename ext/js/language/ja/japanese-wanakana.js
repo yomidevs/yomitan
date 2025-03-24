@@ -16,7 +16,7 @@
  */
 
 import * as wanakana from '../../../lib/wanakana.js';
-import {ROMAJI_TO_KANA} from './romaji-to-kana-dicts.js';
+import {ROMAJI_TO_HIRAGANA, ROMAJI_TO_KATAKANA} from './romaji-to-kana-dicts.js';
 
 /**
  * @param {string} text
@@ -32,7 +32,10 @@ function convertAlphabeticPartToKana(text) {
  */
 export function convertToKana(text) {
     let newText = text;
-    for (const [romaji, kana] of Object.entries(ROMAJI_TO_KANA)) {
+    for (const [romaji, kana] of Object.entries(ROMAJI_TO_HIRAGANA)) {
+        newText = newText.replaceAll(romaji, kana);
+    }
+    for (const [romaji, kana] of Object.entries(ROMAJI_TO_KATAKANA)) {
         newText = newText.replaceAll(romaji, kana);
     }
     return newText;
