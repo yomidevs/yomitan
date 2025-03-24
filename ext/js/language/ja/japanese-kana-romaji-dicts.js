@@ -485,6 +485,7 @@ export const HIRAGANA_TO_ROMAJI = {
     ぞ: 'zo',
     た: 'ta',
     ち: 'chi',
+    つ: 'tsu',
     て: 'te',
     と: 'to',
     だ: 'da',
