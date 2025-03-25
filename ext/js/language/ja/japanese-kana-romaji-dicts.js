@@ -534,6 +534,8 @@ export const HIRAGANA_TO_ROMAJI = {
     ゑ: 'we',
     を: 'wo',
 
+    ー: '-',
+
     // Length 1 Small - Even though these are usually represented with `x` or `l` prepending them, in romaji it makes the most sense to not do that
     ゃ: 'ya',
     ゅ: 'yu',
