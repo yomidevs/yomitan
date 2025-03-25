@@ -345,7 +345,7 @@ export const ROMAJI_TO_HIRAGANA = {
     ')': '）',
     '{': '｛',
     '}': '｝',
-
+    ' ': '　',
 
     // n -> ん is a special case.
     'n': 'ん',
