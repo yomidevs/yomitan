@@ -16,16 +16,12 @@
         "build:libs": "node ./dev/bin/build-libs.js",
         "build:serve:firefox-android": "node ./dev/bin/build.js --target firefox-android && web-ext run -s ./builds/yomitan-firefox-android",
         "build:serve:kiwi-browser": "node ./dev/bin/build.js --target chrome-dev && adb shell mkdir -p /sdcard/yomitan && adb push ./builds/yomitan-chrome-dev.zip /sdcard/yomitan/yomitan-kiwi-browser.zip",
-
-
         "//WARNING": "These are convenience functions for running from CLI but are NOT called from CI because they are not parallel. Make sure you update CI scripts if you update these.",
         "test": "npm run test:js && npm run test:ts && npm run test:css && npm run test:html && npm run test:unit && npm run test:unit:options && npm run test:json && npm run test:md && npm run test:build",
         "test:fast": "npm run test:js && npm run test:ts && npm run test:unit && npm run test:json:format",
         "test:static-analysis": "npm run test:js && npm run test:ts && npm run test:css && npm run test:html && npm run test:md",
         "test:ts": "npm run test:ts:main && npm run test:ts:dev && npm run test:ts:test && npm run test:ts:bench",
         "//END-WARNING": "",
-
-
         "test:js": "npx eslint . --ignore-pattern '**/*.json'",
         "test:json": "npm run test:json:format && npm run test:json:types",
         "test:json:format": "npx eslint '**/*.json'",
@@ -82,12 +78,12 @@
         "@types/jsdom": "^21.1.7",
         "@types/node": "22.10.2",
         "@types/zip.js": "^2.0.33",
-        "@vitest/coverage-v8": "2.1.8",
+        "@vitest/coverage-v8": "^3.0.9",
         "@vitest/eslint-plugin": "^1.1.21",
         "ajv": "^8.17.1",
         "css": "^3.0.0",
         "dotenv": "^16.4.7",
-        "esbuild": "^0.24.2",
+        "esbuild": "^0.25.1",
         "eslint": "^9.17.0",
         "eslint-plugin-eslint-comments": "^3.2.0",
         "eslint-plugin-header": "^3.1.1",
@@ -113,15 +109,15 @@
         "ts-json-schema-generator": "^2.3.0",
         "typescript": "^5.7.2",
         "typescript-eslint": "^8.18.2",
-        "vitest": "^2.1.8"
+        "vitest": "^3.0.9"
     },
     "dependencies": {
         "@resvg/resvg-wasm": "^2.6.2",
-        "@zip.js/zip.js": "^2.7.45",
-        "dexie": "^3.2.5",
-        "dexie-export-import": "^4.1.2",
+        "@zip.js/zip.js": "^2.7.54",
+        "dexie": "^4.0.10",
+        "dexie-export-import": "^4.1.4",
         "hangul-js": "^0.2.6",
-        "parse5": "^7.1.2",
+        "parse5": "^7.2.1",
         "yomitan-handlebars": "git+https://github.com/yomidevs/yomitan-handlebars.git#12aff5e3550954d7d3a98a5917ff7d579f3cce25"
     },
     "lint-staged": {
