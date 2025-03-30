@@ -687,24 +687,24 @@ export class DictionaryController {
         const nameElement = querySelectorNotNull(modal.node, '#dictionary-confirm-delete-name');
         nameElement.textContent = dictionaryTitle;
         /** @type {HTMLElement | null} */
-        const enabledProfilesTextElement = modal.node.querySelector('#dictionary-confirm-delete-enabled-profiles-text');
-        if (enabledProfilesTextElement === null) { return; }
+        const usedProfilesText = modal.node.querySelector('#dictionary-confirm-delete-used-profiles-text');
+        if (usedProfilesText === null) { return; }
         /** @type {HTMLElement | null} */
-        const enabledProfilesListElement = modal.node.querySelector('#dictionary-confirm-delete-enabled-profiles');
-        if (enabledProfilesListElement === null) { return; }
-        const enabledProfileNames = await this.getProfileNamesWithDictionaryEnabled(dictionaryTitle);
-        if (enabledProfileNames.length > 0) {
-            enabledProfilesTextElement.hidden = false;
-            enabledProfilesListElement.hidden = false;
-            enabledProfilesListElement.textContent = '';
-            for (const profileName of enabledProfileNames) {
+        const usedProfilesList = modal.node.querySelector('#dictionary-confirm-delete-used-profiles');
+        if (usedProfilesList === null) { return; }
+        const usedProfileNames = await this.getProfileNamesUsingDictionary(dictionaryTitle);
+        if (usedProfileNames.length > 0) {
+            usedProfilesText.hidden = false;
+            usedProfilesList.hidden = false;
+            usedProfilesList.textContent = '';
+            for (const profileName of usedProfileNames) {
                 const li = document.createElement('li');
                 li.textContent = profileName;
-                enabledProfilesListElement.appendChild(li);
+                usedProfilesList.appendChild(li);
             }
         } else {
-            enabledProfilesTextElement.hidden = true;
-            enabledProfilesListElement.hidden = true;
+            usedProfilesText.hidden = true;
+            usedProfilesList.hidden = true;
         }
         modal.setVisible(true);
     }
@@ -713,7 +713,7 @@ export class DictionaryController {
      * @param {string} dictionaryTitle
      * @returns {Promise<string[]>}
      */
-    async getProfileNamesWithDictionaryEnabled(dictionaryTitle) {
+    async getProfileNamesUsingDictionary(dictionaryTitle) {
         const options = await this._settingsController.getOptionsFull();
         const {profiles} = options;
         /** @type {string[]} */
