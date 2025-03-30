@@ -388,7 +388,7 @@ class DictionaryEntry {
 
     /** */
     _delete() {
-        this._dictionaryController.deleteDictionary(this.dictionaryTitle);
+        void this._dictionaryController.deleteDictionary(this.dictionaryTitle);
     }
 
     /**
