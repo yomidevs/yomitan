@@ -680,13 +680,52 @@ export class DictionaryController {
     /**
      * @param {string} dictionaryTitle
      */
-    deleteDictionary(dictionaryTitle) {
+    async deleteDictionary(dictionaryTitle) {
         const modal = /** @type {import('./modal.js').Modal} */ (this._deleteDictionaryModal);
         modal.node.dataset.dictionaryTitle = dictionaryTitle;
         /** @type {Element} */
         const nameElement = querySelectorNotNull(modal.node, '#dictionary-confirm-delete-name');
         nameElement.textContent = dictionaryTitle;
+        /** @type {HTMLElement | null} */
+        const enabledProfilesText = modal.node.querySelector('#dictionary-confirm-delete-enabled-profiles-text');
+        if (enabledProfilesText === null) { return; }
+        /** @type {HTMLElement | null} */
+        const enabledProfileList = modal.node.querySelector('#dictionary-confirm-delete-enabled-profiles');
+        if (enabledProfileList === null) { return; }
+        const emabledProfileNames = await this.getDictionaryEnabledProfileNames(dictionaryTitle);
+        if (emabledProfileNames.length > 0) {
+            enabledProfilesText.hidden = false;
+            enabledProfileList.hidden = false;
+            enabledProfileList.textContent = '';
+            for (const profileName of emabledProfileNames) {
+                const li = document.createElement('li');
+                li.textContent = profileName;
+                enabledProfileList.appendChild(li);
+            }
+        } else {
+            enabledProfilesText.hidden = true;
+            enabledProfileList.hidden = true;
+        }
         modal.setVisible(true);
+    }
+
+    /**
+     * @param {string} dictionaryTitle
+     * @returns {Promise<string[]>}
+     */
+    async getDictionaryEnabledProfileNames(dictionaryTitle) {
+        const options = await this._settingsController.getOptionsFull();
+        const {profiles} = options;
+        /** @type {string[]} */
+        const enabledProfiles = [];
+        for (let i = 0, ii = profiles.length; i < ii; ++i) {
+            const {dictionaries} = profiles[i].options;
+            const dictionaryOptions = dictionaries.find((x) => x.name === dictionaryTitle);
+            if (dictionaryOptions?.enabled) {
+                enabledProfiles.push(profiles[i].name);
+            }
+        }
+        return enabledProfiles;
     }
 
     /**
