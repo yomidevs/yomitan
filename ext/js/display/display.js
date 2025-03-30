@@ -1299,13 +1299,13 @@ export class Display extends EventDispatcher {
         /** @type {import('api').FindTermsDetails} */
         const findDetails = {primaryReading};
         if (wildcardsEnabled) {
+            findDetails.matchType = 'prefix';
             const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
             if (match !== null) {
                 if (match[1]) {
                     findDetails.matchType = 'suffix';
                     findDetails.deinflect = false;
                 } else if (match[3]) {
-                    findDetails.matchType = 'prefix';
                     findDetails.deinflect = false;
                 }
                 source = match[2];
