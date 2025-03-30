@@ -687,24 +687,24 @@ export class DictionaryController {
         const nameElement = querySelectorNotNull(modal.node, '#dictionary-confirm-delete-name');
         nameElement.textContent = dictionaryTitle;
         /** @type {HTMLElement | null} */
-        const enabledProfilesText = modal.node.querySelector('#dictionary-confirm-delete-enabled-profiles-text');
-        if (enabledProfilesText === null) { return; }
+        const enabledProfilesTextElement = modal.node.querySelector('#dictionary-confirm-delete-enabled-profiles-text');
+        if (enabledProfilesTextElement === null) { return; }
         /** @type {HTMLElement | null} */
-        const enabledProfileList = modal.node.querySelector('#dictionary-confirm-delete-enabled-profiles');
-        if (enabledProfileList === null) { return; }
-        const emabledProfileNames = await this.getDictionaryEnabledProfileNames(dictionaryTitle);
-        if (emabledProfileNames.length > 0) {
-            enabledProfilesText.hidden = false;
-            enabledProfileList.hidden = false;
-            enabledProfileList.textContent = '';
-            for (const profileName of emabledProfileNames) {
+        const enabledProfilesListElement = modal.node.querySelector('#dictionary-confirm-delete-enabled-profiles');
+        if (enabledProfilesListElement === null) { return; }
+        const enabledProfileNames = await this.getProfileNamesWithDictionaryEnabled(dictionaryTitle);
+        if (enabledProfileNames.length > 0) {
+            enabledProfilesTextElement.hidden = false;
+            enabledProfilesListElement.hidden = false;
+            enabledProfilesListElement.textContent = '';
+            for (const profileName of enabledProfileNames) {
                 const li = document.createElement('li');
                 li.textContent = profileName;
-                enabledProfileList.appendChild(li);
+                enabledProfilesListElement.appendChild(li);
             }
         } else {
-            enabledProfilesText.hidden = true;
-            enabledProfileList.hidden = true;
+            enabledProfilesTextElement.hidden = true;
+            enabledProfilesListElement.hidden = true;
         }
         modal.setVisible(true);
     }
@@ -713,19 +713,18 @@ export class DictionaryController {
      * @param {string} dictionaryTitle
      * @returns {Promise<string[]>}
      */
-    async getDictionaryEnabledProfileNames(dictionaryTitle) {
+    async getProfileNamesWithDictionaryEnabled(dictionaryTitle) {
         const options = await this._settingsController.getOptionsFull();
         const {profiles} = options;
         /** @type {string[]} */
-        const enabledProfiles = [];
-        for (let i = 0, ii = profiles.length; i < ii; ++i) {
-            const {dictionaries} = profiles[i].options;
-            const dictionaryOptions = dictionaries.find((x) => x.name === dictionaryTitle);
+        const profileNames = [];
+        for (const profile of profiles) {
+            const dictionaryOptions = profile.options.dictionaries.find((dict) => dict.name === dictionaryTitle);
             if (dictionaryOptions?.enabled) {
-                enabledProfiles.push(profiles[i].name);
+                profileNames.push(profile.name);
             }
         }
-        return enabledProfiles;
+        return profileNames;
     }
 
     /**
