@@ -16,6 +16,7 @@
  */
 
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 
 /**
@@ -64,12 +65,18 @@ export class SharedWorkerBridge {
                 const {action, params} = event.data;
                 return invokeApiMapHandler(this._apiMap, action, params, [interlocutorPort, event.ports], () => {});
             });
+            interlocutorPort.addEventListener('messageerror', (/** @type {MessageEvent} */ event) => {
+                const error = new ExtensionError('SharedWorkerBridge: Error receiving message from interlocutor port when establishing connection');
+                error.data = event;
+                log.error(error);
+            });
             interlocutorPort.start();
         });
     }
 
     /** @type {import('shared-worker').ApiHandler<'registerBackendPort'>} */
     _onRegisterBackendPort(_params, interlocutorPort, _ports) {
+        console.log('SharedWorkerBridge: backend port registered');
         this._backendPort = interlocutorPort;
     }
 
@@ -78,7 +85,7 @@ export class SharedWorkerBridge {
         if (this._backendPort !== null) {
             this._backendPort.postMessage(void 0, [ports[0]]); // connectToBackend2
         } else {
-            log.error('SharedWorkerBridge: backend port is not registered');
+            log.warn('SharedWorkerBridge: backend port is not registered; this can happen if one of the content scripts loads faster than the backend when extension is reloading');
         }
     }
 }
