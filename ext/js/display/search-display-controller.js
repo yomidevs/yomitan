@@ -21,6 +21,7 @@ import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
 import {convertToKanaIME} from '../language/ja/japanese-wanakana.js';
+import {isFakeComposing} from '../language/text-utilities.js';
 
 export class SearchDisplayController {
     /**
@@ -244,7 +245,7 @@ export class SearchDisplayController {
     }
 
     /**
-     * @param {KeyboardEvent} e
+     * @param {InputEvent} e
      */
     _onSearchInput(e) {
         this._updateSearchHeight(true);
@@ -255,10 +256,10 @@ export class SearchDisplayController {
 
     /**
      * @param {HTMLTextAreaElement} element
-     * @param {KeyboardEvent} event
+     * @param {InputEvent} event
      */
     _searchTextKanaConversion(element, event) {
-        if (!this._wanakanaEnabled || event.isComposing) { return; }
+        if (!this._wanakanaEnabled || (event.isComposing && !isFakeComposing(event))) { return; }
         const {kanaString, newSelectionStart} = convertToKanaIME(element.value, element.selectionStart);
         element.value = kanaString;
         element.setSelectionRange(newSelectionStart, newSelectionStart);

@@ -27,3 +27,15 @@ export function getLanguageFromText(text) {
     if (isStringPartiallyJapanese(text)) { return 'ja'; }
     return null;
 }
+
+/**
+ * Mobile browsers report that keyboards are composing even when they are clearly sending normal input.
+ * This conflicts with detection of desktop IME composing which is reported correctly.
+ * If the composing input is a single alphabetic letter, it is almost certainly a mobile keyboard pretending to be composing.
+ * This is not foolproof. For example a Japanese IME could try to convert `えい` to `A` which would show as "fake composing". But this is unlikely.
+ * @param {InputEvent} event
+ * @returns {boolean}
+ */
+export function isFakeComposing(event) {
+    return !!event.data?.match(/^[A-Za-z]$/);
+}

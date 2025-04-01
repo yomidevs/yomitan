@@ -23,6 +23,7 @@ import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {TextSourceRange} from '../../dom/text-source-range.js';
 import {convertToKanaIME} from '../../language/ja/japanese-wanakana.js';
+import {isFakeComposing} from '../../language/text-utilities.js';
 
 export class PopupPreviewFrame {
     /**
@@ -268,7 +269,7 @@ export class PopupPreviewFrame {
     }
 
     /**
-     * @param {KeyboardEvent} e
+     * @param {InputEvent} e
      */
     _onSearchInput(e) {
         const element = /** @type {HTMLTextAreaElement} */ (e.currentTarget);
@@ -277,10 +278,10 @@ export class PopupPreviewFrame {
 
     /**
      * @param {HTMLTextAreaElement} element
-     * @param {KeyboardEvent} event
+     * @param {InputEvent} event
      */
     _searchTextKanaConversion(element, event) {
-        if (event.isComposing) { return; }
+        if (event.isComposing && !isFakeComposing(event)) { return; }
         const {kanaString, newSelectionStart} = convertToKanaIME(element.value, element.selectionStart);
         element.value = kanaString;
         element.setSelectionRange(newSelectionStart, newSelectionStart);
