@@ -161,6 +161,8 @@ export class Display extends EventDispatcher {
         this._frameEndpoint = (pageType === 'popup' ? new FrameEndpoint(this._application.api) : null);
         /** @type {?import('environment').Browser} */
         this._browser = null;
+        /** @type {?import('environment').OperatingSystem} */
+        this._platform = null;
         /** @type {?HTMLTextAreaElement} */
         this._copyTextarea = null;
         /** @type {?TextScanner} */
@@ -316,11 +318,13 @@ export class Display extends EventDispatcher {
 
         // State setup
         const {documentElement} = document;
-        const {browser} = await this._application.api.getEnvironmentInfo();
+        const {browser, platform} = await this._application.api.getEnvironmentInfo();
         this._browser = browser;
+        this._platform = platform.os;
 
         if (documentElement !== null) {
             documentElement.dataset.browser = browser;
+            documentElement.dataset.platform = platform.os;
         }
 
         this._languageSummaries = await this._application.api.getLanguageSummaries();

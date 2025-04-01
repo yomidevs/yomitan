@@ -259,7 +259,7 @@ export class SearchDisplayController {
      * @param {InputEvent} event
      */
     _searchTextKanaConversion(element, event) {
-        if (!this._wanakanaEnabled || (event.isComposing && !isFakeComposing(event))) { return; }
+        if (!this._wanakanaEnabled || (event.isComposing && !isFakeComposing(event) && document.documentElement.dataset.platform !== 'android')) { return; }
         const {kanaString, newSelectionStart} = convertToKanaIME(element.value, element.selectionStart);
         element.value = kanaString;
         element.setSelectionRange(newSelectionStart, newSelectionStart);
