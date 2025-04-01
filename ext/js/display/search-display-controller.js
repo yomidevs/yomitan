@@ -262,7 +262,7 @@ export class SearchDisplayController {
         // Desktop Composing
         if (event.isComposing && document.documentElement.dataset.platform !== 'android') { return; }
         // Android Composing
-        if (event.isComposing && !isFakeComposing(event) && document.documentElement.dataset.platform === 'android') { return; }
+        if (event.isComposing && !isFakeComposing(event) && document.documentElement.dataset.platform === 'android' && document.documentElement.dataset.browser !== 'firefox-mobile') { return; }
         const {kanaString, newSelectionStart} = convertToKanaIME(element.value, element.selectionStart);
         element.value = kanaString;
         element.setSelectionRange(newSelectionStart, newSelectionStart);
