@@ -20,8 +20,8 @@ import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {isComposing} from '../language/ime-utilities.js';
 import {convertToKanaIME} from '../language/ja/japanese-wanakana.js';
-import {isFakeComposing} from '../language/text-utilities.js';
 
 export class SearchDisplayController {
     /**
@@ -259,10 +259,9 @@ export class SearchDisplayController {
      * @param {InputEvent} event
      */
     _searchTextKanaConversion(element, event) {
-        // Desktop Composing
-        if (event.isComposing && document.documentElement.dataset.platform !== 'android') { return; }
-        // Android Composing
-        if (event.isComposing && !isFakeComposing(event) && document.documentElement.dataset.platform === 'android' && document.documentElement.dataset.browser !== 'firefox-mobile') { return; }
+        const platform = document.documentElement.dataset.platform ?? 'unknown';
+        const browser = document.documentElement.dataset.browser ?? 'unknown';
+        if (isComposing(event, platform, browser)) { return; }
         const {kanaString, newSelectionStart} = convertToKanaIME(element.value, element.selectionStart);
         element.value = kanaString;
         element.setSelectionRange(newSelectionStart, newSelectionStart);
