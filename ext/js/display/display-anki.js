@@ -722,7 +722,8 @@ export class DisplayAnki {
         if (entry === null) { return null; }
         const container = entry.querySelector('.note-action-button-container');
         if (container === null) { return null; }
-        const singleNoteActionButtonContainer = container.children[noteOptionsIndex];
+        const singleNoteActionButtonContainer = container.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
+        if (singleNoteActionButtonContainer === null) { return null; }
         return singleNoteActionButtonContainer.querySelector('.action-button[data-action=save-note]');
     }
 
@@ -819,7 +820,6 @@ export class DisplayAnki {
 
                 this._updateSaveButtonForDuplicateBehavior(button, [noteId]);
 
-                console.log('update view note button', dictionaryEntryIndex, noteOptionsIndex, [noteId]);
                 this._updateViewNoteButton(dictionaryEntryIndex, noteOptionsIndex, [noteId]);
             }
         }
@@ -846,7 +846,7 @@ export class DisplayAnki {
     _updateViewNoteButton(dictionaryEntryIndex, noteOptionsIndex, noteIds) {
         const entry = this._getEntry(dictionaryEntryIndex);
         if (entry === null) { return; }
-        const singleNoteActions = entry.children[noteOptionsIndex];
+        const singleNoteActions = entry.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
         if (singleNoteActions === null) { return; }
         /** @type {HTMLButtonElement | null} */
         let viewNoteButton = singleNoteActions.querySelector('.action-button[data-action=view-note]');
@@ -982,8 +982,8 @@ export class DisplayAnki {
         for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
             const dictionaryEntry = dictionaryEntries[i];
             const {type} = dictionaryEntry;
-            const notesOptionsForType = this._notesOptions.filter((noteOptions) => noteOptions.type === type);
-            for (const [noteOptionsIndex, noteOptions] of notesOptionsForType.entries()) {
+            for (const [noteOptionsIndex, noteOptions] of this._notesOptions.entries()) {
+                if (noteOptions.type !== type) { continue; }
                 const notePromise = this._createNote(dictionaryEntry, noteOptionsIndex, []);
                 notePromises.push(notePromise);
                 noteTargets.push({index: i, noteOptionsIndex, noteOptions});
@@ -1003,7 +1003,6 @@ export class DisplayAnki {
             infos = this._checkForDuplicates ?
                 await this._display.application.api.getAnkiNoteInfo(notes, fetchAdditionalInfo) :
                 this._getAnkiNoteInfoForceValue(notes, true);
-            console.log('_getDictionaryEntryDetails infos', infos);
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValue(notes, false);
             ankiError = toError(e);
@@ -1176,7 +1175,6 @@ export class DisplayAnki {
      * @returns {?HTMLButtonElement}
      */
     _createViewNoteButton(index, noteOptionsIndex, noteIds) {
-        console.log('create view note button', index, noteOptionsIndex, noteIds);
         if (noteIds.length === 0) { return null; }
         const viewNoteButton = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('note-action-button-view-note'));
         if (viewNoteButton === null) { return null; }
@@ -1203,7 +1201,7 @@ export class DisplayAnki {
 
         const container = entry.querySelector('.note-action-button-container');
         if (container === null) { return null; }
-        const singleNoteActionButtonContainer = container.children[noteOptionsIndex];
+        const singleNoteActionButtonContainer = container.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
         if (singleNoteActionButtonContainer === null) { return null; }
         singleNoteActionButtonContainer.appendChild(viewNoteButton);
 

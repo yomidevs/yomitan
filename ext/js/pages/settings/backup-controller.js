@@ -584,7 +584,6 @@ export class BackupController {
      * @returns {Promise<Blob>}
      */
     async _exportDatabase(databaseName) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const DexieConstructor = /** @type {import('dexie').DexieConstructor} */ (/** @type {unknown} */ (Dexie));
         const db = new DexieConstructor(databaseName);
         await db.open();

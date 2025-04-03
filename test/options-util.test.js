@@ -17,12 +17,12 @@
  */
 
 import fs from 'fs';
-import { fileURLToPath } from 'node:url';
+import {fileURLToPath} from 'node:url';
 import path from 'path';
-import { describe, expect, test, vi } from 'vitest';
-import { OptionsUtil } from '../ext/js/data/options-util.js';
-import { TemplatePatcher } from '../ext/js/templates/template-patcher.js';
-import { chrome, fetch } from './mocks/common.js';
+import {describe, expect, test, vi} from 'vitest';
+import {OptionsUtil} from '../ext/js/data/options-util.js';
+import {TemplatePatcher} from '../ext/js/templates/template-patcher.js';
+import {chrome, fetch} from './mocks/common.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
