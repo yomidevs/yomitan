@@ -1593,8 +1593,8 @@ select.profile-condition-operator {
     margin-left: 0.25em;
 }
 
-.icon[data-icon=big-plus] { background-image: url('/images/add-term-kanji.svg'); }
-.icon[data-icon=small-plus]  { background-image: url('/images/add-term-kana.svg'); }
+.icon[data-icon=big-circle] { background-image: url('/images/big-circle.svg'); }
+.icon[data-icon=small-circle]  { background-image: url('/images/small-circle.svg'); }
 .icon.select-icon {
     padding-left: 30px;
     background-repeat: no-repeat;

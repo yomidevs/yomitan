@@ -1647,7 +1647,7 @@ export class OptionsUtil {
 
             const termsNotes = [{
                 name: 'Expression',
-                icon: 'big-plus',
+                icon: 'big-circle',
                 deck: oldTerms.deck,
                 model: oldTerms.model,
                 fields: oldTerms.fields,
@@ -1657,7 +1657,7 @@ export class OptionsUtil {
             if (Object.values(oldTerms.fields).some((field) => field.value.includes('{expression}'))) {
                 termsNotes.push({
                     name: 'Reading',
-                    icon: 'small-plus',
+                    icon: 'small-circle',
                     deck: oldTerms.deck,
                     model: oldTerms.model,
                     fields: Object.fromEntries(
@@ -1672,7 +1672,7 @@ export class OptionsUtil {
 
             const kanjiNote = {
                 name: 'Kanji',
-                icon: 'big-plus',
+                icon: 'big-circle',
                 deck: oldKanji.deck,
                 model: oldKanji.model,
                 fields: oldKanji.fields,

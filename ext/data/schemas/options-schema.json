@@ -991,8 +991,8 @@
                                                 },
                                                 "icon": {
                                                     "type": "string",
-                                                    "enum": ["big-plus", "small-plus"],
-                                                    "default": "big-plus"
+                                                    "enum": ["big-circle", "small-circle"],
+                                                    "default": "big-circle"
                                                 },
                                                 "deck": {
                                                     "type": "string",

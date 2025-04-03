@@ -17,12 +17,12 @@
  */
 
 import fs from 'fs';
-import {fileURLToPath} from 'node:url';
+import { fileURLToPath } from 'node:url';
 import path from 'path';
-import {describe, expect, test, vi} from 'vitest';
-import {OptionsUtil} from '../ext/js/data/options-util.js';
-import {TemplatePatcher} from '../ext/js/templates/template-patcher.js';
-import {chrome, fetch} from './mocks/common.js';
+import { describe, expect, test, vi } from 'vitest';
+import { OptionsUtil } from '../ext/js/data/options-util.js';
+import { TemplatePatcher } from '../ext/js/templates/template-patcher.js';
+import { chrome, fetch } from './mocks/common.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -499,7 +499,7 @@ function createProfileOptionsUpdatedTestData1() {
             notes: [{
                 type: 'term',
                 name: 'Expression',
-                icon: 'big-plus',
+                icon: 'big-circle',
                 deck: '',
                 model: '',
                 fields: {
@@ -511,7 +511,7 @@ function createProfileOptionsUpdatedTestData1() {
             }, {
                 type: 'kanji',
                 name: 'Kanji',
-                icon: 'big-plus',
+                icon: 'big-circle',
                 deck: '',
                 model: '',
                 fields: {
