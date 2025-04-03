@@ -91,15 +91,10 @@ export class DisplayAnki {
         this._audioDownloadIdleTimeout = null;
         /** @type {string[]} */
         this._noteTags = [];
-        /** @type {Map<import('display-anki').CreateMode, import('settings').AnkiNoteOptions>} */
-        this._modeOptions = new Map();
+        /** @type {import('settings').AnkiNoteOptions[]} */
+        this._notesOptions = [];
         /** @type {import('settings').DictionariesOptions} */
         this._dictionaries = [];
-        /** @type {Map<import('dictionary').DictionaryEntryType, import('display-anki').CreateMode[]>} */
-        this._dictionaryEntryTypeModeMap = new Map([
-            ['kanji', ['kanji']],
-            ['term', ['term-kanji', 'term-kana']],
-        ]);
         /** @type {HTMLElement} */
         this._menuContainer = querySelectorNotNull(document, '#popup-menus');
         /** @type {(event: MouseEvent) => void} */
@@ -122,8 +117,8 @@ export class DisplayAnki {
         /* eslint-disable @stylistic/no-multi-spaces */
         this._display.hotkeyHandler.registerActions([
             ['addNoteKanji',      () => { this._hotkeySaveAnkiNoteForSelectedEntry('kanji'); }],
-            ['addNoteTermKanji',  () => { this._hotkeySaveAnkiNoteForSelectedEntry('term-kanji'); }],
-            ['addNoteTermKana',   () => { this._hotkeySaveAnkiNoteForSelectedEntry('term-kana'); }],
+            ['addNoteTermKanji',  () => { this._hotkeySaveAnkiNoteForSelectedEntry('term-1'); }],
+            ['addNoteTermKana',   () => { this._hotkeySaveAnkiNoteForSelectedEntry('term-2'); }],
             ['viewNotes',         this._viewNotesForSelectedEntry.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
@@ -161,32 +156,31 @@ export class DisplayAnki {
 
         // Anki notes
         /** @type {import('display-anki').AnkiNoteLogData[]} */
-        const ankiNotes = [];
-        const modes = this._getModes(dictionaryEntry.type === 'term');
-        for (const mode of modes) {
+        const notes = [];
+        for (const [noteOptionsIndex] of this._notesOptions.entries()) {
             let note;
             let errors;
             let requirements;
             try {
-                ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, mode, []));
+                ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, noteOptionsIndex, []));
             } catch (e) {
                 errors = [toError(e)];
             }
             /** @type {import('display-anki').AnkiNoteLogData} */
-            const entry = {mode, note};
+            const entry = {noteOptionsIndex, note};
             if (Array.isArray(errors) && errors.length > 0) {
                 entry.errors = errors;
             }
             if (Array.isArray(requirements) && requirements.length > 0) {
                 entry.requirements = requirements;
             }
-            ankiNotes.push(entry);
+            notes.push(entry);
         }
 
         return {
             ankiNoteData,
             ankiNoteDataException: toError(ankiNoteDataException),
-            ankiNotes,
+            notes,
         };
     }
 
@@ -211,8 +205,7 @@ export class DisplayAnki {
                 suspendNewCards,
                 checkForDuplicates,
                 displayTagsAndFlags,
-                kanji,
-                terms,
+                notes,
                 noteGuiMode,
                 screenshot: {format, quality},
                 downloadTimeout,
@@ -235,10 +228,7 @@ export class DisplayAnki {
         this._noteGuiMode = noteGuiMode;
         this._noteTags = [...tags];
         this._audioDownloadIdleTimeout = (Number.isFinite(downloadTimeout) && downloadTimeout > 0 ? downloadTimeout : null);
-        this._modeOptions.clear();
-        this._modeOptions.set('kanji', kanji);
-        this._modeOptions.set('term-kanji', terms);
-        this._modeOptions.set('term-kana', terms);
+        this._notesOptions = notes;
         this._dictionaries = dictionaries;
 
         void this._updateAnkiFieldTemplates(options);
@@ -292,14 +282,17 @@ export class DisplayAnki {
 
     /**
      * @param {MouseEvent} e
+     * @throws {Error}
      */
     _onNoteSave(e) {
         e.preventDefault();
         const element = /** @type {HTMLElement} */ (e.currentTarget);
-        const mode = this._getValidCreateMode(element.dataset.mode);
-        if (mode === null) { return; }
+        const noteOptionsIndex = element.dataset.noteOptionsIndex;
+        if (!noteOptionsIndex || !Number.isInteger(Number.parseInt(noteOptionsIndex, 10))) {
+            throw new Error('Invalid note options index');
+        }
         const index = this._display.getElementDictionaryEntryIndex(element);
-        void this._saveAnkiNote(index, mode);
+        void this._saveAnkiNote(index, Number.parseInt(noteOptionsIndex, 10));
     }
 
     /**
@@ -324,12 +317,12 @@ export class DisplayAnki {
 
     /**
      * @param {number} index
-     * @param {import('display-anki').CreateMode} mode
+     * @param {number} noteOptionsIndex
      * @returns {?HTMLButtonElement}
      */
-    _saveButtonFind(index, mode) {
+    _saveButtonFind(index, noteOptionsIndex) {
         const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector(`.action-button[data-action=save-note][data-mode="${mode}"]`) : null;
+        return entry !== null ? entry.querySelector(`.action-button[data-action=save-note][data-note-options-index="${noteOptionsIndex}"]`) : null;
     }
 
     /**
@@ -443,7 +436,7 @@ export class DisplayAnki {
         const hotkeyLabel = this._display._hotkeyHelpController.getHotkeyLabel(button);
         if (hotkeyLabel) {
             // eslint-disable-next-line no-underscore-dangle
-            this._display._hotkeyHelpController.setHotkeyLabel(button, `${verb} ${target} ({0})`);
+            this._display._hotkeyHelpController.setHotkeyLabel(button, `${verb} ${target} ({0})`); // {0} is a placeholder that gets replaced with the actual hotkey combination. For example, "Add expression (Ctrl+1)" or "Overwrite reading (Ctrl+2)"
         }
 
         const actionIcon = button.querySelector('.action-icon');
@@ -460,8 +453,8 @@ export class DisplayAnki {
         for (let i = 0, ii = dictionaryEntryDetails.length; i < ii; ++i) {
             /** @type {?Set<number>} */
             let allNoteIds = null;
-            for (const {mode, canAdd, noteIds, noteInfos, ankiError} of dictionaryEntryDetails[i].modeMap.values()) {
-                const button = this._saveButtonFind(i, mode);
+            for (const [noteOptionsIndex, {canAdd, noteIds, noteInfos, ankiError}] of dictionaryEntryDetails[i].noteMap.entries()) {
+                const button = this._saveButtonFind(i, noteOptionsIndex);
                 if (button !== null) {
                     button.disabled = !canAdd;
                     button.hidden = (ankiError !== null);
@@ -644,9 +637,9 @@ export class DisplayAnki {
 
     /**
      * @param {number} dictionaryEntryIndex
-     * @param {import('display-anki').CreateMode} mode
+     * @param {number} noteOptionsIndex
      */
-    async _saveAnkiNote(dictionaryEntryIndex, mode) {
+    async _saveAnkiNote(dictionaryEntryIndex, noteOptionsIndex) {
         const dictionaryEntries = this._display.dictionaryEntries;
         const dictionaryEntryDetails = this._dictionaryEntryDetails;
         if (!(
@@ -658,12 +651,12 @@ export class DisplayAnki {
             return;
         }
         const dictionaryEntry = dictionaryEntries[dictionaryEntryIndex];
-        const details = dictionaryEntryDetails[dictionaryEntryIndex].modeMap.get(mode);
+        const details = dictionaryEntryDetails[dictionaryEntryIndex].noteMap.get(noteOptionsIndex);
         if (typeof details === 'undefined') { return; }
 
         const {requirements} = details;
 
-        const button = this._saveButtonFind(dictionaryEntryIndex, mode);
+        const button = this._saveButtonFind(dictionaryEntryIndex, noteOptionsIndex);
         if (button === null || button.disabled) { return; }
 
         this._hideErrorNotification(true);
@@ -673,13 +666,13 @@ export class DisplayAnki {
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
         try {
-            const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, mode, requirements);
+            const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, noteOptionsIndex, requirements);
             allErrors.push(...errors);
 
             const error = this._getAddNoteRequirementsError(requirements, outputRequirements);
             if (error !== null) { allErrors.push(error); }
             if (button.dataset.overwrite) {
-                const overwrittenNote = await this._getOverwrittenNote(note, dictionaryEntryIndex, mode);
+                const overwrittenNote = await this._getOverwrittenNote(note, dictionaryEntryIndex, noteOptionsIndex);
                 await this._updateAnkiNote(overwrittenNote, allErrors);
             } else {
                 await this._addNewAnkiNote(note, allErrors, button, dictionaryEntryIndex);
@@ -700,23 +693,23 @@ export class DisplayAnki {
     /**
      * @param {import('anki').Note} note
      * @param {number} dictionaryEntryIndex
-     * @param {import('display-anki').CreateMode} mode
+     * @param {number} noteOptionsIndex
      * @returns {Promise<import('anki').NoteWithId | null>}
      */
-    async _getOverwrittenNote(note, dictionaryEntryIndex, mode) {
+    async _getOverwrittenNote(note, dictionaryEntryIndex, noteOptionsIndex) {
         const dictionaryEntries = this._display.dictionaryEntries;
         const allEntryDetails = await this._getDictionaryEntryDetails(dictionaryEntries);
         const relevantEntryDetails = allEntryDetails[dictionaryEntryIndex];
-        const relevantModeDetails = relevantEntryDetails.modeMap.get(mode);
-        if (typeof relevantModeDetails === 'undefined') { return null; }
-        const {noteIds, noteInfos} = relevantModeDetails;
+        const relevantNoteDetails = relevantEntryDetails.noteMap.get(noteOptionsIndex);
+        if (typeof relevantNoteDetails === 'undefined') { return null; }
+        const {noteIds, noteInfos} = relevantNoteDetails;
         if (noteIds === null || typeof noteInfos === 'undefined') { return null; }
         const overwriteId = noteIds.find((id) => id !== INVALID_NOTE_ID);
         if (typeof overwriteId === 'undefined') { return null; }
         const overwriteInfo = noteInfos.find((info) => info !== null && info.noteId === overwriteId);
         if (!overwriteInfo) { return null; }
         const existingFields = overwriteInfo.fields;
-        const fieldOptions = this._modeOptions.get(mode)?.fields;
+        const fieldOptions = this._notesOptions[noteOptionsIndex].fields;
         if (!fieldOptions) { return null; }
 
         const newValues = note.fields;
@@ -918,12 +911,11 @@ export class DisplayAnki {
         for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
             const dictionaryEntry = dictionaryEntries[i];
             const {type} = dictionaryEntry;
-            const modes = this._dictionaryEntryTypeModeMap.get(type);
-            if (typeof modes === 'undefined') { continue; }
-            for (const mode of modes) {
-                const notePromise = this._createNote(dictionaryEntry, mode, []);
+            const notesOptionsForType = this._notesOptions.filter((noteOptions) => noteOptions.type === type);
+            for (const [noteOptionsIndex, noteOptions] of notesOptionsForType.entries()) {
+                const notePromise = this._createNote(dictionaryEntry, noteOptionsIndex, []);
                 notePromises.push(notePromise);
-                noteTargets.push({index: i, mode});
+                noteTargets.push({index: i, noteOptionsIndex, noteOptions});
             }
         }
 
@@ -946,18 +938,13 @@ export class DisplayAnki {
         }
 
         /** @type {import('display-anki').DictionaryEntryDetails[]} */
-        const results = [];
-        for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
-            results.push({
-                modeMap: new Map(),
-            });
-        }
+        const results = new Array(dictionaryEntries.length).fill(null).map(() => ({noteMap: new Map()}));
 
         for (let i = 0, ii = noteInfoList.length; i < ii; ++i) {
             const {note, errors, requirements} = noteInfoList[i];
             const {canAdd, valid, noteIds, noteInfos} = infos[i];
-            const {mode, index} = noteTargets[i];
-            results[index].modeMap.set(mode, {mode, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
+            const {noteOptionsIndex, noteOptions, index} = noteTargets[i];
+            results[index].noteMap.set(noteOptionsIndex, {noteOptions, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
         }
         return results;
     }
@@ -978,15 +965,15 @@ export class DisplayAnki {
 
     /**
      * @param {import('dictionary').DictionaryEntry} dictionaryEntry
-     * @param {import('display-anki').CreateMode} mode
+     * @param {number} noteOptionsIndex
      * @param {import('anki-note-builder').Requirement[]} requirements
      * @returns {Promise<import('display-anki').CreateNoteResult>}
      */
-    async _createNote(dictionaryEntry, mode, requirements) {
+    async _createNote(dictionaryEntry, noteOptionsIndex, requirements) {
         const context = this._noteContext;
         if (context === null) { throw new Error('Note context not initialized'); }
-        const modeOptions = this._modeOptions.get(mode);
-        if (typeof modeOptions === 'undefined') { throw new Error(`Unsupported note type: ${mode}`); }
+        const noteOptions = this._notesOptions?.[noteOptionsIndex];
+        if (typeof noteOptions === 'undefined') { throw new Error('Unsupported note type}'); }
         if (!this._ankiFieldTemplates) {
             const options = this._display.getOptions();
             if (options) {
@@ -995,8 +982,8 @@ export class DisplayAnki {
         }
         const template = this._ankiFieldTemplates;
         if (typeof template !== 'string') { throw new Error('Invalid template'); }
-        const {deck: deckName, model: modelName} = modeOptions;
-        const fields = Object.entries(modeOptions.fields);
+        const {deck: deckName, model: modelName} = noteOptions;
+        const fields = Object.entries(noteOptions.fields);
         const contentOrigin = this._display.getContentOrigin();
         const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntry);
         const audioDetails = this._getAnkiNoteMediaAudioDetails(details);
@@ -1005,7 +992,7 @@ export class DisplayAnki {
 
         const {note, errors, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({
             dictionaryEntry,
-            mode,
+            noteOptions,
             context,
             template,
             deckName,

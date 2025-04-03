@@ -129,10 +129,8 @@ export function hasRequiredPermissionsForOptions(permissions, options) {
         if (options.clipboard.enableBackgroundMonitor || options.clipboard.enableSearchPageMonitor) {
             return false;
         }
-        const fieldsList = [
-            options.anki.terms.fields,
-            options.anki.kanji.fields,
-        ];
+        const fieldsList = options.anki.notes.map((note) => note.fields);
+
         for (const fields of fieldsList) {
             for (const {value: fieldValue} of Object.values(fields)) {
                 const markers = getFieldMarkers(fieldValue);

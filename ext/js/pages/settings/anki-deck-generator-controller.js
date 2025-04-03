@@ -129,8 +129,8 @@ export class AnkiDeckGeneratorController {
         const activeDeckTextConfirm = querySelectorNotNull(document, '#generate-anki-notes-active-deck-confirm');
         const options = await this._settingsController.getOptions();
 
-        this._activeNoteType = options.anki.terms.model;
-        this._activeAnkiDeck = options.anki.terms.deck;
+        this._activeNoteType = options.anki.notes[0].model;
+        this._activeAnkiDeck = options.anki.notes[0].deck;
         activeModelText.textContent = this._activeNoteType;
         activeDeckText.textContent = this._activeAnkiDeck;
         activeDeckTextConfirm.textContent = this._activeAnkiDeck;
@@ -435,7 +435,7 @@ export class AnkiDeckGeneratorController {
             fullQuery: sentenceText,
         };
         const template = await this._getAnkiTemplate(options);
-        const deckOptionsFields = options.anki.terms.fields;
+        const deckOptionsFields = options.anki.notes[0].fields;
         const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
         const fields = [];
         for (const deckField in deckOptionsFields) {

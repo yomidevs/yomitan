@@ -923,8 +923,7 @@
                                     "server",
                                     "tags",
                                     "screenshot",
-                                    "terms",
-                                    "kanji",
+                                    "notes",
                                     "duplicateScope",
                                     "duplicateScopeCheckAllModels",
                                     "checkForDuplicates",
@@ -973,75 +972,61 @@
                                             }
                                         }
                                     },
-                                    "terms": {
-                                        "type": "object",
-                                        "required": [
-                                            "deck",
-                                            "model",
-                                            "fields"
-                                        ],
-                                        "properties": {
-                                            "deck": {
-                                                "type": "string",
-                                                "default": ""
-                                            },
-                                            "model": {
-                                                "type": "string",
-                                                "default": ""
-                                            },
-                                            "fields": {
-                                                "type": "object",
-                                                "additionalProperties": {
+                                    "notes": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "name",
+                                                "icon",
+                                                "deck",
+                                                "model",
+                                                "fields",
+                                                "type"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "default": ""
+                                                },
+                                                "icon": {
+                                                    "type": "string",
+                                                    "enum": ["big-plus", "small-plus"],
+                                                    "default": "big-plus"
+                                                },
+                                                "deck": {
+                                                    "type": "string",
+                                                    "default": ""
+                                                },
+                                                "model": {
+                                                    "type": "string",
+                                                    "default": ""
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "enum": ["term", "kanji"],
+                                                    "default": "term"
+                                                },
+                                                "fields": {
                                                     "type": "object",
-                                                    "properties": {
-                                                        "value:": {
-                                                            "type": "string",
-                                                            "default": ""
-                                                        },
-                                                        "overwriteMode": {
-                                                            "type": "string",
-                                                            "enum": ["coalesce", "coalesce-new", "skip", "append", "prepend", "overwrite"],
-                                                            "default": "coalesce"
+                                                    "additionalProperties": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "value": {
+                                                                "type": "string",
+                                                                "default": ""
+                                                            },
+                                                            "overwriteMode": {
+                                                                "type": "string",
+                                                                "enum": ["coalesce", "coalesce-new", "skip", "append", "prepend", "overwrite"],
+                                                                "default": "coalesce"
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
-                                        }
-                                    },
-                                    "kanji": {
-                                        "type": "object",
-                                        "required": [
-                                            "deck",
-                                            "model",
-                                            "fields"
-                                        ],
-                                        "properties": {
-                                            "deck": {
-                                                "type": "string",
-                                                "default": ""
-                                            },
-                                            "model": {
-                                                "type": "string",
-                                                "default": ""
-                                            },
-                                            "fields": {
-                                                "type": "object",
-                                                "additionalProperties": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "value:": {
-                                                            "type": "string",
-                                                            "default": ""
-                                                        },
-                                                        "overwriteMode": {
-                                                            "type": "string",
-                                                            "enum": ["coalesce", "coalesce-new", "skip", "append", "prepend", "overwrite"],
-                                                            "default": "coalesce"
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        },
+                                        "default": []
                                     },
                                     "duplicateScope": {
                                         "type": "string",

@@ -834,23 +834,44 @@
         </div>
         <div>
             <div class="tabs-container">
-                <div class="tabs">
-                    <label class="tab">
-                        <input type="radio" name="anki-card-primary-type" data-value="terms" data-anki-card-menu="anki-card-terms-field-menu" checked>
-                        <div class="tab-inner"><span class="tab-label">Terms</span></div>
-                    </label>
-                    <label class="tab">
-                        <input type="radio" name="anki-card-primary-type" data-value="kanji" data-anki-card-menu="anki-card-kanji-field-menu">
-                        <div class="tab-inner"><span class="tab-label">Kanji</span></div>
-                    </label>
-                </div>
+                <div class="tabs" id="anki-cards-tabs"></div>
                 <div class="tabs-right" hidden>
                     <button type="button" class="icon-button" data-menu-position="below left" id="anki-card-primary-type-menu-button"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
                 </div>
             </div>
             <div class="modal-separator-line"></div>
         </div>
-        <div class="modal-body anki-card" id="anki-card-primary" data-anki-card-type="terms" data-anki-card-menu="anki-card-terms-field-menu">
+        <div class="modal-body anki-card" id="anki-card-primary" data-note-options-index="0" data-anki-card-menu="anki-card-terms-field-menu">
+            <div class="settings-item"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Name</div>
+                </div>
+                <div class="settings-item-right">
+                    <input type="text" class="anki-card-name" data-setting="anki.notes.[0].name"></select>
+                </div>
+            </div></div>
+            <div class="settings-item advanced-only"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Dictionary Type</div>
+                </div>
+                <div class="settings-item-right">
+                    <select class="anki-card-type">
+                        <option value="term">Term</option>
+                        <option value="kanji">Kanji</option>
+                    </select>
+                </div>
+            </div></div>
+            <div class="settings-item advanced-only"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Button</div>
+                </div>
+                <div class="settings-item-right">
+                    <select class="anki-card-icon select-icon icon color-icon" data-icon="add-term-kanji">
+                        <option value="big-plus">Big Plus</option>
+                        <option value="small-plus">Small Plus</option>
+                    </select>
+                </div>
+            </div></div>
             <div class="settings-item"><div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Deck</div>

@@ -46,7 +46,7 @@ export class AnkiNoteBuilder {
      */
     async createNote({
         dictionaryEntry,
-        mode,
+        noteOptions,
         context,
         template,
         deckName,
@@ -91,7 +91,7 @@ export class AnkiNoteBuilder {
             // Ignore
         }
 
-        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
+        const commonData = this._createData(dictionaryEntry, noteOptions, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
         const formattedFieldValuePromises = [];
         for (const [, {value: fieldValue}] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template);
@@ -202,7 +202,7 @@ export class AnkiNoteBuilder {
 
     /**
      * @param {import('dictionary').DictionaryEntry} dictionaryEntry
-     * @param {import('anki-templates-internal').CreateMode} mode
+     * @param {import('settings').AnkiNoteOptions} noteOptions
      * @param {import('anki-templates-internal').Context} context
      * @param {import('settings').ResultOutputMode} resultOutputMode
      * @param {import('settings').GlossaryLayoutMode} glossaryLayoutMode
@@ -211,10 +211,10 @@ export class AnkiNoteBuilder {
      * @param {Map<string, string>} dictionaryStylesMap
      * @returns {import('anki-note-builder').CommonData}
      */
-    _createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap) {
+    _createData(dictionaryEntry, noteOptions, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap) {
         return {
             dictionaryEntry,
-            mode,
+            noteOptions,
             context,
             resultOutputMode,
             glossaryLayoutMode,

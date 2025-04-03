@@ -496,7 +496,10 @@ function createProfileOptionsUpdatedTestData1() {
             server: 'http://127.0.0.1:8765',
             tags: ['yomitan'],
             screenshot: {format: 'png', quality: 92},
-            terms: {
+            notes: [{
+                type: 'term',
+                name: 'Expression',
+                icon: 'big-plus',
                 deck: '',
                 model: '',
                 fields: {
@@ -505,8 +508,10 @@ function createProfileOptionsUpdatedTestData1() {
                         value: '{popup-selection-text}',
                     },
                 },
-            },
-            kanji: {
+            }, {
+                type: 'kanji',
+                name: 'Kanji',
+                icon: 'big-plus',
                 deck: '',
                 model: '',
                 fields: {
@@ -515,7 +520,7 @@ function createProfileOptionsUpdatedTestData1() {
                         value: '{popup-selection-text}',
                     },
                 },
-            },
+            }],
             duplicateBehavior: 'new',
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
@@ -682,7 +687,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 63,
+        version: 64,
         global: {
             database: {
                 prefixWildcardsSupported: false,

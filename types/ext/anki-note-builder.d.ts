@@ -28,7 +28,7 @@ import type * as Language from './language';
 
 export type CreateNoteDetails = {
     dictionaryEntry: Dictionary.DictionaryEntry;
-    mode: AnkiTemplatesInternal.CreateMode;
+    noteOptions: Settings.AnkiNoteOptions;
     context: AnkiTemplatesInternal.Context;
     template: string;
     deckName: string;

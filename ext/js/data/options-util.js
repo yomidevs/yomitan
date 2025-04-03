@@ -575,6 +575,7 @@ export class OptionsUtil {
             this._updateVersion61,
             this._updateVersion62,
             this._updateVersion63,
+            this._updateVersion64,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1633,6 +1634,56 @@ export class OptionsUtil {
      */
     async _updateVersion63(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v63.handlebars');
+    }
+
+    /**
+     *  - Converted terms and kanji into notes array format
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion64(options) {
+        for (const profile of options.profiles) {
+            const oldTerms = profile.options.anki.terms;
+            const oldKanji = profile.options.anki.kanji;
+
+            const termsNotes = [{
+                name: 'Expression',
+                icon: 'big-plus',
+                deck: oldTerms.deck,
+                model: oldTerms.model,
+                fields: oldTerms.fields,
+                type: 'term',
+            }];
+
+            if (Object.values(oldTerms.fields).some((field) => field.value.includes('{expression}'))) {
+                termsNotes.push({
+                    name: 'Reading',
+                    icon: 'small-plus',
+                    deck: oldTerms.deck,
+                    model: oldTerms.model,
+                    fields: Object.fromEntries(
+                        Object.entries(oldTerms.fields).map(([key, field]) => [
+                            key,
+                            {...field, value: field.value.replace(/{expression}/g, '{reading}')},
+                        ]),
+                    ),
+                    type: 'term',
+                });
+            }
+
+            const kanjiNote = {
+                name: 'Kanji',
+                icon: 'big-plus',
+                deck: oldKanji.deck,
+                model: oldKanji.model,
+                fields: oldKanji.fields,
+                type: 'kanji',
+            };
+
+            profile.options.anki.notes = [...termsNotes, kanjiNote];
+
+            delete profile.options.anki.terms;
+            delete profile.options.anki.kanji;
+        }
     }
 
     /**

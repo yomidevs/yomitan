@@ -292,8 +292,7 @@ export type AnkiOptions = {
     server: string;
     tags: string[];
     screenshot: AnkiScreenshotOptions;
-    terms: AnkiNoteOptions;
-    kanji: AnkiNoteOptions;
+    notes: AnkiNoteOptions[];
     duplicateScope: AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
     duplicateBehavior: AnkiDuplicateBehavior;
@@ -312,10 +311,15 @@ export type AnkiScreenshotOptions = {
 };
 
 export type AnkiNoteOptions = {
+    type: 'kanji' | 'term';
+    name: string;
     deck: string;
     model: string;
     fields: AnkiNoteFields;
+    icon: AnkiNoteIcon;
 };
+
+export type AnkiNoteIcon = 'big-plus' | 'small-plus';
 
 export type AnkiNoteFields = {
     [key: string]: AnkiNoteField;
