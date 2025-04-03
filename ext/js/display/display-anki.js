@@ -320,9 +320,32 @@ export class DisplayAnki {
      * @param {number} noteOptionsIndex
      * @returns {?HTMLButtonElement}
      */
-    _saveButtonFind(index, noteOptionsIndex) {
+    _createSaveButtons(index, noteOptionsIndex) {
         const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector(`.action-button[data-action=save-note][data-note-options-index="${noteOptionsIndex}"]`) : null;
+        if (entry === null) { return null; }
+
+        const container = entry.querySelector('.note-action-button-container');
+        if (container === null) { return null; }
+
+        // Create button from template
+        const singleNoteActionButtons = /** @type {HTMLElement} */ (this._display.displayGenerator.instantiateTemplate('single-note-action-button-container'));
+        /** @type {HTMLButtonElement} */
+        const saveButton = querySelectorNotNull(singleNoteActionButtons, '.action-button');
+        /** @type {HTMLElement} */
+        const iconSpan = querySelectorNotNull(saveButton, '.action-icon');
+        // Set button properties
+        const noteOptions = this._notesOptions[noteOptionsIndex];
+        singleNoteActionButtons.dataset.noteOptionsIndex = noteOptionsIndex.toString();
+        saveButton.title = `Add ${noteOptions.name} note`;
+        iconSpan.dataset.icon = noteOptions.icon;
+
+        // Add event listeners
+        this._eventListeners.addEventListener(saveButton, 'click', this._onNoteSaveBind);
+
+        // Add button to container
+        container.appendChild(singleNoteActionButtons);
+
+        return saveButton;
     }
 
     /**
@@ -454,7 +477,7 @@ export class DisplayAnki {
             /** @type {?Set<number>} */
             let allNoteIds = null;
             for (const [noteOptionsIndex, {canAdd, noteIds, noteInfos, ankiError}] of dictionaryEntryDetails[i].noteMap.entries()) {
-                const button = this._saveButtonFind(i, noteOptionsIndex);
+                const button = this._createSaveButtons(i, noteOptionsIndex);
                 if (button !== null) {
                     button.disabled = !canAdd;
                     button.hidden = (ankiError !== null);
@@ -464,7 +487,7 @@ export class DisplayAnki {
 
                     // If entry has noteIds, show the "add duplicate" button.
                     if (Array.isArray(noteIds) && noteIds.length > 0) {
-                        this._updateSaveButtonForDuplicateBehavior(button, noteIds);
+                        // this._updateSaveButtonForDuplicateBehavior(button, noteIds);
                     }
                 }
 
@@ -932,6 +955,7 @@ export class DisplayAnki {
             infos = this._checkForDuplicates ?
                 await this._display.application.api.getAnkiNoteInfo(notes, fetchAdditionalInfo) :
                 this._getAnkiNoteInfoForceValue(notes, true);
+            console.log('_getDictionaryEntryDetails infos', infos);
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValue(notes, false);
             ankiError = toError(e);

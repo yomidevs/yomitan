@@ -645,6 +645,11 @@ button.sidebar-button.sidebar-button-highlight {
     content: '';
     display: block;
 }
+.note-action-button-container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
 button.action-button {
     cursor: pointer;
     display: block;
@@ -701,9 +706,8 @@ button.action-button:active {
     box-shadow: none;
 }
 .icon[data-icon=view-note]      { background-image: url('/images/view-note.svg'); }
-.icon[data-icon=add-term-kanji] { background-image: url('/images/add-term-kanji.svg'); }
-.icon[data-icon=add-term-kana]  { background-image: url('/images/add-term-kana.svg'); }
-.icon[data-icon=add-kanji]  { background-image: url('/images/add-term-kanji.svg'); }
+.icon[data-icon=big-plus] { background-image: url('/images/add-term-kanji.svg'); }
+.icon[data-icon=small-plus]  { background-image: url('/images/add-term-kana.svg'); }
 .icon[data-icon=overwrite-term-kanji] { background-image: url('/images/overwrite-term-kanji.svg'); }
 .icon[data-icon=overwrite-term-kana]  { background-image: url('/images/overwrite-term-kana.svg'); }
 .icon[data-icon=overwrite-kanji]  { background-image: url('/images/overwrite-term-kanji.svg'); }
