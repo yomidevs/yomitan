@@ -71,6 +71,8 @@ export class AnkiController {
         this._duplicateOverwriteWarning = querySelectorNotNull(document, '#anki-overwrite-warning');
         /** @type {HTMLElement} */
         this._ankiCardPrimary = querySelectorNotNull(document, '#anki-card-primary');
+        /** @type {HTMLElement} */
+        this._ankiCardsTabs = querySelectorNotNull(document, '#anki-cards-tabs');
         /** @type {?Error} */
         this._ankiError = null;
         /** @type {?import('core').TokenObject} */
@@ -94,6 +96,8 @@ export class AnkiController {
         const ankiApiKeyInput = querySelectorNotNull(document, '#anki-api-key-input');
         /** @type {HTMLElement} */
         const ankiErrorLog = querySelectorNotNull(document, '#anki-error-log');
+        /** @type {HTMLElement} */
+        const newNoteButton = querySelectorNotNull(document, '#anki-cards-new-note button');
 
         this._ankiErrorMessageDetailsToggle.addEventListener('click', this._onAnkiErrorMessageDetailsToggleClick.bind(this), false);
         if (this._ankiEnableCheckbox !== null) {
@@ -131,6 +135,8 @@ export class AnkiController {
         /** @type {HTMLSelectElement} */
         const ankiCardIconSelect = querySelectorNotNull(this._ankiCardPrimary, '.anki-card-icon');
         ankiCardIconSelect.addEventListener('change', this._onIconSelectChange.bind(this), false);
+
+        newNoteButton.addEventListener('click', this._onNewNoteButtonClick.bind(this), false);
     }
 
     /**
@@ -593,8 +599,7 @@ export class AnkiController {
      * @param {import('settings').AnkiOptions} ankiOptions
      */
     _setupTabs(ankiOptions) {
-        const tabsContainer = querySelectorNotNull(document, '#anki-cards-tabs');
-        if (tabsContainer === null) { return; }
+        const tabsContainer = this._ankiCardsTabs;
 
         while (tabsContainer.firstChild) {
             tabsContainer.removeChild(tabsContainer.firstChild);
@@ -602,23 +607,10 @@ export class AnkiController {
 
         for (let i = 0; i < ankiOptions.notes.length; ++i) {
             const noteOptions = ankiOptions.notes[i];
-            const content = this._settingsController.instantiateTemplateFragment('anki-card-type-tab');
-
-            /** @type {HTMLInputElement} */
-            const input = querySelectorNotNull(content, 'input');
-            input.value = noteOptions.type;
-            input.dataset.value = noteOptions.type;
-            input.dataset.ankiCardMenu = `anki-card-${noteOptions.type}-field-menu`;
-            input.dataset.noteOptionsIndex = `${i}`;
+            const input = this._createNoteTab(noteOptions, i);
             if (i === 0) {
                 input.checked = true;
             }
-
-            /** @type {HTMLElement} */
-            const labelNode = querySelectorNotNull(content, '.tab-label');
-            labelNode.textContent = noteOptions.name;
-
-            tabsContainer.appendChild(content);
         }
 
         const ankiCardPrimaryTypeRadios = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('input[type=radio][name=anki-card-primary-type]'));
@@ -626,6 +618,64 @@ export class AnkiController {
             input.addEventListener('change', this._onAnkiCardPrimaryTypeRadioChange.bind(this), false);
         }
         this._setNoteOptionsIndex(0, 'anki-card-term-field-menu');
+    }
+
+    /**
+     * @param {import('settings').AnkiNoteOptions} noteOptions
+     * @param {number} noteOptionsIndex
+     * @returns {HTMLInputElement}
+     */
+    _createNoteTab(noteOptions, noteOptionsIndex) {
+        const tabsContainer = this._ankiCardsTabs;
+        const content = this._settingsController.instantiateTemplateFragment('anki-card-type-tab');
+
+        /** @type {HTMLInputElement} */
+        const input = querySelectorNotNull(content, 'input');
+        input.value = noteOptions.type;
+        input.dataset.value = noteOptions.type;
+        input.dataset.ankiCardMenu = `anki-card-${noteOptions.type}-field-menu`;
+        input.dataset.noteOptionsIndex = `${noteOptionsIndex}`;
+
+        /** @type {HTMLElement} */
+        const labelNode = querySelectorNotNull(content, '.tab-label');
+        labelNode.textContent = noteOptions.name;
+
+        tabsContainer.appendChild(content);
+
+        return input;
+    }
+
+    /**
+     * @param {Event} e
+     */
+    _onNewNoteButtonClick(e) {
+        e.preventDefault();
+        void this._addNewNote();
+    }
+
+    /** */
+    async _addNewNote() {
+        const options = await this._settingsController.getOptions();
+        const ankiOptions = options.anki;
+        const index = ankiOptions.notes.length;
+
+        /** @type {import('settings').AnkiNoteOptions} */
+        const newNote = {
+            name: `Note ${index + 1}`,
+            type: 'term',
+            deck: '',
+            model: '',
+            fields: {},
+            icon: 'big-circle',
+        };
+
+        await this._settingsController.modifyProfileSettings([{
+            action: 'splice',
+            path: 'anki.notes',
+            start: index,
+            deleteCount: 0,
+            items: [newNote],
+        }]);
     }
 }
 
