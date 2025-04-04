@@ -655,6 +655,7 @@ button.sidebar-button.sidebar-button-highlight {
     flex-direction: column;
     position: relative;
 }
+
 .note-actions-container .action-button-container::after {
     content: '';
     position: absolute;
@@ -667,7 +668,7 @@ button.sidebar-button.sidebar-button-highlight {
     opacity: 0.25;
     z-index: -1;
 }
-/* Make first action button container horizontal */
+
 .note-actions-container .action-button-container:first-child {
     flex-direction: row-reverse;
 }
@@ -678,6 +679,10 @@ button.sidebar-button.sidebar-button-highlight {
     bottom: auto;
     height: 1px;
     width: auto;
+}
+
+.note-actions-container .action-button-container:only-child::after {
+    display: none;
 }
 
 button.action-button {
