@@ -317,6 +317,14 @@ export class DisplayAnki {
         saveButton.dataset.noteOptionsIndex = noteOptionsIndex.toString();
         iconSpan.dataset.icon = noteOptions.icon;
 
+        const saveButtonIndex = container.children.length;
+        if ([0, 1].includes(saveButtonIndex)) {
+            saveButton.dataset.hotkey = `["addNote${saveButtonIndex + 1}","title","Add ${noteOptions.name} note"]`;
+            // eslint-disable-next-line no-underscore-dangle
+            this._display._hotkeyHelpController.setHotkeyLabel(saveButton, `Add ${noteOptions.name} note ({0})`);
+        } else {
+            delete saveButton.dataset.hotkey;
+        }
         // Add event listeners
         this._eventListeners.addEventListener(saveButton, 'click', this._onNoteSaveBind);
 
@@ -381,6 +389,8 @@ export class DisplayAnki {
             if (this._updateDictionaryEntryDetailsToken !== token) { return; }
             this._dictionaryEntryDetails = dictionaryEntryDetails;
             this._updateSaveButtons(dictionaryEntryDetails);
+            // eslint-disable-next-line no-underscore-dangle
+            this._display._hotkeyHelpController.setupNode(document.documentElement);
         } finally {
             resolve();
             if (this._updateSaveButtonsPromise === promise) {
@@ -580,7 +590,7 @@ export class DisplayAnki {
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return; }
         /** @type {HTMLButtonElement | null} */
-        const nthButton = container.querySelector(`.action-buttons-container:nth-child(${saveButtonIndex + 1})`);
+        const nthButton = container.querySelector(`.action-button-container:nth-child(${saveButtonIndex + 1})`);
         if (nthButton === null) { return; }
         if (typeof nthButton.dataset.noteOptionsIndex === 'undefined') { return; }
         const noteOptionsIndex = Number.parseInt(nthButton.dataset.noteOptionsIndex, 10);
@@ -1238,7 +1248,7 @@ export class DisplayAnki {
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return; }
         /** @type {HTMLButtonElement | null} */
-        const nthButton = container.querySelector(`.action-buttons-container:nth-child(${viewNoteButtonIndex + 1}) .action-button[data-action=view-note]`);
+        const nthButton = container.querySelector(`.action-button-container:nth-child(${viewNoteButtonIndex + 1}) .action-button[data-action=view-note]`);
         if (nthButton === null) { return; }
         void this._viewNotes(nthButton);
     }
