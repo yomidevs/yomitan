@@ -1596,6 +1596,7 @@ select.profile-condition-operator {
 .icon[data-icon=big-circle] { background-image: url('/images/big-circle.svg'); }
 .icon[data-icon=small-circle]  { background-image: url('/images/small-circle.svg'); }
 .icon[data-icon=big-square] { background-image: url('/images/big-square.svg'); }
+.icon[data-icon=big-diamond] { background-image: url('/images/big-diamond.svg'); }
 .icon.select-icon {
     padding-left: 30px;
     background-repeat: no-repeat;

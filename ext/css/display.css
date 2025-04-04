@@ -709,12 +709,15 @@ button.action-button:active {
 .icon[data-icon=big-circle] { background-image: url('/images/big-circle.svg'); }
 .icon[data-icon=small-circle]  { background-image: url('/images/small-circle.svg'); }
 .icon[data-icon=big-square] { background-image: url('/images/big-square.svg'); }
+.icon[data-icon=big-diamond] { background-image: url('/images/big-diamond.svg'); }
 .icon[data-icon=overwrite-big-circle] { background-image: url('/images/overwrite-big-circle.svg'); }
 .icon[data-icon=overwrite-small-circle]  { background-image: url('/images/overwrite-small-circle.svg'); }
 .icon[data-icon=overwrite-big-square] { background-image: url('/images/overwrite-big-square.svg'); }
+.icon[data-icon=overwrite-big-diamond] { background-image: url('/images/overwrite-big-diamond.svg'); }
 .icon[data-icon=add-duplicate-big-circle] { background-image: url('/images/add-duplicate-big-circle.svg'); }
 .icon[data-icon=add-duplicate-small-circle]  { background-image: url('/images/add-duplicate-small-circle.svg'); }
 .icon[data-icon=add-duplicate-big-square] { background-image: url('/images/add-duplicate-big-square.svg'); }
+.icon[data-icon=add-duplicate-big-diamond] { background-image: url('/images/add-duplicate-big-diamond.svg'); }
 .icon[data-icon=play-audio]     { background-image: url('/images/play-audio.svg'); }
 .icon[data-icon=source-term]    { background-image: url('/images/source-term.svg'); }
 .icon[data-icon=entry-current]  { background-image: url('/images/entry-current.svg'); }

@@ -319,7 +319,7 @@ export type AnkiNoteOptions = {
     icon: AnkiNoteIcon;
 };
 
-export type AnkiNoteIcon = 'big-circle' | 'small-circle' | 'big-square';
+export type AnkiNoteIcon = 'big-circle' | 'small-circle' | 'big-square' | 'big-diamond';
 
 export type AnkiNoteFields = {
     [key: string]: AnkiNoteField;

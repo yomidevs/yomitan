@@ -28,10 +28,10 @@
   </symbol>
  </defs>
 
- <g transform="matrix(.91504 0 0 .91504 2.2745 -.91504)" filter="url(#green-to-purple)">
+ <g transform="matrix(.91504 0 0 .91504 1.5 -1.5)" filter="url(#green-to-purple)">
   <use xlink:href="#plus-in-diamond"/>
  </g>
- <g transform="matrix(.91504 0 0 .91504 -.91504 2.2745)" filter="url(#green-to-purple)">
+ <g transform="matrix(.91504 0 0 .91504 0 3)" filter="url(#green-to-purple)">
   <use xlink:href="#plus-in-diamond"/>
  </g>
 </svg>
