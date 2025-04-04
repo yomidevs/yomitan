@@ -1736,6 +1736,13 @@ select.profile-condition-operator {
     display: block;
 }
 
+.anki-card-footer {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 0.5em;
+}
 
 input.anki-card-field-value {
     flex: 1 1 auto;

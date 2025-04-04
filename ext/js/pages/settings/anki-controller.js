@@ -676,6 +676,8 @@ export class AnkiController {
             deleteCount: 0,
             items: [newNote],
         }]);
+
+        this._createNoteTab(newNote, index);
     }
 }
 
