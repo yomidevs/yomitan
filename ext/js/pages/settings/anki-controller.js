@@ -32,12 +32,15 @@ export class AnkiController {
     /**
      * @param {import('./settings-controller.js').SettingsController} settingsController
      * @param {import('../../application.js').Application} application
+     * @param {import('./modal-controller.js').ModalController} modalController
      */
-    constructor(settingsController, application) {
+    constructor(settingsController, application, modalController) {
         /** @type {import('../../application.js').Application} */
         this._application = application;
         /** @type {import('./settings-controller.js').SettingsController} */
         this._settingsController = settingsController;
+        /** @type {import('./modal-controller.js').ModalController} */
+        this._modalController = modalController;
         /** @type {AnkiConnect} */
         this._ankiConnect = new AnkiConnect();
         /** @type {SelectorObserver<AnkiCardController>} */
@@ -83,6 +86,14 @@ export class AnkiController {
         this._ankiOptions = null;
         /** @type {number} */
         this._noteOptionsIndex = 0;
+        /** @type {HTMLButtonElement} */
+        this._ankiNoteDeleteButton = querySelectorNotNull(document, '.anki-card-delete-button');
+        /** @type {?import('./modal.js').Modal} */
+        this._ankiNoteRemoveModal = null;
+        /** @type {HTMLElement} */
+        this._ankiNoteRemoveName = querySelectorNotNull(document, '#anki-note-remove-name');
+        /** @type {HTMLButtonElement} */
+        this._ankiNoteRemoveConfirmButton = querySelectorNotNull(document, '#anki-note-remove-confirm-button');
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
@@ -137,6 +148,15 @@ export class AnkiController {
         ankiCardIconSelect.addEventListener('change', this._onIconSelectChange.bind(this), false);
 
         newNoteButton.addEventListener('click', this._onNewNoteButtonClick.bind(this), false);
+
+        this._ankiNoteRemoveModal = this._modalController.getModal('anki-note-remove');
+
+        if (this._ankiNoteDeleteButton !== null) {
+            this._ankiNoteDeleteButton.addEventListener('click', this._onAnkiNoteDeleteClick.bind(this), false);
+        }
+        if (this._ankiNoteRemoveConfirmButton !== null) {
+            this._ankiNoteRemoveConfirmButton.addEventListener('click', this._onAnkiNoteRemoveConfirm.bind(this), false);
+        }
     }
 
     /**
@@ -678,6 +698,84 @@ export class AnkiController {
         }]);
 
         this._createNoteTab(newNote, index);
+    }
+
+    /**
+     * @param {Event} e
+     */
+    _onAnkiNoteDeleteClick(e) {
+        e.preventDefault();
+        this.openDeleteAnkiNoteModal(this._noteOptionsIndex);
+    }
+
+    /**
+     * @param {number} noteIndex
+     */
+    openDeleteAnkiNoteModal(noteIndex) {
+        const note = this._getNote(noteIndex);
+        if (note === null) { return; }
+
+        /** @type {HTMLElement} */ (this._ankiNoteRemoveName).textContent = note.name;
+        /** @type {import('./modal.js').Modal} */ (this._ankiNoteRemoveModal).node.dataset.noteIndex = `${noteIndex}`;
+        /** @type {import('./modal.js').Modal} */ (this._ankiNoteRemoveModal).setVisible(true);
+    }
+
+    /** */
+    _onAnkiNoteRemoveConfirm() {
+        const modal = /** @type {import('./modal.js').Modal} */ (this._ankiNoteRemoveModal);
+        modal.setVisible(false);
+        const {node} = modal;
+        const noteIndex = node.dataset.noteIndex;
+        delete node.dataset.noteIndex;
+
+        const validNoteIndex = this._tryGetValidNoteIndex(noteIndex);
+        if (validNoteIndex === null) { return; }
+
+        void this.deleteNote(validNoteIndex);
+    }
+
+    /**
+     * @param {string|undefined} stringValue
+     * @returns {?number}
+     */
+    _tryGetValidNoteIndex(stringValue) {
+        if (typeof stringValue !== 'string') { return null; }
+        const intValue = Number.parseInt(stringValue, 10);
+        if (this._ankiOptions === null) { return null; }
+        return (
+            Number.isFinite(intValue) &&
+            intValue >= 0 &&
+            intValue < this._ankiOptions.notes.length ?
+            intValue :
+            null
+        );
+    }
+
+    /**
+     * @param {number} noteIndex
+     * @returns {?import('settings').AnkiNoteOptions}
+     */
+    _getNote(noteIndex) {
+        if (this._ankiOptions === null) { return null; }
+        if (noteIndex < 0 || noteIndex >= this._ankiOptions.notes.length) { return null; }
+        return this._ankiOptions.notes[noteIndex];
+    }
+
+    /**
+     * @param {number} noteIndex
+     */
+    async deleteNote(noteIndex) {
+        if (this._ankiOptions === null) { return; }
+        const notes = this._ankiOptions.notes;
+        if (noteIndex < 0 || noteIndex >= notes.length) { return; }
+
+        await this._settingsController.modifyProfileSettings([{
+            action: 'splice',
+            path: 'anki.notes',
+            start: noteIndex,
+            deleteCount: 1,
+            items: [],
+        }]);
     }
 }
 
