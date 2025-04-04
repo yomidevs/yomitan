@@ -667,6 +667,18 @@ button.sidebar-button.sidebar-button-highlight {
     opacity: 0.25;
     z-index: -1;
 }
+/* Make first action button container horizontal */
+.note-actions-container .action-button-container:first-child {
+    flex-direction: row-reverse;
+}
+.note-actions-container .action-button-container:first-child::after {
+    left: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 3/4);
+    right: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 3/4);
+    top: 50%;
+    bottom: auto;
+    height: 1px;
+    width: auto;
+}
 
 button.action-button {
     cursor: pointer;
