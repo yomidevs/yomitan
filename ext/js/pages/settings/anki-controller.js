@@ -150,13 +150,8 @@ export class AnkiController {
         newNoteButton.addEventListener('click', this._onNewNoteButtonClick.bind(this), false);
 
         this._ankiNoteRemoveModal = this._modalController.getModal('anki-note-remove');
-
-        if (this._ankiNoteDeleteButton !== null) {
-            this._ankiNoteDeleteButton.addEventListener('click', this._onAnkiNoteDeleteClick.bind(this), false);
-        }
-        if (this._ankiNoteRemoveConfirmButton !== null) {
-            this._ankiNoteRemoveConfirmButton.addEventListener('click', this._onAnkiNoteRemoveConfirm.bind(this), false);
-        }
+        this._ankiNoteDeleteButton.addEventListener('click', this._onAnkiNoteDeleteClick.bind(this), false);
+        this._ankiNoteRemoveConfirmButton.addEventListener('click', this._onAnkiNoteRemoveConfirm.bind(this), false);
     }
 
     /**
@@ -339,7 +334,6 @@ export class AnkiController {
         /** @type {HTMLSelectElement} */
         const iconSelect = querySelectorNotNull(this._ankiCardPrimary, '.anki-card-icon');
         iconSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', noteOptionsIndex, 'icon']);
-
         iconSelect.dataset.icon = this._ankiOptions?.notes[noteOptionsIndex].icon ?? 'big-circle';
     }
 
@@ -625,18 +619,16 @@ export class AnkiController {
             tabsContainer.removeChild(tabsContainer.firstChild);
         }
 
+        const activeTab = this._noteOptionsIndex <= ankiOptions.notes.length ? this._noteOptionsIndex : 0;
+
         for (let i = 0; i < ankiOptions.notes.length; ++i) {
             const noteOptions = ankiOptions.notes[i];
             const input = this._createNoteTab(noteOptions, i);
-            if (i === 0) {
+            if (i === activeTab) {
                 input.checked = true;
             }
         }
 
-        const ankiCardPrimaryTypeRadios = /** @type {NodeListOf<HTMLInputElement>} */ (document.querySelectorAll('input[type=radio][name=anki-card-primary-type]'));
-        for (const input of ankiCardPrimaryTypeRadios) {
-            input.addEventListener('change', this._onAnkiCardPrimaryTypeRadioChange.bind(this), false);
-        }
         this._setNoteOptionsIndex(0, 'anki-card-term-field-menu');
     }
 
@@ -655,6 +647,7 @@ export class AnkiController {
         input.dataset.value = noteOptions.type;
         input.dataset.ankiCardMenu = `anki-card-${noteOptions.type}-field-menu`;
         input.dataset.noteOptionsIndex = `${noteOptionsIndex}`;
+        input.addEventListener('change', this._onAnkiCardPrimaryTypeRadioChange.bind(this), false);
 
         /** @type {HTMLElement} */
         const labelNode = querySelectorNotNull(content, '.tab-label');
@@ -663,6 +656,16 @@ export class AnkiController {
         tabsContainer.appendChild(content);
 
         return input;
+    }
+
+    /**
+     * @param {number} noteOptionsIndex
+     */
+    _removeNoteTab(noteOptionsIndex) {
+        const tabsContainer = this._ankiCardsTabs;
+        const input = querySelectorNotNull(tabsContainer, `input[data-note-options-index="${noteOptionsIndex}"]`);
+        if (input === null || input.parentElement === null) { return; }
+        tabsContainer.removeChild(input.parentElement);
     }
 
     /**
@@ -697,7 +700,9 @@ export class AnkiController {
             items: [newNote],
         }]);
 
-        this._createNoteTab(newNote, index);
+        await this._updateOptions();
+
+        // this._createNoteTab(newNote, index);
     }
 
     /**
@@ -776,6 +781,13 @@ export class AnkiController {
             deleteCount: 1,
             items: [],
         }]);
+
+        this._removeNoteTab(noteIndex);
+
+        const closestTabInput = /** @type {HTMLInputElement} */ (this._ankiCardsTabs.querySelector(`input[data-note-options-index="${noteIndex - 1}"]`));
+        if (closestTabInput === null) { return; }
+        closestTabInput.checked = true;
+        closestTabInput.dispatchEvent(new Event('change', {bubbles: true}));
     }
 }
 
