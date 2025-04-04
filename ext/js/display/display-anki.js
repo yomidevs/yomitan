@@ -324,11 +324,11 @@ export class DisplayAnki {
         const entry = this._getEntry(index);
         if (entry === null) { return null; }
 
-        const container = entry.querySelector('.note-action-button-container');
+        const container = entry.querySelector('.note-actions-container');
         if (container === null) { return null; }
 
         // Create button from template
-        const singleNoteActionButtons = /** @type {HTMLElement} */ (this._display.displayGenerator.instantiateTemplate('single-note-action-button-container'));
+        const singleNoteActionButtons = /** @type {HTMLElement} */ (this._display.displayGenerator.instantiateTemplate('action-button-container'));
         /** @type {HTMLButtonElement} */
         const saveButton = querySelectorNotNull(singleNoteActionButtons, '.action-button');
         /** @type {HTMLElement} */
@@ -499,25 +499,30 @@ export class DisplayAnki {
 
                 const validNoteIds = noteIds?.filter((id) => id !== INVALID_NOTE_ID) ?? [];
 
-                if (displayTagsAndFlags !== 'never' && Array.isArray(noteInfos)) {
-                    this._setupTagsIndicator(entryIndex, noteInfos);
-                    this._setupFlagsIndicator(entryIndex, noteInfos);
-                }
-
                 this._createViewNoteButton(entryIndex, noteOptionsIndex, validNoteIds);
+
+                if (displayTagsAndFlags !== 'never' && Array.isArray(noteInfos)) {
+                    this._setupTagsIndicator(entryIndex, noteOptionsIndex, noteInfos);
+                    this._setupFlagsIndicator(entryIndex, noteOptionsIndex, noteInfos);
+                }
             }
         }
     }
 
     /**
      * @param {number} i
+     * @param {number} noteOptionsIndex
      * @param {(?import('anki').NoteInfo)[]} noteInfos
      */
-    _setupTagsIndicator(i, noteInfos) {
-        const tagsIndicator = this._tagsIndicatorFind(i);
-        if (tagsIndicator === null) {
-            return;
-        }
+    _setupTagsIndicator(i, noteOptionsIndex, noteInfos) {
+        const entry = this._getEntry(i);
+        if (entry === null) { return; }
+
+        const container = entry.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
+        if (container === null) { return; }
+
+        const tagsIndicator = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('note-action-button-view-tags'));
+        if (tagsIndicator === null) { return; }
 
         const displayTags = new Set();
         for (const item of noteInfos) {
@@ -536,30 +541,24 @@ export class DisplayAnki {
             tagsIndicator.disabled = false;
             tagsIndicator.hidden = false;
             tagsIndicator.title = `Card tags: ${[...displayTags].join(', ')}`;
+            container.appendChild(tagsIndicator);
         }
-    }
-
-    /**
-     * @param {string} message
-     */
-    _showTagsNotification(message) {
-        if (this._tagsNotification === null) {
-            this._tagsNotification = this._display.createNotification(true);
-        }
-
-        this._tagsNotification.setContent(message);
-        this._tagsNotification.open();
     }
 
     /**
      * @param {number} i
+     * @param {number} noteOptionsIndex
      * @param {(?import('anki').NoteInfo)[]} noteInfos
      */
-    _setupFlagsIndicator(i, noteInfos) {
-        const flagsIndicator = this._flagsIndicatorFind(i);
-        if (flagsIndicator === null) {
-            return;
-        }
+    _setupFlagsIndicator(i, noteOptionsIndex, noteInfos) {
+        const entry = this._getEntry(i);
+        if (entry === null) { return; }
+
+        const container = entry.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
+        if (container === null) { return; }
+
+        const flagsIndicator = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('note-action-button-view-flags'));
+        if (flagsIndicator === null) { return; }
 
         /** @type {Set<string>} */
         const displayFlags = new Set();
@@ -581,60 +580,20 @@ export class DisplayAnki {
             if (flagsIndicatorIcon !== null && flagsIndicator instanceof HTMLElement) {
                 flagsIndicatorIcon.style.background = this._getFlagColor(displayFlags);
             }
+            container.appendChild(flagsIndicator);
         }
     }
 
     /**
-     * @param {number} flag
-     * @returns {string}
+     * @param {string} message
      */
-    _getFlagName(flag) {
-        /** @type {Record<number, string>} */
-        const flagNamesDict = {
-            1: 'Red',
-            2: 'Orange',
-            3: 'Green',
-            4: 'Blue',
-            5: 'Pink',
-            6: 'Turquoise',
-            7: 'Purple',
-        };
-        if (flag in flagNamesDict) {
-            return flagNamesDict[flag];
-        }
-        return '';
-    }
-
-    /**
-     * @param {Set<string>} flags
-     * @returns {string}
-     */
-    _getFlagColor(flags) {
-        /** @type {Record<string, import('display-anki').RGB>} */
-        const flagColorsDict = {
-            Red: {red: 248, green: 113, blue: 113},
-            Orange: {red: 253, green: 186, blue: 116},
-            Green: {red: 134, green: 239, blue: 172},
-            Blue: {red: 96, green: 165, blue: 250},
-            Pink: {red: 240, green: 171, blue: 252},
-            Turquoise: {red: 94, green: 234, blue: 212},
-            Purple: {red: 192, green: 132, blue: 252},
-        };
-
-        const gradientSliceSize = 100 / flags.size;
-        let currentGradientPercent = 0;
-
-        const gradientSlices = [];
-        for (const flag of flags) {
-            const flagColor = flagColorsDict[flag];
-            gradientSlices.push(
-                'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + currentGradientPercent + '%',
-                'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + (currentGradientPercent + gradientSliceSize) + '%',
-            );
-            currentGradientPercent += gradientSliceSize;
+    _showTagsNotification(message) {
+        if (this._tagsNotification === null) {
+            this._tagsNotification = this._display.createNotification(true);
         }
 
-        return 'linear-gradient(to right,' + gradientSlices.join(',') + ')';
+        this._tagsNotification.setContent(message);
+        this._tagsNotification.open();
     }
 
     /**
@@ -720,7 +679,7 @@ export class DisplayAnki {
     _saveButtonFind(dictionaryEntryIndex, noteOptionsIndex) {
         const entry = this._getEntry(dictionaryEntryIndex);
         if (entry === null) { return null; }
-        const container = entry.querySelector('.note-action-button-container');
+        const container = entry.querySelector('.note-actions-container');
         if (container === null) { return null; }
         const singleNoteActionButtonContainer = container.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
         if (singleNoteActionButtonContainer === null) { return null; }
@@ -1199,7 +1158,7 @@ export class DisplayAnki {
         const entry = this._getEntry(index);
         if (entry === null) { return null; }
 
-        const container = entry.querySelector('.note-action-button-container');
+        const container = entry.querySelector('.note-actions-container');
         if (container === null) { return null; }
         const singleNoteActionButtonContainer = container.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
         if (singleNoteActionButtonContainer === null) { return null; }
@@ -1296,6 +1255,59 @@ export class DisplayAnki {
         if (button !== null) {
             void this._viewNotes(button);
         }
+    }
+
+    /**
+     * @param {number} flag
+     * @returns {string}
+     */
+    _getFlagName(flag) {
+        /** @type {Record<number, string>} */
+        const flagNamesDict = {
+            1: 'Red',
+            2: 'Orange',
+            3: 'Green',
+            4: 'Blue',
+            5: 'Pink',
+            6: 'Turquoise',
+            7: 'Purple',
+        };
+        if (flag in flagNamesDict) {
+            return flagNamesDict[flag];
+        }
+        return '';
+    }
+
+    /**
+     * @param {Set<string>} flags
+     * @returns {string}
+     */
+    _getFlagColor(flags) {
+        /** @type {Record<string, import('display-anki').RGB>} */
+        const flagColorsDict = {
+            Red: {red: 248, green: 113, blue: 113},
+            Orange: {red: 253, green: 186, blue: 116},
+            Green: {red: 134, green: 239, blue: 172},
+            Blue: {red: 96, green: 165, blue: 250},
+            Pink: {red: 240, green: 171, blue: 252},
+            Turquoise: {red: 94, green: 234, blue: 212},
+            Purple: {red: 192, green: 132, blue: 252},
+        };
+
+        const gradientSliceSize = 100 / flags.size;
+        let currentGradientPercent = 0;
+
+        const gradientSlices = [];
+        for (const flag of flags) {
+            const flagColor = flagColorsDict[flag];
+            gradientSlices.push(
+                'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + currentGradientPercent + '%',
+                'rgb(' + flagColor.red + ',' + flagColor.green + ',' + flagColor.blue + ') ' + (currentGradientPercent + gradientSliceSize) + '%',
+            );
+            currentGradientPercent += gradientSliceSize;
+        }
+
+        return 'linear-gradient(to right,' + gradientSlices.join(',') + ')';
     }
 }
 

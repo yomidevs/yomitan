@@ -927,6 +927,7 @@
                                     "duplicateScope",
                                     "duplicateScopeCheckAllModels",
                                     "checkForDuplicates",
+                                    "duplicateBehavior",
                                     "fieldTemplates",
                                     "suspendNewCards",
                                     "displayTagsAndFlags",

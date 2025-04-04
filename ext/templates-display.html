@@ -5,17 +5,19 @@
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
         <div class="actions">
-            <div class="note-action-button-container"></div>
-            <button type="button" class="action-button" data-action="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover">
-                <span class="action-icon icon color-icon" data-icon="play-audio"></span>
-                <span class="action-button-badge icon" hidden></span>
-            </button>
+            <div class="note-actions-container"></div>
+            <div class="action-button-container">
+                <button type="button" class="action-button" data-action="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover">
+                    <span class="action-icon icon color-icon" data-icon="play-audio"></span>
+                    <span class="action-button-badge icon" hidden></span>
+                </button>
+                <button type="button" class="action-button action-button-collapsible" data-action="menu" data-menu-position="left below h-cover v-cover">
+                    <span class="action-icon icon" data-icon="kebab-menu"></span>
+                </button>
+            </div>
             <span class="entry-current-indicator-icon" title="Current entry">
                 <span class="icon color-icon" data-icon="entry-current"></span>
             </span>
-            <button type="button" class="action-button action-button-collapsible" data-action="menu" data-menu-position="left below h-cover v-cover">
-                <span class="action-icon icon" data-icon="kebab-menu"></span>
-            </button>
         </div>
         <div class="headword-list"></div>
         <div class="headword-list-details">
@@ -99,7 +101,7 @@
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
         <div class="actions">
-            <div class="note-action-button-container"></div>
+            <div class="note-actions-container"></div>
             <span class="entry-current-indicator-icon" title="Current entry">
                 <span class="icon color-icon" data-icon="entry-current"></span>
             </span>
@@ -201,11 +203,11 @@
 
 <template id="note-action-button-view-note-template"><button type="button" class="action-button" data-action="view-note" hidden disabled title="View added note" data-hotkey='["viewNotes","title","View added note ({0})"]' data-menu-position="left below h-cover v-cover">
     <span class="action-icon icon color-icon" data-icon="view-note"></span>
-    <span class="action-button-badge icon" hidden></span>
+    <span class="action-button-badge icon"></span>
 </button></template>
 
-<template id="single-note-action-button-container-template">
-    <div class="single-note-action-button-container">
+<template id="action-button-container-template">
+    <div class="action-button-container">
         <button type="button" class="action-button" data-action="save-note" title="Add {0}" data-hotkey='["saveNote","title","Add {0} ({0})"]'>
             <span class="action-icon icon color-icon" data-icon=""></span>
         </button>

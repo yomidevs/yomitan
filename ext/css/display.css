@@ -645,10 +645,15 @@ button.sidebar-button.sidebar-button-highlight {
     content: '';
     display: block;
 }
-.note-action-button-container {
+.note-actions-container {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
+}
+.action-button-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 button.action-button {
     cursor: pointer;
