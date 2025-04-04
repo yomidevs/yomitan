@@ -165,7 +165,7 @@ export class AnkiTemplatesController {
     /** */
     _onValidateCompile() {
         if (this._compileResultInfo === null) { return; }
-        void this._validate(this._compileResultInfo, '{expression}', 'term-kanji', false, true);
+        void this._validate(this._compileResultInfo, '{expression}', false, true);
     }
 
     /**
@@ -264,18 +264,30 @@ export class AnkiTemplatesController {
                 };
                 const template = await this._getAnkiTemplate(options);
                 const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
+                const fields = [
+                    [
+                        'field',
+                        {
+                            value: field,
+                            overwriteMode: 'skip',
+                        },
+                    ],
+                ];
                 const {note, errors} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
                     dictionaryEntry,
-                    mode,
+                    noteOptions: {
+                        name: 'Test',
+                        model: 'Test',
+                        deck: 'Test',
+                        fields,
+                        type: 'term',
+                        icon: 'big-circle',
+                    },
                     context,
                     template,
                     deckName: '',
                     modelName: '',
-                    fields: [
-                        [
-                            'field', {value: field},
-                        ],
-                    ],
+                    fields,
                     resultOutputMode,
                     glossaryLayoutMode,
                     compactTags,
