@@ -1245,11 +1245,10 @@
                                             {"action": "historyForward",    "argument": "",  "key": "KeyF",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "profilePrevious",   "argument": "",  "key": "Minus",     "modifiers": ["alt"],  "scopes": ["popup", "search", "web"], "enabled": true},
                                             {"action": "profileNext",       "argument": "",  "key": "Equal",     "modifiers": ["alt"],  "scopes": ["popup", "search", "web"], "enabled": true},
-                                            {"action": "addNoteKanji",      "argument": "",  "key": "KeyK",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "addNoteTermKanji",  "argument": "",  "key": "KeyE",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "addNoteTermKana",   "argument": "",  "key": "KeyR",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "addNote1",          "argument": "",  "key": "KeyE",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "addNote2",          "argument": "",  "key": "KeyR",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "playAudio",         "argument": "",  "key": "KeyP",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "viewNotes",         "argument": "",  "key": "KeyV",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "viewNotes1",        "argument": "",  "key": "KeyV",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "copyHostSelection", "argument": "",  "key": "KeyC",      "modifiers": ["ctrl"], "scopes": ["popup"],           "enabled": true}
                                         ]
                                     }

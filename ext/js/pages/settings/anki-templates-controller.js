@@ -178,7 +178,7 @@ export class AnkiTemplatesController {
         const infoNode = /** @type {HTMLElement} */ (this._renderResult);
         infoNode.hidden = true;
         this._cachedDictionaryEntryText = null;
-        void this._validate(infoNode, field, 'term-kanji', true, false);
+        void this._validate(infoNode, field, true, false);
     }
 
     /** */
@@ -238,11 +238,10 @@ export class AnkiTemplatesController {
     /**
      * @param {HTMLElement} infoNode
      * @param {string} field
-     * @param {import('anki-templates-internal').CreateModeNoTest} mode
      * @param {boolean} showSuccessResult
      * @param {boolean} invalidateInput
      */
-    async _validate(infoNode, field, mode, showSuccessResult, invalidateInput) {
+    async _validate(infoNode, field, showSuccessResult, invalidateInput) {
         /** @type {Error[]} */
         const allErrors = [];
         const text = /** @type {HTMLInputElement} */ (this._renderTextInput).value;

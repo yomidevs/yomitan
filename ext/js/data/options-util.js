@@ -1683,6 +1683,31 @@ export class OptionsUtil {
 
             delete profile.options.anki.terms;
             delete profile.options.anki.kanji;
+
+            // Update hotkeys
+            if (!profile.options.inputs || !profile.options.inputs.hotkeys) {
+                continue;
+            }
+
+            for (const hotkey of profile.options.inputs.hotkeys) {
+                if (!('argument' in hotkey)) {
+                    hotkey.argument = '';
+                }
+                switch (hotkey.action) {
+                    case 'addNoteTermKanji':
+                        hotkey.action = 'addNote1';
+                        break;
+                    case 'addNoteTermKana':
+                        hotkey.action = 'addNote2';
+                        break;
+                    case 'addNoteKanji':
+                        hotkey.action = 'addNote1';
+                        break;
+                    case 'viewNotes':
+                        hotkey.action = 'viewNotes1';
+                        break;
+                }
+            }
         }
     }
 

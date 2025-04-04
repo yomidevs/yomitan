@@ -116,10 +116,9 @@ export class DisplayAnki {
         this._noteContext = this._getNoteContext();
         /* eslint-disable @stylistic/no-multi-spaces */
         this._display.hotkeyHandler.registerActions([
-            ['addNoteKanji',      () => { this._hotkeySaveAnkiNoteForSelectedEntry('kanji'); }],
-            ['addNoteTermKanji',  () => { this._hotkeySaveAnkiNoteForSelectedEntry('term-1'); }],
-            ['addNoteTermKana',   () => { this._hotkeySaveAnkiNoteForSelectedEntry('term-2'); }],
-            ['viewNotes',         this._viewNotesForSelectedEntry.bind(this)],
+            ['addNote1',      () => { this._hotkeySaveAnkiNoteForSelectedEntry(0); }],
+            ['addNote2',      () => { this._hotkeySaveAnkiNoteForSelectedEntry(1); }],
+            ['viewNotes1',    () => { this._hotkeyViewNotesForSelectedEntry(0); }],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
@@ -572,11 +571,20 @@ export class DisplayAnki {
     }
 
     /**
-     * @param {import('display-anki').CreateMode} mode
+     * @param {number} saveButtonIndex
      */
-    _hotkeySaveAnkiNoteForSelectedEntry(mode) {
+    _hotkeySaveAnkiNoteForSelectedEntry(saveButtonIndex) {
         const index = this._display.selectedIndex;
-        void this._saveAnkiNote(index, mode);
+        const entry = this._getEntry(index);
+        if (entry === null) { return; }
+        const container = entry.querySelector('.note-actions-container');
+        if (container === null) { return; }
+        /** @type {HTMLButtonElement | null} */
+        const nthButton = container.querySelector(`.action-buttons-container:nth-child(${saveButtonIndex + 1})`);
+        if (nthButton === null) { return; }
+        if (typeof nthButton.dataset.noteOptionsIndex === 'undefined') { return; }
+        const noteOptionsIndex = Number.parseInt(nthButton.dataset.noteOptionsIndex, 10);
+        void this._saveAnkiNote(index, noteOptionsIndex);
     }
 
     /**
@@ -1221,14 +1229,18 @@ export class DisplayAnki {
     }
 
     /**
-     * Shows notes for selected pop-up entry when "View Notes" hotkey is used.
+     * @param {number} viewNoteButtonIndex
      */
-    _viewNotesForSelectedEntry() {
+    _hotkeyViewNotesForSelectedEntry(viewNoteButtonIndex) {
         const index = this._display.selectedIndex;
-        const button = this._getViewNoteButton(index);
-        if (button !== null) {
-            void this._viewNotes(button);
-        }
+        const entry = this._getEntry(index);
+        if (entry === null) { return; }
+        const container = entry.querySelector('.note-actions-container');
+        if (container === null) { return; }
+        /** @type {HTMLButtonElement | null} */
+        const nthButton = container.querySelector(`.action-buttons-container:nth-child(${viewNoteButtonIndex + 1}) .action-button[data-action=view-note]`);
+        if (nthButton === null) { return; }
+        void this._viewNotes(nthButton);
     }
 
     /**
