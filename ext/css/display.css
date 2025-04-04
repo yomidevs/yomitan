@@ -648,13 +648,26 @@ button.sidebar-button.sidebar-button-highlight {
 .note-actions-container {
     display: flex;
     flex-flow: row nowrap;
-    align-items: center;
+    align-items: start;
 }
 .action-button-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    position: relative;
 }
+.note-actions-container .action-button-container::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 3/4);
+    bottom: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 3/4);
+    width: 1px;
+    background: var(--accent-color);
+    pointer-events: none;
+    opacity: 0.25;
+    z-index: -1;
+}
+
 button.action-button {
     cursor: pointer;
     display: block;
@@ -666,6 +679,7 @@ button.action-button {
     font-size: inherit;
     box-shadow: none;
     position: relative;
+    z-index: 1;
     transition:
         opacity var(--animation-duration) linear,
         visibility 0s linear 0s,

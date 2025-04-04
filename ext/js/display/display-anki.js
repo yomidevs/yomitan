@@ -125,7 +125,6 @@ export class DisplayAnki {
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
         this._display.on('contentClear', this._onContentClear.bind(this));
         this._display.on('contentUpdateStart', this._onContentUpdateStart.bind(this));
-        this._display.on('contentUpdateEntry', this._onContentUpdateEntry.bind(this));
         this._display.on('contentUpdateComplete', this._onContentUpdateComplete.bind(this));
         this._display.on('logDictionaryEntryData', this._onLogDictionaryEntryData.bind(this));
     }
@@ -247,27 +246,6 @@ export class DisplayAnki {
         this._noteContext = this._getNoteContext();
     }
 
-    /**
-     * @param {import('display').EventArgument<'contentUpdateEntry'>} details
-     */
-    _onContentUpdateEntry({element}) {
-        const eventListeners = this._eventListeners;
-        for (const node of element.querySelectorAll('.action-button[data-action=view-tags]')) {
-            eventListeners.addEventListener(node, 'click', this._onShowTagsBind);
-        }
-        for (const node of element.querySelectorAll('.action-button[data-action=view-flags]')) {
-            eventListeners.addEventListener(node, 'click', this._onShowFlagsBind);
-        }
-        for (const node of element.querySelectorAll('.action-button[data-action=save-note]')) {
-            eventListeners.addEventListener(node, 'click', this._onNoteSaveBind);
-        }
-        for (const node of element.querySelectorAll('.action-button[data-action=view-note]')) {
-            eventListeners.addEventListener(node, 'click', this._onViewNotesButtonClickBind);
-            eventListeners.addEventListener(node, 'contextmenu', this._onViewNotesButtonContextMenuBind);
-            eventListeners.addEventListener(node, 'menuClose', this._onViewNotesButtonMenuCloseBind);
-        }
-    }
-
     /** */
     _onContentUpdateComplete() {
         void this._updateDictionaryEntryDetails();
@@ -349,23 +327,6 @@ export class DisplayAnki {
         return saveButton;
     }
 
-    /**
-     * @param {number} index
-     * @returns {?HTMLButtonElement}
-     */
-    _tagsIndicatorFind(index) {
-        const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector('.action-button[data-action=view-tags]') : null;
-    }
-
-    /**
-     * @param {number} index
-     * @returns {?HTMLButtonElement}
-     */
-    _flagsIndicatorFind(index) {
-        const entry = this._getEntry(index);
-        return entry !== null ? entry.querySelector('.action-button[data-action=view-flags]') : null;
-    }
 
     /**
      * @param {number} index
@@ -541,6 +502,7 @@ export class DisplayAnki {
             tagsIndicator.disabled = false;
             tagsIndicator.hidden = false;
             tagsIndicator.title = `Card tags: ${[...displayTags].join(', ')}`;
+            tagsIndicator.addEventListener('click', this._onShowTagsBind);
             container.appendChild(tagsIndicator);
         }
     }
@@ -580,6 +542,7 @@ export class DisplayAnki {
             if (flagsIndicatorIcon !== null && flagsIndicator instanceof HTMLElement) {
                 flagsIndicatorIcon.style.background = this._getFlagColor(displayFlags);
             }
+            flagsIndicator.addEventListener('click', this._onShowFlagsBind);
             container.appendChild(flagsIndicator);
         }
     }
