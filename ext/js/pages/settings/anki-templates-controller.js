@@ -275,14 +275,6 @@ export class AnkiTemplatesController {
                 ];
                 const {note, errors} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
                     dictionaryEntry,
-                    noteOptions: {
-                        name: 'Test',
-                        model: 'Test',
-                        deck: 'Test',
-                        fields,
-                        type: 'term',
-                        icon: 'big-circle',
-                    },
                     context,
                     template,
                     deckName: '',

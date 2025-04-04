@@ -140,7 +140,7 @@ export class AnkiNoteBuilder {
      */
     async getRenderingData({
         dictionaryEntry,
-        mode,
+        noteOptions,
         context,
         resultOutputMode = 'split',
         glossaryLayoutMode = 'default',
@@ -148,7 +148,7 @@ export class AnkiNoteBuilder {
         marker,
         dictionaryStylesMap,
     }) {
-        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0, dictionaryStylesMap);
+        const commonData = this._createData(dictionaryEntry, noteOptions, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0, dictionaryStylesMap);
         return await this._templateRenderer.getModifiedData({marker, commonData}, 'ankiNote');
     }
 

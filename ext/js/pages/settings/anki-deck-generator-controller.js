@@ -211,7 +211,7 @@ export class AnkiDeckGeneratorController {
                         void this._endGenerationState();
                         return;
                     }
-                    const noteData = await this._generateNoteData(value, 'term-kanji', false);
+                    const noteData = await this._generateNoteData(value, false);
                     if (noteData !== null) {
                         const fieldsTSV = this._fieldsToTSV(noteData.fields);
                         if (fieldsTSV) {
@@ -268,7 +268,7 @@ export class AnkiDeckGeneratorController {
                         void this._endGenerationState();
                         return;
                     }
-                    const noteData = await this._generateNoteData(value, 'term-kanji', addMedia);
+                    const noteData = await this._generateNoteData(value, addMedia);
                     if (noteData) {
                         notes.push(noteData);
                     }
@@ -377,7 +377,7 @@ export class AnkiDeckGeneratorController {
         const text = /** @type {HTMLInputElement} */ (this._renderTextInput).value;
         let result;
         try {
-            const noteData = await this._generateNoteData(text, mode, false);
+            const noteData = await this._generateNoteData(text, false);
             result = noteData ? this._fieldsToTSV(noteData.fields) : `No definition found for ${text}`;
         } catch (e) {
             allErrors.push(toError(e));
@@ -412,11 +412,10 @@ export class AnkiDeckGeneratorController {
 
     /**
      * @param {string} word
-     * @param {import('anki-templates-internal').CreateModeNoTest} mode
      * @param {boolean} addMedia
      * @returns {Promise<?import('anki.js').Note>}
      */
-    async _generateNoteData(word, mode, addMedia) {
+    async _generateNoteData(word, addMedia) {
         const optionsContext = this._settingsController.getOptionsContext();
         const data = await this._getDictionaryEntry(word, optionsContext);
         if (data === null) {
@@ -450,7 +449,6 @@ export class AnkiDeckGeneratorController {
         const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(options.dictionaries);
         const {note} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
             dictionaryEntry,
-            mode,
             context,
             template,
             deckName: this._activeAnkiDeck,

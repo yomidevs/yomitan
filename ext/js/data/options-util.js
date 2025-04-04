@@ -1637,10 +1637,14 @@ export class OptionsUtil {
     }
 
     /**
-     *  - Converted terms and kanji into notes array format
+     *  - Added multiple anki note options
+     *  - Updated expression template to remove modeTermKana
+     *  - Updated hotkeys to use generic note actions
      *  @type {import('options-util').UpdateFunction}
      */
     async _updateVersion64(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v64.handlebars');
+
         for (const profile of options.profiles) {
             const oldTerms = profile.options.anki.terms;
             const oldKanji = profile.options.anki.kanji;

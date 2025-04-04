@@ -51,7 +51,14 @@ export function createTestAnkiNoteData(dictionaryEntry, mode, styles = '') {
     const data = {
         dictionaryEntry,
         resultOutputMode: mode,
-        mode: 'test',
+        noteOptions: {
+            type: 'term',
+            name: 'test',
+            deck: 'deck',
+            model: 'model',
+            fields: {},
+            icon: 'big-circle',
+        },
         glossaryLayoutMode: 'default',
         compactTags: false,
         context: {
@@ -113,7 +120,14 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
         /** @type {import('anki-note-builder').CreateNoteDetails} */
         const details = {
             dictionaryEntry,
-            mode: 'test',
+            noteOptions: {
+                type: 'term',
+                name: 'test',
+                deck: 'deck',
+                model: 'model',
+                fields: {},
+                icon: 'big-circle',
+            },
             context,
             template,
             deckName: 'deckName',

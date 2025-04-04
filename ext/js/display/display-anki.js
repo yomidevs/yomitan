@@ -140,7 +140,7 @@ export class DisplayAnki {
             if (this._noteContext === null) { throw new Error('Note context not initialized'); }
             ankiNoteData = await this._ankiNoteBuilder.getRenderingData({
                 dictionaryEntry,
-                mode: 'test',
+                noteOptions: this._notesOptions[0],
                 context: this._noteContext,
                 resultOutputMode: this._resultOutputMode,
                 glossaryLayoutMode: this._glossaryLayoutMode,
