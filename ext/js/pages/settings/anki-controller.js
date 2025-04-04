@@ -377,7 +377,7 @@ export class AnkiController {
     async _setupFieldMenus(dictionaries) {
         /** @type {[types: import('dictionary').DictionaryEntryType[], templateName: string][]} */
         const fieldMenuTargets = [
-            [['term'], 'anki-card-terms-field-menu'],
+            [['term'], 'anki-card-term-field-menu'],
             [['kanji'], 'anki-card-kanji-field-menu'],
             [['term', 'kanji'], 'anki-card-all-field-menu'],
         ];

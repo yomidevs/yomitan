@@ -1352,48 +1352,9 @@ button.fab-button>.icon-button-inner>.icon {
     opacity: 0.25;
 }
 
-#anki-cards-new-note::after {
-    content: '';
-    display: block;
-    position: absolute;
-    pointer-events: none;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 0em;
-    background-color: var(--accent-color);
-    transition: height var(--animation-duration) ease-in-out;
-}
-
-#anki-cards-new-note[data-active=true]::after {
-    height: 0.2em;
-}
-
-#anki-cards-new-note .icon-button {
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    border: none;
-    background: none;
-    cursor: pointer;
-}
-
-#anki-cards-new-note .icon-button-inner {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 #anki-cards-new-note .icon {
     background-color: var(--text-color-light3);
     transition: background-color var(--animation-duration) ease-in-out;
-}
-
-#anki-cards-new-note[data-active=true] .icon {
-    background-color: var(--accent-color);
 }
 
 #anki-cards-new-note .icon-button>.icon-button-inner::after {
