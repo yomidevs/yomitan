@@ -368,10 +368,9 @@ export class AnkiDeckGeneratorController {
 
     /**
      * @param {HTMLElement} infoNode
-     * @param {import('anki-templates-internal').CreateModeNoTest} mode
      * @param {boolean} showSuccessResult
      */
-    async _testNoteData(infoNode, mode, showSuccessResult) {
+    async _testNoteData(infoNode, showSuccessResult) {
         /** @type {Error[]} */
         const allErrors = [];
         const text = /** @type {HTMLInputElement} */ (this._renderTextInput).value;
@@ -531,7 +530,7 @@ export class AnkiDeckGeneratorController {
 
         const infoNode = /** @type {HTMLElement} */ (this._renderResult);
         infoNode.hidden = true;
-        void this._testNoteData(infoNode, 'term-kanji', true);
+        void this._testNoteData(infoNode, true);
     }
 
     /** */

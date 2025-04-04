@@ -32,10 +32,6 @@ export type ContextSentence = {
     offset?: number;
 };
 
-export type CreateModeNoTest = 'kanji' | 'term-kanji' | 'term-kana';
-
-export type CreateMode = CreateModeNoTest | 'test';
-
 export type CreateDetails = {
     dictionaryEntry: Dictionary.DictionaryEntry;
     resultOutputMode: Settings.ResultOutputMode;

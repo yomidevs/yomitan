@@ -100,7 +100,7 @@ test('anki add', async ({context, page, extensionId}) => {
         await expect(page.locator('#search-textbox')).toHaveValue('読む');
     }).toPass({timeout: 5000});
     await page.locator('#search-textbox').press('Enter');
-    await page.locator('[data-mode="term-kanji"]').click();
+    await page.locator('[data-action="save-note"]').click();
     const addNoteReqBody = await addNotePromiseDetails.promise;
     expect(addNoteReqBody).toMatchObject(getExpectedAddNoteBody());
 });
