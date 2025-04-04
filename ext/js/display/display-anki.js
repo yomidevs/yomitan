@@ -776,6 +776,9 @@ export class DisplayAnki {
             viewNoteButton = this._createViewNoteButton(dictionaryEntryIndex, noteOptionsIndex, noteIds);
         }
         if (viewNoteButton === null) { return; }
+        const newNoteIds = new Set([...this._getNodeNoteIds(viewNoteButton), ...noteIds]);
+        viewNoteButton.dataset.noteIds = [...newNoteIds].join(' ');
+        this._setViewButtonBadge(viewNoteButton);
         viewNoteButton.hidden = false;
     }
 
@@ -1105,18 +1108,7 @@ export class DisplayAnki {
         viewNoteButton.hidden = disabled;
         viewNoteButton.dataset.noteIds = noteIds.join(' ');
 
-        /** @type {?HTMLElement} */
-        const badge = viewNoteButton.querySelector('.action-button-badge');
-        if (badge !== null) {
-            const badgeData = badge.dataset;
-            if (noteIds.length > 1) {
-                badgeData.icon = 'plus-thick';
-                badge.hidden = false;
-            } else {
-                delete badgeData.icon;
-                badge.hidden = true;
-            }
-        }
+        this._setViewButtonBadge(viewNoteButton);
 
         const entry = this._getEntry(index);
         if (entry === null) { return null; }
@@ -1132,6 +1124,25 @@ export class DisplayAnki {
         this._eventListeners.addEventListener(viewNoteButton, 'menuClose', this._onViewNotesButtonMenuCloseBind);
 
         return viewNoteButton;
+    }
+
+    /**
+     * @param {HTMLButtonElement} viewNoteButton
+     */
+    _setViewButtonBadge(viewNoteButton) {
+        /** @type {?HTMLElement} */
+        const badge = viewNoteButton.querySelector('.action-button-badge');
+        const noteIds = this._getNodeNoteIds(viewNoteButton);
+        if (badge !== null) {
+            const badgeData = badge.dataset;
+            if (noteIds.length > 1) {
+                badgeData.icon = 'plus-thick';
+                badge.hidden = false;
+            } else {
+                delete badgeData.icon;
+                badge.hidden = true;
+            }
+        }
     }
 
     /**
