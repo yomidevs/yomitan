@@ -1026,7 +1026,32 @@
                                                 }
                                             }
                                         },
-                                        "default": []
+                                        "default": [
+                                            {
+                                                "name": "Expression",
+                                                "icon": "big-circle",
+                                                "deck": "",
+                                                "model": "",
+                                                "fields": {},
+                                                "type": "term"
+                                            },
+                                            {
+                                                "name": "Reading",
+                                                "icon": "small-circle",
+                                                "deck": "",
+                                                "model": "",
+                                                "fields": {},
+                                                "type": "term"
+                                            },
+                                            {
+                                                "name": "Kanji",
+                                                "icon": "big-circle",
+                                                "deck": "",
+                                                "model": "",
+                                                "fields": {},
+                                                "type": "kanji"
+                                            }
+                                        ]
                                     },
                                     "duplicateScope": {
                                         "type": "string",

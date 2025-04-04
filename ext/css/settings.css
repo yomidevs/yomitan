@@ -1212,7 +1212,7 @@ button.fab-button>.icon-button-inner>.icon {
 
 
 /* Tabs */
-.tabs-container {
+.anki-card-tabs-container {
     display: flex;
     flex-flow: row nowrap;
     align-items: stretch;

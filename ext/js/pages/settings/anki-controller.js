@@ -76,6 +76,8 @@ export class AnkiController {
         this._ankiCardPrimary = querySelectorNotNull(document, '#anki-card-primary');
         /** @type {HTMLElement} */
         this._ankiCardsTabs = querySelectorNotNull(document, '#anki-cards-tabs');
+        /** @type {HTMLInputElement} */
+        this._ankiCardNameInput = querySelectorNotNull(document, '.anki-card-name');
         /** @type {?Error} */
         this._ankiError = null;
         /** @type {?import('core').TokenObject} */
@@ -146,6 +148,11 @@ export class AnkiController {
         /** @type {HTMLSelectElement} */
         const ankiCardIconSelect = querySelectorNotNull(this._ankiCardPrimary, '.anki-card-icon');
         ankiCardIconSelect.addEventListener('change', this._onIconSelectChange.bind(this), false);
+
+        this._ankiCardNameInput.addEventListener('input', () => {
+            const tabLabel = querySelectorNotNull(this._ankiCardsTabs, `.tab:nth-child(${this._noteOptionsIndex + 1}) .tab-label`);
+            tabLabel.textContent = this._ankiCardNameInput.value || `Note ${this._noteOptionsIndex + 1}`;
+        });
 
         newNoteButton.addEventListener('click', this._onNewNoteButtonClick.bind(this), false);
 
@@ -323,9 +330,7 @@ export class AnkiController {
             delete this._ankiCardPrimary.dataset.ankiCardMenu;
         }
 
-        /** @type {HTMLElement} */
-        const nameInput = querySelectorNotNull(this._ankiCardPrimary, '.anki-card-name');
-        nameInput.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', noteOptionsIndex, 'name']);
+        this._ankiCardNameInput.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', noteOptionsIndex, 'name']);
 
         /** @type {HTMLSelectElement} */
         const typeSelect = querySelectorNotNull(this._ankiCardPrimary, '.anki-card-type');
@@ -619,17 +624,19 @@ export class AnkiController {
             tabsContainer.removeChild(tabsContainer.firstChild);
         }
 
-        const activeTab = this._noteOptionsIndex <= ankiOptions.notes.length ? this._noteOptionsIndex : 0;
+        if (this._noteOptionsIndex > ankiOptions.notes.length) {
+            this._noteOptionsIndex = ankiOptions.notes.length - 1;
+        }
 
         for (let i = 0; i < ankiOptions.notes.length; ++i) {
             const noteOptions = ankiOptions.notes[i];
             const input = this._createNoteTab(noteOptions, i);
-            if (i === activeTab) {
+            if (i === this._noteOptionsIndex) {
                 input.checked = true;
             }
         }
 
-        this._setNoteOptionsIndex(0, 'anki-card-term-field-menu');
+        this._setNoteOptionsIndex(this._noteOptionsIndex, 'anki-card-term-field-menu');
     }
 
     /**
@@ -656,16 +663,6 @@ export class AnkiController {
         tabsContainer.appendChild(content);
 
         return input;
-    }
-
-    /**
-     * @param {number} noteOptionsIndex
-     */
-    _removeNoteTab(noteOptionsIndex) {
-        const tabsContainer = this._ankiCardsTabs;
-        const input = querySelectorNotNull(tabsContainer, `input[data-note-options-index="${noteOptionsIndex}"]`);
-        if (input === null || input.parentElement === null) { return; }
-        tabsContainer.removeChild(input.parentElement);
     }
 
     /**
@@ -782,12 +779,8 @@ export class AnkiController {
             items: [],
         }]);
 
-        this._removeNoteTab(noteIndex);
-
-        const closestTabInput = /** @type {HTMLInputElement} */ (this._ankiCardsTabs.querySelector(`input[data-note-options-index="${noteIndex - 1}"]`));
-        if (closestTabInput === null) { return; }
-        closestTabInput.checked = true;
-        closestTabInput.dispatchEvent(new Event('change', {bubbles: true}));
+        this._noteOptionsIndex = noteIndex - 1;
+        await this._updateOptions();
     }
 }
 
