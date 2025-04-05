@@ -5,32 +5,19 @@
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
         <div class="actions">
-            <button type="button" class="action-button action-button-collapsible" data-action="view-flags" hidden disabled>
-                <span class="action-icon icon" data-icon="flag"></span>
-            </button>
-            <button type="button" class="action-button action-button-collapsible" data-action="view-tags" hidden disabled>
-                <span class="action-icon icon" data-icon="tag"></span>
-            </button>
-            <button type="button" class="action-button" data-action="view-note" hidden disabled title="View added note" data-hotkey='["viewNotes","title","View added note ({0})"]' data-menu-position="left below h-cover v-cover">
-                <span class="action-icon icon color-icon" data-icon="view-note"></span>
-                <span class="action-button-badge icon" hidden></span>
-            </button>
-            <button type="button" class="action-button" data-action="save-note" hidden disabled data-mode="term-kanji" title="Add expression" data-hotkey='["addNoteTermKanji","title","Add expression ({0})"]'>
-                <span class="action-icon icon color-icon" data-icon="add-term-kanji"></span>
-            </button>
-            <button type="button" class="action-button" data-action="save-note" hidden disabled data-mode="term-kana" title="Add reading" data-hotkey='["addNoteTermKana","title","Add reading ({0})"]'>
-                <span class="action-icon icon color-icon" data-icon="add-term-kana"></span>
-            </button>
-            <button type="button" class="action-button" data-action="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover">
-                <span class="action-icon icon color-icon" data-icon="play-audio"></span>
-                <span class="action-button-badge icon" hidden></span>
-            </button>
+            <div class="note-actions-container"></div>
+            <div class="action-button-container">
+                <button type="button" class="action-button" data-action="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover">
+                    <span class="action-icon icon color-icon" data-icon="play-audio"></span>
+                    <span class="action-button-badge icon" hidden></span>
+                </button>
+                <button type="button" class="action-button action-button-collapsible" data-action="menu" data-menu-position="left below h-cover v-cover">
+                    <span class="action-icon icon" data-icon="kebab-menu"></span>
+                </button>
+            </div>
             <span class="entry-current-indicator-icon" title="Current entry">
                 <span class="icon color-icon" data-icon="entry-current"></span>
             </span>
-            <button type="button" class="action-button action-button-collapsible" data-action="menu" data-menu-position="left below h-cover v-cover">
-                <span class="action-icon icon" data-icon="kebab-menu"></span>
-            </button>
         </div>
         <div class="headword-list"></div>
         <div class="headword-list-details">
@@ -114,12 +101,7 @@
     <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header">
         <div class="actions">
-            <button type="button" class="action-button" data-action="view-note" hidden disabled title="View added note" data-hotkey='["viewNotes","title","View added note ({0})"]'>
-                <span class="action-icon icon color-icon" data-icon="view-note"></span>
-            </button>
-            <button type="button" class="action-button" data-action="save-note" hidden disabled data-mode="kanji" title="Add kanji" data-hotkey='["addNoteKanji","title","Add kanji ({0})"]'>
-                <span class="action-icon icon color-icon" data-icon="add-kanji"></span>
-            </button>
+            <div class="note-actions-container"></div>
             <span class="entry-current-indicator-icon" title="Current entry">
                 <span class="icon color-icon" data-icon="entry-current"></span>
             </span>
@@ -209,5 +191,28 @@
 <template id="view-note-button-popup-menu-item-template"><button type="button" class="popup-menu-item"><span class="popup-menu-item-label"></span></button></template>
 <template id="dictionary-entry-popup-menu-template"><div class="popup-menu-container scan-disable dictionary-entry-popup-menu" tabindex="-1" role="dialog"><div class="popup-menu popup-menu-auto-size"><div class="popup-menu-body"></div></div></div></template>
 <template id="dictionary-entry-popup-menu-item-template"><button type="button" class="popup-menu-item"><span class="popup-menu-item-label"></span></button></template>
+
+<!-- Note action buttons -->
+<template id="note-action-button-view-flags-template"><button type="button" class="action-button action-button-collapsible" data-action="view-flags" hidden disabled>
+    <span class="action-icon icon" data-icon="flag"></span>
+</button></template>
+
+<template id="note-action-button-view-tags-template"><button type="button" class="action-button action-button-collapsible" data-action="view-tags" hidden disabled>
+    <span class="action-icon icon" data-icon="tag"></span>
+</button></template>
+
+<template id="note-action-button-view-note-template"><button type="button" class="action-button" data-action="view-note" hidden disabled title="View added note" data-hotkey='["viewNotes","title","View added note ({0})"]' data-menu-position="left below h-cover v-cover">
+    <span class="action-icon icon color-icon" data-icon="view-note"></span>
+    <span class="action-button-badge icon"></span>
+</button></template>
+
+<template id="action-button-container-template">
+    <div class="action-button-container">
+        <button type="button" class="action-button" data-action="save-note" title="Add {0}" data-hotkey='["saveNote","title","Add {0} ({0})"]'>
+            <span class="action-icon icon color-icon" data-icon=""></span>
+        </button>
+    </div>
+</template>
+
 
 </body></html>

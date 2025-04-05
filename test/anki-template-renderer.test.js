@@ -39,7 +39,14 @@ describe('AnkiTemplateRenderer', () => {
                 frequencies: [],
             },
             resultOutputMode: 'split',
-            mode: 'test',
+            noteOptions: {
+                type: 'term',
+                name: 'test',
+                deck: 'deck',
+                model: 'model',
+                fields: {},
+                icon: 'big-circle',
+            },
             glossaryLayoutMode: 'default',
             compactTags: false,
             context: {
