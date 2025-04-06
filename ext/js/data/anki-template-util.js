@@ -22,7 +22,7 @@
  * @returns {string[]} The list of field markers.
  * @throws {Error}
  */
-export function getStandardFieldMarkers(type, language) {
+export function getStandardFieldMarkers(type, language = 'ja') {
     switch (type) {
         case 'term': {
             const markers = [
