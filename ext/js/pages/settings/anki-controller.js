@@ -78,6 +78,8 @@ export class AnkiController {
         this._ankiCardsTabs = querySelectorNotNull(document, '#anki-cards-tabs');
         /** @type {HTMLInputElement} */
         this._ankiCardNameInput = querySelectorNotNull(document, '.anki-card-name');
+        /** @type {HTMLInputElement} */
+        this._ankiCardDictionaryTypeSelect = querySelectorNotNull(document, '.anki-card-type');
         /** @type {?Error} */
         this._ankiError = null;
         /** @type {?import('core').TokenObject} */
@@ -153,6 +155,8 @@ export class AnkiController {
             const tabLabel = querySelectorNotNull(this._ankiCardsTabs, `.tab:nth-child(${this._noteOptionsIndex + 1}) .tab-label`);
             tabLabel.textContent = this._ankiCardNameInput.value || `Note ${this._noteOptionsIndex + 1}`;
         });
+
+        this._ankiCardDictionaryTypeSelect.addEventListener('change', this._onDictionaryTypeSelectChange.bind(this), false);
 
         newNoteButton.addEventListener('click', this._onNewNoteButtonClick.bind(this), false);
 
@@ -737,6 +741,15 @@ export class AnkiController {
     }
 
     /**
+     * @param {Event} e
+     */
+    _onDictionaryTypeSelectChange(e) {
+        const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
+        const value = node.value;
+        this._ankiCardPrimary.dataset.ankiCardMenu = `anki-card-${value}-field-menu`;
+    }
+
+    /**
      * @param {string|undefined} stringValue
      * @returns {?number}
      */
@@ -877,8 +890,9 @@ class AnkiCardController {
      */
     isStale() {
         const datasetNoteOptionsIndex = this._node.dataset.noteOptionsIndex;
+        const datasetAnkiCardMenu = this._node.dataset.ankiCardMenu;
         if (typeof datasetNoteOptionsIndex !== 'string') { return true; }
-        return (this._noteOptionsIndex !== Number.parseInt(datasetNoteOptionsIndex, 10));
+        return this._noteOptionsIndex !== Number.parseInt(datasetNoteOptionsIndex, 10) || this._cardMenu !== datasetAnkiCardMenu;
     }
 
 
