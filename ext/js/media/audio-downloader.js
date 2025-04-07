@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2017-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -445,7 +445,7 @@ export class AudioDownloader {
     }
 
     /** @type {import('audio-downloader').GetInfoHandler} */
-    async _getInfoCustom(term, reading, details) {
+    async _getInfoCustom(term, reading, details, languageSummary) {
         if (typeof details !== 'object' || details === null) {
             throw new Error('Invalid arguments');
         }
@@ -453,12 +453,12 @@ export class AudioDownloader {
         if (typeof url !== 'string') {
             throw new Error('Invalid url');
         }
-        url = this._getCustomUrl(term, reading, url);
+        url = this._getCustomUrl(term, reading, url, languageSummary);
         return [{type: 'url', url}];
     }
 
     /** @type {import('audio-downloader').GetInfoHandler} */
-    async _getInfoCustomJson(term, reading, details) {
+    async _getInfoCustomJson(term, reading, details, languageSummary) {
         if (typeof details !== 'object' || details === null) {
             throw new Error('Invalid arguments');
         }
@@ -466,7 +466,7 @@ export class AudioDownloader {
         if (typeof url !== 'string') {
             throw new Error('Invalid url');
         }
-        url = this._getCustomUrl(term, reading, url);
+        url = this._getCustomUrl(term, reading, url, languageSummary);
 
         const response = await this._requestBuilder.fetchAnonymous(url, DEFAULT_REQUEST_INIT_PARAMS);
 
@@ -498,14 +498,19 @@ export class AudioDownloader {
      * @param {string} term
      * @param {string} reading
      * @param {string} url
+     * @param {import('language').LanguageSummary} languageSummary
      * @returns {string}
      * @throws {Error}
      */
-    _getCustomUrl(term, reading, url) {
+    _getCustomUrl(term, reading, url, languageSummary) {
         if (typeof url !== 'string') {
             throw new Error('No custom URL defined');
         }
-        const data = {term, reading};
+        const data = {
+            term,
+            reading,
+            language: languageSummary.iso,
+        };
         /**
          * @param {string} m0
          * @param {string} m1
@@ -513,7 +518,7 @@ export class AudioDownloader {
          */
         const replacer = (m0, m1) => (
             Object.prototype.hasOwnProperty.call(data, m1) ?
-            `${data[/** @type {'term'|'reading'} */ (m1)]}` :
+            `${data[/** @type {'term'|'reading'|'language'} */ (m1)]}` :
             m0
         );
         return url.replace(/\{([^}]*)\}/g, replacer);

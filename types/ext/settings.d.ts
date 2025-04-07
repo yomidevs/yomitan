@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -128,6 +128,7 @@ export type GeneralOptions = {
     showGuide: boolean;
     enableContextMenuScanSelected: boolean;
     compactTags: boolean;
+    averageFrequency: boolean;
     glossaryLayoutMode: GlossaryLayoutMode;
     mainDictionary: string;
     popupTheme: PopupTheme;
@@ -167,8 +168,11 @@ export type AudioOptions = {
     enabled: boolean;
     volume: number;
     autoPlay: boolean;
+    fallbackSoundType: FallbackSoundType;
     sources: AudioSourceOptions[];
 };
+
+export type FallbackSoundType = 'none' | 'click' | 'bloop';
 
 export type AudioSourceOptions = {
     type: AudioSourceType;
@@ -314,8 +318,15 @@ export type AnkiNoteOptions = {
 };
 
 export type AnkiNoteFields = {
-    [key: string]: string;
+    [key: string]: AnkiNoteField;
 };
+
+export type AnkiNoteField = {
+    value: string;
+    overwriteMode: AnkiNoteFieldOverwriteMode;
+};
+
+export type AnkiNoteFieldOverwriteMode = 'coalesce' | 'coalesce-new' | 'overwrite' | 'append' | 'prepend' | 'skip';
 
 export type SentenceParsingOptions = {
     scanExtent: number;

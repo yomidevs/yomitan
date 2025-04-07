@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -501,13 +501,16 @@ export class AnkiDeckGeneratorController {
     }
 
     /**
+     * Extracts all values of json keys named `path` which contain a string value.
+     * Example json snippet containing a path:
+     * ...","path":"example-dictionary/svg/example-media.svg","...
+     * The path can be found in many different positions in the structure of the definition json.
+     * It is most reliable to flatten it to a string and use regex.
      * @param {object} obj
      * @returns {Array<string>}
      */
     _findAllPaths(obj) {
-        // @ts-expect-error - Recursive function to find object keys deeply nested in objects and arrays. Essentially impossible to type correctly.
-        // eslint-disable-next-line unicorn/no-array-reduce, @typescript-eslint/no-unsafe-argument
-        return Object.entries(obj).reduce((acc, [key, value]) => (key === 'path' ? [...acc, value] : (typeof value === 'object' ? [...acc, ...this._findAllPaths(value)] : acc)), []);
+        return JSON.stringify(obj).match(/(?<="path":").*?(?=")/g) ?? [];
     }
 
     /**

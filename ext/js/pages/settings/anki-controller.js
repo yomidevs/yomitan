@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,6 +40,8 @@ export class AnkiController {
         this._settingsController = settingsController;
         /** @type {AnkiConnect} */
         this._ankiConnect = new AnkiConnect();
+        /** @type {string} */
+        this._language = 'ja';
         /** @type {SelectorObserver<AnkiCardController>} */
         this._selectorObserver = new SelectorObserver({
             selector: '.anki-card',
@@ -171,7 +173,7 @@ export class AnkiController {
     /**
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
-    _onOptionsChanged({options: {anki, dictionaries}}) {
+    _onOptionsChanged({options: {anki, dictionaries, general: {language}}}) {
         /** @type {?string} */
         let apiKey = anki.apiKey;
         if (apiKey === '') { apiKey = null; }
@@ -179,10 +181,12 @@ export class AnkiController {
         this._ankiConnect.enabled = anki.enable;
         this._ankiConnect.apiKey = apiKey;
 
+        this._language = language;
+
         this._selectorObserver.disconnect();
         this._selectorObserver.observe(document.documentElement, true);
 
-        this._updateDuplicateOverwriteWarning(anki.duplicateBehavior);
+        this._updateDuplicateBehavior(anki.duplicateBehavior);
 
         void this._setupFieldMenus(dictionaries);
     }
@@ -257,15 +261,17 @@ export class AnkiController {
      */
     _onDuplicateBehaviorSelectChange(e) {
         const node = /** @type {HTMLSelectElement} */ (e.currentTarget);
-        const behavior = node.value;
-        this._updateDuplicateOverwriteWarning(behavior);
+        const behavior = /** @type {import('settings').AnkiDuplicateBehavior} */ (node.value);
+        this._updateDuplicateBehavior(behavior);
     }
 
     /**
-     * @param {string} behavior
+     * @param {import('settings').AnkiDuplicateBehavior} behavior
      */
-    _updateDuplicateOverwriteWarning(behavior) {
+    _updateDuplicateBehavior(behavior) {
         this._duplicateOverwriteWarning.hidden = behavior !== 'overwrite';
+        if (this._ankiCardPrimary === null) { return; }
+        this._ankiCardPrimary.dataset.ankiDuplicateBehavior = behavior;
     }
 
     /**
@@ -339,7 +345,7 @@ export class AnkiController {
 
             let markers = [];
             for (const type of types) {
-                markers.push(...getStandardFieldMarkers(type));
+                markers.push(...getStandardFieldMarkers(type, this._language));
             }
             if (types.includes('term')) {
                 const dictionaryInfo = await this._application.api.getDictionaryInfo();
@@ -776,7 +782,7 @@ class AnkiCardController {
         const totalFragment = document.createDocumentFragment();
         this._fieldEntries = [];
         let index = 0;
-        for (const [fieldName, fieldValue] of Object.entries(this._fields)) {
+        for (const [fieldName, {value: fieldValue}] of Object.entries(this._fields)) {
             const content = this._settingsController.instantiateTemplateFragment('anki-card-field');
 
             /** @type {HTMLElement} */
@@ -790,10 +796,14 @@ class AnkiCardController {
             const valueContainer = querySelectorNotNull(content, '.anki-card-field-value-container');
             valueContainer.dataset.index = `${index}`;
 
+            /** @type {HTMLSelectElement} */
+            const overwriteSelect = querySelectorNotNull(content, '.anki-card-field-overwrite');
+            overwriteSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName, 'overwriteMode']);
+
             /** @type {HTMLInputElement} */
             const inputField = querySelectorNotNull(content, '.anki-card-field-value');
             inputField.value = fieldValue;
-            inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName]);
+            inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._optionsType, 'fields', fieldName, 'value']);
             void this._validateFieldPermissions(inputField, index, false);
 
             this._fieldEventListeners.addEventListener(inputField, 'change', this._onFieldChange.bind(this, index), false);
@@ -905,7 +915,10 @@ class AnkiCardController {
         const fields = {};
         for (let i = 0, ii = fieldNames.length; i < ii; ++i) {
             const fieldName = fieldNames[i];
-            fields[fieldName] = this._getDefaultFieldValue(fieldName, i, this._dictionaryEntryType, oldFields);
+            fields[fieldName] = {
+                value: this._getDefaultFieldValue(fieldName, i, this._dictionaryEntryType, oldFields),
+                overwriteMode: 'coalesce',
+            };
         }
 
         /** @type {import('settings-modifications').Modification[]} */
@@ -1002,7 +1015,7 @@ class AnkiCardController {
             oldFields !== null &&
             Object.prototype.hasOwnProperty.call(oldFields, fieldName)
         ) {
-            return oldFields[fieldName];
+            return oldFields[fieldName].value;
         }
 
         if (index === 0) {
@@ -1012,10 +1025,18 @@ class AnkiCardController {
         const markers = getStandardFieldMarkers(dictionaryEntryType);
         const markerAliases = new Map([
             ['expression', ['phrase', 'term', 'word']],
+            ['reading', ['expression-reading', 'term-reading', 'word-reading']],
+            ['furigana', ['expression-furigana', 'term-furigana', 'word-furigana']],
             ['glossary', ['definition', 'meaning']],
-            ['audio', ['sound']],
+            ['audio', ['sound', 'word-audio', 'term-audio', 'expression-audio']],
             ['dictionary', ['dict']],
-            ['pitch-accents', ['pitch']],
+            ['pitch-accents', ['pitch', 'pitch-accent', 'pitch-pattern']],
+            ['sentence', ['example-sentence']],
+            ['frequency-harmonic-rank', ['freq', 'frequency', 'freq-sort', 'freqency-sort']],
+            ['popup-selection-text', ['selection']],
+            ['pitch-accent-positions', ['pitch-position']],
+            ['pitch-accent-categories', ['pitch-categories']],
+            ['popup-selection-text', ['selection-text']],
         ]);
 
         const hyphenPattern = /-/g;

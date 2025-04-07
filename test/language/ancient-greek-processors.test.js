@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,4 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from 'wanakana';
+import {describe, expect, test} from 'vitest';
+import {latinToGreek} from '../../ext/js/language/grc/ancient-greek-processors.js';
+
+
+const testCases = [
+    ['Zeus', 'Ζευς'],
+];
+
+describe('diacritics normalization', () => {
+    test.each(testCases)('%s converts to %s', (input, expected) => {
+        expect(latinToGreek(input)).toStrictEqual(expected);
+    });
+});

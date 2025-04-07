@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2020-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,8 @@
 
 /* Variables */
 :root {
-    --main-content-horizontal-padding: 0.72em;
-    --entry-horizontal-padding: 0;
+    --search-scroll-container-horizontal-padding: 0.72em;
+    --query-horizontal-padding: 0;
 
     --padding: calc(10em / var(--font-size-no-units));
     --content-width-search: 700;
@@ -52,6 +52,10 @@ body {
     color: var(--text-color);
     height: 100%;
     overflow: hidden;
+}
+.search-header {
+    padding-left: var(--search-scroll-container-horizontal-padding);
+    padding-right: var(--search-scroll-container-horizontal-padding);
 }
 h1 {
     font-size: 2em;

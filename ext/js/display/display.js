@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2017-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -1202,6 +1202,7 @@ export class Display extends EventDispatcher {
         data.resultOutputMode = `${options.general.resultOutputMode}`;
         data.glossaryLayoutMode = `${options.general.glossaryLayoutMode}`;
         data.compactTags = `${options.general.compactTags}`;
+        data.averageFrequency = `${options.general.averageFrequency}`;
         data.frequencyDisplayMode = `${options.general.frequencyDisplayMode}`;
         data.termDisplayMode = `${options.general.termDisplayMode}`;
         data.enableSearchTags = `${options.scanning.enableSearchTags}`;
@@ -1366,7 +1367,9 @@ export class Display extends EventDispatcher {
             safePerformance.mark('display:findDictionaryEntries:end');
             safePerformance.measure('display:findDictionaryEntries', 'display:findDictionaryEntries:start', 'display:findDictionaryEntries:end');
             if (this._setContentToken !== token) { return; }
-            content.dictionaryEntries = dictionaryEntries;
+            if (lookup) {
+                content.dictionaryEntries = dictionaryEntries;
+            }
             changeHistory = true;
         }
 

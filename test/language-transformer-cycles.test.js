@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024  Yomitan Authors
+ * Copyright (C) 2024-2025  Yomitan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -168,5 +168,5 @@ describe.each(languagesWithTransforms)('Cycles Test $iso', ({languageTransforms}
                 deinflectionNodes.push(newDeinflectionNode);
             }
         }
-    });
+    }, {timeout: 30 * 1000});
 });

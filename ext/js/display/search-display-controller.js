@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024  Yomitan Authors
+ * Copyright (C) 2023-2025  Yomitan Authors
  * Copyright (C) 2016-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {convertToKanaIME} from '../language/ja/japanese-wanakana.js';
 
 export class SearchDisplayController {
     /**
@@ -51,6 +51,8 @@ export class SearchDisplayController {
         this._wanakanaEnableCheckbox = querySelectorNotNull(document, '#wanakana-enable');
         /** @type {HTMLInputElement} */
         this._stickyHeaderEnableCheckbox = querySelectorNotNull(document, '#sticky-header-enable');
+        /** @type {HTMLElement} */
+        this._profileSelectContainer = querySelectorNotNull(document, '#search-option-profile-select');
         /** @type {HTMLSelectElement} */
         this._profileSelect = querySelectorNotNull(document, '#profile-select');
         /** @type {HTMLElement} */
@@ -61,8 +63,6 @@ export class SearchDisplayController {
         this._queryInputEventsSetup = false;
         /** @type {boolean} */
         this._wanakanaEnabled = false;
-        /** @type {boolean} */
-        this._wanakanaBound = false;
         /** @type {boolean} */
         this._introVisible = true;
         /** @type {?import('core').Timeout} */
@@ -243,9 +243,25 @@ export class SearchDisplayController {
         this._setIntroVisible(!valid, animate);
     }
 
-    /** */
-    _onSearchInput() {
+    /**
+     * @param {KeyboardEvent} e
+     */
+    _onSearchInput(e) {
         this._updateSearchHeight(true);
+
+        const element = /** @type {HTMLTextAreaElement} */ (e.currentTarget);
+        this._searchTextKanaConversion(element, e);
+    }
+
+    /**
+     * @param {HTMLTextAreaElement} element
+     * @param {KeyboardEvent} event
+     */
+    _searchTextKanaConversion(element, event) {
+        if (!this._wanakanaEnabled || event.isComposing) { return; }
+        const {kanaString, newSelectionStart} = convertToKanaIME(element.value, element.selectionStart);
+        element.value = kanaString;
+        element.setSelectionRange(newSelectionStart, newSelectionStart);
     }
 
     /**
@@ -438,17 +454,6 @@ export class SearchDisplayController {
         this._queryInputEvents.addEventListener(input, 'keydown', this._onSearchKeydown.bind(this), false);
 
         this._wanakanaEnabled = enabled;
-        if (enabled) {
-            if (!this._wanakanaBound) {
-                wanakana.bind(input);
-                this._wanakanaBound = true;
-            }
-        } else {
-            if (this._wanakanaBound) {
-                wanakana.unbind(input);
-                this._wanakanaBound = false;
-            }
-        }
 
         this._queryInputEvents.addEventListener(input, 'input', this._onSearchInput.bind(this), false);
         this._queryInputEventsSetup = true;
@@ -672,6 +677,8 @@ export class SearchDisplayController {
         while (optionGroup.firstChild) {
             optionGroup.removeChild(optionGroup.firstChild);
         }
+
+        this._profileSelectContainer.hidden = profiles.length <= 1;
 
         const fragment = document.createDocumentFragment();
         for (let i = 0, ii = profiles.length; i < ii; ++i) {
