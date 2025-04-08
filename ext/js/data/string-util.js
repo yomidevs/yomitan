@@ -70,12 +70,12 @@ export function readCodePointsBackward(text, position, count) {
 }
 
 /**
- * Trims trailing whitespace and adds a space on the end if it needed trimming.
+ * Trims and condenses trailing whitespace and adds a space on the end if it needed trimming.
  * @param {string} text
  * @returns {string}
  */
 export function trimTrailingWhitespacePlusSpace(text) {
-    const prevTextLength = text.length;
-    const textTrimmed = text.trimEnd();
-    return prevTextLength === textTrimmed.length ? textTrimmed : textTrimmed + ' ';
+    // Consense multiple leading and trailing newlines into one newline
+    // Trim trailing whitespace excluding newlines
+    return text.replaceAll(/(\n+$|^\n+)/g, '\n').replaceAll(/[^\S\n]+$/g, ' ');
 }
