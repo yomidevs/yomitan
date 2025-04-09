@@ -222,7 +222,6 @@ const conditions = {
     n: {
         name: 'Noun',
         isDictionaryForm: true,
-        subConditions: ['n_p', 'n_s', 'n_d'],
     },
     n_p: {
         name: 'Noun with Prefix',
@@ -231,10 +230,6 @@ const conditions = {
     n_s: {
         name: 'Noun with Suffix only',
         isDictionaryForm: false,
-    },
-    n_d: {
-        name: 'Noun Dictionary Form',
-        isDictionaryForm: true,
     },
     v: {
         name: 'Verb',
@@ -289,72 +284,72 @@ export const arabicTransforms = {
             name: 'by, with',
             description: 'by, with',
             rules: [
-                prefixInflection('ب', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('وب', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('فب', '', ['n_p'], ['n_s', 'n_d']),
+                prefixInflection('ب', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('وب', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('فب', '', ['n_p'], ['n_s', 'n']),
             ],
         },
         'NPref-Ka': {
             name: 'like, such as',
             description: 'like, such as',
             rules: [
-                prefixInflection('ك', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('وك', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('فك', '', ['n_p'], ['n_s', 'n_d']),
+                prefixInflection('ك', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('وك', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('فك', '', ['n_p'], ['n_s', 'n']),
             ],
         },
         'NPref-Li': {
             name: 'for, to; indeed, truly',
             description: 'for, to (لِ); indeed, truly (لَ)',
             rules: [
-                prefixInflection('ل', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('ول', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('فل', '', ['n_p'], ['n_s', 'n_d']),
+                prefixInflection('ل', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('ول', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('فل', '', ['n_p'], ['n_s', 'n']),
             ],
         },
         'NPref-Al': {
             name: 'the',
             description: 'the',
             rules: [
-                prefixInflection('ال', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('وال', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('فال', '', ['n_p'], ['n_s', 'n_d']),
+                prefixInflection('ال', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('وال', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('فال', '', ['n_p'], ['n_s', 'n']),
             ],
         },
         'NPref-BiAl': {
             name: 'by/with + the',
             description: 'by/with + the',
             rules: [
-                prefixInflection('بال', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('وبال', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('فبال', '', ['n_p'], ['n_s', 'n_d']),
+                prefixInflection('بال', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('وبال', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('فبال', '', ['n_p'], ['n_s', 'n']),
             ],
         },
         'NPref-KaAl': {
             name: 'like/such as + the',
             description: 'like/such as + the',
             rules: [
-                prefixInflection('كال', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('وكال', '', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('فكال', '', ['n_p'], ['n_s', 'n_d']),
+                prefixInflection('كال', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('وكال', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('فكال', '', ['n_p'], ['n_s', 'n']),
             ],
         },
         'NPref-Lil': {
             name: 'for/to + the',
             description: 'for/to + the',
             rules: [
-                conditionalPrefixInflection('لل', '', '(?!ل)', ['n_p'], ['n_s', 'n_d']),
-                conditionalPrefixInflection('ولل', '', '(?!ل)', ['n_p'], ['n_s', 'n_d']),
-                conditionalPrefixInflection('فلل', '', '(?!ل)', ['n_p'], ['n_s', 'n_d']),
+                conditionalPrefixInflection('لل', '', '(?!ل)', ['n_p'], ['n_s', 'n']),
+                conditionalPrefixInflection('ولل', '', '(?!ل)', ['n_p'], ['n_s', 'n']),
+                conditionalPrefixInflection('فلل', '', '(?!ل)', ['n_p'], ['n_s', 'n']),
             ],
         },
         'NPref-LiAl': {
             name: 'for/to + the',
             description: 'for/to + the, assimilated with initial ل',
             rules: [
-                prefixInflection('لل', 'ل', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('ولل', 'ل', ['n_p'], ['n_s', 'n_d']),
-                prefixInflection('فلل', 'ل', ['n_p'], ['n_s', 'n_d']),
+                prefixInflection('لل', 'ل', ['n_p'], ['n_s', 'n']),
+                prefixInflection('ولل', 'ل', ['n_p'], ['n_s', 'n']),
+                prefixInflection('فلل', 'ل', ['n_p'], ['n_s', 'n']),
             ],
         },
 
