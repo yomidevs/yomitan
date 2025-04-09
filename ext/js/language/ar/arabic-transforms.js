@@ -161,7 +161,7 @@ function getImperfectRules(
 ) {
     const stemSegments = {initialStemSegment, finalStemSegment};
     const rules = getImperfectPrefixes(inflectedPrefix, includeLiPrefix).flatMap((pre) => [
-        sandwichInflection(pre, deinflectedPrefix, inflectedSuffix, deinflectedSuffix, ['iv_p'], ['iv_d'], stemSegments),
+        sandwichInflection(pre, deinflectedPrefix, inflectedSuffix, deinflectedSuffix, ['iv_p'], ['iv'], stemSegments),
 
         // With attached direct object pronouns
         ...(attachesTo1st ?
@@ -171,7 +171,7 @@ function getImperfectRules(
                 attachedSuffix + p,
                 deinflectedSuffix,
                 ['iv_p'],
-                ['iv_d'],
+                ['iv'],
                 stemSegments,
             )) :
             []),
@@ -182,7 +182,7 @@ function getImperfectRules(
                 attachedSuffix + p,
                 deinflectedSuffix,
                 ['iv_p'],
-                ['iv_d'],
+                ['iv'],
                 stemSegments,
             )) :
             []),
@@ -192,7 +192,7 @@ function getImperfectRules(
             attachedSuffix + p,
             deinflectedSuffix,
             ['iv_p'],
-            ['iv_d'],
+            ['iv'],
             stemSegments,
         )),
     ]);
@@ -239,12 +239,11 @@ const conditions = {
     v: {
         name: 'Verb',
         isDictionaryForm: true,
-        subConditions: ['pv', 'iv'],
+        subConditions: ['pv', 'iv', 'cv'],
     },
     pv: {
-        name: 'Perfect Verb',
+        name: 'Perfect Verb (no affixes)',
         isDictionaryForm: true,
-        subConditions: ['pv_p', 'pv_s', 'pv_d'],
     },
     pv_p: {
         name: 'Perfect Verb with Prefix',
@@ -254,14 +253,9 @@ const conditions = {
         name: 'Perfect Verb with Suffix only',
         isDictionaryForm: false,
     },
-    pv_d: {
-        name: 'Perfect Verb Dictionary Form (no affixes)',
-        isDictionaryForm: true,
-    },
     iv: {
-        name: 'Imperfect Verb',
+        name: 'Imperfect Verb (no affixes)',
         isDictionaryForm: true,
-        subConditions: ['iv_p', 'iv_s', 'iv_d'],
     },
     iv_p: {
         name: 'Imperfect Verb with Prefix',
@@ -271,9 +265,17 @@ const conditions = {
         name: 'Imperfect Verb with Suffix only',
         isDictionaryForm: false,
     },
-    iv_d: {
-        name: 'Imperfect Verb Dictionary Form (no affixes)',
+    cv: {
+        name: 'Command Verb (no affixes)',
         isDictionaryForm: true,
+    },
+    cv_p: {
+        name: 'Command Verb with Prefix',
+        isDictionaryForm: false,
+    },
+    cv_s: {
+        name: 'Command Verb with Suffix only',
+        isDictionaryForm: false,
     },
 };
 
@@ -282,16 +284,6 @@ export const arabicTransforms = {
     language: 'ar',
     conditions,
     transforms: {
-        // General
-        'Pref-Wa': {
-            name: 'and',
-            description: 'and (و); and, so (ف)',
-            rules: [
-                prefixInflection('و', '', ['pv_p'], ['pv_s', 'pv_d']),
-                prefixInflection('ف', '', ['pv_p'], ['pv_s', 'pv_d']),
-            ],
-        },
-
         // Noun
         'NPref-Bi': {
             name: 'by, with',
@@ -367,35 +359,43 @@ export const arabicTransforms = {
         },
 
         // Perfect Verb
+        'PVPref-Wa': {
+            name: 'and',
+            description: 'and (و); and, so (ف)',
+            rules: [
+                prefixInflection('و', '', ['pv_p'], ['pv_s', 'pv']),
+                prefixInflection('ف', '', ['pv_p'], ['pv_s', 'pv']),
+            ],
+        },
         'PVPref-La': {
             name: 'would have',
             description: 'Result clause particle (if ... I would have ...)',
-            rules: [prefixInflection('ل', '', ['pv_p'], ['pv_s', 'pv_d'])],
+            rules: [prefixInflection('ل', '', ['pv_p'], ['pv_s', 'pv'])],
         },
 
         'PVSuff-ah': {
             name: 'Perfect Tense',
             description: 'Perfect Verb + D.O pronoun',
-            rules: directObjectPronouns.map((p) => suffixInflection(p, '', ['pv_s'], ['pv_d'])),
+            rules: directObjectPronouns.map((p) => suffixInflection(p, '', ['pv_s'], ['pv'])),
         },
         'PVSuff-n': {
             name: 'Perfect Tense',
             description: 'Perfect Verb suffixes assimilating with ن',
             rules: [
                 // Stem doesn't end in ن
-                conditionalSuffixInflection('ن', '', '(?<!ن)', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns.map((p) => conditionalSuffixInflection(`ن${p}`, '', '(?<!ن)', ['pv_s'], ['pv_d'])),
+                conditionalSuffixInflection('ن', '', '(?<!ن)', ['pv_s'], ['pv']),
+                ...directObjectPronouns.map((p) => conditionalSuffixInflection(`ن${p}`, '', '(?<!ن)', ['pv_s'], ['pv'])),
 
-                conditionalSuffixInflection('نا', '', '(?<!ن)', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns2nd.map((p) => conditionalSuffixInflection(`نا${p}`, '', '(?<!ن)', ['pv_s'], ['pv_d'])),
-                ...directObjectPronouns3rd.map((p) => conditionalSuffixInflection(`نا${p}`, '', '(?<!ن)', ['pv_s'], ['pv_d'])),
+                conditionalSuffixInflection('نا', '', '(?<!ن)', ['pv_s'], ['pv']),
+                ...directObjectPronouns2nd.map((p) => conditionalSuffixInflection(`نا${p}`, '', '(?<!ن)', ['pv_s'], ['pv'])),
+                ...directObjectPronouns3rd.map((p) => conditionalSuffixInflection(`نا${p}`, '', '(?<!ن)', ['pv_s'], ['pv'])),
 
                 // Suffixes assimilated with stems ending in ن
-                ...directObjectPronouns.map((p) => suffixInflection(`ن${p}`, 'ن', ['pv_s'], ['pv_d'])),
+                ...directObjectPronouns.map((p) => suffixInflection(`ن${p}`, 'ن', ['pv_s'], ['pv'])),
 
-                suffixInflection('نا', 'ن', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns2nd.map((p) => suffixInflection(`نا${p}`, 'ن', ['pv_s'], ['pv_d'])),
-                ...directObjectPronouns3rd.map((p) => suffixInflection(`نا${p}`, 'ن', ['pv_s'], ['pv_d'])),
+                suffixInflection('نا', 'ن', ['pv_s'], ['pv']),
+                ...directObjectPronouns2nd.map((p) => suffixInflection(`نا${p}`, 'ن', ['pv_s'], ['pv'])),
+                ...directObjectPronouns3rd.map((p) => suffixInflection(`نا${p}`, 'ن', ['pv_s'], ['pv'])),
             ],
         },
         'PVSuff-t': {
@@ -404,64 +404,64 @@ export const arabicTransforms = {
             rules: [
                 // This can either be 3rd p. f. singular, or 1st/2nd p. singular
                 // The former doesn't assimilate, the latter do, so the below accounts for both
-                suffixInflection('ت', '', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns.map((p) => suffixInflection(`ت${p}`, '', ['pv_s'], ['pv_d'])),
+                suffixInflection('ت', '', ['pv_s'], ['pv']),
+                ...directObjectPronouns.map((p) => suffixInflection(`ت${p}`, '', ['pv_s'], ['pv'])),
 
                 // Stem doesn't end in ت
-                conditionalSuffixInflection('تما', '', '(?<!ت)', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns1st.map((p) => conditionalSuffixInflection(`تما${p}`, '', '(?<!ت)', ['pv_s'], ['pv_d'])),
-                ...directObjectPronouns3rd.map((p) => conditionalSuffixInflection(`تما${p}`, '', '(?<!ت)', ['pv_s'], ['pv_d'])),
+                conditionalSuffixInflection('تما', '', '(?<!ت)', ['pv_s'], ['pv']),
+                ...directObjectPronouns1st.map((p) => conditionalSuffixInflection(`تما${p}`, '', '(?<!ت)', ['pv_s'], ['pv'])),
+                ...directObjectPronouns3rd.map((p) => conditionalSuffixInflection(`تما${p}`, '', '(?<!ت)', ['pv_s'], ['pv'])),
 
-                conditionalSuffixInflection('تم', '', '(?<!ت)', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns1st.map((p) => conditionalSuffixInflection(`تمو${p}`, '', '(?<!ت)', ['pv_s'], ['pv_d'])),
-                ...directObjectPronouns3rd.map((p) => conditionalSuffixInflection(`تمو${p}`, '', '(?<!ت)', ['pv_s'], ['pv_d'])),
+                conditionalSuffixInflection('تم', '', '(?<!ت)', ['pv_s'], ['pv']),
+                ...directObjectPronouns1st.map((p) => conditionalSuffixInflection(`تمو${p}`, '', '(?<!ت)', ['pv_s'], ['pv'])),
+                ...directObjectPronouns3rd.map((p) => conditionalSuffixInflection(`تمو${p}`, '', '(?<!ت)', ['pv_s'], ['pv'])),
 
-                conditionalSuffixInflection('تن', '', '(?<!ت)', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns1st.map((p) => conditionalSuffixInflection(`تن${p}`, '', '(?<!ت)', ['pv_s'], ['pv_d'])),
-                ...directObjectPronouns3rd.map((p) => conditionalSuffixInflection(`تن${p}`, '', '(?<!ت)', ['pv_s'], ['pv_d'])),
+                conditionalSuffixInflection('تن', '', '(?<!ت)', ['pv_s'], ['pv']),
+                ...directObjectPronouns1st.map((p) => conditionalSuffixInflection(`تن${p}`, '', '(?<!ت)', ['pv_s'], ['pv'])),
+                ...directObjectPronouns3rd.map((p) => conditionalSuffixInflection(`تن${p}`, '', '(?<!ت)', ['pv_s'], ['pv'])),
 
                 // Suffixes assimilated with stems ending in ت
-                ...directObjectPronouns.map((p) => suffixInflection(`ت${p}`, 'ت', ['pv_s'], ['pv_d'])),
+                ...directObjectPronouns.map((p) => suffixInflection(`ت${p}`, 'ت', ['pv_s'], ['pv'])),
 
-                suffixInflection('تما', 'ت', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns1st.map((p) => suffixInflection(`تما${p}`, 'ت', ['pv_s'], ['pv_d'])),
-                ...directObjectPronouns3rd.map((p) => suffixInflection(`تما${p}`, 'ت', ['pv_s'], ['pv_d'])),
+                suffixInflection('تما', 'ت', ['pv_s'], ['pv']),
+                ...directObjectPronouns1st.map((p) => suffixInflection(`تما${p}`, 'ت', ['pv_s'], ['pv'])),
+                ...directObjectPronouns3rd.map((p) => suffixInflection(`تما${p}`, 'ت', ['pv_s'], ['pv'])),
 
-                suffixInflection('تم', 'ت', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns1st.map((p) => suffixInflection(`تمو${p}`, 'ت', ['pv_s'], ['pv_d'])),
-                ...directObjectPronouns3rd.map((p) => suffixInflection(`تمو${p}`, 'ت', ['pv_s'], ['pv_d'])),
+                suffixInflection('تم', 'ت', ['pv_s'], ['pv']),
+                ...directObjectPronouns1st.map((p) => suffixInflection(`تمو${p}`, 'ت', ['pv_s'], ['pv'])),
+                ...directObjectPronouns3rd.map((p) => suffixInflection(`تمو${p}`, 'ت', ['pv_s'], ['pv'])),
 
-                suffixInflection('تن', 'ت', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns1st.map((p) => suffixInflection(`تن${p}`, 'ت', ['pv_s'], ['pv_d'])),
-                ...directObjectPronouns3rd.map((p) => suffixInflection(`تن${p}`, 'ت', ['pv_s'], ['pv_d'])),
+                suffixInflection('تن', 'ت', ['pv_s'], ['pv']),
+                ...directObjectPronouns1st.map((p) => suffixInflection(`تن${p}`, 'ت', ['pv_s'], ['pv'])),
+                ...directObjectPronouns3rd.map((p) => suffixInflection(`تن${p}`, 'ت', ['pv_s'], ['pv'])),
             ],
         },
         'PVSuff-at': {
             name: 'Perfect Tense',
             description: 'Perfect Verb non-assimilating ت suffixes',
             rules: [
-                suffixInflection('تا', '', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns.map((p) => suffixInflection(`تا${p}`, '', ['pv_s'], ['pv_d'])),
+                suffixInflection('تا', '', ['pv_s'], ['pv']),
+                ...directObjectPronouns.map((p) => suffixInflection(`تا${p}`, '', ['pv_s'], ['pv'])),
             ],
         },
         'PVSuff-A': {
             name: 'Perfect Tense',
             description: 'Perfect Verb 3rd. m. dual',
             rules: [
-                suffixInflection('ا', '', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns.map((p) => suffixInflection(`ا${p}`, '', ['pv_s'], ['pv_d'])),
+                suffixInflection('ا', '', ['pv_s'], ['pv']),
+                ...directObjectPronouns.map((p) => suffixInflection(`ا${p}`, '', ['pv_s'], ['pv'])),
 
                 // Combines with أ to form آ
-                suffixInflection('آ', 'أ', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns.map((p) => suffixInflection(`آ${p}`, 'أ', ['pv_s'], ['pv_d'])),
+                suffixInflection('آ', 'أ', ['pv_s'], ['pv']),
+                ...directObjectPronouns.map((p) => suffixInflection(`آ${p}`, 'أ', ['pv_s'], ['pv'])),
             ],
         },
         'PVSuff-uw': {
             name: 'Perfect Tense',
             description: 'Perfect Verb 3rd. m. pl.',
             rules: [
-                suffixInflection('وا', '', ['pv_s'], ['pv_d']),
-                ...directObjectPronouns.map((p) => suffixInflection(`و${p}`, '', ['pv_s'], ['pv_d'])),
+                suffixInflection('وا', '', ['pv_s'], ['pv']),
+                ...directObjectPronouns.map((p) => suffixInflection(`و${p}`, '', ['pv_s'], ['pv'])),
             ],
         },
 
