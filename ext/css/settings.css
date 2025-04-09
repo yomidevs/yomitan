@@ -1698,7 +1698,7 @@ select.profile-condition-operator {
     flex-flow: row nowrap;
     align-items: center;
     justify-content: flex-end;
-    padding-bottom: 0.5em;
+    padding: 0.5em 0;
 }
 
 input.anki-card-field-value {
