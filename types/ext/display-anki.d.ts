@@ -18,29 +18,27 @@
 import type * as Anki from './anki';
 import type * as AnkiNoteBuilder from './anki-note-builder';
 import type * as AnkiTemplates from './anki-templates';
-import type * as AnkiTemplatesInternal from './anki-templates-internal';
-
-export type CreateMode = AnkiTemplatesInternal.CreateModeNoTest;
+import type * as Settings from './settings';
 
 export type LogData = {
     ankiNoteData: AnkiTemplates.NoteData | undefined;
     ankiNoteDataException: Error | undefined;
-    ankiNotes: AnkiNoteLogData[];
+    notes: AnkiNoteLogData[];
 };
 
 export type AnkiNoteLogData = {
-    mode: CreateMode;
+    noteOptionsIndex: number;
     note: Anki.Note | undefined;
     errors?: Error[];
     requirements?: AnkiNoteBuilder.Requirement[];
 };
 
 export type DictionaryEntryDetails = {
-    modeMap: Map<CreateMode, DictionaryEntryModeDetails>;
+    noteMap: Map<number, DictionaryEntryNoteDetails>;
 };
 
-export type DictionaryEntryModeDetails = {
-    mode: CreateMode;
+export type DictionaryEntryNoteDetails = {
+    noteOptions: Settings.AnkiNoteOptions;
     note: Anki.Note;
     errors: Error[];
     requirements: AnkiNoteBuilder.Requirement[];
