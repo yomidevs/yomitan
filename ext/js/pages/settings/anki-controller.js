@@ -43,6 +43,8 @@ export class AnkiController {
         this._modalController = modalController;
         /** @type {AnkiConnect} */
         this._ankiConnect = new AnkiConnect();
+        /** @type {string} */
+        this._language = 'ja';
         /** @type {SelectorObserver<AnkiCardController>} */
         this._selectorObserver = new SelectorObserver({
             selector: '.anki-card',
@@ -216,13 +218,15 @@ export class AnkiController {
     /**
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
-    _onOptionsChanged({options: {anki, dictionaries}}) {
+    _onOptionsChanged({options: {anki, dictionaries, general: {language}}}) {
         /** @type {?string} */
         let apiKey = anki.apiKey;
         if (apiKey === '') { apiKey = null; }
         this._ankiConnect.server = anki.server;
         this._ankiConnect.enabled = anki.enable;
         this._ankiConnect.apiKey = apiKey;
+
+        this._language = language;
 
         this._selectorObserver.disconnect();
         this._selectorObserver.observe(document.documentElement, true);
@@ -405,7 +409,7 @@ export class AnkiController {
 
             let markers = [];
             for (const type of types) {
-                markers.push(...getStandardFieldMarkers(type));
+                markers.push(...getStandardFieldMarkers(type, this._language));
             }
             if (types.includes('term')) {
                 const dictionaryInfo = await this._application.api.getDictionaryInfo();
