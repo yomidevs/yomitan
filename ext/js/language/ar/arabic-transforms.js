@@ -574,5 +574,47 @@ export const arabicTransforms = {
             description: 'Imperfect Verb 1st. pl.',
             rules: [...getImperfectRules('ن', '', '', '', {attachesTo1st: false})],
         },
+
+        // Command Verb
+        'CVPref': {
+            name: 'Imperative',
+            description: 'Command Verb',
+            rules: [
+                prefixInflection('و', '', ['cv_p'], ['cv_s']),
+                prefixInflection('ف', '', ['cv_p'], ['cv_s']),
+                prefixInflection('ا', '', ['cv_p'], ['cv_s', 'cv']),
+                prefixInflection('وا', '', ['cv_p'], ['cv_s', 'cv']),
+                prefixInflection('فا', '', ['cv_p'], ['cv_s', 'cv']),
+            ],
+        },
+        'CVSuff': {
+            name: 'Imperative',
+            description: 'Command Verb',
+            rules: [
+                // 2nd. m. sing.
+                ...directObjectPronouns1st.map((p) => suffixInflection(p, '', ['cv_s'], ['cv'])),
+                ...directObjectPronouns3rd.map((p) => suffixInflection(p, '', ['cv_s'], ['cv'])),
+
+                // 2nd. f. sing
+                suffixInflection('ي', '', ['cv_s'], ['cv']),
+                ...directObjectPronouns1st.map((p) => suffixInflection(`ي${p}`, '', ['cv_s'], ['cv'])),
+                ...directObjectPronouns3rd.map((p) => suffixInflection(`ي${p}`, '', ['cv_s'], ['cv'])),
+
+                // 2nd. dual
+                suffixInflection('ا', '', ['cv_s'], ['cv']),
+                ...directObjectPronouns1st.map((p) => suffixInflection(`ا${p}`, '', ['cv_s'], ['cv'])),
+                ...directObjectPronouns3rd.map((p) => suffixInflection(`ا${p}`, '', ['cv_s'], ['cv'])),
+
+                // 2nd. m. pl.
+                suffixInflection('وا', '', ['cv_s'], ['cv']),
+                ...directObjectPronouns1st.map((p) => suffixInflection(`و${p}`, '', ['cv_s'], ['cv'])),
+                ...directObjectPronouns3rd.map((p) => suffixInflection(`و${p}`, '', ['cv_s'], ['cv'])),
+
+                // 2nd. f. pl.
+                suffixInflection('ن', '', ['cv_s'], ['cv']),
+                ...directObjectPronouns1st.map((p) => suffixInflection(`ن${p}`, '', ['cv_s'], ['cv'])),
+                ...directObjectPronouns3rd.map((p) => suffixInflection(`ن${p}`, '', ['cv_s'], ['cv'])),
+            ],
+        },
     },
 };

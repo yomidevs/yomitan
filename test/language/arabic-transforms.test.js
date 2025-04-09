@@ -316,6 +316,45 @@ const tests = [
             {term: 'جلس', source: 'سليجلس', rule: 'iv', reasons: null},
         ],
     },
+    {
+        category: 'regluar command verb',
+        valid: true,
+        tests: [
+            {term: 'درس', source: 'ادرس', rule: 'cv', reasons: ['CVPref']},
+            {term: 'درس', source: 'ادرسي', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+            {term: 'درس', source: 'ادرسا', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+            {term: 'درس', source: 'ادرسوا', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+            {term: 'درس', source: 'ادرسن', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+
+            {term: 'درس', source: 'وادرس', rule: 'cv', reasons: ['CVPref']},
+            {term: 'درس', source: 'فادرس', rule: 'cv', reasons: ['CVPref']},
+
+            {term: 'درس', source: 'ادرسه', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+            {term: 'درس', source: 'ادرسها', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+            {term: 'درس', source: 'ادرسهما', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+            {term: 'درس', source: 'ادرسهم', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+            {term: 'درس', source: 'ادرسهن', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+            {term: 'درس', source: 'ادرسني', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+            {term: 'درس', source: 'ادرسنا', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+
+            {term: 'درس', source: 'ادرسيه', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+            {term: 'درس', source: 'ادرسوه', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+
+            // Non-form I Verb
+            {term: 'تعلم', source: 'تعلمي', rule: 'cv', reasons: ['CVSuff']},
+            {term: 'تعلم', source: 'فتعلمي', rule: 'cv', reasons: ['CVSuff', 'CVPref']},
+        ],
+    },
+    {
+        category: 'command verb invalid attached direct object pronouns',
+        valid: false,
+        tests: [
+            {term: 'درس', source: 'ادرسك', rule: 'cv', reasons: null},
+            {term: 'درس', source: 'ادرسكما', rule: 'cv', reasons: null},
+            {term: 'درس', source: 'ادرسكم', rule: 'cv', reasons: null},
+            {term: 'درس', source: 'ادرسكن', rule: 'cv', reasons: null},
+        ],
+    },
 ];
 
 const languageTransformer = new LanguageTransformer();
