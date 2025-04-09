@@ -1647,10 +1647,6 @@ select.profile-condition-operator {
     gap: 0.5em;
 }
 
-.anki-card-field-name-header {
-    font-weight: bold;
-    margin-right: 1em;
-}
 .anki-card-field-input-header {
     font-weight: bold;
 }
@@ -1693,7 +1689,7 @@ select.profile-condition-operator {
     display: block;
 }
 
-.anki-card-footer {
+.anki-card-delete {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
