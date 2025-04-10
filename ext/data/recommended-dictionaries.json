@@ -223,6 +223,20 @@
             }
         ]
     },
+    "he": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [],
+        "terms": [
+            {
+                "name": "kty-he-en",
+                "description": "Hebrew to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-he-en.zip"
+            }
+        ]
+    },
     "hi": {
         "frequency": [],
         "grammar": [],

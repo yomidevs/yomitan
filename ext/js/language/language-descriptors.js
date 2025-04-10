@@ -193,6 +193,12 @@ const languageDescriptors = [
         languageTransforms: ancientGreekTransforms,
     },
     {
+        iso: 'he',
+        iso639_3: 'heb',
+        name: 'Hebrew',
+        exampleText: 'קריאה',
+    },
+    {
         iso: 'hi',
         iso639_3: 'hin',
         name: 'Hindi',
