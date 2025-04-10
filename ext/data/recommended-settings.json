@@ -678,5 +678,15 @@
             },
             "description": "Lookup whole words in the dictionary."
         }
+    ],
+    "he": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        }
     ]
 }
