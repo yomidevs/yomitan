@@ -390,6 +390,10 @@ type ApiSurface = {
         params: void;
         return: Language.LanguageSummary[];
     };
+    heartbeat: {
+        params: void;
+        return: void;
+    };
 };
 
 type ApiExtraArgs = [sender: chrome.runtime.MessageSender];
