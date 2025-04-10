@@ -227,6 +227,32 @@
             "description": "Turn off Yomitan's internal parser for languages with spaces."
         }
     ],
+    "he": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "parsing.enableScanningParser",
+                "value": false
+            },
+            "description": "Turn off Yomitan's internal parser for languages with spaces."
+        }
+    ],
     "hi": [
         {
             "modification": {
@@ -677,16 +703,6 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
-        }
-    ],
-    "he": [
-        {
-            "modification": {
-                "action": "set",
-                "path": "parsing.enableScanningParser",
-                "value": false
-            },
-            "description": "Turn off Yomitan's internal parser for languages with spaces."
         }
     ]
 }
