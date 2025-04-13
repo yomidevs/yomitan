@@ -1647,9 +1647,8 @@ export class OptionsUtil {
 
         for (const profile of options.profiles) {
             const oldTerms = profile.options.anki.terms;
-            const oldKanji = profile.options.anki.kanji;
 
-            const termsNotes = [{
+            const updatedNotes = [{
                 name: 'Expression',
                 icon: 'big-circle',
                 deck: oldTerms.deck,
@@ -1659,7 +1658,7 @@ export class OptionsUtil {
             }];
 
             if (Object.values(oldTerms.fields).some((field) => field.value.includes('{expression}'))) {
-                termsNotes.push({
+                updatedNotes.push({
                     name: 'Reading',
                     icon: 'small-circle',
                     deck: oldTerms.deck,
@@ -1674,16 +1673,22 @@ export class OptionsUtil {
                 });
             }
 
-            const kanjiNote = {
-                name: 'Kanji',
-                icon: 'big-circle',
-                deck: oldKanji.deck,
-                model: oldKanji.model,
-                fields: oldKanji.fields,
-                type: 'kanji',
-            };
+            const language = profile.options.general.language;
+            const logographLanguages = ['ja', 'zh', 'yue'];
+            if (logographLanguages.includes(language)) {
+                const oldKanji = profile.options.anki.kanji;
+                const kanjiNote = {
+                    name: language === 'ja' ? 'Kanji' : 'Hanzi',
+                    icon: 'big-circle',
+                    deck: oldKanji.deck,
+                    model: oldKanji.model,
+                    fields: oldKanji.fields,
+                    type: 'kanji',
+                };
+                updatedNotes.push(kanjiNote);
+            }
 
-            profile.options.anki.notes = [...termsNotes, kanjiNote];
+            profile.options.anki.notes = [...updatedNotes];
 
             delete profile.options.anki.terms;
             delete profile.options.anki.kanji;
