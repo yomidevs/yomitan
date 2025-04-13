@@ -659,9 +659,9 @@ button.sidebar-button.sidebar-button-highlight {
 .note-actions-container .action-button-container::after {
     content: '';
     position: absolute;
-    left: 50%;
-    top: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 3/4);
-    bottom: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 3/4);
+    left: calc(50% - 0.5px);
+    top: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 0.5);
+    bottom: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 0.5);
     width: 1px;
     background: var(--accent-color);
     pointer-events: none;
@@ -673,9 +673,9 @@ button.sidebar-button.sidebar-button-highlight {
     flex-direction: row-reverse;
 }
 .note-actions-container .action-button-container:first-child::after {
-    left: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 3/4);
-    right: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 3/4);
-    top: 50%;
+    top: calc(50% - 0.5px);
+    left: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 0.5);
+    right: calc((var(--action-button-size) + var(--action-button-padding) * 2) * 0.5);
     bottom: auto;
     height: 1px;
     width: auto;
