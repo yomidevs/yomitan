@@ -996,8 +996,6 @@ export class DisplayAnki {
         }
         const template = this._ankiFieldTemplates;
         if (typeof template !== 'string') { throw new Error('Invalid template'); }
-        const {deck: deckName, model: modelName} = noteOptions;
-        const fields = Object.entries(noteOptions.fields);
         const contentOrigin = this._display.getContentOrigin();
         const details = this._ankiNoteBuilder.getDictionaryEntryDetailsForNote(dictionaryEntry);
         const audioDetails = this._getAnkiNoteMediaAudioDetails(details);
@@ -1009,9 +1007,6 @@ export class DisplayAnki {
             noteOptions,
             context,
             template,
-            deckName,
-            modelName,
-            fields,
             tags: this._noteTags,
             duplicateScope: this._duplicateScope,
             duplicateScopeCheckAllModels: this._duplicateScopeCheckAllModels,

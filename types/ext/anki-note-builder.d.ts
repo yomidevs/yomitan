@@ -31,9 +31,6 @@ export type CreateNoteDetails = {
     noteOptions: Settings.AnkiNoteOptions;
     context: AnkiTemplatesInternal.Context;
     template: string;
-    deckName: string;
-    modelName: string;
-    fields: Field[];
     tags: string[];
     requirements: Requirement[];
     duplicateScope: Settings.AnkiDuplicateScope;

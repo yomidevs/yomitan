@@ -22,13 +22,13 @@ import {AnkiTemplateRenderer} from '../../ext/js/templates/anki-template-rendere
 
 /**
  * @param {import('dictionary').DictionaryEntryType} type
- * @returns {import('anki-note-builder').Field[]}
+ * @returns {import('settings').AnkiNoteFields}
  */
 function createTestFields(type) {
-    /** @type {import('anki-note-builder').Field[]} */
-    const fields = [];
+    /** @type {import('settings').AnkiNoteFields} */
+    const fields = {};
     for (const marker of getStandardFieldMarkers(type)) {
-        fields.push([marker, {value: `{${marker}}`, overwriteMode: 'coalesce'}]);
+        fields[marker] = {value: `{${marker}}`, overwriteMode: 'coalesce'};
     }
     return fields;
 }
@@ -121,18 +121,15 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
         const details = {
             dictionaryEntry,
             noteOptions: {
-                type: 'term',
+                type: dictionaryEntry.type,
                 name: 'test',
-                deck: 'deck',
-                model: 'model',
-                fields: {},
+                deck: 'deckName',
+                model: 'modelName',
+                fields: createTestFields(dictionaryEntry.type),
                 icon: 'big-circle',
             },
             context,
             template,
-            deckName: 'deckName',
-            modelName: 'modelName',
-            fields: createTestFields(dictionaryEntry.type),
             tags: ['yomitan'],
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,

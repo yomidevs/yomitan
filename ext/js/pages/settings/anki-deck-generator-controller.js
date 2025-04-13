@@ -435,24 +435,24 @@ export class AnkiDeckGeneratorController {
         const template = await this._getAnkiTemplate(options);
         const deckOptionsFields = options.anki.notes[0].fields;
         const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
-        const fields = [];
-        for (const deckField in deckOptionsFields) {
-            if (Object.prototype.hasOwnProperty.call(deckOptionsFields, deckField)) {
-                fields.push([deckField, deckOptionsFields[deckField]]);
-            }
-        }
         const idleTimeout = (Number.isFinite(options.anki.downloadTimeout) && options.anki.downloadTimeout > 0 ? options.anki.downloadTimeout : null);
         const languageSummary = getLanguageSummaries().find(({iso}) => iso === options.general.language);
         const mediaOptions = addMedia ? {audio: {sources: options.audio.sources, preferredAudioIndex: null, idleTimeout: idleTimeout, languageSummary: languageSummary}} : null;
         const requirements = addMedia ? [...this._getDictionaryEntryMedia(dictionaryEntry), {type: 'audio'}] : [];
         const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(options.dictionaries);
+        const noteOptions = /** @type {import('settings').AnkiNoteOptions} */ ({
+            deck: this._activeAnkiDeck,
+            model: this._activeNoteType,
+            fields: deckOptionsFields,
+            type: 'term',
+            name: '',
+            icon: 'big-circle',
+        });
         const {note} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
             dictionaryEntry,
+            noteOptions,
             context,
             template,
-            deckName: this._activeAnkiDeck,
-            modelName: this._activeNoteType,
-            fields: fields,
             resultOutputMode,
             glossaryLayoutMode,
             compactTags,

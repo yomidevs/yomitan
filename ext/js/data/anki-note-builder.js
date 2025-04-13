@@ -49,9 +49,6 @@ export class AnkiNoteBuilder {
         noteOptions,
         context,
         template,
-        deckName,
-        modelName,
-        fields,
         tags = [],
         requirements = [],
         duplicateScope = 'collection',
@@ -62,6 +59,8 @@ export class AnkiNoteBuilder {
         mediaOptions = null,
         dictionaryStylesMap = new Map(),
     }) {
+        const {deck: deckName, model: modelName, fields: fieldsSettings} = noteOptions;
+        const fields = Object.entries(fieldsSettings);
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
         if (duplicateScope === 'deck-root') {

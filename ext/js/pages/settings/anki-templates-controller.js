@@ -264,22 +264,25 @@ export class AnkiTemplatesController {
                 };
                 const template = await this._getAnkiTemplate(options);
                 const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
-                const fields = [
-                    [
-                        'field',
-                        {
-                            value: field,
-                            overwriteMode: 'skip',
-                        },
-                    ],
-                ];
+                const fields = {
+                    field: {
+                        value: field,
+                        overwriteMode: 'skip',
+                    },
+                };
+                const noteOptions = /** @type {import('settings').AnkiNoteOptions} */ ({
+                    type: 'term',
+                    name: '',
+                    deck: '',
+                    model: '',
+                    fields,
+                    icon: 'big-circle',
+                });
                 const {note, errors} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
                     dictionaryEntry,
                     context,
                     template,
-                    deckName: '',
-                    modelName: '',
-                    fields,
+                    noteOptions,
                     resultOutputMode,
                     glossaryLayoutMode,
                     compactTags,
