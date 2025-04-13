@@ -116,9 +116,8 @@ export class DisplayAnki {
         this._noteContext = this._getNoteContext();
         /* eslint-disable @stylistic/no-multi-spaces */
         this._display.hotkeyHandler.registerActions([
-            ['addNote1',      () => { this._hotkeySaveAnkiNoteForSelectedEntry(0); }],
-            ['addNote2',      () => { this._hotkeySaveAnkiNoteForSelectedEntry(1); }],
-            ['viewNotes1',    () => { this._hotkeyViewNotesForSelectedEntry(0); }],
+            ['addNote',     this._hotkeySaveAnkiNoteForSelectedEntry.bind(this)],
+            ['viewNotes',   this._hotkeyViewNotesForSelectedEntry.bind(this)],
         ]);
         /* eslint-enable @stylistic/no-multi-spaces */
         this._display.on('optionsUpdated', this._onOptionsUpdated.bind(this));
@@ -581,19 +580,20 @@ export class DisplayAnki {
     }
 
     /**
-     * @param {number} saveButtonIndex
+     * @param {unknown} noteOptionsStringIndex
      */
-    _hotkeySaveAnkiNoteForSelectedEntry(saveButtonIndex) {
+    _hotkeySaveAnkiNoteForSelectedEntry(noteOptionsStringIndex) {
+        if (typeof noteOptionsStringIndex !== 'string') { return; }
+        const noteOptionsIndex = Number.parseInt(noteOptionsStringIndex, 10);
+        if (Number.isNaN(noteOptionsIndex)) { return; }
         const index = this._display.selectedIndex;
         const entry = this._getEntry(index);
         if (entry === null) { return; }
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return; }
         /** @type {HTMLButtonElement | null} */
-        const nthButton = container.querySelector(`.action-button-container:nth-child(${saveButtonIndex + 1})`);
+        const nthButton = container.querySelector(`.action-button[data-action=save-note][data-note-options-index="${noteOptionsIndex}"]`);
         if (nthButton === null) { return; }
-        if (typeof nthButton.dataset.noteOptionsIndex === 'undefined') { return; }
-        const noteOptionsIndex = Number.parseInt(nthButton.dataset.noteOptionsIndex, 10);
         void this._saveAnkiNote(index, noteOptionsIndex);
     }
 
@@ -1234,16 +1234,19 @@ export class DisplayAnki {
     }
 
     /**
-     * @param {number} viewNoteButtonIndex
+     * @param {unknown} noteOptionsStringIndex
      */
-    _hotkeyViewNotesForSelectedEntry(viewNoteButtonIndex) {
+    _hotkeyViewNotesForSelectedEntry(noteOptionsStringIndex) {
+        if (typeof noteOptionsStringIndex !== 'string') { return; }
+        const noteOptionsIndex = Number.parseInt(noteOptionsStringIndex, 10);
+        if (Number.isNaN(noteOptionsIndex)) { return; }
         const index = this._display.selectedIndex;
         const entry = this._getEntry(index);
         if (entry === null) { return; }
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return; }
         /** @type {HTMLButtonElement | null} */
-        const nthButton = container.querySelector(`.action-button-container:nth-child(${viewNoteButtonIndex + 1}) .action-button[data-action=view-note]`);
+        const nthButton = container.querySelector(`.action-button-container[data-note-options-index="${noteOptionsIndex}"] .action-button[data-action=view-note]`);
         if (nthButton === null) { return; }
         void this._viewNotes(nthButton);
     }

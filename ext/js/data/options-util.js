@@ -1693,7 +1693,6 @@ export class OptionsUtil {
             delete profile.options.anki.terms;
             delete profile.options.anki.kanji;
 
-            // Update hotkeys
             if (!profile.options.inputs || !profile.options.inputs.hotkeys) {
                 continue;
             }
@@ -1704,16 +1703,20 @@ export class OptionsUtil {
                 }
                 switch (hotkey.action) {
                     case 'addNoteTermKanji':
-                        hotkey.action = 'addNote1';
+                        hotkey.action = 'addNote';
+                        hotkey.argument = '0';
                         break;
                     case 'addNoteTermKana':
-                        hotkey.action = 'addNote2';
+                        hotkey.action = 'addNote';
+                        hotkey.argument = `${Math.min(1, updatedNotes.length - 1)}`;
                         break;
                     case 'addNoteKanji':
-                        hotkey.action = 'addNote1';
+                        hotkey.action = 'addNote';
+                        hotkey.argument = `${updatedNotes.length - 1}`;
                         break;
                     case 'viewNotes':
-                        hotkey.action = 'viewNotes1';
+                        hotkey.action = 'viewNotes';
+                        hotkey.argument = '0';
                         break;
                 }
             }
