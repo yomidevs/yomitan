@@ -687,6 +687,10 @@ export class AnkiController {
         const ankiOptions = options.anki;
         const index = ankiOptions.notes.length;
 
+        if (index >= 5) {
+            throw new Error('Cannot add more than 5 notes');
+        }
+
         /** @type {import('settings').AnkiNoteOptions} */
         const newNote = {
             name: `Note ${index + 1}`,
