@@ -226,32 +226,68 @@ const conditions = {
         isDictionaryForm: true,
     },
     n_p: {
-        name: 'Noun with Prefix',
+        name: 'Noun with Prefix only',
+        isDictionaryForm: false,
+        subConditions: ['n_wa', 'n_bi', 'n_ka', 'n_li', 'n_al', 'n_bi_al', 'n_ka_al', 'n_lil', 'n_li_al'],
+    },
+    n_def: {
+        name: 'Noun with Definite Prefix',
+        isDictionaryForm: false,
+        subConditions: ['n_al', 'n_bi_al', 'n_ka_al', 'n_lil', 'n_li_al'],
+    },
+    n_indef: {
+        name: 'Noun with Indefinite Prefix',
+        isDictionaryForm: false,
+        subConditions: ['n_wa', 'n_bi', 'n_ka', 'n_li'],
+    },
+    n_nom: {
+        name: 'Nominative Noun with Prefix',
+        isDictionaryForm: false,
+        subConditions: ['n_wa', 'n_li', 'n_al'],
+    },
+    n_nom_indef: {
+        name: 'Nominative Noun with Indefinite Prefix',
+        isDictionaryForm: false,
+        subConditions: ['n_wa', 'n_li'],
+    },
+    n_wa: {
+        name: 'Noun with و Prefix',
+        isDictionaryForm: false,
+    },
+    n_bi: {
+        name: 'Noun with ب Prefix',
+        isDictionaryForm: false,
+    },
+    n_ka: {
+        name: 'Noun with ك Prefix',
+        isDictionaryForm: false,
+    },
+    n_li: {
+        name: 'Noun with ل Prefix',
+        isDictionaryForm: false,
+    },
+    n_al: {
+        name: 'Noun with ال Prefix',
+        isDictionaryForm: false,
+    },
+    n_bi_al: {
+        name: 'Noun with بال Prefix',
+        isDictionaryForm: false,
+    },
+    n_ka_al: {
+        name: 'Noun with كال Prefix',
+        isDictionaryForm: false,
+    },
+    n_lil: {
+        name: 'Noun with لل Prefix',
+        isDictionaryForm: false,
+    },
+    n_li_al: {
+        name: 'Noun with Assimilated لل Prefix',
         isDictionaryForm: false,
     },
     n_s: {
-        name: 'Noun with Suffix only',
-        isDictionaryForm: false,
-        subConditions: ['n_s_def', 'n_s_indef', 'n_s_nom', 'n_s_acc', 'n_s_nom_def'],
-    },
-    n_s_def: {
-        name: 'Definite Noun with Suffix only',
-        isDictionaryForm: false,
-    },
-    n_s_indef: {
-        name: 'Indefinite Noun with Suffix only',
-        isDictionaryForm: false,
-    },
-    n_s_nom: {
-        name: 'Nominative Noun with Suffix only',
-        isDictionaryForm: false,
-    },
-    n_s_acc: {
-        name: 'Accusative/Genitive Noun with Suffix only',
-        isDictionaryForm: false,
-    },
-    n_s_nom_def: {
-        name: 'Nominative Definite Noun with Suffix only',
+        name: 'Noun with Suffix',
         isDictionaryForm: false,
     },
     v: {
@@ -307,227 +343,223 @@ export const arabicTransforms = {
             name: 'and',
             description: 'and (و); and, so (ف)',
             rules: [
-                prefixInflection('و', '', ['n_p'], ['n_s', 'n']),
-                prefixInflection('ف', '', ['n_p'], ['n_s', 'n']),
+                prefixInflection('و', '', ['n_wa'], ['n']),
+                prefixInflection('ف', '', ['n_wa'], ['n']),
             ],
         },
         'NPref-Bi': {
             name: 'by, with',
             description: 'by, with',
             rules: [
-                prefixInflection('ب', '', ['n_p'], ['n_s_def', 'n_s_indef', 'n_s_acc', 'n']),
-                prefixInflection('وب', '', ['n_p'], ['n_s_def', 'n_s_indef', 'n_s_acc', 'n']),
-                prefixInflection('فب', '', ['n_p'], ['n_s_def', 'n_s_indef', 'n_s_acc', 'n']),
+                prefixInflection('ب', '', ['n_bi'], ['n']),
+                prefixInflection('وب', '', ['n_bi'], ['n']),
+                prefixInflection('فب', '', ['n_bi'], ['n']),
             ],
         },
         'NPref-Ka': {
             name: 'like, such as',
             description: 'like, such as',
             rules: [
-                prefixInflection('ك', '', ['n_p'], ['n_s_def', 'n_s_indef', 'n_s_acc', 'n']),
-                prefixInflection('وك', '', ['n_p'], ['n_s_def', 'n_s_indef', 'n_s_acc', 'n']),
-                prefixInflection('فك', '', ['n_p'], ['n_s_def', 'n_s_indef', 'n_s_acc', 'n']),
+                prefixInflection('ك', '', ['n_ka'], ['n']),
+                prefixInflection('وك', '', ['n_ka'], ['n']),
+                prefixInflection('فك', '', ['n_ka'], ['n']),
             ],
         },
         'NPref-Li': {
             name: 'for, to; indeed, truly',
             description: 'for, to (لِ); indeed, truly (لَ)',
             rules: [
-                prefixInflection('ل', '', ['n_p'], ['n_s', 'n_s_nom_def', 'n']),
-                prefixInflection('ول', '', ['n_p'], ['n_s', 'n_s_nom_def', 'n']),
-                prefixInflection('فل', '', ['n_p'], ['n_s', 'n_s_nom_def', 'n']),
+                prefixInflection('ل', '', ['n_li'], ['n']),
+                prefixInflection('ول', '', ['n_li'], ['n']),
+                prefixInflection('فل', '', ['n_li'], ['n']),
             ],
         },
         'NPref-Al': {
             name: 'the',
             description: 'the',
             rules: [
-                prefixInflection('ال', '', ['n_p'], ['n_s_indef', 'n_s_nom', 'n_s_acc', 'n']),
-                prefixInflection('وال', '', ['n_p'], ['n_s_indef', 'n_s_nom', 'n_s_acc', 'n']),
-                prefixInflection('فال', '', ['n_p'], ['n_s_indef', 'n_s_nom', 'n_s_acc', 'n']),
+                prefixInflection('ال', '', ['n_al'], ['n']),
+                prefixInflection('وال', '', ['n_al'], ['n']),
+                prefixInflection('فال', '', ['n_al'], ['n']),
             ],
         },
         'NPref-BiAl': {
             name: 'by/with + the',
             description: 'by/with + the',
             rules: [
-                prefixInflection('بال', '', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
-                prefixInflection('وبال', '', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
-                prefixInflection('فبال', '', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
+                prefixInflection('بال', '', ['n_bi_al'], ['n']),
+                prefixInflection('وبال', '', ['n_bi_al'], ['n']),
+                prefixInflection('فبال', '', ['n_bi_al'], ['n']),
             ],
         },
         'NPref-KaAl': {
             name: 'like/such as + the',
             description: 'like/such as + the',
             rules: [
-                prefixInflection('كال', '', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
-                prefixInflection('وكال', '', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
-                prefixInflection('فكال', '', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
+                prefixInflection('كال', '', ['n_ka_al'], ['n']),
+                prefixInflection('وكال', '', ['n_ka_al'], ['n']),
+                prefixInflection('فكال', '', ['n_ka_al'], ['n']),
             ],
         },
         'NPref-Lil': {
             name: 'for/to + the',
             description: 'for/to + the',
             rules: [
-                conditionalPrefixInflection('لل', '', '(?!ل)', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
-                conditionalPrefixInflection('ولل', '', '(?!ل)', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
-                conditionalPrefixInflection('فلل', '', '(?!ل)', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
+                conditionalPrefixInflection('لل', '', '(?!ل)', ['n_lil'], ['n']),
+                conditionalPrefixInflection('ولل', '', '(?!ل)', ['n_lil'], ['n']),
+                conditionalPrefixInflection('فلل', '', '(?!ل)', ['n_lil'], ['n']),
             ],
         },
         'NPref-LiAl': {
             name: 'for/to + the',
             description: 'for/to + the, assimilated with initial ل',
             rules: [
-                prefixInflection('لل', 'ل', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
-                prefixInflection('ولل', 'ل', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
-                prefixInflection('فلل', 'ل', ['n_p'], ['n_s_indef', 'n_s_acc', 'n']),
+                prefixInflection('لل', 'ل', ['n_li_al'], ['n']),
+                prefixInflection('ولل', 'ل', ['n_li_al'], ['n']),
+                prefixInflection('فلل', 'ل', ['n_li_al'], ['n']),
             ],
         },
 
         'NSuff-h': {
             name: 'pos. pron.',
             description: 'possessive pronoun',
-            rules: nonAssimilatingPossessivePronouns.map((p) => suffixInflection(p, '', ['n_s_def'], ['n'])),
-        },
-        'NSuff-iy': {
-            name: 'pos. pron.',
-            description: 'possessive pronoun',
             rules: [
-                conditionalSuffixInflection('ي', '', '(?<!ي)', ['n_s_def'], ['n']),
+                ...nonAssimilatingPossessivePronouns.map((p) => suffixInflection(p, '', ['n_s'], ['n_indef', 'n'])),
+                conditionalSuffixInflection('ي', '', '(?<!ي)', ['n_s'], ['n_indef', 'n']),
             ],
         },
         'NSuff-ap': {
             name: 'fem. sg.',
             description: 'fem. sg.',
             rules: [
-                suffixInflection('ة', '', ['n_s'], ['n']),
+                suffixInflection('ة', '', ['n_s'], ['n_p', 'n']),
             ],
         },
         'NSuff-ath': {
             name: 'fem. sg. + pos. pron.',
             description: 'fem. sg. + possessive pronoun',
             rules: [
-                ...possessivePronouns.map((p) => suffixInflection(`ت${p}`, '', ['n_s_def'], ['n'])),
-                ...possessivePronouns.map((p) => suffixInflection(`ت${p}`, 'ة', ['n_s_def'], ['n'])),
+                ...possessivePronouns.map((p) => suffixInflection(`ت${p}`, '', ['n_s'], ['n_indef', 'n'])),
+                ...possessivePronouns.map((p) => suffixInflection(`ت${p}`, 'ة', ['n_s'], ['n_indef', 'n'])),
             ],
         },
         'NSuff-An': {
             name: 'dual',
             description: 'nominative m. dual',
             rules: [
-                suffixInflection('ان', '', ['n_s_nom'], ['n']),
-                suffixInflection('آن', 'أ', ['n_s_nom'], ['n']),
+                suffixInflection('ان', '', ['n_s'], ['n_nom', 'n']),
+                suffixInflection('آن', 'أ', ['n_s'], ['n_nom', 'n']),
             ],
         },
         'NSuff-Ah': {
             name: 'dual + pos. pron.',
             description: 'nominative m. dual + possessive pronoun',
             rules: [
-                suffixInflection('ا', '', ['n_s_nom_def'], ['n']),
-                suffixInflection('آ', 'أ', ['n_s_nom_def'], ['n']),
-                ...possessivePronouns.map((p) => suffixInflection(`ا${p}`, '', ['n_s_nom_def'], ['n'])),
-                ...possessivePronouns.map((p) => suffixInflection(`آ${p}`, 'أ', ['n_s_nom_def'], ['n'])),
+                suffixInflection('ا', '', ['n_s'], ['n_nom_indef', 'n']),
+                suffixInflection('آ', 'أ', ['n_s'], ['n_nom_indef', 'n']),
+                ...possessivePronouns.map((p) => suffixInflection(`ا${p}`, '', ['n_s'], ['n_nom_indef', 'n'])),
+                ...possessivePronouns.map((p) => suffixInflection(`آ${p}`, 'أ', ['n_s'], ['n_nom_indef', 'n'])),
             ],
         },
         'NSuff-ayn': {
             name: 'dual',
             description: 'accusative/genitive m. dual',
             rules: [
-                suffixInflection('ين', '', ['n_s'], ['n']),
+                suffixInflection('ين', '', ['n_s'], ['n_p', 'n']),
             ],
         },
         'NSuff-ayh': {
             name: 'dual + pos. pron.',
             description: 'accusative/genitive m. dual + possessive pronoun',
             rules: [
-                suffixInflection('ي', '', ['n_s_def'], ['n']),
-                ...nonAssimilatingPossessivePronouns.map((p) => suffixInflection(`ي${p}`, '', ['n_s_def'], ['n'])),
+                suffixInflection('ي', '', ['n_s'], ['n_indef', 'n']),
+                ...nonAssimilatingPossessivePronouns.map((p) => suffixInflection(`ي${p}`, '', ['n_s'], ['n_indef', 'n'])),
             ],
         },
         'NSuff-atAn': {
             name: 'dual',
             description: 'nominative f. dual',
             rules: [
-                suffixInflection('تان', '', ['n_s_nom'], ['n']),
-                suffixInflection('تان', 'ة', ['n_s_nom'], ['n']),
+                suffixInflection('تان', '', ['n_s'], ['n_nom', 'n']),
+                suffixInflection('تان', 'ة', ['n_s'], ['n_nom', 'n']),
             ],
         },
         'NSuff-atAh': {
             name: 'dual + pos. pron.',
             description: 'nominative f. dual + possessive pronoun',
             rules: [
-                suffixInflection('تا', '', ['n_s_nom_def'], ['n']),
-                suffixInflection('تا', 'ة', ['n_s_nom_def'], ['n']),
-                ...possessivePronouns.map((p) => suffixInflection(`تا${p}`, '', ['n_s_nom_def'], ['n'])),
-                ...possessivePronouns.map((p) => suffixInflection(`تا${p}`, 'ة', ['n_s_nom_def'], ['n'])),
+                suffixInflection('تا', '', ['n_s'], ['n_nom_indef', 'n']),
+                suffixInflection('تا', 'ة', ['n_s'], ['n_nom_indef', 'n']),
+                ...possessivePronouns.map((p) => suffixInflection(`تا${p}`, '', ['n_s'], ['n_nom_indef', 'n'])),
+                ...possessivePronouns.map((p) => suffixInflection(`تا${p}`, 'ة', ['n_s'], ['n_nom_indef', 'n'])),
             ],
         },
         'NSuff-tayn': {
             name: 'dual',
             description: 'accusative/genitive f. dual',
             rules: [
-                suffixInflection('تين', '', ['n_s'], ['n']),
-                suffixInflection('تين', 'ة', ['n_s'], ['n']),
+                suffixInflection('تين', '', ['n_s'], ['n_p', 'n']),
+                suffixInflection('تين', 'ة', ['n_s'], ['n_p', 'n']),
             ],
         },
         'NSuff-tayh': {
             name: 'dual + pos. pron.',
             description: 'accusative/genitive f. dual + possessive pronoun',
             rules: [
-                suffixInflection('تي', '', ['n_s_def'], ['n']),
-                suffixInflection('تي', 'ة', ['n_s_def'], ['n']),
-                ...nonAssimilatingPossessivePronouns.map((p) => suffixInflection(`تي${p}`, '', ['n_s_def'], ['n'])),
-                ...nonAssimilatingPossessivePronouns.map((p) => suffixInflection(`تي${p}`, 'ة', ['n_s_def'], ['n'])),
+                suffixInflection('تي', '', ['n_s'], ['n_indef', 'n']),
+                suffixInflection('تي', 'ة', ['n_s'], ['n_indef', 'n']),
+                ...nonAssimilatingPossessivePronouns.map((p) => suffixInflection(`تي${p}`, '', ['n_s'], ['n_indef', 'n'])),
+                ...nonAssimilatingPossessivePronouns.map((p) => suffixInflection(`تي${p}`, 'ة', ['n_s'], ['n_indef', 'n'])),
             ],
         },
         'NSuff-At': {
             name: 'f. pl.',
             description: 'sound f. plural',
             rules: [
-                suffixInflection('ات', '', ['n_s'], ['n']),
-                suffixInflection('ات', 'ة', ['n_s'], ['n']),
-                suffixInflection('آت', 'أ', ['n_s'], ['n']),
-                suffixInflection('آت', 'أة', ['n_s'], ['n']),
+                suffixInflection('ات', '', ['n_s'], ['n_p', 'n']),
+                suffixInflection('ات', 'ة', ['n_s'], ['n_p', 'n']),
+                suffixInflection('آت', 'أ', ['n_s'], ['n_p', 'n']),
+                suffixInflection('آت', 'أة', ['n_s'], ['n_p', 'n']),
             ],
         },
         'NSuff-Ath': {
             name: 'f. pl. + pos. pron.',
             description: 'sound f. plural + possessive pronoun',
             rules: [
-                ...possessivePronouns.map((p) => suffixInflection(`ات${p}`, '', ['n_s_def'], ['n'])),
-                ...possessivePronouns.map((p) => suffixInflection(`ات${p}`, 'ة', ['n_s_def'], ['n'])),
-                ...possessivePronouns.map((p) => suffixInflection(`آت${p}`, 'أ', ['n_s_def'], ['n'])),
-                ...possessivePronouns.map((p) => suffixInflection(`آت${p}`, 'أة', ['n_s_def'], ['n'])),
+                ...possessivePronouns.map((p) => suffixInflection(`ات${p}`, '', ['n_s'], ['n_indef', 'n'])),
+                ...possessivePronouns.map((p) => suffixInflection(`ات${p}`, 'ة', ['n_s'], ['n_indef', 'n'])),
+                ...possessivePronouns.map((p) => suffixInflection(`آت${p}`, 'أ', ['n_s'], ['n_indef', 'n'])),
+                ...possessivePronouns.map((p) => suffixInflection(`آت${p}`, 'أة', ['n_s'], ['n_indef', 'n'])),
             ],
         },
         'NSuff-wn': {
             name: 'm. pl.',
             description: 'nominative sound m. plural',
             rules: [
-                suffixInflection('ون', '', ['n_s_nom'], ['n']),
+                suffixInflection('ون', '', ['n_s'], ['n_nom', 'n']),
             ],
         },
         'NSuff-wh': {
             name: 'm. pl + pos. pron.',
             description: 'nominative sound m. plural + possessive pronoun',
             rules: [
-                suffixInflection('و', '', ['n_s_nom_def'], ['n']),
-                ...nonAssimilatingPossessivePronouns.map((p) => suffixInflection(`و${p}`, '', ['n_s_nom_def'], ['n'])),
+                suffixInflection('و', '', ['n_s'], ['n_nom_indef', 'n']),
+                ...nonAssimilatingPossessivePronouns.map((p) => suffixInflection(`و${p}`, '', ['n_s'], ['n_nom_indef', 'n'])),
             ],
         },
         'NSuff-iyn': {
             name: 'm. pl.',
             description: 'accusative/genitive sound m. plural',
             rules: [
-                suffixInflection('ين', '', ['n_s'], ['n']),
+                suffixInflection('ين', '', ['n_s'], ['n_p', 'n']),
             ],
         },
         'NSuff-iyh': {
             name: 'm. pl. + pos. pron.',
             description: 'accusative/genitive sound m. plural + possessive pronoun',
             rules: [
-                suffixInflection('ي', '', ['n_s_def'], ['n']),
-                ...nonAssimilatingPossessivePronouns.map((p) => suffixInflection(`ي${p}`, '', ['n_s_def'], ['n'])),
+                suffixInflection('ي', '', ['n_s'], ['n_indef', 'n']),
+                ...nonAssimilatingPossessivePronouns.map((p) => suffixInflection(`ي${p}`, '', ['n_s'], ['n_indef', 'n'])),
             ],
         },
 
