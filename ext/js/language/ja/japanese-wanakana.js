@@ -47,7 +47,7 @@ export function convertToKanaIME(text, selectionStart) {
     // Examples (`|` shall be the user's text cursor):
     // `たn|` does not convert to `たん|`. The `n` should be hidden from the converter and `た` should only be sent.
     // `n|の` also does not convert to `ん|の`. Even though the cursor is not at the end of the line, the `n` should still be hidden since it is directly behind the user's text cursor.
-    // `ny|` does not convert to `んy|`. The cursor must be hidden since the user may be trying to type something starting with `ny` such as `nya`.
+    // `ny|` does not convert to `んy|`. The `ny` must be hidden since the user may be trying to type something starting with `ny` such as `nya`.
     // `たnt|` does convert to `たんt|`. The user's text cursor is one character ahead of the `n` so it does not need to be hidden and can be converted.
     // `nとあ|` also converts to `んとあ|` The user's text cursor is two characters away from the `n`.
     // `なno|` will still convert to `なの` instead of `なんお` without issue since the `no` -> `の` conversion will be found before `n` -> `ん` and `o` -> `お`.
