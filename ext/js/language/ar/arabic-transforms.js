@@ -443,6 +443,15 @@ export const arabicTransforms = {
                 ...possessivePronouns.map((p) => suffixInflection(`ت${p}`, 'ة', ['n_s'], ['n_indef', 'n'])),
             ],
         },
+        'NSuff-AF': {
+            name: 'acc. indef.',
+            description: 'accusative indefinite (اً)',
+            rules: [
+                suffixInflection('ا', '', ['n_s'], ['n_wa', 'n']),
+                suffixInflection('اً', '', ['n_s'], ['n_wa', 'n']),
+                suffixInflection('ًا', '', ['n_s'], ['n_wa', 'n']),
+            ],
+        },
         'NSuff-An': {
             name: 'dual',
             description: 'nominative m. dual',

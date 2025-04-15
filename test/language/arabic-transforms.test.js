@@ -100,6 +100,10 @@ const tests = [
             {term: 'زوجة', source: 'زوجته', rule: 'n', reasons: ['NSuff-ath']},
             {term: 'زوجة', source: 'زوجتك', rule: 'n', reasons: ['NSuff-ath']},
             {term: 'زوجة', source: 'زوجتي', rule: 'n', reasons: ['NSuff-ath']},
+
+            // Accusative Indefinite
+            {term: 'أبد', source: 'أبدا', rule: 'n', reasons: ['NSuff-AF']},
+            {term: 'أبد', source: 'وأبدا', rule: 'n', reasons: ['NPref-Wa', 'NSuff-AF']},
         ],
     },
     {
@@ -116,6 +120,16 @@ const tests = [
             // Ta Marbuta
             {term: 'زوجة', source: 'الزوجته', rule: 'n', reasons: ['NPref-Al']},
             {term: 'لؤلؤة', source: 'للؤلؤته', rule: 'n', reasons: ['NPref-LiAl']},
+
+            // Accusative Indefinite
+            {term: 'أبد', source: 'بأبدا', rule: 'n', reasons: ['NPref-Bi', 'NSuff-AF']},
+            {term: 'أبد', source: 'كأبدا', rule: 'n', reasons: ['NPref-Ka', 'NSuff-AF']},
+            {term: 'أبد', source: 'لأبدا', rule: 'n', reasons: ['NPref-Li', 'NSuff-AF']},
+            {term: 'أبد', source: 'الأبدا', rule: 'n', reasons: ['NPref-Al', 'NSuff-AF']},
+            {term: 'أبد', source: 'بالأبدا', rule: 'n', reasons: ['NPref-BiAl', 'NSuff-AF']},
+            {term: 'أبد', source: 'كالأبدا', rule: 'n', reasons: ['NPref-KaAl', 'NSuff-AF']},
+            {term: 'أبد', source: 'للأبدا', rule: 'n', reasons: ['NPref-Lil', 'NSuff-AF']},
+            {term: 'لاحق', source: 'للاحقا', rule: 'n', reasons: ['NPref-LiAl', 'NSuff-AF']},
         ],
     },
     {
