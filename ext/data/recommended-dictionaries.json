@@ -324,6 +324,12 @@
                 "description": "A free and openly licensed Japanese-to-English dictionary with example sentences, usage notes, etymology notes, cross references, antonyms, definition notes.",
                 "homepage": "https://jitendex.org",
                 "downloadUrl": "https://github.com/stephenmk/stephenmk.github.io/releases/latest/download/jitendex-yomitan.zip"
+            },
+            {
+                "name": "JMnedict",
+                "description": "A dictionary of Japanese proper names maintained by the Electronic Dictionary Research and Development Group.",
+                "homepage": "https://github.com/yomidevs/jmdict-yomitan?tab=readme-ov-file#jmnedict-for-yomitan",
+                "downloadUrl": "https://github.com/yomidevs/jmdict-yomitan/releases/latest/download/JMnedict.zip"
             }
         ]
     },
