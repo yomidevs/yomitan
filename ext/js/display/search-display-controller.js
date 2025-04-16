@@ -20,7 +20,7 @@ import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
-import {convertToKanaIME} from '../language/ja/japanese-wanakana.js';
+import {convertToKana, convertToKanaIME} from '../language/ja/japanese-wanakana.js';
 
 export class SearchDisplayController {
     /**
@@ -597,6 +597,8 @@ export class SearchDisplayController {
      * @param {?import('settings').OptionsContextFlag[]} flags
      */
     _search(animate, historyMode, lookup, flags) {
+        this._updateSearchText();
+
         const query = this._queryInput.value;
         const depth = this._display.depth;
         const url = window.location.href;
@@ -650,6 +652,15 @@ export class SearchDisplayController {
                 searchButton.style.height = `${scrollHeight}px`;
             }
         }
+    }
+
+    /** */
+    _updateSearchText() {
+        if (this._wanakanaEnabled) {
+            // don't use convertToKanaIME since user searching has finalized the text and is no longer composing
+            this._queryInput.value = convertToKana(this._queryInput.value);
+        }
+        this._queryInput.setSelectionRange(this._queryInput.value.length, this._queryInput.value.length);
     }
 
     /**
