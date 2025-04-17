@@ -16,7 +16,15 @@
  */
 
 import {removeSyriacScriptDiacritics} from './aii/assyrian-neo-aramaic-text-preprocessors.js';
-import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
+import {
+    removeArabicScriptDiacritics,
+    removeTatweel,
+    normalizeUnicode,
+    addHamzaTop,
+    addHamzaBottom,
+    convertAlifMaqsuraToYaa,
+    convertHaToTaMarbuta,
+} from './ar/arabic-text-preprocessors.js';
 import {arabicTransforms} from './ar/arabic-transforms.js';
 import {normalizeRadicalCharacters} from './CJK-util.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
@@ -74,11 +82,32 @@ const languageDescriptors = [
     },
     {
         iso: 'ar',
-        iso639_3: 'ara',
-        name: 'Arabic',
+        iso639_3: 'arb',
+        name: 'Arabic (MSA)',
         exampleText: 'قَرَأَ',
         textPreprocessors: {
             removeArabicScriptDiacritics,
+            removeTatweel,
+            normalizeUnicode,
+            addHamzaTop,
+            addHamzaBottom,
+            convertAlifMaqsuraToYaa,
+        },
+        languageTransforms: arabicTransforms,
+    },
+    {
+        iso: 'arz',
+        iso639_3: 'arz',
+        name: 'Arabic (Egyptian)',
+        exampleText: 'قَرَأَ',
+        textPreprocessors: {
+            removeArabicScriptDiacritics,
+            removeTatweel,
+            normalizeUnicode,
+            addHamzaTop,
+            addHamzaBottom,
+            convertAlifMaqsuraToYaa,
+            convertHaToTaMarbuta,
         },
         languageTransforms: arabicTransforms,
     },
