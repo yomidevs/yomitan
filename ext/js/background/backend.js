@@ -589,16 +589,35 @@ export class Backend {
     }
 
     /**
+     * Removes all fields except the first field from an array of notes
+     * @param {import('anki').Note[]} notes
+     * @returns {import('anki').Note[]}
+     */
+    _stripNotesArray(notes) {
+        const newNotes = structuredClone(notes);
+        for (let i = 0; i < newNotes.length; i++) {
+            const [firstField, firstFieldValue] = Object.entries(newNotes[i].fields)[0];
+            newNotes[i].fields = {};
+            newNotes[i].fields[firstField] = firstFieldValue;
+        }
+        return newNotes;
+    }
+
+    /**
      * @param {import('anki').Note[]} notes
      * @returns {Promise<import('backend').CanAddResults>}
      */
     async partitionAddibleNotes(notes) {
+        // strip all fields except the first from notes before dupe checking
+        // minimizes the amount of data being sent and reduce network latency and AnkiConnect latency
+        const strippedNotes = this._stripNotesArray(notes);
+
         // `allowDuplicate` is on for all notes by default, so we temporarily set it to false
         // to check which notes are duplicates.
-        const notesNoDuplicatesAllowed = notes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}}));
+        const notesNoDuplicatesAllowed = strippedNotes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}}));
 
         // If only older AnkiConnect available, use `canAddNotes`.
-        const withDuplicatesAllowed = await this._anki.canAddNotes(notes);
+        const withDuplicatesAllowed = await this._anki.canAddNotes(strippedNotes);
         const noDuplicatesAllowed = await this._anki.canAddNotes(notesNoDuplicatesAllowed);
 
         /** @type {{ note: import('anki').Note, isDuplicate: boolean }[]} */

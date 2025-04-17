@@ -213,6 +213,7 @@ export const ROMAJI_TO_HIRAGANA = {
 
     // Length 2
     'nn': 'ん',
+    'n\'': 'ん',
     'va': 'ゔぁ',
     'vi': 'ゔぃ',
     'vu': 'ゔ',
