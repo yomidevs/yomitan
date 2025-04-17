@@ -20,6 +20,7 @@ import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {isComposing} from '../language/ime-utilities.js';
 import {convertToKana, convertToKanaIME} from '../language/ja/japanese-wanakana.js';
 
 export class SearchDisplayController {
@@ -244,7 +245,7 @@ export class SearchDisplayController {
     }
 
     /**
-     * @param {KeyboardEvent} e
+     * @param {InputEvent} e
      */
     _onSearchInput(e) {
         this._updateSearchHeight(true);
@@ -255,10 +256,12 @@ export class SearchDisplayController {
 
     /**
      * @param {HTMLTextAreaElement} element
-     * @param {KeyboardEvent} event
+     * @param {InputEvent} event
      */
     _searchTextKanaConversion(element, event) {
-        if (!this._wanakanaEnabled || event.isComposing) { return; }
+        const platform = document.documentElement.dataset.platform ?? 'unknown';
+        const browser = document.documentElement.dataset.browser ?? 'unknown';
+        if (isComposing(event, platform, browser)) { return; }
         const {kanaString, newSelectionStart} = convertToKanaIME(element.value, element.selectionStart);
         element.value = kanaString;
         element.setSelectionRange(newSelectionStart, newSelectionStart);
