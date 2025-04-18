@@ -710,8 +710,6 @@ export class AnkiController {
         }]);
 
         await this._updateOptions();
-
-        // this._createNoteTab(newNote, index);
     }
 
     /**
