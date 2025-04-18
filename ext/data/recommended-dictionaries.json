@@ -69,6 +69,27 @@
             }
         ]
     },
+    "arz": {
+        "frequency": [],
+        "grammar": [],
+        "kanji": [],
+        "pronunciation": [
+            {
+                "name": "kty-ar-en-ipa",
+                "description": "Arabic IPA dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ar-en-ipa.zip"
+            }
+        ],
+        "terms": [
+            {
+                "name": "kty-ar-en",
+                "description": "Arabic to English dictionary created from Wiktionary data.",
+                "homepage": "https://github.com/yomidevs/kaikki-to-yomitan/blob/master/downloads.md",
+                "downloadUrl": "https://github.com/yomidevs/kaikki-to-yomitan/releases/latest/download/kty-ar-en.zip"
+            }
+        ]
+    },
     "cs": {
         "frequency": [],
         "grammar": [],
