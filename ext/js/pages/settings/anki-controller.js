@@ -96,6 +96,8 @@ export class AnkiController {
         this._ankiNoteDeleteButton = querySelectorNotNull(document, '.anki-card-delete-button');
         /** @type {?import('./modal.js').Modal} */
         this._ankiNoteRemoveModal = null;
+        /** @type {?import('./modal.js').Modal} */
+        this._ankiAddNoteMaximumModal = null;
         /** @type {HTMLElement} */
         this._ankiNoteRemoveName = querySelectorNotNull(document, '#anki-note-remove-name');
         /** @type {HTMLButtonElement} */
@@ -163,6 +165,7 @@ export class AnkiController {
         newNoteButton.addEventListener('click', this._onNewNoteButtonClick.bind(this), false);
 
         this._ankiNoteRemoveModal = this._modalController.getModal('anki-note-remove');
+        this._ankiAddNoteMaximumModal = this._modalController.getModal('anki-add-note-maximum');
         this._ankiNoteDeleteButton.addEventListener('click', this._onAnkiNoteDeleteClick.bind(this), false);
         this._ankiNoteRemoveConfirmButton.addEventListener('click', this._onAnkiNoteRemoveConfirm.bind(this), false);
     }
@@ -688,7 +691,8 @@ export class AnkiController {
         const index = ankiOptions.notes.length;
 
         if (index >= 5) {
-            throw new Error('Cannot add more than 5 notes');
+            this._ankiAddNoteMaximumModal?.setVisible(true);
+            return;
         }
 
         /** @type {import('settings').AnkiNoteOptions} */
