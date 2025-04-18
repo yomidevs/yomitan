@@ -82,7 +82,7 @@ const languageDescriptors = [
     },
     {
         iso: 'ar',
-        iso639_3: 'arb',
+        iso639_3: 'ara',
         name: 'Arabic (MSA)',
         exampleText: 'قَرَأَ',
         textPreprocessors: {
