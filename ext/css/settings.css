@@ -1390,7 +1390,6 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
 
 .quick-start-img {
     border-top: var(--thin-border-size) solid var(--separator-color2);
-    margin: 1.5em;
     display: block;
     margin: auto;
     width: 75%;
