@@ -1388,7 +1388,7 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
     display: flex;
 }
 
-#quick-start-img {
+.quick-start-img {
     border-top: var(--thin-border-size) solid var(--separator-color2);
     margin: 1.5em;
     display: block;
