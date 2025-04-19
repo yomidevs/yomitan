@@ -1,4 +1,40 @@
 {
+    "ar": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "arz": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "word"
+            },
+            "description": "Scan text one word at a time (as opposed to one character)."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "word"
+            },
+            "description": "Lookup whole words in the dictionary."
+        }
+    ],
     "cs": [
         {
             "modification": {

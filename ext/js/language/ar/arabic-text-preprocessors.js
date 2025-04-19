@@ -41,9 +41,69 @@ const diacriticsRegex = new RegExp(`[${optionalDiacritics.join('')}]`, 'g');
 /** @type {import('language').TextProcessor<boolean>} */
 export const removeArabicScriptDiacritics = {
     name: 'Remove diacritics',
-    description: 'وَلَدَ ⬅️ ولد',
+    description: 'وَلَدَ → ولد',
     options: basicTextProcessorOptions,
     process: (text, setting) => {
         return setting ? text.replace(diacriticsRegex, '') : text;
+    },
+};
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const removeTatweel = {
+    name: 'Remove tatweel characters',
+    description: 'لـكن → لكن',
+    options: basicTextProcessorOptions,
+    process: (text, setting) => {
+        return setting ? text.replaceAll('ـ', '') : text;
+    },
+};
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const normalizeUnicode = {
+    name: 'Normalize unicode',
+    description: 'ﻴ → ي',
+    options: basicTextProcessorOptions,
+    process: (text, setting) => {
+        return setting ? text.normalize('NFKC') : text;
+    },
+};
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const addHamzaTop = {
+    name: 'Add Hamza to top of Alif',
+    description: 'اكبر → أكبر',
+    options: basicTextProcessorOptions,
+    process: (text, setting) => {
+        return setting ? text.replace('ا', 'أ') : text;
+    },
+};
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const addHamzaBottom = {
+    name: 'Add Hamza to bottom of Alif',
+    description: 'اسلام → إسلام',
+    options: basicTextProcessorOptions,
+    process: (text, setting) => {
+        return setting ? text.replace('ا', 'إ') : text;
+    },
+};
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const convertAlifMaqsuraToYaa = {
+    name: 'Convert Alif Maqsura to Yaa',
+    description: 'فى → في',
+    options: basicTextProcessorOptions,
+    process: (text, setting) => {
+        return setting ? text.replace(/ى$/, 'ي') : text;
+    },
+};
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const convertHaToTaMarbuta = {
+    name: 'Convert final Ha to Ta Marbuta',
+    description: 'لغه → لغة',
+    options: basicTextProcessorOptions,
+    process: (text, setting) => {
+        return setting ? text.replace(/ه$/, 'ة') : text;
     },
 };
