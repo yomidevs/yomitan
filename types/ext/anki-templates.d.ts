@@ -69,9 +69,6 @@ export type NoteData = {
     compactTags: boolean;
     group: boolean;
     merge: boolean;
-    modeTermKanji: boolean;
-    modeTermKana: boolean;
-    modeKanji: boolean;
     compactGlossaries: boolean;
     readonly uniqueExpressions: string[];
     readonly uniqueReadings: string[];

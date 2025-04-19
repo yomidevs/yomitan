@@ -147,9 +147,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [],
         "uniqueReadings": [],
@@ -314,9 +311,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [],
         "uniqueReadings": [],
@@ -635,9 +629,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -960,9 +951,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -1281,9 +1269,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -1597,9 +1582,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -1913,9 +1895,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -2229,9 +2208,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -2545,9 +2521,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -2870,9 +2843,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -3264,9 +3234,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -3688,9 +3655,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -4112,9 +4076,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -4536,9 +4497,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -4892,9 +4850,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -5213,9 +5168,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -5534,9 +5486,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -5855,9 +5804,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -6171,9 +6117,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -6496,9 +6439,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -6660,9 +6600,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "画像"
@@ -6981,9 +6918,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -7311,9 +7245,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -7627,9 +7558,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -7948,9 +7876,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -8264,9 +8189,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -8585,9 +8507,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -8901,9 +8820,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -9295,9 +9211,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -9719,9 +9632,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -10075,9 +9985,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -10396,9 +10303,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -10790,9 +10694,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -11214,9 +11115,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -11570,9 +11468,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -11891,9 +11786,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -12055,9 +11947,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "画像"
@@ -12488,9 +12377,6 @@
         "compactTags": false,
         "group": true,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -12939,9 +12825,6 @@
         "compactTags": false,
         "group": true,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -13330,9 +13213,6 @@
         "compactTags": false,
         "group": true,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -13686,9 +13566,6 @@
         "compactTags": false,
         "group": true,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -14001,9 +13878,6 @@
         "compactTags": false,
         "group": true,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -14325,9 +14199,6 @@
         "compactTags": false,
         "group": true,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -15047,9 +14918,6 @@
         "compactTags": false,
         "group": false,
         "merge": true,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -15709,9 +15577,6 @@
         "compactTags": false,
         "group": false,
         "merge": true,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -16018,9 +15883,6 @@
         "compactTags": false,
         "group": false,
         "merge": true,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -16335,9 +16197,6 @@
         "compactTags": false,
         "group": false,
         "merge": true,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -16750,9 +16609,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -17195,9 +17051,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -17640,9 +17493,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -18085,9 +17935,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -18441,9 +18288,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -18762,9 +18606,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -19083,9 +18924,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -19404,9 +19242,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -19720,9 +19555,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -20045,9 +19877,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -20439,9 +20268,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -20863,9 +20689,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -21287,9 +21110,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -21711,9 +21531,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -22067,9 +21884,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -22388,9 +22202,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -22709,9 +22520,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -23030,9 +22838,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -23346,9 +23151,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -23671,9 +23473,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -24065,9 +23864,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -24489,9 +24285,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -24913,9 +24706,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -25337,9 +25127,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -25693,9 +25480,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -26014,9 +25798,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -26335,9 +26116,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -26656,9 +26434,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -26972,9 +26747,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -27297,9 +27069,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打"
@@ -27464,9 +27233,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "読む"
@@ -27626,9 +27392,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "強み"
@@ -27797,9 +27560,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "読む"
@@ -28519,9 +28279,6 @@
         "compactTags": false,
         "group": false,
         "merge": true,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打ち込む"
@@ -29181,9 +28938,6 @@
         "compactTags": false,
         "group": false,
         "merge": true,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -29431,9 +29185,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "お手前"
@@ -29685,9 +29436,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "番号"
@@ -29875,9 +29623,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "中腰"
@@ -30065,9 +29810,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "所業"
@@ -30255,9 +29997,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "土木工事"
@@ -30465,9 +30204,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "好き"
@@ -30660,9 +30396,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "構造"
@@ -30802,9 +30535,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "のたまう"
@@ -30906,9 +30636,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "３９"
@@ -31022,9 +30749,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "English"
@@ -31138,9 +30862,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "ＵＳＢ"
@@ -31459,9 +31180,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -31775,9 +31493,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -32096,9 +31811,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -32412,9 +32124,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -32567,9 +32276,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "テキスト"
@@ -32888,9 +32594,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -33204,9 +32907,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "打つ"
@@ -33341,9 +33041,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "凄い"
@@ -33457,9 +33154,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "English"
@@ -33573,9 +33267,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "language"
@@ -33693,9 +33384,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "마시다"
@@ -33809,9 +33497,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "English"
@@ -33925,9 +33610,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "自重"
@@ -34036,9 +33718,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "自重"
@@ -34152,9 +33831,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "自重"
@@ -34263,9 +33939,6 @@
         "compactTags": false,
         "group": false,
         "merge": false,
-        "modeTermKanji": false,
-        "modeTermKana": false,
-        "modeKanji": false,
         "compactGlossaries": false,
         "uniqueExpressions": [
           "自重"
