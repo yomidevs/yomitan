@@ -251,7 +251,9 @@ export class SearchDisplayController {
         this._updateSearchHeight(true);
 
         const element = /** @type {HTMLTextAreaElement} */ (e.currentTarget);
-        this._searchTextKanaConversion(element, e);
+        if (this._wanakanaEnabled) {
+            this._searchTextKanaConversion(element, e);
+        }
     }
 
     /**
