@@ -16,8 +16,8 @@
  */
 
 import path from 'path';
-import { createDictionaryArchiveData } from '../../dev/dictionary-archive-util.js';
-import { deferPromise } from '../../ext/js/core/utilities.js';
+import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
+import {deferPromise} from '../../ext/js/core/utilities.js';
 import {
     expect,
     getExpectedAddNoteBody,
