@@ -829,7 +829,7 @@
         <div>
             <div class="anki-card-tabs-container">
                 <div class="tabs" id="anki-cards-tabs"></div>
-                <div id="anki-cards-new-note" class="advanced-only">
+                <div id="anki-cards-new-format" class="advanced-only">
                     <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="plus-thick"></span></span></button>
                 </div>
             </div>
@@ -841,7 +841,7 @@
                     <div class="settings-item-label">Name</div>
                 </div>
                 <div class="settings-item-right">
-                    <input type="text" class="anki-card-name" data-setting="anki.notes.[0].name">
+                    <input type="text" class="anki-card-name" data-setting="anki.cardFormats.[0].name">
                 </div>
             </div></div>
             <div class="settings-item advanced-only"><div class="settings-item-inner">
@@ -892,7 +892,7 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="danger anki-card-delete-button">Delete</button>
+            <button type="button" class="danger anki-card-delete-format-button">Delete</button>
             <button type="button" class="low-emphasis" data-modal-action="show,anki-cards-info">Help</button>
             <button type="button" data-modal-action="hide">Close</button>
         </div>
@@ -1174,21 +1174,21 @@
         </div>
     </div></div>
 
-    <div id="anki-note-remove-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-        <div class="modal-header"><div class="modal-title">Confirm Note Deletion</div></div>
+    <div id="anki-card-format-remove-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Confirm Card Format Deletion</div></div>
         <div class="modal-body">
-            <p>Are you sure you want to delete the note <em id="anki-note-remove-name"></em>?</p>
+            <p>Are you sure you want to delete the <em id="anki-card-format-remove-name"></em> card format?</p>
         </div>
         <div class="modal-footer">
             <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
-            <button type="button" class="danger" id="anki-note-remove-confirm-button">Delete Note</button>
+            <button type="button" class="danger" id="anki-card-format-remove-confirm-button">Delete Format</button>
         </div>
     </div></div>
 
-    <div id="anki-add-note-maximum-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
-        <div class="modal-header"><div class="modal-title">Maximum Notes Reached</div></div>
+    <div id="anki-add-card-format-maximum-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Maximum Card Formats Reached</div></div>
         <div class="modal-body">
-            <p>The number of notes is limited to 5.</p>
+            <p>The number of card formats is limited to 5.</p>
         </div>
         <div class="modal-footer">
             <button type="button" class="low-emphasis" data-modal-action="hide">Close</button>

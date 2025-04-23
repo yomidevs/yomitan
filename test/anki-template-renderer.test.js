@@ -39,7 +39,7 @@ describe('AnkiTemplateRenderer', () => {
                 frequencies: [],
             },
             resultOutputMode: 'split',
-            noteOptions: {
+            cardFormat: {
                 type: 'term',
                 name: 'test',
                 deck: 'deck',

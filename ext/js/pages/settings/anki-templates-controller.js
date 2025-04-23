@@ -270,7 +270,7 @@ export class AnkiTemplatesController {
                         overwriteMode: 'skip',
                     },
                 };
-                const noteOptions = /** @type {import('settings').AnkiNoteOptions} */ ({
+                const cardFormat = /** @type {import('settings').AnkiNoteOptions} */ ({
                     type: 'term',
                     name: '',
                     deck: '',
@@ -282,7 +282,7 @@ export class AnkiTemplatesController {
                     dictionaryEntry,
                     context,
                     template,
-                    noteOptions,
+                    cardFormat,
                     resultOutputMode,
                     glossaryLayoutMode,
                     compactTags,

@@ -496,7 +496,7 @@ function createProfileOptionsUpdatedTestData1() {
             server: 'http://127.0.0.1:8765',
             tags: ['yomitan'],
             screenshot: {format: 'png', quality: 92},
-            notes: [{
+            cardFormats: [{
                 type: 'term',
                 name: 'Expression',
                 icon: 'big-circle',

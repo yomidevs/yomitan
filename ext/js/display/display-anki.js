@@ -92,7 +92,7 @@ export class DisplayAnki {
         /** @type {string[]} */
         this._noteTags = [];
         /** @type {import('settings').AnkiNoteOptions[]} */
-        this._notesOptions = [];
+        this._cardFormats = [];
         /** @type {import('settings').DictionariesOptions} */
         this._dictionaries = [];
         /** @type {HTMLElement} */
@@ -139,7 +139,7 @@ export class DisplayAnki {
             if (this._noteContext === null) { throw new Error('Note context not initialized'); }
             ankiNoteData = await this._ankiNoteBuilder.getRenderingData({
                 dictionaryEntry,
-                noteOptions: this._notesOptions[0],
+                cardFormat: this._cardFormats[0],
                 context: this._noteContext,
                 resultOutputMode: this._resultOutputMode,
                 glossaryLayoutMode: this._glossaryLayoutMode,
@@ -154,17 +154,17 @@ export class DisplayAnki {
         // Anki notes
         /** @type {import('display-anki').AnkiNoteLogData[]} */
         const notes = [];
-        for (const [noteOptionsIndex] of this._notesOptions.entries()) {
+        for (const [cardFormatIndex] of this._cardFormats.entries()) {
             let note;
             let errors;
             let requirements;
             try {
-                ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, noteOptionsIndex, []));
+                ({note: note, errors, requirements} = await this._createNote(dictionaryEntry, cardFormatIndex, []));
             } catch (e) {
                 errors = [toError(e)];
             }
             /** @type {import('display-anki').AnkiNoteLogData} */
-            const entry = {noteOptionsIndex, note};
+            const entry = {cardFormatIndex, note};
             if (Array.isArray(errors) && errors.length > 0) {
                 entry.errors = errors;
             }
@@ -202,7 +202,7 @@ export class DisplayAnki {
                 suspendNewCards,
                 checkForDuplicates,
                 displayTagsAndFlags,
-                notes,
+                cardFormats,
                 noteGuiMode,
                 screenshot: {format, quality},
                 downloadTimeout,
@@ -225,7 +225,7 @@ export class DisplayAnki {
         this._noteGuiMode = noteGuiMode;
         this._noteTags = [...tags];
         this._audioDownloadIdleTimeout = (Number.isFinite(downloadTimeout) && downloadTimeout > 0 ? downloadTimeout : null);
-        this._notesOptions = notes;
+        this._cardFormats = cardFormats;
         this._dictionaries = dictionaries;
 
         void this._updateAnkiFieldTemplates(options);
@@ -263,12 +263,12 @@ export class DisplayAnki {
     _onNoteSave(e) {
         e.preventDefault();
         const element = /** @type {HTMLElement} */ (e.currentTarget);
-        const noteOptionsIndex = element.dataset.noteOptionsIndex;
-        if (!noteOptionsIndex || !Number.isInteger(Number.parseInt(noteOptionsIndex, 10))) {
-            throw new Error(`Invalid note options index: ${noteOptionsIndex}`);
+        const cardFormatIndex = element.dataset.cardFormatIndex;
+        if (!cardFormatIndex || !Number.isInteger(Number.parseInt(cardFormatIndex, 10))) {
+            throw new Error(`Invalid note options index: ${cardFormatIndex}`);
         }
         const index = this._display.getElementDictionaryEntryIndex(element);
-        void this._saveAnkiNote(index, Number.parseInt(noteOptionsIndex, 10));
+        void this._saveAnkiNote(index, Number.parseInt(cardFormatIndex, 10));
     }
 
     /**
@@ -293,10 +293,10 @@ export class DisplayAnki {
 
     /**
      * @param {number} index
-     * @param {number} noteOptionsIndex
+     * @param {number} cardFormatIndex
      * @returns {?HTMLButtonElement}
      */
-    _createSaveButtons(index, noteOptionsIndex) {
+    _createSaveButtons(index, cardFormatIndex) {
         const entry = this._getEntry(index);
         if (entry === null) { return null; }
 
@@ -310,17 +310,17 @@ export class DisplayAnki {
         /** @type {HTMLElement} */
         const iconSpan = querySelectorNotNull(saveButton, '.action-icon');
         // Set button properties
-        const noteOptions = this._notesOptions[noteOptionsIndex];
-        singleNoteActionButtons.dataset.noteOptionsIndex = noteOptionsIndex.toString();
-        saveButton.title = `Add ${noteOptions.name} note`;
-        saveButton.dataset.noteOptionsIndex = noteOptionsIndex.toString();
-        iconSpan.dataset.icon = noteOptions.icon;
+        const cardFormat = this._cardFormats[cardFormatIndex];
+        singleNoteActionButtons.dataset.cardFormatIndex = cardFormatIndex.toString();
+        saveButton.title = `Add ${cardFormat.name} note`;
+        saveButton.dataset.cardFormatIndex = cardFormatIndex.toString();
+        iconSpan.dataset.icon = cardFormat.icon;
 
         const saveButtonIndex = container.children.length;
         if ([0, 1].includes(saveButtonIndex)) {
-            saveButton.dataset.hotkey = `["addNote${saveButtonIndex + 1}","title","Add ${noteOptions.name} note"]`;
+            saveButton.dataset.hotkey = `["addNote${saveButtonIndex + 1}","title","Add ${cardFormat.name} note"]`;
             // eslint-disable-next-line no-underscore-dangle
-            this._display._hotkeyHelpController.setHotkeyLabel(saveButton, `Add ${noteOptions.name} note ({0})`);
+            this._display._hotkeyHelpController.setHotkeyLabel(saveButton, `Add ${cardFormat.name} note ({0})`);
         } else {
             delete saveButton.dataset.hotkey;
         }
@@ -410,15 +410,15 @@ export class DisplayAnki {
             return;
         }
 
-        const noteOptionsIndex = button.dataset.noteOptionsIndex;
-        if (typeof noteOptionsIndex === 'undefined') { throw new Error('Invalid note options index'); }
-        const noteOptionsIndexNumber = Number.parseInt(noteOptionsIndex, 10);
-        if (Number.isNaN(noteOptionsIndexNumber)) { throw new Error('Invalid note options index'); }
-        const noteOptions = this._notesOptions[noteOptionsIndexNumber];
+        const cardFormatIndex = button.dataset.cardFormatIndex;
+        if (typeof cardFormatIndex === 'undefined') { throw new Error('Invalid note options index'); }
+        const cardFormatIndexNumber = Number.parseInt(cardFormatIndex, 10);
+        if (Number.isNaN(cardFormatIndexNumber)) { throw new Error('Invalid note options index'); }
+        const cardFormat = this._cardFormats[cardFormatIndexNumber];
 
         const verb = behavior === 'overwrite' ? 'Overwrite' : 'Add duplicate';
         const iconPrefix = behavior === 'overwrite' ? 'overwrite' : 'add-duplicate';
-        const target = `${noteOptions.name} note`;
+        const target = `${cardFormat.name} note`;
 
         if (behavior === 'overwrite') {
             button.dataset.overwrite = 'true';
@@ -441,7 +441,7 @@ export class DisplayAnki {
 
         const actionIcon = button.querySelector('.action-icon');
         if (actionIcon instanceof HTMLElement) {
-            actionIcon.dataset.icon = `${iconPrefix}-${noteOptions.icon}`;
+            actionIcon.dataset.icon = `${iconPrefix}-${cardFormat.icon}`;
         }
     }
 
@@ -451,8 +451,8 @@ export class DisplayAnki {
     _updateSaveButtons(dictionaryEntryDetails) {
         const displayTagsAndFlags = this._displayTagsAndFlags;
         for (let entryIndex = 0, entryCount = dictionaryEntryDetails.length; entryIndex < entryCount; ++entryIndex) {
-            for (const [noteOptionsIndex, {canAdd, noteIds, noteInfos, ankiError}] of dictionaryEntryDetails[entryIndex].noteMap.entries()) {
-                const button = this._createSaveButtons(entryIndex, noteOptionsIndex);
+            for (const [cardFormatIndex, {canAdd, noteIds, noteInfos, ankiError}] of dictionaryEntryDetails[entryIndex].noteMap.entries()) {
+                const button = this._createSaveButtons(entryIndex, cardFormatIndex);
                 if (button !== null) {
                     button.disabled = !canAdd;
                     button.hidden = (ankiError !== null);
@@ -468,11 +468,11 @@ export class DisplayAnki {
 
                 const validNoteIds = noteIds?.filter((id) => id !== INVALID_NOTE_ID) ?? [];
 
-                this._createViewNoteButton(entryIndex, noteOptionsIndex, validNoteIds);
+                this._createViewNoteButton(entryIndex, cardFormatIndex, validNoteIds);
 
                 if (displayTagsAndFlags !== 'never' && Array.isArray(noteInfos)) {
-                    this._setupTagsIndicator(entryIndex, noteOptionsIndex, noteInfos);
-                    this._setupFlagsIndicator(entryIndex, noteOptionsIndex, noteInfos);
+                    this._setupTagsIndicator(entryIndex, cardFormatIndex, noteInfos);
+                    this._setupFlagsIndicator(entryIndex, cardFormatIndex, noteInfos);
                 }
             }
         }
@@ -480,14 +480,14 @@ export class DisplayAnki {
 
     /**
      * @param {number} i
-     * @param {number} noteOptionsIndex
+     * @param {number} cardFormatIndex
      * @param {(?import('anki').NoteInfo)[]} noteInfos
      */
-    _setupTagsIndicator(i, noteOptionsIndex, noteInfos) {
+    _setupTagsIndicator(i, cardFormatIndex, noteInfos) {
         const entry = this._getEntry(i);
         if (entry === null) { return; }
 
-        const container = entry.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
+        const container = entry.querySelector(`[data-note-options-index="${cardFormatIndex}"]`);
         if (container === null) { return; }
 
         const tagsIndicator = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('note-action-button-view-tags'));
@@ -517,14 +517,14 @@ export class DisplayAnki {
 
     /**
      * @param {number} i
-     * @param {number} noteOptionsIndex
+     * @param {number} cardFormatIndex
      * @param {(?import('anki').NoteInfo)[]} noteInfos
      */
-    _setupFlagsIndicator(i, noteOptionsIndex, noteInfos) {
+    _setupFlagsIndicator(i, cardFormatIndex, noteInfos) {
         const entry = this._getEntry(i);
         if (entry === null) { return; }
 
-        const container = entry.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
+        const container = entry.querySelector(`[data-note-options-index="${cardFormatIndex}"]`);
         if (container === null) { return; }
 
         const flagsIndicator = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('note-action-button-view-flags'));
@@ -580,28 +580,28 @@ export class DisplayAnki {
     }
 
     /**
-     * @param {unknown} noteOptionsStringIndex
+     * @param {unknown} cardFormatStringIndex
      */
-    _hotkeySaveAnkiNoteForSelectedEntry(noteOptionsStringIndex) {
-        if (typeof noteOptionsStringIndex !== 'string') { return; }
-        const noteOptionsIndex = Number.parseInt(noteOptionsStringIndex, 10);
-        if (Number.isNaN(noteOptionsIndex)) { return; }
+    _hotkeySaveAnkiNoteForSelectedEntry(cardFormatStringIndex) {
+        if (typeof cardFormatStringIndex !== 'string') { return; }
+        const cardFormatIndex = Number.parseInt(cardFormatStringIndex, 10);
+        if (Number.isNaN(cardFormatIndex)) { return; }
         const index = this._display.selectedIndex;
         const entry = this._getEntry(index);
         if (entry === null) { return; }
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return; }
         /** @type {HTMLButtonElement | null} */
-        const nthButton = container.querySelector(`.action-button[data-action=save-note][data-note-options-index="${noteOptionsIndex}"]`);
+        const nthButton = container.querySelector(`.action-button[data-action=save-note][data-note-options-index="${cardFormatIndex}"]`);
         if (nthButton === null) { return; }
-        void this._saveAnkiNote(index, noteOptionsIndex);
+        void this._saveAnkiNote(index, cardFormatIndex);
     }
 
     /**
      * @param {number} dictionaryEntryIndex
-     * @param {number} noteOptionsIndex
+     * @param {number} cardFormatIndex
      */
-    async _saveAnkiNote(dictionaryEntryIndex, noteOptionsIndex) {
+    async _saveAnkiNote(dictionaryEntryIndex, cardFormatIndex) {
         const dictionaryEntries = this._display.dictionaryEntries;
         const dictionaryEntryDetails = this._dictionaryEntryDetails;
         if (!(
@@ -613,12 +613,12 @@ export class DisplayAnki {
             return;
         }
         const dictionaryEntry = dictionaryEntries[dictionaryEntryIndex];
-        const details = dictionaryEntryDetails[dictionaryEntryIndex].noteMap.get(noteOptionsIndex);
+        const details = dictionaryEntryDetails[dictionaryEntryIndex].noteMap.get(cardFormatIndex);
         if (typeof details === 'undefined') { return; }
 
         const {requirements} = details;
 
-        const button = this._saveButtonFind(dictionaryEntryIndex, noteOptionsIndex);
+        const button = this._saveButtonFind(dictionaryEntryIndex, cardFormatIndex);
         if (button === null || button.disabled) { return; }
 
         this._hideErrorNotification(true);
@@ -628,13 +628,13 @@ export class DisplayAnki {
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
         try {
-            const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, noteOptionsIndex, requirements);
+            const {note, errors, requirements: outputRequirements} = await this._createNote(dictionaryEntry, cardFormatIndex, requirements);
             allErrors.push(...errors);
 
             const error = this._getAddNoteRequirementsError(requirements, outputRequirements);
             if (error !== null) { allErrors.push(error); }
             if (button.dataset.overwrite) {
-                const overwrittenNote = await this._getOverwrittenNote(note, dictionaryEntryIndex, noteOptionsIndex);
+                const overwrittenNote = await this._getOverwrittenNote(note, dictionaryEntryIndex, cardFormatIndex);
                 await this._updateAnkiNote(overwrittenNote, allErrors);
             } else {
                 await this._addNewAnkiNote(note, allErrors, button, dictionaryEntryIndex);
@@ -654,15 +654,15 @@ export class DisplayAnki {
 
     /**
      * @param {number} dictionaryEntryIndex
-     * @param {number} noteOptionsIndex
+     * @param {number} cardFormatIndex
      * @returns {?HTMLButtonElement}
      */
-    _saveButtonFind(dictionaryEntryIndex, noteOptionsIndex) {
+    _saveButtonFind(dictionaryEntryIndex, cardFormatIndex) {
         const entry = this._getEntry(dictionaryEntryIndex);
         if (entry === null) { return null; }
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return null; }
-        const singleNoteActionButtonContainer = container.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
+        const singleNoteActionButtonContainer = container.querySelector(`[data-note-options-index="${cardFormatIndex}"]`);
         if (singleNoteActionButtonContainer === null) { return null; }
         return singleNoteActionButtonContainer.querySelector('.action-button[data-action=save-note]');
     }
@@ -670,14 +670,14 @@ export class DisplayAnki {
     /**
      * @param {import('anki').Note} note
      * @param {number} dictionaryEntryIndex
-     * @param {number} noteOptionsIndex
+     * @param {number} cardFormatIndex
      * @returns {Promise<import('anki').NoteWithId | null>}
      */
-    async _getOverwrittenNote(note, dictionaryEntryIndex, noteOptionsIndex) {
+    async _getOverwrittenNote(note, dictionaryEntryIndex, cardFormatIndex) {
         const dictionaryEntries = this._display.dictionaryEntries;
         const allEntryDetails = await this._getDictionaryEntryDetails(dictionaryEntries);
         const relevantEntryDetails = allEntryDetails[dictionaryEntryIndex];
-        const relevantNoteDetails = relevantEntryDetails.noteMap.get(noteOptionsIndex);
+        const relevantNoteDetails = relevantEntryDetails.noteMap.get(cardFormatIndex);
         if (typeof relevantNoteDetails === 'undefined') { return null; }
         const {noteIds, noteInfos} = relevantNoteDetails;
         if (noteIds === null || typeof noteInfos === 'undefined') { return null; }
@@ -686,7 +686,7 @@ export class DisplayAnki {
         const overwriteInfo = noteInfos.find((info) => info !== null && info.noteId === overwriteId);
         if (!overwriteInfo) { return null; }
         const existingFields = overwriteInfo.fields;
-        const fieldOptions = this._notesOptions[noteOptionsIndex].fields;
+        const fieldOptions = this._cardFormats[cardFormatIndex].fields;
         if (!fieldOptions) { return null; }
 
         const newValues = note.fields;
@@ -756,11 +756,11 @@ export class DisplayAnki {
                         allErrors.push(toError(e));
                     }
                 }
-                const noteOptionsIndex = this._getNoteOptionsIndex(button);
+                const cardFormatIndex = this._getCardFormatIndex(button);
 
                 this._updateSaveButtonForDuplicateBehavior(button, [noteId]);
 
-                this._updateViewNoteButton(dictionaryEntryIndex, noteOptionsIndex, [noteId]);
+                this._updateViewNoteButton(dictionaryEntryIndex, cardFormatIndex, [noteId]);
             }
         }
     }
@@ -770,28 +770,28 @@ export class DisplayAnki {
      * @returns {number}
      * @throws {Error}
      */
-    _getNoteOptionsIndex(button) {
-        const noteOptionsIndex = button.dataset.noteOptionsIndex;
-        if (typeof noteOptionsIndex === 'undefined') { throw new Error('Invalid note options index'); }
-        const noteOptionsIndexNumber = Number.parseInt(noteOptionsIndex, 10);
-        if (Number.isNaN(noteOptionsIndexNumber)) { throw new Error('Invalid note options index'); }
-        return noteOptionsIndexNumber;
+    _getCardFormatIndex(button) {
+        const cardFormatIndex = button.dataset.cardFormatIndex;
+        if (typeof cardFormatIndex === 'undefined') { throw new Error('Invalid card format index'); }
+        const cardFormatIndexNumber = Number.parseInt(cardFormatIndex, 10);
+        if (Number.isNaN(cardFormatIndexNumber)) { throw new Error('Invalid card format index'); }
+        return cardFormatIndexNumber;
     }
 
     /**
      * @param {number} dictionaryEntryIndex
-     * @param {number} noteOptionsIndex
+     * @param {number} cardFormatIndex
      * @param {number[]} noteIds
      */
-    _updateViewNoteButton(dictionaryEntryIndex, noteOptionsIndex, noteIds) {
+    _updateViewNoteButton(dictionaryEntryIndex, cardFormatIndex, noteIds) {
         const entry = this._getEntry(dictionaryEntryIndex);
         if (entry === null) { return; }
-        const singleNoteActions = entry.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
+        const singleNoteActions = entry.querySelector(`[data-note-options-index="${cardFormatIndex}"]`);
         if (singleNoteActions === null) { return; }
         /** @type {HTMLButtonElement | null} */
         let viewNoteButton = singleNoteActions.querySelector('.action-button[data-action=view-note]');
         if (viewNoteButton === null) {
-            viewNoteButton = this._createViewNoteButton(dictionaryEntryIndex, noteOptionsIndex, noteIds);
+            viewNoteButton = this._createViewNoteButton(dictionaryEntryIndex, cardFormatIndex, noteIds);
         }
         if (viewNoteButton === null) { return; }
         const newNoteIds = new Set([...this._getNodeNoteIds(viewNoteButton), ...noteIds]);
@@ -925,11 +925,11 @@ export class DisplayAnki {
         for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
             const dictionaryEntry = dictionaryEntries[i];
             const {type} = dictionaryEntry;
-            for (const [noteOptionsIndex, noteOptions] of this._notesOptions.entries()) {
-                if (noteOptions.type !== type) { continue; }
-                const notePromise = this._createNote(dictionaryEntry, noteOptionsIndex, []);
+            for (const [cardFormatIndex, cardFormat] of this._cardFormats.entries()) {
+                if (cardFormat.type !== type) { continue; }
+                const notePromise = this._createNote(dictionaryEntry, cardFormatIndex, []);
                 notePromises.push(notePromise);
-                noteTargets.push({index: i, noteOptionsIndex, noteOptions});
+                noteTargets.push({index: i, cardFormatIndex, cardFormat});
             }
         }
 
@@ -957,8 +957,8 @@ export class DisplayAnki {
         for (let i = 0, ii = noteInfoList.length; i < ii; ++i) {
             const {note, errors, requirements} = noteInfoList[i];
             const {canAdd, valid, noteIds, noteInfos} = infos[i];
-            const {noteOptionsIndex, noteOptions, index} = noteTargets[i];
-            results[index].noteMap.set(noteOptionsIndex, {noteOptions, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
+            const {cardFormatIndex, cardFormat, index} = noteTargets[i];
+            results[index].noteMap.set(cardFormatIndex, {cardFormat, note, errors, requirements, canAdd, valid, noteIds, noteInfos, ankiError});
         }
         return results;
     }
@@ -979,15 +979,15 @@ export class DisplayAnki {
 
     /**
      * @param {import('dictionary').DictionaryEntry} dictionaryEntry
-     * @param {number} noteOptionsIndex
+     * @param {number} cardFormatIndex
      * @param {import('anki-note-builder').Requirement[]} requirements
      * @returns {Promise<import('display-anki').CreateNoteResult>}
      */
-    async _createNote(dictionaryEntry, noteOptionsIndex, requirements) {
+    async _createNote(dictionaryEntry, cardFormatIndex, requirements) {
         const context = this._noteContext;
         if (context === null) { throw new Error('Note context not initialized'); }
-        const noteOptions = this._notesOptions?.[noteOptionsIndex];
-        if (typeof noteOptions === 'undefined') { throw new Error('Unsupported note type}'); }
+        const cardFormat = this._cardFormats?.[cardFormatIndex];
+        if (typeof cardFormat === 'undefined') { throw new Error('Unsupported note type}'); }
         if (!this._ankiFieldTemplates) {
             const options = this._display.getOptions();
             if (options) {
@@ -1004,7 +1004,7 @@ export class DisplayAnki {
 
         const {note, errors, requirements: outputRequirements} = await this._ankiNoteBuilder.createNote({
             dictionaryEntry,
-            noteOptions,
+            cardFormat,
             context,
             template,
             tags: this._noteTags,
@@ -1108,11 +1108,11 @@ export class DisplayAnki {
 
     /**
      * @param {number} index
-     * @param {number} noteOptionsIndex
+     * @param {number} cardFormatIndex
      * @param {number[]} noteIds
      * @returns {?HTMLButtonElement}
      */
-    _createViewNoteButton(index, noteOptionsIndex, noteIds) {
+    _createViewNoteButton(index, cardFormatIndex, noteIds) {
         if (noteIds.length === 0) { return null; }
         const viewNoteButton = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('note-action-button-view-note'));
         if (viewNoteButton === null) { return null; }
@@ -1128,7 +1128,7 @@ export class DisplayAnki {
 
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return null; }
-        const singleNoteActionButtonContainer = container.querySelector(`[data-note-options-index="${noteOptionsIndex}"]`);
+        const singleNoteActionButtonContainer = container.querySelector(`[data-note-options-index="${cardFormatIndex}"]`);
         if (singleNoteActionButtonContainer === null) { return null; }
         singleNoteActionButtonContainer.appendChild(viewNoteButton);
 
@@ -1234,19 +1234,19 @@ export class DisplayAnki {
     }
 
     /**
-     * @param {unknown} noteOptionsStringIndex
+     * @param {unknown} cardFormatStringIndex
      */
-    _hotkeyViewNotesForSelectedEntry(noteOptionsStringIndex) {
-        if (typeof noteOptionsStringIndex !== 'string') { return; }
-        const noteOptionsIndex = Number.parseInt(noteOptionsStringIndex, 10);
-        if (Number.isNaN(noteOptionsIndex)) { return; }
+    _hotkeyViewNotesForSelectedEntry(cardFormatStringIndex) {
+        if (typeof cardFormatStringIndex !== 'string') { return; }
+        const cardFormatIndex = Number.parseInt(cardFormatStringIndex, 10);
+        if (Number.isNaN(cardFormatIndex)) { return; }
         const index = this._display.selectedIndex;
         const entry = this._getEntry(index);
         if (entry === null) { return; }
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return; }
         /** @type {HTMLButtonElement | null} */
-        const nthButton = container.querySelector(`.action-button-container[data-note-options-index="${noteOptionsIndex}"] .action-button[data-action=view-note]`);
+        const nthButton = container.querySelector(`.action-button-container[data-note-options-index="${cardFormatIndex}"] .action-button[data-action=view-note]`);
         if (nthButton === null) { return; }
         void this._viewNotes(nthButton);
     }

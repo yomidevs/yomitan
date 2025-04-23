@@ -923,7 +923,7 @@
                                     "server",
                                     "tags",
                                     "screenshot",
-                                    "notes",
+                                    "cardFormats",
                                     "duplicateScope",
                                     "duplicateScopeCheckAllModels",
                                     "checkForDuplicates",
@@ -973,7 +973,7 @@
                                             }
                                         }
                                     },
-                                    "notes": {
+                                    "cardFormats": {
                                         "type": "array",
                                         "items": {
                                             "type": "object",

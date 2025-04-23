@@ -61,8 +61,8 @@ export class KeyboardShortcutController {
             ['historyForward',                   {scopes: new Set(['popup', 'search'])}],
             ['profilePrevious',                  {scopes: new Set(['popup', 'search', 'web'])}],
             ['profileNext',                      {scopes: new Set(['popup', 'search', 'web'])}],
-            ['addNote',                          {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-anki-note-format', default: '0'}}],
-            ['viewNotes',                        {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-anki-note-format', default: '0'}}],
+            ['addNote',                          {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-anki-card-format', default: '0'}}],
+            ['viewNotes',                        {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-anki-card-format', default: '0'}}],
             ['playAudio',                        {scopes: new Set(['popup', 'search'])}],
             ['playAudioFromSource',              {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-audio-source', default: 'jpod101'}}],
             ['copyHostSelection',                {scopes: new Set(['popup'])}],
@@ -160,10 +160,10 @@ export class KeyboardShortcutController {
     /**
      * @returns {Promise<string[]>}
      */
-    async getAnkiNoteFormats() {
+    async getAnkiCardFormats() {
         const options = await this._settingsController.getOptions();
         const {anki} = options;
-        return anki.notes.map((note) => note.name);
+        return anki.cardFormats.map((cardFormat) => cardFormat.name);
     }
 
     // Private
@@ -717,10 +717,10 @@ class KeyboardShortcutHotkeyEntry {
             void this._updateArgumentInputValidity();
             this._argumentEventListeners.addEventListener(inputNode, 'change', this._onArgumentValueChange.bind(this, template), false);
         }
-        if (template === 'hotkey-argument-anki-note-format') {
-            const ankiNoteFormats = await this._parent.getAnkiNoteFormats();
-            const selectNode = /** @type {HTMLSelectElement} */ (node.querySelector('.anki-note-format-select'));
-            for (const [index, format] of ankiNoteFormats.entries()) {
+        if (template === 'hotkey-argument-anki-card-format') {
+            const ankiCardFormats = await this._parent.getAnkiCardFormats();
+            const selectNode = /** @type {HTMLSelectElement} */ (node.querySelector('.anki-card-format-select'));
+            for (const [index, format] of ankiCardFormats.entries()) {
                 const option = document.createElement('option');
                 option.value = `${index}`;
                 option.textContent = format;

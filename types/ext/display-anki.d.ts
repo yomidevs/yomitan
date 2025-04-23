@@ -27,7 +27,7 @@ export type LogData = {
 };
 
 export type AnkiNoteLogData = {
-    noteOptionsIndex: number;
+    cardFormatIndex: number;
     note: Anki.Note | undefined;
     errors?: Error[];
     requirements?: AnkiNoteBuilder.Requirement[];
@@ -38,7 +38,7 @@ export type DictionaryEntryDetails = {
 };
 
 export type DictionaryEntryNoteDetails = {
-    noteOptions: Settings.AnkiNoteOptions;
+    cardFormat: Settings.AnkiNoteOptions;
     note: Anki.Note;
     errors: Error[];
     requirements: AnkiNoteBuilder.Requirement[];

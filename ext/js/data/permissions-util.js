@@ -129,7 +129,7 @@ export function hasRequiredPermissionsForOptions(permissions, options) {
         if (options.clipboard.enableBackgroundMonitor || options.clipboard.enableSearchPageMonitor) {
             return false;
         }
-        const fieldsList = options.anki.notes.map((note) => note.fields);
+        const fieldsList = options.anki.cardFormats.map((cardFormat) => cardFormat.fields);
 
         for (const fields of fieldsList) {
             for (const {value: fieldValue} of Object.values(fields)) {

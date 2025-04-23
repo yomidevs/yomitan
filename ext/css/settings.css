@@ -1318,7 +1318,7 @@ button.fab-button>.icon-button-inner>.icon {
 .tab>input[type='radio']:checked~.tab-inner>.tab-label {
     color: var(--accent-color);
 }
-#anki-cards-new-note {
+#anki-cards-new-format {
     height: 2.75em;
     flex: 0 0 auto;
     width: 2.75em;
@@ -1328,7 +1328,7 @@ button.fab-button>.icon-button-inner>.icon {
     box-sizing: border-box;
 }
 
-#anki-cards-new-note::before {
+#anki-cards-new-format::before {
     content: '';
     display: block;
     position: absolute;
@@ -1344,20 +1344,20 @@ button.fab-button>.icon-button-inner>.icon {
         opacity var(--animation-duration) ease-in-out;
 }
 
-#anki-cards-new-note:hover::before {
+#anki-cards-new-format:hover::before {
     opacity: 0.125;
 }
 
-#anki-cards-new-note:active::before {
+#anki-cards-new-format:active::before {
     opacity: 0.25;
 }
 
-#anki-cards-new-note .icon {
+#anki-cards-new-format .icon {
     background-color: var(--text-color-light3);
     transition: background-color var(--animation-duration) ease-in-out;
 }
 
-#anki-cards-new-note .icon-button>.icon-button-inner::after {
+#anki-cards-new-format .icon-button>.icon-button-inner::after {
     display: none;
 }
 
@@ -1689,7 +1689,7 @@ select.profile-condition-operator {
     display: block;
 }
 
-.anki-card-delete {
+.anki-card-delete-format {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;

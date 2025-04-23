@@ -1637,7 +1637,7 @@ export class OptionsUtil {
     }
 
     /**
-     *  - Added multiple anki note options
+     *  - Added multiple anki card formats
      *  - Updated expression template to remove modeTermKana
      *  - Updated hotkeys to use generic note actions
      *  @type {import('options-util').UpdateFunction}
@@ -1648,7 +1648,7 @@ export class OptionsUtil {
         for (const profile of options.profiles) {
             const oldTerms = profile.options.anki.terms;
 
-            const updatedNotes = [{
+            const updatedCardFormats = [{
                 name: 'Expression',
                 icon: 'big-circle',
                 deck: oldTerms.deck,
@@ -1658,7 +1658,7 @@ export class OptionsUtil {
             }];
 
             if (Object.values(oldTerms.fields).some((field) => field.value.includes('{expression}'))) {
-                updatedNotes.push({
+                updatedCardFormats.push({
                     name: 'Reading',
                     icon: 'small-circle',
                     deck: oldTerms.deck,
@@ -1685,10 +1685,10 @@ export class OptionsUtil {
                     fields: oldKanji.fields,
                     type: 'kanji',
                 };
-                updatedNotes.push(kanjiNote);
+                updatedCardFormats.push(kanjiNote);
             }
 
-            profile.options.anki.notes = [...updatedNotes];
+            profile.options.anki.cardFormats = [...updatedCardFormats];
 
             delete profile.options.anki.terms;
             delete profile.options.anki.kanji;
@@ -1708,11 +1708,11 @@ export class OptionsUtil {
                         break;
                     case 'addNoteTermKana':
                         hotkey.action = 'addNote';
-                        hotkey.argument = `${Math.min(1, updatedNotes.length - 1)}`;
+                        hotkey.argument = `${Math.min(1, updatedCardFormats.length - 1)}`;
                         break;
                     case 'addNoteKanji':
                         hotkey.action = 'addNote';
-                        hotkey.argument = `${updatedNotes.length - 1}`;
+                        hotkey.argument = `${updatedCardFormats.length - 1}`;
                         break;
                     case 'viewNotes':
                         hotkey.action = 'viewNotes';

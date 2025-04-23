@@ -91,17 +91,17 @@ export class AnkiController {
         /** @type {?import('settings').AnkiOptions} */
         this._ankiOptions = null;
         /** @type {number} */
-        this._noteOptionsIndex = 0;
+        this._cardFormatIndex = 0;
         /** @type {HTMLButtonElement} */
-        this._ankiNoteDeleteButton = querySelectorNotNull(document, '.anki-card-delete-button');
+        this._ankiNoteDeleteButton = querySelectorNotNull(document, '.anki-card-delete-format-button');
         /** @type {?import('./modal.js').Modal} */
-        this._ankiNoteRemoveModal = null;
+        this._cardFormatRemoveModal = null;
         /** @type {?import('./modal.js').Modal} */
-        this._ankiAddNoteMaximumModal = null;
+        this._cardFormatMaximumModal = null;
         /** @type {HTMLElement} */
-        this._ankiNoteRemoveName = querySelectorNotNull(document, '#anki-note-remove-name');
+        this._cardFormatRemoveName = querySelectorNotNull(document, '#anki-card-format-remove-name');
         /** @type {HTMLButtonElement} */
-        this._ankiNoteRemoveConfirmButton = querySelectorNotNull(document, '#anki-note-remove-confirm-button');
+        this._cardFormatRemoveConfirmButton = querySelectorNotNull(document, '#anki-card-format-remove-confirm-button');
     }
 
     /** @type {import('./settings-controller.js').SettingsController} */
@@ -116,7 +116,7 @@ export class AnkiController {
         /** @type {HTMLElement} */
         const ankiErrorLog = querySelectorNotNull(document, '#anki-error-log');
         /** @type {HTMLElement} */
-        const newNoteButton = querySelectorNotNull(document, '#anki-cards-new-note button');
+        const newFormatButton = querySelectorNotNull(document, '#anki-cards-new-format button');
 
         this._ankiErrorMessageDetailsToggle.addEventListener('click', this._onAnkiErrorMessageDetailsToggleClick.bind(this), false);
         if (this._ankiEnableCheckbox !== null) {
@@ -156,18 +156,18 @@ export class AnkiController {
         ankiCardIconSelect.addEventListener('change', this._onIconSelectChange.bind(this), false);
 
         this._ankiCardNameInput.addEventListener('input', () => {
-            const tabLabel = querySelectorNotNull(this._ankiCardsTabs, `.tab:nth-child(${this._noteOptionsIndex + 1}) .tab-label`);
-            tabLabel.textContent = this._ankiCardNameInput.value || `Note ${this._noteOptionsIndex + 1}`;
+            const tabLabel = querySelectorNotNull(this._ankiCardsTabs, `.tab:nth-child(${this._cardFormatIndex + 1}) .tab-label`);
+            tabLabel.textContent = this._ankiCardNameInput.value || `Note ${this._cardFormatIndex + 1}`;
         });
 
         this._ankiCardDictionaryTypeSelect.addEventListener('change', this._onDictionaryTypeSelectChange.bind(this), false);
 
-        newNoteButton.addEventListener('click', this._onNewNoteButtonClick.bind(this), false);
+        newFormatButton.addEventListener('click', this._onNewFormatButtonClick.bind(this), false);
 
-        this._ankiNoteRemoveModal = this._modalController.getModal('anki-note-remove');
-        this._ankiAddNoteMaximumModal = this._modalController.getModal('anki-add-note-maximum');
+        this._cardFormatRemoveModal = this._modalController.getModal('anki-card-format-remove');
+        this._cardFormatMaximumModal = this._modalController.getModal('anki-add-card-format-maximum');
         this._ankiNoteDeleteButton.addEventListener('click', this._onAnkiNoteDeleteClick.bind(this), false);
-        this._ankiNoteRemoveConfirmButton.addEventListener('click', this._onAnkiNoteRemoveConfirm.bind(this), false);
+        this._cardFormatRemoveConfirmButton.addEventListener('click', this._onAnkiNoteRemoveConfirm.bind(this), false);
     }
 
     /**
@@ -207,7 +207,7 @@ export class AnkiController {
         const newIcon = /** @type {import('settings').AnkiNoteIcon} */ (iconSelect.value);
         iconSelect.dataset.icon = newIcon;
         if (this._ankiOptions === null) { return; }
-        this._ankiOptions.notes[this._noteOptionsIndex].icon = newIcon;
+        this._ankiOptions.cardFormats[this._cardFormatIndex].icon = newIcon;
     }
 
 
@@ -265,9 +265,9 @@ export class AnkiController {
     _onAnkiCardPrimaryTypeRadioChange(e) {
         const node = /** @type {HTMLInputElement} */ (e.currentTarget);
         if (!node.checked) { return; }
-        const {noteOptionsIndex, ankiCardMenu} = node.dataset;
-        if (typeof noteOptionsIndex !== 'string') { return; }
-        this._setNoteOptionsIndex(Number.parseInt(noteOptionsIndex, 10), ankiCardMenu);
+        const {cardFormatIndex, ankiCardMenu} = node.dataset;
+        if (typeof cardFormatIndex !== 'string') { return; }
+        this._setCardFormatIndex(Number.parseInt(cardFormatIndex, 10), ankiCardMenu);
     }
 
     /** */
@@ -325,32 +325,32 @@ export class AnkiController {
     }
 
     /**
-     * @param {number} noteOptionsIndex
+     * @param {number} cardFormatIndex
      * @param {string} [ankiCardMenu]
      * @throws {Error}
      */
-    _setNoteOptionsIndex(noteOptionsIndex, ankiCardMenu) {
-        this._noteOptionsIndex = noteOptionsIndex;
+    _setCardFormatIndex(cardFormatIndex, ankiCardMenu) {
+        this._cardFormatIndex = cardFormatIndex;
         if (this._ankiCardPrimary === null) {
             throw new Error('Anki card primary element not found');
         }
-        this._ankiCardPrimary.dataset.noteOptionsIndex = noteOptionsIndex.toString();
+        this._ankiCardPrimary.dataset.cardFormatIndex = cardFormatIndex.toString();
         if (typeof ankiCardMenu !== 'undefined') {
             this._ankiCardPrimary.dataset.ankiCardMenu = ankiCardMenu;
         } else {
             delete this._ankiCardPrimary.dataset.ankiCardMenu;
         }
 
-        this._ankiCardNameInput.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', noteOptionsIndex, 'name']);
+        this._ankiCardNameInput.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'cardFormats', cardFormatIndex, 'name']);
 
         /** @type {HTMLSelectElement} */
         const typeSelect = querySelectorNotNull(this._ankiCardPrimary, '.anki-card-type');
-        typeSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', noteOptionsIndex, 'type']);
+        typeSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'cardFormats', cardFormatIndex, 'type']);
 
         /** @type {HTMLSelectElement} */
         const iconSelect = querySelectorNotNull(this._ankiCardPrimary, '.anki-card-icon');
-        iconSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', noteOptionsIndex, 'icon']);
-        iconSelect.dataset.icon = this._ankiOptions?.notes[noteOptionsIndex].icon ?? 'big-circle';
+        iconSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'cardFormats', cardFormatIndex, 'icon']);
+        iconSelect.dataset.icon = this._ankiOptions?.cardFormats[cardFormatIndex].icon ?? 'big-circle';
     }
 
     /**
@@ -635,41 +635,41 @@ export class AnkiController {
             tabsContainer.removeChild(tabsContainer.firstChild);
         }
 
-        if (this._noteOptionsIndex > ankiOptions.notes.length) {
-            this._noteOptionsIndex = ankiOptions.notes.length - 1;
+        if (this._cardFormatIndex > ankiOptions.cardFormats.length) {
+            this._cardFormatIndex = ankiOptions.cardFormats.length - 1;
         }
 
-        for (let i = 0; i < ankiOptions.notes.length; ++i) {
-            const noteOptions = ankiOptions.notes[i];
-            const input = this._createNoteTab(noteOptions, i);
-            if (i === this._noteOptionsIndex) {
+        for (let i = 0; i < ankiOptions.cardFormats.length; ++i) {
+            const cardFormat = ankiOptions.cardFormats[i];
+            const input = this._createNoteTab(cardFormat, i);
+            if (i === this._cardFormatIndex) {
                 input.checked = true;
             }
         }
 
-        this._setNoteOptionsIndex(this._noteOptionsIndex, 'anki-card-term-field-menu');
+        this._setCardFormatIndex(this._cardFormatIndex, 'anki-card-term-field-menu');
     }
 
     /**
-     * @param {import('settings').AnkiNoteOptions} noteOptions
-     * @param {number} noteOptionsIndex
+     * @param {import('settings').AnkiNoteOptions} cardFormat
+     * @param {number} cardFormatIndex
      * @returns {HTMLInputElement}
      */
-    _createNoteTab(noteOptions, noteOptionsIndex) {
+    _createNoteTab(cardFormat, cardFormatIndex) {
         const tabsContainer = this._ankiCardsTabs;
         const content = this._settingsController.instantiateTemplateFragment('anki-card-type-tab');
 
         /** @type {HTMLInputElement} */
         const input = querySelectorNotNull(content, 'input');
-        input.value = noteOptions.type;
-        input.dataset.value = noteOptions.type;
-        input.dataset.ankiCardMenu = `anki-card-${noteOptions.type}-field-menu`;
-        input.dataset.noteOptionsIndex = `${noteOptionsIndex}`;
+        input.value = cardFormat.type;
+        input.dataset.value = cardFormat.type;
+        input.dataset.ankiCardMenu = `anki-card-${cardFormat.type}-field-menu`;
+        input.dataset.cardFormatIndex = `${cardFormatIndex}`;
         input.addEventListener('change', this._onAnkiCardPrimaryTypeRadioChange.bind(this), false);
 
         /** @type {HTMLElement} */
         const labelNode = querySelectorNotNull(content, '.tab-label');
-        labelNode.textContent = noteOptions.name;
+        labelNode.textContent = cardFormat.name;
 
         tabsContainer.appendChild(content);
 
@@ -679,25 +679,25 @@ export class AnkiController {
     /**
      * @param {Event} e
      */
-    _onNewNoteButtonClick(e) {
+    _onNewFormatButtonClick(e) {
         e.preventDefault();
-        void this._addNewNote();
+        void this._addNewFormat();
     }
 
     /** */
-    async _addNewNote() {
+    async _addNewFormat() {
         const options = await this._settingsController.getOptions();
         const ankiOptions = options.anki;
-        const index = ankiOptions.notes.length;
+        const index = ankiOptions.cardFormats.length;
 
         if (index >= 5) {
-            this._ankiAddNoteMaximumModal?.setVisible(true);
+            this._cardFormatMaximumModal?.setVisible(true);
             return;
         }
 
         /** @type {import('settings').AnkiNoteOptions} */
         const newNote = {
-            name: `Note ${index + 1}`,
+            name: `Format ${index + 1}`,
             type: 'term',
             deck: '',
             model: '',
@@ -707,7 +707,7 @@ export class AnkiController {
 
         await this._settingsController.modifyProfileSettings([{
             action: 'splice',
-            path: 'anki.notes',
+            path: 'anki.cardFormats',
             start: index,
             deleteCount: 0,
             items: [newNote],
@@ -721,33 +721,33 @@ export class AnkiController {
      */
     _onAnkiNoteDeleteClick(e) {
         e.preventDefault();
-        this.openDeleteAnkiNoteModal(this._noteOptionsIndex);
+        this.openDeleteAnkiNoteModal(this._cardFormatIndex);
     }
 
     /**
-     * @param {number} noteIndex
+     * @param {number} cardFormatIndex
      */
-    openDeleteAnkiNoteModal(noteIndex) {
-        const note = this._getNote(noteIndex);
-        if (note === null) { return; }
+    openDeleteAnkiNoteModal(cardFormatIndex) {
+        const cardFormat = this._getCardFormat(cardFormatIndex);
+        if (cardFormat === null) { return; }
 
-        /** @type {HTMLElement} */ (this._ankiNoteRemoveName).textContent = note.name;
-        /** @type {import('./modal.js').Modal} */ (this._ankiNoteRemoveModal).node.dataset.noteIndex = `${noteIndex}`;
-        /** @type {import('./modal.js').Modal} */ (this._ankiNoteRemoveModal).setVisible(true);
+        /** @type {HTMLElement} */ (this._cardFormatRemoveName).textContent = cardFormat.name;
+        /** @type {import('./modal.js').Modal} */ (this._cardFormatRemoveModal).node.dataset.cardFormatIndex = `${cardFormatIndex}`;
+        /** @type {import('./modal.js').Modal} */ (this._cardFormatRemoveModal).setVisible(true);
     }
 
     /** */
     _onAnkiNoteRemoveConfirm() {
-        const modal = /** @type {import('./modal.js').Modal} */ (this._ankiNoteRemoveModal);
+        const modal = /** @type {import('./modal.js').Modal} */ (this._cardFormatRemoveModal);
         modal.setVisible(false);
         const {node} = modal;
-        const noteIndex = node.dataset.noteIndex;
-        delete node.dataset.noteIndex;
+        const cardFormatIndex = node.dataset.cardFormatIndex;
+        delete node.dataset.cardFormatIndex;
 
-        const validNoteIndex = this._tryGetValidNoteIndex(noteIndex);
-        if (validNoteIndex === null) { return; }
+        const validCardFormatIndex = this._tryGetValidCardFormatIndex(cardFormatIndex);
+        if (validCardFormatIndex === null) { return; }
 
-        void this.deleteNote(validNoteIndex);
+        void this.deleteCardFormat(validCardFormatIndex);
     }
 
     /**
@@ -763,46 +763,46 @@ export class AnkiController {
      * @param {string|undefined} stringValue
      * @returns {?number}
      */
-    _tryGetValidNoteIndex(stringValue) {
+    _tryGetValidCardFormatIndex(stringValue) {
         if (typeof stringValue !== 'string') { return null; }
         const intValue = Number.parseInt(stringValue, 10);
         if (this._ankiOptions === null) { return null; }
         return (
             Number.isFinite(intValue) &&
             intValue >= 0 &&
-            intValue < this._ankiOptions.notes.length ?
+            intValue < this._ankiOptions.cardFormats.length ?
             intValue :
             null
         );
     }
 
     /**
-     * @param {number} noteIndex
+     * @param {number} cardFormatIndex
      * @returns {?import('settings').AnkiNoteOptions}
      */
-    _getNote(noteIndex) {
+    _getCardFormat(cardFormatIndex) {
         if (this._ankiOptions === null) { return null; }
-        if (noteIndex < 0 || noteIndex >= this._ankiOptions.notes.length) { return null; }
-        return this._ankiOptions.notes[noteIndex];
+        if (cardFormatIndex < 0 || cardFormatIndex >= this._ankiOptions.cardFormats.length) { return null; }
+        return this._ankiOptions.cardFormats[cardFormatIndex];
     }
 
     /**
-     * @param {number} noteIndex
+     * @param {number} cardFormatIndex
      */
-    async deleteNote(noteIndex) {
+    async deleteCardFormat(cardFormatIndex) {
         if (this._ankiOptions === null) { return; }
-        const notes = this._ankiOptions.notes;
-        if (noteIndex < 0 || noteIndex >= notes.length) { return; }
+        const cardFormats = this._ankiOptions.cardFormats;
+        if (cardFormatIndex < 0 || cardFormatIndex >= cardFormats.length) { return; }
 
         await this._settingsController.modifyProfileSettings([{
             action: 'splice',
-            path: 'anki.notes',
-            start: noteIndex,
+            path: 'anki.cardFormats',
+            start: cardFormatIndex,
             deleteCount: 1,
             items: [],
         }]);
 
-        this._noteOptionsIndex = noteIndex - 1;
+        this._cardFormatIndex = cardFormatIndex - 1;
         await this._updateOptions();
     }
 }
@@ -820,14 +820,14 @@ class AnkiCardController {
         this._ankiController = ankiController;
         /** @type {HTMLElement} */
         this._node = node;
-        const {noteOptionsIndex} = node.dataset;
-        if (typeof noteOptionsIndex === 'undefined') {
+        const {cardFormatIndex} = node.dataset;
+        if (typeof cardFormatIndex === 'undefined') {
             throw new Error('Undefined anki card type in node dataset');
         }
         /** @type {?import('settings').AnkiNoteOptions} */
-        this._noteOptions = null;
+        this._cardFormat = null;
         /** @type {number} */
-        this._noteOptionsIndex = Number.parseInt(noteOptionsIndex, 10);
+        this._cardFormatIndex = Number.parseInt(cardFormatIndex, 10);
         /** @type {string|undefined} */
         this._cardMenu = node.dataset.ankiCardMenu;
         /** @type {EventListenerCollection} */
@@ -856,11 +856,11 @@ class AnkiCardController {
         const ankiOptions = options.anki;
         if (this._cleaned) { return; }
 
-        const noteOptions = this._getNoteOptions(ankiOptions, this._noteOptionsIndex);
-        if (noteOptions === null) { return; }
-        this._noteOptions = noteOptions;
+        const cardFormat = this._getCardFormat(ankiOptions, this._cardFormatIndex);
+        if (cardFormat === null) { return; }
+        this._cardFormat = cardFormat;
 
-        const {deck, model, fields} = this._noteOptions;
+        const {deck, model, fields} = this._cardFormat;
         /** @type {HTMLSelectElement} */
         const deckControllerSelect = querySelectorNotNull(this._node, '.anki-card-deck');
         /** @type {HTMLSelectElement} */
@@ -899,10 +899,10 @@ class AnkiCardController {
      * @returns {boolean}
      */
     isStale() {
-        const datasetNoteOptionsIndex = this._node.dataset.noteOptionsIndex;
+        const datasetCardFormatIndex = this._node.dataset.cardFormatIndex;
         const datasetAnkiCardMenu = this._node.dataset.ankiCardMenu;
-        if (typeof datasetNoteOptionsIndex !== 'string') { return true; }
-        return this._noteOptionsIndex !== Number.parseInt(datasetNoteOptionsIndex, 10) || this._cardMenu !== datasetAnkiCardMenu;
+        if (typeof datasetCardFormatIndex !== 'string') { return true; }
+        return this._cardFormatIndex !== Number.parseInt(datasetCardFormatIndex, 10) || this._cardMenu !== datasetAnkiCardMenu;
     }
 
 
@@ -1019,16 +1019,16 @@ class AnkiCardController {
 
     /**
      * @param {import('settings').AnkiOptions} ankiOptions
-     * @param {number} noteOptionsIndex
+     * @param {number} cardFormatIndex
      * @returns {import('settings').AnkiNoteOptions}
      * @throws {Error}
      */
-    _getNoteOptions(ankiOptions, noteOptionsIndex) {
-        const noteOptions = ankiOptions.notes[noteOptionsIndex];
-        if (typeof noteOptions === 'undefined') {
-            throw new Error('Invalid note options index');
+    _getCardFormat(ankiOptions, cardFormatIndex) {
+        const cardFormat = ankiOptions.cardFormats[cardFormatIndex];
+        if (typeof cardFormat === 'undefined') {
+            throw new Error('Invalid card format index');
         }
-        return noteOptions;
+        return cardFormat;
     }
 
     /** */
@@ -1054,12 +1054,12 @@ class AnkiCardController {
 
             /** @type {HTMLSelectElement} */
             const overwriteSelect = querySelectorNotNull(content, '.anki-card-field-overwrite');
-            overwriteSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', this._noteOptionsIndex, 'fields', fieldName, 'overwriteMode']);
+            overwriteSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', this._cardFormatIndex, 'fields', fieldName, 'overwriteMode']);
 
             /** @type {HTMLInputElement} */
             const inputField = querySelectorNotNull(content, '.anki-card-field-value');
             inputField.value = fieldValue;
-            inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', this._noteOptionsIndex, 'fields', fieldName, 'value']);
+            inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', this._cardFormatIndex, 'fields', fieldName, 'value']);
             void this._validateFieldPermissions(inputField, index, false);
 
             this._fieldEventListeners.addEventListener(inputField, 'change', this._onFieldChange.bind(this, index), false);
@@ -1133,7 +1133,7 @@ class AnkiCardController {
 
         await this._settingsController.modifyProfileSettings([{
             action: 'set',
-            path: ObjectPropertyAccessor.getPathString(['anki', 'notes', this._noteOptionsIndex, 'deck']),
+            path: ObjectPropertyAccessor.getPathString(['anki', 'notes', this._cardFormatIndex, 'deck']),
             value,
         }]);
     }
@@ -1164,15 +1164,15 @@ class AnkiCardController {
             this._modelChangingTo = null;
         }
 
-        const noteOptions = this._getNoteOptions(options.anki, this._noteOptionsIndex);
-        const oldFields = noteOptions !== null ? noteOptions.fields : null;
+        const cardFormat = this._getCardFormat(options.anki, this._cardFormatIndex);
+        const oldFields = cardFormat !== null ? cardFormat.fields : null;
 
         /** @type {import('settings').AnkiNoteFields} */
         const fields = {};
         for (let i = 0, ii = fieldNames.length; i < ii; ++i) {
             const fieldName = fieldNames[i];
             fields[fieldName] = {
-                value: this._getDefaultFieldValue(fieldName, i, noteOptions.type, oldFields),
+                value: this._getDefaultFieldValue(fieldName, i, cardFormat.type, oldFields),
                 overwriteMode: 'coalesce',
             };
         }
@@ -1181,12 +1181,12 @@ class AnkiCardController {
         const targets = [
             {
                 action: 'set',
-                path: ObjectPropertyAccessor.getPathString(['anki', 'notes', this._noteOptionsIndex, 'model']),
+                path: ObjectPropertyAccessor.getPathString(['anki', 'notes', this._cardFormatIndex, 'model']),
                 value,
             },
             {
                 action: 'set',
-                path: ObjectPropertyAccessor.getPathString(['anki', 'notes', this._noteOptionsIndex, 'fields']),
+                path: ObjectPropertyAccessor.getPathString(['anki', 'notes', this._cardFormatIndex, 'fields']),
                 value: fields,
             },
         ];
@@ -1322,10 +1322,10 @@ class AnkiCardController {
 
     /** @type {import('dictionary').DictionaryEntryType} */
     get noteType() {
-        if (this._noteOptions === null) {
+        if (this._cardFormat === null) {
             throw new Error('Note options not initialized');
         }
-        return this._noteOptions.type;
+        return this._cardFormat.type;
     }
 }
 

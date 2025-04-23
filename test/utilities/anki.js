@@ -51,7 +51,7 @@ export function createTestAnkiNoteData(dictionaryEntry, mode, styles = '') {
     const data = {
         dictionaryEntry,
         resultOutputMode: mode,
-        noteOptions: {
+        cardFormat: {
             type: 'term',
             name: 'test',
             deck: 'deck',
@@ -120,7 +120,7 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
         /** @type {import('anki-note-builder').CreateNoteDetails} */
         const details = {
             dictionaryEntry,
-            noteOptions: {
+            cardFormat: {
                 type: dictionaryEntry.type,
                 name: 'test',
                 deck: 'deckName',

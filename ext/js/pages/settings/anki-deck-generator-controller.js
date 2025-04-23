@@ -129,8 +129,8 @@ export class AnkiDeckGeneratorController {
         const activeDeckTextConfirm = querySelectorNotNull(document, '#generate-anki-notes-active-deck-confirm');
         const options = await this._settingsController.getOptions();
 
-        this._activeNoteType = options.anki.notes[0].model;
-        this._activeAnkiDeck = options.anki.notes[0].deck;
+        this._activeNoteType = options.anki.cardFormats[0].model;
+        this._activeAnkiDeck = options.anki.cardFormats[0].deck;
         activeModelText.textContent = this._activeNoteType;
         activeDeckText.textContent = this._activeAnkiDeck;
         activeDeckTextConfirm.textContent = this._activeAnkiDeck;
@@ -433,14 +433,14 @@ export class AnkiDeckGeneratorController {
             fullQuery: sentenceText,
         };
         const template = await this._getAnkiTemplate(options);
-        const deckOptionsFields = options.anki.notes[0].fields;
+        const deckOptionsFields = options.anki.cardFormats[0].fields;
         const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
         const idleTimeout = (Number.isFinite(options.anki.downloadTimeout) && options.anki.downloadTimeout > 0 ? options.anki.downloadTimeout : null);
         const languageSummary = getLanguageSummaries().find(({iso}) => iso === options.general.language);
         const mediaOptions = addMedia ? {audio: {sources: options.audio.sources, preferredAudioIndex: null, idleTimeout: idleTimeout, languageSummary: languageSummary}} : null;
         const requirements = addMedia ? [...this._getDictionaryEntryMedia(dictionaryEntry), {type: 'audio'}] : [];
         const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(options.dictionaries);
-        const noteOptions = /** @type {import('settings').AnkiNoteOptions} */ ({
+        const cardFormat = /** @type {import('settings').AnkiNoteOptions} */ ({
             deck: this._activeAnkiDeck,
             model: this._activeNoteType,
             fields: deckOptionsFields,
@@ -450,7 +450,7 @@ export class AnkiDeckGeneratorController {
         });
         const {note} = await this._ankiNoteBuilder.createNote(/** @type {import('anki-note-builder').CreateNoteDetails} */ ({
             dictionaryEntry,
-            noteOptions,
+            cardFormat,
             context,
             template,
             resultOutputMode,
