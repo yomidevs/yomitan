@@ -23,7 +23,7 @@ import type * as Settings from './settings';
 export type LogData = {
     ankiNoteData: AnkiTemplates.NoteData | undefined;
     ankiNoteDataException: Error | undefined;
-    notes: AnkiNoteLogData[];
+    ankiNotes: AnkiNoteLogData[];
 };
 
 export type AnkiNoteLogData = {

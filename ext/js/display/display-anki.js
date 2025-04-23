@@ -153,7 +153,7 @@ export class DisplayAnki {
 
         // Anki notes
         /** @type {import('display-anki').AnkiNoteLogData[]} */
-        const notes = [];
+        const ankiNotes = [];
         for (const [cardFormatIndex] of this._cardFormats.entries()) {
             let note;
             let errors;
@@ -171,13 +171,13 @@ export class DisplayAnki {
             if (Array.isArray(requirements) && requirements.length > 0) {
                 entry.requirements = requirements;
             }
-            notes.push(entry);
+            ankiNotes.push(entry);
         }
 
         return {
             ankiNoteData,
             ankiNoteDataException: toError(ankiNoteDataException),
-            notes,
+            ankiNotes,
         };
     }
 
