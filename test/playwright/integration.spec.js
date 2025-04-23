@@ -16,8 +16,8 @@
  */
 
 import path from 'path';
-import {createDictionaryArchiveData} from '../../dev/dictionary-archive-util.js';
-import {deferPromise} from '../../ext/js/core/utilities.js';
+import { createDictionaryArchiveData } from '../../dev/dictionary-archive-util.js';
+import { deferPromise } from '../../ext/js/core/utilities.js';
 import {
     expect,
     getExpectedAddNoteBody,
@@ -100,7 +100,7 @@ test('anki add', async ({context, page, extensionId}) => {
         await expect(page.locator('#search-textbox')).toHaveValue('読む');
     }).toPass({timeout: 5000});
     await page.locator('#search-textbox').press('Enter');
-    await page.locator('[data-action="save-note"][data-note-options-index="0"]').click();
+    await page.locator('[data-action="save-note"][data-card-format-index="0"]').click();
     const addNoteReqBody = await addNotePromiseDetails.promise;
     expect(addNoteReqBody).toMatchObject(getExpectedAddNoteBody());
 });

@@ -487,7 +487,7 @@ export class DisplayAnki {
         const entry = this._getEntry(i);
         if (entry === null) { return; }
 
-        const container = entry.querySelector(`[data-note-options-index="${cardFormatIndex}"]`);
+        const container = entry.querySelector(`[data-card-format-index="${cardFormatIndex}"]`);
         if (container === null) { return; }
 
         const tagsIndicator = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('note-action-button-view-tags'));
@@ -524,7 +524,7 @@ export class DisplayAnki {
         const entry = this._getEntry(i);
         if (entry === null) { return; }
 
-        const container = entry.querySelector(`[data-note-options-index="${cardFormatIndex}"]`);
+        const container = entry.querySelector(`[data-card-format-index="${cardFormatIndex}"]`);
         if (container === null) { return; }
 
         const flagsIndicator = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('note-action-button-view-flags'));
@@ -592,7 +592,7 @@ export class DisplayAnki {
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return; }
         /** @type {HTMLButtonElement | null} */
-        const nthButton = container.querySelector(`.action-button[data-action=save-note][data-note-options-index="${cardFormatIndex}"]`);
+        const nthButton = container.querySelector(`.action-button[data-action=save-note][data-card-format-index="${cardFormatIndex}"]`);
         if (nthButton === null) { return; }
         void this._saveAnkiNote(index, cardFormatIndex);
     }
@@ -662,7 +662,7 @@ export class DisplayAnki {
         if (entry === null) { return null; }
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return null; }
-        const singleNoteActionButtonContainer = container.querySelector(`[data-note-options-index="${cardFormatIndex}"]`);
+        const singleNoteActionButtonContainer = container.querySelector(`[data-card-format-index="${cardFormatIndex}"]`);
         if (singleNoteActionButtonContainer === null) { return null; }
         return singleNoteActionButtonContainer.querySelector('.action-button[data-action=save-note]');
     }
@@ -786,7 +786,7 @@ export class DisplayAnki {
     _updateViewNoteButton(dictionaryEntryIndex, cardFormatIndex, noteIds) {
         const entry = this._getEntry(dictionaryEntryIndex);
         if (entry === null) { return; }
-        const singleNoteActions = entry.querySelector(`[data-note-options-index="${cardFormatIndex}"]`);
+        const singleNoteActions = entry.querySelector(`[data-card-format-index="${cardFormatIndex}"]`);
         if (singleNoteActions === null) { return; }
         /** @type {HTMLButtonElement | null} */
         let viewNoteButton = singleNoteActions.querySelector('.action-button[data-action=view-note]');
@@ -1128,7 +1128,7 @@ export class DisplayAnki {
 
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return null; }
-        const singleNoteActionButtonContainer = container.querySelector(`[data-note-options-index="${cardFormatIndex}"]`);
+        const singleNoteActionButtonContainer = container.querySelector(`[data-card-format-index="${cardFormatIndex}"]`);
         if (singleNoteActionButtonContainer === null) { return null; }
         singleNoteActionButtonContainer.appendChild(viewNoteButton);
 
@@ -1246,7 +1246,7 @@ export class DisplayAnki {
         const container = entry.querySelector('.note-actions-container');
         if (container === null) { return; }
         /** @type {HTMLButtonElement | null} */
-        const nthButton = container.querySelector(`.action-button-container[data-note-options-index="${cardFormatIndex}"] .action-button[data-action=view-note]`);
+        const nthButton = container.querySelector(`.action-button-container[data-card-format-index="${cardFormatIndex}"] .action-button[data-action=view-note]`);
         if (nthButton === null) { return; }
         void this._viewNotes(nthButton);
     }
