@@ -79,6 +79,22 @@ type AllTextProcessors = {
     ar: {
         pre: {
             removeArabicScriptDiacritics: TextProcessor<boolean>;
+            removeTatweel: TextProcessor<boolean>;
+            normalizeUnicode: TextProcessor<boolean>;
+            addHamzaTop: TextProcessor<boolean>;
+            addHamzaBottom: TextProcessor<boolean>;
+            convertAlifMaqsuraToYaa: TextProcessor<boolean>;
+        };
+    };
+    arz: {
+        pre: {
+            removeArabicScriptDiacritics: TextProcessor<boolean>;
+            removeTatweel: TextProcessor<boolean>;
+            normalizeUnicode: TextProcessor<boolean>;
+            addHamzaTop: TextProcessor<boolean>;
+            addHamzaBottom: TextProcessor<boolean>;
+            convertAlifMaqsuraToYaa: TextProcessor<boolean>;
+            convertHaToTaMarbuta: TextProcessor<boolean>;
         };
     };
     cs: {
@@ -128,6 +144,7 @@ type AllTextProcessors = {
             convertLatinToGreek: TextProcessor<boolean>;
         };
     };
+    he: Record<string, never>;
     hi: Record<string, never>;
     hu: {
         pre: CapitalizationPreprocessors;
