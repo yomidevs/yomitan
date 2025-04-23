@@ -440,7 +440,7 @@ export class AnkiDeckGeneratorController {
         const mediaOptions = addMedia ? {audio: {sources: options.audio.sources, preferredAudioIndex: null, idleTimeout: idleTimeout, languageSummary: languageSummary}} : null;
         const requirements = addMedia ? [...this._getDictionaryEntryMedia(dictionaryEntry), {type: 'audio'}] : [];
         const dictionaryStylesMap = this._ankiNoteBuilder.getDictionaryStylesMap(options.dictionaries);
-        const cardFormat = /** @type {import('settings').AnkiNoteOptions} */ ({
+        const cardFormat = /** @type {import('settings').AnkiCardFormat} */ ({
             deck: this._activeAnkiDeck,
             model: this._activeNoteType,
             fields: deckOptionsFields,

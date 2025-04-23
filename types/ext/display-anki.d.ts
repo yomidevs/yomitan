@@ -38,7 +38,7 @@ export type DictionaryEntryDetails = {
 };
 
 export type DictionaryEntryNoteDetails = {
-    cardFormat: Settings.AnkiNoteOptions;
+    cardFormat: Settings.AnkiCardFormat;
     note: Anki.Note;
     errors: Error[];
     requirements: AnkiNoteBuilder.Requirement[];

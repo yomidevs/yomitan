@@ -651,7 +651,7 @@ export class AnkiController {
     }
 
     /**
-     * @param {import('settings').AnkiNoteOptions} cardFormat
+     * @param {import('settings').AnkiCardFormat} cardFormat
      * @param {number} cardFormatIndex
      * @returns {HTMLInputElement}
      */
@@ -695,8 +695,8 @@ export class AnkiController {
             return;
         }
 
-        /** @type {import('settings').AnkiNoteOptions} */
-        const newNote = {
+        /** @type {import('settings').AnkiCardFormat} */
+        const newCardFormat = {
             name: `Format ${index + 1}`,
             type: 'term',
             deck: '',
@@ -710,7 +710,7 @@ export class AnkiController {
             path: 'anki.cardFormats',
             start: index,
             deleteCount: 0,
-            items: [newNote],
+            items: [newCardFormat],
         }]);
 
         await this._updateOptions();
@@ -778,7 +778,7 @@ export class AnkiController {
 
     /**
      * @param {number} cardFormatIndex
-     * @returns {?import('settings').AnkiNoteOptions}
+     * @returns {?import('settings').AnkiCardFormat}
      */
     _getCardFormat(cardFormatIndex) {
         if (this._ankiOptions === null) { return null; }
@@ -824,7 +824,7 @@ class AnkiCardController {
         if (typeof cardFormatIndex === 'undefined') {
             throw new Error('Undefined anki card type in node dataset');
         }
-        /** @type {?import('settings').AnkiNoteOptions} */
+        /** @type {?import('settings').AnkiCardFormat} */
         this._cardFormat = null;
         /** @type {number} */
         this._cardFormatIndex = Number.parseInt(cardFormatIndex, 10);
@@ -1020,7 +1020,7 @@ class AnkiCardController {
     /**
      * @param {import('settings').AnkiOptions} ankiOptions
      * @param {number} cardFormatIndex
-     * @returns {import('settings').AnkiNoteOptions}
+     * @returns {import('settings').AnkiCardFormat}
      * @throws {Error}
      */
     _getCardFormat(ankiOptions, cardFormatIndex) {

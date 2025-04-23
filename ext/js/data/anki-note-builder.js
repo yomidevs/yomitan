@@ -201,7 +201,7 @@ export class AnkiNoteBuilder {
 
     /**
      * @param {import('dictionary').DictionaryEntry} dictionaryEntry
-     * @param {import('settings').AnkiNoteOptions} cardFormat
+     * @param {import('settings').AnkiCardFormat} cardFormat
      * @param {import('anki-templates-internal').Context} context
      * @param {import('settings').ResultOutputMode} resultOutputMode
      * @param {import('settings').GlossaryLayoutMode} glossaryLayoutMode

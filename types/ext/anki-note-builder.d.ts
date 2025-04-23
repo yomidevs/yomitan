@@ -28,7 +28,7 @@ import type * as Language from './language';
 
 export type CreateNoteDetails = {
     dictionaryEntry: Dictionary.DictionaryEntry;
-    cardFormat: Settings.AnkiNoteOptions;
+    cardFormat: Settings.AnkiCardFormat;
     context: AnkiTemplatesInternal.Context;
     template: string;
     tags: string[];
@@ -58,7 +58,7 @@ export type CreateNoteResult = {
 
 export type GetRenderingDataDetails = {
     dictionaryEntry: Dictionary.DictionaryEntry;
-    cardFormat: Settings.AnkiNoteOptions;
+    cardFormat: Settings.AnkiCardFormat;
     context: AnkiTemplatesInternal.Context;
     resultOutputMode?: Settings.ResultOutputMode;
     glossaryLayoutMode?: Settings.GlossaryLayoutMode;

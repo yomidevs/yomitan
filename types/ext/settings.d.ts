@@ -292,7 +292,7 @@ export type AnkiOptions = {
     server: string;
     tags: string[];
     screenshot: AnkiScreenshotOptions;
-    cardFormats: AnkiNoteOptions[];
+    cardFormats: AnkiCardFormat[];
     duplicateScope: AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
     duplicateBehavior: AnkiDuplicateBehavior;
@@ -310,7 +310,7 @@ export type AnkiScreenshotOptions = {
     quality: number;
 };
 
-export type AnkiNoteOptions = {
+export type AnkiCardFormat = {
     type: 'kanji' | 'term';
     name: string;
     deck: string;

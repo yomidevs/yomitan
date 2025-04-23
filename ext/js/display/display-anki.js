@@ -91,7 +91,7 @@ export class DisplayAnki {
         this._audioDownloadIdleTimeout = null;
         /** @type {string[]} */
         this._noteTags = [];
-        /** @type {import('settings').AnkiNoteOptions[]} */
+        /** @type {import('settings').AnkiCardFormat[]} */
         this._cardFormats = [];
         /** @type {import('settings').DictionariesOptions} */
         this._dictionaries = [];

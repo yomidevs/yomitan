@@ -270,7 +270,7 @@ export class AnkiTemplatesController {
                         overwriteMode: 'skip',
                     },
                 };
-                const cardFormat = /** @type {import('settings').AnkiNoteOptions} */ ({
+                const cardFormat = /** @type {import('settings').AnkiCardFormat} */ ({
                     type: 'term',
                     name: '',
                     deck: '',

@@ -35,7 +35,7 @@ export type ContextSentence = {
 export type CreateDetails = {
     dictionaryEntry: Dictionary.DictionaryEntry;
     resultOutputMode: Settings.ResultOutputMode;
-    cardFormat: Settings.AnkiNoteOptions;
+    cardFormat: Settings.AnkiCardFormat;
     glossaryLayoutMode: Settings.GlossaryLayoutMode;
     /** Whether or not compact tags mode is enabled. */
     compactTags: boolean;
