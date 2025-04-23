@@ -93,7 +93,7 @@ export class AnkiController {
         /** @type {number} */
         this._cardFormatIndex = 0;
         /** @type {HTMLButtonElement} */
-        this._ankiNoteDeleteButton = querySelectorNotNull(document, '.anki-card-delete-format-button');
+        this._cardFormatDeleteButton = querySelectorNotNull(document, '.anki-card-delete-format-button');
         /** @type {?import('./modal.js').Modal} */
         this._cardFormatRemoveModal = null;
         /** @type {?import('./modal.js').Modal} */
@@ -157,7 +157,7 @@ export class AnkiController {
 
         this._ankiCardNameInput.addEventListener('input', () => {
             const tabLabel = querySelectorNotNull(this._ankiCardsTabs, `.tab:nth-child(${this._cardFormatIndex + 1}) .tab-label`);
-            tabLabel.textContent = this._ankiCardNameInput.value || `Note ${this._cardFormatIndex + 1}`;
+            tabLabel.textContent = this._ankiCardNameInput.value || `Format ${this._cardFormatIndex + 1}`;
         });
 
         this._ankiCardDictionaryTypeSelect.addEventListener('change', this._onDictionaryTypeSelectChange.bind(this), false);
@@ -166,8 +166,8 @@ export class AnkiController {
 
         this._cardFormatRemoveModal = this._modalController.getModal('anki-card-format-remove');
         this._cardFormatMaximumModal = this._modalController.getModal('anki-add-card-format-maximum');
-        this._ankiNoteDeleteButton.addEventListener('click', this._onAnkiNoteDeleteClick.bind(this), false);
-        this._cardFormatRemoveConfirmButton.addEventListener('click', this._onAnkiNoteRemoveConfirm.bind(this), false);
+        this._cardFormatDeleteButton.addEventListener('click', this._onCardFormatDeleteClick.bind(this), false);
+        this._cardFormatRemoveConfirmButton.addEventListener('click', this._onCardFormatRemoveConfirm.bind(this), false);
     }
 
     /**
@@ -204,7 +204,7 @@ export class AnkiController {
     /** */
     _onIconSelectChange() {
         const iconSelect = /** @type {HTMLSelectElement} */ (this._ankiCardPrimary.querySelector('.anki-card-icon'));
-        const newIcon = /** @type {import('settings').AnkiNoteIcon} */ (iconSelect.value);
+        const newIcon = /** @type {import('settings').AddNoteIcon} */ (iconSelect.value);
         iconSelect.dataset.icon = newIcon;
         if (this._ankiOptions === null) { return; }
         this._ankiOptions.cardFormats[this._cardFormatIndex].icon = newIcon;
@@ -641,7 +641,7 @@ export class AnkiController {
 
         for (let i = 0; i < ankiOptions.cardFormats.length; ++i) {
             const cardFormat = ankiOptions.cardFormats[i];
-            const input = this._createNoteTab(cardFormat, i);
+            const input = this._createCardFormatTab(cardFormat, i);
             if (i === this._cardFormatIndex) {
                 input.checked = true;
             }
@@ -655,7 +655,7 @@ export class AnkiController {
      * @param {number} cardFormatIndex
      * @returns {HTMLInputElement}
      */
-    _createNoteTab(cardFormat, cardFormatIndex) {
+    _createCardFormatTab(cardFormat, cardFormatIndex) {
         const tabsContainer = this._ankiCardsTabs;
         const content = this._settingsController.instantiateTemplateFragment('anki-card-type-tab');
 
@@ -719,15 +719,15 @@ export class AnkiController {
     /**
      * @param {Event} e
      */
-    _onAnkiNoteDeleteClick(e) {
+    _onCardFormatDeleteClick(e) {
         e.preventDefault();
-        this.openDeleteAnkiNoteModal(this._cardFormatIndex);
+        this.openDeleteCardFormatModal(this._cardFormatIndex);
     }
 
     /**
      * @param {number} cardFormatIndex
      */
-    openDeleteAnkiNoteModal(cardFormatIndex) {
+    openDeleteCardFormatModal(cardFormatIndex) {
         const cardFormat = this._getCardFormat(cardFormatIndex);
         if (cardFormat === null) { return; }
 
@@ -737,7 +737,7 @@ export class AnkiController {
     }
 
     /** */
-    _onAnkiNoteRemoveConfirm() {
+    _onCardFormatRemoveConfirm() {
         const modal = /** @type {import('./modal.js').Modal} */ (this._cardFormatRemoveModal);
         modal.setVisible(false);
         const {node} = modal;
@@ -834,12 +834,12 @@ class AnkiCardController {
         this._eventListeners = new EventListenerCollection();
         /** @type {EventListenerCollection} */
         this._fieldEventListeners = new EventListenerCollection();
-        /** @type {import('settings').AnkiNoteFields} */
+        /** @type {import('settings').AnkiFields} */
         this._fields = {};
         /** @type {?string} */
         this._modelChangingTo = null;
         /** @type {?Element} */
-        this._ankiCardFieldsContainer = null;
+        this._AnkiFieldsContainer = null;
         /** @type {boolean} */
         this._cleaned = false;
         /** @type {import('anki-controller').FieldEntry[]} */
@@ -869,7 +869,7 @@ class AnkiCardController {
         this._modelController.prepare(modelControllerSelect, model);
         this._fields = fields;
 
-        this._ankiCardFieldsContainer = this._node.querySelector('.anki-card-fields');
+        this._AnkiFieldsContainer = this._node.querySelector('.anki-card-fields');
         this._setupFields();
 
         this._eventListeners.addEventListener(this._deckController.select, 'change', this._onCardDeckChange.bind(this), false);
@@ -961,7 +961,7 @@ class AnkiCardController {
         const indexNumber = typeof index === 'string' ? Number.parseInt(index, 10) : 0;
         if (typeof fieldName !== 'string') { return; }
 
-        const defaultValue = this._getDefaultFieldValue(fieldName, indexNumber, this.noteType, null);
+        const defaultValue = this._getDefaultFieldValue(fieldName, indexNumber, this.cardFormatType, null);
         if (defaultValue === '') { return; }
 
         const match = /^\{([\w\W]+)\}$/.exec(defaultValue);
@@ -1054,12 +1054,12 @@ class AnkiCardController {
 
             /** @type {HTMLSelectElement} */
             const overwriteSelect = querySelectorNotNull(content, '.anki-card-field-overwrite');
-            overwriteSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', this._cardFormatIndex, 'fields', fieldName, 'overwriteMode']);
+            overwriteSelect.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'cardFormats', this._cardFormatIndex, 'fields', fieldName, 'overwriteMode']);
 
             /** @type {HTMLInputElement} */
             const inputField = querySelectorNotNull(content, '.anki-card-field-value');
             inputField.value = fieldValue;
-            inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'notes', this._cardFormatIndex, 'fields', fieldName, 'value']);
+            inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', 'cardFormats', this._cardFormatIndex, 'fields', fieldName, 'value']);
             void this._validateFieldPermissions(inputField, index, false);
 
             this._fieldEventListeners.addEventListener(inputField, 'change', this._onFieldChange.bind(this, index), false);
@@ -1088,7 +1088,7 @@ class AnkiCardController {
         }
 
         const ELEMENT_NODE = Node.ELEMENT_NODE;
-        const container = this._ankiCardFieldsContainer;
+        const container = this._AnkiFieldsContainer;
         if (container !== null) {
             const childNodesFrozen = [...container.childNodes];
             for (const node of childNodesFrozen) {
@@ -1133,7 +1133,7 @@ class AnkiCardController {
 
         await this._settingsController.modifyProfileSettings([{
             action: 'set',
-            path: ObjectPropertyAccessor.getPathString(['anki', 'notes', this._cardFormatIndex, 'deck']),
+            path: ObjectPropertyAccessor.getPathString(['anki', 'cardFormats', this._cardFormatIndex, 'deck']),
             value,
         }]);
     }
@@ -1167,7 +1167,7 @@ class AnkiCardController {
         const cardFormat = this._getCardFormat(options.anki, this._cardFormatIndex);
         const oldFields = cardFormat !== null ? cardFormat.fields : null;
 
-        /** @type {import('settings').AnkiNoteFields} */
+        /** @type {import('settings').AnkiFields} */
         const fields = {};
         for (let i = 0, ii = fieldNames.length; i < ii; ++i) {
             const fieldName = fieldNames[i];
@@ -1181,12 +1181,12 @@ class AnkiCardController {
         const targets = [
             {
                 action: 'set',
-                path: ObjectPropertyAccessor.getPathString(['anki', 'notes', this._cardFormatIndex, 'model']),
+                path: ObjectPropertyAccessor.getPathString(['anki', 'cardFormats', this._cardFormatIndex, 'model']),
                 value,
             },
             {
                 action: 'set',
-                path: ObjectPropertyAccessor.getPathString(['anki', 'notes', this._cardFormatIndex, 'fields']),
+                path: ObjectPropertyAccessor.getPathString(['anki', 'cardFormats', this._cardFormatIndex, 'fields']),
                 value: fields,
             },
         ];
@@ -1262,7 +1262,7 @@ class AnkiCardController {
      * @param {string} fieldName
      * @param {number} index
      * @param {import('dictionary').DictionaryEntryType} dictionaryEntryType
-     * @param {?import('settings').AnkiNoteFields} oldFields
+     * @param {?import('settings').AnkiFields} oldFields
      * @returns {string}
      */
     _getDefaultFieldValue(fieldName, index, dictionaryEntryType, oldFields) {
@@ -1321,9 +1321,9 @@ class AnkiCardController {
     }
 
     /** @type {import('dictionary').DictionaryEntryType} */
-    get noteType() {
+    get cardFormatType() {
         if (this._cardFormat === null) {
-            throw new Error('Note options not initialized');
+            throw new Error('Card format not initialized');
         }
         return this._cardFormat.type;
     }

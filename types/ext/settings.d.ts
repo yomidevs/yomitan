@@ -315,17 +315,17 @@ export type AnkiCardFormat = {
     name: string;
     deck: string;
     model: string;
-    fields: AnkiNoteFields;
-    icon: AnkiNoteIcon;
+    fields: AnkiFields;
+    icon: AddNoteIcon;
 };
 
-export type AnkiNoteIcon = 'big-circle' | 'small-circle' | 'big-square' | 'big-diamond';
+export type AddNoteIcon = 'big-circle' | 'small-circle' | 'big-square' | 'big-diamond';
 
-export type AnkiNoteFields = {
-    [key: string]: AnkiNoteField;
+export type AnkiFields = {
+    [key: string]: AnkiField;
 };
 
-export type AnkiNoteField = {
+export type AnkiField = {
     value: string;
     overwriteMode: AnkiNoteFieldOverwriteMode;
 };

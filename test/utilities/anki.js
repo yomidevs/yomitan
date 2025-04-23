@@ -22,10 +22,10 @@ import {AnkiTemplateRenderer} from '../../ext/js/templates/anki-template-rendere
 
 /**
  * @param {import('dictionary').DictionaryEntryType} type
- * @returns {import('settings').AnkiNoteFields}
+ * @returns {import('settings').AnkiFields}
  */
 function createTestFields(type) {
-    /** @type {import('settings').AnkiNoteFields} */
+    /** @type {import('settings').AnkiFields} */
     const fields = {};
     for (const marker of getStandardFieldMarkers(type)) {
         fields[marker] = {value: `{${marker}}`, overwriteMode: 'coalesce'};
