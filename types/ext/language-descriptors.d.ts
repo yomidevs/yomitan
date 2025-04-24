@@ -150,7 +150,7 @@ type AllTextProcessors = {
         pre: CapitalizationPreprocessors;
     };
     id: {
-        pre: CapitalizationPreprocessors;
+        pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
     };
     it: {
         pre: CapitalizationPreprocessors & AlphabeticDiacriticsProcessor;
