@@ -230,7 +230,7 @@
     {
         "selectors": [
             ".gloss-image-link[data-collapsed=true]",
-            ":root[data-glossary-layout-mode=compact] .gloss-image-link[data-collapsible=true]"
+            ":root[data-glossary-layout-mode^=compact] .gloss-image-link[data-collapsible=true]"
         ],
         "styles": [
             ["vertical-align", "baseline"]
@@ -239,7 +239,7 @@
     {
         "selectors": [
             ".gloss-image-link[data-collapsed=true] .gloss-image-container",
-            ":root[data-glossary-layout-mode=compact] .gloss-image-link[data-collapsible=true] .gloss-image-container"
+            ":root[data-glossary-layout-mode^=compact] .gloss-image-link[data-collapsible=true] .gloss-image-container"
         ],
         "styles": [
             ["display", "none"],
@@ -252,8 +252,8 @@
     {
         "selectors": [
             ".entry:nth-last-of-type(1):not(:nth-of-type(1)) .gloss-image-link[data-collapsed=true] .gloss-image-container",
-            ":root[data-glossary-layout-mode=compact] .entry:nth-last-of-type(1):not(:nth-of-type(1)) .gloss-image-link[data-collapsible=true] .gloss-image-container",
-            ":root[data-glossary-layout-mode=compact] .definition-item:nth-last-of-type(1) .gloss-image-link[data-collapsible=true] .gloss-image-container"
+            ":root[data-glossary-layout-mode^=compact] .entry:nth-last-of-type(1):not(:nth-of-type(1)) .gloss-image-link[data-collapsible=true] .gloss-image-container",
+            ":root[data-glossary-layout-mode^=compact] .definition-item:nth-last-of-type(1) .gloss-image-link[data-collapsible=true] .gloss-image-container"
         ],
         "styles": [
             ["bottom", "100%"],
@@ -264,8 +264,8 @@
         "selectors": [
             ".gloss-image-link[data-collapsed=true]:hover .gloss-image-container",
             ".gloss-image-link[data-collapsed=true]:focus .gloss-image-container",
-            ":root[data-glossary-layout-mode=compact] .gloss-image-link[data-collapsible=true]:hover .gloss-image-container",
-            ":root[data-glossary-layout-mode=compact] .gloss-image-link[data-collapsible=true]:focus .gloss-image-container"
+            ":root[data-glossary-layout-mode^=compact] .gloss-image-link[data-collapsible=true]:hover .gloss-image-container",
+            ":root[data-glossary-layout-mode^=compact] .gloss-image-link[data-collapsible=true]:focus .gloss-image-container"
         ],
         "styles": [
             ["display", "block"]
@@ -274,7 +274,7 @@
     {
         "selectors": [
             ".gloss-image-link[data-collapsed=true] .gloss-image-link-text",
-            ":root[data-glossary-layout-mode=compact] .gloss-image-link[data-collapsible=true] .gloss-image-link-text"
+            ":root[data-glossary-layout-mode^=compact] .gloss-image-link[data-collapsible=true] .gloss-image-link-text"
         ],
         "styles": [
             ["display", "inline"]
@@ -283,7 +283,7 @@
     {
         "selectors": [
             ".gloss-image-link[data-collapsed=true]~.gloss-image-description",
-            ":root[data-glossary-layout-mode=compact] .gloss-image-description"
+            ":root[data-glossary-layout-mode^=compact] .gloss-image-description"
         ],
         "styles": [
             ["display", "inline"]
