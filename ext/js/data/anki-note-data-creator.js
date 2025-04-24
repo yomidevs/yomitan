@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {getAnkiCompactGlossStyles} from '../../data/anki-compact-gloss-style.js';
 import {addScopeToCssLegacy} from '../core/utilities.js';
 import {getDisambiguations, getGroupedPronunciations, getPronunciationsOfType, getTermFrequency, groupTermTags} from '../dictionary/dictionary-data-util.js';
 import {distributeFurigana, distributeFuriganaInflected} from '../language/ja/japanese.js';
@@ -556,7 +557,7 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
             dictScopedStyles = addGlossaryScopeToCss(addDictionaryScopeToCss(dictionaryStyles, dictionary));
         }
         if (glossaryLayoutMode === 'compact-popup-anki') {
-            dictScopedStyles += addGlossaryScopeToCss(getCompactGlossStyles());
+            dictScopedStyles += addGlossaryScopeToCss(getAnkiCompactGlossStyles());
         }
         const definitionTags2 = [];
         for (const tag of tags) {
@@ -583,28 +584,6 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
         definitionTags,
         definitions: hasDefinitions ? definitions : void 0,
     };
-}
-
-/**
- * @returns {string}
- */
-function getCompactGlossStyles() {
-    return `ul[data-sc-content="glossary"] > li:not(:first-child)::before {
-  white-space: pre-wrap;
-  content: ' | ';
-  display: inline;
-  color: #777777;
-}
-
-ul[data-sc-content="glossary"] > li {
-  display: inline;
-}
-
-ul[data-sc-content="glossary"] {
-  display: inline;
-  list-style: none;
-  padding-left: 0;
-}`;
 }
 
 /**
