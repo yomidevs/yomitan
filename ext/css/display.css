@@ -1989,28 +1989,28 @@ button.footer-notification-close-button {
 :root[data-audio-enabled=false] .action-button[data-action=play-audio] {
     display: none;
 }
-:root[data-glossary-layout-mode=compact] .definition-tag-list,
-:root[data-glossary-layout-mode=compact] .definition-disambiguation-list:not([data-count='0']) {
+:root[data-glossary-layout-mode^=compact] .definition-tag-list,
+:root[data-glossary-layout-mode^=compact] .definition-disambiguation-list:not([data-count='0']) {
     display: inline;
 }
-:root[data-glossary-layout-mode=compact] .gloss-list {
+:root[data-glossary-layout-mode^=compact] .gloss-list {
     display: inline;
     list-style: none;
     padding-left: 0;
 }
-:root[data-glossary-layout-mode=compact] .gloss-item {
+:root[data-glossary-layout-mode^=compact] .gloss-item {
     display: inline;
 }
-:root[data-glossary-layout-mode=compact] .gloss-item:not(:first-child)::before {
+:root[data-glossary-layout-mode^=compact] .gloss-item:not(:first-child)::before {
     white-space: pre-wrap;
     content: var(--compact-list-separator);
     display: inline;
     color: var(--text-color-light3);
 }
-:root[data-glossary-layout-mode=compact] .gloss-content {
+:root[data-glossary-layout-mode^=compact] .gloss-content {
     display: inline;
 }
-:root[data-glossary-layout-mode=compact] .gloss-separator {
+:root[data-glossary-layout-mode^=compact] .gloss-separator {
     display: inline;
 }
 
@@ -2028,15 +2028,15 @@ button.footer-notification-close-button {
     display: none;
 }
 
-:root[data-glossary-layout-mode=compact][data-show-pronunciation-graph=false] .pronunciation-list:not([data-has-tags=true]) {
+:root[data-glossary-layout-mode^=compact][data-show-pronunciation-graph=false] .pronunciation-list:not([data-has-tags=true]) {
     display: inline;
     list-style: none;
     padding-left: 0;
 }
-:root[data-glossary-layout-mode=compact][data-show-pronunciation-graph=false] .pronunciation-list:not([data-has-tags=true]) .pronunciation {
+:root[data-glossary-layout-mode^=compact][data-show-pronunciation-graph=false] .pronunciation-list:not([data-has-tags=true]) .pronunciation {
     display: inline;
 }
-:root[data-glossary-layout-mode=compact][data-show-pronunciation-graph=false] .pronunciation-list:not([data-has-tags=true]) .pronunciation:not(:first-child)::before {
+:root[data-glossary-layout-mode^=compact][data-show-pronunciation-graph=false] .pronunciation-list:not([data-has-tags=true]) .pronunciation:not(:first-child)::before {
     white-space: pre-wrap;
     content: var(--compact-list-separator);
     display: inline;
