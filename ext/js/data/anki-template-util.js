@@ -18,18 +18,18 @@
 /**
  * Gets a list of field markers from the standard Handlebars template.
  * @param {import('dictionary').DictionaryEntryType} type What type of dictionary entry to get the fields for.
+ * @param {string} language
  * @returns {string[]} The list of field markers.
  * @throws {Error}
  */
-export function getStandardFieldMarkers(type) {
+export function getStandardFieldMarkers(type, language = 'ja') {
     switch (type) {
-        case 'term':
-            return [
+        case 'term': {
+            const markers = [
                 'audio',
                 'clipboard-image',
                 'clipboard-text',
                 'cloze-body',
-                'cloze-body-kana',
                 'cloze-prefix',
                 'cloze-suffix',
                 'conjugation',
@@ -42,8 +42,6 @@ export function getStandardFieldMarkers(type) {
                 'frequency-harmonic-occurrence',
                 'frequency-average-rank',
                 'frequency-average-occurrence',
-                'furigana',
-                'furigana-plain',
                 'glossary',
                 'glossary-brief',
                 'glossary-no-dictionary',
@@ -51,22 +49,31 @@ export function getStandardFieldMarkers(type) {
                 'glossary-first-brief',
                 'glossary-first-no-dictionary',
                 'part-of-speech',
-                'pitch-accents',
-                'pitch-accent-graphs',
-                'pitch-accent-graphs-jj',
-                'pitch-accent-positions',
-                'pitch-accent-categories',
                 'phonetic-transcriptions',
                 'reading',
                 'screenshot',
                 'search-query',
                 'popup-selection-text',
                 'sentence',
-                'sentence-furigana',
-                'sentence-furigana-plain',
                 'tags',
                 'url',
             ];
+            if (language === 'ja') {
+                markers.push(
+                    'cloze-body-kana',
+                    'furigana',
+                    'furigana-plain',
+                    'pitch-accents',
+                    'pitch-accent-graphs',
+                    'pitch-accent-graphs-jj',
+                    'pitch-accent-positions',
+                    'pitch-accent-categories',
+                    'sentence-furigana',
+                    'sentence-furigana-plain',
+                );
+            }
+            return markers;
+        }
         case 'kanji':
             return [
                 'character',
@@ -152,7 +159,7 @@ export function getDynamicFieldMarkers(dictionaries, dictionaryInfo) {
  * @param {string} str
  * @returns {string}
  */
-function getKebabCase(str) {
+export function getKebabCase(str) {
     return str
         .replace(/[\s_\u3000]/g, '-')
         .replace(/[^\p{L}\p{N}-]/gu, '')

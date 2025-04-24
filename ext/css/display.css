@@ -967,9 +967,9 @@ button.action-button:active {
     color: var(--headword-current-furigana-text-color);
 }
 .headword-kanji-link {
-    border-bottom: var(--headword-thin-border-size) dashed var(--headword-current-kanji-border-color);
+    text-decoration: underline dashed var(--headword-current-kanji-border-color) var(--headword-thin-border-size);
+    text-underline-offset: calc(var(--headword-font-size) / 15);
     color: var(--headword-current-kanji-text-color);
-    text-decoration: none;
     cursor: pointer;
 }
 :root[data-result-output-mode=merge] .headword-list-details {

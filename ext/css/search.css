@@ -18,6 +18,7 @@
 
 /* Variables */
 :root {
+    --search-scroll-container-horizontal-padding: 0.72em;
     --query-horizontal-padding: 0;
 
     --padding: calc(10em / var(--font-size-no-units));
@@ -51,6 +52,10 @@ body {
     color: var(--text-color);
     height: 100%;
     overflow: hidden;
+}
+.search-header {
+    padding-left: var(--search-scroll-container-horizontal-padding);
+    padding-right: var(--search-scroll-container-horizontal-padding);
 }
 h1 {
     font-size: 2em;

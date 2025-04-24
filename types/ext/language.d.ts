@@ -66,3 +66,8 @@ export type LanguageSummary = {
     iso639_3: string;
     exampleText: string;
 };
+
+export type KanaIMEOutput = {
+    kanaString: string;
+    newSelectionStart: number;
+};

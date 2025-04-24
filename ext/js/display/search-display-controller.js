@@ -16,11 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../lib/wanakana.js';
 import {ClipboardMonitor} from '../comm/clipboard-monitor.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
 import {EventListenerCollection} from '../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../dom/query-selector.js';
+import {isComposing} from '../language/ime-utilities.js';
+import {convertToKana, convertToKanaIME} from '../language/ja/japanese-wanakana.js';
 
 export class SearchDisplayController {
     /**
@@ -51,6 +52,8 @@ export class SearchDisplayController {
         this._wanakanaEnableCheckbox = querySelectorNotNull(document, '#wanakana-enable');
         /** @type {HTMLInputElement} */
         this._stickyHeaderEnableCheckbox = querySelectorNotNull(document, '#sticky-header-enable');
+        /** @type {HTMLElement} */
+        this._profileSelectContainer = querySelectorNotNull(document, '#search-option-profile-select');
         /** @type {HTMLSelectElement} */
         this._profileSelect = querySelectorNotNull(document, '#profile-select');
         /** @type {HTMLElement} */
@@ -61,8 +64,6 @@ export class SearchDisplayController {
         this._queryInputEventsSetup = false;
         /** @type {boolean} */
         this._wanakanaEnabled = false;
-        /** @type {boolean} */
-        this._wanakanaBound = false;
         /** @type {boolean} */
         this._introVisible = true;
         /** @type {?import('core').Timeout} */
@@ -243,9 +244,29 @@ export class SearchDisplayController {
         this._setIntroVisible(!valid, animate);
     }
 
-    /** */
-    _onSearchInput() {
+    /**
+     * @param {InputEvent} e
+     */
+    _onSearchInput(e) {
         this._updateSearchHeight(true);
+
+        const element = /** @type {HTMLTextAreaElement} */ (e.currentTarget);
+        if (this._wanakanaEnabled) {
+            this._searchTextKanaConversion(element, e);
+        }
+    }
+
+    /**
+     * @param {HTMLTextAreaElement} element
+     * @param {InputEvent} event
+     */
+    _searchTextKanaConversion(element, event) {
+        const platform = document.documentElement.dataset.platform ?? 'unknown';
+        const browser = document.documentElement.dataset.browser ?? 'unknown';
+        if (isComposing(event, platform, browser)) { return; }
+        const {kanaString, newSelectionStart} = convertToKanaIME(element.value, element.selectionStart);
+        element.value = kanaString;
+        element.setSelectionRange(newSelectionStart, newSelectionStart);
     }
 
     /**
@@ -438,17 +459,6 @@ export class SearchDisplayController {
         this._queryInputEvents.addEventListener(input, 'keydown', this._onSearchKeydown.bind(this), false);
 
         this._wanakanaEnabled = enabled;
-        if (enabled) {
-            if (!this._wanakanaBound) {
-                wanakana.bind(input);
-                this._wanakanaBound = true;
-            }
-        } else {
-            if (this._wanakanaBound) {
-                wanakana.unbind(input);
-                this._wanakanaBound = false;
-            }
-        }
 
         this._queryInputEvents.addEventListener(input, 'input', this._onSearchInput.bind(this), false);
         this._queryInputEventsSetup = true;
@@ -592,6 +602,8 @@ export class SearchDisplayController {
      * @param {?import('settings').OptionsContextFlag[]} flags
      */
     _search(animate, historyMode, lookup, flags) {
+        this._updateSearchText();
+
         const query = this._queryInput.value;
         const depth = this._display.depth;
         const url = window.location.href;
@@ -647,6 +659,15 @@ export class SearchDisplayController {
         }
     }
 
+    /** */
+    _updateSearchText() {
+        if (this._wanakanaEnabled) {
+            // don't use convertToKanaIME since user searching has finalized the text and is no longer composing
+            this._queryInput.value = convertToKana(this._queryInput.value);
+        }
+        this._queryInput.setSelectionRange(this._queryInput.value.length, this._queryInput.value.length);
+    }
+
     /**
      * @param {?Element} element
      * @returns {boolean}
@@ -672,6 +693,8 @@ export class SearchDisplayController {
         while (optionGroup.firstChild) {
             optionGroup.removeChild(optionGroup.firstChild);
         }
+
+        this._profileSelectContainer.hidden = profiles.length <= 1;
 
         const fragment = document.createDocumentFragment();
         for (let i = 0, ii = profiles.length; i < ii; ++i) {

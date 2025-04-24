@@ -3898,7 +3898,7 @@
         "pitch-accent-graphs-jj": "",
         "pitch-accent-positions": "",
         "pitch-accent-categories": "",
-        "phonetic-transcriptions": "<ul><li><i>(東京)</i> [sɨᵝkʲi]</li></ul>",
+        "phonetic-transcriptions": "<ul><li class=\"pronunciation\" data-pronunciation-type=\"phonetic-transcription\"><i>(<span class=\"tag\" data-details=\"東京\">東京</span>)</i> [sɨᵝkʲi]</li></ul>",
         "reading": "すき",
         "screenshot": "",
         "search-query": "fullQuery",

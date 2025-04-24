@@ -300,12 +300,14 @@ export class QueryParser extends EventDispatcher {
     _createParseResult(data) {
         let offset = 0;
         const fragment = document.createDocumentFragment();
-        for (const term of data) {
+        for (let i = 0; i < data.length; i++) {
+            const term = data[i];
             const termNode = document.createElement('span');
             termNode.className = 'query-parser-term';
             termNode.dataset.offset = `${offset}`;
             for (const {text, reading} of term) {
-                const trimmedText = trimTrailingWhitespacePlusSpace(text);
+                // trimEnd only for final text
+                const trimmedText = i === data.length - 1 ? text.trimEnd() : trimTrailingWhitespacePlusSpace(text);
                 if (reading.length === 0) {
                     termNode.appendChild(document.createTextNode(trimmedText));
                 } else {

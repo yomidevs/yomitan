@@ -1424,6 +1424,15 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
 .audio-source-parameter {
     flex: 1 1 auto;
 }
+.audio-source-parameter,
+input.audio-source-parameter {
+    width: var(--input-width);
+}
+
+#audio-source-move-up>span.icon-button-inner,
+#audio-source-move-down>span.icon-button-inner {
+    width: 26px;
+}
 
 .profile-add-button-container {
     display: flex;
@@ -2349,7 +2358,8 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 }
 .dictionary-outdated-button,
 .dictionary-update-available,
-.dictionary-integrity-button {
+.dictionary-integrity-button-check,
+.dictionary-integrity-button-warning {
     --button-content-color: transparent;
     --button-border-color: transparent;
     --button-background-color: transparent;
@@ -2394,16 +2404,6 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 .dictionary-details-entry-info {
     display: table-cell;
     white-space: pre-line;
-}
-.dictionary-counts {
-    width: 100%;
-    box-sizing: border-box;
-    font-size: inherit;
-    max-height: 10em;
-    line-height: 1.25;
-    font-family: 'Courier New', Courier, monospace;
-    white-space: pre;
-    overflow: auto;
 }
 
 #dictionary-alias-input {
@@ -2667,6 +2667,8 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 
 /* Treat devices that can't hover as mobile devices */
 @media (hover: none) {
+    #audio-source-move-up>span.icon-button-inner,
+    #audio-source-move-down>span.icon-button-inner,
     #dictionary-move-up>span.icon-button-inner,
     #dictionary-move-down>span.icon-button-inner {
         width: 36px;
