@@ -118,6 +118,8 @@ export class SearchDisplayController {
         this._stickyHeaderEnableCheckbox.addEventListener('change', this._onStickyHeaderEnableChange.bind(this));
         this._display.hotkeyHandler.on('keydownNonHotkey', this._onKeyDown.bind(this));
 
+        this._profileSelect.addEventListener('change', this._onProfileSelectChange.bind(this), false);
+
         const displayOptions = this._display.getOptions();
         if (displayOptions !== null) {
             await this._onDisplayOptionsUpdated({options: displayOptions});
@@ -707,7 +709,5 @@ export class SearchDisplayController {
         optionGroup.textContent = '';
         optionGroup.appendChild(fragment);
         this._profileSelect.value = `${profileCurrent}`;
-
-        this._profileSelect.addEventListener('change', this._onProfileSelectChange.bind(this), false);
     }
 }
