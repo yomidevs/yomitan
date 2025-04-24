@@ -381,7 +381,7 @@ export type PopupHorizontalTextPosition = 'below' | 'above';
 
 export type PopupVerticalTextPosition = 'default' | 'before' | 'after' | 'left' | 'right';
 
-export type GlossaryLayoutMode = 'default' | 'compact';
+export type GlossaryLayoutMode = 'default' | 'compact' | 'compact-popup-anki';
 
 export type PopupTheme = 'light' | 'dark' | 'browser' | 'site';
 

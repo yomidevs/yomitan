@@ -813,28 +813,11 @@
                 <div class="settings-item-description">Display term glossaries using a more compact layout.</div>
             </div>
             <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="general.glossaryLayoutMode"
-                    data-transform='[
-                        {
-                            "step": "pre",
-                            "type": "conditionalConvert",
-                            "cases": [
-                                {"op": "===", "value": false, "result": "default"},
-                                {"op": "===", "value": true, "result": "compact"},
-                                {"default": true, "result": "default"}
-                            ]
-                        },
-                        {
-                            "step": "post",
-                            "type": "conditionalConvert",
-                            "cases": [
-                                {"op": "===", "value": "default", "result": false},
-                                {"op": "===", "value": "compact", "result": true},
-                                {"default": true, "result": false}
-                            ]
-                        }
-                    ]'
-                ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                <select data-setting="general.glossaryLayoutMode">
+                    <option value="default">Default</option>
+                    <option value="compact">Compact Popup</option>
+                    <option value="compact-popup-anki">Compact Popup and Anki</option>
+                </select>
             </div>
         </div></div>
         <div class="settings-item"><div class="settings-item-inner">

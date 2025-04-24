@@ -66,7 +66,7 @@ export function createAnkiNoteData(marker, {
         modeTermKanji: (mode === 'term-kanji'),
         modeTermKana: (mode === 'term-kana'),
         modeKanji: (mode === 'kanji'),
-        compactGlossaries: (glossaryLayoutMode === 'compact'),
+        compactGlossaries: (['compact', 'compact-popup-anki'].includes(glossaryLayoutMode)),
         get uniqueExpressions() { return getCachedValue(uniqueExpressions); },
         get uniqueReadings() { return getCachedValue(uniqueReadings); },
         get pitches() { return getCachedValue(pitches); },
@@ -555,7 +555,7 @@ function getTermDictionaryEntryCommonInfo(dictionaryEntry, type, dictionaryStyle
             glossaryScopedStyles = addGlossaryScopeToCss(dictionaryStyles);
             dictScopedStyles = addGlossaryScopeToCss(addDictionaryScopeToCss(dictionaryStyles, dictionary));
         }
-        if (glossaryLayoutMode === 'compact') {
+        if (glossaryLayoutMode === 'compact-popup-anki') {
             dictScopedStyles += addGlossaryScopeToCss(getCompactGlossStyles());
         }
         const definitionTags2 = [];
