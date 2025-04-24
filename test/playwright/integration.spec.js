@@ -87,7 +87,7 @@ test('anki add', async ({context, page, extensionId}) => {
     await page.locator('select.anki-card-model').selectOption('Mock Model');
     const mockFields = getMockModelFields();
     for (const [modelField, value] of mockFields) {
-        await page.locator(`[data-setting="anki.terms.fields.${modelField}.value"]`).fill(value);
+        await page.locator(`[data-setting="anki.notes[0].fields.${modelField}.value"]`).fill(value);
     }
     await page.locator('#anki-cards-modal > div > div.modal-footer > button:nth-child(2)').click();
     await writeToClipboardFromPage(page, '読むの例文');
@@ -100,7 +100,7 @@ test('anki add', async ({context, page, extensionId}) => {
         await expect(page.locator('#search-textbox')).toHaveValue('読む');
     }).toPass({timeout: 5000});
     await page.locator('#search-textbox').press('Enter');
-    await page.locator('[data-mode="term-kanji"]').click();
+    await page.locator('[data-action="save-note"][data-card-format-index="0"]').click();
     const addNoteReqBody = await addNotePromiseDetails.promise;
     expect(addNoteReqBody).toMatchObject(getExpectedAddNoteBody());
 });

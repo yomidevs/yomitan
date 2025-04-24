@@ -822,35 +822,52 @@
 
 
     <!-- Anki cards modal -->
-    <div id="anki-cards-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+    <div id="anki-cards-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-full">
         <div class="modal-header">
             <div class="modal-title">Anki Cards</div>
-            <div class="modal-header-button-container">
-                <div class="modal-header-button-group">
-                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-                </div>
-            </div>
         </div>
         <div>
-            <div class="tabs-container">
-                <div class="tabs">
-                    <label class="tab">
-                        <input type="radio" name="anki-card-primary-type" data-value="terms" data-anki-card-menu="anki-card-terms-field-menu" checked>
-                        <div class="tab-inner"><span class="tab-label">Terms</span></div>
-                    </label>
-                    <label class="tab">
-                        <input type="radio" name="anki-card-primary-type" data-value="kanji" data-anki-card-menu="anki-card-kanji-field-menu">
-                        <div class="tab-inner"><span class="tab-label">Kanji</span></div>
-                    </label>
-                </div>
-                <div class="tabs-right" hidden>
-                    <button type="button" class="icon-button" data-menu-position="below left" id="anki-card-primary-type-menu-button"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+            <div class="anki-card-tabs-container">
+                <div class="tabs" id="anki-cards-tabs"></div>
+                <div id="anki-cards-new-format" class="advanced-only">
+                    <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="plus-thick"></span></span></button>
                 </div>
             </div>
             <div class="modal-separator-line"></div>
         </div>
-        <div class="modal-body anki-card" id="anki-card-primary" data-anki-card-type="terms" data-anki-card-menu="anki-card-terms-field-menu">
+        <div class="modal-body anki-card" id="anki-card-primary" data-card-format-index="0" data-anki-card-menu="anki-card-term-field-menu">
+            <div class="settings-item advanced-only"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Name</div>
+                </div>
+                <div class="settings-item-right">
+                    <input type="text" class="anki-card-name" data-setting="anki.cardFormats.[0].name">
+                </div>
+            </div></div>
+            <div class="settings-item advanced-only"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Dictionary Type</div>
+                </div>
+                <div class="settings-item-right">
+                    <select class="anki-card-type">
+                        <option value="term">Term</option>
+                        <option value="kanji">Kanji</option>
+                    </select>
+                </div>
+            </div></div>
+            <div class="settings-item advanced-only"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Button</div>
+                </div>
+                <div class="settings-item-right">
+                    <select class="anki-card-icon select-icon icon color-icon" data-icon="big-circle">
+                        <option value="big-circle">Big Circle</option>
+                        <option value="small-circle">Small Circle</option>
+                        <option value="big-square">Square</option>
+                        <option value="big-diamond">Diamond</option>
+                    </select>
+                </div>
+            </div></div>
             <div class="settings-item"><div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Deck</div>
@@ -867,6 +884,7 @@
                     <select class="anki-card-model"></select>
                 </div>
             </div></div>
+            <hr>
             <div class="anki-card-fields">
                 <div class="anki-card-field-name-header" data-persistent="true">Field</div>
                 <div class="anki-card-field-input-header" data-persistent="true">Value</div>
@@ -874,6 +892,7 @@
             </div>
         </div>
         <div class="modal-footer">
+            <button type="button" class="danger anki-card-delete-format-button advanced-only">Delete Format</button>
             <button type="button" class="low-emphasis" data-modal-action="show,anki-cards-info">Help</button>
             <button type="button" data-modal-action="hide">Close</button>
         </div>
@@ -1154,6 +1173,29 @@
             <button type="button" data-modal-action="hide">Close</button>
         </div>
     </div></div>
+
+    <div id="anki-card-format-remove-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Confirm Card Format Deletion</div></div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete the <em id="anki-card-format-remove-name"></em> card format?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger" id="anki-card-format-remove-confirm-button">Delete Format</button>
+        </div>
+    </div></div>
+
+    <div id="anki-add-card-format-maximum-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Maximum Card Formats Reached</div></div>
+        <div class="modal-body">
+            <p>The number of card formats is limited to 5.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+
 
 
     <!-- Anki field template modals -->

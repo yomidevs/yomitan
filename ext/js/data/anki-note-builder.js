@@ -46,12 +46,9 @@ export class AnkiNoteBuilder {
      */
     async createNote({
         dictionaryEntry,
-        mode,
+        cardFormat,
         context,
         template,
-        deckName,
-        modelName,
-        fields,
         tags = [],
         requirements = [],
         duplicateScope = 'collection',
@@ -62,6 +59,8 @@ export class AnkiNoteBuilder {
         mediaOptions = null,
         dictionaryStylesMap = new Map(),
     }) {
+        const {deck: deckName, model: modelName, fields: fieldsSettings} = cardFormat;
+        const fields = Object.entries(fieldsSettings);
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
         if (duplicateScope === 'deck-root') {
@@ -91,7 +90,7 @@ export class AnkiNoteBuilder {
             // Ignore
         }
 
-        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
+        const commonData = this._createData(dictionaryEntry, cardFormat, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap);
         const formattedFieldValuePromises = [];
         for (const [, {value: fieldValue}] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, commonData, template);
@@ -140,7 +139,7 @@ export class AnkiNoteBuilder {
      */
     async getRenderingData({
         dictionaryEntry,
-        mode,
+        cardFormat,
         context,
         resultOutputMode = 'split',
         glossaryLayoutMode = 'default',
@@ -148,7 +147,7 @@ export class AnkiNoteBuilder {
         marker,
         dictionaryStylesMap,
     }) {
-        const commonData = this._createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0, dictionaryStylesMap);
+        const commonData = this._createData(dictionaryEntry, cardFormat, context, resultOutputMode, glossaryLayoutMode, compactTags, void 0, dictionaryStylesMap);
         return await this._templateRenderer.getModifiedData({marker, commonData}, 'ankiNote');
     }
 
@@ -202,7 +201,7 @@ export class AnkiNoteBuilder {
 
     /**
      * @param {import('dictionary').DictionaryEntry} dictionaryEntry
-     * @param {import('anki-templates-internal').CreateMode} mode
+     * @param {import('settings').AnkiCardFormat} cardFormat
      * @param {import('anki-templates-internal').Context} context
      * @param {import('settings').ResultOutputMode} resultOutputMode
      * @param {import('settings').GlossaryLayoutMode} glossaryLayoutMode
@@ -211,10 +210,10 @@ export class AnkiNoteBuilder {
      * @param {Map<string, string>} dictionaryStylesMap
      * @returns {import('anki-note-builder').CommonData}
      */
-    _createData(dictionaryEntry, mode, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap) {
+    _createData(dictionaryEntry, cardFormat, context, resultOutputMode, glossaryLayoutMode, compactTags, media, dictionaryStylesMap) {
         return {
             dictionaryEntry,
-            mode,
+            cardFormat,
             context,
             resultOutputMode,
             glossaryLayoutMode,

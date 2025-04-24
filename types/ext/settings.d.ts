@@ -292,8 +292,7 @@ export type AnkiOptions = {
     server: string;
     tags: string[];
     screenshot: AnkiScreenshotOptions;
-    terms: AnkiNoteOptions;
-    kanji: AnkiNoteOptions;
+    cardFormats: AnkiCardFormat[];
     duplicateScope: AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
     duplicateBehavior: AnkiDuplicateBehavior;
@@ -311,17 +310,22 @@ export type AnkiScreenshotOptions = {
     quality: number;
 };
 
-export type AnkiNoteOptions = {
+export type AnkiCardFormat = {
+    type: 'kanji' | 'term';
+    name: string;
     deck: string;
     model: string;
-    fields: AnkiNoteFields;
+    fields: AnkiFields;
+    icon: AddNoteIcon;
 };
 
-export type AnkiNoteFields = {
-    [key: string]: AnkiNoteField;
+export type AddNoteIcon = 'big-circle' | 'small-circle' | 'big-square' | 'big-diamond';
+
+export type AnkiFields = {
+    [key: string]: AnkiField;
 };
 
-export type AnkiNoteField = {
+export type AnkiField = {
     value: string;
     overwriteMode: AnkiNoteFieldOverwriteMode;
 };

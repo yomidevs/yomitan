@@ -61,10 +61,8 @@ export class KeyboardShortcutController {
             ['historyForward',                   {scopes: new Set(['popup', 'search'])}],
             ['profilePrevious',                  {scopes: new Set(['popup', 'search', 'web'])}],
             ['profileNext',                      {scopes: new Set(['popup', 'search', 'web'])}],
-            ['addNoteKanji',                     {scopes: new Set(['popup', 'search'])}],
-            ['addNoteTermKanji',                 {scopes: new Set(['popup', 'search'])}],
-            ['addNoteTermKana',                  {scopes: new Set(['popup', 'search'])}],
-            ['viewNotes',                        {scopes: new Set(['popup', 'search'])}],
+            ['addNote',                          {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-anki-card-format', default: '0'}}],
+            ['viewNotes',                        {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-anki-card-format', default: '0'}}],
             ['playAudio',                        {scopes: new Set(['popup', 'search'])}],
             ['playAudioFromSource',              {scopes: new Set(['popup', 'search']), argument: {template: 'hotkey-argument-audio-source', default: 'jpod101'}}],
             ['copyHostSelection',                {scopes: new Set(['popup'])}],
@@ -159,12 +157,21 @@ export class KeyboardShortcutController {
         return this._actionDetails.get(action);
     }
 
+    /**
+     * @returns {Promise<string[]>}
+     */
+    async getAnkiCardFormats() {
+        const options = await this._settingsController.getOptions();
+        const {anki} = options;
+        return anki.cardFormats.map((cardFormat) => cardFormat.name);
+    }
+
     // Private
 
     /**
      * @param {import('settings-controller').EventArgument<'optionsChanged'>} details
      */
-    _onOptionsChanged({options}) {
+    async _onOptionsChanged({options}) {
         for (const entry of this._entries) {
             entry.cleanup();
         }
@@ -180,7 +187,7 @@ export class KeyboardShortcutController {
             fragment.appendChild(node);
             const entry = new KeyboardShortcutHotkeyEntry(this, hotkeyEntry, i, node, os, this._stringComparer);
             this._entries.push(entry);
-            entry.prepare();
+            await entry.prepare();
         }
 
         const listContainer = /** @type {HTMLElement} */ (this._listContainer);
@@ -223,7 +230,7 @@ export class KeyboardShortcutController {
     async _updateOptions() {
         const options = await this._settingsController.getOptions();
         const optionsContext = this._settingsController.getOptionsContext();
-        this._onOptionsChanged({options, optionsContext});
+        await this._onOptionsChanged({options, optionsContext});
     }
 
     /** */
@@ -279,7 +286,7 @@ class KeyboardShortcutHotkeyEntry {
     }
 
     /** */
-    prepare() {
+    async prepare() {
         const node = this._node;
 
         /** @type {HTMLButtonElement} */
@@ -308,7 +315,7 @@ class KeyboardShortcutHotkeyEntry {
         enabledToggle.dataset.setting = `${this._basePath}.enabled`;
 
         this._updateScopesButton();
-        this._updateActionArgument();
+        await this._updateActionArgument();
 
         this._eventListeners.addEventListener(scopesButton, 'menuOpen', this._onScopesMenuOpen.bind(this));
         this._eventListeners.addEventListener(scopesButton, 'menuClose', this._onScopesMenuClose.bind(this));
@@ -596,7 +603,7 @@ class KeyboardShortcutHotkeyEntry {
 
         this._updateScopesButton();
         this._updateScopesMenu();
-        this._updateActionArgument();
+        await this._updateActionArgument();
     }
 
     /**
@@ -687,7 +694,7 @@ class KeyboardShortcutHotkeyEntry {
     }
 
     /** */
-    _updateActionArgument() {
+    async _updateActionArgument() {
         this._clearArgumentEventListeners();
 
         const {action, argument} = this._data;
@@ -697,20 +704,32 @@ class KeyboardShortcutHotkeyEntry {
         if (this._argumentContainer !== null) {
             this._argumentContainer.textContent = '';
         }
-        if (typeof argumentDetails !== 'undefined') {
-            const {template} = argumentDetails;
-            const node = this._parent.settingsController.instantiateTemplate(template);
-            const inputSelector = '.hotkey-argument-input';
-            const inputNode = /** @type {HTMLInputElement} */ (node.matches(inputSelector) ? node : node.querySelector(inputSelector));
-            if (inputNode !== null) {
-                this._setArgumentInputValue(inputNode, argument);
-                this._argumentInput = inputNode;
-                void this._updateArgumentInputValidity();
-                this._argumentEventListeners.addEventListener(inputNode, 'change', this._onArgumentValueChange.bind(this, template), false);
+        if (typeof argumentDetails === 'undefined') {
+            return;
+        }
+        const {template} = argumentDetails;
+        const node = this._parent.settingsController.instantiateTemplate(template);
+        const inputSelector = '.hotkey-argument-input';
+        const inputNode = /** @type {HTMLInputElement} */ (node.matches(inputSelector) ? node : node.querySelector(inputSelector));
+        if (inputNode !== null) {
+            this._setArgumentInputValue(inputNode, argument);
+            this._argumentInput = inputNode;
+            void this._updateArgumentInputValidity();
+            this._argumentEventListeners.addEventListener(inputNode, 'change', this._onArgumentValueChange.bind(this, template), false);
+        }
+        if (template === 'hotkey-argument-anki-card-format') {
+            const ankiCardFormats = await this._parent.getAnkiCardFormats();
+            const selectNode = /** @type {HTMLSelectElement} */ (node.querySelector('.anki-card-format-select'));
+            for (const [index, format] of ankiCardFormats.entries()) {
+                const option = document.createElement('option');
+                option.value = `${index}`;
+                option.textContent = format;
+                selectNode.appendChild(option);
             }
-            if (this._argumentContainer !== null) {
-                this._argumentContainer.appendChild(node);
-            }
+            selectNode.value = argument;
+        }
+        if (this._argumentContainer !== null) {
+            this._argumentContainer.appendChild(node);
         }
     }
 
