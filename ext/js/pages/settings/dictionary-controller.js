@@ -41,6 +41,8 @@ class DictionaryEntry {
         this._dictionaryController = dictionaryController;
         /** @type {number} */
         this._index = index;
+        /** @type {number} */
+        this._clientY = index;
         /** @type {import('dictionary-importer').Summary} */
         this._dictionaryInfo = dictionaryInfo;
         /** @type {string | null} */
@@ -293,7 +295,7 @@ class DictionaryEntry {
 
     /** */
     _onDragEnd() {
-        this._dictionaryItem.dispatchEvent(new CustomEvent('entryDragEnd', {detail: {index: this._index}}));
+        this._dictionaryItem.dispatchEvent(new CustomEvent('entryDragEnd', {detail: {index: this._index, mouseY: this._clientY}}));
     }
 
     /** */
@@ -609,6 +611,8 @@ export class DictionaryController {
         this._checkingUpdates = false;
         /** @type {boolean} */
         this._checkingIntegrity = false;
+        /** @type {number} */
+        this._clientY = 0;
         /** @type {?HTMLButtonElement} */
         this._checkUpdatesButton = document.querySelector('#dictionary-check-updates');
         /** @type {?HTMLButtonElement} */
@@ -763,7 +767,6 @@ export class DictionaryController {
      * @param {number} targetIndex
      */
     async moveDictionaryOptions(currentIndex, targetIndex) {
-
         const options = await this._settingsController.getOptions();
         const {dictionaries} = options;
         if (
@@ -1155,58 +1158,11 @@ export class DictionaryController {
 
     /**
      * @param {DragEvent} e
-     * @throws {Error}
      */
     _onDragOver(e) {
-        const draggingIndex = this._draggingIndex;
-
-        const cursorY = e.clientY;
-        if (draggingIndex === null) { throw new Error('No dragging index'); }
-
-        const nextDictionaryIndex = this._getDragOverDictionaryItem(draggingIndex, cursorY);
-        if (nextDictionaryIndex === draggingIndex) { return; }
-        void this.moveDictionaryOptions(draggingIndex, nextDictionaryIndex);
-        this._draggingIndex = nextDictionaryIndex;
-
-        const containerRect = this._dictionaryEntryContainer.getBoundingClientRect();
-        const topZone = [containerRect.top - 30, containerRect.top + 60];
-        const bottomZone = [containerRect.bottom - 60, containerRect.bottom + 30];
-
-        if (cursorY > topZone[0] && cursorY < topZone[1]) {
-            this._dictionaryEntryContainer.scrollBy(0, -5); // Scroll up
-        } else if (cursorY > bottomZone[0] && cursorY < bottomZone[1]) {
-            this._dictionaryEntryContainer.scrollBy(0, 5); // Scroll down
-        }
+        e.preventDefault();
+        this._clientY = e.clientY;
     }
-
-    /**
-     * @param {number} draggingIndex
-     * @param {number} y
-     * @returns {number}
-     */
-    _getDragOverDictionaryItem(draggingIndex, y) {
-        const neighbors = [draggingIndex - 1, draggingIndex, draggingIndex + 1]
-            .filter((index) => index >= 0 && index < this._dictionaryEntries.length);
-
-        /** @type {{index: number|null, offset: number}} */
-        const currentBest = {index: null, offset: Number.NEGATIVE_INFINITY};
-        for (const index of neighbors) {
-            const item = this._dictionaryEntries[index]._dictionaryItem;
-            const {top, height} = item.getBoundingClientRect();
-            const offset = y - (top + height / 2);
-            if (offset < 0 && offset > currentBest.offset) {
-                currentBest.index = index;
-                currentBest.offset = offset;
-            }
-        }
-
-        if (currentBest.index === null) {
-            return this._dictionaryEntries.length - 1;
-        }
-
-        return currentBest.index;
-    }
-
 
     /**
      * @param {import('dictionary-importer').Summary[]} dictionaries
@@ -1344,9 +1300,57 @@ export class DictionaryController {
         this._draggingIndex = index;
     }
 
-    /** */
-    _onEntryDragEnd() {
+    /**
+     * @param {CustomEvent<{index: number}>} e
+     */
+    _onEntryDragEnd(e) {
+        const draggingIndex = this._draggingIndex;
+
+        const cursorY = this._clientY;
+        if (draggingIndex === null) { throw new Error('No dragging index'); }
+
+        const nextDictionaryIndex = this._getDragOverDictionaryItem(draggingIndex, cursorY);
+        if (nextDictionaryIndex === draggingIndex) { return; }
+        void this.moveDictionaryOptions(draggingIndex, nextDictionaryIndex);
+        this._draggingIndex = nextDictionaryIndex;
+
+        const containerRect = this._dictionaryEntryContainer.getBoundingClientRect();
+        const topZone = [containerRect.top - 30, containerRect.top + 60];
+        const bottomZone = [containerRect.bottom - 60, containerRect.bottom + 30];
+
+        if (cursorY > topZone[0] && cursorY < topZone[1]) {
+            this._dictionaryEntryContainer.scrollBy(0, -5); // Scroll up
+        } else if (cursorY > bottomZone[0] && cursorY < bottomZone[1]) {
+            this._dictionaryEntryContainer.scrollBy(0, 5); // Scroll down
+        }
         this._draggingIndex = null;
+    }
+
+    /**
+     * @param {number} draggingIndex
+     * @param {number} y
+     * @returns {number}
+     */
+    _getDragOverDictionaryItem(draggingIndex, y) {
+        const neighbors = this._dictionaryEntries.map((entry, index) => index)
+
+        /** @type {{index: number|null, offset: number}} */
+        const currentBest = {index: null, offset: Number.NEGATIVE_INFINITY};
+        for (const index of neighbors) {
+            const item = this._dictionaryEntries[index]._dictionaryItem;
+            const {top, height} = item.getBoundingClientRect();
+            const offset = y - (top + height / 2);
+            if (offset < 0 && offset > currentBest.offset) {
+                currentBest.index = index;
+                currentBest.offset = offset;
+            }
+        }
+
+        if (currentBest.index === null) {
+            return this._dictionaryEntries.length - 1;
+        }
+
+        return currentBest.index;
     }
 
     /**
