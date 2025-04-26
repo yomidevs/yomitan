@@ -288,14 +288,25 @@ class DictionaryEntry {
         this._dictionaryController.updateDictionary(this.dictionaryTitle, downloadUrl);
     }
 
-    /** */
+    /**
+     * @typedef {Object} EntryDragStartDetail
+     * @property {number} index The index of the entry being dragged.
+     */
+    /**
+     * @typedef {CustomEvent<EntryDragStartDetail>} EntryDragStartEvent
+     */
+
+    /**
+     * Initiates the drag process by dispatching the 'entryDragStart' custom event.
+     * @fires EntryDragStartEvent - When the drag starts.
+     */
     _onDragStart() {
         this._dictionaryItem.dispatchEvent(new CustomEvent('entryDragStart', {detail: {index: this._index}}));
     }
 
     /** */
     _onDragEnd() {
-        this._dictionaryItem.dispatchEvent(new CustomEvent('entryDragEnd', {detail: {index: this._index, mouseY: this._clientY}}));
+        this._dictionaryItem.dispatchEvent(new CustomEvent('entryDragEnd'));
     }
 
     /** */
@@ -635,6 +646,8 @@ export class DictionaryController {
         this._allCheckbox = querySelectorNotNull(document, '#all-dictionaries-enabled');
         /** @type {?DictionaryExtraInfo} */
         this._extraInfo = null;
+        /** @type {number} */
+        this._draggingIndex = 0;
         /** @type {import('dictionary-controller.js').DictionaryTask[]} */
         this._dictionaryTaskQueue = [];
         /** @type {boolean} */
@@ -1291,7 +1304,7 @@ export class DictionaryController {
         this._dictionaryEntries.push(entry);
         entry.prepare();
 
-        entry._dictionaryItem.addEventListener('entryDragStart', this._onEntryDragStart.bind(this), false);
+        entry._dictionaryItem.addEventListener('entryDragStart',  /** @type {EventListener} */ (this._onEntryDragStart.bind(this)), false);
         entry._dictionaryItem.addEventListener('entryDragEnd', this._onEntryDragEnd.bind(this), false);
 
         const container = /** @type {HTMLElement} */ (this._dictionaryEntryContainer);
@@ -1302,7 +1315,9 @@ export class DictionaryController {
     }
 
     /**
-     * @param {CustomEvent<{index: number}>} e
+     * Handles the 'entryDragStart' custom event.
+     * @param {EntryDragStartEvent} e The custom event object with entry drag details.
+     * @returns {void}
      */
     _onEntryDragStart(e) {
         const index = e?.detail?.index;
@@ -1310,10 +1325,7 @@ export class DictionaryController {
         this._draggingIndex = index;
     }
 
-    /**
-     * @param {CustomEvent<{index: number}>} e
-     */
-    _onEntryDragEnd(e) {
+    _onEntryDragEnd() {
         const draggingIndex = this._draggingIndex;
 
         const cursorY = this._clientY;
@@ -1325,7 +1337,7 @@ export class DictionaryController {
         this._draggingIndex = nextDictionaryIndex;
 
 
-        this._draggingIndex = null;
+        this._draggingIndex = 0;
     }
 
     /**
