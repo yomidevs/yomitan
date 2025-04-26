@@ -54,7 +54,7 @@ class DictionaryEntry {
         /** @type {ChildNode[]} */
         this._nodes = [...fragment.childNodes];
         /** @type {HTMLElement} */
-        this._dictionaryItem = querySelectorNotNull(fragment, '.dictionary-item');
+        this.dictionaryItem = querySelectorNotNull(fragment, '.dictionary-item');
         /** @type {HTMLInputElement} */
         this._enabledCheckbox = querySelectorNotNull(fragment, '.dictionary-enabled');
         /** @type {HTMLButtonElement} */
@@ -104,8 +104,8 @@ class DictionaryEntry {
         this._eventListeners.addEventListener(this._integrityButtonCheck, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._integrityButtonWarning, 'click', this._onIntegrityButtonClick.bind(this), false);
         this._eventListeners.addEventListener(this._updatesAvailable, 'click', this._onUpdateButtonClick.bind(this), false);
-        this._eventListeners.addEventListener(this._dictionaryItem, 'dragstart', this._onDragStart.bind(this), false);
-        this._eventListeners.addEventListener(this._dictionaryItem, 'dragend', this._onDragEnd.bind(this), false);
+        this._eventListeners.addEventListener(this.dictionaryItem, 'dragstart', this._onDragStart.bind(this), false);
+        this._eventListeners.addEventListener(this.dictionaryItem, 'dragend', this._onDragEnd.bind(this), false);
 
         this.setCounts(this._databaseCounts);
     }
@@ -289,7 +289,7 @@ class DictionaryEntry {
     }
 
     /**
-     * @typedef {Object} EntryDragStartDetail
+     * @typedef {object} EntryDragStartDetail
      * @property {number} index The index of the entry being dragged.
      */
     /**
@@ -301,12 +301,12 @@ class DictionaryEntry {
      * @fires EntryDragStartEvent - When the drag starts.
      */
     _onDragStart() {
-        this._dictionaryItem.dispatchEvent(new CustomEvent('entryDragStart', {detail: {index: this._index}}));
+        this.dictionaryItem.dispatchEvent(new CustomEvent('entryDragStart', {detail: {index: this._index}}));
     }
 
     /** */
     _onDragEnd() {
-        this._dictionaryItem.dispatchEvent(new CustomEvent('entryDragEnd'));
+        this.dictionaryItem.dispatchEvent(new CustomEvent('entryDragEnd'));
     }
 
     /** */
@@ -1296,6 +1296,7 @@ export class DictionaryController {
      * @param {import('dictionary-importer').Summary} dictionaryInfo
      * @param {string|null} updateDownloadUrl
      * @param {import('dictionary-database').DictionaryCountGroup|null} dictionaryDatabaseCounts
+     * @throws Error
      */
     _createDictionaryEntry(index, dictionaryInfo, updateDownloadUrl, dictionaryDatabaseCounts) {
         const fragment = this.instantiateTemplateFragment('dictionary');
@@ -1304,8 +1305,8 @@ export class DictionaryController {
         this._dictionaryEntries.push(entry);
         entry.prepare();
 
-        entry._dictionaryItem.addEventListener('entryDragStart',  /** @type {EventListener} */ (this._onEntryDragStart.bind(this)), false);
-        entry._dictionaryItem.addEventListener('entryDragEnd', this._onEntryDragEnd.bind(this), false);
+        entry.dictionaryItem.addEventListener('entryDragStart', /** @type {EventListener} */ (this._onEntryDragStart.bind(this)), false);
+        entry.dictionaryItem.addEventListener('entryDragEnd', this._onEntryDragEnd.bind(this), false);
 
         const container = /** @type {HTMLElement} */ (this._dictionaryEntryContainer);
         const relative = container.querySelector('.dictionary-item-bottom');
@@ -1325,6 +1326,11 @@ export class DictionaryController {
         this._draggingIndex = index;
     }
 
+    /**
+     * Handles the 'entryDragEnd' custom event.
+     * @throws Error
+     * @returns {void}
+     */
     _onEntryDragEnd() {
         const draggingIndex = this._draggingIndex;
 
@@ -1334,9 +1340,8 @@ export class DictionaryController {
         const nextDictionaryIndex = this._getDragOverDictionaryItem(draggingIndex, cursorY);
         if (nextDictionaryIndex === draggingIndex) { return; }
         void this.moveDictionaryOptions(draggingIndex, nextDictionaryIndex);
+
         this._draggingIndex = nextDictionaryIndex;
-
-
         this._draggingIndex = 0;
     }
 
@@ -1346,12 +1351,12 @@ export class DictionaryController {
      * @returns {number}
      */
     _getDragOverDictionaryItem(draggingIndex, y) {
-        const neighbors = this._dictionaryEntries.map((entry, index) => index)
+        const neighbors = this._dictionaryEntries.map((entry, index) => index);
 
         /** @type {{index: number|null, offset: number}} */
         const currentBest = {index: null, offset: Number.POSITIVE_INFINITY};
         for (const index of neighbors) {
-            const item = this._dictionaryEntries[index]._dictionaryItem;
+            const item = this._dictionaryEntries[index].dictionaryItem;
             const {top, height} = item.getBoundingClientRect();
             const offset = Math.abs(y - (top + height / 2));
             if (offset < currentBest.offset) {
