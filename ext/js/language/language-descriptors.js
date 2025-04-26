@@ -17,13 +17,13 @@
 
 import {removeSyriacScriptDiacritics} from './aii/assyrian-neo-aramaic-text-preprocessors.js';
 import {
-    removeArabicScriptDiacritics,
-    removeTatweel,
-    normalizeUnicode,
-    addHamzaTop,
     addHamzaBottom,
+    addHamzaTop,
     convertAlifMaqsuraToYaa,
     convertHaToTaMarbuta,
+    normalizeUnicode,
+    removeArabicScriptDiacritics,
+    removeTatweel,
 } from './ar/arabic-text-preprocessors.js';
 import {arabicTransforms} from './ar/arabic-transforms.js';
 import {normalizeRadicalCharacters} from './CJK-util.js';
@@ -247,7 +247,10 @@ const languageDescriptors = [
         iso639_3: 'ind',
         name: 'Indonesian',
         exampleText: 'baca',
-        textPreprocessors: capitalizationPreprocessors,
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics,
+        },
     },
     {
         iso: 'it',

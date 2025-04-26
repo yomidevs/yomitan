@@ -124,7 +124,7 @@ await Application.main(true, async (application) => {
     const settingsBackup = new BackupController(settingsController, modalController);
     preparePromises.push(settingsBackup.prepare());
 
-    const ankiController = new AnkiController(settingsController, application);
+    const ankiController = new AnkiController(settingsController, application, modalController);
     preparePromises.push(ankiController.prepare());
 
     const ankiDeckGeneratorController = new AnkiDeckGeneratorController(application, settingsController, modalController, ankiController);

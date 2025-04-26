@@ -29,7 +29,6 @@ import {distributeFurigana, distributeFuriganaInflected} from '../language/ja/ja
 export function createAnkiNoteData(marker, {
     dictionaryEntry,
     resultOutputMode,
-    mode,
     glossaryLayoutMode,
     compactTags,
     context,
@@ -63,9 +62,6 @@ export function createAnkiNoteData(marker, {
         compactTags,
         group: (resultOutputMode === 'group'),
         merge: (resultOutputMode === 'merge'),
-        modeTermKanji: (mode === 'term-kanji'),
-        modeTermKana: (mode === 'term-kana'),
-        modeKanji: (mode === 'kanji'),
         compactGlossaries: (glossaryLayoutMode === 'compact'),
         get uniqueExpressions() { return getCachedValue(uniqueExpressions); },
         get uniqueReadings() { return getCachedValue(uniqueReadings); },

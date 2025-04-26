@@ -290,6 +290,13 @@
 </div></div></div></template>
 
 <!-- Anki card -->
+<template id="anki-card-type-tab-template">
+    <label class="tab">
+        <input type="radio" name="anki-card-primary-type" data-value="terms" data-anki-card-menu="anki-card-term-field-menu">
+        <div class="tab-inner"><span class="tab-label"></span></div>
+    </label>
+</template>
+
 <template id="anki-card-field-template">
     <div class="anki-card-field-name-container">
         <span class="anki-card-field-name"></span>
@@ -315,7 +322,7 @@
         </select>
     </div>
 </template>
-<template id="anki-card-terms-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
+<template id="anki-card-term-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
 <template id="anki-card-kanji-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
 <template id="anki-card-all-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
 
@@ -427,9 +434,7 @@
             <option value="historyForward">Navigate forward in history</option>
             <option value="profilePrevious">Switch to previous profile</option>
             <option value="profileNext">Switch to next profile</option>
-            <option value="addNoteKanji">Add kanji note</option>
-            <option value="addNoteTermKanji">Add term note</option>
-            <option value="addNoteTermKana">Add term note (reading)</option>
+            <option value="addNote">Add note</option>
             <option value="viewNotes">View notes</option>
             <option value="playAudio">Play audio</option>
             <option value="playAudioFromSource">Play audio from source</option>
@@ -496,6 +501,11 @@
         <option value="text-to-speech" title="Not supported in Anki">Text-to-speech ⚠️</option>
         <option value="text-to-speech-reading" title="Not supported in Anki">Text-to-speech (Kana reading) ⚠️</option>
         <option value="custom">Custom</option>
+    </select>
+</div></template>
+<template id="hotkey-argument-anki-card-format-template"><div class="flex-row-nowrap">
+    <span class="hotkey-argument-label">Format:</span>
+    <select class="anki-card-format-select hotkey-argument-input horizontal-flex-fill">
     </select>
 </div></template>
 
