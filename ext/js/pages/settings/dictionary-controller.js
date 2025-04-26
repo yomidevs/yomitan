@@ -1162,6 +1162,16 @@ export class DictionaryController {
     _onDragOver(e) {
         e.preventDefault();
         this._clientY = e.clientY;
+        const cursorY = e.clientY;
+        const containerRect = this._dictionaryEntryContainer.getBoundingClientRect();
+        const topZone = [containerRect.top - 60, containerRect.top + 60];
+        const bottomZone = [containerRect.bottom - 60, containerRect.bottom + 60];
+
+        if (cursorY > topZone[0] && cursorY < topZone[1]) {
+            this._dictionaryEntryContainer.scrollBy(0, -5); // Scroll up
+        } else if (cursorY > bottomZone[0] && cursorY < bottomZone[1]) {
+            this._dictionaryEntryContainer.scrollBy(0, 5); // Scroll down
+        }
     }
 
     /**
@@ -1314,15 +1324,7 @@ export class DictionaryController {
         void this.moveDictionaryOptions(draggingIndex, nextDictionaryIndex);
         this._draggingIndex = nextDictionaryIndex;
 
-        const containerRect = this._dictionaryEntryContainer.getBoundingClientRect();
-        const topZone = [containerRect.top - 30, containerRect.top + 60];
-        const bottomZone = [containerRect.bottom - 60, containerRect.bottom + 30];
 
-        if (cursorY > topZone[0] && cursorY < topZone[1]) {
-            this._dictionaryEntryContainer.scrollBy(0, -5); // Scroll up
-        } else if (cursorY > bottomZone[0] && cursorY < bottomZone[1]) {
-            this._dictionaryEntryContainer.scrollBy(0, 5); // Scroll down
-        }
         this._draggingIndex = null;
     }
 
@@ -1335,12 +1337,12 @@ export class DictionaryController {
         const neighbors = this._dictionaryEntries.map((entry, index) => index)
 
         /** @type {{index: number|null, offset: number}} */
-        const currentBest = {index: null, offset: Number.NEGATIVE_INFINITY};
+        const currentBest = {index: null, offset: Number.POSITIVE_INFINITY};
         for (const index of neighbors) {
             const item = this._dictionaryEntries[index]._dictionaryItem;
             const {top, height} = item.getBoundingClientRect();
-            const offset = y - (top + height / 2);
-            if (offset < 0 && offset > currentBest.offset) {
+            const offset = Math.abs(y - (top + height / 2));
+            if (offset < currentBest.offset) {
                 currentBest.index = index;
                 currentBest.offset = offset;
             }

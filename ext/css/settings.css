@@ -2487,6 +2487,9 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     padding: 0.375em 0;
 }
 
+.sort-icon {
+    font-size: 1.3em;
+}
 
 /* Dictionary Import */
 #dictionary-import-url-text {
