@@ -468,7 +468,7 @@ export class DisplayAnki {
 
                 const validNoteIds = noteIds?.filter((id) => id !== INVALID_NOTE_ID) ?? [];
 
-                this._createViewNoteButton(entryIndex, cardFormatIndex, validNoteIds);
+                this._createViewNoteButton(entryIndex, cardFormatIndex, validNoteIds, Array.isArray(noteInfos) ? noteInfos : []);
 
                 if (displayTagsAndFlags !== 'never' && Array.isArray(noteInfos)) {
                     this._setupTagsIndicator(entryIndex, cardFormatIndex, noteInfos);
@@ -791,7 +791,7 @@ export class DisplayAnki {
         /** @type {HTMLButtonElement | null} */
         let viewNoteButton = singleNoteActions.querySelector('.action-button[data-action=view-note]');
         if (viewNoteButton === null) {
-            viewNoteButton = this._createViewNoteButton(dictionaryEntryIndex, cardFormatIndex, noteIds);
+            viewNoteButton = this._createViewNoteButton(dictionaryEntryIndex, cardFormatIndex, noteIds, []);
         }
         if (viewNoteButton === null) { return; }
         const newNoteIds = new Set([...this._getNodeNoteIds(viewNoteButton), ...noteIds]);
@@ -1110,9 +1110,10 @@ export class DisplayAnki {
      * @param {number} index
      * @param {number} cardFormatIndex
      * @param {number[]} noteIds
+     * @param {(?import('anki').NoteInfo)[]} noteInfos
      * @returns {?HTMLButtonElement}
      */
-    _createViewNoteButton(index, cardFormatIndex, noteIds) {
+    _createViewNoteButton(index, cardFormatIndex, noteIds, noteInfos) {
         if (noteIds.length === 0) { return null; }
         const viewNoteButton = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('note-action-button-view-note'));
         if (viewNoteButton === null) { return null; }
@@ -1120,6 +1121,20 @@ export class DisplayAnki {
         viewNoteButton.disabled = disabled;
         viewNoteButton.hidden = disabled;
         viewNoteButton.dataset.noteIds = noteIds.join(' ');
+
+        let isSuspended = false;
+        for (const item of noteInfos) {
+            if (item === null) { continue; }
+            for (const cardInfo of item.cardsInfo) {
+                if (cardInfo.cardState === -1) {
+                    isSuspended = true;
+                    break;
+                }
+            }
+        }
+        if (isSuspended) {
+            viewNoteButton.classList.add('action-icon-card-suspended');
+        }
 
         this._setViewButtonBadge(viewNoteButton);
 

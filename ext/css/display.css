@@ -741,6 +741,9 @@ button.action-button:active {
     background-color: var(--action-button-active-color);
     box-shadow: none;
 }
+button.action-icon-card-suspended {
+    background-color: yellow!important;
+}
 .icon[data-icon=view-note]      { background-image: url('/images/view-note.svg'); }
 .icon[data-icon=big-circle] { background-image: url('/images/big-circle.svg'); }
 .icon[data-icon=small-circle]  { background-image: url('/images/small-circle.svg'); }

@@ -697,7 +697,7 @@ export class AnkiConnect {
                 result2.push(null);
                 continue;
             }
-            const {note, flags} = /** @type {{[key: string]: unknown}} */ (item);
+            const {note, flags, queue} = /** @type {{[key: string]: unknown}} */ (item);
             if (typeof note !== 'number') {
                 result2.push(null);
                 continue;
@@ -708,6 +708,7 @@ export class AnkiConnect {
                 noteId: note,
                 cardId,
                 flags: typeof flags === 'number' ? flags : 0,
+                cardState: typeof queue === 'number' ? queue : 0,
             };
             result2.push(item2);
         }
