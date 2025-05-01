@@ -1179,7 +1179,7 @@ export class DictionaryController {
         const containerRect = this._dictionaryEntryContainer.getBoundingClientRect();
         const topZone = [containerRect.top - 60, containerRect.top + 60];
         const bottomZone = [containerRect.bottom - 60, containerRect.bottom + 60];
-
+        this.highlightDragOverDictionaryItem(e.clientY)
         if (cursorY > topZone[0] && cursorY < topZone[1]) {
             this._dictionaryEntryContainer.scrollBy(0, -5); // Scroll up
         } else if (cursorY > bottomZone[0] && cursorY < bottomZone[1]) {
@@ -1324,6 +1324,9 @@ export class DictionaryController {
         const index = e?.detail?.index;
         if (typeof index !== 'number') { return; }
         this._draggingIndex = index;
+        const item = this._dictionaryEntries[index].dictionaryItem;
+        item.classList.add('dragged-dictionary')
+
     }
 
     /**
@@ -1332,13 +1335,19 @@ export class DictionaryController {
      * @returns {void}
      */
     _onEntryDragEnd() {
+
         const draggingIndex = this._draggingIndex;
 
         const cursorY = this._clientY;
         if (draggingIndex === null) { throw new Error('No dragging index'); }
+        const item = this._dictionaryEntries[draggingIndex].dictionaryItem;
+
+        item.classList.remove('dragged-dictionary')
+        item.classList.remove('dictionary-highlight')
 
         const nextDictionaryIndex = this._getDragOverDictionaryItem(draggingIndex, cursorY);
         if (nextDictionaryIndex === draggingIndex) { return; }
+
         void this.moveDictionaryOptions(draggingIndex, nextDictionaryIndex);
 
         this._draggingIndex = nextDictionaryIndex;
@@ -1370,6 +1379,23 @@ export class DictionaryController {
         }
 
         return currentBest.index;
+    }
+
+    highlightDragOverDictionaryItem(y) {
+        const neighbors = this._dictionaryEntries.map((entry, index) => index);
+
+        const currentBest = {entry: null, offset: Number.POSITIVE_INFINITY};
+        for (const index of neighbors) {
+            const item = this._dictionaryEntries[index].dictionaryItem;
+            const {top, height} = item.getBoundingClientRect();
+            const offset = Math.abs(y - (top + height / 2));
+            item.classList.remove('dictionary-highlight')
+            if (offset < currentBest.offset) {
+                currentBest.entry = item;
+                currentBest.offset = offset;
+            }
+        }
+        currentBest.entry.classList.add('dictionary-highlight')
     }
 
     /**

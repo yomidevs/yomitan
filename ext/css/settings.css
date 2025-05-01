@@ -2469,7 +2469,12 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
     display: table-cell;
     white-space: pre-line;
 }
-
+.dictionary-highlight {
+    border: 2px dashed #8ab4f8;
+}
+.dragged-dictionary {
+    opacity: 50%;
+}
 #dictionary-alias-input {
     width: 100%;
 }
