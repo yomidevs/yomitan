@@ -1122,19 +1122,27 @@ export class DisplayAnki {
         viewNoteButton.hidden = disabled;
         viewNoteButton.dataset.noteIds = noteIds.join(' ');
 
-        let isSuspended = false;
+        const cardStates = [];
         for (const item of noteInfos) {
             if (item === null) { continue; }
             for (const cardInfo of item.cardsInfo) {
-                if (cardInfo.cardState === -1) {
-                    isSuspended = true;
-                    break;
-                }
+                cardStates.push(cardInfo.cardState);
             }
         }
-        if (isSuspended) {
-            viewNoteButton.classList.add('action-icon-card-suspended');
-        }
+
+        // Apply priority-based data-icon
+        const highestState = this._getHighestPriorityCardState(cardStates);
+        const dataIcon = /** @type {HTMLElement} */ (
+            viewNoteButton.querySelector('.icon[data-icon^="view-note-"]')
+        );
+        dataIcon.dataset.icon = `view-note-${highestState}`;
+
+        // Build consistent label
+        const label = `View added note (${highestState} state)`;
+
+        // Set both title and data-hotkey to match
+        viewNoteButton.title = label;
+        viewNoteButton.dataset.hotkey = JSON.stringify(['viewNotes', 'title', `${label} ({0})`]);
 
         this._setViewButtonBadge(viewNoteButton);
 
@@ -1317,6 +1325,34 @@ export class DisplayAnki {
         }
 
         return 'linear-gradient(to right,' + gradientSlices.join(',') + ')';
+    }
+
+    /**
+     * Get the highest priority state from a list of Anki queue states.
+     *
+     * Priority order:
+     *   - -3, -2 → "buried"
+     *   - -1 → "suspended"
+     *   -  2 → "review"
+     *   -  1, 3 → "learning"
+     *   -  0 → "new" (default fallback)
+     * @param {number[]} cardStates Array of queue state integers.
+     * @returns {"buried" | "suspended" | "review" | "learning" | "new"} - The highest priority state found.
+     */
+    _getHighestPriorityCardState(cardStates) {
+        if (cardStates.includes(-3) || cardStates.includes(-2)) {
+            return 'buried';
+        }
+        if (cardStates.includes(-1)) {
+            return 'suspended';
+        }
+        if (cardStates.includes(2)) {
+            return 'review';
+        }
+        if (cardStates.includes(1) || cardStates.includes(3)) {
+            return 'learning';
+        }
+        return 'new';
     }
 }
 
