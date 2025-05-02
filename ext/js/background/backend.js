@@ -596,6 +596,7 @@ export class Backend {
     _stripNotesArray(notes) {
         const newNotes = structuredClone(notes);
         for (let i = 0; i < newNotes.length; i++) {
+            if (Object.keys(newNotes[i].fields).length === 0) { continue; }
             const [firstField, firstFieldValue] = Object.entries(newNotes[i].fields)[0];
             newNotes[i].fields = {};
             newNotes[i].fields[firstField] = firstFieldValue;
