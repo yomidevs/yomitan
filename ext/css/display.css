@@ -742,7 +742,7 @@ button.action-button:active {
     box-shadow: none;
 }
 
-.icon[data-icon=view-note-new] { background-image: url('/images/view-note-new.svg'); }
+.icon[data-icon=view-note] { background-image: url('/images/view-note.svg'); }
 .icon[data-icon=view-note-learning] { background-image: url('/images/view-note-learning.svg'); }
 .icon[data-icon=view-note-review] { background-image: url('/images/view-note-review.svg'); }
 .icon[data-icon=view-note-suspended] { background-image: url('/images/view-note-suspended.svg'); }

@@ -1132,15 +1132,10 @@ export class DisplayAnki {
 
         // Apply priority-based data-icon
         const highestState = this._getHighestPriorityCardState(cardStates);
-        const dataIcon = /** @type {HTMLElement} */ (
-            viewNoteButton.querySelector('.icon[data-icon^="view-note-"]')
-        );
-        dataIcon.dataset.icon = `view-note-${highestState}`;
+        const dataIcon = /** @type {HTMLElement} */ (viewNoteButton.querySelector('.icon[data-icon^="view-note"]'));
+        dataIcon.dataset.icon = highestState && highestState !== 'new' ? `view-note-${highestState}` : 'view-note';
 
-        // Build consistent label
-        const label = `View added note (${highestState} state)`;
-
-        // Set both title and data-hotkey to match
+        const label = highestState ? `View added note (${highestState})` : 'View added note';
         viewNoteButton.title = label;
         viewNoteButton.dataset.hotkey = JSON.stringify(['viewNotes', 'title', `${label} ({0})`]);
 
@@ -1329,6 +1324,7 @@ export class DisplayAnki {
 
     /**
      * Get the highest priority state from a list of Anki queue states.
+     * Source: https://github.com/ankidroid/Anki-Android/wiki/Database-Structure#cards
      *
      * Priority order:
      *   - -3, -2 → "buried"
@@ -1337,7 +1333,7 @@ export class DisplayAnki {
      *   -  1, 3 → "learning"
      *   -  0 → "new" (default fallback)
      * @param {number[]} cardStates Array of queue state integers.
-     * @returns {"buried" | "suspended" | "review" | "learning" | "new"} - The highest priority state found.
+     * @returns {"buried" | "suspended" | "review" | "learning" | "new" | null} - The highest priority state found.
      */
     _getHighestPriorityCardState(cardStates) {
         if (cardStates.includes(-3) || cardStates.includes(-2)) {
@@ -1352,7 +1348,10 @@ export class DisplayAnki {
         if (cardStates.includes(1) || cardStates.includes(3)) {
             return 'learning';
         }
-        return 'new';
+        if (cardStates.includes(0)) {
+            return 'new';
+        }
+        return null;
     }
 }
 
