@@ -76,7 +76,6 @@ export class SharedWorkerBridge {
 
     /** @type {import('shared-worker').ApiHandler<'registerBackendPort'>} */
     _onRegisterBackendPort(_params, interlocutorPort, _ports) {
-        console.log('SharedWorkerBridge: backend port registered');
         this._backendPort = interlocutorPort;
     }
 
