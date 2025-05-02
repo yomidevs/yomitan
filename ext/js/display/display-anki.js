@@ -1155,7 +1155,7 @@ export class DisplayAnki {
      * @returns {HTMLButtonElement}
      */
     _setViewNoteButtonCardState(noteInfos, viewNoteButton) {
-        if (this._isAdditionalInfoEnabled() === false) { return viewNoteButton; }
+        if (this._isAdditionalInfoEnabled() === false || noteInfos.length === 0) { return viewNoteButton; }
 
         const cardStates = [];
         for (const item of noteInfos) {
