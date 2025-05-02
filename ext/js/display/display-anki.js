@@ -914,12 +914,19 @@ export class DisplayAnki {
     }
 
     /**
+     * Checks whether fetching additional information (e.g. tags and flags, or overwrite) is enabled
+     * based on the current instance's display settings and duplicate handling behavior.
+     * @returns {boolean} - True if additional info fetching is enabled, false otherwise.
+     */
+    _isAdditionalInfoEnabled() {
+        return this._displayTagsAndFlags !== 'never' || this._duplicateBehavior === 'overwrite';
+    }
+
+    /**
      * @param {import('dictionary').DictionaryEntry[]} dictionaryEntries
      * @returns {Promise<import('display-anki').DictionaryEntryDetails[]>}
      */
     async _getDictionaryEntryDetails(dictionaryEntries) {
-        const fetchAdditionalInfo = (this._displayTagsAndFlags !== 'never') || this._duplicateBehavior === 'overwrite';
-
         const notePromises = [];
         const noteTargets = [];
         for (let i = 0, ii = dictionaryEntries.length; i < ii; ++i) {
@@ -944,7 +951,7 @@ export class DisplayAnki {
             }
 
             infos = this._checkForDuplicates ?
-                await this._display.application.api.getAnkiNoteInfo(notes, fetchAdditionalInfo) :
+                await this._display.application.api.getAnkiNoteInfo(notes, this._isAdditionalInfoEnabled()) :
                 this._getAnkiNoteInfoForceValue(notes, true);
         } catch (e) {
             infos = this._getAnkiNoteInfoForceValue(notes, false);
@@ -1115,29 +1122,14 @@ export class DisplayAnki {
      */
     _createViewNoteButton(index, cardFormatIndex, noteIds, noteInfos) {
         if (noteIds.length === 0) { return null; }
-        const viewNoteButton = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('note-action-button-view-note'));
+        let viewNoteButton = /** @type {HTMLButtonElement} */ (this._display.displayGenerator.instantiateTemplate('note-action-button-view-note'));
         if (viewNoteButton === null) { return null; }
         const disabled = (noteIds.length === 0);
         viewNoteButton.disabled = disabled;
         viewNoteButton.hidden = disabled;
         viewNoteButton.dataset.noteIds = noteIds.join(' ');
 
-        const cardStates = [];
-        for (const item of noteInfos) {
-            if (item === null) { continue; }
-            for (const cardInfo of item.cardsInfo) {
-                cardStates.push(cardInfo.cardState);
-            }
-        }
-
-        // Apply priority-based data-icon
-        const highestState = this._getHighestPriorityCardState(cardStates);
-        const dataIcon = /** @type {HTMLElement} */ (viewNoteButton.querySelector('.icon[data-icon^="view-note"]'));
-        dataIcon.dataset.icon = highestState && highestState !== 'new' ? `view-note-${highestState}` : 'view-note';
-
-        const label = highestState ? `View added note (${highestState})` : 'View added note';
-        viewNoteButton.title = label;
-        viewNoteButton.dataset.hotkey = JSON.stringify(['viewNotes', 'title', `${label} ({0})`]);
+        viewNoteButton = this._setViewNoteButtonCardState(noteInfos, viewNoteButton);
 
         this._setViewButtonBadge(viewNoteButton);
 
@@ -1154,6 +1146,32 @@ export class DisplayAnki {
         this._eventListeners.addEventListener(viewNoteButton, 'contextmenu', this._onViewNotesButtonContextMenuBind);
         this._eventListeners.addEventListener(viewNoteButton, 'menuClose', this._onViewNotesButtonMenuCloseBind);
 
+        return viewNoteButton;
+    }
+
+    /**
+     * @param {(?import('anki').NoteInfo)[]} noteInfos
+     * @param {HTMLButtonElement} viewNoteButton
+     * @returns {HTMLButtonElement}
+     */
+    _setViewNoteButtonCardState(noteInfos, viewNoteButton) {
+        if (this._isAdditionalInfoEnabled() === false) { return viewNoteButton; }
+
+        const cardStates = [];
+        for (const item of noteInfos) {
+            if (item === null) { continue; }
+            for (const cardInfo of item.cardsInfo) {
+                cardStates.push(cardInfo.cardState);
+            }
+        }
+
+        const highestState = this._getHighestPriorityCardState(cardStates);
+        const dataIcon = /** @type {HTMLElement} */ (viewNoteButton.querySelector('.icon[data-icon^="view-note"]'));
+        dataIcon.dataset.icon = highestState !== 'new' ? `view-note-${highestState}` : 'view-note';
+
+        const label = `View added note (${highestState})`;
+        viewNoteButton.title = label;
+        viewNoteButton.dataset.hotkey = JSON.stringify(['viewNotes', 'title', `${label} ({0})`]);
         return viewNoteButton;
     }
 
@@ -1333,7 +1351,7 @@ export class DisplayAnki {
      *   -  1, 3 → "learning"
      *   -  0 → "new" (default fallback)
      * @param {number[]} cardStates Array of queue state integers.
-     * @returns {"buried" | "suspended" | "review" | "learning" | "new" | null} - The highest priority state found.
+     * @returns {"buried" | "suspended" | "review" | "learning" | "new" } - The highest priority state found.
      */
     _getHighestPriorityCardState(cardStates) {
         if (cardStates.includes(-3) || cardStates.includes(-2)) {
@@ -1348,10 +1366,7 @@ export class DisplayAnki {
         if (cardStates.includes(1) || cardStates.includes(3)) {
             return 'learning';
         }
-        if (cardStates.includes(0)) {
-            return 'new';
-        }
-        return null;
+        return 'new';
     }
 }
 
