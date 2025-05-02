@@ -147,6 +147,57 @@
                 "value": false
             },
             "description": "Turn off Yomitan's internal parser for languages with spaces."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "sentenceParsing.terminationCharacters",
+                "value": [
+                    {
+                        "enabled": true,
+                        "character1": "\"",
+                        "character2": "\"",
+                        "includeCharacterAtStart": false,
+                        "includeCharacterAtEnd": false
+                    },
+                    {
+                        "enabled": false,
+                        "character1": "'",
+                        "character2": "'",
+                        "includeCharacterAtStart": false,
+                        "includeCharacterAtEnd": false
+                    },
+                    {
+                        "enabled": true,
+                        "character1": ".",
+                        "character2": null,
+                        "includeCharacterAtStart": false,
+                        "includeCharacterAtEnd": true
+                    },
+                    {
+                        "enabled": true,
+                        "character1": "!",
+                        "character2": null,
+                        "includeCharacterAtStart": false,
+                        "includeCharacterAtEnd": true
+                    },
+                    {
+                        "enabled": true,
+                        "character1": "?",
+                        "character2": null,
+                        "includeCharacterAtStart": false,
+                        "includeCharacterAtEnd": true
+                    },
+                    {
+                        "enabled": true,
+                        "character1": "…",
+                        "character2": null,
+                        "includeCharacterAtStart": false,
+                        "includeCharacterAtEnd": true
+                    }
+                ]
+            },
+            "description": "Disable apostrophes as a sentence terminator."
         }
     ],
     "eo": [
