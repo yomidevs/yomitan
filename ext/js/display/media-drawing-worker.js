@@ -17,6 +17,7 @@
 
 import {API} from '../comm/api.js';
 import {createApiMap, invokeApiMapHandler} from '../core/api-map.js';
+import {ExtensionError} from '../core/extension-error.js';
 import {log} from '../core/log.js';
 import {WebExtension} from '../extension/web-extension.js';
 
@@ -58,6 +59,11 @@ export class MediaDrawingWorker {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const message = event.data;
             return invokeApiMapHandler(this._fromApplicationApiMap, message.action, message.params, [event.ports], () => {});
+        });
+        addEventListener('messageerror', (event) => {
+            const error = new ExtensionError('MediaDrawingWorker: Error receiving message from application');
+            error.data = event;
+            log.error(error);
         });
     }
 
@@ -117,6 +123,11 @@ export class MediaDrawingWorker {
         dbPort.addEventListener('message', (/** @type {MessageEvent<import('api').PmApiMessageAny>} */ event) => {
             const message = event.data;
             return invokeApiMapHandler(this._fromDatabaseApiMap, message.action, message.params, [event.ports], () => {});
+        });
+        dbPort.addEventListener('messageerror', (event) => {
+            const error = new ExtensionError('MediaDrawingWorker: Error receiving message from database worker');
+            error.data = event;
+            log.error(error);
         });
         dbPort.start();
     }
