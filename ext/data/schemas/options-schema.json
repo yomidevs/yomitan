@@ -243,7 +243,7 @@
                                     },
                                     "glossaryLayoutMode": {
                                         "type": "string",
-                                        "enum": ["default", "compact"],
+                                        "enum": ["default", "compact", "compact-popup-anki"],
                                         "default": "default"
                                     },
                                     "mainDictionary": {
@@ -923,11 +923,11 @@
                                     "server",
                                     "tags",
                                     "screenshot",
-                                    "terms",
-                                    "kanji",
+                                    "cardFormats",
                                     "duplicateScope",
                                     "duplicateScopeCheckAllModels",
                                     "checkForDuplicates",
+                                    "duplicateBehavior",
                                     "fieldTemplates",
                                     "suspendNewCards",
                                     "displayTagsAndFlags",
@@ -973,75 +973,86 @@
                                             }
                                         }
                                     },
-                                    "terms": {
-                                        "type": "object",
-                                        "required": [
-                                            "deck",
-                                            "model",
-                                            "fields"
-                                        ],
-                                        "properties": {
-                                            "deck": {
-                                                "type": "string",
-                                                "default": ""
-                                            },
-                                            "model": {
-                                                "type": "string",
-                                                "default": ""
-                                            },
-                                            "fields": {
-                                                "type": "object",
-                                                "additionalProperties": {
+                                    "cardFormats": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "name",
+                                                "icon",
+                                                "deck",
+                                                "model",
+                                                "fields",
+                                                "type"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "default": ""
+                                                },
+                                                "icon": {
+                                                    "type": "string",
+                                                    "enum": ["big-circle", "small-circle", "big-square", "big-diamond"],
+                                                    "default": "big-circle"
+                                                },
+                                                "deck": {
+                                                    "type": "string",
+                                                    "default": ""
+                                                },
+                                                "model": {
+                                                    "type": "string",
+                                                    "default": ""
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "enum": ["term", "kanji"],
+                                                    "default": "term"
+                                                },
+                                                "fields": {
                                                     "type": "object",
-                                                    "properties": {
-                                                        "value:": {
-                                                            "type": "string",
-                                                            "default": ""
-                                                        },
-                                                        "overwriteMode": {
-                                                            "type": "string",
-                                                            "enum": ["coalesce", "coalesce-new", "skip", "append", "prepend", "overwrite"],
-                                                            "default": "coalesce"
+                                                    "additionalProperties": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "value": {
+                                                                "type": "string",
+                                                                "default": ""
+                                                            },
+                                                            "overwriteMode": {
+                                                                "type": "string",
+                                                                "enum": ["coalesce", "coalesce-new", "skip", "append", "prepend", "overwrite"],
+                                                                "default": "coalesce"
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
-                                        }
-                                    },
-                                    "kanji": {
-                                        "type": "object",
-                                        "required": [
-                                            "deck",
-                                            "model",
-                                            "fields"
-                                        ],
-                                        "properties": {
-                                            "deck": {
-                                                "type": "string",
-                                                "default": ""
+                                        },
+                                        "default": [
+                                            {
+                                                "name": "Expression",
+                                                "icon": "big-circle",
+                                                "deck": "",
+                                                "model": "",
+                                                "fields": {},
+                                                "type": "term"
                                             },
-                                            "model": {
-                                                "type": "string",
-                                                "default": ""
+                                            {
+                                                "name": "Reading",
+                                                "icon": "small-circle",
+                                                "deck": "",
+                                                "model": "",
+                                                "fields": {},
+                                                "type": "term"
                                             },
-                                            "fields": {
-                                                "type": "object",
-                                                "additionalProperties": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "value:": {
-                                                            "type": "string",
-                                                            "default": ""
-                                                        },
-                                                        "overwriteMode": {
-                                                            "type": "string",
-                                                            "enum": ["coalesce", "coalesce-new", "skip", "append", "prepend", "overwrite"],
-                                                            "default": "coalesce"
-                                                        }
-                                                    }
-                                                }
+                                            {
+                                                "name": "Kanji",
+                                                "icon": "big-circle",
+                                                "deck": "",
+                                                "model": "",
+                                                "fields": {},
+                                                "type": "kanji"
                                             }
-                                        }
+                                        ]
                                     },
                                     "duplicateScope": {
                                         "type": "string",
@@ -1234,11 +1245,11 @@
                                             {"action": "historyForward",    "argument": "",  "key": "KeyF",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "profilePrevious",   "argument": "",  "key": "Minus",     "modifiers": ["alt"],  "scopes": ["popup", "search", "web"], "enabled": true},
                                             {"action": "profileNext",       "argument": "",  "key": "Equal",     "modifiers": ["alt"],  "scopes": ["popup", "search", "web"], "enabled": true},
-                                            {"action": "addNoteKanji",      "argument": "",  "key": "KeyK",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "addNoteTermKanji",  "argument": "",  "key": "KeyE",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "addNoteTermKana",   "argument": "",  "key": "KeyR",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "addNote",           "argument": "0", "key": "KeyE",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "addNote",           "argument": "1", "key": "KeyR",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "addNote",           "argument": "2", "key": "KeyK",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "playAudio",         "argument": "",  "key": "KeyP",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
-                                            {"action": "viewNotes",         "argument": "",  "key": "KeyV",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
+                                            {"action": "viewNotes",         "argument": "0", "key": "KeyV",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "copyHostSelection", "argument": "",  "key": "KeyC",      "modifiers": ["ctrl"], "scopes": ["popup"],           "enabled": true}
                                         ]
                                     }

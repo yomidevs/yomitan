@@ -22,6 +22,7 @@ import {createApiMap, invokeApiMapHandler} from '../../core/api-map.js';
 import {EventListenerCollection} from '../../core/event-listener-collection.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {TextSourceRange} from '../../dom/text-source-range.js';
+import {isComposing} from '../../language/ime-utilities.js';
 import {convertToKanaIME} from '../../language/ja/japanese-wanakana.js';
 
 export class PopupPreviewFrame {
@@ -268,7 +269,7 @@ export class PopupPreviewFrame {
     }
 
     /**
-     * @param {KeyboardEvent} e
+     * @param {InputEvent} e
      */
     _onSearchInput(e) {
         const element = /** @type {HTMLTextAreaElement} */ (e.currentTarget);
@@ -277,10 +278,13 @@ export class PopupPreviewFrame {
 
     /**
      * @param {HTMLTextAreaElement} element
-     * @param {KeyboardEvent} event
+     * @param {InputEvent} event
      */
     _searchTextKanaConversion(element, event) {
-        if (event.isComposing) { return; }
+        const platform = document.documentElement.dataset.platform ?? 'unknown';
+        const browser = document.documentElement.dataset.browser ?? 'unknown';
+        if (isComposing(event, platform, browser)) { return; }
+
         const {kanaString, newSelectionStart} = convertToKanaIME(element.value, element.selectionStart);
         element.value = kanaString;
         element.setSelectionRange(newSelectionStart, newSelectionStart);

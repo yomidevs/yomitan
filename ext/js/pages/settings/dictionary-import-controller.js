@@ -651,11 +651,13 @@ export class DictionaryImportController {
             const {profiles} = options;
 
             for (const profile of profiles) {
-                const ankiTermFields = profile.options.anki.terms.fields;
-                const oldFieldSegmentRegex = new RegExp(getKebabCase(profilesDictionarySettings[profile.id].name), 'g');
-                const newFieldSegment = getKebabCase(result.title);
-                for (const key of Object.keys(ankiTermFields)) {
-                    ankiTermFields[key].value = ankiTermFields[key].value.replace(oldFieldSegmentRegex, newFieldSegment);
+                for (const cardFormat of profile.options.anki.cardFormats) {
+                    const ankiTermFields = cardFormat.fields;
+                    const oldFieldSegmentRegex = new RegExp(getKebabCase(profilesDictionarySettings[profile.id].name), 'g');
+                    const newFieldSegment = getKebabCase(result.title);
+                    for (const key of Object.keys(ankiTermFields)) {
+                        ankiTermFields[key].value = ankiTermFields[key].value.replace(oldFieldSegmentRegex, newFieldSegment);
+                    }
                 }
             }
             await this._settingsController.setAllSettings(options);

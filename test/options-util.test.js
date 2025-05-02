@@ -496,7 +496,10 @@ function createProfileOptionsUpdatedTestData1() {
             server: 'http://127.0.0.1:8765',
             tags: ['yomitan'],
             screenshot: {format: 'png', quality: 92},
-            terms: {
+            cardFormats: [{
+                type: 'term',
+                name: 'Expression',
+                icon: 'big-circle',
                 deck: '',
                 model: '',
                 fields: {
@@ -505,8 +508,10 @@ function createProfileOptionsUpdatedTestData1() {
                         value: '{popup-selection-text}',
                     },
                 },
-            },
-            kanji: {
+            }, {
+                type: 'kanji',
+                name: 'Kanji',
+                icon: 'big-circle',
                 deck: '',
                 model: '',
                 fields: {
@@ -515,7 +520,7 @@ function createProfileOptionsUpdatedTestData1() {
                         value: '{popup-selection-text}',
                     },
                 },
-            },
+            }],
             duplicateBehavior: 'new',
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,
@@ -562,11 +567,11 @@ function createProfileOptionsUpdatedTestData1() {
                 {action: 'nextEntry',         argument: '1', key: 'ArrowDown', modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'historyBackward',   argument: '',  key: 'KeyB',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'historyForward',    argument: '',  key: 'KeyF',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'addNoteKanji',      argument: '',  key: 'KeyK',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'addNoteTermKanji',  argument: '',  key: 'KeyE',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'addNoteTermKana',   argument: '',  key: 'KeyR',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'addNote',           argument: '1', key: 'KeyK',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'addNote',           argument: '0', key: 'KeyE',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'addNote',           argument: '1', key: 'KeyR',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'playAudio',         argument: '',  key: 'KeyP',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'viewNotes',         argument: '',  key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'viewNotes',         argument: '0', key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'copyHostSelection', argument: '',  key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true},
                 {action: 'profilePrevious',   argument: '',  key: 'Minus',     modifiers: ['alt'],  scopes: ['popup', 'search', 'web'], enabled: true},
                 {action: 'profileNext',       argument: '',  key: 'Equal',     modifiers: ['alt'],  scopes: ['popup', 'search', 'web'], enabled: true},
@@ -682,7 +687,7 @@ function createOptionsUpdatedTestData1() {
             },
         ],
         profileCurrent: 0,
-        version: 63,
+        version: 64,
         global: {
             database: {
                 prefixWildcardsSupported: false,

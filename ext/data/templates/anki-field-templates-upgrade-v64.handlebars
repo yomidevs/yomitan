@@ -1,0 +1,69 @@
+{{<<<<<<<}}
+{{#*inline "expression"}}
+    {{~#if merge~}}
+        {{~#if modeTermKana~}}
+            {{~#each definition.reading~}}
+                {{{.}}}
+                {{~#unless @last}}、{{/unless~}}
+            {{~else~}}
+                {{~#each definition.expression~}}
+                    {{{.}}}
+                    {{~#unless @last}}、{{/unless~}}
+                {{~/each~}}
+            {{~/each~}}
+        {{~else~}}
+            {{~#each definition.expression~}}
+                {{{.}}}
+                {{~#unless @last}}、{{/unless~}}
+            {{~/each~}}
+        {{~/if~}}
+    {{~else~}}
+        {{~#if modeTermKana~}}
+            {{~#if definition.reading~}}
+                {{definition.reading}}
+            {{~else~}}
+                {{definition.expression}}
+            {{~/if~}}
+        {{~else~}}
+            {{definition.expression}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+{{=======}}
+{{#*inline "expression"}}
+    {{~#if merge~}}
+        {{~#each definition.expression~}}
+            {{{.}}}
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{definition.expression}}
+    {{~/if~}}
+{{/inline}}
+{{>>>>>>>}}
+
+{{<<<<<<<}}
+{{#*inline "reading"}}
+    {{~#unless modeTermKana~}}
+        {{~#if merge~}}
+            {{~#each definition.reading~}}
+                {{{.}}}
+                {{~#unless @last}}、{{/unless~}}
+            {{~/each~}}
+        {{~else~}}
+            {{~definition.reading~}}
+        {{~/if~}}
+    {{~/unless~}}
+{{/inline}}
+{{=======}}
+{{#*inline "reading"}}
+    {{~#if merge~}}
+        {{~#each definition.reading~}}
+            {{{.}}}
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{~definition.reading~}}
+    {{~/if~}}
+{{/inline}}
+{{>>>>>>>}}

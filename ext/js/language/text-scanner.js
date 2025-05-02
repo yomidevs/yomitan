@@ -584,11 +584,24 @@ export class TextScanner extends EventDispatcher {
     }
 
     /**
+     * @param {import('input').Modifier[]} activeModifiers
+     * @returns {boolean}
+     */
+    _modifierKeySet(activeModifiers) {
+        /** @type {string[]} */
+        const settingsModifiers = [];
+        for (const settingsInput of this._inputs) {
+            settingsModifiers.push(...settingsInput.include);
+        }
+        return activeModifiers.some((modifier) => settingsModifiers.includes(modifier));
+    }
+
+    /**
      * @param {KeyboardEvent} e
      */
     _onKeyDown(e) {
         const modifiers = getActiveModifiers(e);
-        if (this._lastMouseMove !== null && (modifiers.length > 0)) {
+        if (this._lastMouseMove !== null && modifiers.length > 0 && this._modifierKeySet(modifiers)) {
             if (this._inputtingText()) { return; }
             const syntheticMousePointerEvent = new PointerEvent(this._lastMouseMove.type, {
                 screenX: this._lastMouseMove.screenX,

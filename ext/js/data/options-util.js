@@ -575,6 +575,7 @@ export class OptionsUtil {
             this._updateVersion61,
             this._updateVersion62,
             this._updateVersion63,
+            this._updateVersion64,
         ];
         /* eslint-enable @typescript-eslint/unbound-method */
         if (typeof targetVersion === 'number' && targetVersion < result.length) {
@@ -1633,6 +1634,93 @@ export class OptionsUtil {
      */
     async _updateVersion63(options) {
         await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v63.handlebars');
+    }
+
+    /**
+     *  - Added multiple anki card formats
+     *  - Updated expression template to remove modeTermKana
+     *  - Updated hotkeys to use generic note actions
+     *  @type {import('options-util').UpdateFunction}
+     */
+    async _updateVersion64(options) {
+        await this._applyAnkiFieldTemplatesPatch(options, '/data/templates/anki-field-templates-upgrade-v64.handlebars');
+
+        for (const profile of options.profiles) {
+            const oldTerms = profile.options.anki.terms;
+
+            const updatedCardFormats = [{
+                name: 'Expression',
+                icon: 'big-circle',
+                deck: oldTerms.deck,
+                model: oldTerms.model,
+                fields: oldTerms.fields,
+                type: 'term',
+            }];
+
+            if (Object.values(oldTerms.fields).some((field) => field.value.includes('{expression}'))) {
+                updatedCardFormats.push({
+                    name: 'Reading',
+                    icon: 'small-circle',
+                    deck: oldTerms.deck,
+                    model: oldTerms.model,
+                    fields: Object.fromEntries(
+                        Object.entries(oldTerms.fields).map(([key, field]) => [
+                            key,
+                            {...field, value: field.value.replace(/{expression}/g, '{reading}')},
+                        ]),
+                    ),
+                    type: 'term',
+                });
+            }
+
+            const language = profile.options.general.language;
+            const logographLanguages = ['ja', 'zh', 'yue'];
+            if (logographLanguages.includes(language)) {
+                const oldKanji = profile.options.anki.kanji;
+                const kanjiNote = {
+                    name: language === 'ja' ? 'Kanji' : 'Hanzi',
+                    icon: 'big-circle',
+                    deck: oldKanji.deck,
+                    model: oldKanji.model,
+                    fields: oldKanji.fields,
+                    type: 'kanji',
+                };
+                updatedCardFormats.push(kanjiNote);
+            }
+
+            profile.options.anki.cardFormats = [...updatedCardFormats];
+
+            delete profile.options.anki.terms;
+            delete profile.options.anki.kanji;
+
+            if (!profile.options.inputs || !profile.options.inputs.hotkeys) {
+                continue;
+            }
+
+            for (const hotkey of profile.options.inputs.hotkeys) {
+                if (!('argument' in hotkey)) {
+                    hotkey.argument = '';
+                }
+                switch (hotkey.action) {
+                    case 'addNoteTermKanji':
+                        hotkey.action = 'addNote';
+                        hotkey.argument = '0';
+                        break;
+                    case 'addNoteTermKana':
+                        hotkey.action = 'addNote';
+                        hotkey.argument = `${Math.min(1, updatedCardFormats.length - 1)}`;
+                        break;
+                    case 'addNoteKanji':
+                        hotkey.action = 'addNote';
+                        hotkey.argument = `${updatedCardFormats.length - 1}`;
+                        break;
+                    case 'viewNotes':
+                        hotkey.action = 'viewNotes';
+                        hotkey.argument = '0';
+                        break;
+                }
+            }
+        }
     }
 
     /**
