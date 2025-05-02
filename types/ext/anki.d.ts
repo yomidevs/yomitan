@@ -69,6 +69,7 @@ export type CardInfo = {
     noteId: NoteId;
     cardId: CardId;
     flags: number;
+    cardState: number;
 };
 
 export type ApiReflectResult = {

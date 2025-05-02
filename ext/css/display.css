@@ -741,7 +741,12 @@ button.action-button:active {
     background-color: var(--action-button-active-color);
     box-shadow: none;
 }
-.icon[data-icon=view-note]      { background-image: url('/images/view-note.svg'); }
+
+.icon[data-icon=view-note] { background-image: url('/images/view-note.svg'); }
+.icon[data-icon=view-note-learning] { background-image: url('/images/view-note-learning.svg'); }
+.icon[data-icon=view-note-review] { background-image: url('/images/view-note-review.svg'); }
+.icon[data-icon=view-note-suspended] { background-image: url('/images/view-note-suspended.svg'); }
+.icon[data-icon=view-note-buried] { background-image: url('/images/view-note-buried.svg'); }
 .icon[data-icon=big-circle] { background-image: url('/images/big-circle.svg'); }
 .icon[data-icon=small-circle]  { background-image: url('/images/small-circle.svg'); }
 .icon[data-icon=big-square] { background-image: url('/images/big-square.svg'); }
