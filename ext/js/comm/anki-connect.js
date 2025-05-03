@@ -163,7 +163,7 @@ export class AnkiConnect {
      * @returns {Promise<boolean[]>}
      */
     async canAddNotes(notes) {
-        if (!this._enabled) { return []; }
+        if (!this._enabled) { return new Array(notes.length).fill(false); }
         await this._checkVersion();
         const result = await this._invoke('canAddNotes', {notes});
         return this._normalizeArray(result, notes.length, 'boolean');
