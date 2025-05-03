@@ -125,6 +125,11 @@ export const spanishTransforms = {
                 suffixInflection('imos', 'ir', ['v_ir'], ['v_ir']),
                 suffixInflection('ís', 'ir', ['v_ir'], ['v_ir']),
                 suffixInflection('en', 'ir', ['v_ir'], ['v_ir']),
+                // i -> y verbs (incluir, huir, construir...)
+                suffixInflection('uyo', 'uir', ['v_ir'], ['v_ir']),
+                suffixInflection('uyes', 'uir', ['v_ir'], ['v_ir']),
+                suffixInflection('uye', 'uir', ['v_ir'], ['v_ir']),
+                suffixInflection('uyen', 'uir', ['v_ir'], ['v_ir']),
                 // -tener verbs
                 suffixInflection('tengo', 'tener', ['v'], ['v']),
                 suffixInflection('tienes', 'tener', ['v'], ['v']),
@@ -132,6 +137,20 @@ export const spanishTransforms = {
                 suffixInflection('tenemos', 'tener', ['v'], ['v']),
                 suffixInflection('tenéis', 'tener', ['v'], ['v']),
                 suffixInflection('tienen', 'tener', ['v'], ['v']),
+                // -oír verbs
+                suffixInflection('oigo', 'oír', ['v'], ['v']),
+                suffixInflection('oyes', 'oír', ['v'], ['v']),
+                suffixInflection('oye', 'oír', ['v'], ['v']),
+                suffixInflection('oímos', 'oír', ['v'], ['v']),
+                suffixInflection('oís', 'oír', ['v'], ['v']),
+                suffixInflection('oyen', 'oír', ['v'], ['v']),
+                // -venir verbs
+                suffixInflection('vengo', 'venir', ['v'], ['v']),
+                suffixInflection('vienes', 'venir', ['v'], ['v']),
+                suffixInflection('viene', 'venir', ['v'], ['v']),
+                suffixInflection('venimos', 'venir', ['v'], ['v']),
+                suffixInflection('venís', 'venir', ['v'], ['v']),
+                suffixInflection('vienen', 'venir', ['v'], ['v']),
                 // Verbs with Irregular Yo Forms
                 // -guir, -ger, or -gir verbs
                 suffixInflection('go', 'guir', ['v'], ['v']),
@@ -380,7 +399,7 @@ export const spanishTransforms = {
                 wholeWordInflection('sé', 'ser', ['v'], ['v']),
                 wholeWordInflection('ve', 'ir', ['v'], ['v']),
                 wholeWordInflection('ten', 'tener', ['v'], ['v']),
-                wholeWordInflection('ven', 'vener', ['v'], ['v']),
+                wholeWordInflection('ven', 'venir', ['v'], ['v']),
                 wholeWordInflection('haz', 'hacer', ['v'], ['v']),
                 wholeWordInflection('di', 'decir', ['v'], ['v']),
                 wholeWordInflection('pon', 'poner', ['v'], ['v']),
