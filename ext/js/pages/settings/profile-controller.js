@@ -38,8 +38,6 @@ export class ProfileController {
         /** @type {HTMLSelectElement} */
         this._profileActiveSelect = querySelectorNotNull(document, '#profile-active-select');
         /** @type {HTMLSelectElement} */
-        this._profileTargetSelect = querySelectorNotNull(document, '#profile-target-select');
-        /** @type {HTMLSelectElement} */
         this._profileCopySourceSelect = querySelectorNotNull(document, '#profile-copy-source-select');
         /** @type {HTMLElement} */
         this._removeProfileNameElement = querySelectorNotNull(document, '#profile-remove-name');
@@ -91,7 +89,6 @@ export class ProfileController {
         this._profileEntriesSupported = (this._profileEntryListContainer !== null);
 
         if (this._profileActiveSelect !== null) { this._profileActiveSelect.addEventListener('change', this._onProfileActiveChange.bind(this), false); }
-        if (this._profileTargetSelect !== null) { this._profileTargetSelect.addEventListener('change', this._onProfileTargetChange.bind(this), false); }
         if (this._profileAddButton !== null) { this._profileAddButton.addEventListener('click', this._onAdd.bind(this), false); }
         if (this._profileRemoveConfirmButton !== null) { this._profileRemoveConfirmButton.addEventListener('click', this._onDeleteConfirm.bind(this), false); }
         if (this._profileCopyConfirmButton !== null) { this._profileCopyConfirmButton.addEventListener('click', this._onCopyConfirm.bind(this), false); }
@@ -394,19 +391,16 @@ export class ProfileController {
         this._profiles = profiles;
         this._profileCurrent = profileCurrent;
 
-        const settingsProfileIndex = this._settingsController.profileIndex;
-
         // Udpate UI
         this._updateProfileSelectOptions();
 
         /** @type {HTMLSelectElement} */ (this._profileActiveSelect).value = `${profileCurrent}`;
-        /** @type {HTMLSelectElement} */ (this._profileTargetSelect).value = `${settingsProfileIndex}`;
 
         // Update profile conditions
         this._profileConditionsUI.cleanup();
-        const conditionsProfile = this._getProfile(this._profileConditionsIndex !== null ? this._profileConditionsIndex : settingsProfileIndex);
+        const conditionsProfile = this._getProfile(this._profileConditionsIndex !== null ? this._profileConditionsIndex : profileCurrent);
         if (conditionsProfile !== null) {
-            void this._profileConditionsUI.prepare(settingsProfileIndex);
+            void this._profileConditionsUI.prepare(profileCurrent);
         }
 
         // Udpate profile entries
@@ -429,15 +423,6 @@ export class ProfileController {
         const value = this._tryGetValidProfileIndex(element.value);
         if (value === null) { return; }
         void this.setDefaultProfile(value);
-    }
-
-    /**
-     * @param {Event} e
-     */
-    _onProfileTargetChange(e) {
-        const element = /** @type {HTMLSelectElement} */ (e.currentTarget);
-        const value = this._tryGetValidProfileIndex(element.value);
-        if (value === null) { return; }
         this._settingsController.profileIndex = value;
     }
 
@@ -536,7 +521,6 @@ export class ProfileController {
     _getAllProfileSelects() {
         return [
             /** @type {HTMLSelectElement} */ (this._profileActiveSelect),
-            /** @type {HTMLSelectElement} */ (this._profileTargetSelect),
             /** @type {HTMLSelectElement} */ (this._profileCopySourceSelect),
         ];
     }
