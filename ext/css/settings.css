@@ -742,6 +742,12 @@ select.short-height {
     color: #8b0000;
 }
 
+/* Hide progress report until import begins */
+.settings-item:has(.settings-item-inner>.settings-item-left>.settings-item-progress-report),
+.settings-item:has(.settings-item-inner>.settings-item-left>.settings-item-error-report) {
+    display: none;
+}
+
 
 /* Advanced settings */
 .settings-group.advanced-only>.settings-item::after,
