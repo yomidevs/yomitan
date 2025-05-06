@@ -148,6 +148,7 @@ export const spanishTransforms = {
                     type: 'other',
                     isInflected: /ue([a-z]*)(o|es|e|emos|éis|en)$/,
                     deinflect: (term) => term.replace(/ue/, 'o').replace(/(o|es|e|emos|éis|en)$/, 'er'),
+                    // TODO oler
                     conditionsIn: ['v_er'],
                     conditionsOut: ['v_er'],
                 },
