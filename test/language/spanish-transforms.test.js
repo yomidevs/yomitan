@@ -109,7 +109,7 @@ const tests = [
             {term: 'mentir', source: 'miento', rule: 'v', reasons: ['present indicative']},
             {term: 'mentir', source: 'mientes', rule: 'v', reasons: ['present indicative']},
             {term: 'mentir', source: 'miente', rule: 'v', reasons: ['present indicative']},
-            {term: 'mentir', source: 'mentemos', rule: 'v', reasons: ['present indicative']},
+            {term: 'mentir', source: 'mentimos', rule: 'v', reasons: ['present indicative']},
             {term: 'mentir', source: 'mentís', rule: 'v', reasons: ['present indicative']},
             {term: 'mentir', source: 'mienten', rule: 'v', reasons: ['present indicative']},
             // costar, o->ue -ar
