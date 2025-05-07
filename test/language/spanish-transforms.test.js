@@ -126,6 +126,13 @@ const tests = [
             {term: 'jugar', source: 'jugamos', rule: 'v', reasons: ['present indicative']},
             {term: 'jugar', source: 'jugáis', rule: 'v', reasons: ['present indicative']},
             {term: 'jugar', source: 'juegan', rule: 'v', reasons: ['present indicative']},
+            // oler
+            {term: 'oler', source: 'huelo', rule: 'v', reasons: ['present indicative']},
+            {term: 'oler', source: 'hueles', rule: 'v', reasons: ['present indicative']},
+            {term: 'oler', source: 'huele', rule: 'v', reasons: ['present indicative']},
+            {term: 'oler', source: 'olemos', rule: 'v', reasons: ['present indicative']},
+            {term: 'oler', source: 'oléis', rule: 'v', reasons: ['present indicative']},
+            {term: 'oler', source: 'huelen', rule: 'v', reasons: ['present indicative']},
             // soler, o->ue -er
             {term: 'soler', source: 'suelo', rule: 'v', reasons: ['present indicative']},
             {term: 'soler', source: 'sueles', rule: 'v', reasons: ['present indicative']},
@@ -230,6 +237,14 @@ const tests = [
             {term: 'soler', source: 'soled', rule: 'v', reasons: ['imperative']},
             {term: 'medir', source: 'mide', rule: 'v', reasons: ['imperative']},
             {term: 'medir', source: 'medid', rule: 'v', reasons: ['imperative']},
+            {term: 'jugar', source: 'juega', rule: 'v', reasons: ['imperative']},
+            {term: 'jugar', source: 'juegue', rule: 'v', reasons: ['imperative']},
+            {term: 'jugar', source: 'jugad', rule: 'v', reasons: ['imperative']},
+            {term: 'jugar', source: 'jueguen', rule: 'v', reasons: ['imperative']},
+            {term: 'oler', source: 'huele', rule: 'v', reasons: ['imperative']},
+            {term: 'oler', source: 'huela', rule: 'v', reasons: ['imperative']},
+            {term: 'oler', source: 'oled', rule: 'v', reasons: ['imperative']},
+            {term: 'oler', source: 'huelan', rule: 'v', reasons: ['imperative']},
         ],
     },
     {

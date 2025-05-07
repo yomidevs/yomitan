@@ -147,8 +147,13 @@ export const spanishTransforms = {
                 {
                     type: 'other',
                     isInflected: /ue([a-z]*)(o|es|e|en)$/,
-                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(o|es|e|en)$/, 'er'),
-                    // TODO oler
+                    deinflect: (term) => {
+                        // "oler" (o->hue)
+                        if (term.startsWith('hue')) {
+                            return term.replace(/hue/, 'o').replace(/(o|es|e|en)$/, 'er');
+                        }
+                        return term.replace(/ue/, 'o').replace(/(o|es|e|en)$/, 'er');
+                    },
                     conditionsIn: ['v_er'],
                     conditionsOut: ['v_er'],
                 },
@@ -486,56 +491,60 @@ export const spanishTransforms = {
             rules: [
                 {
                     type: 'other',
-                    isInflected: /ie([a-z]*)(a|e|ad|en)$/,
-                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(a|e|ad|en)$/, 'ar'),
+                    isInflected: /ie([a-z]*)(a|e|en)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(a|e|en)$/, 'ar'),
                     conditionsIn: ['v_ar'],
                     conditionsOut: ['v_ar'],
                 },
                 {
                     type: 'other',
-                    isInflected: /ie([a-z]*)(e|a|ed|an)$/,
-                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(e|a|ed|an)$/, 'er'),
+                    isInflected: /ie([a-z]*)(e|a|an)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(e|a|an)$/, 'er'),
                     conditionsIn: ['v_er'],
                     conditionsOut: ['v_er'],
                 },
                 {
                     type: 'other',
-                    isInflected: /ie([a-z]*)(e|a|id|an)$/,
-                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(e|a|id|an)$/, 'ir'),
+                    isInflected: /ie([a-z]*)(e|a|an)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(e|a|an)$/, 'ir'),
                     conditionsIn: ['v_ir'],
                     conditionsOut: ['v_ir'],
                 },
                 {
                     type: 'other',
-                    isInflected: /ue([a-z]*)(a|e|ad|en)$/,
+                    isInflected: /ue([a-z]*)(a|e|en)$/,
                     deinflect: (term) => {
                         if (term.startsWith('jue')) {
-                            return term.replace(/ue/, 'u').replace(/(a|ue|ad|uen)$/, 'ar');
+                            return term.replace(/ue/, 'u').replace(/(a|ue|uen)$/, 'ar');
                         }
-                        return term.replace(/ue/, 'o').replace(/(a|e|ad|en)$/, 'ar');
+                        return term.replace(/ue/, 'o').replace(/(a|e|en)$/, 'ar');
                     },
                     conditionsIn: ['v_ar'],
                     conditionsOut: ['v_ar'],
                 },
                 {
                     type: 'other',
-                    isInflected: /ue([a-z]*)(e|a|ed|an)$/,
-                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(e|a|ed|an)$/, 'er'),
-                    // TODO oler
+                    isInflected: /ue([a-z]*)(e|a|an)$/,
+                    deinflect: (term) => {
+                        if (term.startsWith('hue')) {
+                            return term.replace(/hue/, 'o').replace(/(e|a|an)$/, 'er');
+                        }
+                        return term.replace(/ue/, 'o').replace(/(e|a|an)$/, 'er');
+                    },
                     conditionsIn: ['v_er'],
                     conditionsOut: ['v_er'],
                 },
                 {
                     type: 'other',
-                    isInflected: /ue([a-z]*)(e|a|id|an)$/,
-                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(e|a|id|an)$/, 'ir'),
+                    isInflected: /ue([a-z]*)(e|a|an)$/,
+                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(e|a|an)$/, 'ir'),
                     conditionsIn: ['v_ir'],
                     conditionsOut: ['v_ir'],
                 },
                 {
                     type: 'other',
-                    isInflected: /i([a-z]*)(e|a|id|an)$/,
-                    deinflect: (term) => term.replace(/i/, 'e').replace(/(e|a|id|an)$/, 'ir'),
+                    isInflected: /i([a-z]*)(e|a|an)$/,
+                    deinflect: (term) => term.replace(/i/, 'e').replace(/(e|a|an)$/, 'ir'),
                     conditionsIn: ['v_ir'],
                     conditionsOut: ['v_ir'],
                 },
@@ -700,37 +709,37 @@ export const spanishTransforms = {
                 // e->ie for -ar
                 {
                     type: 'other',
-                    isInflected: /ie([a-z]*)(e|es|e|emos|éis|en)$/,
-                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(e|es|e|emos|éis|en)$/, 'ar'),
+                    isInflected: /ie([a-z]*)(e|es|e|en)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(e|es|e|en)$/, 'ar'),
                     conditionsIn: ['v_ar'],
                     conditionsOut: ['v_ar'],
                 },
                 // e->ie for -er
                 {
                     type: 'other',
-                    isInflected: /ie([a-z]*)(a|as|a|amos|áis|an)$/,
-                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(a|as|a|amos|áis|an)$/, 'er'),
+                    isInflected: /ie([a-z]*)(a|as|a|an)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(a|as|a|an)$/, 'er'),
                     conditionsIn: ['v_er'],
                     conditionsOut: ['v_er'],
                 },
                 // e->ie for -ir
                 {
                     type: 'other',
-                    isInflected: /ie([a-z]*)(a|as|a|amos|áis|an)$/,
-                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(a|as|a|amos|áis|an)$/, 'ir'),
+                    isInflected: /ie([a-z]*)(a|as|a|an)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(a|as|a|an)$/, 'ir'),
                     conditionsIn: ['v_ir'],
                     conditionsOut: ['v_ir'],
                 },
                 // o->ue for -ar
                 {
                     type: 'other',
-                    isInflected: /ue([a-z]*)(e|es|e|emos|éis|en)$/,
+                    isInflected: /ue([a-z]*)(e|es|e|en)$/,
                     deinflect: (term) => {
                         // "jugar" (u->ue)
                         if (term.startsWith('jue')) {
-                            return term.replace(/ue/, 'u').replace(/(ue|ues|ue|uemos|uéis|uen)$/, 'ar');
+                            return term.replace(/ue/, 'u').replace(/(ue|ues|ue|uen)$/, 'ar');
                         }
-                        return term.replace(/ue/, 'o').replace(/(e|es|e|emos|éis|en)$/, 'ar');
+                        return term.replace(/ue/, 'o').replace(/(e|es|e|en)$/, 'ar');
                     },
                     conditionsIn: ['v_ar'],
                     conditionsOut: ['v_ar'],
@@ -738,24 +747,29 @@ export const spanishTransforms = {
                 // o->ue for -er
                 {
                     type: 'other',
-                    isInflected: /ue([a-z]*)(a|as|a|amos|áis|an)$/,
-                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(a|as|a|amos|áis|an)$/, 'er'),
+                    isInflected: /ue([a-z]*)(a|as|a|an)$/,
+                    deinflect: (term) => {
+                        if (term.startsWith('hue')) {
+                            return term.replace(/hue/, 'o').replace(/(a|as|a|an)$/, 'er');
+                        }
+                        return term.replace(/ue/, 'o').replace(/(a|as|a|an)$/, 'er');
+                    },
                     conditionsIn: ['v_er'],
                     conditionsOut: ['v_er'],
                 },
                 // o->ue for -ir
                 {
                     type: 'other',
-                    isInflected: /ue([a-z]*)(a|as|a|amos|áis|an)$/,
-                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(a|as|a|amos|áis|an)$/, 'ir'),
+                    isInflected: /ue([a-z]*)(a|as|a|an)$/,
+                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(a|as|a|an)$/, 'ir'),
                     conditionsIn: ['v_ir'],
                     conditionsOut: ['v_ir'],
                 },
                 // e->i for -ir
                 {
                     type: 'other',
-                    isInflected: /i([a-z]*)(a|as|a|amos|áis|an)$/,
-                    deinflect: (term) => term.replace(/i/, 'e').replace(/(a|as|a|amos|áis|an)$/, 'ir'),
+                    isInflected: /i([a-z]*)(a|as|a|an)$/,
+                    deinflect: (term) => term.replace(/i/, 'e').replace(/(a|as|a|an)$/, 'ir'),
                     conditionsIn: ['v_ir'],
                     conditionsOut: ['v_ir'],
                 },
