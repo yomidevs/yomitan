@@ -172,6 +172,10 @@ const tests = [
             {term: 'vivir', source: 'vivisteis', rule: 'v', reasons: ['preterite']},
             {term: 'vivir', source: 'vivieron', rule: 'v', reasons: ['preterite']},
             {term: 'tener', source: 'tuve', rule: 'v', reasons: ['preterite']},
+            {term: 'mentir', source: 'mintió', rule: 'v', reasons: ['preterite']},
+            {term: 'mentir', source: 'mintieron', rule: 'v', reasons: ['preterite']},
+            {term: 'dormir', source: 'durmió', rule: 'v', reasons: ['preterite']},
+            {term: 'dormir', source: 'durmieron', rule: 'v', reasons: ['preterite']},
         ],
     },
     {
@@ -205,6 +209,9 @@ const tests = [
             {term: 'hablar', source: 'hablando', rule: 'v', reasons: ['progressive']},
             {term: 'comer', source: 'comiendo', rule: 'v', reasons: ['progressive']},
             {term: 'vivir', source: 'viviendo', rule: 'v', reasons: ['progressive']},
+            {term: 'servir', source: 'sirviendo', rule: 'v', reasons: ['progressive']},
+            {term: 'dormir', source: 'durmiendo', rule: 'v', reasons: ['progressive']},
+            {term: 'poder', source: 'pudiendo', rule: 'v', reasons: ['progressive']},
         ],
     },
     {

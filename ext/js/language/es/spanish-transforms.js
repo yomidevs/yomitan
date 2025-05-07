@@ -108,37 +108,37 @@ export const spanishTransforms = {
                 // e->ie for -ar
                 {
                     type: 'other',
-                    isInflected: /ie([a-z]*)(o|as|a|amos|áis|an)$/,
-                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(o|as|a|amos|áis|an)$/, 'ar'),
+                    isInflected: /ie([a-z]*)(o|as|a|an)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(o|as|a|an)$/, 'ar'),
                     conditionsIn: ['v_ar'],
                     conditionsOut: ['v_ar'],
                 },
                 // e->ie for -er
                 {
                     type: 'other',
-                    isInflected: /ie([a-z]*)(o|es|e|emos|éis|en)$/,
-                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(o|es|e|emos|éis|en)$/, 'er'),
+                    isInflected: /ie([a-z]*)(o|es|e|en)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(o|es|e|en)$/, 'er'),
                     conditionsIn: ['v_er'],
                     conditionsOut: ['v_er'],
                 },
                 // e->ie for -ir
                 {
                     type: 'other',
-                    isInflected: /ie([a-z]*)(o|es|e|imos|ís|en)$/,
-                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(o|es|e|imos|ís|en)$/, 'ir'),
+                    isInflected: /ie([a-z]*)(o|es|e|en)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(o|es|e|en)$/, 'ir'),
                     conditionsIn: ['v_ir'],
                     conditionsOut: ['v_ir'],
                 },
                 // o->ue for -ar
                 {
                     type: 'other',
-                    isInflected: /ue([a-z]*)(o|as|a|amos|áis|an)$/,
+                    isInflected: /ue([a-z]*)(o|as|a|an)$/,
                     deinflect: (term) => {
                         // "jugar" (u->ue)
                         if (term.startsWith('jue')) {
-                            return term.replace(/ue/, 'u').replace(/(o|as|a|amos|áis|an)$/, 'ar');
+                            return term.replace(/ue/, 'u').replace(/(o|as|a|an)$/, 'ar');
                         }
-                        return term.replace(/ue/, 'o').replace(/(o|as|a|amos|áis|an)$/, 'ar');
+                        return term.replace(/ue/, 'o').replace(/(o|as|a|an)$/, 'ar');
                     },
                     conditionsIn: ['v_ar'],
                     conditionsOut: ['v_ar'],
@@ -146,8 +146,8 @@ export const spanishTransforms = {
                 // o->ue for -er
                 {
                     type: 'other',
-                    isInflected: /ue([a-z]*)(o|es|e|emos|éis|en)$/,
-                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(o|es|e|emos|éis|en)$/, 'er'),
+                    isInflected: /ue([a-z]*)(o|es|e|en)$/,
+                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(o|es|e|en)$/, 'er'),
                     // TODO oler
                     conditionsIn: ['v_er'],
                     conditionsOut: ['v_er'],
@@ -155,16 +155,16 @@ export const spanishTransforms = {
                 // o->ue for -ir
                 {
                     type: 'other',
-                    isInflected: /ue([a-z]*)(o|es|e|imos|ís|en)$/,
-                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(o|es|e|imos|ís|en)$/, 'ir'),
+                    isInflected: /ue([a-z]*)(o|es|e|en)$/,
+                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(o|es|e|en)$/, 'ir'),
                     conditionsIn: ['v_ir'],
                     conditionsOut: ['v_ir'],
                 },
                 // e->i for -ir
                 {
                     type: 'other',
-                    isInflected: /i([a-z]*)(o|es|e|imos|ís|en)$/,
-                    deinflect: (term) => term.replace(/i/, 'e').replace(/(o|es|e|imos|ís|en)$/, 'ir'),
+                    isInflected: /i([a-z]*)(o|es|e|en)$/,
+                    deinflect: (term) => term.replace(/i/, 'e').replace(/(o|es|e|en)$/, 'ir'),
                     conditionsIn: ['v_ir'],
                     conditionsOut: ['v_ir'],
                 },
@@ -262,6 +262,22 @@ export const spanishTransforms = {
             name: 'preterite',
             description: 'Preterite (past) form of a verb',
             rules: [
+                // e->i for -ir
+                {
+                    type: 'other',
+                    isInflected: /i([a-z]*)(ió|ieron)$/, // this only happens in 3rd person - singular and plural
+                    deinflect: (term) => term.replace(/i/, 'e').replace(/(ió|ieron)$/, 'ir'),
+                    conditionsIn: ['v_ir'],
+                    conditionsOut: ['v_ir'],
+                },
+                // o->u for -ir
+                {
+                    type: 'other',
+                    isInflected: /u([a-z]*)(ió|ieron)$/,
+                    deinflect: (term) => term.replace(/u/, 'o').replace(/(ió|ieron)$/, 'ir'),
+                    conditionsIn: ['v_ir'],
+                    conditionsOut: ['v_ir'],
+                },
                 // -ar verbs
                 suffixInflection('é', 'ar', ['v_ar'], ['v_ar']),
                 suffixInflection('aste', 'ar', ['v_ar'], ['v_ar']),
@@ -427,6 +443,30 @@ export const spanishTransforms = {
             name: 'progressive',
             description: 'Progressive form of a verb',
             rules: [
+                // e->i for -ir
+                {
+                    type: 'other',
+                    isInflected: /i([a-z]*)(iendo)$/,
+                    deinflect: (term) => term.replace(/i/, 'e').replace(/(iendo)$/, 'ir'),
+                    conditionsIn: ['v_ir'],
+                    conditionsOut: ['v_ir'],
+                },
+                // o->u for -er
+                {
+                    type: 'other',
+                    isInflected: /u([a-z]*)(iendo)$/,
+                    deinflect: (term) => term.replace(/u/, 'o').replace(/(iendo)$/, 'er'),
+                    conditionsIn: ['v_er'],
+                    conditionsOut: ['v_er'],
+                },
+                // o->u for -ir
+                {
+                    type: 'other',
+                    isInflected: /u([a-z]*)(iendo)$/,
+                    deinflect: (term) => term.replace(/u/, 'o').replace(/(iendo)$/, 'ir'),
+                    conditionsIn: ['v_ir'],
+                    conditionsOut: ['v_ir'],
+                },
                 // regular
                 suffixInflection('ando', 'ar', ['v_ar'], ['v_ar']),
                 suffixInflection('iendo', 'er', ['v_er'], ['v_er']),
@@ -438,7 +478,6 @@ export const spanishTransforms = {
                 // irregular
                 wholeWordInflection('oyendo', 'oír', ['v'], ['v']),
                 wholeWordInflection('yendo', 'ir', ['v'], ['v']),
-                // TODO stem-changing verbs
             ],
         },
         'imperative': {
@@ -535,7 +574,6 @@ export const spanishTransforms = {
                 suffixInflection('as', 'ir', ['v_ir'], ['v_ir']),
                 suffixInflection('amos', 'ir', ['v_ir'], ['v_ir']),
                 suffixInflection('áis', 'ir', ['v_ir'], ['v_ir']),
-                // TODO stem-changing verbs
             ],
         },
         'conditional': {
