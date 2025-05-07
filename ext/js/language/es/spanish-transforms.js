@@ -445,6 +445,61 @@ export const spanishTransforms = {
             name: 'imperative',
             description: 'Imperative form of a verb',
             rules: [
+                {
+                    type: 'other',
+                    isInflected: /ie([a-z]*)(a|e|ad|en)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(a|e|ad|en)$/, 'ar'),
+                    conditionsIn: ['v_ar'],
+                    conditionsOut: ['v_ar'],
+                },
+                {
+                    type: 'other',
+                    isInflected: /ie([a-z]*)(e|a|ed|an)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(e|a|ed|an)$/, 'er'),
+                    conditionsIn: ['v_er'],
+                    conditionsOut: ['v_er'],
+                },
+                {
+                    type: 'other',
+                    isInflected: /ie([a-z]*)(e|a|id|an)$/,
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(e|a|id|an)$/, 'ir'),
+                    conditionsIn: ['v_ir'],
+                    conditionsOut: ['v_ir'],
+                },
+                {
+                    type: 'other',
+                    isInflected: /ue([a-z]*)(a|e|ad|en)$/,
+                    deinflect: (term) => {
+                        if (term.startsWith('jue')) {
+                            return term.replace(/ue/, 'u').replace(/(a|ue|ad|uen)$/, 'ar');
+                        }
+                        return term.replace(/ue/, 'o').replace(/(a|e|ad|en)$/, 'ar');
+                    },
+                    conditionsIn: ['v_ar'],
+                    conditionsOut: ['v_ar'],
+                },
+                {
+                    type: 'other',
+                    isInflected: /ue([a-z]*)(e|a|ed|an)$/,
+                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(e|a|ed|an)$/, 'er'),
+                    // TODO oler
+                    conditionsIn: ['v_er'],
+                    conditionsOut: ['v_er'],
+                },
+                {
+                    type: 'other',
+                    isInflected: /ue([a-z]*)(e|a|id|an)$/,
+                    deinflect: (term) => term.replace(/ue/, 'o').replace(/(e|a|id|an)$/, 'ir'),
+                    conditionsIn: ['v_ir'],
+                    conditionsOut: ['v_ir'],
+                },
+                {
+                    type: 'other',
+                    isInflected: /i([a-z]*)(e|a|id|an)$/,
+                    deinflect: (term) => term.replace(/i/, 'e').replace(/(e|a|id|an)$/, 'ir'),
+                    conditionsIn: ['v_ir'],
+                    conditionsOut: ['v_ir'],
+                },
                 // -ar verbs
                 suffixInflection('a', 'ar', ['v_ar'], ['v_ar']),
                 suffixInflection('emos', 'ar', ['v_ar'], ['v_ar']),
@@ -459,7 +514,6 @@ export const spanishTransforms = {
                 suffixInflection('id', 'ir', ['v_ir'], ['v_ir']),
                 // irregular verbs
                 wholeWordInflection('diga', 'decir', ['v'], ['v']),
-                // irregular imperative verbs
                 wholeWordInflection('sé', 'ser', ['v'], ['v']),
                 wholeWordInflection('ve', 'ir', ['v'], ['v']),
                 wholeWordInflection('ten', 'tener', ['v'], ['v']),

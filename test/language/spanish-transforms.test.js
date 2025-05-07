@@ -217,6 +217,12 @@ const tests = [
             {term: 'comer', source: 'comed', rule: 'v', reasons: ['imperative']},
             {term: 'vivir', source: 'vive', rule: 'v', reasons: ['imperative']},
             {term: 'vivir', source: 'vivid', rule: 'v', reasons: ['imperative']},
+            {term: 'pensar', source: 'piensa', rule: 'v', reasons: ['imperative']},
+            {term: 'pensar', source: 'pensad', rule: 'v', reasons: ['imperative']},
+            {term: 'soler', source: 'suele', rule: 'v', reasons: ['imperative']},
+            {term: 'soler', source: 'solad', rule: 'v', reasons: ['imperative']},
+            {term: 'medir', source: 'mide', rule: 'v', reasons: ['imperative']},
+            {term: 'medir', source: 'medid', rule: 'v', reasons: ['imperative']},
         ],
     },
     {
@@ -289,7 +295,27 @@ const tests = [
             {term: 'vivir', source: 'vivamos', rule: 'v', reasons: ['present subjunctive']},
             {term: 'vivir', source: 'viváis', rule: 'v', reasons: ['present subjunctive']},
             {term: 'vivir', source: 'vivan', rule: 'v', reasons: ['present subjunctive']},
-            // TODO stem-changing tests
+            // pensar, e->ie
+            {term: 'pensar', source: 'piense', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'pensar', source: 'pienses', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'pensar', source: 'piense', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'pensar', source: 'pensemos', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'pensar', source: 'penséis', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'pensar', source: 'piensen', rule: 'v', reasons: ['present subjunctive']},
+            // soler, o->ue
+            {term: 'soler', source: 'suela', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'soler', source: 'suelas', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'soler', source: 'suela', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'soler', source: 'solamos', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'soler', source: 'soláis', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'soler', source: 'suelan', rule: 'v', reasons: ['present subjunctive']},
+            // medir, e->i
+            {term: 'medir', source: 'mida', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'medir', source: 'midas', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'medir', source: 'mida', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'medir', source: 'medamos', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'medir', source: 'medáis', rule: 'v', reasons: ['present subjunctive']},
+            {term: 'medir', source: 'midan', rule: 'v', reasons: ['present subjunctive']},
         ],
     },
     {
