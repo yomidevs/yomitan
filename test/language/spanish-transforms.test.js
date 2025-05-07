@@ -220,7 +220,7 @@ const tests = [
             {term: 'pensar', source: 'piensa', rule: 'v', reasons: ['imperative']},
             {term: 'pensar', source: 'pensad', rule: 'v', reasons: ['imperative']},
             {term: 'soler', source: 'suele', rule: 'v', reasons: ['imperative']},
-            {term: 'soler', source: 'solad', rule: 'v', reasons: ['imperative']},
+            {term: 'soler', source: 'soled', rule: 'v', reasons: ['imperative']},
             {term: 'medir', source: 'mide', rule: 'v', reasons: ['imperative']},
             {term: 'medir', source: 'medid', rule: 'v', reasons: ['imperative']},
         ],

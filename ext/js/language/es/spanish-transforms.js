@@ -663,7 +663,7 @@ export const spanishTransforms = {
                 {
                     type: 'other',
                     isInflected: /ie([a-z]*)(e|es|e|emos|éis|en)$/,
-                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(o|as|a|amos|áis|an)$/, 'ar'),
+                    deinflect: (term) => term.replace(/ie/, 'e').replace(/(e|es|e|emos|éis|en)$/, 'ar'),
                     conditionsIn: ['v_ar'],
                     conditionsOut: ['v_ar'],
                 },
