@@ -54,6 +54,10 @@ export class AnkiDeckGeneratorController {
         this._activeModelText = querySelectorNotNull(document, '#generate-anki-notes-active-model');
         /** @type {HTMLElement} */
         this._activeDeckText = querySelectorNotNull(document, '#generate-anki-notes-active-deck');
+        /** @type {HTMLSelectElement} */
+        this._activeFlashcardFormatSelect = querySelectorNotNull(document, '#generate-anki-flashcard-format');
+        /** @type {import('settings').AnkiCardFormat[]} */
+        this._flashcardFormatDetails = [];
         /** @type {HTMLInputElement} */
         this._addMediaCheckbox = querySelectorNotNull(document, '#generate-anki-notes-add-media');
         /** @type {HTMLInputElement} */
@@ -116,21 +120,45 @@ export class AnkiDeckGeneratorController {
         void this._updateExampleText();
         this._mainSettingsEntry.addEventListener('click', this._updateExampleText.bind(this), false);
 
-        void this._updateActiveModel();
-        this._mainSettingsEntry.addEventListener('click', this._updateActiveModel.bind(this), false);
+        void this._setupModelSelection();
+        this._mainSettingsEntry.addEventListener('click', this._setupModelSelection.bind(this), false);
+
+        this._activeFlashcardFormatSelect.addEventListener('change', this._updateActiveModel.bind(this), false);
     }
 
     // Private
+
+    /** */
+    async _setupModelSelection() {
+        const activeFlashcardFormat = /** @type {HTMLSelectElement} */ (this._activeFlashcardFormatSelect);
+        const options = await this._settingsController.getOptions();
+        this._flashcardFormatDetails = options.anki.cardFormats;
+
+        activeFlashcardFormat.innerHTML = '';
+
+        for (let i = 0; i < options.anki.cardFormats.length; i++) {
+            if (options.anki.cardFormats[i].type === 'kanji') {
+                continue;
+            }
+            const option = document.createElement('option');
+            option.value = i.toString();
+            option.text = options.anki.cardFormats[i].name;
+            activeFlashcardFormat.add(option);
+        }
+
+        void this._updateActiveModel();
+    }
 
     /** */
     async _updateActiveModel() {
         const activeModelText = /** @type {HTMLElement} */ (this._activeModelText);
         const activeDeckText = /** @type {HTMLElement} */ (this._activeDeckText);
         const activeDeckTextConfirm = querySelectorNotNull(document, '#generate-anki-notes-active-deck-confirm');
-        const options = await this._settingsController.getOptions();
 
-        this._activeNoteType = options.anki.cardFormats[0].model;
-        this._activeAnkiDeck = options.anki.cardFormats[0].deck;
+        const index = Number(this._activeFlashcardFormatSelect.value);
+
+        this._activeNoteType = this._flashcardFormatDetails[index].model;
+        this._activeAnkiDeck = this._flashcardFormatDetails[index].deck;
         activeModelText.textContent = this._activeNoteType;
         activeDeckText.textContent = this._activeAnkiDeck;
         activeDeckTextConfirm.textContent = this._activeAnkiDeck;
@@ -433,7 +461,7 @@ export class AnkiDeckGeneratorController {
             fullQuery: sentenceText,
         };
         const template = await this._getAnkiTemplate(options);
-        const deckOptionsFields = options.anki.cardFormats[0].fields;
+        const deckOptionsFields = this._flashcardFormatDetails[Number(this._activeFlashcardFormatSelect.value)].fields;
         const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
         const idleTimeout = (Number.isFinite(options.anki.downloadTimeout) && options.anki.downloadTimeout > 0 ? options.anki.downloadTimeout : null);
         const languageSummary = getLanguageSummaries().find(({iso}) => iso === options.general.language);
