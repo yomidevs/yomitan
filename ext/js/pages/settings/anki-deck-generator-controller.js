@@ -518,7 +518,7 @@ export class AnkiDeckGeneratorController {
     }
 
     /**
-     * @param {import('dictionary').TermDictionaryEntry} dictionaryEntry
+     * @param {import('dictionary').DictionaryEntry} dictionaryEntry
      * @returns {Array<object>}
      */
     _getDictionaryEntryMedia(dictionaryEntry) {
