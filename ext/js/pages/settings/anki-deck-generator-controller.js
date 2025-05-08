@@ -137,9 +137,6 @@ export class AnkiDeckGeneratorController {
         activeFlashcardFormat.innerHTML = '';
 
         for (let i = 0; i < options.anki.cardFormats.length; i++) {
-            if (options.anki.cardFormats[i].type === 'kanji') {
-                continue;
-            }
             const option = document.createElement('option');
             option.value = i.toString();
             option.text = options.anki.cardFormats[i].name;
@@ -444,7 +441,9 @@ export class AnkiDeckGeneratorController {
      */
     async _generateNoteData(word, addMedia) {
         const optionsContext = this._settingsController.getOptionsContext();
-        const data = await this._getDictionaryEntry(word, optionsContext);
+        const activeFlashcardFormatDetails = this._flashcardFormatDetails[Number(this._activeFlashcardFormatSelect.value)];
+        const data = await this._getDictionaryEntry(word, optionsContext, activeFlashcardFormatDetails.type);
+
         if (data === null) {
             return null;
         }
@@ -461,7 +460,7 @@ export class AnkiDeckGeneratorController {
             fullQuery: sentenceText,
         };
         const template = await this._getAnkiTemplate(options);
-        const deckOptionsFields = this._flashcardFormatDetails[Number(this._activeFlashcardFormatSelect.value)].fields;
+        const deckOptionsFields = activeFlashcardFormatDetails.fields;
         const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
         const idleTimeout = (Number.isFinite(options.anki.downloadTimeout) && options.anki.downloadTimeout > 0 ? options.anki.downloadTimeout : null);
         const languageSummary = getLanguageSummaries().find(({iso}) => iso === options.general.language);
@@ -472,7 +471,7 @@ export class AnkiDeckGeneratorController {
             deck: this._activeAnkiDeck,
             model: this._activeNoteType,
             fields: deckOptionsFields,
-            type: 'term',
+            type: activeFlashcardFormatDetails.type,
             name: '',
             icon: 'big-circle',
         });
@@ -497,14 +496,23 @@ export class AnkiDeckGeneratorController {
     /**
      * @param {string} text
      * @param {import('settings').OptionsContext} optionsContext
-     * @returns {Promise<?{dictionaryEntry: import('dictionary').TermDictionaryEntry, text: string}>}
+     * @param {import('settings').AnkiCardFormatType} type
+     * @returns {Promise<?{dictionaryEntry: (import('dictionary').DictionaryEntry), text: string}>}
      */
-    async _getDictionaryEntry(text, optionsContext) {
-        const {dictionaryEntries} = await this._settingsController.application.api.termsFind(text, {}, optionsContext);
-        if (dictionaryEntries.length === 0) { return null; }
+    async _getDictionaryEntry(text, optionsContext, type) {
+        let dictionaryEntriesTermKanji = null;
+        if (type === 'term') {
+            const {dictionaryEntries} = await this._settingsController.application.api.termsFind(text, {}, optionsContext);
+            dictionaryEntriesTermKanji = dictionaryEntries;
+        }
+        if (type === 'kanji') {
+            dictionaryEntriesTermKanji = await this._settingsController.application.api.kanjiFind(text[0], optionsContext);
+        }
+
+        if (!dictionaryEntriesTermKanji || dictionaryEntriesTermKanji.length === 0) { return null; }
 
         return {
-            dictionaryEntry: /** @type {import('dictionary').TermDictionaryEntry} */ (dictionaryEntries[0]),
+            dictionaryEntry: /** @type {import('dictionary').DictionaryEntry} */ (dictionaryEntriesTermKanji[0]),
             text: text,
         };
     }
@@ -514,6 +522,9 @@ export class AnkiDeckGeneratorController {
      * @returns {Array<object>}
      */
     _getDictionaryEntryMedia(dictionaryEntry) {
+        if (dictionaryEntry.type !== 'term') {
+            return [];
+        }
         const media = [];
         const definitions = dictionaryEntry.definitions;
         for (const definition of definitions) {
