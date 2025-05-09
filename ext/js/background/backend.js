@@ -322,6 +322,8 @@ export class Backend {
 
             this._applyOptions('background');
 
+            this._attachOmniboxListener();
+
             const options = this._getProfileOptions({current: true}, false);
             if (options.general.showGuide) {
                 void this._openWelcomeGuidePageOnce();
@@ -1410,8 +1412,6 @@ export class Backend {
         }
 
         this._setupContextMenu(options);
-
-        this._attachOmniboxListener();
 
         void this._accessibilityController.update(this._getOptionsFull(false));
 
