@@ -85,8 +85,8 @@ export class DictionaryImporter {
                     errors.push(toError(e));
                 }
 
-                this._progressData.index += count;
-                this._progress();
+                // this._progressData.index += count;
+                // this._progress();
             }
         };
 
@@ -131,15 +131,41 @@ export class DictionaryImporter {
 
         // Load data
         let totalDataCount = 0;
+        const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
-        let termList = await (
-            version === 1 ?
-            this._readFileSequence(termFiles, this._convertTermBankEntryV1.bind(this), dataBankSchemas[0], dictionaryTitle) :
-            this._readFileSequence(termFiles, this._convertTermBankEntryV3.bind(this), dataBankSchemas[0], dictionaryTitle)
-        );
-        await bulkAdd('terms', termList);
-        totalDataCount += termList.length;
-        termList = [];
+
+        let termListTotal = 0;
+        /** @type {import('dictionary-importer').ImportRequirement[]} */
+        const requirements = [];
+        for (const termFile of termFiles) {
+            let termList = await (
+                version === 1 ?
+                this._readFileSequence([termFile], this._convertTermBankEntryV1.bind(this), dataBankSchemas[0], dictionaryTitle) :
+                this._readFileSequence([termFile], this._convertTermBankEntryV3.bind(this), dataBankSchemas[0], dictionaryTitle)
+            );
+            await bulkAdd('terms', termList);
+            totalDataCount += termList.length;
+            termListTotal += termList.length;
+
+            if (prefixWildcardsSupported) {
+                for (const entry of termList) {
+                    entry.expressionReverse = stringReverse(entry.expression);
+                    entry.readingReverse = stringReverse(entry.reading);
+                }
+            }
+
+            for (let i = 0, ii = termList.length; i < ii; ++i) {
+                const entry = termList[i];
+                const glossaryList = entry.glossary;
+                for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
+                    const glossary = glossaryList[j];
+                    if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
+                    glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
+                }
+            }
+
+            termList = [];
+        }
 
         let termMetaList = await this._readFileSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
         await bulkAdd('termMeta', termMetaList);
@@ -168,32 +194,9 @@ export class DictionaryImporter {
         this._addOldIndexTags(index, tagList, dictionaryTitle);
 
         // Prefix wildcard support
-        const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
-        if (prefixWildcardsSupported) {
-            for (const entry of termList) {
-                entry.expressionReverse = stringReverse(entry.expression);
-                entry.readingReverse = stringReverse(entry.reading);
-            }
-        }
+
 
         // Extended data support
-        this._progressNextStep(termList.length);
-        const formatProgressInterval = 1000;
-        /** @type {import('dictionary-importer').ImportRequirement[]} */
-        const requirements = [];
-        for (let i = 0, ii = termList.length; i < ii; ++i) {
-            const entry = termList[i];
-            const glossaryList = entry.glossary;
-            for (let j = 0, jj = glossaryList.length; j < jj; ++j) {
-                const glossary = glossaryList[j];
-                if (typeof glossary !== 'object' || glossary === null || Array.isArray(glossary)) { continue; }
-                glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
-            }
-            if ((i % formatProgressInterval) === 0) {
-                this._progressData.index = i;
-                this._progress();
-            }
-        }
         this._progress();
 
         // Async requirements
@@ -208,7 +211,7 @@ export class DictionaryImporter {
 
         /** @type {import('dictionary-importer').SummaryCounts} */
         const counts = {
-            terms: {total: termList.length},
+            terms: {total: termListTotal},
             termMeta: this._getMetaCounts(termMetaList),
             kanji: {total: kanjiList.length},
             kanjiMeta: this._getMetaCounts(kanjiMetaList),
