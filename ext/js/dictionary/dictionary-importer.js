@@ -163,7 +163,7 @@ export class DictionaryImporter {
             }
 
             await bulkAdd('terms', termList);
-            termListLength = termList.length;
+            termListLength += termList.length;
 
             termList = [];
         }
