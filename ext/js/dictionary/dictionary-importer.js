@@ -162,8 +162,8 @@ export class DictionaryImporter {
                 }
             }
 
-            termListLength += termList.length;
             await bulkAdd('terms', termList);
+            termListLength = termList.length;
 
             termList = [];
         }
@@ -172,8 +172,10 @@ export class DictionaryImporter {
         let termMetaListLength = {total: 0};
         {
             let termMetaList = await this._readFilesSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
+
             await bulkAdd('termMeta', termMetaList);
             termMetaListLength = this._getMetaCounts(termMetaList);
+
             termMetaList = [];
         }
 
@@ -184,8 +186,10 @@ export class DictionaryImporter {
                 this._readFilesSequence(kanjiFiles, this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
                 this._readFilesSequence(kanjiFiles, this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
             );
+
             await bulkAdd('kanji', kanjiList);
             kanjiListLength = kanjiList.length;
+
             kanjiList = [];
         }
 
@@ -193,17 +197,21 @@ export class DictionaryImporter {
         let kanjiMetaListLength = {total: 0};
         {
             let kanjiMetaList = await this._readFilesSequence(kanjiMetaFiles, this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
+
             await bulkAdd('kanjiMeta', kanjiMetaList);
             kanjiMetaListLength = this._getMetaCounts(kanjiMetaList);
+
             kanjiMetaList = [];
         }
 
         let tagListLength = 0;
         {
             let tagList = await this._readFilesSequence(tagFiles, this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
+            this._addOldIndexTags(index, tagList, dictionaryTitle);
+
             await bulkAdd('tagMeta', tagList);
             tagListLength = tagList.length;
-            this._addOldIndexTags(index, tagList, dictionaryTitle);
+
             tagList = [];
         }
 
@@ -212,8 +220,10 @@ export class DictionaryImporter {
         {
             this._progressNextStep(requirements.length);
             let {media} = await this._resolveAsyncRequirements(requirements, fileMap);
+
             await bulkAdd('media', media);
             mediaLength = media.length;
+
             media = [];
         }
 
