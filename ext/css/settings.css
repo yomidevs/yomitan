@@ -1367,6 +1367,9 @@ button.fab-button>.icon-button-inner>.icon {
     display: none;
 }
 
+.outer-link {
+    color: var(--link-color);
+}
 
 /* Conditional styles */
 body.sidebar-visible .content-dimmer {
@@ -1412,6 +1415,25 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
     display: block;
 }
 
+/* Quick start guide image styles */
+#action-popup {
+    float: left;
+    width: 30%;
+    height: 30%;
+    margin: 1.5em 0 1.5em 1.5em;
+}
+
+#action-popup-container {
+    display: flex;
+}
+
+.quick-start-img {
+    border-top: var(--thin-border-size) solid var(--separator-color2);
+    display: block;
+    margin: auto;
+    width: 75%;
+    height: 75%;
+}
 
 /* Specialized settings styles */
 #audio-source-list>div+div {
