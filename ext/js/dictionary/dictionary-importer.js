@@ -168,38 +168,54 @@ export class DictionaryImporter {
             termList = [];
         }
 
-        let termMetaList = await this._readFilesSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
-        await bulkAdd('termMeta', termMetaList);
-        const termMetaListLength = this._getMetaCounts(termMetaList);
-        termMetaList = [];
+        /** @type {import('dictionary-importer').SummaryMetaCount} */
+        let termMetaListLength = {total: 0};
+        {
+            let termMetaList = await this._readFilesSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
+            await bulkAdd('termMeta', termMetaList);
+            termMetaListLength = this._getMetaCounts(termMetaList);
+            termMetaList = [];
+        }
 
-        let kanjiList = await (
-            version === 1 ?
-            this._readFilesSequence(kanjiFiles, this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
-            this._readFilesSequence(kanjiFiles, this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
-        );
-        await bulkAdd('kanji', kanjiList);
-        const kanjiListLength = kanjiList.length;
-        kanjiList = [];
+        let kanjiListLength = 0;
+        {
+            let kanjiList = await (
+                version === 1 ?
+                this._readFilesSequence(kanjiFiles, this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
+                this._readFilesSequence(kanjiFiles, this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
+            );
+            await bulkAdd('kanji', kanjiList);
+            kanjiListLength = kanjiList.length;
+            kanjiList = [];
+        }
 
-        let kanjiMetaList = await this._readFilesSequence(kanjiMetaFiles, this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
-        await bulkAdd('kanjiMeta', kanjiMetaList);
-        const kanjiMetaListLength = this._getMetaCounts(kanjiMetaList);
-        kanjiMetaList = [];
+        /** @type {import('dictionary-importer').SummaryMetaCount} */
+        let kanjiMetaListLength = {total: 0};
+        {
+            let kanjiMetaList = await this._readFilesSequence(kanjiMetaFiles, this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
+            await bulkAdd('kanjiMeta', kanjiMetaList);
+            kanjiMetaListLength = this._getMetaCounts(kanjiMetaList);
+            kanjiMetaList = [];
+        }
 
-        let tagList = await this._readFilesSequence(tagFiles, this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
-        await bulkAdd('tagMeta', tagList);
-        const tagListLength = tagList.length;
-        tagList = [];
-
-        this._addOldIndexTags(index, tagList, dictionaryTitle);
+        let tagListLength = 0;
+        {
+            let tagList = await this._readFilesSequence(tagFiles, this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
+            await bulkAdd('tagMeta', tagList);
+            tagListLength = tagList.length;
+            this._addOldIndexTags(index, tagList, dictionaryTitle);
+            tagList = [];
+        }
 
         // Async requirements
-        this._progressNextStep(requirements.length);
-        let {media} = await this._resolveAsyncRequirements(requirements, fileMap);
-        await bulkAdd('media', media);
-        const mediaLength = media.length;
-        media = [];
+        let mediaLength = 0;
+        {
+            this._progressNextStep(requirements.length);
+            let {media} = await this._resolveAsyncRequirements(requirements, fileMap);
+            await bulkAdd('media', media);
+            mediaLength = media.length;
+            media = [];
+        }
 
         // Add dictionary descriptor
         /** @type {import('dictionary-importer').SummaryCounts} */
