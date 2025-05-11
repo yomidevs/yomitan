@@ -24,12 +24,12 @@ import {
     ZipReader as ZipReader0,
     configure,
 } from '../../lib/zip.js';
-import {compareRevisions} from './dictionary-data-util.js';
 import {ExtensionError} from '../core/extension-error.js';
 import {parseJson} from '../core/json.js';
 import {toError} from '../core/to-error.js';
 import {stringReverse} from '../core/utilities.js';
 import {getFileExtensionFromImageMediaType, getImageMediaTypeFromFileName} from '../media/media-util.js';
+import {compareRevisions} from './dictionary-data-util.js';
 
 const ajvSchemas = /** @type {import('dictionary-importer').CompiledSchemaValidators} */ (/** @type {unknown} */ (ajvSchemas0));
 const BlobWriter = /** @type {typeof import('@zip.js/zip.js').BlobWriter} */ (/** @type {unknown} */ (BlobWriter0));
@@ -64,6 +64,31 @@ export class DictionaryImporter {
         if (!dictionaryDatabase.isPrepared()) {
             throw new Error('Database is not ready');
         }
+
+        /** @type {Error[]} */
+        const errors = [];
+        const maxTransactionLength = 1000;
+
+        /**
+         * @template {import('dictionary-database').ObjectStoreName} T
+         * @param {T} objectStoreName
+         * @param {import('dictionary-database').ObjectStoreData<T>[]} entries
+         */
+        const bulkAdd = async (objectStoreName, entries) => {
+            const ii = entries.length;
+            for (let i = 0; i < ii; i += maxTransactionLength) {
+                const count = Math.min(maxTransactionLength, ii - i);
+
+                try {
+                    await dictionaryDatabase.bulkAdd(objectStoreName, entries, i, count);
+                } catch (e) {
+                    errors.push(toError(e));
+                }
+
+                this._progressData.index += count;
+                this._progress();
+            }
+        };
 
         this._progressReset();
 
@@ -105,20 +130,41 @@ export class DictionaryImporter {
         const {termFiles, termMetaFiles, kanjiFiles, kanjiMetaFiles, tagFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
 
         // Load data
+        let totalDataCount = 0;
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
-        const termList = await (
+        let termList = await (
             version === 1 ?
             this._readFileSequence(termFiles, this._convertTermBankEntryV1.bind(this), dataBankSchemas[0], dictionaryTitle) :
             this._readFileSequence(termFiles, this._convertTermBankEntryV3.bind(this), dataBankSchemas[0], dictionaryTitle)
         );
-        const termMetaList = await this._readFileSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
-        const kanjiList = await (
+        await bulkAdd('terms', termList);
+        totalDataCount += termList.length;
+        termList = [];
+
+        let termMetaList = await this._readFileSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
+        await bulkAdd('termMeta', termMetaList);
+        totalDataCount += termMetaList.length;
+        termMetaList = [];
+
+        let kanjiList = await (
             version === 1 ?
             this._readFileSequence(kanjiFiles, this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
             this._readFileSequence(kanjiFiles, this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
         );
-        const kanjiMetaList = await this._readFileSequence(kanjiMetaFiles, this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
-        const tagList = await this._readFileSequence(tagFiles, this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
+        await bulkAdd('kanji', kanjiList);
+        totalDataCount += kanjiList.length;
+        kanjiList = [];
+
+        let kanjiMetaList = await this._readFileSequence(kanjiMetaFiles, this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
+        await bulkAdd('kanjiMeta', kanjiMetaList);
+        totalDataCount += kanjiMetaList.length;
+        kanjiMetaList = [];
+
+        let tagList = await this._readFileSequence(tagFiles, this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
+        await bulkAdd('tagMeta', tagList);
+        totalDataCount += tagList.length;
+        tagList = [];
+
         this._addOldIndexTags(index, tagList, dictionaryTitle);
 
         // Prefix wildcard support
@@ -152,10 +198,13 @@ export class DictionaryImporter {
 
         // Async requirements
         this._progressNextStep(requirements.length);
-        const {media} = await this._resolveAsyncRequirements(requirements, fileMap);
+        let {media} = await this._resolveAsyncRequirements(requirements, fileMap);
+        await bulkAdd('media', media);
+        totalDataCount += media.length;
+        media = [];
 
         // Add dictionary descriptor
-        this._progressNextStep(termList.length + termMetaList.length + kanjiList.length + kanjiMetaList.length + tagList.length + media.length);
+        this._progressNextStep(totalDataCount);
 
         /** @type {import('dictionary-importer').SummaryCounts} */
         const counts = {
@@ -187,39 +236,6 @@ export class DictionaryImporter {
 
         const summary = this._createSummary(dictionaryTitle, version, index, summaryDetails);
         await dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
-
-        // Add data
-        /** @type {Error[]} */
-        const errors = [];
-        const maxTransactionLength = 1000;
-
-        /**
-         * @template {import('dictionary-database').ObjectStoreName} T
-         * @param {T} objectStoreName
-         * @param {import('dictionary-database').ObjectStoreData<T>[]} entries
-         */
-        const bulkAdd = async (objectStoreName, entries) => {
-            const ii = entries.length;
-            for (let i = 0; i < ii; i += maxTransactionLength) {
-                const count = Math.min(maxTransactionLength, ii - i);
-
-                try {
-                    await dictionaryDatabase.bulkAdd(objectStoreName, entries, i, count);
-                } catch (e) {
-                    errors.push(toError(e));
-                }
-
-                this._progressData.index += count;
-                this._progress();
-            }
-        };
-
-        await bulkAdd('terms', termList);
-        await bulkAdd('termMeta', termMetaList);
-        await bulkAdd('kanji', kanjiList);
-        await bulkAdd('kanjiMeta', kanjiMetaList);
-        await bulkAdd('tagMeta', tagList);
-        await bulkAdd('media', media);
 
         this._progress();
 
