@@ -130,7 +130,6 @@ export class DictionaryImporter {
         const {termFiles, termMetaFiles, kanjiFiles, kanjiMetaFiles, tagFiles} = Object.fromEntries(this._getArchiveFiles(fileMap, queryDetails));
 
         // Load data
-        let totalDataCount = 0;
         const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
 
@@ -143,9 +142,6 @@ export class DictionaryImporter {
                 this._readFileSequence(termFile, this._convertTermBankEntryV1.bind(this), dataBankSchemas[0], dictionaryTitle) :
                 this._readFileSequence(termFile, this._convertTermBankEntryV3.bind(this), dataBankSchemas[0], dictionaryTitle)
             );
-            await bulkAdd('terms', termList);
-            totalDataCount += termList.length;
-            termListLength += termList.length;
 
             // Prefix wildcard support
             if (prefixWildcardsSupported) {
@@ -165,6 +161,9 @@ export class DictionaryImporter {
                     glossaryList[j] = this._formatDictionaryTermGlossaryObject(glossary, entry, requirements);
                 }
             }
+
+            termListLength += termList.length;
+            await bulkAdd('terms', termList);
 
             termList = [];
         }
@@ -203,8 +202,6 @@ export class DictionaryImporter {
         media = [];
 
         // Add dictionary descriptor
-        this._progressNextStep(totalDataCount);
-
         /** @type {import('dictionary-importer').SummaryCounts} */
         const counts = {
             terms: {total: termListLength},
