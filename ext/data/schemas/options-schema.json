@@ -1070,7 +1070,7 @@
                                     "duplicateBehavior": {
                                         "type": "string",
                                         "enum": ["prevent", "overwrite", "new"],
-                                        "default": "prevent"
+                                        "default": "new"
                                     },
                                     "fieldTemplates": {
                                         "type": ["string", "null"],

@@ -78,7 +78,7 @@ export class DisplayAnki {
         /** @type {boolean} */
         this._duplicateScopeCheckAllModels = false;
         /** @type {import('settings').AnkiDuplicateBehavior} */
-        this._duplicateBehavior = 'prevent';
+        this._duplicateBehavior = 'new';
         /** @type {import('settings').AnkiScreenshotFormat} */
         this._screenshotFormat = 'png';
         /** @type {number} */
