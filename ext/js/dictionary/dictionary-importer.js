@@ -147,6 +147,7 @@ export class DictionaryImporter {
             totalDataCount += termList.length;
             termListLength += termList.length;
 
+            // Prefix wildcard support
             if (prefixWildcardsSupported) {
                 for (const entry of termList) {
                     entry.expressionReverse = stringReverse(entry.expression);
@@ -154,6 +155,7 @@ export class DictionaryImporter {
                 }
             }
 
+            // Extended data support
             for (let i = 0, ii = termList.length; i < ii; ++i) {
                 const entry = termList[i];
                 const glossaryList = entry.glossary;
@@ -192,12 +194,6 @@ export class DictionaryImporter {
         tagList = [];
 
         this._addOldIndexTags(index, tagList, dictionaryTitle);
-
-        // Prefix wildcard support
-
-
-        // Extended data support
-        this._progress();
 
         // Async requirements
         this._progressNextStep(requirements.length);
