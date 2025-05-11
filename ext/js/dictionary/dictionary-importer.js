@@ -134,7 +134,7 @@ export class DictionaryImporter {
         const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
         this._progressNextStep(termFiles.length + termMetaFiles.length + kanjiFiles.length + kanjiMetaFiles.length + tagFiles.length);
 
-        let termListTotal = 0;
+        let termListLength = 0;
         /** @type {import('dictionary-importer').ImportRequirement[]} */
         const requirements = [];
         for (const termFile of termFiles) {
@@ -145,7 +145,7 @@ export class DictionaryImporter {
             );
             await bulkAdd('terms', termList);
             totalDataCount += termList.length;
-            termListTotal += termList.length;
+            termListLength += termList.length;
 
             if (prefixWildcardsSupported) {
                 for (const entry of termList) {
@@ -169,7 +169,7 @@ export class DictionaryImporter {
 
         let termMetaList = await this._readFileSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
         await bulkAdd('termMeta', termMetaList);
-        totalDataCount += termMetaList.length;
+        const termMetaListLength = this._getMetaCounts(termMetaList);
         termMetaList = [];
 
         let kanjiList = await (
@@ -178,17 +178,17 @@ export class DictionaryImporter {
             this._readFileSequence(kanjiFiles, this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
         );
         await bulkAdd('kanji', kanjiList);
-        totalDataCount += kanjiList.length;
+        const kanjiListLength = kanjiList.length;
         kanjiList = [];
 
         let kanjiMetaList = await this._readFileSequence(kanjiMetaFiles, this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
         await bulkAdd('kanjiMeta', kanjiMetaList);
-        totalDataCount += kanjiMetaList.length;
+        const kanjiMetaListLength = this._getMetaCounts(kanjiMetaList);
         kanjiMetaList = [];
 
         let tagList = await this._readFileSequence(tagFiles, this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
         await bulkAdd('tagMeta', tagList);
-        totalDataCount += tagList.length;
+        const tagListLength = tagList.length;
         tagList = [];
 
         this._addOldIndexTags(index, tagList, dictionaryTitle);
@@ -203,7 +203,7 @@ export class DictionaryImporter {
         this._progressNextStep(requirements.length);
         let {media} = await this._resolveAsyncRequirements(requirements, fileMap);
         await bulkAdd('media', media);
-        totalDataCount += media.length;
+        const mediaLength = media.length;
         media = [];
 
         // Add dictionary descriptor
@@ -211,12 +211,12 @@ export class DictionaryImporter {
 
         /** @type {import('dictionary-importer').SummaryCounts} */
         const counts = {
-            terms: {total: termListTotal},
-            termMeta: this._getMetaCounts(termMetaList),
-            kanji: {total: kanjiList.length},
-            kanjiMeta: this._getMetaCounts(kanjiMetaList),
-            tagMeta: {total: tagList.length},
-            media: {total: media.length},
+            terms: {total: termListLength},
+            termMeta: termMetaListLength,
+            kanji: {total: kanjiListLength},
+            kanjiMeta: kanjiMetaListLength,
+            tagMeta: {total: tagListLength},
+            media: {total: mediaLength},
         };
 
         const stylesFileName = 'styles.css';
