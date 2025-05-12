@@ -139,8 +139,8 @@ export class DictionaryImporter {
         for (const termFile of termFiles) {
             let termList = await (
                 version === 1 ?
-                this._readFileSequence(termFile, this._convertTermBankEntryV1.bind(this), dataBankSchemas[0], dictionaryTitle) :
-                this._readFileSequence(termFile, this._convertTermBankEntryV3.bind(this), dataBankSchemas[0], dictionaryTitle)
+                this._readFileSequence([termFile], this._convertTermBankEntryV1.bind(this), dataBankSchemas[0], dictionaryTitle) :
+                this._readFileSequence([termFile], this._convertTermBankEntryV3.bind(this), dataBankSchemas[0], dictionaryTitle)
             );
 
             // Prefix wildcard support
@@ -171,7 +171,7 @@ export class DictionaryImporter {
         /** @type {import('dictionary-importer').SummaryMetaCount} */
         let termMetaListLength = {total: 0};
         {
-            let termMetaList = await this._readFilesSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
+            let termMetaList = await this._readFileSequence(termMetaFiles, this._convertTermMetaBankEntry.bind(this), dataBankSchemas[1], dictionaryTitle);
 
             await bulkAdd('termMeta', termMetaList);
             termMetaListLength = this._getMetaCounts(termMetaList);
@@ -183,8 +183,8 @@ export class DictionaryImporter {
         {
             let kanjiList = await (
                 version === 1 ?
-                this._readFilesSequence(kanjiFiles, this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
-                this._readFilesSequence(kanjiFiles, this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
+                this._readFileSequence(kanjiFiles, this._convertKanjiBankEntryV1.bind(this), dataBankSchemas[2], dictionaryTitle) :
+                this._readFileSequence(kanjiFiles, this._convertKanjiBankEntryV3.bind(this), dataBankSchemas[2], dictionaryTitle)
             );
 
             await bulkAdd('kanji', kanjiList);
@@ -196,7 +196,7 @@ export class DictionaryImporter {
         /** @type {import('dictionary-importer').SummaryMetaCount} */
         let kanjiMetaListLength = {total: 0};
         {
-            let kanjiMetaList = await this._readFilesSequence(kanjiMetaFiles, this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
+            let kanjiMetaList = await this._readFileSequence(kanjiMetaFiles, this._convertKanjiMetaBankEntry.bind(this), dataBankSchemas[3], dictionaryTitle);
 
             await bulkAdd('kanjiMeta', kanjiMetaList);
             kanjiMetaListLength = this._getMetaCounts(kanjiMetaList);
@@ -206,7 +206,7 @@ export class DictionaryImporter {
 
         let tagListLength = 0;
         {
-            let tagList = await this._readFilesSequence(tagFiles, this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
+            let tagList = await this._readFileSequence(tagFiles, this._convertTagBankEntry.bind(this), dataBankSchemas[4], dictionaryTitle);
             this._addOldIndexTags(index, tagList, dictionaryTitle);
 
             await bulkAdd('tagMeta', tagList);
@@ -855,55 +855,39 @@ export class DictionaryImporter {
      * @param {string} dictionaryTitle
      * @returns {Promise<TResult[]>}
      */
-    async _readFilesSequence(files, convertEntry, schemaName, dictionaryTitle) {
-        const results = [];
-        for (const file of files) {
-            const result = await this._readFileSequence(file, convertEntry, schemaName, dictionaryTitle);
-            results.push(...result);
-        }
-        return results;
-    }
-
-    /**
-     * @template [TEntry=unknown]
-     * @template [TResult=unknown]
-     * @param {import('@zip.js/zip.js').Entry} file
-     * @param {(entry: TEntry, dictionaryTitle: string) => TResult} convertEntry
-     * @param {import('dictionary-importer').CompiledSchemaName} schemaName
-     * @param {string} dictionaryTitle
-     * @returns {Promise<TResult[]>}
-     */
-    async _readFileSequence(file, convertEntry, schemaName, dictionaryTitle) {
+    async _readFileSequence(files, convertEntry, schemaName, dictionaryTitle) {
         const progressData = this._progressData;
         let startIndex = 0;
 
         const results = [];
-        const content = await this._getData(file, new TextWriter());
-        let entries;
+        for (const file of files) {
+            const content = await this._getData(file, new TextWriter());
+            let entries;
 
-        try {
-            /** @type {unknown} */
-            entries = parseJson(content);
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(error.message + ` in '${file.filename}'`);
+            try {
+                /** @type {unknown} */
+                entries = parseJson(content);
+            } catch (error) {
+                if (error instanceof Error) {
+                    throw new Error(error.message + ` in '${file.filename}'`);
+                }
             }
-        }
 
-        startIndex = progressData.index;
-        this._progress();
+            startIndex = progressData.index;
+            this._progress();
 
-        const schema = ajvSchemas[schemaName];
-        if (!schema(entries)) {
-            throw this._formatAjvSchemaError(schema, file.filename);
-        }
+            const schema = ajvSchemas[schemaName];
+            if (!schema(entries)) {
+                throw this._formatAjvSchemaError(schema, file.filename);
+            }
 
-        progressData.index = startIndex + 1;
-        this._progress();
+            progressData.index = startIndex + 1;
+            this._progress();
 
-        if (Array.isArray(entries)) {
-            for (const entry of /** @type {TEntry[]} */ (entries)) {
-                results.push(convertEntry(entry, dictionaryTitle));
+            if (Array.isArray(entries)) {
+                for (const entry of /** @type {TEntry[]} */ (entries)) {
+                    results.push(convertEntry(entry, dictionaryTitle));
+                }
             }
         }
         return results;
