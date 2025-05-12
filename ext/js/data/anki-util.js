@@ -77,8 +77,8 @@ export function isNoteDataValid(note) {
     if (!isObjectNotArray(note)) { return false; }
     const {fields, deckName, modelName} = note;
     return (
-        typeof deckName === 'string' &&
-        typeof modelName === 'string' &&
+        typeof deckName === 'string' && deckName.length > 0 &&
+        typeof modelName === 'string' && modelName.length > 0 &&
         Object.entries(fields).length > 0
     );
 }
