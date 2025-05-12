@@ -84,9 +84,6 @@ export class DictionaryImporter {
                 } catch (e) {
                     errors.push(toError(e));
                 }
-
-                // this._progressData.index += count;
-                // this._progress();
             }
         };
 
@@ -165,6 +162,8 @@ export class DictionaryImporter {
             await bulkAdd('terms', termList);
             termListLength += termList.length;
 
+            this._progress();
+
             termList = [];
         }
 
@@ -175,6 +174,9 @@ export class DictionaryImporter {
 
             await bulkAdd('termMeta', termMetaList);
             termMetaListLength = this._getMetaCounts(termMetaList);
+
+            this._progressData.index += termMetaFiles.length - 1;
+            this._progress();
 
             termMetaList = [];
         }
@@ -190,6 +192,9 @@ export class DictionaryImporter {
             await bulkAdd('kanji', kanjiList);
             kanjiListLength = kanjiList.length;
 
+            this._progressData.index += kanjiFiles.length - 1;
+            this._progress();
+
             kanjiList = [];
         }
 
@@ -200,6 +205,9 @@ export class DictionaryImporter {
 
             await bulkAdd('kanjiMeta', kanjiMetaList);
             kanjiMetaListLength = this._getMetaCounts(kanjiMetaList);
+
+            this._progressData.index += kanjiMetaFiles.length - 1;
+            this._progress();
 
             kanjiMetaList = [];
         }
@@ -212,13 +220,17 @@ export class DictionaryImporter {
             await bulkAdd('tagMeta', tagList);
             tagListLength = tagList.length;
 
+            this._progressData.index += tagFiles.length - 1;
+            this._progress();
+
             tagList = [];
         }
 
         // Async requirements
+        this._progressNextStep(requirements.length);
+
         let mediaLength = 0;
         {
-            this._progressNextStep(requirements.length);
             let {media} = await this._resolveAsyncRequirements(requirements, fileMap);
 
             await bulkAdd('media', media);
@@ -228,6 +240,8 @@ export class DictionaryImporter {
         }
 
         // Add dictionary descriptor
+        this._progressNextStep(0);
+
         /** @type {import('dictionary-importer').SummaryCounts} */
         const counts = {
             terms: {total: termListLength},
