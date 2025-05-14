@@ -16,7 +16,16 @@
  */
 
 import {removeSyriacScriptDiacritics} from './aii/assyrian-neo-aramaic-text-preprocessors.js';
-import {removeArabicScriptDiacritics} from './ar/arabic-text-preprocessors.js';
+import {
+    addHamzaBottom,
+    addHamzaTop,
+    convertAlifMaqsuraToYaa,
+    convertHaToTaMarbuta,
+    normalizeUnicode,
+    removeArabicScriptDiacritics,
+    removeTatweel,
+} from './ar/arabic-text-preprocessors.js';
+import {arabicTransforms} from './ar/arabic-transforms.js';
 import {normalizeRadicalCharacters} from './CJK-util.js';
 import {eszettPreprocessor} from './de/german-text-preprocessors.js';
 import {germanTransforms} from './de/german-transforms.js';
@@ -25,6 +34,9 @@ import {esperantoTransforms} from './eo/esperanto-transforms.js';
 import {spanishTransforms} from './es/spanish-transforms.js';
 import {apostropheVariants} from './fr/french-text-preprocessors.js';
 import {frenchTransforms} from './fr/french-transforms.js';
+import {irishTransforms} from './ga/irish-transforms.js';
+import {convertLatinToGreek} from './grc/ancient-greek-processors.js';
+import {ancientGreekTransforms} from './grc/ancient-greek-transforms.js';
 import {
     alphabeticToHiragana,
     alphanumericWidthVariants,
@@ -72,11 +84,33 @@ const languageDescriptors = [
     {
         iso: 'ar',
         iso639_3: 'ara',
-        name: 'Arabic',
+        name: 'Arabic (MSA)',
         exampleText: 'قَرَأَ',
         textPreprocessors: {
             removeArabicScriptDiacritics,
+            removeTatweel,
+            normalizeUnicode,
+            addHamzaTop,
+            addHamzaBottom,
+            convertAlifMaqsuraToYaa,
         },
+        languageTransforms: arabicTransforms,
+    },
+    {
+        iso: 'arz',
+        iso639_3: 'arz',
+        name: 'Arabic (Egyptian)',
+        exampleText: 'قَرَأَ',
+        textPreprocessors: {
+            removeArabicScriptDiacritics,
+            removeTatweel,
+            normalizeUnicode,
+            addHamzaTop,
+            addHamzaBottom,
+            convertAlifMaqsuraToYaa,
+            convertHaToTaMarbuta,
+        },
+        languageTransforms: arabicTransforms,
     },
     {
         iso: 'cs',
@@ -171,6 +205,14 @@ const languageDescriptors = [
         languageTransforms: frenchTransforms,
     },
     {
+        iso: 'ga',
+        iso639_3: 'gle',
+        name: 'Irish',
+        exampleText: 'léigh',
+        textPreprocessors: capitalizationPreprocessors,
+        languageTransforms: irishTransforms,
+    },
+    {
         iso: 'grc',
         iso639_3: 'grc',
         name: 'Ancient Greek',
@@ -178,7 +220,15 @@ const languageDescriptors = [
         textPreprocessors: {
             ...capitalizationPreprocessors,
             removeAlphabeticDiacritics,
+            convertLatinToGreek,
         },
+        languageTransforms: ancientGreekTransforms,
+    },
+    {
+        iso: 'he',
+        iso639_3: 'heb',
+        name: 'Hebrew',
+        exampleText: 'קריאה',
     },
     {
         iso: 'hi',
@@ -198,7 +248,10 @@ const languageDescriptors = [
         iso639_3: 'ind',
         name: 'Indonesian',
         exampleText: 'baca',
-        textPreprocessors: capitalizationPreprocessors,
+        textPreprocessors: {
+            ...capitalizationPreprocessors,
+            removeAlphabeticDiacritics,
+        },
     },
     {
         iso: 'it',

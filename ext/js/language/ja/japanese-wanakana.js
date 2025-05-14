@@ -15,14 +15,59 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as wanakana from '../../../lib/wanakana.js';
+import {HIRAGANA_TO_ROMAJI, ROMAJI_TO_HIRAGANA} from './japanese-kana-romaji-dicts.js';
+import {convertHiraganaToKatakana} from './japanese.js';
 
 /**
  * @param {string} text
  * @returns {string}
  */
-function convertAlphabeticPartToKana(text) {
-    return wanakana.toHiragana(text);
+export function convertToHiragana(text) {
+    let newText = text.toLowerCase();
+    for (const [romaji, kana] of Object.entries(ROMAJI_TO_HIRAGANA)) {
+        newText = newText.replaceAll(romaji, kana);
+    }
+    return fillSokuonGaps(newText);
+}
+
+/**
+ * @param {string} text
+ * @param {number} selectionStart
+ * @returns {import('language').KanaIMEOutput}
+ */
+export function convertToKanaIME(text, selectionStart) {
+    const prevSelectionStart = selectionStart;
+    const prevLength = text.length;
+    let kanaString = '';
+
+    // If the user starts typing a single `n`, hide it from the converter. (This only applies when using the converter as an IME)
+    // The converter must only allow the n to become ん when the user's text cursor is at least one character ahead of it.
+    // If `n` occurs directly behind the user's text cursor, it should be hidden from the converter.
+    // If `ny` occurs directly behind the user's text cursor, it must also be hidden from the converter as the user may be trying to type `nya` `nyi` `nyu` `nye` `nyo`.
+    // Examples (`|` shall be the user's text cursor):
+    // `たn|` does not convert to `たん|`. The `n` should be hidden from the converter and `た` should only be sent.
+    // `n|の` also does not convert to `ん|の`. Even though the cursor is not at the end of the line, the `n` should still be hidden since it is directly behind the user's text cursor.
+    // `ny|` does not convert to `んy|`. The `ny` must be hidden since the user may be trying to type something starting with `ny` such as `nya`.
+    // `たnt|` does convert to `たんt|`. The user's text cursor is one character ahead of the `n` so it does not need to be hidden and can be converted.
+    // `nとあ|` also converts to `んとあ|` The user's text cursor is two characters away from the `n`.
+    // `なno|` will still convert to `なの` instead of `なんお` without issue since the `no` -> `の` conversion will be found before `n` -> `ん` and `o` -> `お`.
+    // `nn|` will still convert to `ん` instead of `んん` since `nn` -> `ん` will be found before `n` -> `ん`.
+    // If the user pastes in a long string of `n` such as `nnnnn|` it should leave the last `n` and convert to `んんn`
+    if (text[prevSelectionStart - 1] === 'n' && text.slice(0, prevSelectionStart - 1).replaceAll('nn', '').at(-1) !== 'n') {
+        const beforeN = text.slice(0, prevSelectionStart - 1);
+        const afterN = text.slice(prevSelectionStart);
+        kanaString = convertToKana(beforeN) + 'n' + convertToKana(afterN);
+    } else if (text.slice(prevSelectionStart - 2, prevSelectionStart) === 'ny') {
+        const beforeN = text.slice(0, prevSelectionStart - 2);
+        const afterN = text.slice(prevSelectionStart);
+        kanaString = convertToKana(beforeN) + 'ny' + convertToKana(afterN);
+    } else {
+        kanaString = convertToKana(text);
+    }
+
+    const selectionOffset = kanaString.length - prevLength;
+
+    return {kanaString, newSelectionStart: prevSelectionStart + selectionOffset};
 }
 
 /**
@@ -30,7 +75,23 @@ function convertAlphabeticPartToKana(text) {
  * @returns {string}
  */
 export function convertToKana(text) {
-    return wanakana.toKana(text);
+    let newText = text;
+    for (const [romaji, kana] of Object.entries(ROMAJI_TO_HIRAGANA)) {
+        newText = newText.replaceAll(romaji, kana);
+        // Uppercase text converts to katakana
+        newText = newText.replaceAll(romaji.toUpperCase(), convertHiraganaToKatakana(kana));
+    }
+    return fillSokuonGaps(newText);
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ *   Fills gaps in sokuons that replaceAll using ROMAJI_TO_HIRAGANA will miss due to it not running iteratively
+ *   Example: `ttttttttttsu` -> `っっっっっっっっっつ` would become `ttttttttttsu` -> `っtっtっtっtっつ` without filling the gaps
+ */
+function fillSokuonGaps(text) {
+    return text.replaceAll(/っ[a-z](?=っ)/g, 'っっ').replaceAll(/ッ[A-Z](?=ッ)/g, 'ッッ');
 }
 
 /**
@@ -38,7 +99,12 @@ export function convertToKana(text) {
  * @returns {string}
  */
 export function convertToRomaji(text) {
-    return wanakana.toRomaji(text);
+    let newText = text;
+    for (const [kana, romaji] of Object.entries(HIRAGANA_TO_ROMAJI)) {
+        newText = newText.replaceAll(kana, romaji);
+        newText = newText.replaceAll(convertHiraganaToKatakana(kana), romaji);
+    }
+    return newText;
 }
 
 /**
@@ -64,7 +130,7 @@ export function convertAlphabeticToKana(text) {
             c = 0x2d; // '-'
         } else {
             if (part.length > 0) {
-                result += convertAlphabeticPartToKana(part);
+                result += convertToHiragana(part);
                 part = '';
             }
             result += char;
@@ -74,7 +140,7 @@ export function convertAlphabeticToKana(text) {
     }
 
     if (part.length > 0) {
-        result += convertAlphabeticPartToKana(part);
+        result += convertToHiragana(part);
     }
     return result;
 }

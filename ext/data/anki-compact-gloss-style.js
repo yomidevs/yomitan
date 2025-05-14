@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2023-2025  Yomitan Authors
+ * Copyright (C) 2019-2022  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,4 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from 'wanakana';
+const ANKI_COMPACT_GLOSS_STYLES = `
+ul[data-sc-content="glossary"] > li:not(:first-child)::before {
+  white-space: pre-wrap;
+  content: ' | ';
+  display: inline;
+  color: #777777;
+}
+
+ul[data-sc-content="glossary"] > li {
+  display: inline;
+}
+
+ul[data-sc-content="glossary"] {
+  display: inline;
+  list-style: none;
+  padding-left: 0;
+}
+`;
+
+/**
+ * @returns {string}
+ */
+export function getAnkiCompactGlossStyles() {
+    return ANKI_COMPACT_GLOSS_STYLES.trim();
+}

@@ -159,6 +159,28 @@ describe('Japanese utility functions', () => {
         });
     });
 
+    describe('convertToKanaIME', () => {
+        /** @type {[input: [string, number], expected: import('language.js').KanaIMEOutput][]} */
+        const data = [
+            // Note: `|` represents the text cursor (newSelectionStart) position in the following comments
+            [['KATAKANA', 8], {kanaString: 'カタカナ', newSelectionStart: 4}], // KATAKANA| -> カタカナ|
+            [['hiragana', 8], {kanaString: 'ひらがな', newSelectionStart: 4}], // hiragana| -> ひらがな|
+            [['n', 1], {kanaString: 'n', newSelectionStart: 1}], // n| -> n|
+            [['nn', 2], {kanaString: 'ん', newSelectionStart: 1}], // nn| -> ん|
+            [['nn', 1], {kanaString: 'nん', newSelectionStart: 1}], // n|n -> n|ん
+            [['nの', 1], {kanaString: 'nの', newSelectionStart: 1}], // n|の -> n|の
+            [['ttttttttttsu', 12], {kanaString: 'っっっっっっっっっつ', newSelectionStart: 10}], // ttttttttttsu| -> っっっっっっっっっつ|
+            [['nnn', 3], {kanaString: 'んn', newSelectionStart: 2}], // nnn| -> んn|
+            [['nnnnano', 7], {kanaString: 'んんあの', newSelectionStart: 4}], // nnnnano| -> んんあの|
+            [['ny', 2], {kanaString: 'ny', newSelectionStart: 2}], // ny| -> ny|
+            [['nya', 3], {kanaString: 'にゃ', newSelectionStart: 2}], // nya| -> にゃ|
+        ];
+
+        test.each(data)('%s -> %o', (dataValue, expected) => {
+            expect(jpw.convertToKanaIME(dataValue[0], dataValue[1])).toStrictEqual(expected);
+        });
+    });
+
     describe('convertToRomaji', () => {
         /** @type {[string: string, expected: string][]} */
         const data = [
@@ -168,9 +190,13 @@ describe('Japanese utility functions', () => {
             ['ヒラガナ', 'hiragana'],
             ['カタカナかたかな', 'katakanakatakana'],
             ['ヒラガナひらがな', 'hiraganahiragana'],
+            ['っかっきっくっけっこ', 'kkakkikkukkekko'],
+            ['ッカッキックッケッコ', 'kkakkikkukkekko'],
             ['chikaraちからチカラ力', 'chikarachikarachikara力'],
             ['katakana', 'katakana'],
             ['hiragana', 'hiragana'],
+            ['っつ', 'ttsu'],
+            ['っっっっっっっっっつ', 'ttsu'],
         ];
 
         test.each(data)('%s -> %o', (string, expected) => {

@@ -38,6 +38,7 @@
     <button type="button" class="popup-menu-item" data-menu-action="copyFrom">Copy from&hellip;</button>
     <button type="button" class="popup-menu-item" data-menu-action="editConditions">Edit conditions&hellip;</button>
     <button type="button" class="popup-menu-item" data-menu-action="duplicate">Duplicate</button>
+    <button type="button" class="popup-menu-item" data-menu-action="reset">Reset to Default</button>
     <button type="button" class="popup-menu-item" data-menu-action="delete">Delete</button>
 </div></div></div></template>
 <template id="profile-condition-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
@@ -57,8 +58,11 @@
         <button type="button" class="dictionary-outdated-button" hidden>
             <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
         </button>
-        <button type="button" class="dictionary-integrity-button" hidden>
+        <button type="button" class="dictionary-integrity-button-check" hidden>
             <div class="badge info-badge badge-small-icon"><span class="icon" data-icon="checkmark"></span></div>
+        </button>
+        <button type="button" class="dictionary-integrity-button-warning" hidden>
+            <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
         </button>
         <button type="button" class="dictionary-update-available" hidden>
             <div class="badge info-badge badge-small-icon"><span class="icon" data-icon="exclamation-point-short" title="Update available"></span></div>
@@ -87,7 +91,7 @@
         <span>
             <strong class="dictionary-title">Unassociated Data</strong> <span class="light dictionary-total-count"></span>
         </span>
-        <button type="button" class="dictionary-integrity-button">
+        <button type="button" class="dictionary-integrity-button-warning">
             <div class="badge warning-badge"><span class="icon" data-icon="exclamation-point-short"></span></div>
         </button>
     </div>
@@ -159,10 +163,13 @@
             <select class="audio-source-parameter"></select>
         </div>
     </div>
+    <button type="button" class="icon-button" id="audio-source-move-up" data-menu-action="moveUp"><span class="icon-button-inner"><span class="icon" data-icon="up-chevron"></span></span></button>
+    <button type="button" class="icon-button" id="audio-source-move-down" data-menu-action="moveDown"><span class="icon-button-inner"><span class="icon" data-icon="down-chevron"></span></span></button>
     <button type="button" class="icon-button audio-source-menu-button" data-menu="audio-source-menu" data-menu-position="below left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
 </div></template>
 <template id="audio-source-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body">
     <button type="button" class="popup-menu-item" data-menu-action="help">Help</button>
+    <button type="button" class="popup-menu-item" data-menu-action="moveTo">Move to&hellip;</button>
     <button type="button" class="popup-menu-item" data-menu-action="remove">Remove</button>
 </div></div></div></template>
 
@@ -281,6 +288,13 @@
 </div></div></div></template>
 
 <!-- Anki card -->
+<template id="anki-card-type-tab-template">
+    <label class="tab">
+        <input type="radio" name="anki-card-primary-type" data-value="terms" data-anki-card-menu="anki-card-term-field-menu">
+        <div class="tab-inner"><span class="tab-label"></span></div>
+    </label>
+</template>
+
 <template id="anki-card-field-template">
     <div class="anki-card-field-name-container">
         <span class="anki-card-field-name"></span>
@@ -297,15 +311,16 @@
     </div>
     <div class="anki-card-field-overwrite-container">
         <select class="anki-card-field-overwrite">
-            <option value="coalesce">Fill Empty</option>
-            <option value="skip">Skip</option>
-            <option value="append">Append</option>
-            <option value="prepend">Prepend</option>
-            <option value="overwrite">Overwrite</option>
+            <option value="skip" title="Keep existing value">Skip</option>
+            <option value="prepend" title="Insert new value before existing">Prepend</option>
+            <option value="append" title="Insert new value after existing">Append</option>
+            <option value="coalesce" title="Overwrite if existing value is empty">Fill if empty</option>
+            <option class="warning-text" value="coalesce-new" title="Overwrite if new value is not empty">Overwrite if available</option>
+            <option class="danger-text" value="overwrite" title="Overwrite even if new value is empty">Overwrite</option>
         </select>
     </div>
 </template>
-<template id="anki-card-terms-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
+<template id="anki-card-term-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
 <template id="anki-card-kanji-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
 <template id="anki-card-all-field-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu"><div class="popup-menu-body"></div></div></div></template>
 
@@ -417,9 +432,7 @@
             <option value="historyForward">Navigate forward in history</option>
             <option value="profilePrevious">Switch to previous profile</option>
             <option value="profileNext">Switch to next profile</option>
-            <option value="addNoteKanji">Add kanji note</option>
-            <option value="addNoteTermKanji">Add term note</option>
-            <option value="addNoteTermKana">Add term note (reading)</option>
+            <option value="addNote">Add note</option>
             <option value="viewNotes">View notes</option>
             <option value="playAudio">Play audio</option>
             <option value="playAudioFromSource">Play audio from source</option>
@@ -486,6 +499,11 @@
         <option value="text-to-speech" title="Not supported in Anki">Text-to-speech ⚠️</option>
         <option value="text-to-speech-reading" title="Not supported in Anki">Text-to-speech (Kana reading) ⚠️</option>
         <option value="custom">Custom</option>
+    </select>
+</div></template>
+<template id="hotkey-argument-anki-card-format-template"><div class="flex-row-nowrap">
+    <span class="hotkey-argument-label">Format:</span>
+    <select class="anki-card-format-select hotkey-argument-input horizontal-flex-fill">
     </select>
 </div></template>
 

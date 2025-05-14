@@ -50,7 +50,8 @@ export type MediaSimpleType = (
 export type TextFuriganaSegment = {
     text: string;
     readingMode: TextFuriganaReadingMode;
-    details: MediaObject;
+    detailsHtml: MediaObject;
+    detailsPlain: MediaObject;
 };
 
 export type TextFuriganaReadingMode = 'hiragana' | 'katakana' | null;
@@ -68,9 +69,6 @@ export type NoteData = {
     compactTags: boolean;
     group: boolean;
     merge: boolean;
-    modeTermKanji: boolean;
-    modeTermKana: boolean;
-    modeKanji: boolean;
     compactGlossaries: boolean;
     readonly uniqueExpressions: string[];
     readonly uniqueReadings: string[];

@@ -128,6 +128,7 @@ export type GeneralOptions = {
     showGuide: boolean;
     enableContextMenuScanSelected: boolean;
     compactTags: boolean;
+    averageFrequency: boolean;
     glossaryLayoutMode: GlossaryLayoutMode;
     mainDictionary: string;
     popupTheme: PopupTheme;
@@ -167,9 +168,11 @@ export type AudioOptions = {
     enabled: boolean;
     volume: number;
     autoPlay: boolean;
-    playFallbackSound: boolean;
+    fallbackSoundType: FallbackSoundType;
     sources: AudioSourceOptions[];
 };
+
+export type FallbackSoundType = 'none' | 'click' | 'bloop';
 
 export type AudioSourceOptions = {
     type: AudioSourceType;
@@ -289,8 +292,7 @@ export type AnkiOptions = {
     server: string;
     tags: string[];
     screenshot: AnkiScreenshotOptions;
-    terms: AnkiNoteOptions;
-    kanji: AnkiNoteOptions;
+    cardFormats: AnkiCardFormat[];
     duplicateScope: AnkiDuplicateScope;
     duplicateScopeCheckAllModels: boolean;
     duplicateBehavior: AnkiDuplicateBehavior;
@@ -308,22 +310,29 @@ export type AnkiScreenshotOptions = {
     quality: number;
 };
 
-export type AnkiNoteOptions = {
+export type AnkiCardFormat = {
+    type: AnkiCardFormatType;
+    name: string;
     deck: string;
     model: string;
-    fields: AnkiNoteFields;
+    fields: AnkiFields;
+    icon: AddNoteIcon;
 };
 
-export type AnkiNoteFields = {
-    [key: string]: AnkiNoteField;
+export type AnkiCardFormatType = 'kanji' | 'term';
+
+export type AddNoteIcon = 'big-circle' | 'small-circle' | 'big-square' | 'big-diamond';
+
+export type AnkiFields = {
+    [key: string]: AnkiField;
 };
 
-export type AnkiNoteField = {
+export type AnkiField = {
     value: string;
     overwriteMode: AnkiNoteFieldOverwriteMode;
 };
 
-export type AnkiNoteFieldOverwriteMode = 'coalesce' | 'overwrite' | 'append' | 'prepend' | 'skip';
+export type AnkiNoteFieldOverwriteMode = 'coalesce' | 'coalesce-new' | 'overwrite' | 'append' | 'prepend' | 'skip';
 
 export type SentenceParsingOptions = {
     scanExtent: number;
@@ -378,7 +387,7 @@ export type PopupHorizontalTextPosition = 'below' | 'above';
 
 export type PopupVerticalTextPosition = 'default' | 'before' | 'after' | 'left' | 'right';
 
-export type GlossaryLayoutMode = 'default' | 'compact';
+export type GlossaryLayoutMode = 'default' | 'compact' | 'compact-popup-anki';
 
 export type PopupTheme = 'light' | 'dark' | 'browser' | 'site';
 

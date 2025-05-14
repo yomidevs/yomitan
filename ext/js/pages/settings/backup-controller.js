@@ -550,6 +550,9 @@ export class BackupController {
      */
     _databaseExportImportErrorMessage(message, isWarning = false) {
         /** @type {HTMLElement} */
+        const errorMessageSettingsContainer = querySelectorNotNull(document, '#db-ops-error-report-container');
+        errorMessageSettingsContainer.style.display = 'block';
+        /** @type {HTMLElement} */
         const errorMessageContainer = querySelectorNotNull(document, '#db-ops-error-report');
         errorMessageContainer.style.display = 'block';
         errorMessageContainer.textContent = message;
@@ -569,6 +572,9 @@ export class BackupController {
     _databaseExportProgressCallback({totalRows, completedRows, done}) {
         log.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
         /** @type {HTMLElement} */
+        const messageSettingsContainer = querySelectorNotNull(document, '#db-ops-progress-report-container');
+        messageSettingsContainer.style.display = 'block';
+        /** @type {HTMLElement} */
         const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
         messageContainer.style.display = 'block';
         messageContainer.textContent = `Export Progress: ${completedRows} of ${totalRows} rows completed`;
@@ -584,6 +590,7 @@ export class BackupController {
      * @returns {Promise<Blob>}
      */
     async _exportDatabase(databaseName) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const DexieConstructor = /** @type {import('dexie').DexieConstructor} */ (/** @type {unknown} */ (Dexie));
         const db = new DexieConstructor(databaseName);
         await db.open();
@@ -634,6 +641,9 @@ export class BackupController {
      */
     _databaseImportProgressCallback({totalRows, completedRows, done}) {
         log.log(`Progress: ${completedRows} of ${totalRows} rows completed`);
+        /** @type {HTMLElement} */
+        const messageSettingsContainer = querySelectorNotNull(document, '#db-ops-progress-report-container');
+        messageSettingsContainer.style.display = 'block';
         /** @type {HTMLElement} */
         const messageContainer = querySelectorNotNull(document, '#db-ops-progress-report');
         messageContainer.style.display = 'block';

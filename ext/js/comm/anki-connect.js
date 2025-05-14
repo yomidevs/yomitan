@@ -163,7 +163,7 @@ export class AnkiConnect {
      * @returns {Promise<boolean[]>}
      */
     async canAddNotes(notes) {
-        if (!this._enabled) { return []; }
+        if (!this._enabled) { return new Array(notes.length).fill(false); }
         await this._checkVersion();
         const result = await this._invoke('canAddNotes', {notes});
         return this._normalizeArray(result, notes.length, 'boolean');
@@ -697,7 +697,7 @@ export class AnkiConnect {
                 result2.push(null);
                 continue;
             }
-            const {note, flags} = /** @type {{[key: string]: unknown}} */ (item);
+            const {note, flags, queue} = /** @type {{[key: string]: unknown}} */ (item);
             if (typeof note !== 'number') {
                 result2.push(null);
                 continue;
@@ -708,6 +708,7 @@ export class AnkiConnect {
                 noteId: note,
                 cardId,
                 flags: typeof flags === 'number' ? flags : 0,
+                cardState: typeof queue === 'number' ? queue : 0,
             };
             result2.push(item2);
         }

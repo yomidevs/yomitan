@@ -22,13 +22,13 @@ import {AnkiTemplateRenderer} from '../../ext/js/templates/anki-template-rendere
 
 /**
  * @param {import('dictionary').DictionaryEntryType} type
- * @returns {import('anki-note-builder').Field[]}
+ * @returns {import('settings').AnkiFields}
  */
 function createTestFields(type) {
-    /** @type {import('anki-note-builder').Field[]} */
-    const fields = [];
+    /** @type {import('settings').AnkiFields} */
+    const fields = {};
     for (const marker of getStandardFieldMarkers(type)) {
-        fields.push([marker, {value: `{${marker}}`, overwriteMode: 'coalesce'}]);
+        fields[marker] = {value: `{${marker}}`, overwriteMode: 'coalesce'};
     }
     return fields;
 }
@@ -51,7 +51,14 @@ export function createTestAnkiNoteData(dictionaryEntry, mode, styles = '') {
     const data = {
         dictionaryEntry,
         resultOutputMode: mode,
-        mode: 'test',
+        cardFormat: {
+            type: 'term',
+            name: 'test',
+            deck: 'deck',
+            model: 'model',
+            fields: {},
+            icon: 'big-circle',
+        },
         glossaryLayoutMode: 'default',
         compactTags: false,
         context: {
@@ -113,12 +120,16 @@ export async function getTemplateRenderResults(dictionaryEntries, mode, template
         /** @type {import('anki-note-builder').CreateNoteDetails} */
         const details = {
             dictionaryEntry,
-            mode: 'test',
+            cardFormat: {
+                type: dictionaryEntry.type,
+                name: 'test',
+                deck: 'deckName',
+                model: 'modelName',
+                fields: createTestFields(dictionaryEntry.type),
+                icon: 'big-circle',
+            },
             context,
             template,
-            deckName: 'deckName',
-            modelName: 'modelName',
-            fields: createTestFields(dictionaryEntry.type),
             tags: ['yomitan'],
             duplicateScope: 'collection',
             duplicateScopeCheckAllModels: false,

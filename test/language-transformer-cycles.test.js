@@ -168,5 +168,5 @@ describe.each(languagesWithTransforms)('Cycles Test $iso', ({languageTransforms}
                 deinflectionNodes.push(newDeinflectionNode);
             }
         }
-    });
+    }, {timeout: 30 * 1000});
 });

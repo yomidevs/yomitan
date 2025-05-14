@@ -742,6 +742,12 @@ select.short-height {
     color: #8b0000;
 }
 
+/* Hide progress report until import begins */
+.settings-item:has(.settings-item-inner>.settings-item-left>.settings-item-progress-report),
+.settings-item:has(.settings-item-inner>.settings-item-left>.settings-item-error-report) {
+    display: none;
+}
+
 
 /* Advanced settings */
 .settings-group.advanced-only>.settings-item::after,
@@ -1212,13 +1218,13 @@ button.fab-button>.icon-button-inner>.icon {
 
 
 /* Tabs */
-.tabs-container {
+.anki-card-tabs-container {
     display: flex;
     flex-flow: row nowrap;
     align-items: stretch;
-    margin-left: calc(-1 * var(--modal-padding-horizontal));
-    margin-right: calc(-1 * var(--modal-padding-horizontal));
     position: relative;
+    width: 100%;
+    box-sizing: border-box;
 }
 .tabs {
     flex: 1 1 auto;
@@ -1227,10 +1233,12 @@ button.fab-button>.icon-button-inner>.icon {
     align-items: stretch;
     height: 2.75em;
     overflow: hidden;
+    min-width: 0;
 }
 .tab {
     cursor: pointer;
     flex: 1 1 auto;
+    min-width: 0;
 }
 .tab>input[type='radio'] {
     opacity: 0;
@@ -1316,18 +1324,52 @@ button.fab-button>.icon-button-inner>.icon {
 .tab>input[type='radio']:checked~.tab-inner>.tab-label {
     color: var(--accent-color);
 }
-.tabs-right {
-    flex: 0 0 auto;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-content: center;
-    padding: 0 var(--modal-padding-horizontal);
+#anki-cards-new-format {
     height: 2.75em;
-}
-.tabs-right:not([hidden]) {
-    display: flex;
+    flex: 0 0 auto;
+    width: 2.75em;
+    margin-left: auto;
+    cursor: pointer;
+    position: relative;
+    box-sizing: border-box;
 }
 
+#anki-cards-new-format::before {
+    content: '';
+    display: block;
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--text-color-light3);
+    opacity: 0;
+    transition:
+        background-color var(--animation-duration) ease-in-out,
+        opacity var(--animation-duration) ease-in-out;
+}
+
+#anki-cards-new-format:hover::before {
+    opacity: 0.125;
+}
+
+#anki-cards-new-format:active::before {
+    opacity: 0.25;
+}
+
+#anki-cards-new-format .icon {
+    background-color: var(--text-color-light3);
+    transition: background-color var(--animation-duration) ease-in-out;
+}
+
+#anki-cards-new-format .icon-button>.icon-button-inner::after {
+    display: none;
+}
+
+.outer-link {
+    color: var(--link-color);
+}
 
 /* Conditional styles */
 body.sidebar-visible .content-dimmer {
@@ -1373,6 +1415,25 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
     display: block;
 }
 
+/* Quick start guide image styles */
+#action-popup {
+    float: left;
+    width: 30%;
+    height: 30%;
+    margin: 1.5em 0 1.5em 1.5em;
+}
+
+#action-popup-container {
+    display: flex;
+}
+
+.quick-start-img {
+    border-top: var(--thin-border-size) solid var(--separator-color2);
+    display: block;
+    margin: auto;
+    width: 75%;
+    height: 75%;
+}
 
 /* Specialized settings styles */
 #audio-source-list>div+div {
@@ -1423,6 +1484,15 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
 }
 .audio-source-parameter {
     flex: 1 1 auto;
+}
+.audio-source-parameter,
+input.audio-source-parameter {
+    width: var(--input-width);
+}
+
+#audio-source-move-up>span.icon-button-inner,
+#audio-source-move-down>span.icon-button-inner {
+    width: 26px;
 }
 
 .profile-add-button-container {
@@ -1584,6 +1654,17 @@ select.profile-condition-operator {
     margin-left: 0.25em;
 }
 
+.icon[data-icon=big-circle] { background-image: url('/images/big-circle.svg'); }
+.icon[data-icon=small-circle]  { background-image: url('/images/small-circle.svg'); }
+.icon[data-icon=big-square] { background-image: url('/images/big-square.svg'); }
+.icon[data-icon=big-diamond] { background-image: url('/images/big-diamond.svg'); }
+.icon.select-icon {
+    padding-left: 30px;
+    background-repeat: no-repeat;
+    background-position: 5px center;
+    background-size: 20px 20px;
+}
+
 .anki-card-fields {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -1594,10 +1675,6 @@ select.profile-condition-operator {
     gap: 0.5em;
 }
 
-.anki-card-field-name-header {
-    font-weight: bold;
-    margin-right: 1em;
-}
 .anki-card-field-input-header {
     font-weight: bold;
 }
@@ -1640,6 +1717,13 @@ select.profile-condition-operator {
     display: block;
 }
 
+.anki-card-delete-format {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.5em 0;
+}
 
 input.anki-card-field-value {
     flex: 1 1 auto;
@@ -2349,7 +2433,8 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 }
 .dictionary-outdated-button,
 .dictionary-update-available,
-.dictionary-integrity-button {
+.dictionary-integrity-button-check,
+.dictionary-integrity-button-warning {
     --button-content-color: transparent;
     --button-border-color: transparent;
     --button-background-color: transparent;
@@ -2394,16 +2479,6 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 .dictionary-details-entry-info {
     display: table-cell;
     white-space: pre-line;
-}
-.dictionary-counts {
-    width: 100%;
-    box-sizing: border-box;
-    font-size: inherit;
-    max-height: 10em;
-    line-height: 1.25;
-    font-family: 'Courier New', Courier, monospace;
-    white-space: pre;
-    overflow: auto;
 }
 
 #dictionary-alias-input {
@@ -2667,6 +2742,8 @@ button.hotkey-list-item-enabled-button[data-scope-count='0'] {
 
 /* Treat devices that can't hover as mobile devices */
 @media (hover: none) {
+    #audio-source-move-up>span.icon-button-inner,
+    #audio-source-move-down>span.icon-button-inner,
     #dictionary-move-up>span.icon-button-inner,
     #dictionary-move-down>span.icon-button-inner {
         width: 36px;

@@ -50,32 +50,12 @@
 
 {{#*inline "expression"}}
     {{~#if merge~}}
-        {{~#if modeTermKana~}}
-            {{~#each definition.reading~}}
-                {{{.}}}
-                {{~#unless @last}}、{{/unless~}}
-            {{~else~}}
-                {{~#each definition.expression~}}
-                    {{{.}}}
-                    {{~#unless @last}}、{{/unless~}}
-                {{~/each~}}
-            {{~/each~}}
-        {{~else~}}
-            {{~#each definition.expression~}}
-                {{{.}}}
-                {{~#unless @last}}、{{/unless~}}
-            {{~/each~}}
-        {{~/if~}}
+        {{~#each definition.expression~}}
+            {{{.}}}
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
     {{~else~}}
-        {{~#if modeTermKana~}}
-            {{~#if definition.reading~}}
-                {{definition.reading}}
-            {{~else~}}
-                {{definition.expression}}
-            {{~/if~}}
-        {{~else~}}
-            {{definition.expression}}
-        {{~/if~}}
+        {{definition.expression}}
     {{~/if~}}
 {{/inline}}
 
@@ -204,16 +184,14 @@
 {{/inline}}
 
 {{#*inline "reading"}}
-    {{~#unless modeTermKana~}}
-        {{~#if merge~}}
-            {{~#each definition.reading~}}
-                {{{.}}}
-                {{~#unless @last}}、{{/unless~}}
-            {{~/each~}}
-        {{~else~}}
-            {{~definition.reading~}}
-        {{~/if~}}
-    {{~/unless~}}
+    {{~#if merge~}}
+        {{~#each definition.reading~}}
+            {{{.}}}
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{~definition.reading~}}
+    {{~/if~}}
 {{/inline}}
 
 {{#*inline "sentence"}}
@@ -312,11 +290,11 @@
         <ul>
             {{~#each definition.phoneticTranscriptions~}}
                 {{~#each phoneticTranscriptions~}}
-                    <li>
+                    <li class="pronunciation" data-pronunciation-type="phonetic-transcription">
                         {{~set "any" false~}}
                         {{~#each tags~}}
                             {{~#if (get "any")}}, {{else}}<i>({{/if~}}
-                            {{name}}
+                            <span class="tag" data-details="{{name}}">{{name}}</span>
                             {{~set "any" true~}}
                         {{~/each~}}
                         {{~#if (get "any")}})</i> {{/if~}}
@@ -466,6 +444,16 @@
     {{~#if definition.cloze~}}
         {{~#if (hasMedia "textFurigana" definition.cloze.sentence)~}}
             {{{getMedia "textFurigana" definition.cloze.sentence escape=false}}}
+        {{~else~}}
+            {{{definition.cloze.sentence}}}
+        {{~/if~}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "sentence-furigana-plain"}}
+    {{~#if definition.cloze~}}
+        {{~#if (hasMedia "textFuriganaPlain" definition.cloze.sentence)~}}
+            {{{getMedia "textFuriganaPlain" definition.cloze.sentence escape=false}}}
         {{~else~}}
             {{{definition.cloze.sentence}}}
         {{~/if~}}

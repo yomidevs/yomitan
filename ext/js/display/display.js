@@ -161,6 +161,8 @@ export class Display extends EventDispatcher {
         this._frameEndpoint = (pageType === 'popup' ? new FrameEndpoint(this._application.api) : null);
         /** @type {?import('environment').Browser} */
         this._browser = null;
+        /** @type {?import('environment').OperatingSystem} */
+        this._platform = null;
         /** @type {?HTMLTextAreaElement} */
         this._copyTextarea = null;
         /** @type {?TextScanner} */
@@ -316,11 +318,13 @@ export class Display extends EventDispatcher {
 
         // State setup
         const {documentElement} = document;
-        const {browser} = await this._application.api.getEnvironmentInfo();
+        const {browser, platform} = await this._application.api.getEnvironmentInfo();
         this._browser = browser;
+        this._platform = platform.os;
 
         if (documentElement !== null) {
             documentElement.dataset.browser = browser;
+            documentElement.dataset.platform = platform.os;
         }
 
         this._languageSummaries = await this._application.api.getLanguageSummaries();
@@ -1202,6 +1206,7 @@ export class Display extends EventDispatcher {
         data.resultOutputMode = `${options.general.resultOutputMode}`;
         data.glossaryLayoutMode = `${options.general.glossaryLayoutMode}`;
         data.compactTags = `${options.general.compactTags}`;
+        data.averageFrequency = `${options.general.averageFrequency}`;
         data.frequencyDisplayMode = `${options.general.frequencyDisplayMode}`;
         data.termDisplayMode = `${options.general.termDisplayMode}`;
         data.enableSearchTags = `${options.scanning.enableSearchTags}`;
@@ -1366,7 +1371,9 @@ export class Display extends EventDispatcher {
             safePerformance.mark('display:findDictionaryEntries:end');
             safePerformance.measure('display:findDictionaryEntries', 'display:findDictionaryEntries:start', 'display:findDictionaryEntries:end');
             if (this._setContentToken !== token) { return; }
-            content.dictionaryEntries = dictionaryEntries;
+            if (lookup) {
+                content.dictionaryEntries = dictionaryEntries;
+            }
             changeHistory = true;
         }
 

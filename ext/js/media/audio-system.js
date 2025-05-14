@@ -27,8 +27,8 @@ export class AudioSystem extends EventDispatcher {
         super();
         /** @type {?HTMLAudioElement} */
         this._fallbackAudio = null;
-        /** @type {?boolean} */
-        this._playFallbackSound = null;
+        /** @type {?import('settings').FallbackSoundType} */
+        this._fallbackSoundType = null;
     }
 
     /**
@@ -45,14 +45,24 @@ export class AudioSystem extends EventDispatcher {
     }
 
     /**
-     * @param {boolean} playFallbackSound
+     * @param {import('settings').FallbackSoundType} fallbackSoundType
      * @returns {HTMLAudioElement}
      */
-    getFallbackAudio(playFallbackSound) {
-        if (this._fallbackAudio === null || this._playFallbackSound !== playFallbackSound) {
-            // audio handler expects audio url to always be present, empty string must be used instead of `new Audio()`
-            this._fallbackAudio = playFallbackSound ? new Audio('/data/audio/button.mp3') : new Audio('');
-            this._playFallbackSound = playFallbackSound;
+    getFallbackAudio(fallbackSoundType) {
+        if (this._fallbackAudio === null || this._fallbackSoundType !== fallbackSoundType) {
+            this._fallbackSoundType = fallbackSoundType;
+            switch (fallbackSoundType) {
+                case 'click':
+                    this._fallbackAudio = new Audio('/data/audio/fallback-click.mp3');
+                    break;
+                case 'bloop':
+                    this._fallbackAudio = new Audio('/data/audio/fallback-bloop.mp3');
+                    break;
+                case 'none':
+                    // audio handler expects audio url to always be present, empty string must be used instead of `new Audio()`
+                    this._fallbackAudio = new Audio('');
+                    break;
+            }
         }
         return this._fallbackAudio;
     }

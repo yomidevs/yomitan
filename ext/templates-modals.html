@@ -67,7 +67,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="low-emphasis danger dictionary-database-mutating-input" id="dictionary-delete-all-button">Delete All</button>
-            <button type="button" class="low-emphasis dictionary-database-mutating-input debug-only" id="dictionary-check-integrity">Check Integrity</button>
+            <button type="button" class="low-emphasis dictionary-database-mutating-input advanced-only" id="dictionary-check-integrity">Check Integrity</button>
             <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-check-updates">Check for Updates</button>
             <button type="button" class="low-emphasis dictionary-database-mutating-input" id="dictionary-import-button">Import</button>
             <button type="button" data-modal-action="hide">Close</button>
@@ -103,6 +103,8 @@
         <div class="modal-body">
             <p>Are you sure you want to delete the dictionary:</p>
             <p><strong id="dictionary-confirm-delete-name"></strong>?</p>
+            <p id="dictionary-confirm-delete-used-profiles-text">This dictionary is currently used by the following profiles:</p>
+            <ul id="dictionary-confirm-delete-used-profiles"></ul>
             <p class="danger-text">This action cannot be undone.</p>
         </div>
         <div class="modal-footer">
@@ -231,7 +233,6 @@
             <hr>
             <div class="settings-item"><div class="settings-item-children">
                 <div class="dictionary-details-table"></div>
-                <div class="dictionary-counts"></div>
             </div></div>
         </div>
         <div class="modal-footer">
@@ -250,7 +251,9 @@
                 The database contains extra data which is not associated with any installed dictionary.
                 Purging the database can fix this issue.
             </p>
-            <div class="dictionary-counts"></div>
+            <div class="settings-item"><div class="settings-item-children">
+                <div class="dictionary-details-table"></div>
+            </div></div>
         </div>
         <div class="modal-footer">
             <button type="button" data-modal-action="hide">Close</button>
@@ -457,6 +460,19 @@
         <div class="modal-footer">
             <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
             <button type="button" id="profile-copy-confirm-button">Copy Profile</button>
+        </div>
+    </div></div>
+
+    <div id="profile-reset-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Confirm Profile Reset</div></div>
+        <div class="modal-body">
+            <p>
+                Are you sure you want to reset the profile <em id="profile-reset-name"></em> to default?
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger" id="profile-reset-confirm-button">Reset Profile</button>
         </div>
     </div></div>
 
@@ -702,6 +718,20 @@
         </div>
     </div></div>
 
+    <div id="audio-source-move-location-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Move Audio Source Options</div></div>
+        <div class="modal-body">
+            <p>Input the location the audio source should be moved to:</p>
+            <div class="margin-above">
+                <input type="number" id="audio-source-move-location" min="1" step="1">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" data-modal-action="hide" id="audio-source-move-button">Move</button>
+        </div>
+    </div></div>
+
 
     <!-- Scanning inputs modal -->
     <div id="scanning-inputs-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
@@ -805,35 +835,52 @@
 
 
     <!-- Anki cards modal -->
-    <div id="anki-cards-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content">
+    <div id="anki-cards-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-full">
         <div class="modal-header">
             <div class="modal-title">Anki Cards</div>
-            <div class="modal-header-button-container">
-                <div class="modal-header-button-group">
-                    <button type="button" class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
-                    <button type="button" class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
-                </div>
-            </div>
         </div>
         <div>
-            <div class="tabs-container">
-                <div class="tabs">
-                    <label class="tab">
-                        <input type="radio" name="anki-card-primary-type" data-value="terms" data-anki-card-menu="anki-card-terms-field-menu" checked>
-                        <div class="tab-inner"><span class="tab-label">Terms</span></div>
-                    </label>
-                    <label class="tab">
-                        <input type="radio" name="anki-card-primary-type" data-value="kanji" data-anki-card-menu="anki-card-kanji-field-menu">
-                        <div class="tab-inner"><span class="tab-label">Kanji</span></div>
-                    </label>
-                </div>
-                <div class="tabs-right" hidden>
-                    <button type="button" class="icon-button" data-menu-position="below left" id="anki-card-primary-type-menu-button"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+            <div class="anki-card-tabs-container">
+                <div class="tabs" id="anki-cards-tabs"></div>
+                <div id="anki-cards-new-format" class="advanced-only">
+                    <button type="button" class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="plus-thick"></span></span></button>
                 </div>
             </div>
             <div class="modal-separator-line"></div>
         </div>
-        <div class="modal-body anki-card" id="anki-card-primary" data-anki-card-type="terms" data-anki-card-menu="anki-card-terms-field-menu">
+        <div class="modal-body anki-card" id="anki-card-primary" data-card-format-index="0" data-anki-card-menu="anki-card-term-field-menu">
+            <div class="settings-item advanced-only"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Name</div>
+                </div>
+                <div class="settings-item-right">
+                    <input type="text" class="anki-card-name" data-setting="anki.cardFormats.[0].name">
+                </div>
+            </div></div>
+            <div class="settings-item advanced-only"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Dictionary Type</div>
+                </div>
+                <div class="settings-item-right">
+                    <select class="anki-card-type">
+                        <option value="term">Term</option>
+                        <option value="kanji">Kanji</option>
+                    </select>
+                </div>
+            </div></div>
+            <div class="settings-item advanced-only"><div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Button</div>
+                </div>
+                <div class="settings-item-right">
+                    <select class="anki-card-icon select-icon icon color-icon" data-icon="big-circle">
+                        <option value="big-circle">Big Circle</option>
+                        <option value="small-circle">Small Circle</option>
+                        <option value="big-square">Square</option>
+                        <option value="big-diamond">Diamond</option>
+                    </select>
+                </div>
+            </div></div>
             <div class="settings-item"><div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Deck</div>
@@ -850,6 +897,7 @@
                     <select class="anki-card-model"></select>
                 </div>
             </div></div>
+            <hr>
             <div class="anki-card-fields">
                 <div class="anki-card-field-name-header" data-persistent="true">Field</div>
                 <div class="anki-card-field-input-header" data-persistent="true">Value</div>
@@ -857,6 +905,7 @@
             </div>
         </div>
         <div class="modal-footer">
+            <button type="button" class="danger anki-card-delete-format-button advanced-only">Delete Format</button>
             <button type="button" class="low-emphasis" data-modal-action="show,anki-cards-info">Help</button>
             <button type="button" data-modal-action="hide">Close</button>
         </div>
@@ -1123,6 +1172,10 @@
                         <td>Sentence, quote, or phrase that the term or kanji appears in from the source content, with furigana added.</td>
                     </tr>
                     <tr>
+                        <td><code class="anki-field-marker">{sentence-furigana-plain}</code></td>
+                        <td>Sentence, quote, or phrase that the term or kanji appears in from the source content, with furigana added in brackets.</td>
+                    </tr>
+                    <tr>
                         <td><code class="anki-field-marker">{url}</code></td>
                         <td>Address of the web page in which the term or kanji appeared in.</td>
                     </tr>
@@ -1133,6 +1186,29 @@
             <button type="button" data-modal-action="hide">Close</button>
         </div>
     </div></div>
+
+    <div id="anki-card-format-remove-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Confirm Card Format Deletion</div></div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete the <em id="anki-card-format-remove-name"></em> card format?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Cancel</button>
+            <button type="button" class="danger" id="anki-card-format-remove-confirm-button">Delete Format</button>
+        </div>
+    </div></div>
+
+    <div id="anki-add-card-format-maximum-modal" class="modal" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-small">
+        <div class="modal-header"><div class="modal-title">Maximum Card Formats Reached</div></div>
+        <div class="modal-body">
+            <p>The number of card formats is limited to 5.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="low-emphasis" data-modal-action="hide">Close</button>
+        </div>
+    </div></div>
+
+
 
 
     <!-- Anki field template modals -->
@@ -1206,10 +1282,9 @@
             </div>
             <textarea autocomplete="off" spellcheck="false" id="generate-anki-notes-textarea" class="no-wrap margin-above" data-tab-action="indent,4"></textarea>
             <div class="generate-anki-notes-test-container margin-above">
-                <p>
-                    Active Anki deck: <code id="generate-anki-notes-active-deck"></code><br>
-                    Active Anki model: <code id="generate-anki-notes-active-model"></code>
-                </p>
+                <div>Active Anki Flashcard Format: <select id="generate-anki-flashcard-format"></select></div>
+                <div>Active Anki deck: <code id="generate-anki-notes-active-deck"></code></div>
+                <div>Active Anki model: <code id="generate-anki-notes-active-model"></code></div>
                 <div class="generate-anki-notes-test-table margin-above">
                     <div class="generate-anki-notes-test-table-header">Test word</div>
                     <div></div>

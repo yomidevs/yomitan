@@ -20,6 +20,7 @@ import {ExtensionError} from '../../core/extension-error.js';
 import {readResponseJson} from '../../core/json.js';
 import {log} from '../../core/log.js';
 import {toError} from '../../core/to-error.js';
+import {getKebabCase} from '../../data/anki-template-util.js';
 import {DictionaryWorker} from '../../dictionary/dictionary-worker.js';
 import {querySelectorNotNull} from '../../dom/query-selector.js';
 import {DictionaryController} from './dictionary-controller.js';
@@ -643,6 +644,24 @@ export class DictionaryImportController {
         const errors2 = await this._addDictionarySettings(result, profilesDictionarySettings);
 
         await this._settingsController.application.api.triggerDatabaseUpdated('dictionary', 'import');
+
+        // Only runs if updating a dictionary
+        if (profilesDictionarySettings !== null) {
+            const options = await this._settingsController.getOptionsFull();
+            const {profiles} = options;
+
+            for (const profile of profiles) {
+                for (const cardFormat of profile.options.anki.cardFormats) {
+                    const ankiTermFields = cardFormat.fields;
+                    const oldFieldSegmentRegex = new RegExp(getKebabCase(profilesDictionarySettings[profile.id].name), 'g');
+                    const newFieldSegment = getKebabCase(result.title);
+                    for (const key of Object.keys(ankiTermFields)) {
+                        ankiTermFields[key].value = ankiTermFields[key].value.replace(oldFieldSegmentRegex, newFieldSegment);
+                    }
+                }
+            }
+            await this._settingsController.setAllSettings(options);
+        }
 
         if (errors.length > 0) {
             errors.push(new Error(`Dictionary may not have been imported properly: ${errors.length} error${errors.length === 1 ? '' : 's'} reported.`));

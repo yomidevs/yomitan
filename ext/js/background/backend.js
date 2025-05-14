@@ -184,6 +184,7 @@ export class Backend {
             ['findAnkiNotes',                this._onApiFindAnkiNotes.bind(this)],
             ['openCrossFramePort',           this._onApiOpenCrossFramePort.bind(this)],
             ['getLanguageSummaries',         this._onApiGetLanguageSummaries.bind(this)],
+            ['heartbeat',                    this._onApiHeartbeat.bind(this)],
         ]);
 
         /** @type {import('api').PmApiMap} */
@@ -247,6 +248,7 @@ export class Backend {
 
         // On Chrome, this is for receiving messages sent with navigator.serviceWorker, which has the benefit of being able to transfer objects, but doesn't accept callbacks
         (/** @type {ServiceWorkerGlobalScope & typeof globalThis} */ (globalThis)).addEventListener('message', this._onPmMessage.bind(this));
+        (/** @type {ServiceWorkerGlobalScope & typeof globalThis} */ (globalThis)).addEventListener('messageerror', this._onPmMessageError.bind(this));
 
         if (this._canObservePermissionsChanges()) {
             const onPermissionsChanged = this._onWebExtensionEventWrapper(this._onPermissionsChanged.bind(this));
@@ -303,6 +305,7 @@ export class Backend {
                     // connectToBackend2
                     e.ports[0].onmessage = this._onPmMessage.bind(this);
                 });
+                sharedWorkerBridge.port.addEventListener('messageerror', this._onPmMessageError.bind(this));
                 sharedWorkerBridge.port.start();
             }
             try {
@@ -318,6 +321,8 @@ export class Backend {
             this._options = await this._optionsUtil.load();
 
             this._applyOptions('background');
+
+            this._attachOmniboxListener();
 
             const options = this._getProfileOptions({current: true}, false);
             if (options.general.showGuide) {
@@ -448,6 +453,16 @@ export class Backend {
         const {action, params} = event.data;
         return invokeApiMapHandler(this._pmApiMap, action, params, [event.ports], () => {});
     }
+
+    /**
+     * @param {MessageEvent<import('api').PmApiMessageAny>} event
+     */
+    _onPmMessageError(event) {
+        const error = new ExtensionError('Backend: Error receiving message via postMessage');
+        error.data = event;
+        log.error(error);
+    }
+
 
     /**
      * @param {chrome.tabs.ZoomChangeInfo} event
@@ -589,16 +604,36 @@ export class Backend {
     }
 
     /**
+     * Removes all fields except the first field from an array of notes
+     * @param {import('anki').Note[]} notes
+     * @returns {import('anki').Note[]}
+     */
+    _stripNotesArray(notes) {
+        const newNotes = structuredClone(notes);
+        for (let i = 0; i < newNotes.length; i++) {
+            if (Object.keys(newNotes[i].fields).length === 0) { continue; }
+            const [firstField, firstFieldValue] = Object.entries(newNotes[i].fields)[0];
+            newNotes[i].fields = {};
+            newNotes[i].fields[firstField] = firstFieldValue;
+        }
+        return newNotes;
+    }
+
+    /**
      * @param {import('anki').Note[]} notes
      * @returns {Promise<import('backend').CanAddResults>}
      */
     async partitionAddibleNotes(notes) {
+        // strip all fields except the first from notes before dupe checking
+        // minimizes the amount of data being sent and reduce network latency and AnkiConnect latency
+        const strippedNotes = this._stripNotesArray(notes);
+
         // `allowDuplicate` is on for all notes by default, so we temporarily set it to false
         // to check which notes are duplicates.
-        const notesNoDuplicatesAllowed = notes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}}));
+        const notesNoDuplicatesAllowed = strippedNotes.map((note) => ({...note, options: {...note.options, allowDuplicate: false}}));
 
         // If only older AnkiConnect available, use `canAddNotes`.
-        const withDuplicatesAllowed = await this._anki.canAddNotes(notes);
+        const withDuplicatesAllowed = await this._anki.canAddNotes(strippedNotes);
         const noDuplicatesAllowed = await this._anki.canAddNotes(notesNoDuplicatesAllowed);
 
         /** @type {{ note: import('anki').Note, isDuplicate: boolean }[]} */
@@ -1031,6 +1066,11 @@ export class Backend {
         return getLanguageSummaries();
     }
 
+    /** @type {import('api').ApiHandler<'heartbeat'>} */
+    _onApiHeartbeat() {
+        return void 0;
+    }
+
     // Command handlers
 
     /**
@@ -1399,6 +1439,18 @@ export class Backend {
             } else {
                 chrome.contextMenus.remove('yomitan_lookup', () => this._checkLastError(chrome.runtime.lastError));
             }
+        } catch (e) {
+            log.error(e);
+        }
+    }
+
+    /** */
+    _attachOmniboxListener() {
+        try {
+            chrome.omnibox.onInputEntered.addListener((text) => {
+                const newURL = 'search.html?query=' + encodeURIComponent(text);
+                void chrome.tabs.create({url: newURL});
+            });
         } catch (e) {
             log.error(e);
         }
