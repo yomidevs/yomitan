@@ -27,6 +27,7 @@ import {
     normalizeCJKCompatibilityCharacters as normalizeCJKCompatibilityCharactersFunction,
     normalizeCombiningCharacters as normalizeCombiningCharactersFunction,
 } from './japanese.js';
+import {convertVariants} from '../../../lib/kanji-processor.js';
 
 /** @type {import('language').TextProcessor<boolean>} */
 export const convertHalfWidthCharacters = {
@@ -35,7 +36,6 @@ export const convertHalfWidthCharacters = {
     options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? convertHalfWidthKanaToFullWidth(str) : str),
 };
-
 
 /** @type {import('language').TextProcessor<boolean>} */
 export const alphabeticToHiragana = {
@@ -107,4 +107,12 @@ export const normalizeCJKCompatibilityCharacters = {
     description: '㌀ → アパート',
     options: basicTextProcessorOptions,
     process: (str, setting) => (setting ? normalizeCJKCompatibilityCharactersFunction(str) : str),
+};
+
+/** @type {import('language').TextProcessor<boolean>} */
+export const standardizeKanji = {
+    name: 'Convert kanji variants to their modern standard form',
+    description: '萬 → 万',
+    options: basicTextProcessorOptions,
+    process: (str, setting) => (setting ? convertVariants(str) : str),
 };

@@ -45,6 +45,7 @@ import {
     convertHiraganaToKatakana,
     normalizeCJKCompatibilityCharacters,
     normalizeCombiningCharacters,
+    standardizeKanji,
 } from './ja/japanese-text-preprocessors.js';
 import {japaneseTransforms} from './ja/japanese-transforms.js';
 import {isStringPartiallyJapanese} from './ja/japanese.js';
@@ -302,6 +303,7 @@ const languageDescriptors = [
             alphanumericWidthVariants,
             convertHiraganaToKatakana,
             collapseEmphaticSequences,
+            standardizeKanji,
         },
         languageTransforms: japaneseTransforms,
     },
