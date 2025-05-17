@@ -40,9 +40,13 @@ export class ProfileController {
         /** @type {HTMLSelectElement} */
         this._profileCopySourceSelect = querySelectorNotNull(document, '#profile-copy-source-select');
         /** @type {HTMLElement} */
+        this._resetProfileNameElement = querySelectorNotNull(document, '#profile-reset-name');
+        /** @type {HTMLElement} */
         this._removeProfileNameElement = querySelectorNotNull(document, '#profile-remove-name');
         /** @type {HTMLButtonElement} */
         this._profileAddButton = querySelectorNotNull(document, '#profile-add-button');
+        /** @type {HTMLButtonElement} */
+        this._profileResetConfirmButton = querySelectorNotNull(document, '#profile-reset-confirm-button');
         /** @type {HTMLButtonElement} */
         this._profileRemoveConfirmButton = querySelectorNotNull(document, '#profile-remove-confirm-button');
         /** @type {HTMLButtonElement} */
@@ -82,6 +86,7 @@ export class ProfileController {
         const {platform: {os}} = await this._settingsController.application.api.getEnvironmentInfo();
         this._profileConditionsUI.os = os;
 
+        this._profileResetModal = this._modalController.getModal('profile-reset');
         this._profileRemoveModal = this._modalController.getModal('profile-remove');
         this._profileCopyModal = this._modalController.getModal('profile-copy');
         this._profileConditionsModal = this._modalController.getModal('profile-conditions');
@@ -90,6 +95,7 @@ export class ProfileController {
 
         if (this._profileActiveSelect !== null) { this._profileActiveSelect.addEventListener('change', this._onProfileActiveChange.bind(this), false); }
         if (this._profileAddButton !== null) { this._profileAddButton.addEventListener('click', this._onAdd.bind(this), false); }
+        if (this._profileResetConfirmButton !== null) { this._profileResetConfirmButton.addEventListener('click', this._onResetConfirm.bind(this), false); }
         if (this._profileRemoveConfirmButton !== null) { this._profileRemoveConfirmButton.addEventListener('click', this._onDeleteConfirm.bind(this), false); }
         if (this._profileCopyConfirmButton !== null) { this._profileCopyConfirmButton.addEventListener('click', this._onCopyConfirm.bind(this), false); }
 
@@ -202,6 +208,26 @@ export class ProfileController {
 
         // Update profile index
         this._settingsController.profileIndex = index;
+    }
+
+    /**
+     * @param {number} profileIndex
+     */
+    async resetProfile(profileIndex) {
+        const profile = this._getProfile(profileIndex);
+        if (profile === null) { return; }
+
+        const defaultOptions = await this._settingsController.getDefaultOptions();
+        const defaultProfileOptions = defaultOptions.profiles[0];
+        defaultProfileOptions.name = profile.name;
+
+        await this._settingsController.modifyGlobalSettings([{
+            action: 'set',
+            path: `profiles[${profileIndex}]`,
+            value: defaultProfileOptions,
+        }]);
+
+        await this._settingsController.refresh();
     }
 
     /**
@@ -327,6 +353,18 @@ export class ProfileController {
     /**
      * @param {number} profileIndex
      */
+    openResetProfileModal(profileIndex) {
+        const profile = this._getProfile(profileIndex);
+        if (profile === null || this.profileCount <= 1) { return; }
+
+        /** @type {HTMLElement} */ (this._resetProfileNameElement).textContent = profile.name;
+        /** @type {import('./modal.js').Modal} */ (this._profileResetModal).node.dataset.profileIndex = `${profileIndex}`;
+        /** @type {import('./modal.js').Modal} */ (this._profileResetModal).setVisible(true);
+    }
+
+    /**
+     * @param {number} profileIndex
+     */
     openDeleteProfileModal(profileIndex) {
         const profile = this._getProfile(profileIndex);
         if (profile === null || this.profileCount <= 1) { return; }
@@ -431,6 +469,20 @@ export class ProfileController {
     /** */
     _onAdd() {
         void this.duplicateProfile(this._settingsController.profileIndex);
+    }
+
+    /** */
+    _onResetConfirm() {
+        const modal = /** @type {import('./modal.js').Modal} */ (this._profileResetModal);
+        modal.setVisible(false);
+        const {node} = modal;
+        const profileIndex = node.dataset.profileIndex;
+        delete node.dataset.profileIndex;
+
+        const validProfileIndex = this._tryGetValidProfileIndex(profileIndex);
+        if (validProfileIndex === null) { return; }
+
+        void this.resetProfile(validProfileIndex);
     }
 
     /** */
@@ -775,6 +827,9 @@ class ProfileEntry {
                 break;
             case 'duplicate':
                 void this._profileController.duplicateProfile(this._index);
+                break;
+            case 'reset':
+                this._profileController.openResetProfileModal(this._index);
                 break;
             case 'delete':
                 this._profileController.openDeleteProfileModal(this._index);
