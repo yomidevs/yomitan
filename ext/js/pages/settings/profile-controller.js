@@ -213,7 +213,7 @@ export class ProfileController {
 
         // Get indices
         let profileCurrentNew = this._profileCurrent;
-        const settingsProfileIndex = this._settingsController.profileIndex;
+        const settingsProfileIndex = this._profileCurrent;
 
         // Construct settings modifications
         /** @type {import('settings-modifications').Modification[]} */
@@ -391,6 +391,8 @@ export class ProfileController {
         this._profiles = profiles;
         this._profileCurrent = profileCurrent;
 
+        const settingsProfileIndex = this._settingsController.profileIndex;
+
         // Udpate UI
         this._updateProfileSelectOptions();
 
@@ -398,9 +400,9 @@ export class ProfileController {
 
         // Update profile conditions
         this._profileConditionsUI.cleanup();
-        const conditionsProfile = this._getProfile(this._profileConditionsIndex !== null ? this._profileConditionsIndex : profileCurrent);
+        const conditionsProfile = this._getProfile(this._profileConditionsIndex !== null ? this._profileConditionsIndex : settingsProfileIndex);
         if (conditionsProfile !== null) {
-            void this._profileConditionsUI.prepare(profileCurrent);
+            void this._profileConditionsUI.prepare(settingsProfileIndex);
         }
 
         // Udpate profile entries
