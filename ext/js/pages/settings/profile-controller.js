@@ -147,6 +147,7 @@ export class ProfileController {
         const profileEntry = this._getProfileEntry(profileIndex);
         if (profileEntry !== null) { profileEntry.setIsDefault(true); }
 
+        this._settingsController.profileIndex = profileIndex;
         await this._settingsController.setGlobalSetting('profileCurrent', profileIndex);
     }
 
@@ -463,7 +464,6 @@ export class ProfileController {
         const value = this._tryGetValidProfileIndex(element.value);
         if (value === null) { return; }
         void this.setDefaultProfile(value);
-        this._settingsController.profileIndex = value;
     }
 
     /** */
