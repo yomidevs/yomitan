@@ -428,6 +428,24 @@
             "description": "Turn off Yomitan's internal parser for languages with spaces."
         }
     ],
+    "ja": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "character"
+            },
+            "description": "Scan text one character at a time."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "letter"
+            },
+            "description": "Lookup words by letter in the dictionary."
+        }
+    ],
     "ko": [
         {
             "modification": {
@@ -790,6 +808,42 @@
                 "value": "word"
             },
             "description": "Lookup whole words in the dictionary."
+        }
+    ],
+    "yue": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "character"
+            },
+            "description": "Scan text one character at a time."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "letter"
+            },
+            "description": "Lookup words by letter in the dictionary."
+        }
+    ],
+    "zh": [
+        {
+            "modification": {
+                "action": "set",
+                "path": "scanning.scanResolution",
+                "value": "character"
+            },
+            "description": "Scan text one character at a time."
+        },
+        {
+            "modification": {
+                "action": "set",
+                "path": "translation.searchResolution",
+                "value": "letter"
+            },
+            "description": "Lookup words by letter in the dictionary."
         }
     ]
 }
