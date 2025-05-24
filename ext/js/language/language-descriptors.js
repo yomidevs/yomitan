@@ -225,6 +225,14 @@ const languageDescriptors = [
         languageTransforms: ancientGreekTransforms,
     },
     {
+        // no 2 letter iso for hawaiian
+        iso: 'haw',
+        iso639_3: 'haw',
+        name: 'Hawaiian',
+        exampleText: 'heluhelu',
+        textPreprocessors: capitalizationPreprocessors,
+    },
+    {
         iso: 'he',
         iso639_3: 'heb',
         name: 'Hebrew',
