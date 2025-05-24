@@ -51,6 +51,7 @@ import {SortFrequencyDictionaryController} from './sort-frequency-dictionary-con
 import {StatusFooter} from './status-footer.js';
 import {StorageController} from './storage-controller.js';
 import {TranslationTextReplacementsController} from './translation-text-replacements-controller.js';
+import {YomitanApiController} from './yomitan-api-controller.js';
 
 /**
  * @param {GenericSettingController} genericSettingController
@@ -168,6 +169,9 @@ await Application.main(true, async (application) => {
 
     const mecabController = new MecabController(application.api);
     mecabController.prepare();
+
+    const yomitanApiController = new YomitanApiController(application.api);
+    yomitanApiController.prepare();
 
     const collapsibleDictionaryController = new CollapsibleDictionaryController(settingsController);
     preparePromises.push(collapsibleDictionaryController.prepare());
