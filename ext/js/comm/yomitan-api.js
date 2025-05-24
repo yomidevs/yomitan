@@ -53,10 +53,13 @@ export class YomitanApi {
     /**
      * @param {boolean} enabled
      */
-    setEnabled(enabled) {
+    async setEnabled(enabled) {
         this._enabled = !!enabled;
         if (!this._enabled && this._port !== null) {
             this._clearPort();
+        }
+        if (this._enabled) {
+            await this.startApiServer();
         }
     }
 

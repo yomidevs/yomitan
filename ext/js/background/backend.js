@@ -1446,7 +1446,7 @@ export class Backend {
 
         this._mecab.setEnabled(options.parsing.enableMecabParser && enabled);
 
-        this._yomitanApi.setEnabled(options.general.enableYomitanApi && enabled);
+        void this._yomitanApi.setEnabled(options.general.enableYomitanApi && enabled);
 
         if (options.clipboard.enableBackgroundMonitor && enabled) {
             this._clipboardMonitor.start();
