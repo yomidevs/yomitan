@@ -155,31 +155,6 @@ export class YomitanApi {
     }
 
     /**
-     * @param {string} action
-     * @param {import('core').SerializableObject} params
-     * @returns {Promise<unknown>}
-     */
-    _invoke(action, params) {
-        return new Promise((resolve, reject) => {
-            if (this._port === null) {
-                reject(new Error('Port disconnected'));
-                return;
-            }
-
-            const sequence = this._sequence++;
-
-            const timer = setTimeout(() => {
-                this._invocations.delete(sequence);
-                reject(new Error(`Yomitan Api invoke timed out after ${this._timeout}ms`));
-            }, this._timeout);
-
-            this._invocations.set(sequence, {resolve, reject, timer});
-
-            this._port.postMessage({action, params, sequence});
-        });
-    }
-
-    /**
      * @returns {Promise<void>}
      */
     async _setupPortWrapper() {
