@@ -1014,23 +1014,23 @@ export class Backend {
             throw new Error('Insufficient permissions');
         }
 
-        // const disconnect = !this._yomitanApi.isConnected();
-        // try {
-        //     const version = await this._yomitanApi.getVersion();
-        //     if (version === null) {
-        //         throw new Error('Could not connect to native MeCab component');
-        //     }
+        const disconnect = !this._yomitanApi.isConnected();
+        try {
+            const version = await this._yomitanApi.getRemoteVersion();
+            if (version === null) {
+                throw new Error('Could not connect to native Yomitan API component');
+            }
 
-        //     const localVersion = this._yomitanApi.getLocalVersion();
-        //     if (version !== localVersion) {
-        //         throw new Error(`MeCab component version not supported: ${version}`);
-        //     }
-        // } finally {
-        //     // Disconnect if the connection was previously disconnected
-        //     if (disconnect && this._yomitanApi.isEnabled() && this._yomitanApi.isActive()) {
-        //         this._yomitanApi.disconnect();
-        //     }
-        // }
+            const localVersion = this._yomitanApi.getLocalVersion();
+            if (version !== localVersion) {
+                throw new Error(`Yomitan API component version not supported: ${version}`);
+            }
+        } finally {
+            // Disconnect if the connection was previously disconnected
+            if (disconnect && this._yomitanApi.isEnabled() && this._yomitanApi.isActive()) {
+                this._yomitanApi.disconnect();
+            }
+        }
 
         return true;
     }

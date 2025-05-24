@@ -87,16 +87,35 @@ export class YomitanApi {
         return this._version;
     }
 
+    /**
+     * @returns {Promise<?number>}
+     */
+    async getRemoteVersion() {
+        try {
+            await this._setupPortWrapper();
+        } catch (e) {
+            // NOP
+        }
+        return this._remoteVersion;
+    }
+
     // Private
 
     /**
      * @param {unknown} message
      */
-    _onMessage(message) {
+    async _onMessage(message) {
         if (typeof message !== 'object' || message === null) { return; }
+        console.log('Yomitan API _onMessage');
+        console.log(message);
 
-        const {sequence, data} = /** @type {import('core').SerializableObject} */ (message);
+        const {action, params, sequence, data} = /** @type {import('core').SerializableObject} */ (message);
         if (typeof sequence !== 'number') { return; }
+
+        if (this._port !== null) {
+            const placeholder_data = 'placeholder data';
+            this._port.postMessage({action, params, data: placeholder_data, sequence});
+        }
 
         const invocation = this._invocations.get(sequence);
         if (typeof invocation === 'undefined') { return; }
@@ -172,25 +191,27 @@ export class YomitanApi {
         this._eventListeners.addListener(port.onDisconnect, this._onDisconnect.bind(this));
         this._port = port;
 
-        try {
-            const data = await this._invoke('get_version', {});
-            if (typeof data !== 'object' || data === null) {
-                throw new Error('Invalid version');
-            }
-            const {version} = /** @type {import('core').SerializableObject} */ (data);
-            if (typeof version !== 'number') {
-                throw new Error('Invalid version');
-            }
-            this._remoteVersion = version;
-            if (version !== this._version) {
-                throw new Error(`Unsupported Yomitan Api native messenger version ${version}. Yomitan supports version ${this._version}.`);
-            }
-        } catch (e) {
-            if (this._port === port) {
-                this._clearPort();
-            }
-            throw e;
-        }
+        this._remoteVersion = 1;
+
+        // try {
+        //     const data = await this._invoke('get_version', {});
+        //     if (typeof data !== 'object' || data === null) {
+        //         throw new Error('Invalid version');
+        //     }
+        //     const {version} = /** @type {import('core').SerializableObject} */ (data);
+        //     if (typeof version !== 'number') {
+        //         throw new Error('Invalid version');
+        //     }
+        //     this._remoteVersion = version;
+        //     if (version !== this._version) {
+        //         throw new Error(`Unsupported Yomitan Api native messenger version ${version}. Yomitan supports version ${this._version}.`);
+        //     }
+        // } catch (e) {
+        //     if (this._port === port) {
+        //         this._clearPort();
+        //     }
+        //     throw e;
+        // }
     }
 
     /**
