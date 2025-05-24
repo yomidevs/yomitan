@@ -92,10 +92,8 @@ export class YomitanApi {
      * @returns {Promise<?number>}
      */
     async getRemoteVersion() {
-        try {
-            await this._setupPortWrapper();
-        } catch (e) {
-            log.error(e);
+        if (this._port === null) {
+            await this.startApiServer();
         }
         return this._remoteVersion;
     }
