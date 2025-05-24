@@ -97,6 +97,9 @@ type AllTextProcessors = {
             convertHaToTaMarbuta: TextProcessor<boolean>;
         };
     };
+    bg: {
+        pre: CapitalizationPreprocessors;
+    };
     cs: {
         pre: CapitalizationPreprocessors;
     };
