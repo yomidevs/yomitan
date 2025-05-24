@@ -16,6 +16,7 @@
  */
 
 import {EventListenerCollection} from '../core/event-listener-collection.js';
+import {log} from '../core/log.js';
 import {toError} from '../core/to-error.js';
 
 /** */
@@ -94,9 +95,22 @@ export class YomitanApi {
         try {
             await this._setupPortWrapper();
         } catch (e) {
-            // NOP
+            log.error(e);
         }
         return this._remoteVersion;
+    }
+
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async startApiServer() {
+        try {
+            await this._setupPortWrapper();
+            return true;
+        } catch (e) {
+            log.error(e);
+            return false;
+        }
     }
 
     // Private
