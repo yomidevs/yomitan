@@ -172,6 +172,36 @@
                     <input type="number" min="1" data-setting="general.maxResults">
                 </div>
             </div></div>
+            <div class="settings-item advanced-only">
+                <div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-invalid-indicator"></div>
+                        <div class="settings-item-label">
+                            Enable Yomitan API
+                        </div>
+                        <div class="settings-item-description">
+                            Enable support for sending local web requests to fetch data from Yomitan.
+                            <a tabindex="0" class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                        </div>
+                    </div>
+                    <div class="settings-item-right">
+                        <label class="toggle"><input type="checkbox" class="permissions-toggle" data-permissions-setting="general.enableYomitanApi" data-required-permissions="nativeMessaging"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    </div>
+                </div>
+                <div class="settings-item-children more" hidden>
+                    <p>
+                        To activate the Yomitan API, a native messaging component must be installed.
+                        A setup guide can be found <a href="https://github.com/yomidevs/yomitan-api-installer/blob/master/README.md" target="_blank" rel="noopener noreferrer">here</a>.
+                    </p>
+                    <div class="margin-above flex-row-nowrap">
+                        <button type="button" id="test-yomitan-api-button">Test</button>
+                        <div id="test-yomitan-api-results" class="flex-margin-left" hidden></div>
+                    </div>
+                    <p class="margin-above">
+                        <a tabindex="0" class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                    </p>
+                </div>
+            </div>
         </div>
 
     <!-- Dictionaries -->
