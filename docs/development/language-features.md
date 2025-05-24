@@ -42,7 +42,7 @@ That's it! Your language should now be selectable from the dropdown, and may wor
 If you want to suggest to the user some dictionaries to download, you can make a pull request similar to:
 https://github.com/yomidevs/yomitan/pull/1951/files
 
-Please make sure these dictionary suggestions are open source so Yomitan does not inadvertently promote piracy.
+Please make sure these dictionary suggestions are properly licensed as Yomitan does not promote distribution of dictionaries without proper, open source licenses.
 
 ## Language Features
 
