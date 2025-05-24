@@ -127,7 +127,8 @@
                                     "stickySearchHeader",
                                     "fontFamily",
                                     "fontSize",
-                                    "lineHeight"
+                                    "lineHeight",
+                                    "enableYomitanApi"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -334,6 +335,10 @@
                                         "default": "descending"
                                     },
                                     "stickySearchHeader": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "enableYomitanApi": {
                                         "type": "boolean",
                                         "default": false
                                     }

@@ -325,6 +325,7 @@ export class OptionsUtil {
                 showIframePopupsInRootFrame: false,
                 useSecurePopupFrameUrl: true,
                 usePopupShadowDom: true,
+                enableYomitanApi: false,
             },
 
             audio: {

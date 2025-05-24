@@ -71,6 +71,7 @@ function createProfileOptionsTestData1() {
             showIframePopupsInRootFrame: false,
             useSecurePopupFrameUrl: true,
             usePopupShadowDom: true,
+            enableYomitanApi: false,
         },
         audio: {
             enabled: true,
@@ -312,6 +313,7 @@ function createProfileOptionsUpdatedTestData1() {
             sortFrequencyDictionary: null,
             sortFrequencyDictionaryOrder: 'descending',
             stickySearchHeader: false,
+            enableYomitanApi: false,
         },
         audio: {
             enabled: true,
