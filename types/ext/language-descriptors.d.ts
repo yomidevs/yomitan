@@ -144,6 +144,9 @@ type AllTextProcessors = {
             convertLatinToGreek: TextProcessor<boolean>;
         };
     };
+    haw: {
+        pre: CapitalizationPreprocessors;
+    };
     he: Record<string, never>;
     hi: Record<string, never>;
     hu: {
