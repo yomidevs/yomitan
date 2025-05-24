@@ -121,7 +121,7 @@ export function getRequiredPermissionsForAnkiFieldValue(fieldValue) {
 export function hasRequiredPermissionsForOptions(permissions, options) {
     const permissionsSet = new Set(permissions.permissions);
 
-    if (!permissionsSet.has('nativeMessaging') && options.parsing.enableMecabParser) {
+    if (!permissionsSet.has('nativeMessaging') && (options.parsing.enableMecabParser || options.general.enableYomitanApi)) {
         return false;
     }
 
