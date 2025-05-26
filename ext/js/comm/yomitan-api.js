@@ -267,21 +267,15 @@ export class YomitanApi {
                 dictionaryStylesMap: new Map(),
             };
         } else {
+            const invokeParams = {
+                text: text,
+                details: {},
+                optionsContext: {index: profileIndex},
+            };
+            const dictionaryEntries = (await this._invoke('kanjiFind', invokeParams));
             /** @type {import('anki-note-builder.js').CommonData} */
             return {
-                dictionaryEntry: {
-                    type: 'kanji',
-                    character: '',
-                    dictionary: '',
-                    dictionaryIndex: 0,
-                    dictionaryAlias: '',
-                    onyomi: [],
-                    kunyomi: [],
-                    tags: [],
-                    stats: {},
-                    definitions: [],
-                    frequencies: [],
-                },
+                dictionaryEntry: dictionaryEntries[0],
                 resultOutputMode: 'group',
                 cardFormat: {
                     type: 'term',
