@@ -17,6 +17,7 @@
  */
 
 import {Handlebars} from '../../lib/handlebars.js';
+import {NodeFilter} from '../../lib/linkedom.js';
 import {createAnkiNoteData} from '../data/anki-note-data-creator.js';
 import {getPronunciationsOfType, isNonNounVerbOrAdjective} from '../dictionary/dictionary-data-util.js';
 import {createPronunciationDownstepPosition, createPronunciationGraph, createPronunciationGraphJJ, createPronunciationText} from '../display/pronunciation-generator.js';
@@ -608,7 +609,8 @@ export class AnkiTemplateRenderer {
      * @param {?RegExp} datasetKeyIgnorePattern
      */
     _normalizeHtml(root, styleApplier, datasetKeyIgnorePattern) {
-        const {ELEMENT_NODE, TEXT_NODE} = Node;
+        const TEXT_NODE = this._document.TEXT_NODE;
+        const ELEMENT_NODE = this._document.ELEMENT_NODE;
         const treeWalker = this._document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
         /** @type {HTMLElement[]} */
         const elements = [];
